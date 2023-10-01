@@ -14,7 +14,7 @@ const AdminAccess = () => {
   const [tabId, setTabId] = useState('tabTableEditor')
 
   return (
-    <SectionContainer>
+    <SectionContainer useSectionTag>
       <div className="mb-16">
         <h2 className="h3">Build your app without leaving the dashboard</h2>
       </div>

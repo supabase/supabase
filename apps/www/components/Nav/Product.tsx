@@ -63,6 +63,7 @@ const Product = () => {
                           src={`${basePath}/${customer.imgUrl}`}
                           alt={customer.title}
                           layout="fill"
+                          role="img"
                           objectFit="contain"
                           className="dark:brightness-200 dark:contrast-0 dark:filter"
                         />

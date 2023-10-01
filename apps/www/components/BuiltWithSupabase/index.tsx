@@ -10,7 +10,7 @@ import Link from 'next/link'
 const BuiltExamples = () => {
   const { basePath } = useRouter()
   return (
-    <SectionContainer className="xl:pt-32">
+    <SectionContainer className="xl:pt-32" useSectionTag>
       <div className="text-center">
         <h3 className="h2">What can you build with Supabase?</h3>
         <p className="p">There are many example apps and starter projects to get you started.</p>
@@ -28,7 +28,7 @@ const BuiltExamples = () => {
             passHref
           >
             <a>
-              <Button type="default" icon={<IconGitHub />} size="small">
+              <Button type="default" icon={<IconGitHub role="presentation" />} size="small">
                 Official GitHub library
               </Button>
             </a>

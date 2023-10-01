@@ -8,14 +8,14 @@ interface TweetCard {
 
 function TweetCard(props: TweetCard) {
   return (
-    <div
+    <figure
       className="
       dark:bg-scale-300 border-scale-300 dark:border-scale-400
       rounded-2xl border bg-white p-6
       drop-shadow-sm
     "
     >
-      <div className="relative">
+      <figcaption className="relative">
         <div className="flex items-center gap-2">
           {props.img_url ? (
             <div className="h-10 w-10 overflow-hidden rounded-full border dark:border-gray-600">
@@ -25,6 +25,7 @@ function TweetCard(props: TweetCard) {
                 width="64"
                 height="64"
                 alt={`${props.handle} twitter image`}
+                role="img"
               />
             </div>
           ) : (
@@ -39,16 +40,16 @@ function TweetCard(props: TweetCard) {
               className="h-[12px] w-[12px]"
               fill="currentColor"
               viewBox="0 0 24 24"
-              aria-hidden="true"
+              role="presentation"
             >
               <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
             </svg>
           </div>
         </div>
-      </div>
+      </figcaption>
 
-      <p className="text-scale-900 mt-3 text-base">"{props.quote}"</p>
-    </div>
+      <blockquote className="text-scale-900 mt-3 text-base">"{props.quote}"</blockquote>
+    </figure>
   )
 }
 export default TweetCard

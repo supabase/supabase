@@ -189,7 +189,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
               undefined,
               showIcon &&
                 (loading ? (
-                  <IconLoader size={size} className={cn(loadingVariants({ loading }))} />
+                  <IconLoader
+                    size={size || undefined}
+                    className={cn(loadingVariants({ loading }))}
+                  />
                 ) : _iconLeft ? (
                   <IconContext.Provider value={{ contextSize: size }}>
                     {_iconLeft}
@@ -209,7 +212,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           <>
             {showIcon &&
               (loading ? (
-                <IconLoader size={size} className={cn(loadingVariants({ loading }))} />
+                <IconLoader size={size || undefined} className={cn(loadingVariants({ loading }))} />
               ) : _iconLeft ? (
                 <IconContext.Provider value={{ contextSize: size }}>
                   {_iconLeft}

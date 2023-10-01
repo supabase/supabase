@@ -30,6 +30,7 @@ function Badge({ color = 'brand', children, size, dot, className }: Props) {
           className={`${__styles.dot} ${__styles.color[color]}`}
           fill="currentColor"
           viewBox="0 0 8 8"
+          role="presentation"
         >
           <circle cx="4" cy="4" r="3" />
         </svg>

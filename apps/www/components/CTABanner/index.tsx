@@ -7,7 +7,7 @@ interface Props {
 
 const CTABanner = ({ darkerBg, className }: Props) => {
   return (
-    <div
+    <section
       className={[
         `bg-scale-200 grid grid-cols-12 items-center gap-4 border-t py-32 text-center px-16`,
         darkerBg && 'dark:bg-dark-900',
@@ -30,7 +30,7 @@ const CTABanner = ({ darkerBg, className }: Props) => {
           </Button>
         </a>
       </div>
-    </div>
+    </section>
   )
 }
 

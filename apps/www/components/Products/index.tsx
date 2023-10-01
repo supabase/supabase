@@ -61,7 +61,10 @@ const Products = (props: any) => {
   }
 
   return (
-    <SectionContainer className="!pt-0 grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-4 lg:gap-6 md:grid-cols-12">
+    <SectionContainer
+      className="!pt-0 grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-4 lg:gap-6 md:grid-cols-12"
+      useSectionTag
+    >
       <ProductCard
         className="col-span-6 lg:col-span-12 xl:col-span-6"
         alignLeft
@@ -72,13 +75,13 @@ const Products = (props: any) => {
         highlights={
           <ul className="flex flex-col gap-1 text-sm">
             <li>
-              <IconCheck className="inline h-4 w-4" /> 100% portable
+              <IconCheck role="presentation" className="inline h-4 w-4" /> 100% portable
             </li>
             <li>
-              <IconCheck className="inline h-4 w-4" /> Built-in Auth with RLS
+              <IconCheck role="presentation" className="inline h-4 w-4" /> Built-in Auth with RLS
             </li>
             <li>
-              <IconCheck className="inline h-4 w-4" /> Easy to extend
+              <IconCheck role="presentation" className="inline h-4 w-4" /> Easy to extend
             </li>
           </ul>
         }

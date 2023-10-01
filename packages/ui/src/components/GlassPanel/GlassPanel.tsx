@@ -52,6 +52,7 @@ const GlassPanel = ({
         <Image
           src={logoImage}
           alt={title}
+          role="img"
           layout="fill"
           objectFit="contain"
           objectPosition="left"

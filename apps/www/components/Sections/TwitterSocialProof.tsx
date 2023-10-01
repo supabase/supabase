@@ -33,14 +33,22 @@ function TwitterSocialProof() {
           <div className="my-8 flex justify-center gap-2">
             <Link href={'https://github.com/supabase/supabase/discussions'} passHref>
               <a target="_blank" tabIndex={-1}>
-                <Button size="small" iconRight={<IconMessageCircle size={14} />} type="default">
+                <Button
+                  size="small"
+                  iconRight={<IconMessageCircle size={14} role="presentation" />}
+                  type="default"
+                >
                   GitHub discussions
                 </Button>
               </a>
             </Link>
             <Link href={'https://discord.supabase.com/'} passHref>
               <a target="_blank" tabIndex={-1}>
-                <Button type="default" size="small" iconRight={<IconMessageCircle size={14} />}>
+                <Button
+                  type="default"
+                  size="small"
+                  iconRight={<IconMessageCircle size={14} role="presentation" />}
+                >
                   Discord
                 </Button>
               </a>

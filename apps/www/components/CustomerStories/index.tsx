@@ -15,7 +15,7 @@ const CustomerStories = ({ customerStories }: any) => {
   })
 
   return (
-    <SectionContainer>
+    <SectionContainer useSectionTag>
       <div className="mb-12">
         <SectionHeader
           title={'Infrastructure'}

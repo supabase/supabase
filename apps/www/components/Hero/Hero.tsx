@@ -18,7 +18,7 @@ const Hero = () => {
   }
 
   return (
-    <div className="relative -mt-[65px]">
+    <section className="relative -mt-[65px]">
       <SectionContainer className="pt-8 md:pt-16 overflow-hidden">
         <div className="relative">
           <div className="mx-auto">
@@ -68,7 +68,11 @@ const Hero = () => {
                       onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_documentation'])}
                       tabIndex={-1}
                     >
-                      <Button size="medium" type="default" icon={<IconBookOpen />}>
+                      <Button
+                        size="medium"
+                        type="default"
+                        icon={<IconBookOpen role="presentation" />}
+                      >
                         Documentation
                       </Button>
                     </a>
@@ -81,7 +85,7 @@ const Hero = () => {
           </div>
         </div>
       </SectionContainer>
-    </div>
+    </section>
   )
 }
 

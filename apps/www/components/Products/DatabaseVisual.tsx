@@ -57,6 +57,7 @@ const DatabaseVisual = () => {
           fill="none"
           className="absolute w-full h-full z-10 m-auto"
           xmlns="http://www.w3.org/2000/svg"
+          role="presentation"
         >
           <g filter="url(#filter5_bd_467_4905)">
             <path

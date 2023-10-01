@@ -20,7 +20,7 @@ function ProductIcon({ icon, color }: ProductIcon) {
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
-        aria-hidden="true"
+        role="presentation"
       >
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d={icon} />
       </svg>

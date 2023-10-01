@@ -81,6 +81,7 @@ const HeroFrameworks = ({ className }: { className?: string }) => {
                 viewBox="0 0 61 61"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
+                role="presentation"
               >
                 <path d={framework.icon} fill="#7E7E7E" />
               </svg>

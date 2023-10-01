@@ -17,7 +17,7 @@ export default function Loading({ children, active }: Props) {
     contentClasses.push(__styles.content.active)
   }
 
-  let spinnerClasses = [__styles.spinner]
+  let spinnerClasses = __styles.spinner
 
   return (
     <div className={classNames.join(' ')}>

@@ -57,6 +57,7 @@ const VectorVisual = () => {
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           className="absolute w-full h-full z-20 m-auto"
+          role="presentation"
         >
           <path
             d="M195.918 125.344L276.779 172.029V265.399L195.918 312.084L115.057 265.399V172.029L195.918 125.344Z"

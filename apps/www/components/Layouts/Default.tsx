@@ -23,9 +23,11 @@ const DefaultLayout = (props: Props) => {
     <>
       {!hideHeader && <Nav />}
       <div className="min-h-screen">
-        <main className={className}>{children}</main>
+        <main role="main" className={className || undefined}>
+          {children}
+        </main>
       </div>
-      {!hideFooter && <Footer className={footerClassName} />}
+      {!hideFooter && <Footer className={footerClassName || undefined} />}
     </>
   )
 }

@@ -12,7 +12,7 @@ function TextLink({ url = '', label, ...props }: any) {
           <span className="sr-only">{`${label} about ${url}`}</span>
           <span>{label}</span>
           <div className="transition-all group-hover:ml-0.5">
-            <IconChevronRight size={14} strokeWidth={2} />
+            <IconChevronRight role="presentation" size={14} strokeWidth={2} />
           </div>
         </div>
       </a>

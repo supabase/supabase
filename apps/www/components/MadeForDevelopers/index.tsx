@@ -9,7 +9,7 @@ import TextLink from '../TextLink'
 
 const MadeForDevelopers = () => {
   return (
-    <SectionContainer>
+    <SectionContainer useSectionTag>
       <APISection
         autoHeight={true}
         size="large"

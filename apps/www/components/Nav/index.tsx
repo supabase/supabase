@@ -67,7 +67,7 @@ const Nav = () => {
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
-              aria-hidden="true"
+              role="presentation"
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={icon} />
             </svg>
@@ -124,7 +124,8 @@ const Nav = () => {
           'text-scale-900 focus:ring-brand dark:bg-scale-200 dark:hover:bg-scale-300 inline-flex items-center justify-center rounded-md bg-gray-50 p-2 hover:bg-white focus:outline-none focus:ring-2 focus:ring-inset',
           showLaunchWeekNavMode && '!bg-transparent border border-[#be9eea]',
         ].join(' ')}
-        aria-expanded="false"
+        aria-expanded={open}
+        aria-haspopup="true"
       >
         <span className="sr-only">Open main menu</span>
 
@@ -134,7 +135,7 @@ const Nav = () => {
           fill="none"
           viewBox="0 0 24 24"
           stroke={showLaunchWeekNavMode ? '#be9eea' : 'currentColor'}
-          aria-hidden="true"
+          role="presentation"
         >
           <path
             strokeLinecap="round"
@@ -150,7 +151,7 @@ const Nav = () => {
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
-          aria-hidden="true"
+          role="presentation"
         >
           <path
             strokeLinecap="round"
@@ -163,8 +164,14 @@ const Nav = () => {
     </div>
   )
 
-  const FlyOutNavButton = (props: any) => (
-    <div
+  type FlyOutNavButtonProps = {
+    title: string
+    onClick: React.MouseEventHandler<HTMLButtonElement>
+    active: boolean
+  }
+
+  const FlyOutNavButton = (props: FlyOutNavButtonProps) => (
+    <li
       className={[
         `
         inline-flex cursor-pointer items-center
@@ -177,9 +184,14 @@ const Nav = () => {
         props.active ? 'text-brand' : 'hover:text-brand',
         props.active,
       ].join(' ')}
-      onClick={props.onClick}
     >
-      <>
+      <button
+        role="menuitem"
+        className="flex"
+        onClick={props.onClick}
+        aria-expanded={openProduct}
+        aria-haspopup="true"
+      >
         <span>{props.title}</span>
         <div
           className={
@@ -190,15 +202,16 @@ const Nav = () => {
           <IconChevronDown
             size={14}
             strokeWidth={2}
+            role="presentation"
             className={showLaunchWeekNavMode ? 'text-white' : ''}
           />
         </div>
-      </>
-    </div>
+      </button>
+    </li>
   )
 
   return (
-    <>
+    <header>
       <div className="sticky top-0 z-40 transform" style={{ transform: 'translate3d(0,0,999px)' }}>
         <div
           className={[
@@ -208,6 +221,8 @@ const Nav = () => {
           ].join(' ')}
         />
         <nav
+          role="navigation"
+          aria-label="main navigation"
           className={[
             `relative z-40 border-scale-300 border-b backdrop-blur-sm transition-opacity`,
             showLaunchWeekNavMode ? '!opacity-100 !border-[#e0d2f430]' : '',
@@ -234,6 +249,7 @@ const Nav = () => {
                         width={124}
                         height={24}
                         alt="Supabase Logo"
+                        role="img"
                       />
                     </a>
                   </Link>
@@ -246,54 +262,63 @@ const Nav = () => {
                     </Link>
                   )}
                 </div>
-                <div className="hidden pl-4 sm:ml-6 sm:space-x-4 lg:flex">
+                <ul role="menu" className="hidden pl-4 sm:ml-6 sm:space-x-4 lg:flex">
                   <FlyOutNavButton
-                    title={'Product'}
+                    title="Product"
                     onClick={() => handleToggle(() => setOpenProduct(!openProduct))}
                     active={openProduct}
                   />
                   <FlyOutNavButton
-                    title={'Developers'}
+                    title="Developers"
                     onClick={() => handleToggle(() => setOpenDevelopers(!openDevelopers))}
                     active={openDevelopers}
                   />
-                  <Link href="/pricing">
-                    <a
-                      className={[
-                        `text-scale-1200 hover:text-brand hover:border-brand dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
+                  <li>
+                    <Link href="/pricing">
+                      <a
+                        className={[
+                          `text-scale-1200 hover:text-brand hover:border-brand dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
                         border-b-2 border-transparent p-5 px-1
                         text-sm font-medium`,
-                        showLaunchWeekNavMode && '!text-white',
-                      ].join(' ')}
-                    >
-                      Pricing
-                    </a>
-                  </Link>
-                  <Link href="/docs">
-                    <a
-                      className={[
-                        `text-scale-1200 hover:text-brand hover:border-brand dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
+                          showLaunchWeekNavMode && '!text-white',
+                        ].join(' ')}
+                        role="menuitem"
+                      >
+                        Pricing
+                      </a>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/docs">
+                      <a
+                        className={[
+                          `text-scale-1200 hover:text-brand hover:border-brand dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
                         border-b-2 border-transparent p-5 px-1
                         text-sm font-medium`,
-                        showLaunchWeekNavMode && '!text-white',
-                      ].join(' ')}
-                    >
-                      Docs
-                    </a>
-                  </Link>
-                  <Link href="/blog">
-                    <a
-                      className={[
-                        `text-scale-1200 hover:text-brand hover:border-brand dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
+                          showLaunchWeekNavMode && '!text-white',
+                        ].join(' ')}
+                        role="menuitem"
+                      >
+                        Docs
+                      </a>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/blog">
+                      <a
+                        className={[
+                          `text-scale-1200 hover:text-brand hover:border-brand dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
                         border-b-2 border-transparent p-5 px-1
                         text-sm font-medium`,
-                        showLaunchWeekNavMode && '!text-white',
-                      ].join(' ')}
-                    >
-                      Blog
-                    </a>
-                  </Link>
-                </div>
+                          showLaunchWeekNavMode && '!text-white',
+                        ].join(' ')}
+                        role="menuitem"
+                      >
+                        Blog
+                      </a>
+                    </Link>
+                  </li>
+                </ul>
               </div>
               <div className="flex items-center gap-2">
                 {!isUserLoading && (
@@ -319,7 +344,7 @@ const Nav = () => {
                                 showLaunchWeekNavMode && '!text-white',
                               ].join(' ')}
                             >
-                              <IconStar strokeWidth={2} />
+                              <IconStar role="presentation" strokeWidth={2} />
                             </div>
                           </div>
                         }
@@ -385,6 +410,8 @@ const Nav = () => {
                     onClick={() => setOpen(false)}
                     type="button"
                     className="inline-flex items-center justify-center p-2 bg-white rounded-md text-scale-900 focus:ring-brand dark:bg-scale-300 dark:hover:bg-scale-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset"
+                    aria-expanded={open}
+                    aria-haspopup="true"
                   >
                     <span className="sr-only">Close menu</span>
                     <svg
@@ -393,7 +420,7 @@ const Nav = () => {
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
-                      aria-hidden="true"
+                      role="presentation"
                     >
                       <path
                         strokeLinecap="round"
@@ -414,39 +441,60 @@ const Nav = () => {
                     </a>
                   </Link>
                 </div>
-                <div className="pt-2 pb-4 space-y-1">
-                  <Link href="/docs">
-                    <a className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white">
-                      Developers
-                    </a>
-                  </Link>
-                  <Link href="/pricing">
-                    <a className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white">
-                      Pricing
-                    </a>
-                  </Link>
-                  <Link href="/docs">
-                    <a
-                      target="_blank"
-                      className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white"
-                    >
-                      Docs
-                    </a>
-                  </Link>
-                  <Link href="/blog">
-                    <a
-                      target="_blank"
-                      className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white"
-                    >
-                      Blog
-                    </a>
-                  </Link>
-                  <Link href="/support">
-                    <a className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white">
-                      Support
-                    </a>
-                  </Link>
-                </div>
+                <ul className="pt-2 pb-4 space-y-1" role="menu">
+                  <li>
+                    <Link href="/docs">
+                      <a
+                        role="menuitem"
+                        className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white"
+                      >
+                        Developers
+                      </a>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/pricing">
+                      <a
+                        role="menuitem"
+                        className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white"
+                      >
+                        Pricing
+                      </a>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/docs">
+                      <a
+                        role="menuitem"
+                        target="_blank"
+                        className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white"
+                      >
+                        Docs
+                      </a>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/blog">
+                      <a
+                        role="menuitem"
+                        target="_blank"
+                        className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white"
+                      >
+                        Blog
+                      </a>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/support">
+                      <a
+                        role="menuitem"
+                        className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white"
+                      >
+                        Support
+                      </a>
+                    </Link>
+                  </li>
+                </ul>
                 <div className="p-3">
                   <p className="mb-6 text-sm text-scale-900">Products available:</p>
                   {iconSections}
@@ -463,7 +511,7 @@ const Nav = () => {
         </FlyOut>
         <ScrollProgress />
       </div>
-    </>
+    </header>
   )
 }
 

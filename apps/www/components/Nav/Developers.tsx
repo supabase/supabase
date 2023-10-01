@@ -30,7 +30,7 @@ const Developers = () => {
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
-            aria-hidden="true"
+            role="presentation"
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d={icon} />
           </svg>
@@ -77,6 +77,7 @@ const Developers = () => {
                         alt={announcement.title}
                         layout="fill"
                         objectFit="cover"
+                        role="img"
                       />
                     </div>
                     <div className="min-w-0 flex-1 sm:ml-4">

@@ -27,6 +27,7 @@ function ExampleCard(props: any) {
                 alt={props.author + ' GitHub profile picture'}
                 layout="fill"
                 objectFit="cover"
+                role="img"
               />
             </div>
             <span className="text-scale-1200 ml-2 text-sm">{props.author}</span>
@@ -52,7 +53,7 @@ function ExampleCard(props: any) {
             >
               <span>{props.repo_name}</span>
               <span className="ml-1 inline-block">
-                <IconGitHub size={14} />
+                <IconGitHub size={14} role="presentation" />
               </span>
             </a>
           </Link>
@@ -60,13 +61,23 @@ function ExampleCard(props: any) {
           <div className="mt-3 flex items-stretch gap-2 h-[26px]">
             {props.vercel_deploy_url && (
               <a target="_blank" href={props.vercel_deploy_url}>
-                <Image src="https://vercel.com/button" alt="vercel button" width={75} height={26} />
+                <Image
+                  src="https://vercel.com/button"
+                  alt="vercel button"
+                  width={75}
+                  height={26}
+                  role="presentation"
+                />
               </a>
             )}
             {props.demo_url && (
               <Link href={props.demo_url} as={props.demo_url}>
                 <a target="_blank" tabIndex={-1}>
-                  <Button size="tiny" type="default" iconRight={<IconArrowUpRight />}>
+                  <Button
+                    size="tiny"
+                    type="default"
+                    iconRight={<IconArrowUpRight role="presentation" />}
+                  >
                     Launch Demo
                   </Button>
                 </a>
@@ -75,7 +86,11 @@ function ExampleCard(props: any) {
             {!props.demo_url && (
               <Link href={props.repo_url} as={props.repo_url}>
                 <a target="_blank" tabIndex={-1}>
-                  <Button size="tiny" type="default" iconRight={<IconArrowUpRight />}>
+                  <Button
+                    size="tiny"
+                    type="default"
+                    iconRight={<IconArrowUpRight role="presentation" />}
+                  >
                     View Code
                   </Button>
                 </a>
