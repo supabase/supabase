@@ -59,6 +59,7 @@ const FunctionLink = React.memo(function FunctionLink({
         onClick={(e) => {
           e.preventDefault()
           history.pushState({}, '', url)
+          router.events.emit('routeChangeComplete', url)
           document.getElementById(slug)?.scrollIntoView()
         }}
         className={cn(
