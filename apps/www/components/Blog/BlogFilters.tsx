@@ -1,13 +1,23 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
 import { startCase } from 'lodash'
+import { useRouter } from 'next/router'
+import { useCallback, useEffect, useState } from 'react'
 
-import { Button, Dropdown, IconChevronDown, IconSearch, IconX, Input } from 'ui'
+import {
+  Button,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
+  IconChevronDown,
+  IconSearch,
+  IconX,
+  Input,
+} from 'ui'
 import { useParams } from '~/hooks/useParams'
 
-import PostTypes from '~/types/post'
 import { useBreakpoint } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
+import PostTypes from '~/types/post'
 
 interface Props {
   posts: PostTypes[]
@@ -72,32 +82,32 @@ const BlogFilters = ({ posts, setPosts, setCategory, allCategories, handlePosts 
             exit={{ opacity: 0, transition: { duration: 0.05 } }}
             className="flex lg:hidden"
           >
-            <Dropdown
-              side="bottom"
-              align="start"
-              size="large"
-              overlay={allCategories.map((category: string) => (
-                <Dropdown.Item
-                  key="custom-expiry"
-                  onClick={() => setCategory(category)}
-                  className={[
-                    (category === 'all' && !activeCategory) || category === activeCategory
-                      ? 'text-brand-600'
-                      : '',
-                  ].join(' ')}
+            <DropdownMenu_Shadcn_>
+              <DropdownMenuTrigger_Shadcn_>
+                <Button
+                  type="outline"
+                  iconRight={<IconChevronDown />}
+                  className="w-full min-w-[200px] flex justify-between items-center py-2"
                 >
-                  {category === 'all' ? 'All Posts' : startCase(category.replaceAll('-', ' '))}
-                </Dropdown.Item>
-              ))}
-            >
-              <Button
-                type="outline"
-                iconRight={<IconChevronDown />}
-                className="w-full min-w-[200px] flex justify-between items-center py-2"
-              >
-                {!activeCategory ? 'All Posts' : startCase(activeCategory?.replaceAll('-', ' '))}
-              </Button>
-            </Dropdown>
+                  {!activeCategory ? 'All Posts' : startCase(activeCategory?.replaceAll('-', ' '))}
+                </Button>
+              </DropdownMenuTrigger_Shadcn_>
+              <DropdownMenuContent_Shadcn_ side="bottom" align="start">
+                {allCategories.map((category: string) => (
+                  <DropdownMenuItem_Shadcn_
+                    key="custom-expiry"
+                    onClick={() => setCategory(category)}
+                    className={[
+                      (category === 'all' && !activeCategory) || category === activeCategory
+                        ? 'text-brand-600'
+                        : '',
+                    ].join(' ')}
+                  >
+                    {category === 'all' ? 'All Posts' : startCase(category.replaceAll('-', ' '))}
+                  </DropdownMenuItem_Shadcn_>
+                ))}
+              </DropdownMenuContent_Shadcn_>
+            </DropdownMenu_Shadcn_>
           </motion.div>
         )}
         <div className="hidden lg:flex flex-wrap items-center flex-grow gap-2">
