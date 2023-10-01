@@ -91,7 +91,7 @@ const PolicyRow = ({
                 onClick={() => onSelectEditPolicy(policy)}
               >
                 <IconEdit size={14} />
-                <p className="text">Edit</p>
+                <p>Edit</p>
               </DropdownMenuItem_Shadcn_>
               <DropdownMenuSeparator_Shadcn_ />
               <DropdownMenuItem_Shadcn_
@@ -99,7 +99,7 @@ const PolicyRow = ({
                 onClick={() => onSelectDeletePolicy(policy)}
               >
                 <IconTrash size={14} />
-                <p className="text">Delete</p>
+                <p>Delete</p>
               </DropdownMenuItem_Shadcn_>
             </DropdownMenuContent_Shadcn_>
           </DropdownMenu_Shadcn_>
