@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { Button, Badge, IconStar, IconChevronDown } from 'ui'
+import { Button, Badge, IconStar, IconChevronDown, TextLink } from 'ui'
 import FlyOut from '~/components/UI/FlyOut'
 import Transition from 'lib/Transition'
 
@@ -13,8 +13,13 @@ import Developers from '~/components/Nav/Developers'
 
 import ScrollProgress from '~/components/ScrollProgress'
 
+<<<<<<< Updated upstream
 import { useIsLoggedIn, useTheme } from 'common'
 import TextLink from '../TextLink'
+=======
+import { useIsLoggedIn, useIsUserLoading } from 'common'
+import { useTheme } from 'next-themes'
+>>>>>>> Stashed changes
 import Image from 'next/image'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'

@@ -1,11 +1,10 @@
-import { Badge, Button, IconArrowUpRight, IconMail } from 'ui'
+import { Badge, Button, IconArrowUpRight, IconMail, TextLink } from 'ui'
 import APISection from '../Sections/APISection'
 import SectionContainer from '../Layouts/SectionContainer'
 import FeatureColumn from '../FeatureColumn'
 
 import CodeExamples from 'data/home/api-examples'
 import DeveloperFeatures from 'data/DeveloperFeatures.json'
-import TextLink from '../TextLink'
 
 const MadeForDevelopers = () => {
   return (

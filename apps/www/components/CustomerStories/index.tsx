@@ -2,8 +2,7 @@ import SectionHeader from 'components/UI/SectionHeader'
 import PostTypes from '~/types/post'
 import SectionContainer from '../Layouts/SectionContainer'
 import Link from 'next/link'
-import { GlassPanel } from 'ui'
-import TextLink from '../TextLink'
+import { GlassPanel, TextLink } from 'ui'
 
 const CustomerStories = ({ customerStories }: any) => {
   const caseStudyThumbs = customerStories.map((blog: PostTypes, idx: number) => {

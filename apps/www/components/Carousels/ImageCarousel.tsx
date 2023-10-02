@@ -1,4 +1,4 @@
-import { Button, IconCornerRightUp, Tabs } from 'ui'
+import { Button, IconCornerRightUp, Tabs, TextLink } from 'ui'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
@@ -9,7 +9,6 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/swiper.min.css'
 
 import Image from 'next/image'
-import TextLink from '../TextLink'
 import ImageCarouselStyles from './ImageCarousel.module.css'
 
 interface Content {
