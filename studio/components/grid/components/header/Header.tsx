@@ -21,7 +21,7 @@ import clsx from 'clsx'
 import { useDispatch, useTrackedState } from 'components/grid/store'
 import { Filter, Sort, SupaTable } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { ConfirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { useTableRowDeleteAllMutation } from 'data/table-rows/table-row-delete-all-mutation'
 import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
 import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-mutation'
@@ -312,7 +312,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
 
   const onRowsDelete = () => {
     const numRows = allRowsSelected ? totalRows : selectedRows.size
-    confirmAlert({
+    ConfirmAlert({
       title: 'Confirm to delete',
       message: `Are you sure you want to delete the selected ${numRows} row${
         numRows > 1 ? 's' : ''

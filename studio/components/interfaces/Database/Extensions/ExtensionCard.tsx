@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import { Badge, IconExternalLink, IconLoader, Toggle } from 'ui'
 
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { ConfirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { useCheckPermissions, useStore } from 'hooks'
 import { isResponseOk } from 'lib/common/fetch'
 import Link from 'next/link'
@@ -32,7 +32,7 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
   }
 
   async function disableExtension() {
-    confirmAlert({
+    ConfirmAlert({
       title: 'Confirm to disable extension',
       message: `Are you sure you want to turn OFF "${extension.name}" extension?`,
       onAsyncConfirm: async () => {

@@ -1,7 +1,7 @@
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { ConfirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { useUrlState } from 'hooks'
 import { useEffect, useState } from 'react'
@@ -77,7 +77,7 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
   const onPreviousPage = () => {
     if (state.page > 1) {
       if (state.selectedRows.size >= 1) {
-        confirmAlert({
+        ConfirmAlert({
           title: 'Confirm moving to previous page',
           message: 'The currently selected lines will be deselected, do you want to proceed?',
           onConfirm: () => {
@@ -97,7 +97,7 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
   const onNextPage = () => {
     if (state.page < maxPages) {
       if (state.selectedRows.size >= 1) {
-        confirmAlert({
+        ConfirmAlert({
           title: 'Confirm moving to next page',
           message: 'The currently selected lines will be deselected, do you want to proceed?',
           onConfirm: () => {

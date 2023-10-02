@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import { Button, IconAlertCircle, IconSearch, Input, Toggle } from 'ui'
 
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { ConfirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import Table from 'components/to-be-cleaned/Table'
 import InformationBox from 'components/ui/InformationBox'
 import NoSearchResults from 'components/ui/NoSearchResults'
@@ -36,7 +36,7 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
 
   const toggleListenEvent = async (publication: any, event: any, currentStatus: any) => {
     const startStop = currentStatus ? 'stop' : 'start'
-    confirmAlert({
+    ConfirmAlert({
       title: 'Confirm',
       message: `Are you sure you want to ${startStop} sending ${event} events for ${publication.name}?`,
       onAsyncConfirm: async () => {

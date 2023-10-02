@@ -2,7 +2,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useParams } from 'common/hooks'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { ConfirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
 import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
 import { useOrganizationMemberInviteDeleteMutation } from 'data/organizations/organization-member-invite-delete-mutation'
@@ -78,7 +78,7 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
     useOrganizationMemberInviteDeleteMutation()
 
   const handleMemberDelete = async () => {
-    confirmAlert({
+    ConfirmAlert({
       title: 'Confirm to remove',
       message: `This is permanent! Are you sure you want to remove ${member.primary_email}`,
       onAsyncConfirm: async () => {

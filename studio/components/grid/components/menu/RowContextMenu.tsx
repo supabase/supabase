@@ -3,7 +3,7 @@ import { IconClipboard, IconEdit, IconTrash } from 'ui'
 
 import { SupaRow, SupaTable } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { ConfirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
 import { useDispatch, useTrackedState } from '../../store'
 import { copyToClipboard, formatClipboardValue } from '../../utils'
@@ -35,7 +35,7 @@ const RowContextMenu = ({ table, rows }: RowContextMenuProps) => {
   })
 
   function onDeleteRow(p: ItemParams) {
-    confirmAlert({
+    ConfirmAlert({
       title: 'Confirm to delete',
       message: 'Are you sure you want to delete this row? This action cannot be undone.',
       onAsyncConfirm: async () => {

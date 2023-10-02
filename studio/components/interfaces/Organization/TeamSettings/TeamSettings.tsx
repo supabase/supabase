@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { Button, IconSearch, Input } from 'ui'
 
 import { useParams } from 'common/hooks'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { ConfirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { useOrganizationDetailQuery } from 'data/organizations/organization-detail-query'
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
@@ -55,7 +55,7 @@ const TeamSettings = () => {
   const leaveTeam = async () => {
     setIsLeaving(true)
     try {
-      confirmAlert({
+      ConfirmAlert({
         title: 'Are you sure?',
         message: 'Are you sure you want to leave this organization? This is permanent.',
         onAsyncConfirm: async () => {

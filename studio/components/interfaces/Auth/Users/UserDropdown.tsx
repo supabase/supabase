@@ -14,7 +14,7 @@ import {
   IconTrash,
 } from 'ui'
 
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { ConfirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { useUserDeleteMFAFactorsMutation } from 'data/auth/user-delete-mfa-factors-mutation'
 import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
 import { useUserResetPasswordMutation } from 'data/auth/user-reset-password-mutation'
@@ -80,7 +80,7 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
 
   async function handleDelete() {
     await timeout(200)
-    confirmAlert({
+    ConfirmAlert({
       title: 'Confirm to delete',
       message: `This is permanent! Are you sure you want to delete user ${user.email} ?`,
       onAsyncConfirm: async () => {
@@ -95,7 +95,7 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
 
   async function handleDeleteFactors() {
     await timeout(200)
-    confirmAlert({
+    ConfirmAlert({
       title: 'Confirm to delete',
       message: `This is permanent! Are you sure you want to delete the user's MFA factors?`,
       onAsyncConfirm: async () => {
