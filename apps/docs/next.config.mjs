@@ -4,7 +4,6 @@ import remarkGfm from 'remark-gfm'
 import rehypeSlug from 'rehype-slug'
 import { remarkCodeHike } from '@code-hike/mdx'
 
-import withTM from 'next-transpile-modules'
 import withYaml from 'next-plugin-yaml'
 import configureBundleAnalyzer from '@next/bundle-analyzer'
 
@@ -61,15 +60,22 @@ const nextConfig = {
       'obuldanrptloktxcffvn.supabase.co',
     ],
   },
-  experimental: {
-    // TODO: @next/mdx ^13.0.2 only supports experimental mdxRs flag. next ^13.0.2 will stop warning about this being unsupported.
-    // mdxRs: true,
-    modularizeImports: {
-      lodash: {
-        transform: 'lodash/{{member}}',
-      },
+  // TODO: @next/mdx ^13.0.2 only supports experimental mdxRs flag. next ^13.0.2 will stop warning about this being unsupported.
+  // mdxRs: true,
+  modularizeImports: {
+    lodash: {
+      transform: 'lodash/{{member}}',
     },
   },
+  transpilePackages: [
+    'ui',
+    'common',
+    '@supabase/auth-helpers-nextjs',
+    'mermaid',
+    'mdx-mermaid',
+    'dayjs',
+    'shared-data',
+  ],
   async headers() {
     return [
       {
@@ -104,20 +110,8 @@ const nextConfig = {
 }
 
 const configExport = () => {
-  const plugins = [
-    withTM([
-      'ui',
-      'common',
-      '@supabase/auth-helpers-nextjs',
-      'mermaid',
-      'mdx-mermaid',
-      'dayjs',
-      'shared-data',
-    ]),
-    withMDX,
-    withYaml,
-    withBundleAnalyzer,
-  ]
+  const plugins = [withMDX, withYaml, withBundleAnalyzer]
+  // @ts-ignore
   return plugins.reduce((acc, next) => next(acc), nextConfig)
 }
 
