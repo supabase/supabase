@@ -67,6 +67,10 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
     if (!values.name) {
       errors.name = 'Please provide a name for your bucket'
     }
+    if (values.name && values.name.endsWith(' ')) {
+      errors.name = 'The name of the bucket cannot end with a whitespace'
+    }
+
     if (values.has_file_size_limit && values.formatted_size_limit < 0) {
       errors.formatted_size_limit = 'File size upload limit has to be at least 0'
     }
@@ -81,7 +85,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
 
     createBucket({
       projectRef: ref,
-      id: values.name.trim(),
+      id: values.name,
       isPublic: values.public,
       file_size_limit: values.has_file_size_limit
         ? convertToBytes(values.formatted_size_limit, selectedUnit)
