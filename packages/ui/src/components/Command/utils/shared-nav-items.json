@@ -97,7 +97,7 @@
           "url": "/project/_/logs/pooler-logs"
         },
         {
-          "label": "Auth logs logs",
+          "label": "Auth logs",
           "url": "/project/_/logs/auth-logs"
         },
         {
@@ -105,7 +105,7 @@
           "url": "/project/_/logs/storage-logs"
         },
         {
-          "label": "realtime logs",
+          "label": "Realtime logs",
           "url": "/project/_/logs/realtime-logs"
         }
       ]
@@ -123,7 +123,7 @@
           "url": "/project/_/api?page=users"
         },
         {
-          "label": "Graphql",
+          "label": "GraphQL",
           "url": "/project/_/api/graphiql"
         }
       ]
