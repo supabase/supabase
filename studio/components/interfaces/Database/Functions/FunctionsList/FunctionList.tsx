@@ -93,9 +93,7 @@ const FunctionList = ({
               <p title={x.return_type}>{x.return_type}</p>
             </Table.td>
             <Table.td className="hidden lg:table-cell">
-              <div className="flex justify-center">
-                {x.security_definer ? <IconCheck strokeWidth={1.5} className="text-brand" /> : null}
-              </div>
+              {x.security_definer ? 'Definer' : 'Invoker'}
             </Table.td>
             <Table.td className="text-right">
               {!isLocked && (
