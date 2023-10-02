@@ -21,7 +21,7 @@
     "@graphiql/react": "^0.15.0",
     "@graphiql/toolkit": "^0.8.0",
     "@hcaptcha/react-hcaptcha": "^1.4.4",
-    "@headlessui/react": "^1.7.14",
+    "@headlessui/react": "^1.7.17",
     "@monaco-editor/react": "^4.3.1",
     "@next/bundle-analyzer": "^13.5.3",
     "@radix-ui/react-portal": "^1.0.4",

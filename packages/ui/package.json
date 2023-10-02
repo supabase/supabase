@@ -17,7 +17,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@headlessui/react": "^1.7.14",
+    "@headlessui/react": "^1.7.17",
     "@hookform/resolvers": "^3.1.1",
     "@mertasan/tailwindcss-variables": "^2.2.3",
     "@radix-ui/react-accordion": "^1.1.2",
@@ -61,6 +61,7 @@
     "formik": "^2.2.9",
     "lodash": "^4.17.21",
     "lucide-react": "^0.167.0",
+    "next-themes": "^0.2.1",
     "openai": "^3.3.0",
     "postcss": "^8.4.22",
     "prop-types": "^15.7.2",
@@ -94,24 +95,24 @@
     "@storybook/react": "^7.4.5",
     "@storybook/react-webpack5": "^7.4.5",
     "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^12.1.5",
     "@tokens-studio/sd-transforms": "^0.8.5",
     "@types/common-tags": "^1.8.1",
     "@types/react": "^18.2.24",
     "@types/react-copy-to-clipboard": "^5.0.4",
     "@types/react-dom": "^18.2.8",
     "@types/react-syntax-highlighter": "^15.5.6",
-    "@testing-library/react": "^12.1.5",
     "config": "*",
     "copyfiles": "^2.4.1",
     "glob": "^8.1.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "next": "^13.5.3",
     "sql-formatter": "^12.2.0",
     "storybook": "^7.0.5",
     "storybook-dark-mode": "^3.0.0",
     "style-dictionary": "^3.7.1",
-    "tsconfig-paths-webpack-plugin": "^4.0.1",
-    "typescript": "^5.2.2",
     "ts-jest": "^29.1.1",
-    "jest-environment-jsdom": "^29.7.0",
-    "next": "^13.5.3"
+    "tsconfig-paths-webpack-plugin": "^4.0.1",
+    "typescript": "^5.2.2"
   }
 }
