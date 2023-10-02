@@ -1,7 +1,8 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { patch } from 'data/fetchers'
+import { patch } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
 import { ResponseError } from 'types'
 import { storageKeys } from './keys'
 
@@ -9,36 +10,27 @@ export type BucketUpdateVariables = {
   projectRef: string
   id: string
   isPublic: boolean
-  fileSizeLimit: number
-  allowedMimeTypes: string[]
+  file_size_limit: number | null
+  allowed_mime_types: string[] | null
 }
 
 export async function updateBucket({
   projectRef,
   id,
   isPublic,
-  fileSizeLimit,
-  allowedMimeTypes,
+  file_size_limit,
+  allowed_mime_types,
 }: BucketUpdateVariables) {
   if (!projectRef) throw new Error('projectRef is required')
-  if (!id) throw new Error('Bucket name is required')
+  if (!id) throw new Error('Bucket name is requried')
 
-  const { data, error } = await patch('/platform/storage/{ref}/buckets/{id}', {
-    params: {
-      path: {
-        ref: projectRef,
-        id: id,
-      },
-    },
-    body: {
-      public: isPublic,
-      file_size_limit: fileSizeLimit,
-      allowed_mime_types: allowedMimeTypes,
-    },
+  const response = await patch(`${API_URL}/storage/${projectRef}/buckets/${id}`, {
+    public: isPublic,
+    file_size_limit,
+    allowed_mime_types,
   })
-
-  if (error) throw error
-  return data
+  if (response.error) throw response.error
+  return response
 }
 
 type BucketUpdateData = Awaited<ReturnType<typeof updateBucket>>

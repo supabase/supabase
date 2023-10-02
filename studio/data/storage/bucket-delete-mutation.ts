@@ -1,7 +1,8 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { del, post } from 'data/fetchers'
+import { delete_, post } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
 import { ResponseError } from 'types'
 import { storageKeys } from './keys'
 
@@ -14,16 +15,12 @@ export async function deleteBucket({ projectRef, id }: BucketDeleteVariables) {
   if (!projectRef) throw new Error('projectRef is required')
   if (!id) throw new Error('Bucket name is requried')
 
-  const { error: emptyBucketError } = await post('/platform/storage/{ref}/buckets/{id}/empty', {
-    params: { path: { ref: projectRef, id } },
-  })
-  if (emptyBucketError) throw emptyBucketError
+  const emptyBucketRes = await post(`${API_URL}/storage/${projectRef}/buckets/${id}/empty`, {})
+  if (emptyBucketRes.error) throw emptyBucketRes.error
 
-  const { data, error } = await del('/platform/storage/{ref}/buckets/{id}', {
-    params: { path: { ref: projectRef, id } },
-  })
-  if (error) throw error
-  return data
+  const response = await delete_(`${API_URL}/storage/${projectRef}/buckets/${id}`)
+  if (response.error) throw response.error
+  return response
 }
 
 type BucketDeleteData = Awaited<ReturnType<typeof deleteBucket>>
