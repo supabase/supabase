@@ -15,8 +15,11 @@ import {
 } from 'ui'
 import { DOCS_RESOURCE_CONTENT } from './ProjectAPIDocs.constants'
 import { navigateToSection } from './Content/Content.utils'
+import { useBucketsQuery } from 'data/storage/buckets-query'
+import { useParams } from 'common'
 
 const SecondLevelNav = () => {
+  const { ref } = useParams()
   const { meta } = useStore()
   const snap = useAppStateSnapshot()
   const [open, setOpen] = useState(false)
@@ -24,8 +27,11 @@ const SecondLevelNav = () => {
   const { data } = meta.openApi
   const tables = data?.tables ?? []
   const functions = data?.functions ?? []
+  const [section, resource] = snap.activeDocsSection
 
-  const [section] = snap.activeDocsSection
+  const { data: buckets } = useBucketsQuery({ projectRef: ref })
+  const bucket = (buckets ?? []).find((b) => b.name === resource)
+
   const header =
     section === 'entities'
       ? 'Tables & Views'
@@ -34,7 +40,14 @@ const SecondLevelNav = () => {
       : section === 'storage'
       ? 'Storage Buckets'
       : section
-  const options = section === 'entities' ? tables : functions
+  const options =
+    section === 'entities'
+      ? tables
+      : section === 'stored-procedures'
+      ? functions
+      : section === 'storage'
+      ? buckets ?? []
+      : []
 
   const updateSection = (value: string) => {
     snap.setActiveDocsSection([snap.activeDocsSection[0], value])
@@ -75,6 +88,7 @@ const SecondLevelNav = () => {
               <CommandGroup_Shadcn_>
                 {options.map((option) => (
                   <CommandItem_Shadcn_
+                    key={option.name}
                     className="cursor-pointer"
                     onSelect={() => updateSection(option.name)}
                     onClick={() => updateSection(option.name)}
@@ -89,16 +103,25 @@ const SecondLevelNav = () => {
       </Popover_Shadcn_>
 
       <div className="space-y-2 py-2">
-        {menuItems.map((item) => (
-          <p
-            key={item.key}
-            title={item.title}
-            className="text-sm text-light px-4 hover:text-foreground transition cursor-pointer"
-            onClick={() => navigateToSection(item.key)}
-          >
-            {item.title}
-          </p>
-        ))}
+        {menuItems.map((item) => {
+          if (
+            section === 'storage' &&
+            bucket !== undefined &&
+            !bucket.public &&
+            item.key === 'retrieve-public-url'
+          )
+            return null
+          return (
+            <p
+              key={item.key}
+              title={item.title}
+              className="text-sm text-light px-4 hover:text-foreground transition cursor-pointer"
+              onClick={() => navigateToSection(item.key)}
+            >
+              {item.title}
+            </p>
+          )
+        })}
       </div>
     </div>
   )

@@ -340,104 +340,15 @@ curl -X POST '${endpoint}/auth/v1/invite' \\
     `,
   },
   // Storage
-  uploadFile: {
-    key: 'upload-file',
+  storage: {
+    key: 'storage',
     category: 'storage',
-    title: 'Upload a file',
-    description: `
-Upload a file to an existing bucket. RLS policy permissions required:
-- \`buckets\` table permissions: none
-- \`objects\` table permissions: only \`insert\` when you are uploading new files and \`select\`, \`insert\`, and \`update\` when you are upserting files.
-`,
-    js: (apikey?: string, endpoint?: string) => `
-const avatarFile = event.target.files[0]
-const { data, error } = await supabase
-  .storage
-  .from('avatars')
-  .upload('public/avatar1.png', avatarFile, {
-    cacheControl: '3600',
-    upsert: false
-  })
-`,
-    bash: (apikey?: string, endpoint?: string) => `No command available`,
-  },
-  deleteFiles: {
-    key: 'delete-files',
-    category: 'storage',
-    title: 'Delete files within a bucket',
-    description: `
-List all files within a bucket. RLS policy permissions required:
-- \`buckets\` table permissions: none
-- \`objects\` table permissions: \`delete\` and \`select\`
-`,
-    js: (apikey?: string, endpoint?: string) => `
-const { data, error } = await supabase
-  .storage
-  .from('avatars')
-  .remove(['folder/avatar1.png']) 
-`,
-    bash: (apikey?: string, endpoint?: string) => `No command available`,
-  },
-  listFiles: {
-    key: 'list-files',
-    category: 'storage',
-    title: 'List all files in a bucket',
-    description: `
-List all files within a bucket. RLS policy permissions required:
-- \`buckets\` table permissions: none
-- \`objects\` table permissions: \`select\`
-`,
-    js: (apikey?: string, endpoint?: string) => `
-const { data, error } = await supabase
-  .storage
-  .from('avatars')
-  .list('folder', {
-    limit: 100,
-    offset: 0,
-    sortBy: { column: 'name', order: 'asc' },
-  })    
-`,
-    bash: (apikey?: string, endpoint?: string) => `No command available`,
-  },
-  createSignedURL: {
-    key: 'create-signed-url',
-    category: 'storage',
-    title: 'Create a signed URL',
-    description: `
-Create a signed URL which can be used to share a file for a fixed amount of time. RLS policy permissions required:
-- \`buckets\` table permissions: none
-- \`objects\` table permissions: \`select\`
-`,
-    js: (apikey?: string, endpoint?: string) => `
-const { data, error } = await supabase
-  .storage
-  .from('avatars')
-  .createSignedUrl('folder/avatar1.png', 60)
-`,
-    bash: (apikey?: string, endpoint?: string) => `No command available`,
-  },
-  retrievePublicURL: {
-    key: 'retrieve-public-url',
-    category: 'storage',
-    title: 'Retrieve public URL',
-    description: `
-A simple convenience function to get the URL for an asset in a public bucket. If you do not want to use this function, you can construct the public URL by concatenating the bucket URL with the path to the asset.
+    title: `Introduction`,
+    description: `Supabase Storage makes it simple to upload and serve files of any size, providing a robust framework for file access controls.
 
-This function does not verify if the bucket is public. If a public URL is created for a bucket which is not public, you will not be able to download the asset.
-
-The bucket needs to be set to public, either via updateBucket() or by going to Storage on supabase.com/dashboard, clicking the overflow menu on a bucket and choosing "Make public"
-
-RLS policy permissions required:
-- \`buckets\` table permissions: none
-- \`objects\` table permissions: none
-`,
-    js: (apikey?: string, endpoint?: string) => `
-const { data } = supabase
-  .storage
-  .from('public-bucket')
-  .getPublicUrl('folder/avatar1.png')
-`,
-    bash: (apikey?: string, endpoint?: string) => `No command available`,
+You can use Supabase Storage to store images, videos, documents, and any other file type. Serve your assets with a global CDN to reduce latency from over 285 cities globally. Supabase Storage includes a built-in image optimizer, so you can resize and compress your media files on the fly.`,
+    js: undefined,
+    bash: undefined,
   },
   // Edge functions
   createEdgeFunction: {
@@ -1016,5 +927,129 @@ const channels = supabase.channel('custom-filter-channel')
         },
       ]
     },
+  },
+  uploadFile: {
+    key: 'upload-file',
+    category: 'storage',
+    title: 'Upload a file',
+    description: `
+Upload a file to an existing bucket. RLS policy permissions required:
+- \`buckets\` table permissions: none
+- \`objects\` table permissions: only \`insert\` when you are uploading new files and \`select\`, \`insert\`, and \`update\` when you are upserting files.
+`,
+    code: ({ name }: { name: string }) => [
+      {
+        title: undefined,
+        bash: `# No command via bash available`,
+        js: `
+const avatarFile = event.target.files[0]
+const { data, error } = await supabase
+  .storage
+  .from('${name}')
+  .upload('folder/avatar1.png', avatarFile, {
+    cacheControl: '3600',
+    upsert: false
+  })
+`,
+      },
+    ],
+  },
+  deleteFiles: {
+    key: 'delete-files',
+    category: 'storage',
+    title: 'Delete files',
+    description: `
+Delete files within the bucket. RLS policy permissions required:
+- \`buckets\` table permissions: none
+- \`objects\` table permissions: \`delete\` and \`select\`
+`,
+    code: ({ name }: { name: string }) => [
+      {
+        title: undefined,
+        bash: `# No command via bash available`,
+        js: `
+const { data, error } = await supabase
+  .storage
+  .from('${name}')
+  .remove(['folder/avatar1.png']) 
+        `,
+      },
+    ],
+  },
+  listFiles: {
+    key: 'list-files',
+    category: 'storage',
+    title: 'List all files',
+    description: `
+List all files within the bucket. RLS policy permissions required:
+- \`buckets\` table permissions: none
+- \`objects\` table permissions: \`select\`
+`,
+    code: ({ name }: { name: string }) => [
+      {
+        title: undefined,
+        bash: `# No command via bash available`,
+        js: `
+const { data, error } = await supabase
+  .storage
+  .from('${name}')
+  .list('folder', {
+    limit: 100,
+    offset: 0,
+    sortBy: { column: 'name', order: 'asc' },
+  })    
+        `,
+      },
+    ],
+  },
+  createSignedURL: {
+    key: 'create-signed-url',
+    category: 'storage',
+    title: 'Create a signed URL',
+    description: `
+Create a signed URL which can be used to share a file for a fixed amount of time. RLS policy permissions required:
+- \`buckets\` table permissions: none
+- \`objects\` table permissions: \`select\`
+`,
+    code: ({ name }: { name: string }) => [
+      {
+        title: undefined,
+        bash: `# No command via bash available`,
+        js: `
+const { data, error } = await supabase
+  .storage
+  .from('${name}')
+  .createSignedUrl('folder/avatar1.png', 60)
+        `,
+      },
+    ],
+  },
+  retrievePublicURL: {
+    key: 'retrieve-public-url',
+    category: 'storage',
+    title: 'Retrieve public URL',
+    description: `
+A simple convenience function to get the URL for an asset in a public bucket. If you do not want to use this function, you can construct the public URL by concatenating the bucket URL with the path to the asset.
+
+This function does not verify if the bucket is public. If a public URL is created for a bucket which is not public, you will not be able to download the asset.
+
+The bucket needs to be set to public, either via updateBucket() or by going to Storage on supabase.com/dashboard, clicking the overflow menu on a bucket and choosing "Make public"
+
+RLS policy permissions required:
+- \`buckets\` table permissions: none
+- \`objects\` table permissions: none
+`,
+    code: ({ name }: { name: string }) => [
+      {
+        title: undefined,
+        bash: `# No command via bash available`,
+        js: `
+const { data } = supabase
+  .storage
+  .from('${name}')
+  .getPublicUrl('folder/avatar1.png')
+        `,
+      },
+    ],
   },
 }

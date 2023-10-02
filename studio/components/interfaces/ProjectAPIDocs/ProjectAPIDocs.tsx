@@ -13,6 +13,7 @@ import {
 
 import { useAppStateSnapshot } from 'state/app-state'
 import {
+  Bucket,
   EdgeFunctions,
   Entities,
   Entity,
@@ -91,7 +92,7 @@ const ProjectAPIDocs = () => {
           {snap.activeDocsSection[0] === 'storage' && (
             <>
               {snap.activeDocsSection[1] !== undefined ? (
-                <Storage language={language} />
+                <Bucket language={language} />
               ) : (
                 <Storage language={language} />
               )}

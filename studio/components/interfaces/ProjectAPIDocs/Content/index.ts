@@ -5,10 +5,12 @@ import Storage from './Storage'
 import StoredProcedures from './StoredProcedures'
 import UserManagement from './UserManagement'
 
+import Bucket from './Bucket'
 import Entity from './Entity'
 import RPC from './RPC'
 
 export {
+  Bucket,
   EdgeFunctions,
   Entities,
   Entity,
