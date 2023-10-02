@@ -124,7 +124,7 @@ const General = () => {
                 <div>
                   <p className="text-sm">Restart project</p>
                   <div className="max-w-[420px]">
-                    <p className="text-sm text-scale-1100">
+                    <p className="text-sm text-foreground-light">
                       Your project will not be available for a few minutes.
                     </p>
                   </div>
@@ -135,7 +135,7 @@ const General = () => {
                 <div>
                   <p className="text-sm">Pause project</p>
                   <div className="max-w-[420px]">
-                    <p className="text-sm text-scale-1100">
+                    <p className="text-sm text-foreground-light">
                       Your project will not be accessible while it is paused.
                     </p>
                   </div>
@@ -152,7 +152,7 @@ const General = () => {
                     <IconBarChart2 strokeWidth={2} />
                     <div>
                       <p className="text-sm">Project usage statistics has been moved</p>
-                      <p className="text-scale-1000 text-sm">
+                      <p className="text-foreground-light text-sm">
                         You may view your project's usage under your organization's settings
                       </p>
                     </div>

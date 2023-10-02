@@ -15,7 +15,11 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Command_Shadcn_,
-  Dropdown,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuRadioGroup_Shadcn_,
+  DropdownMenuRadioItem_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
   IconCheck,
   IconChevronsDown,
   IconCode,
@@ -148,7 +152,11 @@ const TableEditorMenu = () => {
                   type="outline"
                   className="w-full [&>span]:w-full"
                   iconRight={
-                    <IconCode className="text-scale-1100 rotate-90" strokeWidth={2} size={12} />
+                    <IconCode
+                      className="text-foreground-light rotate-90"
+                      strokeWidth={2}
+                      size={12}
+                    />
                   }
                 >
                   <div>
@@ -228,7 +236,7 @@ const TableEditorMenu = () => {
                   disabled={!canCreateTables}
                   size="tiny"
                   icon={
-                    <div className="text-scale-900">
+                    <div className="text-foreground-lighter">
                       <IconEdit size={14} strokeWidth={1.5} />
                     </div>
                   }
@@ -249,7 +257,7 @@ const TableEditorMenu = () => {
                         'border border-scale-200',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text-foreground">
                         You need additional permissions to create tables
                       </span>
                     </div>
@@ -279,9 +287,13 @@ const TableEditorMenu = () => {
               className="table-editor-search border-none"
               icon={
                 isSearching ? (
-                  <IconLoader className="animate-spin text-scale-900" size={12} strokeWidth={1.5} />
+                  <IconLoader
+                    className="animate-spin text-foreground-lighter"
+                    size={12}
+                    strokeWidth={1.5}
+                  />
                 ) : (
-                  <IconSearch className="text-scale-900" size={12} strokeWidth={1.5} />
+                  <IconSearch className="text-foreground-lighter" size={12} strokeWidth={1.5} />
                 )
               }
               placeholder="Search tables"
@@ -302,17 +314,21 @@ const TableEditorMenu = () => {
         {isLoading ? (
           <div className="mx-4 flex items-center space-x-2">
             <IconLoader className="animate-spin" size={14} strokeWidth={1.5} />
-            <p className="text-sm text-scale-1000">Loading entities...</p>
+            <p className="text-sm text-foreground-light">Loading entities...</p>
           </div>
         ) : searchText.length === 0 && (entityTypes?.length ?? 0) === 0 ? (
           <div className="mx-4 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
             <p className="text-xs">No entities available</p>
-            <p className="text-xs text-scale-1100">This schema has no entities available yet</p>
+            <p className="text-xs text-foreground-light">
+              This schema has no entities available yet
+            </p>
           </div>
         ) : searchText.length > 0 && (entityTypes?.length ?? 0) === 0 ? (
           <div className="mx-4 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
             <p className="text-xs">No results found</p>
-            <p className="text-xs text-scale-1100">There are no entities that match your search</p>
+            <p className="text-xs text-foreground-light">
+              There are no entities that match your search
+            </p>
           </div>
         ) : (
           <Menu
@@ -333,68 +349,49 @@ const TableEditorMenu = () => {
                     </div>
 
                     <div className="flex gap-3 items-center">
-                      <Dropdown
-                        size="small"
-                        side="bottom"
-                        align="start"
-                        style={{ zIndex: 1 }}
-                        overlay={[
-                          <Dropdown.Item
-                            key="alphabetical"
-                            icon={
-                              sort === 'alphabetical' ? (
-                                <IconCheck size="tiny" />
-                              ) : (
-                                <div className="w-[14px] h-[14px]" />
-                              )
-                            }
-                            onClick={() => {
-                              setSort('alphabetical')
-                            }}
-                          >
-                            Alphabetical
-                          </Dropdown.Item>,
-                          <Dropdown.Item
-                            key="grouped-alphabetical"
-                            icon={
-                              sort === 'grouped-alphabetical' ? (
-                                <IconCheck size="tiny" />
-                              ) : (
-                                <div className="w-[14px] h-[14px]" />
-                              )
-                            }
-                            onClick={() => {
-                              setSort('grouped-alphabetical')
-                            }}
-                          >
-                            Entity Type
-                          </Dropdown.Item>,
-                        ]}
-                      >
-                        <Tooltip.Root delayDuration={0}>
-                          <Tooltip.Trigger asChild>
-                            <div className="text-scale-900 transition-colors hover:text-scale-1200">
-                              <IconChevronsDown size={18} strokeWidth={1} />
-                            </div>
-                          </Tooltip.Trigger>
-                          <Tooltip.Portal>
-                            <Tooltip.Content side="bottom">
-                              <Tooltip.Arrow className="radix-tooltip-arrow" />
-                              <div
-                                className={[
-                                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                  'border border-scale-200',
-                                ].join(' ')}
-                              >
-                                <span className="text-xs">Sort By</span>
+                      <DropdownMenu_Shadcn_>
+                        <DropdownMenuTrigger_Shadcn_>
+                          <Tooltip.Root delayDuration={0}>
+                            <Tooltip.Trigger asChild>
+                              <div className="text-foreground-lighter transition-colors hover:text-foreground">
+                                <IconChevronsDown size={18} strokeWidth={1} />
                               </div>
-                            </Tooltip.Content>
-                          </Tooltip.Portal>
-                        </Tooltip.Root>
-                      </Dropdown>
+                            </Tooltip.Trigger>
+                            <Tooltip.Portal>
+                              <Tooltip.Content side="bottom">
+                                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                <div
+                                  className={[
+                                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                    'border border-scale-200',
+                                  ].join(' ')}
+                                >
+                                  <span className="text-xs">Sort By</span>
+                                </div>
+                              </Tooltip.Content>
+                            </Tooltip.Portal>
+                          </Tooltip.Root>
+                        </DropdownMenuTrigger_Shadcn_>
+                        <DropdownMenuContent_Shadcn_ side="bottom" align="start" className="w-48">
+                          <DropdownMenuRadioGroup_Shadcn_
+                            value={sort}
+                            onValueChange={(value: any) => setSort(value)}
+                          >
+                            <DropdownMenuRadioItem_Shadcn_ key="alphabetical" value="alphabetical">
+                              Alphabetical
+                            </DropdownMenuRadioItem_Shadcn_>
+                            <DropdownMenuRadioItem_Shadcn_
+                              key="grouped-alphabetical"
+                              value="grouped-alphabetical"
+                            >
+                              Entity Type
+                            </DropdownMenuRadioItem_Shadcn_>
+                          </DropdownMenuRadioGroup_Shadcn_>
+                        </DropdownMenuContent_Shadcn_>
+                      </DropdownMenu_Shadcn_>
 
                       <button
-                        className="cursor-pointer text-scale-900 transition-colors hover:text-scale-1200"
+                        className="cursor-pointer text-foreground-lighter transition-colors hover:text-foreground"
                         onClick={refreshTables}
                       >
                         <IconRefreshCw className={isRefetching ? 'animate-spin' : ''} size={14} />
