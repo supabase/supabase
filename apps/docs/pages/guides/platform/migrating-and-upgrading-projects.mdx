@@ -81,10 +81,19 @@ psql \
 
 Setting the `session_replication_role` to `replica` disables all triggers so that columns are not double encrypted.
 
-Notes:
+Troubleshooting notes:
 
 - If you have created any [custom roles](https://supabase.com/dashboard/project/_/database/roles) with `login` attribute, you have to manually set their passwords in the new project.
-- If you receive any permission errors when running `supabase db dump --db-url "$OLD_DB_URL" -f schema.sql`, you may need to edit the `schema.sql` file and change any lines saying `OWNER TO "supabase_admin"` to `OWNER TO "postgres"`.
+- If you run into any permission errors related to `supabase_admin` during restore, edit the `schema.sql` file and comment out any lines containing `ALTER ... OWNER TO "supabase_admin"`.
+
+### Schema changes to `auth` and `storage`
+
+If you have modified the `auth` and `storage` schemas in your old project, such as adding triggers or RLS policies, you have to restore them separately. The Supabase CLI can help you diff the changes to these schemas using the following commands.
+
+```bash
+supabase link --project-ref "$OLD_PROJECT_REF"
+supabase db diff --linked --schema auth,storage > changes.sql
+```
 
 ### Enable publication on tables
 
