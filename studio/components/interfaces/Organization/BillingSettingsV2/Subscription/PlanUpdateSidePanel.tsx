@@ -380,7 +380,7 @@ const PlanUpdateSidePanel = () => {
                 }
               />
 
-              {subscriptionPreview.number_of_projects &&
+              {subscriptionPreview.number_of_projects !== undefined &&
                 subscriptionPreview.number_of_projects > 1 && (
                   <p className="text-sm mt-2">
                     All {subscriptionPreview.number_of_projects} projects from your organization "

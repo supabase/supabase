@@ -186,6 +186,11 @@ const OrganizationProjects = ({
               .
             </p>
 
+            <p className="text-sm leading-normal">
+              Please do this until the <span className="font-medium">18th of October</span>, as
+              remaining organizations will be migrated.
+            </p>
+
             <div className="space-x-3">
               <Link href="https://supabase.com/blog/organization-based-billing" passHref>
                 <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
