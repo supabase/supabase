@@ -13,8 +13,8 @@ import pricingFaq from '~/data/PricingFAQ.json'
 import { useTheme } from 'next-themes'
 import ComputePricingModal from '~/components/Pricing/ComputePricingModal'
 import { plans } from 'shared-data/plans'
-import { ArrowNarrowRightIcon } from '@heroicons/react/outline'
 import AnnouncementBadge from '../../components/Announcement/Badge'
+import Image from 'next/image'
 
 export default function IndexPage() {
   const router = useRouter()
@@ -341,9 +341,11 @@ export default function IndexPage() {
           <div className="grid lg:grid-cols-3 gap-4 mb-16">
             {addons.map((addon) => (
               <div className="bg-white dark:bg-scale-300 rounded-[4px]" key={addon.name}>
-                <div className="overflow-hidden rounded-lg">
-                  <img
+                <div className="overflow-hidden rounded-lg relative h-56">
+                  <Image
                     className="w-full"
+                    layout="fill"
+                    objectFit="contain"
                     src={`${basePath}/images/pricing/${addon.heroImg}${
                       resolvedTheme === 'dark' ? '' : '-light'
                     }.png`}
