@@ -17,6 +17,7 @@ import { DOCS_RESOURCE_CONTENT } from './ProjectAPIDocs.constants'
 import { navigateToSection } from './Content/Content.utils'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useParams } from 'common'
+import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 
 const SecondLevelNav = () => {
   const { ref } = useParams()
@@ -30,6 +31,7 @@ const SecondLevelNav = () => {
   const [section, resource] = snap.activeDocsSection
 
   const { data: buckets } = useBucketsQuery({ projectRef: ref })
+  const { data: edgeFunctions } = useEdgeFunctionsQuery({ projectRef: ref })
   const bucket = (buckets ?? []).find((b) => b.name === resource)
 
   const header =
@@ -39,6 +41,8 @@ const SecondLevelNav = () => {
       ? 'Stored Procedures'
       : section === 'storage'
       ? 'Storage Buckets'
+      : section === 'edge-functions'
+      ? 'Edge Functions'
       : section
   const options =
     section === 'entities'
@@ -47,6 +51,8 @@ const SecondLevelNav = () => {
       ? functions
       : section === 'storage'
       ? buckets ?? []
+      : section === 'edge-functions'
+      ? edgeFunctions ?? []
       : []
 
   const updateSection = (value: string) => {
@@ -104,13 +110,13 @@ const SecondLevelNav = () => {
 
       <div className="space-y-2 py-2">
         {menuItems.map((item) => {
-          if (
-            section === 'storage' &&
-            bucket !== undefined &&
-            !bucket.public &&
-            item.key === 'retrieve-public-url'
-          )
-            return null
+          if (section === 'storage' && bucket !== undefined) {
+            if (
+              (!bucket.public && item.key === 'retrieve-public-url') ||
+              (bucket.public && item.key === 'create-signed-url')
+            )
+              return null
+          }
           return (
             <p
               key={item.key}

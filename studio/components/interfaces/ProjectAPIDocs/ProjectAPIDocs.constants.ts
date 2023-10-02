@@ -351,6 +351,32 @@ You can use Supabase Storage to store images, videos, documents, and any other f
     bash: undefined,
   },
   // Edge functions
+  edgeFunctions: {
+    key: 'edge-function',
+    category: 'edge-functions',
+    title: 'Introduction',
+    description: `
+Edge Functions are server-side TypeScript functions, distributed globally at the edge—close to your users. They can be used for listening to webhooks or integrating your Supabase project with third-parties like Stripe. Edge Functions are developed using Deno, which offers a few benefits to you as a developer:
+`,
+    js: undefined,
+    bash: undefined,
+  },
+  edgeFunctionsPreReq: {
+    key: 'edge-function-pre-req',
+    category: 'edge-functions',
+    title: 'Pre-requisites',
+    description: `
+Follow the steps to prepare your Supabase project on your local machine.
+
+- Install the Supabase [CLI](https://supabase.com/docs/guides/cli).
+- [Login to the CLI](https://supabase.com/docs/reference/cli/usage#supabase-login) using the command: \`supabase login\`..
+- [Initialize Supabase](https://supabase.com/docs/guides/getting-started/local-development#getting-started) inside your project using the command: \`supabase init\`..
+- [Link to your Remote Project](https://supabase.com/docs/reference/cli/usage#supabase-link) using the command \`supabase link --project-ref [ref]\`..
+- Setup your environment: Follow the steps [here](https://supabase.com/docs/guides/functions/quickstart#setting-up-your-environment).
+`,
+    js: undefined,
+    bash: undefined,
+  },
   createEdgeFunction: {
     key: 'create-edge-function',
     category: 'edge-functions',
@@ -358,9 +384,9 @@ You can use Supabase Storage to store images, videos, documents, and any other f
     description: `
 Create a Supabase Edge Function locally via the Supabase CLI.
 `,
-    js: (apikey?: string, endpoint?: string) => `// Create an edge function via the Supabase CLI`,
-    bash: (apikey?: string, endpoint?: string) => `
-supabase functions new hello-word
+    js: () => `// Create an edge function via the Supabase CLI`,
+    bash: () => `
+supabase functions new hello-world
 `,
   },
   deployEdgeFunction: {
@@ -370,32 +396,8 @@ supabase functions new hello-word
     description: `
 Deploy a Supabase Edge Function to your Supabase project via the Supabase CLI.
 `,
-    js: (apikey?: string, endpoint?: string) => `// Deploy an edge function via the Supabase CLI`,
-    bash: (apikey?: string, endpoint?: string) => `
-supabase functions deploy hello-world --project-ref PROJECT_REF
-`,
-  },
-  invokeEdgeFunction: {
-    key: 'invoke-edge-function',
-    category: 'edge-functions',
-    title: 'Invoke an Edge Function',
-    description: `
-Invokes a Supabase Edge Function. Requires an Authorization header, and invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.
-
-When you pass in a body to your function, we automatically attach the \`Content-Type\` header for \`Blob\`, \`ArrayBuffer\`, \`File\`, \`FormData\` and \`String\`. If it doesn't match any of these types we assume the payload is \`json\`, serialise it and attach the \`Content-Type\` header as \`application/json\`. You can override this behaviour by passing in a \`Content-Type\` header of your own.
-
-Responses are automatically parsed as \`json\`, \`blob\` and \`form-data\` depending on the \`Content-Type\` header sent by your function. Responses are parsed as \`text\` by default.
-`,
-    js: (apikey?: string, endpoint?: string) => `
-const { data, error } = await supabase.functions.invoke('hello', {
-  body: { foo: 'bar' }
-})
-`,
-    bash: (apikey?: string, endpoint?: string) => `\
-curl --request POST '${endpoint}' \
-  --header 'Authorization: Bearer ${apikey}' \
-  --header 'Content-Type: application/json' \
-  --data '{ "name": "Functions" }'
+    js: () => `// Deploy an edge function via the Supabase CLI`,
+    bash: () => `supabase functions deploy hello-world --project-ref [ref]
 `,
   },
   // Entities
@@ -493,6 +495,85 @@ The API endpoint supports POST (and in some cases GET) to execute the function.
     js: undefined,
     bash: undefined,
   },
+  // Realtime
+  realtime: {
+    key: 'realtime-introduction',
+    category: 'realtime',
+    title: 'Introduction',
+    description: `
+Supabase provides a globally distributed cluster of Realtime servers that enable the following functionality:
+
+- [Broadcast](https://supabase.com/docs/guides/realtime/broadcast): Send ephemeral messages from client to clients with low latency.
+- [Presence](https://supabase.com/docs/guides/realtime/presence): Track and synchronize shared state between clients.
+- [Postgres Changes](https://supabase.com/docs/guides/realtime/postgres-changes): Listen to Postgres database changes and send them to authorized clients.
+`,
+    js: undefined,
+    bash: undefined,
+  },
+  subscribeChannel: {
+    key: 'subscribe-to-channel',
+    category: 'realtime',
+    title: 'Subscribe to channel',
+    description: `
+Creates an event handler that listens to changes.
+
+- By default, Broadcast and Presence are enabled for all projects.
+- By default, listening to database changes is disabled for new projects due to database performance and security concerns. You can turn it on by managing Realtime's [replication](https://supabase.com/docs/guides/api#realtime-api-overview).
+- You can receive the "previous" data for updates and deletes by setting the table's \`REPLICA IDENTITY\` to \`FULL\` (e.g., \`ALTER TABLE your_table REPLICA IDENTITY FULL;\`).
+- Row level security is not applied to delete statements. When RLS is enabled and replica identity is set to full, only the primary key is sent to clients.
+`,
+    js: () => `
+supabase
+  .channel('any')
+  .on('broadcast', { event: 'cursor-pos' }, payload => {
+    console.log('Cursor position received!', payload)
+  })
+  .subscribe((status) => {
+    if (status === 'SUBSCRIBED') {
+      channel.send({
+        type: 'broadcast',
+        event: 'cursor-pos',
+        payload: { x: Math.random(), y: Math.random() },
+      })
+    }
+  })
+    `,
+    bash: () => `# Realtime streams are only supported by our client libraries`,
+  },
+  unsubscribeChannel: {
+    key: 'unsubscribe-channel',
+    category: 'realtime',
+    title: 'Unsubscribe from a channel',
+    description: `
+Unsubscribes and removes Realtime channel from Realtime client.
+
+Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+`,
+    js: () => `supabase.removeChannel(myChannel)`,
+    bash: () => `# Realtime streams are only supported by our client libraries`,
+  },
+  unsubscribeChannels: {
+    key: 'unsubscribe-channels',
+    category: 'realtime',
+    title: 'Unsubscribe from all channels',
+    description: `
+Unsubscribes and removes all Realtime channels from Realtime client.
+
+Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+`,
+    js: () => `supabase.removeChannels()`,
+    bash: () => `# Realtime streams are only supported by our client libraries`,
+  },
+  retrieveAllChannels: {
+    key: 'unsubscribe-channel',
+    category: 'realtime',
+    title: 'Unsubscribe from a channel',
+    description: `
+Returns all Realtime channels.
+`,
+    js: () => `const channels = supabase.getChannels()`,
+    bash: () => `# Realtime streams are only supported by our client libraries`,
+  },
 }
 
 export const DOCS_RESOURCE_CONTENT = {
@@ -501,7 +582,7 @@ export const DOCS_RESOURCE_CONTENT = {
     title: 'Invoke function',
     category: 'stored-procedures',
     description: undefined,
-    docsUrl: undefined,
+    docsUrl: 'https://supabase.com/docs/reference/javascript/rpc',
     code: ({
       rpcName,
       rpcParams,
@@ -562,11 +643,11 @@ else console.log(data)
     code: ({
       resourceId,
       endpoint,
-      apiKey,
+      apikey,
     }: {
       resourceId: string
       endpoint: string
-      apiKey: string
+      apikey: string
     }) => {
       return [
         {
@@ -574,8 +655,8 @@ else console.log(data)
           title: 'Read all rows',
           bash: `
 curl '${endpoint}/rest/v1/${resourceId}?select=*' \\
--H "apikey: ${apiKey}" \\
--H "Authorization: Bearer ${apiKey}"
+-H "apikey: ${apikey}" \\
+-H "Authorization: Bearer ${apikey}"
           `,
           js: `
 let { data: ${resourceId}, error } = await supabase
@@ -588,8 +669,8 @@ let { data: ${resourceId}, error } = await supabase
           title: 'Read specific columns',
           bash: `
 curl '${endpoint}/rest/v1/${resourceId}?select=some_column,other_column' \\
--H "apikey: ${apiKey}" \\
--H "Authorization: Bearer ${apiKey}"
+-H "apikey: ${apikey}" \\
+-H "Authorization: Bearer ${apikey}"
           `,
           js: `
 let { data: ${resourceId}, error } = await supabase
@@ -602,8 +683,8 @@ let { data: ${resourceId}, error } = await supabase
           title: 'Read foreign tables',
           bash: `
 curl '${endpoint}/rest/v1/${resourceId}?select=some_column,other_table(foreign_key)' \\
--H "apikey: ${apiKey}" \\
--H "Authorization: Bearer ${apiKey}"
+-H "apikey: ${apikey}" \\
+-H "Authorization: Bearer ${apikey}"
           `,
           js: `
 let { data: ${resourceId}, error } = await supabase
@@ -621,8 +702,8 @@ let { data: ${resourceId}, error } = await supabase
           title: 'With pagination',
           bash: `
 curl '${endpoint}/rest/v1/${resourceId}?select=*' \\
--H "apikey: ${apiKey}" \\
--H "Authorization: Bearer ${apiKey}" \\
+-H "apikey: ${apikey}" \\
+-H "Authorization: Bearer ${apikey}" \\
 -H "Range: 0-9"
           `,
           js: `
@@ -644,11 +725,11 @@ let { data: ${resourceId}, error } = await supabase
     code: ({
       resourceId,
       endpoint,
-      apiKey,
+      apikey,
     }: {
       resourceId: string
       endpoint: string
-      apiKey: string
+      apikey: string
     }) => {
       return [
         {
@@ -656,8 +737,8 @@ let { data: ${resourceId}, error } = await supabase
           title: 'With filtering',
           bash: `
 curl '${endpoint}/rest/v1/${resourceId}?id=eq.1&select=*' \\
--H "apikey: ${apiKey}" \\
--H "Authorization: Bearer ${apiKey}" \\
+-H "apikey: ${apikey}" \\
+-H "Authorization: Bearer ${apikey}" \\
 -H "Range: 0-9"
         `,
           js: `
@@ -698,11 +779,11 @@ let { data: ${resourceId}, error } = await supabase
     code: ({
       resourceId,
       endpoint,
-      apiKey,
+      apikey,
     }: {
       resourceId: string
       endpoint: string
-      apiKey: string
+      apikey: string
     }) => {
       return [
         {
@@ -710,8 +791,8 @@ let { data: ${resourceId}, error } = await supabase
           title: 'Insert a row',
           bash: `
 curl -X POST '${endpoint}/rest/v1/${resourceId}' \\
--H "apikey: ${apiKey}" \\
--H "Authorization: Bearer ${apiKey}" \\
+-H "apikey: ${apikey}" \\
+-H "Authorization: Bearer ${apikey}" \\
 -H "Content-Type: application/json" \\
 -H "Prefer: return=minimal" \\
 -d '{ "some_column": "someValue", "other_column": "otherValue" }'
@@ -730,8 +811,8 @@ const { data, error } = await supabase
           title: 'Insert many rows',
           bash: `
 curl -X POST '${endpoint}/rest/v1/${resourceId}' \\
--H "apikey: ${apiKey}" \\
--H "Authorization: Bearer ${apiKey}" \\
+-H "apikey: ${apikey}" \\
+-H "Authorization: Bearer ${apikey}" \\
 -H "Content-Type: application/json" \\
 -d '[{ "some_column": "someValue" }, { "other_column": "otherValue" }]'
           `,
@@ -750,8 +831,8 @@ const { data, error } = await supabase
           title: 'Upsert matching rows',
           bash: `
 curl -X POST '${endpoint}/rest/v1/${resourceId}' \\
--H "apikey: ${apiKey}" \\
--H "Authorization: Bearer ${apiKey}" \\
+-H "apikey: ${apikey}" \\
+-H "Authorization: Bearer ${apikey}" \\
 -H "Content-Type: application/json" \\
 -H "Prefer: resolution=merge-duplicates" \\
 -d '{ "some_column": "someValue", "other_column": "otherValue" }'
@@ -779,11 +860,11 @@ const { data, error } = await supabase
     code: ({
       resourceId,
       endpoint,
-      apiKey,
+      apikey,
     }: {
       resourceId: string
       endpoint: string
-      apiKey: string
+      apikey: string
     }) => {
       return [
         {
@@ -791,8 +872,8 @@ const { data, error } = await supabase
           title: 'Update matching rows',
           bash: `
 curl -X PATCH '${endpoint}/rest/v1/${resourceId}?some_column=eq.someValue' \\
--H "apikey: ${apiKey}" \\
--H "Authorization: Bearer ${apiKey}" \\
+-H "apikey: ${apikey}" \\
+-H "Authorization: Bearer ${apikey}" \\
 -H "Content-Type: application/json" \\
 -H "Prefer: return=minimal" \\
 -d '{ "other_column": "otherValue" }'
@@ -819,11 +900,11 @@ const { data, error } = await supabase
     code: ({
       resourceId,
       endpoint,
-      apiKey,
+      apikey,
     }: {
       resourceId: string
       endpoint: string
-      apiKey: string
+      apikey: string
     }) => {
       return [
         {
@@ -831,8 +912,8 @@ const { data, error } = await supabase
           title: 'Delete matching rows',
           bash: `
 curl -X DELETE '${endpoint}/rest/v1/${resourceId}?some_column=eq.someValue' \\
--H "apikey: ${apiKey}" \\
--H "Authorization: Bearer ${apiKey}"
+-H "apikey: ${apikey}" \\
+-H "Authorization: Bearer ${apikey}"
           `,
           js: `
 const { error } = await supabase
@@ -932,6 +1013,7 @@ const channels = supabase.channel('custom-filter-channel')
     key: 'upload-file',
     category: 'storage',
     title: 'Upload a file',
+    docsUrl: 'https://supabase.com/docs/reference/javascript/storage-from-upload',
     description: `
 Upload a file to an existing bucket. RLS policy permissions required:
 - \`buckets\` table permissions: none
@@ -958,6 +1040,7 @@ const { data, error } = await supabase
     key: 'delete-files',
     category: 'storage',
     title: 'Delete files',
+    docsUrl: 'https://supabase.com/docs/reference/javascript/storage-from-remove',
     description: `
 Delete files within the bucket. RLS policy permissions required:
 - \`buckets\` table permissions: none
@@ -980,6 +1063,7 @@ const { data, error } = await supabase
     key: 'list-files',
     category: 'storage',
     title: 'List all files',
+    docsUrl: 'https://supabase.com/docs/reference/javascript/storage-from-list',
     description: `
 List all files within the bucket. RLS policy permissions required:
 - \`buckets\` table permissions: none
@@ -1006,6 +1090,7 @@ const { data, error } = await supabase
     key: 'create-signed-url',
     category: 'storage',
     title: 'Create a signed URL',
+    docsUrl: 'https://supabase.com/docs/reference/javascript/storage-from-createsignedurl',
     description: `
 Create a signed URL which can be used to share a file for a fixed amount of time. RLS policy permissions required:
 - \`buckets\` table permissions: none
@@ -1028,6 +1113,7 @@ const { data, error } = await supabase
     key: 'retrieve-public-url',
     category: 'storage',
     title: 'Retrieve public URL',
+    docsUrl: 'https://supabase.com/docs/reference/javascript/storage-from-getpublicurl',
     description: `
 A simple convenience function to get the URL for an asset in a public bucket. If you do not want to use this function, you can construct the public URL by concatenating the bucket URL with the path to the asset.
 
@@ -1049,6 +1135,36 @@ const { data } = supabase
   .from('${name}')
   .getPublicUrl('folder/avatar1.png')
         `,
+      },
+    ],
+  },
+  invokeEdgeFunction: {
+    key: 'invoke-edge-function',
+    category: 'edge-functions',
+    title: 'Invoke an edge function',
+    docsUrl: 'https://supabase.com/docs/reference/javascript/functions-invoke',
+    description: `
+Invokes a Supabase Edge Function. Requires an Authorization header, and invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.
+
+When you pass in a body to your function, we automatically attach the \`Content-Type\` header for \`Blob\`, \`ArrayBuffer\`, \`File\`, \`FormData\` and \`String\`. If it doesn't match any of these types we assume the payload is \`json\`, serialise it and attach the \`Content-Type\` header as \`application/json\`. You can override this behaviour by passing in a \`Content-Type\` header of your own.
+
+Responses are automatically parsed as \`json\`, \`blob\` and \`form-data\` depending on the \`Content-Type\` header sent by your function. Responses are parsed as \`text\` by default.
+`,
+    code: ({ name, endpoint, apikey }: { name: string; endpoint: string; apikey: string }) => [
+      {
+        title: undefined,
+        bash: `
+curl --request POST '${endpoint}/functions/v1/${name}' \\
+--header 'Authorization: Bearer ${apikey}' \\
+--header 'Content-Type: application/json' \\
+--data '{ "name": "Functions" }'
+        `,
+        js: `
+const { data, error } = await supabase
+  .functions
+  .invoke('${name}', {
+    body: { foo: 'bar' }
+  })`,
       },
     ],
   },

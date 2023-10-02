@@ -2,10 +2,7 @@ import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import { useAppStateSnapshot } from 'state/app-state'
-import ContentSnippet from '../ContentSnippet'
 import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
-import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
-import { useProjectApiQuery } from 'data/config/project-api-query'
 import ResourceContent from '../ResourceContent'
 import { ContentProps } from './Content.types'
 
@@ -29,13 +26,11 @@ function getColumnType(type: string, format: string) {
   }
 }
 
-const Entity = ({ language }: ContentProps) => {
+const Entity = ({ language, apikey = '', endpoint = '' }: ContentProps) => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
   const resource = snap.activeDocsSection[1]
 
-  const useServiceKey = false
-  const { data } = useProjectApiQuery({ projectRef: ref })
   const { data: jsonSchema } = useProjectJsonSchemaQuery({ projectRef: ref })
   const definition = jsonSchema?.definitions?.[resource]
   const columns = Object.entries(definition.properties).map(([id, val]: any) => ({
@@ -43,9 +38,6 @@ const Entity = ({ language }: ContentProps) => {
     id,
     required: definition.required.includes(id),
   }))
-
-  const apiKey = useServiceKey ? 'SUPABASE_SERVICE_KEY' : 'SUPABASE_CLIENT_API_KEY'
-  const endpoint = data?.autoApiService.endpoint ?? ''
 
   if (resource === undefined) return null
 
@@ -88,7 +80,7 @@ const Entity = ({ language }: ContentProps) => {
         codeSnippets={DOCS_RESOURCE_CONTENT.readRows.code({
           resourceId: resource,
           endpoint,
-          apiKey,
+          apikey,
         })}
       />
       <ResourceContent
@@ -97,7 +89,7 @@ const Entity = ({ language }: ContentProps) => {
         codeSnippets={DOCS_RESOURCE_CONTENT.filtering.code({
           resourceId: resource,
           endpoint,
-          apiKey,
+          apikey,
         })}
       />
       <ResourceContent
@@ -106,7 +98,7 @@ const Entity = ({ language }: ContentProps) => {
         codeSnippets={DOCS_RESOURCE_CONTENT.insertRows.code({
           resourceId: resource,
           endpoint,
-          apiKey,
+          apikey,
         })}
       />
       <ResourceContent
@@ -115,7 +107,7 @@ const Entity = ({ language }: ContentProps) => {
         codeSnippets={DOCS_RESOURCE_CONTENT.updateRows.code({
           resourceId: resource,
           endpoint,
-          apiKey,
+          apikey,
         })}
       />
       <ResourceContent
@@ -124,7 +116,7 @@ const Entity = ({ language }: ContentProps) => {
         codeSnippets={DOCS_RESOURCE_CONTENT.deleteRows.code({
           resourceId: resource,
           endpoint,
-          apiKey,
+          apikey,
         })}
       />
       <ResourceContent

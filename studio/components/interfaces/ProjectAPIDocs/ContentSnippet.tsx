@@ -1,11 +1,11 @@
 import { useParams } from 'common'
 
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
-import { useProjectApiQuery } from 'data/config/project-api-query'
 import { Markdown } from '../Markdown'
 
 interface ContentSnippetProps {
-  useServiceKey?: boolean
+  apikey?: string
+  endpoint?: string
   selectedLanguage: 'js' | 'bash'
   snippet: {
     key: string
@@ -17,18 +17,12 @@ interface ContentSnippetProps {
   }
 }
 
-const ContentSnippet = ({
-  useServiceKey = false,
-  selectedLanguage,
-  snippet,
-}: ContentSnippetProps) => {
+const ContentSnippet = ({ apikey, endpoint, selectedLanguage, snippet }: ContentSnippetProps) => {
   const { ref: projectRef } = useParams()
-  const { data } = useProjectApiQuery({ projectRef })
-
-  const apikey = useServiceKey ? 'SUPABASE_SERVICE_KEY' : 'SUPABASE_CLIENT_API_KEY'
-  const endpoint = data?.autoApiService.endpoint ?? ''
-
-  const codeSnippet = snippet[selectedLanguage]?.(apikey, endpoint)
+  const codeSnippet = snippet[selectedLanguage]?.(apikey, endpoint).replaceAll(
+    '[ref]',
+    projectRef ?? ''
+  )
 
   return (
     <div id={snippet.key} className="space-y-4 py-6 pb-2 last:pb-6">

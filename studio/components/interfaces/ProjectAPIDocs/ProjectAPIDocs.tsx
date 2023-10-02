@@ -11,25 +11,40 @@ import {
   SidePanel,
 } from 'ui'
 
+import { useParams } from 'common'
+import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   Bucket,
+  EdgeFunction,
   EdgeFunctions,
   Entities,
   Entity,
   Introduction,
   RPC,
+  Realtime,
   Storage,
   StoredProcedures,
   UserManagement,
 } from './Content'
 import FirstLevelNav from './FirstLevelNav'
 import SecondLevelNav from './SecondLevelNav'
+import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 
 const ProjectAPIDocs = () => {
+  const { ref } = useParams()
   const snap = useAppStateSnapshot()
   const [open, setOpen] = useState(false)
+  const [useServiceKey, setUseServiceKey] = useState(false)
   const [language, setLanguage] = useState<'js' | 'bash'>('js')
+
+  const { data } = useProjectApiQuery({ projectRef: ref })
+  const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
+  const apikey = useServiceKey ? 'SUPABASE_SERVICE_KEY' : 'SUPABASE_CLIENT_API_KEY'
+  const endpoint =
+    customDomainData?.customDomain?.status === 'active'
+      ? `https://${customDomainData.customDomain?.hostname}/auth/v1/callback`
+      : `https://${data?.autoApiService.endpoint ?? ''}`
 
   const updateLanguage = (value: 'js' | 'bash') => {
     setLanguage(value)
@@ -83,11 +98,15 @@ const ProjectAPIDocs = () => {
         </div>
 
         <div className="flex-1 divide-y space-y-4 max-h-screen overflow-auto">
-          {snap.activeDocsSection[0] === 'introduction' && <Introduction language={language} />}
+          {snap.activeDocsSection[0] === 'introduction' && (
+            <Introduction language={language} apikey={apikey} endpoint={endpoint} />
+          )}
 
           {snap.activeDocsSection[0] === 'user-management' && (
-            <UserManagement language={language} />
+            <UserManagement language={language} apikey={apikey} endpoint={endpoint} />
           )}
+
+          {snap.activeDocsSection[0] === 'realtime' && <Realtime language={language} />}
 
           {snap.activeDocsSection[0] === 'storage' && (
             <>
@@ -99,12 +118,20 @@ const ProjectAPIDocs = () => {
             </>
           )}
 
-          {snap.activeDocsSection[0] === 'edge-functions' && <EdgeFunctions language={language} />}
+          {snap.activeDocsSection[0] === 'edge-functions' && (
+            <>
+              {snap.activeDocsSection[1] !== undefined ? (
+                <EdgeFunction language={language} apikey={apikey} endpoint={endpoint} />
+              ) : (
+                <EdgeFunctions language={language} />
+              )}
+            </>
+          )}
 
           {snap.activeDocsSection[0] === 'entities' && (
             <>
               {snap.activeDocsSection[1] !== undefined ? (
-                <Entity language={language} />
+                <Entity language={language} apikey={apikey} endpoint={endpoint} />
               ) : (
                 <Entities language={language} />
               )}

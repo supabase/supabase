@@ -69,18 +69,19 @@ const Bucket = ({ language }: ContentProps) => {
           name: resource,
         })}
       />
-      <ResourceContent
-        selectedLanguage={language}
-        snippet={DOCS_RESOURCE_CONTENT.createSignedURL}
-        codeSnippets={DOCS_RESOURCE_CONTENT.createSignedURL.code({
-          name: resource,
-        })}
-      />
-      {bucket.public && (
+      {bucket.public ? (
         <ResourceContent
           selectedLanguage={language}
           snippet={DOCS_RESOURCE_CONTENT.retrievePublicURL}
           codeSnippets={DOCS_RESOURCE_CONTENT.retrievePublicURL.code({
+            name: resource,
+          })}
+        />
+      ) : (
+        <ResourceContent
+          selectedLanguage={language}
+          snippet={DOCS_RESOURCE_CONTENT.createSignedURL}
+          codeSnippets={DOCS_RESOURCE_CONTENT.createSignedURL.code({
             name: resource,
           })}
         />

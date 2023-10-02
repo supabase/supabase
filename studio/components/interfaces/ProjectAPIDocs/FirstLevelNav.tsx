@@ -7,6 +7,7 @@ import { useStore } from 'hooks'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useParams } from 'common'
 import { navigateToSection } from './Content/Content.utils'
+import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 
 const FirstLevelNav = () => {
   const { ref } = useParams()
@@ -18,6 +19,7 @@ const FirstLevelNav = () => {
   const functions = data?.functions ?? []
 
   const { data: buckets } = useBucketsQuery({ projectRef: ref })
+  const { data: edgeFunctions } = useEdgeFunctionsQuery({ projectRef: ref })
 
   return (
     <>
@@ -85,6 +87,17 @@ const FirstLevelNav = () => {
                         onClick={() => snap.setActiveDocsSection([item.key, bucket.name])}
                       >
                         {bucket.name}
+                      </p>
+                    ))}
+                  {item.key === 'edge-functions' &&
+                    (edgeFunctions ?? []).map((fn) => (
+                      <p
+                        key={fn.name}
+                        title={fn.name}
+                        className="text-sm text-light px-4 hover:text-foreground transition cursor-pointer"
+                        onClick={() => snap.setActiveDocsSection([item.key, fn.name])}
+                      >
+                        {fn.name}
                       </p>
                     ))}
                 </div>
