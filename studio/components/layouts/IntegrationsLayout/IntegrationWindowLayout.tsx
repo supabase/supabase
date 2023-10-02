@@ -30,24 +30,24 @@ const IntegrationWindowLayout = ({
       <main className="overflow-auto flex flex-col h-full bg">{children}</main>
       <ScaffoldContainer className="bg-body flex flex-row gap-6 py-6 border-t">
         {docsHref && (
-          <Link href={docsHref} passHref>
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 text-xs text-light hover:text"
-            >
-              <IconBook size={16} /> Docs
-            </a>
-          </Link>
-        )}
-        <Link href={'https://supabase.com/support'} passHref>
-          <a
+          <Link
+            href={docsHref}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-xs text-light hover:text"
           >
-            <IconLifeBuoy size={16} /> Support
-          </a>
+            <IconBook size={16} />
+            Docs
+          </Link>
+        )}
+        <Link
+          href={'https://supabase.com/support'}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 text-xs text-light hover:text"
+        >
+          <IconLifeBuoy size={16} />
+          Support
         </Link>
       </ScaffoldContainer>
     </div>

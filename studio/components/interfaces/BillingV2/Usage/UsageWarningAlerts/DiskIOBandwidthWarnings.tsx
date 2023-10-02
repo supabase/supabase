@@ -27,13 +27,9 @@ const DiskIOBandwidthWarnings = ({
           performance. If you need consistent disk performance, consider upgrading to a larger
           compute add-on.
         </p>
-        <Link href={upgradeUrl}>
-          <a>
-            <Button type="danger">
-              {isFreePlan ? 'Upgrade project' : 'Change compute add-on'}
-            </Button>
-          </a>
-        </Link>
+        <Button asChild type="danger">
+          <Link href={upgradeUrl}>{isFreePlan ? 'Upgrade project' : 'Change compute add-on'}</Link>
+        </Button>
       </Alert>
     )
   }
@@ -46,13 +42,9 @@ const DiskIOBandwidthWarnings = ({
           up all your Disk IO Budget, your instance will reverted to baseline performance. If you
           need consistent disk performance, consider upgrading to a larger compute add-on.
         </p>
-        <Link href={upgradeUrl}>
-          <a>
-            <Button type="danger">
-              {isFreePlan ? 'Upgrade project' : 'Change compute add-on'}
-            </Button>
-          </a>
-        </Link>
+        <Button asChild type="danger">
+          <Link href={upgradeUrl}>{isFreePlan ? 'Upgrade project' : 'Change compute add-on'}</Link>
+        </Button>
       </Alert>
     )
   }
@@ -65,13 +57,9 @@ const DiskIOBandwidthWarnings = ({
           least once during this billing cycle. If you need consistent disk performance, consider
           upgrading to a larger compute add-on.
         </p>
-        <Link href={upgradeUrl}>
-          <a>
-            <Button type="warning">
-              {isFreePlan ? 'Upgrade project' : 'Change compute add-on'}
-            </Button>
-          </a>
-        </Link>
+        <Button asChild type="warning">
+          <Link href={upgradeUrl}>{isFreePlan ? 'Upgrade project' : 'Change compute add-on'}</Link>
+        </Button>
       </Alert>
     )
   }
@@ -89,13 +77,9 @@ const DiskIOBandwidthWarnings = ({
           baseline performance. If you need consistent disk performance, consider upgrading to a
           larger compute add-on.
         </p>
-        <Link href={upgradeUrl}>
-          <a>
-            <Button type="warning">
-              {isFreePlan ? 'Upgrade project' : 'Change compute add-on'}
-            </Button>
-          </a>
-        </Link>
+        <Button asChild type="warning">
+          <Link href={upgradeUrl}>{isFreePlan ? 'Upgrade project' : 'Change compute add-on'}</Link>
+        </Button>
       </Alert>
     )
   }

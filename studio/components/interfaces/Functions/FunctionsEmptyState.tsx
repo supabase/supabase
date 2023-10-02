@@ -16,23 +16,24 @@ const FunctionsEmptyState = () => {
             Supabase project with third-parties.
           </p>
           <div className="flex gap-2">
-            <Link passHref href="https://supabase.com/docs/guides/functions">
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" iconRight={<IconBookOpen />}>
-                  Documentation
-                </Button>
-              </a>
-            </Link>
-            <Link
-              passHref
-              href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
-            >
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" iconRight={<IconCode />}>
-                  Examples
-                </Button>
-              </a>
-            </Link>
+            <Button asChild type="default" iconRight={<IconBookOpen />}>
+              <Link
+                href="https://supabase.com/docs/guides/functions"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Documentation
+              </Link>
+            </Button>
+            <Button asChild type="default" iconRight={<IconCode />}>
+              <Link
+                href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Examples
+              </Link>
+            </Button>
           </div>
         </div>
         <TerminalInstructions />

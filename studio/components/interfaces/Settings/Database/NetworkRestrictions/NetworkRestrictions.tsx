@@ -110,13 +110,15 @@ const NetworkRestrictions = ({}) => {
             description="Allow specific IP ranges to have access to your database."
           />
           <div className="flex items-center space-x-2 mb-6">
-            <Link href="https://supabase.com/docs/guides/platform/network-restrictions">
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" icon={<IconExternalLink />}>
-                  Documentation
-                </Button>
-              </a>
-            </Link>
+            <Button asChild type="default" icon={<IconExternalLink />}>
+              <Link
+                href="https://supabase.com/docs/guides/platform/network-restrictions"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Documentation
+              </Link>
+            </Button>
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger>
                 <Button

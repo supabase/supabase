@@ -30,9 +30,7 @@ const PolicyTableRowHeader = ({
     <div id={table.id.toString()} className="flex w-full items-center justify-between">
       <div className="flex space-x-4 text-left">
         <Link href={`/project/${ref}/editor/${table.id}`}>
-          <a>
-            <h4 className="m-0">{table.name}</h4>
-          </a>
+          <h4 className="m-0">{table.name}</h4>
         </Link>
         {isLocked ? (
           <Badge color="scale">

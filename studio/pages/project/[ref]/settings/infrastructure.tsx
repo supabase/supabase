@@ -22,8 +22,8 @@ const ProjectInfrastructure: NextPageWithLayout = () => {
           title="This page is only available for projects under an organization subscription"
         >
           You might be looking for the{' '}
-          <Link href={`/project/${ref}/settings/billing/usage`}>
-            <a className="text-brand">project's usage</a>
+          <Link href={`/project/${ref}/settings/billing/usage`} className="text-brand">
+            project's usage
           </Link>{' '}
           page instead.
         </Alert>

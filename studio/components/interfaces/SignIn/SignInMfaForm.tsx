@@ -171,16 +171,12 @@ const SignInMfaForm = () => {
           )}
           <li>
             <Link
-              passHref
               href="/support/new?subject=Unable+to+sign+in+via+MFA&category=Login_issues"
+              target="_blank"
+              rel="noreferrer"
+              className="text-sm transition text-foreground-light hover:text-foreground"
             >
-              <a
-                target="_blank"
-                rel="noreferrer"
-                className="text-sm transition text-foreground-light hover:text-foreground"
-              >
-                Reach out to us via support
-              </a>
+              Reach out to us via support
             </Link>
           </li>
         </ul>

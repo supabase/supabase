@@ -173,13 +173,15 @@ const DeleteConfirmationDialogs = ({
                   All dependent objects will be removed, as will any objects that depend on them,
                   recursively.
                 </p>
-                <Link href="https://www.postgresql.org/docs/current/ddl-depend.html">
-                  <a target="_blank" rel="noreferrer">
-                    <Button size="tiny" type="default" icon={<IconExternalLink />}>
-                      About dependency tracking
-                    </Button>
-                  </a>
-                </Link>
+                <Button asChild size="tiny" type="default" icon={<IconExternalLink />}>
+                  <Link
+                    href="https://www.postgresql.org/docs/current/ddl-depend.html"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    About dependency tracking
+                  </Link>
+                </Button>
               </Alert>
             )}
           </div>
@@ -220,13 +222,15 @@ const DeleteConfirmationDialogs = ({
                   All dependent objects will be removed, as will any objects that depend on them,
                   recursively.
                 </p>
-                <Link href="https://www.postgresql.org/docs/current/ddl-depend.html">
-                  <a target="_blank" rel="noreferrer">
-                    <Button size="tiny" type="default" icon={<IconExternalLink />}>
-                      About dependency tracking
-                    </Button>
-                  </a>
-                </Link>
+                <Button asChild size="tiny" type="default" icon={<IconExternalLink />}>
+                  <Link
+                    href="https://www.postgresql.org/docs/current/ddl-depend.html"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    About dependency tracking
+                  </Link>
+                </Button>
               </Alert>
             )}
           </div>

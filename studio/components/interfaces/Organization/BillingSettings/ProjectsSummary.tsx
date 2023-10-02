@@ -51,11 +51,12 @@ const ProjectSummary = ({ project }: ProjectSummaryProps) => {
             <p className="text-sm">{dayjs.unix(currentPeriodEnd).utc().format('MMM D, YYYY')}</p>
           </div>
           <div className="flex w-[15%] items-center justify-end">
-            <Link href={`/project/${project.ref}/settings/billing/subscription`}>
-              <a className="flex items-center space-x-2 group">
-                <p className="text-xs transition opacity-0 group-hover:opacity-100">View details</p>
-                <IconChevronRight strokeWidth={1.5} />
-              </a>
+            <Link
+              href={`/project/${project.ref}/settings/billing/subscription`}
+              className="flex items-center space-x-2 group"
+            >
+              <p className="text-xs transition opacity-0 group-hover:opacity-100">View details</p>
+              <IconChevronRight strokeWidth={1.5} />
             </Link>
           </div>
         </>

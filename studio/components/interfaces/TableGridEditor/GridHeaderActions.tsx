@@ -4,7 +4,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import { Button, IconAlertCircle, IconCode, IconLock, IconZap, IconZapOff, Modal } from 'ui'
+import { Button, IconAlertCircle, IconCode, IconLock, Modal } from 'ui'
 
 import { rlsAcknowledgedKey } from 'components/grid/constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -145,26 +145,25 @@ const GridHeaderActions = ({
         )}
 
         {(table.rls_enabled || showRLSWarning) && (
-          <Link href={`/project/${projectRef}/auth/policies?search=${table.id}`}>
-            <a>
-              <Button
-                type={table.rls_enabled ? 'link' : 'warning'}
-                icon={
-                  table.rls_enabled ? (
-                    <IconLock strokeWidth={2} size={14} />
-                  ) : (
-                    <IconAlertCircle strokeWidth={2} size={14} />
-                  )
-                }
-              >
-                {!table.rls_enabled
-                  ? 'RLS is not enabled'
-                  : `${policies.length == 0 ? 'No' : policies.length} active RLS polic${
-                      policies.length > 1 || policies.length == 0 ? 'ies' : 'y'
-                    }`}
-              </Button>
-            </a>
-          </Link>
+          <Button
+            asChild
+            type={table.rls_enabled ? 'link' : 'warning'}
+            icon={
+              table.rls_enabled ? (
+                <IconLock strokeWidth={2} size={14} />
+              ) : (
+                <IconAlertCircle strokeWidth={2} size={14} />
+              )
+            }
+          >
+            <Link href={`/project/${projectRef}/auth/policies?search=${table.id}`}>
+              {!table.rls_enabled
+                ? 'RLS is not enabled'
+                : `${policies.length == 0 ? 'No' : policies.length} active RLS polic${
+                    policies.length > 1 || policies.length == 0 ? 'ies' : 'y'
+                  }`}
+            </Link>
+          </Button>
         )}
         <Button
           type="default"
@@ -203,8 +202,8 @@ const GridHeaderActions = ({
           {!isRealtimeEnabled && (
             <p className="text-sm">
               You may also select which events to broadcast to subscribers on the{' '}
-              <Link href={`/project/${ref}/database/replication`}>
-                <a className="text-brand">database replication</a>
+              <Link href={`/project/${ref}/database/replication`} className="text-brand">
+                database replication
               </Link>{' '}
               settings.
             </p>

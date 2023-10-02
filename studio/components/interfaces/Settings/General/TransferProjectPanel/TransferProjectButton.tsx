@@ -145,10 +145,13 @@ const TransferProjectButton = () => {
             <p className="text-sm">
               To transfer projects, the owner must be a member of both the source and target
               organizations. For further information see our{' '}
-              <Link href="https://supabase.com/docs/guides/platform/project-transfer">
-                <a className="text-brand hover:underline" target="_blank" rel="noreferrer">
-                  Documentation
-                </a>
+              <Link
+                href="https://supabase.com/docs/guides/platform/project-transfer"
+                className="text-brand hover:underline"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Documentation
               </Link>
               .
             </p>
@@ -227,16 +230,22 @@ const TransferProjectButton = () => {
 
                 <p className="text-foreground-light text-sm">
                   The target organization needs to use{' '}
-                  <Link href="https://supabase.com/docs/guides/platform/org-based-billing">
-                    <a target="_blank" rel="noreferrer" className="underline">
-                      organization-based billing
-                    </a>
+                  <Link
+                    href="https://supabase.com/docs/guides/platform/org-based-billing"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline"
+                  >
+                    organization-based billing
                   </Link>
                   . To migrate an organization to the new billing, head to your{' '}
-                  <Link href="/org/_/billing">
-                    <a target="_blank" rel="noreferrer" className="underline">
-                      organizations billing settings
-                    </a>
+                  <Link
+                    href="/org/_/billing"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline"
+                  >
+                    organizations billing settings
                   </Link>
                   .
                 </p>

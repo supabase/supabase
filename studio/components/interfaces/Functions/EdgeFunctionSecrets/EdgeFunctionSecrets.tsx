@@ -65,13 +65,19 @@ const EdgeFunctionSecrets = () => {
               icon={<IconSearch size="tiny" />}
             />
             <div className="flex items-center space-x-2">
-              <Link passHref href="https://supabase.com/docs/guides/functions/secrets">
-                <a target="_blank" rel="noreferrer">
-                  <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
-                    Documentation
-                  </Button>
-                </a>
-              </Link>
+              <Button
+                asChild
+                type="default"
+                icon={<IconExternalLink size={14} strokeWidth={1.5} />}
+              >
+                <Link
+                  href="https://supabase.com/docs/guides/functions/secrets"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Documentation
+                </Link>
+              </Button>
               <Button onClick={() => setShowCreateSecret(true)}>Add new secret</Button>
             </div>
           </div>

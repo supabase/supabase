@@ -10,15 +10,14 @@ interface SettingsMenuItemProps {
 const SettingsMenuItem = ({ href, label, isActive }: SettingsMenuItemProps) => {
   return (
     <div>
-      <Link href={href}>
-        <a
-          className={clsx(
-            'text-sm',
-            isActive ? 'text-foreground' : 'text-foreground-light hover:text-foreground transition'
-          )}
-        >
-          {label}
-        </a>
+      <Link
+        href={href}
+        className={clsx(
+          'text-sm',
+          isActive ? 'text-foreground' : 'text-foreground-light hover:text-foreground transition'
+        )}
+      >
+        {label}
       </Link>
     </div>
   )

@@ -181,21 +181,22 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
                     Auto-scaling
                   </Badge>
                 </div>
-                <Link href="https://supabase.com/docs/guides/platform/database-usage#disk-management">
-                  <a>
-                    <Button size="tiny" type="default" icon={<IconExternalLink size={14} />}>
-                      What is disk size?
-                    </Button>
-                  </a>
-                </Link>
+                <Button asChild size="tiny" type="default" icon={<IconExternalLink size={14} />}>
+                  <Link href="https://supabase.com/docs/guides/platform/database-usage#disk-management">
+                    What is disk size?
+                  </Link>
+                </Button>
               </div>
               <p className="text-sm text-foreground-light mt-3">
                 If you reach 95% of the disk space, your project will enter read-only mode. Your
                 disk storage expands automatically when the database reaches 90% of the disk size.
                 The disk is expanded to be 50% larger. Auto-scaling can only take place once every 6
                 hours. You can also{' '}
-                <Link passHref href={`/project/${ref}/settings/database#diskManagement`}>
-                  <a className="text-brand transition hover:text-brand-600">preprovision</a>
+                <Link
+                  href={`/project/${ref}/settings/database#diskManagement`}
+                  className="text-brand transition hover:text-brand-600"
+                >
+                  preprovision
                 </Link>{' '}
                 disk for loading larger amounts of data.
               </p>

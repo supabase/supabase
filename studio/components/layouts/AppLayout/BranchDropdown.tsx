@@ -41,25 +41,23 @@ const BranchLink = ({
     sanitizedRoute?.replace('[ref]', branch.project_ref) ?? `/project/${branch.project_ref}`
 
   return (
-    <Link passHref href={href}>
-      <CommandItem_Shadcn_
-        asChild
-        value={branch.name}
-        className="cursor-pointer w-full flex items-center justify-between"
-        onSelect={() => {
-          setOpen(false)
-          router.push(href)
-        }}
-        onClick={() => {
-          setOpen(false)
-        }}
-      >
-        <a>
-          {branch.name}
-          {isSelected && <IconCheck />}
-        </a>
-      </CommandItem_Shadcn_>
-    </Link>
+    <CommandItem_Shadcn_
+      asChild
+      value={branch.name}
+      className="cursor-pointer w-full flex items-center justify-between"
+      onSelect={() => {
+        setOpen(false)
+        router.push(href)
+      }}
+      onClick={() => {
+        setOpen(false)
+      }}
+    >
+      <Link href={href}>
+        {branch.name}
+        {isSelected && <IconCheck />}
+      </Link>
+    </CommandItem_Shadcn_>
   )
 }
 
@@ -137,22 +135,20 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
                     </ScrollArea>
                   </CommandGroup_Shadcn_>
                   <CommandGroup_Shadcn_ className="border-t">
-                    <Link passHref href={`/project/${ref}/branches`}>
-                      <CommandItem_Shadcn_
-                        asChild
-                        className="cursor-pointer flex items-center space-x-2 w-full"
-                        onSelect={(e) => {
-                          setOpen(false)
-                          router.push(`/project/${ref}/branches`)
-                        }}
-                        onClick={() => setOpen(false)}
-                      >
-                        <a>
-                          <ListTree size={14} strokeWidth={1.5} />
-                          <p>Manage branches</p>
-                        </a>
-                      </CommandItem_Shadcn_>
-                    </Link>
+                    <CommandItem_Shadcn_
+                      asChild
+                      className="cursor-pointer flex items-center space-x-2 w-full"
+                      onSelect={(e) => {
+                        setOpen(false)
+                        router.push(`/project/${ref}/branches`)
+                      }}
+                      onClick={() => setOpen(false)}
+                    >
+                      <Link href={`/project/${ref}/branches`}>
+                        <ListTree size={14} strokeWidth={1.5} />
+                        <p>Manage branches</p>
+                      </Link>
+                    </CommandItem_Shadcn_>
                   </CommandGroup_Shadcn_>
                 </CommandList_Shadcn_>
               </Command_Shadcn_>

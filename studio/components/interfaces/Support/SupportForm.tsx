@@ -444,20 +444,22 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                         Enhanced SLAs for support are available on our Enterprise Plan.
                       </p>
                       <div className="flex items-center space-x-2">
-                        <Link
-                          href={`/project/${values.projectRef}/settings/billing/subscription?panel=subscriptionPlan`}
-                        >
-                          <a>
-                            <Button>Upgrade project</Button>
-                          </a>
-                        </Link>
-                        <Link href="https://supabase.com/contact/enterprise">
-                          <a target="_blank" rel="noreferrer">
-                            <Button type="default" icon={<IconExternalLink size={14} />}>
-                              Enquire about Enterprise
-                            </Button>
-                          </a>
-                        </Link>
+                        <Button asChild>
+                          <Link
+                            href={`/project/${values.projectRef}/settings/billing/subscription?panel=subscriptionPlan`}
+                          >
+                            Upgrade project
+                          </Link>
+                        </Button>
+                        <Button asChild type="default" icon={<IconExternalLink size={14} />}>
+                          <Link
+                            href="https://supabase.com/contact/enterprise"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Enquire about Enterprise
+                          </Link>
+                        </Button>
                       </div>
                     </div>
                   }
@@ -489,15 +491,12 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                               <Link
                                 key="gh-discussions"
                                 href={`https://github.com/orgs/supabase/discussions?discussions_q=${values.subject}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="flex items-center space-x-2 text-foreground-light underline hover:text-foreground transition"
                               >
-                                <a
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="flex items-center space-x-2 text-foreground-light underline hover:text-foreground transition"
-                                >
-                                  Github discussions
-                                  <IconExternalLink size={14} strokeWidth={2} className="ml-1" />
-                                </a>
+                                Github discussions
+                                <IconExternalLink size={14} strokeWidth={2} className="ml-1" />
                               </Link>
                               <span> for a quick answer</span>
                             </p>
@@ -562,16 +561,15 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                                   </p>
                                 </div>
                                 <div>
-                                  <Link href={library.url}>
-                                    <a target="_blank" rel="noreferrer">
-                                      <Button
-                                        type="default"
-                                        icon={<IconExternalLink size={14} strokeWidth={1.5} />}
-                                      >
-                                        View Github issues
-                                      </Button>
-                                    </a>
-                                  </Link>
+                                  <Button
+                                    asChild
+                                    type="default"
+                                    icon={<IconExternalLink size={14} strokeWidth={1.5} />}
+                                  >
+                                    <Link href={library.url} target="_blank" rel="noreferrer">
+                                      View Github issues
+                                    </Link>
+                                  </Button>
                                 </div>
                               </div>
                             )
@@ -589,16 +587,19 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                               </p>
                             </div>
                             <div>
-                              <Link href="https://github.com/supabase/supabase">
-                                <a target="_blank" rel="noreferrer">
-                                  <Button
-                                    type="default"
-                                    icon={<IconExternalLink size={14} strokeWidth={1.5} />}
-                                  >
-                                    View Github issues
-                                  </Button>
-                                </a>
-                              </Link>
+                              <Button
+                                asChild
+                                type="default"
+                                icon={<IconExternalLink size={14} strokeWidth={1.5} />}
+                              >
+                                <Link
+                                  href="https://github.com/supabase/supabase"
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  View Github issues
+                                </Link>
+                              </Button>
                             </div>
                           </div>
                         </div>

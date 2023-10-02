@@ -97,11 +97,12 @@ const ProjectUpgradeAlert = () => {
                                       <p className="text-foreground">{change.title}</p>
                                       <p className="flex items-center space-x-1">
                                         <span>This update has breaking changes. Read more </span>
-                                        <Link href={change.url}>
-                                          <a className="text-brand opacity-90 flex items-center space-x-1">
-                                            <span>here</span>
-                                            <IconExternalLink size="tiny" strokeWidth={2} />
-                                          </a>
+                                        <Link
+                                          href={change.url}
+                                          className="text-brand opacity-90 flex items-center space-x-1"
+                                        >
+                                          <span>here</span>
+                                          <IconExternalLink size="tiny" strokeWidth={2} />
                                         </Link>
                                       </p>
                                     </li>

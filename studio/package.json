@@ -29,6 +29,7 @@
     "@scaleleap/pg-format": "^1.0.0",
     "@sentry/browser": "^7.72.0",
     "@sentry/nextjs": "^7.72.0",
+    "@sentry/tracing": "^7.72.0",
     "@serafin/schema-builder": "^0.18.2",
     "@stripe/react-stripe-js": "^1.7.0",
     "@stripe/stripe-js": "^1.25.0",

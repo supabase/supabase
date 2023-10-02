@@ -191,11 +191,9 @@ const DatabaseUsage = observer(() => {
                 <p className="text-sm text-foreground">
                   Head to your{' '}
                   <Link href={`/org/${selectedOrganization?.slug}/usage`}>
-                    <a>
-                      <span className="text-green-900 transition hover:text-green-1000">
-                        organizations usage page
-                      </span>
-                    </a>
+                    <span className="text-green-900 transition hover:text-green-1000">
+                      organizations usage page
+                    </span>
                   </Link>
                   , to see a breakdown of your entire usage.
                 </p>

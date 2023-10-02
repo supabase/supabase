@@ -97,13 +97,11 @@ const GithubRepositorySelection = ({
               : 'Your database preview branches will be based on the branches in the Git repository that your project is connected with.'}
           </p>
           {!hasGithubIntegrationInstalled && (
-            <Link passHref href={githubIntegrationAppUrl}>
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" className="!mt-3">
-                  Install Github Integration
-                </Button>
-              </a>
-            </Link>
+            <Button asChild type="default" className="!mt-3">
+              <Link href={githubIntegrationAppUrl} target="_blank" rel="noreferrer">
+                Install Github Integration
+              </Link>
+            </Button>
           )}
           {hasGithubIntegrationInstalled && !githubConnection && (
             <EmptyIntegrationConnection showNode={false} onClick={() => onSelectConnectRepo()} />

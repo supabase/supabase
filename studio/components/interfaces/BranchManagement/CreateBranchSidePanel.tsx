@@ -118,10 +118,12 @@ const CreateBranchSidePanel = ({ visible, onClose }: CreateBranchSidePanelProps)
               </p>
               <div className="flex items-center space-x-2">
                 <p>{githubConnection?.metadata.name}</p>
-                <Link passHref href={`https://github.com/${repoOwner}/${repoName}`}>
-                  <a target="_blank" rel="noreferrer">
-                    <IconExternalLink size={14} strokeWidth={1.5} />
-                  </a>
+                <Link
+                  href={`https://github.com/${repoOwner}/${repoName}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <IconExternalLink size={14} strokeWidth={1.5} />
                 </Link>
               </div>
             </div>
@@ -156,13 +158,20 @@ const CreateBranchSidePanel = ({ visible, onClose }: CreateBranchSidePanelProps)
                     <AlertTitle_Shadcn_>No branches available in repository</AlertTitle_Shadcn_>
                     <AlertDescription_Shadcn_>
                       <p>Create a branch in the {repoName} repository on Github first</p>
-                      <Link passHref href={`https://github.com/${repoOwner}/${repoName}`}>
-                        <a target="_blank" rel="noreferrer">
-                          <Button type="default" iconRight={<IconExternalLink />} className="mt-2">
-                            Create a new branch on Github
-                          </Button>
-                        </a>
-                      </Link>
+                      <Button
+                        asChild
+                        type="default"
+                        iconRight={<IconExternalLink />}
+                        className="mt-2"
+                      >
+                        <Link
+                          href={`https://github.com/${repoOwner}/${repoName}`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Create a new branch on Github
+                        </Link>
+                      </Button>
                     </AlertDescription_Shadcn_>
                   </Alert_Shadcn_>
                 )}

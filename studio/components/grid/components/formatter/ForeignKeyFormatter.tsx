@@ -53,16 +53,14 @@ export const ForeignKeyFormatter = (props: PropsWithChildren<FormatterProps<Supa
             <Link
               href={`/project/${projectRef}/editor/${targetTable?.id}?filter=${relationship?.target_column_name}%3Aeq%3A${value}`}
             >
-              <a>
-                <Button
-                  type="default"
-                  size="tiny"
-                  className="translate-y-[2px]"
-                  onClick={() => {}}
-                  icon={<IconArrowRight size="tiny" />}
-                  style={{ padding: '3px' }}
-                />
-              </a>
+              <Button
+                type="default"
+                size="tiny"
+                className="translate-y-[2px]"
+                onClick={() => {}}
+                icon={<IconArrowRight size="tiny" />}
+                style={{ padding: '3px' }}
+              />
             </Link>
           </Tooltip.Trigger>
           <Tooltip.Portal>

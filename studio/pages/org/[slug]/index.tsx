@@ -38,13 +38,9 @@ const ProjectsPage: NextPageWithLayout = () => {
           <NoProjectsOnPaidOrgInfo organization={organization} />
 
           <div>
-            <Link href={`/new/${organization?.slug}`}>
-              <a>
-                <Button size="medium" type="default" iconRight={<IconPlus />}>
-                  New project
-                </Button>
-              </a>
-            </Link>
+            <Button asChild size="medium" type="default" iconRight={<IconPlus />}>
+              <Link href={`/new/${organization?.slug}`}>New project</Link>
+            </Button>
           </div>
           <div className="space-y-4">
             <h4 className="text-lg">Projects</h4>
@@ -68,11 +64,9 @@ const ProjectsPage: NextPageWithLayout = () => {
                       </p>
                     </div>
                     <div>
-                      <Link href={`/new/${organization?.slug}`}>
-                        <a>
-                          <Button icon={<IconPlus />}>New Project</Button>
-                        </a>
-                      </Link>
+                      <Button asChild icon={<IconPlus />}>
+                        <Link href={`/new/${organization?.slug}`}>New Project</Link>
+                      </Button>
                     </div>
                   </div>
                 ) : (

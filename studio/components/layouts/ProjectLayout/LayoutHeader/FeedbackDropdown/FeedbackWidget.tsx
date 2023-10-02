@@ -223,11 +223,9 @@ const FeedbackWidget = ({
         <p className="text-xs text-foreground-light">
           Have a technical issue? Contact{' '}
           <Link href="/support/new">
-            <a>
-              <span className="cursor-pointer text-brand transition-colors hover:text-brand-600">
-                Supabase support
-              </span>
-            </a>
+            <span className="cursor-pointer text-brand transition-colors hover:text-brand-600">
+              Supabase support
+            </span>
           </Link>{' '}
           or{' '}
           <a href="https://supabase.com/docs" target="_blank" rel="noreferrer">

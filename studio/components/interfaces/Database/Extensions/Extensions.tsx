@@ -57,13 +57,15 @@ const Extensions = () => {
               />
             </div>
           ) : (
-            <Link passHref href="https://supabase.com/docs/guides/database/extensions">
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" iconRight={<IconBookOpen />}>
-                  Learn more about extensions
-                </Button>
-              </a>
-            </Link>
+            <Button asChild type="default" iconRight={<IconBookOpen />}>
+              <Link
+                href="https://supabase.com/docs/guides/database/extensions"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Learn more about extensions
+              </Link>
+            </Button>
           )}
         </div>
       </div>

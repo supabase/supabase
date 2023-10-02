@@ -243,18 +243,20 @@ const ColumnEditor = ({
             className="lg:!col-span-4"
             description={
               <div>
-                <Link href="https://supabase.com/docs/guides/database/tables#data-types" passHref>
-                  <Button
-                    asChild
-                    type="default"
-                    size="tiny"
-                    icon={<IconExternalLink size={14} strokeWidth={2} />}
+                <Button
+                  asChild
+                  type="default"
+                  size="tiny"
+                  icon={<IconExternalLink size={14} strokeWidth={2} />}
+                >
+                  <Link
+                    href="https://supabase.com/docs/guides/database/tables#data-types"
+                    target="_blank"
+                    rel="noreferrer"
                   >
-                    <a target="_blank" rel="noreferrer">
-                      About data types
-                    </a>
-                  </Button>
-                </Link>
+                    About data types
+                  </Link>
+                </Button>
               </div>
             }
           >
@@ -367,8 +369,11 @@ const ColumnEditor = ({
                     {!isPgSodiumInstalled ? (
                       <p>
                         You will need to{' '}
-                        <Link href={`/project/${ref}/database/extensions?filter=pgsodium`}>
-                          <a className="text-brand-300 hover:text-brand transition">install</a>
+                        <Link
+                          href={`/project/${ref}/database/extensions?filter=pgsodium`}
+                          className="text-brand-300 hover:text-brand transition"
+                        >
+                          install
                         </Link>{' '}
                         the extension <code className="text-xs">pgsodium</code> first before being
                         able to encrypt your column.

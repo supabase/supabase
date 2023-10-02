@@ -103,10 +103,11 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
                         }`
                     : extensions.find((item: any) => item.name === extension.name)?.link ?? ''
                 }
+                className="max-w-[85%] cursor-default zans"
+                target="_blank"
+                rel="noreferrer"
               >
-                <a className="max-w-[85%] cursor-default zans" target="_blank" rel="noreferrer">
-                  <IconExternalLink className="ml-2.5 cursor-pointer" size={14} />
-                </a>
+                <IconExternalLink className="ml-2.5 cursor-pointer" size={14} />
               </Link>
             ) : null}
           </div>

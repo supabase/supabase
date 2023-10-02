@@ -106,13 +106,11 @@ const PullRequests = ({
                         <IconGitPullRequest strokeWidth={2} className="text-foreground-light" />
                         <p>Create a pull request</p>
                       </div>
-                      <Link passHref href={pullRequestUrl}>
-                        <a target="_blank" rel="noreferrer">
-                          <Button type="default" iconRight={<IconExternalLink />}>
-                            Github
-                          </Button>
-                        </a>
-                      </Link>
+                      <Button asChild type="default" iconRight={<IconExternalLink />}>
+                        <Link href={pullRequestUrl} target="_blank" rel="noreferrer">
+                          Github
+                        </Link>
+                      </Button>
                     </div>
                     <div className="px-5 py-3 border-t flex items-center justify-between">
                       <div>

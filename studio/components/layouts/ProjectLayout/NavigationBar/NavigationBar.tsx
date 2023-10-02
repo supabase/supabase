@@ -62,14 +62,12 @@ const NavigationBar = () => {
     >
       <ul className="flex flex-col space-y-2">
         {(!navLayoutV2 || !IS_PLATFORM) && (
-          <Link href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}>
-            <a className="block">
-              <img
-                src={`${router.basePath}/img/supabase-logo.svg`}
-                alt="Supabase"
-                className="mx-auto h-[40px] w-6 cursor-pointer rounded"
-              />
-            </a>
+          <Link href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`} className="block">
+            <img
+              src={`${router.basePath}/img/supabase-logo.svg`}
+              alt="Supabase"
+              className="mx-auto h-[40px] w-6 cursor-pointer rounded"
+            />
           </Link>
         )}
         <NavigationIconButton
@@ -154,12 +152,12 @@ const NavigationBar = () => {
             <DropdownMenuContent_Shadcn_ side="right" align="start">
               {IS_PLATFORM && (
                 <>
-                  <Link href="/account/me">
-                    <DropdownMenuItem_Shadcn_ key="header" className="space-x-2">
+                  <DropdownMenuItem_Shadcn_ key="header" asChild className="space-x-2">
+                    <Link href="/account/me">
                       <IconSettings size={14} strokeWidth={1.5} />
                       <p>Account preferences</p>
-                    </DropdownMenuItem_Shadcn_>
-                  </Link>
+                    </Link>
+                  </DropdownMenuItem_Shadcn_>
                   {showFeaturePreviews && (
                     <DropdownMenuItem_Shadcn_
                       key="header"

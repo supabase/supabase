@@ -68,13 +68,14 @@ const BannedIPs = () => {
           description="We monitor unsuccessful logins and block IPs for security"
         />
         <div className="flex items-center space-x-2 mb-6">
-          <Link href="https://supabase.com/docs/reference/cli/supabase-network-bans">
-            <a target="_blank">
-              <Button type="default" icon={<IconExternalLink />}>
-                Documentation
-              </Button>
-            </a>
-          </Link>
+          <Button asChild type="default" icon={<IconExternalLink />}>
+            <Link
+              href="https://supabase.com/docs/reference/cli/supabase-network-bans"
+              target="_blank"
+            >
+              Documentation
+            </Link>
+          </Button>
         </div>
       </div>
       <FormPanel>

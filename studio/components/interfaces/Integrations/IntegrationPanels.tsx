@@ -114,16 +114,15 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
           </div>
         </div>
 
-        <Link
-          href={getIntegrationConfigurationUrl(integration)}
-          target="_blank"
-          rel="noopener noreferrer"
-          passHref
-        >
-          <Button type="default" asChild iconRight={<IconExternalLink />}>
-            <a>Manage</a>
-          </Button>
-        </Link>
+        <Button asChild type="default" iconRight={<IconExternalLink />}>
+          <Link
+            href={getIntegrationConfigurationUrl(integration)}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Manage
+          </Link>
+        </Button>
       </li>
     )
   }

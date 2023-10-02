@@ -55,18 +55,16 @@ const BillingMetric = ({ idx, slug, metric, usage, subscription }: BillingMetric
     >
       <div className="flex items-center justify-between">
         <Link href={`/org/${slug}/usage#${metric.anchor}`}>
-          <a>
-            <div className="group flex items-center space-x-2">
-              <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
-                {metric.name}
-              </p>
-              <IconChevronRight
-                strokeWidth={1.5}
-                size={16}
-                className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
-              />
-            </div>
-          </a>
+          <div className="group flex items-center space-x-2">
+            <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
+              {metric.name}
+            </p>
+            <IconChevronRight
+              strokeWidth={1.5}
+              size={16}
+              className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
+            />
+          </div>
         </Link>
 
         {isUsageBillingEnabled && hasLimit && usageFee && (

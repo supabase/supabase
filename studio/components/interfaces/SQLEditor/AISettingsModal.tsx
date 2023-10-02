@@ -31,11 +31,14 @@ const AISettingsModal = (props: ModalProps) => {
             variant="warning"
             title="This option is only available if your organization has opted-in to sending anonymous data to OpenAI."
           >
-            <Link href={`/org/${selectedOrganization.slug}/general`} passHref>
-              <a className="flex flex-row gap-1 items-center" target="_blank" rel="noopener">
-                Go to your organization's settings to opt-in.
-                <IconExternalLink className="inline-block w-3 h-3" />
-              </a>
+            <Link
+              href={`/org/${selectedOrganization.slug}/general`}
+              className="flex flex-row gap-1 items-center"
+              target="_blank"
+              rel="noopener"
+            >
+              Go to your organization's settings to opt-in.
+              <IconExternalLink className="inline-block w-3 h-3" />
             </Link>
           </Alert>
         )}

@@ -82,14 +82,13 @@ const BuildingState = () => {
                   description={
                     <p className="text-sm text-foreground-light">
                       Browse the Supabase{' '}
-                      <Link href="https://supabase.com/docs">
-                        <a
-                          className="mb-0 text-brand transition-colors hover:text-brand-600"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          documentation
-                        </a>
+                      <Link
+                        href="https://supabase.com/docs"
+                        className="mb-0 text-brand transition-colors hover:text-brand-600"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        documentation
                       </Link>
                       .
                     </p>
@@ -113,11 +112,9 @@ const BuildingState = () => {
                           If your dashboard hasn't connected within 2 minutes, you can open a
                           support ticket.
                         </p>
-                        <Link href="/support/new">
-                          <a>
-                            <Button type="default">Contact support team</Button>
-                          </a>
-                        </Link>
+                        <Button asChild type="default">
+                          <Link href="/support/new">Contact support team</Link>
+                        </Button>
                       </>
                     }
                   />

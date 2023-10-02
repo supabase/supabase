@@ -71,11 +71,10 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
       {'\n\n'}It relies on the <code>pg_stat_statements</code> table. Read more about{' '}
       <Link
         href="https://supabase.com/docs/guides/platform/performance#examining-query-performance"
-        passHref
+        target="_blank"
+        rel="noreferrer"
       >
-        <a target="_blank" rel="noreferrer">
-          examining query performance
-        </a>
+        examining query performance
       </Link>
       .{'\n\n'}Consider resetting the analysis after optimizing any queries.
     </p>

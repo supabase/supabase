@@ -84,11 +84,11 @@ const OveragesBanner = ({ tier, minimal }: OveragesBannerProps) => {
         actions={
           minimal ? (
             <div className="flex h-full items-center">
-              <Link href={`/project/${projectRef}/settings/billing/usage`}>
-                <a>
-                  <Button type="default">Explore usage details</Button>
-                </a>
-              </Link>
+              <Button asChild type="default">
+                <Link href={`/project/${projectRef}/settings/billing/usage`}>
+                  Explore usage details
+                </Link>
+              </Button>
             </div>
           ) : (
             <></>

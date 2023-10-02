@@ -56,18 +56,17 @@ const MainBranchPanel = ({
               <IconGitHub size={18} strokeWidth={2} />
             </div>
             <p>Github branch workflow</p>
-            <Link passHref href={`https://github.com/${repo}`}>
-              <a target="_blank" rel="noreferrer">
-                <Button
-                  type="text"
-                  size="small"
-                  className="text-light hover:text py-1 px-1.5"
-                  iconRight={<IconExternalLink size={14} strokeWidth={1.5} />}
-                >
-                  {repo}
-                </Button>
-              </a>
-            </Link>
+            <Button
+              asChild
+              type="text"
+              size="small"
+              className="text-light hover:text py-1 px-1.5"
+              iconRight={<IconExternalLink size={14} strokeWidth={1.5} />}
+            >
+              <Link href={`https://github.com/${repo}`} target="_blank" rel="noreferrer">
+                {repo}
+              </Link>
+            </Button>
           </div>
           <Button type="default" onClick={() => onSelectCreateBranch()}>
             Create preview branch
@@ -100,15 +99,13 @@ const MainBranchPanel = ({
                   </Button>
                 </DropdownMenuTrigger_Shadcn_>
                 <DropdownMenuContent_Shadcn_ side="bottom" align="end">
-                  <Link passHref href={`/project/${ref}/settings/general`}>
-                    <DropdownMenuItem_Shadcn_
-                      asChild
-                      className="flex gap-2"
-                      onSelect={() => onSelectUpdate()}
-                    >
-                      <a>Change production branch</a>
-                    </DropdownMenuItem_Shadcn_>
-                  </Link>
+                  <DropdownMenuItem_Shadcn_
+                    asChild
+                    className="flex gap-2"
+                    onSelect={() => onSelectUpdate()}
+                  >
+                    <Link href={`/project/${ref}/settings/general`}>Change production branch</Link>
+                  </DropdownMenuItem_Shadcn_>
                   <DropdownMenuSeparator_Shadcn_ />
                   <DropdownMenuItem_Shadcn_
                     className="flex gap-2"
@@ -168,13 +165,11 @@ const BranchPanel = ({
         </p>
       </div>
       <div className="flex items-center space-x-4">
-        <Link passHref href={pullRequestURL}>
-          <a target="_blank" rel="noreferrer">
-            <Button type="default" icon={<IconExternalLink />}>
-              Create pull request
-            </Button>
-          </a>
-        </Link>
+        <Button asChild type="default" icon={<IconExternalLink />}>
+          <Link href={pullRequestURL} target="_blank" rel="noreferrer">
+            Create pull request
+          </Link>
+        </Button>
         <DropdownMenu_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
           <DropdownMenuTrigger_Shadcn_>
             <Button asChild type="text" className="px-1" icon={<IconMoreVertical size={14} />}>
@@ -244,13 +239,11 @@ const PullRequestPanel = ({
             <p className="text-foreground-light ml-8 mt-0.5">{pr.title}</p>
           </div>
           <div className="flex items-center space-x-4">
-            <Link passHref href={pr.url}>
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" icon={<IconExternalLink />}>
-                  View pull request
-                </Button>
-              </a>
-            </Link>
+            <Button asChild type="default" icon={<IconExternalLink />}>
+              <Link href={pr.url} target="_blank" rel="noreferrer">
+                View pull request
+              </Link>
+            </Button>
             <DropdownMenu_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
               <DropdownMenuTrigger_Shadcn_>
                 <Button asChild type="text" className="px-1" icon={<IconMoreVertical size={14} />}>

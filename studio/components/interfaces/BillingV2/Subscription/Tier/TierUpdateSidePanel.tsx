@@ -122,13 +122,11 @@ const TierUpdateSidePanel = () => {
         header={
           <div className="flex items-center justify-between">
             <h4>Change subscription plan</h4>
-            <Link href="https://supabase.com/pricing">
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                  Pricing
-                </Button>
-              </a>
-            </Link>
+            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+              <Link href="https://supabase.com/pricing" target="_blank" rel="noreferrer">
+                Pricing
+              </Link>
+            </Button>
           </div>
         }
       >
@@ -145,29 +143,34 @@ const TierUpdateSidePanel = () => {
                   This organization uses the legacy project-based billing. We’ve recently made some
                   big improvements to our billing system. To migrate to the new organization-based
                   billing, head over to your{' '}
-                  <Link href={`/org/${slug}/billing`}>
-                    <a className="text-sm text-green-900 transition hover:text-green-1000">
-                      organization billing settings
-                    </a>
+                  <Link
+                    href={`/org/${slug}/billing`}
+                    className="text-sm text-green-900 transition hover:text-green-1000"
+                  >
+                    organization billing settings
                   </Link>
                   .
                 </p>
 
                 <div className="space-x-3">
-                  <Link href="https://supabase.com/blog/organization-based-billing">
-                    <a target="_blank" rel="noreferrer">
-                      <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                        Announcement
-                      </Button>
-                    </a>
-                  </Link>
-                  <Link href="https://supabase.com/docs/guides/platform/org-based-billing">
-                    <a target="_blank" rel="noreferrer">
-                      <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                        Documentation
-                      </Button>
-                    </a>
-                  </Link>
+                  <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                    <Link
+                      href="https://supabase.com/blog/organization-based-billing"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Announcement
+                    </Link>
+                  </Button>
+                  <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                    <Link
+                      href="https://supabase.com/docs/guides/platform/org-based-billing"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Documentation
+                    </Link>
+                  </Button>
                 </div>
               </div>
             }
@@ -285,13 +288,11 @@ const TierUpdateSidePanel = () => {
                         ) : null}
                       </Tooltip.Root>
                     ) : (
-                      <Link href={plan.href} passHref className="hidden md:block">
-                        <a target="_blank">
-                          <Button block type="primary">
-                            Contact Us
-                          </Button>
-                        </a>
-                      </Link>
+                      <Button asChild block type="primary">
+                        <Link href={plan.href} className="hidden md:block" target="_blank">
+                          Contact Us
+                        </Link>
+                      </Button>
                     )}
 
                     <div className="border-t my-6" />
