@@ -94,7 +94,7 @@ const FunctionList = ({
             </Table.td>
             <Table.td className="hidden lg:table-cell">
               <div className="flex justify-center">
-                {x.security_definer ? <IconCheck strokeWidth={1.5} className="text-brand" /> : null}
+                {x.security_definer ? 'Definer' : 'Invoker'}
               </div>
             </Table.td>
             <Table.td className="text-right">
