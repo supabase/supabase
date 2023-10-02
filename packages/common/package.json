@@ -5,7 +5,7 @@
   "types": "./index.tsx",
   "license": "MIT",
   "scripts": {
-    "type-check_CURRENTLY_IGNORED": "tsc --noEmit"
+    "typecheck_CURRENTLY_IGNORED": "tsc --noEmit"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.14",

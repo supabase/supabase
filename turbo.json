@@ -53,7 +53,7 @@
     "test": {
       "cache": false
     },
-    "type-check": {
+    "typecheck": {
       "outputs": ["**/node_modules/.cache/tsbuildinfo.json"]
     }
   }
