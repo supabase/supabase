@@ -22,7 +22,7 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
   const [errorMsg] = useState('')
   const { supabase, session, setUserData, setPageState, userData } = useConfData()
   const [realtimeChannel, setRealtimeChannel] = useState<ReturnType<
-    typeof supabase['channel']
+    (typeof supabase)['channel']
   > | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
   const router = useRouter()
