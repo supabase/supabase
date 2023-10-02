@@ -2,12 +2,14 @@ export const DOCS_MENU = [
   { name: 'Getting started', key: 'introduction' },
   { name: 'User Management', key: 'user-management' },
   { name: 'Tables & Views', key: 'entities' },
-  { name: 'RPC Functions', key: 'rpc-functions' },
+  { name: 'Stored Procedures', key: 'stored-procedures' },
   { name: 'Storage', key: 'storage' },
   { name: 'Edge Functions', key: 'edge-functions' },
+  { name: 'Realtime', key: 'realtime' },
 ]
 
 export const DOCS_CONTENT = {
+  // Introduction
   init: {
     key: 'introduction',
     category: 'introduction',
@@ -69,6 +71,7 @@ const SUPABASE_URL = 'https://${endpoint}'
 const supabase = createClient(SUPABASE_URL, process.env.SUPABASE_KEY);`,
     bash: (apikey?: string, endpoint?: string) => `${apikey}`,
   },
+  // User Management
   userManagement: {
     key: 'user-management',
     category: 'user-management',
@@ -336,6 +339,7 @@ curl -X POST '${endpoint}/auth/v1/invite' \\
 }'
     `,
   },
+  // Storage
   uploadFile: {
     key: 'upload-file',
     category: 'storage',
@@ -435,6 +439,7 @@ const { data } = supabase
 `,
     bash: (apikey?: string, endpoint?: string) => `No command available`,
   },
+  // Edge functions
   createEdgeFunction: {
     key: 'create-edge-function',
     category: 'edge-functions',
@@ -481,5 +486,515 @@ curl --request POST '${endpoint}' \
   --header 'Content-Type: application/json' \
   --data '{ "name": "Functions" }'
 `,
+  },
+  // Entities
+  entitiesIntroduction: {
+    key: 'entities-introduction',
+    category: 'entities',
+    title: 'Tables & Views',
+    description: `
+All views and tables in the \`public\` schema, and those accessible by the active database role for a request are available for querying via the API.
+
+If you don't want to expose tables in your API, simply add them to a different schema (not the \`public\` schema).
+`,
+    js: undefined,
+    bash: undefined,
+  },
+  generatingTypes: {
+    key: 'generating-types',
+    category: 'entities',
+    title: 'Generating Types',
+    description: `
+Supabase APIs are generated from your database, which means that we can use database introspection to generate type-safe API definitions.
+
+You can generate types from your database either through the [Supabase CLI](https://supabase.com/docs/guides/database/api/generating-types), or by downloading the types file via the button on the right and importing it in your application within \`src/index.ts\`.
+`,
+    js: undefined,
+    bash: undefined,
+  },
+  graphql: {
+    key: 'graphql',
+    category: 'entities',
+    title: 'GraphQL vs Supabase',
+    description: `
+If you have a GraphQL background, you might be wonering if you can fetch your data in a single round-trip. The answer is yes! The syntax is very similar. This example shows how you might achieve the same thing with Apollo GraphQL and Supabase.
+
+Still want GraphQL?
+If you still want to use GraphQL, you can. Supabase provides you with a full Postgres database, so as long as your middleware can connect to the database then you can still use the tools you love. You can find the database connection details [in the settings](/project/[ref]/settings/database).
+`,
+    js: (apikey?: string, endpoint?: string) => `
+// With Apollo GraphQL
+const { loading, error, data } = useQuery(gql\`
+  query GetDogs {
+    dogs {
+      id
+      breed
+      owner {
+        id
+        name
+      }
+    }
+  }
+    \`)
+
+// With Supabase
+const { data, error } = await supabase
+  .from('dogs')
+  .select(\`
+      id, breed,
+      owner (id, name)
+  \`)
+`,
+    bash: (apikey?: string, endpoint?: string) => `
+// With Apollo GraphQL
+const { loading, error, data } = useQuery(gql\`
+  query GetDogs {
+    dogs {
+      id
+      breed
+      owner {
+        id
+        name
+      }
+    }
+  }
+    \`)
+
+// With Supabase
+const { data, error } = await supabase
+  .from('dogs')
+  .select(\`
+      id, breed,
+      owner (id, name)
+  \`)
+    `,
+  },
+  // Stored Procedures
+  storedProceduresIntroduction: {
+    key: 'stored-procedures-introduction',
+    category: 'stored-procedures',
+    title: 'Stored Procedures',
+    description: `
+All of your database stored procedures are available on your API. This means you can build your logic directly into the database (if you're brave enough)!
+
+The API endpoint supports POST (and in some cases GET) to execute the function.
+`,
+    js: undefined,
+    bash: undefined,
+  },
+}
+
+export const DOCS_RESOURCE_CONTENT = {
+  rpcSingle: {
+    key: 'invoke-function',
+    title: 'Invoke function',
+    description: undefined,
+    docsUrl: undefined,
+    code: ({
+      rpcName,
+      rpcParams,
+      endpoint,
+      apiKey,
+      showBearer = true,
+    }: {
+      rpcName: string
+      rpcParams: any[]
+      endpoint: string
+      apiKey: string
+      showBearer: boolean
+    }) => {
+      let rpcList = rpcParams.map((x) => `"${x.name}": "value"`).join(', ')
+      let noParams = !rpcParams.length
+      let bashParams = noParams ? '' : `\n-d '{ ${rpcList} }' \\`
+      let jsParams = noParams
+        ? ''
+        : `, {${
+            rpcParams.length
+              ? rpcParams
+                  .map((x) => `\n    ${x.name}`)
+                  .join(`, `)
+                  .concat('\n  ')
+              : ''
+          }}`
+      return [
+        {
+          bash: `
+  curl -X POST '${endpoint}/rest/v1/rpc/${rpcName}' \\${bashParams}
+  -H "Content-Type: application/json" \\
+  -H "apikey: ${apiKey}" ${
+            showBearer
+              ? `\\
+  -H "Authorization: Bearer ${apiKey}"`
+              : ''
+          }
+        `,
+          js: `
+let { data, error } = await supabase
+  .rpc('${rpcName}'${jsParams})
+
+if (error) console.error(error)
+else console.log(data)
+        `,
+        },
+      ]
+    },
+  },
+  readRows: {
+    key: 'read-rows',
+    title: `Read rows`,
+    docsUrl: 'https://supabase.com/docs/reference/javascript/select',
+    description: `To read rows in this table, use the \`select\` method.`,
+    code: ({
+      resourceId,
+      endpoint,
+      apiKey,
+    }: {
+      resourceId: string
+      endpoint: string
+      apiKey: string
+    }) => {
+      return [
+        {
+          title: 'Read all rows',
+          bash: `
+curl '${endpoint}/rest/v1/${resourceId}?select=*' \\
+-H "apikey: ${apiKey}" \\
+-H "Authorization: Bearer ${apiKey}"
+          `,
+          js: `
+let { data: ${resourceId}, error } = await supabase
+  .from('${resourceId}')
+  .select('*')
+          `,
+        },
+        {
+          title: 'Read specific columns',
+          bash: `
+curl '${endpoint}/rest/v1/${resourceId}?select=some_column,other_column' \\
+-H "apikey: ${apiKey}" \\
+-H "Authorization: Bearer ${apiKey}"
+          `,
+          js: `
+let { data: ${resourceId}, error } = await supabase
+  .from('${resourceId}')
+  .select('some_column,other_column')
+  `,
+        },
+        {
+          title: 'Read foreign tables',
+          bash: `
+curl '${endpoint}/rest/v1/${resourceId}?select=some_column,other_table(foreign_key)' \\
+-H "apikey: ${apiKey}" \\
+-H "Authorization: Bearer ${apiKey}"
+          `,
+          js: `
+let { data: ${resourceId}, error } = await supabase
+  .from('${resourceId}')
+  .select(\`
+    some_column,
+    other_table (
+      foreign_key
+    )
+  \`)
+          `,
+        },
+        {
+          title: 'With pagination',
+          bash: `
+curl '${endpoint}/rest/v1/${resourceId}?select=*' \\
+-H "apikey: ${apiKey}" \\
+-H "Authorization: Bearer ${apiKey}" \\
+-H "Range: 0-9"
+          `,
+          js: `
+let { data: ${resourceId}, error } = await supabase
+  .from('${resourceId}')
+  .select('*')
+  .range(0, 9)
+          `,
+        },
+      ]
+    },
+  },
+  filtering: {
+    key: 'filter-rows',
+    title: 'Filtering',
+    description: `Supabase provides a wide range of filters`,
+    docsUrl: 'https://supabase.com/docs/reference/javascript/using-filters',
+    code: ({
+      resourceId,
+      endpoint,
+      apiKey,
+    }: {
+      resourceId: string
+      endpoint: string
+      apiKey: string
+    }) => {
+      return [
+        {
+          title: 'With filtering',
+          bash: `
+curl '${endpoint}/rest/v1/${resourceId}?id=eq.1&select=*' \\
+-H "apikey: ${apiKey}" \\
+-H "Authorization: Bearer ${apiKey}" \\
+-H "Range: 0-9"
+        `,
+          js: `
+let { data: ${resourceId}, error } = await supabase
+  .from('${resourceId}')
+  .select("*")
+
+  // Filters
+  .eq('column', 'Equal to')
+  .gt('column', 'Greater than')
+  .lt('column', 'Less than')
+  .gte('column', 'Greater than or equal to')
+  .lte('column', 'Less than or equal to')
+  .like('column', '%CaseSensitive%')
+  .ilike('column', '%CaseInsensitive%')
+  .is('column', null)
+  .in('column', ['Array', 'Values'])
+  .neq('column', 'Not equal to')
+
+  // Arrays
+  .cs('array_column', ['array', 'contains'])
+  .cd('array_column', ['contained', 'by'])
+          `,
+        },
+      ]
+    },
+  },
+  insertRows: {
+    key: 'insert-rows',
+    title: 'Insert rows',
+    description: `
+\`insert\` lets you insert into your tables. You can also insert in bulk and do UPSERT.
+
+\`insert\` will also return the replaced values for UPSERT.
+`,
+    docsUrl: 'https://supabase.com/docs/reference/javascript/insert',
+    code: ({
+      resourceId,
+      endpoint,
+      apiKey,
+    }: {
+      resourceId: string
+      endpoint: string
+      apiKey: string
+    }) => {
+      return [
+        {
+          title: 'Insert a row',
+          bash: `
+curl -X POST '${endpoint}/rest/v1/${resourceId}' \\
+-H "apikey: ${apiKey}" \\
+-H "Authorization: Bearer ${apiKey}" \\
+-H "Content-Type: application/json" \\
+-H "Prefer: return=minimal" \\
+-d '{ "some_column": "someValue", "other_column": "otherValue" }'
+          `,
+          js: `
+const { data, error } = await supabase
+  .from('${resourceId}')
+  .insert([
+    { some_column: 'someValue', other_column: 'otherValue' },
+  ])
+  .select()
+          `,
+        },
+        {
+          title: 'Insert many rows',
+          bash: `
+curl -X POST '${endpoint}/rest/v1/${resourceId}' \\
+-H "apikey: ${apiKey}" \\
+-H "Authorization: Bearer ${apiKey}" \\
+-H "Content-Type: application/json" \\
+-d '[{ "some_column": "someValue" }, { "other_column": "otherValue" }]'
+          `,
+          js: `
+const { data, error } = await supabase
+  .from('${resourceId}')
+  .insert([
+    { some_column: 'someValue' },
+    { some_column: 'otherValue' },
+  ])
+  .select()
+          `,
+        },
+        {
+          title: 'Upsert matching rows',
+          bash: `
+curl -X POST '${endpoint}/rest/v1/${resourceId}' \\
+-H "apikey: ${apiKey}" \\
+-H "Authorization: Bearer ${apiKey}" \\
+-H "Content-Type: application/json" \\
+-H "Prefer: resolution=merge-duplicates" \\
+-d '{ "some_column": "someValue", "other_column": "otherValue" }'
+          `,
+          js: `
+const { data, error } = await supabase
+  .from('${resourceId}')
+  .upsert({ some_column: 'someValue' })
+  .select()
+          `,
+        },
+      ]
+    },
+  },
+  updateRows: {
+    key: 'update-rows',
+    title: 'Update rows',
+    description: `
+\`update\` lets you update rows. \`update\` will match all rows by default. You can update specific rows using horizontal filters, e.g. \`eq\`, \`lt\`, and \`is\`.
+
+\`update\` will also return the replaced values for UPDATE.
+`,
+    docsUrl: 'https://supabase.com/docs/reference/javascript/update',
+    code: ({
+      resourceId,
+      endpoint,
+      apiKey,
+    }: {
+      resourceId: string
+      endpoint: string
+      apiKey: string
+    }) => {
+      return [
+        {
+          title: 'Update matching rows',
+          bash: `
+curl -X PATCH '${endpoint}/rest/v1/${resourceId}?some_column=eq.someValue' \\
+-H "apikey: ${apiKey}" \\
+-H "Authorization: Bearer ${apiKey}" \\
+-H "Content-Type: application/json" \\
+-H "Prefer: return=minimal" \\
+-d '{ "other_column": "otherValue" }'
+          `,
+          js: `
+const { data, error } = await supabase
+  .from('${resourceId}')
+  .update({ other_column: 'otherValue' })
+  .eq('some_column', 'someValue')
+  .select()
+          `,
+        },
+      ]
+    },
+  },
+  deleteRows: {
+    key: 'delete-rows',
+    title: 'Delete rows',
+    description: `
+\`delete\` lets you delete rows. \`delete\` will match all rows by default, so remember to specify your filters!
+`,
+    docsUrl: 'https://supabase.com/docs/reference/javascript/delete',
+    code: ({
+      resourceId,
+      endpoint,
+      apiKey,
+    }: {
+      resourceId: string
+      endpoint: string
+      apiKey: string
+    }) => {
+      return [
+        {
+          title: 'Delete matching rows',
+          bash: `
+curl -X DELETE '${endpoint}/rest/v1/${resourceId}?some_column=eq.someValue' \\
+-H "apikey: ${apiKey}" \\
+-H "Authorization: Bearer ${apiKey}"
+          `,
+          js: `
+const { error } = await supabase
+  .from('${resourceId}')
+  .delete()
+  .eq('some_column', 'someValue')
+          `,
+        },
+      ]
+    },
+  },
+  subscribeChanges: {
+    key: 'subscribe-changes',
+    title: 'Subscribe to changes',
+    description: `
+Supabase provides realtime functionality and broadcasts database changes to authorized users depending on Row Level Security (RLS) policies.
+`,
+    docsUrl: 'https://supabase.com/docs/reference/javascript/subscribe',
+    code: ({ resourceId }: { resourceId: string }) => {
+      return [
+        {
+          title: 'Subscribe to all events',
+          bash: `# Realtime streams are only supported by our client libraries`,
+          js: `
+const channels = supabase.channel('custom-all-channel')
+  .on(
+    'postgres_changes',
+    { event: '*', schema: 'public', table: '${resourceId}' },
+    (payload) => {
+      console.log('Change received!', payload)
+    }
+  )
+  .subscribe()`,
+        },
+        {
+          title: 'Subscribe to inserts',
+          bash: `# Realtime streams are only supported by our client libraries`,
+          js: `
+const channels = supabase.channel('custom-insert-channel')
+  .on(
+    'postgres_changes',
+    { event: 'INSERT', schema: 'public', table: '${resourceId}' },
+    (payload) => {
+      console.log('Change received!', payload)
+    }
+  )
+  .subscribe()`,
+        },
+        {
+          title: 'Subscribe to updates',
+          bash: `# Realtime streams are only supported by our client libraries`,
+          js: `
+const channels = supabase.channel('custom-update-channel')
+  .on(
+    'postgres_changes',
+    { event: 'UPDATE', schema: 'public', table: '${resourceId}' },
+    (payload) => {
+      console.log('Change received!', payload)
+    }
+  )
+  .subscribe()`,
+        },
+        {
+          title: 'Subscribe to deletes',
+          bash: `# Realtime streams are only supported by our client libraries`,
+          js: `
+const channels = supabase.channel('custom-delete-channel')
+  .on(
+    'postgres_changes',
+    { event: 'DELETE', schema: 'public', table: '${resourceId}' },
+    (payload) => {
+      console.log('Change received!', payload)
+    }
+  )
+  .subscribe()`,
+        },
+        {
+          title: 'Subscribe to specific rows',
+          bash: `# Realtime streams are only supported by our client libraries`,
+          js: `
+const channels = supabase.channel('custom-filter-channel')
+  .on(
+    'postgres_changes',
+    { event: '*', schema: 'public', table: '${resourceId}', filter: 'some_column=eq.some_value' },
+    (payload) => {
+      console.log('Change received!', payload)
+    }
+  )
+  .subscribe()`,
+        },
+      ]
+    },
   },
 }

@@ -3,11 +3,28 @@ import { Fragment } from 'react'
 import { Button, IconBook, IconBookOpen, SidePanel } from 'ui'
 
 import { useAppStateSnapshot } from 'state/app-state'
-import { Introduction, UserManagement, Storage, EdgeFunctions } from './Content'
+import {
+  Introduction,
+  UserManagement,
+  Storage,
+  EdgeFunctions,
+  Entities,
+  StoredProcedures,
+  RPC,
+  Entity,
+} from './Content'
 import { DOCS_CONTENT, DOCS_MENU } from './ProjectAPIDocs.constants'
+import { useStore } from 'hooks'
 
 const ProjectAPIDocs = () => {
+  const { meta } = useStore()
   const snap = useAppStateSnapshot()
+
+  const { data } = meta.openApi
+  const tables = data?.tables ?? []
+  const functions = data?.functions ?? []
+
+  // [Joshen] need to consider custom domains
 
   return (
     <SidePanel
@@ -45,17 +62,40 @@ const ProjectAPIDocs = () => {
                           key={section.key}
                           title={section.title}
                           className="text-sm text-light px-4 hover:text-foreground transition cursor-pointer"
+                          onClick={() => snap.setActiveDocsSection([item.key])}
                         >
                           {section.title}
                         </p>
                       ))}
+                      {item.key === 'entities' &&
+                        tables.map((table) => (
+                          <p
+                            key={table.name}
+                            title={table.name}
+                            className="text-sm text-light px-4 hover:text-foreground transition cursor-pointer"
+                            onClick={() => snap.setActiveDocsSection([item.key, table.name])}
+                          >
+                            {table.name}
+                          </p>
+                        ))}
+                      {item.key === 'stored-procedures' &&
+                        functions.map((fn) => (
+                          <p
+                            key={fn.name}
+                            title={fn.name}
+                            className="text-sm text-light px-4 hover:text-foreground transition cursor-pointer"
+                            onClick={() => snap.setActiveDocsSection([item.key, fn.name])}
+                          >
+                            {fn.name}
+                          </p>
+                        ))}
                     </div>
                   )}
                 </Fragment>
               )
             })}
           </div>
-          <div className="p-4">
+          <div className="px-2 py-4">
             <Link passHref href="https://supabase.com/docs">
               <Button block asChild type="text" size="small" icon={<IconBook />}>
                 <a target="_blank" rel="noreferrer" className="!justify-start">
@@ -77,6 +117,13 @@ const ProjectAPIDocs = () => {
           {snap.activeDocsSection[0] === 'user-management' && <UserManagement />}
           {snap.activeDocsSection[0] === 'storage' && <Storage />}
           {snap.activeDocsSection[0] === 'edge-functions' && <EdgeFunctions />}
+
+          {snap.activeDocsSection[0] === 'entities' && (
+            <>{snap.activeDocsSection[1] !== undefined ? <Entity /> : <Entities />}</>
+          )}
+          {snap.activeDocsSection[0] === 'stored-procedures' && (
+            <>{snap.activeDocsSection[1] !== undefined ? <RPC /> : <StoredProcedures />}</>
+          )}
         </div>
       </div>
     </SidePanel>
