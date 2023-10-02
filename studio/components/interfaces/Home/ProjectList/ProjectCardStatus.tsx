@@ -88,7 +88,9 @@ export const ProjectCardStatus = ({
         variant={alertType}
         className={cn(
           `border-0 rounded-none rounded-b-md my-2 mb-2.5 [&>svg]:top-2.5 [&>svg]:w-[24px] [&>svg]:h-[24px] [&>svg]:p-1.5 [&>svg]:left-4 pl-2 bg-transparent transition-colors flex items-center`,
-          !isCritical ? '[&>svg]:text-foreground [&>svg]:bg-scale-400' : ''
+          !isCritical
+            ? '[&>svg]:text-foreground [&>svg]:bg-scale-400 [&>svg]:dark:bg-scale-600'
+            : ''
         )}
       >
         {projectStatus === 'isPaused' || projectStatus === 'isPausing' ? (
