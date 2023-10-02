@@ -25,7 +25,7 @@ export const generateRowFields = (
       isUndefined(row) && TEXT_TYPES.includes(column.format)
         ? null
         : isUndefined(row) && column.format === 'bool' && !column.is_nullable
-        ? 'true'
+        ? column.default_value
         : isUndefined(row) && column.format === 'bool' && column.is_nullable
         ? 'null'
         : isUndefined(row)
