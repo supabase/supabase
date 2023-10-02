@@ -1079,16 +1079,16 @@ export default function launchweek() {
               className={classNames(
                 // isDarkMode ? styles.dark_community : styles.community,
                 styles.dark_community,
-                'flex basis-1/3 flex-col px-5'
+                'flex basis-1/3 flex-col p-5'
               )}
             >
               <a
                 href="https://github.com/psteinroe/supabase-cache-helpers"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="self-end"
+                className="self-end mb-4"
               >
-                <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 mb-4 bg-[#121212] w-fit relative max-w-[250px]">
+                <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 bg-[#121212] w-fit relative max-w-[250px]">
                   <img
                     src="/images/launchweek/link.svg"
                     className="absolute top-[16px] right-[10px] text-brand"
@@ -1101,8 +1101,9 @@ export default function launchweek() {
                 href="https://github.com/pheralb/superui"
                 target="_blank"
                 rel="noopener noreferrer"
+                className="mb-4 w-fit"
               >
-                <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 mb-4 bg-[#121212] w-fit relative max-w-[250px]">
+                <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 bg-[#121212] w-fit relative max-w-[250px]">
                   <img
                     src="/images/launchweek/link.svg"
                     className="absolute top-[16px] right-[10px] text-brand"
@@ -1115,9 +1116,9 @@ export default function launchweek() {
                 href="https://github.com/Myzel394/quid_faciam_hodie"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="self-end"
+                className="self-end mb-4"
               >
-                <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 mb-4 bg-[#121212] w-fit relative max-w-[250px]">
+                <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 bg-[#121212] w-fit relative max-w-[250px]">
                   <img
                     src="/images/launchweek/link.svg"
                     className="absolute top-[16px] right-[10px] text-brand"
@@ -1126,8 +1127,13 @@ export default function launchweek() {
                   <p className="text-slate-1000 text-xs">Winner Best Flutter Project</p>
                 </div>
               </a>
-              <a href="https://github.com/laznic/hotdogs" target="_blank" rel="noopener noreferrer">
-                <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 mb-4 bg-[#121212] w-fit relative max-w-[250px]">
+              <a
+                href="https://github.com/laznic/hotdogs"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mb-4 w-fit"
+              >
+                <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 bg-[#121212] w-fit relative max-w-[250px]">
                   <img
                     src="/images/launchweek/link.svg"
                     className="absolute top-[16px] right-[10px] text-brand"
