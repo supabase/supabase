@@ -88,6 +88,8 @@ export default function Form({ validate, ...props }: Props) {
           handleReset: formik.handleReset,
           /** Resets the form with custom values */
           resetForm: formik.resetForm,
+          /** Manually sets a fields value */
+          setFieldValue: formik.setFieldValue,
         })}
       </FormContextProvider>
     </form>

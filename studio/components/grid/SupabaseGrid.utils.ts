@@ -97,7 +97,7 @@ export async function initTable(
     editable: props.editable,
     defaultWidth: props.gridProps?.defaultColumnWidth,
     onAddColumn: props.editable ? props.onAddColumn : undefined,
-    onExpandJSONEditor: props.editable ? props.onExpandJSONEditor : () => {},
+    onExpandJSONEditor: props.onExpandJSONEditor,
   })
 
   dispatch({

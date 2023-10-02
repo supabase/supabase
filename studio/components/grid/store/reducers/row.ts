@@ -136,14 +136,6 @@ const RowReducer = (state: RowInitialState, action: ROW_ACTIONTYPE) => {
         }),
       }
     }
-    case 'REMOVE_ROWS': {
-      const totalRows = state.totalRows - action.payload.rowIdxs.length
-      return {
-        ...state,
-        rows: state.rows.filter((x) => !action.payload.rowIdxs.includes(x.idx)),
-        totalRows: totalRows,
-      }
-    }
     case 'REMOVE_ALL_ROWS': {
       return {
         ...state,

@@ -1,28 +1,31 @@
-import { FC, useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PostgresRole } from '@supabase/postgres-meta'
+import { useState } from 'react'
 import {
   Button,
-  Form,
-  Dropdown,
-  IconChevronUp,
-  Toggle,
   Collapsible,
-  IconTrash,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
+  Form,
+  IconChevronUp,
   IconHelpCircle,
   IconMoreVertical,
+  IconTrash,
+  Toggle,
 } from 'ui'
 
 import { useStore } from 'hooks'
 import { ROLE_PERMISSIONS } from './Roles.constants'
 
-interface Props {
+interface RoleRowProps {
   role: PostgresRole
   disabled?: boolean
   onSelectDelete: (role: PostgresRole) => void
 }
 
-const RoleRow: FC<Props> = ({ role, disabled = false, onSelectDelete }) => {
+const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
   const { ui, meta } = useStore()
   const [isExpanded, setIsExpanded] = useState(false)
 
@@ -89,7 +92,7 @@ const RoleRow: FC<Props> = ({ role, disabled = false, onSelectDelete }) => {
               <button
                 id="collapsible-trigger"
                 type="button"
-                className="group flex w-full items-center justify-between rounded py-3 px-6 text-scale-1200"
+                className="group flex w-full items-center justify-between rounded py-3 px-6 text-foreground"
                 onClick={(event: any) => {
                   if (event.target.id === 'collapsible-trigger') setIsExpanded(!isExpanded)
                 }}
@@ -105,7 +108,7 @@ const RoleRow: FC<Props> = ({ role, disabled = false, onSelectDelete }) => {
                     <p className="text-left text-sm" id="collapsible-trigger">
                       {role.name}
                     </p>
-                    <p className="text-left text-sm text-scale-1000" id="collapsible-trigger">
+                    <p className="text-left text-sm text-foreground-light" id="collapsible-trigger">
                       (ID: {role.id})
                     </p>
                   </div>
@@ -114,52 +117,45 @@ const RoleRow: FC<Props> = ({ role, disabled = false, onSelectDelete }) => {
                   {role.active_connections > 0 && (
                     <div className="relative h-2 w-2">
                       <span className="flex h-2 w-2">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-900 opacity-75"></span>
-                        <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-900 opacity-75"></span>
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand opacity-75"></span>
+                        <span className="relative inline-flex h-2 w-2 rounded-full bg-brand opacity-75"></span>
                       </span>
                     </div>
                   )}
                   <p
                     id="collapsible-trigger"
                     className={`text-sm ${
-                      role.active_connections > 0 ? 'text-scale-1100' : 'text-scale-1000'
+                      role.active_connections > 0 ? 'text-foreground' : 'text-foreground-light'
                     }`}
                   >
                     {role.active_connections} connections
                   </p>
                   {!disabled && (
-                    <Dropdown
-                      side="bottom"
-                      className="w-[120px]"
-                      overlay={
-                        <>
-                          <Dropdown.Item
-                            icon={
-                              <IconTrash className="text-red-800" size="tiny" strokeWidth={2} />
-                            }
-                            onClick={(event: any) => {
-                              event.stopPropagation()
-                              onSelectDelete(role)
-                            }}
-                          >
-                            Delete
-                          </Dropdown.Item>
-                        </>
-                      }
-                    >
-                      <Button
-                        as="span"
-                        type="default"
-                        className="px-1"
-                        icon={<IconMoreVertical />}
-                      />
-                    </Dropdown>
+                    <DropdownMenu_Shadcn_>
+                      <DropdownMenuTrigger_Shadcn_>
+                        <Button asChild type="default" className="px-1" icon={<IconMoreVertical />}>
+                          <span></span>
+                        </Button>
+                      </DropdownMenuTrigger_Shadcn_>
+                      <DropdownMenuContent_Shadcn_ side="bottom" className="w-[120px]">
+                        <DropdownMenuItem_Shadcn_
+                          className="space-x-2"
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            onSelectDelete(role)
+                          }}
+                        >
+                          <IconTrash className="text-red-800" size="tiny" strokeWidth={2} />
+                          <p>Delete</p>
+                        </DropdownMenuItem_Shadcn_>
+                      </DropdownMenuContent_Shadcn_>
+                    </DropdownMenu_Shadcn_>
                   )}
                 </div>
               </button>
             </Collapsible.Trigger>
             <Collapsible.Content>
-              <div className="group border-t border-scale-500 bg-scale-100 py-6 px-20 text-scale-1200 dark:bg-scale-300">
+              <div className="group border-t border-scale-500 bg-scale-100 py-6 px-20 text-foreground dark:bg-scale-300">
                 <div className="py-4 space-y-[9px]">
                   {Object.keys(ROLE_PERMISSIONS).map((permission) => (
                     <Toggle

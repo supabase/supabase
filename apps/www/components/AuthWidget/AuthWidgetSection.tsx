@@ -7,7 +7,7 @@ import Image from 'next/image'
 
 import { ColorSwatchIcon, MenuIcon } from '@heroicons/react/outline'
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 
 const supabase = createClient(
   'https://rsnibhkhsbfnncjmwnkj.supabase.co',
@@ -15,13 +15,13 @@ const supabase = createClient(
 )
 
 function AuthWidgetSection() {
-  const { isDarkMode } = useTheme()
+  const { theme } = useTheme()
   const { basePath } = useRouter()
   const [radius, setRadius] = useState('4px')
   const [brandColor, setBrandColor] = useState({
-    brand: 'var(--colors-brand9)',
-    brandAccent: 'var(--colors-brand11)',
-    brandAccent2: 'var(--colors-brand3)',
+    brand: 'hsl(var(--brand-default))',
+    brandAccent: 'hsl(var(--brand-500))',
+    brandAccent2: 'hsl(var(--brand-200))',
   })
   const [layout, setLayout] = useState('horizontal')
 
@@ -84,7 +84,7 @@ function AuthWidgetSection() {
                     <Auth
                       // @ts-ignore
                       socialLayout={layout}
-                      theme={isDarkMode ? 'dark' : 'default'}
+                      theme={theme === 'dark' ? 'dark' : 'default'}
                       providers={['google', 'facebook', 'twitter']}
                       supabaseClient={supabase}
                       localization={{
@@ -140,15 +140,15 @@ function AuthWidgetSection() {
                   <button
                     onClick={() =>
                       setBrandColor({
-                        brand: 'var(--colors-brand9)',
-                        brandAccent: 'var(--colors-brand11)',
-                        brandAccent2: 'var(--colors-brand3)',
+                        brand: 'hsl(var(--brand-default))',
+                        brandAccent: 'hsl(var(--brand-500))',
+                        brandAccent2: 'hsl(var(--brand-200))',
                       })
                     }
                     className={[
-                      'bg-brand-300 border-brand-900 h-10 w-10 rounded-full border-2 transition hover:scale-105',
-                      brandColor.brand === 'var(--colors-brand9)'
-                        ? ' !bg-brand-900 ring-scale-400 border-scale-800 ring-2 drop-shadow-lg dark:ring-white'
+                      'bg-brand-300 border-brand h-10 w-10 rounded-full border-2 transition hover:scale-105',
+                      brandColor.brand === 'hsl(var(--brand-default))'
+                        ? ' !bg-brand ring-scale-400 border-scale-800 ring-2 drop-shadow-lg dark:ring-white'
                         : '',
                     ].join(' ')}
                   ></button>

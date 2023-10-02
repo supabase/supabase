@@ -1,11 +1,10 @@
-import { FC, Fragment, useState } from 'react'
-import { IconCheck, IconHelpCircle, IconInfo, Modal } from 'ui'
-import { PERMISSIONS_MAPPING } from './RolesHelperModal.constants'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { Fragment, useState } from 'react'
+import { IconCheck, IconHelpCircle, IconInfo, Modal } from 'ui'
 
-interface Props {}
+import { PERMISSIONS_MAPPING } from './RolesHelperModal.constants'
 
-const RolesHelperModal: FC<Props> = ({}) => {
+const RolesHelperModal = () => {
   const [showModal, setShowModal] = useState(false)
 
   const permissionColumnClassName = 'w-[40%] text-sm pl-4 font-bold'
@@ -26,7 +25,7 @@ const RolesHelperModal: FC<Props> = ({}) => {
               'border border-scale-200 ', //border
             ].join(' ')}
           >
-            <span className="text-xs text-scale-1200">Only available in Team/Enterprise plan.</span>
+            <span className="text-xs text-foreground">Only available in Team/Enterprise plan.</span>
           </div>
         </Tooltip.Content>
       </Tooltip.Portal>
@@ -38,7 +37,7 @@ const RolesHelperModal: FC<Props> = ({}) => {
       <IconHelpCircle
         size={16}
         strokeWidth={1.5}
-        className="cursor-pointer transition hover:text-scale-1200"
+        className="cursor-pointer transition hover:text-foreground"
         onClick={() => setShowModal(!showModal)}
       />
       <Modal

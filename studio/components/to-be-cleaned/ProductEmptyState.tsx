@@ -1,20 +1,20 @@
-import { Button, IconExternalLink } from 'ui'
-import { FC, ReactNode } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { PropsWithChildren } from 'react'
+import { Button, IconExternalLink } from 'ui'
 
-interface Props {
+interface ProductEmptyStateProps {
   title?: string
   size?: 'medium' | 'large'
-  children?: ReactNode
   ctaButtonLabel?: string
   infoButtonLabel?: string
   infoButtonUrl?: string
   onClickCta?: () => void
+  loading?: boolean
   disabled?: boolean
   disabledMessage?: string
 }
 
-const ProductEmptyState: FC<Props> = ({
+const ProductEmptyState = ({
   title = '',
   size = 'medium',
   children,
@@ -22,9 +22,10 @@ const ProductEmptyState: FC<Props> = ({
   infoButtonLabel = '',
   infoButtonUrl = '',
   onClickCta = () => {},
+  loading = false,
   disabled = false,
   disabledMessage = '',
-}) => {
+}: PropsWithChildren<ProductEmptyStateProps>) => {
   const hasAction = (ctaButtonLabel && onClickCta) || (infoButtonUrl && infoButtonLabel)
 
   return (
@@ -39,8 +40,13 @@ const ProductEmptyState: FC<Props> = ({
               <div className="flex items-center space-x-2">
                 {ctaButtonLabel && onClickCta && (
                   <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger>
-                      <Button type="primary" onClick={onClickCta} disabled={disabled}>
+                    <Tooltip.Trigger asChild>
+                      <Button
+                        type="primary"
+                        onClick={onClickCta}
+                        loading={loading}
+                        disabled={loading || disabled}
+                      >
                         {ctaButtonLabel}
                       </Button>
                     </Tooltip.Trigger>
@@ -54,7 +60,7 @@ const ProductEmptyState: FC<Props> = ({
                               'border border-scale-200',
                             ].join(' ')}
                           >
-                            <span className="text-xs text-scale-1200">{disabledMessage}</span>
+                            <span className="text-xs text-foreground">{disabledMessage}</span>
                           </div>
                         </Tooltip.Content>
                       </Tooltip.Portal>

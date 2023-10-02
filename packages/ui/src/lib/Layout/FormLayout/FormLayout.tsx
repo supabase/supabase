@@ -125,12 +125,12 @@ export function FormLayout({
   )
 
   const renderDescription = descriptionText && (
-    <p
+    <div
       className={[__styles.description.base, __styles.description.size[size]].join(' ')}
       id={id + '-description'}
     >
       {descriptionText}
-    </p>
+    </div>
   )
 
   return (

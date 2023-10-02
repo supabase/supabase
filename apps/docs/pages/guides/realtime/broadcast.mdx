@@ -1,0 +1,164 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  title: 'Broadcast',
+  subtitle: 'Send and receive messages using Realtime Broadcast',
+  description: 'Send and receive messages using Realtime Broadcast',
+  // breadcrumb: 'Realtime Broadcast Quickstart',
+}
+
+Let's explore how to implement Realtime Broadcast to send messages between clients.
+
+## Usage
+
+You can use the Supabase client libraries to send and receive Broadcast messages.
+
+### Initialize the client
+
+Go to your Supabase project's [API Settings](https://supabase.com/dashboard/project/_/settings/api) and grab the `URL` and `anon` public API key.
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+const SUPABASE_URL = 'https://<project>.supabase.co'
+const SUPABASE_KEY = '<your-anon-key>'
+
+const client = createClient(SUPABASE_URL, SUPABASE_KEY)
+```
+
+### Listening to Broadcast messages
+
+You can provide a callback for the `broadcast` channel to receive message. In this example we will receive any `broadcast` messages in `room-1`:
+
+{/* prettier-ignore */}
+```js
+// Join a room/topic. Can be anything except for 'realtime'.
+const channelA = clientA.channel('room-1')
+
+// Simple function to log any messages we receive
+function messageReceived(payload) {
+  console.log(payload)
+}
+
+// Subscribe to the Channel
+channelA
+  .on(
+    'broadcast',
+    { event: 'test' },
+    (payload) => messageReceived(payload)
+  )
+  .subscribe()
+```
+
+### Sending Broadcast messages
+
+We can send Broadcast messages using `channelB.send()`. Let's set up another client to send messages.
+
+{/* prettier-ignore */}
+```js
+// Join a room/topic. Can be anything except for 'realtime'.
+const channelB = clientA.channel('room-1')
+
+channelB.subscribe((status) => {
+  // Wait for successful connection
+  if (status !== 'SUBSCRIBED') {
+    return null
+  }
+
+  // Send a message once the client is subscribed
+  channelB.send({
+    type: 'broadcast',
+    event: 'test',
+    payload: { message: 'hello, world' },
+  })
+})
+```
+
+Before sending messages we need to ensure the client is connected, which we have done within the `subscribe()` callback.
+
+## Broadcast options
+
+You can pass configuration options while initializing the Supabase Client.
+
+### Self-send messages
+
+By default, broadcast messages are only sent to other clients. You can broadcast messages back to the sender by setting Broadcast's `self` parameter to `true`.
+
+{/* prettier-ignore */}
+```js
+const myChannel = supabase.channel('room-2', {
+  config: {
+    broadcast: { self: true },
+  },
+})
+
+myChannel.on(
+  'broadcast',
+  { event: 'test-my-messages' },
+  (payload) => console.log(payload)
+)
+
+myChannel.subscribe((status) => {
+  if (status !== 'SUBSCRIBED') { return }
+  channelC.send({
+    type: 'broadcast',
+    event: 'test-my-messages',
+    payload: { message: 'talking to myself' },
+  })
+})
+```
+
+### Acknowledge messages
+
+You can confirm that Realtime received your message by setting Broadcast's `ack` config to `true`.
+
+{/* prettier-ignore */}
+```js
+const myChannel = clientD.channel('room-3', {
+  config: {
+    broadcast: { ack: true },
+  },
+})
+
+myChannel.subscribe(async (status) => {
+  if (status !== 'SUBSCRIBED') { return }
+
+  const serverResponse = await myChannel.send({
+    type: 'broadcast',
+    event: 'acknowledge',
+    payload: {},
+  })
+
+  console.log('serverResponse', serverResponse)
+})
+```
+
+Use this to guarantee that the server has received the message before resolving `channelD.send`'s promise. If the `ack` config is not set to `true` when creating the channel, the promise returned by `channelD.send` will resolve immediately.
+
+### Send messages using REST calls
+
+You can also send a Broadcast message by making an HTTP request to Reatlime servers. This is useful when you want to send messages from your server or client without having to first establish a WebSocket connection.
+
+```js
+const channel = client.channel('test-channel')
+
+// No need to subscribe to channel
+
+channel
+  .send({
+    type: 'broadcast',
+    event: 'test',
+    payload: { message: 'Hi' },
+  })
+  .then((resp) => {
+    console.log(resp)
+  })
+
+// Remember to clean up the channel
+
+client.removeChannel(channel)
+```
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

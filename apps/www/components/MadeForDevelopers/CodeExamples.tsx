@@ -150,6 +150,7 @@ const CodeExamples = () => {
             </div>
             <SyntaxHighlighter
               language="javascript"
+              // @ts-ignore
               style={monokaiCustomTheme}
               className="rounded-b-lg"
               customStyle={{

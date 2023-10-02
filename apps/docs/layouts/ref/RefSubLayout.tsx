@@ -51,7 +51,11 @@ interface ISectionDetails {}
 interface ISectionExamples {}
 
 const RefSubLayout: FC<RefSubLayoutType> & RefSubLayoutSubComponents = (props) => {
-  return <div className="flex flex-col w-full divide-y">{props.children}</div>
+  return (
+    <div className="flex flex-col w-full divide-y px-5 max-w-7xl mx-auto py-16">
+      {props.children}
+    </div>
+  )
 }
 
 const Section: FC<ISectionContainer> = (props) => {
@@ -103,7 +107,7 @@ const StickyHeader: FC<StickyHeader> = ({ icon, ...props }) => {
   return (
     <div className={['flex items-center gap-3 not-prose', icon && 'mb-8'].join(' ')}>
       {icon && (
-        <div className="w-8 h-8 bg-brand-500 rounded flex items-center justify-center">
+        <div className="w-8 h-8 bg-brand-300 rounded flex items-center justify-center">
           <Image width={16} height={16} alt={icon} src={`${icon}.svg`} />
         </div>
       )}
@@ -128,7 +132,7 @@ const StickyHeader: FC<StickyHeader> = ({ icon, ...props }) => {
 }
 
 const Details: FC<ISectionDetails> = (props) => {
-  return <div className="relative overflow-hidden w-full">{props.children}</div>
+  return <div className="relative w-full">{props.children}</div>
 }
 
 const Examples: FC<ISectionExamples> = (props) => {

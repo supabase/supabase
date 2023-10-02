@@ -1,5 +1,4 @@
-import * as React from 'react'
-import { Children, FC } from 'react'
+import { Children } from 'react'
 import * as CopyToClipboard from 'react-copy-to-clipboard'
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { monokaiCustomTheme } from './CodeBlock.utils'
@@ -13,13 +12,14 @@ import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
 import bash from 'react-syntax-highlighter/dist/cjs/languages/hljs/bash'
 import dart from 'react-syntax-highlighter/dist/cjs/languages/hljs/dart'
 import json from 'react-syntax-highlighter/dist/cjs/languages/hljs/json'
+import kotlin from 'react-syntax-highlighter/dist/cjs/languages/hljs/kotlin'
 
 import { useState } from 'react'
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 
 export interface CodeBlockProps {
   title?: string
-  language: 'js' | 'jsx' | 'sql' | 'py' | 'bash' | 'ts' | 'dart' | 'json' | 'csharp'
+  language: 'js' | 'jsx' | 'sql' | 'py' | 'bash' | 'ts' | 'dart' | 'json' | 'csharp' | 'kotlin'
   linesToHighlight?: number[]
   hideCopy?: boolean
   hideLineNumbers?: boolean
@@ -38,8 +38,8 @@ export const CodeBlock = ({
   hideCopy = false,
   hideLineNumbers = false,
 }: CodeBlockProps) => {
-  const { isDarkMode } = useTheme()
-  const monokaiTheme = monokaiCustomTheme(isDarkMode)
+  const { theme } = useTheme()
+  const monokaiTheme = monokaiCustomTheme(theme === 'dark')
 
   const [copied, setCopied] = useState(false)
 
@@ -74,6 +74,7 @@ export const CodeBlock = ({
   SyntaxHighlighter.registerLanguage('dart', dart)
   SyntaxHighlighter.registerLanguage('csharp', csharp)
   SyntaxHighlighter.registerLanguage('json', json)
+  SyntaxHighlighter.registerLanguage('kotlin', kotlin)
 
   const large = false
   // don't show line numbers if bash == lang
@@ -89,9 +90,11 @@ export const CodeBlock = ({
       )}
       {className ? (
         <div className="relative max-w-[90vw] md:max-w-none overflow-auto">
+          {/* @ts-ignore */}
           <SyntaxHighlighter
             language={lang}
             wrapLines={true}
+            // @ts-ignore
             style={monokaiTheme}
             className={[
               'code-block border p-4 w-full !my-0 !bg-scale-300',
@@ -133,7 +136,7 @@ export const CodeBlock = ({
             <div
               className={[
                 'absolute right-2',
-                `${isDarkMode ? 'dark' : ''}`,
+                `${theme === 'dark' ? 'dark' : ''}`,
                 `${!title ? 'top-2' : 'top-[3.25rem]'}`,
               ].join(' ')}
             >

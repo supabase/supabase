@@ -1,0 +1,453 @@
+---
+title: Coding the stars - an interactive constellation with Three.js and React Three Fiber
+description: How we built a constellation of stars with Three.js and React Three Fiber.
+author: fsansalvadore
+image: lw8-constellation-breakdown/lw8-constellation-breakdown-og.png
+thumb: lw8-constellation-breakdown/lw8-constellation-breakdown-og.png
+categories:
+  - engineering
+tags:
+  - launch-week
+date: '2023-08-04'
+toc_depth: 3
+---
+
+Every Launch Week is an opportunity for Supabase to experiment, try some spicy new designs, and dogfood our own technology. During our previous Launch Week we [took Generative AI for a spin](https://supabase.com/blog/designing-with-ai-midjourney). This time we decided to shoot for the stars.
+
+For [Launch Week 8](https://supabase.com/launch-week/), we wanted to make the user-generated tickets a central piece of the launch week theme. To do this, we built a “constellation” of stars - an animated night sky where every user signup was represented as a star, in the form of an “8” shape.
+
+<Img src="/images/blog/lw8-constellation-breakdown/lw8-early-design.png" caption="Early design" />
+
+We could approach this animation in a few ways.
+
+For example, animating the `stroke-dashoffset` on an SVG path, similar to <Link children="this" href="https://css-tricks.com/svg-line-animation-works/" target="_blank" /> example, was a good option, but it would have been difficult to randomize and change the shape at a later stage. Other approaches included 2D animation libraries, like <Link children="Framer Motion" href="https://www.framer.com/motion/animation/" target="_blank" />, <Link children="gsap" href="https://greensock.com/gsap/" target="_blank" /> or <Link children="PixiJS" href="https://pixijs.com/" target="_blank" />.
+
+Ultimately we decided to take <Link href="https://threejs.org/" target="_blank" children="Three.js" /> for a spin using [React Three Fiber](https://docs.pmnd.rs/react-three-fiber/getting-started/introduction) (R3F) giving us a more powerful toolset to enable us to achieve the best possible result.
+
+Learning Three.js is not a walk in the park but R3F abstracted many of its complexities such as cameras and renderers, to name a few. If you're new to R3F, some of the core primitives they provide for a basic scene include:
+
+- `Geometries`: used to create and define shapes
+- `Materials`: manage the texture and color of objects
+- `Mesh`: used to instantiate polygonal objects by combining a Geometry with a Material
+- `Lights`: to shine bright like a diamond 💎🎵
+- `Canvas`: where you define your R3F Scene
+
+If you want to dive a little deeper, here are a few good resources we found to get a solid grasp on the topic:
+
+- <Link
+    href="https://www.youtube.com/watch?v=DPl34H2ISsk"
+    target="_blank"
+    children="I wish I knew this before using React Three Fiber"
+  /> - from our very own <Link href="https://twitter.com/ggrdson" target="_blank" children="Greg" />
+- <Link href="https://threejs-journey.com/" target="_blank" children="Three.js Journey" /> - by <Link
+    href="https://bruno-simon.com/"
+    target="_blank"
+    children="Bruno Simon"
+  />
+
+## Setting up the scene
+
+In this article, we’re going to break down the steps to reproduce the Launch Week 8 animation using React Three Fiber in NextJs.
+
+These are the dependencies we’ll need:
+
+```bash
+npm install three @react-three/fiber
+```
+
+If you’re using React 17, we’ll spare you the trouble of finding the last compatible R3F version:
+
+```bash
+npm install three @react-three/fiber@7.0.29
+```
+
+All we need for each particle is a circle geometry with a minimal amount of sides to minimize complexity.
+
+```jsx
+import { useMemo } from 'react'
+
+const Geometry = useMemo(() => () => <circleGeometry args={[1.5, 5]} />, [])
+```
+
+A basic standard material with a white color will do just fine. Using the AdditiveBlending module from `three` provides a more interesting touch when particles happen to overlap, making them shine brighter:
+
+```jsx
+import { AdditiveBlending } from 'three'
+
+const Material = () =>
+  useMemo(() => <meshStandardMaterial color="#ffffff" blending={AdditiveBlending} />, [])
+```
+
+Let’s put it together in an R3F `Canvas` element and wrap up the initial setup with an `ambientLight`, which will make objects visible, just as real light does:
+
+```jsx
+import { useMemo } from 'react'
+import { Canvas } from '@react-three/fiber'
+import { AdditiveBlending } from 'three'
+
+const Geometry = useMemo(
+    () => () => <circleGeometry args={[1.5, 5]} />,
+    []
+  )
+
+const Material = () =>
+    useMemo(
+      () => (
+        <meshStandardMaterial
+          color="#ffffff"
+          blending={AdditiveBlending}
+        />
+      ),
+      []
+    )
+
+return (
+  <div style={{ width: 100vw, height: 100vh, background: "#000000" }}>
+    <Canvas
+      dpr={[1, 2]}
+      camera={{ fov: 75, position: [0, 0, 500] }}
+    >
+      <ambientLight intensity={0.3} />
+      <group>
+        {particles?.map((particle, index) => (
+          <mesh
+            key={particle.username}
+          >
+            <Geometry />
+            <Material />
+          </mesh>
+        ))}
+      </group>
+    </Canvas>
+  </div>
+)
+```
+
+For more context, the `dpr` values help with pixelation issues and the `camera` [0, 0, 500] position means that the camera is moved 500 units back in the z-axis to actually see the center [0,0,0] of the scene.
+
+One thing to note is that the R3F Canvas renders a transparent background, so in order to see the white particle, we need to set the background of the parent html element to a dark color.
+
+We created a separate component for the Particle, which will later encapsulate the animation logic.
+
+```jsx
+import React, { useRef } from 'react'
+
+const Particle = ({ children }) => {
+  const particle = useRef(null)
+
+  return <mesh ref={particle}>{children}</mesh>
+}
+
+export default Particle
+```
+
+## Load users from Supabase
+
+You might have noticed we haven’t instantiated the particles yet. As we mentioned earlier, we wanted each particle to represent a ticket generated by a user and stored in the database. Let’s fetch the signups from the `tickets` table in our Supabase project (you might need to start your own Launch Week to fill your table):
+
+```jsx
+const [particles, setParticles] = useState([])
+
+const loadUsers = async () => {
+  return await supabase.from('lw8_tickets').select('*')
+}
+
+useEffect(() => {
+  const { data: users } = loadUsers()
+  setParticles(users)
+}, [])
+```
+
+We updated the constellation in [realtime](https://supabase.com/realtime) whenever a new ticket was generated, but we’ll skip over this part to keep the article shorter. Since it’s all open-source, you can dive deeper <Link children="here" href="https://github.com/supabase/supabase/pull/16022/files#diff-e3298724d8ca571c732651658e388d70cafd90c4ceea99be8e5e7529ebb73a56R17-R52" target="_blank" /> if you wish.
+
+## Animating the particles
+
+To move the particle around the screen we are going to leverage a few different concepts: _useFrame_ and _trigonometry_ 🤯
+
+### useFrame
+
+Generally, the most optimal way to animate things in a browser viewport, using javascript, is by leveraging a method called <Link href="https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame" target="_blank" children="requestAnimationFrame" />, which _“tells the browser that you wish to perform an animation and requests that the browser calls a specified function to update an animation right before the next repaint.”_. R3F has a similar hook called <Link href="https://docs.pmnd.rs/react-three-fiber/tutorials/basic-animations" target="_blank" children="useFrame" /> that lets you execute code on every frame of Fiber's render loop. We’ll use this to change the position of the particles over time in a few moments.
+
+### Using time as an animation variable
+
+We can extract time information from the useFrame `clock` parameter, to know how much time has elapsed in our application, and use that time to animate a value. Updating the `x` position with Math.sin() generates a horizontal oscillating movement. Multiply it with a `widthRadius` variable to customize the amplitude of the movement.
+
+```jsx
+const particle = useRef(null)
+
+const widthRadius = 100
+const heightRadius = 100
+
+useFrame(({ clock }) => {
+    const timer = clock.getElapsedTime()
+
+    particle.current.position.x = Math.sin(timer) * widthRadius
+  }
+})
+
+return <mesh ref={particle}>{children}</mesh>
+```
+
+![01-x-sine.gif](/images/blog/lw8-constellation-breakdown/01-x-sine.gif)
+
+Combine the previous horizontal movement with a `Math.cos()` on the `y` position to [draw a circle](https://en.wikipedia.org/wiki/Sine_and_cosine):
+
+```jsx
+particle.current.position.y = Math.cos(timer) * heightRadius
+```
+
+![02-circle.gif](/images/blog/lw8-constellation-breakdown/02-circle.gif)
+
+Calculating the circumference we can get the time the x position takes to complete a full circle.
+
+```jsx
+const circumference = (config.widthRadius * Math.PI * 2) / 100
+```
+
+When that happens, we can invert the cos sign on every other loop to obtain a basic 8 shape.
+
+```jsx
+const isEven = Math.floor(timer / circumference) % 2 == 0
+
+particle.current.position.x = Math.sin(timer) * widthRadius
+particle.current.position.y = isEven
+  ? Math.cos(timer) * heightRadius - heightRadius
+  : -Math.cos(timer) * heightRadius + heightRadius
+```
+
+![03-eight.gif](/images/blog/lw8-constellation-breakdown/03-eight.gif)
+
+At this point, we played around with a number of parameters that made the animation more randomized and interesting.
+
+For example, we randomized the speed and the delay of each particle:
+
+```jsx
+const minSpeed = -0.3
+const maxSpeed = 0.4
+const speed = Math.random() * (minSpeed - maxSpeed) + maxSpeed
+
+const delayOffsetFactor = 100
+const delayOffset = Math.random() * delayOffsetFactor
+
+[...]
+
+const timer = clock.getElapsedTime() *** speed + delayOffset**
+```
+
+We offset the shape on the x-axis, to concentrate most of the particles in the core of the 8 shape and leave a smaller amount externally, by playing around with exponentials using Math.pow() in combination with some more randomization.
+
+```jsx
+const xThickness = 7
+const xRandomnessShape = 2.2
+const xRandomness = 5
+
+const pathOffset =
+    Math.pow(
+      Math.random() * xRandomnessShape,
+      xRandomness - xRandomness / 2
+    ) * xThickness
+
+...
+
+particle.current.position.x = Math.sin(timer) * widthRadius + pathOffset
+```
+
+Honestly, this was the result of a lot of playing and tweaking around, and we certainly didn’t hit the best possible result on the first try. Perhaps you want to take some time to experiment with the math - you might find even better and more configurable results.
+
+## GUI playground
+
+<Img src="/images/blog/lw8-constellation-breakdown/lw8-constellation-gui-demo.png" wide={true} />
+
+What really helped to visualize the shape, gather feedback, and decide on a final design was adding a GUI to play around with the values. You can try for yourself by appending `#debug` to the [supabase.com/launch-week#debu](http://supabase.com/launch-week#debug)[g](http://supabase.com/launch-weekdebug) url. Go crazy with it.
+
+We used the <Link href="https://github.com/dataarts/dat.gui" children="dat.gui" target="_blank"/> library:
+
+```bash
+npm install dat.gui@0.7.9
+```
+
+Which needs to be loaded asynchronously, otherwise it raises a `window is not defined` error.
+
+```jsx
+const init = async () => {
+  const dat = await import('dat.gui')
+  const gui = new dat.GUI()
+}
+
+useEffect(() => {
+  init()
+}, [])
+```
+
+Then we prepared a `useParticlesConfig` hook with all the configuration wired up to the GUI. Whenever the GUI updated, we also updated react state.
+
+```jsx
+import { useEffect, useState } from 'react'
+import { range } from 'lodash'
+
+let defaultConfig = {
+  particles: 1500,
+  widthRadius: 100,
+  topHeightRadius: 80,
+  bottomHeightRadius: 100,
+  xThickness: 7,
+  xRandomnessFactor: 2.2,
+  xRandomnessShape: 2.2,
+  xRandomness: 5,
+  yThickness: 20,
+  max_speed: 0.1,
+  min_speed: -0.1,
+}
+
+const useParticlesConfig = (): any => {
+  if (typeof window === 'undefined') return null
+  const hash = window.location.hash
+  const isDebugMode = hash.includes('#debug')
+  const [particles, setParticles] = useState(range(0, defaultConfig.particles))
+
+  const [config, setConfig] = useState(defaultConfig)
+
+  const handleSetConfig = (name, value) => {
+    setConfig((prevConfig) => ({ ...prevConfig, [name]: value }))
+  }
+
+  const init = async () => {
+    if (!isDebugMode) return
+    const dat = await import('dat.gui')
+    const gui = new dat.GUI()
+    const particlesFolder = gui.addFolder('Particles')
+    const shapeFolder = gui.addFolder('Shape')
+
+    particlesFolder
+      .add(config, 'particles')
+      .min(1)
+      .max(5000)
+      .step(1)
+      .onChange((value) => {
+        handleSetConfig('particles', value)
+        setParticles(range(0, value))
+      })
+    shapeFolder
+      .add(config, 'widthRadius')
+      .min(1)
+      .max(200)
+      .step(1)
+      .onChange((value) => handleSetConfig('widthRadius', value))
+
+    // add desired folders and parameters
+
+    particlesFolder.open()
+    shapeFolder.open()
+  }
+
+  useEffect(() => {
+    init()
+  }, [])
+
+  return { config, handleSetConfig, particles, setParticles, isDebugMode }
+}
+
+export default useParticlesConfig
+```
+
+Here is the final code:
+
+```jsx
+import React, { useMemo, useEffect, useState } from 'react'
+import { Canvas, useFrame } from '@react-three/fiber'
+import { AdditiveBlending } from 'three'
+import useParticlesConfig from './hooks/useParticlesConfig'
+
+const ParticlesCanvas = () => {
+  if (typeof window === 'undefined') return null
+  const { config, particles } = useParticlesConfig()
+
+  const Geometry = useMemo(
+    () => () => <circleGeometry args={[config.particlesSize, config.particlesSides]} />,
+    []
+  )
+
+  const Material = () =>
+    useMemo(
+      () => (
+        <meshStandardMaterial
+          color={config.color}
+          blending={config.particlesBlending ? AdditiveBlending : undefined}
+        />
+      ),
+      []
+    )
+
+  return (
+    <div style={{ width: 100vw, height: 100vh, background: "#000000" }}>
+      <Canvas
+        dpr={[1, 2]}
+        camera={{ fov: 75, position: [0, 0, 500] }}
+      >
+        <ambientLight intensity={config.lightIntensity} />
+        <group>
+          {particles?.map((particle, index) => (
+            <Particle
+              key={particle.username}
+            >
+              <Geometry />
+              <Material />
+            </Particle>
+          ))}
+        </group>
+      </Canvas>
+    </div>
+  )
+}
+
+const Particle = ({ children }: Props) => {
+  const particle = useRef(null)
+
+  const pathOffset =
+    Math.pow(
+      Math.random() * config.xRandomnessShape,
+      config.xRandomness - config.xRandomness / 2
+    ) * config.xThickness
+
+  const verticalRandomness = Math.random() * (config.yThickness - 1) + 1 - config.yThickness / 2
+
+  const speed = Math.random() * (config.min_speed - config.max_speed) + config.max_speed
+
+  const circumference = (config.widthRadius * Math.PI * 2) / 100
+  const delayOffsetFactor = 100
+  const delayOffset = Math.random() * delayOffsetFactor
+
+  useFrame(({ clock }) => {
+    const timer = clock.getElapsedTime() * speed + delayOffset
+    const isEven = Math.floor(timer / circumference) % 2 == 0
+
+		// When the loop count is even, draw bottom 8 shape
+    // if odd, draw top 8 shape
+    particle.current.position.x = isEven
+      ? Math.sin(timer) * config.widthRadius * config.widthRatio + pathOffset
+      : Math.sin(timer) * config.widthRadius + pathOffset
+    particle.current.position.y = isEven
+      ? Math.cos(timer) * config.bottomHeightRadius -
+        config.bottomHeightRadius +
+        verticalRandomness
+      : -Math.cos(timer) * config.topHeightRadius + config.topHeightRadius + verticalRandomness
+  })
+
+  return <mesh ref={particle}>{children}</mesh>
+}
+
+export default Particle
+```
+
+Now **_THAT’S_** how you create a new constellation ✨. Feel free to use the code and learnings to build your own.
+
+## Conclusion
+
+In this journey, you saw how to use Three.js and harness the power of React Three Fiber and creative experimentation to craft an animation. We leveraged trigonometry, animation hooks, and GUI playgrounds to build a "8" shape formed by user-generated stars.
+
+If you loved this and the new [Launch Week 8](https://supabase.com/launch-week) branding, make sure to tune in on Monday at 09 AM PT as we unveil the full landing 💥
+
+## More Supabase Design
+
+- [Designing with AI: Generating unique artwork for every user](https://supabase.com/blog/designing-with-ai-midjourney)
+- **[Infinite scroll with Next.js, Framer Motion, and Supabase](https://supabase.com/blog/infinite-scroll-with-nextjs-framer-motion)**

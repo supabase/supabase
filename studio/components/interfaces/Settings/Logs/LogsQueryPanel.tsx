@@ -1,7 +1,23 @@
-import { Button, Dropdown, IconChevronDown, IconPlay, Badge, Popover, Alert } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import {
+  Alert,
+  Badge,
+  Button,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
+  IconChevronDown,
+  IconPlay,
+  Popover,
+} from 'ui'
 
+import { useCheckPermissions } from 'hooks'
+import { IS_PLATFORM } from 'lib/constants'
+import { useProfile } from 'lib/profile'
+import Link from 'next/link'
+import React from 'react'
 import {
   EXPLORER_DATEPICKER_HELPERS,
   LogsTableName,
@@ -10,11 +26,6 @@ import {
   LogTemplate,
 } from '.'
 import DatePickers from './Logs.DatePickers'
-import Link from 'next/link'
-import React from 'react'
-import { checkPermissions } from 'hooks'
-import { useProfileQuery } from 'data/profile/profile-query'
-import { IS_PLATFORM } from 'lib/constants'
 
 export interface LogsQueryPanelProps {
   templates?: LogTemplate[]
@@ -45,8 +56,8 @@ const LogsQueryPanel = ({
   onDateChange,
   warnings,
 }: LogsQueryPanelProps) => {
-  const { data: profile } = useProfileQuery()
-  const canCreateLogQuery = checkPermissions(PermissionAction.CREATE, 'user_content', {
+  const { profile } = useProfile()
+  const canCreateLogQuery = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'log_sql', owner_id: profile?.id },
     subject: { id: profile?.id },
   })
@@ -56,40 +67,47 @@ const LogsQueryPanel = ({
       <div className="flex w-full items-center justify-between px-5 py-2">
         <div className="flex w-full flex-row items-center justify-between gap-x-4">
           <div className="flex items-center gap-2">
-            <Dropdown
-              side="bottom"
-              align="start"
-              overlay={Object.values(LogsTableName)
-                .sort((a, b) => a.localeCompare(b))
-                .map((source) => (
-                  <Dropdown.Item key={source} onClick={() => onSelectSource(source)}>
-                    <div className="flex flex-col gap-1">
-                      <span className="font-mono font-bold text-scale-1100">{source}</span>
-                      <span className="text-scale-1100">{LOGS_SOURCE_DESCRIPTION[source]}</span>
-                    </div>
-                  </Dropdown.Item>
-                ))}
-            >
-              <Button as="span" type="default" iconRight={<IconChevronDown />}>
-                Insert source
-              </Button>
-            </Dropdown>
+            <DropdownMenu_Shadcn_>
+              <DropdownMenuTrigger_Shadcn_>
+                <Button asChild type="default" iconRight={<IconChevronDown />}>
+                  <span>Insert source</span>
+                </Button>
+              </DropdownMenuTrigger_Shadcn_>
+              <DropdownMenuContent_Shadcn_ side="bottom" align="start">
+                {Object.values(LogsTableName)
+                  .sort((a, b) => a.localeCompare(b))
+                  .map((source) => (
+                    <DropdownMenuItem_Shadcn_ key={source} onClick={() => onSelectSource(source)}>
+                      <div className="flex flex-col gap-1">
+                        <span className="font-mono font-bold">{source}</span>
+                        <span className="text-foreground-light">
+                          {LOGS_SOURCE_DESCRIPTION[source]}
+                        </span>
+                      </div>
+                    </DropdownMenuItem_Shadcn_>
+                  ))}
+              </DropdownMenuContent_Shadcn_>
+            </DropdownMenu_Shadcn_>
 
-            <Dropdown
-              side="bottom"
-              align="start"
-              overlay={templates
-                .sort((a, b) => a.label!.localeCompare(b.label!))
-                .map((template: LogTemplate) => (
-                  <Dropdown.Item key={template.label} onClick={() => onSelectTemplate(template)}>
-                    <p>{template.label}</p>
-                  </Dropdown.Item>
-                ))}
-            >
-              <Button as="span" type="default" iconRight={<IconChevronDown />}>
-                Templates
-              </Button>
-            </Dropdown>
+            <DropdownMenu_Shadcn_>
+              <DropdownMenuTrigger_Shadcn_>
+                <Button asChild type="default" iconRight={<IconChevronDown />}>
+                  <span>Templates</span>
+                </Button>
+              </DropdownMenuTrigger_Shadcn_>
+              <DropdownMenuContent_Shadcn_ side="bottom" align="start">
+                {templates
+                  .sort((a, b) => a.label!.localeCompare(b.label!))
+                  .map((template) => (
+                    <DropdownMenuItem_Shadcn_
+                      key={template.label}
+                      onClick={() => onSelectTemplate(template)}
+                    >
+                      <p>{template.label}</p>
+                    </DropdownMenuItem_Shadcn_>
+                  ))}
+              </DropdownMenuContent_Shadcn_>
+            </DropdownMenu_Shadcn_>
             <DatePickers
               to={defaultTo}
               from={defaultFrom}
@@ -152,7 +170,7 @@ const LogsQueryPanel = ({
                               'border border-scale-200',
                             ].join(' ')}
                           >
-                            <span className="text-xs text-scale-1200">
+                            <span className="text-xs text-foreground">
                               You need additional permissions to save your query
                             </span>
                           </div>

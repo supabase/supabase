@@ -1,43 +1,55 @@
-import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
-import { SessionContextProvider } from '@supabase/auth-helpers-react'
-import { AuthProvider, ThemeProvider } from 'common'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
-import { AppPropsWithLayout } from 'types'
-import { CommandMenuProvider } from 'ui'
-import components from '~/components'
-import Favicons from '~/components/Favicons'
-import SiteLayout from '~/layouts/SiteLayout'
-import { IS_PLATFORM, LOCAL_SUPABASE } from '~/lib/constants'
-import { post } from '~/lib/fetchWrappers'
-import '../styles/ch.scss'
+import '../../../packages/ui/build/css/themes/dark.css'
+import '../../../packages/ui/build/css/themes/light.css'
+
+import 'config/code-hike.scss'
 import '../styles/main.scss?v=1.0.0'
 import '../styles/new-docs.scss'
 import '../styles/prism-okaidia.scss'
 
+import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import { SessionContextProvider } from '@supabase/auth-helpers-react'
+import { AuthProvider, ThemeProvider, useConsent, useTelemetryProps } from 'common'
+import { useRouter } from 'next/router'
+import { useCallback, useEffect, useState } from 'react'
+import { AppPropsWithLayout } from 'types'
+import { CommandMenuProvider } from 'ui'
+import { TabsProvider } from 'ui/src/components/Tabs'
+import Favicons from '~/components/Favicons'
+import SiteLayout from '~/layouts/SiteLayout'
+import { API_URL, IS_PLATFORM, LOCAL_SUPABASE } from '~/lib/constants'
+import { post } from '~/lib/fetchWrappers'
+import PortalToast from 'ui/src/layout/PortalToast'
+
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
+  const telemetryProps = useTelemetryProps()
+  const { consentValue, hasAcceptedConsent } = useConsent()
 
   const [supabase] = useState(() =>
     IS_PLATFORM || LOCAL_SUPABASE ? createBrowserSupabaseClient() : undefined
   )
 
-  function handlePageTelemetry(route: string) {
-    return post(`https://api.supabase.io/platform/telemetry/page`, {
-      referrer: document.referrer,
-      title: document.title,
-      route,
-    })
-  }
+  const handlePageTelemetry = useCallback(
+    (route: string) => {
+      return post(`${API_URL}/telemetry/page`, {
+        referrer: document.referrer,
+        title: document.title,
+        route,
+        ga: {
+          screen_resolution: telemetryProps?.screenResolution,
+          language: telemetryProps?.language,
+        },
+      })
+    },
+    [telemetryProps]
+  )
 
   useEffect(() => {
     function handleRouteChange(url: string) {
       /*
        * handle telemetry
        */
-      handlePageTelemetry(url)
+      if (hasAcceptedConsent) handlePageTelemetry(url)
       /*
        * handle "scroll to top" behaviour on route change
        */
@@ -57,16 +69,73 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     return () => {
       router.events.off('routeChangeComplete', handleRouteChange)
     }
-  }, [router.events])
+  }, [router, handlePageTelemetry, consentValue])
+
+  /**
+   * Save/restore scroll position when reloading or navigating back/forward.
+   *
+   * Required since scroll happens within a sub-container, not the page root.
+   */
+  useEffect(() => {
+    const storageKey = 'scroll-position'
+
+    const container = document.getElementById('docs-content-container')
+    if (!container) {
+      return
+    }
+
+    const previousScroll = Number(sessionStorage.getItem(storageKey))
+    const [entry] = window.performance.getEntriesByType('navigation')
+
+    // Only restore scroll position on reload and back/forward events
+    if (
+      previousScroll &&
+      entry &&
+      isPerformanceNavigationTiming(entry) &&
+      ['reload', 'back_forward'].includes(entry.type)
+    ) {
+      container.scrollTop = previousScroll
+    }
+
+    const handler = () => {
+      // Scroll stored in session storage, so only persisted per tab
+      sessionStorage.setItem(storageKey, container.scrollTop.toString())
+    }
+
+    window.addEventListener('beforeunload', handler)
+
+    return () => window.removeEventListener('beforeunload', handler)
+  }, [router])
 
   useEffect(() => {
+    if (!hasAcceptedConsent) return
+
     /**
      * Send page telemetry on first page load
      */
     if (router.isReady) {
-      handlePageTelemetry(router.asPath)
+      handlePageTelemetry(router.basePath + router.asPath)
     }
-  }, [router.isReady])
+  }, [router, handlePageTelemetry, consentValue])
+
+  /**
+   * Reference docs use `history.pushState()` to jump to
+   * sub-sections without causing a re-render.
+   *
+   * We need to the below handler to manually force a re-render
+   * when navigating away from, then back to reference docs
+   */
+  useEffect(() => {
+    function handler() {
+      router.replace(window.location.href)
+    }
+
+    window.addEventListener('popstate', handler)
+
+    return () => {
+      window.removeEventListener('popstate', handler)
+    }
+  }, [router])
 
   const SITE_TITLE = 'Supabase Documentation'
 
@@ -84,21 +153,34 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     <>
       <Favicons />
       <AuthContainer>
-        <ThemeProvider>
-          <CommandMenuProvider
-            site="docs"
-            MarkdownHandler={(props) => (
-              <ReactMarkdown remarkPlugins={[remarkGfm]} components={components} {...props} />
-            )}
-          >
-            <SiteLayout>
-              <Component {...pageProps} />
-            </SiteLayout>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <CommandMenuProvider site="docs">
+            <TabsProvider>
+              <SiteLayout>
+                <PortalToast />
+                <Component {...pageProps} />
+              </SiteLayout>
+            </TabsProvider>
           </CommandMenuProvider>
         </ThemeProvider>
       </AuthContainer>
     </>
   )
+}
+
+/**
+ * Type guard that checks if a performance entry is a
+ * `PerformanceNavigationTiming`.
+ */
+function isPerformanceNavigationTiming(
+  entry: PerformanceEntry
+): entry is PerformanceNavigationTiming {
+  return entry.entryType === 'navigation'
 }
 
 export default MyApp

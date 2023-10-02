@@ -18,9 +18,9 @@ interface NotificationMetadata {
 export interface ChartIntervals {
   key: 'minutely' | 'hourly' | 'daily' | '5min' | '15min' | '1hr' | '1day' | '7day'
   label: string
-  startValue: 1 | 24 | 7
-  startUnit: 'hour' | 'day'
-  format: 'MMM D, h:mma' | 'MMM D, ha' | 'MMM D'
+  startValue: number
+  startUnit: 'minute' | 'hour' | 'day'
+  format?: 'MMM D, h:mm:ssa' | 'MMM D, h:mma' | 'MMM D, ha' | 'MMM D'
 }
 
 export interface VaultSecret {

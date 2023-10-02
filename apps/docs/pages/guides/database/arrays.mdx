@@ -17,10 +17,11 @@ Create a test table with a text array (an array of strings):
   size="small"
   type="underlined"
   defaultActiveId="dashboard"
+  queryGroup="database-method"
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Table editor](https://app.supabase.com/project/_/editor) page in the Dashboard.
+1. Go to the [Table editor](https://supabase.com/dashboard/project/_/editor) page in the Dashboard.
 1. Click **New Table** and create a table with the name `arraytest`.
 1. Click **Save**.
 1. Click **New Column** and create a column with the name `textarray`, type `text`, and select **Define as array**.
@@ -46,10 +47,11 @@ create table arraytest (
   size="small"
   type="underlined"
   defaultActiveId="dashboard"
+  queryGroup="database-method"
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Table editor](https://app.supabase.com/project/_/editor) page in the Dashboard.
+1. Go to the [Table editor](https://supabase.com/dashboard/project/_/editor) page in the Dashboard.
 1. Select the `arraytest` table.
 1. Click **Insert row** and add `["Harry", "Larry", "Moe"]`.
 1. Click **Save.**
@@ -82,10 +84,11 @@ const { data, error } = await supabase
   size="small"
   type="underlined"
   defaultActiveId="dashboard"
+  queryGroup="database-method"
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Table editor](https://app.supabase.com/project/_/editor) page in the Dashboard.
+1. Go to the [Table editor](https://supabase.com/dashboard/project/_/editor) page in the Dashboard.
 1. Select the `arraytest` table.
 
 You should see:
@@ -119,6 +122,7 @@ PostgreSQL uses 1-based indexing (e.g., `textarray[1]` is the first item in the 
   size="small"
   type="underlined"
   defaultActiveId="sql"
+  queryGroup="language"
 >
 <TabPanel id="sql" label="SQL">
 
@@ -160,7 +164,7 @@ returns:
 ## Resources
 
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
-- [Supabase Account - Free Tier OK](https://supabase.com)
+- [Supabase Account - Free Plan OK](https://supabase.com)
 - [PostgreSQL Arrays](https://www.postgresql.org/docs/15/arrays.html)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />

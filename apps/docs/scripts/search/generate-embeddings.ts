@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import dotenv from 'dotenv'
+import minimist from 'minimist'
 import 'openai'
 import { Configuration, OpenAIApi } from 'openai'
 import { inspect } from 'util'
@@ -9,9 +10,9 @@ import { fetchSources } from './sources'
 dotenv.config()
 
 async function generateEmbeddings() {
-  // TODO: use better CLI lib like yargs
-  const args = process.argv.slice(2)
-  const shouldRefresh = args.includes('--refresh')
+  const argv = minimist(process.argv.slice(2))
+
+  const shouldRefresh = Boolean(argv.refresh)
 
   const requiredEnvVars = [
     'NEXT_PUBLIC_SUPABASE_URL',
@@ -75,13 +76,11 @@ async function generateEmbeddings() {
         throw fetchPageError
       }
 
-      type Singular<T> = T extends any[] ? undefined : T
-
       // We use checksum to determine if this page & its sections need to be regenerated
       if (!shouldRefresh && existingPage?.checksum === checksum) {
-        const existingParentPage = existingPage?.parentPage as Singular<
-          typeof existingPage.parentPage
-        >
+        const existingParentPage = Array.isArray(existingPage?.parentPage)
+          ? existingPage?.parentPage[0]
+          : existingPage?.parentPage
 
         // If parent page changed, update it
         if (existingParentPage?.path !== parentPath) {

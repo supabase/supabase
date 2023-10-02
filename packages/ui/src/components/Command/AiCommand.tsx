@@ -1,4 +1,3 @@
-import React from 'react'
 import type {
   ChatCompletionResponseMessage,
   CreateChatCompletionResponse,
@@ -16,14 +15,24 @@ import {
 
 import { SSE } from 'sse.js'
 
-import { Alert, Button, IconAlertTriangle, IconCornerDownLeft, IconUser, Input } from 'ui'
+import {
+  AiIconAnimation,
+  Button,
+  IconAlertTriangle,
+  IconCornerDownLeft,
+  IconUser,
+  Input,
+  markdownComponents,
+} from 'ui'
 import { AiIcon, AiIconChat } from './Command.icons'
 import { CommandGroup, CommandItem, useAutoInputFocus, useHistoryKeys } from './Command.utils'
 
-import { useCommandMenu } from './CommandMenuProvider'
 import { AiWarning } from './Command.alerts'
+import { useCommandMenu } from './CommandMenuProvider'
 
-import { cn } from './../../utils/cn'
+import ReactMarkdown from 'react-markdown'
+import { cn } from './../../lib/utils'
+import remarkGfm from 'remark-gfm'
 
 const questions = [
   'How do I get started with Supabase?',
@@ -339,7 +348,7 @@ export function queryAi(messages: Message[], timeout = 0) {
 }
 
 const AiCommand = () => {
-  const { isLoading, setIsLoading, search, setSearch, MarkdownHandler } = useCommandMenu()
+  const { isLoading, setIsLoading, search, setSearch } = useCommandMenu()
 
   const { submit, reset, messages, isResponding, hasError } = useAiChat({
     setIsLoading,
@@ -374,6 +383,9 @@ const AiCommand = () => {
     }
   }, [])
 
+  // Detect an IME composition (so that we can ignore Enter keypress)
+  const [isImeComposing, setIsImeComposing] = useState(false)
+
   return (
     <div onClick={(e) => e.stopPropagation()}>
       <div className={cn('relative mb-[145px] py-4 max-h-[720px] overflow-auto')}>
@@ -399,12 +411,19 @@ const AiCommand = () => {
               return (
                 <div key={index} className="px-4 [overflow-anchor:none] mb-6">
                   <div className="flex gap-6 [overflow-anchor:none] mb-6">
-                    <AiIconChat />
+                    <AiIconChat
+                      loading={
+                        message.status === MessageStatus.Pending ||
+                        message.status === MessageStatus.InProgress
+                      }
+                    />
                     <>
                       {message.status === MessageStatus.Pending ? (
                         <div className="bg-scale-700 h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
                       ) : (
-                        <MarkdownHandler
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          components={markdownComponents}
                           linkTarget="_blank"
                           className="prose dark:prose-dark"
                           transformLinkUri={(href) => {
@@ -419,7 +438,7 @@ const AiCommand = () => {
                           }}
                         >
                           {message.content}
-                        </MarkdownHandler>
+                        </ReactMarkdown>
                       )}
                     </>
                   </div>
@@ -443,7 +462,7 @@ const AiCommand = () => {
                   forceMount
                   key={key}
                 >
-                  <AiIcon />
+                  <AiIconAnimation />
                   {question}
                 </CommandItem>
               )
@@ -468,7 +487,7 @@ const AiCommand = () => {
       <div className="absolute bottom-0 w-full bg-scale-200 py-3">
         {messages.length > 0 && !hasError && <AiWarning className="mb-3 mx-3" />}
         <Input
-          className="bg-scale-100 rounded mx-3"
+          className="bg-scale-100 rounded mx-3 [&_input]:pr-32 md:[&_input]:pr-40"
           inputRef={inputRef}
           autoFocus
           placeholder={
@@ -496,17 +515,15 @@ const AiCommand = () => {
               setSearch(e.target.value)
             }
           }}
+          onCompositionStart={() => setIsImeComposing(true)}
+          onCompositionEnd={() => setIsImeComposing(false)}
           onKeyDown={(e) => {
             switch (e.key) {
               case 'Enter':
-                if (!search) {
+                if (!search || isLoading || isResponding || isImeComposing) {
                   return
                 }
-                if (isLoading || isResponding) {
-                  return
-                }
-                handleSubmit(search)
-                return
+                return handleSubmit(search)
               default:
                 return
             }

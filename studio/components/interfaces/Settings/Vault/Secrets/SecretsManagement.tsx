@@ -1,21 +1,19 @@
-import Link from 'next/link'
-import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { FC, Fragment, useState, useEffect } from 'react'
-import { IconSearch, Input, Button, Listbox, IconLoader, IconExternalLink, IconX } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
+import { observer } from 'mobx-react-lite'
+import Link from 'next/link'
+import { Fragment, useEffect, useState } from 'react'
+import { Button, IconExternalLink, IconLoader, IconSearch, IconX, Input, Listbox } from 'ui'
 
-import { useStore, checkPermissions } from 'hooks'
-import { useParams } from 'common/hooks'
-import SecretRow from './SecretRow'
-import EditSecretModal from './EditSecretModal'
-import DeleteSecretModal from './DeleteSecretModal'
-import AddNewSecretModal from './AddNewSecretModal'
 import Divider from 'components/ui/Divider'
+import { useCheckPermissions, useStore } from 'hooks'
+import AddNewSecretModal from './AddNewSecretModal'
+import DeleteSecretModal from './DeleteSecretModal'
+import EditSecretModal from './EditSecretModal'
+import SecretRow from './SecretRow'
 
-interface Props {}
-
-const SecretsManagement: FC<Props> = ({}) => {
+const SecretsManagement = () => {
   const { vault } = useStore()
   const { search } = useParams()
 
@@ -25,7 +23,7 @@ const SecretsManagement: FC<Props> = ({}) => {
   const [selectedSecretToEdit, setSelectedSecretToEdit] = useState<any>()
   const [selectedSecretToRemove, setSelectedSecretToRemove] = useState<any>()
 
-  const canManageSecrets = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  const canManageSecrets = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   useEffect(() => {
     if (search !== undefined) setSearchValue(search)
@@ -131,7 +129,7 @@ const SecretsManagement: FC<Props> = ({}) => {
                         'border border-scale-200',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text-foreground">
                         You need additional permissions to add secrets
                       </span>
                     </div>
@@ -146,8 +144,12 @@ const SecretsManagement: FC<Props> = ({}) => {
         <div className="border border-scale-500 rounded">
           {!vault.isLoaded ? (
             <div className="px-6 py-6 space-x-2 flex items-center justify-center">
-              <IconLoader className="animate-spin text-scale-1100" size={16} strokeWidth={1.5} />
-              <p className="text-sm text-scale-1200">Loading secrets from the Vault</p>
+              <IconLoader
+                className="animate-spin text-foreground-light"
+                size={16}
+                strokeWidth={1.5}
+              />
+              <p className="text-sm text-foreground">Loading secrets from the Vault</p>
             </div>
           ) : (
             <>
@@ -167,15 +169,15 @@ const SecretsManagement: FC<Props> = ({}) => {
                 <>
                   {searchValue.length === 0 ? (
                     <div className="px-6 py-6 space-y-1 flex flex-col items-center justify-center">
-                      <p className="text-sm text-scale-1200">No secrets added yet</p>
-                      <p className="text-sm text-scale-1100">
+                      <p className="text-sm text-foreground">No secrets added yet</p>
+                      <p className="text-sm text-foreground-light">
                         The Vault allows you to store sensitive information like API keys
                       </p>
                     </div>
                   ) : (
                     <div className="px-6 py-4 space-y-1">
-                      <p className="text-sm text-scale-1200">No results found</p>
-                      <p className="text-sm text-scale-1100">
+                      <p className="text-sm text-foreground">No results found</p>
+                      <p className="text-sm text-foreground-light">
                         Your search for "{searchValue}" did not return any results
                       </p>
                     </div>

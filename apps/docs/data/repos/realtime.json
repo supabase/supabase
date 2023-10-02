@@ -25,7 +25,7 @@
     "site_admin": false
   },
   "html_url": "https://github.com/supabase/realtime",
-  "description": "Listen to your to PostgreSQL database in realtime via websockets. Built with Elixir.",
+  "description": "Listen to your PostgreSQL database in realtime via websockets. Built with Elixir.",
   "fork": false,
   "url": "https://api.github.com/repos/supabase/realtime",
   "forks_url": "https://api.github.com/repos/supabase/realtime/forks",

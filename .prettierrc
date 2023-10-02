@@ -5,5 +5,7 @@
   "singleQuote": true,
   "printWidth": 100,
   "endOfLine": "lf",
-  "sqlKeywordCase": "lower"
+  "sqlKeywordCase": "lower",
+  "pluginSearchDirs": false,
+  "plugins": ["prettier-plugin-sql-cst"]
 }

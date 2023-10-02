@@ -1,49 +1,32 @@
-import React, { useEffect } from 'react'
-import { useRouter } from 'next/router'
-import { observer } from 'mobx-react-lite'
+import { useParams } from 'common'
 import { find } from 'lodash'
+import { observer } from 'mobx-react-lite'
 
-import { API_URL } from 'lib/constants'
-import { useFlag, useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { PROJECT_STATUS } from 'lib/constants'
 import { StorageLayout } from 'components/layouts'
-import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import StorageBucketsError from 'components/layouts/StorageLayout/StorageBucketsError'
 import { StorageExplorer } from 'components/to-be-cleaned/Storage'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import { useBucketsQuery } from 'data/storage/buckets-query'
 import { NextPageWithLayout } from 'types'
 
-/**
- * PageLayout is used to setup layout - as usual it will requires inject global store
- */
 const PageLayout: NextPageWithLayout = () => {
-  const router = useRouter()
-  const { ref, bucketId } = router.query
+  const { ref, bucketId } = useParams()
+  const { project } = useProjectContext()
 
-  const { ui } = useStore()
-  const project = ui.selectedProject
-
-  const storageStore = useStorageStore()
-  const { buckets, loaded } = storageStore
-
-  const kpsEnabled = useFlag('initWithKps')
-
-  useEffect(() => {
-    if (project && project.status === PROJECT_STATUS.INACTIVE) {
-      post(`${API_URL}/projects/${ref}/restore`, { kps_enabled: kpsEnabled })
-    }
-  }, [project])
-
-  if (!project) return <div></div>
-
+  const { data, isSuccess, isError, error } = useBucketsQuery({ projectRef: ref })
+  const buckets = data ?? []
   const bucket = find(buckets, { id: bucketId })
+
+  if (!project) return null
 
   return (
     <div className="storage-container flex flex-grow p-4">
-      {loaded ? (
+      {isError && <StorageBucketsError error={error as any} />}
+
+      {isSuccess ? (
         !bucket ? (
           <div className="flex h-full w-full items-center justify-center">
-            <p className="text-sm text-scale-1100">Bucket {bucketId} cannot be found</p>
+            <p className="text-sm text-foreground-light">Bucket {bucketId} cannot be found</p>
           </div>
         ) : (
           // @ts-ignore

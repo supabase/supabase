@@ -31,7 +31,7 @@ git clone https://github.com/supabase-community/firebase-to-supabase.git
 }
 ```
 
-1. Go to the [Database settings](https://app.supabase.com/project/_/settings/database) for your project in the Supabase Dashboard.
+1. Go to the [Database settings](https://supabase.com/dashboard/project/_/settings/database) for your project in the Supabase Dashboard.
 1. Under **Connection Info**, copy the Host string and replace the entry in your `supabase-service.json` file.
 1. Enter the password you used when you created your Supabase project in the `password` entry in the `supabase-service.json` file.
 
@@ -61,17 +61,17 @@ git clone https://github.com/supabase-community/firebase-to-supabase.git
 
 You can customize the way your JSON file is written using a [custom hook](#custom-hooks). A common use for this is to "flatten" the JSON file, or to split nested data into separate, related database tables. For example, you could take a Firestore document that looks like this:
 
-```json title=Firestore%20document
+```json Firestore
 [{ "user": "mark", "score": 100, "items": ["hammer", "nail", "glue"] }]
 ```
 
 And split it into two files (one table for users and one table for items):
 
-```json title=Users%20table
+```json Users
 [{ "user": "mark", "score": 100 }]
 ```
 
-```json title=Items%20table
+```json Items
 [
   { "user": "mark", "item": "hammer" },
   { "user": "mark", "item": "nail" },
@@ -89,7 +89,7 @@ And split it into two files (one table for users and one table for items):
   - `smallserial` Creates a key using `(id SMALLSERIAL PRIMARY KEY)` (autoincrementing 2-byte integer).
   - `serial` Creates a key using `(id SERIAL PRIMARY KEY)` (autoincrementing 4-byte integer).
   - `bigserial` Creates a key using `(id BIGSERIAL PRIMARY KEY)` (autoincrementing 8-byte integer).
-  - `uuid` Creates a key using `(id UUID PRIMARY KEY DEFAULT uuid_generate_v4())` (randomly generated UUID).
+  - `uuid` Creates a key using `(id UUID PRIMARY KEY DEFAULT gen_random_uuid())` (randomly generated UUID).
   - `firestore_id` Creates a key using `(id TEXT PRIMARY KEY)` (uses existing `firestore_id` random text as key).
 - `[<primary_key_name>]` (optional) Name of primary key. Defaults to "id".
 
@@ -187,14 +187,14 @@ module.exports = (collectionName, doc, recordCounters, writeRecord) => {
 
 The result is two separate JSON files:
 
-```json title=users.json
+```json users.json
 [
   { "uid": "abc123", "name": "mark", "score": 100 },
   { "uid": "xyz789", "name": "chuck", "score": 9999999 }
 ]
 ```
 
-```json title=weapons.json
+```json weapons.json
 [
   { "uid": "abc123", "weapon": "toothpick" },
   { "uid": "abc123", "weapon": "needle" },

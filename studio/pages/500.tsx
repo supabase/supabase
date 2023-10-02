@@ -5,16 +5,16 @@ import Image from 'next/image'
 import { Button } from 'ui'
 import { observer } from 'mobx-react-lite'
 
-import { auth, STORAGE_KEY } from 'lib/gotrue'
-import { useTheme } from 'common'
+import { useSignOut } from 'lib/auth'
+import { useTheme } from 'next-themes'
 
 const Error500: NextPage = () => {
   const router = useRouter()
-  const { isDarkMode } = useTheme()
+  const { theme } = useTheme()
 
+  const signOut = useSignOut()
   const onClickLogout = async () => {
-    await auth.signOut()
-    localStorage.removeItem(STORAGE_KEY)
+    await signOut()
     await router.push('/sign-in')
     router.reload()
   }
@@ -29,7 +29,7 @@ const Error500: NextPage = () => {
                 <a>
                   <Image
                     src={
-                      isDarkMode
+                      theme === 'dark'
                         ? `${router.basePath}/img/supabase-dark.svg`
                         : `${router.basePath}/img/supabase-light.svg`
                     }

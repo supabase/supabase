@@ -1,21 +1,22 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, Form, IconClock, Input, Listbox } from 'ui'
 
-import { checkPermissions, useStore } from 'hooks'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
-import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
+import { useCheckPermissions, useStore } from 'hooks'
+import { IS_PLATFORM } from 'lib/constants'
 import { StorageSizeUnits, STORAGE_FILE_SIZE_LIMIT_MAX_BYTES } from './StorageSettings.constants'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
 
 export type StorageSettingsProps = {
   projectRef: string | undefined
 }
 
 const StorageSettings = ({ projectRef }: StorageSettingsProps) => {
-  const { data, error } = useProjectStorageConfigQuery({ projectRef })
+  const { data, error } = useProjectStorageConfigQuery({ projectRef }, { enabled: IS_PLATFORM })
 
   if (error || data?.error) {
     return (
@@ -27,8 +28,8 @@ const StorageSettings = ({ projectRef }: StorageSettingsProps) => {
 
   if (!data) {
     return (
-      <div className="p-6 mx-auto text-center sm:w-full md:w-3/4">
-        <p className="text-sm">Loading...</p>
+      <div className="w-full">
+        <GenericSkeletonLoader />
       </div>
     )
   }
@@ -44,7 +45,21 @@ const StorageConfig = ({ config, projectRef }: any) => {
   const [selectedUnit, setSelectedUnit] = useState(unit)
   let initialValues = { fileSizeLimit: value, unformattedFileSizeLimit: fileSizeLimit }
 
-  const canUpdateStorageSettings = checkPermissions(PermissionAction.UPDATE, 'projects')
+  const canUpdateStorageSettings = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const { mutate: updateStorageConfig, isLoading: isUpdating } =
+    useProjectStorageConfigUpdateUpdateMutation({
+      onSuccess: (res) => {
+        const updatedValue = convertFromBytes(res.fileSizeLimit)
+        initialValues = {
+          fileSizeLimit: updatedValue.value,
+          unformattedFileSizeLimit: res.fileSizeLimit,
+        }
+        ui.setNotification({
+          category: 'success',
+          message: 'Successfully updated storage settings',
+        })
+      },
+    })
 
   const formattedMaxSizeBytes = `${new Intl.NumberFormat('en-US').format(
     STORAGE_FILE_SIZE_LIMIT_MAX_BYTES
@@ -65,60 +80,36 @@ const StorageConfig = ({ config, projectRef }: any) => {
     return errors
   }
 
-  const { mutateAsync: updateStorageConfig } = useProjectStorageConfigUpdateUpdateMutation()
-
   const onSubmit = async (values: any) => {
     const errors = onValidate(values)
 
     if (errors.fileSizeLimit) {
-      ui.setNotification({
+      return ui.setNotification({
         category: 'error',
         message: `Upload file size limit must be up to 5GB (${formattedMaxSizeBytes})`,
       })
-    } else {
-      try {
-        const res = await updateStorageConfig({
-          projectRef,
-          fileSizeLimit: convertToBytes(values.fileSizeLimit, selectedUnit),
-        })
-
-        const updatedValue = convertFromBytes(res.fileSizeLimit)
-        initialValues = {
-          fileSizeLimit: updatedValue.value,
-          unformattedFileSizeLimit: res.fileSizeLimit,
-        }
-        ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
-      } catch (error: any) {
-        ui.setNotification({
-          category: 'error',
-          message: `Failed to update storage settings: ${error?.message}`,
-        })
-      }
     }
+
+    updateStorageConfig({
+      projectRef,
+      fileSizeLimit: convertToBytes(values.fileSizeLimit, selectedUnit),
+    })
   }
 
   // [Joshen] To be refactored using FormContainer, FormPanel, FormContent etc once
   // Jonny's auth config refactor PR goes in
   return (
-    <div className="mx-auto w-[56rem] max-w-4xl px-5 pt-12 pb-20">
+    <div>
       <Form validateOnBlur initialValues={initialValues} validate={onValidate} onSubmit={onSubmit}>
-        {({
-          values,
-          isSubmitting,
-          handleReset,
-        }: {
-          values: any
-          isSubmitting: boolean
-          handleReset: () => void
-        }) => {
+        {({ values, handleReset }: { values: any; handleReset: () => void }) => {
           const hasChanges =
             initialValues.unformattedFileSizeLimit !==
             convertToBytes(values.fileSizeLimit, selectedUnit)
           return (
             <>
               <div className="mb-6">
-                <h3 className="mb-2 text-xl text-scale-1200">Storage settings</h3>
-                <div className="text-sm text-scale-900">
+                <h3 className="mb-2 text-xl text-foreground">Storage Settings</h3>
+                <div className="text-sm text-foreground-lighter">
                   Configure your project's storage settings
                 </div>
               </div>
@@ -170,7 +161,7 @@ const StorageConfig = ({ config, projectRef }: any) => {
                             </Listbox>
                           </div>
                         </div>
-                        <p className="text-sm text-scale-1100">
+                        <p className="text-sm text-foreground-light">
                           {selectedUnit !== StorageSizeUnits.BYTES &&
                             `Equivalent to ${convertToBytes(
                               values.fileSizeLimit,
@@ -196,7 +187,7 @@ const StorageConfig = ({ config, projectRef }: any) => {
                   <div className="flex justify-between px-8 py-4">
                     <div className="flex items-center justify-between w-full gap-2">
                       {!canUpdateStorageSettings ? (
-                        <p className="text-sm text-scale-1000">
+                        <p className="text-sm text-foreground-light">
                           You need additional permissions to update storage settings
                         </p>
                       ) : (
@@ -207,16 +198,18 @@ const StorageConfig = ({ config, projectRef }: any) => {
                           type="default"
                           htmlType="reset"
                           onClick={() => handleReset()}
-                          disabled={!hasChanges && hasChanges !== undefined}
+                          disabled={isUpdating || (!hasChanges && hasChanges !== undefined)}
                         >
                           Cancel
                         </Button>
                         <Button
                           type="primary"
                           htmlType="submit"
-                          loading={isSubmitting}
+                          loading={isUpdating}
                           disabled={
-                            !canUpdateStorageSettings || (!hasChanges && hasChanges !== undefined)
+                            !canUpdateStorageSettings ||
+                            isUpdating ||
+                            (!hasChanges && hasChanges !== undefined)
                           }
                         >
                           Save

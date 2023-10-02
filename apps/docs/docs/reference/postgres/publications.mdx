@@ -1,34 +1,12 @@
 ---
 id: publications
-title: "Publications"
+title: 'Publications'
 slug: publications
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/postgres.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabsPanel from '@theme/TabsPanel';
-
-Publications are a way of grouping changes generated from a table or a group of tables. 
+Publications are a way of grouping changes generated from a table or a group of tables.
 These changes can then be sent to other systems (usually another Postgres database).
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ## Examples
 
@@ -36,19 +14,19 @@ These changes can then be sent to other systems (usually another Postgres databa
 
 This publication will contain all changes to all tables.
 
-
 <Tabs
   defaultActiveId="sql"
   groupId="reference/postgres"
-  values={[{ label: 'SQL', value: 'sql' }]}>
+  values={[{ label: 'SQL', value: 'sql' }]}
+  queryGroup="database-method"
+>
 
 <TabsPanel id="sql" label="sql">
 
 ```sql
-create publication publication_name 
+create publication publication_name
 for all tables;
 ```
-
 
 </TabsPanel>
 
@@ -56,20 +34,19 @@ for all tables;
 
 ### Create a Publication which listens to individual tables
 
-
-
 <Tabs
   defaultActiveId="sql"
   groupId="reference/postgres"
-  values={[{ label: 'SQL', value: 'sql' }]}>
+  values={[{ label: 'SQL', value: 'sql' }]}
+  queryGroup="database-method"
+>
 
 <TabsPanel id="sql" label="sql">
 
 ```sql
-create publication publication_name 
+create publication publication_name
 for table table_one, table_two;
 ```
-
 
 </TabsPanel>
 
@@ -77,20 +54,19 @@ for table table_one, table_two;
 
 ### Add tables to an existing publication
 
-
-
 <Tabs
   defaultActiveId="sql"
   groupId="reference/postgres"
-  values={[{ label: 'SQL', value: 'sql' }]}>
+  values={[{ label: 'SQL', value: 'sql' }]}
+  queryGroup="database-method"
+>
 
 <TabsPanel id="sql" label="sql">
 
 ```sql
-alter publication publication_name 
+alter publication publication_name
 add table table_name;
 ```
-
 
 </TabsPanel>
 
@@ -98,21 +74,20 @@ add table table_name;
 
 ### Listens to inserts only
 
-
-
 <Tabs
   defaultActiveId="sql"
   groupId="reference/postgres"
-  values={[{ label: 'SQL', value: 'sql' }]}>
+  values={[{ label: 'SQL', value: 'sql' }]}
+  queryGroup="database-method"
+>
 
 <TabsPanel id="sql" label="sql">
 
 ```sql
-create publication publication_name 
+create publication publication_name
 for all tables
 with (publish = 'insert');
 ```
-
 
 </TabsPanel>
 
@@ -120,21 +95,20 @@ with (publish = 'insert');
 
 ### Listens to updates only
 
-
-
 <Tabs
   defaultActiveId="sql"
   groupId="reference/postgres"
-  values={[{ label: 'SQL', value: 'sql' }]}>
+  values={[{ label: 'SQL', value: 'sql' }]}
+  queryGroup="database-method"
+>
 
 <TabsPanel id="sql" label="sql">
 
 ```sql
-create publication publication_name 
+create publication publication_name
 for all tables
 with (publish = 'update');
 ```
-
 
 </TabsPanel>
 
@@ -142,21 +116,20 @@ with (publish = 'update');
 
 ### Listens to deletions only
 
-
-
 <Tabs
   defaultActiveId="sql"
   groupId="reference/postgres"
-  values={[{ label: 'SQL', value: 'sql' }]}>
+  values={[{ label: 'SQL', value: 'sql' }]}
+  queryGroup="database-method"
+>
 
 <TabsPanel id="sql" label="sql">
 
 ```sql
-create publication publication_name 
+create publication publication_name
 for all tables
 with (publish = 'delete');
 ```
-
 
 </TabsPanel>
 
@@ -164,19 +137,18 @@ with (publish = 'delete');
 
 ### Remove a Publication
 
-
-
 <Tabs
   defaultActiveId="sql"
   groupId="reference/postgres"
-  values={[{ label: 'SQL', value: 'sql' }]}>
+  values={[{ label: 'SQL', value: 'sql' }]}
+  queryGroup="database-method"
+>
 
 <TabsPanel id="sql" label="sql">
 
 ```sql
 drop publication if exists publication_name;
 ```
-
 
 </TabsPanel>
 
@@ -186,24 +158,24 @@ drop publication if exists publication_name;
 
 If you are planning to re-create a publication, it's best to do it in a transaction to ensure the operation succeeds.
 
-
 <Tabs
   defaultActiveId="sql"
   groupId="reference/postgres"
-  values={[{ label: 'SQL', value: 'sql' }]}>
+  values={[{ label: 'SQL', value: 'sql' }]}
+  queryGroup="database-method"
+>
 
 <TabsPanel id="sql" label="sql">
 
 ```sql
-begin; 
+begin;
   -- remove the realtime publication
-  drop publication if exists publication_name; 
+  drop publication if exists publication_name;
 
   -- re-create the publication but don't enable it for any tables
-  create publication publication_name;  
+  create publication publication_name;
 commit;
 ```
-
 
 </TabsPanel>
 

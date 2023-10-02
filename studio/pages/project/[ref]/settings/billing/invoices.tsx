@@ -1,23 +1,31 @@
-import { observer } from 'mobx-react-lite'
-import { FC, useEffect } from 'react'
+import Link from 'next/link'
 
+import { Invoices } from 'components/interfaces/BillingV2'
 import { SettingsLayout } from 'components/layouts'
-import LoadingUI from 'components/ui/Loading'
-import OveragesBanner from 'components/ui/OveragesBanner/OveragesBanner'
-import { useStore } from 'hooks'
-import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
-import { NextPageWithLayout, Project } from 'types'
-
-import { Invoices } from 'components/interfaces/Billing'
+import InformationBox from 'components/ui/InformationBox'
+import { useSelectedOrganization } from 'hooks'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+import { NextPageWithLayout } from 'types'
+import { Button, IconExternalLink, IconInfo } from 'ui'
 
 const ProjectBilling: NextPageWithLayout = () => {
-  const { ui } = useStore()
-  const project = ui.selectedProject
+  const organization = useSelectedOrganization()
+  const isOrgBilling = !!organization?.subscription_id
+  const router = useRouter()
+
+  useEffect(() => {
+    if (isOrgBilling) {
+      router.push(`/org/${organization.slug}/invoices`)
+    }
+  }, [router, organization?.slug, isOrgBilling])
+
+  if (isOrgBilling) return null
 
   return (
     <div className="w-full h-full overflow-y-auto content">
       <div className="w-full mx-auto">
-        <Settings project={project} />
+        <Settings />
       </div>
     </div>
   )
@@ -27,41 +35,69 @@ ProjectBilling.getLayout = (page) => (
   <SettingsLayout title="Billing and Usage">{page}</SettingsLayout>
 )
 
-export default observer(ProjectBilling)
+export default ProjectBilling
 
-interface SettingsProps {
-  project?: Project
-}
-
-const Settings: FC<SettingsProps> = ({ project }) => {
-  const { ui } = useStore()
-  const projectTier = ui.selectedProject?.subscription_tier
-
-  const { data: subscription, error } = useProjectSubscriptionQuery({
-    projectRef: ui.selectedProject?.ref,
-  })
-
-  useEffect(() => {
-    if (error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to get project subscription: ${(error as any)?.message ?? 'unknown'}`,
-      })
-    }
-  }, [error])
-
-  if (!subscription) {
-    return <LoadingUI />
-  }
+const Settings = () => {
+  const selectedOrganization = useSelectedOrganization()
+  const orgSlug = selectedOrganization?.slug ?? ''
 
   return (
     <div className="container max-w-4xl p-4 space-y-8">
-      {/* [Joshen TODO] Temporarily hidden until usage endpoint is sorted out */}
-      {/* {projectTier !== undefined && <OveragesBanner tier={projectTier} />} */}
-
       <div className="space-y-2">
+        <div className="py-2">
+          <InformationBox
+            icon={<IconInfo size="large" strokeWidth={1.5} />}
+            defaultVisibility={true}
+            hideCollapse
+            title="We're upgrading our billing system"
+            description={
+              <div className="space-y-3">
+                <p className="text-sm leading-normal">
+                  This organization uses the legacy project-based billing. We’ve recently made some
+                  big improvements to our billing system. To migrate to the new organization-based
+                  billing, head over to your{' '}
+                  <Link href={`/org/${selectedOrganization?.slug}/billing`} passHref>
+                    <a className="text-sm text-green-900 transition hover:text-green-1000">
+                      organization billing settings
+                    </a>
+                  </Link>
+                  .
+                </p>
+
+                <div className="space-x-3">
+                  <Link href="https://supabase.com/blog/organization-based-billing" passHref>
+                    <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                      <a target="_blank" rel="noreferrer">
+                        Announcement
+                      </a>
+                    </Button>
+                  </Link>
+                  <Link href="https://supabase.com/docs/guides/platform/org-based-billing" passHref>
+                    <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                      <a target="_blank" rel="noreferrer">
+                        Documentation
+                      </a>
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            }
+          />
+        </div>
+
         <h4 className="text-lg">Invoices</h4>
-        <Invoices projectRef={ui.selectedProject?.ref ?? ''} />
+
+        <div className="text-sm text-foreground-light">
+          To manage your billing address, emails or Tax ID, head to your{' '}
+          <Link href={`/org/${orgSlug}/billing`} passHref>
+            <a className="text-sm text-green-900 transition hover:text-green-1000">
+              organization settings
+            </a>
+          </Link>
+          .
+        </div>
+
+        <Invoices />
       </div>
     </div>
   )

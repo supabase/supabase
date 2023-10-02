@@ -1,20 +1,23 @@
-import { useEffect, useState, useMemo } from 'react'
-import { Alert, Button, IconEye, IconEyeOff } from 'ui'
 import DataGrid, { Row, RowRendererProps } from '@supabase/react-data-grid'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Alert, Button, IconClipboard, IconEye, IconEyeOff } from 'ui'
 
-import LogSelection, { LogSelectionProps } from './LogSelection'
-import { LogData, QueryType } from './Logs.types'
-import { isDefaultLogPreviewFormat } from './Logs.utils'
 import CSVButton from 'components/ui/CSVButton'
+import { useStore } from 'hooks'
+import { copyToClipboard } from 'lib/helpers'
+import { isEqual } from 'lodash'
+import { LogQueryError } from '.'
+import AuthColumnRenderer from './LogColumnRenderers/AuthColumnRenderer'
 import DatabaseApiColumnRender from './LogColumnRenderers/DatabaseApiColumnRender'
 import DatabasePostgresColumnRender from './LogColumnRenderers/DatabasePostgresColumnRender'
 import DefaultPreviewColumnRenderer from './LogColumnRenderers/DefaultPreviewColumnRenderer'
-import { LogQueryError } from '.'
-import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
-import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
-import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnRender'
 import FunctionsEdgeColumnRender from './LogColumnRenderers/FunctionsEdgeColumnRender'
-import AuthColumnRenderer from './LogColumnRenderers/AuthColumnRenderer'
+import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnRender'
+import { LogData, QueryType } from './Logs.types'
+import { isDefaultLogPreviewFormat } from './Logs.utils'
+import LogSelection, { LogSelectionProps } from './LogSelection'
+import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
+import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
 
 interface Props {
   data?: Array<LogData | Object>
@@ -59,11 +62,11 @@ const LogTable = ({
   onHistogramToggle,
   isHistogramShowing,
   isLoading,
-  showDownload,
   error,
   projectRef,
   params,
 }: Props) => {
+  const { ui } = useStore()
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const firstRow: LogData | undefined = data?.[0] as LogData
   const columnNames = Object.keys(data[0] || {})
@@ -144,8 +147,10 @@ const LogTable = ({
   }, [stringData])
 
   useEffect(() => {
-    if (!hasId || data === null) return
-    if (focusedLog && !(focusedLog.id in logMap)) {
+    if (!data) return
+    const found = data.find((datum) => isEqual(datum, focusedLog))
+    if (!found) {
+      // close selection panel if not found in dataset
       setFocusedLog(null)
     }
   }, [stringData])
@@ -161,13 +166,17 @@ const LogTable = ({
     }
   }, [stringData])
 
-  const RowRenderer = (props: RowRendererProps<any>) => {
-    return (
-      <Row
-        {...props}
-        className="font-mono tracking-tight cursor-pointer !bg-scale-200 hover:!bg-scale-300"
-      />
-    )
+  const RowRenderer = useCallback(
+    (props: RowRendererProps<any>) => (
+      <Row {...props} isRowSelected={false} selectedCellIdx={undefined} />
+    ),
+    []
+  )
+
+  const copyResultsToClipboard = () => {
+    copyToClipboard(stringData, () => {
+      ui.setNotification({ category: 'success', message: 'Results copied to clipboard.' })
+    })
   }
 
   const LogsExplorerTableHeader = () => (
@@ -175,11 +184,11 @@ const LogTable = ({
       <div className="flex items-center gap-2">
         {data && data.length ? (
           <>
-            <span className="text-sm text-scale-1200">Query results</span>
-            <span className="text-sm text-scale-1100">{data && data.length}</span>
+            <span className="text-sm text-foreground">Query results</span>
+            <span className="text-sm text-foreground-light">{data && data.length}</span>
           </>
         ) : (
-          <span className="text-xs text-scale-1200">Results will be shown below</span>
+          <span className="text-xs text-foreground">Results will be shown below</span>
         )}
       </div>
       <div className="flex items-center gap-2">
@@ -192,6 +201,9 @@ const LogTable = ({
             Histogram
           </Button>
         )}
+        <Button type="default" icon={<IconClipboard />} onClick={copyResultsToClipboard}>
+          Copy to clipboard
+        </Button>
         <CSVButton data={data}>Download</CSVButton>
       </div>
     </div>
@@ -225,7 +237,7 @@ const LogTable = ({
       <div className="flex flex-col gap-1">
         <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-scale-600 px-2 dark:border-scale-900"></div>
         <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-scale-600 px-2 dark:border-scale-900">
-          <div className="absolute right-1 -bottom-4 text-scale-1100">
+          <div className="absolute right-1 -bottom-4 text-foreground-light">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-6 w-6"
@@ -244,8 +256,10 @@ const LogTable = ({
         </div>
       </div>
       <div className="flex flex-col gap-1 px-5">
-        <h3 className="text-lg text-scale-1200">No results</h3>
-        <p className="text-sm text-scale-900">Try another search, or adjusting the filters</p>
+        <h3 className="text-lg text-foreground">No results</h3>
+        <p className="text-sm text-foreground-lighter">
+          Try another search, or adjusting the filters
+        </p>
       </div>
     </div>
   )
@@ -268,10 +282,11 @@ const LogTable = ({
           `}
             rowHeight={40}
             headerRowHeight={queryType ? 0 : 28}
-            onSelectedCellChange={({ idx, rowIdx }) => {
+            onSelectedCellChange={({ rowIdx }) => {
               if (!hasId) return
               setFocusedLog(data[rowIdx] as LogData)
             }}
+            selectedRows={new Set([])}
             noRowsFallback={
               !isLoading ? (
                 <div className="mx-auto flex h-full w-full items-center justify-center space-y-12 py-4 transition-all delay-200 duration-500">
@@ -282,15 +297,20 @@ const LogTable = ({
             }
             columns={columns as any}
             rowClass={(row: LogData) =>
-              row.id === focusedLog?.id ? '!bg-scale-400 rdg-row--focused' : 'cursor-pointer'
+              [
+                'font-mono tracking-tight',
+                isEqual(row, focusedLog)
+                  ? '!bg-scale-800 rdg-row--focused'
+                  : ' !bg-scale-200 hover:!bg-scale-300 cursor-pointer',
+              ].join(' ')
             }
             rows={logDataRows}
             rowKeyGetter={(r) => {
-              if (!hasId) return Object.keys(r)[0]
+              if (!hasId) return JSON.stringify(r)
               const row = r as LogData
               return row.id
             }}
-            onRowClick={(r) => setFocusedLog(r)}
+            onRowClick={setFocusedLog}
             rowRenderer={RowRenderer}
           />
           {logDataRows.length > 0 ? (

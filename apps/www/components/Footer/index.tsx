@@ -1,27 +1,55 @@
 import FooterLinks from 'data/Footer.json'
 import SectionContainer from '../Layouts/SectionContainer'
-import DarkModeToggle from '../DarkModeToggle'
 import Link from 'next/link'
-import { useTheme } from 'common/Providers'
-import { Badge } from 'ui'
+import { useTheme } from 'next-themes'
+import { Badge, IconChevronRight, TextLink } from 'ui'
 import Image from 'next/image'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 import { useRouter } from 'next/router'
+import { Fragment } from 'react'
+import ThemeToggle from '@ui/components/ThemeProvider/ThemeToggle'
+import { CheckIcon } from '@heroicons/react/outline'
 
-const Footer = () => {
-  const { isDarkMode } = useTheme()
+interface Props {
+  className?: string
+}
+
+const Footer = (props: Props) => {
+  const { resolvedTheme } = useTheme()
   const { pathname } = useRouter()
-  const isLaunchWeekPage = pathname.includes('launch-week')
+
+  const isLaunchWeekPage = pathname.includes('launch-week') || pathname === '/'
 
   return (
     <footer
-      className="border-scale-500 dark:border-scale-600 border-t"
+      className={['border-scale-500 dark:border-scale-600 border-t', props.className].join(' ')}
       aria-labelledby="footerHeading"
     >
       <h2 id="footerHeading" className="sr-only">
         Footer
       </h2>
+      <div className="w-full !py-0 border-b">
+        <SectionContainer className="grid grid-cols-2 md:flex items-center justify-between md:justify-center gap-8 md:gap-10 !py-6 md:!py-10 text-sm">
+          <div className="flex flex-col md:flex-row gap-2 md:items-center">
+            We protect your data.
+            <Link href="/security">
+              <a className="text-brand hover:underline">More on Security</a>
+            </Link>
+          </div>
+          <span className="hidden md:block h-px w-8 bg-border" />
+          <ul className="flex flex-col md:flex-row gap-2 md:gap-8 justify-center md:items-center">
+            <li className="flex items-center gap-2">
+              <CheckIcon className="w-4 h-4" /> SOC2 Type 2{' '}
+              <span className="text-lighter">Certified</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <CheckIcon className="w-4 h-4" /> HIPAA{' '}
+              <span className="text-lighter">Compliant</span>
+            </li>
+          </ul>
+        </SectionContainer>
+      </div>
       <SectionContainer>
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="space-y-8 xl:col-span-1">
@@ -31,7 +59,7 @@ const Footer = () => {
                   src={
                     isLaunchWeekPage
                       ? supabaseLogoWordmarkDark
-                      : isDarkMode
+                      : resolvedTheme === 'dark'
                       ? supabaseLogoWordmarkDark
                       : supabaseLogoWordmarkLight
                   }
@@ -48,7 +76,7 @@ const Footer = () => {
               >
                 <span className="sr-only">Twitter</span>
                 <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                 </svg>
               </a>
 
@@ -98,15 +126,16 @@ const Footer = () => {
           </div>
           <div className="mt-12 grid grid-cols-1 gap-8 xl:col-span-2 xl:mt-0">
             <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-              {FooterLinks.map((segment: any) => {
+              {FooterLinks.map((segment) => {
                 return (
                   <div key={`footer_${segment.title}`}>
                     <h6 className="text-scale-1200 overwrite text-base">{segment.title}</h6>
                     <ul className="mt-4 space-y-2">
-                      {segment.links.map((link: any, idx: number) => (
-                        <li key={`${segment.title}_link_${idx}`}>
+                      {segment.links.map((link, idx) => {
+                        const children = (
                           <a
-                            href={link.url}
+                            // only add href key if link is external
+                            {...(link.url.startsWith('https') && { href: link.url })}
                             className={`text-sm transition-colors ${
                               link.url
                                 ? 'text-scale-1100 hover:text-scale-1200 '
@@ -122,8 +151,18 @@ const Footer = () => {
                               </div>
                             )}
                           </a>
-                        </li>
-                      ))}
+                        )
+
+                        return (
+                          <li key={`${segment.title}_link_${idx}`}>
+                            {link.url.startsWith('https') ? (
+                              <Fragment>{children}</Fragment>
+                            ) : (
+                              <Link href={link.url}>{children}</Link>
+                            )}
+                          </li>
+                        )
+                      })}
                     </ul>
                   </div>
                 )
@@ -133,7 +172,7 @@ const Footer = () => {
         </div>
         <div className="border-scale-500 dark:border-scale-600 mt-32 flex justify-between border-t pt-8">
           <small className="small">&copy; Supabase Inc</small>
-          <DarkModeToggle />
+          <ThemeToggle forceDark={isLaunchWeekPage} />
         </div>
       </SectionContainer>
     </footer>

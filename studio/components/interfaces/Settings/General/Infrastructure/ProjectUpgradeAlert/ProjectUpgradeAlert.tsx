@@ -1,31 +1,32 @@
+import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { FC, useState } from 'react'
+import { useState } from 'react'
 import {
   Alert,
   Button,
   Form,
-  Modal,
-  IconPackage,
-  Listbox,
   IconAlertCircle,
   IconExternalLink,
+  IconPackage,
+  Listbox,
+  Modal,
 } from 'ui'
 
-import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import { post } from 'lib/common/fetch'
-import { API_ADMIN_URL, PROJECT_STATUS } from 'lib/constants'
 import InformationBox from 'components/ui/InformationBox'
-import { BREAKING_CHANGES } from './ProjectUpgradeAlert.constants'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
+import { useProjectUpgradeMutation } from 'data/projects/project-upgrade-mutation'
+import { setProjectStatus } from 'data/projects/projects-query'
+import { useStore } from 'hooks'
+import { PROJECT_STATUS } from 'lib/constants'
+import { BREAKING_CHANGES } from './ProjectUpgradeAlert.constants'
 
-interface Props {}
-
-const ProjectUpgradeAlert: FC<Props> = ({}) => {
+const ProjectUpgradeAlert = () => {
   const router = useRouter()
-  const { app, ui } = useStore()
+  const { ui } = useStore()
   const { ref } = useParams()
+  const queryClient = useQueryClient()
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
 
   const formId = 'project-upgrade-form'
@@ -34,34 +35,23 @@ const ProjectUpgradeAlert: FC<Props> = ({}) => {
   const latestPgVersion = (data?.latest_app_version ?? '').split('supabase-postgres-')[1]
 
   const initialValues = { version: data?.target_upgrade_versions?.[0]?.postgres_version ?? 0 }
+  const { mutate: upgradeProject, isLoading: isUpgrading } = useProjectUpgradeMutation({
+    onSuccess: (res, variables) => {
+      setProjectStatus(queryClient, variables.ref, PROJECT_STATUS.UPGRADING)
+      ui.setNotification({ category: 'success', message: 'Upgrading project' })
+      router.push(`/project/${variables.ref}?upgradeInitiated=true`)
+    },
+  })
 
-  const onConfirmUpgrade = async (values: any, { setSubmitting }: any) => {
-    setSubmitting(true)
-
-    const res = await post(`${API_ADMIN_URL}/projects/${ref}/upgrade`, {
-      target_version: values.version,
-    })
-    if (res.error) {
-      ui.setNotification({
-        category: 'error',
-        error: res.error,
-        message: `Failed to upgrade: ${res.error.message}`,
-      })
-      setSubmitting(false)
-    } else {
-      const projectId = ui.selectedProject?.id
-      if (projectId !== undefined) {
-        app.onProjectStatusUpdated(projectId, PROJECT_STATUS.UPGRADING)
-        ui.setNotification({ category: 'success', message: 'Upgrading project' })
-        router.push(`/project/${ref}?upgradeInitiated=true`)
-      }
-    }
+  const onConfirmUpgrade = async (values: any) => {
+    if (!ref) return ui.setNotification({ category: 'error', message: 'Project ref not found' })
+    upgradeProject({ ref, target_version: values.version })
   }
 
   return (
     <>
       <Alert
-        icon={<IconPackage className="text-brand-900" strokeWidth={1.5} />}
+        icon={<IconPackage className="text-brand" strokeWidth={1.5} />}
         variant="success"
         title="Your project can be upgraded to the latest version of Postgres"
       >
@@ -79,7 +69,7 @@ const ProjectUpgradeAlert: FC<Props> = ({}) => {
         header={<h3>Upgrade Postgres</h3>}
       >
         <Form id={formId} initialValues={initialValues} onSubmit={onConfirmUpgrade}>
-          {({ values, isSubmitting }: { values: any; isSubmitting: boolean }) => {
+          {({ values }: { values: any }) => {
             const selectedVersion = (data?.target_upgrade_versions ?? []).find(
               (x) => x.postgres_version === values.version
             )
@@ -104,11 +94,11 @@ const ProjectUpgradeAlert: FC<Props> = ({}) => {
                                 if (change !== undefined)
                                   return (
                                     <li key={reason}>
-                                      <p className="text-scale-1200">{change.title}</p>
+                                      <p className="text-foreground">{change.title}</p>
                                       <p className="flex items-center space-x-1">
                                         <span>This update has breaking changes. Read more </span>
                                         <Link href={change.url}>
-                                          <a className="text-brand-900 opacity-90 flex items-center space-x-1">
+                                          <a className="text-brand opacity-90 flex items-center space-x-1">
                                             <span>here</span>
                                             <IconExternalLink size="tiny" strokeWidth={2} />
                                           </a>
@@ -160,11 +150,11 @@ const ProjectUpgradeAlert: FC<Props> = ({}) => {
                   <Button
                     type="default"
                     onClick={() => setShowUpgradeModal(false)}
-                    disabled={isSubmitting}
+                    disabled={isUpgrading}
                   >
                     Cancel
                   </Button>
-                  <Button htmlType="submit" disabled={isSubmitting} loading={isSubmitting}>
+                  <Button htmlType="submit" disabled={isUpgrading} loading={isUpgrading}>
                     Confirm upgrade
                   </Button>
                 </div>

@@ -1,11 +1,10 @@
-import React, { FC } from 'react'
-import { IconChevronRight, IconLoader } from 'ui'
 import Link from 'next/link'
+import React, { PropsWithChildren } from 'react'
+import { IconChevronRight, IconLoader } from 'ui'
 
-interface Props {
+interface CardButtonProps {
   title: string | React.ReactNode
   description?: string
-  children?: React.ReactNode
   footer?: React.ReactNode
   url?: string
   linkHref?: string
@@ -13,11 +12,11 @@ interface Props {
   imgAlt?: string
   onClick?: () => void
   icon?: React.ReactNode
-  containerHeightClassName?: string
   loading?: boolean
+  className?: string
 }
 
-const CardButton: FC<Props> = ({
+const CardButton = ({
   title,
   description,
   children,
@@ -28,9 +27,9 @@ const CardButton: FC<Props> = ({
   imgAlt,
   onClick,
   icon,
-  containerHeightClassName = 'h-32',
+  className,
   loading = false,
-}) => {
+}: PropsWithChildren<CardButtonProps>) => {
   const LinkContainer = ({ children }: { children: React.ReactNode }) => (
     <Link href={linkHref}>
       <a>{children}</a>
@@ -45,12 +44,12 @@ const CardButton: FC<Props> = ({
   const isLink = url || linkHref || onClick
 
   let containerClasses = [
+    className,
     'group relative text-left',
     'bg-panel-header-light dark:bg-panel-header-dark',
     'border border-panel-border-light dark:border-panel-border-dark',
-    'rounded-md py-4 px-6 flex flex-row',
+    'rounded-md py-4 px-6 flex flex-row h-32',
     'transition ease-in-out duration-150',
-    containerHeightClassName,
   ]
 
   if (isLink) {
@@ -84,14 +83,14 @@ const CardButton: FC<Props> = ({
       )}
       {icon && <ImageContainer>{icon}</ImageContainer>}
       <div className="flex h-full w-full flex-col space-y-2">
-        <h5 className="text-scale-1200">{title}</h5>
+        {typeof title === 'string' ? <h5 className="text-foreground">{title}</h5> : title}
         {(children || description) && (
           <div className="flex w-full flex-1 flex-col">
-            <p className="text-sm text-scale-1100">{description}</p>
+            <p className="text-sm text-foreground-light">{description}</p>
             <div className="w-full">{children && children}</div>
           </div>
         )}
-        {footer && <div className="w-full">{footer}</div>}
+        {footer && <div className="w-full !mt-auto">{footer}</div>}
       </div>
       {isLink && (
         <div
@@ -99,11 +98,11 @@ const CardButton: FC<Props> = ({
           absolute
           right-4
           top-4
-          text-scale-900
+          text-foreground-lighter
           transition-all
           duration-200
           group-hover:right-3
-          group-hover:text-scale-1200
+          group-hover:text-foreground
         "
         >
           {loading ? <IconLoader className="animate-spin" /> : <IconChevronRight />}
