@@ -1,6 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import dayjs from 'dayjs'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import { useEffect, useState } from 'react'
 import { Alert, Button, IconArrowDown, IconArrowUp, IconRefreshCw, IconUser } from 'ui'
 

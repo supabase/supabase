@@ -3,9 +3,6 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 })
 
-// this is required to use shared packages in the packages directory
-const withTM = require('next-transpile-modules')(['ui', 'common', 'shared-data'])
-
 // Required for nextjs standalone build
 const path = require('path')
 
@@ -222,6 +219,7 @@ const nextConfig = {
       'vercel.com',
     ],
   },
+  transpilePackages: ['ui', 'common', 'shared-data'],
   // Ref: https://nextjs.org/docs/advanced-features/output-file-tracing#caveats
   experimental: {
     outputFileTracingRoot: path.join(__dirname, '../../'),
@@ -242,7 +240,7 @@ const nextConfig = {
 }
 
 // Export all config
-const moduleExports = withTM(withBundleAnalyzer(nextConfig))
+const moduleExports = withBundleAnalyzer(nextConfig)
 
 const sentryWebpackPluginOptions = {
   // Additional config options for the Sentry Webpack plugin. Keep in mind that

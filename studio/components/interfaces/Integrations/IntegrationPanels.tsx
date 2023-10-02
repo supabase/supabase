@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import React from 'react'
 
 import { Markdown } from 'components/interfaces/Markdown'

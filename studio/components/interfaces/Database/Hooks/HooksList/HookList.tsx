@@ -1,7 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { includes, noop } from 'lodash'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 
 import { useParams } from 'common/hooks'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'

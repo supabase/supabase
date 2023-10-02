@@ -1,5 +1,5 @@
 import { NextPage } from 'next'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Button } from 'ui'

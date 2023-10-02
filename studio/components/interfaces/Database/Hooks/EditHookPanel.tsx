@@ -1,5 +1,5 @@
 import { PostgresTable, PostgresTrigger } from '@supabase/postgres-meta'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useParams } from 'common/hooks'

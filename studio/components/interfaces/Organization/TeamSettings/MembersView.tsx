@@ -1,6 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { observer } from 'mobx-react-lite'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import { Fragment, useState } from 'react'
 
 import { useParams } from 'common/hooks'
