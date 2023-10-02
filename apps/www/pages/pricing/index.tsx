@@ -354,11 +354,13 @@ export default function IndexPage() {
                 <div className="px-8 -mt-1">
                   <p className="text-[13px] text-scale-900">{addon.price}</p>
                   <div className="flex items-center gap-2 mt-2">
-                    <img
+                    <Image
                       src={`${basePath}/images/pricing/${addon.icon}${
                         resolvedTheme === 'dark' ? '' : '-light'
                       }.svg`}
                       className="file:"
+                      width={14}
+                      height={14}
                       alt="Compute"
                     />
                     <span className="text-sm text-scale-1200">{addon.name}</span>
@@ -408,7 +410,7 @@ export default function IndexPage() {
           id="cost-control"
           className="grid lg:grid-cols-2 gap-8 items-center mt-12 lg:mt-8 max-w-6xl mx-auto"
         >
-          <div>
+          <div className="lg:py-12">
             <span className="bg-brand-300 text-brand-600 rounded-md bg-opacity-30 inline-block  dark:bg-scale-400 dark:text-scale-1100 py-0.5 px-2 text-[13px] leading-4 mt-2">
               Available for Pro plan
             </span>
@@ -420,8 +422,10 @@ export default function IndexPage() {
               restrictions if you have the spend cap enabled and exhaust your quota.
             </p>
           </div>
-          <div>
-            <img
+          <div className="relative h-full min-h-[14rem]">
+            <Image
+              layout="fill"
+              objectFit="contain"
               className="w-full"
               src={`${basePath}/images/pricing/spend-cap${
                 resolvedTheme === 'dark' ? '' : '-light'
