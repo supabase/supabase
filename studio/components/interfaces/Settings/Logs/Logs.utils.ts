@@ -130,13 +130,14 @@ const genWhereStatement = (table: LogsTableName, filters: Filters) => {
 export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
   const where = genWhereStatement(table, filters)
   const joins = genCrossJoinUnnests(table)
-
+  const orderBy = 'order by timestamp desc'
   switch (table) {
     case 'edge_logs':
       return `select id, timestamp, event_message, request.method, request.path, response.status_code
   from ${table}
   ${joins}
   ${where}
+  ${orderBy}
   limit 100
   `
 
@@ -144,6 +145,7 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
       return `select postgres_logs.timestamp, id, event_message, parsed.error_severity from ${table}
   ${joins}
   ${where}
+  ${orderBy}
   limit 100
   `
 
@@ -151,6 +153,7 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
       return `select id, ${table}.timestamp, event_message, metadata.event_type, metadata.function_id, metadata.level from ${table}
   ${joins}
   ${where}
+  ${orderBy}
   limit 100
     `
 
@@ -158,6 +161,7 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
       return `select id, ${table}.timestamp, event_message, metadata.level, metadata.status, metadata.path, metadata.msg as msg, metadata.error from ${table}
   ${joins}
   ${where}
+  ${orderBy}
   limit 100
     `
 
@@ -165,12 +169,14 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
       return `select id, ${table}.timestamp, event_message, response.status_code, request.method, m.function_id, m.execution_time_ms, m.deployment_id, m.version from ${table}
   ${joins}
   ${where}
+  ${orderBy}
   limit 100
   `
 
     default:
       return `select id, ${table}.timestamp, event_message from ${table}
   ${where}
+  ${orderBy}
   limit 100
   `
   }
