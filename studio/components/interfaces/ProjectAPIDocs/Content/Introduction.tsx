@@ -1,17 +1,16 @@
 import ContentSnippet from '../ContentSnippet'
 import { DOCS_CONTENT } from '../ProjectAPIDocs.constants'
+import { ContentProps } from './Content.types'
 
-const Introduction = () => {
-  const selectedLanguage = 'js'
-
+const Introduction = ({ language }: ContentProps) => {
   return (
     <>
-      <ContentSnippet selectedLanguage={selectedLanguage} snippet={DOCS_CONTENT.init} />
-      <ContentSnippet selectedLanguage={selectedLanguage} snippet={DOCS_CONTENT.auth} />
-      <ContentSnippet selectedLanguage={selectedLanguage} snippet={DOCS_CONTENT.clientApiKeys} />
+      <ContentSnippet selectedLanguage={language} snippet={DOCS_CONTENT.init} />
+      <ContentSnippet selectedLanguage={language} snippet={DOCS_CONTENT.auth} />
+      <ContentSnippet selectedLanguage={language} snippet={DOCS_CONTENT.clientApiKeys} />
       <ContentSnippet
         useServiceKey
-        selectedLanguage={selectedLanguage}
+        selectedLanguage={language}
         snippet={DOCS_CONTENT.serviceApiKeys}
       />
     </>

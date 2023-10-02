@@ -7,14 +7,14 @@ import { useStore } from 'hooks'
 import { useAppStateSnapshot } from 'state/app-state'
 import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
 import ResourceContent from '../ResourceContent'
+import { ContentProps } from './Content.types'
 
-const RPC = () => {
+const RPC = ({ language }: ContentProps) => {
   const { ref } = useParams()
   const { meta } = useStore()
   const snap = useAppStateSnapshot()
   const { data: jsonSchema } = useProjectJsonSchemaQuery({ projectRef: ref })
 
-  const selectedLanguage = 'js'
   const rpcName = snap.activeDocsSection[1]
   const rpc = meta.openApi.data?.functions.find((fn) => fn.name === rpcName)
   const rpcJsonSchema = jsonSchema.paths[rpc?.path]
@@ -58,7 +58,7 @@ const RPC = () => {
         />
       </div>
       <ResourceContent
-        selectedLanguage={selectedLanguage}
+        selectedLanguage={language}
         snippet={DOCS_RESOURCE_CONTENT.rpcSingle}
         codeSnippets={DOCS_RESOURCE_CONTENT.rpcSingle.code({
           rpcName,

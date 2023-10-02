@@ -7,6 +7,7 @@ import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import ResourceContent from '../ResourceContent'
+import { ContentProps } from './Content.types'
 
 function getColumnType(type: string, format: string) {
   // json and jsonb both have type=undefined, so check format instead
@@ -28,13 +29,12 @@ function getColumnType(type: string, format: string) {
   }
 }
 
-const Entity = () => {
+const Entity = ({ language }: ContentProps) => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
   const resource = snap.activeDocsSection[1]
 
   const useServiceKey = false
-  const selectedLanguage = 'js'
   const { data } = useProjectApiQuery({ projectRef: ref })
   const { data: jsonSchema } = useProjectJsonSchemaQuery({ projectRef: ref })
   const definition = jsonSchema?.definitions?.[resource]
@@ -83,7 +83,7 @@ const Entity = () => {
       </div>
 
       <ResourceContent
-        selectedLanguage={selectedLanguage}
+        selectedLanguage={language}
         snippet={DOCS_RESOURCE_CONTENT.readRows}
         codeSnippets={DOCS_RESOURCE_CONTENT.readRows.code({
           resourceId: resource,
@@ -92,7 +92,7 @@ const Entity = () => {
         })}
       />
       <ResourceContent
-        selectedLanguage={selectedLanguage}
+        selectedLanguage={language}
         snippet={DOCS_RESOURCE_CONTENT.filtering}
         codeSnippets={DOCS_RESOURCE_CONTENT.filtering.code({
           resourceId: resource,
@@ -101,7 +101,7 @@ const Entity = () => {
         })}
       />
       <ResourceContent
-        selectedLanguage={selectedLanguage}
+        selectedLanguage={language}
         snippet={DOCS_RESOURCE_CONTENT.insertRows}
         codeSnippets={DOCS_RESOURCE_CONTENT.insertRows.code({
           resourceId: resource,
@@ -110,7 +110,7 @@ const Entity = () => {
         })}
       />
       <ResourceContent
-        selectedLanguage={selectedLanguage}
+        selectedLanguage={language}
         snippet={DOCS_RESOURCE_CONTENT.updateRows}
         codeSnippets={DOCS_RESOURCE_CONTENT.updateRows.code({
           resourceId: resource,
@@ -119,7 +119,7 @@ const Entity = () => {
         })}
       />
       <ResourceContent
-        selectedLanguage={selectedLanguage}
+        selectedLanguage={language}
         snippet={DOCS_RESOURCE_CONTENT.deleteRows}
         codeSnippets={DOCS_RESOURCE_CONTENT.deleteRows.code({
           resourceId: resource,
@@ -128,7 +128,7 @@ const Entity = () => {
         })}
       />
       <ResourceContent
-        selectedLanguage={selectedLanguage}
+        selectedLanguage={language}
         snippet={DOCS_RESOURCE_CONTENT.subscribeChanges}
         codeSnippets={DOCS_RESOURCE_CONTENT.subscribeChanges.code({ resourceId: resource })}
       />

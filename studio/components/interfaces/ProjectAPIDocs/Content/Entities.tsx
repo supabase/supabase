@@ -7,12 +7,12 @@ import { generateTypes } from 'data/projects/project-type-generation-query'
 import { useStore } from 'hooks'
 import ContentSnippet from '../ContentSnippet'
 import { DOCS_CONTENT } from '../ProjectAPIDocs.constants'
+import { ContentProps } from './Content.types'
 
-const Entities = () => {
+const Entities = ({ language }: ContentProps) => {
   const { ui } = useStore()
   const { ref } = useParams()
 
-  const selectedLanguage = 'js'
   const [isGeneratingTypes, setIsGeneratingTypes] = useState(false)
 
   const onClickGenerateTypes = async () => {
@@ -43,15 +43,9 @@ const Entities = () => {
 
   return (
     <>
-      <ContentSnippet
-        selectedLanguage={selectedLanguage}
-        snippet={DOCS_CONTENT.entitiesIntroduction}
-      />
+      <ContentSnippet selectedLanguage={language} snippet={DOCS_CONTENT.entitiesIntroduction} />
       <div>
-        <ContentSnippet
-          selectedLanguage={selectedLanguage}
-          snippet={DOCS_CONTENT.generatingTypes}
-        />
+        <ContentSnippet selectedLanguage={language} snippet={DOCS_CONTENT.generatingTypes} />
         <div className="flex items-center space-x-2 px-4 mt-3">
           <Link href="https://supabase.com/docs/guides/database/api/generating-types">
             <Button asChild type="default" icon={<IconExternalLink />}>
@@ -74,7 +68,7 @@ const Entities = () => {
           Remember to re-generate and download this file as you make changes to your tables.
         </p>
       </div>
-      <ContentSnippet selectedLanguage={selectedLanguage} snippet={DOCS_CONTENT.graphql} />
+      <ContentSnippet selectedLanguage={language} snippet={DOCS_CONTENT.graphql} />
     </>
   )
 }

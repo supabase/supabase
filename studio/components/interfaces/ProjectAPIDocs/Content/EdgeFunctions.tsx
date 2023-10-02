@@ -1,23 +1,13 @@
 import ContentSnippet from '../ContentSnippet'
 import { DOCS_CONTENT } from '../ProjectAPIDocs.constants'
+import { ContentProps } from './Content.types'
 
-const EdgeFunctions = () => {
-  const selectedLanguage = 'js'
-
+const EdgeFunctions = ({ language }: ContentProps) => {
   return (
     <>
-      <ContentSnippet
-        selectedLanguage={selectedLanguage}
-        snippet={DOCS_CONTENT.createEdgeFunction}
-      />
-      <ContentSnippet
-        selectedLanguage={selectedLanguage}
-        snippet={DOCS_CONTENT.deployEdgeFunction}
-      />
-      <ContentSnippet
-        selectedLanguage={selectedLanguage}
-        snippet={DOCS_CONTENT.invokeEdgeFunction}
-      />
+      <ContentSnippet selectedLanguage={language} snippet={DOCS_CONTENT.createEdgeFunction} />
+      <ContentSnippet selectedLanguage={language} snippet={DOCS_CONTENT.deployEdgeFunction} />
+      <ContentSnippet selectedLanguage={language} snippet={DOCS_CONTENT.invokeEdgeFunction} />
     </>
   )
 }

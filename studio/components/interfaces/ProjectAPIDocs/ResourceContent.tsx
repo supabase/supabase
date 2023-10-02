@@ -57,7 +57,7 @@ const ResourceContent = ({
         )}
       </div>
       {codeSnippets.map((codeSnippet) => (
-        <div className="px-4 space-y-2">
+        <div key={codeSnippet.key} className="px-4 space-y-2">
           <p className="text-sm text-foreground-light">{codeSnippet.title}</p>
           <div className="codeblock-container">
             <div className="bg rounded p-2">

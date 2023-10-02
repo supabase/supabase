@@ -75,7 +75,7 @@ const supabase = createClient(SUPABASE_URL, process.env.SUPABASE_KEY);`,
   userManagement: {
     key: 'user-management',
     category: 'user-management',
-    title: `User Mananagement`,
+    title: `Introduction`,
     description: `Supabase makes it easy to manage your users.
 
   Supabase assigns each user a unique ID. You can reference this ID anywhere in your database. For example, you might create a \`profiles\` table references the user using a \`user_id\` field.
@@ -491,7 +491,7 @@ curl --request POST '${endpoint}' \
   entitiesIntroduction: {
     key: 'entities-introduction',
     category: 'entities',
-    title: 'Tables & Views',
+    title: 'Introduction',
     description: `
 All views and tables in the \`public\` schema, and those accessible by the active database role for a request are available for querying via the API.
 
@@ -573,7 +573,7 @@ const { data, error } = await supabase
   storedProceduresIntroduction: {
     key: 'stored-procedures-introduction',
     category: 'stored-procedures',
-    title: 'Stored Procedures',
+    title: 'Introduction',
     description: `
 All of your database stored procedures are available on your API. This means you can build your logic directly into the database (if you're brave enough)!
 
@@ -588,6 +588,7 @@ export const DOCS_RESOURCE_CONTENT = {
   rpcSingle: {
     key: 'invoke-function',
     title: 'Invoke function',
+    category: 'stored-procedures',
     description: undefined,
     docsUrl: undefined,
     code: ({
@@ -618,6 +619,8 @@ export const DOCS_RESOURCE_CONTENT = {
           }}`
       return [
         {
+          key: undefined,
+          title: undefined,
           bash: `
   curl -X POST '${endpoint}/rest/v1/rpc/${rpcName}' \\${bashParams}
   -H "Content-Type: application/json" \\
@@ -642,6 +645,7 @@ else console.log(data)
   readRows: {
     key: 'read-rows',
     title: `Read rows`,
+    category: 'entities',
     docsUrl: 'https://supabase.com/docs/reference/javascript/select',
     description: `To read rows in this table, use the \`select\` method.`,
     code: ({
@@ -655,6 +659,7 @@ else console.log(data)
     }) => {
       return [
         {
+          key: 'read-all-rows',
           title: 'Read all rows',
           bash: `
 curl '${endpoint}/rest/v1/${resourceId}?select=*' \\
@@ -668,6 +673,7 @@ let { data: ${resourceId}, error } = await supabase
           `,
         },
         {
+          key: 'read-specific-columns',
           title: 'Read specific columns',
           bash: `
 curl '${endpoint}/rest/v1/${resourceId}?select=some_column,other_column' \\
@@ -681,6 +687,7 @@ let { data: ${resourceId}, error } = await supabase
   `,
         },
         {
+          key: 'read-foreign-tables',
           title: 'Read foreign tables',
           bash: `
 curl '${endpoint}/rest/v1/${resourceId}?select=some_column,other_table(foreign_key)' \\
@@ -699,6 +706,7 @@ let { data: ${resourceId}, error } = await supabase
           `,
         },
         {
+          key: 'with-pagination',
           title: 'With pagination',
           bash: `
 curl '${endpoint}/rest/v1/${resourceId}?select=*' \\
@@ -718,6 +726,7 @@ let { data: ${resourceId}, error } = await supabase
   },
   filtering: {
     key: 'filter-rows',
+    category: 'entities',
     title: 'Filtering',
     description: `Supabase provides a wide range of filters`,
     docsUrl: 'https://supabase.com/docs/reference/javascript/using-filters',
@@ -732,6 +741,7 @@ let { data: ${resourceId}, error } = await supabase
     }) => {
       return [
         {
+          key: 'with-filtering',
           title: 'With filtering',
           bash: `
 curl '${endpoint}/rest/v1/${resourceId}?id=eq.1&select=*' \\
@@ -766,6 +776,7 @@ let { data: ${resourceId}, error } = await supabase
   },
   insertRows: {
     key: 'insert-rows',
+    category: 'entities',
     title: 'Insert rows',
     description: `
 \`insert\` lets you insert into your tables. You can also insert in bulk and do UPSERT.
@@ -784,6 +795,7 @@ let { data: ${resourceId}, error } = await supabase
     }) => {
       return [
         {
+          key: 'insert-a-row',
           title: 'Insert a row',
           bash: `
 curl -X POST '${endpoint}/rest/v1/${resourceId}' \\
@@ -803,6 +815,7 @@ const { data, error } = await supabase
           `,
         },
         {
+          key: 'insert-many-rows',
           title: 'Insert many rows',
           bash: `
 curl -X POST '${endpoint}/rest/v1/${resourceId}' \\
@@ -822,6 +835,7 @@ const { data, error } = await supabase
           `,
         },
         {
+          key: 'upsert-matching-rows',
           title: 'Upsert matching rows',
           bash: `
 curl -X POST '${endpoint}/rest/v1/${resourceId}' \\
@@ -843,6 +857,7 @@ const { data, error } = await supabase
   },
   updateRows: {
     key: 'update-rows',
+    category: 'entities',
     title: 'Update rows',
     description: `
 \`update\` lets you update rows. \`update\` will match all rows by default. You can update specific rows using horizontal filters, e.g. \`eq\`, \`lt\`, and \`is\`.
@@ -861,6 +876,7 @@ const { data, error } = await supabase
     }) => {
       return [
         {
+          key: 'update-matching-rows',
           title: 'Update matching rows',
           bash: `
 curl -X PATCH '${endpoint}/rest/v1/${resourceId}?some_column=eq.someValue' \\
@@ -883,6 +899,7 @@ const { data, error } = await supabase
   },
   deleteRows: {
     key: 'delete-rows',
+    category: 'entities',
     title: 'Delete rows',
     description: `
 \`delete\` lets you delete rows. \`delete\` will match all rows by default, so remember to specify your filters!
@@ -899,6 +916,7 @@ const { data, error } = await supabase
     }) => {
       return [
         {
+          key: 'delete-matching-rows',
           title: 'Delete matching rows',
           bash: `
 curl -X DELETE '${endpoint}/rest/v1/${resourceId}?some_column=eq.someValue' \\
@@ -917,6 +935,7 @@ const { error } = await supabase
   },
   subscribeChanges: {
     key: 'subscribe-changes',
+    category: 'entities',
     title: 'Subscribe to changes',
     description: `
 Supabase provides realtime functionality and broadcasts database changes to authorized users depending on Row Level Security (RLS) policies.
@@ -925,6 +944,7 @@ Supabase provides realtime functionality and broadcasts database changes to auth
     code: ({ resourceId }: { resourceId: string }) => {
       return [
         {
+          key: 'subscribe-all-events',
           title: 'Subscribe to all events',
           bash: `# Realtime streams are only supported by our client libraries`,
           js: `

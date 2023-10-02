@@ -1,13 +1,12 @@
 import ContentSnippet from '../ContentSnippet'
 import { DOCS_CONTENT } from '../ProjectAPIDocs.constants'
+import { ContentProps } from './Content.types'
 
-const StoredProcedures = () => {
-  const selectedLanguage = 'js'
-
+const StoredProcedures = ({ language }: ContentProps) => {
   return (
     <>
       <ContentSnippet
-        selectedLanguage={selectedLanguage}
+        selectedLanguage={language}
         snippet={DOCS_CONTENT.storedProceduresIntroduction}
       />
     </>
