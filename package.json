@@ -39,7 +39,7 @@
     }
   },
   "devDependencies": {
-    "eslint": "^8.41.0",
+    "eslint": "^8.45.0",
     "eslint-config-custom": "*",
     "prettier": "^2.8.8",
     "prettier-plugin-sql-cst": "^0.5.0",

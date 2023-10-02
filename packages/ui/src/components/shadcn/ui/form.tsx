@@ -13,9 +13,6 @@ import {
 import { cn } from '@ui/lib/utils'
 import { Label } from '@ui/components/shadcn/ui/label'
 
-// react 17 hack
-import { useId } from '@radix-ui/react-id'
-
 const Form = FormProvider
 
 type FormFieldContextValue<
@@ -71,8 +68,7 @@ const FormItemContext = React.createContext<FormItemContextValue>({} as FormItem
 
 const FormItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => {
-    // const id = React.useId()
-    const id = useId()
+    const id = React.useId()
 
     return (
       <FormItemContext.Provider value={{ id }}>

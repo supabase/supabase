@@ -33,6 +33,6 @@
     "jest-environment-jsdom": "^29.7.0",
     "postgres": "^3.0.5",
     "ts-node": "^10.9.1",
-    "typescript": "^5.0.4"
+    "typescript": "^5.2.2"
   }
 }
