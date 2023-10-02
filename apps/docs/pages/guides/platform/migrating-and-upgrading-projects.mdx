@@ -44,7 +44,7 @@ Regardless of the upgrade method, a few caveats apply:
 
 #### Logical Replication
 
-If you are using logical replication, the replication slots will not be preserved by the upgrade process. You will need to manually recreate them after the upgrade.
+If you are using logical replication, the replication slots will not be preserved by the upgrade process. You will need to manually recreate them after the upgrade with the method `pg_create_logical_replication_slot`. Refer [here](https://www.postgresql.org/docs/current/functions-admin.html#FUNCTIONS-REPLICATION) for more details about the method.
 
 #### Breaking changes
 
