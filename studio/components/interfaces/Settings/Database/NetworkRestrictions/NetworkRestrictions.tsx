@@ -103,7 +103,7 @@ const NetworkRestrictions = ({}) => {
 
   return (
     <>
-      <section>
+      <section id="network-restrictions">
         <div className="flex items-center justify-between">
           <FormHeader
             title="Network Restrictions"

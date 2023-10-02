@@ -34,7 +34,7 @@ const CustomDomainConfig = () => {
   const isLoading = isSettingsLoading || isCustomDomainsLoading
 
   return (
-    <section>
+    <section id="custom-domains">
       <FormHeader title="Custom Domains" description="Present a branded experience to your users" />
       {isLoading ? (
         <Panel>

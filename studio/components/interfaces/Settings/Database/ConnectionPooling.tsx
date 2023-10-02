@@ -200,7 +200,7 @@ export const PgbouncerConfig = ({ projectRef, bouncerInfo, connectionInfo }: Con
   }
 
   return (
-    <div>
+    <div id="connection-pooling">
       <SchemaFormPanel
         title="Connection Pooling Custom Configuration"
         schema={formSchema}

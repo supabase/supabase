@@ -11,7 +11,7 @@ const TransferProjectPanel = () => {
   if (project === undefined) return <></>
 
   return (
-    <section>
+    <section id="transfer-project">
       <FormHeader
         title="Transfer Project"
         description="Transfer your project to a different organization with no downtime."

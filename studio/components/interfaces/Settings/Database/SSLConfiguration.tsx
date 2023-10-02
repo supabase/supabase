@@ -80,7 +80,7 @@ const SSLConfiguration = () => {
   }
 
   return (
-    <div>
+    <div id="ssl-configuration">
       <div className="flex items-center justify-between">
         <FormHeader title="SSL Configuration" description="" />
         <div className="flex items-center space-x-2 mb-6">
