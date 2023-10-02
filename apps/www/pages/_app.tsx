@@ -21,8 +21,11 @@ export default function App({ Component, pageProps }: AppProps) {
   const { consentValue, hasAcceptedConsent } = useConsent()
 
   function handlePageTelemetry(route: string) {
+    const initialReferrer = localStorage.getItem('initialReferrer')
+    if (initialReferrer) localStorage.removeItem('initialReferrer')
+
     return post(`${API_URL}/telemetry/page`, {
-      referrer: document.referrer,
+      referrer: initialReferrer ?? document.referrer ?? undefined,
       title: document.title,
       route,
       ga: {
@@ -47,7 +50,12 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [router.events, consentValue])
 
   useEffect(() => {
-    if (!hasAcceptedConsent) return
+    if (!hasAcceptedConsent) {
+      if (!localStorage.getItem('initialReferrer'))
+        localStorage.setItem('initialReferrer', document.referrer)
+      return
+    }
+
     /**
      * Send page telemetry on first page load
      */
