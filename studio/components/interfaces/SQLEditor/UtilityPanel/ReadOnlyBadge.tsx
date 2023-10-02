@@ -8,7 +8,7 @@ const ReadOnlyBadge = ({ id }: ReadOnlyBadgeProps) => {
   const snap = useSqlEditorStateSnapshot()
 
   const snippet = snap.snippets[id]
-  const isSnippetOwner = user?.user_metadata?.user_name === snippet.snippet?.owner?.username
+  const isSnippetOwner = user?.user_metadata?.user_name === snippet?.snippet?.owner?.username
 
   return <>{isSnippetOwner ? <Badge color="gray">Read-only</Badge> : null}</>
 }
