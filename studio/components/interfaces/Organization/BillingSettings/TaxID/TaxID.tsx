@@ -231,7 +231,9 @@ const TaxID = () => {
               </div>
             ) : (
               <div>
-                <p className="flex items-center space-x-2 text-sm text-scale-900">No tax IDs</p>
+                <p className="flex items-center space-x-2 text-sm text-foreground-lighter">
+                  No tax IDs
+                </p>
               </div>
             )}
             {canUpdateTaxIds && (

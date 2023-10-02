@@ -33,7 +33,7 @@ const Migrations = () => {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h3 className="mb-1 text-xl text-foreground">Database Migrations</h3>
-            <div className="text-sm text-scale-900">
+            <div className="text-sm text-foreground-lighter">
               History of migrations that have been run on your database
             </div>
           </div>
@@ -119,7 +119,9 @@ const Migrations = () => {
                               <Table.td>{migration.version}</Table.td>
                               <Table.td
                                 className={
-                                  (migration?.name ?? '').length === 0 ? '!text-scale-900' : ''
+                                  (migration?.name ?? '').length === 0
+                                    ? '!text-foreground-lighter'
+                                    : ''
                                 }
                               >
                                 {migration?.name ?? 'Name not available'}

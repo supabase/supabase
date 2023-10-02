@@ -159,7 +159,7 @@ const ColumnType = ({
           >
             <div className="flex items-center space-x-4">
               <span className="text-foreground">{option.name}</span>
-              <span className="text-scale-900">{option.description}</span>
+              <span className="text-foreground-lighter">{option.description}</span>
             </div>
           </Listbox.Option>
         ))}

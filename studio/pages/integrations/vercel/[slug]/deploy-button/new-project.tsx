@@ -32,7 +32,7 @@ const VercelIntegration: NextPageWithLayout = () => {
           <header>
             <h1 className="text-xl text">New project</h1>
             <Markdown
-              className="text-light"
+              className="text-foreground-light"
               content={`Choose the Supabase organization you wish to install in`}
             />
           </header>

@@ -348,11 +348,13 @@ const PITRSelection = () => {
             </div>
             <div className="py-2 flex flex-col gap-3">
               <div>
-                <p className="text-sm font-mono text-scale-900">{selectedTimezone?.text}</p>
+                <p className="text-sm font-mono text-foreground-lighter">
+                  {selectedTimezone?.text}
+                </p>
                 <p className="text-2xl">{recoveryTimeString}</p>
               </div>
               <div>
-                <p className="text-sm font-mono text-scale-900">(UTC+00:00)</p>
+                <p className="text-sm font-mono text-foreground-lighter">(UTC+00:00)</p>
                 <p className="text-2xl">{recoveryTimeStringUtc}</p>
               </div>
             </div>

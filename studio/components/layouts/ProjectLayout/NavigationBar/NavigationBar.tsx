@@ -1,15 +1,18 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useParams } from 'common'
-import { isUndefined } from 'lodash'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useTheme } from 'next-themes'
 import { useFlag } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
+import { isUndefined } from 'lodash'
+import { FlaskConical } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
   DropdownMenuContent_Shadcn_,
+  DropdownMenuGroup_Shadcn_,
   DropdownMenuItem_Shadcn_,
   DropdownMenuLabel_Shadcn_,
   DropdownMenuRadioGroup_Shadcn_,
@@ -33,21 +36,23 @@ import {
 import NavigationIconButton from './NavigationIconButton'
 
 const NavigationBar = () => {
+  const os = detectOS()
   const router = useRouter()
+  const snap = useAppStateSnapshot()
   const { theme, setTheme } = useTheme()
   const { ref: projectRef } = useParams()
-
-  const os = detectOS()
   const { setIsOpen } = useCommandMenu()
 
   const { project } = useProjectContext()
   const navLayoutV2 = useFlag('navigationLayoutV2')
   const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
+  const showFeaturePreviews = useFlag('featurePreviews')
 
   const activeRoute = router.pathname.split('/')[3]
   const toolRoutes = generateToolRoutes(projectRef, project, supabaseAIEnabled)
   const productRoutes = generateProductRoutes(projectRef, project)
   const otherRoutes = generateOtherRoutes(projectRef, project)
+
   return (
     <div
       className={[
@@ -114,7 +119,7 @@ const NavigationBar = () => {
                   className="border-none"
                 >
                   <div className="py-1">
-                    <IconSearch size={18} strokeWidth={2} className="text-scale-900" />
+                    <IconSearch size={18} strokeWidth={2} className="text-foreground-lighter" />
                   </div>
                 </Button>
               </Tooltip.Trigger>
@@ -142,7 +147,7 @@ const NavigationBar = () => {
             <DropdownMenuTrigger_Shadcn_>
               <Button asChild type="text" size="tiny">
                 <span className="py-1 h-10 border-none">
-                  <IconUser size={18} strokeWidth={2} className="text-scale-900" />
+                  <IconUser size={18} strokeWidth={2} className="text-foreground-lighter" />
                 </span>
               </Button>
             </DropdownMenuTrigger_Shadcn_>
@@ -152,24 +157,40 @@ const NavigationBar = () => {
                   <Link href="/account/me">
                     <DropdownMenuItem_Shadcn_ key="header" className="space-x-2">
                       <IconSettings size={14} strokeWidth={1.5} />
-                      <p className="text">Account Preferences</p>
+                      <p>Account preferences</p>
                     </DropdownMenuItem_Shadcn_>
                   </Link>
+                  {showFeaturePreviews && (
+                    <DropdownMenuItem_Shadcn_
+                      key="header"
+                      className="space-x-2"
+                      onClick={() => snap.setShowFeaturePreviewModal(true)}
+                      onSelect={() => snap.setShowFeaturePreviewModal(true)}
+                    >
+                      <FlaskConical size={14} strokeWidth={2} />
+                      <p className="text">Feature previews</p>
+                    </DropdownMenuItem_Shadcn_>
+                  )}
                   <DropdownMenuSeparator_Shadcn_ />
                 </>
               )}
               <DropdownMenuLabel_Shadcn_>Theme</DropdownMenuLabel_Shadcn_>
-              <DropdownMenuRadioGroup_Shadcn_
-                key="theme"
-                value={theme === 'dark' ? 'dark' : 'light'}
-                onValueChange={(value: string) => setTheme(value)}
-              >
-                <DropdownMenuRadioItem_Shadcn_ value="system">
-                  System default
-                </DropdownMenuRadioItem_Shadcn_>
-                <DropdownMenuRadioItem_Shadcn_ value="dark">Dark</DropdownMenuRadioItem_Shadcn_>
-                <DropdownMenuRadioItem_Shadcn_ value="light">Light</DropdownMenuRadioItem_Shadcn_>
-              </DropdownMenuRadioGroup_Shadcn_>
+              <DropdownMenuGroup_Shadcn_>
+                <DropdownMenuRadioGroup_Shadcn_
+                  value={theme}
+                  onValueChange={(value) => {
+                    setTheme(value)
+                  }}
+                >
+                  <DropdownMenuRadioItem_Shadcn_ value={'system'}>
+                    System
+                  </DropdownMenuRadioItem_Shadcn_>
+                  <DropdownMenuRadioItem_Shadcn_ value={'dark'}>Dark</DropdownMenuRadioItem_Shadcn_>
+                  <DropdownMenuRadioItem_Shadcn_ value={'light'}>
+                    Light
+                  </DropdownMenuRadioItem_Shadcn_>
+                </DropdownMenuRadioGroup_Shadcn_>
+              </DropdownMenuGroup_Shadcn_>
             </DropdownMenuContent_Shadcn_>
           </DropdownMenu_Shadcn_>
         </ul>

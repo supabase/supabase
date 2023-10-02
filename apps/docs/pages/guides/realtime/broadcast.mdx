@@ -37,14 +37,14 @@ const channelA = clientA.channel('room-1')
 
 // Simple function to log any messages we receive
 function messageReceived(payload) {
-  console.log(payload) 
+  console.log(payload)
 }
 
 // Subscribe to the Channel
 channelA
   .on(
-    'broadcast', 
-    { event: 'test' }, 
+    'broadcast',
+    { event: 'test' },
     (payload) => messageReceived(payload)
   )
   .subscribe()
@@ -93,8 +93,8 @@ const myChannel = supabase.channel('room-2', {
 })
 
 myChannel.on(
-  'broadcast', 
-  { event: 'test-my-messages' }, 
+  'broadcast',
+  { event: 'test-my-messages' },
   (payload) => console.log(payload)
 )
 
@@ -134,6 +134,30 @@ myChannel.subscribe(async (status) => {
 ```
 
 Use this to guarantee that the server has received the message before resolving `channelD.send`'s promise. If the `ack` config is not set to `true` when creating the channel, the promise returned by `channelD.send` will resolve immediately.
+
+### Send messages using REST calls
+
+You can also send a Broadcast message by making an HTTP request to Reatlime servers. This is useful when you want to send messages from your server or client without having to first establish a WebSocket connection.
+
+```js
+const channel = client.channel('test-channel')
+
+// No need to subscribe to channel
+
+channel
+  .send({
+    type: 'broadcast',
+    event: 'test',
+    payload: { message: 'Hi' },
+  })
+  .then((resp) => {
+    console.log(resp)
+  })
+
+// Remember to clean up the channel
+
+client.removeChannel(channel)
+```
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

@@ -49,7 +49,7 @@ const ResourceContent = ({
 
       <div className="doc-section">
         <article className="text">
-          <label className="font-mono text-xs uppercase text-scale-900 inline-block mb-2">
+          <label className="font-mono text-xs uppercase text-foreground-lighter inline-block mb-2">
             Description
           </label>
           <Description

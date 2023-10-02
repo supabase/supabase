@@ -74,7 +74,7 @@ export default function SchemaFormPanel({
             </Button>
           </div>
         )}
-        <span className="text-sm text-scale-900">{message}</span>
+        <span className="text-sm text-foreground-lighter">{message}</span>
       </div>
 
       <div className="Form section-block--body px-6 py-3">

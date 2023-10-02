@@ -2,7 +2,7 @@ import ButtonCard from './ButtonCard'
 import { useTheme } from 'next-themes'
 
 const Frameworks = () => {
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
 
   const frameworks = [
     {
@@ -14,12 +14,12 @@ const Frameworks = () => {
       href: '/guides/with-angular',
     },
     {
-      name: 'Expo',
+      name: 'Expo React Native',
       logo: {
         light: '/docs/img/icons/expo-icon.svg',
         dark: '/docs/img/icons/expo-icon-dark.svg',
       },
-      href: '/guides/with-expo',
+      href: '/guides/with-expo-react-native',
     },
     {
       name: 'Flutter',
@@ -110,8 +110,7 @@ const Frameworks = () => {
             layout="horizontal"
             to={x.href}
             title={x.name}
-            // [Joshen] Nice to have: theming
-            icon={theme === 'dark' ? x.logo.dark : x.logo.light}
+            icon={resolvedTheme === 'dark' ? x.logo.dark : x.logo.light}
           />
         </div>
       ))}

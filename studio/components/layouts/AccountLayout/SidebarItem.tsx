@@ -54,7 +54,7 @@ const SidebarItem = ({
           onClick={onClick}
         >
           {isExternal && (
-            <span className="truncate text-sm text-scale-900 transition group-hover:text-foreground-light">
+            <span className="truncate text-sm text-foreground-lighter transition group-hover:text-foreground-light">
               <IconArrowUpRight size="tiny" />
             </span>
           )}

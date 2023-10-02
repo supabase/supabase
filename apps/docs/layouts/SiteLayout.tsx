@@ -220,13 +220,13 @@ const MobileMenuBackdrop = memo(function MobileMenuBackdrop() {
 })
 
 const HeaderLogo = memo(function HeaderLogo() {
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
   return (
     <Link href="/">
       <a className="px-10 flex items-center gap-2">
         <Image
           className="cursor-pointer"
-          src={theme === 'dark' ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'}
+          src={resolvedTheme === 'dark' ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'}
           width={96}
           height={24}
           alt="Supabase Logo"
