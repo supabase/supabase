@@ -81,7 +81,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
 
     createBucket({
       projectRef: ref,
-      id: values.name,
+      id: values.name.trim(),
       isPublic: values.public,
       file_size_limit: values.has_file_size_limit
         ? convertToBytes(values.formatted_size_limit, selectedUnit)
