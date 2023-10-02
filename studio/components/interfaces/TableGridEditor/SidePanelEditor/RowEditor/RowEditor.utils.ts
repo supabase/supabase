@@ -188,7 +188,17 @@ export const generateRowObjectFromFields = (
       rowObject[field.name] = value
     }
   })
-  return includeNullProperties ? rowObject : omitBy(rowObject, isNull)
+  if (includeNullProperties) {
+    return rowObject
+  } else {
+    return omitBy(rowObject, (v, k) => {
+      const field = fields.find((f) => f.name === k)
+      if (field && field.isNullable) {
+        return false
+      }
+      return isNull(v)
+    })
+  }
 }
 
 export const generateUpdateRowPayload = (originalRow: any, field: RowField[]) => {
