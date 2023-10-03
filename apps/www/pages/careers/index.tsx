@@ -76,7 +76,7 @@ export async function getStaticProps() {
 }
 
 const CareerPage: NextPage = ({ jobs, contributors }: any) => {
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
   const { basePath } = useRouter()
 
   const meta_title = 'Careers | Supabase'
@@ -282,7 +282,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                             <div className="relative w-full h-full mx-auto">
                               <Image
                                 src={`/images/career/icons/${human.icon}${
-                                  theme === 'dark' ? '-dark' : '-light'
+                                  resolvedTheme === 'dark' ? '-dark' : '-light'
                                 }.svg`}
                                 className="w-12 h-12 sm:w-10 sm:h-10 lg:w-12 lg:h-12"
                                 alt={`${human.icon} icon`}
@@ -307,7 +307,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                   <div className="relative w-full h-full mx-auto">
                     <Image
                       src={`/images/career/icons/open_source${
-                        theme === 'dark' ? '-dark' : '-light'
+                        resolvedTheme === 'dark' ? '-dark' : '-light'
                       }.svg`}
                       alt="open source icon"
                       layout="fill"
@@ -397,7 +397,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                           <div className="relative w-full h-full mx-auto">
                             <Image
                               src={`/images/career/icons/${benefits.icon}${
-                                theme === 'dark' ? '-dark' : '-light'
+                                resolvedTheme === 'dark' ? '-dark' : '-light'
                               }.svg`}
                               alt={`${benefits.icon} icon`}
                               layout="fill"
@@ -423,7 +423,9 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
             <div className="w-14 h-14 rounded-lg flex items-center mx-auto mb-6">
               <div className="relative w-full h-full mx-auto">
                 <Image
-                  src={`/images/career/icons/jobs${theme === 'dark' ? '-dark' : '-light'}.svg`}
+                  src={`/images/career/icons/jobs${
+                    resolvedTheme === 'dark' ? '-dark' : '-light'
+                  }.svg`}
                   alt="jobs icon"
                   layout="fill"
                   objectFit="cover"
