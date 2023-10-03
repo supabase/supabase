@@ -15,7 +15,7 @@ const supabase = createClient(
 )
 
 function AuthWidgetSection() {
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
   const { basePath } = useRouter()
   const [radius, setRadius] = useState('4px')
   const [brandColor, setBrandColor] = useState({
@@ -81,10 +81,11 @@ function AuthWidgetSection() {
                 </div>
                 <Auth.UserContextProvider supabaseClient={supabase}>
                   <AuthContainer supabaseClient={supabase}>
+                    aaaaaaaaaaaaaaaaaaaaa
                     <Auth
                       // @ts-ignore
                       socialLayout={layout}
-                      theme={theme === 'dark' ? 'dark' : 'default'}
+                      theme={resolvedTheme === 'dark' ? 'dark' : 'default'}
                       providers={['google', 'facebook', 'twitter']}
                       supabaseClient={supabase}
                       localization={{
