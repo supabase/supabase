@@ -20,9 +20,8 @@ The standard file upload method is ideal for small files that are not larger tha
 It uses the traditional `multipart/form-data` format and is simple to implement using the supabase-js SDK. Here's an example of how to upload a file using the standard upload method:
 
 <Admonition type="note">
-  You can upload up to 5GB file size using the standard upload method.
-  <br />
-  For files greater than 6 MB in size, use [TUS Resumable Upload](#resumable-upload) for better
+  Though you can upload up to 5GB files using the standard upload method, we recommend use [TUS
+  Resumable Upload](#resumable-upload) for uploading files greater than 6MB in size for better
   reliability.
 </Admonition>
 
