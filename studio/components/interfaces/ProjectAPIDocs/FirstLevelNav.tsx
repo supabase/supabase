@@ -1,6 +1,6 @@
 import { useAppStateSnapshot } from 'state/app-state'
 import { DOCS_CONTENT, DOCS_MENU } from './ProjectAPIDocs.constants'
-import { Fragment } from 'react'
+import { Fragment, useEffect } from 'react'
 import Link from 'next/link'
 import { Button, IconBook, IconBookOpen } from 'ui'
 import { useStore } from 'hooks'
@@ -11,7 +11,7 @@ import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 
 const FirstLevelNav = () => {
   const { ref } = useParams()
-  const { meta } = useStore()
+  const { meta, ui } = useStore()
   const snap = useAppStateSnapshot()
 
   const { data } = meta.openApi
@@ -20,6 +20,13 @@ const FirstLevelNav = () => {
 
   const { data: buckets } = useBucketsQuery({ projectRef: ref })
   const { data: edgeFunctions } = useEdgeFunctionsQuery({ projectRef: ref })
+
+  useEffect(() => {
+    if (ui.selectedProjectRef) {
+      meta.openApi.load()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ui.selectedProjectRef])
 
   return (
     <>

@@ -10,6 +10,14 @@ export const DOCS_MENU = [
 
 export const DOCS_CONTENT = {
   // Introduction
+  connecting: {
+    key: 'connecting-project',
+    category: 'introduction',
+    title: 'Connecting to your project',
+    description: undefined,
+    js: undefined,
+    bash: undefined,
+  },
   init: {
     key: 'introduction',
     category: 'introduction',
