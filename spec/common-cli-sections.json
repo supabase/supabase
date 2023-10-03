@@ -365,6 +365,18 @@
   },
   {
     "type": "category",
+    "title": "Services",
+    "items": [
+      {
+        "id": "supabase-services",
+        "title": "Show versions of all Supabase services",
+        "slug": "supabase-services",
+        "type": "cli-command"
+      }
+    ]
+  },
+  {
+    "type": "category",
     "title": "Branches",
     "items": [
       {
@@ -731,6 +743,30 @@
         "id": "supabase-postgres-config-update",
         "title": "Update Postgres configurations",
         "slug": "supabase-postgres-config-update",
+        "type": "cli-command"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "SQL Snippets",
+    "items": [
+      {
+        "id": "supabase-snippets",
+        "title": "Manage Supabase SQL snippets",
+        "slug": "supabase-snippets",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-snippets-list",
+        "title": "List all SQL snippets",
+        "slug": "supabase-snippets-list",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-snippets-download",
+        "title": "Download SQL snippet content",
+        "slug": "supabase-snippets-download",
         "type": "cli-command"
       }
     ]
