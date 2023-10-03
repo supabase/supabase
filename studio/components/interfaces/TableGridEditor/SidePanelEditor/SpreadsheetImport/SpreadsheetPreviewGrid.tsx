@@ -1,4 +1,4 @@
-import DataGrid from '@supabase/react-data-grid'
+import DataGrid from 'react-data-grid'
 import clsx from 'clsx'
 
 const MAX_ROWS = 20

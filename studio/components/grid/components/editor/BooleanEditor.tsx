@@ -1,8 +1,8 @@
 import { Select } from 'ui'
-import { EditorProps } from '@supabase/react-data-grid'
+import { RenderEditCellProps } from 'react-data-grid'
 import { useTrackedState } from 'components/grid/store'
 
-interface Props<TRow, TSummaryRow = unknown> extends EditorProps<TRow, TSummaryRow> {
+interface Props<TRow, TSummaryRow = unknown> extends RenderEditCellProps<TRow, TSummaryRow> {
   isNullable?: boolean
 }
 

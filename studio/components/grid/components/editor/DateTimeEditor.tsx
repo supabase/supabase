@@ -1,5 +1,5 @@
 import { ChangeEvent } from 'react'
-import { EditorProps } from '@supabase/react-data-grid'
+import { RenderEditCellProps } from 'react-data-grid'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 
@@ -10,7 +10,7 @@ function autoFocusAndSelect(input: HTMLInputElement | null) {
   input?.select()
 }
 
-interface Props<TRow, TSummaryRow = unknown> extends EditorProps<TRow, TSummaryRow> {
+interface Props<TRow, TSummaryRow = unknown> extends RenderEditCellProps<TRow, TSummaryRow> {
   format: string
 }
 
@@ -49,12 +49,14 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
   )
 }
 
-export function DateTimeEditor<TRow, TSummaryRow = unknown>(props: EditorProps<TRow, TSummaryRow>) {
+export function DateTimeEditor<TRow, TSummaryRow = unknown>(
+  props: RenderEditCellProps<TRow, TSummaryRow>
+) {
   return <BaseEditor {...props} format="YYYY-MM-DDTHH:mm:ss" />
 }
 
 export function DateTimeWithTimezoneEditor<TRow, TSummaryRow = unknown>(
-  props: EditorProps<TRow, TSummaryRow>
+  props: RenderEditCellProps<TRow, TSummaryRow>
 ) {
   return <BaseEditor {...props} format="YYYY-MM-DDTHH:mm:ssZ" />
 }
