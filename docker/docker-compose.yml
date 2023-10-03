@@ -10,7 +10,7 @@ services:
 
   studio:
     container_name: supabase-studio
-    image: supabase/studio:20230912-748fd33
+    image: supabase/studio:20230921-d657f29
     restart: unless-stopped
     healthcheck:
       test:
@@ -346,7 +346,7 @@ services:
   # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
-    image: supabase/postgres:15.1.0.103
+    image: supabase/postgres:15.1.0.117
     healthcheck:
       test: pg_isready -U postgres -h localhost
       interval: 5s
