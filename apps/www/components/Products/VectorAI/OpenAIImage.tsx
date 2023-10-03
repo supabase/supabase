@@ -4,7 +4,7 @@ import { useTheme } from 'next-themes'
 import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
 
 const OpenAIImage = ({ isHovered }: { isHovered: boolean }) => {
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
 
   const lineVariants = {
     animate: {
@@ -23,17 +23,17 @@ const OpenAIImage = ({ isHovered }: { isHovered: boolean }) => {
   }
 
   const colors = {
-    glow: theme === 'dark' ? '#009C77' : '#00FFD9',
-    rectStart: theme === 'dark' ? '#17FDDF' : '#49615E',
-    rectEnd: theme === 'dark' ? '#10FFE0' : '#202020',
-    cardBgStart: theme === 'dark' ? '#171717' : 'white',
-    cardBgEnd: theme === 'dark' ? '#171717' : 'white',
-    openAIStart: theme === 'dark' ? '#89FFCA' : '#4FD7B6',
-    openAIEnd: theme === 'dark' ? '#D0FAE6' : '#4F7362',
-    openAIStrokeStart: theme === 'dark' ? '#A5FFD6' : '#5F5F5F',
-    openAIStrokeEnd: theme === 'dark' ? '#D0FAE6' : '#D6D6D6',
-    openAIAltStart: theme === 'dark' ? '#00DBA7' : '#00DBA7',
-    openAIAltEnd: theme === 'dark' ? '#171717' : '#DFDFDF',
+    glow: resolvedTheme === 'dark' ? '#009C77' : '#00FFD9',
+    rectStart: resolvedTheme === 'dark' ? '#17FDDF' : '#49615E',
+    rectEnd: resolvedTheme === 'dark' ? '#10FFE0' : '#202020',
+    cardBgStart: resolvedTheme === 'dark' ? '#171717' : 'white',
+    cardBgEnd: resolvedTheme === 'dark' ? '#171717' : 'white',
+    openAIStart: resolvedTheme === 'dark' ? '#89FFCA' : '#4FD7B6',
+    openAIEnd: resolvedTheme === 'dark' ? '#D0FAE6' : '#4F7362',
+    openAIStrokeStart: resolvedTheme === 'dark' ? '#A5FFD6' : '#5F5F5F',
+    openAIStrokeEnd: resolvedTheme === 'dark' ? '#D0FAE6' : '#D6D6D6',
+    openAIAltStart: resolvedTheme === 'dark' ? '#00DBA7' : '#00DBA7',
+    openAIAltEnd: resolvedTheme === 'dark' ? '#171717' : '#DFDFDF',
   }
 
   return (
@@ -41,7 +41,7 @@ const OpenAIImage = ({ isHovered }: { isHovered: boolean }) => {
       <div className="w-[44%] h-[44%] -translate-x-[2px] absolute z-10 inset-0 top-auto bottom-[16%] m-auto">
         <Image
           src={
-            theme === 'dark'
+            resolvedTheme === 'dark'
               ? '/images/product/vector/openai-logo-dark.png'
               : '/images/product/vector/openai-logo-light.png'
           }

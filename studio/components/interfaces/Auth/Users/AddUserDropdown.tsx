@@ -4,10 +4,10 @@ import { useState } from 'react'
 import semver from 'semver'
 import {
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   IconChevronDown,
   IconMail,
   IconUserPlus,
@@ -39,24 +39,24 @@ const AddUserDropdown = ({ projectKpsVersion }: AddUserDropdownProps) => {
 
   return (
     <>
-      <DropdownMenu_Shadcn_>
-        <DropdownMenuTrigger_Shadcn_>
+      <DropdownMenu>
+        <DropdownMenuTrigger>
           <Button type="primary" iconRight={<IconChevronDown strokeWidth={1.5} />}>
             Add user
           </Button>
-        </DropdownMenuTrigger_Shadcn_>
-        <DropdownMenuContent_Shadcn_ side="bottom" align="end">
+        </DropdownMenuTrigger>
+        <DropdownMenuContent side="bottom" align="end">
           {inviteEnabled && (
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger className="w-full">
-                <DropdownMenuItem_Shadcn_
+                <DropdownMenuItem
                   className="space-x-2"
                   disabled={!canInviteUsers}
                   onClick={() => setInviteVisible(true)}
                 >
                   <IconMail size="small" />
                   <p>Send invitation</p>
-                </DropdownMenuItem_Shadcn_>
+                </DropdownMenuItem>
               </Tooltip.Trigger>
               {!canInviteUsers && (
                 <Tooltip.Portal>
@@ -80,14 +80,14 @@ const AddUserDropdown = ({ projectKpsVersion }: AddUserDropdownProps) => {
 
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger className="w-full text-left">
-              <DropdownMenuItem_Shadcn_
+              <DropdownMenuItem
                 className="space-x-2"
                 disabled={!canCreateUsers}
                 onClick={() => setCreateVisible(true)}
               >
                 <IconUserPlus size="small" />
                 <p>Create new user</p>
-              </DropdownMenuItem_Shadcn_>
+              </DropdownMenuItem>
             </Tooltip.Trigger>
 
             {!canCreateUsers && (
@@ -108,8 +108,8 @@ const AddUserDropdown = ({ projectKpsVersion }: AddUserDropdownProps) => {
               </Tooltip.Portal>
             )}
           </Tooltip.Root>
-        </DropdownMenuContent_Shadcn_>
-      </DropdownMenu_Shadcn_>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       {inviteEnabled && <InviteUserModal visible={inviteVisible} setVisible={setInviteVisible} />}
       <CreateUserModal visible={createVisible} setVisible={setCreateVisible} />
