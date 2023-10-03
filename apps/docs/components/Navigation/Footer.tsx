@@ -44,11 +44,17 @@ const Footer = () => (
           <a className="text-xs text-scale-900">&copy; Supabase Inc</a>
         </Link>
         <span className="text-xs text-scale-900">—</span>
-        {secondaryLinks.map((item) => (
-          <Link href={item.url} key={item.url}>
-            <a className="text-xs text-scale-800 hover:underline">{item.title}</a>
-          </Link>
-        ))}
+        {secondaryLinks.map(({ component: Component, ...item }) =>
+          item.url ? (
+            <Link href={item.url} key={item.url}>
+              <a className="text-xs text-scale-800 hover:underline">{item.title}</a>
+            </Link>
+          ) : (
+            Component && (
+              <Component className="text-xs text-scale-800 hover:underline">{item.title}</Component>
+            )
+          )
+        )}
       </div>
       <div className="flex items-center gap-2">
         <Button type="text" asChild>

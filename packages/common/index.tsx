@@ -5,6 +5,7 @@ export * from './helpers'
 export * from './hooks'
 export * from './gotrue'
 export * from './auth'
+export * from './telemetry'
 
 export const Layouts = {
   SidebarLayout,

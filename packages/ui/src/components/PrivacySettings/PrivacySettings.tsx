@@ -1,11 +1,12 @@
-import { useConsentValue } from 'common'
+import { useConsentValue, handlePageTelemetry, useTelemetryProps } from 'common'
 import { PropsWithChildren, useState } from 'react'
 import { Modal, Toggle, cn } from 'ui'
 
 const PrivacySettings = ({ children, className }: PropsWithChildren<{ className?: string }>) => {
-  const [isOpen, setIsOpen] = useState(false)
+  const telemetryProps = useTelemetryProps()
   const { hasAccepted, handleConsent } = useConsentValue('supabase-consent')
   const [telemetryValue, setTelemetryValue] = useState(hasAccepted)
+  const [isOpen, setIsOpen] = useState(false)
 
   const handleConfirmPreferences = () => {
     handleConsent && handleConsent(telemetryValue ? 'true' : 'false')
@@ -25,6 +26,7 @@ const PrivacySettings = ({ children, className }: PropsWithChildren<{ className?
       <Modal
         closable
         visible={isOpen}
+        alignFooter="right"
         onCancel={handleCancel}
         onConfirm={handleConfirmPreferences}
         header="Privacy Settings"

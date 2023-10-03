@@ -144,7 +144,7 @@ const footerData = [
         url: '/privacy',
       },
       {
-        text: 'Manage Privacy Settings',
+        text: 'Privacy Settings',
         component: PrivacySettings,
       },
       {
