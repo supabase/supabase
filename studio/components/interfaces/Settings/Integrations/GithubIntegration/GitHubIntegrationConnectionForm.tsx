@@ -4,6 +4,7 @@ import { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   Button,
+  cn,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
@@ -23,7 +24,6 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
-  cn,
 } from 'ui'
 import * as z from 'zod'
 
@@ -130,7 +130,7 @@ const GitHubIntegrationConnectionForm = ({
   return (
     <div className="flex flex-col gap-6 px-8 py-8">
       <div>
-        <Label_Shadcn_ className="text">Production branch</Label_Shadcn_>
+        <Label_Shadcn_ className="text-foreground">Production branch</Label_Shadcn_>
         <p className="text-xs text-light mb-3">
           All other branches will be treated as Preview branches
         </p>

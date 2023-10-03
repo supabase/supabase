@@ -168,7 +168,7 @@ const NavigationBar = () => {
                       onSelect={() => snap.setShowFeaturePreviewModal(true)}
                     >
                       <FlaskConical size={14} strokeWidth={2} />
-                      <p className="text">Feature previews</p>
+                      <p className="text-foreground">Feature previews</p>
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuSeparator />
