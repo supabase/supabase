@@ -1,15 +1,15 @@
-import FooterLinks from 'data/Footer.json'
-import SectionContainer from '../Layouts/SectionContainer'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
-import { Badge, IconChevronRight, TextLink } from 'ui'
+import { Badge } from 'ui'
 import Image from 'next/image'
-import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
-import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 import { useRouter } from 'next/router'
-import { Fragment } from 'react'
 import ThemeToggle from '@ui/components/ThemeProvider/ThemeToggle'
 import { CheckIcon } from '@heroicons/react/outline'
+import SectionContainer from '../Layouts/SectionContainer'
+
+import footerData from 'data/Footer'
+import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
+import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 
 interface Props {
   className?: string
@@ -126,39 +126,43 @@ const Footer = (props: Props) => {
           </div>
           <div className="mt-12 grid grid-cols-1 gap-8 xl:col-span-2 xl:mt-0">
             <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-              {FooterLinks.map((segment) => {
+              {footerData.map((segment) => {
                 return (
                   <div key={`footer_${segment.title}`}>
                     <h6 className="text-scale-1200 overwrite text-base">{segment.title}</h6>
                     <ul className="mt-4 space-y-2">
-                      {segment.links.map((link, idx) => {
+                      {segment.links.map(({ component: Component, ...link }, idx) => {
                         const children = (
-                          <a
-                            // only add href key if link is external
-                            {...(link.url.startsWith('https') && { href: link.url })}
+                          <div
                             className={`text-sm transition-colors ${
-                              link.url
-                                ? 'text-scale-1100 hover:text-scale-1200 '
+                              link.url || Component
+                                ? 'text-scale-1100 hover:text-scale-1200'
                                 : 'text-scale-900 hover:text-scale-900'
                             } `}
                           >
                             {link.text}
-                            {!link.url && (
+                            {!link.url && !Component && (
                               <div className="ml-2 inline text-xs xl:ml-0 xl:block 2xl:ml-2 2xl:inline">
                                 <Badge color="scale" size="small">
                                   Coming soon
                                 </Badge>
                               </div>
                             )}
-                          </a>
+                          </div>
                         )
 
                         return (
                           <li key={`${segment.title}_link_${idx}`}>
-                            {link.url.startsWith('https') ? (
-                              <Fragment>{children}</Fragment>
+                            {link.url ? (
+                              link.url.startsWith('https') ? (
+                                <a href={link.url}>{children}</a>
+                              ) : (
+                                <Link href={link.url}>
+                                  <a>{children}</a>
+                                </Link>
+                              )
                             ) : (
-                              <Link href={link.url}>{children}</Link>
+                              Component && <Component>{children}</Component>
                             )}
                           </li>
                         )
