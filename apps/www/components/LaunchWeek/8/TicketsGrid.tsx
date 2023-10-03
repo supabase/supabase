@@ -41,6 +41,8 @@ export default function TicketsGrid({ loadedUsers, isLoading, pageCount, offset 
             href={`/launch-week/tickets/${user.username}`}
             key={`${user.username}-000${i}`}
             onClick={() => window.scrollTo(0, 0)}
+            legacyBehavior
+            passHref
           >
             <motion.a
               className="relative w-full p-[1px] rounded-lg sm:rounded-xl overflow-hidden hover:cursor-pointer bg-gradient-to-b from-[#58585860] to-[#ffffff10]"

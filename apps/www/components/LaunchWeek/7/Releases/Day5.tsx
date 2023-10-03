@@ -109,9 +109,10 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
           whileHover="hover"
           style={{ gridArea: 'commandK' }}
         >
-          <Link href={`${day.steps[1].blog}${day.steps[1].steps[0].url}`}>
-            <a className="absolute inset-0 z-10" />
-          </Link>
+          <Link
+            href={`${day.steps[1].blog}${day.steps[1].steps[0].url}`}
+            className="absolute inset-0 z-10"
+          />
           <div className="flex items-center text-center md:text-left justify-between flex-col md:flex-row lg:justify-start gap-3 text-white">
             <CartTitle>{day.steps[1].steps[0].title}</CartTitle>
             <div className="flex gap-2">
@@ -159,9 +160,10 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
           whileHover="hover"
           style={{ gridArea: 'wrappers' }}
         >
-          <Link href={`${day.steps[1].blog}${day.steps[1].steps[1].url}`}>
-            <a className="absolute inset-0 z-10" />
-          </Link>
+          <Link
+            href={`${day.steps[1].blog}${day.steps[1].steps[1].url}`}
+            className="absolute inset-0 z-10"
+          />
           <div className="flex items-center text-center md:text-left justify-between flex-col md:items-start gap-3 text-white">
             <CartTitle>{day.steps[1].steps[1].title}</CartTitle>
             <div className="flex gap-2">
@@ -207,9 +209,10 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
           whileHover="hover"
           style={{ gridArea: 'nullable' }}
         >
-          <Link href={`${day.steps[1].blog}${day.steps[1].steps[2].url}`}>
-            <a className="absolute inset-0 z-10" />
-          </Link>
+          <Link
+            href={`${day.steps[1].blog}${day.steps[1].steps[2].url}`}
+            className="absolute inset-0 z-10"
+          />
           <div className="flex flex-col items-center text-center gap-3 text-white">
             <CartTitle>{day.steps[1].steps[2].title}</CartTitle>
             <div className="flex gap-2">
@@ -257,9 +260,10 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
           whileHover="hover"
           style={{ gridArea: 'apiAutodocs' }}
         >
-          <Link href={`${day.steps[1].blog}${day.steps[1].steps[3].url}`}>
-            <a className="absolute inset-0 z-10" />
-          </Link>
+          <Link
+            href={`${day.steps[1].blog}${day.steps[1].steps[3].url}`}
+            className="absolute inset-0 z-10"
+          />
           <div className="flex items-center text-center flex-col gap-3 text-white">
             <CartTitle>{day.steps[1].steps[3].title}</CartTitle>
             <div className="flex gap-2">
@@ -307,9 +311,10 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
           whileHover="hover"
           style={{ gridArea: 'pgRoles' }}
         >
-          <Link href={`${day.steps[1].blog}${day.steps[1].steps[4].url}`}>
-            <a className="absolute inset-0 z-10" />
-          </Link>
+          <Link
+            href={`${day.steps[1].blog}${day.steps[1].steps[4].url}`}
+            className="absolute inset-0 z-10"
+          />
           <div className="flex items-center text-center lg:text-left justify-between flex-col lg:flex-row lg:justify-start gap-3 lg:gap-2 text-white">
             <CartTitle>{day.steps[1].steps[4].title}</CartTitle>
             <div className="flex gap-2">
@@ -357,9 +362,10 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
           whileHover="hover"
           style={{ gridArea: 'casDeletes' }}
         >
-          <Link href={`${day.steps[1].blog}${day.steps[1].steps[5].url}`}>
-            <a className="absolute inset-0 z-10" />
-          </Link>
+          <Link
+            href={`${day.steps[1].blog}${day.steps[1].steps[5].url}`}
+            className="absolute inset-0 z-10"
+          />
           <div className="flex items-center text-center lg:text-left justify-between flex-col lg:flex-row lg:justify-start gap-3 text-white">
             <CartTitle>{day.steps[1].steps[5].title}</CartTitle>
             <div className="flex gap-2">
@@ -407,9 +413,10 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
           whileHover="hover"
           style={{ gridArea: 'graphiQL' }}
         >
-          <Link href={`${day.steps[1].blog}${day.steps[1].steps[6].url}`}>
-            <a className="absolute inset-0 z-10" />
-          </Link>
+          <Link
+            href={`${day.steps[1].blog}${day.steps[1].steps[6].url}`}
+            className="absolute inset-0 z-10"
+          />
           <div className="flex items-center text-center md:text-left justify-between flex-col md:flex-row md:justify-start gap-3 text-white">
             <CartTitle>{day.steps[1].steps[6].title}</CartTitle>
             <div className="flex gap-2">
@@ -457,9 +464,10 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
           whileHover="hover"
           style={{ gridArea: 'dbWebhooks' }}
         >
-          <Link href={`${day.steps[1].blog}${day.steps[1].steps[7].url}`}>
-            <a className="absolute inset-0 z-10" />
-          </Link>
+          <Link
+            href={`${day.steps[1].blog}${day.steps[1].steps[7].url}`}
+            className="absolute inset-0 z-10"
+          />
           <div className="flex items-center text-center lg:text-left justify-between flex-col lg:flex-row lg:justify-start gap-3 text-white">
             <CartTitle>{day.steps[1].steps[7].title}</CartTitle>
             <div className="flex gap-2">
@@ -507,9 +515,10 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
           whileHover="hover"
           style={{ gridArea: 'viewsTables' }}
         >
-          <Link href={`${day.steps[1].blog}${day.steps[1].steps[9].url}`}>
-            <a className="absolute inset-0 z-10" />
-          </Link>
+          <Link
+            href={`${day.steps[1].blog}${day.steps[1].steps[9].url}`}
+            className="absolute inset-0 z-10"
+          />
           <div className="flex items-center text-center flex-col gap-3 text-white">
             <CartTitle>{day.steps[1].steps[8].title}</CartTitle>
             <div className="flex gap-2">
@@ -557,9 +566,10 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
           whileHover="hover"
           style={{ gridArea: 'JSONsupport' }}
         >
-          <Link href={`${day.steps[1].blog}${day.steps[1].steps[9].url}`}>
-            <a className="absolute inset-0 z-10" />
-          </Link>
+          <Link
+            href={`${day.steps[1].blog}${day.steps[1].steps[9].url}`}
+            className="absolute inset-0 z-10"
+          />
           <div className="flex items-center text-center flex-col gap-3 text-white">
             <CartTitle>{day.steps[1].steps[9].title}</CartTitle>
             <div className="flex gap-2">
@@ -607,9 +617,10 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
           whileHover="hover"
           style={{ gridArea: 'insights' }}
         >
-          <Link href={`${day.steps[1].blog}${day.steps[1].steps[10].url}`}>
-            <a className="absolute inset-0 z-10" />
-          </Link>
+          <Link
+            href={`${day.steps[1].blog}${day.steps[1].steps[10].url}`}
+            className="absolute inset-0 z-10"
+          />
           <div className="flex items-center text-center lg:text-left justify-between flex-col lg:flex-row lg:justify-start gap-3 text-white">
             <CartTitle>{day.steps[1].steps[10].title}</CartTitle>
             <div className="flex gap-2">

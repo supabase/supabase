@@ -87,9 +87,9 @@ export function PreLaunchTeaser() {
               </p>
             </div>
             <div>
-              <Link href="/blog/supabase-series-b">
-                <Button type="default">Read more</Button>
-              </Link>
+              <Button asChild type="default">
+                <Link href="/blog/supabase-series-b">Read more</Link>
+              </Button>
             </div>
           </div>
         </div>

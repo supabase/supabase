@@ -337,18 +337,16 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                         `}
                         key={i}
                       >
-                        <Link href={contributor.html_url}>
-                          <a target="_blank">
-                            <div className="relative w-full h-full">
-                              <Image
-                                src={contributor.avatar_url}
-                                alt={`${contributor.login} github avatar`}
-                                className="rounded-full"
-                                layout="fill"
-                                objectFit="cover"
-                              />
-                            </div>
-                          </a>
+                        <Link href={contributor.html_url} target="_blank">
+                          <div className="relative w-full h-full">
+                            <Image
+                              src={contributor.avatar_url}
+                              alt={`${contributor.login} github avatar`}
+                              className="rounded-full"
+                              layout="fill"
+                              objectFit="cover"
+                            />
+                          </div>
                         </Link>
                       </div>
                     )

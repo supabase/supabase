@@ -126,8 +126,8 @@ function CaseStudyPage(props: any) {
               <div className="">
                 <article className="flex flex-col gap-8">
                   <div className="flex flex-col gap-8 max-w-xxl">
-                    <Link passHref href="/customers">
-                      <a className="text-brand hover:text-brand-600 mb-2 mt-0">Customer Stories</a>
+                    <Link href="/customers" className="text-brand hover:text-brand-600 mb-2 mt-0">
+                      Customer Stories
                     </Link>
                     <h1 className="text-scale-1200 text-4xl font-semibold xl:text-5xl">
                       {props.blog.title}
@@ -187,13 +187,14 @@ function CaseStudyPage(props: any) {
                         <div className="">
                           <p>Ready to get started?</p>
                           <div>
-                            <Link href="https://supabase.com/contact/enterprise">
-                              <a className="no-underline">
-                                <Button type="default" iconRight={<IconChevronRight />}>
-                                  Contact sales
-                                </Button>
-                              </a>
-                            </Link>
+                            <Button asChild type="default" iconRight={<IconChevronRight />}>
+                              <Link
+                                href="https://supabase.com/contact/enterprise"
+                                className="no-underline"
+                              >
+                                Contact sales
+                              </Link>
+                            </Button>
                           </div>
                         </div>
                       </div>

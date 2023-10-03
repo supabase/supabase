@@ -94,10 +94,12 @@ const Nav = () => {
       </div>
     )
     return url ? (
-      <Link href={url} key={`solution_${idx}`}>
-        <a className="flex flex-col justify-between p-3 my-2 -m-3 transition duration-150 ease-in-out rounded-lg dark:hover:bg-scale-600 hover:bg-gray-50">
-          {content}
-        </a>
+      <Link
+        href={url}
+        key={`solution_${idx}`}
+        className="flex flex-col justify-between p-3 my-2 -m-3 transition duration-150 ease-in-out rounded-lg dark:hover:bg-scale-600 hover:bg-gray-50"
+      >
+        {content}
       </Link>
     ) : (
       <div
@@ -223,26 +225,26 @@ const Nav = () => {
             <div className="flex items-center justify-center flex-1 sm:items-stretch lg:justify-between">
               <div className="flex items-center">
                 <div className="flex items-center flex-shrink-0">
-                  <Link href="/" as="/">
-                    <a className="block w-auto h-6">
-                      <Image
-                        src={
-                          isLaunchWeekPage || resolvedTheme === 'dark' || isHomePage
-                            ? supabaseLogoWordmarkDark
-                            : supabaseLogoWordmarkLight
-                        }
-                        width={124}
-                        height={24}
-                        alt="Supabase Logo"
-                      />
-                    </a>
+                  <Link href="/" as="/" className="block w-auto h-6">
+                    <Image
+                      src={
+                        isLaunchWeekPage || resolvedTheme === 'dark' || isHomePage
+                          ? supabaseLogoWordmarkDark
+                          : supabaseLogoWordmarkLight
+                      }
+                      width={124}
+                      height={24}
+                      alt="Supabase Logo"
+                    />
                   </Link>
 
                   {isLaunchWeekPage && (
-                    <Link href="/launch-week" as="/launch-week">
-                      <a className="hidden ml-2 xl:block font-mono text-sm uppercase leading-4">
-                        Launch Week
-                      </a>
+                    <Link
+                      href="/launch-week"
+                      as="/launch-week"
+                      className="hidden ml-2 xl:block font-mono text-sm uppercase leading-4"
+                    >
+                      Launch Week
                     </Link>
                   )}
                 </div>
@@ -257,41 +259,38 @@ const Nav = () => {
                     onClick={() => handleToggle(() => setOpenDevelopers(!openDevelopers))}
                     active={openDevelopers}
                   />
-                  <Link href="/pricing">
-                    <a
-                      className={[
-                        `text-scale-1200 hover:text-brand hover:border-brand dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
-                        border-b-2 border-transparent p-5 px-1
-                        text-sm font-medium`,
-                        showLaunchWeekNavMode && '!text-white',
-                      ].join(' ')}
-                    >
-                      Pricing
-                    </a>
+                  <Link
+                    href="/pricing"
+                    className={[
+                      `text-scale-1200 hover:text-brand hover:border-brand dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
+                    border-b-2 border-transparent p-5 px-1
+                    text-sm font-medium`,
+                      showLaunchWeekNavMode && '!text-white',
+                    ].join(' ')}
+                  >
+                    Pricing
                   </Link>
-                  <Link href="/docs">
-                    <a
-                      className={[
-                        `text-scale-1200 hover:text-brand hover:border-brand dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
-                        border-b-2 border-transparent p-5 px-1
-                        text-sm font-medium`,
-                        showLaunchWeekNavMode && '!text-white',
-                      ].join(' ')}
-                    >
-                      Docs
-                    </a>
+                  <Link
+                    href="/docs"
+                    className={[
+                      `text-scale-1200 hover:text-brand hover:border-brand dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
+                    border-b-2 border-transparent p-5 px-1
+                    text-sm font-medium`,
+                      showLaunchWeekNavMode && '!text-white',
+                    ].join(' ')}
+                  >
+                    Docs
                   </Link>
-                  <Link href="/blog">
-                    <a
-                      className={[
-                        `text-scale-1200 hover:text-brand hover:border-brand dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
-                        border-b-2 border-transparent p-5 px-1
-                        text-sm font-medium`,
-                        showLaunchWeekNavMode && '!text-white',
-                      ].join(' ')}
-                    >
-                      Blog
-                    </a>
+                  <Link
+                    href="/blog"
+                    className={[
+                      `text-scale-1200 hover:text-brand hover:border-brand dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
+                    border-b-2 border-transparent p-5 px-1
+                    text-sm font-medium`,
+                      showLaunchWeekNavMode && '!text-white',
+                    ].join(' ')}
+                  >
+                    Blog
                   </Link>
                 </div>
               </div>
@@ -333,27 +332,17 @@ const Nav = () => {
                     </a>
 
                     {isLoggedIn ? (
-                      <Link href="/dashboard/projects">
-                        <a>
-                          <Button className="hidden text-white lg:block">Dashboard</Button>
-                        </a>
-                      </Link>
+                      <Button asChild className="hidden text-white lg:block">
+                        <Link href="/dashboard/projects">Dashboard</Link>
+                      </Button>
                     ) : (
                       <>
-                        <Link href="https://supabase.com/dashboard">
-                          <a>
-                            <Button type="default" className="hidden lg:block">
-                              Sign in
-                            </Button>
-                          </a>
-                        </Link>
-                        <Link href="https://supabase.com/dashboard">
-                          <a>
-                            <Button className="hidden text-white lg:block">
-                              Start your project
-                            </Button>
-                          </a>
-                        </Link>
+                        <Button asChild type="default" className="hidden lg:block">
+                          <Link href="https://supabase.com/dashboard">Sign in</Link>
+                        </Button>
+                        <Button asChild className="hidden text-white lg:block">
+                          <Link href="https://supabase.com/dashboard">Start your project</Link>
+                        </Button>
                       </>
                     )}
                   </>
@@ -408,43 +397,45 @@ const Nav = () => {
               {/* </div> */}
               <div className="mt-6 mb-12">
                 <div className="pt-2 pb-4 space-y-1">
-                  <Link href="https://supabase.com/dashboard">
-                    <a className="block pl-3 pr-4 text-base font-medium text-scale-900 dark:text-white">
-                      Sign in
-                    </a>
+                  <Link
+                    href="https://supabase.com/dashboard"
+                    className="block pl-3 pr-4 text-base font-medium text-scale-900 dark:text-white"
+                  >
+                    Sign in
                   </Link>
                 </div>
                 <div className="pt-2 pb-4 space-y-1">
-                  <Link href="/docs">
-                    <a className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white">
-                      Developers
-                    </a>
+                  <Link
+                    href="/docs"
+                    className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white"
+                  >
+                    Developers
                   </Link>
-                  <Link href="/pricing">
-                    <a className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white">
-                      Pricing
-                    </a>
+                  <Link
+                    href="/pricing"
+                    className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white"
+                  >
+                    Pricing
                   </Link>
-                  <Link href="/docs">
-                    <a
-                      target="_blank"
-                      className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white"
-                    >
-                      Docs
-                    </a>
+                  <Link
+                    href="/docs"
+                    target="_blank"
+                    className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white"
+                  >
+                    Docs
                   </Link>
-                  <Link href="/blog">
-                    <a
-                      target="_blank"
-                      className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white"
-                    >
-                      Blog
-                    </a>
+                  <Link
+                    href="/blog"
+                    target="_blank"
+                    className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white"
+                  >
+                    Blog
                   </Link>
-                  <Link href="/support">
-                    <a className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white">
-                      Support
-                    </a>
+                  <Link
+                    href="/support"
+                    className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white"
+                  >
+                    Support
                   </Link>
                 </div>
                 <div className="p-3">

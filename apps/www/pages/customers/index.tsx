@@ -93,7 +93,7 @@ function CustomerStoriesPage(props: any) {
               </motion.div>
               <div className="mx-auto my-12 md:my-20 grid grid-cols-12 gap-6 not-prose">
                 {caseStudyThumbs.map((caseStudy: any, i: number) => (
-                  <Link href={`${caseStudy.link}`} key={caseStudy.title} passHref>
+                  <Link href={`${caseStudy.link}`} key={caseStudy.title} passHref legacyBehavior>
                     <motion.a
                       className="col-span-12 md:col-span-4"
                       initial={{ opacity: 0, y: 20 }}

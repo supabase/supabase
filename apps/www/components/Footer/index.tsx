@@ -33,8 +33,8 @@ const Footer = (props: Props) => {
         <SectionContainer className="grid grid-cols-2 md:flex items-center justify-between md:justify-center gap-8 md:gap-10 !py-6 md:!py-10 text-sm">
           <div className="flex flex-col md:flex-row gap-2 md:items-center">
             We protect your data.
-            <Link href="/security">
-              <a className="text-brand hover:underline">More on Security</a>
+            <Link href="/security" className="text-brand hover:underline">
+              More on Security
             </Link>
           </div>
           <span className="hidden md:block h-px w-8 bg-border" />
@@ -53,21 +53,19 @@ const Footer = (props: Props) => {
       <SectionContainer>
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="space-y-8 xl:col-span-1">
-            <Link href="#" as="/">
-              <a className="w-40">
-                <Image
-                  src={
-                    isLaunchWeekPage
-                      ? supabaseLogoWordmarkDark
-                      : resolvedTheme === 'dark'
-                      ? supabaseLogoWordmarkDark
-                      : supabaseLogoWordmarkLight
-                  }
-                  width={160}
-                  height={30}
-                  alt="Supabase"
-                />
-              </a>
+            <Link href="#" as="/" className="w-40">
+              <Image
+                src={
+                  isLaunchWeekPage
+                    ? supabaseLogoWordmarkDark
+                    : resolvedTheme === 'dark'
+                    ? supabaseLogoWordmarkDark
+                    : supabaseLogoWordmarkLight
+                }
+                width={160}
+                height={30}
+                alt="Supabase"
+              />
             </Link>
             <div className="flex space-x-5">
               <a
@@ -158,7 +156,9 @@ const Footer = (props: Props) => {
                             {link.url.startsWith('https') ? (
                               <Fragment>{children}</Fragment>
                             ) : (
-                              <Link href={link.url}>{children}</Link>
+                              <Link href={link.url} legacyBehavior>
+                                {children}
+                              </Link>
                             )}
                           </li>
                         )

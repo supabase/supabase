@@ -88,13 +88,11 @@ const UseCase = ({
                 {useCase.cta.label ?? 'View example'}
               </Button>
             ) : (
-              <Link href={useCase.cta.link}>
-                <a target="_blank">
-                  <Button size="tiny" type="default" iconRight={<IconArrowUpRight />}>
-                    {useCase.cta.label ?? 'View example'}
-                  </Button>
-                </a>
-              </Link>
+              <Button asChild size="tiny" type="default" iconRight={<IconArrowUpRight />}>
+                <Link href={useCase.cta.link} target="_blank">
+                  {useCase.cta.label ?? 'View example'}
+                </Link>
+              </Button>
             ))}
         </div>
       </InteractiveShimmerCard>

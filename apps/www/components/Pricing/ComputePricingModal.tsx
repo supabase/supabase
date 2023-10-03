@@ -61,17 +61,18 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
                 instance or parts of any other instance. Read more on{' '}
                 <Link
                   href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
-                  passHref
+                  target="_blank"
+                  className="transition text-brand hover:text-brand-600"
                 >
-                  <a target="_blank" className="transition text-brand hover:text-brand-600">
-                    usage-based billing for compute
-                  </a>
+                  usage-based billing for compute
                 </Link>{' '}
                 or{' '}
-                <Link href="https://supabase.com/docs/guides/platform/compute-add-ons" passHref>
-                  <a target="_blank" className="transition text-brand hover:text-brand-600">
-                    Compute Add-ons
-                  </a>
+                <Link
+                  href="https://supabase.com/docs/guides/platform/compute-add-ons"
+                  target="_blank"
+                  className="transition text-brand hover:text-brand-600"
+                >
+                  Compute Add-ons
                 </Link>
                 .
               </p>

@@ -70,31 +70,29 @@ const ProductHeaderCentered = (props: Types) => (
         </div>
         <div className="flex flex-row md:flex-row pt-8 md:items-center">
           {props.cta && (
-            <Link href={props.cta.link} as={props.cta.link}>
-              <a tabIndex={-1}>
-                <Button size="medium" className="text-white">
-                  {props.cta.label ?? 'Start for free'}
-                </Button>
-              </a>
-            </Link>
+            <Button asChild size="medium" className="text-white">
+              <Link href={props.cta.link} as={props.cta.link} tabIndex={-1}>
+                {props.cta.label ?? 'Start for free'}
+              </Link>
+            </Button>
           )}
           {props.video && (
-            <Link href={props.video} as={props.video}>
-              <a className="ml-2">
-                <Button type="default" size="medium" icon={<IconPlayCircle />}>
-                  Watch video
-                </Button>
-              </a>
-            </Link>
+            <Button asChild type="default" size="medium" icon={<IconPlayCircle />}>
+              <Link href={props.video} as={props.video} className="ml-2">
+                Watch video
+              </Link>
+            </Button>
           )}
           {props.secondaryCta && (
-            <Link href={props.secondaryCta.link} as={props.secondaryCta.link}>
-              <a className="ml-2 md:ml-3">
-                <Button type="default" size="medium">
-                  {props.secondaryCta.label}
-                </Button>
-              </a>
-            </Link>
+            <Button asChild type="default" size="medium">
+              <Link
+                href={props.secondaryCta.link}
+                as={props.secondaryCta.link}
+                className="ml-2 md:ml-3"
+              >
+                {props.secondaryCta.label}
+              </Link>
+            </Button>
           )}
         </div>
         {props.footer && <div className="mb-4">{props.footer}</div>}

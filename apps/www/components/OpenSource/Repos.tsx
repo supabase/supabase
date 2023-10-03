@@ -104,17 +104,21 @@ const Repos = ({ tabs }: Props) => {
   return (
     <div className="flex flex-col gap-8 xl:gap-10">
       <div className="flex mx-auto items-center gap-6 text-sm sm:gap-8">
-        <Link href="https://github.com/supabase/supabase/blob/master/DEVELOPERS.md">
-          <a className="text-lighter hover:underline flex gap-1 items-center" target="_blank">
-            <GitHubIcon />
-            How to contribute
-          </a>
+        <Link
+          href="https://github.com/supabase/supabase/blob/master/DEVELOPERS.md"
+          className="text-lighter hover:underline flex gap-1 items-center"
+          target="_blank"
+        >
+          <GitHubIcon />
+          How to contribute
         </Link>
-        <Link href="https://github.com/supabase/.github/blob/main/CODE_OF_CONDUCT.md">
-          <a className="text-lighter hover:underline flex gap-1 items-center" target="_blank">
-            <GitHubIcon />
-            Code of Conduct
-          </a>
+        <Link
+          href="https://github.com/supabase/.github/blob/main/CODE_OF_CONDUCT.md"
+          className="text-lighter hover:underline flex gap-1 items-center"
+          target="_blank"
+        >
+          <GitHubIcon />
+          Code of Conduct
         </Link>
       </div>
       <div className="w-full gap-2 flex flex-col items-center">

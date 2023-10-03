@@ -43,10 +43,12 @@ const Developers = () => {
       </div>
     )
     return url ? (
-      <Link href={url} key={text}>
-        <a className="dark:hover:bg-scale-500 col-span-6 rounded p-3 transition hover:bg-gray-50">
-          {content}
-        </a>
+      <Link
+        href={url}
+        key={text}
+        className="dark:hover:bg-scale-500 col-span-6 rounded p-3 transition hover:bg-gray-50"
+      >
+        {content}
       </Link>
     ) : (
       <div
@@ -69,23 +71,24 @@ const Developers = () => {
           <ul className="mt-6 space-y-3">
             {AnnouncementsData.map((announcement: any, idx: number) => (
               <li className="flow-root" key={`flyout_case_${idx}`}>
-                <Link href={announcement.url}>
-                  <a className="dark:hover:bg-dark-700 flex items-center rounded-lg border p-3 transition duration-150 ease-in-out hover:bg-gray-100">
-                    <div className="relative hidden h-20 w-32 flex-shrink-0 overflow-auto rounded-md sm:block">
-                      <Image
-                        src={`${basePath}${announcement.imgUrl}`}
-                        alt={announcement.title}
-                        layout="fill"
-                        objectFit="cover"
-                      />
-                    </div>
-                    <div className="min-w-0 flex-1 sm:ml-4">
-                      <h4 className="text-scale-1200 text-normal mb-0 text-base">
-                        {announcement.title}
-                      </h4>
-                      <p className="p text-sm">{announcement.description}</p>
-                    </div>
-                  </a>
+                <Link
+                  href={announcement.url}
+                  className="dark:hover:bg-dark-700 flex items-center rounded-lg border p-3 transition duration-150 ease-in-out hover:bg-gray-100"
+                >
+                  <div className="relative hidden h-20 w-32 flex-shrink-0 overflow-auto rounded-md sm:block">
+                    <Image
+                      src={`${basePath}${announcement.imgUrl}`}
+                      alt={announcement.title}
+                      layout="fill"
+                      objectFit="cover"
+                    />
+                  </div>
+                  <div className="min-w-0 flex-1 sm:ml-4">
+                    <h4 className="text-scale-1200 text-normal mb-0 text-base">
+                      {announcement.title}
+                    </h4>
+                    <p className="p text-sm">{announcement.description}</p>
+                  </div>
                 </Link>
               </li>
             ))}

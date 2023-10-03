@@ -53,10 +53,13 @@ export default {
         paragraph: (
           <>
             Supabase is{' '}
-            <Link href="https://forms.supabase.com/soc2">
-              <a className="text-scale-1100 hover:underline" target="_blank">
+            <Link
+              href="https://forms.supabase.com/soc2"
+              className="text-scale-1100 hover:underline"
+              target="_blank">
+              
                 SOC2 type 2
-              </a>
+              
             </Link>{' '}
             compliant, and comes with an advanced permissions system.
           </>

@@ -209,10 +209,8 @@ export default function LW8Releases() {
                     }}
                   />
                   <div className="flex flex-col items-center lg:items-start gap-2 min-w-[300px] w-full text-center lg:text-left">
-                    <Link href={day1.steps[0].blog!}>
-                      <a className="m-0">
-                        <CartTitle>{day1.steps[0].title}</CartTitle>
-                      </a>
+                    <Link href={day1.steps[0].blog!} className="m-0">
+                      <CartTitle>{day1.steps[0].title}</CartTitle>
                     </Link>
                     <p className="text-sm text-slate-900">{day1.steps[0]?.description}</p>
                   </div>
@@ -268,10 +266,8 @@ export default function LW8Releases() {
                     }}
                   />
                   <div className="flex flex-col items-center lg:items-start gap-2 min-w-[300px] w-full text-center lg:text-left">
-                    <Link href={day2.steps[0].blog!}>
-                      <a className="m-0">
-                        <CartTitle>{day2.steps[0].title}</CartTitle>
-                      </a>
+                    <Link href={day2.steps[0].blog!} className="m-0">
+                      <CartTitle>{day2.steps[0].title}</CartTitle>
                     </Link>
                     <p className="text-sm text-slate-900">{day2.steps[0]?.description}</p>
                   </div>
@@ -326,10 +322,8 @@ export default function LW8Releases() {
                     }}
                   />
                   <div className="flex flex-col items-center lg:items-start gap-2 min-w-[300px] w-full text-center lg:text-left">
-                    <Link href={day3.steps[0].blog!}>
-                      <a className="m-0">
-                        <CartTitle>{day3.steps[0].title}</CartTitle>
-                      </a>
+                    <Link href={day3.steps[0].blog!} className="m-0">
+                      <CartTitle>{day3.steps[0].title}</CartTitle>
                     </Link>
                     <p className="text-sm text-slate-900">{day3.steps[0]?.description}</p>
                     <ul className="flex flex-row flex-wrap lg:flex-col gap-2 text-sm md:text-base justify-center">
@@ -396,10 +390,8 @@ export default function LW8Releases() {
                     }}
                   />
                   <div className="flex flex-col items-center lg:items-start gap-2 min-w-[300px] w-full text-center lg:text-left">
-                    <Link href={day4.steps[0].blog!}>
-                      <a className="m-0">
-                        <CartTitle>{day4.steps[0].title}</CartTitle>
-                      </a>
+                    <Link href={day4.steps[0].blog!} className="m-0">
+                      <CartTitle>{day4.steps[0].title}</CartTitle>
                     </Link>
                     <p className="text-sm text-slate-900">{day4.steps[0]?.description}</p>
                   </div>
@@ -435,10 +427,8 @@ export default function LW8Releases() {
                     }}
                   />
                   <div className="flex flex-col items-center gap-2 min-w-[300px] w-full text-center lg:text-left">
-                    <Link href={day4.steps[1].blog!}>
-                      <a className="m-0">
-                        <CartTitle>{day4.steps[1].title}</CartTitle>
-                      </a>
+                    <Link href={day4.steps[1].blog!} className="m-0">
+                      <CartTitle>{day4.steps[1].title}</CartTitle>
                     </Link>
                     <p className="text-sm text-slate-900">{day4.steps[1]?.description}</p>
                   </div>
@@ -490,10 +480,8 @@ export default function LW8Releases() {
                     }}
                   />
                   <div className="flex flex-col items-center lg:items-start gap-2 min-w-[300px] w-full text-center lg:text-left">
-                    <Link href={day5.steps[0].blog!}>
-                      <a className="m-0">
-                        <CartTitle>{day5.steps[0].title}</CartTitle>
-                      </a>
+                    <Link href={day5.steps[0].blog!} className="m-0">
+                      <CartTitle>{day5.steps[0].title}</CartTitle>
                     </Link>
                     <p className="text-sm text-slate-900">{day5.steps[0]?.description}</p>
                   </div>
@@ -529,10 +517,8 @@ export default function LW8Releases() {
                     }}
                   />
                   <div className="flex flex-col items-center lg:items-start gap-2 min-w-[300px] w-full text-center lg:text-left">
-                    <Link href={day5.steps[1].blog!}>
-                      <a className="m-0">
-                        <CartTitle>{day5.steps[1].title}</CartTitle>
-                      </a>
+                    <Link href={day5.steps[1].blog!} className="m-0">
+                      <CartTitle>{day5.steps[1].title}</CartTitle>
                     </Link>
                     <p className="text-sm text-slate-900">{day5.steps[1]?.description}</p>
                   </div>
@@ -568,10 +554,8 @@ export default function LW8Releases() {
                     }}
                   />
                   <div className="flex flex-col items-center lg:items-start gap-2 min-w-[300px] w-full text-center lg:text-left">
-                    <Link href={day5.steps[2].blog!}>
-                      <a className="m-0">
-                        <CartTitle>{day5.steps[2].title}</CartTitle>
-                      </a>
+                    <Link href={day5.steps[2].blog!} className="m-0">
+                      <CartTitle>{day5.steps[2].title}</CartTitle>
                     </Link>
                     <p className="text-sm text-slate-900">{day5.steps[2]?.description}</p>
                   </div>

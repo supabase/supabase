@@ -265,31 +265,33 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                       {author.map((author: any, i: number) => {
                         return (
                           <div className="mr-4 w-max" key={i}>
-                            <Link href={author.author_url} target="_blank">
-                              <a className="cursor-pointer">
-                                <div className="flex items-center gap-3">
-                                  {author.author_image_url && (
-                                    <div className="w-10">
-                                      <Image
-                                        src={author.author_image_url}
-                                        className="dark:border-dark rounded-full border"
-                                        alt={`${author.author} avatar`}
-                                        width="100%"
-                                        height="100%"
-                                        layout="responsive"
-                                      />
-                                    </div>
-                                  )}
-                                  <div className="flex flex-col">
-                                    <span className="text-scale-1200 mb-0 text-sm">
-                                      {author.author}
-                                    </span>
-                                    <span className="text-scale-900 mb-0 text-xs">
-                                      {author.position}
-                                    </span>
+                            <Link
+                              href={author.author_url}
+                              target="_blank"
+                              className="cursor-pointer"
+                            >
+                              <div className="flex items-center gap-3">
+                                {author.author_image_url && (
+                                  <div className="w-10">
+                                    <Image
+                                      src={author.author_image_url}
+                                      className="dark:border-dark rounded-full border"
+                                      alt={`${author.author} avatar`}
+                                      width="100%"
+                                      height="100%"
+                                      layout="responsive"
+                                    />
                                   </div>
+                                )}
+                                <div className="flex flex-col">
+                                  <span className="text-scale-1200 mb-0 text-sm">
+                                    {author.author}
+                                  </span>
+                                  <span className="text-scale-900 mb-0 text-xs">
+                                    {author.position}
+                                  </span>
                                 </div>
-                              </a>
+                              </div>
                             </Link>
                           </div>
                         )
@@ -374,10 +376,11 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                           </Link>
                         ))}
                         <div className="mt-2">
-                          <Link href={`/blog`} passHref>
-                            <a className="text-scale-1100 hover:text-scale-1200 cursor-pointer text-xs">
-                              View all posts
-                            </a>
+                          <Link
+                            href={`/blog`}
+                            className="text-scale-1100 hover:text-scale-1200 cursor-pointer text-xs"
+                          >
+                            View all posts
                           </Link>
                         </div>
                         <div className="py-4 hidden lg:block">

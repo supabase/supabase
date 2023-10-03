@@ -32,10 +32,12 @@ const Product = () => {
     )
     return (
       url && (
-        <Link href={url} key={name}>
-          <a className="hover:bg-scale-300 dark:hover:bg-scale-500 col-span-6 rounded p-3 transition">
-            {content}
-          </a>
+        <Link
+          href={url}
+          key={name}
+          className="hover:bg-scale-300 dark:hover:bg-scale-500 col-span-6 rounded p-3 transition"
+        >
+          {content}
         </Link>
       )
     )
@@ -56,24 +58,25 @@ const Product = () => {
               }
               return (
                 <li className="flow-root" key={`flyout_case_${idx}`}>
-                  <Link href={customer.url}>
-                    <a className="dark:hover:bg-dark-700 flex items-center rounded-lg border p-3 transition duration-150 ease-in-out hover:bg-gray-100">
-                      <div className="relative hidden mx-2 h-12 w-32 flex-shrink-0 overflow-auto rounded-md sm:block">
-                        <Image
-                          src={`${basePath}/${customer.imgUrl}`}
-                          alt={customer.title}
-                          layout="fill"
-                          objectFit="contain"
-                          className="dark:brightness-200 dark:contrast-0 dark:filter"
-                        />
-                      </div>
-                      <div className="min-w-0 flex-1 sm:ml-4">
-                        <h4 className="text-scale-1200 text-normal mb-0 text-base">
-                          {customer.title}
-                        </h4>
-                        <p className="p text-sm !mb-0">{customer.description}</p>
-                      </div>
-                    </a>
+                  <Link
+                    href={customer.url}
+                    className="dark:hover:bg-dark-700 flex items-center rounded-lg border p-3 transition duration-150 ease-in-out hover:bg-gray-100"
+                  >
+                    <div className="relative hidden mx-2 h-12 w-32 flex-shrink-0 overflow-auto rounded-md sm:block">
+                      <Image
+                        src={`${basePath}/${customer.imgUrl}`}
+                        alt={customer.title}
+                        layout="fill"
+                        objectFit="contain"
+                        className="dark:brightness-200 dark:contrast-0 dark:filter"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1 sm:ml-4">
+                      <h4 className="text-scale-1200 text-normal mb-0 text-base">
+                        {customer.title}
+                      </h4>
+                      <p className="p text-sm !mb-0">{customer.description}</p>
+                    </div>
                   </Link>
                 </li>
               )
