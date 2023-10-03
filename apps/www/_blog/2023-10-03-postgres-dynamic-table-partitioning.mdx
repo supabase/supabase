@@ -31,7 +31,7 @@ When small projects get big, millions of rows can quickly grow to billions of ro
 
 ## Starting small but getting big
 
-A common growing pain for small startups is that they start their database model in a very simple and straightforward way, but then their popularity explodes and so does the amount of data they need to store. Postgres is good at handling millions of rows in a single table table, but often there is that one table in a system, the “Large Table”, that grows at a daily rate into hundreds of millions of rows.
+A common growing pain for small startups is that they start their database model in a very simple and straightforward way, but then their popularity explodes and so does the amount of data they need to store. Postgres is good at handling millions of rows in a single table, but often there is that one table in a system, the “Large Table”, that grows at a daily rate into hundreds of millions of rows.
 
 Partitioning is a simple solution, but for Postgres this usually requires setting up the partitions at the same time that you create your tables. The challenge is figuring out how to create the partitions _after_ you have millions of rows in your database, and how to migrate those existing rows into your new partitioning scheme with minimal downtime.
 
