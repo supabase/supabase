@@ -35,6 +35,7 @@ import {
 } from './NavigationBar.utils'
 import NavigationIconButton from './NavigationIconButton'
 import { useAppStateSnapshot } from 'state/app-state'
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 const NavigationBar = () => {
   const os = detectOS()
@@ -48,11 +49,12 @@ const NavigationBar = () => {
   const navLayoutV2 = useFlag('navigationLayoutV2')
   const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
   const showFeaturePreviews = useFlag('featurePreviews')
+  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
 
   const activeRoute = router.pathname.split('/')[3]
   const toolRoutes = generateToolRoutes(projectRef, project, supabaseAIEnabled)
   const productRoutes = generateProductRoutes(projectRef, project)
-  const otherRoutes = generateOtherRoutes(projectRef, project)
+  const otherRoutes = generateOtherRoutes(projectRef, project, isNewAPIDocsEnabled)
 
   return (
     <div
@@ -110,16 +112,35 @@ const NavigationBar = () => {
       </ul>
       {!navLayoutV2 && (
         <ul className="flex flex-col space-y-4 items-center">
-          <Button
-            type="text"
-            size="tiny"
-            onClick={() => snap.setShowProjectApiDocs(true)}
-            className="border-none"
-          >
-            <div className="py-1">
-              <IconFileText size={18} strokeWidth={2} className="text-foreground-lighter" />
-            </div>
-          </Button>
+          {isNewAPIDocsEnabled && (
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger asChild>
+                <Button
+                  type="text"
+                  size="tiny"
+                  onClick={() => snap.setShowProjectApiDocs(true)}
+                  className="border-none"
+                >
+                  <div className="py-1">
+                    <IconFileText size={18} strokeWidth={2} className="text-foreground-lighter" />
+                  </div>
+                </Button>
+              </Tooltip.Trigger>
+              <Tooltip.Portal>
+                <Tooltip.Content side="right">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded py-1 px-2 leading-none shadow text-xs',
+                      'border border-scale-200 flex items-center space-x-1',
+                    ].join(' ')}
+                  >
+                    Project API Docs
+                  </div>
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            </Tooltip.Root>
+          )}
           {IS_PLATFORM && (
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger asChild>

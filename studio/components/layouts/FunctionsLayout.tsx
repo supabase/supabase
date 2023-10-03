@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 import { Button, IconCode, IconExternalLink } from 'ui'
 
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreviewContext'
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import NoPermission from 'components/ui/NoPermission'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'

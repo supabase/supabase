@@ -7,7 +7,7 @@ import { useUsersQuery } from 'data/auth/users-query'
 import AddUserDropdown from './AddUserDropdown'
 import UsersList from './UsersList'
 import { useAppStateSnapshot } from 'state/app-state'
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreviewContext'
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 const Users = () => {
   const { project } = useProjectContext()

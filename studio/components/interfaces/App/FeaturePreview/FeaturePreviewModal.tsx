@@ -6,7 +6,7 @@ import { Button, IconEye, IconEyeOff, Modal, ScrollArea, cn } from 'ui'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import Telemetry from 'lib/telemetry'
 import { useAppStateSnapshot } from 'state/app-state'
-import { Markdown } from '../Markdown'
+import APISidePanelPreview from './APISidePanelPreview'
 import { useFeaturePreviewContext } from './FeaturePreviewContext'
 
 // [Ivan] We should probably move this to a separate file, together with LOCAL_STORAGE_KEYS. We should make adding new feature previews as simple as possible.
@@ -15,12 +15,12 @@ const FEATURE_PREVIEWS = [
   // {
   //   key: LOCAL_STORAGE_KEYS.UI_PREVIEW_NAVIGATION_LAYOUT,
   //   name: 'Global navigation update',
-  //   description: `Experience a redesigned and improved site navigation on the dashboard, with an intention to making finding your way around more intuitive and easier.`,
+  //   content: null
   // },
   {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
     name: 'Project API documentation',
-    description: `Get building with your client application faster with your Project's API documentation now available on any page across the dashboard.`,
+    content: <APISidePanelPreview />,
   },
 ]
 
@@ -52,13 +52,14 @@ const FeaturePreviewModal = () => {
     <Modal
       hideFooter
       size="xlarge"
+      className="max-w-4xl"
       header="Dashboard feature previews"
       visible={snap.showFeaturePreviewModal}
       onCancel={() => snap.setShowFeaturePreviewModal(false)}
     >
       <div className="flex">
         <div>
-          <ScrollArea className="h-[400px] w-[240px] border-r">
+          <ScrollArea className="h-[500px] w-[240px] border-r">
             {FEATURE_PREVIEWS.map((feature) => {
               const isEnabled = flags[feature.key] ?? false
 
@@ -82,14 +83,14 @@ const FeaturePreviewModal = () => {
             })}
           </ScrollArea>
         </div>
-        <div className="flex-grow p-4 space-y-3">
+        <div className="flex-grow max-h-[500px] p-4 space-y-3 overflow-y-auto">
           <div className="flex items-center justify-between">
             <p>{selectedFeature?.name}</p>
             <Button type="default" onClick={() => toggleFeature()}>
               {isSelectedFeatureEnabled ? 'Disable' : 'Enable'} feature
             </Button>
           </div>
-          <Markdown className="text-sm" content={selectedFeature?.description ?? ''} />
+          {selectedFeature?.content}
         </div>
       </div>
     </Modal>

@@ -17,7 +17,7 @@ const RPC = ({ language }: ContentProps) => {
 
   const rpcName = snap.activeDocsSection[1]
   const rpc = meta.openApi.data?.functions.find((fn) => fn.name === rpcName)
-  const rpcJsonSchema = jsonSchema.paths[rpc?.path]
+  const rpcJsonSchema = jsonSchema?.paths[rpc?.path]
 
   const summary = rpcJsonSchema?.post.summary
   const parameters = rpc?.get.parameters ?? []

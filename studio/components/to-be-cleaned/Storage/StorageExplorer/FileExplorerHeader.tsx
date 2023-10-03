@@ -36,7 +36,7 @@ import { useCheckPermissions } from 'hooks'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreviewContext'
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useAppStateSnapshot } from 'state/app-state'
 
 const VIEW_OPTIONS = [
