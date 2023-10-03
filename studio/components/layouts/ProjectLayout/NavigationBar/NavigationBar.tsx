@@ -11,15 +11,15 @@ import { useRouter } from 'next/router'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuGroup_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuLabel_Shadcn_,
-  DropdownMenuRadioGroup_Shadcn_,
-  DropdownMenuRadioItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   IconCommand,
   IconHome,
   IconSearch,
@@ -143,25 +143,25 @@ const NavigationBar = () => {
               </Tooltip.Portal>
             </Tooltip.Root>
           )}
-          <DropdownMenu_Shadcn_>
-            <DropdownMenuTrigger_Shadcn_>
+          <DropdownMenu>
+            <DropdownMenuTrigger>
               <Button asChild type="text" size="tiny">
                 <span className="py-1 h-10 border-none">
                   <IconUser size={18} strokeWidth={2} className="text-foreground-lighter" />
                 </span>
               </Button>
-            </DropdownMenuTrigger_Shadcn_>
-            <DropdownMenuContent_Shadcn_ side="right" align="start">
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="right" align="start">
               {IS_PLATFORM && (
                 <>
                   <Link href="/account/me">
-                    <DropdownMenuItem_Shadcn_ key="header" className="space-x-2">
+                    <DropdownMenuItem key="header" className="space-x-2">
                       <IconSettings size={14} strokeWidth={1.5} />
                       <p>Account preferences</p>
-                    </DropdownMenuItem_Shadcn_>
+                    </DropdownMenuItem>
                   </Link>
                   {showFeaturePreviews && (
-                    <DropdownMenuItem_Shadcn_
+                    <DropdownMenuItem
                       key="header"
                       className="space-x-2"
                       onClick={() => snap.setShowFeaturePreviewModal(true)}
@@ -169,30 +169,26 @@ const NavigationBar = () => {
                     >
                       <FlaskConical size={14} strokeWidth={2} />
                       <p className="text">Feature previews</p>
-                    </DropdownMenuItem_Shadcn_>
+                    </DropdownMenuItem>
                   )}
-                  <DropdownMenuSeparator_Shadcn_ />
+                  <DropdownMenuSeparator />
                 </>
               )}
-              <DropdownMenuLabel_Shadcn_>Theme</DropdownMenuLabel_Shadcn_>
-              <DropdownMenuGroup_Shadcn_>
-                <DropdownMenuRadioGroup_Shadcn_
+              <DropdownMenuLabel>Theme</DropdownMenuLabel>
+              <DropdownMenuGroup>
+                <DropdownMenuRadioGroup
                   value={theme}
                   onValueChange={(value) => {
                     setTheme(value)
                   }}
                 >
-                  <DropdownMenuRadioItem_Shadcn_ value={'system'}>
-                    System
-                  </DropdownMenuRadioItem_Shadcn_>
-                  <DropdownMenuRadioItem_Shadcn_ value={'dark'}>Dark</DropdownMenuRadioItem_Shadcn_>
-                  <DropdownMenuRadioItem_Shadcn_ value={'light'}>
-                    Light
-                  </DropdownMenuRadioItem_Shadcn_>
-                </DropdownMenuRadioGroup_Shadcn_>
-              </DropdownMenuGroup_Shadcn_>
-            </DropdownMenuContent_Shadcn_>
-          </DropdownMenu_Shadcn_>
+                  <DropdownMenuRadioItem value={'system'}>System</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value={'dark'}>Dark</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value={'light'}>Light</DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </ul>
       )}
     </div>

@@ -1,11 +1,11 @@
 import { useRouter } from 'next/router'
 import {
   Badge,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuLabel_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
   IconChevronDown,
 } from 'ui'
 import { REFERENCES } from './Navigation/NavigationMenu/NavigationMenu.constants'
@@ -36,8 +36,8 @@ const RevVersionDropdown = () => {
   }
 
   return (
-    <DropdownMenu_Shadcn_>
-      <DropdownMenuTrigger_Shadcn_>
+    <DropdownMenu>
+      <DropdownMenuTrigger>
         <div
           className="
           group
@@ -57,11 +57,11 @@ const RevVersionDropdown = () => {
           </span>
           <IconChevronDown size={14} strokeWidth={2} />
         </div>
-      </DropdownMenuTrigger_Shadcn_>
-      <DropdownMenuContent_Shadcn_ align="start" side="bottom" className="w-48">
-        <DropdownMenuLabel_Shadcn_ className="text-xs">Stable releases</DropdownMenuLabel_Shadcn_>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" side="bottom" className="w-48">
+        <DropdownMenuLabel className="text-xs">Stable releases</DropdownMenuLabel>
         {versions.map((version, index) => (
-          <DropdownMenuItem_Shadcn_
+          <DropdownMenuItem
             key={version}
             onClick={() => onSelectVersion(version)}
             className="justify-between flex"
@@ -70,10 +70,10 @@ const RevVersionDropdown = () => {
               Version {version}.0
             </span>
             {index === 0 && <Badge size="small">Latest</Badge>}
-          </DropdownMenuItem_Shadcn_>
+          </DropdownMenuItem>
         ))}
-      </DropdownMenuContent_Shadcn_>
-    </DropdownMenu_Shadcn_>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
 export default RevVersionDropdown
