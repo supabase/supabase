@@ -12,8 +12,8 @@ import { DefaultSeo } from 'next-seo'
 import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from 'lib/constants'
 import Meta from '~/components/Favicons'
 import { post } from '~/lib/fetchWrapper'
-import PortalToast from 'ui/src/layout/PortalToast'
-import { AuthProvider, ThemeProvider, useConsent, useTelemetryProps } from 'common'
+import { PortalToast, useConsent } from 'ui'
+import { AuthProvider, ThemeProvider, useTelemetryProps } from 'common'
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()

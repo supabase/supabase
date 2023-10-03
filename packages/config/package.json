@@ -17,5 +17,9 @@
     "tailwindcss-radix": "^2.0.0",
     "@tailwindcss/typography": "^0.5.9",
     "mini-svg-data-uri": "^1.4.3"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.1.8",
+    "tailwindcss-animate": "^1.0.6"
   }
 }
