@@ -1,19 +1,12 @@
-import { useState } from 'react'
-import {
-  AreaChart as RechartAreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts'
-import dayjs from 'dayjs'
 import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
-import ChartHeader from './ChartHeader'
-import { Datum, CommonChartProps } from './Charts.types'
+import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import ChartNoData from './NoDataPlaceholder'
+import { useState } from 'react'
+import { Area, AreaChart as RechartAreaChart, Tooltip, XAxis } from 'recharts'
+import ChartHeader from './ChartHeader'
+import { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
+import ChartNoData from './NoDataPlaceholder'
 dayjs.extend(utc)
 
 export interface AreaChartProps<D = Datum> extends CommonChartProps<D> {
@@ -24,7 +17,7 @@ export interface AreaChartProps<D = Datum> extends CommonChartProps<D> {
   displayDateInUtc?: boolean
 }
 
-const AreaChart: React.FC<AreaChartProps> = ({
+const AreaChart = ({
   data,
   yAxisKey,
   xAxisKey,
@@ -36,8 +29,9 @@ const AreaChart: React.FC<AreaChartProps> = ({
   displayDateInUtc,
   minimalHeader,
   className = '',
+  valuePrecision,
   size = 'normal',
-}) => {
+}: AreaChartProps) => {
   const { Container } = useChartSize(size)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
@@ -62,7 +56,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
         customDateFormat={customDateFormat}
         highlightedValue={
           typeof resolvedHighlightedValue === 'number'
-            ? numberFormatter(resolvedHighlightedValue)
+            ? numberFormatter(resolvedHighlightedValue, valuePrecision)
             : resolvedHighlightedValue
         }
         highlightedLabel={resolvedHighlightedLabel}
@@ -113,7 +107,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
         </RechartAreaChart>
       </Container>
       {data && (
-        <div className="text-scale-900 -mt-2 flex items-center justify-between text-xs">
+        <div className="text-foreground-lighter -mt-2 flex items-center justify-between text-xs">
           <span>{dayjs(data[0][xAxisKey]).format(customDateFormat)}</span>
           <span>{dayjs(data[data?.length - 1]?.[xAxisKey]).format(customDateFormat)}</span>
         </div>

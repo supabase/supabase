@@ -1,52 +1,67 @@
-import dayjs from 'dayjs'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import { format } from 'date-fns'
+import dayjs from 'dayjs'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 import DatePicker from 'react-datepicker'
-import { Button, Modal, IconChevronLeft, IconChevronRight, IconHelpCircle, Alert } from 'ui'
-import * as Tooltip from '@radix-ui/react-tooltip'
+import { Alert, Button, IconChevronLeft, IconChevronRight, IconHelpCircle, Modal } from 'ui'
 
-import { useParams } from 'common'
-import { useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { FormHeader, FormPanel } from 'components/ui/Forms'
 import InformationBox from 'components/ui/InformationBox'
-import TimeInput from './TimeInput'
-import TimezoneSelection from './TimezoneSelection'
+import { useBackupsQuery } from 'data/database/backups-query'
+import { usePitrRestoreMutation } from 'data/database/pitr-restore-mutation'
+import { setProjectStatus } from 'data/projects/projects-query'
+import { PROJECT_STATUS } from 'lib/constants'
+import BackupsEmpty from '../BackupsEmpty'
 import { Timezone } from './PITR.types'
-import PITRStatus from './PITRStatus'
 import {
   constrainDateToRange,
   formatNumberToTwoDigits,
   getClientTimezone,
   getDatesBetweenRange,
 } from './PITR.utils'
-import { useRouter } from 'next/router'
-import BackupsEmpty from '../BackupsEmpty'
+import PITRStatus from './PITRStatus'
+import TimeInput from './TimeInput'
+import TimezoneSelection from './TimezoneSelection'
 
-const PITRSelection = ({}) => {
+const PITRSelection = () => {
   const router = useRouter()
   const { ref } = useParams()
+  const queryClient = useQueryClient()
 
-  const { app, ui, backups } = useStore()
-  const projectId = ui.selectedProject?.id ?? -1
-
+  const { data: backups } = useBackupsQuery({ projectRef: ref })
+  const [showConfiguration, setShowConfiguration] = useState(false)
+  const [showConfirmation, setShowConfirmation] = useState(false)
   const [selectedTimezone, setSelectedTimezone] = useState<Timezone>(getClientTimezone())
 
+  const {
+    mutate: restoreFromPitr,
+    isLoading: isRestoring,
+    isSuccess: isSuccessPITR,
+  } = usePitrRestoreMutation({
+    onSuccess: (res, variables) => {
+      setTimeout(() => {
+        setShowConfirmation(false)
+        setProjectStatus(queryClient, variables.ref, PROJECT_STATUS.RESTORING)
+        router.push(`/project/${variables.ref}`)
+      }, 3000)
+    },
+  })
+
   const { earliestPhysicalBackupDateUnix, latestPhysicalBackupDateUnix } =
-    backups?.configuration?.physicalBackupData ?? {}
+    backups?.physicalBackupData ?? {}
   const hasNoBackupsAvailable = !earliestPhysicalBackupDateUnix || !latestPhysicalBackupDateUnix
   const earliestAvailableBackup = dayjs
-    .unix(earliestPhysicalBackupDateUnix)
+    .unix(earliestPhysicalBackupDateUnix ?? 0)
     .tz(selectedTimezone.utc[0])
-  const latestAvailableBackup = dayjs.unix(latestPhysicalBackupDateUnix).tz(selectedTimezone.utc[0])
+  const latestAvailableBackup = dayjs
+    .unix(latestPhysicalBackupDateUnix ?? 0)
+    .tz(selectedTimezone.utc[0])
 
   const [selectedDateRaw, setSelectedDateRaw] = useState<Date>(latestAvailableBackup.toDate())
   const selectedDate = dayjs(selectedDateRaw).tz(selectedTimezone.utc[0], true) // true to keep local time and just change +whatever
-
-  const [showConfiguration, setShowConfiguration] = useState(false)
-  const [showConfirmation, setShowConfirmation] = useState(false)
-  const [isRestoring, setIsRestoring] = useState(false)
 
   const isSelectedOnEarliestDay = selectedDate.isSame(earliestAvailableBackup, 'day')
   const isSelectedOnLatestDay = selectedDate.isSame(latestAvailableBackup, 'day')
@@ -96,28 +111,9 @@ const PITRSelection = ({}) => {
   }
 
   const onConfirmRestore = async () => {
-    if (!recoveryTimeTargetUnix) return
-
-    setIsRestoring(true)
-    const projectRef = ref as string
-    const { error } = await post(`${API_URL}/database/${projectRef}/backups/pitr`, {
-      recovery_time_target_unix: recoveryTimeTargetUnix,
-    })
-
-    if (error) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to start restoration: ${error.message}`,
-      })
-      setIsRestoring(false)
-    } else {
-      setTimeout(() => {
-        setShowConfirmation(false)
-        app.onProjectStatusUpdated(projectId, PROJECT_STATUS.RESTORING)
-        router.push(`/project/${projectRef}`)
-      }, 3000)
-    }
+    if (!ref) return console.error('Project ref is required')
+    if (!recoveryTimeTargetUnix) return console.error('Recovery time target unix is required')
+    restoreFromPitr({ ref, recovery_time_target_unix: recoveryTimeTargetUnix })
   }
 
   return (
@@ -145,9 +141,8 @@ const PITRSelection = ({}) => {
                     Cancel
                   </Button>
                   <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger>
+                    <Tooltip.Trigger asChild>
                       <Button
-                        as="span"
                         type="warning"
                         disabled={isSelectedOutOfRange || !selectedDate}
                         onClick={() => setShowConfirmation(true)}
@@ -165,7 +160,7 @@ const PITRSelection = ({}) => {
                               'border-scale-200 border w-48 text-center',
                             ].join(' ')}
                           >
-                            <span className="text-scale-1200 text-xs">
+                            <span className="text-foreground text-xs">
                               Selected date is out of range where backups are available
                             </span>
                           </div>
@@ -201,12 +196,12 @@ const PITRSelection = ({}) => {
                             type="button"
                             className={`
                             ${prevMonthButtonDisabled && 'cursor-not-allowed opacity-50'}
-                            text-scale-1100 hover:text-scale-1200 focus:outline-none
+                            text-foreground-light hover:text-foreground focus:outline-none
                         `}
                           >
                             <IconChevronLeft size={16} strokeWidth={2} />
                           </button>
-                          <span className="text-scale-1100 text-sm">
+                          <span className="text-foreground-light text-sm">
                             {format(date, 'MMMM yyyy')}
                           </span>
                           <button
@@ -215,7 +210,7 @@ const PITRSelection = ({}) => {
                             type="button"
                             className={`
                             ${nextMonthButtonDisabled && 'cursor-not-allowed opacity-50'}
-                            text-scale-1100 hover:text-scale-1200 focus:outline-none
+                            text-foreground-light hover:text-foreground focus:outline-none
                         `}
                           >
                             <IconChevronRight size={16} strokeWidth={2} />
@@ -226,7 +221,7 @@ const PITRSelection = ({}) => {
                   />
                   <div className="flex items-center space-x-2">
                     <div className="border w-4 h-4 border-scale-800 bg-brand-600" />
-                    <p className="text-xs text-scale-1000">Point in time back up available</p>
+                    <p className="text-xs text-foreground-light">Point in time back up available</p>
                   </div>
                 </div>
 
@@ -245,7 +240,7 @@ const PITRSelection = ({}) => {
                   ) : (
                     <div className="space-y-8 py-2">
                       <div className="space-y-1">
-                        <p className="text-sm text-scale-1100">Restore database to</p>
+                        <p className="text-sm text-foreground-light">Restore database to</p>
                         <p className="text-3xl">
                           <span>{dayjs(selectedDate).format('DD MMM YYYY')}</span>
                           <span>
@@ -257,7 +252,7 @@ const PITRSelection = ({}) => {
                       </div>
                       <div className="space-y-2">
                         <div className="space-y-1">
-                          <p className="text-sm text-scale-1100">Time zone</p>
+                          <p className="text-sm text-foreground-light">Time zone</p>
                           <div className="w-[350px]">
                             <TimezoneSelection
                               hideLabel
@@ -269,7 +264,7 @@ const PITRSelection = ({}) => {
                         </div>
                         <div>
                           <div className="space-y-1">
-                            <p className="text-sm text-scale-1100">Recovery time</p>
+                            <p className="text-sm text-foreground-light">Recovery time</p>
                             <TimeInput
                               defaultTime={selectedTime}
                               minimumTime={
@@ -289,7 +284,7 @@ const PITRSelection = ({}) => {
                             />
                           </div>
 
-                          <p className="text-sm text-scale-1000 mt-8">
+                          <p className="text-sm text-foreground-light mt-8">
                             Enter a time within the available range to restore from. <br /> Backups
                             are captured every 2 minutes, allowing you to enter a time and restore
                             your database to the closest backup point. We'll match the time you
@@ -297,15 +292,15 @@ const PITRSelection = ({}) => {
                           </p>
                         </div>
                         <div className="!mt-4 space-y-1">
-                          <h3 className="text-sm text-scale-1100"></h3>
+                          <h3 className="text-sm text-foreground-light"></h3>
                           {isSelectedOnEarliestDay && (
-                            <p className="text-sm text-scale-1000">
+                            <p className="text-sm text-foreground-light">
                               <strong>Earliest backup available for this date</strong>:{' '}
                               {earliestAvailableBackup.format('HH:mm:ss')}
                             </p>
                           )}
                           {isSelectedOnLatestDay && (
-                            <p className="text-sm text-scale-1000">
+                            <p className="text-sm text-foreground-light">
                               <strong>Latest backup available for this date</strong>:{' '}
                               {latestAvailableBackup.format('HH:mm:ss')}
                             </p>
@@ -330,15 +325,15 @@ const PITRSelection = ({}) => {
           <div className="flex items-center justify-end space-x-2">
             <Button
               type="default"
-              disabled={isRestoring}
+              disabled={isRestoring || isSuccessPITR}
               onClick={() => setShowConfirmation(false)}
             >
               Cancel
             </Button>
             <Button
               type="warning"
-              disabled={isRestoring}
-              loading={isRestoring}
+              disabled={isRestoring || isSuccessPITR}
+              loading={isRestoring || isSuccessPITR}
               onClick={onConfirmRestore}
             >
               I understand, begin restore
@@ -349,15 +344,17 @@ const PITRSelection = ({}) => {
         <div className="space-y-4 py-3">
           <Modal.Content>
             <div className="py-2 space-y-1">
-              <p className="text-sm text-scale-1100">Your database will be restored to:</p>
+              <p className="text-sm text-foreground-light">Your database will be restored to:</p>
             </div>
             <div className="py-2 flex flex-col gap-3">
               <div>
-                <p className="text-sm font-mono text-scale-900">{selectedTimezone?.text}</p>
+                <p className="text-sm font-mono text-foreground-lighter">
+                  {selectedTimezone?.text}
+                </p>
                 <p className="text-2xl">{recoveryTimeString}</p>
               </div>
               <div>
-                <p className="text-sm font-mono text-scale-900">(UTC+00:00)</p>
+                <p className="text-sm font-mono text-foreground-lighter">(UTC+00:00)</p>
                 <p className="text-2xl">{recoveryTimeStringUtc}</p>
               </div>
             </div>
@@ -375,7 +372,7 @@ const PITRSelection = ({}) => {
           </Modal.Content>
           <Modal.Separator />
           <Modal.Content>
-            <p className="text-sm text-scale-1100">
+            <p className="text-sm text-foreground-light">
               Restores may take from a few minutes up to several hours depending on the size of your
               database. During this period, your project will not be available, until the
               restoration is completed.

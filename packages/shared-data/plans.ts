@@ -3,10 +3,12 @@ export interface PricingInformation {
   name: string
   nameBadge?: string
   costUnit?: string
+  costUnitOrg?: string
   href: string
   priceLabel?: string
   priceMonthly: number | string
   warning?: string
+  warningLegacy?: string
   description: string
   preface: string
   features: string[]
@@ -19,11 +21,13 @@ export const plans: PricingInformation[] = [
     id: 'tier_free',
     name: 'Free',
     nameBadge: '',
-    costUnit: '/ month',
-    href: 'https://supabase.com/dashboard/new/new-project',
+    costUnit: '/ month / project',
+    costUnitOrg: '/ month / org',
+    href: 'https://supabase.com/dashboard/new?plan=free',
     priceLabel: '',
     priceMonthly: 0,
-    warning: 'Limit of 2 free projects',
+    warning: 'Limit of 2 free organizations',
+    warningLegacy: 'Limit of 2 free projects',
     description: 'Perfect for passion projects & simple websites.',
     preface: 'Get started with:',
     features: [
@@ -31,7 +35,7 @@ export const plans: PricingInformation[] = [
       'Social OAuth providers',
       'Up to 500MB database space',
       'Up to 1GB file storage',
-      'Up to 2GB bandwidth',
+      'Up to 5GB bandwidth',
       'Up to 50MB file uploads',
       'Up to 50,000 monthly active users',
       'Up to 500K Edge Function invocations',
@@ -47,10 +51,12 @@ export const plans: PricingInformation[] = [
     id: 'tier_pro',
     name: 'Pro',
     nameBadge: '',
-    costUnit: '/ month',
-    href: 'https://supabase.com/dashboard/new/new-project',
+    costUnit: '/ month / project',
+    costUnitOrg: '/ month / org',
+    href: 'https://supabase.com/dashboard/new?plan=pro',
     priceLabel: 'From',
     warning: 'Usage-based plan',
+    warningLegacy: 'Usage-based plan',
     priceMonthly: 25,
     description: 'For production applications with the option to scale.',
     features: [
@@ -58,7 +64,7 @@ export const plans: PricingInformation[] = [
       'Daily backups stored for 7 days',
       '8GB database space included',
       '100GB file storage included',
-      '50GB bandwidth included',
+      '250GB bandwidth included',
       '5GB file uploads included',
       '100,000 monthly active users included',
       '2M Edge Function invocations included',
@@ -67,8 +73,7 @@ export const plans: PricingInformation[] = [
       '7-day log retention',
       'Email support',
     ],
-    footer:
-      'Your cost control settings determine if you allow over-usage.',
+    footer: 'Your cost control settings determine if you allow over-usage.',
     preface: 'Everything in the Free plan, plus:',
     cta: 'Get Started',
   },
@@ -76,10 +81,12 @@ export const plans: PricingInformation[] = [
     id: 'tier_team',
     name: 'Team',
     nameBadge: 'New',
-    costUnit: '/ month',
-    href: 'https://forms.supabase.com/team',
+    costUnit: '/ month / project',
+    costUnitOrg: '/ month / org',
+    href: 'https://supabase.com/dashboard/new?plan=team',
     priceLabel: 'From',
     warning: 'Usage-based plan',
+    warningLegacy: 'Usage-based plan',
     priceMonthly: 599,
     description: 'Collaborate with different permissions and access patterns.',
     features: [
@@ -87,13 +94,14 @@ export const plans: PricingInformation[] = [
       'Daily backups stored for 14 days',
       'Standardised Security Questionnaire',
       'SOC2',
+      'HIPAA available as paid add-on',
       'SSO for Supabase Dashboard',
       'Priority email support & SLAs',
       '28-day log retention',
     ],
     footer: 'Additional fees apply for usage beyond included usage.',
     preface: 'Everything in the Pro plan, plus:',
-    cta: 'Contact Us',
+    cta: 'Get Started',
   },
   {
     id: 'tier_enterprise',
@@ -102,10 +110,10 @@ export const plans: PricingInformation[] = [
     description: 'For large-scale applications managing serious workloads.',
     features: [
       `Designated Support manager & SLAs`,
-      `Enterprise OAuth providers`,
       `SSO/SAML`,
       `On-premise support`,
       `24×7×365 premium enterprise support`,
+      'Custom Security Questionnaires',
       `Private Slack channel`,
     ],
     priceLabel: '',

@@ -1,6 +1,6 @@
 <p align="center">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--light.svg#gh-light-mode-only">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--dark.svg#gh-dark-mode-only">
+<img src="https://user-images.githubusercontent.com/8291514/213727234-cda046d6-28c6-491a-b284-b86c5cede25d.png#gh-light-mode-only">
+<img src="https://user-images.githubusercontent.com/8291514/213727225-56186826-bee8-43b5-9b15-86e839d89393.png#gh-dark-mode-only">
 </p>
 
 ---
@@ -12,9 +12,9 @@
 - [x] ஹோஸ்ட் செய்யப்பட்ட பூஸ்ட்ஜீஆர்இஎஸ் தரவுத்தளம். [ஆவணம்](https://supabase.com/docs/guides/database)
 - [x] அங்கீகாரம் மற்றும் அங்கீகாரம்.. [ஆவணம்](https://supabase.com/docs/guides/auth)
 - [x] தானாக உருவாக்கப்பட்ட ஏபிஐ கள்.
-  - [x] ராஸ்ட். [ஆவணம்](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] நிகழ்நேர சந்தாக்கள். [ஆவணம்](https://supabase.com/docs/guides/database/api#realtime-api)
-  - [x] கிராப்க்யூஎல் (பீட்டா). [ஆவணம்](https://supabase.com/docs/guides/database/api#graphql-api)
+  - [x] ராஸ்ட். [ஆவணம்](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] நிகழ்நேர சந்தாக்கள். [ஆவணம்](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] கிராப்க்யூஎல் (பீட்டா). [ஆவணம்](https://supabase.com/docs/guides/api#graphql-api-overview)
 - [x] செயல்பாடுகள்.
   - [x] தரவுத்தளம் செயல்பாடுகள். [ஆவணம்](https://supabase.com/docs/guides/database/functions)
   - [x] விளிம்பு செயல்பாடுகள் [ஆவணம்](https://supabase.com/docs/guides/functions)
@@ -39,7 +39,7 @@
 ## நிலை
 
 - [x] ஆல்ஃபா: நாங்கள் வாடிக்கையாளர்களின் மூடிய தொகுப்புடன் சுபாபேஸை சோதிக்கிறோம்
-- [x] பொது ஆல்ஃபா: எவரும் [app.supabase.com](https://app.supabase.com) இல் பதிவு செய்யலாம், ஆனால் எங்களுக்கு எளிதாக செல்லுங்கள், ஒரு சில கின்க்ஸ் உள்ளன
+- [x] பொது ஆல்ஃபா: எவரும் [supabase.com/dashboard](https://supabase.com/dashboard) இல் பதிவு செய்யலாம், ஆனால் எங்களுக்கு எளிதாக செல்லுங்கள், ஒரு சில கின்க்ஸ் உள்ளன
 - [x] பொது பீட்டா: பெரும்பாலான அல்லாத நிறுவன பயன்பாட்டு-வழக்குகளுக்கு போதுமான நிலையானது
 - [ ] பொது: உற்பத்தி-தயார்
 
@@ -55,10 +55,10 @@
 
 **கட்டிடக்கலை**
 
-சுபாபேஸ் ஒரு [ஹோஸ்ட் செய்யப்பட்ட தளம்](https://app.supabase.com). எதையும் நிறுவாமல் நீங்கள் பதிவுசெய்து Supabase ஐப் பயன்படுத்தத் தொடங்கலாம்.
+சுபாபேஸ் ஒரு [ஹோஸ்ட் செய்யப்பட்ட தளம்](https://supabase.com/dashboard). எதையும் நிறுவாமல் நீங்கள் பதிவுசெய்து Supabase ஐப் பயன்படுத்தத் தொடங்கலாம்.
 நீங்கள் [சுய ஹோஸ்ட்](https://supabase.com/docs/guides/hosting/overview) மற்றும் [உள்நாட்டில் உருவாக்க](https://supabase.com/docs/guides/local-development) ஆகியவற்றையும் செய்யலாம்.
 
-![கட்டிடக்கலை](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
+![கட்டிடக்கலை](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [பூஸ்ட்ஜீஆர்இஎஸ்கியூஎல்](https://www.postgresql.org/) என்பது 30 ஆண்டுகளுக்கும் மேலான செயலில் உள்ள வளர்ச்சியுடன் கூடிய ஒரு பொருள்-தொடர்புடைய தரவுத்தள அமைப்பாகும், இது நம்பகத்தன்மை, அம்ச உறுதிப்பாடு மற்றும் செயல்திறனுக்கான வலுவான நற்பெயரைப் பெற்றுள்ளது.
 - [நிகழ்நேரம்](https://github.com/supabase/realtime) என்பது ஒரு எலிக்சர் சேவையகமாகும், இது வெப்சாக்கெட்டுகளைப் பயன்படுத்தி பூஸ்ட்ஜீஆர்இஎஸ்கியூஎல் செருகல்கள், புதுப்பிப்புகள் மற்றும் நீக்குதல்களைக் கேட்க உங்களை அனுமதிக்கிறது. நிகழ்நேர கருத்துக் கணிப்புகள் தரவுத்தள மாற்றங்களுக்கான போஸ்ட்கிரஸின் உள்ளமைக்கப்பட்ட பிரதிபலிப்பு செயல்பாடு, ஜே.எஸ்.ஆனுக்கு மாற்றங்களை மாற்றுகிறது, பின்னர் அங்கீகரிக்கப்பட்ட வாடிக்கையாளர்களுக்கு வெப்சாக்கெட்டுகள் மூலம் ஜே.எஸ்.என் ஐ ஒளிபரப்புகிறது.

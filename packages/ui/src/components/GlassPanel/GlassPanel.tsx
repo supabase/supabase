@@ -1,4 +1,4 @@
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 import * as React from 'react'
 import Image from 'next/image'
 
@@ -29,15 +29,17 @@ const GlassPanel = ({
   showLink = false,
   showIconBg = false,
 }: Props) => {
-  const { isDarkMode } = useTheme()
-  const showLogoInverse = logoInverse && isDarkMode
+  const { resolvedTheme } = useTheme()
+  const showLogoInverse = logoInverse && resolvedTheme === 'dark'
   const showLogo = !showLogoInverse && logo
 
   const IconBackground: React.FC = (props) => (
     <div
       className={[
         'shrink-0',
-        showIconBg ? 'bg-green-600 w-8 h-8 flex items-center justify-center rounded' : '',
+        showIconBg
+          ? 'bg-brand-300 border border-brand-400 w-8 h-8 flex items-center justify-center rounded'
+          : '',
       ].join(' ')}
     >
       {props.children}
@@ -104,7 +106,7 @@ const GlassPanel = ({
               <img
                 className="w-5"
                 alt={title}
-                src={`${icon}${hasLightIcon && !isDarkMode ? '-light' : ''}.svg`}
+                src={`${icon}${hasLightIcon && resolvedTheme !== 'dark' ? '-light' : ''}.svg`}
               />
             </IconBackground>
           ) : (
@@ -114,7 +116,7 @@ const GlassPanel = ({
         </div>
 
         {children && <span className="text-sm text-scale-1100 flex-grow">{children}</span>}
-        {showLink && <span className="text-brand-900 justify-end text-sm">Learn more</span>}
+        {showLink && <span className="text-brand justify-end text-sm">Learn more</span>}
       </div>
     </div>
   )

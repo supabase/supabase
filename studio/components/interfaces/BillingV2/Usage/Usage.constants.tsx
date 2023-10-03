@@ -49,11 +49,11 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
     attributes: [
       {
         anchor: 'cpu',
-        key: 'cpu_usage',
-        attribute: 'cpu_usage',
+        key: 'max_cpu_usage',
+        attribute: 'max_cpu_usage',
         name: 'CPU',
         unit: 'percentage',
-        description: 'CPU usage of your server',
+        description: 'Max CPU usage of your server',
         chartDescription: '',
         links: [
           {
@@ -81,6 +81,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
             name: 'Compute Add-Ons',
             url: 'https://supabase.com/docs/guides/platform/compute-add-ons',
           },
+          { name: 'High RAM Usage', url: 'https://supabase.com/docs/guides/platform/exhaust-ram' },
           {
             name: 'Metrics',
             url: 'https://supabase.com/docs/guides/platform/metrics',
@@ -188,13 +189,13 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
                   </a>
                 </Link>
               </div>
-              <p className="text-sm text-scale-1000 mt-3">
+              <p className="text-sm text-foreground-light mt-3">
                 If you reach 95% of the disk space, your project will enter read-only mode. Your
                 disk storage expands automatically when the database reaches 90% of the disk size.
                 The disk is expanded to be 50% larger. Auto-scaling can only take place once every 6
                 hours. You can also{' '}
                 <Link passHref href={`/project/${ref}/settings/database#diskManagement`}>
-                  <a className="text-brand-900 transition hover:text-brand-1000">preprovision</a>
+                  <a className="text-brand transition hover:text-brand-600">preprovision</a>
                 </Link>{' '}
                 disk for loading larger amounts of data.
               </p>
@@ -228,7 +229,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         key: 'storage_size',
         attribute: 'total_storage_size_bytes',
         name: 'Storage Size',
-        chartPrefix: 'Max ',
+        chartPrefix: 'Average ',
         unit: 'bytes',
         description:
           'Sum of all objects in your storage buckets.\nBilling is based on the average daily size in GB throughout your billing period.',
@@ -361,69 +362,3 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
     ],
   },
 ]
-
-// [Joshen] Ideally live in common package for www as well
-export const COMPUTE_INSTANCE_SPECS: {
-  [key: string]: { maxBandwidth: number; baseBandwidth: number; memoryGb: number; cpuCores: number }
-} = {
-  addon_instance_micro: {
-    memoryGb: 1,
-    cpuCores: 2,
-    maxBandwidth: 2085,
-    baseBandwidth: 87,
-  },
-  addon_instance_small: {
-    memoryGb: 2,
-    cpuCores: 2,
-    maxBandwidth: 2085,
-    baseBandwidth: 174,
-  },
-  addon_instance_medium: {
-    memoryGb: 4,
-    cpuCores: 2,
-    maxBandwidth: 2085,
-    baseBandwidth: 347,
-  },
-  addon_instance_large: {
-    memoryGb: 8,
-    cpuCores: 2,
-    maxBandwidth: 4750,
-    baseBandwidth: 630,
-  },
-  addon_instance_xlarge: {
-    memoryGb: 16,
-    cpuCores: 4,
-    maxBandwidth: 4750,
-    baseBandwidth: 1188,
-  },
-  addon_instance_xxlarge: {
-    memoryGb: 32,
-    cpuCores: 8,
-    maxBandwidth: 4750,
-    baseBandwidth: 2375,
-  },
-  addon_instance_4xlarge: {
-    memoryGb: 64,
-    cpuCores: 16,
-    maxBandwidth: 4750,
-    baseBandwidth: 4750,
-  },
-  addon_instance_8xlarge: {
-    memoryGb: 128,
-    cpuCores: 32,
-    maxBandwidth: 9500,
-    baseBandwidth: 9500,
-  },
-  addon_instance_12xlarge: {
-    memoryGb: 192,
-    cpuCores: 48,
-    maxBandwidth: 14250,
-    baseBandwidth: 14250,
-  },
-  addon_instance_16xlarge: {
-    memoryGb: 256,
-    cpuCores: 64,
-    maxBandwidth: 19000,
-    baseBandwidth: 19000,
-  },
-}

@@ -1,7 +1,10 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
+
 import { Query, SupaTable } from 'components/grid'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
+import { ResponseError } from 'types'
 
 export type TableRowUpdateVariables = {
   projectRef: string
@@ -44,22 +47,28 @@ type TableRowUpdateData = Awaited<ReturnType<typeof updateTableRow>>
 
 export const useTableRowUpdateMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
-  UseMutationOptions<TableRowUpdateData, unknown, TableRowUpdateVariables>,
+  UseMutationOptions<TableRowUpdateData, ResponseError, TableRowUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<TableRowUpdateData, unknown, TableRowUpdateVariables>(
+  return useMutation<TableRowUpdateData, ResponseError, TableRowUpdateVariables>(
     (vars) => updateTableRow(vars),
     {
       async onSuccess(data, variables, context) {
         const { projectRef, table } = variables
-
         await queryClient.invalidateQueries(sqlKeys.query(projectRef, [table.schema, table.name]))
-
         await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to update table row: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
       },
       ...options,
     }

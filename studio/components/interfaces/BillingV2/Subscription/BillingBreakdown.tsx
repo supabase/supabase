@@ -1,24 +1,20 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
 import clsx from 'clsx'
 import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import SparkBar from 'components/ui/SparkBar'
 import { useUpcomingInvoiceQuery } from 'data/invoices/invoice-upcoming-query'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import {
-  ProjectUsageResponse,
-  UsageMetric,
-  useProjectUsageQuery,
-} from 'data/usage/project-usage-query'
+import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 import dayjs from 'dayjs'
 import { USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { partition } from 'lodash'
+import Link from 'next/link'
 import { useState } from 'react'
+import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, Collapsible, IconAlertTriangle, IconChevronRight, IconInfo } from 'ui'
 import { BILLING_BREAKDOWN_METRICS } from './Subscription.constants'
-import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
-import Link from 'next/link'
-import * as Tooltip from '@radix-ui/react-tooltip'
 
 export interface BillingBreakdownProps {}
 
@@ -62,7 +58,7 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
       <div className="col-span-12 lg:col-span-5">
         <div className="sticky top-16">
           <p className="text-base">Billing breakdown</p>
-          <p className="text-sm text-scale-1000">
+          <p className="text-sm text-foreground-light">
             Current billing cycle: {billingCycleStart.format('MMM DD')} -{' '}
             {billingCycleEnd.format('MMM DD')}
           </p>
@@ -78,16 +74,16 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
         <div className="col-span-12 lg:col-span-7 space-y-6">
           <p className="text-sm">Included usage summary</p>
           {isUsageBillingEnabled ? (
-            <p className="text-sm text-scale-1000">
+            <p className="text-sm text-foreground-light">
               Your plan includes a limited amount of usage. If the usage on your project exceeds
-              these quotas, your subscription will be charged for the overage. It may take up to 24
+              these quotas, your subscription will be charged for the overages. It may take up to 24
               hours for usage stats to update.
             </p>
           ) : (
-            <p className="text-sm text-scale-1000">
+            <p className="text-sm text-foreground-light">
               Your plan includes a limited amount of usage. If the usage on your project exceeds
               these quotas, you may experience restrictions, as you are currently not billed for
-              overage. It may take up to 24 hours for usage stats to update.
+              overages. It may take up to 24 hours for usage stats to update.
             </p>
           )}
 
@@ -127,22 +123,18 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
           ) : (
             <div className="grid grid-cols-12">
               {BILLING_BREAKDOWN_METRICS.map((metric, i) => {
-                const usageMeta =
-                  (usage?.[metric.key as keyof ProjectUsageResponse] as UsageMetric) ?? undefined
-                const usageRatio =
-                  typeof usageMeta !== 'number'
-                    ? (usageMeta?.usage ?? 0) / (usageMeta?.limit ?? 0)
-                    : 0
+                const usageMeta = usage?.[metric.key]
+                const usageRatio = (usageMeta?.usage ?? 0) / (usageMeta?.limit ?? 0)
 
-                const hasLimit = usageMeta.limit > 0
+                const hasLimit = (usageMeta?.limit ?? 0) > 0
                 const usageCurrentLabel =
                   metric.units === 'bytes'
-                    ? formatBytes(usageMeta.usage)
-                    : usageMeta.usage?.toLocaleString()
+                    ? formatBytes(usageMeta?.usage)
+                    : usageMeta?.usage?.toLocaleString()
                 const usageLimitLabel =
                   metric.units === 'bytes'
-                    ? formatBytes(usageMeta.limit)
-                    : usageMeta.limit.toLocaleString()
+                    ? formatBytes(usageMeta?.limit)
+                    : usageMeta?.limit.toLocaleString()
                 const usageLabel = `${usageCurrentLabel} ${hasLimit ? `of ${usageLimitLabel}` : ''}`
                 const percentageLabel = `${(usageRatio * 100).toFixed(2)}%`
 
@@ -166,7 +158,7 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                       <Link href={`/project/${projectRef}/settings/billing/usage#${metric.anchor}`}>
                         <a>
                           <div className="group flex items-center space-x-2">
-                            <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition cursor-pointer">
+                            <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                               {metric.name}
                             </p>
                             <IconChevronRight
@@ -177,14 +169,14 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                           </div>
                         </a>
                       </Link>
-                      {isUsageBillingEnabled && usageFee && (
+                      {isUsageBillingEnabled && hasLimit && usageFee && (
                         <Tooltip.Root delayDuration={0}>
                           <Tooltip.Trigger>
                             <div className="flex items-center">
                               <IconInfo
                                 size={14}
                                 strokeWidth={2}
-                                className="hover:text-scale-1000"
+                                className="hover:text-foreground-light"
                               />
                             </div>
                           </Tooltip.Trigger>
@@ -197,7 +189,7 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                                   'border border-scale-200',
                                 ].join(' ')}
                               >
-                                <div className="text-xs text-scale-1200">
+                                <div className="text-xs text-foreground">
                                   {usageFee.pricingStrategy === 'UNIT' ? (
                                     <div>
                                       <p>
@@ -268,11 +260,11 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                                     'border border-scale-200',
                                   ].join(' ')}
                                 >
-                                  <p className="text-xs text-scale-1200">
+                                  <p className="text-xs text-foreground">
                                     Exceeding your plans included usage will lead to restrictions to
                                     your project.
                                   </p>
-                                  <p className="text-xs text-scale-1200">
+                                  <p className="text-xs text-foreground">
                                     Upgrade to a usage-based plan or disable the spend cap to avoid
                                     restrictions.
                                   </p>
@@ -282,44 +274,55 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                           </Tooltip.Root>
                         )}
                     </div>
-                    {usageMeta.available_in_plan ? (
-                      <SparkBar
-                        type="horizontal"
-                        // If the limit is 0, it means that the usage is unlimited and not billed
-                        // By setting "1" as max, the bar is only filled if the metric has any usage
-                        // This is only the case for Enterprise plans
-                        max={usageMeta.limit || 1}
-                        value={usageMeta.usage ?? 0}
-                        barClass={
-                          !hasLimit && usageMeta.usage > 0
-                            ? 'bg-scale-1100'
-                            : isExceededLimit && !isUsageBillingEnabled
-                            ? 'bg-red-900'
-                            : isApproachingLimit && !isUsageBillingEnabled
-                            ? 'bg-amber-900'
-                            : 'bg-scale-1100'
-                        }
-                        bgClass="bg-gray-300 dark:bg-gray-600"
-                        labelBottom={usageLabel}
-                        labelBottomClass="!text-scale-1000"
-                        labelTop={hasLimit ? percentageLabel : undefined}
-                        labelTopClass={
-                          !hasLimit
-                            ? ''
-                            : isExceededLimit && !isUsageBillingEnabled
-                            ? '!text-red-900'
-                            : isApproachingLimit && !isUsageBillingEnabled
-                            ? '!text-amber-900'
-                            : ''
-                        }
-                      />
+                    {usageMeta ? (
+                      usageMeta.available_in_plan ? (
+                        <SparkBar
+                          type="horizontal"
+                          // If the limit is 0, it means that the usage is unlimited and not billed
+                          // By setting "1" as max, the bar is only filled if the metric has any usage
+                          // This is only the case for Enterprise plans
+                          max={usageMeta.limit || 1}
+                          value={usageMeta.usage ?? 0}
+                          barClass={
+                            !hasLimit && usageMeta.usage > 0
+                              ? 'bg-scale-1100'
+                              : isExceededLimit && !isUsageBillingEnabled
+                              ? 'bg-red-900'
+                              : isApproachingLimit && !isUsageBillingEnabled
+                              ? 'bg-amber-900'
+                              : 'bg-scale-1100'
+                          }
+                          bgClass="bg-gray-300 dark:bg-gray-600"
+                          labelBottom={usageLabel}
+                          labelBottomClass="!text-foreground-light"
+                          labelTop={hasLimit ? percentageLabel : undefined}
+                          labelTopClass={
+                            !hasLimit
+                              ? ''
+                              : isExceededLimit && !isUsageBillingEnabled
+                              ? '!text-red-900'
+                              : isApproachingLimit && !isUsageBillingEnabled
+                              ? '!text-amber-900'
+                              : ''
+                          }
+                        />
+                      ) : (
+                        // [Joshen] Needs a better CTA here
+                        <div className="flex items-center justify-between flex-grow">
+                          <p className="text-sm text-foreground-light">Unavailable in your plan</p>
+                          <Button
+                            type="default"
+                            onClick={() => snap.setPanelKey('subscriptionPlan')}
+                          >
+                            Upgrade
+                          </Button>
+                        </div>
+                      )
                     ) : (
-                      // [Joshen] Needs a better CTA here
                       <div className="flex items-center justify-between flex-grow">
-                        <p className="text-sm text-scale-1000">Unavailable in your plan</p>
-                        <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
-                          Upgrade
-                        </Button>
+                        <p className="text-sm text-foreground-light">
+                          The usage for this metric is missing.
+                        </p>
                       </div>
                     )}
                   </div>
@@ -329,10 +332,10 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
           )}
 
           <p className="!mt-10 text-sm">Upcoming cost for next invoice</p>
-          <p className="text-sm text-scale-1000">
+          <p className="text-sm text-foreground-light">
             The following table shows your upcoming costs. Depending on your usage, the final amount
             may vary. Next invoice on{' '}
-            <span className="text-scale-1100">{billingCycleEnd.format('MMM DD, YYYY')}</span>.
+            <span className="text-foreground-light">{billingCycleEnd.format('MMM DD, YYYY')}</span>.
           </p>
 
           {isLoadingUpcomingInvoice ? (
@@ -366,10 +369,18 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
             <table className="w-full">
               <thead>
                 <tr className="border-b">
-                  <th className="py-2 font-normal text-left text-sm text-scale-1000 w-1/2">Item</th>
-                  <th className="py-2 font-normal text-left text-sm text-scale-1000">Count</th>
-                  <th className="py-2 font-normal text-left text-sm text-scale-1000">Unit price</th>
-                  <th className="py-2 font-normal text-right text-sm text-scale-1000">Price</th>
+                  <th className="py-2 font-normal text-left text-sm text-foreground-light w-1/2">
+                    Item
+                  </th>
+                  <th className="py-2 font-normal text-left text-sm text-foreground-light">
+                    Count
+                  </th>
+                  <th className="py-2 font-normal text-left text-sm text-foreground-light">
+                    Unit price
+                  </th>
+                  <th className="py-2 font-normal text-right text-sm text-foreground-light">
+                    Price
+                  </th>
                 </tr>
               </thead>
               <tbody>

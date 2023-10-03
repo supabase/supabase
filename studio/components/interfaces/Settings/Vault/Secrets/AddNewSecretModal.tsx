@@ -1,16 +1,16 @@
-import { FC, useState, useEffect } from 'react'
-import { Modal, Form, Input, IconHelpCircle, Button, IconEyeOff, IconEye } from 'ui'
+import { useEffect, useState } from 'react'
+import { Button, Form, IconEye, IconEyeOff, IconHelpCircle, Input, Modal } from 'ui'
 
+import InformationBox from 'components/ui/InformationBox'
 import { useStore } from 'hooks'
 import EncryptionKeySelector from '../Keys/EncryptionKeySelector'
-import InformationBox from 'components/ui/InformationBox'
 
-interface Props {
+interface AddNewSecretModalProps {
   visible: boolean
   onClose: () => void
 }
 
-const AddNewSecretModal: FC<Props> = ({ visible, onClose }) => {
+const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
   const { vault, ui } = useStore()
   const [showSecretValue, setShowSecretValue] = useState(false)
   const [selectedKeyId, setSelectedKeyId] = useState<string>()
@@ -81,7 +81,7 @@ const AddNewSecretModal: FC<Props> = ({ visible, onClose }) => {
       size="medium"
       visible={visible}
       onCancel={onClose}
-      header={<h5 className="text-sm text-scale-1200">Add new secret</h5>}
+      header={<h5 className="text-sm text-foreground">Add new secret</h5>}
     >
       <Form
         id="add-new-secret-form"

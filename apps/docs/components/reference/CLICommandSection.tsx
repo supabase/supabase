@@ -96,7 +96,7 @@ const CliCommandSection = (props) => {
                       </div>
                       <a
                         href={`#${subcommand}`}
-                        className="transition text-scale-1100 hover:text-brand-900"
+                        className="transition text-scale-1100 hover:text-brand"
                       >
                         $ {subcommand.replace(/-/g, ' ')}
                       </a>
@@ -138,6 +138,7 @@ const CliCommandSection = (props) => {
               size="tiny"
               type="rounded-pills"
               scrollable
+              queryGroup="example"
             >
               {command.examples ? (
                 command.examples.map((example) => {

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import Editor from '@monaco-editor/react'
 
 type MonacoEditorProps = {
@@ -6,18 +5,20 @@ type MonacoEditorProps = {
   height?: string | number | undefined
   value?: string | undefined
   language?: string | undefined
+  readOnly?: boolean
   onChange: (value: string | undefined) => void
   onMount?: (editor: any) => void
 }
 
-export const MonacoEditor: React.FC<MonacoEditorProps> = ({
+export const MonacoEditor = ({
   width,
   height,
   value,
   language,
+  readOnly = false,
   onChange,
   onMount,
-}) => {
+}: MonacoEditorProps) => {
   function handleEditorOnMount(editor: any) {
     // add margin above first line
     editor.changeViewZones((accessor: any) => {
@@ -55,6 +56,7 @@ export const MonacoEditor: React.FC<MonacoEditorProps> = ({
       onChange={onChange}
       onMount={handleEditorOnMount}
       options={{
+        readOnly,
         tabSize: 2,
         fontSize: 13,
         minimap: {

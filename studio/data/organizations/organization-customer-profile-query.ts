@@ -3,13 +3,21 @@ import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { organizationKeys } from './keys'
+import { ResponseError } from 'types'
 
 export type OrganizationCustomerProfileVariables = {
   slug?: string
 }
 
 export type OrganizationCustomerProfileResponse = {
-  address: string | null
+  address: {
+    city: string | null
+    country: string | null
+    line1: string | null
+    line2: string | null
+    postal_code: string | null
+    state: string | null
+  } | null
   balance: number
   email: string
   id: string
@@ -33,7 +41,7 @@ export async function getOrganizationCustomerProfile(
 export type OrganizationCustomerProfileData = Awaited<
   ReturnType<typeof getOrganizationCustomerProfile>
 >
-export type OrganizationCustomerProfileError = unknown
+export type OrganizationCustomerProfileError = ResponseError
 
 export const useOrganizationCustomerProfileQuery = <TData = OrganizationCustomerProfileData>(
   { slug }: OrganizationCustomerProfileVariables,

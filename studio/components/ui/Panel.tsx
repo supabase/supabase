@@ -1,9 +1,8 @@
+import { PropsWithChildren, ReactNode } from 'react'
 import { Loading } from 'ui'
-import React, { ReactNode } from 'react'
 
-interface Props {
+interface PanelProps {
   bodyClassName?: string
-  children?: ReactNode
   className?: string
   footer?: JSX.Element | false
   hideHeaderStyling?: boolean
@@ -13,7 +12,7 @@ interface Props {
   wrapWithLoading?: boolean
   noHideOverflow?: boolean
 }
-function Panel(props: Props) {
+function Panel(props: PropsWithChildren<PanelProps>) {
   let headerClasses: string[] = []
 
   if (!props.hideHeaderStyling) {

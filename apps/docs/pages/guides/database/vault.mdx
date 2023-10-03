@@ -197,7 +197,7 @@ updated_at       | 2022-12-14 02:51:13.938396+00
 
 </details>
 
-## Deep Dive on How The Vault works
+## Deep Dive
 
 <div className="video-container">
   <iframe
@@ -227,7 +227,7 @@ This is an important safety precaution - there is little value in storing the en
 
 Where are the keys stored? Supabase creates and manages the root keys (from which all key IDs are derived) in our secured backend systems. We keep this root key safe and separate from your data. You remain in control of your keys - a separate API endpoint is available that you can use to access the key if you want to decrypt your data outside of Supabase.
 
-## Internal Details
+### Internal Details
 
 To encrypt data, you need a _key id_. You can use the default key id created automatically for every project, or create your own key ids Using the `pgsodium.create_key()` function. Key ids are used to internally derive the encryption key used to encrypt secrets in the vault. Vault users typically do not have access to the key itself, only the key id.
 

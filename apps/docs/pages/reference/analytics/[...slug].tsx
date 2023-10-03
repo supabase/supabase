@@ -139,6 +139,7 @@ export default function Config() {
                             operation.responseList[0].responseCode ??
                             operation.responseList[0].responseCode
                           }
+                          queryGroup="response-status"
                         >
                           {operation.responseList.map((response: any) => (
                             <Tabs.Panel id={response.responseCode} label={response.responseCode}>

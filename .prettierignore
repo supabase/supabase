@@ -7,7 +7,16 @@ apps/**/out
 # prettier-plugin-sql-cst only supports sqlite syntax
 **/supabase/migrations/*.sql
 apps/www/schema.sql
+apps/docs/**/generated/*
 examples/slack-clone/nextjs-slack-clone/full-schema.sql
 # ignore files with custom js formatting
 apps/docs/pages/guides/auth/*.mdx
 apps/docs/pages/guides/integrations/*.mdx
+studio/public
+studio/__mocks__
+studio/.next
+studio/.storybook
+studio/.swc
+studio/.turbo
+studio/node
+studio/data

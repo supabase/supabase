@@ -14,6 +14,7 @@ Bobbie Soedirgo
 Chandana Anumula
 Chase Granberry
 Chris Copplestone
+Chris Gwilliams
 Dave Wilson
 Div Arora
 Divit D
@@ -42,6 +43,7 @@ Margarita Sandomirskaia
 Marijana Šimag
 Mark Burggraf
 Michel Pelletier
+Mickael Hebert
 Monica El Khoury
 Nikita Kotlyarov
 Oli R
@@ -50,6 +52,7 @@ Paul Cioanca
 Paul Copplestone
 Pavel Borisov
 Qiao Han
+Raminder Singh
 Ramiro Nuñez Dosio
 Rodrigo Martins Mansueli
 Rory Wilding
@@ -57,6 +60,7 @@ Sreyas Udayavarman
 Stanislav M
 Steve Chavez
 Stojan Dimitrovski
+Supun Sudaraka Kalidasa
 Terry Sutton
 Thor Schaeff
 Tyler Shukert

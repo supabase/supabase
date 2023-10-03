@@ -30,9 +30,14 @@ export async function getStaticProps({ params }: any) {
   const { data, content } = matter(postContent)
   const mdxSource: any = await mdxSerialize(content)
 
-  const relatedPosts = getSortedPosts('_customers', 5, mdxSource.scope.tags)
+  const relatedPosts = getSortedPosts({
+    directory: '_customers',
+    limit: 5,
+    tags: mdxSource.scope.tags,
+    currentPostSlug: filePath,
+  })
 
-  const allPosts = getSortedPosts('_customers')
+  const allPosts = getSortedPosts({ directory: '_customers' })
   const currentIndex = allPosts
     .map(function (e) {
       return e.slug
@@ -122,9 +127,7 @@ function CaseStudyPage(props: any) {
                 <article className="flex flex-col gap-8">
                   <div className="flex flex-col gap-8 max-w-xxl">
                     <Link passHref href="/customers">
-                      <a className="text-brand-900 hover:text-brand-1000 mb-2 mt-0">
-                        Customer Stories
-                      </a>
+                      <a className="text-brand hover:text-brand-600 mb-2 mt-0">Customer Stories</a>
                     </Link>
                     <h1 className="text-scale-1200 text-4xl font-semibold xl:text-5xl">
                       {props.blog.title}

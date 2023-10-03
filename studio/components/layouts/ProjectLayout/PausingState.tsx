@@ -1,12 +1,43 @@
-import { FC } from 'react'
-import { Badge, IconLoader, IconCircle } from 'ui'
+import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
+import { Badge, IconCircle, IconLoader } from 'ui'
+
+import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
+import { useProjectStatusQuery } from 'data/projects/project-status-query'
+import { invalidateProjectsQuery } from 'data/projects/projects-query'
+import { PROJECT_STATUS } from 'lib/constants'
+import { useEffect, useState } from 'react'
 import { Project } from 'types'
 
-interface Props {
+export interface PausingStateProps {
   project: Project
 }
 
-const PausingState: FC<Props> = ({ project }) => {
+const PausingState = ({ project }: PausingStateProps) => {
+  const { ref } = useParams()
+  const queryClient = useQueryClient()
+  const [startPolling, setStartPolling] = useState(false)
+
+  useProjectStatusQuery(
+    { projectRef: ref },
+    {
+      enabled: startPolling,
+      refetchInterval: (res) => {
+        return res?.status === PROJECT_STATUS.INACTIVE ? false : 2000
+      },
+      onSuccess: async (res) => {
+        if (res.status === PROJECT_STATUS.INACTIVE) {
+          if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
+          await invalidateProjectsQuery(queryClient)
+        }
+      },
+    }
+  )
+
+  useEffect(() => {
+    setTimeout(() => setStartPolling(true), 4000)
+  }, [])
+
   return (
     <div className="mx-auto my-16 w-full max-w-7xl space-y-16">
       <div className="mx-6 space-y-16">
@@ -28,10 +59,10 @@ const PausingState: FC<Props> = ({ project }) => {
                 <div className="absolute flex h-full w-full items-center justify-center">
                   <IconLoader className="animate-spin" size={20} strokeWidth={2} />
                 </div>
-                <IconCircle className="text-scale-900" size={50} strokeWidth={1.5} />
+                <IconCircle className="text-foreground-lighter" size={50} strokeWidth={1.5} />
               </div>
               <p className="text-center">Pausing {project.name}</p>
-              <p className="mt-4 text-center text-sm text-scale-1100">
+              <p className="mt-4 text-center text-sm text-foreground-light">
                 You may restore your project anytime thereafter, and your data will be restored to
                 when it was initially paused.
               </p>
