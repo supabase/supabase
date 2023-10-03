@@ -199,7 +199,7 @@ Let's point our `.signInWithOAuth` method's redirect to the callback route we cr
 
 ```js
 await supabase.auth.signInWithOAuth({
-  email,
+  provider,
   options: {
     redirectTo: `http://example.com/auth/callback`,
   },
