@@ -5,11 +5,11 @@ import { copyToClipboard } from 'lib/helpers'
 import { useState } from 'react'
 import {
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   IconCheck,
   IconClipboard,
   IconEdit,
@@ -69,30 +69,22 @@ const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) =>
       </Table.td>
       <Table.td>{dayjs(app.created_at).format('DD/MM/YYYY, HH:mm:ss')}</Table.td>
       <Table.td align="right">
-        <DropdownMenu_Shadcn_>
-          <DropdownMenuTrigger_Shadcn_>
+        <DropdownMenu>
+          <DropdownMenuTrigger>
             <Button type="default" icon={<IconMoreVertical />} className="px-1" />
-          </DropdownMenuTrigger_Shadcn_>
-          <DropdownMenuContent_Shadcn_ align="end" side="bottom">
-            <DropdownMenuItem_Shadcn_
-              className="space-x-2"
-              key="edit"
-              onClick={() => onSelectEdit()}
-            >
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" side="bottom">
+            <DropdownMenuItem className="space-x-2" key="edit" onClick={() => onSelectEdit()}>
               <IconEdit />
               <p>Edit app</p>
-            </DropdownMenuItem_Shadcn_>
-            <DropdownMenuSeparator_Shadcn_ />
-            <DropdownMenuItem_Shadcn_
-              className="space-x-2"
-              key="delete"
-              onClick={() => onSelectDelete()}
-            >
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="space-x-2" key="delete" onClick={() => onSelectDelete()}>
               <IconTrash />
               <p>Delete app</p>
-            </DropdownMenuItem_Shadcn_>
-          </DropdownMenuContent_Shadcn_>
-        </DropdownMenu_Shadcn_>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </Table.td>
     </Table.tr>
   )
