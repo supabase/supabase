@@ -1,33 +1,37 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import saveAs from 'file-saver'
 import Papa from 'papaparse'
-import { useState, ReactNode } from 'react'
+import { ReactNode, useState } from 'react'
 import {
   Button,
-  IconDownload,
-  IconX,
-  IconTrash,
-  Dropdown,
-  IconChevronDown,
-  IconFileText,
+  cn,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
   IconArrowUp,
+  IconChevronDown,
+  IconDownload,
+  IconFileText,
+  IconTrash,
+  IconX,
 } from 'ui'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore, useUrlState } from 'hooks'
-import FilterDropdown from './filter'
-import SortPopover from './sort'
-import RefreshButton from './RefreshButton'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import { Sort, Filter, SupaTable } from 'components/grid/types'
+import clsx from 'clsx'
 import { useDispatch, useTrackedState } from 'components/grid/store'
+import { Filter, Sort, SupaTable } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
+import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { useTableRowDeleteAllMutation } from 'data/table-rows/table-row-delete-all-mutation'
+import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
 import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-mutation'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
+import { useCheckPermissions, useStore, useUrlState } from 'hooks'
+import FilterDropdown from './filter'
+import RefreshButton from './RefreshButton'
 import RLSBannerWarning from './RLSBannerWarning'
-import clsx from 'clsx'
+import SortPopover from './sort'
 
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
 // just too large for a browser to keep all the rows in memory before
@@ -106,7 +110,7 @@ const DefaultHeader = ({
   const canAddNew = onAddRow !== undefined || onAddColumn !== undefined
 
   // [Joshen] Using this logic to block both column and row creation/update/delete
-  const canCreateColumns = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
+  const canCreateColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
 
   const [{ filter: filters, sort: sorts }, setParams] = useUrlState({
     arrayKeys: ['sort', 'filter'],
@@ -124,96 +128,94 @@ const DefaultHeader = ({
           <div className="h-[20px] w-px border-r border-scale-600"></div>
           <div className="flex items-center gap-2">
             {canCreateColumns && (
-              <Dropdown
-                side="bottom"
-                align="start"
-                size="medium"
-                overlay={[
-                  ...(onAddRow !== undefined
-                    ? [
-                        <Dropdown.Item
-                          key="add-row"
-                          className="group"
-                          onClick={onAddRow}
-                          icon={
+              <DropdownMenu_Shadcn_>
+                <DropdownMenuTrigger_Shadcn_ className="flex">
+                  <Button size="tiny" icon={<IconChevronDown size={14} strokeWidth={1.5} />}>
+                    Insert
+                  </Button>
+                </DropdownMenuTrigger_Shadcn_>
+                <DropdownMenuContent_Shadcn_ side="bottom" align="start">
+                  {[
+                    ...(onAddRow !== undefined
+                      ? [
+                          <DropdownMenuItem_Shadcn_
+                            key="add-row"
+                            className="group space-x-2"
+                            onClick={onAddRow}
+                          >
                             <div className="-mt-2 pr-1.5">
                               <div className="border border-scale-1000 w-[15px] h-[4px]" />
                               <div className="border border-scale-1000 w-[15px] h-[4px] my-[2px]" />
                               <div
-                                className={[
+                                className={cn([
                                   'border border-scale-1100 w-[15px] h-[4px] translate-x-0.5',
-                                  'transition duration-200 group-data-[highlighted]:border-brand-900 group-data-[highlighted]:translate-x-0',
-                                ].join(' ')}
+                                  'transition duration-200 group-data-[highlighted]:border-brand group-data-[highlighted]:translate-x-0',
+                                ])}
                               />
                             </div>
-                          }
-                        >
-                          <div className="">
-                            <p>Insert row</p>
-                            <p className="text-scale-1000">Insert a new row into {table.name}</p>
-                          </div>
-                        </Dropdown.Item>,
-                      ]
-                    : []),
-                  ...(onAddColumn !== undefined
-                    ? [
-                        <Dropdown.Item
-                          key="add-column"
-                          className="group"
-                          onClick={onAddColumn}
-                          icon={
+                            <div>
+                              <p>Insert row</p>
+                              <p className="text-foreground-light">
+                                Insert a new row into {table.name}
+                              </p>
+                            </div>
+                          </DropdownMenuItem_Shadcn_>,
+                        ]
+                      : []),
+                    ...(onAddColumn !== undefined
+                      ? [
+                          <DropdownMenuItem_Shadcn_
+                            key="add-column"
+                            className="group space-x-2"
+                            onClick={onAddColumn}
+                          >
                             <div className="flex -mt-2 pr-1.5">
                               <div className="border border-scale-1000 w-[4px] h-[15px]" />
                               <div className="border border-scale-1000 w-[4px] h-[15px] mx-[2px]" />
                               <div
-                                className={[
+                                className={cn([
                                   'border border-scale-1100 w-[4px] h-[15px] -translate-y-0.5',
-                                  'transition duration-200 group-data-[highlighted]:border-brand-900 group-data-[highlighted]:translate-y-0',
-                                ].join(' ')}
+                                  'transition duration-200 group-data-[highlighted]:border-brand group-data-[highlighted]:translate-y-0',
+                                ])}
                               />
                             </div>
-                          }
-                        >
-                          <div className="">
-                            <p>Insert column</p>
-                            <p className="text-scale-1000">Insert a new column into {table.name}</p>
-                          </div>
-                        </Dropdown.Item>,
-                      ]
-                    : []),
-                  ...(onImportData !== undefined
-                    ? [
-                        <Dropdown.Item
-                          key="import-data"
-                          className="group"
-                          onClick={onImportData}
-                          icon={
+                            <div>
+                              <p>Insert column</p>
+                              <p className="text-foreground-light">
+                                Insert a new column into {table.name}
+                              </p>
+                            </div>
+                          </DropdownMenuItem_Shadcn_>,
+                        ]
+                      : []),
+                    ...(onImportData !== undefined
+                      ? [
+                          <DropdownMenuItem_Shadcn_
+                            key="import-data"
+                            className="group space-x-2"
+                            onClick={onImportData}
+                          >
                             <div className="relative -mt-2">
                               <IconFileText className="-translate-x-[2px]" />
                               <IconArrowUp
                                 className={clsx(
-                                  'transition duration-200 absolute bottom-0 right-0 translate-y-1 opacity-0 bg-brand-700 rounded-full',
-                                  'group-data-[highlighted]:translate-y-0 group-data-[highlighted]:text-brand-900 group-data-[highlighted]:opacity-100'
+                                  'transition duration-200 absolute bottom-0 right-0 translate-y-1 opacity-0 bg-brand-400 rounded-full',
+                                  'group-data-[highlighted]:translate-y-0 group-data-[highlighted]:text-brand group-data-[highlighted]:opacity-100'
                                 )}
                                 strokeWidth={3}
                                 size={12}
                               />
                             </div>
-                          }
-                        >
-                          <div className="">
-                            <p>Import data from CSV</p>
-                            <p className="text-scale-1000">Insert new rows from a CSV</p>
-                          </div>
-                        </Dropdown.Item>,
-                      ]
-                    : []),
-                ]}
-              >
-                <Button size="tiny" icon={<IconChevronDown size={14} strokeWidth={1.5} />}>
-                  Insert
-                </Button>
-              </Dropdown>
+                            <div>
+                              <p>Import data from CSV</p>
+                              <p className="text-foreground-light">Insert new rows from a CSV</p>
+                            </div>
+                          </DropdownMenuItem_Shadcn_>,
+                        ]
+                      : []),
+                  ]}
+                </DropdownMenuContent_Shadcn_>
+              </DropdownMenu_Shadcn_>
             )}
           </div>
         </>
@@ -233,9 +235,45 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   const dispatch = useDispatch()
 
   const { project } = useProjectContext()
-  const { mutateAsync: deleteRows } = useTableRowDeleteMutation()
-  const { mutateAsync: deleteAllRows } = useTableRowDeleteAllMutation()
-  const { mutateAsync: truncateRows } = useTableRowTruncateMutation()
+  // [Joshen] Passing blank error handlers here as the errors are handled via the
+  // error handler in tracked state within catch block
+  const { mutateAsync: deleteRows } = useTableRowDeleteMutation({
+    onSuccess: (res, variables) => {
+      const rowIdxs = variables.rows.map((x) => x.idx)
+      dispatch({ type: 'REMOVE_ROWS', payload: { rowIdxs } })
+      dispatch({
+        type: 'SELECTED_ROWS_CHANGE',
+        payload: { selectedRows: new Set() },
+      })
+    },
+    onError: (error) => {
+      if (state.onError) state.onError(error)
+    },
+  })
+  const { mutateAsync: deleteAllRows } = useTableRowDeleteAllMutation({
+    onSuccess: () => {
+      dispatch({ type: 'REMOVE_ALL_ROWS' })
+      dispatch({
+        type: 'SELECTED_ROWS_CHANGE',
+        payload: { selectedRows: new Set() },
+      })
+    },
+    onError: (error) => {
+      if (state.onError) state.onError(error)
+    },
+  })
+  const { mutateAsync: truncateRows } = useTableRowTruncateMutation({
+    onSuccess: () => {
+      dispatch({ type: 'REMOVE_ALL_ROWS' })
+      dispatch({
+        type: 'SELECTED_ROWS_CHANGE',
+        payload: { selectedRows: new Set() },
+      })
+    },
+    onError: (error) => {
+      if (state.onError) state.onError(error)
+    },
+  })
 
   const { data } = useTableRowsQuery({
     queryKey: [table.schema, table.name],
@@ -299,15 +337,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
                 filters,
               })
             }
-
-            dispatch({ type: 'REMOVE_ALL_ROWS' })
-            dispatch({
-              type: 'SELECTED_ROWS_CHANGE',
-              payload: { selectedRows: new Set() },
-            })
-          } catch (error) {
-            if (state.onError) state.onError(error)
-          }
+          } catch (error) {}
         } else {
           const rowIdxs = Array.from(selectedRows) as number[]
           const rows = allRows.filter((x) => rowIdxs.includes(x.idx))
@@ -319,15 +349,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
               table,
               rows,
             })
-
-            dispatch({ type: 'REMOVE_ROWS', payload: { rowIdxs } })
-            dispatch({
-              type: 'SELECTED_ROWS_CHANGE',
-              payload: { selectedRows: new Set() },
-            })
-          } catch (error) {
-            if (state.onError) state.onError(error)
-          }
+          } catch (error) {}
         }
       },
     })
@@ -382,7 +404,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
           icon={<IconX size="tiny" strokeWidth={2} />}
           onClick={deselectRows}
         />
-        <span className="text-xs text-scale-1200">
+        <span className="text-xs text-foreground">
           {allRowsSelected
             ? `${totalRows} rows selected`
             : selectedRows.size > 1

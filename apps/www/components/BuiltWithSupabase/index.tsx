@@ -12,8 +12,8 @@ const BuiltExamples = () => {
   return (
     <SectionContainer className="xl:pt-32">
       <div className="text-center">
-        <h3 className="h2">What can you build with supabase?</h3>
-        <p className="p">There are many example apps and starter projects to get going</p>
+        <h3 className="h2">What can you build with Supabase?</h3>
+        <p className="p">There are many example apps and starter projects to get you started.</p>
         <div className="flex justify-center gap-2 py-4">
           <Link href="/docs/guides/examples" as="/docs/guides/examples" passHref>
             <a>
@@ -29,7 +29,7 @@ const BuiltExamples = () => {
           >
             <a>
               <Button type="default" icon={<IconGitHub />} size="small">
-                Official github library
+                Official GitHub library
               </Button>
             </a>
           </Link>

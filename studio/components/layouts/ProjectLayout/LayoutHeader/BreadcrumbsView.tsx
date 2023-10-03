@@ -1,11 +1,11 @@
-import { FC, Fragment } from 'react'
 import { observer } from 'mobx-react-lite'
+import { Fragment } from 'react'
 
-interface Props {
+interface BreadcrumbsViewProps {
   defaultValue: any
 }
 
-const BreadcrumbsView: FC<Props> = ({ defaultValue: breadcrumbs }) => {
+const BreadcrumbsView = ({ defaultValue: breadcrumbs }: BreadcrumbsViewProps) => {
   return (
     <>
       {breadcrumbs?.length

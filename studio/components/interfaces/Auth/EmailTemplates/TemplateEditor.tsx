@@ -1,42 +1,45 @@
-import ReactMarkdown from 'react-markdown'
-import { FC, useState, useEffect } from 'react'
-import { observer } from 'mobx-react-lite'
-import { Input, Form } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { observer } from 'mobx-react-lite'
+import { useMemo, useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import { Form, Input } from 'ui'
 
-import { useStore, checkPermissions } from 'hooks'
-import { FormSchema } from 'types'
-import { FormActions, FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
 import CodeEditor from 'components/ui/CodeEditor'
+import { FormActions, FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
 import InformationBox from 'components/ui/InformationBox'
 
-interface Props {
+import { useParams } from 'common'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useCheckPermissions, useStore } from 'hooks'
+import { FormSchema } from 'types'
+
+interface TemplateEditorProps {
   template: FormSchema
+  authConfig: Record<string, string>
 }
 
-const TemplateEditor: FC<Props> = ({ template }) => {
-  const { ui, authConfig } = useStore()
-  const [bodyValue, setBodyValue] = useState('')
+const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
+  const { ui } = useStore()
+  const { ref: projectRef } = useParams()
+  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
-  const { isLoaded } = authConfig
   const { id, properties } = template
 
   const formId = `auth-config-email-templates-${id}`
-  const INITIAL_VALUES: { [x: string]: string } = {}
-  const canUpdateConfig = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
-
-  useEffect(() => {
-    if (isLoaded) {
-      Object.keys(properties).forEach((key) => {
-        INITIAL_VALUES[key] = authConfig.config[key] ?? ''
-      })
-    }
-  }, [isLoaded])
+  const INITIAL_VALUES = useMemo(() => {
+    const result: { [x: string]: string } = {}
+    Object.keys(properties).forEach((key) => {
+      result[key] = (authConfig && authConfig[key]) ?? ''
+    })
+    return result
+  }, [authConfig, properties])
+  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const messageSlug = `MAILER_TEMPLATES_${id}_CONTENT`
   const messageProperty = properties[messageSlug]
+  const [bodyValue, setBodyValue] = useState((authConfig && authConfig[messageSlug]) ?? '')
 
-  const onSubmit = async (values: any, { setSubmitting, resetForm }: any) => {
+  const onSubmit = (values: any, { resetForm }: any) => {
     const payload = { ...values }
 
     // Because the template content uses the code editor which is not a form component
@@ -44,52 +47,40 @@ const TemplateEditor: FC<Props> = ({ template }) => {
     delete payload[messageSlug]
     if (messageProperty) payload[messageSlug] = bodyValue
 
-    setSubmitting(true)
-    const { error } = await authConfig.update(payload)
-
-    if (!error) {
-      ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
-      resetForm({
-        values: values,
-        initialValues: values,
-      })
-      setBodyValue(authConfig?.config?.[messageSlug])
-    } else {
-      ui.setNotification({ category: 'error', message: 'Failed to update settings' })
-    }
-
-    setSubmitting(false)
+    updateAuthConfig(
+      { projectRef: projectRef!, config: payload },
+      {
+        onError: () => {
+          ui.setNotification({ category: 'error', message: 'Failed to update settings' })
+        },
+        onSuccess: () => {
+          ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
+          resetForm({
+            values: values,
+            initialValues: values,
+          })
+        },
+      }
+    )
   }
 
   return (
     <Form id={formId} className="!border-t-0" initialValues={INITIAL_VALUES} onSubmit={onSubmit}>
-      {({ isSubmitting, resetForm, values, initialValues }: any) => {
-        // [Alaister] although this "technically" is breaking the rules of React hooks
-        // it won't error because the hooks are always rendered in the same order
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        useEffect(() => {
-          // Form is reset once remote data is loaded in store
-          resetForm({
-            values: INITIAL_VALUES,
-            initialValues: INITIAL_VALUES,
-          })
-          setBodyValue(authConfig?.config?.[messageSlug])
-        }, [authConfig.isLoaded])
-
-        const message = authConfig?.config?.[messageSlug]
+      {({ resetForm, values, initialValues }: any) => {
+        const message = (authConfig && authConfig[messageSlug]) ?? ''
         const hasChanges =
           JSON.stringify(values) !== JSON.stringify(initialValues) || message !== bodyValue
 
         return (
           <>
             <FormSection className="!border-t-0 pb-8 pt-4">
-              <FormSectionContent loading={!isLoaded}>
+              <FormSectionContent loading={false}>
                 {Object.keys(properties).map((x: string) => {
                   const property = properties[x]
                   if (property.type === 'string') {
                     return (
                       <div key={x} className="space-y-3">
-                        <label className="col-span-12 text-sm text-scale-1200 lg:col-span-5">
+                        <label className="col-span-12 text-sm text-foreground lg:col-span-5">
                           {property.title}
                         </label>
                         <Input
@@ -121,7 +112,7 @@ const TemplateEditor: FC<Props> = ({ template }) => {
               </FormSectionContent>
             </FormSection>
             <FormSection className="!mt-0 grid-cols-12 !border-t-0 !pt-0">
-              <FormSectionContent fullWidth loading={!isLoaded}>
+              <FormSectionContent fullWidth loading={false}>
                 {messageProperty && (
                   <>
                     <div className="space-y-3">
@@ -142,7 +133,6 @@ const TemplateEditor: FC<Props> = ({ template }) => {
                     <div className="relative h-96">
                       <CodeEditor
                         id="code-id"
-                        loading={!isLoaded}
                         language="html"
                         isReadOnly={!canUpdateConfig}
                         className="!mb-0 h-96 overflow-hidden rounded border"
@@ -157,13 +147,13 @@ const TemplateEditor: FC<Props> = ({ template }) => {
                   <FormActions
                     handleReset={() => {
                       resetForm({
-                        values: authConfig.config,
-                        initialValues: authConfig.config,
+                        values: authConfig,
+                        initialValues: authConfig,
                       })
-                      setBodyValue(authConfig?.config?.[messageSlug])
+                      setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
                     }}
                     form={formId}
-                    isSubmitting={isSubmitting}
+                    isSubmitting={isUpdatingConfig}
                     hasChanges={hasChanges}
                     disabled={!canUpdateConfig}
                     helper={

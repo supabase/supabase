@@ -12,9 +12,9 @@
 - [x] 호스팅된 Postgres 데이터베이스. [문서](https://supabase.com/docs/guides/database)
 - [x] 인증 및 권한 부여. [문서](https://supabase.com/docs/guides/auth)
 - [x] 자동 생성 API.
-  - [x] REST. [문서](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [문서](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] 실시간 구독. [문서](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [문서](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [문서](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] 실시간 구독. [문서](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] 함수.
   - [x] 데이터베이스 함수. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] 엣지 기능 [문서](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@
 
 전체 문서는 [supabase.com/docs](https://supabase.com/docs)에서 확인하실 수 있습니다
 
-기여 방법을 확인하려면 [시작하기](./DEVELOPERS.md)를 방문하세요
+기여 방법을 확인하려면 [시작하기](../DEVELOPERS.md)를 방문하세요
 
 ## 커뮤니티 및 지원
 
@@ -39,7 +39,7 @@
 ## 상태
 
 - [x] 알파: 비공개 고객들을 대상으로 Supabase를 테스트 중입니다
-- [x] 공개 알파: 누구나 [app.supabase.com](https://app.supabase.com)에서 가입할 수 있습니다. 하지만 몇 가지 불편한 점이 있습니다
+- [x] 공개 알파: 누구나 [supabase.com/dashboard](https://supabase.com/dashboard)에서 가입할 수 있습니다. 하지만 몇 가지 불편한 점이 있습니다
 - [x] 공개 베타: 대부분의 비기업용 사용 사례에 충분히 안정적입니다
 - [ ] 공개: 일반 사용 가능 [[상태](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
@@ -55,10 +55,10 @@ Supabase는 오픈 소스 도구의 조합입니다. 저희는 엔터프라이�
 
 **아키텍처**
 
-Supabase는 [호스팅 플랫폼](https://app.supabase.com)입니다. 가입만 하면 아무것도 설치하지 않고 Supabase를 사용할 수 있습니다.
+Supabase는 [호스팅 플랫폼](https://supabase.com/dashboard)입니다. 가입만 하면 아무것도 설치하지 않고 Supabase를 사용할 수 있습니다.
 자체 호스팅](https://supabase.com/docs/guides/hosting/overview) 및 [로컬 개발](https://supabase.com/docs/guides/local-development)도 가능합니다.
 
-아키텍처](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+![아키텍처](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [PostgreSQL](https://www.postgresql.org/)은 30년 이상 활발하게 개발되어 안정성, 기능 견고성 및 성능에 대한 높은 평판을 얻고 있는 객체 관계형 데이터베이스 시스템입니다.
 - [Realtime](https://github.com/supabase/realtime)은 웹소켓을 사용하여 PostgreSQL 삽입, 업데이트, 삭제를 수신할 수 있는 Elixir 서버입니다. Realtime은 데이터베이스 변경 사항에 대해 Postgres의 기본 제공 복제 기능을 폴링하고, 변경 사항을 JSON으로 변환한 다음, 웹 소켓을 통해 승인된 클라이언트에 JSON을 브로드캐스트합니다.

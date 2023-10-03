@@ -1,5 +1,5 @@
-import { Accordion, Button, IconCheck, Select } from 'ui'
-import Solutions from 'data/Solutions.json'
+import { Accordion, Badge, Button, IconCheck, Select } from 'ui'
+import Solutions from 'data/Solutions'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -10,14 +10,16 @@ import DefaultLayout from '~/components/Layouts/Default'
 import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/Pricing/PricingTableRow'
 import { pricing } from 'shared-data/pricing'
 import pricingFaq from '~/data/PricingFAQ.json'
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 import ComputePricingModal from '~/components/Pricing/ComputePricingModal'
 import { plans } from 'shared-data/plans'
+import AnnouncementBadge from '../../components/Announcement/Badge'
+import Image from 'next/image'
 
 export default function IndexPage() {
   const router = useRouter()
   const { basePath, asPath } = useRouter()
-  const { isDarkMode } = useTheme()
+  const { resolvedTheme } = useTheme()
   const [showComputeModal, setShowComputeModal] = useState(false)
   const [activeMobilePlan, setActiveMobilePlan] = useState('Free')
 
@@ -104,13 +106,16 @@ export default function IndexPage() {
   }) => {
     return (
       <div className="mt-8 px-4 mobile-header">
-        <h2 className="gradient-text-brand-500 dark:gradient-text-brand-100 text-3xl font-medium uppercase font-mono">
+        <h2 className="text-brand-600 dark:text-brand text-3xl font-medium uppercase font-mono">
           {plan}
         </h2>
         <div className="flex items-baseline gap-2">
           {from && <span className="text-scale-1200 text-base">From</span>}
           {showDollarSign ? (
-            <span className="h1">${price}</span>
+            <span className="h1">
+              {plan !== 'Enterprise' ? '$' : ''}
+              {price}
+            </span>
           ) : (
             <span className="text-scale-1100">{price}</span>
           )}
@@ -118,7 +123,7 @@ export default function IndexPage() {
           <p className="p">{priceDescription}</p>
         </div>
         <p className="p">{description}</p>
-        <Link href="https://supabase.com/dashboard" passHref>
+        <Link href="https://supabase.com/dashboard/new" passHref>
           <a>
             <Button size="medium" block>
               Get started
@@ -140,26 +145,34 @@ export default function IndexPage() {
           url: `https://supabase.com/${router.pathname}`,
           images: [
             {
-              url: `https://supabase.com/images/og/og-image.jpg`,
+              url: `https://supabase.com/images/og/og-image-v2.jpg`,
             },
           ],
         }}
       />
 
       <div>
-        <div className="relative z-10 py-16 lg:py-28">
+        <div className="relative z-10 py-16 lg:py-20">
           <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
             <div className="mx-auto max-w-3xl space-y-2 lg:max-w-none">
-              <h1 className="text-brand-900 text-base">Pricing</h1>
+              <h1 className="text-brand text-base">Pricing</h1>
               <h2 className="h1">Predictable pricing, no surprises</h2>
               <p className="p text-lg">
-                Start building for free, collaborate with a team, then scale to millions of users
+                Start building for free, collaborate with a team, then scale to millions of users.
               </p>
+              <div className="w-full inline-flex justify-center items-center pt-3 pb-6">
+                <AnnouncementBadge
+                  url="/blog/organization-based-billing"
+                  badge="Update"
+                  announcement="Changes to how we bill"
+                  target="_blank"
+                />
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="mx-auto max-w-7xl flex flex-col">
+        <div className="mx-auto lg:container lg:px-16 xl:px-12 flex flex-col">
           {/* <div className="absolute inset-0 shadow-sm bg-scale-200 h-3/5" /> */}
 
           <div
@@ -168,18 +181,20 @@ export default function IndexPage() {
             lg:px-8
           "
           >
-            <div className="mx-auto max-w-md grid lg:max-w-6xl lg:grid-cols-3 gap-24 lg:gap-5">
-              {plansExceptEnterprise.map((plan) => (
+            <div className="mx-auto max-w-md grid lg:max-w-none lg:grid-cols-2 xl:grid-cols-4 gap-4 xl:gap-2 2xl:gap-5">
+              {plans.map((plan) => (
                 <div
                   key={`row-${plan.name}`}
                   className={[
                     plan.name === 'Pro'
-                      ? 'bg-brand-1100 dark:bg-brand-900 border px-0.5 -mt-8 rounded-[6px]'
+                      ? 'bg-brand-600 dark:bg-brand border px-0.5 lg:-mt-8 rounded-[6px]'
                       : '',
                   ].join(' ')}
                 >
                   {plan.name === 'Pro' && (
-                    <p className="text-xs text-center py-2 text-white">Most Popular</p>
+                    <p className="text-[13px] leading-4 text-center py-2 text-scale-100">
+                      Most Popular
+                    </p>
                   )}
                   <div
                     key={plan.name}
@@ -189,20 +204,20 @@ export default function IndexPage() {
                     ].join(' ')}
                   >
                     <div
-                      className={`dark:bg-scale-300 bg-white px-8 pt-6 rounded-tr-[4px] rounded-tl-[4px] ${
+                      className={`dark:bg-scale-300 bg-white px-8 xl:px-4 2xl:px-8 pt-6 rounded-tr-[4px] rounded-tl-[4px] ${
                         plan.name === 'Pro' ? 'rounded-tr-[4px] rounded-tl-[4px]' : ''
                       }`}
                     >
                       <div className="mb-2 flex items-center gap-2">
                         <div className="flex items-center gap-2">
                           <h3
-                            className="gradient-text-brand-500 dark:gradient-text-brand-100 text-2xl font-normal
+                            className="text-brand-600 dark:text-brand text-2xl font-normal
                            uppercase flex items-center gap-4 font-mono"
                           >
                             {plan.name}
                           </h3>
                           {plan.nameBadge && (
-                            <span className="bg-brand-500 text-brand-1100 rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
+                            <span className="bg-brand-300 text-brand-600 rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4">
                               {plan.nameBadge}
                             </span>
                           )}
@@ -227,7 +242,7 @@ export default function IndexPage() {
                           <div className="flex items-end gap-2">
                             <div>
                               {plan.priceLabel && (
-                                <p className="text-scale-900 ml-1 text-xs font-normal">
+                                <p className="text-scale-900 ml-1 text-[13px] leading-4 font-normal">
                                   {plan.priceLabel}
                                 </p>
                               )}
@@ -238,16 +253,17 @@ export default function IndexPage() {
                                     plan.name !== 'Enterprise' ? 'text-5xl' : 'text-4xl'
                                   }`}
                                 >
-                                  ${plan.priceMonthly}
+                                  {plan.name !== 'Enterprise' ? '$' : ''}
+                                  {plan.priceMonthly}
                                 </p>
-                                <p className="text-scale-900 mb-1.5 ml-1 text-xs">
-                                  {plan.costUnit}
+                                <p className="text-scale-900 mb-1.5 ml-1 text-[13px] leading-4">
+                                  {plan.costUnitOrg}
                                 </p>
                               </div>
 
                               {plan.warning && (
                                 <p className="-mt-2">
-                                  <span className="bg-scale-200 text-brand-1100 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
+                                  <span className="bg-scale-200 text-brand-600 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4">
                                     {plan.warning}
                                   </span>
                                 </p>
@@ -259,19 +275,19 @@ export default function IndexPage() {
                     </div>
                     <div
                       className={[
-                        `dark:border-scale-400 dark:bg-scale-300 flex h-full rounded-bl-[4px] rounded-br-[4px] flex-1 flex-col bg-white px-8 py-6`,
+                        `dark:border-scale-400 dark:bg-scale-300 flex h-full rounded-bl-[4px] rounded-br-[4px] flex-1 flex-col bg-white px-8 xl:px-4 2xl:px-8 py-6`,
                         plan.name === 'Pro' ? 'mb-0.5 rounded-bl-[4px] rounded-br-[4px]' : '',
                       ].join(' ')}
                     >
                       {plan.preface && (
-                        <p className="text-scale-1100 text-xs mt-2 mb-4">{plan.preface}</p>
+                        <p className="text-scale-1100 text-[13px] mt-2 mb-4">{plan.preface}</p>
                       )}
                       {/* <p className="text-scale-900 text-sm">Included with plan:</p> */}
-                      <ul role="list" className="text-xs text-scale-1000">
+                      <ul role="list" className="text-[13px] text-scale-1000">
                         {plan.features.map((feature) => (
                           <li key={feature} className="flex items-center py-2 first:mt-0">
                             <IconCheck
-                              className="text-brand-900 h-4 w-4"
+                              className="text-brand h-4 w-4"
                               aria-hidden="true"
                               strokeWidth={3}
                             />
@@ -284,7 +300,7 @@ export default function IndexPage() {
                       <div className="flex flex-col gap-6 mt-auto prose">
                         <div className="space-y-2 mt-12">
                           {plan.footer && (
-                            <p className="text-xs whitespace-pre-wrap">{plan.footer}</p>
+                            <p className="text-[13px] whitespace-pre-wrap">{plan.footer}</p>
                           )}
                         </div>
                         <a href={plan.href}>
@@ -301,51 +317,7 @@ export default function IndexPage() {
           </div>
         </div>
 
-        <div className="mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-md lg:max-w-6xl grid grid-cols-1 lg:grid-cols-3 mx-auto border bg-scale-100 rounded-md p-8 lg:px-0 mt-8 gap-x-5">
-            <div className="flex flex-col justify-center lg:px-8">
-              <div>
-                <h3
-                  className="gradient-text-brand-500 dark:gradient-text-brand-100 text-2xl font-normal
-                           uppercase flex items-center gap-4 font-mono"
-                >
-                  {planEnterprise.name}
-                </h3>
-                <p className="text-scale-1100 my-4 text-sm pb-2 2xl:pr-4">
-                  {planEnterprise.description}
-                </p>
-
-                <a href={planEnterprise.href} className="hidden lg:block">
-                  <Button type="default" size="small">
-                    {planEnterprise.cta}
-                  </Button>
-                </a>
-              </div>
-            </div>
-            <div className="flex flex-col justify-center lg:col-span-2">
-              <ul role="list" className="text-xs text-scale-1000 lg:grid lg:grid-cols-2 lg:gap-x-5">
-                {planEnterprise.features.map((feature) => (
-                  <li key={feature} className="flex items-center py-2 first:mt-0">
-                    <IconCheck
-                      className="text-brand-900 h-4 w-4 "
-                      aria-hidden="true"
-                      strokeWidth={3}
-                    />
-                    <span className="dark:text-scale-1200 mb-0 ml-3 ">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <a href={planEnterprise.href} className="visible lg:hidden mt-8">
-                <Button block type="default" size="small">
-                  {planEnterprise.cta}
-                </Button>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <div className="text-center mt-24">
+        <div className="text-center mt-20">
           <a href="#compare-plans">
             <Button size="tiny" type="default">
               Compare Plans
@@ -369,27 +341,31 @@ export default function IndexPage() {
           <div className="grid lg:grid-cols-3 gap-4 mb-16">
             {addons.map((addon) => (
               <div className="bg-white dark:bg-scale-300 rounded-[4px]" key={addon.name}>
-                <div className="overflow-hidden rounded-lg">
-                  <img
+                <div className="overflow-hidden rounded-lg relative h-56">
+                  <Image
                     className="w-full"
+                    layout="fill"
+                    objectFit="contain"
                     src={`${basePath}/images/pricing/${addon.heroImg}${
-                      isDarkMode ? '' : '-light'
+                      resolvedTheme === 'dark' ? '' : '-light'
                     }.png`}
                   />
                 </div>
                 <div className="px-8 -mt-1">
-                  <p className="text-xs text-scale-900">{addon.price}</p>
+                  <p className="text-[13px] text-scale-900">{addon.price}</p>
                   <div className="flex items-center gap-2 mt-2">
-                    <img
+                    <Image
                       src={`${basePath}/images/pricing/${addon.icon}${
-                        isDarkMode ? '' : '-light'
+                        resolvedTheme === 'dark' ? '' : '-light'
                       }.svg`}
                       className="file:"
+                      width={14}
+                      height={14}
                       alt="Compute"
                     />
                     <span className="text-sm text-scale-1200">{addon.name}</span>
                   </div>
-                  <p className="mt-2 text-scale-900 text-xs min-h-[40px] lg:min-h-[50px] lg:max-w-[290px]">
+                  <p className="mt-2 text-scale-900 text-[13px] min-h-[40px] lg:min-h-[50px] lg:max-w-[290px]">
                     {addon.description}
                   </p>
                   <div className="flex items-center justify-between mt-4 mb-4 lg:mb-8">
@@ -402,7 +378,7 @@ export default function IndexPage() {
                     </Link>
                     {addon.name === 'Optimized Compute' ? (
                       <button
-                        className="text-brand-1000 text-xs hover:underline "
+                        className="text-brand-600 text-[13px] leading-4 hover:underline "
                         onClick={() => setShowComputeModal(true)}
                       >
                         {addon.rightCtaText}
@@ -434,22 +410,26 @@ export default function IndexPage() {
           id="cost-control"
           className="grid lg:grid-cols-2 gap-8 items-center mt-12 lg:mt-8 max-w-6xl mx-auto"
         >
-          <div>
-            <span className="bg-brand-500 text-brand-1100 rounded-md bg-opacity-30 inline-block  dark:bg-scale-400 dark:text-scale-1100 py-0.5 px-2 text-xs mt-2">
+          <div className="lg:py-12">
+            <span className="bg-brand-300 text-brand-600 rounded-md bg-opacity-30 inline-block  dark:bg-scale-400 dark:text-scale-1100 py-0.5 px-2 text-[13px] leading-4 mt-2">
               Available for Pro plan
             </span>
             <h2 className="text-scale-1200 text-4xl mt-4">Cost control with spend caps</h2>
             <p className="mt-3 prose lg:max-w-lg">
               The Pro plan has a usage quota included and a spend cap turned on by default. If you
               need to go beyond the inclusive limits, simply switch off your spend cap to pay for
-              additional usage and scale seamlessly. Note that your project will run into
+              additional usage and scale seamlessly. Note that your projects will run into
               restrictions if you have the spend cap enabled and exhaust your quota.
             </p>
           </div>
-          <div>
-            <img
+          <div className="relative h-full min-h-[14rem]">
+            <Image
+              layout="fill"
+              objectFit="contain"
               className="w-full"
-              src={`${basePath}/images/pricing/spend-cap${isDarkMode ? '' : '-light'}.png`}
+              src={`${basePath}/images/pricing/spend-cap${
+                resolvedTheme === 'dark' ? '' : '-light'
+              }.png`}
             />
           </div>
         </div>
@@ -494,7 +474,7 @@ export default function IndexPage() {
                   <MobileHeader
                     plan="Free"
                     price={'0'}
-                    priceDescription={'/mo'}
+                    priceDescription={'/month'}
                     description={'Perfect for hobby projects and experiments'}
                   />
                   <PricingTableRowMobile
@@ -524,7 +504,7 @@ export default function IndexPage() {
                   <PricingTableRowMobile
                     category={pricing['edge_functions']}
                     plan={'free'}
-                    icon={Solutions['edge-functions'].icon}
+                    icon={Solutions['functions'].icon}
                     sectionId="edge-functions"
                   />
                   <PricingTableRowMobile
@@ -554,7 +534,7 @@ export default function IndexPage() {
                     plan="Pro"
                     from={false}
                     price={'25'}
-                    priceDescription={'/mo + additional use'}
+                    priceDescription={'/month + additional use'}
                     description={'Everything you need to scale your project into production'}
                   />
                   <PricingTableRowMobile
@@ -580,7 +560,7 @@ export default function IndexPage() {
                   <PricingTableRowMobile
                     category={pricing['edge_functions']}
                     plan={'pro'}
-                    icon={Solutions['edge-functions'].icon}
+                    icon={Solutions['functions'].icon}
                   />
                   <PricingTableRowMobile
                     category={pricing.dashboard}
@@ -606,7 +586,7 @@ export default function IndexPage() {
                     plan="Team"
                     from={false}
                     price={'599'}
-                    priceDescription={'/mo + additional use'}
+                    priceDescription={'/month + additional use'}
                     description={'Collaborate with different permissions and access patterns'}
                   />
                   <PricingTableRowMobile
@@ -632,7 +612,7 @@ export default function IndexPage() {
                   <PricingTableRowMobile
                     category={pricing['edge_functions']}
                     plan={'team'}
-                    icon={Solutions['edge-functions'].icon}
+                    icon={Solutions['functions'].icon}
                   />
                   <PricingTableRowMobile
                     category={pricing.dashboard}
@@ -686,7 +666,7 @@ export default function IndexPage() {
                   <PricingTableRowMobile
                     category={pricing['edge_functions']}
                     plan={'enterprise'}
-                    icon={Solutions['edge-functions'].icon}
+                    icon={Solutions['functions'].icon}
                   />
                   <PricingTableRowMobile
                     category={pricing.dashboard}
@@ -730,7 +710,7 @@ export default function IndexPage() {
                         scope="col"
                         key={plan.name}
                       >
-                        <h3 className="gradient-text-brand-500 dark:gradient-text-brand-100 text-2xl font-mono font-normal uppercase flex items-center gap-4">
+                        <h3 className="text-brand-600 dark:text-brand text-2xl font-mono font-normal uppercase flex items-center gap-4">
                           {plan.name}
                         </h3>
                         <div
@@ -770,7 +750,7 @@ export default function IndexPage() {
 
                     {plans.map((plan) => (
                       <td className="h-full px-6 py-2 align-top" key={`price-${plan.name}`}>
-                        <div className="relative table h-full w-full">
+                        <div className="relative h-full w-full">
                           <div className="flex flex-col justify-between h-full">
                             <>
                               <span
@@ -782,16 +762,16 @@ export default function IndexPage() {
                                 {plan.priceMonthly}
                               </span>
                               {['Pro', 'Free'].includes(plan.name) && (
-                                <p className="p text-xs mt-1">per month</p>
+                                <p className="p text-[13px] leading-4 mt-1">/ month / org</p>
                               )}
                               {['Team'].includes(plan.name) && (
-                                <p className="p text-xs mt-1">per month</p>
+                                <p className="p text-[13px] leading-4 mt-1">/ month / org</p>
                               )}
                             </>
 
                             {plan.warning && (
                               <p className="-mt-2">
-                                <span className="bg-scale-100 text-brand-1100 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
+                                <span className="bg-scale-100 text-brand-600 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4">
                                   {plan.warning}
                                 </span>
                               </p>
@@ -838,7 +818,7 @@ export default function IndexPage() {
                   />
                   <PricingTableRowDesktop
                     category={pricing['edge_functions']}
-                    icon={Solutions['edge-functions'].icon}
+                    icon={Solutions['functions'].icon}
                     sectionId="edge-functions"
                   />
                   <PricingTableRowDesktop
@@ -865,12 +845,12 @@ export default function IndexPage() {
 
                     <td className="px-6 pt-5">
                       <Link
-                        href="https://supabase.com/dashboard"
-                        as="https://supabase.com/dashboard"
+                        href="https://supabase.com/dashboard/new?plan=free"
+                        as="https://supabase.com/dashboard/new?plan=free"
                       >
                         <a>
                           <Button size="tiny" type="primary" block>
-                            Get started
+                            Get Started
                           </Button>
                         </a>
                       </Link>
@@ -878,22 +858,22 @@ export default function IndexPage() {
 
                     <td className="px-6 pt-5">
                       <Link
-                        href="https://supabase.com/dashboard"
-                        as="https://supabase.com/dashboard"
+                        href="https://supabase.com/dashboard/new?plan=pro"
+                        as="https://supabase.com/dashboard/new?plan=pro"
                       >
                         <a>
                           <Button size="tiny" type="primary" block>
-                            Get started
+                            Get Started
                           </Button>
                         </a>
                       </Link>
                     </td>
 
                     <td className="px-6 pt-5">
-                      <Link href="https://forms.supabase.com/team">
+                      <Link href="https://supabase.com/dashboard/new?plan=team">
                         <a>
                           <Button size="tiny" type="primary" block>
-                            Contact us
+                            Get Started
                           </Button>
                         </a>
                       </Link>
@@ -903,7 +883,7 @@ export default function IndexPage() {
                       <Link href="https://forms.supabase.com/enterprise">
                         <a>
                           <Button size="tiny" type="default" block>
-                            Contact us
+                            Contact Us
                           </Button>
                         </a>
                       </Link>
@@ -944,22 +924,22 @@ export default function IndexPage() {
                 </Accordion>
               </div>
               <p className="p text-center">
-                Can&apos;t find the answer to your question, you can{' '}
+                Can&apos;t find the answer to your question?{' '}
                 <a
                   target="_blank"
                   href="https://supabase.com/dashboard/support/new"
-                  className="transition text-brand-900 hover:text-brand-1000"
+                  className="transition text-brand hover:text-brand-600"
                 >
-                  open a support ticket
+                  Open a support ticket
                 </a>{' '}
-                and our team of experts will be able to help.
+                to receive help from our team of experts.
               </p>
               <p className="p text-center">
                 For enterprise enquries,{' '}
                 <a
                   target="_blank"
                   href="https://supabase.com/dashboard/support/new"
-                  className="transition text-brand-900 hover:text-brand-1000"
+                  className="transition text-brand hover:text-brand-600"
                 >
                   you can contact the team here
                 </a>

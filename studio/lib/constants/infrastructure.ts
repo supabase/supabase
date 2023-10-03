@@ -38,6 +38,7 @@ export const PRICING_TIER_LABELS = {
 }
 
 export const PRICING_TIER_LABELS_ORG = {
+  FREE: 'Free - $0/month',
   PRO: 'Pro - $25/month',
   TEAM: 'Team - $599/month',
 }
@@ -53,7 +54,8 @@ export const PRICING_TIER_PRODUCT_IDS = {
 export const PRICING_TIER_FREE_KEY = 'FREE'
 export const PRICING_TIER_DEFAULT_KEY = 'FREE'
 
-export const DEFAULT_PROVIDER: CloudProvider = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? 'FLY' : 'AWS'
+export const DEFAULT_PROVIDER: CloudProvider =
+  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? 'FLY' : 'AWS'
 
 export const PROVIDERS = {
   FLY: {
@@ -134,13 +136,7 @@ export const PROJECT_STATUS = {
   RESTORING: 'RESTORING',
   RESTORATION_FAILED: 'RESTORATION_FAILED',
   UPGRADING: 'UPGRADING',
-}
-
-export const STRIPE_PRODUCT_IDS: { [x: string]: string } = {
-  FREE: process?.env?.NEXT_PUBLIC_STRIPE_FREE_TIER_ID || 'prod_Ip4vqwv3EJ7Mi0',
-  PRO: process?.env?.NEXT_PUBLIC_STRIPE_PRO_TIER_ID || 'prod_IsRLOp58Z7V4XN',
-  PAYG: process?.env?.NEXT_PUBLIC_STRIPE_PAYG_TIER_ID || 'prod_JlTbw91xcM6NY4',
-  TEAM: process?.env?.NEXT_PUBLIC_STRIPE_TEAM_TIER_ID || 'prod_MeUrsWN6pj0oXM',
+  PAUSING: 'PAUSING',
 }
 
 export const DEFAULT_MINIMUM_PASSWORD_STRENGTH = 4

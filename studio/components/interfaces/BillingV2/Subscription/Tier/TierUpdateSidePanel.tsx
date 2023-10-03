@@ -1,37 +1,42 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+
 import { useParams } from 'common'
+import InformationBox from 'components/ui/InformationBox'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useProjectPlansQuery } from 'data/subscriptions/project-plans-query'
 import { useProjectSubscriptionUpdateMutation } from 'data/subscriptions/project-subscription-update-mutation'
-import { checkPermissions, useStore } from 'hooks'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import Telemetry from 'lib/telemetry'
+import { useRouter } from 'next/router'
+import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
-import { Alert, Button, IconCheck, IconExternalLink, Modal, SidePanel } from 'ui'
+import { Alert, Button, IconCheck, IconExternalLink, IconInfo, Modal, SidePanel } from 'ui'
 import EnterpriseCard from './EnterpriseCard'
 import ExitSurveyModal from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import PaymentMethodSelection from './PaymentMethodSelection'
-import { plans as subscriptionsPlans } from 'shared-data/plans'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import * as Tooltip from '@radix-ui/react-tooltip'
 
 const TierUpdateSidePanel = () => {
   const { ui } = useStore()
-  const slug = ui.selectedOrganization?.slug
+  const router = useRouter()
+  const selectedOrganization = useSelectedOrganization()
+  const slug = selectedOrganization?.slug
   const { ref: projectRef } = useParams()
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [showExitSurvey, setShowExitSurvey] = useState(false)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>()
   const [showDowngradeError, setShowDowngradeError] = useState(false)
   const [selectedTier, setSelectedTier] = useState<'tier_free' | 'tier_pro' | 'tier_team'>()
 
-  const canUpdateSubscription = checkPermissions(
+  const canUpdateSubscription = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
@@ -44,7 +49,18 @@ const TierUpdateSidePanel = () => {
   const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug })
-  const { mutateAsync: updateSubscriptionTier } = useProjectSubscriptionUpdateMutation()
+  const { mutate: updateSubscriptionTier, isLoading: isUpdating } =
+    useProjectSubscriptionUpdateMutation({
+      onSuccess: () => {
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully updated subscription to ${selectedTierMeta?.name}!`,
+        })
+        setSelectedTier(undefined)
+        onClose()
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+      },
+    })
 
   const availablePlans = plans ?? []
   const subscriptionAddons = addons?.selected_addons ?? []
@@ -58,6 +74,18 @@ const TierUpdateSidePanel = () => {
   useEffect(() => {
     if (visible) {
       setSelectedTier(undefined)
+      Telemetry.sendActivity(
+        {
+          activity: 'Side Panel Viewed',
+          source: 'Dashboard',
+          data: {
+            title: 'Change Subscription Plan',
+            section: 'Subscription plan',
+          },
+          projectRef,
+        },
+        router
+      )
     }
   }, [visible])
 
@@ -77,29 +105,11 @@ const TierUpdateSidePanel = () => {
       return ui.setNotification({ category: 'error', message: 'Please select a payment method' })
     }
 
-    try {
-      setIsSubmitting(true)
-      await updateSubscriptionTier({
-        projectRef,
-        tier: selectedTier,
-        paymentMethod: selectedPaymentMethod,
-      })
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully updated subscription to ${selectedTierMeta?.name}!`,
-      })
-      setSelectedTier(undefined)
-      onClose()
-      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
-    } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Unable to update subscription: ${error.message}`,
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
+    updateSubscriptionTier({
+      projectRef,
+      tier: selectedTier,
+      paymentMethod: selectedPaymentMethod,
+    })
   }
 
   return (
@@ -123,13 +133,53 @@ const TierUpdateSidePanel = () => {
         }
       >
         <SidePanel.Content>
+          <InformationBox
+            icon={<IconInfo size="large" strokeWidth={1.5} />}
+            defaultVisibility={true}
+            hideCollapse
+            title="We're upgrading our billing system"
+            className="mt-4"
+            description={
+              <div className="space-y-3">
+                <p className="text-sm leading-normal">
+                  This organization uses the legacy project-based billing. We’ve recently made some
+                  big improvements to our billing system. To migrate to the new organization-based
+                  billing, head over to your{' '}
+                  <Link href={`/org/${slug}/billing`}>
+                    <a className="text-sm text-green-900 transition hover:text-green-1000">
+                      organization billing settings
+                    </a>
+                  </Link>
+                  .
+                </p>
+
+                <div className="space-x-3">
+                  <Link href="https://supabase.com/blog/organization-based-billing">
+                    <a target="_blank" rel="noreferrer">
+                      <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                        Announcement
+                      </Button>
+                    </a>
+                  </Link>
+                  <Link href="https://supabase.com/docs/guides/platform/org-based-billing">
+                    <a target="_blank" rel="noreferrer">
+                      <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                        Documentation
+                      </Button>
+                    </a>
+                  </Link>
+                </div>
+              </div>
+            }
+          />
+
           <div className="py-6 grid grid-cols-12 gap-3">
             {subscriptionsPlans.map((plan) => {
               const planMeta = availablePlans.find((p) => p.id === plan.id.split('tier_')[1])
               const tierMeta = subscriptionsPlans.find((it) => it.id === plan.id)
               const price = planMeta?.price ?? 0
               const isDowngradeOption = planMeta?.change_type === 'downgrade'
-              const isCurrentPlan = planMeta?.is_current ?? false
+              const isCurrentPlan = planMeta?.id === subscription?.plan?.id
 
               if (plan.id === 'tier_enterprise') {
                 return <EnterpriseCard key={plan.id} plan={plan} isCurrentPlan={isCurrentPlan} />
@@ -146,13 +196,13 @@ const TierUpdateSidePanel = () => {
                 >
                   <div className="w-full">
                     <div className="flex items-center space-x-2">
-                      <p className={clsx('text-brand-900 text-sm uppercase')}>{plan.name}</p>
+                      <p className={clsx('text-brand text-sm uppercase')}>{plan.name}</p>
                       {isCurrentPlan ? (
-                        <div className="text-xs bg-scale-500 text-scale-1000 rounded px-2 py-0.5">
+                        <div className="text-xs bg-scale-500 text-foreground-light rounded px-2 py-0.5">
                           Current plan
                         </div>
                       ) : plan.nameBadge ? (
-                        <div className="text-xs bg-brand-400 text-brand-900 rounded px-2 py-0.5">
+                        <div className="text-xs bg-brand-400 text-brand rounded px-2 py-0.5">
                           {plan.nameBadge}
                         </div>
                       ) : (
@@ -160,19 +210,21 @@ const TierUpdateSidePanel = () => {
                       )}
                     </div>
                     <div className="mt-4 flex items-center space-x-1">
-                      {(price ?? 0) > 0 && <p className="text-scale-1000 text-sm">From</p>}
+                      {(price ?? 0) > 0 && <p className="text-foreground-light text-sm">From</p>}
                       {isLoadingPlans ? (
                         <div className="h-[28px] flex items-center justify-center">
                           <ShimmeringLoader className="w-[30px] h-[24px]" />
                         </div>
                       ) : (
-                        <p className="text-scale-1200 text-lg">${price}</p>
+                        <p className="text-foreground text-lg">${price}</p>
                       )}
-                      <p className="text-scale-1000 text-sm">{tierMeta?.costUnit}</p>
+                      <p className="text-foreground-light text-sm">{tierMeta?.costUnit}</p>
                     </div>
-                    <div className={clsx('flex mt-1 mb-4', !tierMeta?.warning && 'opacity-0')}>
-                      <div className="bg-scale-200 text-brand-1100 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
-                        {tierMeta?.warning}
+                    <div
+                      className={clsx('flex mt-1 mb-4', !tierMeta?.warningLegacy && 'opacity-0')}
+                    >
+                      <div className="bg-scale-200 text-brand-600 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
+                        {tierMeta?.warningLegacy}
                       </div>
                     </div>
                     {isCurrentPlan ? (
@@ -192,7 +244,23 @@ const TierUpdateSidePanel = () => {
                                 !canUpdateSubscription
                               }
                               type={isDowngradeOption ? 'default' : 'primary'}
-                              onClick={() => setSelectedTier(plan.id as any)}
+                              onClick={() => {
+                                setSelectedTier(plan.id as any)
+                                Telemetry.sendActivity(
+                                  {
+                                    activity: 'Popup Viewed',
+                                    source: 'Dashboard',
+                                    data: {
+                                      title: isDowngradeOption
+                                        ? 'Downgrade'
+                                        : 'Upgrade' + ' to ' + plan.name,
+                                      section: 'Subscription plan',
+                                    },
+                                    projectRef,
+                                  },
+                                  router
+                                )
+                              }}
                             >
                               {isDowngradeOption ? 'Downgrade' : 'Upgrade'} to {plan.name}
                             </Button>
@@ -208,7 +276,7 @@ const TierUpdateSidePanel = () => {
                                   'border border-scale-200',
                                 ].join(' ')}
                               >
-                                <span className="text-xs text-scale-1200">
+                                <span className="text-xs text-foreground">
                                   You do not have permission to change the subscription plan.
                                 </span>
                               </div>
@@ -233,12 +301,12 @@ const TierUpdateSidePanel = () => {
                         <li key={feature} className="flex py-2">
                           <div className="w-[12px]">
                             <IconCheck
-                              className="h-3 w-3 text-brand-900 translate-y-[2.5px]"
+                              className="h-3 w-3 text-brand translate-y-[2.5px]"
                               aria-hidden="true"
                               strokeWidth={3}
                             />
                           </div>
-                          <p className="ml-3 text-xs text-scale-1100">{feature}</p>
+                          <p className="ml-3 text-xs text-foreground-light">{feature}</p>
                         </li>
                       ))}
                     </ul>
@@ -246,7 +314,7 @@ const TierUpdateSidePanel = () => {
 
                   {plan.footer && (
                     <div className="border-t pt-4 mt-4">
-                      <p className="text-scale-1000 text-xs">{plan.footer}</p>
+                      <p className="text-foreground-light text-xs">{plan.footer}</p>
                     </div>
                   )}
                 </div>
@@ -301,7 +369,7 @@ const TierUpdateSidePanel = () => {
       </Modal>
 
       <Modal
-        loading={isSubmitting}
+        loading={isUpdating}
         alignFooter="right"
         className="!w-[450px]"
         visible={selectedTier !== undefined && selectedTier !== 'tier_free'}
@@ -318,7 +386,7 @@ const TierUpdateSidePanel = () => {
               Changing the plan resets your billing cycle and may result in a prorated charge for
               previous usage.
             </p>
-            <p className="text-sm text-scale-1000">
+            <p className="text-sm text-foreground-light">
               You will also be able to change your project's add-ons after upgrading your project's
               plan.
             </p>

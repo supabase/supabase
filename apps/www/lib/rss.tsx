@@ -7,6 +7,10 @@ dayjs.extend(advancedFormat)
 
 const generateRssItem = (post: any): string => {
   const xmlEncode = (str: string) => {
+    if (str === undefined || str === null) {
+      return ''
+    }
+
     return str
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')

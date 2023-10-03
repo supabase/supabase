@@ -1,5 +1,5 @@
-import '../../../packages/ui/build/css/themes/light.css'
 import '../../../packages/ui/build/css/themes/dark.css'
+import '../../../packages/ui/build/css/themes/light.css'
 
 import 'config/code-hike.scss'
 import '../styles/main.scss?v=1.0.0'
@@ -8,19 +8,22 @@ import '../styles/prism-okaidia.scss'
 
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
-import { AuthProvider, ThemeProvider, useTelemetryProps } from 'common'
+import { AuthProvider, ThemeProvider, useConsent, useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import { AppPropsWithLayout } from 'types'
 import { CommandMenuProvider } from 'ui'
+import { TabsProvider } from 'ui/src/components/Tabs'
 import Favicons from '~/components/Favicons'
 import SiteLayout from '~/layouts/SiteLayout'
 import { API_URL, IS_PLATFORM, LOCAL_SUPABASE } from '~/lib/constants'
 import { post } from '~/lib/fetchWrappers'
+import PortalToast from 'ui/src/layout/PortalToast'
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
+  const { consentValue, hasAcceptedConsent } = useConsent()
 
   const [supabase] = useState(() =>
     IS_PLATFORM || LOCAL_SUPABASE ? createBrowserSupabaseClient() : undefined
@@ -46,7 +49,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       /*
        * handle telemetry
        */
-      handlePageTelemetry(url)
+      if (hasAcceptedConsent) handlePageTelemetry(url)
       /*
        * handle "scroll to top" behaviour on route change
        */
@@ -66,7 +69,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     return () => {
       router.events.off('routeChangeComplete', handleRouteChange)
     }
-  }, [router, handlePageTelemetry])
+  }, [router, handlePageTelemetry, consentValue])
 
   /**
    * Save/restore scroll position when reloading or navigating back/forward.
@@ -105,13 +108,15 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   }, [router])
 
   useEffect(() => {
+    if (!hasAcceptedConsent) return
+
     /**
      * Send page telemetry on first page load
      */
     if (router.isReady) {
       handlePageTelemetry(router.basePath + router.asPath)
     }
-  }, [router, handlePageTelemetry])
+  }, [router, handlePageTelemetry, consentValue])
 
   /**
    * Reference docs use `history.pushState()` to jump to
@@ -148,11 +153,19 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     <>
       <Favicons />
       <AuthContainer>
-        <ThemeProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
           <CommandMenuProvider site="docs">
-            <SiteLayout>
-              <Component {...pageProps} />
-            </SiteLayout>
+            <TabsProvider>
+              <SiteLayout>
+                <PortalToast />
+                <Component {...pageProps} />
+              </SiteLayout>
+            </TabsProvider>
           </CommandMenuProvider>
         </ThemeProvider>
       </AuthContainer>

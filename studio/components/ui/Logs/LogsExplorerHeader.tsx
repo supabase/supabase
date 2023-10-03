@@ -29,14 +29,14 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
       <div className="flex items-center gap-3">
         <div
           className="flex h-6 w-6 items-center justify-center rounded border
-            border-brand-600 bg-brand-300 text-brand-900
+            border-brand-600 bg-brand-300 text-brand
           "
         >
           <IconList size={14} strokeWidth={3} />
         </div>
 
-        <h1 className="text-2xl text-scale-1200">Logs Explorer</h1>
-        {subtitle && <span className="text-2xl text-scale-1000">{subtitle}</span>}
+        <h1 className="text-2xl text-foreground">Logs Explorer</h1>
+        {subtitle && <span className="text-2xl text-foreground-light">{subtitle}</span>}
       </div>
       <div className="flex flex-row gap-2">
         <Link href={LOGS_EXPLORER_DOCS_URL}>
@@ -81,7 +81,7 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
                 respective source. Do note that to access nested keys, you would need to perform the
                 necessary{' '}
                 <Link href="https://supabase.com/docs/guides/platform/logs#unnesting-arrays">
-                  <a target="_blank" rel="noreferrer" className="text-brand-900">
+                  <a target="_blank" rel="noreferrer" className="text-brand">
                     unnesting joins
                     <IconExternalLink
                       size="tiny"
@@ -147,7 +147,7 @@ const Field = ({
   return (
     <Table.tr>
       <Table.td
-        className="font-mono text-xs !p-2 cursor-pointer hover:text-scale-1200 transition flex items-center space-x-2"
+        className="font-mono text-xs !p-2 cursor-pointer hover:text-foreground transition flex items-center space-x-2"
         onClick={() =>
           copyToClipboard(field.path, () => {
             setIsCopied(true)
@@ -159,7 +159,7 @@ const Field = ({
         {isCopied ? (
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger>
-              <IconCheck size={14} strokeWidth={3} className="text-brand-900" />
+              <IconCheck size={14} strokeWidth={3} className="text-brand" />
             </Tooltip.Trigger>
             <Tooltip.Portal>
               <Tooltip.Content side="bottom">
@@ -170,7 +170,7 @@ const Field = ({
                     'border border-scale-200',
                   ].join(' ')}
                 >
-                  <span className="text-xs text-scale-1200">Copied</span>
+                  <span className="text-xs text-foreground">Copied</span>
                 </div>
               </Tooltip.Content>
             </Tooltip.Portal>
@@ -189,7 +189,7 @@ const Field = ({
                     'border border-scale-200',
                   ].join(' ')}
                 >
-                  <span className="text-xs text-scale-1200">Copy value</span>
+                  <span className="text-xs text-foreground">Copy value</span>
                 </div>
               </Tooltip.Content>
             </Tooltip.Portal>

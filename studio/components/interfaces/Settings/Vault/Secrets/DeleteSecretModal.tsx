@@ -1,14 +1,15 @@
-import { FC, useState } from 'react'
+import { useState } from 'react'
 import { Modal } from 'ui'
-import { VaultSecret } from 'types'
-import { useStore } from 'hooks'
 
-interface Props {
+import { useStore } from 'hooks'
+import { VaultSecret } from 'types'
+
+interface DeleteSecretModalProps {
   selectedSecret: VaultSecret
   onClose: () => void
 }
 
-const DeleteSecretModal: FC<Props> = ({ selectedSecret, onClose }) => {
+const DeleteSecretModal = ({ selectedSecret, onClose }: DeleteSecretModalProps) => {
   const { vault, ui } = useStore()
 
   const [isDeleting, setIsDeleting] = useState(false)
@@ -41,7 +42,7 @@ const DeleteSecretModal: FC<Props> = ({ selectedSecret, onClose }) => {
       onCancel={onClose}
       onConfirm={onConfirmDeleteSecret}
       loading={isDeleting}
-      header={<h5 className="text-sm text-scale-1200">Confirm to delete secret</h5>}
+      header={<h5 className="text-sm text-foreground">Confirm to delete secret</h5>}
     >
       <div className="py-4">
         <Modal.Content>
@@ -52,7 +53,7 @@ const DeleteSecretModal: FC<Props> = ({ selectedSecret, onClose }) => {
             </p>
             <div className="space-y-1">
               <p className="text-sm">{selectedSecret?.description}</p>
-              <p className="text-sm text-scale-1100">
+              <p className="text-sm text-foreground-light">
                 ID: <span className="font-mono">{selectedSecret?.key_id}</span>
               </p>
             </div>

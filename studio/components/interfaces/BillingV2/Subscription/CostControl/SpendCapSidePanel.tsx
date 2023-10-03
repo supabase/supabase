@@ -1,16 +1,19 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
-import { useParams, useTheme } from 'common'
+import { useParams } from 'common'
+import { useTheme } from 'next-themes'
 import Table from 'components/to-be-cleaned/Table'
 import { useProjectSubscriptionUpdateMutation } from 'data/subscriptions/project-subscription-update-mutation'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { BASE_PATH, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import Telemetry from 'lib/telemetry'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import { pricing } from 'shared-data/pricing'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, Collapsible, IconChevronRight, IconExternalLink, SidePanel } from 'ui'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { pricing } from 'shared-data/pricing'
 
 const SPEND_CAP_OPTIONS: {
   name: string
@@ -34,56 +37,71 @@ const SPEND_CAP_OPTIONS: {
 
 const SpendCapSidePanel = () => {
   const { ui } = useStore()
+  const router = useRouter()
   const { ref: projectRef } = useParams()
-  const { isDarkMode } = useTheme()
+  const { theme } = useTheme()
 
   const [showUsageCosts, setShowUsageCosts] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [selectedOption, setSelectedOption] = useState<'on' | 'off'>()
 
-  const canUpdateSpendCap = checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.subscriptions')
+  const canUpdateSpendCap = useCheckPermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.subscriptions'
+  )
 
   const snap = useSubscriptionPageStateSnapshot()
   const visible = snap.panelKey === 'costControl'
   const onClose = () => snap.setPanelKey(undefined)
 
   const { data: subscription, isLoading } = useProjectSubscriptionV2Query({ projectRef })
-  const { mutateAsync: updateSubscriptionTier } = useProjectSubscriptionUpdateMutation()
-
   const isFreePlan = subscription?.plan?.id === 'free'
   const isSpendCapOn = !subscription?.usage_billing_enabled
   const isTurningOnCap = !isSpendCapOn && selectedOption === 'on'
   const hasChanges = selectedOption !== (isSpendCapOn ? 'on' : 'off')
 
+  const { mutate: updateSubscriptionTier, isLoading: isUpdating } =
+    useProjectSubscriptionUpdateMutation({
+      onSuccess: () => {
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully ${isTurningOnCap ? 'enabled' : 'disabled'} spend cap`,
+        })
+        onClose()
+      },
+      onError: (error) => {
+        ui.setNotification({
+          error,
+          category: 'error',
+          message: `Unable to toggle spend cap: ${error.message}`,
+        })
+      },
+    })
+
   useEffect(() => {
     if (visible && subscription !== undefined) {
       setSelectedOption(isSpendCapOn ? 'on' : 'off')
+      Telemetry.sendActivity(
+        {
+          activity: 'Side Panel Viewed',
+          source: 'Dashboard',
+          data: {
+            title: 'Spend cap',
+            section: 'Cost Control',
+          },
+          projectRef,
+        },
+        router
+      )
     }
   }, [visible, isLoading, subscription, isSpendCapOn])
 
   const onConfirm = async () => {
     if (!projectRef) return console.error('Project ref is required')
 
-    try {
-      const tier = (
-        selectedOption === 'on' ? PRICING_TIER_PRODUCT_IDS.PRO : PRICING_TIER_PRODUCT_IDS.PAYG
-      ) as 'tier_pro' | 'tier_payg'
-      setIsSubmitting(true)
-      await updateSubscriptionTier({ projectRef, tier })
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully ${isTurningOnCap ? 'enabled' : 'disabled'} spend cap`,
-      })
-      onClose()
-    } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Unable to toggle spend cap: ${error.message}`,
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
+    const tier = (
+      selectedOption === 'on' ? PRICING_TIER_PRODUCT_IDS.PRO : PRICING_TIER_PRODUCT_IDS.PAYG
+    ) as 'tier_pro' | 'tier_payg'
+    updateSubscriptionTier({ projectRef, tier })
   }
 
   const billingMetricCategories: (keyof typeof pricing)[] = [
@@ -97,8 +115,8 @@ const SpendCapSidePanel = () => {
   return (
     <SidePanel
       size="large"
-      loading={isLoading || isSubmitting}
-      disabled={isFreePlan || isLoading || !hasChanges || isSubmitting || !canUpdateSpendCap}
+      loading={isLoading || isUpdating}
+      disabled={isFreePlan || isLoading || !hasChanges || isUpdating || !canUpdateSpendCap}
       visible={visible}
       onCancel={onClose}
       onConfirm={onConfirm}
@@ -131,7 +149,7 @@ const SpendCapSidePanel = () => {
                   size={16}
                   className={showUsageCosts ? 'rotate-90' : ''}
                 />
-                <p className="text-sm text-scale-1100">
+                <p className="text-sm text-foreground-light">
                   How are each resource charged after exceeding the included quota?
                 </p>
               </div>
@@ -157,20 +175,18 @@ const SpendCapSidePanel = () => {
                     <>
                       <Table.tr key={categoryId}>
                         <Table.td>
-                          <p className="text-xs text-scale-1200">{category.title}</p>
+                          <p className="text-xs text-foreground">{category.title}</p>
                         </Table.td>
                         <Table.td>{null}</Table.td>
                       </Table.tr>
                       {usageItems.map((item: any) => {
                         return (
-                          <Table.tr key={item.name}>
+                          <Table.tr key={item.title}>
                             <Table.td>
                               <p className="text-xs pl-4">{item.title}</p>
                             </Table.td>
                             <Table.td>
-                              <p className="text-xs pl-4">
-                                {item.plans[subscription?.plan?.id || 'pro']}
-                              </p>
+                              <p className="text-xs pl-4">{item.plans['pro']}</p>
                             </Table.td>
                           </Table.tr>
                         )
@@ -206,7 +222,22 @@ const SpendCapSidePanel = () => {
                   <div
                     key={option.value}
                     className={clsx('col-span-4 group space-y-1', isFreePlan && 'opacity-75')}
-                    onClick={() => !isFreePlan && setSelectedOption(option.value)}
+                    onClick={() => {
+                      !isFreePlan && setSelectedOption(option.value)
+                      Telemetry.sendActivity(
+                        {
+                          activity: 'Option Selected',
+                          source: 'Dashboard',
+                          data: {
+                            title: 'Spend cap',
+                            section: 'Cost Control',
+                            option: option.name,
+                          },
+                          projectRef,
+                        },
+                        router
+                      )
+                    }}
                   >
                     <img
                       alt="Spend Cap"
@@ -220,14 +251,14 @@ const SpendCapSidePanel = () => {
                       )}
                       width={160}
                       height={96}
-                      src={isDarkMode ? option.imageUrl : option.imageUrlLight}
+                      src={theme === 'dark' ? option.imageUrl : option.imageUrlLight}
                     />
 
                     <p
                       className={clsx(
                         'text-sm transition',
-                        !isFreePlan && 'group-hover:text-scale-1200',
-                        isSelected ? 'text-scale-1200' : 'text-scale-1000'
+                        !isFreePlan && 'group-hover:text-foreground',
+                        isSelected ? 'text-foreground' : 'text-foreground-light'
                       )}
                     >
                       {option.name}

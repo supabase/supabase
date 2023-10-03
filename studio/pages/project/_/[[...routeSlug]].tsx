@@ -1,16 +1,13 @@
-import { FC } from 'react'
-import Link from 'next/link'
-import { NextPage } from 'next'
-import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
+import { NextPage } from 'next'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 
+import ProjectList from 'components/interfaces/Home/ProjectList'
 import { withAuth } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
-import ProjectList from 'components/interfaces/Home/ProjectList'
 
-interface Props {}
-
-const Header: FC<Props> = () => {
+const Header = () => {
   return (
     <div className="dark:border-dark border-b p-3">
       <div className="flex items-center space-x-2">
@@ -43,12 +40,22 @@ const GenericProjectPage: NextPage = () => {
 
   const urlRewriterFactory = (slug: string | string[] | undefined) => {
     return (projectRef: string) => {
+      const hash = location.hash
+
       if (!Array.isArray(slug)) {
-        return `/project/${projectRef}?${queryString}`
+        return [`/project/${projectRef}`, queryString ?? `?${queryString}`, hash ?? `#${hash}`]
+          .filter(Boolean)
+          .join('')
       }
 
-      const slugPath = slug.reduce((a: string, b: string) => `${a}/${b}`, '').slice(1)
-      return `/project/${projectRef}/${slugPath}?${queryString}`
+      const slugPath = slug.reduce((a, b) => `${a}/${b}`, '').slice(1)
+      return [
+        `/project/${projectRef}/${slugPath}`,
+        queryString ?? `?${queryString}`,
+        hash ?? `#${hash}`,
+      ]
+        .filter(Boolean)
+        .join('')
     }
   }
 

@@ -1,21 +1,19 @@
-import { FC } from 'react'
-import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { checkPermissions, useLocalStorage, useStore } from 'hooks'
-import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
+import { useCheckPermissions, useLocalStorage } from 'hooks'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 
-interface Props {
-  selectedSchema: string
-  onAddTable: () => void
-}
+export interface EmptyStateProps {}
 
-const EmptyState: FC<Props> = ({ selectedSchema, onAddTable }) => {
-  const { meta } = useStore()
-  const isProtectedSchema = meta.excludedSchemas.includes(selectedSchema)
+const EmptyState = ({}: EmptyStateProps) => {
+  const snap = useTableEditorStateSnapshot()
+  const isProtectedSchema = EXCLUDED_SCHEMAS.includes(snap.selectedSchemaName)
   const canCreateTables =
-    !isProtectedSchema && checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+    useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables') && !isProtectedSchema
 
   const [sort] = useLocalStorage<'alphabetical' | 'grouped-alphabetical'>(
     'table-editor-sort',
@@ -27,7 +25,7 @@ const EmptyState: FC<Props> = ({ selectedSchema, onAddTable }) => {
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      schema: selectedSchema,
+      schema: snap.selectedSchemaName,
       sort,
     },
     {
@@ -43,18 +41,20 @@ const EmptyState: FC<Props> = ({ selectedSchema, onAddTable }) => {
         <ProductEmptyState
           title="Table Editor"
           ctaButtonLabel={canCreateTables ? 'Create a new table' : undefined}
-          onClickCta={canCreateTables ? onAddTable : undefined}
+          onClickCta={canCreateTables ? snap.onAddTable : undefined}
         >
-          <p className="text-sm text-scale-1100">There are no tables available in this schema.</p>
+          <p className="text-sm text-foreground-light">
+            There are no tables available in this schema.
+          </p>
         </ProductEmptyState>
       ) : (
         <div className="flex flex-col items-center space-y-4">
           <ProductEmptyState
             title="Table Editor"
             ctaButtonLabel={canCreateTables ? 'Create a new table' : undefined}
-            onClickCta={canCreateTables ? onAddTable : undefined}
+            onClickCta={canCreateTables ? snap.onAddTable : undefined}
           >
-            <p className="text-sm text-scale-1100">
+            <p className="text-sm text-foreground-light">
               Select a table from the navigation panel on the left to view its data
               {canCreateTables && ', or create a new one.'}
             </p>
@@ -65,4 +65,4 @@ const EmptyState: FC<Props> = ({ selectedSchema, onAddTable }) => {
   )
 }
 
-export default observer(EmptyState)
+export default EmptyState

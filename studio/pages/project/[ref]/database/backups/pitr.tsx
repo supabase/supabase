@@ -1,51 +1,52 @@
-import { useRouter } from 'next/router'
-import { observer } from 'mobx-react-lite'
-import { Tabs } from 'ui'
-import clsx from 'clsx'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { observer } from 'mobx-react-lite'
+import { useRouter } from 'next/router'
+import { Tabs } from 'ui'
 
-import { NextPageWithLayout } from 'types'
-import { useStore, checkPermissions } from 'hooks'
-import { DatabaseLayout } from 'components/layouts'
-import Loading from 'components/ui/Loading'
-import NoPermission from 'components/ui/NoPermission'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { PITRNotice, PITRSelection } from 'components/interfaces/Database/Backups/PITR'
-import BackupsError from 'components/interfaces/Database/Backups/BackupsError'
-import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import { DatabaseLayout } from 'components/layouts'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
+import NoPermission from 'components/ui/NoPermission'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import UpgradeToPro from 'components/ui/UpgradeToPro'
+import { useBackupsQuery } from 'data/database/backups-query'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { useCheckPermissions } from 'hooks'
+import { NextPageWithLayout } from 'types'
 
 const DatabasePhysicalBackups: NextPageWithLayout = () => {
-  const { ui } = useStore()
   const router = useRouter()
-  const ref = ui.selectedProject?.ref ?? 'default'
+  const { project } = useProjectContext()
+  const ref = project?.ref ?? 'default'
 
   return (
-    <div
-      className={clsx(
-        'mx-auto flex flex-col px-5 pt-6 pb-14',
-        'lg:pt-8 lg:px-14 1xl:px-28 2xl:px-32 h-full'
-      )}
-    >
-      <div className="space-y-6">
-        <h3 className="text-xl text-scale-1200">Backups</h3>
+    <ScaffoldContainer>
+      <ScaffoldSection>
+        <div className="col-span-12">
+          <div className="space-y-6">
+            <h3 className="text-xl text-foreground">Database Backups</h3>
 
-        <Tabs
-          type="underlined"
-          size="small"
-          activeId="pitr"
-          onChange={(id: any) => {
-            if (id === 'scheduled') router.push(`/project/${ref}/database/backups/scheduled`)
-          }}
-        >
-          <Tabs.Panel id="scheduled" label="Scheduled backups" />
-          <Tabs.Panel id="pitr" label="Point in Time" />
-        </Tabs>
+            <Tabs
+              type="underlined"
+              size="small"
+              activeId="pitr"
+              onChange={(id: any) => {
+                if (id === 'scheduled') router.push(`/project/${ref}/database/backups/scheduled`)
+              }}
+            >
+              <Tabs.Panel id="scheduled" label="Scheduled backups" />
+              <Tabs.Panel id="pitr" label="Point in Time" />
+            </Tabs>
 
-        <div className="space-y-8">
-          <PITR />
+            <div className="space-y-8">
+              <PITR />
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      </ScaffoldSection>
+    </ScaffoldContainer>
   )
 }
 
@@ -53,39 +54,58 @@ DatabasePhysicalBackups.getLayout = (page) => (
   <DatabaseLayout title="Database">{page}</DatabaseLayout>
 )
 
-const PITR = () => {
-  const { ui, backups } = useStore()
-  const { configuration, error, isLoading } = backups
+const PITR = observer(() => {
+  const { project } = useProjectContext()
+  const {
+    data: backups,
+    error,
+    isLoading,
+    isError,
+    isSuccess,
+  } = useBackupsQuery({
+    projectRef: project?.ref,
+  })
 
-  const ref = ui.selectedProject?.ref ?? 'default'
-  const tier = ui.selectedProject?.subscription_tier
-  const isEnabled = configuration.walg_enabled
+  const { data: subscription } = useProjectSubscriptionV2Query(
+    { projectRef: project?.ref },
+    { enabled: project?.ref !== undefined }
+  )
 
-  const canReadPhysicalBackups = checkPermissions(PermissionAction.READ, 'physical_backups')
+  const ref = project?.ref ?? 'default'
+  const plan = subscription?.plan?.id
+  const isEnabled = backups?.pitr_enabled
+
+  const canReadPhysicalBackups = useCheckPermissions(PermissionAction.READ, 'physical_backups')
+
   if (!canReadPhysicalBackups) return <NoPermission resourceText="view PITR backups" />
-
-  if (isLoading) return <Loading />
-  if (error) return <BackupsError />
-  if (!isEnabled) {
-    return (
-      <UpgradeToPro
-        projectRef={ref}
-        primaryText="Point in time recovery is a Pro plan add-on."
-        secondaryText={
-          tier === PRICING_TIER_PRODUCT_IDS.FREE
-            ? 'Upgrade to the Pro plan with the PITR add-on selected to enable point in time recovery for your project.'
-            : 'Please enable the add-on to enable point in time recovery for your project.'
-        }
-      />
-    )
-  }
 
   return (
     <>
-      <PITRNotice />
-      <PITRSelection />
+      {isLoading && <GenericSkeletonLoader />}
+      {isError && <AlertError error={error} subject="Failed to retrieve PITR backups" />}
+      {isSuccess && (
+        <>
+          {isEnabled ? (
+            <>
+              <PITRNotice />
+              <PITRSelection />
+            </>
+          ) : (
+            <UpgradeToPro
+              projectRef={ref}
+              primaryText="Point in time recovery is a Pro plan add-on."
+              secondaryText={
+                plan === 'free'
+                  ? 'Upgrade to the Pro plan with the PITR add-on selected to enable point in time recovery for your project.'
+                  : 'Please enable the add-on to enable point in time recovery for your project.'
+              }
+              addon="pitr"
+            />
+          )}
+        </>
+      )}
     </>
   )
-}
+})
 
-export default observer(DatabasePhysicalBackups)
+export default DatabasePhysicalBackups

@@ -53,14 +53,14 @@ This will serve as the `client_secret` when you make API calls to authenticate t
 
 ![Obtain the client secret](/docs/img/guides/auth-azure/azure-client-secret.png)
 
-## Obtain the Tenant URL
+## Obtain the Tenant URL (Optional)
 
-This will allow your users to use your custom Azure login page when logging in.
+The default tenant url is `https://login.microsoftonline.com/common`. This will allow users with personal Azure accounts as well as with Azure work accounts, other than that of your own organization, to sign in to your app. This is set by default in Supabase and you can leave the `Azure Tenant URL` field blank in your provider settings.
 
-- Select the Directory (Tenant) ID value.
-- The Azure Tenant URL should look like this: `https://login.microsoftonline.com/<tenant-id>`
+If you want to allow users from **your Azure organization only** to be able to log in to you app
 
-![Obtain the tenant url](/docs/img/guides/auth-azure/azure-tenant-url.png)
+- Select the Directory (Tenant) ID value
+- Set the tenant URL in your Supabase Azure Provider settings to `https://login.microsoftonline.com/<tenant-id>`
 
 ## Add login code to your client app
 

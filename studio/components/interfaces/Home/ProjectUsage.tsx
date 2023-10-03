@@ -1,10 +1,17 @@
+import { useParams } from 'common'
 import dayjs from 'dayjs'
+import sumBy from 'lodash/sumBy'
 import Link from 'next/link'
-import { FC, useState } from 'react'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { ChartIntervals } from 'types'
 import {
   Button,
-  Dropdown,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuRadioGroup_Shadcn_,
+  DropdownMenuRadioItem_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
   IconArchive,
   IconChevronDown,
   IconDatabase,
@@ -12,12 +19,10 @@ import {
   IconZap,
   Loading,
 } from 'ui'
-import Panel from 'components/ui/Panel'
-import { ChartIntervals } from 'types'
-import { useParams } from 'common/hooks'
-import { UsageApiCounts, useProjectLogStatsQuery } from 'data/analytics/project-log-stats-query'
+
 import BarChart from 'components/ui/Charts/BarChart'
-import sumBy from 'lodash/sumBy'
+import Panel from 'components/ui/Panel'
+import { UsageApiCounts, useProjectLogStatsQuery } from 'data/analytics/project-log-stats-query'
 import useFillTimeseriesSorted from 'hooks/analytics/useFillTimeseriesSorted'
 
 const CHART_INTERVALS: ChartIntervals[] = [
@@ -31,9 +36,8 @@ const CHART_INTERVALS: ChartIntervals[] = [
   { key: 'hourly', label: '24 hours', startValue: 24, startUnit: 'hour', format: 'MMM D, ha' },
   { key: 'daily', label: '7 days', startValue: 7, startUnit: 'day', format: 'MMM D' },
 ]
-interface Props {}
 
-const ProjectUsage: FC<Props> = ({}) => {
+const ProjectUsage = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
 
@@ -67,31 +71,34 @@ const ProjectUsage: FC<Props> = ({}) => {
     // TODO (ziinc): link to edge logs with correct filter applied
     _type: 'rest' | 'realtime' | 'storage' | 'auth'
   ) => {
-    const selected = dayjs(value?.timestamp).toISOString()
-    router.push(`/project/${projectRef}/logs/edge-logs?ite=${encodeURIComponent(selected)}`)
+    const unit = selectedInterval.startUnit
+    const selectedStart = dayjs(value?.timestamp)
+    const selectedEnd = selectedStart.add(1, unit)
+    router.push(
+      `/project/${projectRef}/logs/edge-logs?ite=${encodeURIComponent(selectedEnd.toISOString())}`
+    )
   }
 
   return (
     <div className="space-y-6">
       <div className="flex flex-row items-center gap-2">
-        <Dropdown
-          side="bottom"
-          align="start"
-          overlay={
-            <Dropdown.RadioGroup value={interval} onChange={setInterval}>
+        <DropdownMenu_Shadcn_>
+          <DropdownMenuTrigger_Shadcn_>
+            <Button asChild type="default" iconRight={<IconChevronDown />}>
+              <span>{selectedInterval.label}</span>
+            </Button>
+          </DropdownMenuTrigger_Shadcn_>
+          <DropdownMenuContent_Shadcn_ side="bottom" align="start">
+            <DropdownMenuRadioGroup_Shadcn_ value={interval} onValueChange={setInterval}>
               {CHART_INTERVALS.map((i) => (
-                <Dropdown.Radio key={i.key} value={i.key}>
+                <DropdownMenuRadioItem_Shadcn_ key={i.key} value={i.key}>
                   {i.label}
-                </Dropdown.Radio>
+                </DropdownMenuRadioItem_Shadcn_>
               ))}
-            </Dropdown.RadioGroup>
-          }
-        >
-          <Button as="span" type="default" iconRight={<IconChevronDown />}>
-            {selectedInterval.label}
-          </Button>
-        </Dropdown>
-        <span className="text-xs text-scale-1000">
+            </DropdownMenuRadioGroup_Shadcn_>
+          </DropdownMenuContent_Shadcn_>
+        </DropdownMenu_Shadcn_>
+        <span className="text-xs text-foreground-light">
           Statistics for past {selectedInterval.label}
         </span>
       </div>
@@ -100,7 +107,7 @@ const ProjectUsage: FC<Props> = ({}) => {
           <Panel.Content className="space-y-4">
             <PanelHeader
               icon={
-                <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
+                <div className="rounded bg-scale-600 p-1.5 text-foreground-light shadow-sm">
                   <IconDatabase strokeWidth={2} size={16} />
                 </div>
               }
@@ -125,7 +132,7 @@ const ProjectUsage: FC<Props> = ({}) => {
           <Panel.Content className="space-y-4">
             <PanelHeader
               icon={
-                <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
+                <div className="rounded bg-scale-600 p-1.5 text-foreground-light shadow-sm">
                   <IconKey strokeWidth={2} size={16} />
                 </div>
               }
@@ -149,7 +156,7 @@ const ProjectUsage: FC<Props> = ({}) => {
           <Panel.Content className="space-y-4">
             <PanelHeader
               icon={
-                <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
+                <div className="rounded bg-scale-600 p-1.5 text-foreground-light shadow-sm">
                   <IconArchive strokeWidth={2} size={16} />
                 </div>
               }
@@ -174,7 +181,7 @@ const ProjectUsage: FC<Props> = ({}) => {
           <Panel.Content className="space-y-4">
             <PanelHeader
               icon={
-                <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
+                <div className="rounded bg-scale-600 p-1.5 text-foreground-light shadow-sm">
                   <IconZap strokeWidth={2} size={16} />
                 </div>
               }

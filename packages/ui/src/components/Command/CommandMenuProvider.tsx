@@ -1,4 +1,3 @@
-import { useTheme, UseThemeProps } from 'common'
 import dynamic from 'next/dynamic'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 
@@ -12,7 +11,6 @@ export interface CommandMenuContextValue {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
   isLoading: boolean
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
-  actions: CommandMenuActions
   search: string
   setSearch: React.Dispatch<React.SetStateAction<string>>
   pages: string[]
@@ -23,7 +21,7 @@ export interface CommandMenuContextValue {
   /**
    * Project metadata for easy retrieval
    */
-  project?: { ref?: string; apiKeys?: { anon?: string; service?: string } }
+  project?: { ref?: string; apiKeys?: { anon?: string; service?: string }; apiUrl?: string }
   /**
    * Any additional metadata that CMDK component can use in its AI prompts
    */
@@ -47,10 +45,6 @@ export const useCommandMenu = () => {
   return context
 }
 
-export interface CommandMenuActions {
-  toggleTheme: UseThemeProps['toggleTheme']
-}
-
 export interface CommandMenuProviderProps {
   site: 'studio' | 'docs'
   projectRef?: string
@@ -58,6 +52,7 @@ export interface CommandMenuProviderProps {
    * Project's API keys, for easy access through CMDK
    */
   apiKeys?: { anon?: string; service?: string }
+  apiUrl?: string
   /**
    * Opt in flag to use additional metadata in AI prompts
    */
@@ -77,6 +72,7 @@ const CommandMenuProvider = ({
   site,
   projectRef,
   apiKeys,
+  apiUrl,
   metadata,
   isOptedInToAI = false,
   saveGeneratedSQL,
@@ -85,11 +81,9 @@ const CommandMenuProvider = ({
   const [isLoading, setIsLoading] = useState(false)
   const [search, setSearch] = useState('')
   const [pages, setPages] = useState<string[]>([])
-  const { toggleTheme } = useTheme()
   const currentPage = pages[pages.length - 1]
 
-  const actions: CommandMenuActions = { toggleTheme }
-  const project = projectRef !== undefined ? { ref: projectRef, apiKeys } : undefined
+  const project = projectRef !== undefined ? { ref: projectRef, apiKeys, apiUrl } : undefined
 
   useKeyboardEvents({ setIsOpen, currentPage, setSearch, setPages })
 
@@ -100,7 +94,6 @@ const CommandMenuProvider = ({
         setIsOpen,
         isLoading,
         setIsLoading,
-        actions,
         setSearch,
         search,
         pages,

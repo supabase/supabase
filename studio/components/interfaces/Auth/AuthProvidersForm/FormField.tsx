@@ -1,22 +1,94 @@
-import { BASE_PATH } from 'lib/constants'
-import { FC, useState } from 'react'
+import { DatePicker } from 'components/ui/DatePicker'
+import dayjs from 'dayjs'
+import { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { Button, Input, InputNumber, Toggle, Listbox, IconEye, IconEyeOff } from 'ui'
+import { Button, IconEye, IconEyeOff, Input, InputNumber, Listbox, Toggle } from 'ui'
+
+import { BASE_PATH } from 'lib/constants'
 import { Enum } from './AuthProvidersForm.types'
 
-interface Props {
+interface FormFieldProps {
   name: string
   properties: any
   formValues: any
   disabled?: boolean
 }
 
-const FormField: FC<Props> = ({ name, properties, formValues, disabled = false }) => {
-  const [hidden, setHidden] = useState(!!properties.isSecret)
+function formatDate(date: Date): string {
+  return dayjs(date).format('dddd, MMMM D, YYYY HH:mm:ss Z')
+}
 
-  if (properties.show && formValues[properties.show.key] !== properties.show.matches) return null
+const FormField = ({ name, properties, formValues, disabled = false }: FormFieldProps) => {
+  const [hidden, setHidden] = useState(!!properties.isSecret)
+  const [dateAsText, setDateAsText] = useState(
+    formValues[name] ? formatDate(new Date(formValues[name])) : ''
+  )
+
+  useEffect(() => {
+    if (properties.show && properties.show.key && !formValues[properties.show.key]) {
+      formValues[name] = ''
+      setDateAsText('')
+    }
+  }, [properties.show && properties.show.key && !formValues[properties.show.key]])
+
+  if (properties.show) {
+    if (properties.show.matches) {
+      if (!properties.show.matches.includes(formValues[properties.show.key])) {
+        return null
+      }
+    } else if (!formValues[properties.show.key]) {
+      return null
+    }
+  }
 
   switch (properties.type) {
+    case 'datetime':
+      return (
+        <Input
+          size="small"
+          layout="vertical"
+          id={name}
+          name={name}
+          type="text"
+          value={dateAsText}
+          readOnly
+          label={properties.title}
+          labelOptional={
+            properties.descriptionOptional ? (
+              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                {properties.descriptionOptional}
+              </ReactMarkdown>
+            ) : null
+          }
+          descriptionText={
+            properties.description ? (
+              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                {properties.description}
+              </ReactMarkdown>
+            ) : null
+          }
+          actions={
+            <DatePicker
+              selectsRange={false}
+              minDate={new Date()}
+              from={formValues[name]}
+              to={formValues[name]}
+              onChange={(date) => {
+                if (date && date.to) {
+                  formValues[name] = date.to
+                  setDateAsText(formatDate(new Date(date.to)))
+                } else {
+                  setDateAsText('')
+                  formValues[name] = ''
+                }
+              }}
+            >
+              <span>Pick</span>
+            </DatePicker>
+          }
+        />
+      )
+
     case 'string':
       return (
         <Input
@@ -49,7 +121,7 @@ const FormField: FC<Props> = ({ name, properties, formValues, disabled = false }
                 onClick={() => setHidden(!hidden)}
               />
             ) : (
-              <span className="mr-3 text-scale-900">
+              <span className="mr-3 text-foreground-lighter">
                 {properties.units ? (
                   <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
                     {properties.units}
@@ -84,7 +156,7 @@ const FormField: FC<Props> = ({ name, properties, formValues, disabled = false }
             ) : null
           }
           actions={
-            <span className="mr-3 text-scale-900">
+            <span className="mr-3 text-foreground-lighter">
               {properties.units ? (
                 <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
                   {properties.units}

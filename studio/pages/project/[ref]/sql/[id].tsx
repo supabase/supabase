@@ -1,27 +1,29 @@
-import { useTheme } from 'common'
-import { useEffect, useRef } from 'react'
-import { observer } from 'mobx-react-lite'
 import { useMonaco } from '@monaco-editor/react'
+import { observer } from 'mobx-react-lite'
+import { useEffect, useRef } from 'react'
 
-import { NextPageWithLayout } from 'types'
-import { useFormatQueryMutation } from 'data/sql/format-sql-query'
-import { useKeywordsQuery } from 'data/database/keywords-query'
 import { useFunctionsQuery } from 'data/database/functions-query'
+import { useKeywordsQuery } from 'data/database/keywords-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTableColumnsQuery } from 'data/database/table-columns-query'
+import { useFormatQueryMutation } from 'data/sql/format-sql-query'
+import { NextPageWithLayout } from 'types'
 
-import { SQLEditorLayout } from 'components/layouts'
 import SQLEditor from 'components/interfaces/SQLEditor/SQLEditor'
+import { SQLEditorLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import getPgsqlCompletionProvider from 'components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
 import getPgsqlSignatureHelpProvider from 'components/ui/CodeEditor/Providers/PgSQLSignatureHelpProvider'
+import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { useParams } from 'common'
 
 const SqlEditor: NextPageWithLayout = () => {
   const monaco = useMonaco()
-  const { isDarkMode } = useTheme()
+  const { id } = useParams()
   const { project } = useProjectContext()
-
+  const snap = useSqlEditorStateSnapshot()
   const { mutateAsync: formatQuery } = useFormatQueryMutation()
+
   async function formatPgsql(value: string) {
     try {
       if (!project) throw new Error('No project')
@@ -65,25 +67,10 @@ const SqlEditor: NextPageWithLayout = () => {
       pgInfoRef.current = {}
     }
     pgInfoRef.current.tableColumns = tableColumns?.result
-    pgInfoRef.current.schemas = schemas?.result
+    pgInfoRef.current.schemas = schemas
     pgInfoRef.current.keywords = keywords?.result
     pgInfoRef.current.functions = functions?.result
   }
-
-  useEffect(() => {
-    if (monaco) {
-      monaco.editor.defineTheme('supabase', {
-        base: isDarkMode ? 'vs-dark' : 'vs',
-        inherit: true,
-        rules: [
-          { token: '', background: isDarkMode ? '1f1f1f' : 'f0f0f0' },
-          { token: 'string.sql', foreground: '24b47e' },
-          { token: 'comment', foreground: '666666' },
-        ],
-        colors: { 'editor.background': isDarkMode ? '#1f1f1f' : '#f0f0f0' },
-      })
-    }
-  }, [monaco, isDarkMode])
 
   // Enable pgsql format
   useEffect(() => {
@@ -92,6 +79,7 @@ const SqlEditor: NextPageWithLayout = () => {
         async provideDocumentFormattingEdits(model: any) {
           const value = model.getValue()
           const formatted = await formatPgsqlRef.current(value)
+          if (id) snap.setSql(id, formatted)
           return [{ range: model.getFullModelRange(), text: formatted }]
         },
       })

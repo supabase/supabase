@@ -10,6 +10,8 @@ export type ProjectSubscriptionVariables = {
   projectRef?: string
 }
 
+export type PlanId = 'free' | 'pro' | 'team' | 'enterprise'
+
 export type ProjectSubscriptionResponse = {
   billing_cycle_anchor: number
   current_period_start: number
@@ -17,7 +19,7 @@ export type ProjectSubscriptionResponse = {
   next_invoice_at: number
   usage_billing_enabled: boolean
   plan: {
-    id: 'free' | 'pro' | 'team' | 'enterprise'
+    id: PlanId
     name: string
     price: number
   }

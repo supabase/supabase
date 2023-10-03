@@ -1,7 +1,7 @@
-import dayjs from 'dayjs'
-import { isNaN } from 'lodash'
-import { ChangeEvent, FC, useEffect, useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import dayjs from 'dayjs'
+import { isNaN, noop } from 'lodash'
+import { ChangeEvent, useEffect, useState } from 'react'
 import { IconClock } from 'ui'
 
 import { Time } from './PITR.types'
@@ -15,14 +15,14 @@ import { formatNumberToTwoDigits, formatTimeToTimeString } from './PITR.utils'
 
 // [Joshen] Potential extension, give option to toggle 24 hours or AM/PM
 
-interface Props {
+interface TimeInputProps {
   defaultTime?: Time
   minimumTime?: Time
   maximumTime?: Time
   onChange?: (time: Time) => void
 }
 
-const TimeInput: FC<Props> = ({ defaultTime, minimumTime, maximumTime, onChange = () => {} }) => {
+const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: TimeInputProps) => {
   const [isFocused, setIsFocused] = useState(false)
   const [error, setError] = useState<string>()
   const [time, setTime] = useState<Time>(defaultTime || { h: 0, m: 0, s: 0 })
@@ -94,7 +94,7 @@ const TimeInput: FC<Props> = ({ defaultTime, minimumTime, maximumTime, onChange 
           }`,
         ].join(' ')}
       >
-        <IconClock className="text-scale-1100" size={18} strokeWidth={1.5} />
+        <IconClock className="text-foreground-light" size={18} strokeWidth={1.5} />
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger className="w-1/4" tabIndex={-1}>
             <input
@@ -119,7 +119,7 @@ const TimeInput: FC<Props> = ({ defaultTime, minimumTime, maximumTime, onChange 
                   'border-scale-200 border',
                 ].join(' ')}
               >
-                <span className="text-scale-1200 text-xs">Hours (HH)</span>
+                <span className="text-foreground text-xs">Hours (HH)</span>
               </div>
             </Tooltip.Content>
           </Tooltip.Portal>
@@ -149,7 +149,7 @@ const TimeInput: FC<Props> = ({ defaultTime, minimumTime, maximumTime, onChange 
                   'border-scale-200 border',
                 ].join(' ')}
               >
-                <span className="text-scale-1200 text-xs">Minutes (MM)</span>
+                <span className="text-foreground text-xs">Minutes (MM)</span>
               </div>
             </Tooltip.Content>
           </Tooltip.Portal>
@@ -179,7 +179,7 @@ const TimeInput: FC<Props> = ({ defaultTime, minimumTime, maximumTime, onChange 
                   'border-scale-200 border',
                 ].join(' ')}
               >
-                <span className="text-scale-1200 text-xs">Seconds (SS)</span>
+                <span className="text-foreground text-xs">Seconds (SS)</span>
               </div>
             </Tooltip.Content>
           </Tooltip.Portal>

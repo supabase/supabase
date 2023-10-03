@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+@import './../../packages/ui/build/css/source/global.css';
+@import './../../packages/ui/build/css/themes/dark.css';
+@import './../../packages/ui/build/css/themes/light.css';
+
 @layer utilities {
   .btn-primary {
     @apply inline-block rounded border border-green-500 bg-green-500 py-1 px-3 text-sm;
@@ -22,7 +26,7 @@ body,
 #__next,
 .main {
   @apply bg-scale-200;
-  @apply text-scale-1200;
+  @apply text-foreground;
   height: 100%;
   padding: 0;
   margin: 0;
@@ -36,7 +40,7 @@ body,
 
 .form-group .form-text,
 .Form .form-text {
-  @apply text-scale-900;
+  @apply text-foreground-lighter;
 }
 
 .form-group input,
@@ -64,7 +68,7 @@ input.form-control,
   @apply rounded-md;
   @apply shadow-sm;
   @apply transition-all;
-  @apply text-scale-1200;
+  @apply text-foreground;
   @apply border;
   @apply focus:shadow-md;
 
@@ -127,11 +131,11 @@ input[type='submit']:hover {
 }
 
 input::placeholder {
-  @apply text-scale-900;
+  @apply text-foreground-lighter;
 }
 
 .form-group input::placeholder {
-  @apply text-scale-900;
+  @apply text-foreground-lighter;
 }
 
 .billing-input-fixed {
@@ -150,8 +154,19 @@ a {
   }
 }
 
+.input-xs {
+  input,
+  textarea {
+    @apply text-xs;
+  }
+}
+
 input[type='radio'] {
   @apply p-0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield; /* Firefox, Not included in tailwind styles reset */
 }
 
 // TODO: It doesnt' work, need to check

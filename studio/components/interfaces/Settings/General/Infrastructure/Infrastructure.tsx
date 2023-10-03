@@ -1,32 +1,31 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { Alert, Badge, Button, IconPackage, Input } from 'ui'
-import { observer } from 'mobx-react-lite'
-import * as Tooltip from '@radix-ui/react-tooltip'
 
-import { useFlag } from 'hooks'
 import { useParams } from 'common/hooks'
-import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   FormHeader,
   FormPanel,
   FormSection,
-  FormSectionLabel,
   FormSectionContent,
+  FormSectionLabel,
 } from 'components/ui/Forms'
-import ProjectUpgradeAlert from './ProjectUpgradeAlert'
-import PauseProjectButton from './PauseProjectButton'
-import RestartServerButton from './RestartServerButton'
-import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { useFlag } from 'hooks'
+import PauseProjectButton from './PauseProjectButton'
+import ProjectUpgradeAlert from './ProjectUpgradeAlert'
+import RestartServerButton from './RestartServerButton'
 
 interface InfrastructureProps {}
 
 const Infrastructure = ({}: InfrastructureProps) => {
   const { ref } = useParams()
   const { project } = useProjectContext()
-  const { data: subscription } = useProjectSubscriptionQuery({ projectRef: ref })
-  const isFreeProject = subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.FREE
+  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef: ref })
+  const isFreeProject = subscription?.plan?.id === 'free'
 
   const {
     data,
@@ -54,12 +53,12 @@ const Infrastructure = ({}: InfrastructureProps) => {
               <div>
                 <p className="text-sm">Restart server</p>
                 <div className="max-w-[420px]">
-                  <p className="text-sm text-scale-1100">
+                  <p className="text-sm text-foreground-light">
                     Your project will not be available for a few minutes.
                   </p>
                 </div>
               </div>
-              {project && <RestartServerButton project={project} />}
+              {project && <RestartServerButton />}
             </div>
 
             {isFreeProject && (
@@ -69,14 +68,12 @@ const Infrastructure = ({}: InfrastructureProps) => {
                   <div>
                     <p className="text-sm">Pause project</p>
                     <div className="max-w-[420px]">
-                      <p className="text-sm text-scale-1100">
+                      <p className="text-sm text-foreground-light">
                         Your project will not be accessible while it is paused.
                       </p>
                     </div>
                   </div>
-                  {project && (
-                    <PauseProjectButton projectId={project.id} projectRef={project.ref} />
-                  )}
+                  {project && <PauseProjectButton />}
                 </div>
               </>
             )}
@@ -116,7 +113,7 @@ const Infrastructure = ({}: InfrastructureProps) => {
                             'border border-scale-200 w-[200px]',
                           ].join(' ')}
                         >
-                          <span className="text-xs text-scale-1200">
+                          <span className="text-xs text-foreground">
                             Project is on the latest version of Postgres that Supabase supports
                           </span>
                         </div>
@@ -129,7 +126,7 @@ const Infrastructure = ({}: InfrastructureProps) => {
             {showDbUpgrades && data?.eligible && <ProjectUpgradeAlert />}
             {showDbUpgrades && !data?.eligible && data?.requires_manual_intervention && (
               <Alert
-                icon={<IconPackage className="text-scale-1100" strokeWidth={1.5} />}
+                icon={<IconPackage className="text-foreground-light" strokeWidth={1.5} />}
                 variant="neutral"
                 title="A new version of Postgres is available for your project"
               >

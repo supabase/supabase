@@ -1,29 +1,31 @@
-import { FC, useEffect, createContext, useContext, useState } from 'react'
+import { has, isEmpty, mapValues, union, without } from 'lodash'
 import { makeAutoObservable } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
-import { isEmpty, mapValues, has, without, union } from 'lodash'
-import {
-  Input,
-  SidePanel,
-  Checkbox,
-  Listbox,
-  IconPlayCircle,
-  IconPauseCircle,
-  IconTerminal,
-  Badge,
-  Button,
-  Modal,
-} from 'ui'
-import { Dictionary } from 'components/grid'
-import { useRouter } from 'next/router'
+import { createContext, useContext, useEffect, useState } from 'react'
 import SVG from 'react-inlinesvg'
 
-import ChooseFunctionForm from './ChooseFunctionForm'
+import { Dictionary } from 'components/grid'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
 import FormEmptyBox from 'components/ui/FormBoxEmpty'
 import NoTableState from 'components/ui/States/NoTableState'
+import { useTablesQuery } from 'data/tables/tables-query'
 import { useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import {
+  Badge,
+  Button,
+  Checkbox,
+  IconPauseCircle,
+  IconPlayCircle,
+  IconTerminal,
+  Input,
+  Listbox,
+  Modal,
+  SidePanel,
+} from 'ui'
+import ChooseFunctionForm from './ChooseFunctionForm'
 
 class CreateTriggerFormState {
   id: number | undefined
@@ -111,7 +113,7 @@ interface ICreateTriggerStore {
   setChooseFunctionFormVisible: (value: boolean) => void
   setDefaultSelectedTable: () => void
   setLoading: (value: boolean) => void
-  setTables: (value: Dictionary<any>[]) => void
+  setTables: (value: any[]) => void
   setTriggerFunctions: (value: Dictionary<any>[]) => void
   validateForm: () => boolean
 }
@@ -167,8 +169,10 @@ class CreateTriggerStore implements ICreateTriggerStore {
     this.isDirty = value
   }
 
-  setTables = (value: Dictionary<any>[]) => {
-    this.tables = value as any
+  setTables = (value: any[]) => {
+    this.tables = value
+      .sort((a, b) => a.schema.localeCompare(b.schema))
+      .filter((a) => !EXCLUDED_SCHEMAS.includes(a.schema)) as any
     this.setDefaultSelectedTable()
   }
 
@@ -249,37 +253,41 @@ function hasWhitespace(value: string) {
 
 const CreateTriggerContext = createContext<ICreateTriggerStore | null>(null)
 
-type CreateTriggerProps = {
+interface CreateTriggerProps {
   trigger?: any
   visible: boolean
   setVisible: (value: boolean) => void
-} & any
+}
 
-const CreateTrigger: FC<CreateTriggerProps> = ({ trigger, visible, setVisible }) => {
+const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => {
+  const { project } = useProjectContext()
   const { ui, meta } = useStore()
   const [isClosingPanel, setIsClosingPanel] = useState(false)
   const _localState = useLocalObservable(() => new CreateTriggerStore())
-  _localState.meta = meta as any
 
-  // for the empty 'no tables' state link
-  const router = useRouter()
-  const { ref } = router.query
+  useTablesQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      onSuccess(tables) {
+        if (_localState.tables.length <= 0) {
+          _localState.setTables(tables)
+        }
+      },
+    }
+  )
 
   useEffect(() => {
-    const fetchTables = async () => {
-      await (_localState!.meta as any)!.tables!.load()
-      const tables = (_localState!.meta as any)!.tables.list()
-      _localState.setTables(tables)
-    }
     const fetchFunctions = async () => {
-      await (_localState.meta as any).functions.load()
-      const triggerFuncs = (_localState!.meta as any)!.functions.listTriggerFunctions()
+      await meta.functions.load()
+      const triggerFuncs = (meta as any)!.functions.listTriggerFunctions()
       _localState.setTriggerFunctions(triggerFuncs)
     }
 
-    fetchTables()
-    fetchFunctions()
-  }, [])
+    if (ui.selectedProjectRef) fetchFunctions()
+  }, [ui.selectedProjectRef])
 
   useEffect(() => {
     _localState.setisDirty(false)
@@ -298,8 +306,8 @@ const CreateTrigger: FC<CreateTriggerProps> = ({ trigger, visible, setVisible })
 
         const body = _localState.formState.requestBody
         const response: any = _localState.isEditing
-          ? await (_localState.meta as any).triggers.update(body.id, body)
-          : await (_localState.meta as any).triggers.create(body)
+          ? await (meta as any).triggers.update(body.id, body)
+          : await (meta as any).triggers.create(body)
 
         if (response.error) {
           ui.setNotification({
@@ -387,8 +395,8 @@ const CreateTrigger: FC<CreateTriggerProps> = ({ trigger, visible, setVisible })
             </CreateTriggerContext.Provider>
             <ConfirmationModal
               visible={isClosingPanel}
-              header="Confirm to close"
-              buttonLabel="Confirm"
+              header="Discard changes"
+              buttonLabel="Discard"
               onSelectCancel={() => setIsClosingPanel(false)}
               onSelectConfirm={() => {
                 setIsClosingPanel(false)
@@ -396,7 +404,7 @@ const CreateTrigger: FC<CreateTriggerProps> = ({ trigger, visible, setVisible })
               }}
             >
               <Modal.Content>
-                <p className="py-4 text-sm text-scale-1100">
+                <p className="py-4 text-sm text-foreground-light">
                   There are unsaved changes. Are you sure you want to close the panel? Your changes
                   will be lost.
                 </p>
@@ -413,7 +421,7 @@ const CreateTrigger: FC<CreateTriggerProps> = ({ trigger, visible, setVisible })
 
 export default observer(CreateTrigger)
 
-const InputName: FC = observer(({}) => {
+const InputName = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
   return (
     <Input
@@ -435,7 +443,7 @@ const InputName: FC = observer(({}) => {
   )
 })
 
-const SelectEnabledMode: FC = observer(({}) => {
+const SelectEnabledMode = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
   return (
     <Listbox
@@ -462,7 +470,7 @@ const SelectEnabledMode: FC = observer(({}) => {
         label="Origin"
       >
         Origin
-        <span className="block text-scale-900">This is a default behaviour</span>
+        <span className="block text-foreground-lighter">This is a default behaviour</span>
       </Listbox.Option>
       <Listbox.Option
         addOnBefore={({ active, selected }: any) => {
@@ -474,7 +482,7 @@ const SelectEnabledMode: FC = observer(({}) => {
         label="Replica"
       >
         Replica
-        <span className="block text-scale-900">
+        <span className="block text-foreground-lighter">
           Will only fire if the session is in “replica” mode
         </span>
       </Listbox.Option>
@@ -488,7 +496,7 @@ const SelectEnabledMode: FC = observer(({}) => {
         label="Always"
       >
         Always
-        <span className="block text-scale-900">
+        <span className="block text-foreground-lighter">
           Will fire regardless of the current replication role
         </span>
       </Listbox.Option>
@@ -502,13 +510,13 @@ const SelectEnabledMode: FC = observer(({}) => {
         label="Disabled"
       >
         Disabled
-        <span className="block text-scale-900">Will not fire</span>
+        <span className="block text-foreground-lighter">Will not fire</span>
       </Listbox.Option>
     </Listbox>
   )
 })
 
-const SelectOrientation: FC = observer(({}) => {
+const SelectOrientation = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
   return (
     <Listbox
@@ -527,17 +535,17 @@ const SelectOrientation: FC = observer(({}) => {
     >
       <Listbox.Option value="ROW" label="Row">
         Row
-        <span className="block text-scale-900">fires once for each processed row</span>
+        <span className="block text-foreground-lighter">fires once for each processed row</span>
       </Listbox.Option>
       <Listbox.Option value="STATEMENT" label="Statement">
         Statement
-        <span className="block text-scale-900">fires once for each statement</span>
+        <span className="block text-foreground-lighter">fires once for each statement</span>
       </Listbox.Option>
     </Listbox>
   )
 })
 
-const ListboxTable: FC = observer(({}) => {
+const ListboxTable = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
 
   return (
@@ -587,8 +595,8 @@ const ListboxTable: FC = observer(({}) => {
             )}
           >
             <div className="flex flex-row items-center space-x-1">
-              <p>{x.name}</p>
-              <p className="text-sm text-scale-1000">{x.schema}</p>
+              <p className="text-sm text-foreground-light">{x.schema}</p>
+              <p className="text">{x.name}</p>
             </div>
           </Listbox.Option>
         )
@@ -597,7 +605,7 @@ const ListboxTable: FC = observer(({}) => {
   )
 })
 
-const CheckboxEvents: FC = observer(({}) => {
+const CheckboxEvents = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
   return (
     // @ts-ignore
@@ -643,7 +651,7 @@ const CheckboxEvents: FC = observer(({}) => {
   )
 })
 
-const ListboxActivation: FC = observer(({}) => {
+const ListboxActivation = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
   return (
     <Listbox
@@ -673,7 +681,7 @@ const ListboxActivation: FC = observer(({}) => {
       >
         <div className="flex flex-col">
           <span>{'before'}</span>
-          <span className="block text-scale-900">
+          <span className="block text-foreground-lighter">
             Trigger fires before the operation is attempted
           </span>
         </div>
@@ -690,7 +698,7 @@ const ListboxActivation: FC = observer(({}) => {
       >
         <div className="flex flex-col">
           <span>{'after'}</span>
-          <span className="block text-scale-900">
+          <span className="block text-foreground-lighter">
             Trigger fires after the operation has completed
           </span>
         </div>
@@ -699,7 +707,7 @@ const ListboxActivation: FC = observer(({}) => {
   )
 })
 
-const FunctionForm: FC = observer(({}) => {
+const FunctionForm = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
 
   return (
@@ -718,7 +726,7 @@ const FunctionForm: FC = observer(({}) => {
   )
 })
 
-const FunctionEmpty: FC = observer(({}) => {
+const FunctionEmpty = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
   return (
     <button
@@ -742,7 +750,7 @@ const FunctionEmpty: FC = observer(({}) => {
   )
 })
 
-const FunctionWithArguments: FC = observer(({}) => {
+const FunctionWithArguments = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
 
   return (
@@ -761,7 +769,7 @@ const FunctionWithArguments: FC = observer(({}) => {
             <IconTerminal size="small" strokeWidth={2} width={14} />
           </div>
           <div className="flex items-center gap-2">
-            <p className="text-scale-1000">{_localState!.formState.functionName.value}</p>
+            <p className="text-foreground-light">{_localState!.formState.functionName.value}</p>
             <div>
               <Badge>{_localState!.formState.functionSchema.value}</Badge>
             </div>
