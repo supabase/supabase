@@ -86,24 +86,7 @@ export * from './src/components/ThemeProvider/ThemeToggle'
 // animated ui
 
 // shadcn
-
-export {
-  DropdownMenu as DropdownMenu_Shadcn_,
-  DropdownMenuTrigger as DropdownMenuTrigger_Shadcn_,
-  DropdownMenuContent as DropdownMenuContent_Shadcn_,
-  DropdownMenuItem as DropdownMenuItem_Shadcn_,
-  DropdownMenuCheckboxItem as DropdownMenuCheckboxItem_Shadcn_,
-  DropdownMenuRadioItem as DropdownMenuRadioItem_Shadcn_,
-  DropdownMenuLabel as DropdownMenuLabel_Shadcn_,
-  DropdownMenuSeparator as DropdownMenuSeparator_Shadcn_,
-  DropdownMenuShortcut as DropdownMenuShortcut_Shadcn_,
-  DropdownMenuGroup as DropdownMenuGroup_Shadcn_,
-  DropdownMenuPortal as DropdownMenuPortal_Shadcn_,
-  DropdownMenuSub as DropdownMenuSub_Shadcn_,
-  DropdownMenuSubContent as DropdownMenuSubContent_Shadcn_,
-  DropdownMenuSubTrigger as DropdownMenuSubTrigger_Shadcn_,
-  DropdownMenuRadioGroup as DropdownMenuRadioGroup_Shadcn_,
-} from './src/components/shadcn/ui/dropdown-menu'
+export * from './src/components/shadcn/ui/dropdown-menu'
 
 export {
   Command as Command_Shadcn_,

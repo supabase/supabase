@@ -29,7 +29,7 @@ An easy way to get started would be to create RLS policies for `SELECT`, `INSERT
 ```sql
 create policy "policy_name"
 ON storage.objects
-for insert using (
+for insert with check (
   true
 );
 ```
@@ -38,7 +38,7 @@ and modify it to only allow authenticated users to upload assets to a specific b
 
 ```sql
 create policy "policy_name"
-on storage.objects for insert to authenticated using (
+on storage.objects for insert to authenticated with check (
     -- restrict bucket
     bucket_id = 'my_bucket_id'
 );
