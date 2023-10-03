@@ -1,3 +1,5 @@
+import { BASE_PATH } from 'lib/constants'
+
 const APISidePanelPreview = () => {
   return (
     <div className="space-y-2">
@@ -7,7 +9,7 @@ const APISidePanelPreview = () => {
         you're viewing in the dashboard - so less thinking, more building.
       </p>
       <img
-        src="/img/previews/api-docs-preview.png"
+        src={`${BASE_PATH}/img/previews/api-docs-preview.png`}
         alt="api-docs-side-panel-preview"
         className="rounded border"
       />
