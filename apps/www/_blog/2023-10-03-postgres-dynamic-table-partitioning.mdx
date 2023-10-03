@@ -9,8 +9,8 @@ date: '2023-10-03'
 published_at: '2023-10-03T07:00:00.000-07:00'
 to_depth: 3
 author: michel
-image: partitions/thumb.jpg
-thumb: partitions/thumb.jpg
+image: partitions/dynamic-table-partitioning-og.png
+thumb: partitions/dynamic-table-partitioning-thumb.png
 ---
 
 We helped a customer recently who was storing 500 million chat messages in a single Postgres table. As the table was growing, their queries were slowing down.
@@ -105,7 +105,18 @@ In our example below, we will be copying lots of existing chat messages out of o
 
 After we have pre-loaded a new child table with copied rows and verified that the rows are valid with a check constraint, then we can ******attach****** the partition to the parent table with `ATTACH PARTITION ...` command.  This will make the new range of child data available for queries on the parent table.
 
-![diagram showing table structure of partitioned tables](/images/blog/partitions/diagram.png)
+<img
+className="dark:hidden !m-0"
+alt="diagram reference"
+src="/images/blog/partitions/dynamic-table-partitioning-diagram-light.png"
+/>
+
+<img
+className="hidden dark:block !m-0"
+alt="diagram reference"
+src="/images/blog/partitions/dynamic-table-partitioning-diagram-dark.png"
+/>
+
 
 Postgres partitioning became significantly easier in recent versions. Postgres added the new syntax for [Declarative Partitioning](https://www.postgresql.org/docs/current/ddl-partitioning.html#DDL-PARTITIONING-DECLARATIVE) that makes it easy to create new partitions by adding additional details to your `CREATE TABLE` statements:
 
