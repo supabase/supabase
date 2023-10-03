@@ -1,19 +1,15 @@
 import { Button, Modal } from 'ui'
 
-import { TIER_QUERY_LIMITS } from '.'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useFlag } from 'hooks'
-import { StripeSubscription } from 'components/interfaces/Billing'
-import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import { TIER_QUERY_LIMITS } from '.'
 
 interface Props {
   show: boolean
   setShowUpgradePrompt: (value: boolean) => void
-  subscription: StripeSubscription | undefined
 }
 
-const UpgradePrompt: React.FC<Props> = ({ show, setShowUpgradePrompt, subscription }) => {
+const UpgradePrompt: React.FC<Props> = ({ show, setShowUpgradePrompt }) => {
   const router = useRouter()
   const { ref } = router.query
 
@@ -35,8 +31,8 @@ const UpgradePrompt: React.FC<Props> = ({ show, setShowUpgradePrompt, subscripti
             </p>
             <div className="border-scale-600 bg-scale-500 rounded border">
               <div className="flex items-center px-4 pt-2 pb-1">
-                <p className="text-scale-1100 w-[40%] text-sm">Plan</p>
-                <p className="text-scale-1100 w-[60%] text-sm">Retention duration</p>
+                <p className="text-foreground-light w-[40%] text-sm">Plan</p>
+                <p className="text-foreground-light w-[60%] text-sm">Retention duration</p>
               </div>
               <div className="py-1">
                 <div className="flex items-center px-4 py-1">

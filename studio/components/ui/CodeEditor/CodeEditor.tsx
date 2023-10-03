@@ -1,17 +1,19 @@
-import { FC, useEffect, useRef } from 'react'
 import Editor, { EditorProps } from '@monaco-editor/react'
+import { merge, noop } from 'lodash'
+import { useRef } from 'react'
 
 import { timeout } from 'lib/helpers'
 import Connecting from '../Loading'
 import { alignEditor } from './CodeEditor.utils'
-import { merge } from 'lodash'
+import { cn } from 'ui'
 
-interface Props {
+interface CodeEditorProps {
   id: string
   language: 'pgsql' | 'json' | 'html'
+  autofocus?: boolean
   defaultValue?: string
   isReadOnly?: boolean
-  onInputChange: (value?: string) => void
+  onInputChange?: (value?: string) => void
   onInputRun?: (value: string) => void
   hideLineNumbers?: boolean
   className?: string
@@ -20,29 +22,26 @@ interface Props {
   value?: string
 }
 
-const CodeEditor: FC<Props> = ({
+const CodeEditor = ({
   id,
   language,
   defaultValue,
+  autofocus = true,
   isReadOnly = false,
   hideLineNumbers = false,
-  onInputChange = () => {},
-  onInputRun = () => {},
+  onInputChange = noop,
+  onInputRun = noop,
   className,
   loading,
   options,
   value,
-}) => {
+}: CodeEditorProps) => {
   const editorRef = useRef()
 
-  useEffect(() => {
-    if (editorRef.current) {
-      // alignEditor(editorRef.current)
-    }
-  }, [id])
-
   const onMount = async (editor: any, monaco: any) => {
+    editorRef.current = editor
     alignEditor(editor)
+
     editor.addAction({
       id: 'supabase',
       label: 'Run Query',
@@ -58,8 +57,7 @@ const CodeEditor: FC<Props> = ({
     })
 
     await timeout(500)
-    editor?.focus()
-    editorRef.current = editor
+    if (autofocus) editor?.focus()
   }
 
   const optionsMerged = merge(
@@ -83,10 +81,10 @@ const CodeEditor: FC<Props> = ({
 
   return (
     <Editor
-      value={value ?? undefined}
       path={id}
       theme="supabase"
-      className={`monaco-editor ${className}`}
+      className={cn(className, 'monaco-editor')}
+      value={value ?? undefined}
       defaultLanguage={language}
       defaultValue={defaultValue ?? undefined}
       loading={loading || <Connecting />}

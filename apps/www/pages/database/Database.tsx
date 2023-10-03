@@ -4,7 +4,7 @@ import ApiExamplesData from 'data/products/database/api-examples'
 import ExtensionsExamplesData from 'data/products/database/extensions-examples'
 import SqlViewCarouselData from 'data/products/database/sql-view-carousel.json'
 import TableViewCarouselData from 'data/products/database/table-view-carousel.json'
-import Solutions from 'data/Solutions.json'
+import Solutions from 'data/Solutions'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -23,7 +23,7 @@ import ProductIcon from '~/components/ProductIcon'
 import APISection from '~/components/Sections/APISection'
 import GithubExamples from '~/components/Sections/GithubExamples'
 import ProductHeader from '~/components/Sections/ProductHeader'
-import TweetCard from '~/components/TweetCard'
+import { TweetCard } from 'ui'
 
 // install Swiper's Controller component
 // SwiperCore.use([Controller])

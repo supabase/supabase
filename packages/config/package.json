@@ -15,6 +15,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-react": "7.28.0",
     "tailwindcss-radix": "^2.0.0",
-    "@tailwindcss/typography": "^0.5.9"
+    "@tailwindcss/typography": "^0.5.9",
+    "mini-svg-data-uri": "^1.4.3"
   }
 }

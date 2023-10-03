@@ -1,23 +1,23 @@
-import { useEffect } from 'react'
-import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
-import { Button, IconClock } from 'ui'
-import { useStore } from 'hooks'
+import Link from 'next/link'
+import { useEffect } from 'react'
+
+import { useParams } from 'common'
 import RecentQueriesItem from 'components/interfaces/Settings/Logs/RecentQueriesItem'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import Table from 'components/to-be-cleaned/Table'
-import { useRouter } from 'next/router'
-import { LogSqlSnippets, NextPageWithLayout } from 'types'
 import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
+import { useStore } from 'hooks'
+import { LogSqlSnippets, NextPageWithLayout } from 'types'
+import { Button, IconClock } from 'ui'
 
 export const LogsSavedPage: NextPageWithLayout = () => {
-  const { content, ui } = useStore()
-  const router = useRouter()
-  const { ref } = router.query
+  const { content } = useStore()
+  const { ref } = useParams()
 
   useEffect(() => {
     content.loadPersistentData()
-  }, [ui.selectedProjectRef])
+  }, [ref])
   const recent = content.recentLogSqlSnippets.slice().reverse()
 
   return (
@@ -50,8 +50,8 @@ export const LogsSavedPage: NextPageWithLayout = () => {
         <>
           <div className="my-auto flex h-full flex-grow flex-col items-center justify-center gap-1">
             <IconClock className="animate-bounce" />
-            <h3 className="text-lg text-scale-1200">No Recent Queries Yet</h3>
-            <p className="text-sm text-scale-900">
+            <h3 className="text-lg text-foreground">No Recent Queries Yet</h3>
+            <p className="text-sm text-foreground-lighter">
               Your recent queries run from the{' '}
               <Link href={`/project/${ref}/logs/explorer`}>
                 <span className="cursor-pointer font-bold underline">Query</span>

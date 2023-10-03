@@ -1,24 +1,24 @@
-import { FC } from 'react'
+import { useParams, useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
 import { Input, Tabs } from 'ui'
-import { pluckObjectFields } from 'lib/helpers'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 
-import { useTelemetryProps } from 'common'
-import Telemetry from 'lib/telemetry'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { pluckObjectFields } from 'lib/helpers'
+import Telemetry from 'lib/telemetry'
 import ResetDbPassword from './ResetDbPassword'
 
-const DatabaseSettings: FC<any> = ({ projectRef }) => {
-  const { data, isLoading, isError } = useProjectSettingsQuery({ projectRef })
+const DatabaseSettings = () => {
   const router = useRouter()
+  const { ref: projectRef } = useParams()
   const telemetryProps = useTelemetryProps()
+  const { data, isLoading, isError } = useProjectSettingsQuery({ projectRef })
 
   if (isError) {
     return (
       <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
-        <p className="text-scale-1000">Error loading database settings</p>
+        <p className="text-foreground-light">Error loading database settings</p>
       </div>
     )
   }
@@ -27,7 +27,7 @@ const DatabaseSettings: FC<any> = ({ projectRef }) => {
     return (
       <div className="space-y-10">
         <section className="space-y-6">
-          <h3 className="text-scale-1200 mb-2 text-xl">Database Settings</h3>
+          <h3 className="text-foreground mb-2 text-xl">Database Settings</h3>
           <Panel
             title={
               <h5 key="panel-title" className="mb-0">
@@ -50,12 +50,12 @@ const DatabaseSettings: FC<any> = ({ projectRef }) => {
           </Panel>
         </section>
 
-        <ResetDbPassword disabled={true} />
+        <ResetDbPassword disabled />
 
         <section className="space-y-6">
           <Panel
             title={
-              <h5 key="panel-title" className="mb-0">
+              <h5 key="panel-title" className="mb-0" id="connection-string">
                 Connection string
               </h5>
             }
@@ -133,7 +133,7 @@ const DatabaseSettings: FC<any> = ({ projectRef }) => {
   return (
     <div className="space-y-10">
       <section className="space-y-6">
-        <h3 className="text-scale-1200 mb-2 text-xl">Database Settings</h3>
+        <h3 className="text-foreground mb-2 text-xl">Database Settings</h3>
         <Panel
           title={
             <h5 key="panel-title" className="mb-0">

@@ -1,4 +1,4 @@
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 import * as React from 'react'
 import { ChevronRight } from 'react-feather'
 import ReactTooltip from 'react-tooltip'
@@ -30,7 +30,7 @@ const IconPanel = ({
   showLink = false,
   hideArrow = false,
 }: Props) => {
-  const { isDarkMode } = useTheme()
+  const { theme } = useTheme()
 
   const IconContainer: React.FC = (props) => {
     return (
@@ -69,8 +69,14 @@ const IconPanel = ({
               <IconContainer>
                 <img
                   className={iconSize === 'lg' ? 'w-8' : 'w-5'}
-                  src={`${icon}${hasLightIcon && !isDarkMode ? '-light' : ''}.svg`}
-                  alt={title !== undefined ? `${title} Icon` : tooltip !== undefined ? `${tooltip} Icon` : 'Icon'}
+                  src={`${icon}${hasLightIcon && theme !== 'dark' ? '-light' : ''}.svg`}
+                  alt={
+                    title !== undefined
+                      ? `${title} Icon`
+                      : tooltip !== undefined
+                      ? `${tooltip} Icon`
+                      : 'Icon'
+                  }
                 />
               </IconContainer>
             ) : (
@@ -82,7 +88,7 @@ const IconPanel = ({
                 {!hideArrow && (
                   <div
                     className="
-                transition-all ease-out -ml-1 opacity-0 
+                transition-all ease-out -ml-1 opacity-0
                 text-scale-800
                 group-hover:opacity-100
                 group-hover:ml-0"
@@ -92,14 +98,14 @@ const IconPanel = ({
                 )}
               </div>
               {children && <span className="text-sm text-scale-1100 not-prose">{children}</span>}
-              {showLink && <span className="text-brand-900 justify-end text-sm">Learn more</span>}
+              {showLink && <span className="text-brand justify-end text-sm">Learn more</span>}
             </div>
           </div>
         </div>
         <div
           className="
-        absolute transition-all ease-in 
-        -z-10 -inset-3 rounded-2xl 
+        absolute transition-all ease-in
+        -z-10 -inset-3 rounded-2xl
         bg-scale-200 dark:bg-whiteA-300 opacity-0 peer-hover:opacity-100"
         ></div>
       </div>

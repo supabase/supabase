@@ -4,33 +4,38 @@ import Announcements from 'data/Announcements.json'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
 import Link from 'next/link'
+import { TextLink } from 'ui'
 
 type Props = {
   text: string
   description?: string
   url?: string
   icon?: string
+  svg?: any
 }
 
 const Developers = () => {
   const { basePath } = useRouter()
 
   const iconSections = links.map((link: Props) => {
-    const { text, description, url, icon } = link
+    const { text, description, url, icon, svg: Svg } = link
 
     const content = (
       <div className="dark:hover:bg-scale-500 -m-3 flex items-start rounded-lg p-3 transition duration-150 ease-in-out hover:bg-gray-50">
         {/* <!-- Heroicon name: support --> */}
-        <svg
-          className="stroke-scale-900 h-5 w-5 flex-shrink-0"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          aria-hidden="true"
-        >
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d={icon} />
-        </svg>
+        {icon && (
+          <svg
+            className="stroke-scale-900 h-5 w-5 flex-shrink-0"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            aria-hidden="true"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d={icon} />
+          </svg>
+        )}
+        {Svg && <Svg />}
         <div className="ml-4">
           <h5 className="text-scale-1200 text-base">{text}</h5>
           <p className="text-scale-900 text-sm">{description}</p>
@@ -55,11 +60,11 @@ const Developers = () => {
 
   return (
     <div className="grid grid-cols-12">
-      <nav className="col-span-6 py-8" aria-labelledby="developersResources">
-        <div className="m-3 grid grid-cols-12 gap-4 py-4 pr-3">{iconSections}</div>
+      <nav className="col-span-6 py-6" aria-labelledby="developersResources">
+        <div className="m-3 grid grid-cols-12 gap-2 pr-3">{iconSections}</div>
       </nav>
-      <div className="col-span-6">
-        <div className="m-3 mx-6">
+      <div className="col-span-6 py-8">
+        <div className="py-3 mx-6">
           <p className="p">Latest announcements</p>
           <ul className="mt-6 space-y-3 pb-6">
             {Announcements.map((announcement: any, idx: number) => (
@@ -85,6 +90,9 @@ const Developers = () => {
               </li>
             ))}
           </ul>
+          <div className="pt-4">
+            <TextLink url="/blog" label="Explore more" />
+          </div>
         </div>
       </div>
     </div>

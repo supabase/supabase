@@ -3,27 +3,28 @@ export const alignEditor = (editor: any) => {
   editor.changeViewZones((accessor: any) => {
     accessor.addZone({
       afterLineNumber: 0,
-      heightInPx: 10,
+      heightInPx: 4,
       domNode: document.createElement('div'),
     })
   })
 }
 
-export const getTheme = (isDarkTheme: boolean) => {
+export const getTheme = (theme: string) => {
   // [TODO] Probably need better theming for light mode
   return {
-    base: 'vs-dark', // can also be vs-dark or hc-black
+    base: theme === 'dark' ? 'vs-dark' : 'vs', // can also be vs-dark or hc-black
     inherit: true, // can also be false to completely replace the builtin rules
-    colors: {
-      'editor.background': isDarkTheme ? '#1F1F1F' : '#FFFFFF',
-    },
     rules: [
-      { background: isDarkTheme ? '1F1F1F' : 'FFFFFF' },
-      { token: '', foreground: isDarkTheme ? 'D4D4D4' : '444444' },
-      { token: 'string.sql', foreground: '24B47E' },
+      { background: theme === 'dark' ? '1f1f1f' : 'f0f0f0' },
+      {
+        token: '',
+        background: theme === 'dark' ? '1f1f1f' : 'f0f0f0',
+        foreground: theme === 'dark' ? 'd4d4d4' : '444444',
+      },
+      { token: 'string.sql', foreground: '24b47e' },
       { token: 'comment', foreground: '666666' },
-      { token: 'predefined.sql', foreground: isDarkTheme ? 'D4D4D4' : '444444' },
-      // { token: '', foreground: 'ffcc00' }, // Trying to figure out how to change the border color of the row selected
+      { token: 'predefined.sql', foreground: theme === 'dark' ? 'D4D4D4' : '444444' },
     ],
+    colors: { 'editor.background': theme === 'dark' ? '#1f1f1f' : '#f0f0f0' },
   }
 }

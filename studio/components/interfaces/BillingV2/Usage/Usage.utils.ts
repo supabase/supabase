@@ -2,9 +2,6 @@ import { DataPoint } from 'data/analytics/constants'
 import { ProjectUsageResponse } from 'data/usage/project-usage-query'
 import { USAGE_APPROACHING_THRESHOLD } from '../Billing.constants'
 import { CategoryAttribute, USAGE_STATUS } from './Usage.constants'
-import { StripeSubscription } from 'components/interfaces/Billing'
-import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
-import { formatBytes } from 'lib/helpers'
 import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
 
 // [Joshen] This is just for development to generate some test data for chart rendering
@@ -37,42 +34,14 @@ export const getUsageStatus = (attributes: CategoryAttribute[], usage?: ProjectU
   else return USAGE_STATUS.NORMAL
 }
 
-export const getUpgradeUrl = (projectRef: string, subscription?: StripeSubscription) => {
-  if (!subscription) return `/project/${projectRef}/settings/billing/update`
-
-  return subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
-    ? `/project/${projectRef}/settings/billing/update/enterprise`
-    : subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
-    ? `/project/${projectRef}/settings/billing/update/team`
-    : subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.FREE
-    ? `/project/${projectRef}/settings/billing/update`
-    : `/project/${projectRef}/settings/billing/update/pro`
-}
-
-export const getUpgradeUrlFromV2Subscription = (
-  projectRef: string,
-  subscription?: ProjectSubscriptionResponse,
-  newSubscriptionPage?: boolean
-) => {
+export const getUpgradeUrl = (projectRef: string, subscription?: ProjectSubscriptionResponse) => {
   if (!subscription) {
-    return !newSubscriptionPage
-      ? `/project/${projectRef}/settings/billing/update`
-      : `/project/${projectRef}/settings/billing/subscription`
+    return `/project/${projectRef}/settings/billing/subscription`
   }
 
-  if (!newSubscriptionPage) {
-    return subscription?.plan.id === 'enterprise'
-      ? `/project/${projectRef}/settings/billing/update/enterprise`
-      : subscription?.plan.id === 'team'
-      ? `/project/${projectRef}/settings/billing/update/team`
-      : subscription?.plan.id === 'free'
-      ? `/project/${projectRef}/settings/billing/update`
-      : `/project/${projectRef}/settings/billing/update/pro`
-  } else {
-    return subscription?.plan?.id === 'pro' && subscription?.usage_billing_enabled === false
-      ? `/project/${projectRef}/settings/billing/subscription#cost-control`
-      : `/project/${projectRef}/settings/billing/subscription?panel=subscriptionPlan`
-  }
+  return subscription?.plan?.id === 'pro' && subscription?.usage_billing_enabled === false
+    ? `/project/${projectRef}/settings/billing/subscription#cost-control`
+    : `/project/${projectRef}/settings/billing/subscription?panel=subscriptionPlan`
 }
 
 const compactNumberFormatter = new Intl.NumberFormat('en-US', {
@@ -80,14 +49,63 @@ const compactNumberFormatter = new Intl.NumberFormat('en-US', {
   compactDisplay: 'short',
 })
 
+/**
+ * For the y-axis, we don't need to be as precise, to avoid showing 58.597MB.
+ */
 export const ChartYFormatterCompactNumber = (number: number | string, unit: string) => {
   if (typeof number === 'string') return number
 
   if (unit === 'bytes') {
-    const formattedBytes = formatBytes(number, 0).replace(/\s/g, '')
+    const formattedBytes = formatBytesCompact(number).replace(/\s/g, '')
 
     return formattedBytes === '0bytes' ? '0' : formattedBytes
   } else {
     return compactNumberFormatter.format(number)
   }
+}
+
+/**
+ * For the chart tooltip, we want to be more precise and show more decimals.
+ */
+export const ChartTooltipValueFormatter = (number: number | string, unit: string) => {
+  if (typeof number === 'string') return number
+
+  if (unit === 'bytes') {
+    const formattedBytes = formatBytesPrecision(number).replace(/\s/g, '')
+
+    return formattedBytes === '0bytes' ? '0' : formattedBytes
+  } else {
+    return compactNumberFormatter.format(number)
+  }
+}
+
+const sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+
+export const formatBytesCompact = (bytes: number) => {
+  if (bytes === 0 || bytes === undefined) return '0 bytes'
+
+  const k = 1024
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+  const unit = sizes[i]
+
+  let dm = 2
+  if (['bytes', 'KB', 'MB'].includes(unit)) {
+    dm = 0
+  } else if (['GB'].includes(unit)) {
+    dm = 1
+  }
+
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + unit
+}
+
+export const formatBytesPrecision = (bytes: any) => {
+  if (bytes === 0 || bytes === undefined) return '0 bytes'
+
+  const k = 1024
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+  const unit = sizes[i]
+
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(3)) + ' ' + unit
 }

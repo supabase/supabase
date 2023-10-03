@@ -6,11 +6,11 @@ import { Button } from 'ui'
 import { observer } from 'mobx-react-lite'
 
 import { useSignOut } from 'lib/auth'
-import { useTheme } from 'common'
+import { useTheme } from 'next-themes'
 
 const Error500: NextPage = () => {
   const router = useRouter()
-  const { isDarkMode } = useTheme()
+  const { theme } = useTheme()
 
   const signOut = useSignOut()
   const onClickLogout = async () => {
@@ -29,7 +29,7 @@ const Error500: NextPage = () => {
                 <a>
                   <Image
                     src={
-                      isDarkMode
+                      theme === 'dark'
                         ? `${router.basePath}/img/supabase-dark.svg`
                         : `${router.basePath}/img/supabase-light.svg`
                     }

@@ -32,10 +32,10 @@ ProjectUsage.mockImplementation((props) => {
   )
 })
 
-jest.mock('data/subscriptions/project-subscription-query')
-import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
+jest.mock('data/subscriptions/project-subscription-v2-query')
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 
-useProjectSubscriptionQuery.mockReturnValue({
+useProjectSubscriptionV2Query.mockReturnValue({
   data: undefined,
 })
 

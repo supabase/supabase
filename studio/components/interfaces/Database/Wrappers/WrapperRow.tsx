@@ -1,60 +1,32 @@
-import Link from 'next/link'
-import Image from 'next/image'
-import { FC } from 'react'
-import { partition } from 'lodash'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Collapsible, IconChevronUp, Button, IconExternalLink, IconTrash, IconEdit } from 'ui'
+import { partition } from 'lodash'
+import Image from 'next/image'
+import Link from 'next/link'
+import { Button, Collapsible, IconChevronUp, IconEdit, IconExternalLink, IconTrash } from 'ui'
 
-import { useStore, checkPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
-import { WrapperMeta } from './Wrappers.types'
 import { FDW } from 'data/fdw/fdws-query'
-import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { useCheckPermissions } from 'hooks'
+import { WrapperMeta } from './Wrappers.types'
 
-interface Props {
+interface WrapperRowProps {
   wrappers: FDW[]
   wrapperMeta: WrapperMeta
   isOpen: boolean
   onOpen: (wrapper: string) => void
+  onSelectDelete: (wrapper: FDW) => void
 }
 
-const WrapperRow: FC<Props> = ({ wrappers = [], wrapperMeta, isOpen, onOpen }) => {
-  const { ui } = useStore()
+const WrapperRow = ({
+  wrappers = [],
+  wrapperMeta,
+  isOpen,
+  onOpen,
+  onSelectDelete,
+}: WrapperRowProps) => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
-  const { mutateAsync: deleteFDW } = useFDWDeleteMutation()
-
-  const canManageWrappers = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
-
-  const onDeleteWrapper = (wrapper: any) => {
-    confirmAlert({
-      title: `Confirm to disable ${wrapper.name}`,
-      message: `Are you sure you want to disable the ${wrapper.name} wrapper? This will also remove all tables created with this wrapper.`,
-      onAsyncConfirm: async () => {
-        try {
-          await deleteFDW({
-            projectRef: project?.ref,
-            connectionString: project?.connectionString,
-            wrapper,
-            wrapperMeta,
-          })
-          ui.setNotification({
-            category: 'success',
-            message: `Successfully disabled ${wrapper.name} foreign data wrapper`,
-          })
-        } catch (error: any) {
-          ui.setNotification({
-            error,
-            category: 'error',
-            message: `Failed to disable ${wrapper.name}: ${error.message}`,
-          })
-        }
-      },
-    })
-  }
+  const canManageWrappers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
 
   return (
     <>
@@ -78,7 +50,7 @@ const WrapperRow: FC<Props> = ({ wrappers = [], wrapperMeta, isOpen, onOpen }) =
         <Collapsible.Trigger asChild>
           <button
             type="button"
-            className="flex items-center justify-between w-full px-6 py-3 rounded group text-scale-1200"
+            className="flex items-center justify-between w-full px-6 py-3 rounded group text-foreground"
           >
             <div className="flex items-center gap-3">
               <IconChevronUp
@@ -95,14 +67,14 @@ const WrapperRow: FC<Props> = ({ wrappers = [], wrapperMeta, isOpen, onOpen }) =
               <span className="text-sm capitalize">{wrapperMeta.label}</span>
             </div>
             <div className="flex items-center gap-3">
-              <div className="px-3 py-1 text-xs border rounded-md border-scale-500 bg-scale-100 text-scale-1200 dark:border-scale-700 dark:bg-scale-300">
+              <div className="px-3 py-1 text-xs border rounded-md border-scale-500 bg-scale-100 text-foreground dark:border-scale-700 dark:bg-scale-300">
                 {wrappers.length} wrapper{wrappers.length > 1 ? 's' : ''}
               </div>
             </div>
           </button>
         </Collapsible.Trigger>
         <Collapsible.Content>
-          <div className="border-t group border-scale-500 bg-scale-100 text-scale-1200 dark:bg-scale-300 divide-y">
+          <div className="border-t group border-scale-500 bg-scale-100 text-foreground dark:bg-scale-300 divide-y">
             {wrappers.map((wrapper) => {
               const serverOptions = Object.fromEntries(
                 wrapper.server_options.map((option: any) => option.split('='))
@@ -121,7 +93,7 @@ const WrapperRow: FC<Props> = ({ wrappers = [], wrapperMeta, isOpen, onOpen }) =
                     {visibleMetadata.map((metadata) => (
                       <div
                         key={metadata.name}
-                        className="flex items-center space-x-2 text-sm text-scale-1000"
+                        className="flex items-center space-x-2 text-sm text-foreground-light"
                       >
                         <p>{metadata.label}:</p>
                         <p>{serverOptions[metadata.name]}</p>
@@ -129,11 +101,11 @@ const WrapperRow: FC<Props> = ({ wrappers = [], wrapperMeta, isOpen, onOpen }) =
                     ))}
                     {encryptedMetadata.map((metadata) => (
                       <div key={metadata.name} className="flex items-center space-x-2 text-sm">
-                        <p className="text-scale-1000">{metadata.label}:</p>
+                        <p className="text-foreground-light">{metadata.label}:</p>
                         <Link
                           href={`/project/${ref}/settings/vault/secrets?search=${wrapper.name}_${metadata.name}`}
                         >
-                          <a className="transition text-scale-1000 hover:text-scale-1100 flex items-center space-x-2">
+                          <a className="transition text-foreground-light hover:text-foreground flex items-center space-x-2">
                             <span>Encrypted in Vault</span>
                             <IconExternalLink size={14} strokeWidth={1.5} />
                           </a>
@@ -141,22 +113,26 @@ const WrapperRow: FC<Props> = ({ wrappers = [], wrapperMeta, isOpen, onOpen }) =
                       </div>
                     ))}
                     <div className="!mt-3 space-y-1">
-                      <p className="text-sm text-scale-1100">
-                        Foreign tables: ({wrapper.tables.length})
+                      <p className="text-sm text-foreground-light">
+                        Foreign tables{wrapper.tables && `: (${wrapper.tables.length})`}
                       </p>
                       <div className="flex flex-wrap gap-2">
-                        {wrapper.tables.map((table: any) => (
-                          <Link key={table.id} href={`/project/${ref}/editor/${table.id}`}>
-                            <a>
-                              <div
-                                key={table.id}
-                                className="text-sm border rounded px-2 py-1 transition bg-scale-400 hover:bg-scale-500"
-                              >
-                                {table.name}
-                              </div>
-                            </a>
-                          </Link>
-                        ))}
+                        {wrapper.tables ? (
+                          wrapper.tables.map((table: any) => (
+                            <Link key={table.id} href={`/project/${ref}/editor/${table.id}`}>
+                              <a>
+                                <div
+                                  key={table.id}
+                                  className="text-sm border rounded px-2 py-1 transition bg-scale-400 hover:bg-scale-500"
+                                >
+                                  {table.name}
+                                </div>
+                              </a>
+                            </Link>
+                          ))
+                        ) : (
+                          <p className="text-sm text-foreground-light">No tables available</p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -191,7 +167,7 @@ const WrapperRow: FC<Props> = ({ wrappers = [], wrapperMeta, isOpen, onOpen }) =
                                   'border border-scale-200',
                                 ].join(' ')}
                               >
-                                <span className="text-xs text-scale-1200">
+                                <span className="text-xs text-foreground">
                                   You need additional permissions to edit wrappers
                                 </span>
                               </div>
@@ -207,7 +183,7 @@ const WrapperRow: FC<Props> = ({ wrappers = [], wrapperMeta, isOpen, onOpen }) =
                           disabled={!canManageWrappers}
                           icon={<IconTrash strokeWidth={1.5} />}
                           className="py-2"
-                          onClick={() => onDeleteWrapper(wrapper)}
+                          onClick={() => onSelectDelete(wrapper)}
                         />
                       </Tooltip.Trigger>
                       {!canManageWrappers && (
@@ -220,7 +196,7 @@ const WrapperRow: FC<Props> = ({ wrappers = [], wrapperMeta, isOpen, onOpen }) =
                                 'border border-scale-200',
                               ].join(' ')}
                             >
-                              <span className="text-xs text-scale-1200">
+                              <span className="text-xs text-foreground">
                                 You need additional permissions to add wrappers
                               </span>
                             </div>

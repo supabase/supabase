@@ -1,23 +1,27 @@
-import { CalculatedColumn } from '@supabase/react-data-grid'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { CalculatedColumn } from '@supabase/react-data-grid'
 import {
   Button,
-  Dropdown,
-  IconChevronDown,
   Divider,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
+  IconChevronDown,
   IconEdit,
-  IconTrash,
   IconLock,
+  IconTrash,
   IconUnlock,
 } from 'ui'
+
 import { useDispatch, useTrackedState } from '../../store'
 
-type ColumnMenuProps = {
+interface ColumnMenuProps {
   column: CalculatedColumn<any, unknown>
   isEncrypted?: boolean
 }
 
-const ColumnMenu: React.FC<ColumnMenuProps> = ({ column, isEncrypted }) => {
+const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
   const state = useTrackedState()
   const dispatch = useDispatch()
   const { onEditColumn: onEditColumnFunc, onDeleteColumn: onDeleteColumnFunc } = state
@@ -45,14 +49,15 @@ const ColumnMenu: React.FC<ColumnMenuProps> = ({ column, isEncrypted }) => {
       <>
         {state.editable && onEditColumn !== undefined && (
           <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger className={`w-full ${isEncrypted ? 'opacity-50' : ''}`}>
-              <Dropdown.Item
+            <Tooltip.Trigger asChild className={`${isEncrypted ? 'opacity-50' : ''}`}>
+              <DropdownMenuItem_Shadcn_
+                className="space-x-2"
                 onClick={onEditColumn}
                 disabled={isEncrypted}
-                icon={<IconEdit size="tiny" />}
               >
-                Edit column
-              </Dropdown.Item>
+                <IconEdit size="tiny" />
+                <p>Edit column</p>
+              </DropdownMenuItem_Shadcn_>
             </Tooltip.Trigger>
             {isEncrypted && (
               <Tooltip.Portal>
@@ -64,7 +69,7 @@ const ColumnMenu: React.FC<ColumnMenuProps> = ({ column, isEncrypted }) => {
                       'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">
+                    <span className="text-xs text-foreground">
                       Encrypted columns cannot be edited
                     </span>
                   </div>
@@ -73,18 +78,29 @@ const ColumnMenu: React.FC<ColumnMenuProps> = ({ column, isEncrypted }) => {
             )}
           </Tooltip.Root>
         )}
-        <Dropdown.Item
+        <DropdownMenuItem_Shadcn_
+          className="space-x-2"
           onClick={column.frozen ? onUnfreezeColumn : onFreezeColumn}
-          icon={column.frozen ? <IconUnlock size="tiny" /> : <IconLock size="tiny" />}
         >
-          {column.frozen ? 'Unfreeze column' : 'Freeze column'}
-        </Dropdown.Item>
+          {column.frozen ? (
+            <>
+              <IconUnlock size="tiny" />
+              <p>Unfreeze column</p>
+            </>
+          ) : (
+            <>
+              <IconLock size="tiny" />
+              <p>Freeze column</p>
+            </>
+          )}
+        </DropdownMenuItem_Shadcn_>
         {state.editable && onDeleteColumn !== undefined && (
           <>
             <Divider light />
-            <Dropdown.Item onClick={onDeleteColumn} icon={<IconTrash size="tiny" stroke="red" />}>
-              Delete Column
-            </Dropdown.Item>
+            <DropdownMenuItem_Shadcn_ className="space-x-2" onClick={onDeleteColumn}>
+              <IconTrash size="tiny" stroke="red" />
+              <p>Delete column</p>
+            </DropdownMenuItem_Shadcn_>
           </>
         )}
       </>
@@ -93,16 +109,24 @@ const ColumnMenu: React.FC<ColumnMenuProps> = ({ column, isEncrypted }) => {
 
   return (
     <>
-      <Dropdown align="end" side="bottom" overlay={renderMenu()}>
-        <Button
-          as={'span'}
-          className="opacity-50"
-          type="text"
-          icon={<IconChevronDown />}
-          style={{ padding: '3px' }}
-        />
-      </Dropdown>
+      <DropdownMenu_Shadcn_>
+        <DropdownMenuTrigger_Shadcn_>
+          <Button
+            asChild
+            className="opacity-50 flex"
+            type="text"
+            icon={<IconChevronDown />}
+            style={{ padding: '3px' }}
+          >
+            <span></span>
+          </Button>
+        </DropdownMenuTrigger_Shadcn_>
+        <DropdownMenuContent_Shadcn_ align="end" side="bottom">
+          {renderMenu()}
+        </DropdownMenuContent_Shadcn_>
+      </DropdownMenu_Shadcn_>
     </>
   )
 }
+
 export default ColumnMenu

@@ -1,24 +1,23 @@
-import { FC } from 'react'
-import { Button, Divider, IconX } from 'ui'
+import { Button, IconX } from 'ui'
 
-import { LogData, QueryType } from './Logs.types'
-
-import DatabaseApiSelectionRender from './LogSelectionRenderers/DatabaseApiSelectionRender'
-import DatabasePostgresSelectionRender from './LogSelectionRenderers/DatabasePostgresSelectionRender'
-import FunctionInvocationSelectionRender from './LogSelectionRenderers/FunctionInvocationSelectionRender'
-import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSelectionRender'
-import DefaultExplorerSelectionRenderer from './LogSelectionRenderers/DefaultExplorerSelectionRenderer'
-import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
+import CopyButton from 'components/ui/CopyButton'
+import Connecting from 'components/ui/Loading/Loading'
+import useSingleLog from 'hooks/analytics/useSingleLog'
+import { useMemo } from 'react'
 import {
   isDefaultLogPreviewFormat,
   isUnixMicro,
   LogsEndpointParams,
   unixMicroToIsoTimestamp,
 } from '.'
-import useSingleLog from 'hooks/analytics/useSingleLog'
-import Connecting from 'components/ui/Loading/Loading'
-import CopyButton from 'components/ui/CopyButton'
+import { LogData, QueryType } from './Logs.types'
 import AuthSelectionRenderer from './LogSelectionRenderers/AuthSelectionRenderer'
+import DatabaseApiSelectionRender from './LogSelectionRenderers/DatabaseApiSelectionRender'
+import DatabasePostgresSelectionRender from './LogSelectionRenderers/DatabasePostgresSelectionRender'
+import DefaultExplorerSelectionRenderer from './LogSelectionRenderers/DefaultExplorerSelectionRenderer'
+import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
+import FunctionInvocationSelectionRender from './LogSelectionRenderers/FunctionInvocationSelectionRender'
+import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSelectionRender'
 
 export interface LogSelectionProps {
   log: LogData | null
@@ -28,13 +27,13 @@ export interface LogSelectionProps {
   params: Partial<LogsEndpointParams>
 }
 
-const LogSelection: FC<LogSelectionProps> = ({
+const LogSelection = ({
   projectRef,
   log: partialLog,
   onClose,
   queryType,
   params = {},
-}) => {
+}: LogSelectionProps) => {
   const { logData: fullLog, isLoading } = useSingleLog(
     projectRef,
     queryType,
@@ -45,22 +44,27 @@ const LogSelection: FC<LogSelectionProps> = ({
     switch (queryType) {
       case 'api':
         if (!fullLog) return null
+        if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />
         return <DatabaseApiSelectionRender log={fullLog} />
 
       case 'database':
         if (!fullLog) return null
+        if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />
         return <DatabasePostgresSelectionRender log={fullLog} />
 
       case 'fn_edge':
         if (!fullLog) return null
+        if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />
         return <FunctionInvocationSelectionRender log={fullLog} />
 
       case 'functions':
         if (!fullLog) return null
+        if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />
         return <FunctionLogsSelectionRender log={fullLog} />
 
       case 'auth':
         if (!fullLog) return null
+        if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />
         return <AuthSelectionRenderer log={fullLog} />
 
       default:
@@ -75,9 +79,8 @@ const LogSelection: FC<LogSelectionProps> = ({
     }
   }
 
-  const selectionText = () => {
-    if (!fullLog) return ''
-    if (queryType) {
+  const selectionText = useMemo(() => {
+    if (fullLog && queryType) {
       return `Log ID
 ${fullLog.id}\n
 Log Timestamp (UTC)
@@ -89,8 +92,8 @@ ${JSON.stringify(fullLog.metadata, null, 2)}
 `
     }
 
-    return JSON.stringify(fullLog, null, 2)
-  }
+    return JSON.stringify(fullLog || partialLog, null, 2)
+  }, [fullLog])
 
   return (
     <div
@@ -143,8 +146,8 @@ ${JSON.stringify(fullLog.metadata, null, 2)}
             </div>
           </div>
           <div className="flex flex-col gap-1">
-            <h3 className="text-sm text-scale-1200">Select an Event</h3>
-            <p className="text-xs text-scale-900">
+            <h3 className="text-sm text-foreground">Select an Event</h3>
+            <p className="text-xs text-foreground-lighter">
               Select an Event to view the code snippet (pretty view) or complete JSON payload (raw
               view).
             </p>
@@ -155,14 +158,14 @@ ${JSON.stringify(fullLog.metadata, null, 2)}
         <div className="pt-4 px-4 flex flex-col gap-4">
           <div className="flex flex-row justify-between items-center">
             <div className={`transition ${!isLoading ? 'opacity-100' : 'opacity-0'}`}>
-              <CopyButton text={selectionText()} type="default" title="Copy log to clipboard" />
+              <CopyButton text={selectionText} type="default" title="Copy log to clipboard" />
             </div>
             <Button
               type="text"
-              className="cursor-pointer transition hover:text-scale-1200 h-8 w-8 px-0 py-0 flex items-center justify-center"
+              className="cursor-pointer transition hover:text-foreground h-8 w-8 px-0 py-0 flex items-center justify-center"
               onClick={onClose}
             >
-              <IconX size={14} strokeWidth={2} className="text-scale-900" />
+              <IconX size={14} strokeWidth={2} className="text-foreground-lighter" />
             </Button>
           </div>
           <div className="h-px w-full bg-scale-600 rounded " />

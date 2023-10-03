@@ -1,22 +1,23 @@
+import dayjs from 'dayjs'
+import Link from 'next/link'
+
 import { useParams } from 'common'
+import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import SparkBar from 'components/ui/SparkBar'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import dayjs from 'dayjs'
+import { useFlag, useSelectedOrganization } from 'hooks'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconExternalLink } from 'ui'
-import TierUpdateSidePanel from './TierUpdateSidePanel'
-import Link from 'next/link'
-import { useFlag, useStore } from 'hooks'
-import ProjectUpdateDisabledTooltip from '../../ProjectUpdateDisabledTooltip'
 import SubscriptionPaymentMethod from './SubscriptionPaymentMethod'
+import TierUpdateSidePanel from './TierUpdateSidePanel'
 
 export interface SubscriptionTierProps {}
 
 const SubscriptionTier = ({}: SubscriptionTierProps) => {
   const { ref: projectRef } = useParams()
-  const { ui } = useStore()
-  const orgSlug = ui.selectedOrganization?.slug ?? ''
+  const selectedOrganization = useSelectedOrganization()
+  const orgSlug = selectedOrganization?.slug ?? ''
   const snap = useSubscriptionPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   const { data: subscription, isLoading, refetch } = useProjectSubscriptionV2Query({ projectRef })
@@ -38,19 +39,17 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
         <div className="col-span-12 lg:col-span-5 space-y-6">
           <div className="sticky space-y-6 top-16">
             <p className="text-base">Subscription plan</p>
-            <div className="text-sm text-scale-1000">
+            <div className="text-sm text-foreground-light">
               To manage your billing address, emails or Tax ID, head to your{' '}
               <Link href={`/org/${orgSlug}/billing`}>
-                <a>
-                  <span className="text-sm text-green-900 transition hover:text-green-1000">
-                    organization settings
-                  </span>
-                  .
+                <a className="text-sm text-green-900 transition hover:text-green-1000">
+                  organization settings
                 </a>
               </Link>
+              .
             </div>
             <div className="space-y-2">
-              <p className="text-sm text-scale-1100">More information</p>
+              <p className="text-sm text-foreground-light">More information</p>
               <div>
                 <Link href="https://supabase.com/pricing">
                   <a target="_blank" rel="noreferrer">
@@ -74,12 +73,13 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
           <div className="col-span-12 lg:col-span-7 space-y-6">
             <div>
               <p className="text-sm">This project is currently on the plan:</p>
-              <p className="text-2xl text-brand-900 uppercase">{tierName}</p>
+              <p className="text-2xl text-brand uppercase">{tierName}</p>
             </div>
             <div>
               <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
                 <Button
                   type="default"
+                  className="pointer-events-auto"
                   disabled={!canChangeTier}
                   onClick={() => snap.setPanelKey('subscriptionPlan')}
                 >
@@ -114,8 +114,23 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
                 </Alert>
               ))}
             {!subscription?.usage_billing_enabled && (
-              <Alert withIcon variant="info" title="This project is limited by the included usage">
-                <p className="text-sm text-scale-1000">
+              <Alert
+                withIcon
+                variant="info"
+                title="This project is limited by the included usage"
+                actions={
+                  currentPlan?.id === 'free' ? (
+                    <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
+                      Upgrade Plan
+                    </Button>
+                  ) : (
+                    <Button type="default" onClick={() => snap.setPanelKey('costControl')}>
+                      Adjust Spend Cap
+                    </Button>
+                  )
+                }
+              >
+                <p className="text-sm text-foreground-light">
                   When this project exceeds its{' '}
                   <Link href="#breakdown">
                     <a className="text-sm text-green-900 transition hover:text-green-1000">
@@ -124,14 +139,15 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
                   </Link>
                   , it may become unresponsive.{' '}
                   {currentPlan?.id === 'free' ? (
-                    <span>
+                    <p className="pr-4">
                       If you wish to exceed the included usage, you should upgrade to a paid plan.
-                    </span>
+                    </p>
                   ) : (
-                    <span>
-                      You can change the Cost Control settings if you plan on exceeding the included
-                      usage quotas.
-                    </span>
+                    <p className="pr-4">
+                      You currently have Spend Cap enabled - when you exceed your plan's limit, you
+                      will experience restrictions. To scale seamlessly and pay for over-usage, you
+                      can adjust your Cost Control settings.
+                    </p>
                   )}
                 </p>
               </Alert>
@@ -145,8 +161,8 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
                 'MMM DD'
               )} - ${billingCycleEnd.format('MMM DD')})`}
               bgClass="bg-gray-300 dark:bg-gray-600"
-              labelBottomClass="!text-scale-1000 pb-1"
-              labelTop={`${daysToCycleEnd} Days left`}
+              labelBottomClass="!text-foreground-light pb-1"
+              labelTop={`${daysToCycleEnd} days remaining`}
             />
 
             {subscription && (
