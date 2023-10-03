@@ -10,12 +10,12 @@ import { noop } from 'lodash'
 import { useEffect, useRef, useState } from 'react'
 import {
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuLabel_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   IconList,
   Input,
 } from 'ui'
@@ -93,8 +93,8 @@ const InputWithSuggestions = ({
         onChange={onInputChange}
         actions={
           showSuggestions && (
-            <DropdownMenu_Shadcn_>
-              <DropdownMenuTrigger_Shadcn_>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
                 <Tooltip.Root delayDuration={0}>
                   <Tooltip.Trigger asChild>
                     <Button
@@ -119,24 +119,22 @@ const InputWithSuggestions = ({
                     </Tooltip.Content>
                   </Tooltip.Portal>
                 </Tooltip.Root>
-              </DropdownMenuTrigger_Shadcn_>
-              <DropdownMenuContent_Shadcn_ align="end" side="bottom">
-                <DropdownMenuLabel_Shadcn_>
-                  {suggestionsHeader || 'Suggestions'}
-                </DropdownMenuLabel_Shadcn_>
-                <DropdownMenuSeparator_Shadcn_ />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" side="bottom">
+                <DropdownMenuLabel>{suggestionsHeader || 'Suggestions'}</DropdownMenuLabel>
+                <DropdownMenuSeparator />
                 {filteredSuggestions.map((suggestion: Suggestion) => (
-                  <DropdownMenuItem_Shadcn_
+                  <DropdownMenuItem
                     className="space-x-2"
                     key={suggestion.name}
                     onClick={() => onSelectSuggestion(suggestion)}
                   >
                     <div>{suggestion.name}</div>
                     <div className="text-foreground-lighter">{suggestion.description}</div>
-                  </DropdownMenuItem_Shadcn_>
+                  </DropdownMenuItem>
                 ))}
-              </DropdownMenuContent_Shadcn_>
-            </DropdownMenu_Shadcn_>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )
         }
       />

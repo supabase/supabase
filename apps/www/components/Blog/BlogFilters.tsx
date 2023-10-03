@@ -4,10 +4,10 @@ import { useCallback, useEffect, useState } from 'react'
 
 import {
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   IconChevronDown,
   IconSearch,
   IconX,
@@ -82,8 +82,8 @@ const BlogFilters = ({ posts, setPosts, setCategory, allCategories, handlePosts 
             exit={{ opacity: 0, transition: { duration: 0.05 } }}
             className="flex lg:hidden"
           >
-            <DropdownMenu_Shadcn_>
-              <DropdownMenuTrigger_Shadcn_>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
                 <Button
                   type="outline"
                   iconRight={<IconChevronDown />}
@@ -91,10 +91,10 @@ const BlogFilters = ({ posts, setPosts, setCategory, allCategories, handlePosts 
                 >
                   {!activeCategory ? 'All Posts' : startCase(activeCategory?.replaceAll('-', ' '))}
                 </Button>
-              </DropdownMenuTrigger_Shadcn_>
-              <DropdownMenuContent_Shadcn_ side="bottom" align="start">
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="bottom" align="start">
                 {allCategories.map((category: string) => (
-                  <DropdownMenuItem_Shadcn_
+                  <DropdownMenuItem
                     key="custom-expiry"
                     onClick={() => setCategory(category)}
                     className={[
@@ -104,10 +104,10 @@ const BlogFilters = ({ posts, setPosts, setCategory, allCategories, handlePosts 
                     ].join(' ')}
                   >
                     {category === 'all' ? 'All Posts' : startCase(category.replaceAll('-', ' '))}
-                  </DropdownMenuItem_Shadcn_>
+                  </DropdownMenuItem>
                 ))}
-              </DropdownMenuContent_Shadcn_>
-            </DropdownMenu_Shadcn_>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </motion.div>
         )}
         <div className="hidden lg:flex flex-wrap items-center flex-grow gap-2">

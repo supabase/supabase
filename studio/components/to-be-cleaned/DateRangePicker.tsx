@@ -2,11 +2,11 @@ import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 import {
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuRadioGroup_Shadcn_,
-  DropdownMenuRadioItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
   IconChevronDown,
 } from 'ui'
 
@@ -195,25 +195,25 @@ const DateRangePicker = ({
 
   return (
     <>
-      <DropdownMenu_Shadcn_>
-        <DropdownMenuTrigger_Shadcn_>
+      <DropdownMenu>
+        <DropdownMenuTrigger>
           <Button asChild type="default" iconRight={<IconChevronDown />}>
             <span>{timePeriod && options.find((x) => x.key === timePeriod)?.label}</span>
           </Button>
-        </DropdownMenuTrigger_Shadcn_>
+        </DropdownMenuTrigger>
 
-        <DropdownMenuContent_Shadcn_ side="bottom" align="start">
-          <DropdownMenuRadioGroup_Shadcn_ value={timePeriod} onValueChange={(x) => handleChange(x)}>
+        <DropdownMenuContent side="bottom" align="start">
+          <DropdownMenuRadioGroup value={timePeriod} onValueChange={(x) => handleChange(x)}>
             {options.map((option) => {
               return (
-                <DropdownMenuRadioItem_Shadcn_ value={option.key} key={option.key}>
+                <DropdownMenuRadioItem value={option.key} key={option.key}>
                   {option.label}
-                </DropdownMenuRadioItem_Shadcn_>
+                </DropdownMenuRadioItem>
               )
             })}
-          </DropdownMenuRadioGroup_Shadcn_>
-        </DropdownMenuContent_Shadcn_>
-      </DropdownMenu_Shadcn_>
+          </DropdownMenuRadioGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </>
   )
 }

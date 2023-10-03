@@ -4,11 +4,11 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import {
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   IconEdit,
   IconMoreVertical,
   IconTrash,
@@ -77,32 +77,26 @@ const PolicyRow = ({
       </div>
       <div>
         {canUpdatePolicies ? (
-          <DropdownMenu_Shadcn_>
-            <DropdownMenuTrigger_Shadcn_>
+          <DropdownMenu>
+            <DropdownMenuTrigger>
               <Button
                 type="default"
                 style={{ paddingLeft: 4, paddingRight: 4 }}
                 icon={<IconMoreVertical />}
               />
-            </DropdownMenuTrigger_Shadcn_>
-            <DropdownMenuContent_Shadcn_ side="bottom" align="end">
-              <DropdownMenuItem_Shadcn_
-                className="space-x-2"
-                onClick={() => onSelectEditPolicy(policy)}
-              >
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="bottom" align="end">
+              <DropdownMenuItem className="space-x-2" onClick={() => onSelectEditPolicy(policy)}>
                 <IconEdit size={14} />
                 <p>Edit</p>
-              </DropdownMenuItem_Shadcn_>
-              <DropdownMenuSeparator_Shadcn_ />
-              <DropdownMenuItem_Shadcn_
-                className="space-x-2"
-                onClick={() => onSelectDeletePolicy(policy)}
-              >
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="space-x-2" onClick={() => onSelectDeletePolicy(policy)}>
                 <IconTrash size={14} />
                 <p>Delete</p>
-              </DropdownMenuItem_Shadcn_>
-            </DropdownMenuContent_Shadcn_>
-          </DropdownMenu_Shadcn_>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         ) : (
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger>

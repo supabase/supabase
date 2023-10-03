@@ -2,11 +2,11 @@ import { ComponentProps, useState } from 'react'
 import {
   Button,
   cn,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   IconBox,
   IconChevronDown,
   IconCode,
@@ -152,8 +152,8 @@ const ReportFilterBar = ({
           from={datepickerFrom}
           helpers={datepickerHelpers}
         />
-        <DropdownMenu_Shadcn_>
-          <DropdownMenuTrigger_Shadcn_>
+        <DropdownMenu>
+          <DropdownMenuTrigger>
             <Button
               asChild
               type="default"
@@ -164,16 +164,16 @@ const ReportFilterBar = ({
                 {currentProductFilter === null ? 'All Requests' : currentProductFilter.label}
               </span>
             </Button>
-          </DropdownMenuTrigger_Shadcn_>
-          <DropdownMenuContent_Shadcn_ side="bottom" align="start">
-            <DropdownMenuItem_Shadcn_ onClick={() => handleProductFilterChange(null)}>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="bottom" align="start">
+            <DropdownMenuItem onClick={() => handleProductFilterChange(null)}>
               <p>All Requests</p>
-            </DropdownMenuItem_Shadcn_>
-            <DropdownMenuSeparator_Shadcn_ />
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
             {PRODUCT_FILTERS.map((productFilter) => {
               const Icon = productFilter.icon
               return (
-                <DropdownMenuItem_Shadcn_
+                <DropdownMenuItem
                   key={productFilter.key}
                   className="space-x-2"
                   disabled={productFilter.key === currentProductFilter?.key}
@@ -193,11 +193,11 @@ const ReportFilterBar = ({
                       {productFilter.description}
                     </p>
                   </div>
-                </DropdownMenuItem_Shadcn_>
+                </DropdownMenuItem>
               )
             })}
-          </DropdownMenuContent_Shadcn_>
-        </DropdownMenu_Shadcn_>
+          </DropdownMenuContent>
+        </DropdownMenu>
         {filters
           .filter(
             (filter) =>

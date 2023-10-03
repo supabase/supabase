@@ -1,10 +1,5 @@
 import { PropsWithChildren } from 'react'
-import {
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
-} from 'ui'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
 
 interface DropdownControlProps {
   options: {
@@ -26,24 +21,24 @@ export const DropdownControl = ({
   onSelect,
 }: PropsWithChildren<DropdownControlProps>) => {
   return (
-    <DropdownMenu_Shadcn_>
-      <DropdownMenuTrigger_Shadcn_>{children}</DropdownMenuTrigger_Shadcn_>
-      <DropdownMenuContent_Shadcn_ side={side} align={align}>
+    <DropdownMenu>
+      <DropdownMenuTrigger>{children}</DropdownMenuTrigger>
+      <DropdownMenuContent side={side} align={align}>
         <div className="dropdown-control" style={{ maxHeight: '30vh' }}>
           {options.length === 0 && <p className="dropdown-control__empty-text">No more items</p>}
           {options.map((x) => {
             return (
-              <DropdownMenuItem_Shadcn_ key={x.value} onClick={() => onSelect(x.value)}>
+              <DropdownMenuItem key={x.value} onClick={() => onSelect(x.value)}>
                 <div className="flex items-center gap-2">
                   {x.preLabel && <span className="grow text-foreground-lighter">{x.preLabel}</span>}
                   <span>{x.label}</span>
                   {x.postLabel && <span className="text-foreground-lighter">{x.postLabel}</span>}
                 </div>
-              </DropdownMenuItem_Shadcn_>
+              </DropdownMenuItem>
             )
           })}
         </div>
-      </DropdownMenuContent_Shadcn_>
-    </DropdownMenu_Shadcn_>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }

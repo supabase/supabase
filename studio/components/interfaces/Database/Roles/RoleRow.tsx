@@ -4,10 +4,10 @@ import { useState } from 'react'
 import {
   Button,
   Collapsible,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   Form,
   IconChevronUp,
   IconHelpCircle,
@@ -131,14 +131,14 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                     {role.active_connections} connections
                   </p>
                   {!disabled && (
-                    <DropdownMenu_Shadcn_>
-                      <DropdownMenuTrigger_Shadcn_>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger>
                         <Button asChild type="default" className="px-1" icon={<IconMoreVertical />}>
                           <span></span>
                         </Button>
-                      </DropdownMenuTrigger_Shadcn_>
-                      <DropdownMenuContent_Shadcn_ side="bottom" className="w-[120px]">
-                        <DropdownMenuItem_Shadcn_
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent side="bottom" className="w-[120px]">
+                        <DropdownMenuItem
                           className="space-x-2"
                           onClick={(event) => {
                             event.stopPropagation()
@@ -147,9 +147,9 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                         >
                           <IconTrash className="text-red-800" size="tiny" strokeWidth={2} />
                           <p>Delete</p>
-                        </DropdownMenuItem_Shadcn_>
-                      </DropdownMenuContent_Shadcn_>
-                    </DropdownMenu_Shadcn_>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   )}
                 </div>
               </button>

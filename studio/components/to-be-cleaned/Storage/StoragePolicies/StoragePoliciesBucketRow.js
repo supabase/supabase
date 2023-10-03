@@ -3,11 +3,11 @@ import { isEmpty } from 'lodash'
 import {
   Badge,
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   IconArchive,
   IconEdit,
   IconMoreVertical,
@@ -31,34 +31,34 @@ const PolicyRow = ({
             <span className="truncate text-sm text-foreground">{name}</span>
           </div>
         </div>
-        <DropdownMenu_Shadcn_>
-          <DropdownMenuTrigger_Shadcn_>
+        <DropdownMenu>
+          <DropdownMenuTrigger>
             <Button
               type="default"
               style={{ paddingLeft: 4, paddingRight: 4 }}
               icon={<IconMoreVertical />}
             />
-          </DropdownMenuTrigger_Shadcn_>
-          <DropdownMenuContent_Shadcn_ side="bottom" align="end" size="small">
-            <DropdownMenuItem_Shadcn_
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="bottom" align="end" size="small">
+            <DropdownMenuItem
               className="space-x-2"
               type="outline"
               onClick={() => onSelectPolicyEdit(policy, bucketName, table)}
             >
               <IconEdit size={14} />
               <p>Edit</p>
-            </DropdownMenuItem_Shadcn_>
-            <DropdownMenuSeparator_Shadcn_ />
-            <DropdownMenuItem_Shadcn_
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
               type="outline"
               className="space-x-2"
               onClick={() => onSelectPolicyDelete(policy)}
             >
               <IconTrash size={14} />
               <p>Delete</p>
-            </DropdownMenuItem_Shadcn_>
-          </DropdownMenuContent_Shadcn_>
-        </DropdownMenu_Shadcn_>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </Panel.Content>
     </div>
   )

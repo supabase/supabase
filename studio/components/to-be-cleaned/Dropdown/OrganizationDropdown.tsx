@@ -3,12 +3,12 @@ import { useRouter } from 'next/router'
 import { EMPTY_ARR } from 'lib/void'
 import {
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuLabel_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   IconPlus,
 } from 'ui'
 
@@ -20,30 +20,30 @@ const OrganizationDropdown = ({
   const router = useRouter()
 
   return (
-    <DropdownMenu_Shadcn_>
-      <DropdownMenuTrigger_Shadcn_>
+    <DropdownMenu>
+      <DropdownMenuTrigger>
         <Button asChild>
           <span>New project</span>
         </Button>
-      </DropdownMenuTrigger_Shadcn_>
-      <DropdownMenuContent_Shadcn_ side="bottom" align="center">
+      </DropdownMenuTrigger>
+      <DropdownMenuContent side="bottom" align="center">
         <>
-          <DropdownMenuLabel_Shadcn_>Choose organization</DropdownMenuLabel_Shadcn_>
+          <DropdownMenuLabel>Choose organization</DropdownMenuLabel>
           {organizations
             .sort((a, b) => a.name.localeCompare(b.name))
             .map((x) => (
-              <DropdownMenuItem_Shadcn_ key={x.slug} onClick={() => router.push(`/new/${x.slug}`)}>
+              <DropdownMenuItem key={x.slug} onClick={() => router.push(`/new/${x.slug}`)}>
                 {x.name}
-              </DropdownMenuItem_Shadcn_>
+              </DropdownMenuItem>
             ))}
-          <DropdownMenuSeparator_Shadcn_ />
-          <DropdownMenuItem_Shadcn_ className="space-x-2" onClick={() => router.push(`/new`)}>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem className="space-x-2" onClick={() => router.push(`/new`)}>
             <IconPlus size="tiny" />
             <p>New organization</p>
-          </DropdownMenuItem_Shadcn_>
+          </DropdownMenuItem>
         </>
-      </DropdownMenuContent_Shadcn_>
-    </DropdownMenu_Shadcn_>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
 export default OrganizationDropdown

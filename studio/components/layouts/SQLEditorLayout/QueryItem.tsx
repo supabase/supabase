@@ -10,11 +10,11 @@ import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   IconAlertCircle,
   IconAlertTriangle,
   IconChevronDown,
@@ -204,8 +204,8 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
   return (
     <div className="group [div&>button[data-state='open']>span]:text-foreground-lighter flex items-center">
       {IS_PLATFORM ? (
-        <DropdownMenu_Shadcn_>
-          <DropdownMenuTrigger_Shadcn_ asChild>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
             <span
               className={clsx(
                 'rounded p-1',
@@ -216,33 +216,33 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
             >
               <IconChevronDown size="tiny" strokeWidth={2} />
             </span>
-          </DropdownMenuTrigger_Shadcn_>
-          <DropdownMenuContent_Shadcn_ side="bottom" align="end">
-            <DropdownMenuItem_Shadcn_ onClick={onClickRename} className="space-x-2">
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="bottom" align="end">
+            <DropdownMenuItem onClick={onClickRename} className="space-x-2">
               <IconEdit2 size="tiny" />
               <p>Rename query</p>
-            </DropdownMenuItem_Shadcn_>
+            </DropdownMenuItem>
             {sharedSnippetsFeature && visibility === 'user' && canCreateSQLSnippet && (
-              <DropdownMenuItem_Shadcn_ onClick={onClickShare} className="space-x-2">
+              <DropdownMenuItem onClick={onClickShare} className="space-x-2">
                 <IconShare size="tiny" />
                 <p>Share query</p>
-              </DropdownMenuItem_Shadcn_>
+              </DropdownMenuItem>
             )}
             {sharedSnippetsFeature && visibility === 'project' && canCreateSQLSnippet && (
-              <DropdownMenuItem_Shadcn_ onClick={createPersonalCopy} className="space-x-2">
+              <DropdownMenuItem onClick={createPersonalCopy} className="space-x-2">
                 <IconCopy size="tiny" />
                 <p>Duplicate personal copy</p>
-              </DropdownMenuItem_Shadcn_>
+              </DropdownMenuItem>
             )}
             <>
-              <DropdownMenuSeparator_Shadcn_ />
-              <DropdownMenuItem_Shadcn_ onClick={onClickDelete} className="space-x-2">
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={onClickDelete} className="space-x-2">
                 <IconTrash size="tiny" />
                 <p>Delete query</p>
-              </DropdownMenuItem_Shadcn_>
+              </DropdownMenuItem>
             </>
-          </DropdownMenuContent_Shadcn_>
-        </DropdownMenu_Shadcn_>
+          </DropdownMenuContent>
+        </DropdownMenu>
       ) : (
         <Button asChild disabled type="text" style={{ padding: '3px' }}>
           <span></span>

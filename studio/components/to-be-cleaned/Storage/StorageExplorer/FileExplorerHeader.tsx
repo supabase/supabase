@@ -4,11 +4,11 @@ import { compact, debounce, isEqual, noop } from 'lodash'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuRadioGroup_Shadcn_,
-  DropdownMenuRadioItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
   IconChevronLeft,
   IconChevronRight,
   IconChevronsDown,
@@ -329,8 +329,8 @@ const FileExplorerHeader = ({
           >
             Reload
           </Button>
-          <DropdownMenu_Shadcn_>
-            <DropdownMenuTrigger_Shadcn_>
+          <DropdownMenu>
+            <DropdownMenuTrigger>
               <Button
                 asChild
                 icon={
@@ -346,25 +346,17 @@ const FileExplorerHeader = ({
               >
                 <span>View as</span>
               </Button>
-            </DropdownMenuTrigger_Shadcn_>
+            </DropdownMenuTrigger>
 
-            <DropdownMenuContent_Shadcn_>
-              <DropdownMenuRadioGroup_Shadcn_
-                key="viewOptions"
-                value={view}
-                onValueChange={setView}
-              >
-                <DropdownMenuRadioItem_Shadcn_ value={STORAGE_VIEWS.COLUMNS}>
-                  Columns
-                </DropdownMenuRadioItem_Shadcn_>
-                <DropdownMenuRadioItem_Shadcn_ value={STORAGE_VIEWS.LIST}>
-                  List
-                </DropdownMenuRadioItem_Shadcn_>
-              </DropdownMenuRadioGroup_Shadcn_>
-            </DropdownMenuContent_Shadcn_>
-          </DropdownMenu_Shadcn_>
-          <DropdownMenu_Shadcn_>
-            <DropdownMenuTrigger_Shadcn_>
+            <DropdownMenuContent>
+              <DropdownMenuRadioGroup key="viewOptions" value={view} onValueChange={setView}>
+                <DropdownMenuRadioItem value={STORAGE_VIEWS.COLUMNS}>Columns</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value={STORAGE_VIEWS.LIST}>List</DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger>
               <Button
                 asChild
                 icon={<IconChevronsDown size={16} strokeWidth={2} />}
@@ -373,30 +365,24 @@ const FileExplorerHeader = ({
               >
                 <span>Sort by</span>
               </Button>
-            </DropdownMenuTrigger_Shadcn_>
-            <DropdownMenuContent_Shadcn_>
-              <DropdownMenuRadioGroup_Shadcn_
-                key="sortOptions"
-                value={sortBy}
-                onValueChange={setSortBy}
-              >
-                <DropdownMenuRadioItem_Shadcn_ value={STORAGE_SORT_BY.NAME}>
-                  Name
-                </DropdownMenuRadioItem_Shadcn_>
-                <DropdownMenuRadioItem_Shadcn_ value={STORAGE_SORT_BY.CREATED_AT}>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuRadioGroup key="sortOptions" value={sortBy} onValueChange={setSortBy}>
+                <DropdownMenuRadioItem value={STORAGE_SORT_BY.NAME}>Name</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value={STORAGE_SORT_BY.CREATED_AT}>
                   Time created
-                </DropdownMenuRadioItem_Shadcn_>
-                <DropdownMenuRadioItem_Shadcn_ value={STORAGE_SORT_BY.UPDATED_AT}>
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value={STORAGE_SORT_BY.UPDATED_AT}>
                   Time modified
-                </DropdownMenuRadioItem_Shadcn_>
-                <DropdownMenuRadioItem_Shadcn_ value={STORAGE_SORT_BY.LAST_ACCESSED_AT}>
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value={STORAGE_SORT_BY.LAST_ACCESSED_AT}>
                   Time last accessed
-                </DropdownMenuRadioItem_Shadcn_>
-              </DropdownMenuRadioGroup_Shadcn_>
-            </DropdownMenuContent_Shadcn_>
-          </DropdownMenu_Shadcn_>
-          <DropdownMenu_Shadcn_>
-            <DropdownMenuTrigger_Shadcn_>
+                </DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger>
               <Button
                 asChild
                 icon={
@@ -411,22 +397,22 @@ const FileExplorerHeader = ({
               >
                 <span>Sort Order</span>
               </Button>
-            </DropdownMenuTrigger_Shadcn_>
-            <DropdownMenuContent_Shadcn_>
-              <DropdownMenuRadioGroup_Shadcn_
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuRadioGroup
                 key="sortOrderOptions"
                 value={sortByOrder}
                 onValueChange={setSortByOrder}
               >
-                <DropdownMenuRadioItem_Shadcn_ value={STORAGE_SORT_BY_ORDER.ASC}>
+                <DropdownMenuRadioItem value={STORAGE_SORT_BY_ORDER.ASC}>
                   Ascending
-                </DropdownMenuRadioItem_Shadcn_>
-                <DropdownMenuRadioItem_Shadcn_ value={STORAGE_SORT_BY_ORDER.DESC}>
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value={STORAGE_SORT_BY_ORDER.DESC}>
                   Descending
-                </DropdownMenuRadioItem_Shadcn_>
-              </DropdownMenuRadioGroup_Shadcn_>
-            </DropdownMenuContent_Shadcn_>
-          </DropdownMenu_Shadcn_>
+                </DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         <div className="h-6 border-r border-panel-border-light dark:border-panel-border-dark" />
         <div className="flex items-center space-x-1">

@@ -10,10 +10,10 @@ import { CSVLink } from 'react-csv'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import {
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   IconChevronDown,
   IconClipboard,
   IconDownload,
@@ -105,8 +105,8 @@ const ResultsDropdown = ({ id, isExecuting }: ResultsDropdownProps) => {
   }
 
   return (
-    <DropdownMenu_Shadcn_>
-      <DropdownMenuTrigger_Shadcn_>
+    <DropdownMenu>
+      <DropdownMenuTrigger>
         <Button asChild type="text" iconRight={<IconChevronDown />}>
           <span>
             Results
@@ -123,20 +123,20 @@ const ResultsDropdown = ({ id, isExecuting }: ResultsDropdownProps) => {
           data={csvData}
           filename={`supabase_${project?.ref}_${snap.snippets[id]?.snippet.name}`}
         />
-      </DropdownMenuTrigger_Shadcn_>
-      <DropdownMenuContent_Shadcn_ side="bottom" align="start">
+      </DropdownMenuTrigger>
+      <DropdownMenuContent side="bottom" align="start">
         <>
-          <DropdownMenuItem_Shadcn_ onClick={onDownloadCSV} className="space-x-2">
+          <DropdownMenuItem onClick={onDownloadCSV} className="space-x-2">
             <IconDownload size="tiny" />
             <p>Download CSV</p>
-          </DropdownMenuItem_Shadcn_>
-          <DropdownMenuItem_Shadcn_ onClick={onCopyAsMarkdown} className="space-x-2">
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={onCopyAsMarkdown} className="space-x-2">
             <IconClipboard size="tiny" />
             <p>Copy as markdown</p>
-          </DropdownMenuItem_Shadcn_>
+          </DropdownMenuItem>
         </>
-      </DropdownMenuContent_Shadcn_>
-    </DropdownMenu_Shadcn_>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
 

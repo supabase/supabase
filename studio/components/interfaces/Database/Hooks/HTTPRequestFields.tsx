@@ -9,11 +9,11 @@ import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { uuidv4 } from 'lib/helpers'
 import {
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   IconChevronDown,
   IconPlus,
   IconTrash,
@@ -169,16 +169,16 @@ const HTTPRequestFields = ({
                 Add a new header
               </Button>
               {type === 'supabase_function' && (
-                <DropdownMenu_Shadcn_>
-                  <DropdownMenuTrigger_Shadcn_>
+                <DropdownMenu>
+                  <DropdownMenuTrigger>
                     <Button
                       type="default"
                       className="rounded-l-none px-[4px] py-[5px]"
                       icon={<IconChevronDown />}
                     />
-                  </DropdownMenuTrigger_Shadcn_>
-                  <DropdownMenuContent_Shadcn_ align="end" side="bottom">
-                    <DropdownMenuItem_Shadcn_
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" side="bottom">
+                    <DropdownMenuItem
                       key="add-auth-header"
                       onClick={() =>
                         onAddHeader({
@@ -194,9 +194,9 @@ const HTTPRequestFields = ({
                           Required if your edge function enforces JWT verification
                         </p>
                       </div>
-                    </DropdownMenuItem_Shadcn_>
-                    <DropdownMenuSeparator_Shadcn_ />
-                    <DropdownMenuItem_Shadcn_
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
                       key="add-source-header"
                       onClick={() =>
                         onAddHeader({
@@ -212,9 +212,9 @@ const HTTPRequestFields = ({
                           Useful to verify that the edge function was triggered from this webhook
                         </p>
                       </div>
-                    </DropdownMenuItem_Shadcn_>
-                  </DropdownMenuContent_Shadcn_>
-                </DropdownMenu_Shadcn_>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
             </div>
           </div>

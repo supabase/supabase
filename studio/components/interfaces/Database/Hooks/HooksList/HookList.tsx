@@ -12,11 +12,11 @@ import { BASE_PATH } from 'lib/constants'
 import {
   Badge,
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   IconEdit3,
   IconMoreVertical,
   IconTrash,
@@ -89,30 +89,27 @@ const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: 
             <Table.td className="text-right">
               <div className="flex justify-end gap-4">
                 {canUpdateWebhook ? (
-                  <DropdownMenu_Shadcn_>
-                    <DropdownMenuTrigger_Shadcn_>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger>
                       <Button asChild type="default" icon={<IconMoreVertical />} className="px-1">
                         <span></span>
                       </Button>
-                    </DropdownMenuTrigger_Shadcn_>
+                    </DropdownMenuTrigger>
 
-                    <DropdownMenuContent_Shadcn_ side="left">
+                    <DropdownMenuContent side="left">
                       <>
-                        <DropdownMenuItem_Shadcn_ className="space-x-2" onClick={() => editHook(x)}>
+                        <DropdownMenuItem className="space-x-2" onClick={() => editHook(x)}>
                           <IconEdit3 size="tiny" />
                           <p>Edit hook</p>
-                        </DropdownMenuItem_Shadcn_>
-                        <DropdownMenuSeparator_Shadcn_ />
-                        <DropdownMenuItem_Shadcn_
-                          className="space-x-2"
-                          onClick={() => deleteHook(x)}
-                        >
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="space-x-2" onClick={() => deleteHook(x)}>
                           <IconTrash stroke="red" size="tiny" />
                           <p>Delete hook</p>
-                        </DropdownMenuItem_Shadcn_>
+                        </DropdownMenuItem>
                       </>
-                    </DropdownMenuContent_Shadcn_>
-                  </DropdownMenu_Shadcn_>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 ) : (
                   <Tooltip.Root delayDuration={0}>
                     <Tooltip.Trigger asChild>

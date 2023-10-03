@@ -12,11 +12,11 @@ import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   IconAlertCircle,
   IconAlertTriangle,
   IconChevronDown,
@@ -170,30 +170,30 @@ const JWTSettings = () => {
                               </Tooltip.Portal>
                             </Tooltip.Root>
                           ) : (
-                            <DropdownMenu_Shadcn_>
-                              <DropdownMenuTrigger_Shadcn_>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger>
                                 <Button asChild type="default" iconRight={<IconChevronDown />}>
                                   <span>Generate a new secret</span>
                                 </Button>
-                              </DropdownMenuTrigger_Shadcn_>
-                              <DropdownMenuContent_Shadcn_ align="end" side="bottom">
-                                <DropdownMenuItem_Shadcn_
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" side="bottom">
+                                <DropdownMenuItem
                                   className="space-x-2"
                                   onClick={() => setIsGeneratingKey(true)}
                                 >
                                   <IconRefreshCw size={16} />
                                   <p>Generate a random secret</p>
-                                </DropdownMenuItem_Shadcn_>
-                                <DropdownMenuSeparator_Shadcn_ />
-                                <DropdownMenuItem_Shadcn_
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
                                   className="space-x-2"
                                   onClick={() => setIsCreatingKey(true)}
                                 >
                                   <IconPenTool size={16} />
                                   <p>Create my own secret</p>
-                                </DropdownMenuItem_Shadcn_>
-                              </DropdownMenuContent_Shadcn_>
-                            </DropdownMenu_Shadcn_>
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           )}
                         </div>
                       </div>
