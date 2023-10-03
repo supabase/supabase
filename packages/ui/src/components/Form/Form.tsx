@@ -1,18 +1,52 @@
-import { FormikConfig, FormikHelpers, FormikValues, useFormik } from 'formik'
+import {
+  FormikConfig,
+  FormikErrors,
+  FormikHelpers,
+  FormikState,
+  FormikTouched,
+  FormikValues,
+  useFormik,
+} from 'formik'
 import { useReducer } from 'react'
 import { FormContextProvider } from './FormContext'
 
 interface Props<T> extends Omit<FormikConfig<T>, 'validateOnMount' | 'validateOnChange'> {
-  children: any
-  handleIsSubmitting?: any
-  handleIsValidating?: any
-  name?: string
   id?: string
+  name?: string
+  children: (props: {
+    /** map of field names to specific error for that field */
+    errors: FormikErrors<T>
+    /** map of field names to whether the field has been touched */
+    touched: FormikTouched<T>
+    /** whether the form is currently submitting */
+    isSubmitting: boolean
+    /** whether the form is currently validating (prior to submission) */
+    isValidating: boolean
+    /** Number of times user tried to submit the form */
+    submitCount: number
+    /** Initial values of the form */
+    initialValues: T
+    /** Form values */
+    values: T
+    /** Reset form event handler  */
+    handleReset: (e?: React.SyntheticEvent<any>) => void
+    /** Reset form */
+    resetForm: (nextState?: Partial<FormikState<T>>) => void
+    /** Set value of form field directly */
+    setFieldValue<K extends keyof T>(
+      field: K,
+      value: T[K],
+      shouldValidate?: boolean
+    ): Promise<void | FormikErrors<T>>
+  }) => React.ReactNode
   className?: string
   style?: React.CSSProperties
 }
 
-export type { FormikHelpers }
+export type FormOnSubmitHandler<Values> = (
+  values: Values,
+  formikHelpers: FormikHelpers<Values>
+) => void | Promise<any>
 
 function errorReducer(state: any, action: any) {
   if (!action.error) {
@@ -50,10 +84,6 @@ export default function Form<T extends FormikValues>({ validate, ...props }: Pro
       },
   })
 
-  // console.log('values', formik.values)
-  // console.log('errors', formik.errors)
-  // console.log('touched', formik.touched)
-
   return (
     <form
       id={props.id}
@@ -72,7 +102,7 @@ export default function Form<T extends FormikValues>({ validate, ...props }: Pro
       >
         {props.children({
           /** map of field names to specific error for that field */
-          errors: formik.errors, // errors,
+          errors: formik.errors,
           // /** map of field names to whether the field has been touched */
           touched: formik.touched,
           /** whether the form is currently submitting */
@@ -90,7 +120,7 @@ export default function Form<T extends FormikValues>({ validate, ...props }: Pro
           /** Resets the form with custom values */
           resetForm: formik.resetForm,
           /** Manually sets a fields value */
-          setFieldValue: formik.setFieldValue,
+          setFieldValue: formik.setFieldValue as any,
         })}
       </FormContextProvider>
     </form>
