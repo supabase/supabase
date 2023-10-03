@@ -12,6 +12,7 @@ import {
 } from 'ui'
 import { InferType, object, string } from 'yup'
 
+import { FormOnSubmitHandler } from '@ui/components/Form/Form'
 import {
   FormActions,
   FormHeader,
@@ -44,9 +45,9 @@ const SiteUrl = observer(() => {
   const formId = 'auth-config-general-form'
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
-  const INITIAL_VALUES = { SITE_URL: authConfig?.SITE_URL }
+  const INITIAL_VALUES = { SITE_URL: authConfig?.SITE_URL ?? '' }
 
-  const onSubmit = (values: any, { resetForm }: any) => {
+  const onSubmit: FormOnSubmitHandler<SiteURLSchema> = (values, { resetForm }) => {
     const payload = { ...values }
     updateAuthConfig(
       { projectRef: projectRef!, config: payload },
@@ -62,7 +63,7 @@ const SiteUrl = observer(() => {
             category: 'success',
             message: `Successfully updated settings`,
           })
-          resetForm({ values: values, initialValues: values })
+          resetForm({ values: values })
         },
       }
     )
@@ -80,13 +81,13 @@ const SiteUrl = observer(() => {
 
   return (
     <Form id={formId} initialValues={INITIAL_VALUES} onSubmit={onSubmit} validationSchema={schema}>
-      {({ handleReset, resetForm, values, initialValues }: any) => {
+      {({ handleReset, resetForm, values, initialValues, setFieldValue }) => {
         const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
         // Form is reset once remote data is loaded in store
         useEffect(() => {
           if (isSuccess) {
-            resetForm({ values: INITIAL_VALUES, initialValues: INITIAL_VALUES })
+            resetForm({ values: INITIAL_VALUES })
           }
         }, [isSuccess])
 
