@@ -334,14 +334,17 @@ In some cases, you may wish to use WhatsApp as a delivery channel instead. Here 
 - You wish for a secure channel
 - Your users mostly use WhatsApp as a messaging platform
 
-WhatsApp OTPs can be used with Twilio Verify without additional configuration. To make use of WhatsApp OTP with Twilio Programmable Messaging, please complete the following steps:
+Twilio Verify can be used with WhatsApp OTPs with no additional configuration.
 
-- Go through the [Twilio self sign up guide for WhatsApp](https://www.twilio.com/docs/whatsapp/self-sign-up)
-- Submit a template via the [Twilio Guide For Submitting WhatsApp templates](https://www.twilio.com/docs/whatsapp/tutorial/send-whatsapp-notification-messages-templates#creating-message-templates-and-submitting-them-for-approval)
+Complete the following steps to use WhatsApp OTP with Twilio Programmable Messaging:
+
+1. Go through the [Twilio self sign up guide for WhatsApp](https://www.twilio.com/docs/whatsapp/self-sign-up).
+2. Follow the [Twilio Guide for Submitting Templates](https://www.twilio.com/docs/whatsapp/tutorial/send-whatsapp-notification-messages-templates#creating-message-templates-and-submitting-them-for-approval) and submit a Basic Authentication Message for approval (e.g. Your Code is 123456).
 
 <Admonition type="caution">
-  The message template submitted to Twilio must exactly match the SMS Body entered on the Supabase
-  dashboard.
+
+Twilio Programmable Messaging can only be used with the Basic Authentication Message. For advanced customization options, please use Twilio Verify.
+
 </Admonition>
 
 The sign in process with WhatsApp is similar to the sign in process for SMS. Do note the additional `whatsapp` parameter added:
