@@ -124,12 +124,13 @@ const NavigationBar = () => {
                 </Button>
               </Tooltip.Trigger>
               <Tooltip.Portal>
-                <Tooltip.Content side="right">
+                <Tooltip.Content side="right" sideOffset={5}>
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'rounded  py-1 px-2 leading-none shadow',
-                      'border border-scale-200 flex items-center space-x-1',
+                      'bg-scale-100 shadow-lg shadow-scale-700 dark:shadow-scale-300',
+                      'py-1.5 px-3 rounded leading-none', // background
+                      'border border-scale-500', //border
                     ].join(' ')}
                   >
                     {os === 'macos' ? (
