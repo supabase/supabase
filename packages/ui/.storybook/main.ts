@@ -14,7 +14,6 @@ const config: any = {
     '../src/components/Button/Button.stories.tsx',
     '../src/components/Checkbox/Checkbox.stories.tsx',
     '../src/components/Collapsible/Collapsible.stories.tsx',
-    '../src/components/Dropdown/Dropdown.stories.tsx',
   ],
   addons: [
     'storybook-dark-mode',
