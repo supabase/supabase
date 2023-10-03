@@ -29,7 +29,7 @@ const SignInLayout = ({
   const router = useRouter()
   const pushNext = usePushNext()
   const queryClient = useQueryClient()
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
   const ongoingIncident = useFlag('ongoingIncident')
 
   // This useEffect redirects the user to MFA if they're already halfway signed in
@@ -103,7 +103,7 @@ const SignInLayout = ({
                   <a>
                     <Image
                       src={
-                        theme === 'dark'
+                        resolvedTheme === 'dark'
                           ? `${BASE_PATH}/img/supabase-dark.svg`
                           : `${BASE_PATH}/img/supabase-light.svg`
                       }

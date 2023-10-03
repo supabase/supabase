@@ -8,7 +8,7 @@ import Divider from 'components/ui/Divider'
 export interface APIAuthorizationLayoutProps {}
 
 const APIAuthorizationLayout = ({ children }: PropsWithChildren<APIAuthorizationLayoutProps>) => {
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
   return (
     <>
       <Head>
@@ -23,7 +23,7 @@ const APIAuthorizationLayout = ({ children }: PropsWithChildren<APIAuthorization
                   <span className="sr-only">Supabase</span>
                   <Image
                     src={
-                      theme === 'dark'
+                      resolvedTheme === 'dark'
                         ? `${BASE_PATH}/img/supabase-dark.svg`
                         : `${BASE_PATH}/img/supabase-light.svg`
                     }

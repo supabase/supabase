@@ -23,7 +23,7 @@ const TableDefinition = ({ id }: TableDefinitionProps) => {
   const { ref } = useParams()
   const editorRef = useRef(null)
   const monacoRef = useRef(null)
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
   const entityType = useEntityType(id)
   const { project } = useProjectContext()
 
@@ -113,7 +113,7 @@ const TableDefinition = ({ id }: TableDefinitionProps) => {
       </Link>
       <Editor
         className="monaco-editor"
-        theme={theme === 'dark' ? 'vs-dark' : 'vs'}
+        theme={resolvedTheme === 'dark' ? 'vs-dark' : 'vs'}
         onMount={handleEditorOnMount}
         defaultLanguage="pgsql"
         value={formattedDefinition}

@@ -32,9 +32,10 @@ import { BASE_PATH } from 'lib/constants'
 import { getSemanticVersion } from 'lib/helpers'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { getAddons } from '../Subscription.utils'
+import Image from 'next/image'
 
 const AddOns = () => {
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
   const snap = useSubscriptionPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
@@ -140,10 +141,10 @@ const AddOns = () => {
                       src={
                         computeInstance !== undefined
                           ? `${BASE_PATH}/img/optimized-compute-on${
-                              theme === 'dark' ? '' : '--light'
+                              resolvedTheme === 'dark' ? '' : '--light'
                             }.png`
                           : `${BASE_PATH}/img/optimized-compute-off${
-                              theme === 'dark' ? '' : '--light'
+                              resolvedTheme === 'dark' ? '' : '--light'
                             }.png`
                       }
                     />
@@ -309,8 +310,12 @@ const AddOns = () => {
                       height={96}
                       src={
                         pitr !== undefined
-                          ? `${BASE_PATH}/img/pitr-on${theme === 'dark' ? '' : '--light'}.png?v=2`
-                          : `${BASE_PATH}/img/pitr-off${theme === 'dark' ? '' : '--light'}.png?v=2`
+                          ? `${BASE_PATH}/img/pitr-on${
+                              resolvedTheme === 'dark' ? '' : '--light'
+                            }.png?v=2`
+                          : `${BASE_PATH}/img/pitr-off${
+                              resolvedTheme === 'dark' ? '' : '--light'
+                            }.png?v=2`
                       }
                     />
                   </div>
@@ -363,17 +368,17 @@ const AddOns = () => {
               <div className="flex space-x-6">
                 <div>
                   <div className="rounded-md bg-scale-100 dark:bg-scale-400 w-[160px] h-[96px] shadow">
-                    <img
+                    <Image
                       alt="Custom Domain"
                       width={160}
                       height={96}
                       src={
                         customDomain !== undefined
                           ? `${BASE_PATH}/img/custom-domain-on${
-                              theme === 'dark' ? '' : '--light'
+                              resolvedTheme === 'dark' ? '' : '--light'
                             }.png`
                           : `${BASE_PATH}/img/custom-domain-off${
-                              theme === 'dark' ? '' : '--light'
+                              resolvedTheme === 'dark' ? '' : '--light'
                             }.png`
                       }
                     />

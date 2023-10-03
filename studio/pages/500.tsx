@@ -10,7 +10,7 @@ import { useTheme } from 'next-themes'
 
 const Error500: NextPage = () => {
   const router = useRouter()
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
 
   const signOut = useSignOut()
   const onClickLogout = async () => {
@@ -29,7 +29,7 @@ const Error500: NextPage = () => {
                 <a>
                   <Image
                     src={
-                      theme === 'dark'
+                      resolvedTheme === 'dark'
                         ? `${router.basePath}/img/supabase-dark.svg`
                         : `${router.basePath}/img/supabase-light.svg`
                     }

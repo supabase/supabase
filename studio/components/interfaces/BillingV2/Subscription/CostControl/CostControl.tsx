@@ -9,6 +9,7 @@ import Link from 'next/link'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconExternalLink } from 'ui'
 import SpendCapSidePanel from './SpendCapSidePanel'
+import Image from 'next/image'
 
 export interface CostControlProps {}
 
@@ -16,7 +17,7 @@ const CostControl = ({}: CostControlProps) => {
   const { ref: projectRef } = useParams()
   const snap = useSubscriptionPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
 
   const { data: subscription, isLoading } = useProjectSubscriptionV2Query({ projectRef })
 
@@ -95,17 +96,17 @@ const CostControl = ({}: CostControlProps) => {
             <div className="flex space-x-6">
               <div>
                 <div className="rounded-md bg-scale-100 dark:bg-scale-400 w-[160px] h-[96px] shadow">
-                  <img
+                  <Image
                     alt="Spend Cap"
                     width={160}
                     height={96}
                     src={
                       isUsageBillingEnabled
                         ? `${BASE_PATH}/img/spend-cap-off${
-                            theme === 'dark' ? '' : '--light'
+                            resolvedTheme === 'dark' ? '' : '--light'
                           }.png?v=3`
                         : `${BASE_PATH}/img/spend-cap-on${
-                            theme === 'dark' ? '' : '--light'
+                            resolvedTheme === 'dark' ? '' : '--light'
                           }.png?v=3`
                     }
                   />

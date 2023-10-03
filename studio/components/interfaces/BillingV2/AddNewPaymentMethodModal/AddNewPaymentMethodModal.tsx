@@ -27,7 +27,7 @@ const AddNewPaymentMethodModal = ({
   onConfirm,
 }: AddNewPaymentMethodModalProps) => {
   const { ui } = useStore()
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
   const [intent, setIntent] = useState<any>()
   const selectedOrganization = useSelectedOrganization()
 
@@ -90,7 +90,7 @@ const AddNewPaymentMethodModal = ({
 
   const options = {
     clientSecret: intent ? intent.client_secret : '',
-    appearance: { theme: theme === 'dark' ? 'night' : 'flat', labels: 'floating' },
+    appearance: { theme: resolvedTheme === 'dark' ? 'night' : 'flat', labels: 'floating' },
   } as any
 
   const onLocalCancel = () => {

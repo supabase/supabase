@@ -21,6 +21,7 @@ import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconExternalLink, IconInfo, Modal, Radio, SidePanel } from 'ui'
 
 import * as Tooltip from '@radix-ui/react-tooltip'
+import Image from 'next/image'
 
 const COMPUTE_CATEGORY_OPTIONS: {
   id: 'micro' | 'optimized'
@@ -47,7 +48,7 @@ const ComputeInstanceSidePanel = () => {
   const { ui } = useStore()
   const router = useRouter()
   const { ref: projectRef } = useParams()
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
   const { project: selectedProject } = useProjectContext()
   const organization = useSelectedOrganization()
   const isOrgBilling = !!organization?.subscription_id
@@ -226,7 +227,7 @@ const ComputeInstanceSidePanel = () => {
                         )
                       }}
                     >
-                      <img
+                      <Image
                         alt="Compute Instance"
                         className={clsx(
                           'relative rounded-xl transition border bg-no-repeat bg-center bg-cover cursor-pointer w-[160px] h-[96px]',
@@ -236,7 +237,7 @@ const ComputeInstanceSidePanel = () => {
                         )}
                         width={160}
                         height={96}
-                        src={theme === 'dark' ? option.imageUrl : option.imageUrlLight}
+                        src={resolvedTheme === 'dark' ? option.imageUrl : option.imageUrlLight}
                       />
 
                       <p

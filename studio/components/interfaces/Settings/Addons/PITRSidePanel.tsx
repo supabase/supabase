@@ -41,7 +41,7 @@ const PITRSidePanel = () => {
   const { ui } = useStore()
   const router = useRouter()
   const { ref: projectRef } = useParams()
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
   const organization = useSelectedOrganization()
   const isOrgBilling = !!organization?.subscription_id
 
@@ -207,7 +207,7 @@ const PITRSidePanel = () => {
                       )}
                       width={160}
                       height={96}
-                      src={theme === 'dark' ? option.imageUrl : option.imageUrlLight}
+                      src={resolvedTheme === 'dark' ? option.imageUrl : option.imageUrlLight}
                     />
 
                     <p
