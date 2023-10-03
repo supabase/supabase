@@ -4,10 +4,10 @@ import {
   Alert,
   Badge,
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   IconChevronDown,
   IconPlay,
   Popover,
@@ -67,47 +67,47 @@ const LogsQueryPanel = ({
       <div className="flex w-full items-center justify-between px-5 py-2">
         <div className="flex w-full flex-row items-center justify-between gap-x-4">
           <div className="flex items-center gap-2">
-            <DropdownMenu_Shadcn_>
-              <DropdownMenuTrigger_Shadcn_>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
                 <Button asChild type="default" iconRight={<IconChevronDown />}>
                   <span>Insert source</span>
                 </Button>
-              </DropdownMenuTrigger_Shadcn_>
-              <DropdownMenuContent_Shadcn_ side="bottom" align="start">
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="bottom" align="start">
                 {Object.values(LogsTableName)
                   .sort((a, b) => a.localeCompare(b))
                   .map((source) => (
-                    <DropdownMenuItem_Shadcn_ key={source} onClick={() => onSelectSource(source)}>
+                    <DropdownMenuItem key={source} onClick={() => onSelectSource(source)}>
                       <div className="flex flex-col gap-1">
                         <span className="font-mono font-bold">{source}</span>
                         <span className="text-foreground-light">
                           {LOGS_SOURCE_DESCRIPTION[source]}
                         </span>
                       </div>
-                    </DropdownMenuItem_Shadcn_>
+                    </DropdownMenuItem>
                   ))}
-              </DropdownMenuContent_Shadcn_>
-            </DropdownMenu_Shadcn_>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-            <DropdownMenu_Shadcn_>
-              <DropdownMenuTrigger_Shadcn_>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
                 <Button asChild type="default" iconRight={<IconChevronDown />}>
                   <span>Templates</span>
                 </Button>
-              </DropdownMenuTrigger_Shadcn_>
-              <DropdownMenuContent_Shadcn_ side="bottom" align="start">
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="bottom" align="start">
                 {templates
                   .sort((a, b) => a.label!.localeCompare(b.label!))
                   .map((template) => (
-                    <DropdownMenuItem_Shadcn_
+                    <DropdownMenuItem
                       key={template.label}
                       onClick={() => onSelectTemplate(template)}
                     >
                       <p>{template.label}</p>
-                    </DropdownMenuItem_Shadcn_>
+                    </DropdownMenuItem>
                   ))}
-              </DropdownMenuContent_Shadcn_>
-            </DropdownMenu_Shadcn_>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <DatePickers
               to={defaultTo}
               from={defaultFrom}
