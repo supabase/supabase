@@ -584,7 +584,16 @@ Returns all Realtime channels.
   },
 }
 
-export const DOCS_RESOURCE_CONTENT = {
+export const DOCS_RESOURCE_CONTENT: {
+  [key: string]: {
+    key: string
+    title: string
+    category: string
+    description?: string
+    docsUrl: string
+    code: (props: any) => { key: string; title?: string; bash: string; js: string }[]
+  }
+} = {
   rpcSingle: {
     key: 'invoke-function',
     title: 'Invoke function',
@@ -619,7 +628,7 @@ export const DOCS_RESOURCE_CONTENT = {
           }}`
       return [
         {
-          key: undefined,
+          key: 'rpc-single',
           title: undefined,
           bash: `
   curl -X POST '${endpoint}/rest/v1/rpc/${rpcName}' \\${bashParams}
@@ -959,6 +968,7 @@ const channels = supabase.channel('custom-all-channel')
   .subscribe()`,
         },
         {
+          key: 'subscribe-to-inserts',
           title: 'Subscribe to inserts',
           bash: `# Realtime streams are only supported by our client libraries`,
           js: `
@@ -973,6 +983,7 @@ const channels = supabase.channel('custom-insert-channel')
   .subscribe()`,
         },
         {
+          key: 'subscribe-to-updates',
           title: 'Subscribe to updates',
           bash: `# Realtime streams are only supported by our client libraries`,
           js: `
@@ -987,6 +998,7 @@ const channels = supabase.channel('custom-update-channel')
   .subscribe()`,
         },
         {
+          key: 'subscribe-to-deletes',
           title: 'Subscribe to deletes',
           bash: `# Realtime streams are only supported by our client libraries`,
           js: `
@@ -1001,6 +1013,7 @@ const channels = supabase.channel('custom-delete-channel')
   .subscribe()`,
         },
         {
+          key: 'subscribe-to-specific-rows',
           title: 'Subscribe to specific rows',
           bash: `# Realtime streams are only supported by our client libraries`,
           js: `
@@ -1029,6 +1042,7 @@ Upload a file to an existing bucket. RLS policy permissions required:
 `,
     code: ({ name }: { name: string }) => [
       {
+        key: 'storage-upload-file',
         title: undefined,
         bash: `# No command via bash available`,
         js: `
@@ -1056,6 +1070,7 @@ Delete files within the bucket. RLS policy permissions required:
 `,
     code: ({ name }: { name: string }) => [
       {
+        key: 'storage-delete-files',
         title: undefined,
         bash: `# No command via bash available`,
         js: `
@@ -1079,6 +1094,7 @@ List all files within the bucket. RLS policy permissions required:
 `,
     code: ({ name }: { name: string }) => [
       {
+        key: 'storage-list-files',
         title: undefined,
         bash: `# No command via bash available`,
         js: `
@@ -1106,6 +1122,7 @@ Downloads a file from a private bucket. For public buckets, make a request to th
 `,
     code: ({ name }: { name: string }) => [
       {
+        key: 'storage-download-file',
         title: undefined,
         bash: `# No command via bash available`,
         js: `
@@ -1129,6 +1146,7 @@ Create a signed URL which can be used to share a file for a fixed amount of time
 `,
     code: ({ name }: { name: string }) => [
       {
+        key: 'storage-create-signed-url',
         title: undefined,
         bash: `# No command via bash available`,
         js: `
@@ -1158,6 +1176,7 @@ RLS policy permissions required:
 `,
     code: ({ name }: { name: string }) => [
       {
+        key: 'storage-retrieve-public-url',
         title: undefined,
         bash: `# No command via bash available`,
         js: `
@@ -1183,6 +1202,7 @@ Responses are automatically parsed as \`json\`, \`blob\` and \`form-data\` depen
 `,
     code: ({ name, endpoint, apikey }: { name: string; endpoint: string; apikey: string }) => [
       {
+        key: 'invoke-edge-function',
         title: undefined,
         bash: `
 curl --request POST '${endpoint}/functions/v1/${name}' \\

@@ -1,13 +1,11 @@
-import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
-import { Markdown } from '../Markdown'
-import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useParams } from 'common'
-import { PropsWithChildren } from 'react'
 import Link from 'next/link'
 import { Button, IconExternalLink } from 'ui'
 
+import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
+import { Markdown } from '../Markdown'
+
 interface ResourceContentProps {
-  useServiceKey?: boolean
   selectedLanguage: 'js' | 'bash'
   snippet: {
     key: string
@@ -18,17 +16,8 @@ interface ResourceContentProps {
   codeSnippets: any[]
 }
 
-const ResourceContent = ({
-  useServiceKey = false,
-  selectedLanguage,
-  snippet,
-  codeSnippets,
-}: ResourceContentProps) => {
+const ResourceContent = ({ selectedLanguage, snippet, codeSnippets }: ResourceContentProps) => {
   const { ref: projectRef } = useParams()
-  const { data } = useProjectApiQuery({ projectRef })
-
-  const apikey = useServiceKey ? 'SUPABASE_SERVICE_KEY' : 'SUPABASE_CLIENT_API_KEY'
-  const endpoint = data?.autoApiService.endpoint ?? ''
 
   return (
     <div id={snippet.key} className="space-y-4 py-6">
