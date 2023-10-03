@@ -4,9 +4,11 @@ import { useFlag } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
 import { isUndefined } from 'lodash'
+import { FlaskConical } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
   DropdownMenuContent_Shadcn_,
@@ -32,23 +34,25 @@ import {
   generateToolRoutes,
 } from './NavigationBar.utils'
 import NavigationIconButton from './NavigationIconButton'
-import ThemeToggle from '@ui/components/ThemeProvider/ThemeToggle'
 
 const NavigationBar = () => {
+  const os = detectOS()
   const router = useRouter()
+  const snap = useAppStateSnapshot()
   const { theme, setTheme } = useTheme()
   const { ref: projectRef } = useParams()
-  const os = detectOS()
   const { setIsOpen } = useCommandMenu()
 
   const { project } = useProjectContext()
   const navLayoutV2 = useFlag('navigationLayoutV2')
   const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
+  const showFeaturePreviews = useFlag('featurePreviews')
 
   const activeRoute = router.pathname.split('/')[3]
   const toolRoutes = generateToolRoutes(projectRef, project, supabaseAIEnabled)
   const productRoutes = generateProductRoutes(projectRef, project)
   const otherRoutes = generateOtherRoutes(projectRef, project)
+
   return (
     <div
       className={[
@@ -153,9 +157,20 @@ const NavigationBar = () => {
                   <Link href="/account/me">
                     <DropdownMenuItem_Shadcn_ key="header" className="space-x-2">
                       <IconSettings size={14} strokeWidth={1.5} />
-                      <p className="text">Account Preferences</p>
+                      <p>Account preferences</p>
                     </DropdownMenuItem_Shadcn_>
                   </Link>
+                  {showFeaturePreviews && (
+                    <DropdownMenuItem_Shadcn_
+                      key="header"
+                      className="space-x-2"
+                      onClick={() => snap.setShowFeaturePreviewModal(true)}
+                      onSelect={() => snap.setShowFeaturePreviewModal(true)}
+                    >
+                      <FlaskConical size={14} strokeWidth={2} />
+                      <p className="text">Feature previews</p>
+                    </DropdownMenuItem_Shadcn_>
+                  )}
                   <DropdownMenuSeparator_Shadcn_ />
                 </>
               )}
