@@ -81,7 +81,6 @@ function AuthWidgetSection() {
                 </div>
                 <Auth.UserContextProvider supabaseClient={supabase}>
                   <AuthContainer supabaseClient={supabase}>
-                    aaaaaaaaaaaaaaaaaaaaa
                     <Auth
                       // @ts-ignore
                       socialLayout={layout}
