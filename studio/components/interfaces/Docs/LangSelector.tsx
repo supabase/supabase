@@ -85,7 +85,7 @@ const LangSelector = ({
                         })
                       }
                     >
-                      <p className="text">anon (public)</p>
+                      <p>anon (public)</p>
                     </DropdownMenuItem_Shadcn_>
                   )}
                   {canReadServiceKey && (
@@ -98,7 +98,7 @@ const LangSelector = ({
                         })
                       }
                     >
-                      <p className="text">service_role (secret)</p>
+                      <p>service_role (secret)</p>
                     </DropdownMenuItem_Shadcn_>
                   )}
                 </>

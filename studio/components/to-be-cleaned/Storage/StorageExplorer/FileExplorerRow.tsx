@@ -434,14 +434,14 @@ const FileExplorerRow = ({
                       <DropdownMenuSub_Shadcn_ key={option.name}>
                         <DropdownMenuSubTrigger_Shadcn_ className="space-x-2">
                           {option.icon || <></>}
-                          <p className="text-xs">{option.name}</p>
+                          <p>{option.name}</p>
                         </DropdownMenuSubTrigger_Shadcn_>
                         <DropdownMenuPortal_Shadcn_>
                           <DropdownMenuSubContent_Shadcn_>
                             {(option?.children ?? [])?.map((child) => {
                               return (
                                 <DropdownMenuItem_Shadcn_ key={child.name} onClick={child.onClick}>
-                                  <p className="text-xs">{child.name}</p>
+                                  <p>{child.name}</p>
                                 </DropdownMenuItem_Shadcn_>
                               )
                             })}
@@ -459,7 +459,7 @@ const FileExplorerRow = ({
                         onClick={option.onClick}
                       >
                         {option.icon || <></>}
-                        <p className="text-xs">{option.name}</p>
+                        <p>{option.name}</p>
                       </DropdownMenuItem_Shadcn_>
                     )
                   }

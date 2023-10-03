@@ -56,7 +56,7 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
                 disabled={isEncrypted}
               >
                 <IconEdit size="tiny" />
-                <p className="text">Edit column</p>
+                <p>Edit column</p>
               </DropdownMenuItem_Shadcn_>
             </Tooltip.Trigger>
             {isEncrypted && (
@@ -85,12 +85,12 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
           {column.frozen ? (
             <>
               <IconUnlock size="tiny" />
-              <p className="text">Unfreeze column</p>
+              <p>Unfreeze column</p>
             </>
           ) : (
             <>
               <IconLock size="tiny" />
-              <p className="text">Freeze column</p>
+              <p>Freeze column</p>
             </>
           )}
         </DropdownMenuItem_Shadcn_>
@@ -99,7 +99,7 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
             <Divider light />
             <DropdownMenuItem_Shadcn_ className="space-x-2" onClick={onDeleteColumn}>
               <IconTrash size="tiny" stroke="red" />
-              <p className="text">Delete column</p>
+              <p>Delete column</p>
             </DropdownMenuItem_Shadcn_>
           </>
         )}

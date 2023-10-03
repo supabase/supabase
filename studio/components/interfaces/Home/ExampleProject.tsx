@@ -11,7 +11,7 @@ interface ExampleProjectProps {
 }
 
 const ExampleProject = ({ framework, title, description, url }: ExampleProjectProps) => {
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
 
   return (
     <Link href={url}>
@@ -30,7 +30,7 @@ const ExampleProject = ({ framework, title, description, url }: ExampleProjectPr
               className="transition-all group-hover:scale-110"
               src={`${BASE_PATH}/img/libraries/${framework.toLowerCase()}${
                 ['expo', 'nextjs'].includes(framework.toLowerCase())
-                  ? theme === 'dark'
+                  ? resolvedTheme === 'dark'
                     ? '-dark'
                     : ''
                   : ''

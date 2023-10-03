@@ -1,8 +1,5 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useParams } from 'common'
-import { useFlag } from 'hooks'
-import { IS_PLATFORM } from 'lib/constants'
-import { detectOS } from 'lib/helpers'
 import { isUndefined } from 'lodash'
 import { FlaskConical } from 'lucide-react'
 import { useTheme } from 'next-themes'
@@ -27,6 +24,12 @@ import {
   IconUser,
   useCommandMenu,
 } from 'ui'
+
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useFlag } from 'hooks'
+import { IS_PLATFORM } from 'lib/constants'
+import { detectOS } from 'lib/helpers'
+import { useAppStateSnapshot } from 'state/app-state'
 import { useProjectContext } from '../ProjectContext'
 import {
   generateOtherRoutes,
@@ -34,8 +37,6 @@ import {
   generateToolRoutes,
 } from './NavigationBar.utils'
 import NavigationIconButton from './NavigationIconButton'
-import { useAppStateSnapshot } from 'state/app-state'
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 const NavigationBar = () => {
   const os = detectOS()
@@ -189,7 +190,7 @@ const NavigationBar = () => {
                   <Link href="/account/me">
                     <DropdownMenuItem_Shadcn_ key="header" className="space-x-2">
                       <IconSettings size={14} strokeWidth={1.5} />
-                      <p className="text">Account preferences</p>
+                      <p>Account preferences</p>
                     </DropdownMenuItem_Shadcn_>
                   </Link>
                   {showFeaturePreviews && (
