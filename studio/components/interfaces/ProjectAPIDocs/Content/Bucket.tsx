@@ -69,6 +69,13 @@ const Bucket = ({ language }: ContentProps) => {
           name: resource,
         })}
       />
+      <ResourceContent
+        selectedLanguage={language}
+        snippet={DOCS_RESOURCE_CONTENT.downloadFile}
+        codeSnippets={DOCS_RESOURCE_CONTENT.downloadFile.code({
+          name: resource,
+        })}
+      />
       {bucket.public ? (
         <ResourceContent
           selectedLanguage={language}

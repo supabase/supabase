@@ -117,7 +117,7 @@ const FirstLevelNav = () => {
         <Link passHref href="https://supabase.com/docs">
           <Button block asChild type="text" size="small" icon={<IconBook />}>
             <a target="_blank" rel="noreferrer" className="!justify-start">
-              Guides
+              Documentation
             </a>
           </Button>
         </Link>

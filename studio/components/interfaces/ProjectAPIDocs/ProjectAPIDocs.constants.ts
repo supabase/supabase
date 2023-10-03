@@ -1094,6 +1094,29 @@ const { data, error } = await supabase
       },
     ],
   },
+  downloadFile: {
+    key: 'download-file',
+    category: 'storage',
+    title: 'Download a file',
+    docsUrl: 'https://supabase.com/docs/reference/javascript/storage-from-download',
+    description: `
+Downloads a file from a private bucket. For public buckets, make a request to the URL returned from getPublicUrl instead. RLS policy permissions required:
+- \`buckets\` table permissions: none
+- \`objects\` table permissions: \`select\`
+`,
+    code: ({ name }: { name: string }) => [
+      {
+        title: undefined,
+        bash: `# No command via bash available`,
+        js: `
+const { data, error } = await supabase
+  .storage
+  .from('avatars')
+  .download('folder/avatar1.png')
+      `,
+      },
+    ],
+  },
   createSignedURL: {
     key: 'create-signed-url',
     category: 'storage',

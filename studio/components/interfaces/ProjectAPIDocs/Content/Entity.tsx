@@ -33,11 +33,14 @@ const Entity = ({ language, apikey = '', endpoint = '' }: ContentProps) => {
 
   const { data: jsonSchema } = useProjectJsonSchemaQuery({ projectRef: ref })
   const definition = jsonSchema?.definitions?.[resource]
-  const columns = Object.entries(definition.properties).map(([id, val]: any) => ({
-    ...val,
-    id,
-    required: definition.required.includes(id),
-  }))
+  const columns =
+    definition !== undefined
+      ? Object.entries(definition.properties).map(([id, val]: any) => ({
+          ...val,
+          id,
+          required: definition.required.includes(id),
+        }))
+      : []
 
   if (resource === undefined) return null
 
@@ -56,7 +59,7 @@ const Entity = ({ language, apikey = '', endpoint = '' }: ContentProps) => {
             <Table.th key="name">Name</Table.th>,
             <Table.th key="format">Format</Table.th>,
             <Table.th key="type">Type</Table.th>,
-            <Table.th key="type">Description</Table.th>,
+            <Table.th key="description">Description</Table.th>,
           ]}
           body={columns.map((column) => {
             const formattedColumnType = getColumnType(column.type, column.format)
