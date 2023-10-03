@@ -97,8 +97,8 @@ const data: Companies[] = [
     image: '/images/company/companies-using-supabase/squarespace.png',
   },
   {
-    name: 'twitter',
-    image: '/images/company/companies-using-supabase/twitter.png',
+    name: 'X (Twiiter)',
+    image: '/images/company/companies-using-supabase/x.png',
   },
 ]
 
