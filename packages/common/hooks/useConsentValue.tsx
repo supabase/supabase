@@ -10,6 +10,7 @@ export const useConsentValue = (KEY_NAME: string) => {
     if (!isBrowser) return
     setConsentValue(value)
     localStorage.setItem(KEY_NAME, value)
+    if (value === 'true') location.reload()
   }
 
   return {

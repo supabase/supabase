@@ -18,6 +18,7 @@ export const useConsent = () => {
     localStorage.setItem(TELEMETRY_CONSENT, value)
 
     if (consentToastId.current) toast.dismiss(consentToastId.current)
+    if (value === 'true') location.reload()
   }
 
   useEffect(() => {
