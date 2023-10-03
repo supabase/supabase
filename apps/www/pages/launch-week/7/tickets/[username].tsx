@@ -28,7 +28,7 @@ const supabaseAdmin = createClient(
 )
 
 export default function UsernamePage({ user, users, ogImageUrl }: Props) {
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
   const { username, ticketNumber, name, golden, referrals, bg_image_id } = user
   const TITLE = `${name ? name + '’s' : 'Get your'} #SupaLaunchWeek Ticket`
   const DESCRIPTION = 'Supabase Launch Week 7 | 10–14 April 2023 | Generate your ticket. Win swag.'
@@ -46,7 +46,7 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
     document.body.className = '!dark bg-[#1C1C1C]'
 
     return () => {
-      document.body.className = theme === 'dark' ? 'dark' : 'light'
+      document.body.className = resolvedTheme === 'dark' ? 'dark' : 'light'
     }
   }, [])
 

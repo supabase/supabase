@@ -12,7 +12,7 @@ import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-w
 
 const Error404 = () => {
   const [show404, setShow404] = useState<boolean>(false)
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
 
   useEffect(() => {
     setTimeout(() => {
@@ -29,7 +29,11 @@ const Error404 = () => {
               <div className="flex w-full items-center justify-between md:w-auto">
                 <a href="/">
                   <Image
-                    src={theme === 'dark' ? supabaseLogoWordmarkDark : supabaseLogoWordmarkLight}
+                    src={
+                      resolvedTheme === 'dark'
+                        ? supabaseLogoWordmarkDark
+                        : supabaseLogoWordmarkLight
+                    }
                     alt="supabase logo"
                     height={24}
                     width={120}

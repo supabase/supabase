@@ -9,12 +9,12 @@ function getRandomNumber(min: number, max: number) {
 }
 
 const DeployGlobally = ({ isHovered }: { isHovered: boolean }) => {
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
   const ref = React.useRef<any>()
   const states = ['1', '2', '3']
   const colors = {
-    green: theme === 'dark' ? '#1CF7C3' : '#00B99F',
-    gray: theme === 'dark' ? '#151918' : '#D3D3D3',
+    green: resolvedTheme === 'dark' ? '#1CF7C3' : '#00B99F',
+    gray: resolvedTheme === 'dark' ? '#151918' : '#D3D3D3',
   }
   const transitionDuration = 250
 
