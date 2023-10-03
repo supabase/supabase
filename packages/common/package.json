@@ -5,7 +5,6 @@
   "types": "./index.tsx",
   "license": "MIT",
   "dependencies": {
-    "@supabase/supabase-js": "^2.37.0",
     "config": "*",
     "lodash": "^4.17.21",
     "next-themes": "^0.2.1",
@@ -19,6 +18,7 @@
     "typescript": "^5.2.2"
   },
   "peerDependencies": {
+    "@supabase/supabase-js": "*",
     "next": "*",
     "react": "*",
     "react-dom": "*"
