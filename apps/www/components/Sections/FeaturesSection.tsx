@@ -23,7 +23,7 @@ interface Props {
 
 const FeaturesSection = ({ title, paragraph, cta, features }: Props) => {
   const ref = useRef(null)
-  const isInView = useInView(ref, { margin: '-25%', once: true })
+  const isInView = useInView(ref, { margin: '-5%', once: true })
 
   return (
     <LazyMotion features={domAnimation}>

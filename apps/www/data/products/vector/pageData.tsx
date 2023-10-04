@@ -1,9 +1,9 @@
 import Link from 'next/link'
-import IntegrationsImage from '~/components/Products/VectorAI/IntegrationsImage'
 import OpenAIImage from '~/components/Products/VectorAI/OpenAIImage'
 import SecureAndScalableImg from '~/components/Products/VectorAI/SecureAndScalableImg'
 import PGvectorImg from '~/components/Products/VectorAI/PGvectorImg'
 import DeployGlobally from '~/components/Products/VectorAI/DeployGlobally'
+import IntegrationsImage from '~/components/Products/VectorAI/IntegrationsImage'
 
 export default {
   metaTitle: '',
@@ -73,7 +73,7 @@ export default {
   },
   integrations: {
     title: 'Leverage the tools you love',
-    image: <IntegrationsImage />,
+    image: IntegrationsImage,
   },
   useCasesSection: {
     title: (
