@@ -1,14 +1,14 @@
 import { useTheme } from 'next-themes'
 import { useState } from 'react'
 import {
-  DropdownMenuGroup_Shadcn_,
-  DropdownMenuRadioGroup_Shadcn_,
-  DropdownMenuRadioItem_Shadcn_,
-  DropdownMenu_Shadcn_,
-  DropdownMenuContent_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
   IconMoon,
   IconSun,
-  DropdownMenuTrigger_Shadcn_,
 } from 'ui'
 
 interface ThemeToggleProps {
@@ -23,8 +23,8 @@ const ThemeToggle = ({ forceDark = false }: ThemeToggleProps) => {
   const currentTheme = forceDark ? 'dark' : theme
 
   return (
-    <DropdownMenu_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
-      <DropdownMenuTrigger_Shadcn_ asChild disabled={forceDark}>
+    <DropdownMenu open={open} onOpenChange={() => setOpen(!open)} modal={false}>
+      <DropdownMenuTrigger asChild disabled={forceDark}>
         <button
           id="user-settings-dropdown"
           className="flex items-center justify-center h-7 w-7 text"
@@ -33,22 +33,22 @@ const ThemeToggle = ({ forceDark = false }: ThemeToggleProps) => {
           <IconMoon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
           <span className="sr-only">Toggle theme</span>
         </button>
-      </DropdownMenuTrigger_Shadcn_>
-      <DropdownMenuContent_Shadcn_ align="end" className="w-60">
-        <DropdownMenuGroup_Shadcn_>
-          <DropdownMenuRadioGroup_Shadcn_
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-60">
+        <DropdownMenuGroup>
+          <DropdownMenuRadioGroup
             value={currentTheme} // Use the currentTheme variable here
             onValueChange={(value) => {
               setTheme(value)
             }}
           >
-            <DropdownMenuRadioItem_Shadcn_ value={'system'}>System</DropdownMenuRadioItem_Shadcn_>
-            <DropdownMenuRadioItem_Shadcn_ value={'dark'}>Dark</DropdownMenuRadioItem_Shadcn_>
-            <DropdownMenuRadioItem_Shadcn_ value={'light'}>Light</DropdownMenuRadioItem_Shadcn_>
-          </DropdownMenuRadioGroup_Shadcn_>
-        </DropdownMenuGroup_Shadcn_>
-      </DropdownMenuContent_Shadcn_>
-    </DropdownMenu_Shadcn_>
+            <DropdownMenuRadioItem value={'system'}>System</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value={'dark'}>Dark</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value={'light'}>Light</DropdownMenuRadioItem>
+          </DropdownMenuRadioGroup>
+        </DropdownMenuGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
 

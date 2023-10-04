@@ -4,17 +4,12 @@ import { compact, debounce, isEqual, noop } from 'lodash'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuRadioGroup_Shadcn_,
-  DropdownMenuRadioItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuSubContent_Shadcn_,
-  DropdownMenuSubTrigger_Shadcn_,
-  DropdownMenuSub_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
-  IconCheck,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuSeparator,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   IconChevronLeft,
   IconChevronRight,
   IconChevronsDown,
@@ -30,6 +25,11 @@ import {
   IconUpload,
   IconX,
   Input,
+  IconCheck,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuRadioItem,
 } from 'ui'
 
 import { useCheckPermissions } from 'hooks'
@@ -358,8 +358,8 @@ const FileExplorerHeader = ({
           </Button>
 
           {isNewAPIDocsEnabled ? (
-            <DropdownMenu_Shadcn_>
-              <DropdownMenuTrigger_Shadcn_ asChild>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
                 <Button
                   type="text"
                   icon={
@@ -372,59 +372,53 @@ const FileExplorerHeader = ({
                 >
                   View
                 </Button>
-              </DropdownMenuTrigger_Shadcn_>
-              <DropdownMenuContent_Shadcn_ align="end" className="w-40 min-w-0">
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-40 min-w-0">
                 {VIEW_OPTIONS.map((option) => (
-                  <DropdownMenuItem_Shadcn_ key={option.key} onClick={() => setView(option.key)}>
+                  <DropdownMenuItem key={option.key} onClick={() => setView(option.key)}>
                     <div className="flex items-center justify-between w-full">
                       <p>{option.name}</p>
                       {view === option.key && <IconCheck className="text-brand" strokeWidth={2} />}
                     </div>
-                  </DropdownMenuItem_Shadcn_>
+                  </DropdownMenuItem>
                 ))}
-                <DropdownMenuSeparator_Shadcn_ />
-                <DropdownMenuSub_Shadcn_>
-                  <DropdownMenuSubTrigger_Shadcn_>Sort by</DropdownMenuSubTrigger_Shadcn_>
-                  <DropdownMenuSubContent_Shadcn_ className="w-44">
+                <DropdownMenuSeparator />
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>Sort by</DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent className="w-44">
                     {SORT_BY_OPTIONS.map((option) => (
-                      <DropdownMenuItem_Shadcn_
-                        key={option.key}
-                        onClick={() => setSortBy(option.key)}
-                      >
+                      <DropdownMenuItem key={option.key} onClick={() => setSortBy(option.key)}>
                         <div className="flex items-center justify-between w-full">
                           <p>{option.name}</p>
                           {sortBy === option.key && (
                             <IconCheck className="text-brand" strokeWidth={2} />
                           )}
                         </div>
-                      </DropdownMenuItem_Shadcn_>
+                      </DropdownMenuItem>
                     ))}
-                  </DropdownMenuSubContent_Shadcn_>
-                </DropdownMenuSub_Shadcn_>
-                <DropdownMenuSub_Shadcn_>
-                  <DropdownMenuSubTrigger_Shadcn_>Sort order</DropdownMenuSubTrigger_Shadcn_>
-                  <DropdownMenuSubContent_Shadcn_>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>Sort order</DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
                     {SORT_ORDER_OPTIONS.map((option) => (
-                      <DropdownMenuItem_Shadcn_
-                        key={option.key}
-                        onClick={() => setSortByOrder(option.key)}
-                      >
+                      <DropdownMenuItem key={option.key} onClick={() => setSortByOrder(option.key)}>
                         <div className="flex items-center justify-between w-full">
                           <p>{option.name}</p>
                           {sortByOrder === option.key && (
                             <IconCheck className="text-brand" strokeWidth={2} />
                           )}
                         </div>
-                      </DropdownMenuItem_Shadcn_>
+                      </DropdownMenuItem>
                     ))}
-                  </DropdownMenuSubContent_Shadcn_>
-                </DropdownMenuSub_Shadcn_>
-              </DropdownMenuContent_Shadcn_>
-            </DropdownMenu_Shadcn_>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
             <>
-              <DropdownMenu_Shadcn_>
-                <DropdownMenuTrigger_Shadcn_>
+              <DropdownMenu>
+                <DropdownMenuTrigger>
                   <Button
                     asChild
                     icon={
@@ -440,25 +434,19 @@ const FileExplorerHeader = ({
                   >
                     <span>View as</span>
                   </Button>
-                </DropdownMenuTrigger_Shadcn_>
+                </DropdownMenuTrigger>
 
-                <DropdownMenuContent_Shadcn_>
-                  <DropdownMenuRadioGroup_Shadcn_
-                    key="viewOptions"
-                    value={view}
-                    onValueChange={setView}
-                  >
-                    <DropdownMenuRadioItem_Shadcn_ value={STORAGE_VIEWS.COLUMNS}>
+                <DropdownMenuContent>
+                  <DropdownMenuRadioGroup key="viewOptions" value={view} onValueChange={setView}>
+                    <DropdownMenuRadioItem value={STORAGE_VIEWS.COLUMNS}>
                       Columns
-                    </DropdownMenuRadioItem_Shadcn_>
-                    <DropdownMenuRadioItem_Shadcn_ value={STORAGE_VIEWS.LIST}>
-                      List
-                    </DropdownMenuRadioItem_Shadcn_>
-                  </DropdownMenuRadioGroup_Shadcn_>
-                </DropdownMenuContent_Shadcn_>
-              </DropdownMenu_Shadcn_>
-              <DropdownMenu_Shadcn_>
-                <DropdownMenuTrigger_Shadcn_>
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value={STORAGE_VIEWS.LIST}>List</DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <DropdownMenu>
+                <DropdownMenuTrigger>
                   <Button
                     asChild
                     icon={<IconChevronsDown size={16} strokeWidth={2} />}
@@ -467,30 +455,28 @@ const FileExplorerHeader = ({
                   >
                     <span>Sort by</span>
                   </Button>
-                </DropdownMenuTrigger_Shadcn_>
-                <DropdownMenuContent_Shadcn_>
-                  <DropdownMenuRadioGroup_Shadcn_
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuRadioGroup
                     key="sortOptions"
                     value={sortBy}
                     onValueChange={setSortBy}
                   >
-                    <DropdownMenuRadioItem_Shadcn_ value={STORAGE_SORT_BY.NAME}>
-                      Name
-                    </DropdownMenuRadioItem_Shadcn_>
-                    <DropdownMenuRadioItem_Shadcn_ value={STORAGE_SORT_BY.CREATED_AT}>
+                    <DropdownMenuRadioItem value={STORAGE_SORT_BY.NAME}>Name</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value={STORAGE_SORT_BY.CREATED_AT}>
                       Time created
-                    </DropdownMenuRadioItem_Shadcn_>
-                    <DropdownMenuRadioItem_Shadcn_ value={STORAGE_SORT_BY.UPDATED_AT}>
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value={STORAGE_SORT_BY.UPDATED_AT}>
                       Time modified
-                    </DropdownMenuRadioItem_Shadcn_>
-                    <DropdownMenuRadioItem_Shadcn_ value={STORAGE_SORT_BY.LAST_ACCESSED_AT}>
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value={STORAGE_SORT_BY.LAST_ACCESSED_AT}>
                       Time last accessed
-                    </DropdownMenuRadioItem_Shadcn_>
-                  </DropdownMenuRadioGroup_Shadcn_>
-                </DropdownMenuContent_Shadcn_>
-              </DropdownMenu_Shadcn_>
-              <DropdownMenu_Shadcn_>
-                <DropdownMenuTrigger_Shadcn_>
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <DropdownMenu>
+                <DropdownMenuTrigger>
                   <Button
                     asChild
                     icon={
@@ -505,22 +491,22 @@ const FileExplorerHeader = ({
                   >
                     <span>Sort Order</span>
                   </Button>
-                </DropdownMenuTrigger_Shadcn_>
-                <DropdownMenuContent_Shadcn_>
-                  <DropdownMenuRadioGroup_Shadcn_
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuRadioGroup
                     key="sortOrderOptions"
                     value={sortByOrder}
                     onValueChange={setSortByOrder}
                   >
-                    <DropdownMenuRadioItem_Shadcn_ value={STORAGE_SORT_BY_ORDER.ASC}>
+                    <DropdownMenuRadioItem value={STORAGE_SORT_BY_ORDER.ASC}>
                       Ascending
-                    </DropdownMenuRadioItem_Shadcn_>
-                    <DropdownMenuRadioItem_Shadcn_ value={STORAGE_SORT_BY_ORDER.DESC}>
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value={STORAGE_SORT_BY_ORDER.DESC}>
                       Descending
-                    </DropdownMenuRadioItem_Shadcn_>
-                  </DropdownMenuRadioGroup_Shadcn_>
-                </DropdownMenuContent_Shadcn_>
-              </DropdownMenu_Shadcn_>
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </>
           )}
         </div>
