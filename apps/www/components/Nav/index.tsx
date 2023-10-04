@@ -122,7 +122,7 @@ const Nav = () => {
       <button
         className={[
           'text-scale-900 focus:ring-brand dark:bg-scale-200 dark:hover:bg-scale-300 inline-flex items-center justify-center rounded-md bg-gray-50 p-2 hover:bg-white focus:outline-none focus:ring-2 focus:ring-inset',
-          showLaunchWeekNavMode && '!bg-transparent border border-[#be9eea]',
+          ' border border-[#3ECF8E]',
         ].join(' ')}
         aria-expanded="false"
       >
@@ -133,7 +133,7 @@ const Nav = () => {
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
-          stroke={showLaunchWeekNavMode ? '#be9eea' : 'currentColor'}
+          stroke={'#3ECF8E'}
           aria-hidden="true"
         >
           <path
