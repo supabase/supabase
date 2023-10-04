@@ -276,6 +276,47 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
     </Admonition>
 
   </TabPanel>
+  
+  <TabPanel id="kotlin" label="Kotlin">
+  
+    ## Using Native Sign in with Apple in Kotlin
+  
+	When using [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/), you can use the [compose-auth](https://supabase.com/docs/reference/kotlin/installing) plugin. On iOS it uses Native Apple Login automatically and on other platforms it uses `gotrue.loginWith(Apple)`.
+
+    **Initialize the Supabase Client**
+
+    ```kotlin
+    val supabaseClient = createSupabaseClient(
+    	supabaseUrl = "SUPABASE_URL",
+    	supabaseKey = "SUPABASE_KEY"
+    ) {
+    	install(GoTrue)
+    	install(ComposeAuth) {
+    		nativeAppleLogin()
+    	}
+    }
+    ```
+
+    **Use the Compose Auth plugin in your Auth Screen**
+
+    ```kotlin
+    val authState = supabaseClient.composeAuth.rememberLoginWithApple(
+    	onResult = {
+    		when(it) { //handle errors
+    			NativeSignInResult.ClosedByUser -> TODO()
+    			is NativeSignInResult.Error -> TODO()
+    			is NativeSignInResult.NetworkError -> TODO()
+    			NativeSignInResult.Success -> TODO()
+    		}
+    	}
+    )
+
+    Button(onClick = { authState.startFlow() }) {
+    	Text("Sign in with Apple")
+    }
+    ```
+
+  </TabPanel>
 </Tabs>
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />

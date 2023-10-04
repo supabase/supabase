@@ -29,21 +29,51 @@ Sign in with Google's OAuth flow is designed for web or browser based sign in me
 
 Behind the scenes, Supabase Auth uses the [Google OAuth 2.0 APIs](https://developers.google.com/identity/openid-connect/openid-connect), which are OpenID Connect certified, to perform the authentication.
 
-To initiate sign in, you can use the `signInWithOAuth()` method from the Supabase JavaScript library:
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
 
-```ts
+```js
 supabase.auth.signInWithOAuth({
   provider: 'google',
 })
 ```
 
+To initiate sign in, you can use the `signInWithOAuth()` method from the Supabase JavaScript library:
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+supabase.gotrue.loginWith(Google)
+```
+
+To initiate sign in, you can use the `loginWith()` method from the Supabase JavaScript library:
+
+</TabPanel>
+</Tabs>
+
 This call takes the user to Google's consent screen. When the flow ends, the user's profile information is exchanged and validated with Supabase Auth before it redirects back to your web application with an access and refresh token representing the user's session.
 
 You can additionally extract the `provider_token` from the session (on initial login only) which is the OAuth 2.0 access token issued by Google that grants your application access to the Google services for the authenticated users. Please store this token in local storage, cookies or in your database or server.
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
 Google does not send out a refresh token by default, so you will need to pass parameters like these to `signInWithOAuth()` in order to extract the `provider_refresh_token`:
 
-```ts
+```js
 const { data, error } = await supabase.auth.signInWithOAuth({
   provider: 'google',
   options: {
@@ -54,6 +84,21 @@ const { data, error } = await supabase.auth.signInWithOAuth({
   },
 })
 ```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+supabase.gotrue.loginWith(Google) {
+    queryParams["access_type"] = "offline"
+    queryParams["prompt"] = "consent"
+}
+```
+
+To initiate sign in, you can use the `loginWith()` method from the Supabase JavaScript library:
+
+</TabPanel>
+</Tabs>
 
 ### Configuration [#configuration-web]
 
@@ -69,9 +114,18 @@ Unlike the OAuth flow which requires the use of a web browser, the native Sign i
 
 When the user provides consent, Google issues an identity token (commonly abbreviated as ID token) that is then sent to your project's Supabase Auth server. When valid, a new user session is started by issuing an access and refresh token from Supabase Auth.
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dart"
+  queryGroup="language"
+>
+<TabPanel id="dart" label="Flutter">
+
 If you are building a Flutter app, you can use [flutter_appauth](https://pub.dev/packages/flutter_appauth) package to sign a user into your Supabase project:
 
-````dart
+```dart
 import 'dart:convert';
 import 'dart:math';
 import 'package:crypto/crypto.dart';
@@ -154,21 +208,66 @@ Future<AuthResponse> signInWithGoogle() {
 }
 ```
 
+</TabPanel>
+<TabPanel id="js" label="JavaScript">
+
 In the Supabase JavaScript library, which you can use with web-based native frameworks like React Native or Expo, you can invoke this functionality like so:
 
 ```ts
 await supabase.auth.signInWithIdToken({
   provider: 'google',
   token: '<identity token received from the OS>',
-  access_token: '<access token received from the OS>'
+  access_token: '<access token received from the OS>',
 })
-````
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+When using [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/), you can use the [compose-auth](https://supabase.com/docs/reference/kotlin/installing) plugin. On Android it uses Google OneTap automatically and on other platforms it uses `gotrue.loginWith(Google)`.
+Alternatively, you can have a look at [Google One Tap](https://developers.google.com/identity/one-tap/android/overview), just login with the IdToken after you receive it.
+
+**Initialize the Supabase Client**
+
+**Note:** You have to create OAuth credentials for both a Web and Android application. [Learn more](https://developers.google.com/identity/one-tap/android/get-started#api-console)
+
+```kotlin
+val supabaseClient = createSupabaseClient(
+    supabaseUrl = "SUPABASE_URL",
+    supabaseKey = "SUPABASE_KEY"
+) {
+    install(GoTrue)
+    install(ComposeAuth) {
+        nativeGoogleLogin("WEB_GOOGLE_CLIENT_ID") //Use the Web Client ID, not the Android one!
+    }
+}
+```
+
+**Use the Compose Auth plugin in your Auth Screen**
+
+```kotlin
+val authState = supabaseClient.composeAuth.rememberLoginWithGoogle(
+    onResult = {
+        when(it) { //handle errors
+            NativeSignInResult.ClosedByUser -> TODO()
+            is NativeSignInResult.Error -> TODO()
+            is NativeSignInResult.NetworkError -> TODO()
+            NativeSignInResult.Success -> TODO()
+        }
+    }
+)
+
+Button(onClick = { authState.startFlow() }) {
+    Text("Sign in with Google")
+}
+```
+
+</TabPanel>
+</Tabs>
 
 Please take a look at these open-source projects which may help you obtain an ID token directly from the OS:
 
 - [react-native-google-signin/google-signin](https://github.com/react-native-google-signin/google-signin).
-
-For apps written in Kotlin, please consult the [community maintained library](/docs/reference/kotlin/introduction).
 
 ### Configuration [#configuration-native-app]
 

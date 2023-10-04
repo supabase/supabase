@@ -62,6 +62,20 @@ Future<void> signInWithEmail() async {
 ```
 
 </TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+When your user signs in, call [loginWith(Email)](/docs/reference/kotlin/auth-signinwithpassword) with their email address and password:
+
+```kotlin
+suspend fun signInWithEmail() {
+	supabase.gotrue.loginWith(Email) {
+		email = "example@email.com"
+		password = "example-password"
+	}
+}
+```
+
+</TabPanel>
 </Tabs>
 
 <Tabs
@@ -89,6 +103,17 @@ When your user signs out, call [signOut()](/docs/reference/dart/auth-signout) to
 ```dart
 Future<void> signOut() async {
    await supabase.auth.signOut();
+}
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```kotlin
+suspend fun logout() {
+	supabase.gotrue.logout()
 }
 ```
 

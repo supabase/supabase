@@ -122,8 +122,6 @@ Use the variable `.Code` in the template to display the OTP code. Here's an exam
 
 In this scenario we'll be using the user's mobile phone number and a corresponding password as an alternative to signing up with an email address. Note: please thoroughly consider potential security implications when signing up with a combination of phone number and password. Phone numbers are sometimes recycled by phone networks when users cancel their phone contracts or move countries, thereby granting access to the user's account to the subsequent owner of the phone number. In the near future Supabase will support multifactor authentication, which will mitigate this risk, but for now you may want to consider allowing your users to recover their account by some other means in an emergency.
 
-Using supabase-js on the client you'll want to use the same `signUp` method that you'd use for email based sign ups, but with the `phone` param instead of the `email param`:
-
 <Tabs
   scrollable
   size="small"
@@ -133,11 +131,23 @@ Using supabase-js on the client you'll want to use the same `signUp` method that
 >
 <TabPanel id="js" label="JavaScript">
 
+Using supabase-js on the client you'll want to use the same `signUp` method that you'd use for email based sign ups, but with the `phone` param instead of the `email param`:
+
 ```js
 let { user, error } = await supabase.auth.signUp({
   phone: '+13334445555',
   password: 'some-password',
 })
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+supabase.gotrue.signUpWith(Phone) {
+    phoneNumber = "+13334445555"
+    password = "some-password"
+}
 ```
 
 </TabPanel>
@@ -158,8 +168,6 @@ curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/signup' \
 
 The user will now receive an SMS with a 6-digit pin that you will need to receive from them within 60-seconds before they can login to their account.
 
-You should present a form to the user so they can input the 6 digit pin, then send it along with the phone number to `verifyOtp`:
-
 <Tabs
   scrollable
   size="small"
@@ -169,12 +177,27 @@ You should present a form to the user so they can input the 6 digit pin, then se
 >
 <TabPanel id="js" label="JavaScript">
 
+You should present a form to the user so they can input the 6 digit pin, then send it along with the phone number to `verifyOtp`:
+
 ```js
 let { session, error } = await supabase.auth.verifyOtp({
   phone: '+13334445555',
   token: '123456',
   type: 'sms',
 })
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+You should present a form to the user so they can input the 6 digit pin, then send it along with the phone number to `verifyPhoneOtp`:
+
+```kotlin
+supabase.gotrue.verifyPhoneOtp(
+    type = OtpType.Phone.SMS,
+    phoneNumber = "+13334445555",
+    token = "123456"
+)
 ```
 
 </TabPanel>
@@ -226,6 +249,16 @@ let { user, error } = await supabase.auth.signInWithPassword({
 ```
 
 </TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+supabase.gotrue.loginWith(Phone) {
+    phoneNumber = "+13334445555"
+    password = "some-password"
+}
+```
+
+</TabPanel>
 <TabPanel id="http" label="HTTP">
 
 ```bash
@@ -245,8 +278,6 @@ curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/token?grant_type=
 
 In this scenario you are granting your user's the ability to login to their account without needing to set a password on their account, all they have to do to log in is verify their mobile each time using the OTP.
 
-In javascript we can use the `signIn` method with a single parameter: `phone`
-
 <Tabs
   scrollable
   size="small"
@@ -256,10 +287,23 @@ In javascript we can use the `signIn` method with a single parameter: `phone`
 >
 <TabPanel id="js" label="JavaScript">
 
+In JavaScript we can use the `signIn` method with a single parameter: `phone`
+
 ```js
 let { user, error } = await supabase.auth.signInWithOtp({
   phone: '+13334445555',
 })
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+In Kotlin, we can use the `sendOtpTo` method and change the property `phoneNumber`
+
+```kotlin
+supabase.gotrue.sendOtpTo(Phone) {
+    phoneNumber = "+13334445555"
+}
 ```
 
 </TabPanel>
@@ -294,6 +338,17 @@ let { session, error } = await supabase.auth.verifyOtp({
   token: '123456',
   type: 'sms',
 })
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+supabase.gotrue.verifyPhoneOtp(
+    type = OtpType.Phone.SMS,
+    phoneNumber = "+13334445555",
+    token = "123456"
+)
 ```
 
 </TabPanel>

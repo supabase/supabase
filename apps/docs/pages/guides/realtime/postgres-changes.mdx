@@ -202,6 +202,15 @@ You can use the Supabase client libraries to subscribe to database changes.
 
 Subscribe to specific schema events using the `schema` parameter:
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
 {/* prettier-ignore */}
 ```js
 const changes = client
@@ -217,9 +226,43 @@ const changes = client
   .subscribe()
 ```
 
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val myChannel = supabase.realtime.createChannel("schema-db-changes")
+
+val changes = myChannel.postgresChangeFlow<PostgresAction>(schema = "public")
+
+changes
+    .onEach {
+        when(it) { //You can also check for <is PostgresAction.Insert>, etc.. manually
+            is HasRecord -> println(it.record)
+            is HasOldRecord -> println(it.oldRecord)
+            else -> println(it)
+        }
+    }
+    .launchIn(yourCoroutineScope)
+
+supabase.realtime.connect()
+myChannel.join()
+```
+
+</TabPanel>
+</Tabs>
+
 The channel name can be any string except 'realtime'.
 
 ### Listening to INSERT events
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
 
 Use the `event` parameter to listen only to database `INSERT`s:
 
@@ -237,9 +280,41 @@ const changes = client
   .subscribe()
 ```
 
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+Use `PostgresAction.Insert` as type to listen only to database `INSERT`s:
+
+```kotlin
+val myChannel = supabase.realtime.createChannel("db-changes")
+
+val changes = myChannel.postgresChangeFlow<PostgresAction.Insert>(schema = "public")
+
+changes
+    .onEach {
+        println(it.record)
+    }
+    .launchIn(yourCoroutineScope)
+
+supabase.realtime.connect()
+myChannel.join()
+```
+
+</TabPanel>
+</Tabs>
+
 The channel name can be any string except 'realtime'.
 
 ### Listening to UPDATE events
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
 
 Use the `event` parameter to listen only to database `UPDATE`s:
 
@@ -257,11 +332,43 @@ const changes = client
   .subscribe()
 ```
 
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+Use `PostgresAction.Update` as type to listen only to database `UPDATE`s:
+
+```kotlin
+val myChannel = supabase.realtime.createChannel("db-changes")
+
+val changes = myChannel.postgresChangeFlow<PostgresAction.Update>(schema = "public")
+
+changes
+    .onEach {
+        println(it.record)
+    }
+    .launchIn(yourCoroutineScope)
+
+supabase.realtime.connect()
+myChannel.join()
+```
+
+</TabPanel>
+</Tabs>
+
 The channel name can be any string except 'realtime'.
 
 ### Listening to DELETE events
 
-Use the `event` parameter to listen only to database `UPDATE`s:
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+Use the `event` parameter to listen only to database `DELETE`s:
 
 ```js
 const changes = client
@@ -277,11 +384,43 @@ const changes = client
   .subscribe()
 ```
 
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+Use `PostgresAction.Delete` as type to listen only to database `DELETE`s:
+
+```kotlin
+val myChannel = supabase.realtime.createChannel("db-changes")
+
+val changes = myChannel.postgresChangeFlow<PostgresAction.Delete>(schema = "public")
+
+changes
+    .onEach {
+        println(it.oldRecord)
+    }
+    .launchIn(yourCoroutineScope)
+
+supabase.realtime.connect()
+myChannel.join()
+```
+
+</TabPanel>
+</Tabs>
+
 The channel name can be any string except 'realtime'.
 
 ### Listening to specific tables
 
 Subscribe to specific table events using the `table` parameter:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
 
 ```js
 const changes = client
@@ -298,11 +437,43 @@ const changes = client
   .subscribe()
 ```
 
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val myChannel = supabase.realtime.createChannel("db-changes")
+
+val changes = myChannel.postgresChangeFlow<PostgresAction>(schema = "public") {
+    table = "todos"
+}
+
+changes
+    .onEach {
+        println(it.record)
+    }
+    .launchIn(yourCoroutineScope)
+
+supabase.realtime.connect()
+myChannel.join()
+```
+
+</TabPanel>
+</Tabs>
+
 The channel name can be any string except 'realtime'.
 
 ### Listening to multiple changes
 
 To listen to different events and schema/tables/filters combinations with the same channel:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
 
 ```js
 const channel = supabase
@@ -328,9 +499,36 @@ const channel = supabase
   .subscribe()
 ```
 
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val myChannel = supabase.realtime.createChannel("db-changes")
+val messageChanges = myChannel.postgresChangeFlow<PostgresAction>(schema = "public") {
+    table = "messages"
+}
+val userChanges = myChannel.postgresChangeFlow<PostgresAction.Insert>(schema = "public") {
+    table = "users"
+}
+supabase.realtime.connect()
+myChannel.join()
+```
+
+</TabPanel>
+</Tabs>
+
 ### Filtering for specific changes
 
 Use the `filter` parameter for granular changes:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
 
 ```js
 const changes = client
@@ -348,6 +546,30 @@ const changes = client
   .subscribe()
 ```
 
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val myChannel = supabase.realtime.createChannel("db-changes")
+
+val changes = myChannel.postgresChangeFlow<PostgresAction.Insert>(schema = "public") {
+    table = "todos"
+    filter = "id=eq.1"
+}
+
+changes
+    .onEach {
+        println(it.record)
+    }
+    .launchIn(yourCoroutineScope)
+
+supabase.realtime.connect()
+myChannel.join()
+```
+
+</TabPanel>
+</Tabs>
+
 ## Available filters
 
 Realtime offers filters so you can specify the data your client receives at a more granular level.
@@ -355,6 +577,15 @@ Realtime offers filters so you can specify the data your client receives at a mo
 ### Equal to (eq)
 
 To listen to changes when a column's value in a table equals a client-specified value:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
 
 ```js
 const channel = supabase
@@ -371,6 +602,30 @@ const channel = supabase
   )
   .subscribe()
 ```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val myChannel = supabase.realtime.createChannel("db-changes")
+
+val changes = myChannel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
+    table = "messages"
+    filter = "body=eq.hey"
+}
+
+changes
+    .onEach {
+        println(it.record)
+    }
+    .launchIn(yourCoroutineScope)
+
+supabase.realtime.connect()
+myChannel.join()
+```
+
+</TabPanel>
+</Tabs>
 
 This filter uses Postgres's `=` filter.
 
@@ -400,6 +655,15 @@ This filter uses Postgres's `!=` filter.
 
 To listen to changes when a column's value in a table is less than a client-specified value:
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
 ```js
 const channel = supabase
   .channel('changes')
@@ -408,19 +672,52 @@ const channel = supabase
     {
       event: 'INSERT',
       schema: 'public',
-      table: 'messages',
-      filter: 'id=lt.100',
+      table: 'profiles',
+      filter: 'age=lt.65',
     },
     (payload) => console.log(payload)
   )
   .subscribe()
 ```
 
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val myChannel = supabase.realtime.createChannel("db-changes")
+
+val changes = myChannel.postgresChangeFlow<PostgresAction.Insert>(schema = "public") {
+    table = "profiles"
+    filter = "age=lt.65"
+}
+
+changes
+    .onEach {
+        println(it.record)
+    }
+    .launchIn(yourCoroutineScope)
+
+supabase.realtime.connect()
+myChannel.join()
+```
+
+</TabPanel>
+</Tabs>
+
 This filter uses Postgres's `<` filter, so it works for non-numeric types. Make sure to check the expected behavior of the compared data's type.
 
 ### Less than or equal to (lte)
 
 To listen to changes when a column's value in a table is less than or equal to a client-specified value:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
 
 ```js
 const channel = supabase
@@ -438,11 +735,44 @@ const channel = supabase
   .subscribe()
 ```
 
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val myChannel = supabase.realtime.createChannel("db-changes")
+
+val changes = myChannel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
+    table = "profiles"
+    filter = "age=lte.65"
+}
+
+changes
+    .onEach {
+        println(it.record)
+    }
+    .launchIn(yourCoroutineScope)
+
+supabase.realtime.connect()
+myChannel.join()
+```
+
+</TabPanel>
+</Tabs>
+
 This filter uses Postgres' `<=` filter, so it works for non-numeric types. Make sure to check the expected behavior of the compared data's type.
 
 ### Greater thank (gt)
 
 To listen to changes when a column's value in a table is greater than a client-specified value:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
 
 ```js
 const channel = supabase
@@ -460,11 +790,44 @@ const channel = supabase
   .subscribe()
 ```
 
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val myChannel = supabase.realtime.createChannel("db-changes")
+
+val changes = myChannel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
+    table = "products"
+    filter = "quantity=gt.10"
+}
+
+changes
+    .onEach {
+        println(it.record)
+    }
+    .launchIn(yourCoroutineScope)
+
+supabase.realtime.connect()
+myChannel.join()
+```
+
+</TabPanel>
+</Tabs>
+
 This filter uses Postgres's `>` filter, so it works for non-numeric types. Make sure to check the expected behavior of the compared data's type.
 
 ### Greater than or equal to (gte)
 
 To listen to changes when a column's value in a table is greater than or equal to a client-specified value:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
 
 ```js
 const channel = supabase
@@ -482,11 +845,44 @@ const channel = supabase
   .subscribe()
 ```
 
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val myChannel = supabase.realtime.createChannel("db-changes")
+
+val changes = myChannel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
+    table = "products"
+    filter = "quantity=gte.10"
+}
+
+changes
+    .onEach {
+        println(it.record)
+    }
+    .launchIn(yourCoroutineScope)
+
+supabase.realtime.connect()
+myChannel.join()
+```
+
+</TabPanel>
+</Tabs>
+
 This filter uses Postgres's `>=` filter, so it works for non-numeric types. Make sure to check the expected behavior of the compared data's type.
 
 ### Contained in list (in)
 
 To listen to changes when a column's value in a table equals any client-specified values:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
 
 ```js
 const channel = supabase
@@ -503,6 +899,30 @@ const channel = supabase
   )
   .subscribe()
 ```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val myChannel = supabase.realtime.createChannel("db-changes")
+
+val changes = myChannel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
+    table = "products"
+    filter = "name=in.(red, blue, yellow)"
+}
+
+changes
+    .onEach {
+        println(it.record)
+    }
+    .launchIn(yourCoroutineScope)
+
+supabase.realtime.connect()
+myChannel.join()
+```
+
+</TabPanel>
+</Tabs>
 
 This filter uses Postgres's `= ANY`. Realtime allows a maximum of 100 values for this filter.
 
@@ -548,6 +968,15 @@ Your project JWT secret is found with your [Project API keys](https://app.supaba
 
 To use your own JWT with Realtime make sure to set the token after instantiating the Supabase client and before connecting to a Channel.
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
 ```js
 const { createClient } = require('@supabase/supabase-js')
 
@@ -571,9 +1000,47 @@ const channel = supabase
   .subscribe()
 ```
 
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
+	install(Realtime) {
+		jwtToken = "your-custom-jwt"
+	}
+}
+val myChannel = supabase.realtime.createChannel("db-changes")
+
+val changes = myChannel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
+    table = "products"
+    filter = "name=in.(red, blue, yellow)"
+}
+
+changes
+    .onEach {
+        println(it.record)
+    }
+    .launchIn(yourCoroutineScope)
+
+supabase.realtime.connect()
+myChannel.join()
+```
+
+</TabPanel>
+</Tabs>
+
 ### Refreshed tokens
 
 You will need to refresh tokens on your own, but once generated, you can pass them to Realtime.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
 
 For example, if you're using the `supabase-js` `v2` client then you can pass your token like this:
 
@@ -582,6 +1049,18 @@ For example, if you're using the `supabase-js` `v2` client then you can pass you
 
 supabase.realtime.setAuth('fresh-token')
 ```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+In Kotlin, you have to update the token manually per channel:
+
+```kotlin
+myChannel.updateAuth("fresh-token")
+```
+
+</TabPanel>
+</Tabs>
 
 ## Limitations
 

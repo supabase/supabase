@@ -25,6 +25,15 @@ It uses the traditional `multipart/form-data` format and is simple to implement 
   reliability.
 </Admonition>
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
 ```javascript
 import { createClient } from '@supabase/supabase-js'
 
@@ -42,6 +51,27 @@ async function uploadFile(file) {
 }
 ```
 
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
+    install(Storage)
+}
+
+suspend fun uploadData(bytes: ByteArray) {
+    supabase.storage["bucket_name"].upload("file_path", bytes)
+}
+
+//Or on JVM/Android: (This will stream the data from the file to supabase)
+suspend fun uploadFile(file: File) {
+    supabase.storage["bucket_name"].upload("file_path", file)
+}
+```
+
+</TabPanel>
+</Tabs>
+
 ## Resumable Upload
 
 <Admonition type="note">
@@ -52,6 +82,15 @@ async function uploadFile(file) {
 The Resumable upload method is recommended for uploading large files that may exceed 6MB in size or for scenarios where network stability is a concern or if you simply want to have a progress bar for your uploads.
 
 Supabase Storage implements the [TUS protocol](https://tus.io/) to enable resumable uploads. TUS stands for The Upload Server and is an open protocol for supporting resumable uploads. The protocol allows the upload process to be resumed from where it left off in case of interruptions. This method can be implemented using the tus-js-client library, or other client-side libraries like [Uppy-js](https://uppy.io/docs/tus/) that support the TUS protocol.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
 
 Here's an example of how to upload a file using `tus-js-client`:
 
@@ -108,6 +147,42 @@ async function uploadFile(bucketName, fileName, file) {
   })
 }
 ```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+Kotlin supports resumable uploads natively for all targets:
+
+```kotlin
+//Or on JVM/Android: (This will stream the data from the file to supabase)
+suspend fun uploadFile(file: File) {
+    val upload: ResumableUpload = supabase.storage["bucket_name"].resumable.createOrContinueUpload("file_path", file)
+
+    upload.stateFlow
+        .onEach {
+            println(it.progress)
+        }
+        .launchIn(yourCoroutineScope)
+
+    upload.startOrResumeUploading()
+}
+
+//On other platforms you might have to give the bytes directly and specify a source if you want to continue it alter:
+suspend fun uploadData(bytes: ByteArray) {
+    val upload: ResumableUpload = supabase.storage["bucket_name"].resumable.createOrContinueUpload(bytes, "source", "file_path")
+
+    upload.stateFlow
+        .onEach {
+            println(it.progress)
+        }
+        .launchIn(yourCoroutineScope)
+
+    upload.startOrResumeUploading()
+}
+```
+
+</TabPanel>
+</Tabs>
 
 ### Upload URL
 
