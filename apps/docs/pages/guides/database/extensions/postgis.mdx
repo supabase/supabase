@@ -159,10 +159,10 @@ Sorting datasets from closest to farthest, sometimes called nearest-neighbor sor
 
 ```sql
 create or replace function nearby_restaurants(lat float, long float)
-returns table (id public.restaurants.id%TYPE, name public.restaurants.name%TYPE, location text, dist_meters float)
+returns table (id public.restaurants.id%TYPE, name public.restaurants.name%TYPE, lat float, long float, dist_meters float)
 language sql
 as $$
-  select id, name, st_astext(location) as location, st_distance(location, st_point(long, lat)::geography) as dist_meters
+  select id, name, st_y(location::geometry) as lat, st_x(location::geometry) as long, st_distance(location, st_point(long, lat)::geography) as dist_meters
   from public.restaurants
   order by location <-> st_point(long, lat)::geography;
 $$;
@@ -204,19 +204,22 @@ final data = await supabase.rpc('nearby_restaurants',params: {
   {
     "id": 1,
     "name": "Supa Burger",
-    "location": "POINT(-73.946823 40.807416)",
+    "lat": 40.807416,
+    "long": -73.946823,
     "dist_meters": 14.73033739
   },
   {
     "id": 2,
     "name": "Supa Pizza",
-    "location": "POINT(-73.94581 40.807475)",
+    "lat": 40.807475,
+    "long": -73.94581,
     "dist_meters": 78.28980007
   },
   {
     "id": 3,
     "name": "Supa Taco",
-    "location": "POINT(-73.945826 40.80629)",
+    "lat": 40.80629,
+    "long": -73.945826,
     "dist_meters": 136.04329002
   }
 ]
