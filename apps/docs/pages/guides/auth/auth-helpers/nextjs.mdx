@@ -171,7 +171,8 @@ export async function GET(request) {
   const code = requestUrl.searchParams.get('code')
 
   if (code) {
-    const supabase = createRouteHandlerClient({ cookies })
+    const cookieStore = () => cookies()
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
     await supabase.auth.exchangeCodeForSession(code)
   }
 
@@ -401,7 +402,8 @@ export async function POST(request) {
   const formData = await request.formData()
   const email = formData.get('email')
   const password = formData.get('password')
-  const supabase = createRouteHandlerClient({ cookies })
+  const cookieStore = () => cookies()
+  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
   await supabase.auth.signUp({
     email,
@@ -489,7 +491,8 @@ export async function POST(request) {
   const formData = await request.formData()
   const email = formData.get('email')
   const password = formData.get('password')
-  const supabase = createRouteHandlerClient({ cookies })
+  const cookieStore = () => cookies()
+  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
   await supabase.auth.signInWithPassword({
     email,
@@ -568,7 +571,8 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(request) {
   const requestUrl = new URL(request.url)
-  const supabase = createRouteHandlerClient({ cookies })
+  const cookieStore = () => cookies()
+  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
   await supabase.auth.signOut()
 
@@ -807,7 +811,8 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 export const dynamic = 'force-dynamic'
 
 export default async function Page() {
-  const supabase = createServerComponentClient({ cookies })
+  const cookeStore = cookies()
+  const supabase = createServerComponentClient({ cookies: () => cookieStore })
   const { data } = await supabase.from('todos').select()
   return <pre>{JSON.stringify(data, null, 2)}</pre>
 }
@@ -971,7 +976,8 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(request) {
   const { title } = await request.json()
-  const supabase = createRouteHandlerClient({ cookies })
+  const cookieStore = () => cookies()
+  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
   const { data } = await supabase.from('todos').insert({ title }).select()
   return NextResponse.json(data)
 }
@@ -1103,10 +1109,7 @@ export const dynamic = 'force-dynamic'
 export async function POST(request) {
   const { title } = await request.json()
   const cookieStore = cookies()
-
-  const supabase = createRouteHandlerClient({
-    cookies: () => cookieStore,
-  })
+  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
   const { data } = await supabase.from('todos').insert({ title }).select()
   return NextResponse.json(data)
