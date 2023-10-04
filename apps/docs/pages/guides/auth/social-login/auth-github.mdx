@@ -59,23 +59,69 @@ Copy your new OAuth credentials
 
 ## Add login code to your client app
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
 When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `github` as the `provider`:
 
 ```js
-async function signInWithGitHub() {
+async function signInWithGithub() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'github',
   })
 }
 ```
 
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+When your user signs in, call [loginWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Github` as the `Provider`:
+
+```kotlin
+suspend fun signInWithGithub() {
+	supabase.gotrue.loginWith(Github)
+}
+```
+
+</TabPanel>
+</Tabs>
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
 When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```js
-async function signout() {
+async function signOut() {
   const { error } = await supabase.auth.signOut()
 }
 ```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```kotlin
+suspend fun signOut() {
+	supabase.gotrue.logout()
+}
+```
+
+</TabPanel>
+</Tabs>
 
 ## Resources
 
