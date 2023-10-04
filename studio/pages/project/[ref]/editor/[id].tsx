@@ -10,7 +10,7 @@ import { NextPageWithLayout } from 'types'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
   const { id: _id, ref: projectRef } = useParams()
   const id = _id ? Number(_id) : undefined
 
@@ -21,7 +21,7 @@ const TableEditorPage: NextPageWithLayout = () => {
       <TableGridEditor
         isLoadingSelectedTable={isLoading}
         selectedTable={selectedTable}
-        theme={theme === 'dark' ? 'dark' : 'light'}
+        theme={resolvedTheme === 'dark' ? 'dark' : 'light'}
       />
       <DeleteConfirmationDialogs
         projectRef={projectRef}
