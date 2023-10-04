@@ -80,48 +80,46 @@ export const ProjectCardStatus = ({
     ? 'default'
     : 'warning'
 
-  if (activeWarnings.length === 0 && projectStatus === 'isHealthy') return <div className="py-2" />
+  if (activeWarnings.length === 0 && projectStatus === 'isHealthy') return null
 
   return (
-    <div>
-      <Alert_Shadcn_
-        variant={alertType}
-        className={cn(
-          `border-0 rounded-none rounded-b-md my-2 mb-2.5 [&>svg]:top-2.5 [&>svg]:w-[24px] [&>svg]:h-[24px] [&>svg]:p-1.5 [&>svg]:left-4 pl-2 bg-transparent transition-colors flex items-center`,
-          !isCritical
-            ? '[&>svg]:text-foreground [&>svg]:bg-scale-400 [&>svg]:dark:bg-scale-600'
-            : ''
-        )}
-      >
-        {projectStatus === 'isPaused' || projectStatus === 'isPausing' ? (
-          <IconPauseCircle strokeWidth={2} />
-        ) : projectStatus === 'isRestoring' || projectStatus === 'isComingUp' ? (
-          <IconRefreshCw size={14} strokeWidth={2} />
-        ) : (
-          <IconAlertTriangle strokeWidth={2} />
-        )}
-        <div className="flex justify-between items-center w-full pr-0.5">
-          <AlertTitle_Shadcn_ className="text-xs mb-0 mr-8">{alertTitle}</AlertTitle_Shadcn_>
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
-              <Info size={14} />
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-foreground">{alertDescription}</span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
-        </div>
-      </Alert_Shadcn_>
-    </div>
+    <Alert_Shadcn_
+      variant={alertType}
+      className={cn(
+        'border-0 p-5',
+        'bg-transparent',
+        '[&>svg]:left-[21px] [&>svg]:top-3.5',
+        !isCritical ? '[&>svg]:text-foreground [&>svg]:bg-surface-300' : ''
+      )}
+    >
+      {projectStatus === 'isPaused' || projectStatus === 'isPausing' ? (
+        <IconPauseCircle strokeWidth={2} />
+      ) : projectStatus === 'isRestoring' || projectStatus === 'isComingUp' ? (
+        <IconRefreshCw strokeWidth={2} />
+      ) : (
+        <IconAlertTriangle strokeWidth={2} />
+      )}
+      <div className="flex justify-between items-center w-full">
+        <AlertTitle_Shadcn_ className="text-xs mb-0">{alertTitle} hello world</AlertTitle_Shadcn_>
+        <Tooltip.Root delayDuration={0}>
+          <Tooltip.Trigger>
+            <Info size={14} className="text-foreground-light hover:text-foreground" />
+          </Tooltip.Trigger>
+          <Tooltip.Portal>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                  'border border-scale-200',
+                ].join(' ')}
+              >
+                <span className="text-xs text-foreground">{alertDescription}</span>
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Portal>
+        </Tooltip.Root>
+      </div>
+    </Alert_Shadcn_>
   )
 }
