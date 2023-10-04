@@ -1,13 +1,14 @@
 import { useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { Button, IconEye, IconEyeOff, Modal, ScrollArea, cn } from 'ui'
+import { Button, IconExternalLink, IconEye, IconEyeOff, Modal, ScrollArea, cn } from 'ui'
 
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import Telemetry from 'lib/telemetry'
 import { useAppStateSnapshot } from 'state/app-state'
 import APISidePanelPreview from './APISidePanelPreview'
 import { useFeaturePreviewContext } from './FeaturePreviewContext'
+import Link from 'next/link'
 
 // [Ivan] We should probably move this to a separate file, together with LOCAL_STORAGE_KEYS. We should make adding new feature previews as simple as possible.
 
@@ -21,6 +22,7 @@ const FEATURE_PREVIEWS = [
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
     name: 'Project API documentation',
     content: <APISidePanelPreview />,
+    discussionsUrl: 'https://github.com/orgs/supabase/discussions',
   },
 ]
 
@@ -59,7 +61,7 @@ const FeaturePreviewModal = () => {
     >
       <div className="flex">
         <div>
-          <ScrollArea className="h-[500px] w-[240px] border-r">
+          <ScrollArea className="h-[550px] w-[240px] border-r">
             {FEATURE_PREVIEWS.map((feature) => {
               const isEnabled = flags[feature.key] ?? false
 
@@ -83,12 +85,23 @@ const FeaturePreviewModal = () => {
             })}
           </ScrollArea>
         </div>
-        <div className="flex-grow max-h-[500px] p-4 space-y-3 overflow-y-auto">
+        <div className="flex-grow max-h-[550px] p-4 space-y-3 overflow-y-auto">
           <div className="flex items-center justify-between">
             <p>{selectedFeature?.name}</p>
-            <Button type="default" onClick={() => toggleFeature()}>
-              {isSelectedFeatureEnabled ? 'Disable' : 'Enable'} feature
-            </Button>
+            <div className="flex items-center space-x-2">
+              {selectedFeature?.discussionsUrl !== undefined && (
+                <Link passHref href={selectedFeature.discussionsUrl}>
+                  <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                    <a target="_blank" rel="noreferrer">
+                      Give feedback
+                    </a>
+                  </Button>
+                </Link>
+              )}
+              <Button type="default" onClick={() => toggleFeature()}>
+                {isSelectedFeatureEnabled ? 'Disable' : 'Enable'} feature
+              </Button>
+            </div>
           </div>
           {selectedFeature?.content}
         </div>

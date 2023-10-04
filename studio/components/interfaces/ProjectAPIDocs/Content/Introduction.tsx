@@ -17,7 +17,7 @@ const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) =>
 
   return (
     <>
-      <div id="connecting-project" className="space-y-4 py-6 pb-2 last:pb-6">
+      {/* <div id="connecting-project" className="space-y-4 py-6 pb-2 last:pb-6">
         <div className="px-4 space-y-2">
           <h2 className="doc-heading">Connecting to your project</h2>
           <div className="doc-section">
@@ -26,17 +26,9 @@ const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) =>
                 className="max-w-none [&>p]:!my-2"
                 content={`
 Interact with your database through the [Supabase client libraries](https://supabase.com/docs/reference) with your API keys.
-
-More information about your project's keys can be found in your project's API settings.
               `}
               />
             </article>
-          </div>
-          <div className="flex items-center space-x-2 !mt-4">
-            <Button type="default">View API settings</Button>
-            <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-              About APIs
-            </Button>
           </div>
           <div className="!mt-6 space-y-4">
             <Input
@@ -65,14 +57,49 @@ More information about your project's keys can be found in your project's API se
             />
           </div>
         </div>
-      </div>
+      </div> */}
       <ContentSnippet
         selectedLanguage={language}
         apikey={apikey}
         endpoint={endpoint}
         snippet={DOCS_CONTENT.init}
-      />
-      <ContentSnippet selectedLanguage={language} snippet={DOCS_CONTENT.auth} />
+      >
+        <div className="px-4 space-y-4">
+          <div className="flex space-x-4">
+            <p className="text-sm w-40">Project URL</p>
+            <Input disabled readOnly copy size="small" value={endpoint} className="w-full" />
+          </div>
+          <div className="flex space-x-4">
+            <p className="text-sm w-40">Client API key</p>
+            <Input
+              disabled
+              readOnly
+              copy
+              size="small"
+              value={apikey}
+              className="w-full"
+              descriptionText="This key is safe to use in a browser if you have enabled Row Level Security (RLS) for your tables and configured policies. You may also use the service key which can be found here to bypass RLS."
+            />
+          </div>
+          <div className="flex space-x-4">
+            <p className="text-sm w-40">Service key</p>
+            <Input
+              disabled
+              readOnly
+              copy
+              size="small"
+              value={serviceKey}
+              className="w-full"
+              descriptionText={
+                <p>
+                  This key has the ability to bypass Row Level Security.{' '}
+                  <span className="text-amber-900">Never share it publicly.</span>
+                </p>
+              }
+            />
+          </div>
+        </div>
+      </ContentSnippet>
       <ContentSnippet
         selectedLanguage={language}
         apikey={apikey}

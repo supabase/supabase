@@ -1,5 +1,5 @@
 export const DOCS_MENU = [
-  { name: 'Getting started', key: 'introduction' },
+  { name: 'Connect', key: 'introduction' },
   { name: 'User Management', key: 'user-management' },
   { name: 'Tables & Views', key: 'entities' },
   { name: 'Stored Procedures', key: 'stored-procedures' },
@@ -9,43 +9,18 @@ export const DOCS_MENU = [
 ]
 
 export const DOCS_CONTENT = {
-  // Introduction
-  connecting: {
-    key: 'connecting-project',
-    category: 'introduction',
-    title: 'Connecting to your project',
-    description: undefined,
-    js: undefined,
-    bash: undefined,
-  },
   init: {
     key: 'introduction',
     category: 'introduction',
-    title: `Initializing`,
-    description: `Create a new client for use in the browser.`,
+    title: `Connect to your project`,
+    description: `Projects have a RESTful endpoint that you can use with your project's API key to query and manage your database. We recommend setting your keys as environment variables.`,
     js: (apikey?: string, endpoint?: string) => `
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = '${endpoint}'
 const supabaseKey = process.env.SUPABASE_KEY
 const supabase = createClient(supabaseUrl, supabaseKey)`,
-    bash: (apikey?: string, endpoint?: string) => `# No client library required for Bash.`,
-  },
-  auth: {
-    key: 'authentication',
-    category: 'introduction',
-    title: 'Authentication',
-    description: `Supabase works through a mixture of JWT and Key auth.
-
-If no \`Authorization\` header is included, the API will assume that you are
-making a request with an anonymous user.
-
-If an \`Authorization\` header is included, the API will "switch" to the role
-of the user making the request. See the User Management section for more details.
-
-We recommend setting your keys as Environment Variables.`,
-    js: undefined,
-    bash: undefined,
+    bash: () => `# No client library required for Bash.`,
   },
   clientApiKeys: {
     key: 'client-api-keys',
@@ -53,12 +28,9 @@ We recommend setting your keys as Environment Variables.`,
     title: `Client API Keys`,
     description: `Client keys allow "anonymous access" to your database, until the user has logged in. After logging in the keys will switch to the user's own login token.
 
-In this documentation, we will refer to the key using the name \`SUPABASE_KEY\`.
-
-We have provided you a Client Key to get started. You will soon be able to add as many keys as you like. You can find the \`anon\` key in the API settings page.`,
+In this documentation, we will refer to the key using the name \`SUPABASE_KEY\`. You can find the \`anon\` key in the [API settings](/project/[ref]/settings/api) page.`,
     js: (apikey?: string, endpoint?: string) => `
 const SUPABASE_KEY = '${apikey}'
-
 const SUPABASE_URL = 'https://${endpoint}'
 const supabase = createClient(SUPABASE_URL, process.env.SUPABASE_KEY);`,
     bash: (apikey?: string, endpoint?: string) => `${apikey}`,
@@ -69,12 +41,9 @@ const supabase = createClient(SUPABASE_URL, process.env.SUPABASE_KEY);`,
     title: `Service Keys`,
     description: `Service keys have *FULL* access to your data, bypassing any security policies. Be VERY careful where you expose these keys. They should only be used on a server and never on a client or browser.
   
-In this documentation, we will refer to the key using the name \`SERVICE_KEY\`.
-
-We have provided you with a Service Key to get started. Soon you will be able to add as many keys as you like. You can find the \`service_role\` in the API settings page.`,
+In this documentation, we will refer to the key using the name \`SERVICE_KEY\`. You can find the \`service_role\` in the [API settings](/project/[ref]/settings/api) page.`,
     js: (apikey?: string, endpoint?: string) => `
 const SUPABASE_KEY = '${apikey}'
-
 const SUPABASE_URL = 'https://${endpoint}'
 const supabase = createClient(SUPABASE_URL, process.env.SUPABASE_KEY);`,
     bash: (apikey?: string, endpoint?: string) => `${apikey}`,

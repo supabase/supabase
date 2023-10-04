@@ -273,6 +273,7 @@ export const ProjectLayoutNonBlocking = ({
         </div>
 
         <EnableBranchingModal />
+        <ProjectAPIDocs />
       </ProjectContextProvider>
     </AppLayout>
   )

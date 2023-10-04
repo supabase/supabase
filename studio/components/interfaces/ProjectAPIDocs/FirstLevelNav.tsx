@@ -9,6 +9,8 @@ import { useParams } from 'common'
 import { navigateToSection } from './Content/Content.utils'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 
+const Separator = () => <div className="border-t !mt-3 pb-1 mx-3" />
+
 const FirstLevelNav = () => {
   const { ref } = useParams()
   const { meta, ui } = useStore()
@@ -63,50 +65,66 @@ const FirstLevelNav = () => {
                       {section.title}
                     </p>
                   ))}
-                  {item.key === 'entities' &&
-                    tables.map((table) => (
-                      <p
-                        key={table.name}
-                        title={table.name}
-                        className="text-sm text-light px-4 hover:text-foreground transition cursor-pointer"
-                        onClick={() => snap.setActiveDocsSection([item.key, table.name])}
-                      >
-                        {table.name}
-                      </p>
-                    ))}
-                  {item.key === 'stored-procedures' &&
-                    functions.map((fn) => (
-                      <p
-                        key={fn.name}
-                        title={fn.name}
-                        className="text-sm text-light px-4 hover:text-foreground transition cursor-pointer"
-                        onClick={() => snap.setActiveDocsSection([item.key, fn.name])}
-                      >
-                        {fn.name}
-                      </p>
-                    ))}
-                  {item.key === 'storage' &&
-                    (buckets ?? []).map((bucket) => (
-                      <p
-                        key={bucket.name}
-                        title={bucket.name}
-                        className="text-sm text-light px-4 hover:text-foreground transition cursor-pointer"
-                        onClick={() => snap.setActiveDocsSection([item.key, bucket.name])}
-                      >
-                        {bucket.name}
-                      </p>
-                    ))}
-                  {item.key === 'edge-functions' &&
-                    (edgeFunctions ?? []).map((fn) => (
-                      <p
-                        key={fn.name}
-                        title={fn.name}
-                        className="text-sm text-light px-4 hover:text-foreground transition cursor-pointer"
-                        onClick={() => snap.setActiveDocsSection([item.key, fn.name])}
-                      >
-                        {fn.name}
-                      </p>
-                    ))}
+                  {item.key === 'entities' && (
+                    <>
+                      {tables.length > 0 && <Separator />}
+                      {tables.map((table) => (
+                        <p
+                          key={table.name}
+                          title={table.name}
+                          className="text-sm text-light px-4 hover:text-foreground transition cursor-pointer"
+                          onClick={() => snap.setActiveDocsSection([item.key, table.name])}
+                        >
+                          {table.name}
+                        </p>
+                      ))}
+                    </>
+                  )}
+                  {item.key === 'stored-procedures' && (
+                    <>
+                      {functions.length > 0 && <Separator />}
+                      {functions.map((fn) => (
+                        <p
+                          key={fn.name}
+                          title={fn.name}
+                          className="text-sm text-light px-4 hover:text-foreground transition cursor-pointer"
+                          onClick={() => snap.setActiveDocsSection([item.key, fn.name])}
+                        >
+                          {fn.name}
+                        </p>
+                      ))}
+                    </>
+                  )}
+                  {item.key === 'storage' && (
+                    <>
+                      {(buckets ?? []).length > 0 && <Separator />}
+                      {(buckets ?? []).map((bucket) => (
+                        <p
+                          key={bucket.name}
+                          title={bucket.name}
+                          className="text-sm text-light px-4 hover:text-foreground transition cursor-pointer"
+                          onClick={() => snap.setActiveDocsSection([item.key, bucket.name])}
+                        >
+                          {bucket.name}
+                        </p>
+                      ))}
+                    </>
+                  )}
+                  {item.key === 'edge-functions' && (
+                    <>
+                      {(edgeFunctions ?? []).length > 0 && <Separator />}
+                      {(edgeFunctions ?? []).map((fn) => (
+                        <p
+                          key={fn.name}
+                          title={fn.name}
+                          className="text-sm text-light px-4 hover:text-foreground transition cursor-pointer"
+                          onClick={() => snap.setActiveDocsSection([item.key, fn.name])}
+                        >
+                          {fn.name}
+                        </p>
+                      ))}
+                    </>
+                  )}
                 </div>
               )}
             </Fragment>

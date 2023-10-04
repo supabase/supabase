@@ -1,6 +1,10 @@
+import { useParams } from 'common'
+import { Markdown } from 'components/interfaces/Markdown'
 import { BASE_PATH } from 'lib/constants'
 
 const APISidePanelPreview = () => {
+  const { ref } = useParams()
+
   return (
     <div className="space-y-2">
       <p className="text-foreground-light text-sm">
@@ -24,20 +28,10 @@ const APISidePanelPreview = () => {
             bar)
           </li>
           <li>
-            Documentation for storage, edge functions, and realtime have been added to the API
-            documentation side panel.
-          </li>
-          <li>
-            Opening the API documentation side panel via the "API" button on the Table Editor, Auth
-            Users Management, Storage Explorer, and Edge Functions pages will directly open docs for
-            the resource that you're looking at
-          </li>
-          <li>
-            For e.g. Opening the docs while in the Storage Explorer will show docs for the bucket
-            that you're currently viewing
-          </li>
-          <li>
-            All code snippets are also contextualized to the page that you're on in the dashboard.
+            <Markdown
+              className="text-foreground-light"
+              content={`The GraphiQL interface will be shifted to the Database section of the dashboard [here](/project/${ref}/database/graphiql).`}
+            />
           </li>
         </ul>
       </div>
