@@ -55,7 +55,7 @@ const DatabaseSettings = () => {
         <section className="space-y-6">
           <Panel
             title={
-              <h5 key="panel-title" className="mb-0">
+              <h5 key="panel-title" className="mb-0" id="connection-string">
                 Connection string
               </h5>
             }

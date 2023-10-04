@@ -12,11 +12,11 @@ import { observer } from 'mobx-react-lite'
 import { Member, Role } from 'types'
 import {
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   IconMoreHorizontal,
   IconTrash,
 } from 'ui'
@@ -148,8 +148,8 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
 
   return (
     <div className="flex items-center justify-end">
-      <DropdownMenu_Shadcn_>
-        <DropdownMenuTrigger_Shadcn_>
+      <DropdownMenu>
+        <DropdownMenuTrigger>
           <Button
             asChild
             type="text"
@@ -159,41 +159,41 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
           >
             <span></span>
           </Button>
-        </DropdownMenuTrigger_Shadcn_>
-        <DropdownMenuContent_Shadcn_ side="bottom" align="end">
+        </DropdownMenuTrigger>
+        <DropdownMenuContent side="bottom" align="end">
           <>
             {isPendingInviteAcceptance ? (
               <>
                 {canRevokeInvite && (
-                  <DropdownMenuItem_Shadcn_ onClick={() => handleRevokeInvitation(member)}>
+                  <DropdownMenuItem onClick={() => handleRevokeInvitation(member)}>
                     <div className="flex flex-col">
                       <p>Cancel invitation</p>
                       <p className="block opacity-50">Revoke this invitation.</p>
                     </div>
-                  </DropdownMenuItem_Shadcn_>
+                  </DropdownMenuItem>
                 )}
                 {/* canResendInvite && isExpired */}
                 {true && (
                   <>
-                    <DropdownMenuSeparator_Shadcn_ />
-                    <DropdownMenuItem_Shadcn_ onClick={() => handleResendInvite(member)}>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => handleResendInvite(member)}>
                       <div className="flex flex-col">
                         <p>Resend invitation</p>
                         <p className="block opacity-50">Invites expire after 24hrs.</p>
                       </div>
-                    </DropdownMenuItem_Shadcn_>
+                    </DropdownMenuItem>
                   </>
                 )}
               </>
             ) : (
-              <DropdownMenuItem_Shadcn_ className="space-x-2" onClick={handleMemberDelete}>
+              <DropdownMenuItem className="space-x-2" onClick={handleMemberDelete}>
                 <IconTrash size={16} />
                 <p>Remove member</p>
-              </DropdownMenuItem_Shadcn_>
+              </DropdownMenuItem>
             )}
           </>
-        </DropdownMenuContent_Shadcn_>
-      </DropdownMenu_Shadcn_>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   )
 }
