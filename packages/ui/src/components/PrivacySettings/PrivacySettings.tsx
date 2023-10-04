@@ -1,9 +1,11 @@
 import { useConsentValue, handlePageTelemetry, useTelemetryProps } from 'common'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { PropsWithChildren, useState } from 'react'
 import { Modal, Toggle, cn } from 'ui'
 
 const PrivacySettings = ({ children, className }: PropsWithChildren<{ className?: string }>) => {
-  const telemetryProps = useTelemetryProps()
+  const { basePath } = useRouter()
   const { hasAccepted, handleConsent } = useConsentValue('supabase-consent')
   const [telemetryValue, setTelemetryValue] = useState(hasAccepted)
   const [isOpen, setIsOpen] = useState(false)
@@ -46,7 +48,14 @@ const PrivacySettings = ({ children, className }: PropsWithChildren<{ className?
               disabled
               onChange={() => null}
               label="Strictly necessary cookies"
-              descriptionText="These cookies are necessary for Supabase to function."
+              descriptionText={
+                <>
+                  These cookies are necessary for Supabase to function.{' '}
+                  <Link href="/privacy#4-how-we-use-cookies-and-other-tracking-technology-to-collect-information">
+                    <a className="underline">Learn more</a>
+                  </Link>
+                </>
+              }
             />
           </Modal.Content>
           <Modal.Separator />
