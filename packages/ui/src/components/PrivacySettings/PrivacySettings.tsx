@@ -1,14 +1,16 @@
-import { useConsentValue, handlePageTelemetry, useTelemetryProps } from 'common'
+import { PropsWithChildren, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { PropsWithChildren, useState } from 'react'
-import { Modal, Toggle, cn } from 'ui'
+import { useConsentValue } from 'common'
+import { Modal, Toggle } from 'ui'
 
-const PrivacySettings = ({ children, className }: PropsWithChildren<{ className?: string }>) => {
-  const { basePath } = useRouter()
-  const { hasAccepted, handleConsent } = useConsentValue('supabase-consent')
+const PrivacySettings = ({ children, ...props }: PropsWithChildren<{ className?: string }>) => {
+  const { consentValue, hasAccepted, handleConsent } = useConsentValue('supabase-consent')
   const [telemetryValue, setTelemetryValue] = useState(hasAccepted)
   const [isOpen, setIsOpen] = useState(false)
+
+  useEffect(() => {
+    setTelemetryValue(hasAccepted)
+  }, [isOpen, consentValue])
 
   const handleConfirmPreferences = () => {
     handleConsent && handleConsent(telemetryValue ? 'true' : 'false')
@@ -22,7 +24,7 @@ const PrivacySettings = ({ children, className }: PropsWithChildren<{ className?
 
   return (
     <>
-      <button onClick={() => setIsOpen(true)} className={cn(className)}>
+      <button {...props} onClick={() => setIsOpen(true)}>
         {children}
       </button>
       <Modal
@@ -65,8 +67,15 @@ const PrivacySettings = ({ children, className }: PropsWithChildren<{ className?
               checked={telemetryValue}
               onChange={() => setTelemetryValue((prev) => !prev)}
               label="Telemetry"
-              descriptionText="By opting in to sending telemetry data, Supabase can improve the overall user
-          experience."
+              descriptionText={
+                <>
+                  By opting in to sending telemetry data, Supabase can improve the overall user
+                  experience.{' '}
+                  <Link href="https://supabase.com/privacy#cookieless-analytics">
+                    <a className="underline">Learn more</a>
+                  </Link>
+                </>
+              }
             />
           </Modal.Content>
         </div>
