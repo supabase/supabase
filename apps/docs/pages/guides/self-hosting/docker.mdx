@@ -136,7 +136,11 @@ You will need to [restart](#restarting-all-services) the services for the change
 You can restart services to pick up any configuration changes by running:
 
 ```sh
-docker compose restart
+docker compose down
+```
+
+```sh
+docker compose up -d
 ```
 
 Be aware that this will result in downtime while the services are restarting.
