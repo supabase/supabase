@@ -1,6 +1,23 @@
 [
   {
     "type": "Customer Story",
+    "title": "Scaling securely: one million users in 7 months protected with Supabase Auth",
+    "description": "Learn how Pebblely, an AI image generation company, used Supabase Auth for rapid growth and adaptable security solutions.",
+    "imgUrl": "images/customers/logos/pebblely.png",
+    "logoUrl": "images/customers/logos/pebblely.png",
+    "organization": "Pebblely",
+    "url": "/customers/pebblely",
+    "path": "/customers/pebblely",
+    "postMeta": {
+      "name": "Paul Copplestone",
+      "avatarUrl": "https://avatars0.githubusercontent.com/u/10214025?v=4",
+      "publishDate": "Sep 29, 2023",
+      "readLength": 4
+    },
+    "ctaText": "View story"
+  },
+  {
+    "type": "Customer Story",
     "title": "Bootstrapped founder builds an AI app with Supabase and scales to $1M in 5 months.",
     "description": "How Yasser leveraged Supabase to build Chatbase and became one of the most successful single-founder AI products.",
     "imgUrl": "images/customers/logos/chatbase.png",
@@ -11,7 +28,7 @@
     "postMeta": {
       "name": "Paul Copplestone",
       "avatarUrl": "https://avatars0.githubusercontent.com/u/10214025?v=4",
-      "publishDate": "Sep 10, 2023",
+      "publishDate": "Sep 6, 2023",
       "readLength": 6
     },
     "ctaText": "View story"
@@ -28,7 +45,7 @@
     "postMeta": {
       "name": "Paul Copplestone",
       "avatarUrl": "https://avatars0.githubusercontent.com/u/10214025?v=4",
-      "publishDate": "Sep 6, 2023",
+      "publishDate": "Sep 5, 2023",
       "readLength": 6
     },
     "ctaText": "View story"
