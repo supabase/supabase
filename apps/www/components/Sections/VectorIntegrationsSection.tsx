@@ -7,7 +7,6 @@ import Image from 'next/image'
 
 interface Props {
   title: string
-  image: any
 }
 
 const VectorIntegrationsSection = ({ title }: Props) => {
