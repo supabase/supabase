@@ -22,7 +22,7 @@ const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) =>
         endpoint={endpoint}
         snippet={DOCS_CONTENT.init}
       >
-        <div className="px-4 space-y-4">
+        <div className="px-4 space-y-6">
           <div className="flex space-x-4">
             <p className="text-sm w-40">Project URL</p>
             <Input disabled readOnly copy size="small" value={endpoint} className="w-full" />
@@ -40,7 +40,7 @@ const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) =>
             />
           </div>
           <div className="flex space-x-4">
-            <p className="text-sm w-40">Service key</p>
+            <p className="text-sm w-40 mb-16">Service key</p>
             <Input
               disabled
               readOnly
@@ -58,12 +58,14 @@ const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) =>
           </div>
         </div>
       </ContentSnippet>
+
       <ContentSnippet
         selectedLanguage={language}
         apikey={apikey}
         endpoint={endpoint}
         snippet={DOCS_CONTENT.clientApiKeys}
       />
+
       <ContentSnippet
         selectedLanguage={language}
         apikey={serviceKey}

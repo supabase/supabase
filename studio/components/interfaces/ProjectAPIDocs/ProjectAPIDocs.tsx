@@ -150,7 +150,7 @@ const ProjectAPIDocs = () => {
           {snap.activeDocsSection.length === 1 ? <FirstLevelNav /> : <SecondLevelNav />}
         </div>
 
-        <div className="flex-1 divide-y space-y-4 max-h-screen overflow-auto">
+        <div className="flex-1 divide-y space-y-4 max-h-screen overflow-auto px-4">
           {snap.activeDocsSection[0] === 'introduction' && (
             <Introduction
               showKeys={showKeys}
