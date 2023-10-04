@@ -7,19 +7,21 @@ const IntegrationsImage = () => {
   const { resolvedTheme } = useTheme()
   const isMobile = useBreakpoint(767)
 
-  const image =
-    resolvedTheme === 'dark'
-      ? `/images/product/vector/vector-tools-dark${isMobile ? '-mobile' : ''}.svg`
-      : `/images/product/vector/vector-tools-light${isMobile ? '-mobile' : ''}.svg`
-
+  const ResolvedImage = () => (
+    <Image
+      src={
+        resolvedTheme === 'dark'
+          ? `/images/product/vector/vector-tools-dark${isMobile ? '-mobile' : ''}.svg`
+          : `/images/product/vector/vector-tools-light${isMobile ? '-mobile' : ''}.svg`
+      }
+      alt="Diagram of Machine Learning tools that integrate with Supabase Vector"
+      layout="fill"
+      objectFit="contain"
+    />
+  )
   return (
     <div className="relative w-full h-full">
-      <Image
-        src={image}
-        alt="Diagram of Machine Learning tools that integrate with Supabase Vector"
-        layout="fill"
-        objectFit="contain"
-      />
+      <ResolvedImage />
     </div>
   )
 }
