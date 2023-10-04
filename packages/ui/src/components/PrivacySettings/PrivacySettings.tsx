@@ -39,6 +39,7 @@ const PrivacySettings = ({ children, className }: PropsWithChildren<{ className?
             setIsOpen(!isOpen)
           }
         }}
+        className="max-w-[calc(100vw-4rem)]"
         size="medium"
       >
         <div className="pt-6 pb-3 space-y-4">
