@@ -17,8 +17,8 @@ import { useIsLoggedIn, useIsUserLoading } from 'common'
 import { useTheme } from 'next-themes'
 import TextLink from '../TextLink'
 import Image from 'next/image'
-import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
-import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
+import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.svg'
+import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.svg'
 
 const Nav = () => {
   const { theme, resolvedTheme } = useTheme()
