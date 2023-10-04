@@ -9,7 +9,7 @@ const IntegrationsImage = () => {
   const { resolvedTheme } = useTheme()
   const isMobile = useBreakpoint(767)
   const ref = useRef(null)
-  const isInView = useInView(ref, { margin: '-25%', once: true })
+  const isInView = useInView(ref, { margin: '-15%', once: true })
 
   const initial = INITIAL_BOTTOM
   const animate = getAnimation({})
