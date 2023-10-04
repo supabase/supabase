@@ -1,10 +1,10 @@
 import Image from 'next/image'
 import React from 'react'
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
 
 const OpenAIImage = ({ isHovered }: { isHovered: boolean }) => {
-  const { isDarkMode } = useTheme()
+  const { resolvedTheme } = useTheme()
 
   const lineVariants = {
     animate: {
@@ -23,17 +23,17 @@ const OpenAIImage = ({ isHovered }: { isHovered: boolean }) => {
   }
 
   const colors = {
-    glow: isDarkMode ? '#009C77' : '#00FFD9',
-    rectStart: isDarkMode ? '#17FDDF' : '#49615E',
-    rectEnd: isDarkMode ? '#10FFE0' : '#202020',
-    cardBgStart: isDarkMode ? '#171717' : 'white',
-    cardBgEnd: isDarkMode ? '#171717' : 'white',
-    openAIStart: isDarkMode ? '#89FFCA' : '#4FD7B6',
-    openAIEnd: isDarkMode ? '#D0FAE6' : '#4F7362',
-    openAIStrokeStart: isDarkMode ? '#A5FFD6' : '#5F5F5F',
-    openAIStrokeEnd: isDarkMode ? '#D0FAE6' : '#D6D6D6',
-    openAIAltStart: isDarkMode ? '#00DBA7' : '#00DBA7',
-    openAIAltEnd: isDarkMode ? '#171717' : '#DFDFDF',
+    glow: resolvedTheme === 'dark' ? '#009C77' : '#00FFD9',
+    rectStart: resolvedTheme === 'dark' ? '#17FDDF' : '#49615E',
+    rectEnd: resolvedTheme === 'dark' ? '#10FFE0' : '#202020',
+    cardBgStart: resolvedTheme === 'dark' ? '#171717' : 'white',
+    cardBgEnd: resolvedTheme === 'dark' ? '#171717' : 'white',
+    openAIStart: resolvedTheme === 'dark' ? '#89FFCA' : '#4FD7B6',
+    openAIEnd: resolvedTheme === 'dark' ? '#D0FAE6' : '#4F7362',
+    openAIStrokeStart: resolvedTheme === 'dark' ? '#A5FFD6' : '#5F5F5F',
+    openAIStrokeEnd: resolvedTheme === 'dark' ? '#D0FAE6' : '#D6D6D6',
+    openAIAltStart: resolvedTheme === 'dark' ? '#00DBA7' : '#00DBA7',
+    openAIAltEnd: resolvedTheme === 'dark' ? '#171717' : '#DFDFDF',
   }
 
   return (
@@ -41,7 +41,7 @@ const OpenAIImage = ({ isHovered }: { isHovered: boolean }) => {
       <div className="w-[44%] h-[44%] -translate-x-[2px] absolute z-10 inset-0 top-auto bottom-[16%] m-auto">
         <Image
           src={
-            isDarkMode
+            resolvedTheme === 'dark'
               ? '/images/product/vector/openai-logo-dark.png'
               : '/images/product/vector/openai-logo-light.png'
           }

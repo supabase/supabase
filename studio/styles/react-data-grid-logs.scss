@@ -1,7 +1,7 @@
 .data-grid--simple-logs {
   .rdg-cell,
   .rdg-cell span {
-    @apply text-scale-1100 font-normal #{!important};
+    @apply text-foreground-light font-normal #{!important};
     border-left: none;
     border-right: none;
   }
@@ -21,7 +21,7 @@
 
     &.rdg-row--focused .rdg-cell,
     &.rdg-row--focused .rdg-cell span {
-      @apply text-scale-1200 font-semibold #{!important};
+      @apply text-foreground font-semibold #{!important};
     }
   }
 }
@@ -31,7 +31,7 @@
 
   .rdg-cell,
   .rdg-cell span {
-    @apply text-scale-1100 font-normal #{!important};
+    @apply text-foreground-light font-normal #{!important};
   }
 
   .rdg-cell:first-child {
@@ -49,7 +49,7 @@
 
     &.rdg-row--focused .rdg-cell,
     &.rdg-row--focused .rdg-cell span {
-      @apply text-scale-1100 font-semibold #{!important};
+      @apply text-foreground-light font-semibold #{!important};
     }
   }
 }

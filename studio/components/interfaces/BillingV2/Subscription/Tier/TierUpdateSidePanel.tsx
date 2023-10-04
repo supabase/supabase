@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
+import InformationBox from 'components/ui/InformationBox'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
@@ -17,7 +18,7 @@ import Telemetry from 'lib/telemetry'
 import { useRouter } from 'next/router'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
-import { Alert, Button, IconCheck, IconExternalLink, Modal, SidePanel } from 'ui'
+import { Alert, Button, IconCheck, IconExternalLink, IconInfo, Modal, SidePanel } from 'ui'
 import EnterpriseCard from './EnterpriseCard'
 import ExitSurveyModal from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
@@ -132,6 +133,46 @@ const TierUpdateSidePanel = () => {
         }
       >
         <SidePanel.Content>
+          <InformationBox
+            icon={<IconInfo size="large" strokeWidth={1.5} />}
+            defaultVisibility={true}
+            hideCollapse
+            title="We're upgrading our billing system"
+            className="mt-4"
+            description={
+              <div className="space-y-3">
+                <p className="text-sm leading-normal">
+                  This organization uses the legacy project-based billing. We’ve recently made some
+                  big improvements to our billing system. To migrate to the new organization-based
+                  billing, head over to your{' '}
+                  <Link href={`/org/${slug}/billing`}>
+                    <a className="text-sm text-green-900 transition hover:text-green-1000">
+                      organization billing settings
+                    </a>
+                  </Link>
+                  .
+                </p>
+
+                <div className="space-x-3">
+                  <Link href="https://supabase.com/blog/organization-based-billing">
+                    <a target="_blank" rel="noreferrer">
+                      <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                        Announcement
+                      </Button>
+                    </a>
+                  </Link>
+                  <Link href="https://supabase.com/docs/guides/platform/org-based-billing">
+                    <a target="_blank" rel="noreferrer">
+                      <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                        Documentation
+                      </Button>
+                    </a>
+                  </Link>
+                </div>
+              </div>
+            }
+          />
+
           <div className="py-6 grid grid-cols-12 gap-3">
             {subscriptionsPlans.map((plan) => {
               const planMeta = availablePlans.find((p) => p.id === plan.id.split('tier_')[1])
@@ -157,7 +198,7 @@ const TierUpdateSidePanel = () => {
                     <div className="flex items-center space-x-2">
                       <p className={clsx('text-brand text-sm uppercase')}>{plan.name}</p>
                       {isCurrentPlan ? (
-                        <div className="text-xs bg-scale-500 text-scale-1000 rounded px-2 py-0.5">
+                        <div className="text-xs bg-scale-500 text-foreground-light rounded px-2 py-0.5">
                           Current plan
                         </div>
                       ) : plan.nameBadge ? (
@@ -169,19 +210,21 @@ const TierUpdateSidePanel = () => {
                       )}
                     </div>
                     <div className="mt-4 flex items-center space-x-1">
-                      {(price ?? 0) > 0 && <p className="text-scale-1000 text-sm">From</p>}
+                      {(price ?? 0) > 0 && <p className="text-foreground-light text-sm">From</p>}
                       {isLoadingPlans ? (
                         <div className="h-[28px] flex items-center justify-center">
                           <ShimmeringLoader className="w-[30px] h-[24px]" />
                         </div>
                       ) : (
-                        <p className="text-scale-1200 text-lg">${price}</p>
+                        <p className="text-foreground text-lg">${price}</p>
                       )}
-                      <p className="text-scale-1000 text-sm">{tierMeta?.costUnit}</p>
+                      <p className="text-foreground-light text-sm">{tierMeta?.costUnit}</p>
                     </div>
-                    <div className={clsx('flex mt-1 mb-4', !tierMeta?.warning && 'opacity-0')}>
+                    <div
+                      className={clsx('flex mt-1 mb-4', !tierMeta?.warningLegacy && 'opacity-0')}
+                    >
                       <div className="bg-scale-200 text-brand-600 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
-                        {tierMeta?.warning}
+                        {tierMeta?.warningLegacy}
                       </div>
                     </div>
                     {isCurrentPlan ? (
@@ -233,7 +276,7 @@ const TierUpdateSidePanel = () => {
                                   'border border-scale-200',
                                 ].join(' ')}
                               >
-                                <span className="text-xs text-scale-1200">
+                                <span className="text-xs text-foreground">
                                   You do not have permission to change the subscription plan.
                                 </span>
                               </div>
@@ -263,7 +306,7 @@ const TierUpdateSidePanel = () => {
                               strokeWidth={3}
                             />
                           </div>
-                          <p className="ml-3 text-xs text-scale-1100">{feature}</p>
+                          <p className="ml-3 text-xs text-foreground-light">{feature}</p>
                         </li>
                       ))}
                     </ul>
@@ -271,7 +314,7 @@ const TierUpdateSidePanel = () => {
 
                   {plan.footer && (
                     <div className="border-t pt-4 mt-4">
-                      <p className="text-scale-1000 text-xs">{plan.footer}</p>
+                      <p className="text-foreground-light text-xs">{plan.footer}</p>
                     </div>
                   )}
                 </div>
@@ -343,7 +386,7 @@ const TierUpdateSidePanel = () => {
               Changing the plan resets your billing cycle and may result in a prorated charge for
               previous usage.
             </p>
-            <p className="text-sm text-scale-1000">
+            <p className="text-sm text-foreground-light">
               You will also be able to change your project's add-ons after upgrading your project's
               plan.
             </p>

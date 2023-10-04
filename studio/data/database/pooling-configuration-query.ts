@@ -21,7 +21,7 @@ export type PoolingConfiguration = {
   inserted_at: string
   max_client_conn: number | null
   pgbouncer_enabled: boolean
-  supavisor_enabled?: boolean
+  supavisor_enabled: boolean
   pgbouncer_status: string
   pool_mode: string
   connectionString: string

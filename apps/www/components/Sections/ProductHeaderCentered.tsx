@@ -66,7 +66,7 @@ const ProductHeaderCentered = (props: Types) => (
           <h1 className="h1 text-3xl md:text-4xl xl:!text-5xl tracking-[-1.5px]" key={`h1`}>
             {props.h1}
           </h1>
-          <p className="p !text-scale-1000">{props.subheader}</p>
+          <p className="p !text-scale-1100">{props.subheader}</p>
         </div>
         <div className="flex flex-row md:flex-row pt-8 md:items-center">
           {props.cta && (

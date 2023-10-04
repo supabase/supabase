@@ -3,8 +3,8 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'organization-based-billing',
   title: 'How billing works',
-  description: 'Learn how organzation-based billing works in Supabase.',
-  subtitle: 'Learn how organzation-based billing works in Supabase.',
+  description: 'Learn how organization-based billing works in Supabase.',
+  subtitle: 'Learn how organization-based billing works in Supabase.',
 }
 
 Our goal at Supabase is to provide a _predictable_ billing system that grows with your project.
@@ -123,7 +123,7 @@ If you launch a second or third instance on your paid plan, we add the additiona
 | 12XL          | $3.836       | ~$2800                  |
 | 16XL          | $5.12        | ~$3730                  |
 
-With Legacy Billing, when you upgraded the [Compute Add-On](/docs/guides/platform/compute-add-ons), you were immediately charged the prorated amount (days left in your current billing cycle) and when your billing cycle reset you were charged upfront for the entire month. When you downgraded, you got the appropriate credits for unused time.
+With Legacy Billing, when you upgraded the [Compute Add-On](/docs/guides/platform/compute-add-ons), you were immediately charged the prorated amount (days remaining in your current billing cycle) and when your billing cycle reset you were charged upfront for the entire month. When you downgraded, you got the appropriate credits for unused time.
 
 ### Free plan
 
@@ -313,6 +313,15 @@ If you head over to your [organizations' billing settings](https://supabase.com/
   </summary>
   Not at all. There are no service disruptions during the migration, as we’re not touching your projects’
   infrastructure.
+</details>
+
+<details>
+<summary>
+  <i>Where do I change my project add-ons such as PITR, Compute and Custom Domain?</i>
+</summary>
+
+Head over to your project [Add-ons page](https://supabase.com/dashboard/project/_/settings/addons) to change your compute size, Point-In-Time-Recovery or custom domain.
+
 </details>
 
 <details>

@@ -6,10 +6,9 @@ import { Markdown } from 'components/interfaces/Markdown'
 import { Integration, IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { BASE_PATH } from 'lib/constants'
-import { Badge, Button, IconArrowRight, IconExternalLink, IconGitHub, IconSquare, cn } from 'ui'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
 import Link from 'next/link'
-import { BooleanFormatter } from 'components/grid/components/formatter'
+import { Badge, Button, cn, IconArrowRight, IconExternalLink, IconGitHub } from 'ui'
 
 const ICON_STROKE_WIDTH = 2
 const ICON_SIZE = 14
@@ -173,7 +172,7 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
             <div className="flex gap-2 items-center">
               <HandleIcon type={'Supabase'} />
               <span className="text-sm">{project?.name}</span>
-              <IconArrowRight size={14} className="text-scale-900" strokeWidth={1.5} />
+              <IconArrowRight size={14} className="text-foreground-lighter" strokeWidth={1.5} />
               {!connection?.metadata?.framework ? (
                 <div className="bg-black text-white w-4 h-4 rounded flex items-center justify-center">
                   <HandleIcon type={type} className={'!w-2.5'} />
@@ -190,10 +189,10 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
             </div>
 
             <div className="flex flex-col gap-0">
-              <span className="text-scale-900 text-xs">
+              <span className="text-foreground-lighter text-xs">
                 Connected {dayjs(connection?.inserted_at).fromNow()}
               </span>
-              <span className="text-scale-900 text-xs">
+              <span className="text-foreground-lighter text-xs">
                 Added by {connection?.added_by?.primary_email}
               </span>
             </div>
@@ -224,7 +223,7 @@ const IntegrationConnectionOption = React.forwardRef<HTMLLIElement, IntegrationC
           <div className="flex gap-2 items-center">
             <HandleIcon type={'Supabase'} />
             <span className="text-sm">{project?.name}</span>
-            <IconArrowRight size={14} className="text-scale-900" strokeWidth={1.5} />
+            <IconArrowRight size={14} className="text-foreground-lighter" strokeWidth={1.5} />
             <HandleIcon type={type} />
             <span className="text-sm">{connection.metadata.name}</span>
           </div>

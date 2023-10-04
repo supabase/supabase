@@ -26,17 +26,17 @@ const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
                 <IconChevronRight strokeWidth={2} size={14} />
               </div>
             </button>
-            <span className="text-sm text-scale-1200">{item.name}</span>
+            <span className="text-sm text-foreground">{item.name}</span>
           </div>
         </Table.td>
         <Table.td className="">
-          <span className="text-scale-1100">{item.description}</span>
+          <span className="text-foreground-light">{item.description}</span>
         </Table.td>
         <Table.td className="">
-          <span className="text-scale-1100">{timestampLocalFormatter(item.inserted_at)}</span>
+          <span className="text-foreground-light">{timestampLocalFormatter(item.inserted_at)}</span>
         </Table.td>
         <Table.td className="">
-          <span className="text-scale-1100">{timestampLocalFormatter(item.updated_at)}</span>
+          <span className="text-foreground-light">{timestampLocalFormatter(item.updated_at)}</span>
         </Table.td>
         <Table.td className=" text-right">
           <Button

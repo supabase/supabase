@@ -1715,7 +1715,12 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/with-expo',
-    destination: '/docs/guides/getting-started/tutorials/with-expo',
+    destination: '/docs/guides/getting-started/tutorials/with-expo-react-native',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/tutorials/with-expo',
+    destination: '/docs/guides/getting-started/tutorials/with-expo-react-native',
   },
   {
     permanent: true,
@@ -2287,5 +2292,15 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/database/managing-passwords',
     destination: '/docs/guides/database/postgres/roles#passwords',
+  },
+  {
+    permanent: true,
+    source: '/blog/pgvector-v0-5-0-hnsw',
+    destination: '/blog/increase-performance-pgvector-hnsw',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/ai/managing-indexes',
+    destination: '/docs/guides/ai/vector-indexes',
   },
 ]

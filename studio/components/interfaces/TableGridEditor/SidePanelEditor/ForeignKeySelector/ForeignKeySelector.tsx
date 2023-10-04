@@ -1,17 +1,30 @@
 import type { PostgresColumn, PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
-import { Dictionary } from 'components/grid'
 import { find, get, isEmpty, sortBy } from 'lodash'
 import { useEffect, useState } from 'react'
-import { IconDatabase, IconHelpCircle, Input, Listbox, SidePanel } from 'ui'
 
+import { Dictionary } from 'components/grid'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import InformationBox from 'components/ui/InformationBox'
-import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
-import { useStore } from 'hooks'
+import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
+import { useSchemasQuery } from 'data/database/schemas-query'
+import { useTablesQuery } from 'data/tables/tables-query'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  IconAlertCircle,
+  IconAlertTriangle,
+  IconDatabase,
+  IconHelpCircle,
+  Input,
+  Listbox,
+  SidePanel,
+} from 'ui'
 import ActionBar from '../ActionBar'
 import { ColumnField } from '../SidePanelEditor.types'
-import { FOREIGN_KEY_DELETION_OPTIONS } from './ForeignKeySelector.constants'
+import { FOREIGN_KEY_CASCADE_OPTIONS } from './ForeignKeySelector.constants'
 import { ForeignKey } from './ForeignKeySelector.types'
-import { generateDeletionActionDescription } from './ForeignKeySelector.utils'
+import { generateCascadeActionDescription } from './ForeignKeySelector.utils'
 
 interface ForeignKeySelectorProps {
   column: ColumnField
@@ -19,7 +32,14 @@ interface ForeignKeySelectorProps {
   visible: boolean
   closePanel: () => void
   saveChanges: (
-    value: { table: PostgresTable; column: PostgresColumn; deletionAction: string } | undefined
+    value:
+      | {
+          table: PostgresTable
+          column: PostgresColumn
+          deletionAction: string
+          updateAction: string
+        }
+      | undefined
   ) => void
 }
 
@@ -29,19 +49,25 @@ const ForeignKeySelector = ({
   closePanel,
   saveChanges,
 }: ForeignKeySelectorProps) => {
-  const { meta } = useStore()
+  const { project } = useProjectContext()
   const [errors, setErrors] = useState<any>({})
   const [selectedForeignKey, setSelectedForeignKey] = useState<ForeignKey>({
     schema: 'public',
     table: '',
     column: '',
-    deletionAction: FOREIGN_KEY_DELETION_ACTION.NO_ACTION,
+    deletionAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
+    updateAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
   })
 
-  const schemas = meta.schemas.list()
-  const tables = meta.tables.list(
-    (table: PostgresTable) => table.schema === selectedForeignKey.schema
-  )
+  const { data: schemas } = useSchemasQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const { data: tables } = useTablesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schema: selectedForeignKey.schema,
+  })
 
   const foreignKey = column?.foreignKey
   const selectedTable: PostgresTable | undefined = find(tables, {
@@ -51,11 +77,6 @@ const ForeignKeySelector = ({
   const selectedColumn: PostgresColumn | undefined = find(selectedTable?.columns ?? [], {
     name: selectedForeignKey?.column,
   })
-
-  useEffect(() => {
-    // make sure the public schemas are loaded initially
-    meta.tables.loadBySchema('public')
-  }, [])
 
   useEffect(() => {
     // Reset the state of the side panel
@@ -68,25 +89,27 @@ const ForeignKeySelector = ({
           table: foreignKey.target_table_name,
           column: foreignKey.target_column_name,
           deletionAction: foreignKey.deletion_action,
+          updateAction: foreignKey.update_action,
         })
       } else {
         setSelectedForeignKey({
           schema: 'public',
           table: '',
           column: '',
-          deletionAction: FOREIGN_KEY_DELETION_ACTION.NO_ACTION,
+          deletionAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
+          updateAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
         })
       }
     }
   }, [visible])
 
   const updateSelectedSchema = (schema: string) => {
-    meta.tables.loadBySchema(schema)
     const updatedForeignKey = {
       schema,
       table: '',
       column: '',
-      deletionAction: FOREIGN_KEY_DELETION_ACTION.NO_ACTION,
+      deletionAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
+      updateAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
     }
     setSelectedForeignKey(updatedForeignKey)
   }
@@ -94,23 +117,26 @@ const ForeignKeySelector = ({
   const updateSelectedTable = (tableId: number) => {
     setErrors({})
     if (!tableId) {
-      setSelectedForeignKey({
+      return setSelectedForeignKey({
         schema: '',
         table: '',
         column: '',
-        deletionAction: FOREIGN_KEY_DELETION_ACTION.NO_ACTION,
+        deletionAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
+        updateAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
       })
     }
+
     const table = find(tables, { id: tableId })
     if (table) {
-      const primaryColumn = table.primary_keys[0].name
+      const primaryColumn = table.primary_keys[0]?.name
       const firstColumn = table.columns?.length ? table.columns[0].name : undefined
 
       setSelectedForeignKey({
         schema: table.schema,
         table: table.name,
         column: primaryColumn ?? firstColumn,
-        deletionAction: FOREIGN_KEY_DELETION_ACTION.NO_ACTION,
+        deletionAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
+        updateAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
       })
     }
   }
@@ -124,9 +150,9 @@ const ForeignKeySelector = ({
     }
   }
 
-  const updateDeletionAction = (value: string) => {
+  const updateCascadeAction = (action: 'updateAction' | 'deletionAction', value: string) => {
     setErrors({})
-    setSelectedForeignKey({ ...selectedForeignKey, deletionAction: value })
+    setSelectedForeignKey({ ...selectedForeignKey, [action]: value })
   }
 
   const onSaveChanges = (resolve: () => void) => {
@@ -147,11 +173,14 @@ const ForeignKeySelector = ({
           table: selectedTable,
           column: selectedColumn,
           deletionAction: selectedForeignKey.deletionAction,
+          updateAction: selectedForeignKey.updateAction,
         })
       }
     }
     resolve()
   }
+
+  const matchingColumnTypes = selectedColumn?.format === column?.format
 
   return (
     <SidePanel
@@ -173,6 +202,7 @@ const ForeignKeySelector = ({
       customFooter={
         <ActionBar
           backButtonLabel="Cancel"
+          disableApply={!!column?.format && !matchingColumnTypes}
           applyButtonLabel="Save"
           closePanel={closePanel}
           applyFunction={onSaveChanges}
@@ -198,7 +228,7 @@ const ForeignKeySelector = ({
             error={errors.schema}
             onChange={(value: string) => updateSelectedSchema(value)}
           >
-            {schemas.map((schema: PostgresSchema) => {
+            {schemas?.map((schema: PostgresSchema) => {
               return (
                 <Listbox.Option
                   key={schema.id}
@@ -209,7 +239,7 @@ const ForeignKeySelector = ({
                   <div className="flex items-center gap-2">
                     {/* For aria searching to target the schema name instead of schema */}
                     <span className="hidden">{schema.name}</span>
-                    <span className="text-scale-1200">{schema.name}</span>
+                    <span className="text-foreground">{schema.name}</span>
                   </div>
                 </Listbox.Option>
               )
@@ -233,8 +263,8 @@ const ForeignKeySelector = ({
                   <div className="flex items-center gap-2">
                     {/* For aria searching to target the table name instead of schema */}
                     <span className="hidden">{table.name}</span>
-                    <span className="text-scale-900">{table.schema}</span>
-                    <span className="text-scale-1200">{table.name}</span>
+                    <span className="text-foreground-lighter">{table.schema}</span>
+                    <span className="text-foreground">{table.name}</span>
                   </div>
                 </Listbox.Option>
               )
@@ -278,14 +308,52 @@ const ForeignKeySelector = ({
                   {(selectedTable?.columns ?? []).map((column: PostgresColumn) => (
                     <Listbox.Option key={column.id} value={column.id} label={column.name}>
                       <div className="flex items-center gap-2">
-                        <span className="text-scale-1200">{column.name}</span>
-                        <span className="text-scale-900">{column.format}</span>
+                        <span className="text-foreground">{column.name}</span>
+                        <span className="text-foreground-lighter">{column.format}</span>
                       </div>
                     </Listbox.Option>
                   ))}
                 </Listbox>
               )}
+              {!matchingColumnTypes && !column?.format && (
+                <Alert_Shadcn_ variant="default">
+                  <IconAlertCircle className="h-4 w-4" />
+                  <AlertTitle_Shadcn_>
+                    The referenced column's type will be updated to {selectedColumn?.data_type}
+                  </AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_ className="leading-6">
+                    <span>The referenced column</span>
+                    {column?.name && <span className="text-code">{column.name}</span>}
+                    <span>
+                      {' '}
+                      must match the type of the selected foreign column when creating a foreign key
+                      relationship.
+                    </span>
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+              )}
+              {!matchingColumnTypes && column?.format && (
+                <Alert_Shadcn_ variant="warning">
+                  <IconAlertTriangle strokeWidth={2} />
+                  <AlertTitle_Shadcn_>Column types do not match</AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_ className="leading-6">
+                    <span>The referenced column</span>
+                    {column?.name && <span className="text-code">{column.name}</span>}
+                    <span> is of type </span>
+                    <span className="text-code">{column.format}</span>
+                    <span> while the selected foreign column </span>
+                    <span className="text-code">
+                      {selectedTable?.name}.{selectedColumn?.name}
+                    </span>
+                    <span> has </span>
+                    <span className="text-code">{selectedColumn?.data_type}</span>type. These two
+                    columns can't be referenced until they are of the same type.
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+              )}
+
               <SidePanel.Separator />
+
               <InformationBox
                 icon={<IconHelpCircle size="large" strokeWidth={1.5} />}
                 title="Which action is most appropriate?"
@@ -321,6 +389,32 @@ const ForeignKeySelector = ({
                 url="https://www.postgresql.org/docs/current/ddl-constraints.html#DDL-CONSTRAINTS-FK"
                 urlLabel="More information"
               />
+
+              <Listbox
+                id="updateAction"
+                value={selectedForeignKey.updateAction}
+                label="Action if referenced row is updated"
+                descriptionText={
+                  <p>
+                    {generateCascadeActionDescription(
+                      'update',
+                      selectedForeignKey.updateAction,
+                      `${selectedForeignKey.schema}.${selectedForeignKey.table}`
+                    )}
+                  </p>
+                }
+                error={errors.column}
+                onChange={(value: string) => updateCascadeAction('updateAction', value)}
+              >
+                {FOREIGN_KEY_CASCADE_OPTIONS.filter((option) =>
+                  ['no-action', 'cascade', 'restrict'].includes(option.key)
+                ).map((option) => (
+                  <Listbox.Option key={option.key} value={option.value} label={option.label}>
+                    <p className="text-foreground">{option.label}</p>
+                  </Listbox.Option>
+                ))}
+              </Listbox>
+
               <Listbox
                 id="deletionAction"
                 value={selectedForeignKey.deletionAction}
@@ -328,7 +422,8 @@ const ForeignKeySelector = ({
                 descriptionText={
                   <>
                     <p>
-                      {generateDeletionActionDescription(
+                      {generateCascadeActionDescription(
+                        'delete',
                         selectedForeignKey.deletionAction,
                         `${selectedForeignKey.schema}.${selectedForeignKey.table}`
                       )}
@@ -346,11 +441,11 @@ const ForeignKeySelector = ({
                   </>
                 }
                 error={errors.column}
-                onChange={(value: string) => updateDeletionAction(value)}
+                onChange={(value: string) => updateCascadeAction('deletionAction', value)}
               >
-                {FOREIGN_KEY_DELETION_OPTIONS.map((option) => (
+                {FOREIGN_KEY_CASCADE_OPTIONS.map((option) => (
                   <Listbox.Option key={option.key} value={option.value} label={option.label}>
-                    <p className="text-scale-1200">{option.label}</p>
+                    <p className="text-foreground">{option.label}</p>
                   </Listbox.Option>
                 ))}
               </Listbox>

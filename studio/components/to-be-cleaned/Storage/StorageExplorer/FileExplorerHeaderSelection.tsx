@@ -20,7 +20,7 @@ const FileExplorerHeaderSelection = () => {
         onClick={() => clearSelectedItems()}
       />
       <div className="ml-4 flex items-center space-x-3">
-        <p className="mb-0 text-sm text-scale-1200">
+        <p className="mb-0 text-sm text-foreground">
           <span style={{ fontVariantNumeric: 'tabular-nums' }}>{selectedItems.length}</span> items
           selected
         </p>

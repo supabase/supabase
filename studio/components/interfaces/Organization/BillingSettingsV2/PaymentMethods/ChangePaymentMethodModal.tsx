@@ -1,10 +1,8 @@
 import { useParams } from 'common'
 import { OrganizationPaymentMethod } from 'data/organizations/organization-payment-methods-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import {
-  SubscriptionTier,
-  useOrgSubscriptionUpdateMutation,
-} from 'data/subscriptions/org-subscription-update-mutation'
+import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
+import { SubscriptionTier } from 'data/subscriptions/types'
 import { useStore } from 'hooks'
 import { Button, Modal } from 'ui'
 

@@ -23,7 +23,7 @@ import ProductIcon from '~/components/ProductIcon'
 import APISection from '~/components/Sections/APISection'
 import GithubExamples from '~/components/Sections/GithubExamples'
 import ProductHeader from '~/components/Sections/ProductHeader'
-import TweetCard from '~/components/TweetCard'
+import { TweetCard } from 'ui'
 
 // install Swiper's Controller component
 // SwiperCore.use([Controller])
@@ -295,7 +295,7 @@ function Database() {
 
               <FeatureColumn
                 title="40+ preinstalled extensions"
-                text="We only show a few of the extensions supported by supabase here, but we preinstall many more that you can use right away."
+                text="We only show a few of the extensions supported by Supabase here, but we preinstall many more that you can use right away."
               />
               <Link href="/docs/guides/database" passHref>
                 <a>

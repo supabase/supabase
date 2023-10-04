@@ -1,4 +1,4 @@
-import { Accordion, Button, IconCheck, Select } from 'ui'
+import { Accordion, Badge, Button, IconCheck, Select } from 'ui'
 import Solutions from 'data/Solutions'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
@@ -10,14 +10,16 @@ import DefaultLayout from '~/components/Layouts/Default'
 import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/Pricing/PricingTableRow'
 import { pricing } from 'shared-data/pricing'
 import pricingFaq from '~/data/PricingFAQ.json'
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 import ComputePricingModal from '~/components/Pricing/ComputePricingModal'
 import { plans } from 'shared-data/plans'
+import AnnouncementBadge from '../../components/Announcement/Badge'
+import Image from 'next/image'
 
 export default function IndexPage() {
   const router = useRouter()
   const { basePath, asPath } = useRouter()
-  const { isDarkMode } = useTheme()
+  const { resolvedTheme } = useTheme()
   const [showComputeModal, setShowComputeModal] = useState(false)
   const [activeMobilePlan, setActiveMobilePlan] = useState('Free')
 
@@ -121,7 +123,7 @@ export default function IndexPage() {
           <p className="p">{priceDescription}</p>
         </div>
         <p className="p">{description}</p>
-        <Link href="https://supabase.com/dashboard" passHref>
+        <Link href="https://supabase.com/dashboard/new" passHref>
           <a>
             <Button size="medium" block>
               Get started
@@ -150,7 +152,7 @@ export default function IndexPage() {
       />
 
       <div>
-        <div className="relative z-10 py-16 lg:py-28">
+        <div className="relative z-10 py-16 lg:py-20">
           <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
             <div className="mx-auto max-w-3xl space-y-2 lg:max-w-none">
               <h1 className="text-brand text-base">Pricing</h1>
@@ -158,6 +160,14 @@ export default function IndexPage() {
               <p className="p text-lg">
                 Start building for free, collaborate with a team, then scale to millions of users.
               </p>
+              <div className="w-full inline-flex justify-center items-center pt-3 pb-6">
+                <AnnouncementBadge
+                  url="/blog/organization-based-billing"
+                  badge="Update"
+                  announcement="Changes to how we bill"
+                  target="_blank"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -247,7 +257,7 @@ export default function IndexPage() {
                                   {plan.priceMonthly}
                                 </p>
                                 <p className="text-scale-900 mb-1.5 ml-1 text-[13px] leading-4">
-                                  {plan.costUnit}
+                                  {plan.costUnitOrg}
                                 </p>
                               </div>
 
@@ -331,22 +341,26 @@ export default function IndexPage() {
           <div className="grid lg:grid-cols-3 gap-4 mb-16">
             {addons.map((addon) => (
               <div className="bg-white dark:bg-scale-300 rounded-[4px]" key={addon.name}>
-                <div className="overflow-hidden rounded-lg">
-                  <img
+                <div className="overflow-hidden rounded-lg relative h-56">
+                  <Image
                     className="w-full"
+                    layout="fill"
+                    objectFit="contain"
                     src={`${basePath}/images/pricing/${addon.heroImg}${
-                      isDarkMode ? '' : '-light'
+                      resolvedTheme === 'dark' ? '' : '-light'
                     }.png`}
                   />
                 </div>
                 <div className="px-8 -mt-1">
                   <p className="text-[13px] text-scale-900">{addon.price}</p>
                   <div className="flex items-center gap-2 mt-2">
-                    <img
+                    <Image
                       src={`${basePath}/images/pricing/${addon.icon}${
-                        isDarkMode ? '' : '-light'
+                        resolvedTheme === 'dark' ? '' : '-light'
                       }.svg`}
                       className="file:"
+                      width={14}
+                      height={14}
                       alt="Compute"
                     />
                     <span className="text-sm text-scale-1200">{addon.name}</span>
@@ -396,7 +410,7 @@ export default function IndexPage() {
           id="cost-control"
           className="grid lg:grid-cols-2 gap-8 items-center mt-12 lg:mt-8 max-w-6xl mx-auto"
         >
-          <div>
+          <div className="lg:py-12">
             <span className="bg-brand-300 text-brand-600 rounded-md bg-opacity-30 inline-block  dark:bg-scale-400 dark:text-scale-1100 py-0.5 px-2 text-[13px] leading-4 mt-2">
               Available for Pro plan
             </span>
@@ -404,14 +418,18 @@ export default function IndexPage() {
             <p className="mt-3 prose lg:max-w-lg">
               The Pro plan has a usage quota included and a spend cap turned on by default. If you
               need to go beyond the inclusive limits, simply switch off your spend cap to pay for
-              additional usage and scale seamlessly. Note that your project will run into
+              additional usage and scale seamlessly. Note that your projects will run into
               restrictions if you have the spend cap enabled and exhaust your quota.
             </p>
           </div>
-          <div>
-            <img
+          <div className="relative h-full min-h-[14rem]">
+            <Image
+              layout="fill"
+              objectFit="contain"
               className="w-full"
-              src={`${basePath}/images/pricing/spend-cap${isDarkMode ? '' : '-light'}.png`}
+              src={`${basePath}/images/pricing/spend-cap${
+                resolvedTheme === 'dark' ? '' : '-light'
+              }.png`}
             />
           </div>
         </div>
@@ -456,7 +474,7 @@ export default function IndexPage() {
                   <MobileHeader
                     plan="Free"
                     price={'0'}
-                    priceDescription={'/mo'}
+                    priceDescription={'/month'}
                     description={'Perfect for hobby projects and experiments'}
                   />
                   <PricingTableRowMobile
@@ -516,7 +534,7 @@ export default function IndexPage() {
                     plan="Pro"
                     from={false}
                     price={'25'}
-                    priceDescription={'/mo + additional use'}
+                    priceDescription={'/month + additional use'}
                     description={'Everything you need to scale your project into production'}
                   />
                   <PricingTableRowMobile
@@ -568,7 +586,7 @@ export default function IndexPage() {
                     plan="Team"
                     from={false}
                     price={'599'}
-                    priceDescription={'/mo + additional use'}
+                    priceDescription={'/month + additional use'}
                     description={'Collaborate with different permissions and access patterns'}
                   />
                   <PricingTableRowMobile
@@ -744,10 +762,10 @@ export default function IndexPage() {
                                 {plan.priceMonthly}
                               </span>
                               {['Pro', 'Free'].includes(plan.name) && (
-                                <p className="p text-[13px] leading-4 mt-1">per month</p>
+                                <p className="p text-[13px] leading-4 mt-1">/ month / org</p>
                               )}
                               {['Team'].includes(plan.name) && (
-                                <p className="p text-[13px] leading-4 mt-1">per month</p>
+                                <p className="p text-[13px] leading-4 mt-1">/ month / org</p>
                               )}
                             </>
 
@@ -827,12 +845,12 @@ export default function IndexPage() {
 
                     <td className="px-6 pt-5">
                       <Link
-                        href="https://supabase.com/dashboard"
-                        as="https://supabase.com/dashboard"
+                        href="https://supabase.com/dashboard/new?plan=free"
+                        as="https://supabase.com/dashboard/new?plan=free"
                       >
                         <a>
                           <Button size="tiny" type="primary" block>
-                            Get started
+                            Get Started
                           </Button>
                         </a>
                       </Link>
@@ -840,22 +858,22 @@ export default function IndexPage() {
 
                     <td className="px-6 pt-5">
                       <Link
-                        href="https://supabase.com/dashboard"
-                        as="https://supabase.com/dashboard"
+                        href="https://supabase.com/dashboard/new?plan=pro"
+                        as="https://supabase.com/dashboard/new?plan=pro"
                       >
                         <a>
                           <Button size="tiny" type="primary" block>
-                            Get started
+                            Get Started
                           </Button>
                         </a>
                       </Link>
                     </td>
 
                     <td className="px-6 pt-5">
-                      <Link href="https://forms.supabase.com/team">
+                      <Link href="https://supabase.com/dashboard/new?plan=team">
                         <a>
                           <Button size="tiny" type="primary" block>
-                            Contact us
+                            Get Started
                           </Button>
                         </a>
                       </Link>
@@ -865,7 +883,7 @@ export default function IndexPage() {
                       <Link href="https://forms.supabase.com/enterprise">
                         <a>
                           <Button size="tiny" type="default" block>
-                            Contact us
+                            Contact Us
                           </Button>
                         </a>
                       </Link>

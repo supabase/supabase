@@ -15,7 +15,7 @@ import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/8/LaunchWeekLogoHe
 import { Meetup } from '~/components/LaunchWeek/8/LW8Meetups'
 import LW8CalloutsSection from '~/components/LaunchWeek/8/LW8CalloutsSection'
 
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 
 import 'swiper/swiper.min.css'
 
@@ -37,9 +37,9 @@ interface Props {
 }
 
 const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'http://localhost:54321',
+  process.env.NEXT_PUBLIC_MISC_USE_URL ?? 'http://localhost:54321',
   // ANON KEY
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!
 )
 
 export default function TicketHome({ users, meetups }: Props) {
@@ -53,8 +53,8 @@ export default function TicketHome({ users, meetups }: Props) {
   const bgImageId = query.bgImageId?.toString()
   const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
   const [session, setSession] = useState<Session | null>(null)
-  const { isDarkMode, toggleTheme } = useTheme()
-  const [initialDarkMode] = useState(isDarkMode)
+
+  const [initialDarkMode] = useState('dark')
 
   const defaultUserData = {
     id: query.id?.toString(),
@@ -72,8 +72,8 @@ export default function TicketHome({ users, meetups }: Props) {
     if (!supabase) {
       setSupabase(
         createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+          process.env.NEXT_PUBLIC_MISC_USE_URL!,
+          process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!
         )
       )
     }
@@ -93,11 +93,12 @@ export default function TicketHome({ users, meetups }: Props) {
   }, [supabase])
 
   useEffect(() => {
-    toggleTheme(true)
-    document.body.className = 'dark bg-[#020405]'
+    document.body.classList.add('bg-[#020405]')
+
     return () => {
-      document.body.className = ''
-      toggleTheme(initialDarkMode)
+      if (document.body.classList.contains('bg-[#020405]')) {
+        document.body.classList.remove('bg-[#020405]')
+      }
     }
   }, [])
 

@@ -17,7 +17,7 @@ export async function updateGithubConnection({
     },
     body: {
       // @ts-expect-error
-      metadata
+      metadata,
     },
   })
 

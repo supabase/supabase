@@ -1,8 +1,7 @@
-import { Modal, Button, Form } from 'ui'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { Button, Form, Modal } from 'ui'
 
-// [Joshen] As of 280222, let's just use THIS component as the one and only confirmation modal
-// deprecate all others, since it uses the Form component from the UI library as well
+// [Joshen] As of 280222, let's just use ConfirmationModal as the one and only confirmation modal (Deprecate this)
 
 const ConfirmModal = ({
   visible = false,
@@ -51,7 +50,7 @@ const ConfirmModal = ({
           return (
             <div className="space-y-4 py-4">
               <Modal.Content>
-                <p className="text-sm text-scale-1100">{description}</p>
+                <p className="text-sm text-foreground-light">{description}</p>
               </Modal.Content>
               <Modal.Separator />
               <Modal.Content>

@@ -96,6 +96,7 @@ functions:
         name: React Native options
         js: |
           ```js
+          import 'react-native-url-polyfill/auto'
           import { createClient } from '@supabase/supabase-js'
           import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -295,6 +296,13 @@ functions:
         js: |
           ```js
           const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'signup'})
+          ```
+      - id: verify-email-auth(tokenhash)
+        name: Verify Email Auth (Token Hash)
+        isSpotlight: false
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'email'})
           ```
   - id: auth.getSession()
     title: 'getSession()'

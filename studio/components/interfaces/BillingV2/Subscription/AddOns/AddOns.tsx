@@ -1,38 +1,51 @@
-import { useParams, useTheme } from 'common'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useParams } from 'common'
+import { useTheme } from 'next-themes'
 import dayjs from 'dayjs'
-import { useFlag } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
 import Link from 'next/link'
 import { useMemo } from 'react'
-import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
-import { Alert, Button, IconChevronRight, IconExternalLink } from 'ui'
-import { getAddons } from '../Subscription.utils'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconChevronRight,
+  IconExternalLink,
+} from 'ui'
+
+import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
 import {
   ComputeInstanceSidePanel,
   CustomDomainSidePanel,
   PITRSidePanel,
 } from 'components/interfaces/Settings/Addons'
-import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
 import {
   useIsProjectActive,
   useProjectContext,
 } from 'components/layouts/ProjectLayout/ProjectContext'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useFlag } from 'hooks'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
+import { BASE_PATH } from 'lib/constants'
+import { getSemanticVersion } from 'lib/helpers'
+import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
+import { getAddons } from '../Subscription.utils'
+import Image from 'next/image'
 
-export interface AddOnsProps {}
-
-const AddOns = ({}: AddOnsProps) => {
+const AddOns = () => {
+  const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
   const snap = useSubscriptionPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-  const { isDarkMode } = useTheme()
 
   const { project: selectedProject } = useProjectContext()
   const isProjectActive = useIsProjectActive()
   const cpuArchitecture = getCloudProviderArchitecture(selectedProject?.cloud_provider)
+
+  // Only projects of version greater than supabase-postgrest-14.1.0.44 can use PITR
+  const sufficientPgVersion = getSemanticVersion(selectedProject?.dbVersion ?? '') >= 141044
 
   // [Joshen] We could possibly look into reducing the interval to be more "realtime"
   // I tried setting the interval to 1m but no data was returned, may need to experiment
@@ -60,10 +73,10 @@ const AddOns = ({}: AddOnsProps) => {
             <div className="space-y-6">
               <div>
                 <p className="text-base">Add ons</p>
-                <p className="text-sm text-scale-1000">Level up your project with add-ons</p>
+                <p className="text-sm text-foreground-light">Level up your project with add-ons</p>
               </div>
               <div className="space-y-2">
-                <p className="text-sm text-scale-1100">More information</p>
+                <p className="text-sm text-foreground-light">More information</p>
                 <div>
                   <Link href="https://supabase.com/docs/guides/platform/compute-add-ons">
                     <a target="_blank" rel="noreferrer">
@@ -128,17 +141,17 @@ const AddOns = ({}: AddOnsProps) => {
                       src={
                         computeInstance !== undefined
                           ? `${BASE_PATH}/img/optimized-compute-on${
-                              isDarkMode ? '' : '--light'
+                              resolvedTheme === 'dark' ? '' : '--light'
                             }.png`
                           : `${BASE_PATH}/img/optimized-compute-off${
-                              isDarkMode ? '' : '--light'
+                              resolvedTheme === 'dark' ? '' : '--light'
                             }.png`
                       }
                     />
                   </div>
                 </div>
                 <div className="flex-grow">
-                  <p className="text-sm text-scale-1000">Optimized compute</p>
+                  <p className="text-sm text-foreground-light">Optimized compute</p>
                   <p className="">{computeInstance?.variant.name ?? 'Micro'}</p>
                   <ProjectUpdateDisabledTooltip
                     projectUpdateDisabled={projectUpdateDisabled}
@@ -197,7 +210,7 @@ const AddOns = ({}: AddOnsProps) => {
                     <Link href={`/project/${projectRef}/settings/billing/usage#ram`}>
                       <a>
                         <div className="group flex items-center space-x-2">
-                          <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition cursor-pointer">
+                          <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                             Memory
                           </p>
                           <IconChevronRight
@@ -214,7 +227,7 @@ const AddOns = ({}: AddOnsProps) => {
                     <Link href={`/project/${projectRef}/settings/billing/usage#cpu`}>
                       <a>
                         <div className="group flex items-center space-x-2">
-                          <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition cursor-pointer">
+                          <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                             CPU
                           </p>
                           <IconChevronRight
@@ -231,13 +244,13 @@ const AddOns = ({}: AddOnsProps) => {
                     </p>
                   </div>
                   <div className="w-full flex items-center justify-between border-b py-2">
-                    <p className="text-sm text-scale-1000">No. of direct connections</p>
+                    <p className="text-sm text-foreground-light">No. of direct connections</p>
                     <p className="text-sm">
                       {computeInstance?.variant?.meta?.connections_direct ?? 60}
                     </p>
                   </div>
                   <div className="w-full flex items-center justify-between border-b py-2">
-                    <p className="text-sm text-scale-1000">No. of pooler connections</p>
+                    <p className="text-sm text-foreground-light">No. of pooler connections</p>
                     <p className="text-sm">
                       {computeInstance?.variant?.meta?.connections_pooler ?? 200}
                     </p>
@@ -246,7 +259,7 @@ const AddOns = ({}: AddOnsProps) => {
                     <Link href={`/project/${projectRef}/settings/billing/usage#disk_io`}>
                       <a>
                         <div className="group flex items-center space-x-2">
-                          <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition cursor-pointer">
+                          <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                             Max Disk Throughput
                           </p>
                           <IconChevronRight
@@ -266,7 +279,7 @@ const AddOns = ({}: AddOnsProps) => {
                     <Link href={`/project/${projectRef}/settings/billing/usage#disk_io`}>
                       <a>
                         <div className="group flex items-center space-x-2">
-                          <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition cursor-pointer">
+                          <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                             Baseline Disk Throughput
                           </p>
                           <IconChevronRight
@@ -297,32 +310,55 @@ const AddOns = ({}: AddOnsProps) => {
                       height={96}
                       src={
                         pitr !== undefined
-                          ? `${BASE_PATH}/img/pitr-on${isDarkMode ? '' : '--light'}.png?v=2`
-                          : `${BASE_PATH}/img/pitr-off${isDarkMode ? '' : '--light'}.png?v=2`
+                          ? `${BASE_PATH}/img/pitr-on${
+                              resolvedTheme === 'dark' ? '' : '--light'
+                            }.png?v=2`
+                          : `${BASE_PATH}/img/pitr-off${
+                              resolvedTheme === 'dark' ? '' : '--light'
+                            }.png?v=2`
                       }
                     />
                   </div>
                 </div>
                 <div>
-                  <p className="text-sm text-scale-1000">Point in time recovery</p>
+                  <p className="text-sm text-foreground-light">Point in time recovery</p>
                   <p className="">
                     {pitr !== undefined
                       ? `Point in time recovery of ${pitr.variant.meta?.backup_duration_days} days is enabled`
                       : 'Point in time recovery is not enabled'}
                   </p>
-                  <ProjectUpdateDisabledTooltip
-                    projectUpdateDisabled={projectUpdateDisabled}
-                    projectNotActive={!isProjectActive}
-                  >
-                    <Button
-                      type="default"
-                      className="mt-2 pointer-events-auto"
-                      onClick={() => snap.setPanelKey('pitr')}
-                      disabled={!isProjectActive || projectUpdateDisabled}
+                  {!sufficientPgVersion ? (
+                    <Alert_Shadcn_ className="mt-2">
+                      <AlertTitle_Shadcn_>Your project is too old enable PITR</AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_>
+                        <p className="text-sm leading-normal mb-2">
+                          Reach out to us via support if you're interested
+                        </p>
+                        <Link
+                          passHref
+                          href={`/support/new?ref=${projectRef}&category=sales&subject=Project%20too%20old%20old%20for%20PITR`}
+                        >
+                          <Button asChild type="default">
+                            <a>Contact support</a>
+                          </Button>
+                        </Link>
+                      </AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
+                  ) : (
+                    <ProjectUpdateDisabledTooltip
+                      projectUpdateDisabled={projectUpdateDisabled}
+                      projectNotActive={!isProjectActive}
                     >
-                      Change point in time recovery
-                    </Button>
-                  </ProjectUpdateDisabledTooltip>
+                      <Button
+                        type="default"
+                        className="mt-2 pointer-events-auto"
+                        onClick={() => snap.setPanelKey('pitr')}
+                        disabled={!isProjectActive || projectUpdateDisabled || !sufficientPgVersion}
+                      >
+                        Change point in time recovery
+                      </Button>
+                    </ProjectUpdateDisabledTooltip>
+                  )}
                 </div>
               </div>
 
@@ -332,20 +368,24 @@ const AddOns = ({}: AddOnsProps) => {
               <div className="flex space-x-6">
                 <div>
                   <div className="rounded-md bg-scale-100 dark:bg-scale-400 w-[160px] h-[96px] shadow">
-                    <img
+                    <Image
                       alt="Custom Domain"
                       width={160}
                       height={96}
                       src={
                         customDomain !== undefined
-                          ? `${BASE_PATH}/img/custom-domain-on${isDarkMode ? '' : '--light'}.png`
-                          : `${BASE_PATH}/img/custom-domain-off${isDarkMode ? '' : '--light'}.png`
+                          ? `${BASE_PATH}/img/custom-domain-on${
+                              resolvedTheme === 'dark' ? '' : '--light'
+                            }.png`
+                          : `${BASE_PATH}/img/custom-domain-off${
+                              resolvedTheme === 'dark' ? '' : '--light'
+                            }.png`
                       }
                     />
                   </div>
                 </div>
                 <div>
-                  <p className="text-sm text-scale-1000">Custom domain</p>
+                  <p className="text-sm text-foreground-light">Custom domain</p>
                   <p className="">
                     {customDomain !== undefined
                       ? 'Custom domain is enabled'
