@@ -161,7 +161,7 @@
     "jest-canvas-mock": "^2.5.2",
     "jest-environment-jsdom": "^29.7.0",
     "openapi-typescript": "^6.3.4",
-    "postcss": "^8.4.22",
+    "postcss": "^8.4.31",
     "prettier": "^2.8.8",
     "storybook-dark-mode": "^3.0.0",
     "superjson": "^1.12.3",
