@@ -16,8 +16,8 @@ const IntegrationsImage = () => {
 
   const image =
     resolvedTheme === 'dark'
-      ? `/images/product/vector/vector-tools-dark${isMobile ? '-mobile' : ''}.svg`
-      : `/images/product/vector/vector-tools-light${isMobile ? '-mobile' : ''}.svg`
+      ? `/images/product/vector/vector-tools-dark${isMobile ? '-mobile' : ''}.png`
+      : `/images/product/vector/vector-tools-light${isMobile ? '-mobile' : ''}.png`
 
   const ResolvedImage = () => (
     <Image
