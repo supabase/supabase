@@ -104,7 +104,7 @@ const StorageMenu = () => {
                       </Alert>
                     </div>
                   )}
-                  {buckets.map((bucket: any, idx: number) => {
+                  {buckets.map((bucket, idx: number) => {
                     const isSelected = bucketId === bucket.id
                     return (
                       <BucketRow

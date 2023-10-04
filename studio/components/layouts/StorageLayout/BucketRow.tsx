@@ -23,8 +23,8 @@ export interface BucketRowProps {
   bucket: Bucket
   projectRef?: string
   isSelected: boolean
-  onSelectDeleteBucket: (bucket: any) => void
-  onSelectEditBucket: (bucket: any) => void
+  onSelectDeleteBucket: (bucket: Bucket) => void
+  onSelectEditBucket: (bucket: Bucket) => void
 }
 
 const BucketRow = ({
@@ -44,7 +44,8 @@ const BucketRow = ({
         isSelected && 'text-foreground bg-scale-300'
       )}
     >
-      <Link href={`/project/${projectRef}/storage/buckets/${bucket.id}`}>
+      {/* Even though we trim whitespaces from bucket names, there may be some existing buckets with trailing whitespaces. */}
+      <Link href={`/project/${projectRef}/storage/buckets/${encodeURIComponent(bucket.id)}`}>
         <a className="py-1 px-3 w-full">
           <div className="flex items-center justify-between space-x-2 truncate w-full">
             <p
