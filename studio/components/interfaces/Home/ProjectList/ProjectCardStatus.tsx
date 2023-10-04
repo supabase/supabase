@@ -100,7 +100,7 @@ export const ProjectCardStatus = ({
         <IconAlertTriangle strokeWidth={2} />
       )}
       <div className="flex justify-between items-center w-full">
-        <AlertTitle_Shadcn_ className="text-xs mb-0">{alertTitle} hello world</AlertTitle_Shadcn_>
+        <AlertTitle_Shadcn_ className="text-xs mb-0">{alertTitle}</AlertTitle_Shadcn_>
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger>
             <Info size={14} className="text-foreground-light hover:text-foreground" />
