@@ -167,7 +167,7 @@ project
   └── functions
 ```
 
-Where you only want to enabled the `supabase/functions` path (and its subpaths) to be Deno enabled, you will want to add `./supabase/functions` to the list of _Deno: Enable Paths_ in the configuration. In your `.vscode/settings.json` file add:
+To enable Deno exclusively for the Supabase functions path and its subpaths, include `./supabase/functions` in the list of paths designated for Deno activation within your configuration. To achieve this, simply append the following line to your `.vscode/settings.json` file:
 
 ```json
 {
