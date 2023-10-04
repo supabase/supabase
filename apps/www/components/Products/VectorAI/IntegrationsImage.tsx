@@ -16,8 +16,8 @@ const IntegrationsImage = () => {
 
   const image =
     resolvedTheme === 'dark'
-      ? `/images/product/vector/vector-tools-dark${isMobile ? '-mobile' : ''}.svg`
-      : `/images/product/vector/vector-tools-light${isMobile ? '-mobile' : ''}.svg`
+      ? `/images/product/vector/vector-tools-dark${isMobile ? '-mobile' : ''}.png`
+      : `/images/product/vector/vector-tools-light${isMobile ? '-mobile' : ''}.png`
 
   const ResolvedImage = () => (
     <Image
@@ -25,7 +25,7 @@ const IntegrationsImage = () => {
       alt="Diagram of Machine Learning tools that integrate with Supabase Vector"
       layout="fill"
       objectFit="contain"
-      className="bg-blue-300"
+      quality={100}
     />
   )
 
