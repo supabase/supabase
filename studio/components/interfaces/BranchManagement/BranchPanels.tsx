@@ -100,6 +100,16 @@ const MainBranchPanel = ({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="bottom" align="end">
+                  <Link passHref href={`/project/${ref}/settings/integrations`}>
+                    <DropdownMenuItem
+                      asChild
+                      className="flex gap-2"
+                      onSelect={() => onSelectUpdate()}
+                    >
+                      <a>Change production branch</a>
+                    </DropdownMenuItem>
+                  </Link>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem
                     className="flex gap-2"
                     onSelect={() => onSelectDisableBranching()}

@@ -3,6 +3,9 @@ import { GitBranch, RotateCcw, Shield } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Button,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
@@ -134,11 +137,21 @@ const GitHubIntegrationConnectionForm = ({
         <p className="text-xs text-light mb-3">
           All other branches will be treated as Preview branches
         </p>
+
+        <Alert_Shadcn_ className="mb-4 w-96">
+          <AlertTitle_Shadcn_ className="text-sm">
+            We currently don’t allow changing production branch
+          </AlertTitle_Shadcn_>
+          <AlertDescription_Shadcn_ className="text-xs">
+            You will need to disable branching and opt back in to choose a new production branch
+          </AlertDescription_Shadcn_>
+        </Alert_Shadcn_>
+
         {/* <pre>! This should only work if branching is turned on !</pre> */}
         <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
           <PopoverTrigger_Shadcn_ asChild name="branch-selector">
             <Button
-              disabled={isUpdatingProdBranch}
+              disabled
               type="default"
               size="medium"
               ref={comboBoxRef}
@@ -250,7 +263,10 @@ const GitHubIntegrationConnectionForm = ({
                   type="secondary"
                   size="medium"
                   loading={isUpdatingGithubConnection}
-                  disabled={isUpdatingGithubConnection}
+                  disabled={
+                    field.value === connection.metadata?.supabaseConfig?.supabaseDirectory ||
+                    isUpdatingGithubConnection
+                  }
                 >
                   Update
                 </Button>
