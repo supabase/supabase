@@ -13,7 +13,7 @@ import { BASE_PATH } from 'lib/constants'
 const WrappersDisabledState = () => {
   const { ui, meta } = useStore()
   const { ref } = useParams()
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
   const wrappersExtension = meta.extensions.byId('wrappers')
   const vaultExtension = meta.extensions.byId('supabase_vault')
   const isNotAvailable = wrappersExtension === undefined || vaultExtension === undefined
@@ -72,7 +72,7 @@ const WrappersDisabledState = () => {
           backgroundSize: '45%',
           backgroundPosition: '105% 40%',
           backgroundImage:
-            theme === 'dark'
+            resolvedTheme === 'dark'
               ? `url("${BASE_PATH}/img/wrappers-dark.png")`
               : `url("${BASE_PATH}/img/wrappers-light.png")`,
         }}

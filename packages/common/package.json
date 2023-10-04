@@ -4,6 +4,9 @@
   "main": "./index.tsx",
   "types": "./index.tsx",
   "license": "MIT",
+  "scripts": {
+    "typecheck_CURRENTLY_IGNORED": "tsc --noEmit"
+  },
   "dependencies": {
     "@headlessui/react": "^1.7.14",
     "@supabase/gotrue-js": "^2.54.0",
