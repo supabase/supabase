@@ -2,7 +2,18 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import dayjs from 'dayjs'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
-import { Alert, Button, IconArrowDown, IconArrowUp, IconRefreshCw, IconUser } from 'ui'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconAlertTriangle,
+  IconArrowDown,
+  IconArrowUp,
+  IconRefreshCw,
+  IconUser,
+} from 'ui'
 
 import { useParams } from 'common'
 import { FilterPopover, LogDetailsPanel } from 'components/interfaces/AuditLogs'
@@ -19,6 +30,7 @@ import { useOrganizationDetailQuery } from 'data/organizations/organization-deta
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import Link from 'next/link'
 
 // [Joshen considerations]
 // - Maybe fix the height of the table to the remaining height of the viewport, so that the search input is always visible
@@ -45,11 +57,23 @@ const AuditLogs = () => {
   const { data: detailData } = useOrganizationDetailQuery({ slug })
   const { data: rolesData } = useOrganizationRolesQuery({ slug })
   const { data, error, isLoading, isSuccess, isError, isRefetching, refetch } =
-    useOrganizationAuditLogsQuery({
-      slug,
-      iso_timestamp_start: dateRange.from,
-      iso_timestamp_end: dateRange.to,
-    })
+    useOrganizationAuditLogsQuery(
+      {
+        slug,
+        iso_timestamp_start: dateRange.from,
+        iso_timestamp_end: dateRange.to,
+      },
+      {
+        retry(_failureCount, error) {
+          if (error.message.endsWith('upgrade to team or enterprise plan to access audit logs.')) {
+            return false
+          }
+          return true
+        },
+        retryOnMount: false,
+        refetchOnWindowFocus: false,
+      }
+    )
 
   // This feature depends on the subscription tier of the user. Free user can view logs up to 1 day
   // in the past. The API limits the logs to maximum of 1 day and 5 minutes so when the page is
@@ -184,7 +208,35 @@ const AuditLogs = () => {
             </div>
           )}
 
-          {isError && <AlertError error={error} subject="Failed to retrieve audit logs" />}
+          {isError && error.message.endsWith('') ? (
+            <Alert_Shadcn_
+              variant="default"
+              title="Organization audit logs are not available for free or pro organizations"
+            >
+              <IconAlertTriangle className="h-4 w-4 mt-3" />
+              <div className="flex flex-row pt-3 pb-2">
+                <div className="grow">
+                  <AlertTitle_Shadcn_>
+                    Organization audit logs are not available for free or pro organizations
+                  </AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_ className="flex flex-row justify-between gap-3">
+                    <p>
+                      If you need to use organization audit logs, then you will need to upgrade to
+                      Team or Enterprise plan to access.
+                    </p>
+                  </AlertDescription_Shadcn_>
+                </div>
+
+                <div className="flex items-center">
+                  <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
+                    <Button type="primary">Upgrade subscription</Button>
+                  </Link>
+                </div>
+              </div>
+            </Alert_Shadcn_>
+          ) : (
+            <AlertError error={error} subject="Failed to retrieve audit logs" />
+          )}
 
           {isSuccess && (
             <>
