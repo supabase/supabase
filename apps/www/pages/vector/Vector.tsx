@@ -12,9 +12,7 @@ const ProductHeaderCentered = dynamic(() => import('~/components/Sections/Produc
 const HighlightCards = dynamic(() => import('~/components/Sections/HighlightCards'))
 const FeaturesSection = dynamic(() => import('~/components/Sections/FeaturesSection'))
 const UseCasesSection = dynamic(() => import('~/components/Sections/UseCasesSection'))
-const VectorIntegrationsSection = dynamic(
-  () => import('~/components/Sections/VectorIntegrationsSection')
-)
+const CenteredTitleImage = dynamic(() => import('~/components/Sections/CenteredTitleImage'))
 const CustomerQuotesSection = dynamic(() => import('~/components/Sections/CustomerQuotesSection'))
 const TimedTabsSection = dynamic(() => import('~/components/Sections/TimedTabsSection'))
 const ProductsCta = dynamic(() => import('~/components/Sections/ProductsCta'))
@@ -46,7 +44,7 @@ function VectorPage() {
       <DefaultLayout className="!bg-scale-300 dark:!bg-scale-100">
         <ProductHeaderCentered {...pageData.heroSection} />
         <HighlightCards {...pageData.highlightsSection} />
-        <VectorIntegrationsSection {...pageData.integrations} />
+        <CenteredTitleImage {...pageData.integrations} />
         <TimedTabsSection {...pageData.APIsection} />
         <div className="bg-white dark:bg-[#121212]">
           <UseCasesSection {...pageData.useCasesSection} />

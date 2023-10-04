@@ -72,6 +72,7 @@ export default {
   },
   integrations: {
     title: 'Leverage the tools you love',
+    image: IntegrationsImage,
   },
   useCasesSection: {
     title: (
