@@ -1,17 +1,10 @@
-import { RESOURCE_WARNING_MESSAGES } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.constants'
-import { ResourceWarning } from 'data/usage/resource-warnings-query'
-import {
-  Alert_Shadcn_,
-  AlertTitle_Shadcn_,
-  cn,
-  IconAlertTriangle,
-  IconPauseCircle,
-  IconRefreshCw,
-} from 'ui'
-import { InferredProjectStatus } from './ProjectCard.utils'
-import { getWarningContent } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.utils'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Info } from 'lucide-react'
+import { RESOURCE_WARNING_MESSAGES } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.constants'
+import { getWarningContent } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.utils'
+import { ResourceWarning } from 'data/usage/resource-warnings-query'
+import { AlertTriangle, Info, RefreshCcw } from 'lucide-react'
+import { Alert_Shadcn_, AlertTitle_Shadcn_, cn, IconPauseCircle } from 'ui'
+import { InferredProjectStatus } from './ProjectCard.utils'
 
 export interface ProjectCardWarningsProps {
   resourceWarnings?: ResourceWarning
@@ -93,11 +86,11 @@ export const ProjectCardStatus = ({
       )}
     >
       {projectStatus === 'isPaused' || projectStatus === 'isPausing' ? (
-        <IconPauseCircle strokeWidth={2} />
+        <IconPauseCircle strokeWidth={1.5} size={12} />
       ) : projectStatus === 'isRestoring' || projectStatus === 'isComingUp' ? (
-        <IconRefreshCw strokeWidth={2} />
+        <RefreshCcw strokeWidth={1.5} size={12} />
       ) : (
-        <IconAlertTriangle strokeWidth={2} />
+        <AlertTriangle strokeWidth={1.5} size={12} />
       )}
       <div className="flex justify-between items-center w-full">
         <AlertTitle_Shadcn_ className="text-xs mb-0">{alertTitle}</AlertTitle_Shadcn_>

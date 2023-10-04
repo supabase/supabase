@@ -1,9 +1,8 @@
-import { IconGitBranch, IconGitHub } from 'ui'
-
 import CardButton from 'components/ui/CardButton'
 import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { ResourceWarning } from 'data/usage/resource-warnings-query'
 import { BASE_PATH } from 'lib/constants'
+import { GitBranch, Github } from 'lucide-react'
 import { Project } from 'types'
 import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
@@ -53,13 +52,13 @@ const ProjectCard = ({
               )}
               {isBranchingEnabled && (
                 <div className="w-fit p-1 border rounded-md flex items-center border-scale-600">
-                  <IconGitBranch size={12} strokeWidth={1.5} />
+                  <GitBranch size={12} strokeWidth={1.5} />
                 </div>
               )}
               {isGithubIntegrated && (
                 <>
                   <div className="w-fit p-1 border rounded-md flex items-center border-scale-600">
-                    <IconGitHub size={12} strokeWidth={1.5} />
+                    <Github size={12} strokeWidth={1.5} />
                   </div>
                   <p className="text-xs !ml-2 text-foreground-light">{githubRepository}</p>
                 </>
@@ -70,7 +69,7 @@ const ProjectCard = ({
         footer={
           <ProjectCardStatus projectStatus={projectStatus} resourceWarnings={resourceWarnings} />
         }
-      ></CardButton>
+      />
     </li>
   )
 }
