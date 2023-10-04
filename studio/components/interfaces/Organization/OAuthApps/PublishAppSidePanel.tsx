@@ -14,10 +14,10 @@ import { uploadAttachment } from 'lib/upload'
 import {
   Badge,
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   Form,
   IconEdit,
   IconUpload,
@@ -240,31 +240,31 @@ const PublishAppSidePanel = ({
                               }}
                             >
                               <div className="absolute bottom-1 right-1">
-                                <DropdownMenu_Shadcn_>
-                                  <DropdownMenuTrigger_Shadcn_>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger>
                                     <Button type="default" icon={<IconEdit />} className="px-1" />
-                                  </DropdownMenuTrigger_Shadcn_>
-                                  <DropdownMenuContent_Shadcn_ align="end" side="bottom">
-                                    <DropdownMenuItem_Shadcn_
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end" side="bottom">
+                                    <DropdownMenuItem
                                       key="upload"
                                       onClick={() => {
                                         if (uploadButtonRef.current)
                                           (uploadButtonRef.current as any).click()
                                       }}
                                     >
-                                      <p className="text">Upload image</p>
-                                    </DropdownMenuItem_Shadcn_>
-                                    <DropdownMenuItem_Shadcn_
+                                      <p>Upload image</p>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
                                       key="remove"
                                       onClick={() => {
                                         setIconFile(undefined)
                                         setIconUrl(undefined)
                                       }}
                                     >
-                                      <p className="text">Remove image</p>
-                                    </DropdownMenuItem_Shadcn_>
-                                  </DropdownMenuContent_Shadcn_>
-                                </DropdownMenu_Shadcn_>
+                                      <p>Remove image</p>
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
                               </div>
                             </div>
                           ) : (

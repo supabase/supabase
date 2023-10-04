@@ -13,7 +13,7 @@ partition by list(country);
 
 create table customers_americas 
 	partition of customers
-	for values in ('US', 'CANADA')
+	for values in ('US', 'CANADA');
 
 create table customers_asia 
 	partition of customers

@@ -9,10 +9,10 @@ import {
   AiIconAnimation,
   Button,
   cn,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   IconCheck,
   IconChevronDown,
   IconCornerDownLeft,
@@ -707,19 +707,19 @@ const SQLEditor = () => {
                         >
                           {getDiffTypeButtonLabel(selectedDiffType)}
                         </Button>
-                        <DropdownMenu_Shadcn_>
-                          <DropdownMenuTrigger_Shadcn_>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
                             <Button
                               type="primary"
-                              className="rounded-l-none border-l-0 px-[4px] py-[5px]"
+                              className="rounded-l-none border-l-0 px-[4px] py-[5px] flex"
                               icon={<IconChevronDown />}
                             />
-                          </DropdownMenuTrigger_Shadcn_>
-                          <DropdownMenuContent_Shadcn_ align="end" side="bottom">
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" side="bottom">
                             {Object.values(DiffType)
                               .filter((diffType) => diffType !== selectedDiffType)
                               .map((diffType) => (
-                                <DropdownMenuItem_Shadcn_
+                                <DropdownMenuItem
                                   key={diffType}
                                   onClick={() => {
                                     setSelectedDiffType(diffType)
@@ -735,11 +735,11 @@ const SQLEditor = () => {
                                     }
                                   }}
                                 >
-                                  <p className="text">{getDiffTypeDropdownLabel(diffType)}</p>
-                                </DropdownMenuItem_Shadcn_>
+                                  <p>{getDiffTypeDropdownLabel(diffType)}</p>
+                                </DropdownMenuItem>
                               ))}
-                          </DropdownMenuContent_Shadcn_>
-                        </DropdownMenu_Shadcn_>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                       <Button
                         type="alternative"

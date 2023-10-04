@@ -6,10 +6,10 @@ import {
   Alert,
   Badge,
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   IconCreditCard,
   IconMoreHorizontal,
   IconPlus,
@@ -214,30 +214,30 @@ const PaymentMethods = () => {
                                 </Tooltip.Portal>
                               </Tooltip.Root>
                             ) : (
-                              <DropdownMenu_Shadcn_>
-                                <DropdownMenuTrigger_Shadcn_>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger>
                                   <Button
                                     type="outline"
                                     icon={<IconMoreHorizontal />}
                                     loading={isLoadingPaymentMethods}
                                     className="hover:border-gray-500"
                                   />
-                                </DropdownMenuTrigger_Shadcn_>
-                                <DropdownMenuContent_Shadcn_>
-                                  <DropdownMenuItem_Shadcn_
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                  <DropdownMenuItem
                                     key="make-default"
                                     onClick={() => setSelectedMethodForDefault(paymentMethod)}
                                   >
-                                    <p className="text">Make default</p>
-                                  </DropdownMenuItem_Shadcn_>
-                                  <DropdownMenuItem_Shadcn_
+                                    <p>Make default</p>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
                                     key="delete-method"
                                     onClick={() => setSelectedMethodToDelete(paymentMethod)}
                                   >
-                                    <p className="text">Delete</p>
-                                  </DropdownMenuItem_Shadcn_>
-                                </DropdownMenuContent_Shadcn_>
-                              </DropdownMenu_Shadcn_>
+                                    <p>Delete</p>
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             )}
                           </>
                         )}

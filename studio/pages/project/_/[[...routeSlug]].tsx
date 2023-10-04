@@ -40,12 +40,22 @@ const GenericProjectPage: NextPage = () => {
 
   const urlRewriterFactory = (slug: string | string[] | undefined) => {
     return (projectRef: string) => {
+      const hash = location.hash
+
       if (!Array.isArray(slug)) {
-        return `/project/${projectRef}?${queryString}`
+        return [`/project/${projectRef}`, queryString ?? `?${queryString}`, hash ?? `#${hash}`]
+          .filter(Boolean)
+          .join('')
       }
 
-      const slugPath = slug.reduce((a: string, b: string) => `${a}/${b}`, '').slice(1)
-      return `/project/${projectRef}/${slugPath}?${queryString}`
+      const slugPath = slug.reduce((a, b) => `${a}/${b}`, '').slice(1)
+      return [
+        `/project/${projectRef}/${slugPath}`,
+        queryString ?? `?${queryString}`,
+        hash ?? `#${hash}`,
+      ]
+        .filter(Boolean)
+        .join('')
     }
   }
 
