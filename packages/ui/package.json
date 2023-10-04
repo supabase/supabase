@@ -7,6 +7,7 @@
   "sideEffects": false,
   "scripts": {
     "build:icons": "node --experimental-modules internals/populate-icons.js",
+    "typecheck_CURRENTLY_IGNORED": "tsc --noEmit",
     "build-tokens": "node internals/tokens/build-tokens.js",
     "copy-tokens": "node internals/tokens/copy-tokens.js",
     "cleanse-css-for-tailwind": "node internals/tokens/cleanse-css-for-tailwind.js",

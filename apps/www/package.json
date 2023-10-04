@@ -8,7 +8,7 @@
     "build": "next build",
     "export": "next export",
     "start": "next start",
-    "typecheck": "tsc",
+    "typecheck": "tsc --noEmit",
     "prettier": "prettier --write \"./{pages,components,lib,stores,styles,tests}/**/*.{ts,tsx,md,js,jsx,json}\"",
     "postbuild": "node ./internals/generate-sitemap.mjs"
   },
