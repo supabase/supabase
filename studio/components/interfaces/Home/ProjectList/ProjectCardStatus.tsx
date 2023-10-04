@@ -79,10 +79,10 @@ export const ProjectCardStatus = ({
     <Alert_Shadcn_
       variant={alertType}
       className={cn(
-        'border-0 p-5',
+        'border-0 p-5 pb-[1.25rem]',
         'bg-transparent',
-        '[&>svg]:left-[21px] [&>svg]:top-3.5',
-        !isCritical ? '[&>svg]:text-foreground [&>svg]:bg-surface-300' : ''
+        '[&>svg]:left-[1.25rem] [&>svg]:top-3.5 [&>svg]:border',
+        !isCritical ? '[&>svg]:text-foreground [&>svg]:bg-surface-100' : ''
       )}
     >
       {projectStatus === 'isPaused' || projectStatus === 'isPausing' ? (
