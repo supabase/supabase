@@ -63,8 +63,6 @@ const ProjectAPIDocs = () => {
     setOpenKeys(false)
   }
 
-  // [Joshen] need to consider custom domains
-
   return (
     <SidePanel
       hideFooter

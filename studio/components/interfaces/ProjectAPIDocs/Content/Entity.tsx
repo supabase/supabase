@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+
 import Table from 'components/to-be-cleaned/Table'
 import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import { useAppStateSnapshot } from 'state/app-state'

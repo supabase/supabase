@@ -1,36 +1,36 @@
-import { useStore } from 'hooks'
+import { useParams } from 'common'
+import Link from 'next/link'
 import { useState } from 'react'
-import { useAppStateSnapshot } from 'state/app-state'
 import {
-  Popover_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Button,
-  PopoverContent_Shadcn_,
-  Command_Shadcn_,
-  CommandList_Shadcn_,
   CommandGroup_Shadcn_,
   CommandItem_Shadcn_,
-  IconCode,
+  CommandList_Shadcn_,
+  Command_Shadcn_,
   IconChevronLeft,
+  IconCode,
   IconExternalLink,
-  Alert_Shadcn_,
-  AlertTitle_Shadcn_,
-  AlertDescription_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
 } from 'ui'
-import { DOCS_RESOURCE_CONTENT } from './ProjectAPIDocs.constants'
-import { navigateToSection } from './Content/Content.utils'
-import { useBucketsQuery } from 'data/storage/buckets-query'
-import { useParams } from 'common'
+
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import Link from 'next/link'
+import { useOpenAPISpecQuery } from 'data/open-api/api-spec-query'
+import { useBucketsQuery } from 'data/storage/buckets-query'
+import { useAppStateSnapshot } from 'state/app-state'
+import { navigateToSection } from './Content/Content.utils'
+import { DOCS_RESOURCE_CONTENT } from './ProjectAPIDocs.constants'
 
 const SecondLevelNav = () => {
   const { ref } = useParams()
-  const { meta } = useStore()
   const snap = useAppStateSnapshot()
   const [open, setOpen] = useState(false)
 
-  const { data } = meta.openApi
+  const { data } = useOpenAPISpecQuery({ projectRef: ref })
   const tables = data?.tables ?? []
   const functions = data?.functions ?? []
   const [section, resource] = snap.activeDocsSection

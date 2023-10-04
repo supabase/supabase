@@ -3,7 +3,7 @@ import { Badge } from 'ui'
 
 import Table from 'components/to-be-cleaned/Table'
 import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
-import { useStore } from 'hooks'
+import { useOpenAPISpecQuery } from 'data/open-api/api-spec-query'
 import { useAppStateSnapshot } from 'state/app-state'
 import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
 import ResourceContent from '../ResourceContent'
@@ -11,12 +11,14 @@ import { ContentProps } from './Content.types'
 
 const RPC = ({ language }: ContentProps) => {
   const { ref } = useParams()
-  const { meta } = useStore()
   const snap = useAppStateSnapshot()
+
   const { data: jsonSchema } = useProjectJsonSchemaQuery({ projectRef: ref })
+  const { data } = useOpenAPISpecQuery({ projectRef: ref })
+  const functions = data?.functions ?? []
 
   const rpcName = snap.activeDocsSection[1]
-  const rpc = meta.openApi.data?.functions.find((fn) => fn.name === rpcName)
+  const rpc = functions.find((fn) => fn.name === rpcName)
   const rpcJsonSchema = jsonSchema?.paths[rpc?.path]
 
   const summary = rpcJsonSchema?.post.summary

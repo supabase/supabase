@@ -2,16 +2,14 @@ import { useParams } from 'common'
 import { Badge } from 'ui'
 
 import { useBucketsQuery } from 'data/storage/buckets-query'
-import { useStore } from 'hooks'
+import { formatBytes } from 'lib/helpers'
 import { useAppStateSnapshot } from 'state/app-state'
 import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
 import ResourceContent from '../ResourceContent'
 import { ContentProps } from './Content.types'
-import { formatBytes } from 'lib/helpers'
 
 const Bucket = ({ language }: ContentProps) => {
   const { ref } = useParams()
-  const { meta } = useStore()
   const snap = useAppStateSnapshot()
   const { data } = useBucketsQuery({ projectRef: ref })
 

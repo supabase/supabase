@@ -1,34 +1,27 @@
-import { useAppStateSnapshot } from 'state/app-state'
-import { DOCS_CONTENT, DOCS_MENU } from './ProjectAPIDocs.constants'
-import { Fragment, useEffect } from 'react'
-import Link from 'next/link'
-import { Button, IconBook, IconBookOpen } from 'ui'
-import { useStore } from 'hooks'
-import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useParams } from 'common'
-import { navigateToSection } from './Content/Content.utils'
+import Link from 'next/link'
+import { Fragment } from 'react'
+import { Button, IconBook, IconBookOpen } from 'ui'
+
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import { useOpenAPISpecQuery } from 'data/open-api/api-spec-query'
+import { useBucketsQuery } from 'data/storage/buckets-query'
+import { useAppStateSnapshot } from 'state/app-state'
+import { navigateToSection } from './Content/Content.utils'
+import { DOCS_CONTENT, DOCS_MENU } from './ProjectAPIDocs.constants'
 
 const Separator = () => <div className="border-t !mt-3 pb-1 mx-3" />
 
 const FirstLevelNav = () => {
   const { ref } = useParams()
-  const { meta, ui } = useStore()
   const snap = useAppStateSnapshot()
 
-  const { data } = meta.openApi
+  const { data } = useOpenAPISpecQuery({ projectRef: ref })
   const tables = data?.tables ?? []
   const functions = data?.functions ?? []
 
   const { data: buckets } = useBucketsQuery({ projectRef: ref })
   const { data: edgeFunctions } = useEdgeFunctionsQuery({ projectRef: ref })
-
-  useEffect(() => {
-    if (ui.selectedProjectRef) {
-      meta.openApi.load()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ui.selectedProjectRef])
 
   return (
     <>
