@@ -62,7 +62,6 @@ This call takes the user to Google's consent screen. When the flow ends, the use
 
 You can additionally extract the `provider_token` from the session (on initial login only) which is the OAuth 2.0 access token issued by Google that grants your application access to the Google services for the authenticated users. Please store this token in local storage, cookies or in your database or server.
 
-
 <Tabs
   scrollable
   size="small"
@@ -218,7 +217,7 @@ In the Supabase JavaScript library, which you can use with web-based native fram
 await supabase.auth.signInWithIdToken({
   provider: 'google',
   token: '<identity token received from the OS>',
-  access_token: '<access token received from the OS>'
+  access_token: '<access token received from the OS>',
 })
 ```
 
@@ -262,6 +261,7 @@ Button(onClick = { authState.startFlow() }) {
     Text("Sign in with Google")
 }
 ```
+
 </TabPanel>
 </Tabs>
 

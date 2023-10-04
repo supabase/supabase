@@ -94,7 +94,7 @@ val broadcastFlow: Flow<JsonObject> = channelA.broadcastFlow<JsonObject>("test")
         println(it)
     }
     .launchIn(yourCoroutineScope) //you can also use .collect { } here
-	
+
 clientA.realtime.connect()
 channelA.join()
 ```
@@ -103,7 +103,6 @@ channelA.join()
 </Tabs>
 
 ### Sending Broadcast messages
-
 
 <Tabs
   scrollable
@@ -217,7 +216,7 @@ val broadcastFlow: Flow<JsonObject> = myChannel.broadcastFlow<JsonObject>("test-
         println(it)
     }
     .launchIn(yourCoroutineScope)
-	
+
 clientA.realtime.connect()
 myChannel.join(blockUntilJoined = true) //You can also use the myChannel.status flow instead, but this parameter will block the coroutine until the status is joined.
 
@@ -277,10 +276,10 @@ By default, broadcast messages are only sent to other clients. You can broadcast
          acknowledgeBroadcasts = true
      }
  }
- 
+
  supabase.realtime.connect()
  myChannel.join(blockUntilJoined = true) //You can also use the myChannel.status flow instead, but this parameter will block the coroutine until the status is joined.
- 
+
  myChannel.broadcast(event = "acknowledge", buildJsonObject {  })
 ```
 
