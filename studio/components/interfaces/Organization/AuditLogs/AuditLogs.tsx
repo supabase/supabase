@@ -211,7 +211,7 @@ const AuditLogs = () => {
           {isError && error.message.endsWith('') ? (
             <Alert_Shadcn_
               variant="default"
-              title="Organization audit logs are not available for free or pro organizations"
+              title="Organization audit logs are not available for Free or Pro organizations"
             >
               <IconAlertTriangle className="h-4 w-4 mt-3" />
               <div className="flex flex-row pt-3 pb-2">
@@ -221,8 +221,8 @@ const AuditLogs = () => {
                   </AlertTitle_Shadcn_>
                   <AlertDescription_Shadcn_ className="flex flex-row justify-between gap-3">
                     <p>
-                      If you need to use organization audit logs, then you will need to upgrade to
-                      Team or Enterprise plan to access.
+                      Upgrade to Team or Enterprise to view up to 28 days of audit logs for your
+                      organization.
                     </p>
                   </AlertDescription_Shadcn_>
                 </div>
