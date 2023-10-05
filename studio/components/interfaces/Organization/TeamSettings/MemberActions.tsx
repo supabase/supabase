@@ -12,11 +12,11 @@ import { observer } from 'mobx-react-lite'
 import { Member, Role } from 'types'
 import {
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   IconMoreHorizontal,
   IconTrash,
 } from 'ui'
@@ -51,7 +51,7 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
     resource: { role_id: roleId },
   })
 
-  const { mutate: deleteOrganizationMember, isLoading: isOrganizationMemberDeleteLoading } =
+  const { mutate: deleteOrganizationMember, isLoading: isDeletingMember } =
     useOrganizationMemberDeleteMutation({
       onSuccess: () => {
         ui.setNotification({
@@ -61,29 +61,21 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
       },
     })
 
-  const {
-    mutate: createOrganizationMemberInvite,
-    isLoading: isOrganizationMemberInviteCreateLoading,
-  } = useOrganizationMemberInviteCreateMutation({
-    onSuccess: () => {
-      ui.setNotification({ category: 'success', message: 'Resent the invitation.' })
-    },
-    onError: (error) => {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to resend invitation: ${error.message}`,
-      })
-    },
-  })
+  const { mutate: createOrganizationMemberInvite, isLoading: isCreatingInvite } =
+    useOrganizationMemberInviteCreateMutation({
+      onSuccess: () => {
+        ui.setNotification({ category: 'success', message: 'Resent the invitation.' })
+      },
+      onError: (error) => {
+        ui.setNotification({
+          category: 'error',
+          message: `Failed to resend invitation: ${error.message}`,
+        })
+      },
+    })
 
-  const {
-    mutate: deleteOrganizationMemberInvite,
-    isLoading: isOrganizationMemberInviteDeleteLoading,
-  } = useOrganizationMemberInviteDeleteMutation({
-    onSuccess: () => {
-      ui.setNotification({ category: 'success', message: 'Successfully revoked the invitation.' })
-    },
-  })
+  const { mutateAsync: asyncDeleteMemberInvite, isLoading: isDeletingInvite } =
+    useOrganizationMemberInviteDeleteMutation()
 
   const handleMemberDelete = async () => {
     confirmAlert({
@@ -98,13 +90,17 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
   }
 
   const handleResendInvite = async (member: Member) => {
-    if (!slug) return console.error('Slug is required')
-    if (!member.invited_id) return console.error('Member invited ID is required')
     const roleId = (member?.role_ids ?? [])[0]
+    const invitedId = member.invited_id
+
+    if (!slug) return console.error('Slug is required')
+    if (!invitedId) return console.error('Member invited ID is required')
+
+    await asyncDeleteMemberInvite({ slug, invitedId, invalidateDetail: false })
     createOrganizationMemberInvite({
       slug,
       invitedEmail: member.primary_email,
-      ownerId: member.invited_id,
+      ownerId: invitedId,
       roleId: roleId,
     })
   }
@@ -113,7 +109,12 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
     const invitedId = member.invited_id
     if (!slug) return console.error('Slug is required')
     if (!invitedId) return console.error('Member invited ID is required')
-    deleteOrganizationMemberInvite({ slug, invitedId })
+
+    await asyncDeleteMemberInvite({ slug, invitedId })
+    ui.setNotification({
+      category: 'success',
+      message: 'Successfully revoked the invitation.',
+    })
   }
 
   if (!canRemoveMember || (isPendingInviteAcceptance && !canResendInvite && !canRevokeInvite)) {
@@ -143,15 +144,12 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
     )
   }
 
-  const isLoading =
-    isOrganizationMemberDeleteLoading ||
-    isOrganizationMemberInviteDeleteLoading ||
-    isOrganizationMemberInviteCreateLoading
+  const isLoading = isDeletingMember || isDeletingInvite || isCreatingInvite
 
   return (
     <div className="flex items-center justify-end">
-      <DropdownMenu_Shadcn_>
-        <DropdownMenuTrigger_Shadcn_>
+      <DropdownMenu>
+        <DropdownMenuTrigger>
           <Button
             asChild
             type="text"
@@ -161,40 +159,41 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
           >
             <span></span>
           </Button>
-        </DropdownMenuTrigger_Shadcn_>
-        <DropdownMenuContent_Shadcn_ side="bottom" align="end">
+        </DropdownMenuTrigger>
+        <DropdownMenuContent side="bottom" align="end">
           <>
             {isPendingInviteAcceptance ? (
               <>
                 {canRevokeInvite && (
-                  <DropdownMenuItem_Shadcn_ onClick={() => handleRevokeInvitation(member)}>
+                  <DropdownMenuItem onClick={() => handleRevokeInvitation(member)}>
                     <div className="flex flex-col">
                       <p>Cancel invitation</p>
                       <p className="block opacity-50">Revoke this invitation.</p>
                     </div>
-                  </DropdownMenuItem_Shadcn_>
+                  </DropdownMenuItem>
                 )}
-                {canResendInvite && isExpired && (
+                {/* canResendInvite && isExpired */}
+                {true && (
                   <>
-                    <DropdownMenuSeparator_Shadcn_ />
-                    <DropdownMenuItem_Shadcn_ onClick={() => handleResendInvite(member)}>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => handleResendInvite(member)}>
                       <div className="flex flex-col">
                         <p>Resend invitation</p>
                         <p className="block opacity-50">Invites expire after 24hrs.</p>
                       </div>
-                    </DropdownMenuItem_Shadcn_>
+                    </DropdownMenuItem>
                   </>
                 )}
               </>
             ) : (
-              <DropdownMenuItem_Shadcn_ className="space-x-2" onClick={handleMemberDelete}>
+              <DropdownMenuItem className="space-x-2" onClick={handleMemberDelete}>
                 <IconTrash size={16} />
-                <p className="text">Remove member</p>
-              </DropdownMenuItem_Shadcn_>
+                <p>Remove member</p>
+              </DropdownMenuItem>
             )}
           </>
-        </DropdownMenuContent_Shadcn_>
-      </DropdownMenu_Shadcn_>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   )
 }

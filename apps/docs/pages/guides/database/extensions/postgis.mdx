@@ -151,7 +151,8 @@ At this point, if you go into your Supabase dashboard and look at the data, you 
 0101000020E6100000A4DFBE0E9C91614044FAEDEBC0494240
 ```
 
-We can query the `restaurants` table directly, but it will return the `location` column in the format you see above. We will create [database functions](https://supabase.com/docs/guides/database/functions) so that we can use the [st_astext()](https://postgis.net/docs/ST_AsText.html) function to convert it back to a human-readable format like `POINT(-73.946713 40.807313)`.
+We can query the `restaurants` table directly, but it will return the `location` column in the format you see above.
+We will create [database functions](https://supabase.com/docs/guides/database/functions) so that we can use the [st_y()](https://postgis.net/docs/ST_Y.html) and [st_x()](https://postgis.net/docs/ST_X.html) function to convert it back to lat and long floating values.
 
 ### Order by distance
 
@@ -159,10 +160,10 @@ Sorting datasets from closest to farthest, sometimes called nearest-neighbor sor
 
 ```sql
 create or replace function nearby_restaurants(lat float, long float)
-returns table (id public.restaurants.id%TYPE, name public.restaurants.name%TYPE, location text, dist_meters float)
+returns table (id public.restaurants.id%TYPE, name public.restaurants.name%TYPE, lat float, long float, dist_meters float)
 language sql
 as $$
-  select id, name, st_astext(location) as location, st_distance(location, st_point(long, lat)::geography) as dist_meters
+  select id, name, st_y(location::geometry) as lat, st_x(location::geometry) as long, st_distance(location, st_point(long, lat)::geography) as dist_meters
   from public.restaurants
   order by location <-> st_point(long, lat)::geography;
 $$;
@@ -204,19 +205,22 @@ final data = await supabase.rpc('nearby_restaurants',params: {
   {
     "id": 1,
     "name": "Supa Burger",
-    "location": "POINT(-73.946823 40.807416)",
+    "lat": 40.807416,
+    "long": -73.946823,
     "dist_meters": 14.73033739
   },
   {
     "id": 2,
     "name": "Supa Pizza",
-    "location": "POINT(-73.94581 40.807475)",
+    "lat": 40.807475,
+    "long": -73.94581,
     "dist_meters": 78.28980007
   },
   {
     "id": 3,
     "name": "Supa Taco",
-    "location": "POINT(-73.945826 40.80629)",
+    "lat": 40.80629,
+    "long": -73.945826,
     "dist_meters": 136.04329002
   }
 ]
@@ -233,10 +237,10 @@ When you are working on a map-based application where the user scrolls through y
 
 ```sql
 create or replace function restaurants_in_view(min_lat float, min_long float, max_lat float, max_long float)
-returns table (id public.restaurants.id%TYPE, name public.restaurants.name%TYPE, location text)
+returns table (id public.restaurants.id%TYPE, name public.restaurants.name%TYPE, lat float, long float)
 language sql
 as $$
-	select id, name, st_astext(location) as location
+	select id, name, st_y(location::geometry) as lat, st_x(location::geometry) as long
 	from public.restaurants
 	where location && ST_SetSRID(ST_MakeBox2D(ST_Point(min_long, min_lat), ST_Point(max_long, max_lat)), 4326)
 $$;
@@ -287,7 +291,8 @@ final data = await supabase.rpc('restaurants_in_view', params: {
   {
     "id": 2,
     "name": "Supa Pizza",
-    "location": "POINT(-73.94581 40.807475)"
+    "lat": 40.807475,
+    "long": -73.94581
   }
 ]
 ```

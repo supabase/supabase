@@ -4,6 +4,7 @@ import { ColumnType, SupaColumn, SupaRow, SupaTable } from '../types'
 import {
   isArrayColumn,
   isBoolColumn,
+  isCiTextColumn,
   isDateColumn,
   isDateTimeColumn,
   isEnumColumn,
@@ -146,6 +147,7 @@ function getColumnEditor(
     case 'number': {
       return NumberEditor
     }
+    case 'citext':
     case 'text': {
       // eslint-disable-next-line react/display-name
       return (p: any) => (
@@ -190,6 +192,8 @@ function getColumnType(columnDef: SupaColumn): ColumnType {
     return 'json'
   } else if (isTextColumn(columnDef.dataType)) {
     return 'text'
+  } else if (isCiTextColumn(columnDef.format)) {
+    return 'citext'
   } else if (isDateColumn(columnDef.format)) {
     return 'date'
   } else if (isTimeColumn(columnDef.format)) {

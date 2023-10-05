@@ -5,11 +5,11 @@ import Link from 'next/link'
 import Papa from 'papaparse'
 import SVG from 'react-inlinesvg'
 import {
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   IconChevronDown,
   IconCopy,
   IconDownload,
@@ -201,14 +201,14 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
       </Link>
       <div className="pr-3">
         {entity.type === ENTITY_TYPE.TABLE && isActive && !isLocked && (
-          <DropdownMenu_Shadcn_>
-            <DropdownMenuTrigger_Shadcn_>
+          <DropdownMenu>
+            <DropdownMenuTrigger>
               <div className="text-foreground-lighter transition-colors hover:text-foreground">
                 <IconChevronDown size={14} strokeWidth={2} />
               </div>
-            </DropdownMenuTrigger_Shadcn_>
-            <DropdownMenuContent_Shadcn_ side="bottom" align="start">
-              <DropdownMenuItem_Shadcn_
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="bottom" align="start">
+              <DropdownMenuItem
                 key="edit-table"
                 className="space-x-2"
                 onClick={(e) => {
@@ -217,9 +217,9 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                 }}
               >
                 <IconEdit size="tiny" />
-                <p className="text">Edit Table</p>
-              </DropdownMenuItem_Shadcn_>
-              <DropdownMenuItem_Shadcn_
+                <p>Edit Table</p>
+              </DropdownMenuItem>
+              <DropdownMenuItem
                 key="duplicate-table"
                 className="space-x-2"
                 onClick={(e) => {
@@ -228,20 +228,20 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                 }}
               >
                 <IconCopy size="tiny" />
-                <p className="text">Duplicate Table</p>
-              </DropdownMenuItem_Shadcn_>
+                <p>Duplicate Table</p>
+              </DropdownMenuItem>
               <Link
                 key="view-policies"
                 href={`/project/${projectRef}/auth/policies?search=${entity.id}`}
               >
                 <a>
-                  <DropdownMenuItem_Shadcn_ key="delete-table" className="space-x-2">
+                  <DropdownMenuItem key="delete-table" className="space-x-2">
                     <IconLock size="tiny" />
-                    <p className="text">View Policies</p>
-                  </DropdownMenuItem_Shadcn_>
+                    <p>View Policies</p>
+                  </DropdownMenuItem>
                 </a>
               </Link>
-              <DropdownMenuItem_Shadcn_
+              <DropdownMenuItem
                 key="download-table-csv"
                 className="space-x-2"
                 onClick={(e) => {
@@ -250,10 +250,10 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                 }}
               >
                 <IconDownload size="tiny" />
-                <p className="text">Export as CSV</p>
-              </DropdownMenuItem_Shadcn_>
-              <DropdownMenuSeparator_Shadcn_ />
-              <DropdownMenuItem_Shadcn_
+                <p>Export as CSV</p>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
                 key="delete-table"
                 className="space-x-2"
                 onClick={(e) => {
@@ -262,10 +262,10 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                 }}
               >
                 <IconTrash size="tiny" />
-                <p className="text">Delete Table</p>
-              </DropdownMenuItem_Shadcn_>
-            </DropdownMenuContent_Shadcn_>
-          </DropdownMenu_Shadcn_>
+                <p>Delete Table</p>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
       </div>
     </div>

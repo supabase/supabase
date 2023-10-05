@@ -5,10 +5,10 @@ import { ReactNode, useState } from 'react'
 import {
   Button,
   cn,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   IconArrowUp,
   IconChevronDown,
   IconDownload,
@@ -128,17 +128,17 @@ const DefaultHeader = ({
           <div className="h-[20px] w-px border-r border-scale-600"></div>
           <div className="flex items-center gap-2">
             {canCreateColumns && (
-              <DropdownMenu_Shadcn_>
-                <DropdownMenuTrigger_Shadcn_ className="flex">
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex">
                   <Button size="tiny" icon={<IconChevronDown size={14} strokeWidth={1.5} />}>
                     Insert
                   </Button>
-                </DropdownMenuTrigger_Shadcn_>
-                <DropdownMenuContent_Shadcn_ side="bottom" align="start">
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="bottom" align="start">
                   {[
                     ...(onAddRow !== undefined
                       ? [
-                          <DropdownMenuItem_Shadcn_
+                          <DropdownMenuItem
                             key="add-row"
                             className="group space-x-2"
                             onClick={onAddRow}
@@ -154,17 +154,17 @@ const DefaultHeader = ({
                               />
                             </div>
                             <div>
-                              <p className="text">Insert row</p>
-                              <p className="text-foreground-light text-xs">
+                              <p>Insert row</p>
+                              <p className="text-foreground-light">
                                 Insert a new row into {table.name}
                               </p>
                             </div>
-                          </DropdownMenuItem_Shadcn_>,
+                          </DropdownMenuItem>,
                         ]
                       : []),
                     ...(onAddColumn !== undefined
                       ? [
-                          <DropdownMenuItem_Shadcn_
+                          <DropdownMenuItem
                             key="add-column"
                             className="group space-x-2"
                             onClick={onAddColumn}
@@ -180,17 +180,17 @@ const DefaultHeader = ({
                               />
                             </div>
                             <div>
-                              <p className="text">Insert column</p>
-                              <p className="text-lighter text-xs">
+                              <p>Insert column</p>
+                              <p className="text-foreground-light">
                                 Insert a new column into {table.name}
                               </p>
                             </div>
-                          </DropdownMenuItem_Shadcn_>,
+                          </DropdownMenuItem>,
                         ]
                       : []),
                     ...(onImportData !== undefined
                       ? [
-                          <DropdownMenuItem_Shadcn_
+                          <DropdownMenuItem
                             key="import-data"
                             className="group space-x-2"
                             onClick={onImportData}
@@ -207,15 +207,15 @@ const DefaultHeader = ({
                               />
                             </div>
                             <div>
-                              <p className="text">Import data from CSV</p>
-                              <p className="text-lighter text-xs">Insert new rows from a CSV</p>
+                              <p>Import data from CSV</p>
+                              <p className="text-foreground-light">Insert new rows from a CSV</p>
                             </div>
-                          </DropdownMenuItem_Shadcn_>,
+                          </DropdownMenuItem>,
                         ]
                       : []),
                   ]}
-                </DropdownMenuContent_Shadcn_>
-              </DropdownMenu_Shadcn_>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
           </div>
         </>

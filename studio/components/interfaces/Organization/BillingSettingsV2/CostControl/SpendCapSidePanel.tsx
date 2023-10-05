@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react'
 import { pricing } from 'shared-data/pricing'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import { Alert, Button, Collapsible, IconChevronRight, IconExternalLink, SidePanel } from 'ui'
+import Image from 'next/image'
 
 const SPEND_CAP_OPTIONS: {
   name: string
@@ -39,7 +40,7 @@ const SpendCapSidePanel = () => {
   const { ui } = useStore()
   const router = useRouter()
   const { slug } = useParams()
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
 
   const [showUsageCosts, setShowUsageCosts] = useState(false)
   const [selectedOption, setSelectedOption] = useState<'on' | 'off'>()
@@ -243,7 +244,7 @@ const SpendCapSidePanel = () => {
                       )
                     }}
                   >
-                    <img
+                    <Image
                       alt="Spend Cap"
                       className={clsx(
                         'relative rounded-xl transition border bg-no-repeat bg-center bg-cover w-[160px] h-[96px]',
@@ -255,7 +256,7 @@ const SpendCapSidePanel = () => {
                       )}
                       width={160}
                       height={96}
-                      src={theme === 'dark' ? option.imageUrl : option.imageUrlLight}
+                      src={resolvedTheme === 'dark' ? option.imageUrl : option.imageUrlLight}
                     />
 
                     <p

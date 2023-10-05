@@ -3,11 +3,11 @@ import { useParams } from 'common'
 import {
   Button,
   cn,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   IconMail,
   IconMoreHorizontal,
   IconShieldOff,
@@ -115,8 +115,8 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
   }
 
   return (
-    <DropdownMenu_Shadcn_>
-      <DropdownMenuTrigger_Shadcn_>
+    <DropdownMenu>
+      <DropdownMenuTrigger>
         <Button
           asChild
           type="text"
@@ -126,38 +126,38 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
         >
           <span />
         </Button>
-      </DropdownMenuTrigger_Shadcn_>
-      <DropdownMenuContent_Shadcn_>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
         <>
           {user.email !== null ? (
             <>
-              <DropdownMenuItem_Shadcn_ className="space-x-2" onClick={handleResetPassword}>
+              <DropdownMenuItem className="space-x-2" onClick={handleResetPassword}>
                 <IconMail size="tiny" />
-                <p className="text">Send password recovery</p>
-              </DropdownMenuItem_Shadcn_>
-              <DropdownMenuItem_Shadcn_ className="space-x-2" onClick={handleSendMagicLink}>
+                <p>Send password recovery</p>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="space-x-2" onClick={handleSendMagicLink}>
                 <IconMail size="tiny" />
-                <p className="text">Send magic link</p>
-              </DropdownMenuItem_Shadcn_>
+                <p>Send magic link</p>
+              </DropdownMenuItem>
             </>
           ) : null}
           {user.phone !== null ? (
-            <DropdownMenuItem_Shadcn_ className="space-x-2" onClick={handleSendOtp}>
+            <DropdownMenuItem className="space-x-2" onClick={handleSendOtp}>
               <IconMail size="tiny" />
-              <p className="text">Send OTP</p>
-            </DropdownMenuItem_Shadcn_>
+              <p>Send OTP</p>
+            </DropdownMenuItem>
           ) : null}
-          <DropdownMenuSeparator_Shadcn_ />
+          <DropdownMenuSeparator />
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger asChild>
-              <DropdownMenuItem_Shadcn_
+              <DropdownMenuItem
                 onClick={handleDeleteFactors}
                 disabled={!canRemoveMFAFactors}
                 className="space-x-2"
               >
                 <IconShieldOff size="tiny" />
-                <p className="text">Remove MFA factors</p>
-              </DropdownMenuItem_Shadcn_>
+                <p>Remove MFA factors</p>
+              </DropdownMenuItem>
             </Tooltip.Trigger>
             {/* 
                 [Joshen] Deleting MFA factors should be different ABAC perms i think
@@ -183,14 +183,14 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
           </Tooltip.Root>
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger asChild>
-              <DropdownMenuItem_Shadcn_
+              <DropdownMenuItem
                 onClick={handleDelete}
                 disabled={!canRemoveUser}
                 className="space-x-2"
               >
                 <IconTrash size="tiny" />
-                <p className="text">Delete user</p>
-              </DropdownMenuItem_Shadcn_>
+                <p>Delete user</p>
+              </DropdownMenuItem>
             </Tooltip.Trigger>
             {!canRemoveUser && (
               <Tooltip.Portal>
@@ -211,8 +211,8 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
             )}
           </Tooltip.Root>
         </>
-      </DropdownMenuContent_Shadcn_>
-    </DropdownMenu_Shadcn_>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
 
