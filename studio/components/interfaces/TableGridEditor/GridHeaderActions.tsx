@@ -2,29 +2,23 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { MousePointer2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import { Button, IconAlertCircle, IconCode, IconLock, IconZap, IconZapOff, Modal } from 'ui'
+import { Button, IconAlertCircle, IconCode, IconLock, Modal } from 'ui'
 
 import { rlsAcknowledgedKey } from 'components/grid/constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useCheckPermissions, useStore } from 'hooks'
-import { MousePointer2 } from 'lucide-react'
 
 export interface GridHeaderActionsProps {
   table: PostgresTable
-  apiPreviewPanelOpen: boolean
-  setApiPreviewPanelOpen: (apiPreviewPanelOpen: boolean) => void
+  openAPIDocsPanel: () => void
   refreshDocs: () => void
 }
 
-const GridHeaderActions = ({
-  table,
-  apiPreviewPanelOpen,
-  setApiPreviewPanelOpen,
-  refreshDocs,
-}: GridHeaderActionsProps) => {
+const GridHeaderActions = ({ table, openAPIDocsPanel, refreshDocs }: GridHeaderActionsProps) => {
   const { ref } = useParams()
   const { meta, ui } = useStore()
   const { project } = useProjectContext()
@@ -69,8 +63,8 @@ const GridHeaderActions = ({
     return () => rlsAcknowledgedChannel.current.close()
   }, [rlsKey])
 
-  function handlePreviewToggle() {
-    setApiPreviewPanelOpen(!apiPreviewPanelOpen)
+  function openAPIDocs() {
+    openAPIDocsPanel()
     refreshDocs()
   }
 
@@ -80,7 +74,7 @@ const GridHeaderActions = ({
         size="tiny"
         type="default"
         icon={<IconCode size={14} strokeWidth={2} />}
-        onClick={handlePreviewToggle}
+        onClick={openAPIDocs}
       >
         API
       </Button>

@@ -1,12 +1,12 @@
 import type { PostgresColumn, PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { QueryKey, useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import { find, isUndefined } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 
-import { useParams } from 'common'
 import {
   Dictionary,
   parseSupaTable,
@@ -32,8 +32,10 @@ import useEntityType from 'hooks/misc/useEntityType'
 import { TableLike } from 'hooks/misc/useTable'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { EMPTY_ARR } from 'lib/void'
+import { useAppStateSnapshot } from 'state/app-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { SchemaView } from 'types'
+import { useIsAPIDocsSidePanelEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import APIDocumentationPanel from './APIDocumentationPanel'
 import GridHeaderActions from './GridHeaderActions'
 import NotFoundState from './NotFoundState'
@@ -53,12 +55,15 @@ const TableGridEditor = ({
   isLoadingSelectedTable = false,
   selectedTable,
 }: TableGridEditorProps) => {
-  const { project } = useProjectContext()
-  const snap = useTableEditorStateSnapshot()
-  const { meta, ui, vault } = useStore()
   const router = useRouter()
+  const { meta, ui, vault } = useStore()
   const { ref: projectRef, id } = useParams()
+
+  const { project } = useProjectContext()
+  const appSnap = useAppStateSnapshot()
+  const snap = useTableEditorStateSnapshot()
   const gridRef = useRef<SupabaseGridRef>(null)
+  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
 
   const [encryptedColumns, setEncryptedColumns] = useState([])
   const [apiPreviewPanelOpen, setApiPreviewPanelOpen] = useState(false)
@@ -327,8 +332,14 @@ const TableGridEditor = ({
               {canEditViaTableEditor && (
                 <GridHeaderActions
                   table={selectedTable as PostgresTable}
-                  apiPreviewPanelOpen={apiPreviewPanelOpen}
-                  setApiPreviewPanelOpen={setApiPreviewPanelOpen}
+                  openAPIDocsPanel={() => {
+                    if (isNewAPIDocsEnabled) {
+                      appSnap.setActiveDocsSection(['entities', selectedTable.name])
+                      appSnap.setShowProjectApiDocs(true)
+                    } else {
+                      setApiPreviewPanelOpen(true)
+                    }
+                  }}
                   refreshDocs={refreshDocs}
                 />
               )}

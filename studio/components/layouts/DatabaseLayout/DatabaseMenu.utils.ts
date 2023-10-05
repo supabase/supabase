@@ -6,10 +6,11 @@ export const generateDatabaseMenu = (
   project?: Project,
   flags?: {
     pgNetExtensionExists: boolean
+    isNewAPIDocsEnabled: boolean
   }
 ): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
-  const { pgNetExtensionExists } = flags || {}
+  const { pgNetExtensionExists, isNewAPIDocsEnabled } = flags || {}
 
   return [
     {
@@ -85,6 +86,16 @@ export const generateDatabaseMenu = (
           url: `/project/${ref}/database/indexes`,
           items: [],
         },
+        ...(isNewAPIDocsEnabled
+          ? [
+              {
+                name: 'GraphiQL',
+                key: 'graphiql',
+                url: `/project/${ref}/database/graphiql`,
+                items: [],
+              },
+            ]
+          : []),
       ],
     },
   ]
