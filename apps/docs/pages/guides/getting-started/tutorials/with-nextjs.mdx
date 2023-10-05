@@ -299,7 +299,7 @@ import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
 export async function GET(req) {
-  const cookieStore = () => cookies()
+  const cookieStore = cookies()
   const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
   const { searchParams } = new URL(req.url)
   const code = searchParams.get('code')
@@ -321,7 +321,7 @@ import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(req: NextRequest) {
-  const cookieStore = () => cookies()
+  const cookieStore = cookies()
   const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
   const { searchParams } = new URL(req.url)
   const code = searchParams.get('code')
@@ -356,7 +356,7 @@ import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
 export async function POST(req) {
-  const cookieStore = () => cookies()
+  const cookieStore = cookies()
   const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
   // Check if we have a session
@@ -383,7 +383,7 @@ import { cookies } from 'next/headers'
 import { type NextRequest, NextResponse } from 'next/server'
 
 export async function POST(req: NextRequest) {
-  const cookieStore = () => cookies()
+  const cookieStore = cookies()
   const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
   // Check if we have a session

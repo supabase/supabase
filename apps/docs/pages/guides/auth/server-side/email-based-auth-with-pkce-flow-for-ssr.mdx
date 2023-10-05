@@ -145,7 +145,7 @@ export async function GET(req) {
   const next = searchParams.get('next') ?? '/'
 
   if (token_hash && type) {
-    const cookieStore = () => cookies()
+    const cookieStore = cookies()
     const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
     const { error } = await supabase.auth.verifyOtp({ type, token_hash })
     if (!error) {
