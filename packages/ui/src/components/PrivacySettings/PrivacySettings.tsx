@@ -1,16 +1,16 @@
 import { PropsWithChildren, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Modal, Toggle } from 'ui'
-import { useConsentValue } from 'common'
+import { useConsentValue, LOCAL_STORAGE_KEYS } from 'common'
 
 const PrivacySettings = ({ children, ...props }: PropsWithChildren<{ className?: string }>) => {
-  const CONSENT_KEY = 'supabase-consent'
   const [isOpen, setIsOpen] = useState(false)
-  const { hasAccepted, handleConsent } = useConsentValue(CONSENT_KEY)
+  const { hasAccepted, handleConsent } = useConsentValue(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
   const [telemetryValue, setTelemetryValue] = useState(hasAccepted)
 
+  // Every time the modal opens, sync state with localStorage
   useEffect(() => {
-    setTelemetryValue(localStorage?.getItem(CONSENT_KEY) === 'true')
+    setTelemetryValue(localStorage?.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT) === 'true')
   }, [isOpen])
 
   const handleConfirmPreferences = () => {
