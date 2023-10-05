@@ -31,7 +31,7 @@ const supabase = createClient(supabaseUrl, supabaseKey)`,
 In this documentation, we will refer to the key using the name \`SUPABASE_KEY\`. You can find the \`anon\` key in the [API settings](/project/[ref]/settings/api) page.`,
     js: (apikey?: string, endpoint?: string) => `
 const SUPABASE_KEY = '${apikey}'
-const SUPABASE_URL = 'https://${endpoint}'
+const SUPABASE_URL = '${endpoint}'
 const supabase = createClient(SUPABASE_URL, process.env.SUPABASE_KEY);`,
     bash: (apikey?: string, endpoint?: string) => `${apikey}`,
   },
