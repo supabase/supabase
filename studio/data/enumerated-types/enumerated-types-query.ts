@@ -4,15 +4,14 @@ import { useCallback } from 'react'
 import { get } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { enumeratedTypesKeys } from './keys'
+import { components } from 'data/api'
 
 export type EnumeratedTypesVariables = {
   projectRef?: string
   connectionString?: string
 }
 
-export type EnumeratedTypesResponse = {
-  id: string
-}
+export type EnumeratedType = components['schemas']['PostgresType']
 
 export async function getEnumeratedTypes(
   { projectRef, connectionString }: EnumeratedTypesVariables,
