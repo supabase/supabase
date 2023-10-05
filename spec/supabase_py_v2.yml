@@ -40,11 +40,15 @@ functions:
         code: |
           ```
           import os
-          from supabase import create_client, Client
+          from supabase import create_client, Client, ClientOptions
 
           url: str = os.environ.get("SUPABASE_URL")
           key: str = os.environ.get("SUPABASE_KEY")
-          supabase: Client = create_client(url, key, options={'timeout': 10})
+          supabase: Client = create_client(url, key, 
+            options=ClientOptions(
+              postgrest_client_timeout=10, 
+              storage_client_timeout=10
+            ))
           ```
 
   - id: sign-up
@@ -335,8 +339,8 @@ functions:
           If your database has foreign key relationships, you can query related tables too.
         code: |
           ```
-          response = supabase.table('countries') \
-            .select('name, cities(name)') \
+          response = supabase.table('countries')
+            .select('name, cities(name)')
             .execute()
           ```
         data:
@@ -372,8 +376,8 @@ functions:
         name: Query foreign tables through a join table
         code: |
           ```
-          response = supabase.table('users') \
-            .select('name, teams(name)') \
+          response = supabase.table('users')
+            .select('name, teams(name)')
             .execute()
           ```
         data:
@@ -433,8 +437,8 @@ functions:
         name: Query the same foreign table multiple times
         code: |
           ```
-          response = supabase.table('messages') \ 
-            .select('content,from:sender_id(name),to:receiver_id(name)') \
+          response = supabase.table('messages') 
+            .select('content,from:sender_id(name),to:receiver_id(name)')
             .execute()
           ```
         data:
@@ -478,9 +482,9 @@ functions:
         name: Filtering through foreign tables
         code: |
           ```
-          response = supabase.table('cities') \
-            .select('name, countries(*)') \
-            .eq('countries.name', 'Estonia') \
+          response = supabase.table('cities')
+            .select('name, countries(*)')
+            .eq('countries.name', 'Estonia')
             .execute()
           ```
         data:
@@ -522,8 +526,8 @@ functions:
         name: Querying foreign table with count
         code: |
           ```
-          response = supabase.table('countries') \
-            .select('*, cities(count)') \
+          response = supabase.table('countries')
+            .select('*, cities(count)')
             .execute()
           ```
         data:
@@ -564,7 +568,9 @@ functions:
         name: Querying with count option
         code: |
           ```
-          response = supabase.table('countries').select('*', count='exact').execute()
+          response = supabase.table('countries')
+            .select('*', count='exact')
+            .execute()
           ```
         data:
           sql: |
@@ -593,8 +599,8 @@ functions:
         name: Querying JSON data
         code: |
           ```
-          response = supabase.table('users') \
-              .select('id, name, address->city') \
+          response = supabase.table('users')
+              .select('id, name, address->city')
               .execute()
           ```
         data:
@@ -630,8 +636,8 @@ functions:
         name: Create a record
         code: |
           ```python
-          data, count = supabase.table('countries') \
-            .insert({"id": 1, "name": "Denmark"}) \
+          data, count = supabase.table('countries')
+            .insert({"id": 1, "name": "Denmark"})
             .execute()
           ```
         data:
@@ -655,9 +661,9 @@ functions:
         name: Updating your data
         code: |
           ```python
-          data, count = supabase.table('countries') \
-            .update({'name': 'Austrailia'}) \
-            .eq('id', 1) \
+          data, count = supabase.table('countries')
+            .update({'name': 'Austrailia'})
+            .eq('id', 1)
             .execute()
           ```
         data:
@@ -686,8 +692,8 @@ functions:
         name: Upsert your data
         code: |
           ```python
-          data, count = supabase.table('countries') \
-            .upsert({'id': 1, 'name': 'Austrailia'}) \
+          data, count = supabase.table('countries')
+            .upsert({'id': 1, 'name': 'Austrailia'})
             .execute()
           ```
         data:
@@ -711,8 +717,8 @@ functions:
         name: Bulk Upsert your data
         code: |
             ```python
-            data, count = supabase.table('countries') \
-              .upsert([{'id': 1, 'name': 'Albania'}, {'id': 2, 'name': 'Algeria'}]) \
+            data, count = supabase.table('countries')
+              .upsert([{'id': 1, 'name': 'Albania'}, {'id': 2, 'name': 'Algeria'}])
               .execute()
             ```
         data:
@@ -746,9 +752,9 @@ functions:
         name: Delete records
         code: |
           ```python
-          data, count = supabase.table('countries') \
-            .delete() \
-            .eq('id', 1) \
+          data, count = supabase.table('countries')
+            .delete()
+            .eq('id', 1)
             .execute()
           ```
         data:
@@ -787,15 +793,15 @@ functions:
         code: |
           ```python
           # Correct
-          data, count = supabase.from('cities') \
-            .select('name, country_id') \
-            .eq('name', 'The Shire') \
+          data, count = supabase.from('cities')
+            .select('name, country_id')
+            .eq('name', 'The Shire')
             .execute()
           
           # Incorrect
-          data, count = supabase.table('cities') \
-            .eq('name', 'The Shire') \
-            .select('name, country_id') \
+          data, count = supabase.table('cities')
+            .eq('name', 'The Shire')
+            .select('name, country_id')
             .execute()
           ```
       - id: chaining-filters
@@ -805,10 +811,10 @@ functions:
           to query cities with population between 1,000 and 10,000.
         code: |
           ```python
-          data, count = supabase.table('cities') \
-            .select('name, country_id') \
-            .gte('population', 1000) \
-            .lt('population', 10000) \
+          data, count = supabase.table('cities')
+            .select('name, country_id')
+            .gte('population', 1000)
+            .lt('population', 10000)
             .execute()
           ```
       - id: conditional-chaining
@@ -838,9 +844,9 @@ functions:
         name: Filter by values within JSON column
         code: |
           ```python
-          data, count = supabase.table('users') \
-            .select('*') \
-            .eq('address->postcode', 90210) \
+          data, count = supabase.table('users')
+            .select('*')
+            .eq('address->postcode', 90210)
             .execute()
           ```
         data:
@@ -867,9 +873,9 @@ functions:
         name: Filter Foreign Tables
         code: |
           ```python
-          data, count = supabase.table('countries') \
-            .select('name, cities!inner(name)') \
-            .eq('cities.name', 'Bali') \
+          data, count = supabase.table('countries')
+            .select('name, cities!inner(name)')
+            .eq('cities.name', 'Bali')
             .execute()
           ```
         data:
@@ -910,9 +916,9 @@ functions:
         name: With `select()`
         code: |
           ```python
-          data, count = supabase.table('countries') \
-            .select('*') \
-            .eq('name', 'Albania') \
+          data, count = supabase.table('countries')
+            .select('*')
+            .eq('name', 'Albania')
             .execute()
           ```
         data:
@@ -941,9 +947,9 @@ functions:
         name: With `select()`
         code: |
           ```python
-            data, count = supabase.table('countries') \
-              .select('*') \
-              .neq('name', 'Albania') \
+            data, count = supabase.table('countries')
+              .select('*')
+              .neq('name', 'Albania')
               .execute()
           ```
         data:
@@ -974,9 +980,9 @@ functions:
         name: With `select()`
         code: |
             ```python
-            data, count = supabase.table('countries') \
-                .select('*') \
-                .gt('id', 2) \
+            data, count = supabase.table('countries')
+                .select('*')
+                .gt('id', 2)
                 .execute()
             ```
         data:
@@ -1008,9 +1014,9 @@ functions:
         name: With `select()`
         code: |
             ```python
-            data, count = supabase.table('countries') \
-              .select('*') \
-              .gte('id', 2) \
+            data, count = supabase.table('countries')
+              .select('*')
+              .gte('id', 2)
               .execute()
             ```
         data:
@@ -1041,9 +1047,9 @@ functions:
         name: With `select()`
         code: |
             ```python
-            data, count = supabase.table('countries') \
-              .select('*') \
-              .lt('id', 2) \
+            data, count = supabase.table('countries')
+              .select('*')
+              .lt('id', 2)
               .execute()
             ```
         data:
@@ -1072,9 +1078,9 @@ functions:
         name: With `select()`
         code: |
           ```python
-          data, count = supabase.table('countries') \
-            .select('*') \
-            .lte('id', 2) \
+          data, count = supabase.table('countries')
+            .select('*')
+            .lte('id', 2)
             .execute()
           ```
         data:
@@ -1105,9 +1111,9 @@ functions:
         name: With `select()`
         code: |
           ```python
-          data, count = supabase.table('countries') \
-            .select('*') \
-            .like('name', '%Alba%') \
+          data, count = supabase.table('countries')
+            .select('*')
+            .like('name', '%Alba%')
             .execute()
           ```
         data:
@@ -1136,9 +1142,9 @@ functions:
         name: With `select()`
         code: |
           ```python
-          data, count = supabase.table('countries') \
-              .select('*') \
-              .ilike('name', '%alba%') \
+          data, count = supabase.table('countries')
+              .select('*')
+              .ilike('name', '%alba%')
               .execute()
           ```
         data:
@@ -1167,9 +1173,9 @@ functions:
         name: Checking for nullness, True or False
         code: |
           ```python
-          data, count = supabase.table('countries') \
-            .select('*') \
-            .is_('name', 'null') \
+          data, count = supabase.table('countries')
+            .select('*')
+            .is_('name', 'null')
             .execute()
           ```
         data:
@@ -1203,9 +1209,9 @@ functions:
         name: With `select()`
         code: |
             ```python
-            data, count = supabase.table('countries') \
-                .select('*') \
-                .in_('name', ['Albania', 'Algeria']) \
+            data, count = supabase.table('countries')
+                .select('*')
+                .in_('name', ['Albania', 'Algeria'])
                 .execute()
             ```
         data:
@@ -1236,9 +1242,9 @@ functions:
         name: On array columns
         code: |
           ```python
-            data, count = supabase.table('issues') \
-              .select('*') \
-              .contains('tags', ['is:open', 'priority:low']) \
+            data, count = supabase.table('issues')
+              .select('*')
+              .contains('tags', ['is:open', 'priority:low'])
               .execute()
           ```
         data:
@@ -1266,9 +1272,9 @@ functions:
         name: On range columns
         code: |
           ```python
-          data, count = supabase.table('reservations') \
-              .select('*') \
-              .contains('during', '[2000-01-01 13:00, 2000-01-01 13:30)') \
+          data, count = supabase.table('reservations')
+              .select('*')
+              .contains('during', '[2000-01-01 13:00, 2000-01-01 13:30)')
               .execute()
           ```
         data:
@@ -1301,9 +1307,9 @@ functions:
         name: On `jsonb` columns
         code: |
           ```python
-          data, count = supabase.table('users') \
-              .select('*') \
-              .contains('address', {'postcode': 90210}) \
+          data, count = supabase.table('users')
+              .select('*')
+              .contains('address', {'postcode': 90210})
               .execute()
           ```
         data:
@@ -1334,9 +1340,9 @@ functions:
         name: On array columns
         code: |
           ```python
-          data, count = supabase.table('classes') \
-            .select('name') \
-            .contained_by('days', ['monday', 'tuesday', 'wednesday', 'friday']) \
+          data, count = supabase.table('classes')
+            .select('name')
+            .contained_by('days', ['monday', 'tuesday', 'wednesday', 'friday'])
             .execute()
           ```
         data:
@@ -1365,9 +1371,9 @@ functions:
         name: On range columns
         code: |
           ```python
-          data, count = supabase.table('reservations') \
-            .select('*') \
-            .contained_by('during', '[2000-01-01 00:00, 2000-01-01 23:59)') \
+          data, count = supabase.table('reservations')
+            .select('*')
+            .contained_by('during', '[2000-01-01 00:00, 2000-01-01 23:59)')
             .execute()
           ```
         data:
@@ -1400,9 +1406,9 @@ functions:
         name: On `jsonb` columns
         code: |
           ```python
-          data, count = supabase.table('users') \
-              .select('name') \
-              .contained_by('address', {}) \
+          data, count = supabase.table('users')
+              .select('name')
+              .contained_by('address', {})
               .execute()
           ```
         data:
@@ -1433,9 +1439,9 @@ functions:
         name: With `select()`
         code: |
           ```python
-          data, count = supabase.table('countries') \
-              .select('*') \
-              .match({'id': 2, 'name': 'Albania'}) \
+          data, count = supabase.table('countries')
+              .select('*')
+              .match({'id': 2, 'name': 'Albania'})
               .execute()
           ```
         data:
@@ -1464,9 +1470,9 @@ functions:
           name: With `select()`
           code: |
             ```python
-            data, count = supabase.table('countries') \
-                .select('*') \
-                .not_.is_('name', 'null') \
+            data, count = supabase.table('countries')
+                .select('*')
+                .not_.is_('name', 'null')
                 .execute()
             ```
           data:
@@ -1496,9 +1502,9 @@ functions:
         name: With `select()`
         code: |
           ```python
-          data, count = supabase.table('countries') \
-              .select('*') \
-              .filter('name', 'in', '("Algeria","Japan")') \
+          data, count = supabase.table('countries')
+              .select('*')
+              .filter('name', 'in', '("Algeria","Japan")')
               .execute()
           ```
         data:
@@ -1524,9 +1530,9 @@ functions:
         name: On a foreign table
         code: |
           ```python
-          data, count = supabase.table('countries') \
-              .select('name, cities!inner (name)') \
-              .filter('cities.name', 'eq', 'Bali') \
+          data, count = supabase.table('countries')
+              .select('name, cities!inner (name)')
+              .filter('cities.name', 'eq', 'Bali')
               .execute()
           ```
         data:
@@ -1577,9 +1583,9 @@ functions:
         name: With `select()`
         code: |
             ```python
-            data, count = supabase.table('countries') \
-              .select('*') \
-              .order('name', desc=True) \
+            data, count = supabase.table('countries')
+              .select('*')
+              .order('name', desc=True)
               .execute()
             ```
         data:
@@ -1611,9 +1617,9 @@ functions:
         name: On a foreign table
         code: |
             ```python
-            data, count = supabase.table('countries') \
-                .select('name, cities(name)') \
-                .order('name', desc=True, foreign_table='cities') \
+            data, count = supabase.table('countries')
+                .select('name, cities(name)')
+                .order('name', desc=True, foreign_table='cities')
                 .execute()
             ```
         data:
@@ -1652,9 +1658,9 @@ functions:
         name: With `select()`
         code: |
           ```python
-          data, count = supabase.table('countries') \
-            .select('*') \
-            .limit(1) \
+          data, count = supabase.table('countries')
+            .select('*')
+            .limit(1)
             .execute()
           ```
         data:
@@ -1680,9 +1686,9 @@ functions:
         name: On a foreign table
         code: |
             ```python
-            data, count = supabase.table('countries') \
-                .select('name, cities(name)') \
-                .limit(1, foreign_table='cities') \
+            data, count = supabase.table('countries')
+                .select('name, cities(name)')
+                .limit(1, foreign_table='cities')
                 .execute()
             ```
         data:
@@ -1719,10 +1725,10 @@ functions:
         name: With `select()`
         code: |
           ```python
-          data, count = supabase.table('countries') \
-            .select('name') \
-            .limit(1) \
-            .single() \
+          data, count = supabase.table('countries')
+            .select('name')
+            .limit(1)
+            .single()
             .execute()
           ```
         data:
@@ -1751,10 +1757,10 @@ functions:
         name: With `select()`
         code: |
           ```python
-          data, count = supabase.table('countries') \
-            .select('*') \
-            .eq('name', 'Albania') \
-            .maybe_single() \
+          data, count = supabase.table('countries')
+            .select('*')
+            .eq('name', 'Albania')
+            .maybe_single()
             .execute()
           ```
         data:
