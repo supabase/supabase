@@ -1,14 +1,22 @@
 import { useParams } from 'common'
-import { Input } from 'ui'
+import { Button, IconCopy, Input } from 'ui'
 
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import ContentSnippet from '../ContentSnippet'
 import { DOCS_CONTENT } from '../ProjectAPIDocs.constants'
 import { ContentProps } from './Content.types'
+import { copyToClipboard } from 'lib/helpers'
+import { useEffect, useState } from 'react'
 
 const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) => {
   const { ref } = useParams()
   const { data } = useProjectApiQuery({ projectRef: ref })
+
+  const [copied, setCopied] = useState<'anon' | 'service'>()
+
+  useEffect(() => {
+    if (copied !== undefined) setTimeout(() => setCopied(undefined), 2000)
+  }, [copied])
 
   const serviceKey = showKeys
     ? data?.autoApiService.serviceApiKey ?? 'SUPABASE_CLIENT_SERVICE_KEY'
@@ -32,11 +40,25 @@ const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) =>
             <Input
               disabled
               readOnly
-              copy
               size="small"
-              value={apikey}
+              value={showKeys ? apikey : 'Reveal API keys via dropdown in the header'}
               className="w-full"
               descriptionText="This key is safe to use in a browser if you have enabled Row Level Security (RLS) for your tables and configured policies."
+              actions={[
+                <Button
+                  key="copy"
+                  type="default"
+                  icon={<IconCopy />}
+                  onClick={() => {
+                    setCopied('anon')
+                    copyToClipboard(
+                      data?.autoApiService.defaultApiKey ?? 'SUPABASE_CLIENT_ANON_KEY'
+                    )
+                  }}
+                >
+                  {copied === 'anon' ? 'Copied' : 'Copy'}
+                </Button>,
+              ]}
             />
           </div>
           <div className="flex space-x-4">
@@ -44,9 +66,8 @@ const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) =>
             <Input
               disabled
               readOnly
-              copy
               size="small"
-              value={serviceKey}
+              value={showKeys ? serviceKey : 'Reveal API keys via dropdown in the header'}
               className="w-full"
               descriptionText={
                 <p>
@@ -54,6 +75,21 @@ const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) =>
                   <span className="text-amber-900">Never share it publicly.</span>
                 </p>
               }
+              actions={[
+                <Button
+                  key="copy"
+                  type="default"
+                  icon={<IconCopy />}
+                  onClick={() => {
+                    setCopied('service')
+                    copyToClipboard(
+                      data?.autoApiService.serviceApiKey ?? 'SUPABASE_CLIENT_SERVICE_KEY'
+                    )
+                  }}
+                >
+                  {copied === 'service' ? 'Copied' : 'Copy'}
+                </Button>,
+              ]}
             />
           </div>
         </div>

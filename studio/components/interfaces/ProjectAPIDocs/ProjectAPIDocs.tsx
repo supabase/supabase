@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import {
   Button,
   CommandGroup_Shadcn_,
@@ -14,6 +14,8 @@ import {
 
 import { useParams } from 'common'
 import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
+import { BASE_PATH } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   Bucket,
@@ -30,17 +32,10 @@ import {
 } from './Content'
 import FirstLevelNav from './FirstLevelNav'
 import SecondLevelNav from './SecondLevelNav'
-import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { BASE_PATH } from 'lib/constants'
 
 const ProjectAPIDocs = () => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
-
-  const { activeDocsSection } = snap
-  useEffect(() => {
-    console.log({ activeDocsSection })
-  }, [activeDocsSection])
 
   const [openKeys, setOpenKeys] = useState(false)
   const [openLanguage, setOpenLanguage] = useState(false)
