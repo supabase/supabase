@@ -4,26 +4,37 @@ import toast from 'react-hot-toast'
 import { ResponseError } from 'types'
 import { enumeratedTypesKeys } from './keys'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { wrapWithTransaction } from 'data/sql/utils/transaction'
 
 export type EnumeratedTypeUpdateVariables = {
   projectRef: string
   connectionString: string
+  originalName: string
   name: string
-  values: string[]
+  values?: string[]
 }
 
-export async function addEnumeratedTypeValue({
+export async function updateEnumeratedType({
   projectRef,
   connectionString,
+  originalName,
   name,
-  values,
+  values = [],
 }: EnumeratedTypeUpdateVariables) {
-  const sql = `insert into ${name} values (${values.map((x) => `'${x}'`).join(', ')})`
+  const statements: string[] = []
+  if (originalName !== name) {
+    statements.push(`alter type ${originalName} rename to ${name};`)
+  }
+  if (values.length > 0) {
+    values.forEach((x) => statements.push(`alter type ${name} add value '${x}';`))
+  }
+
+  const sql = wrapWithTransaction(statements.join(' '))
   const { result } = await executeSql({ projectRef, connectionString, sql })
   return result
 }
 
-type EnumeratedTypeUpdateData = Awaited<ReturnType<typeof addEnumeratedTypeValue>>
+type EnumeratedTypeUpdateData = Awaited<ReturnType<typeof updateEnumeratedType>>
 
 export const useEnumeratedTypeUpdateMutation = ({
   onSuccess,
@@ -36,7 +47,7 @@ export const useEnumeratedTypeUpdateMutation = ({
   const queryClient = useQueryClient()
 
   return useMutation<EnumeratedTypeUpdateData, ResponseError, EnumeratedTypeUpdateVariables>(
-    (vars) => addEnumeratedTypeValue(vars),
+    (vars) => updateEnumeratedType(vars),
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
