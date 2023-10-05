@@ -10,7 +10,7 @@ const DeleteProjectPanel = () => {
   if (project === undefined) return null
 
   return (
-    <section>
+    <section id="delete-project">
       <FormHeader title="Delete Project" description="" />
       <Panel>
         <Panel.Content>

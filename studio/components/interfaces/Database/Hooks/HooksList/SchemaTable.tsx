@@ -21,7 +21,7 @@ const SchemaTable = ({
     <div key={schema} className="">
       <div className="sticky top-0 backdrop-blur backdrop-filter">
         <div className="flex items-baseline space-x-1 py-2">
-          <h5 className="text-scale-1000">schema</h5>
+          <h5 className="text-foreground-light">schema</h5>
           <h4>{schema}</h4>
         </div>
       </div>

@@ -8,7 +8,11 @@ import { format } from 'sql-formatter'
 import {
   AiIconAnimation,
   Button,
-  Dropdown,
+  cn,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   IconCheck,
   IconChevronDown,
   IconCornerDownLeft,
@@ -16,7 +20,6 @@ import {
   IconSettings,
   IconX,
   Input_Shadcn_,
-  cn,
 } from 'ui'
 
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
@@ -704,38 +707,39 @@ const SQLEditor = () => {
                         >
                           {getDiffTypeButtonLabel(selectedDiffType)}
                         </Button>
-                        <Dropdown
-                          align="end"
-                          side="bottom"
-                          overlay={Object.values(DiffType)
-                            .filter((diffType) => diffType !== selectedDiffType)
-                            .map((diffType) => (
-                              <Dropdown.Item
-                                key={diffType}
-                                onClick={() => {
-                                  setSelectedDiffType(diffType)
-                                  switch (diffType) {
-                                    case DiffType.Modification:
-                                      return compareAsModification()
-                                    case DiffType.Addition:
-                                      return compareAsAddition()
-                                    case DiffType.NewSnippet:
-                                      return compareAsNewSnippet()
-                                    default:
-                                      throw new Error(`Unknown diff type '${diffType}'`)
-                                  }
-                                }}
-                              >
-                                {getDiffTypeDropdownLabel(diffType)}
-                              </Dropdown.Item>
-                            ))}
-                        >
-                          <Button
-                            type="primary"
-                            className="rounded-l-none border-l-0 px-[4px] py-[5px]"
-                            icon={<IconChevronDown />}
-                          />
-                        </Dropdown>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              type="primary"
+                              className="rounded-l-none border-l-0 px-[4px] py-[5px] flex"
+                              icon={<IconChevronDown />}
+                            />
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" side="bottom">
+                            {Object.values(DiffType)
+                              .filter((diffType) => diffType !== selectedDiffType)
+                              .map((diffType) => (
+                                <DropdownMenuItem
+                                  key={diffType}
+                                  onClick={() => {
+                                    setSelectedDiffType(diffType)
+                                    switch (diffType) {
+                                      case DiffType.Modification:
+                                        return compareAsModification()
+                                      case DiffType.Addition:
+                                        return compareAsAddition()
+                                      case DiffType.NewSnippet:
+                                        return compareAsNewSnippet()
+                                      default:
+                                        throw new Error(`Unknown diff type '${diffType}'`)
+                                    }
+                                  }}
+                                >
+                                  <p>{getDiffTypeDropdownLabel(diffType)}</p>
+                                </DropdownMenuItem>
+                              ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                       <Button
                         type="alternative"

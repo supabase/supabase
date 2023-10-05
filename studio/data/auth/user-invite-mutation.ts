@@ -1,9 +1,10 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 
 import { post } from 'lib/common/fetch'
 import { ResponseError } from 'types'
 import { API_URL } from 'lib/constants'
+import { authKeys } from './keys'
 
 export type UserInviteVariables = {
   projectRef: string
@@ -26,11 +27,13 @@ export const useUserInviteMutation = ({
   UseMutationOptions<UserInviteData, ResponseError, UserInviteVariables>,
   'mutationFn'
 > = {}) => {
+  const queryClient = useQueryClient()
   return useMutation<UserInviteData, ResponseError, UserInviteVariables>(
     (vars) => inviteUser(vars),
     {
       async onSuccess(data, variables, context) {
-        // [Joshen] If we need to invalidate any queries
+        const { projectRef } = variables
+        await queryClient.invalidateQueries(authKeys.users(projectRef))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

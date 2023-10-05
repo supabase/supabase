@@ -21,7 +21,8 @@
     "dev:docs": "turbo run dev --filter=docs --parallel",
     "dev:www": "turbo run dev --filter=www --parallel",
     "lint": "turbo run lint",
-    "format": "prettier --write \"apps/**/*.{js,jsx,ts,tsx,css,md,mdx,json}\"",
+    "typecheck": "turbo --continue typecheck",
+    "format": "prettier --write \"{apps,studio}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}\"",
     "docker:dev": "cd docker && docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml up --renew-anon-volumes",
     "docker:up": "cd docker && docker compose up",
     "docker:down": "cd docker && docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml down --remove-orphans",
@@ -64,5 +65,8 @@
   ],
   "volta": {
     "node": "18.17.1"
+  },
+  "dependencies": {
+    "next-themes": "^0.2.1"
   }
 }

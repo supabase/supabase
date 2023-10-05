@@ -44,12 +44,12 @@ export type ForeignTableData = Awaited<ReturnType<typeof getForeignTable>>
 export type ForeignTableError = unknown
 
 export const useForeignTableQuery = <TData = ForeignTableData>(
-  { projectRef, id }: ForeignTableVariables,
+  { projectRef, connectionString, id }: ForeignTableVariables,
   { enabled = true, ...options }: UseQueryOptions<ForeignTableData, ForeignTableError, TData> = {}
 ) =>
   useQuery<ForeignTableData, ForeignTableError, TData>(
     foreignTableKeys.foreignTable(projectRef, id),
-    ({ signal }) => getForeignTable({ projectRef, id }, signal),
+    ({ signal }) => getForeignTable({ projectRef, connectionString, id }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined',
       ...options,

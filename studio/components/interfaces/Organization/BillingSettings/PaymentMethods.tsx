@@ -6,7 +6,10 @@ import {
   Alert,
   Badge,
   Button,
-  Dropdown,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   IconCreditCard,
   IconMoreHorizontal,
   IconPlus,
@@ -135,7 +138,7 @@ const PaymentMethods = () => {
             footer={
               <div className="flex w-full justify-between">
                 {!canUpdatePaymentMethods ? (
-                  <p className="text-sm text-scale-1000">
+                  <p className="text-sm text-foreground-light">
                     You need additional permissions to manage this organization's payment methods
                   </p>
                 ) : (
@@ -203,7 +206,7 @@ const PaymentMethods = () => {
                                         'w-48 border border-scale-200 text-center', //border
                                       ].join(' ')}
                                     >
-                                      <span className="text-xs text-scale-1200">
+                                      <span className="text-xs text-foreground">
                                         Your default payment method cannot be deleted
                                       </span>
                                     </div>
@@ -211,30 +214,30 @@ const PaymentMethods = () => {
                                 </Tooltip.Portal>
                               </Tooltip.Root>
                             ) : (
-                              <Dropdown
-                                size="tiny"
-                                overlay={[
-                                  <Dropdown.Item
+                              <DropdownMenu>
+                                <DropdownMenuTrigger>
+                                  <Button
+                                    type="outline"
+                                    icon={<IconMoreHorizontal />}
+                                    loading={isLoadingPaymentMethods}
+                                    className="hover:border-gray-500"
+                                  />
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                  <DropdownMenuItem
                                     key="make-default"
                                     onClick={() => setSelectedMethodForDefault(paymentMethod)}
                                   >
-                                    Make default
-                                  </Dropdown.Item>,
-                                  <Dropdown.Item
+                                    <p>Make default</p>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
                                     key="delete-method"
                                     onClick={() => setSelectedMethodToDelete(paymentMethod)}
                                   >
-                                    Delete
-                                  </Dropdown.Item>,
-                                ]}
-                              >
-                                <Button
-                                  type="outline"
-                                  icon={<IconMoreHorizontal />}
-                                  loading={isLoadingPaymentMethods}
-                                  className="hover:border-gray-500"
-                                />
-                              </Dropdown>
+                                    <p>Delete</p>
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             )}
                           </>
                         )}

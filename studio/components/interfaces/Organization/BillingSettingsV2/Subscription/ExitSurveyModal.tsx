@@ -140,7 +140,7 @@ const ExitSurveyModal = ({ visible, subscription, onClose }: ExitSurveyModalProp
       >
         <Modal.Content>
           <div className="py-6 space-y-4">
-            <p className="text-sm text-scale-1100">
+            <p className="text-sm text-foreground-light">
               We always strive to improve Supabase as much as we can. Please let us know the reasons
               you are canceling your subscription so that we can improve in the future.
             </p>
@@ -158,7 +158,7 @@ const ExitSurveyModal = ({ visible, subscription, onClose }: ExitSurveyModalProp
                       ${
                         active
                           ? ` bg-scale-1200 text-scale-100 opacity-100 hover:bg-opacity-75`
-                          : ` bg-scale-700 text-scale-1200 opacity-25 hover:opacity-50`
+                          : ` bg-scale-700 text-foreground opacity-25 hover:opacity-50`
                       }
                   `}
                     >
@@ -200,7 +200,7 @@ const ExitSurveyModal = ({ visible, subscription, onClose }: ExitSurveyModalProp
         </Modal.Content>
 
         <div className="flex items-center justify-between border-t px-4 py-4">
-          <p className="text-xs text-scale-900">
+          <p className="text-xs text-foreground-lighter">
             The unused amount for the remaining of your billing cycle will be refunded as credits
           </p>
           <div className="flex items-center space-x-2">
