@@ -38,7 +38,7 @@ const ProjectCard = ({
         className="h-44 !px-0 group pt-5 pb-0"
         title={
           <div className="w-full justify-between space-y-1.5 px-5">
-            <p className="flex-shrink truncate text-sm">{name}</p>
+            <p className="flex-shrink truncate text-sm pr-4">{name}</p>
             <span className="text-sm lowercase text-foreground-light">{desc}</span>
             <div className="flex items-center space-x-1.5">
               {isVercelIntegrated && (
