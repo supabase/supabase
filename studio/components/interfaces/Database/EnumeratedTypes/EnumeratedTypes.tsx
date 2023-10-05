@@ -22,11 +22,13 @@ import {
   Input,
 } from 'ui'
 import DeleteEnumeratedTypeModal from './DeleteEnumeratedTypeModal'
+import CreateEnumeratedTypeSidePanel from './CreateEnumeratedTypeSidePanel'
 
 const EnumeratedTypes = () => {
   const { project } = useProjectContext()
   const [search, setSearch] = useState('')
   const [selectedSchema, setSelectedSchema] = useState('public')
+  const [showCreateTypePanel, setShowCreateTypePanel] = useState(false)
   const [selectedTypeToDelete, setSelectedTypeToDelete] = useState<EnumeratedType>()
 
   const { data, error, isLoading, isError, isSuccess } = useEnumeratedTypesQuery({
@@ -61,7 +63,7 @@ const EnumeratedTypes = () => {
             icon={<IconSearch size={14} />}
           />
         </div>
-        <Button type="primary" onClick={() => {}} disabled={false}>
+        <Button type="primary" onClick={() => setShowCreateTypePanel(true)}>
           Create type
         </Button>
       </div>
@@ -126,7 +128,7 @@ const EnumeratedTypes = () => {
                           <DropdownMenuContent side="bottom" align="end" className="w-32">
                             <DropdownMenuItem className="space-x-2" onClick={() => {}}>
                               <IconPlus size="tiny" />
-                              <p>Edit type</p>
+                              <p>Add values</p>
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="space-x-2"
@@ -145,6 +147,11 @@ const EnumeratedTypes = () => {
           }
         />
       )}
+
+      <CreateEnumeratedTypeSidePanel
+        visible={showCreateTypePanel}
+        onClose={() => setShowCreateTypePanel(false)}
+      />
 
       <DeleteEnumeratedTypeModal
         visible={selectedTypeToDelete !== undefined}
