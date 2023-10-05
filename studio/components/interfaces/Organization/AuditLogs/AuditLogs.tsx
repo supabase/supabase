@@ -208,35 +208,37 @@ const AuditLogs = () => {
             </div>
           )}
 
-          {isError && error.message.endsWith('') ? (
-            <Alert_Shadcn_
-              variant="default"
-              title="Organization audit logs are not available for Free or Pro organizations"
-            >
-              <IconAlertTriangle className="h-4 w-4 mt-3" />
-              <div className="flex flex-row pt-3 pb-2">
-                <div className="grow">
-                  <AlertTitle_Shadcn_>
-                    Organization audit logs are not available for free or pro organizations
-                  </AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_ className="flex flex-row justify-between gap-3">
-                    <p>
-                      Upgrade to Team or Enterprise to view up to 28 days of audit logs for your
-                      organization.
-                    </p>
-                  </AlertDescription_Shadcn_>
-                </div>
+          {isError ? (
+            error.message.endsWith('upgrade to team or enterprise plan to access audit logs.') ? (
+              <Alert_Shadcn_
+                variant="default"
+                title="Organization audit logs are not available for Free or Pro organizations"
+              >
+                <IconAlertTriangle className="h-4 w-4 mt-3" />
+                <div className="flex flex-row pt-3 pb-2">
+                  <div className="grow">
+                    <AlertTitle_Shadcn_>
+                      Organization audit logs are not available for free or pro organizations
+                    </AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_ className="flex flex-row justify-between gap-3">
+                      <p>
+                        Upgrade to Team or Enterprise to view up to 28 days of audit logs for your
+                        organization.
+                      </p>
+                    </AlertDescription_Shadcn_>
+                  </div>
 
-                <div className="flex items-center">
-                  <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
-                    <Button type="primary">Upgrade subscription</Button>
-                  </Link>
+                  <div className="flex items-center">
+                    <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
+                      <Button type="primary">Upgrade subscription</Button>
+                    </Link>
+                  </div>
                 </div>
-              </div>
-            </Alert_Shadcn_>
-          ) : (
-            <AlertError error={error} subject="Failed to retrieve audit logs" />
-          )}
+              </Alert_Shadcn_>
+            ) : (
+              <AlertError error={error} subject="Failed to retrieve audit logs" />
+            )
+          ) : null}
 
           {isSuccess && (
             <>
