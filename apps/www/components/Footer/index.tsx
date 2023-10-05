@@ -27,14 +27,13 @@ const Footer = (props: Props) => {
         Footer
       </h2>
       <div className="w-full !py-0">
-        <SectionContainer className="grid grid-cols-2 md:flex items-center justify-between md:justify-center gap-8 md:gap-10 !py-6 md:!py-10 text-sm">
+        <SectionContainer className="grid grid-cols-2 md:flex items-center justify-between md:justify-center gap-8 md:gap-16 xl:gap-28 !py-6 md:!py-10 text-sm">
           <div className="flex flex-col md:flex-row gap-2 md:items-center">
             We protect your data.
             <Link href="/security">
               <a className="text-brand hover:underline">More on Security</a>
             </Link>
           </div>
-          <span className="hidden md:block h-px w-8 bg-border" />
           <ul className="flex flex-col md:flex-row gap-2 md:gap-8 justify-center md:items-center">
             <li className="flex items-center gap-2 whitespace-nowrap flex-nowrap">
               <CheckIcon className="w-4 h-4" /> SOC2 Type 2{' '}
