@@ -1,7 +1,7 @@
 # Tailwind theming
 
 Supabase is migrating to use tailwind classes that use CSS properties.
-This is to support the concept of theming, so that
+This is to support the concept of theming, so that:
 
 1. It is easy for the team to update the theme without changing 100s of files.
 2. It means we could offer custom or additional themes in future.
