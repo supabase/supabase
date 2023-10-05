@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Button,
   CommandGroup_Shadcn_,
@@ -36,6 +36,11 @@ import { BASE_PATH } from 'lib/constants'
 const ProjectAPIDocs = () => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
+
+  const { activeDocsSection } = snap
+  useEffect(() => {
+    console.log({ activeDocsSection })
+  }, [activeDocsSection])
 
   const [openKeys, setOpenKeys] = useState(false)
   const [openLanguage, setOpenLanguage] = useState(false)

@@ -33,7 +33,7 @@ const ContentSnippet = ({
 
   return (
     <div id={snippet.key} className="space-y-4 py-6 pb-2 last:pb-6">
-      <div className="px-4 space-y-2">
+      <div className="px-4 space-y-4">
         <h2 className="doc-heading">{snippet.title}</h2>
         {snippet.description !== undefined && (
           <div className="doc-section">

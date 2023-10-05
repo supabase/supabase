@@ -13,7 +13,7 @@ export const DOCS_CONTENT = {
     key: 'introduction',
     category: 'introduction',
     title: `Connect to your project`,
-    description: `Projects have a RESTful endpoint that you can use with your project's API key to query and manage your database. We recommend setting your keys as environment variables.`,
+    description: `Projects have a RESTful endpoint that you can use with your project's API key to query and manage your database. Put these keys in your .env file.`,
     js: (apikey?: string, endpoint?: string) => `
 import { createClient } from '@supabase/supabase-js'
 
@@ -26,7 +26,7 @@ const supabase = createClient(supabaseUrl, supabaseKey)`,
     key: 'client-api-keys',
     category: 'introduction',
     title: `Client API Keys`,
-    description: `Client keys allow "anonymous access" to your database, until the user has logged in. After logging in the keys will switch to the user's own login token.
+    description: `Client keys allow "anonymous access" to your database, until the user has logged in. After logging in, the keys will switch to the user's own login token.
 
 In this documentation, we will refer to the key using the name \`SUPABASE_KEY\`. You can find the \`anon\` key in the [API settings](/project/[ref]/settings/api) page.`,
     js: (apikey?: string, endpoint?: string) => `
@@ -40,8 +40,8 @@ const supabase = createClient(SUPABASE_URL, process.env.SUPABASE_KEY);`,
     category: 'introduction',
     title: `Service Keys`,
     description: `Service keys have *FULL* access to your data, bypassing any security policies. Be VERY careful where you expose these keys. They should only be used on a server and never on a client or browser.
-  
-In this documentation, we will refer to the key using the name \`SERVICE_KEY\`. You can find the \`service_role\` in the [API settings](/project/[ref]/settings/api) page.`,
+
+In this documentation, we refer to the key using the name \`SERVICE_KEY\`. You can find the \`service_role\` key above or in the [API settings](/project/[ref]/settings/api) page.`,
     js: (apikey?: string, endpoint?: string) => `
 const SUPABASE_KEY = '${apikey}'
 const SUPABASE_URL = 'https://${endpoint}'
@@ -1046,7 +1046,7 @@ Delete files within the bucket. RLS policy permissions required:
 const { data, error } = await supabase
   .storage
   .from('${name}')
-  .remove(['folder/avatar1.png']) 
+  .remove(['folder/avatar1.png'])
         `,
       },
     ],
@@ -1074,7 +1074,7 @@ const { data, error } = await supabase
     limit: 100,
     offset: 0,
     sortBy: { column: 'name', order: 'asc' },
-  })    
+  })
         `,
       },
     ],

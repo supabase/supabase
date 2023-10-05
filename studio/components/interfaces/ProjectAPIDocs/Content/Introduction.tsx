@@ -23,7 +23,7 @@ const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) =>
         snippet={DOCS_CONTENT.init}
       >
         <div className="px-4 space-y-6">
-          <div className="flex space-x-4">
+          <div className="flex space-x-4 mt-8">
             <p className="text-sm w-40">Project URL</p>
             <Input disabled readOnly copy size="small" value={endpoint} className="w-full" />
           </div>
@@ -36,7 +36,7 @@ const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) =>
               size="small"
               value={apikey}
               className="w-full"
-              descriptionText="This key is safe to use in a browser if you have enabled Row Level Security (RLS) for your tables and configured policies. You may also use the service key which can be found here to bypass RLS."
+              descriptionText="This key is safe to use in a browser if you have enabled Row Level Security (RLS) for your tables and configured policies."
             />
           </div>
           <div className="flex space-x-4">
