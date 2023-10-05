@@ -1,14 +1,10 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useParams } from 'common'
-import { useFlag } from 'hooks'
-import { IS_PLATFORM } from 'lib/constants'
-import { detectOS } from 'lib/helpers'
 import { isUndefined } from 'lodash'
 import { FlaskConical } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
   DropdownMenu,
@@ -21,12 +17,19 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   IconCommand,
+  IconFileText,
   IconHome,
   IconSearch,
   IconSettings,
   IconUser,
   useCommandMenu,
 } from 'ui'
+
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useFlag } from 'hooks'
+import { IS_PLATFORM } from 'lib/constants'
+import { detectOS } from 'lib/helpers'
+import { useAppStateSnapshot } from 'state/app-state'
 import { useProjectContext } from '../ProjectContext'
 import {
   generateOtherRoutes,
@@ -47,11 +50,12 @@ const NavigationBar = () => {
   const navLayoutV2 = useFlag('navigationLayoutV2')
   const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
   const showFeaturePreviews = useFlag('featurePreviews')
+  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
 
   const activeRoute = router.pathname.split('/')[3]
   const toolRoutes = generateToolRoutes(projectRef, project, supabaseAIEnabled)
   const productRoutes = generateProductRoutes(projectRef, project)
-  const otherRoutes = generateOtherRoutes(projectRef, project)
+  const otherRoutes = generateOtherRoutes(projectRef, project, isNewAPIDocsEnabled)
 
   return (
     <div
@@ -109,6 +113,35 @@ const NavigationBar = () => {
       </ul>
       {!navLayoutV2 && (
         <ul className="flex flex-col space-y-4 items-center">
+          {isNewAPIDocsEnabled && (
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger asChild>
+                <Button
+                  type="text"
+                  size="tiny"
+                  onClick={() => snap.setShowProjectApiDocs(true)}
+                  className="border-none"
+                >
+                  <div className="py-1">
+                    <IconFileText size={18} strokeWidth={2} className="text-foreground-lighter" />
+                  </div>
+                </Button>
+              </Tooltip.Trigger>
+              <Tooltip.Portal>
+                <Tooltip.Content side="right">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded py-1 px-2 leading-none shadow text-xs',
+                      'border border-scale-200 flex items-center space-x-1',
+                    ].join(' ')}
+                  >
+                    Project API Docs
+                  </div>
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            </Tooltip.Root>
+          )}
           {IS_PLATFORM && (
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger asChild>
@@ -168,7 +201,7 @@ const NavigationBar = () => {
                       onSelect={() => snap.setShowFeaturePreviewModal(true)}
                     >
                       <FlaskConical size={14} strokeWidth={2} />
-                      <p className="text">Feature previews</p>
+                      <p>Feature previews</p>
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuSeparator />
