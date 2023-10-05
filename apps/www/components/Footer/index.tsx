@@ -23,7 +23,7 @@ const Footer = (props: Props) => {
 
   return (
     <footer
-      className={['border-scale-500 dark:border-scale-600 border-t', props.className].join(' ')}
+      className={['border-border border-t', props.className].join(' ')}
       aria-labelledby="footerHeading"
     >
       <h2 id="footerHeading" className="sr-only">
@@ -72,7 +72,7 @@ const Footer = (props: Props) => {
             <div className="flex space-x-5">
               <a
                 href="https://twitter.com/supabase"
-                className="text-scale-900 hover:text-scale-1200 transition"
+                className="text-lighter hover:text-strong transition"
               >
                 <span className="sr-only">Twitter</span>
                 <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -82,7 +82,7 @@ const Footer = (props: Props) => {
 
               <a
                 href="https://github.com/supabase"
-                className="text-scale-900 hover:text-scale-1200 transition"
+                className="text-lighter hover:text-strong transition"
               >
                 <span className="sr-only">GitHub</span>
                 <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -96,7 +96,7 @@ const Footer = (props: Props) => {
 
               <a
                 href="https://discord.supabase.com/"
-                className="text-scale-900 hover:text-scale-1200 transition"
+                className="text-lighter hover:text-strong transition"
               >
                 <span className="sr-only">Discord</span>
                 <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 71 55" aria-hidden="true">
@@ -110,7 +110,7 @@ const Footer = (props: Props) => {
 
               <a
                 href="https://youtube.com/c/supabase"
-                className="text-scale-900 hover:text-scale-1200 transition"
+                className="text-lighter hover:text-strong transition"
               >
                 <span className="sr-only">Youtube</span>
                 <svg
@@ -129,15 +129,15 @@ const Footer = (props: Props) => {
               {footerData.map((segment) => {
                 return (
                   <div key={`footer_${segment.title}`}>
-                    <h6 className="text-scale-1200 overwrite text-base">{segment.title}</h6>
+                    <h6 className="text-strong overwrite text-base">{segment.title}</h6>
                     <ul className="mt-4 space-y-2">
                       {segment.links.map(({ component: Component, ...link }, idx) => {
                         const children = (
                           <div
                             className={`text-sm transition-colors ${
                               link.url || Component
-                                ? 'text-scale-1100 hover:text-scale-1200'
-                                : 'text-scale-900 hover:text-scale-900'
+                                ? 'text-lighter hover:text-strong'
+                                : 'text-muted hover:text-lighter'
                             } `}
                           >
                             {link.text}
@@ -174,7 +174,7 @@ const Footer = (props: Props) => {
             </div>
           </div>
         </div>
-        <div className="border-scale-500 dark:border-scale-600 mt-32 flex justify-between border-t pt-8">
+        <div className="border-border mt-32 flex justify-between border-t pt-8">
           <small className="small">&copy; Supabase Inc</small>
           <ThemeToggle forceDark={isLaunchWeekPage} />
         </div>
