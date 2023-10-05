@@ -52,6 +52,39 @@ Accuracy was 0.99 for benchmarks.
 </TabPanel>
 </Tabs>
 
+### 960 Dimensions
+
+This benchmark uses the [gist-960](http://corpus-texmex.irisa.fr/) dataset, which contains 1,000,000 embeddings of images. Each embedding is 960 dimensions.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="openai1536"
+  queryGroup="benchmark"
+>
+<TabPanel id="openai1536" label="OpenAI-1536">
+
+| Plan    | Vectors   | m   | ef_construction | ef_search | QPS  | Latency Mean | Latency p95 | RAM Usage     | RAM    |
+| ------- | --------- | --- | --------------- | --------- | ---- | ------------ | ----------- | ------------- | ------ |
+| Starter | 30,000    | 16  | 64              | 65        | 430  | 0.024 sec    | 0.034 sec   | 1.2 GB (Swap) | 1 GB   |
+| Small   | 100,000   | 32  | 80              | 60        | 260  | 0.040 sec    | 0.054 sec   | 2.2 GB (Swap) | 2 GB   |
+| Medium  | 250,000   | 32  | 80              | 90        | 120  | 0.083 sec    | 0.106 sec   | 4 GB          | 4 GB   |
+| Large   | 500,000   | 32  | 80              | 120       | 160  | 0.063 sec    | 0.087 sec   | 7 GB          | 8 GB   |
+| XL      | 1,000,000 | 32  | 80              | 200       | 200  | 0.049 sec    | 0.072 sec   | 13 GB         | 16 GB  |
+| 2XL     | 1,000,000 | 32  | 80              | 200       | 340  | 0.025 sec    | 0.029 sec   | 17 GB         | 32 GB  |
+| 4XL     | 1,000,000 | 32  | 80              | 200       | 630  | 0.031 sec    | 0.050 sec   | 18 GB         | 64 GB  |
+| 8XL     | 1,000,000 | 32  | 80              | 200       | 1100 | 0.034 sec    | 0.048 sec   | 19 GB         | 128 GB |
+| 12XL    | 1,000,000 | 32  | 80              | 200       | 1420 | 0.041 sec    | 0.095 sec   | 21 GB         | 192 GB |
+| 16XL    | 1,000,000 | 32  | 80              | 200       | 1650 | 0.037 sec    | 0.081 sec   | 23 GB         | 256 GB |
+
+Accuracy was 0.99 for benchmarks.
+
+QPS can also be improved by increasing [`m` and `ef_construction`](/docs/guides/ai/going-to-prod#hnsw-understanding-efconstruction--efsearch--and-m). This will allow you to use a smaller value for `ef_search` and increase QPS.
+
+</TabPanel>
+</Tabs>
+
 ### 1536 Dimensions
 
 This benchmark uses the [dbpedia-entities-openai-1M](https://huggingface.co/datasets/KShivendu/dbpedia-entities-openai-1M) dataset, which contains 1,000,000 embeddings of text. And 224,482 embeddings from [Wikipedia articles](https://huggingface.co/datasets/Supabase/wikipedia-en-embeddings) for compute add-ons `large` and below. Each embedding is 1536 dimensions created with the [OpenAI Embeddings API](https://platform.openai.com/docs/guides/embeddings).
@@ -153,7 +186,7 @@ This benchmark uses the dbpedia-entities-openai-1M dataset containing 1,000,000 
 
 ### 960 Dimensions
 
-This benchmark uses the [gist-960-angular](http://corpus-texmex.irisa.fr/) dataset, which contains 1,000,000 embeddings of images. Each embedding is 960 dimensions.
+This benchmark uses the [gist-960](http://corpus-texmex.irisa.fr/) dataset, which contains 1,000,000 embeddings of images. Each embedding is 960 dimensions.
 
 <Tabs
   scrollable
