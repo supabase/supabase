@@ -55,8 +55,10 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { RootStore } from 'stores'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
-import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreviewContext'
-import FeaturePreviewModal from 'components/interfaces/App/FeaturePreviewModal'
+import {
+  FeaturePreviewContextProvider,
+  FeaturePreviewModal,
+} from 'components/interfaces/App/FeaturePreview'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
