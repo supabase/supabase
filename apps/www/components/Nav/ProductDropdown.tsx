@@ -31,10 +31,10 @@ const ProductDropdown = () => {
           </NavigationMenuLink>
         ))}
       </ul>
-      <div className="border-t xl:border-t-0 xl:border-l grid grid-cols-3 xl:flex xl:flex-col w-full xl:w-[500px] bg-alternative">
-        <div className="col-span-2 xl:w-auto py-8 px-10">
+      <div className="border-t xl:border-t-0 xl:border-l py-8 px-10 gap-2 xl:gap-8 grid grid-cols-3 xl:flex xl:flex-col w-full xl:w-[500px] bg-alternative">
+        <div className="col-span-2 xl:w-auto">
           <Link href="/customers">
-            <a className="inline-flex items-center gap-1 text-lighter hover:text-brand text-xs uppercase tracking-widest font-mono mb-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm focus-visible:text-brand">
+            <a className="flex items-center gap-1 text-lighter hover:text-brand text-xs uppercase tracking-widest font-mono mb-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm focus-visible:text-brand">
               Customer Stories
               <IconChevronRight className="h-3 w-3" />
             </a>
@@ -64,7 +64,7 @@ const ProductDropdown = () => {
             ))}
           </ul>
         </div>
-        <div className="pt-8 xl:pt-2 pl-0 pr-10 pb-8 xl:pl-10">
+        <div>
           <p className="text-lighter text-xs uppercase tracking-widest font-mono mb-6">
             {ComparisonsData.label}
           </p>
