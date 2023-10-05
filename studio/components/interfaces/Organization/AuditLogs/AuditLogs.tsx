@@ -212,13 +212,13 @@ const AuditLogs = () => {
             error.message.endsWith('upgrade to team or enterprise plan to access audit logs.') ? (
               <Alert_Shadcn_
                 variant="default"
-                title="Organization audit logs are not available for Free or Pro organizations"
+                title="Organization Audit Logs are not available on Free or Pro plans"
               >
                 <IconAlertTriangle className="h-4 w-4 mt-3" />
                 <div className="flex flex-row pt-3 pb-2">
                   <div className="grow">
                     <AlertTitle_Shadcn_>
-                      Organization audit logs are not available for Free or Pro organizations
+                      Organization Audit Logs are not available on Free or Pro plans
                     </AlertTitle_Shadcn_>
                     <AlertDescription_Shadcn_ className="flex flex-row justify-between gap-3">
                       <p>
