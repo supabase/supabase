@@ -1298,4 +1298,4 @@ export const sqlAiDisclaimerComment = stripIndent`
 
 export const untitledSnippetTitle = 'Untitled query'
 
-export const destructiveSqlRegex = [/(drop|delete|truncate)\s/i]
+export const destructiveSqlRegex = [/^(.*;)?\s*(drop|delete|truncate)\s/is]
