@@ -218,7 +218,7 @@ const AuditLogs = () => {
                 <div className="flex flex-row pt-3 pb-2">
                   <div className="grow">
                     <AlertTitle_Shadcn_>
-                      Organization audit logs are not available for free or pro organizations
+                      Organization audit logs are not available for Free or Pro organizations
                     </AlertTitle_Shadcn_>
                     <AlertDescription_Shadcn_ className="flex flex-row justify-between gap-3">
                       <p>
