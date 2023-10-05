@@ -72,7 +72,7 @@ const Footer = (props: Props) => {
             <div className="flex space-x-5">
               <a
                 href="https://twitter.com/supabase"
-                className="text-lighter hover:text-strong transition"
+                className="text-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">Twitter</span>
                 <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -82,7 +82,7 @@ const Footer = (props: Props) => {
 
               <a
                 href="https://github.com/supabase"
-                className="text-lighter hover:text-strong transition"
+                className="text-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">GitHub</span>
                 <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -96,7 +96,7 @@ const Footer = (props: Props) => {
 
               <a
                 href="https://discord.supabase.com/"
-                className="text-lighter hover:text-strong transition"
+                className="text-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">Discord</span>
                 <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 71 55" aria-hidden="true">
@@ -110,7 +110,7 @@ const Footer = (props: Props) => {
 
               <a
                 href="https://youtube.com/c/supabase"
-                className="text-lighter hover:text-strong transition"
+                className="text-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">Youtube</span>
                 <svg
@@ -129,14 +129,14 @@ const Footer = (props: Props) => {
               {footerData.map((segment) => {
                 return (
                   <div key={`footer_${segment.title}`}>
-                    <h6 className="text-strong overwrite text-base">{segment.title}</h6>
+                    <h6 className="text-foreground overwrite text-base">{segment.title}</h6>
                     <ul className="mt-4 space-y-2">
                       {segment.links.map(({ component: Component, ...link }, idx) => {
                         const children = (
                           <div
                             className={`text-sm transition-colors ${
                               link.url || Component
-                                ? 'text-lighter hover:text-strong'
+                                ? 'text-lighter hover:text-foreground'
                                 : 'text-muted hover:text-lighter'
                             } `}
                           >
