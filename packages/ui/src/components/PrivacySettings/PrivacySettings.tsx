@@ -1,16 +1,17 @@
 import { PropsWithChildren, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { useConsentValue } from 'common'
 import { Modal, Toggle } from 'ui'
+import { useConsentValue } from 'common'
 
 const PrivacySettings = ({ children, ...props }: PropsWithChildren<{ className?: string }>) => {
-  const { consentValue, hasAccepted, handleConsent } = useConsentValue('supabase-consent')
-  const [telemetryValue, setTelemetryValue] = useState(hasAccepted)
+  const CONSENT_KEY = 'supabase-consent'
   const [isOpen, setIsOpen] = useState(false)
+  const { hasAccepted, handleConsent } = useConsentValue(CONSENT_KEY)
+  const [telemetryValue, setTelemetryValue] = useState(hasAccepted)
 
   useEffect(() => {
-    setTelemetryValue(hasAccepted)
-  }, [isOpen, consentValue])
+    setTelemetryValue(localStorage?.getItem(CONSENT_KEY) === 'true')
+  }, [isOpen])
 
   const handleConfirmPreferences = () => {
     handleConsent && handleConsent(telemetryValue ? 'true' : 'false')
@@ -27,6 +28,7 @@ const PrivacySettings = ({ children, ...props }: PropsWithChildren<{ className?:
       <button {...props} onClick={() => setIsOpen(true)}>
         {children}
       </button>
+
       <Modal
         closable
         visible={isOpen}
