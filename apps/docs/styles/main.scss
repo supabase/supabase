@@ -282,3 +282,7 @@ div[role='tablist'] {
   position: relative !important;
   height: unset !important;
 }
+
+.introduction-padding > article:first-child > div:first-child {
+  padding-top: 64px;
+}

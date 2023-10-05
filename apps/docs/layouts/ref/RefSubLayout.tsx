@@ -52,7 +52,7 @@ interface ISectionExamples {}
 
 const RefSubLayout: FC<RefSubLayoutType> & RefSubLayoutSubComponents = (props) => {
   return (
-    <div className="flex flex-col w-full divide-y px-5 max-w-7xl mx-auto py-16">
+    <div className="flex flex-col w-full divide-y px-5 max-w-7xl mx-auto pb-16 introduction-padding">
       {props.children}
     </div>
   )
