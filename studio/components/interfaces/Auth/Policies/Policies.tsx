@@ -8,10 +8,12 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { IconHelpCircle } from 'ui'
 
+import { useQueryClient } from '@tanstack/react-query'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import InformationBox from 'components/ui/InformationBox'
+import { tableKeys } from 'data/tables/keys'
 
 interface PoliciesProps {
   tables: PostgresTable[]
@@ -24,6 +26,7 @@ const Policies = ({ tables, hasTables, isLocked }: PoliciesProps) => {
   const { ref } = useParams()
 
   const { ui, meta } = useStore()
+  const queryClient = useQueryClient()
   const roles = meta.roles.list((role: PostgresRole) => !meta.roles.systemRoles.includes(role.name))
 
   const [selectedSchemaAndTable, setSelectedSchemaAndTable] = useState<any>({})
@@ -76,6 +79,8 @@ const Policies = ({ tables, hasTables, isLocked }: PoliciesProps) => {
         category: 'error',
         message: `Failed to toggle RLS: ${res.error.message}`,
       })
+    } else {
+      queryClient.invalidateQueries(tableKeys.list(ref, selectedSchemaAndTable.schema))
     }
     closeConfirmModal()
   }
