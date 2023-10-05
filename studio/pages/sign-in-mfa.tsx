@@ -32,7 +32,9 @@ const SignInMfaPage: NextPageWithLayout = () => {
           const { data, error } = await auth.mfa.getAuthenticatorAssuranceLevel()
           if (error) {
             // if there was a problem signing in via the url, don't redirect
-            toast.error(`Failed to retrieve assurance level: ${error.message}. Please try signing in again`)
+            toast.error(
+              `Failed to retrieve assurance level: ${error.message}. Please try signing in again`
+            )
             setLoading(false)
             return router.push('/sign-in')
           }
