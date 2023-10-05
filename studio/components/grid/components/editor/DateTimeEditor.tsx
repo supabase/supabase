@@ -2,6 +2,7 @@ import { ChangeEvent } from 'react'
 import { EditorProps } from '@supabase/react-data-grid'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
+import moment from 'moment'
 
 dayjs.extend(customParseFormat)
 
@@ -28,10 +29,13 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
 
   function onChange(event: ChangeEvent<HTMLInputElement>) {
     const _value = event.target.value
+    console.log('the _value', _value)
     if (_value.length === 0) {
       onRowChange({ ...row, [column.key]: null })
     } else {
-      const _timeValue = dayjs(_value).format(format)
+      //parsing the date into ISO 8601 date  using the momemt library
+      const completeDate = moment(_value, moment.ISO_8601).toISOString()
+      const _timeValue = dayjs(completeDate).format(format)
       onRowChange({ ...row, [column.key]: _timeValue })
     }
   }

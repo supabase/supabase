@@ -45,7 +45,7 @@
     "prettier": "^2.8.8",
     "prettier-plugin-sql-cst": "^0.5.0",
     "supabase": "^1.45.2",
-    "turbo": "^1.10.13"
+    "turbo": "^1.10.14"
   },
   "repository": {
     "type": "git",
@@ -67,6 +67,7 @@
     "node": "18.17.1"
   },
   "dependencies": {
+    "moment": "^2.29.4",
     "next-themes": "^0.2.1"
   }
 }
