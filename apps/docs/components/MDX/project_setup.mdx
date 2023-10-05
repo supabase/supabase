@@ -35,7 +35,8 @@ Now we are going to set up the database schema. We can use the "User Management 
 </Admonition>
 
 ```bash
-supabase link
+supabase link --project-ref <project-id>
+# You can get <project-id> from your project's dashboard URL: https://supabase.com/dashboard/project/<project-id>
 supabase db pull
 ```
 
