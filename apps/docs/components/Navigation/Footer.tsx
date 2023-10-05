@@ -8,7 +8,7 @@ const Footer = () => (
     <div className="mt-16">
       <ul className="flex flex-col gap-2">
         {primaryLinks.map(({ url, featherIcon: Icon, icon, text, ctaLabel }) => (
-          <li key={url} className="flex items-center gap-1 text-xs text-scale-900">
+          <li key={url} className="flex items-center gap-1 text-xs text-lighter">
             {icon && (
               <svg
                 width="16"
@@ -37,18 +37,24 @@ const Footer = () => (
         ))}
       </ul>
     </div>
-    <hr className="border-scale-400 my-6"></hr>
+    <hr className="border-border my-6"></hr>
     <div className="flex gap-4 items-center justify-between">
       <div className="flex flex-col lg:flex-row gap-3 ">
         <Link href="https://supabase.com/">
-          <a className="text-xs text-scale-900">&copy; Supabase Inc</a>
+          <a className="text-xs text-lighter">&copy; Supabase Inc</a>
         </Link>
-        <span className="text-xs text-scale-900">—</span>
-        {secondaryLinks.map((item) => (
-          <Link href={item.url} key={item.url}>
-            <a className="text-xs text-scale-800 hover:underline">{item.title}</a>
-          </Link>
-        ))}
+        <span className="text-xs text-lighter">—</span>
+        {secondaryLinks.map(({ component: Component, ...item }) =>
+          item.url ? (
+            <Link href={item.url} key={item.url}>
+              <a className="text-xs text-lighter hover:underline">{item.title}</a>
+            </Link>
+          ) : (
+            Component && (
+              <Component className="text-xs text-lighter hover:underline">{item.title}</Component>
+            )
+          )
+        )}
       </div>
       <div className="flex items-center gap-2">
         <Button type="text" asChild>
