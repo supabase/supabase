@@ -46,9 +46,9 @@ const CardButton = ({
   let containerClasses = [
     className,
     'group relative text-left',
-    'bg-panel-header-light dark:bg-panel-header-dark',
-    'border border-panel-border-light dark:border-panel-border-dark',
-    'rounded-md py-4 px-6 flex flex-row h-32',
+    'bg-surface-100',
+    'border border-surface',
+    'rounded-md p-5 flex flex-row h-32',
     'transition ease-in-out duration-150',
   ]
 
@@ -56,9 +56,8 @@ const CardButton = ({
     containerClasses = [
       ...containerClasses,
       'cursor-pointer',
-      'hover:bg-panel-border-light dark:hover:bg-panel-border-dark',
-      'hover:border-panel-border-hover-light',
-      'dark:hover:border-panel-border-hover-dark hover:border-gray-300',
+      'hover:bg-surface-200',
+      'hover:border-control',
     ]
   }
 
