@@ -37,7 +37,6 @@ const ProjectAPIDocs = () => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
 
-  const [openKeys, setOpenKeys] = useState(false)
   const [openLanguage, setOpenLanguage] = useState(false)
   const [showKeys, setShowKeys] = useState(false)
   const [language, setLanguage] = useState<'js' | 'bash'>('js')
@@ -56,11 +55,6 @@ const ProjectAPIDocs = () => {
   const updateLanguage = (value: 'js' | 'bash') => {
     setLanguage(value)
     setOpenLanguage(false)
-  }
-
-  const updateKeys = (value: boolean) => {
-    setShowKeys(value)
-    setOpenKeys(false)
   }
 
   return (
@@ -117,33 +111,9 @@ const ProjectAPIDocs = () => {
                   </Command_Shadcn_>
                 </PopoverContent_Shadcn_>
               </Popover_Shadcn_>
-              <Popover_Shadcn_ open={openKeys} onOpenChange={setOpenKeys} modal={false}>
-                <PopoverTrigger_Shadcn_ asChild>
-                  <Button type="default">{showKeys ? 'Show keys' : 'Hide keys'}</Button>
-                </PopoverTrigger_Shadcn_>
-                <PopoverContent_Shadcn_ className="p-0 w-32" side="bottom" align="end">
-                  <Command_Shadcn_>
-                    <CommandList_Shadcn_>
-                      <CommandGroup_Shadcn_>
-                        <CommandItem_Shadcn_
-                          className="cursor-pointer"
-                          onSelect={() => updateKeys(false)}
-                          onClick={() => updateKeys(false)}
-                        >
-                          <p>Hide API keys</p>
-                        </CommandItem_Shadcn_>
-                        <CommandItem_Shadcn_
-                          className="cursor-pointer"
-                          onSelect={() => updateKeys(true)}
-                          onClick={() => updateKeys(true)}
-                        >
-                          <p>Show API keys</p>
-                        </CommandItem_Shadcn_>
-                      </CommandGroup_Shadcn_>
-                    </CommandList_Shadcn_>
-                  </Command_Shadcn_>
-                </PopoverContent_Shadcn_>
-              </Popover_Shadcn_>
+              <Button type="default" onClick={() => setShowKeys(!showKeys)}>
+                {showKeys ? 'Hide keys' : 'Show keys'}
+              </Button>
             </div>
           </div>
 
