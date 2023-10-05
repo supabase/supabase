@@ -46,8 +46,9 @@ const Footer = (props: Props) => {
             </li>
           </ul>
         </SectionContainer>
+        <div className="w-full h-px bg-gradient-to-r from-transparent via-border to-transparent" />
       </div>
-      <SectionContainer>
+      <SectionContainer className="py-8">
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="space-y-8 xl:col-span-1">
             <Link href="#" as="/">
