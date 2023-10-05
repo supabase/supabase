@@ -5,17 +5,22 @@ import { ChevronDown } from 'lucide-react'
 
 import { cn } from '@ui/lib/utils'
 
+interface NavigationMenuProps
+  extends React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Root> {
+  viewportClassName?: string | undefined
+}
+
 const NavigationMenu = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Root>
->(({ className, children, ...props }, ref) => (
+  NavigationMenuProps
+>(({ className, viewportClassName, children, ...props }, ref) => (
   <NavigationMenuPrimitive.Root
     ref={ref}
     className={cn('relative z-10 flex flex-1 items-center justify-center', className)}
     {...props}
   >
     {children}
-    <NavigationMenuViewport />
+    <NavigationMenuViewport className={viewportClassName} />
   </NavigationMenuPrimitive.Root>
 ))
 NavigationMenu.displayName = NavigationMenuPrimitive.Root.displayName
@@ -80,7 +85,7 @@ const NavigationMenuViewport = React.forwardRef<
   <div className={cn('absolute left-0 top-full flex justify-center')}>
     <NavigationMenuPrimitive.Viewport
       className={cn(
-        'menu-viewport origin-top-center relative mt-1.5 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-md border bg-overlay text-popover-foreground shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 md:w-[var(--radix-navigation-menu-viewport-width)]',
+        'origin-top-center relative mt-1.5 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-md border bg-overlay text-popover-foreground shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 md:w-[var(--radix-navigation-menu-viewport-width)]',
         className
       )}
       ref={ref}
