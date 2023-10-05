@@ -45,6 +45,9 @@ Panels
 
 `bg-surface-300`
 
+Alernative background (inverted)
+`bg-alternative`
+
 Overlays, Dropdowns, Popovers
 
 `bg-overlay`
@@ -64,6 +67,9 @@ Default border
 Secondary border
 
 `border-secondary`
+
+Alernative border (inverted)
+`border-alternative`
 
 Overlays, Dropdowns, Popovers
 
