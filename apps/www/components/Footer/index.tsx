@@ -36,13 +36,13 @@ const Footer = (props: Props) => {
           </div>
           <span className="hidden md:block h-px w-8 bg-border" />
           <ul className="flex flex-col md:flex-row gap-2 md:gap-8 justify-center md:items-center">
-            <li className="flex items-center gap-2">
+            <li className="flex items-center gap-2 whitespace-nowrap flex-nowrap">
               <CheckIcon className="w-4 h-4" /> SOC2 Type 2{' '}
-              <span className="text-lighter">Certified</span>
+              <span className="text-lighter hidden sm:inline">Certified</span>
             </li>
-            <li className="flex items-center gap-2">
+            <li className="flex items-center gap-2 whitespace-nowrap flex-nowrap">
               <CheckIcon className="w-4 h-4" /> HIPAA{' '}
-              <span className="text-lighter">Compliant</span>
+              <span className="text-lighter hidden sm:inline">Compliant</span>
             </li>
           </ul>
         </SectionContainer>
