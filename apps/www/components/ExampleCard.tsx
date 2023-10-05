@@ -1,4 +1,4 @@
-import { Button, Divider, IconArrowUpRight, IconGitHub, IconTriangle, Space } from 'ui'
+import { Button, IconArrowUpRight } from 'ui'
 import Link from 'next/link'
 import Image from 'next/image'
 
