@@ -56,7 +56,7 @@ android {
                 // *account_id* will be unique for every single app
                 'appAuthRedirectScheme': 'com.googleusercontent.apps.*account_id*'
         ]
-
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -74,4 +74,5 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'androidx.multidex:multidex:2.0.1'
 }

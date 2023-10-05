@@ -109,7 +109,11 @@ class _LoginScreenState extends State<LoginScreen> {
       idToken = tokenResult?.idToken;
     } else {
       final GoogleSignIn googleSignIn = GoogleSignIn(
-        clientId: clientId,
+        serverClientId: clientId,
+        scopes: [
+          'openid',
+          'email',
+        ],
       );
       final res = await googleSignIn.signIn();
       final authentication = await res!.authentication;
