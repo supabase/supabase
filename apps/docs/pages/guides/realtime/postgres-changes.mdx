@@ -1064,6 +1064,12 @@ myChannel.updateAuth("fresh-token")
 
 ## Limitations
 
+### Spaces in Table Names
+
+Realtime currently does not work when table names contain spaces.
+
+### Database Instance and Realtime Performance
+
 Realtime systems usually require forethought because of their scaling dynamics. For the `Postgres Changes` feature, every change event must be checked to see if the subscribed user has access. For instance, if you have 100 users subscribed to a table where you make a single insert, it will then trigger 100 "reads": one for each user.
 
 There can be a database bottleneck which limits message throughput. If your database cannot authorize the changes rapidly enough, the changes will be delayed until you receive a timeout.
