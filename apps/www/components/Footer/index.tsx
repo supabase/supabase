@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
-import { Badge } from 'ui'
+import { Badge, cn } from 'ui'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import ThemeToggle from '@ui/components/ThemeProvider/ThemeToggle'
@@ -22,14 +22,11 @@ const Footer = (props: Props) => {
   const isLaunchWeekPage = pathname.includes('launch-week') || pathname === '/'
 
   return (
-    <footer
-      className={['border-border border-t', props.className].join(' ')}
-      aria-labelledby="footerHeading"
-    >
+    <footer className={cn('bg-alternative', props.className)} aria-labelledby="footerHeading">
       <h2 id="footerHeading" className="sr-only">
         Footer
       </h2>
-      <div className="w-full !py-0 border-b">
+      <div className="w-full !py-0">
         <SectionContainer className="grid grid-cols-2 md:flex items-center justify-between md:justify-center gap-8 md:gap-10 !py-6 md:!py-10 text-sm">
           <div className="flex flex-col md:flex-row gap-2 md:items-center">
             We protect your data.
