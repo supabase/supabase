@@ -230,6 +230,7 @@ const GitHubIntegrationConnectionForm = ({
                 <FormControl_Shadcn_ className="xl:w-96">
                   <div className="relative">
                     <Input_Shadcn_
+                      disabled
                       {...field}
                       onKeyPress={(event) => {
                         if (event.key === 'Escape') {
