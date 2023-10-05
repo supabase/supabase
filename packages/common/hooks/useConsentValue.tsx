@@ -13,6 +13,7 @@ export const useConsentValue = (KEY_NAME: string) => {
     if (!isBrowser) return
     setConsentValue(value)
     localStorage.setItem(KEY_NAME, value)
+    window.dispatchEvent(new Event('storage'))
     if (value === 'true')
       handlePageTelemetry(process.env.NEXT_PUBLIC_API_URL!, location.pathname, telemetryProps)
   }
