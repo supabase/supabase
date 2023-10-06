@@ -136,7 +136,7 @@ const Index = ({}: Props) => {
                         </Button>
                       </a>
                     </Link>
-                    <Link href="https://discord.supabase.com/" as="https://discord.supabase.com/">
+                    <Link href="https://discord.gg/rxTfewPvys" as="https://discord.gg/rxTfewPvys">
                       <a target="_blank">
                         <Button
                           size="medium"
