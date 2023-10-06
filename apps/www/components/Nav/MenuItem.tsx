@@ -53,7 +53,7 @@ const MenuItem = React.forwardRef<
                 )}
               </div>
               {description && (
-                <p className="line-clamp-1 leading-relaxed text-lighter group-hover/menu-item:text-light group-focus-visible/menu-item:text-light">
+                <p className="line-clamp-1 -mb-1 leading-relaxed text-lighter group-hover/menu-item:text-light group-focus-visible/menu-item:text-light">
                   {description}
                 </p>
               )}
