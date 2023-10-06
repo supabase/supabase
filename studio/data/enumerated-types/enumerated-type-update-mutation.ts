@@ -9,32 +9,39 @@ import { wrapWithTransaction } from 'data/sql/utils/transaction'
 export type EnumeratedTypeUpdateVariables = {
   projectRef: string
   connectionString: string
-  originalName: string
-  name: string
+  name: { original: string; updated: string }
   description?: string
-  values?: string[]
+  values?: { original: string; updated: string; isNew: boolean }[]
 }
 
 export async function updateEnumeratedType({
   projectRef,
   connectionString,
-  originalName,
   name,
   description,
   values = [],
 }: EnumeratedTypeUpdateVariables) {
   const statements: string[] = []
-  if (originalName !== name) {
-    statements.push(`alter type ${originalName} rename to ${name};`)
+  if (name.original !== name.updated) {
+    statements.push(`alter type ${name.original} rename to ${name.updated};`)
   }
   if (values.length > 0) {
-    values.forEach((x) => statements.push(`alter type ${name} add value '${x}';`))
+    values.forEach((x) => {
+      if (x.isNew) {
+        statements.push(`alter type ${name.updated} add value '${x.updated}';`)
+      } else if (x.original !== x.updated) {
+        statements.push(
+          `alter type ${name.updated} rename value '${x.original}' to '${x.updated}';`
+        )
+      }
+    })
   }
   if (description !== undefined) {
-    statements.push(`comment on type ${name} is '${description}';`)
+    statements.push(`comment on type ${name.updated} is '${description}';`)
   }
 
   const sql = wrapWithTransaction(statements.join(' '))
+
   const { result } = await executeSql({ projectRef, connectionString, sql })
   return result
 }

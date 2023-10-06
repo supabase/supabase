@@ -33,11 +33,14 @@ const EditEnumeratedTypeSidePanel = ({
   // [Joshen] Opting states for simplicity
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
-  const [values, setValues] = useState<{ id: string; value: string }[]>([])
+  const [values, setValues] = useState<
+    { id: string; originalValue: string; updatedValue: string }[]
+  >([])
 
   const originalEnumeratedTypes = (selectedEnumeratedType?.enums ?? []).map((x) => ({
     id: x,
-    value: x,
+    originalValue: x,
+    updatedValue: x,
   }))
 
   useEffect(() => {
@@ -59,7 +62,7 @@ const EditEnumeratedTypeSidePanel = ({
 
   const updateValue = (id: string, value: string) => {
     const updatedValues = values.map((x) => {
-      if (id === x.id) return { ...x, value }
+      if (id === x.id) return { ...x, updatedValue: value }
       return x
     })
     setValues(updatedValues)
@@ -72,19 +75,25 @@ const EditEnumeratedTypeSidePanel = ({
     if (selectedEnumeratedType === undefined)
       return console.error('selectedEnumeratedType required')
 
-    const newValues = values.filter((x) => !selectedEnumeratedType.enums.includes(x.value))
-
-    const payload: { name: string; values: string[]; description?: string } = {
-      name,
-      values: newValues.map((x) => x.value),
+    const payload: {
+      name: { original: string; updated: string }
+      values: { original: string; updated: string; isNew: boolean }[]
+      description?: string
+    } = {
+      name: { original: selectedEnumeratedType.name, updated: name },
+      values: values
+        .filter((x) => x.updatedValue.length !== 0)
+        .map((x) => ({
+          original: x.originalValue,
+          updated: x.updatedValue,
+          isNew: x.id !== x.originalValue,
+        })),
+      ...(description !== selectedEnumeratedType.comment ? { description } : {}),
     }
-
-    if (description !== selectedEnumeratedType.comment) payload.description = description
 
     updateEnumeratedType({
       projectRef: project.ref,
       connectionString: project.connectionString,
-      originalName: selectedEnumeratedType.name,
       ...payload,
     })
   }
@@ -112,10 +121,10 @@ const EditEnumeratedTypeSidePanel = ({
           <Alert_Shadcn_>
             <IconAlertCircle strokeWidth={1.5} />
             <AlertTitle_Shadcn_>
-              Existing values in an enum type cannot be altered
+              Existing values in an enum type cannot be deleted
             </AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_>
-              You may only add new values to an existing enumerated type. If you'd like to update or
+              You may only add or update values to an existing enumerated type. If you'd like to
               delete existing values, you will need to delete and recreate the enumerated type with
               the updated values.
               <Link
@@ -138,14 +147,13 @@ const EditEnumeratedTypeSidePanel = ({
 
           <div className="mt-2 mb-3 space-y-2">
             {values.map((x) => {
-              const disabled = x.id === x.value
+              const disabled = x.id === x.updatedValue
 
               return (
                 <div key={x.id} className="flex items-center space-x-2">
                   <Input
                     className="w-full"
-                    value={x.value}
-                    disabled={disabled}
+                    value={x.updatedValue}
                     onChange={(e) => updateValue(x.id, e.target.value)}
                   />
                   <Button
@@ -163,7 +171,9 @@ const EditEnumeratedTypeSidePanel = ({
           <Button
             type="default"
             icon={<IconPlus strokeWidth={1.5} />}
-            onClick={() => setValues(values.concat([{ id: uuidv4(), value: '' }]))}
+            onClick={() =>
+              setValues(values.concat([{ id: uuidv4(), originalValue: '', updatedValue: '' }]))
+            }
           >
             Add value
           </Button>
