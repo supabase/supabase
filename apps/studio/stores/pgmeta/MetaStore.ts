@@ -39,7 +39,6 @@ import { tableKeys } from 'data/tables/keys'
 import { getTable } from 'data/tables/table-query'
 import { getTables } from 'data/tables/tables-query'
 import ExtensionsStore from './ExtensionsStore'
-import ForeignTableStore, { IForeignTableStore } from './ForeignTableStore'
 import FunctionsStore from './FunctionsStore'
 import MaterializedViewStore, { IMaterializedViewStore } from './MaterializedViewStore'
 import PoliciesStore from './PoliciesStore'
@@ -57,7 +56,6 @@ export interface IMetaStore {
   columns: IPostgresMetaInterface<PostgresColumn>
   views: IViewStore
   materializedViews: IMaterializedViewStore
-  foreignTables: IForeignTableStore
 
   roles: IRolesStore
   policies: IPostgresMetaInterface<any>
@@ -147,7 +145,6 @@ export default class MetaStore implements IMetaStore {
   columns: ColumnStore
   views: ViewStore
   materializedViews: MaterializedViewStore
-  foreignTables: ForeignTableStore
 
   roles: RolesStore
   policies: PoliciesStore
@@ -183,11 +180,6 @@ export default class MetaStore implements IMetaStore {
     this.materializedViews = new MaterializedViewStore(
       this.rootStore,
       `${this.baseUrl}/materialized-views`,
-      this.headers
-    )
-    this.foreignTables = new ForeignTableStore(
-      this.rootStore,
-      `${this.baseUrl}/foreign-tables`,
       this.headers
     )
 
@@ -987,9 +979,6 @@ export default class MetaStore implements IMetaStore {
 
     this.materializedViews.setUrl(`${this.baseUrl}/materialized-views`)
     this.materializedViews.setHeaders(this.headers)
-
-    this.foreignTables.setUrl(`${this.baseUrl}/foreign-tables`)
-    this.foreignTables.setHeaders(this.headers)
 
     this.roles.setUrl(`${this.baseUrl}/roles`)
     this.roles.setHeaders(this.headers)
