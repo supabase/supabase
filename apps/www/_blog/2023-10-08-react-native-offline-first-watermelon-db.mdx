@@ -2,8 +2,8 @@
 title: Offline-first React Native Apps with Expo, WatermelonDB, and Supabase
 description: Store your data locally and sync it with Postgres using WatermelonDB!
 author: benediktmueller
-image: 2023-08-01-react-native-storage/react-native-storage.png
-thumb: 2023-08-01-react-native-storage/react-native-storage.png
+image: 2023-10-08-react-native-offline-first-watermelon-db/expo-watermelondb-supabase.png
+thumb: 2023-10-08-react-native-offline-first-watermelon-db/expo-watermelondb-supabase.png
 categories:
   - engineering
 tags:
@@ -14,7 +14,7 @@ date: '2023-10-08'
 toc_depth: 3
 ---
 
-Using the Supabase JavaScript Client in a React Native, it's super easy to fetch data from a Supabase backend by simply calling functions like `supabase.from('countries').select()` wherever the data is needed. However, another approach to handling data in mobile apps recently gained a lot of popularity: Offline-first - meaning an app works primarily offline and synchronizes data whenever possible.
+Using the [Supabase JavaScript Client](https://supabase.com/docs/reference/javascript/introduction) in a React Native app, it's super easy to fetch data from a Supabase backend by simply calling functions like `supabase.from('countries').select()` wherever the data is needed. However, another approach to handling data in mobile apps recently gained a lot of popularity: Offline-first - meaning an app works primarily offline and synchronizes data whenever possible.
 
 This has multiple advantages, the obvious being that the app can be used offline. But even when the app is used online, the user experience still profits from this approach as reading and updating data feels instantaneous as it happens on the device first and is then synced in the background. The approach also has drawbacks: Data can become stale, and if it is changed in multiple places while offline, data conflicts can occur.
 
@@ -104,7 +104,7 @@ static associations = {
 
 ## Syncing the local DB with Supabase
 
-The [WatermelonDB docs](https://watermelondb.dev/docs/) outline how to set up a sync function that talks with the backend server. In our case, the backend is a Postgres database hosted on Supabase. As indicated earlier, we'll implement the sync via two Postgres functions called via Supabase RPC. This way, each sync is only two database calls (one push, one pull), and most of the logic is carried out directly within the database.
+The [WatermelonDB docs](https://watermelondb.dev/docs/) outline how to set up a sync function that talks with the backend server. In our case, the backend is a Postgres database hosted on Supabase. As indicated earlier, we'll implement the sync via two [Postgres functions](https://supabase.com/docs/guides/database/functions) called via Supabase RPC. This way, each sync is only two database calls (one push, one pull), and most of the logic is carried out directly within the database.
 
 ```typescript
 import { SyncDatabaseChangeSet, synchronize } from '@nozbe/watermelondb/sync'
