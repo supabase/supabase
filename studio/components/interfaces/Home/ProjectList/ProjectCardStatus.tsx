@@ -1,15 +1,10 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { RESOURCE_WARNING_MESSAGES } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.constants'
-import { ResourceWarning } from 'data/usage/resource-warnings-query'
-import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  IconAlertTriangle,
-  IconPauseCircle,
-  IconRefreshCw,
-} from 'ui'
-import { InferredProjectStatus } from './ProjectCard.utils'
 import { getWarningContent } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.utils'
+import { ResourceWarning } from 'data/usage/resource-warnings-query'
+import { AlertTriangle, Info, RefreshCcw } from 'lucide-react'
+import { Alert_Shadcn_, AlertTitle_Shadcn_, cn, IconPauseCircle } from 'ui'
+import { InferredProjectStatus } from './ProjectCard.utils'
 
 export interface ProjectCardWarningsProps {
   resourceWarnings?: ResourceWarning
@@ -78,24 +73,46 @@ export const ProjectCardStatus = ({
     ? 'default'
     : 'warning'
 
-  if (activeWarnings.length === 0 && projectStatus === 'isHealthy') return <div className="py-2" />
+  if (activeWarnings.length === 0 && projectStatus === 'isHealthy') return null
 
   return (
-    <div>
-      <Alert_Shadcn_
-        variant={alertType}
-        className="border-0 rounded-none rounded-b-md my-2 mb-2.5 [&>svg]:w-[28px] [&>svg]:h-[28px] [&>svg]:mt-1 [&>svg]:p-1.5 [&>svg]:left-6 pl-6 group-hover:bg-destructive-300 transition-colors"
-      >
-        {projectStatus === 'isPaused' || projectStatus === 'isPausing' ? (
-          <IconPauseCircle strokeWidth={2} />
-        ) : projectStatus === 'isRestoring' || projectStatus === 'isComingUp' ? (
-          <IconRefreshCw size={14} strokeWidth={2} />
-        ) : (
-          <IconAlertTriangle strokeWidth={2} />
-        )}
-        <AlertTitle_Shadcn_ className="text-sm mb-0.5">{alertTitle}</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_ className="text-xs">{alertDescription}</AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
-    </div>
+    <Alert_Shadcn_
+      variant={alertType}
+      className={cn(
+        'border-0 p-5 pb-[1.25rem]',
+        'bg-transparent',
+        '[&>svg]:left-[1.25rem] [&>svg]:top-3.5 [&>svg]:border',
+        !isCritical ? '[&>svg]:text-foreground [&>svg]:bg-surface-100' : ''
+      )}
+    >
+      {projectStatus === 'isPaused' || projectStatus === 'isPausing' ? (
+        <IconPauseCircle strokeWidth={1.5} size={12} />
+      ) : projectStatus === 'isRestoring' || projectStatus === 'isComingUp' ? (
+        <RefreshCcw strokeWidth={1.5} size={12} />
+      ) : (
+        <AlertTriangle strokeWidth={1.5} size={12} />
+      )}
+      <div className="flex justify-between items-center w-full">
+        <AlertTitle_Shadcn_ className="text-xs mb-0">{alertTitle}</AlertTitle_Shadcn_>
+        <Tooltip.Root delayDuration={0}>
+          <Tooltip.Trigger>
+            <Info size={14} className="text-foreground-light hover:text-foreground" />
+          </Tooltip.Trigger>
+          <Tooltip.Portal>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                  'border border-scale-200',
+                ].join(' ')}
+              >
+                <span className="text-xs text-foreground">{alertDescription}</span>
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Portal>
+        </Tooltip.Root>
+      </div>
+    </Alert_Shadcn_>
   )
 }

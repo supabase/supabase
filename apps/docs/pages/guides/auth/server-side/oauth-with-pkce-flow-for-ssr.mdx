@@ -153,7 +153,8 @@ export async function GET(req) {
   const next = searchParams.get('next') ?? '/'
 
   if (code) {
-    const supabase = createRouteHandlerClient({ cookies: () => cookies() })
+    const cookieStore = cookies()
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
       return NextResponse.redirect(new URL(`/${next.slice(1)}`, req.url))
@@ -199,7 +200,7 @@ Let's point our `.signInWithOAuth` method's redirect to the callback route we cr
 
 ```js
 await supabase.auth.signInWithOAuth({
-  email,
+  provider,
   options: {
     redirectTo: `http://example.com/auth/callback`,
   },

@@ -19,7 +19,7 @@ export const meta = {
   ></iframe>
 </div>
 
-## **Pre requirements**
+## Pre requirements
 
 Make sure you have [the edge CLI](https://docs.dartedge.dev/#getting-started) installed in addition to [the Supabase CLI](https://supabase.com/docs/guides/cli#installation).
 
@@ -28,7 +28,7 @@ Make sure you have [the edge CLI](https://docs.dartedge.dev/#getting-started) in
 dart pub global activate edge
 ```
 
-## **Setting up your first Dart Edge project**
+## Setting up your first Dart Edge project
 
 Create a new Dart Edge project using the `new` command on the edge CLI. This will create a familiar boilerplate for your Dart Edge project such as `main.dart` and `pubspec.yaml` file.
 
@@ -60,6 +60,19 @@ void main() {
 ```
 
 `SupabaseFunctions` class has a `fetch` handler, which is expected to return a `Response` object, and has a `request` parameter, which contains information about the request such as body and headers.
+
+## Supporting multiple edge functions
+
+By default, Dart Edge will create a single `main.dart` file in your project, which will be compiled into a function called `dart_edge`.
+You can override this behavior and create multiple functions by creating an `edge.yaml` file in the root of your project.
+Specify how to map which of your dart files should compile to what Supabase edge functions using the `functions` option.
+
+```yaml
+supabase:
+  functions:
+    api_handler: 'lib/api.dart'
+    webhook_handler: 'lib/webhooks.dart'
+```
 
 ## Using Supabase Client
 
