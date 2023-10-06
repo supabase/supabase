@@ -140,10 +140,11 @@ const GitHubIntegrationConnectionForm = ({
 
         <Alert_Shadcn_ className="mb-4 w-96">
           <AlertTitle_Shadcn_ className="text-sm">
-            We currently don’t allow changing production branch
+            Changing Git branch for Production Branch coming soon
           </AlertTitle_Shadcn_>
           <AlertDescription_Shadcn_ className="text-xs">
-            You will need to disable branching and opt back in to choose a new production branch
+            If you wish to change the Git branch that is used for the Production Branch you will
+            need to disable Branching and opt back in.
           </AlertDescription_Shadcn_>
         </Alert_Shadcn_>
 
@@ -222,6 +223,17 @@ const GitHubIntegrationConnectionForm = ({
           <FormDescription_Shadcn_ className="text-xs text-lighter mb-3">
             Migration and seed SQL files will be run from this directory.
           </FormDescription_Shadcn_>
+
+          <Alert_Shadcn_ className="mb-4 w-96">
+            <AlertTitle_Shadcn_ className="text-sm">
+              Changing Supabase directory is currently not supported
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_ className="text-xs">
+              Your migration and seed SQL files will need to be within the /supabase directory of
+              your Git repository.
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+
           <FormField_Shadcn_
             control={form.control}
             name="supabaseDirectory"
