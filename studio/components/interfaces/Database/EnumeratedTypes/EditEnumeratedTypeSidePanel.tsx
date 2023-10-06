@@ -18,6 +18,8 @@ import { uuidv4 } from 'lib/helpers'
 import { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 import { useEnumeratedTypeUpdateMutation } from 'data/enumerated-types/enumerated-type-update-mutation'
 import Link from 'next/link'
+import { DragDropContext, Droppable, DroppableProvided } from 'react-beautiful-dnd'
+import EnumeratedTypeValueRow from './EnumeratedTypeValueRow'
 
 interface EditEnumeratedTypeSidePanelProps {
   visible: boolean
@@ -65,6 +67,16 @@ const EditEnumeratedTypeSidePanel = ({
       if (id === x.id) return { ...x, updatedValue: value }
       return x
     })
+    setValues(updatedValues)
+  }
+
+  const updateOrder = (result: any) => {
+    // Dropped outside of the list
+    if (!result.destination) return
+
+    const updatedValues = values.slice()
+    const [removed] = updatedValues.splice(result.source.index, 1)
+    updatedValues.splice(result.destination.index, 0, removed)
     setValues(updatedValues)
   }
 
@@ -120,9 +132,7 @@ const EditEnumeratedTypeSidePanel = ({
 
           <Alert_Shadcn_>
             <IconAlertCircle strokeWidth={1.5} />
-            <AlertTitle_Shadcn_>
-              Existing values in an enum type cannot be deleted
-            </AlertTitle_Shadcn_>
+            <AlertTitle_Shadcn_>Existing values cannot be deleted or sorted</AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_>
               You may only add or update values to an existing enumerated type. If you'd like to
               delete existing values, you will need to delete and recreate the enumerated type with
@@ -145,29 +155,26 @@ const EditEnumeratedTypeSidePanel = ({
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
 
-          <div className="mt-2 mb-3 space-y-2">
-            {values.map((x) => {
-              const disabled = x.id === x.updatedValue
-
-              return (
-                <div key={x.id} className="flex items-center space-x-2">
-                  <Input
-                    className="w-full"
-                    value={x.updatedValue}
-                    onChange={(e) => updateValue(x.id, e.target.value)}
-                  />
-                  <Button
-                    type="default"
-                    size="small"
-                    icon={<IconTrash strokeWidth={1.5} size={16} />}
-                    className="px-2"
-                    disabled={disabled}
-                    onClick={() => setValues(values.filter((y) => y.id !== x.id))}
-                  />
+          <DragDropContext onDragEnd={(result: any) => updateOrder(result)}>
+            <Droppable droppableId="enum_type_values_droppable">
+              {(droppableProvided: DroppableProvided) => (
+                <div ref={droppableProvided.innerRef} className="mt-2 mb-3 space-y-2">
+                  {values.map((x, idx) => (
+                    <EnumeratedTypeValueRow
+                      key={x.id}
+                      index={idx}
+                      isDisabled={x.id === x.originalValue}
+                      enumTypeValue={{ id: x.id, value: x.updatedValue }}
+                      onUpdateValue={updateValue}
+                      onRemoveValue={() => setValues(values.filter((y) => y.id !== x.id))}
+                    />
+                  ))}
+                  {droppableProvided.placeholder}
                 </div>
-              )
-            })}
-          </div>
+              )}
+            </Droppable>
+          </DragDropContext>
+
           <Button
             type="default"
             icon={<IconPlus strokeWidth={1.5} />}

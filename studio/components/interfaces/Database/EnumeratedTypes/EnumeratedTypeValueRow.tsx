@@ -3,6 +3,7 @@ import { Button, IconMenu, IconTrash, Input } from 'ui'
 
 interface EnumeratedTypeValueRowProps {
   index: number
+  isDisabled?: boolean
   enumTypeValue: { id: string; value: string }
   onUpdateValue: (id: string, value: string) => void
   onRemoveValue: () => void
@@ -10,24 +11,24 @@ interface EnumeratedTypeValueRowProps {
 
 const EnumeratedTypeValueRow = ({
   index,
+  isDisabled = false,
   enumTypeValue,
   onUpdateValue,
   onRemoveValue,
 }: EnumeratedTypeValueRowProps) => {
   return (
-    <Draggable draggableId={enumTypeValue.id} index={index}>
+    <Draggable draggableId={enumTypeValue.id} index={index} isDragDisabled={isDisabled}>
       {(draggableProvided: DraggableProvided) => (
         <div
           ref={draggableProvided.innerRef}
           {...draggableProvided.draggableProps}
           className="flex items-center space-x-2"
         >
-          <div {...draggableProvided.dragHandleProps}>
-            <IconMenu
-              size={16}
-              strokeWidth={1.5}
-              className="text-foreground-lighter cursor-pointer"
-            />
+          <div
+            {...draggableProvided.dragHandleProps}
+            className={isDisabled ? 'text-foreground-lighter !cursor-default' : 'text-foreground'}
+          >
+            <IconMenu size={16} strokeWidth={1.5} />
           </div>
           <Input
             className="w-full"
@@ -38,6 +39,7 @@ const EnumeratedTypeValueRow = ({
             <Button
               type="default"
               size="small"
+              disabled={isDisabled}
               icon={<IconTrash strokeWidth={1.5} size={16} />}
               className="px-2"
               onClick={() => onRemoveValue()}

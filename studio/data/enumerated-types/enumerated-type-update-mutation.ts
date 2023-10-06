@@ -26,9 +26,21 @@ export async function updateEnumeratedType({
     statements.push(`alter type ${name.original} rename to ${name.updated};`)
   }
   if (values.length > 0) {
-    values.forEach((x) => {
+    values.forEach((x, idx) => {
       if (x.isNew) {
-        statements.push(`alter type ${name.updated} add value '${x.updated}';`)
+        if (idx === 0) {
+          // Consider if any new enums were added before any existing enums
+          const firstExistingEnumValue = values.find((x) => !x.isNew)
+          statements.push(
+            `alter type ${name.updated} add value '${x.updated}' before '${firstExistingEnumValue?.original}';`
+          )
+        } else {
+          statements.push(
+            `alter type ${name.updated} add value '${x.updated}' after '${
+              values[idx - 1].updated
+            }';`
+          )
+        }
       } else if (x.original !== x.updated) {
         statements.push(
           `alter type ${name.updated} rename value '${x.original}' to '${x.updated}';`
@@ -41,7 +53,6 @@ export async function updateEnumeratedType({
   }
 
   const sql = wrapWithTransaction(statements.join(' '))
-
   const { result } = await executeSql({ projectRef, connectionString, sql })
   return result
 }
