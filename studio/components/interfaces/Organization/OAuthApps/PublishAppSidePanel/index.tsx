@@ -1,6 +1,7 @@
 import clsx from 'clsx'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 
+import { OAuthScope } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import {
   OAuthAppCreateResponse,
@@ -25,7 +26,8 @@ import {
   Modal,
   SidePanel,
 } from 'ui'
-import AuthorizeRequesterDetails from './AuthorizeRequesterDetails'
+import AuthorizeRequesterDetails from '../AuthorizeRequesterDetails'
+import { ScopesPanel } from './Scopes'
 
 export interface PublishAppSidePanelProps {
   visible: boolean
@@ -88,6 +90,7 @@ const PublishAppSidePanel = ({
   const [iconUrl, setIconUrl] = useState<string>()
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const [urls, setUrls] = useState<{ id: string; value: string }[]>([{ id: uuidv4(), value: '' }])
+  const [scopes, setScopes] = useState<OAuthScope[]>([])
 
   useEffect(() => {
     if (visible) {
@@ -101,9 +104,11 @@ const PublishAppSidePanel = ({
             return { id: uuidv4(), value: url }
           })
         )
+        setScopes(selectedApp.scopes)
         setIconUrl(selectedApp.icon === null ? undefined : selectedApp.icon)
       } else {
         setUrls([{ id: uuidv4(), value: '' }])
+        setScopes([])
         setIconUrl(undefined)
       }
     }
@@ -139,6 +144,7 @@ const PublishAppSidePanel = ({
     return errors
   }
 
+  console.log(scopes)
   const onSubmit = async (values: any) => {
     if (!slug) return console.error('Slug is required')
 
@@ -164,6 +170,7 @@ const PublishAppSidePanel = ({
         name,
         website,
         redirect_uris,
+        scopes,
         icon: uploadedIconUrl,
       })
     } else {
@@ -174,6 +181,7 @@ const PublishAppSidePanel = ({
         name,
         website,
         redirect_uris,
+        scopes,
         icon: uploadedIconUrl === undefined ? null : uploadedIconUrl,
       })
     }
@@ -332,6 +340,17 @@ const PublishAppSidePanel = ({
                       </div>
                     </SidePanel.Content>
                     <SidePanel.Separator />
+                    <div className="p-6 ">
+                      <div className="pb-4 flex flex-col">
+                        <span className="prose text-sm">Application permissions</span>
+                        <span className="text-sm text-foreground-light">
+                          The application permissions are organized in scopes and will be presented
+                          to the user when adding an app to their project.
+                        </span>
+                      </div>
+
+                      <ScopesPanel scopes={scopes} setScopes={setScopes} />
+                    </div>
                   </div>
 
                   <SidePanel.Separator />
@@ -376,6 +395,7 @@ const PublishAppSidePanel = ({
                         icon={iconUrl || null}
                         name={values.name}
                         domain={values.website}
+                        scopes={scopes}
                       />
                       <div className="pt-4 space-y-2">
                         <p className="prose text-sm">
