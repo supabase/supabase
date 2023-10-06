@@ -29,36 +29,21 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   const headers = constructHeaders(req.headers)
 
-  const onlyAuthSchema = req.query['schema'] === 'auth'
-  const onlyStorageSchema = req.query['schema'] === 'storage'
+  const queryParams = new URLSearchParams()
+  const includedSchemas = req.query['included_schemas']
 
-  const includeAuthSchema = true // req.query['auth-schema'] === 'true'
-  const includeStorageSchema = true // req.query['storage-schema'] === 'true'
+  if (includedSchemas) {
+    const schemas = typeof includedSchemas == 'string' ? includedSchemas : includedSchemas.join(',')
+    queryParams.set('included_schemas', schemas)
+  }
 
-  const response = await get(`${PG_META_URL}/tables`, { headers })
+  const queryStr = queryParams.toString()
+  const response = await get(`${PG_META_URL}/tables${queryStr ? `?${queryStr}` : ''}`, { headers })
   if (response.error) {
     return res.status(400).json({ error: response.error })
   }
 
   let tables = response || []
-
-  if (onlyStorageSchema) {
-    const storageTables = tables?.filter((x: any) => x.schema === 'storage')
-    return res.status(200).json(storageTables)
-  }
-
-  if (onlyAuthSchema) {
-    const authTables = tables?.filter((x: any) => x.schema === 'auth')
-    return res.status(200).json(authTables)
-  }
-
-  if (!includeAuthSchema && Array.isArray(tables)) {
-    tables = tables?.filter((x) => x.schema !== 'auth')
-  }
-
-  if (!includeStorageSchema && Array.isArray(tables)) {
-    tables = tables?.filter((x) => x.schema !== 'storage')
-  }
 
   return res.status(200).json(tables)
 }
