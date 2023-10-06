@@ -1,10 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { DragDropContext, Droppable, DroppableProvided } from 'react-beautiful-dnd'
 import toast from 'react-hot-toast'
-import { Button, IconPlus, IconTrash, Input, SidePanel } from 'ui'
+import { Button, IconPlus, Input, SidePanel } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useEnumeratedTypeCreateMutation } from 'data/enumerated-types/enumerated-type-create-mutation'
 import { uuidv4 } from 'lib/helpers'
+import EnumeratedTypeValueRow from './EnumeratedTypeValueRow'
 
 interface CreateEnumeratedTypeSidePanelProps {
   visible: boolean
@@ -20,6 +22,14 @@ const CreateEnumeratedTypeSidePanel = ({
   const [description, setDescription] = useState('')
   const [values, setValues] = useState([{ id: uuidv4(), value: '' }])
 
+  useEffect(() => {
+    if (visible) {
+      setName('')
+      setDescription('')
+      setValues([{ id: uuidv4(), value: '' }])
+    }
+  }, [visible])
+
   const { project } = useProjectContext()
   const { mutate: createEnumeratedType, isLoading: isCreating } = useEnumeratedTypeCreateMutation({
     onSuccess: () => {
@@ -33,6 +43,16 @@ const CreateEnumeratedTypeSidePanel = ({
       if (id === x.id) return { ...x, value }
       return x
     })
+    setValues(updatedValues)
+  }
+
+  const updateOrder = (result: any) => {
+    // Dropped outside of the list
+    if (!result.destination) return
+
+    const updatedValues = values.slice()
+    const [removed] = updatedValues.splice(result.source.index, 1)
+    updatedValues.splice(result.destination.index, 0, removed)
     setValues(updatedValues)
   }
 
@@ -67,28 +87,26 @@ const CreateEnumeratedTypeSidePanel = ({
           onChange={(e) => setDescription(e.target.value)}
         />
 
-        <div className="">
+        <div>
           <p className="text-sm text-foreground-light">Values</p>
-          <div className="mt-2 mb-3 space-y-2">
-            {values.map((x) => (
-              <div key={x.id} className="flex items-center space-x-2">
-                <Input
-                  className="w-full"
-                  value={x.value}
-                  onChange={(e) => updateValue(x.id, e.target.value)}
-                />
-                <div>
-                  <Button
-                    type="default"
-                    size="small"
-                    icon={<IconTrash strokeWidth={1.5} size={16} />}
-                    className="px-2"
-                    onClick={() => setValues(values.filter((y) => y.id !== x.id))}
-                  />
+          <DragDropContext onDragEnd={(result: any) => updateOrder(result)}>
+            <Droppable droppableId="enum_type_values_droppable">
+              {(droppableProvided: DroppableProvided) => (
+                <div ref={droppableProvided.innerRef} className="mt-2 mb-3 space-y-2">
+                  {values.map((x, idx) => (
+                    <EnumeratedTypeValueRow
+                      key={x.id}
+                      index={idx}
+                      enumTypeValue={x}
+                      onUpdateValue={updateValue}
+                      onRemoveValue={() => setValues(values.filter((y) => y.id !== x.id))}
+                    />
+                  ))}
+                  {droppableProvided.placeholder}
                 </div>
-              </div>
-            ))}
-          </div>
+              )}
+            </Droppable>
+          </DragDropContext>
           <Button
             type="default"
             icon={<IconPlus strokeWidth={1.5} />}
