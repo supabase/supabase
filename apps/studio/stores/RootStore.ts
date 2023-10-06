@@ -1,7 +1,6 @@
 import { configure } from 'mobx'
 import { Project } from 'types'
 import UiStore, { IUiStore } from './UiStore'
-import AppStore, { IAppStore } from './app/AppStore'
 import MetaStore, { IMetaStore } from './pgmeta/MetaStore'
 import ProjectFunctionsStore, { IProjectFunctionsStore } from './project/ProjectFunctionsStore'
 import VaultStore, { IVaultStore } from './project/VaultStore'
@@ -13,7 +12,6 @@ configure({
 })
 
 export interface IRootStore {
-  app: IAppStore
   ui: IUiStore
   meta: IMetaStore
   functions: IProjectFunctionsStore
@@ -24,7 +22,6 @@ export interface IRootStore {
   setProject: (project: Project) => void
 }
 export class RootStore implements IRootStore {
-  app: IAppStore
   ui: IUiStore
   meta: IMetaStore
   functions: IProjectFunctionsStore
@@ -33,7 +30,6 @@ export class RootStore implements IRootStore {
   selectedProjectRef: string | undefined
 
   constructor() {
-    this.app = new AppStore(this)
     this.ui = new UiStore(this)
     this.meta = new MetaStore(this, { projectRef: '', connectionString: '' })
 
