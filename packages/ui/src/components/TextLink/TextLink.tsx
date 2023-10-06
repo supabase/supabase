@@ -1,7 +1,22 @@
 import { IconChevronRight, cn } from 'ui'
 import Link from 'next/link'
 
-function TextLink({ url = '', label, className, hasChevron = true, ...props }: any) {
+interface Props {
+  label: string
+  url?: string
+  className?: string
+  hasChevron?: boolean
+  chevronAnimation?: 'translate' | 'fadeIn'
+}
+
+function TextLink({
+  url = '',
+  label,
+  className,
+  hasChevron = true,
+  chevronAnimation = 'translate',
+  ...props
+}: Props) {
   return (
     <Link href={url} passHref>
       <a
@@ -15,7 +30,12 @@ function TextLink({ url = '', label, className, hasChevron = true, ...props }: a
           <span className="sr-only">{`${label} about ${url}`}</span>
           <span>{label}</span>
           {hasChevron && (
-            <div className="transition-all group-hover:ml-0.5">
+            <div
+              className={cn(
+                'transition-all group-hover:ml-0.5',
+                chevronAnimation === 'fadeIn' && 'opacity-0 group-hover:opacity-100'
+              )}
+            >
               <IconChevronRight size={14} strokeWidth={2} />
             </div>
           )}

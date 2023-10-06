@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 
+import { useBreakpoint } from 'common'
 import { IconChevronRight, TextLink } from 'ui'
 import { NavigationMenuLink } from 'ui/src/components/shadcn/ui/navigation-menu'
 import MenuItem from './MenuItem'
@@ -10,7 +11,6 @@ import MenuItem from './MenuItem'
 import ComparisonsData from 'data/Comparisons'
 import CustomersData from 'data/CustomerStories'
 import SolutionsData from 'data/Solutions'
-import { useBreakpoint } from 'common'
 
 const ProductDropdown = () => {
   const { basePath } = useRouter()
@@ -18,7 +18,7 @@ const ProductDropdown = () => {
 
   return (
     <div className="flex flex-col xl:flex-row">
-      <ul className="grid gap-2 py-6 px-7 grid-cols-2 xl:grid-cols-1 w-[700px] xl:w-[380px]">
+      <ul className="bg-background grid gap-1 py-6 px-6 grid-cols-2 xl:grid-cols-1 w-[700px] xl:w-[360px]">
         {Object.values(SolutionsData).map((component) => (
           <NavigationMenuLink key={component.name} asChild>
             <MenuItem
@@ -27,24 +27,25 @@ const ProductDropdown = () => {
               description={component.description_short}
               icon={component.icon}
               className="h-fit"
+              hasChevron
             />
           </NavigationMenuLink>
         ))}
       </ul>
-      <div className="border-t xl:border-t-0 xl:border-l py-8 px-10 gap-2 xl:gap-8 grid grid-cols-3 xl:flex xl:flex-col w-full xl:w-[500px] bg-alternative">
-        <div className="col-span-2 xl:w-auto">
+      <div className="border-t xl:border-t-0 xl:border-l py-8 px-10 gap-8 grid grid-cols-5 xl:flex xl:flex-col w-full xl:w-[500px]">
+        <div className="col-span-3 xl:w-auto">
           <Link href="/customers">
-            <a className="flex items-center gap-1 text-lighter hover:text-brand text-xs uppercase tracking-widest font-mono mb-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm focus-visible:text-brand">
+            <a className="group flex items-center gap-1 text-lighter hover:text-foreground text-xs uppercase tracking-widest font-mono mb-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm focus-visible:text-foreground">
               Customer Stories
-              <IconChevronRight className="h-3 w-3" />
+              <IconChevronRight className="h-3 w-3 transition-transform will-change-transform -translate-x-1 group-hover:translate-x-0" />
             </a>
           </Link>
-          <ul className="flex flex-col gap-3">
-            {CustomersData.slice(0, isTablet ? 2 : 4).map((customer) => (
+          <ul className="flex flex-col gap-4">
+            {CustomersData.slice(0, isTablet ? 2 : 3).map((customer) => (
               <li key={customer.organization}>
                 <Link href={customer.url}>
                   <a className="group flex items-center gap-3 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded">
-                    <div className="relative rounded-md bg-overlay p-2 border h-16 w-32 flex-shrink-0 overflow-auto">
+                    <div className="relative rounded-md bg-background p-2 border group-hover:border-foreground-muted/50 h-16 w-32 flex-shrink-0 overflow-auto">
                       <Image
                         src={`${basePath}/${customer.imgUrl}`}
                         alt={customer.title}
@@ -54,7 +55,7 @@ const ProductDropdown = () => {
                       />
                     </div>
                     <div className="flex flex-col">
-                      <h4 className="text-light group-hover:text-brand group-focus-visible:text-brand text-normal mb-0 text-sm">
+                      <h4 className="text-light group-hover:text-foreground group-focus-visible:text-foreground text-normal mb-0 text-sm">
                         {customer.title}
                       </h4>
                     </div>
@@ -64,7 +65,7 @@ const ProductDropdown = () => {
             ))}
           </ul>
         </div>
-        <div>
+        <div className="col-span-2">
           <p className="text-lighter text-xs uppercase tracking-widest font-mono mb-6">
             {ComparisonsData.label}
           </p>
@@ -72,10 +73,10 @@ const ProductDropdown = () => {
             {ComparisonsData.comparisons.map((link) => (
               <li key={link.text}>
                 <TextLink
-                  hasChevron={false}
+                  chevronAnimation="fadeIn"
                   url={link.url}
                   label={link.text}
-                  className="mt-0 hover:text-brand focus-visible:text-brand focus-visible:ring-offset-4 focus-visible:ring-offset-background-overlay"
+                  className="mt-0 hover:text-foreground focus-visible:text-foreground focus-visible:ring-offset-4 focus-visible:ring-offset-background-overlay"
                 />
               </li>
             ))}
