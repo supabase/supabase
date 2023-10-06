@@ -6,6 +6,7 @@ import {
   Alert_Shadcn_,
   Button,
   IconAlertCircle,
+  IconExternalLink,
   IconPlus,
   IconTrash,
   Input,
@@ -16,6 +17,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { uuidv4 } from 'lib/helpers'
 import { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 import { useEnumeratedTypeUpdateMutation } from 'data/enumerated-types/enumerated-type-update-mutation'
+import Link from 'next/link'
 
 interface EditEnumeratedTypeSidePanelProps {
   visible: boolean
@@ -109,11 +111,28 @@ const EditEnumeratedTypeSidePanel = ({
 
           <Alert_Shadcn_>
             <IconAlertCircle strokeWidth={1.5} />
-            <AlertTitle_Shadcn_>Existing values in an enum cannot be altered</AlertTitle_Shadcn_>
+            <AlertTitle_Shadcn_>
+              Existing values in an enum type cannot be altered
+            </AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_>
               You may only add new values to an existing enumerated type. If you'd like to update or
               delete existing values, you will need to delete and recreate the enumerated type with
               the updated values.
+              <Link
+                passHref
+                href="https://www.postgresql.org/message-id/21012.1459434338%40sss.pgh.pa.us"
+              >
+                <Button
+                  asChild
+                  type="default"
+                  icon={<IconExternalLink strokeWidth={1.5} />}
+                  className="mt-2"
+                >
+                  <a target="_blank" rel="noreferrer">
+                    Learn more
+                  </a>
+                </Button>
+              </Link>
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
 

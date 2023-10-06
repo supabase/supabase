@@ -28,7 +28,6 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useStore } from 'hooks'
 import CreateIndexSidePanel from './CreateIndexSidePanel'
-import { FormHeader } from 'components/ui/Forms'
 
 const Indexes = () => {
   const { ui } = useStore()
