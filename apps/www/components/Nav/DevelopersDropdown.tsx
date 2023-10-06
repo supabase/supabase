@@ -64,7 +64,7 @@ const DevelopersDropdown = () => {
           </div>
         ))}
       </div>
-      <div className="flex flex-col w-[550px] xl:w-[480px] border-t xl:border-t-0 xl:border-l">
+      <div className="bg-overlay flex flex-col w-[550px] xl:w-[480px] border-t xl:border-t-0 xl:border-l">
         <div className="flex-col gap-2 py-8 px-10">
           <Link href="/blog">
             <a className="group flex items-center gap-1 text-lighter hover:text-foreground text-xs uppercase tracking-widest font-mono mb-5 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm focus-visible:text-foreground">
