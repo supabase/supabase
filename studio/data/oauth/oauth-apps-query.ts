@@ -1,9 +1,10 @@
+import { OAuthScope } from '@supabase/shared-types/out/constants'
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
 import { API_ADMIN_URL } from 'lib/constants'
 import { useCallback } from 'react'
-import { oauthAppKeys } from './keys'
 import { ResponseError } from 'types'
+import { oauthAppKeys } from './keys'
 
 export type OAuthAppsVariables = {
   slug?: string
@@ -17,6 +18,7 @@ export type OAuthApp = {
   created_at: string
   name: string
   website: string
+  scopes: OAuthScope[]
   redirect_uris: string[]
 }
 
