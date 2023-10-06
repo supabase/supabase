@@ -94,6 +94,8 @@ const ColumnType = ({
     }
   }
 
+  console.log(enumTypes)
+
   return (
     <div className="space-y-2">
       <Listbox
@@ -139,7 +141,10 @@ const ColumnType = ({
               }}
             >
               <div className="flex items-center space-x-4">
-                <p>{enumType.name}</p>
+                <p className="text-foreground">{enumType.name}</p>
+                {enumType.comment !== undefined && (
+                  <p className="text-foreground-lighter">{enumType.comment}</p>
+                )}
               </div>
             </Listbox.Option>
           ))
