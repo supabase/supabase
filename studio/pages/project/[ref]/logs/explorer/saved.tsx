@@ -1,32 +1,28 @@
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
-import { useEffect } from 'react'
 
 import { useParams } from 'common'
 import { LogsSavedQueriesItem } from 'components/interfaces/Settings/Logs'
 import { LogsLayout } from 'components/layouts'
 import Table from 'components/to-be-cleaned/Table'
 import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
-import { useStore } from 'hooks'
+import { useContentQuery } from 'data/content/content-query'
 import { NextPageWithLayout } from 'types'
 import { IconSave, Loading } from 'ui'
 
 export const LogsSavedPage: NextPageWithLayout = () => {
-  const { content } = useStore()
   const { ref } = useParams()
 
-  useEffect(() => {
-    content.load()
-  }, [ref])
+  const { data: saved, isLoading } = useContentQuery(ref)
 
-  if (content.isLoading) {
+  if (isLoading) {
     return <Loading active={true}>{null}</Loading>
   }
-  const saved = content.savedLogSqlSnippets()
+
   return (
     <div className="mx-auto w-full px-5 py-6 h-full">
       <LogsExplorerHeader subtitle="Saved Queries" />
-      {saved.length > 0 && (
+      {(saved?.content ?? []).length > 0 && (
         <div className="flex flex-col gap-3 py-6">
           <Table
             headTrClasses="expandable-tr"
@@ -39,13 +35,13 @@ export const LogsSavedPage: NextPageWithLayout = () => {
                 <Table.th></Table.th>
               </>
             }
-            body={saved.map((item) => (
+            body={(saved?.content ?? []).map((item) => (
               <LogsSavedQueriesItem key={item.id} item={item} />
             ))}
           />
         </div>
       )}
-      {saved.length === 0 && (
+      {(saved?.content ?? []).length === 0 && (
         <div className="my-auto flex h-full flex-grow flex-col items-center justify-center gap-1">
           <IconSave className="animate-bounce" />
           <h3 className="text-lg text-foreground">No Saved Queries Yet</h3>
