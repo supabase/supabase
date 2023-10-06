@@ -13,7 +13,6 @@ import {
 } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useEnumeratedTypeCreateMutation } from 'data/enumerated-types/enumerated-type-create-mutation'
 import { uuidv4 } from 'lib/helpers'
 import { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 import { useEnumeratedTypeUpdateMutation } from 'data/enumerated-types/enumerated-type-update-mutation'
@@ -31,6 +30,7 @@ const EditEnumeratedTypeSidePanel = ({
 }: EditEnumeratedTypeSidePanelProps) => {
   // [Joshen] Opting states for simplicity
   const [name, setName] = useState('')
+  const [description, setDescription] = useState('')
   const [values, setValues] = useState<{ id: string; value: string }[]>([])
 
   const originalEnumeratedTypes = (selectedEnumeratedType?.enums ?? []).map((x) => ({
@@ -42,6 +42,7 @@ const EditEnumeratedTypeSidePanel = ({
     if (selectedEnumeratedType !== undefined) {
       setName(selectedEnumeratedType.name)
       setValues(originalEnumeratedTypes)
+      if (selectedEnumeratedType.comment) setDescription(selectedEnumeratedType.comment)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedEnumeratedType])
@@ -71,12 +72,18 @@ const EditEnumeratedTypeSidePanel = ({
 
     const newValues = values.filter((x) => !selectedEnumeratedType.enums.includes(x.value))
 
+    const payload: { name: string; values: string[]; description?: string } = {
+      name,
+      values: newValues.map((x) => x.value),
+    }
+
+    if (description !== selectedEnumeratedType.comment) payload.description = description
+
     updateEnumeratedType({
       projectRef: project.ref,
       connectionString: project.connectionString,
       originalName: selectedEnumeratedType.name,
-      name,
-      values: newValues.map((x) => x.value),
+      ...payload,
     })
   }
 
@@ -90,6 +97,12 @@ const EditEnumeratedTypeSidePanel = ({
     >
       <SidePanel.Content className="py-4 space-y-4">
         <Input label="Name" value={name} onChange={(e) => setName(e.target.value)} />
+        <Input
+          label="Description"
+          placeholder="Optional"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
 
         <div className="">
           <p className="text-sm text-foreground-light mb-1">Values</p>

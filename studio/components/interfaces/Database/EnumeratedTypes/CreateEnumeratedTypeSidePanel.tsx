@@ -17,6 +17,7 @@ const CreateEnumeratedTypeSidePanel = ({
 }: CreateEnumeratedTypeSidePanelProps) => {
   // [Joshen] Opting states for simplicity
   const [name, setName] = useState('')
+  const [description, setDescription] = useState('')
   const [values, setValues] = useState([{ id: uuidv4(), value: '' }])
 
   const { project } = useProjectContext()
@@ -44,6 +45,7 @@ const CreateEnumeratedTypeSidePanel = ({
       projectRef: project.ref,
       connectionString: project.connectionString,
       name,
+      description,
       values: values.map((x) => x.value),
     })
   }
@@ -58,6 +60,12 @@ const CreateEnumeratedTypeSidePanel = ({
     >
       <SidePanel.Content className="py-4 space-y-4">
         <Input label="Name" value={name} onChange={(e) => setName(e.target.value)} />
+        <Input
+          label="Description"
+          placeholder="Optional"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
 
         <div className="">
           <p className="text-sm text-foreground-light">Values</p>

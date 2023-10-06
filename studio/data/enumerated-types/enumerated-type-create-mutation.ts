@@ -4,11 +4,13 @@ import toast from 'react-hot-toast'
 import { ResponseError } from 'types'
 import { enumeratedTypesKeys } from './keys'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { wrapWithTransaction } from 'data/sql/utils/transaction'
 
 export type EnumeratedTypeCreateVariables = {
   projectRef: string
   connectionString: string
   name: string
+  description?: string
   values: string[]
 }
 
@@ -16,9 +18,12 @@ export async function createEnumeratedType({
   projectRef,
   connectionString,
   name,
+  description,
   values,
 }: EnumeratedTypeCreateVariables) {
-  const sql = `create type ${name} as enum (${values.map((x) => `'${x}'`).join(', ')})`
+  const createSql = `create type ${name} as enum (${values.map((x) => `'${x}'`).join(', ')});`
+  const commentSql = description !== undefined ? `comment on type ${name} is '${description}';` : ''
+  const sql = wrapWithTransaction(`${createSql} ${commentSql}`)
   const { result } = await executeSql({ projectRef, connectionString, sql })
   return result
 }

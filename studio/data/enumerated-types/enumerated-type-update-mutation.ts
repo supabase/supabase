@@ -11,6 +11,7 @@ export type EnumeratedTypeUpdateVariables = {
   connectionString: string
   originalName: string
   name: string
+  description?: string
   values?: string[]
 }
 
@@ -19,6 +20,7 @@ export async function updateEnumeratedType({
   connectionString,
   originalName,
   name,
+  description,
   values = [],
 }: EnumeratedTypeUpdateVariables) {
   const statements: string[] = []
@@ -27,6 +29,9 @@ export async function updateEnumeratedType({
   }
   if (values.length > 0) {
     values.forEach((x) => statements.push(`alter type ${name} add value '${x}';`))
+  }
+  if (description !== undefined) {
+    statements.push(`comment on type ${name} is '${description}';`)
   }
 
   const sql = wrapWithTransaction(statements.join(' '))
