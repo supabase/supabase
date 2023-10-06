@@ -11,6 +11,7 @@ import ComparisonsData from 'data/Comparisons'
 import CustomersData from 'data/CustomerStories'
 import SolutionsData from 'data/Solutions'
 import { useBreakpoint } from 'common'
+import DropdownMenuItem from './DropdownMenuItem'
 
 const ProductDropdown = () => {
   const { basePath } = useRouter()
@@ -18,10 +19,10 @@ const ProductDropdown = () => {
 
   return (
     <div className="flex flex-col xl:flex-row">
-      <ul className="grid gap-2 py-6 px-7 grid-cols-2 xl:grid-cols-1 w-[700px] xl:w-[380px]">
+      <ul className="grid gap-1 py-8 px-7 w-[520px] xl:w-[380px]">
         {Object.values(SolutionsData).map((component) => (
           <NavigationMenuLink key={component.name} asChild>
-            <MenuItem
+            <DropdownMenuItem
               title={component.name}
               href={component.url}
               description={component.description_short}
@@ -31,30 +32,30 @@ const ProductDropdown = () => {
           </NavigationMenuLink>
         ))}
       </ul>
-      <div className="border-t xl:border-t-0 xl:border-l py-8 px-10 gap-2 xl:gap-8 grid grid-cols-3 xl:flex xl:flex-col w-full xl:w-[500px] bg-alternative">
+      <div className="border-t xl:border-t-0 xl:border-l py-8 px-10 gap-2 xl:gap-8 grid grid-cols-3 xl:flex xl:flex-col w-full xl:w-[500px] bg-surface-200">
         <div className="col-span-2 xl:w-auto">
           <Link href="/customers">
-            <a className="flex items-center gap-1 text-lighter hover:text-brand text-xs uppercase tracking-widest font-mono mb-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm focus-visible:text-brand">
+            <a className="flex items-center gap-1 text-lighter hover:text-foreground text-xs uppercase tracking-widest font-mono mb-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm focus-visible:text-brand">
               Customer Stories
               <IconChevronRight className="h-3 w-3" />
             </a>
           </Link>
           <ul className="flex flex-col gap-3">
-            {CustomersData.slice(0, isTablet ? 2 : 4).map((customer) => (
+            {CustomersData.slice(0, isTablet ? 2 : 3).map((customer) => (
               <li key={customer.organization}>
                 <Link href={customer.url}>
-                  <a className="group flex items-center gap-3 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded">
-                    <div className="relative rounded-md bg-overlay p-2 border h-16 w-32 flex-shrink-0 overflow-auto">
+                  <a className="group flex gap-3 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded">
+                    <div className="relative rounded-md bg-overlay p-2 border h-16 w-32 flex-shrink-0 overflow-auto group-hover:border-control">
                       <Image
                         src={`${basePath}/${customer.imgUrl}`}
                         alt={customer.title}
                         layout="fill"
                         objectFit="contain"
-                        className="!p-4 brightness-50 contrast-50 dark:contrast-0 filter"
+                        className="!p-4 brightness-50 contrast-50 dark:contrast-0 group-hover:brightness-0 filter"
                       />
                     </div>
                     <div className="flex flex-col">
-                      <h4 className="text-light group-hover:text-brand group-focus-visible:text-brand text-normal mb-0 text-sm">
+                      <h4 className="text-foreground-light group-hover:text-foreground group-focus-visible:text-brand mb-0 text-sm">
                         {customer.title}
                       </h4>
                     </div>

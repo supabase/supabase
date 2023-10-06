@@ -60,7 +60,8 @@
     "ui": "*",
     "use-debounce": "^7.0.1",
     "vanilla-tilt": "1.7.0",
-    "yup": "^0.32.11"
+    "yup": "^0.32.11",
+    "lucide-react": "^0.167.0"
   },
   "devDependencies": {
     "@types/classnames": "^2.3.1",
