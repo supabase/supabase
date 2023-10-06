@@ -40,7 +40,6 @@ import { getTable } from 'data/tables/table-query'
 import { getTables } from 'data/tables/tables-query'
 import ExtensionsStore from './ExtensionsStore'
 import FunctionsStore from './FunctionsStore'
-import MaterializedViewStore, { IMaterializedViewStore } from './MaterializedViewStore'
 import PoliciesStore from './PoliciesStore'
 import PublicationStore from './PublicationStore'
 import RolesStore, { IRolesStore } from './RolesStore'
@@ -55,7 +54,6 @@ export interface IMetaStore {
   tables: ITableStore
   columns: IPostgresMetaInterface<PostgresColumn>
   views: IViewStore
-  materializedViews: IMaterializedViewStore
 
   roles: IRolesStore
   policies: IPostgresMetaInterface<any>
@@ -144,7 +142,6 @@ export default class MetaStore implements IMetaStore {
   tables: TableStore
   columns: ColumnStore
   views: ViewStore
-  materializedViews: MaterializedViewStore
 
   roles: RolesStore
   policies: PoliciesStore
@@ -177,11 +174,6 @@ export default class MetaStore implements IMetaStore {
     this.tables = new TableStore(this.rootStore, `${this.baseUrl}/tables`, this.headers)
     this.columns = new ColumnStore(this.rootStore, `${this.baseUrl}/columns`, this.headers)
     this.views = new ViewStore(this.rootStore, `${this.baseUrl}/views`, this.headers)
-    this.materializedViews = new MaterializedViewStore(
-      this.rootStore,
-      `${this.baseUrl}/materialized-views`,
-      this.headers
-    )
 
     this.roles = new RolesStore(this.rootStore, `${this.baseUrl}/roles`, this.headers)
     this.policies = new PoliciesStore(this.rootStore, `${this.baseUrl}/policies`, this.headers)
@@ -976,9 +968,6 @@ export default class MetaStore implements IMetaStore {
 
     this.views.setUrl(`${this.baseUrl}/views`)
     this.views.setHeaders(this.headers)
-
-    this.materializedViews.setUrl(`${this.baseUrl}/materialized-views`)
-    this.materializedViews.setHeaders(this.headers)
 
     this.roles.setUrl(`${this.baseUrl}/roles`)
     this.roles.setHeaders(this.headers)
