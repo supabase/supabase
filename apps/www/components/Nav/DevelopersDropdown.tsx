@@ -14,7 +14,7 @@ type Props = {
 }
 
 const DevelopersDropdown = () => {
-  const iconsWithFill = ['GitHub Discussions', 'Launch Week']
+  const iconsWithFill = ['GitHub Discussions', 'Launch Week', 'Open Source']
 
   return (
     <div className="flex flex-col xl:flex-row">
