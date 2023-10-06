@@ -5,10 +5,10 @@ import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import {
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   IconCheck,
   IconEdit3,
   IconFileText,
@@ -19,7 +19,6 @@ import {
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import { useCheckPermissions, useStore } from 'hooks'
-import { toJS } from 'mobx'
 
 interface FunctionListProps {
   schema: string
@@ -94,46 +93,38 @@ const FunctionList = ({
               <p title={x.return_type}>{x.return_type}</p>
             </Table.td>
             <Table.td className="hidden lg:table-cell">
-              <div className="flex justify-center">
-                {x.security_definer ? <IconCheck strokeWidth={1.5} className="text-brand" /> : null}
-              </div>
+              {x.security_definer ? 'Definer' : 'Invoker'}
             </Table.td>
             <Table.td className="text-right">
               {!isLocked && (
                 <div className="flex items-center justify-end">
                   {canUpdateFunctions ? (
-                    <DropdownMenu_Shadcn_>
-                      <DropdownMenuTrigger_Shadcn_>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger>
                         <Button asChild type="default" icon={<IconMoreVertical />} className="px-1">
                           <span></span>
                         </Button>
-                      </DropdownMenuTrigger_Shadcn_>
-                      <DropdownMenuContent_Shadcn_ side="left">
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent side="left">
                         {isApiDocumentAvailable && (
-                          <DropdownMenuItem_Shadcn_
+                          <DropdownMenuItem
                             className="space-x-2"
                             onClick={() => router.push(`/project/${projectRef}/api?rpc=${x.name}`)}
                           >
                             <IconFileText size="tiny" />
-                            <p className="text">Client API docs</p>
-                          </DropdownMenuItem_Shadcn_>
+                            <p>Client API docs</p>
+                          </DropdownMenuItem>
                         )}
-                        <DropdownMenuItem_Shadcn_
-                          className="space-x-2"
-                          onClick={() => editFunction(x)}
-                        >
+                        <DropdownMenuItem className="space-x-2" onClick={() => editFunction(x)}>
                           <IconEdit3 size="tiny" />
-                          <p className="text">Edit function</p>
-                        </DropdownMenuItem_Shadcn_>
-                        <DropdownMenuItem_Shadcn_
-                          className="space-x-2"
-                          onClick={() => deleteFunction(x)}
-                        >
+                          <p>Edit function</p>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="space-x-2" onClick={() => deleteFunction(x)}>
                           <IconTrash stroke="red" size="tiny" />
-                          <p className="text">Delete function</p>
-                        </DropdownMenuItem_Shadcn_>
-                      </DropdownMenuContent_Shadcn_>
-                    </DropdownMenu_Shadcn_>
+                          <p>Delete function</p>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   ) : (
                     <Tooltip.Root delayDuration={0}>
                       <Tooltip.Trigger asChild>
