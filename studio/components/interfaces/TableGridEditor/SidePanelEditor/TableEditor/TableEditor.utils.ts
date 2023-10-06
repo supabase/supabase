@@ -15,6 +15,9 @@ export const validateFields = (field: TableField) => {
   if (field.name.length === 0) {
     errors['name'] = 'Please assign a name for your table'
   }
+  if (field.name.trim() !== field.name) {
+    errors['name'] = 'Please avoid trailing or leading spaces in your table name'
+  }
   if (some(field.columns, (column: ColumnField) => column.format.length === 0)) {
     errors['columns'] = 'Ensure that all your columns are assigned a type'
   }
