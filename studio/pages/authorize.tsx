@@ -164,6 +164,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
           icon={requester.icon}
           name={requester.name}
           domain={requester.domain}
+          scopes={requester.scopes}
         />
 
         {/* Expiry warning */}
