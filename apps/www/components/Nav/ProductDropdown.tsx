@@ -18,7 +18,7 @@ const ProductDropdown = () => {
 
   return (
     <div className="flex flex-col xl:flex-row">
-      <ul className="bg-background grid gap-1 py-6 px-6 grid-cols-2 xl:grid-cols-1 w-[700px] xl:w-[360px]">
+      <ul className="bg-background grid gap-2 py-6 px-6 grid-cols-2 xl:grid-cols-1 w-[700px] xl:w-[360px]">
         {Object.values(SolutionsData).map((component) => (
           <NavigationMenuLink key={component.name} asChild>
             <MenuItem
@@ -40,7 +40,7 @@ const ProductDropdown = () => {
               <IconChevronRight className="h-3 w-3 transition-transform will-change-transform -translate-x-1 group-hover:translate-x-0" />
             </a>
           </Link>
-          <ul className="flex flex-col gap-4">
+          <ul className="flex flex-col gap-2">
             {CustomersData.slice(0, isTablet ? 2 : 3).map((customer) => (
               <li key={customer.organization}>
                 <Link href={customer.url}>
