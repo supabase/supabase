@@ -1,12 +1,11 @@
 import type { PostgresType } from '@supabase/postgres-meta'
-import { isNil, noop } from 'lodash'
+import { noop } from 'lodash'
 import { Select } from 'ui'
 
 import { POSTGRES_DATA_TYPES } from '../SidePanelEditor.constants'
 import { ColumnField } from '../SidePanelEditor.types'
 import { typeExpressionSuggestions } from './ColumnEditor.constants'
 import { Suggestion } from './ColumnEditor.types'
-import { getSelectedEnumValues } from './ColumnEditor.utils'
 import InputWithSuggestions from './InputWithSuggestions'
 
 interface ColumnDefaultValueProps {
