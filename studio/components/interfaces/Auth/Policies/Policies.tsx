@@ -14,6 +14,7 @@ import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import InformationBox from 'components/ui/InformationBox'
 import { tableKeys } from 'data/tables/keys'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 
 interface PoliciesProps {
   tables: PostgresTable[]
@@ -22,6 +23,7 @@ interface PoliciesProps {
 }
 
 const Policies = ({ tables, hasTables, isLocked }: PoliciesProps) => {
+  const snap = useTableEditorStateSnapshot()
   const router = useRouter()
   const { ref } = useParams()
 
@@ -80,7 +82,7 @@ const Policies = ({ tables, hasTables, isLocked }: PoliciesProps) => {
         message: `Failed to toggle RLS: ${res.error.message}`,
       })
     } else {
-      queryClient.invalidateQueries(tableKeys.list(ref, selectedSchemaAndTable.schema))
+      queryClient.invalidateQueries(tableKeys.list(ref, snap.selectedSchemaName))
     }
     closeConfirmModal()
   }
