@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
-import { Badge } from 'ui'
+import { Badge, cn } from 'ui'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import ThemeToggle from '@ui/components/ThemeProvider/ThemeToggle'
@@ -22,35 +22,32 @@ const Footer = (props: Props) => {
   const isLaunchWeekPage = pathname.includes('launch-week') || pathname === '/'
 
   return (
-    <footer
-      className={['border-border border-t', props.className].join(' ')}
-      aria-labelledby="footerHeading"
-    >
+    <footer className={cn('bg-alternative', props.className)} aria-labelledby="footerHeading">
       <h2 id="footerHeading" className="sr-only">
         Footer
       </h2>
-      <div className="w-full !py-0 border-b">
-        <SectionContainer className="grid grid-cols-2 md:flex items-center justify-between md:justify-center gap-8 md:gap-10 !py-6 md:!py-10 text-sm">
+      <div className="w-full !py-0">
+        <SectionContainer className="grid grid-cols-2 md:flex items-center justify-between md:justify-center gap-8 md:gap-16 xl:gap-28 !py-6 md:!py-10 text-sm">
           <div className="flex flex-col md:flex-row gap-2 md:items-center">
             We protect your data.
             <Link href="/security">
               <a className="text-brand hover:underline">More on Security</a>
             </Link>
           </div>
-          <span className="hidden md:block h-px w-8 bg-border" />
           <ul className="flex flex-col md:flex-row gap-2 md:gap-8 justify-center md:items-center">
-            <li className="flex items-center gap-2">
+            <li className="flex items-center gap-2 whitespace-nowrap flex-nowrap">
               <CheckIcon className="w-4 h-4" /> SOC2 Type 2{' '}
-              <span className="text-lighter">Certified</span>
+              <span className="text-lighter hidden sm:inline">Certified</span>
             </li>
-            <li className="flex items-center gap-2">
+            <li className="flex items-center gap-2 whitespace-nowrap flex-nowrap">
               <CheckIcon className="w-4 h-4" /> HIPAA{' '}
-              <span className="text-lighter">Compliant</span>
+              <span className="text-lighter hidden sm:inline">Compliant</span>
             </li>
           </ul>
         </SectionContainer>
+        <div className="w-full h-px bg-gradient-to-r from-transparent via-border to-transparent" />
       </div>
-      <SectionContainer>
+      <SectionContainer className="py-8">
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="space-y-8 xl:col-span-1">
             <Link href="#" as="/">
