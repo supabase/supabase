@@ -97,7 +97,7 @@ const Nav = () => {
                 </div>
                 <NavigationMenu
                   delayDuration={0}
-                  className="hidden pl-4 sm:space-x-4 lg:flex h-16 !duration-75"
+                  className="hidden pl-4 sm:space-x-4 lg:flex h-16"
                   viewportClassName="rounded-xl bg-background"
                 >
                   <NavigationMenuList>
