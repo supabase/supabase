@@ -11,6 +11,8 @@ import {
   SearchButton,
   IconSearch,
   IconCommand,
+  IconGitHubSolid,
+  IconDiscussions,
   // IconChevronRight,
 } from 'ui'
 
@@ -116,7 +118,7 @@ const Index = () => {
                 as="https://github.com/supabase/supabase/issues"
                 passHref
               >
-                <Button size="small" type="default" iconRight={<IconGitHub />} asChild>
+                <Button size="small" type="default" iconRight={<IconGitHubSolid />} asChild>
                   <a target="_blank">Open GitHub Issue</a>
                 </Button>
               </Link>
@@ -139,8 +141,8 @@ const Index = () => {
                 as="https://github.com/supabase/supabase/discussions"
                 passHref
               >
-                <Button size="small" type="default" iconRight={<IconMessageCircle />} asChild>
-                  <a target="_blank">Join the discussion</a>
+                <Button size="small" type="secondary" iconRight={<IconDiscussions />} asChild>
+                  <a target="_blank">Ask a question</a>
                 </Button>
               </Link>
               <Link
@@ -173,44 +175,30 @@ const Index = () => {
             </div>
           </InteractiveShimmerCard>
         </SectionContainer>
-        {/* <SectionContainer className="!pt-0 max-w-7xl">
-          <div className="border-b pb-2">
-            <h2 className="text text-lg font-medium">Troubleshooting</h2>
-          </div>
-          <ul className="grid grid-cols-2 gap-4 mt-8">
-            {faqs.slice(0, 6).map((faq) => (
-              <li key={faq.label}>
-                <Link href={faq.url}>
-                  <a className="text-light hover:text-strong transition-colors flex justify-between items-center">
-                    <span>{faq.label}</span>
-                    <IconChevronRight className="w-4" />
-                  </a>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </SectionContainer> */}
         <SectionContainer className="!pt-0 max-w-7xl">
-          <div className="mx-auto bg-alternative border rounded-xl p-6 lg:p-16">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 xl:gap-10 justify-between">
-              <div className="col-span-full lg:col-span-4 gap-2 flex flex-col">
-                <h2 className="text-2xl lg:text-3xl lg:max-w-[360px] tracking-[-1px]">
+          <div className="mx-auto bg-alternative border rounded-xl p-6 lg:p-10">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 xl:gap-16 justify-between">
+              <div className="col-span-full lg:col-span-6 gap-2 flex flex-col">
+                <h2 className="text-xl lg:text-2xl tracking-tight">
                   Can't find what you're looking for?
                 </h2>
               </div>
-              <div className="col-span-full lg:col-start-5 xl:col-start-6 lg:col-span-7 flex flex-col gap-4">
-                <p className="text-light">
-                  No need to worry, the Supabase Support Team is ready to help.
-                </p>
+              <div className="col-span-full lg:col-start-7 lg:col-span-6 flex flex-col gap-4">
+                <div className="flex flex-col">
+                  <p className="text-light">The Supabase Support Team is ready to help.</p>
+                  <p className="text-lighter text-sm">
+                    Response time might vary depending on plan type and severity of the issue.
+                  </p>
+                </div>
                 <div className="flex gap-2">
-                  <Link href="https://supabase.com/dashboard/support/new" passHref>
-                    <Button type="secondary" size="small" iconRight={<IconArrowUpRight />} asChild>
-                      <a>Open Ticket</a>
-                    </Button>
-                  </Link>
                   <Link href="https://forms.supabase.com/enterprise" passHref>
                     <Button type="default" size="small" asChild>
                       <a>Contact Enterprise Sales</a>
+                    </Button>
+                  </Link>
+                  <Link href="https://supabase.com/dashboard/support/new" passHref>
+                    <Button type="text" size="small" iconRight={<IconArrowUpRight />} asChild>
+                      <a className="!text-light hover:!text-foreground">Open Ticket</a>
                     </Button>
                   </Link>
                 </div>
