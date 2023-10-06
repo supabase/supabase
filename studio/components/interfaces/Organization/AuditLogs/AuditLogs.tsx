@@ -222,7 +222,7 @@ const AuditLogs = () => {
                     </AlertTitle_Shadcn_>
                     <AlertDescription_Shadcn_ className="flex flex-row justify-between gap-3">
                       <p>
-                        Upgrade to Team or Enterprise to view up to 28 days of audit logs for your
+                        Upgrade to Team or Enterprise to view up to 28 days of Audit Logs for your
                         organization.
                       </p>
                     </AlertDescription_Shadcn_>
