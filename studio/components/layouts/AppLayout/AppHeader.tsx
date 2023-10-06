@@ -2,16 +2,16 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
-import { useFlag, useSelectedOrganization, useSelectedProject } from 'hooks'
+import { useFlag, useIsFeatureEnabled, useSelectedOrganization, useSelectedProject } from 'hooks'
 import FeedbackDropdown from '../ProjectLayout/LayoutHeader/FeedbackDropdown'
 import HelpPopover from '../ProjectLayout/LayoutHeader/HelpPopover'
 import NotificationsPopover from '../ProjectLayout/LayoutHeader/NotificationsPopover'
+import BranchDropdown from './BranchDropdown'
+import EnableBranchingButton from './EnableBranchingButton/EnableBranchingButton'
 import OrganizationDropdown from './OrganizationDropdown'
 import ProjectDropdown from './ProjectDropdown'
 import SettingsButton from './SettingsButton'
 import UserSettingsDropdown from './UserSettingsDropdown'
-import BranchDropdown from './BranchDropdown'
-import EnableBranchingButton from './EnableBranchingButton/EnableBranchingButton'
 
 const AppHeader = () => {
   const router = useRouter()
@@ -19,6 +19,8 @@ const AppHeader = () => {
   const project = useSelectedProject()
   const organization = useSelectedOrganization()
   const enableBranchManagement = useFlag('branchManagement')
+
+  const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
   const isBranchingEnabled =
     project?.is_branch_enabled === true || project?.parent_project_ref !== undefined
@@ -35,7 +37,7 @@ const AppHeader = () => {
             />
           </a>
         </Link>
-        <OrganizationDropdown isNewNav />
+        {projectCreationEnabled && <OrganizationDropdown isNewNav />}
         {ref !== undefined && <ProjectDropdown isNewNav />}
         {ref !== undefined && enableBranchManagement && (
           <>

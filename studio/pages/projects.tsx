@@ -1,3 +1,6 @@
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+
 import ProjectList from 'components/interfaces/Home/ProjectList'
 import { AccountLayout } from 'components/layouts'
 import OrganizationDropdown from 'components/to-be-cleaned/Dropdown/OrganizationDropdown'
@@ -5,11 +8,9 @@ import AlertError from 'components/ui/AlertError'
 import Connecting from 'components/ui/Loading/Loading'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
-import { useFlag } from 'hooks'
+import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
 import { NextPageWithLayout } from 'types'
 
 const ProjectsPage: NextPageWithLayout = () => {
@@ -21,6 +22,8 @@ const ProjectsPage: NextPageWithLayout = () => {
     isSuccess,
   } = useOrganizationsQuery()
   useAutoProjectsPrefetch()
+
+  const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
   const { isLoading: isProfileLoading } = useProfile()
   const isLoading = isOrganizationLoading || isProfileLoading
@@ -58,7 +61,7 @@ const ProjectsPage: NextPageWithLayout = () => {
 
       {!navLayoutV2 && isSuccess && (
         <div className="py-4 px-5">
-          {IS_PLATFORM && organizations.length !== 0 && (
+          {IS_PLATFORM && projectCreationEnabled && organizations.length !== 0 && (
             <div className="my-2">
               <div className="flex">
                 <div className="">

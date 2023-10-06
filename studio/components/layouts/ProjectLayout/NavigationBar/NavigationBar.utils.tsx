@@ -51,12 +51,14 @@ export const generateToolRoutes = (
 export const generateProductRoutes = (
   ref?: string,
   project?: ProjectBase,
-  features?: { auth: boolean }
+  features?: { auth?: boolean; edgeFunctions?: boolean; storage?: boolean }
 ): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}/building`
 
   const authEnabled = features?.auth ?? true
+  const edgeFunctionsEnabled = features?.edgeFunctions ?? true
+  const storageEnabled = features?.storage ?? true
 
   return [
     {
@@ -109,30 +111,34 @@ export const generateProductRoutes = (
           },
         ]
       : []),
-    {
-      key: 'storage',
-      label: 'Storage',
-      icon: (
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 18 18"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d={products.storage.icon[18]}
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeMiterlimit="10"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      ),
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/storage/buckets`),
-    },
-    ...(IS_PLATFORM
+    ...(storageEnabled
+      ? [
+          {
+            key: 'storage',
+            label: 'Storage',
+            icon: (
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 18 18"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d={products.storage.icon[18]}
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeMiterlimit="10"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            ),
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/storage/buckets`),
+          },
+        ]
+      : []),
+    ...(IS_PLATFORM && edgeFunctionsEnabled
       ? [
           {
             key: 'functions',
