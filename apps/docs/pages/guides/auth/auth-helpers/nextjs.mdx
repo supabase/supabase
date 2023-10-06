@@ -164,14 +164,13 @@ import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
-export const dynamic = 'force-dynamic'
-
 export async function GET(request) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
 
   if (code) {
-    const supabase = createRouteHandlerClient({ cookies })
+    const cookieStore = cookies()
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
     await supabase.auth.exchangeCodeForSession(code)
   }
 
@@ -194,14 +193,13 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import type { Database } from '@/lib/database.types'
 
-export const dynamic = 'force-dynamic'
-
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
 
   if (code) {
-    const supabase = createRouteHandlerClient<Database>({ cookies })
+    const cookieStore = cookies()
+    const supabase = createRouteHandlerClient<Database>({ cookies: () => cookieStore })
     await supabase.auth.exchangeCodeForSession(code)
   }
 
@@ -394,14 +392,13 @@ import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
-export const dynamic = 'force-dynamic'
-
 export async function POST(request) {
   const requestUrl = new URL(request.url)
   const formData = await request.formData()
   const email = formData.get('email')
   const password = formData.get('password')
-  const supabase = createRouteHandlerClient({ cookies })
+  const cookieStore = cookies()
+  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
   await supabase.auth.signUp({
     email,
@@ -428,14 +425,13 @@ import { NextResponse } from 'next/server'
 
 import type { Database } from '@/lib/database.types'
 
-export const dynamic = 'force-dynamic'
-
 export async function POST(request: Request) {
   const requestUrl = new URL(request.url)
   const formData = await request.formData()
   const email = String(formData.get('email'))
   const password = String(formData.get('password'))
-  const supabase = createRouteHandlerClient<Database>({ cookies })
+  const cookieStore = cookies()
+  const supabase = createRouteHandlerClient<Database>({ cookies: () => cookieStore })
 
   await supabase.auth.signUp({
     email,
@@ -482,14 +478,13 @@ import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
-export const dynamic = 'force-dynamic'
-
 export async function POST(request) {
   const requestUrl = new URL(request.url)
   const formData = await request.formData()
   const email = formData.get('email')
   const password = formData.get('password')
-  const supabase = createRouteHandlerClient({ cookies })
+  const cookieStore = cookies()
+  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
   await supabase.auth.signInWithPassword({
     email,
@@ -513,14 +508,13 @@ import { NextResponse } from 'next/server'
 
 import type { Database } from '@/lib/database.types'
 
-export const dynamic = 'force-dynamic'
-
 export async function POST(request: Request) {
   const requestUrl = new URL(request.url)
   const formData = await request.formData()
   const email = String(formData.get('email'))
   const password = String(formData.get('password'))
-  const supabase = createRouteHandlerClient<Database>({ cookies })
+  const cookieStore = cookies()
+  const supabase = createRouteHandlerClient<Database>({ cookies: () => cookieStore })
 
   await supabase.auth.signInWithPassword({
     email,
@@ -564,11 +558,10 @@ import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
-export const dynamic = 'force-dynamic'
-
 export async function POST(request) {
   const requestUrl = new URL(request.url)
-  const supabase = createRouteHandlerClient({ cookies })
+  const cookieStore = cookies()
+  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
   await supabase.auth.signOut()
 
@@ -589,11 +582,10 @@ import { NextResponse } from 'next/server'
 
 import type { Database } from '@/lib/database.types'
 
-export const dynamic = 'force-dynamic'
-
 export async function POST(request: Request) {
   const requestUrl = new URL(request.url)
-  const supabase = createRouteHandlerClient<Database>({ cookies })
+  const cookieStore = cookies()
+  const supabase = createRouteHandlerClient<Database>({ cookies: () => cookieStore })
 
   await supabase.auth.signOut()
 
@@ -804,10 +796,9 @@ In order to use Supabase in Server Components, you need to have implemented the 
 import { cookies } from 'next/headers'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 
-export const dynamic = 'force-dynamic'
-
 export default async function Page() {
-  const supabase = createServerComponentClient({ cookies })
+  const cookeStore = cookies()
+  const supabase = createServerComponentClient({ cookies: () => cookieStore })
   const { data } = await supabase.from('todos').select()
   return <pre>{JSON.stringify(data, null, 2)}</pre>
 }
@@ -823,10 +814,9 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 
 import type { Database } from '@/lib/database.types'
 
-export const dynamic = 'force-dynamic'
-
 export default async function ServerComponent() {
-  const supabase = createServerComponentClient<Database>({ cookies })
+  const cookieStore = cookies()
+  const supabase = createServerComponentClient<Database>({ cookies: () => cookieStore })
   const { data } = await supabase.from('todos').select()
   return <pre>{JSON.stringify(data, null, 2)}</pre>
 }
@@ -880,8 +870,6 @@ import { cookies } from 'next/headers'
 import { createServerActionClient } from '@supabase/auth-helpers-nextjs'
 import { revalidatePath } from 'next/cache'
 
-export const dynamic = 'force-dynamic'
-
 export default async function NewTodo() {
   const addTodo = async (formData) => {
     'use server'
@@ -911,14 +899,13 @@ import { revalidatePath } from 'next/cache'
 
 import type { Database } from '@/lib/database.types'
 
-export const dynamic = 'force-dynamic'
-
 export default async function NewTodo() {
   const addTodo = async (formData: FormData) => {
     'use server'
 
     const title = formData.get('title')
-    const supabase = createServerActionClient<Database>({ cookies })
+    const cookieStore = cookies()
+    const supabase = createServerActionClient<Database>({ cookies: () => cookieStore })
     await supabase.from('todos').insert({ title })
     revalidatePath('/')
   }
@@ -967,11 +954,10 @@ import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 
-export const dynamic = 'force-dynamic'
-
 export async function POST(request) {
   const { title } = await request.json()
-  const supabase = createRouteHandlerClient({ cookies })
+  const cookieStore = cookies()
+  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
   const { data } = await supabase.from('todos').insert({ title }).select()
   return NextResponse.json(data)
 }
@@ -988,11 +974,10 @@ import { cookies } from 'next/headers'
 
 import type { Database } from '@/lib/database.types'
 
-export const dynamic = 'force-dynamic'
-
 export async function POST(request: Request) {
   const { title } = await request.json()
-  const supabase = createRouteHandlerClient<Database>({ cookies })
+  const cookieStore = cookies()
+  const supabase = createRouteHandlerClient<Database>({ cookies: () => cookieStore })
   const { data } = await supabase.from('todos').insert({ title }).select()
   return NextResponse.json(data)
 }
@@ -1103,10 +1088,7 @@ export const dynamic = 'force-dynamic'
 export async function POST(request) {
   const { title } = await request.json()
   const cookieStore = cookies()
-
-  const supabase = createRouteHandlerClient({
-    cookies: () => cookieStore,
-  })
+  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
   const { data } = await supabase.from('todos').insert({ title }).select()
   return NextResponse.json(data)

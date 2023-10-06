@@ -24,11 +24,11 @@ import {
   Alert,
   Badge,
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   IconCreditCard,
   IconMoreHorizontal,
   IconPlus,
@@ -168,8 +168,8 @@ const PaymentMethods = () => {
                                   </div>
                                   {isActive && <Badge color="green">Active</Badge>}
                                   {canUpdatePaymentMethods && !isActive ? (
-                                    <DropdownMenu_Shadcn_>
-                                      <DropdownMenuTrigger_Shadcn_>
+                                    <DropdownMenu>
+                                      <DropdownMenuTrigger>
                                         <Button
                                           asChild
                                           type="outline"
@@ -178,30 +178,30 @@ const PaymentMethods = () => {
                                         >
                                           <span />
                                         </Button>
-                                      </DropdownMenuTrigger_Shadcn_>
-                                      <DropdownMenuContent_Shadcn_ align="end">
+                                      </DropdownMenuTrigger>
+                                      <DropdownMenuContent align="end">
                                         {subscription?.plan.id !== 'free' &&
                                           subscription?.payment_method_type === 'card' && (
                                             <>
-                                              <DropdownMenuItem_Shadcn_
+                                              <DropdownMenuItem
                                                 key="make-default"
                                                 onClick={() =>
                                                   setSelectedMethodForUse(paymentMethod)
                                                 }
                                               >
                                                 <p>Use this card</p>
-                                              </DropdownMenuItem_Shadcn_>
-                                              <DropdownMenuSeparator_Shadcn_ />
+                                              </DropdownMenuItem>
+                                              <DropdownMenuSeparator />
                                             </>
                                           )}
-                                        <DropdownMenuItem_Shadcn_
+                                        <DropdownMenuItem
                                           key="delete-method"
                                           onClick={() => setSelectedMethodToDelete(paymentMethod)}
                                         >
                                           <p>Delete card</p>
-                                        </DropdownMenuItem_Shadcn_>
-                                      </DropdownMenuContent_Shadcn_>
-                                    </DropdownMenu_Shadcn_>
+                                        </DropdownMenuItem>
+                                      </DropdownMenuContent>
+                                    </DropdownMenu>
                                   ) : null}
                                 </div>
                               )

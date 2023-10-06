@@ -7,11 +7,11 @@ import { useState } from 'react'
 import { ChartIntervals } from 'types'
 import {
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuRadioGroup_Shadcn_,
-  DropdownMenuRadioItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
   IconArchive,
   IconChevronDown,
   IconDatabase,
@@ -82,22 +82,22 @@ const ProjectUsage = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-row items-center gap-2">
-        <DropdownMenu_Shadcn_>
-          <DropdownMenuTrigger_Shadcn_>
+        <DropdownMenu>
+          <DropdownMenuTrigger>
             <Button asChild type="default" iconRight={<IconChevronDown />}>
               <span>{selectedInterval.label}</span>
             </Button>
-          </DropdownMenuTrigger_Shadcn_>
-          <DropdownMenuContent_Shadcn_ side="bottom" align="start">
-            <DropdownMenuRadioGroup_Shadcn_ value={interval} onValueChange={setInterval}>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="bottom" align="start">
+            <DropdownMenuRadioGroup value={interval} onValueChange={setInterval}>
               {CHART_INTERVALS.map((i) => (
-                <DropdownMenuRadioItem_Shadcn_ key={i.key} value={i.key}>
+                <DropdownMenuRadioItem key={i.key} value={i.key}>
                   {i.label}
-                </DropdownMenuRadioItem_Shadcn_>
+                </DropdownMenuRadioItem>
               ))}
-            </DropdownMenuRadioGroup_Shadcn_>
-          </DropdownMenuContent_Shadcn_>
-        </DropdownMenu_Shadcn_>
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <span className="text-xs text-foreground-light">
           Statistics for past {selectedInterval.label}
         </span>
