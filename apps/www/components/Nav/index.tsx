@@ -108,7 +108,7 @@ const Nav = () => {
                             {menuItem.title}
                           </NavigationMenuTrigger>
                           <NavigationMenuContent
-                            className={cn('rounded-xl', menuItem.dropdownContainerClassName)}
+                            className={cn('rounded-xl', menuItem.dropdownContainerClassName ?? '')}
                           >
                             {menuItem.dropdown}
                           </NavigationMenuContent>
