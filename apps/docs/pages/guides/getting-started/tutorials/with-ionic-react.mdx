@@ -161,7 +161,11 @@ import { supabase } from '../supabaseClient';
 export function AccountPage() {
   const [showLoading, hideLoading] = useIonLoading();
   const [showToast] = useIonToast();
-  const { data, error } = await supabase.auth.getSession();
+  useEffect(() => {
+    supabase.auth.onAuthStateChange((_event, session) => {
+    setSession(session)
+    })
+  }, []);
   const router = useIonRouter();
   const [profile, setProfile] = useState({
     username: '',
