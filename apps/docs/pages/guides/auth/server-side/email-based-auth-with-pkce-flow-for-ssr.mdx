@@ -93,9 +93,8 @@ Create a new `hooks.server.js` file in the root of your project and populate wit
 ```ts src/hooks.server.js
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
 import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit'
-import type { Handle } from '@sveltejs/kit'
 
-export const handle: Handle = async ({ event, resolve }) => {
+export const handle = async ({ event, resolve }) => {
   event.locals.supabase = createSupabaseServerClient({
     supabaseUrl: PUBLIC_SUPABASE_URL,
     supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
@@ -146,7 +145,8 @@ export async function GET(req) {
   const next = searchParams.get('next') ?? '/'
 
   if (token_hash && type) {
-    const supabase = createRouteHandlerClient({ cookies })
+    const cookieStore = cookies()
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
     const { error } = await supabase.auth.verifyOtp({ type, token_hash })
     if (!error) {
       return NextResponse.redirect(new URL(`/${next.slice(1)}`, req.url))
