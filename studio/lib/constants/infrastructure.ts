@@ -7,7 +7,7 @@ export type Region = typeof AWS_REGIONS | typeof FLY_REGIONS
 
 export const AWS_REGIONS = {
   WEST_US: 'West US (North California)',
-  // EAST_US: 'East US (North Virginia)',
+  EAST_US: 'East US (North Virginia)',
   CENTRAL_CANADA: 'Canada (Central)',
   WEST_EU: 'West EU (Ireland)',
   WEST_EU_2: 'West EU (London)',
@@ -27,7 +27,7 @@ export const FLY_REGIONS = {
 } as const
 
 export const AWS_REGIONS_DEFAULT =
-  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.WEST_US
+  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.EAST_US
 
 // TO DO, change default to US region for prod
 export const FLY_REGIONS_DEFAULT = FLY_REGIONS.SOUTHEAST_ASIA
