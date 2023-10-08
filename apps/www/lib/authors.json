@@ -342,5 +342,13 @@
     "position": "Engineering",
     "author_url": "https://github.com/kevcodez",
     "author_image_url": "https://github.com/kevcodez.png"
+  },
+  {
+    "author_id": "benediktmueller",
+    "author": "Benedikt Müller",
+    "username": "bndkt",
+    "position": "Guest Author",
+    "author_url": "https://twitter.com/bndkt",
+    "author_image_url": "https://github.com/bndkt.png"
   }
 ]
