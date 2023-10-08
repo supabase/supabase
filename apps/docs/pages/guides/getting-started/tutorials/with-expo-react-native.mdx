@@ -148,7 +148,7 @@ These variables will be exposed on the browser, and that's completely fine since
     const supabaseUrl = YOUR_REACT_NATIVE_SUPABASE_URL
     const supabaseAnonKey = YOUR_REACT_NATIVE_SUPABASE_ANON_KEY
 
-    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+    export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
         storage: new LargeSecureStore(),
         autoRefreshToken: true,
