@@ -12,7 +12,7 @@ export const AWS_REGIONS = {
   WEST_EU: 'West EU (Ireland)',
   WEST_EU_2: 'West EU (London)',
   // 'North EU': 'North EU',
-  // CENTRAL_EU: 'Central EU (Frankfurt)',
+  CENTRAL_EU: 'Central EU (Frankfurt)',
   SOUTH_ASIA: 'South Asia (Mumbai)',
   SOUTHEAST_ASIA: 'Southeast Asia (Singapore)',
   NORTHEAST_ASIA: 'Northeast Asia (Tokyo)',
