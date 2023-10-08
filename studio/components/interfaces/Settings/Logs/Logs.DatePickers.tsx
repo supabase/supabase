@@ -4,11 +4,11 @@ import { useEffect, useState } from 'react'
 import {
   Alert,
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuRadioGroup_Shadcn_,
-  DropdownMenuRadioItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
   IconClock,
 } from 'ui'
 import { DatetimeHelper, getDefaultHelper, LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from '.'
@@ -49,8 +49,8 @@ const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
 
   return (
     <div className="flex items-center">
-      <DropdownMenu_Shadcn_>
-        <DropdownMenuTrigger_Shadcn_>
+      <DropdownMenu>
+        <DropdownMenuTrigger>
           <Button
             asChild
             type={helperValue ? 'secondary' : 'default'}
@@ -59,14 +59,14 @@ const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
           >
             <span>{selectedHelper?.text || defaultHelper.text}</span>
           </Button>
-        </DropdownMenuTrigger_Shadcn_>
-        <DropdownMenuContent_Shadcn_ side="bottom" align="start">
-          <DropdownMenuRadioGroup_Shadcn_
+        </DropdownMenuTrigger>
+        <DropdownMenuContent side="bottom" align="start">
+          <DropdownMenuRadioGroup
             onValueChange={handleHelperChange}
             value={selectedHelper?.text || ''}
           >
             {helpers.map((helper) => (
-              <DropdownMenuRadioItem_Shadcn_
+              <DropdownMenuRadioItem
                 key={helper.text}
                 value={helper.text}
                 disabled={helper.disabled}
@@ -78,11 +78,11 @@ const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
                 >
                   {helper.text}
                 </span>
-              </DropdownMenuRadioItem_Shadcn_>
+              </DropdownMenuRadioItem>
             ))}
-          </DropdownMenuRadioGroup_Shadcn_>
-        </DropdownMenuContent_Shadcn_>
-      </DropdownMenu_Shadcn_>
+          </DropdownMenuRadioGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       <DatePicker
         triggerButtonClassName="rounded-l-none"

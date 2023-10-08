@@ -1,8 +1,9 @@
 // @ts-ignore
 import MarkdownTable from 'markdown-table'
-import { NEW_SQL_SNIPPET_SKELETON } from './SQLEditor.constants'
+import { NEW_SQL_SNIPPET_SKELETON, destructiveSqlRegex } from './SQLEditor.constants'
 import { SqlSnippets, UserContent } from 'types'
 import { DiffType } from './SQLEditor.types'
+import { removeCommentsFromSql } from 'lib/helpers'
 
 export const getResultsMarkdown = (results: any[]) => {
   const columns = Object.keys(results[0])
@@ -66,4 +67,8 @@ export function getDiffTypeDropdownLabel(diffType: DiffType) {
     default:
       throw new Error(`Unknown diff type '${diffType}'`)
   }
+}
+
+export function checkDestructiveQuery(sql: string) {
+  return destructiveSqlRegex.some((regex) => regex.test(removeCommentsFromSql(sql)))
 }

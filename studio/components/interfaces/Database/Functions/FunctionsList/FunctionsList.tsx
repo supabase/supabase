@@ -178,7 +178,7 @@ const FunctionsList = ({
                   Return type
                 </Table.th>
                 <Table.th key="return_type" className="hidden lg:table-cell w-[100px]">
-                  <p className="text-center">Definer</p>
+                  Security
                 </Table.th>
                 <Table.th key="buttons" className="w-1/6"></Table.th>
               </>
