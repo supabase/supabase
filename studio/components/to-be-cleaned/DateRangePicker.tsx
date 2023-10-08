@@ -1,6 +1,14 @@
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
-import { Button, Dropdown, IconChevronDown } from 'ui'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+  IconChevronDown,
+} from 'ui'
 
 import { DATE_FORMAT } from 'lib/constants'
 
@@ -187,27 +195,25 @@ const DateRangePicker = ({
 
   return (
     <>
-      <Dropdown
-        side="bottom"
-        align="start"
-        overlay={
-          <>
-            <Dropdown.RadioGroup value={timePeriod} onChange={(x) => handleChange(x)}>
-              {options.map((option: any) => {
-                return (
-                  <Dropdown.Radio value={option.key} key={option.key}>
-                    {option.label}
-                  </Dropdown.Radio>
-                )
-              })}
-            </Dropdown.RadioGroup>
-          </>
-        }
-      >
-        <Button asChild type="default" iconRight={<IconChevronDown />}>
-          <span>{timePeriod && options.find((x: any) => x.key == timePeriod)?.label}</span>
-        </Button>
-      </Dropdown>
+      <DropdownMenu>
+        <DropdownMenuTrigger>
+          <Button asChild type="default" iconRight={<IconChevronDown />}>
+            <span>{timePeriod && options.find((x) => x.key === timePeriod)?.label}</span>
+          </Button>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent side="bottom" align="start">
+          <DropdownMenuRadioGroup value={timePeriod} onValueChange={(x) => handleChange(x)}>
+            {options.map((option) => {
+              return (
+                <DropdownMenuRadioItem value={option.key} key={option.key}>
+                  {option.label}
+                </DropdownMenuRadioItem>
+              )
+            })}
+          </DropdownMenuRadioGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </>
   )
 }

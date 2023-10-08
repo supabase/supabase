@@ -1,11 +1,4 @@
 import { ReactNode, useRef, useState } from 'react'
-
-import {
-  IntegrationConnectionsCreateVariables,
-  IntegrationProjectConnection,
-} from 'data/integrations/integrations.types'
-import { useSelectedOrganization } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
 import { toast } from 'react-hot-toast'
 import {
   Button,
@@ -21,6 +14,14 @@ import {
   Popover_Shadcn_,
   cn,
 } from 'ui'
+
+import ShimmerLine from 'components/ui/ShimmerLine'
+import {
+  IntegrationConnectionsCreateVariables,
+  IntegrationProjectConnection,
+} from 'data/integrations/integrations.types'
+import { useSelectedOrganization } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
 
 export interface Project {
   id: string
@@ -145,9 +146,14 @@ const ProjectLinker = ({
         <div
           className="absolute inset-0 bg-grid-black/5 [mask-image:linear-gradient(0deg,#fff,rgba(255,255,255,0.6))] dark:bg-grid-white/5 dark:[mask-image:linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]"
           style={{ backgroundPosition: '10px 10px' }}
-        ></div>
-        {(noSupabaseProjects || noForeignProjects) &&
-        (!loadingForeignProjects || !loadingSupabaseProjects) ? (
+        />
+
+        {loadingForeignProjects || loadingSupabaseProjects ? (
+          <div className="w-1/2 mx-auto space-y-2 py-4">
+            <p className="text text-center">Loading projects</p>
+            <ShimmerLine active />
+          </div>
+        ) : noSupabaseProjects || noForeignProjects ? (
           <div className="text-center">
             <h5 className="text">No {missingEntity} Projects found</h5>
             <p className="text-light text-sm">
@@ -305,6 +311,7 @@ const ProjectLinker = ({
           </div>
         )}
       </div>
+
       <div className="flex w-full justify-end gap-2">
         {onSkip !== undefined && (
           <Button

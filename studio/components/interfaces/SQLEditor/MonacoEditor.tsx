@@ -3,6 +3,7 @@ import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { MutableRefObject, useRef } from 'react'
 import { cn } from 'ui'
+import { debounce, memoize } from 'lodash'
 
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useSelectedProject } from 'hooks'
@@ -74,10 +75,14 @@ const MonacoEditor = ({
     }
   }
 
+  const debouncedSetSql = debounce((id, value) => {
+    snap.setSql(id, value)
+  }, 1000)
+
   function handleEditorChange(value: string | undefined) {
     if (id && value) {
       if (snap.snippets[id]) {
-        snap.setSql(id, value)
+        debouncedSetSql(id, value)
       } else {
         const snippet = createSqlSnippetSkeleton({
           id,

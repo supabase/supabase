@@ -1,13 +1,15 @@
 import dagre from '@dagrejs/dagre'
 import clsx from 'clsx'
-import { observer } from 'mobx-react-lite'
 import { uniqBy } from 'lodash'
+import { Diamond, Fingerprint } from 'lucide-react'
+import { observer } from 'mobx-react-lite'
 import { useEffect, useMemo } from 'react'
 import ReactFlow, {
   Background,
   BackgroundVariant,
   Edge,
   Handle,
+  MiniMap,
   Node,
   NodeProps,
   Position,
@@ -16,12 +18,11 @@ import ReactFlow, {
 } from 'reactflow'
 
 import { PostgresTable } from '@supabase/postgres-meta'
-import { useTheme } from 'common/Providers'
-import { useStore } from 'hooks'
-import { IconHash, IconKey, IconLoader, IconLock } from 'ui'
-import { Diamond, Fingerprint } from 'lucide-react'
-
+import { useTheme } from 'next-themes'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useTablesQuery } from 'data/tables/tables-query'
 import 'reactflow/dist/style.css'
+import { IconHash, IconKey, IconLoader, IconLock } from 'ui'
 
 type TableNodeData = {
   name: string
@@ -300,9 +301,13 @@ function TableNode({ data, targetPosition, sourcePosition }: NodeProps<TableNode
 }
 
 const TablesGraph = ({ tables }: { tables: PostgresTable[] }) => {
-  const { isDarkMode } = useTheme()
-  const backgroundPatternColor = isDarkMode ? '#2e2e2e' : '#e6e8eb'
-  const edgeStrokeColor = isDarkMode ? '#ededed' : '#111318'
+  const { resolvedTheme } = useTheme()
+  const backgroundPatternColor = resolvedTheme === 'dark' ? '#2e2e2e' : '#e6e8eb'
+  const edgeStrokeColor = resolvedTheme === 'dark' ? '#ededed' : '#111318'
+
+  const miniMapNodeColor = '#111318'
+  const miniMapMaskColor =
+    resolvedTheme === 'dark' ? 'rgb(17, 19, 24, .8)' : 'rgb(237, 237, 237, .8)'
 
   const reactFlowInstance = useReactFlow()
   const nodeTypes = useMemo(
@@ -318,7 +323,7 @@ const TablesGraph = ({ tables }: { tables: PostgresTable[] }) => {
       reactFlowInstance.setEdges(edges)
       setTimeout(() => reactFlowInstance.fitView({})) // it needs to happen during next event tick
     })
-  }, [tables, isDarkMode])
+  }, [tables, resolvedTheme])
 
   return (
     <>
@@ -336,10 +341,18 @@ const TablesGraph = ({ tables }: { tables: PostgresTable[] }) => {
           }}
           nodeTypes={nodeTypes}
           fitView
-          maxZoom={1.5}
+          minZoom={0.8}
+          maxZoom={1.8}
           proOptions={{ hideAttribution: true }}
         >
           <Background gap={16} color={backgroundPatternColor} variant={BackgroundVariant.Lines} />
+          <MiniMap
+            pannable
+            zoomable
+            nodeColor={miniMapNodeColor}
+            maskColor={miniMapMaskColor}
+            className="border border-scale-600 rounded-md shadow-sm"
+          />
         </ReactFlow>
       </div>
     </>
@@ -347,23 +360,32 @@ const TablesGraph = ({ tables }: { tables: PostgresTable[] }) => {
 }
 
 const SchemaGraph = ({ schema }: { schema: string }) => {
-  const { meta } = useStore()
-  const tables = meta.tables.list((table: { schema: string }) => table.schema === schema)
+  const { project } = useProjectContext()
+  const {
+    data: tables,
+    isLoading,
+    isError,
+    error,
+  } = useTablesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schema,
+  })
 
-  if (meta.tables.isLoading) {
+  if (isLoading) {
     return (
       <div className="flex h-full w-full items-center justify-center space-x-2">
         <IconLoader className="animate-spin" size={14} />
-        <p className="text-sm text-scale-1000">Loading schemas...</p>
+        <p className="text-sm text-foreground-light">Loading table...</p>
       </div>
     )
   }
 
-  if (meta.tables.hasError) {
+  if (isError) {
     return (
-      <div className="px-6 py-4 text-scale-1000">
+      <div className="px-6 py-4 text-foreground-light">
         <p>Error connecting to API</p>
-        <p>{`${meta.tables.error?.message ?? 'Unknown error'}`}</p>
+        <p>{`${error?.message ?? 'Unknown error'}`}</p>
       </div>
     )
   }

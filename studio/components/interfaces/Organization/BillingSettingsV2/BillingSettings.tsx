@@ -11,49 +11,49 @@ import BillingBreakdown from './BillingBreakdown/BillingBreakdown'
 const BillingSettings = () => {
   return (
     <>
-      <ScaffoldContainer id='subscription'>
+      <ScaffoldContainer id="subscription">
         <Subscription />
       </ScaffoldContainer>
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer id='cost-control'>
+      <ScaffoldContainer id="cost-control">
         <CostControl />
       </ScaffoldContainer>
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer id='breakdown'>
+      <ScaffoldContainer id="breakdown">
         <BillingBreakdown />
       </ScaffoldContainer>
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer id='credits-balance'>
+      <ScaffoldContainer id="credits-balance">
         <CreditBalance />
       </ScaffoldContainer>
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer id='payment-methods'>
+      <ScaffoldContainer id="payment-methods">
         <PaymentMethods />
       </ScaffoldContainer>
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer id='email'>
+      <ScaffoldContainer id="email">
         <BillingEmail />
       </ScaffoldContainer>
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer id='address'>
+      <ScaffoldContainer id="address">
         <BillingAddress />
       </ScaffoldContainer>
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer id='taxId'>
+      <ScaffoldContainer id="taxId">
         <TaxID />
       </ScaffoldContainer>
     </>

@@ -14,10 +14,10 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { ResourceWarning, useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { IS_PLATFORM } from 'lib/constants'
 import { makeRandomString } from 'lib/helpers'
+import { useState } from 'react'
 import { Organization, Project, ResponseError } from 'types'
 import ProjectCard from './ProjectCard'
 import ShimmeringCard from './ShimmeringCard'
-import { useState } from 'react'
 
 export interface ProjectListProps {
   rewriteHref?: (projectRef: string) => string
@@ -186,6 +186,11 @@ const OrganizationProjects = ({
               .
             </p>
 
+            <p className="text-sm leading-normal">
+              Please do this until the <span className="font-medium">18th of October</span>, as
+              remaining organizations will be migrated.
+            </p>
+
             <div className="space-x-3">
               <Link href="https://supabase.com/blog/organization-based-billing" passHref>
                 <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
@@ -214,7 +219,7 @@ const NoProjectsState = ({ slug }: { slug: string }) => {
     <div className="col-span-4 space-y-4 rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
       <div className="space-y-1">
         <p>No projects</p>
-        <p className="text-sm text-scale-1100">Get started by creating a new project.</p>
+        <p className="text-sm text-foreground-light">Get started by creating a new project.</p>
       </div>
       <div>
         <Link href={`/new/${slug}`}>

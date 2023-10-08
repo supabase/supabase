@@ -2,13 +2,13 @@ import dayjs from 'dayjs'
 import Link from 'next/link'
 
 import { useParams } from 'common'
+import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import SparkBar from 'components/ui/SparkBar'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useFlag, useSelectedOrganization } from 'hooks'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconExternalLink } from 'ui'
-import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
 import SubscriptionPaymentMethod from './SubscriptionPaymentMethod'
 import TierUpdateSidePanel from './TierUpdateSidePanel'
 
@@ -39,7 +39,7 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
         <div className="col-span-12 lg:col-span-5 space-y-6">
           <div className="sticky space-y-6 top-16">
             <p className="text-base">Subscription plan</p>
-            <div className="text-sm text-scale-1000">
+            <div className="text-sm text-foreground-light">
               To manage your billing address, emails or Tax ID, head to your{' '}
               <Link href={`/org/${orgSlug}/billing`}>
                 <a className="text-sm text-green-900 transition hover:text-green-1000">
@@ -49,7 +49,7 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
               .
             </div>
             <div className="space-y-2">
-              <p className="text-sm text-scale-1100">More information</p>
+              <p className="text-sm text-foreground-light">More information</p>
               <div>
                 <Link href="https://supabase.com/pricing">
                   <a target="_blank" rel="noreferrer">
@@ -130,7 +130,7 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
                   )
                 }
               >
-                <p className="text-sm text-scale-1000">
+                <p className="text-sm text-foreground-light">
                   When this project exceeds its{' '}
                   <Link href="#breakdown">
                     <a className="text-sm text-green-900 transition hover:text-green-1000">
@@ -161,7 +161,7 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
                 'MMM DD'
               )} - ${billingCycleEnd.format('MMM DD')})`}
               bgClass="bg-gray-300 dark:bg-gray-600"
-              labelBottomClass="!text-scale-1000 pb-1"
+              labelBottomClass="!text-foreground-light pb-1"
               labelTop={`${daysToCycleEnd} days remaining`}
             />
 

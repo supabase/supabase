@@ -1,4 +1,4 @@
-import { IconCheckCircle, IconLifeBuoy } from '~/../../packages/ui'
+import { IconCheckCircle, IconLifeBuoy, PrivacySettings } from '~/../../packages/ui'
 
 export const primaryLinks = [
   {
@@ -29,4 +29,5 @@ export const secondaryLinks = [
   },
   { title: 'Open Source', url: 'https://supabase.com/open-source' },
   { title: 'SupaSquad', url: 'https://supabase.com/supasquad' },
+  { title: 'Privacy Settings', component: PrivacySettings },
 ]

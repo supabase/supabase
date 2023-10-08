@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 import { IconArrowUpRight } from 'ui'
 import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
 
@@ -15,6 +15,7 @@ interface Customer {
   avatar?: string
   author?: string
   role?: string
+  target?: string
   quote?: string | React.ReactNode
   abstract?: string
   image?: string
@@ -31,7 +32,6 @@ interface Card {
 interface Props {
   title: string | React.ReactNode
   customers: Customer[]
-  secondaryLinks: Customer[]
 }
 
 const CustomerQuotesSection = (props: Props) => {
@@ -40,8 +40,10 @@ const CustomerQuotesSection = (props: Props) => {
   const isInView = useInView(ref, { margin: '-25%', once: true })
 
   const Card = ({ customer, index }: Card) => {
-    const { isDarkMode } = useTheme()
-    const logo = `/images/customers/logos/${!isDarkMode ? '' : 'light/'}${customer.customer}.png`
+    const { resolvedTheme } = useTheme()
+    const logo = `/images/customers/logos/${resolvedTheme !== 'dark' ? '' : 'light/'}${
+      customer.customer
+    }.png`
 
     const initial = INITIAL_BOTTOM
     const animate = getAnimation({ delay: index * 0.1 })
@@ -96,11 +98,11 @@ const CustomerQuotesSection = (props: Props) => {
           </div>
           <div
             ref={ref}
-            className="relative mx-auto max-w-4xl grid grid-cols-1 lg:grid-cols-2 gap-4 xl:gap-8 pt-16 pb-0"
+            className="relative mx-auto max-w-7xl grid grid-cols-1 lg:grid-cols-3 gap-4 xl:gap-8 pt-16 pb-0"
           >
             {props.customers.map((customer, i: number) => (
               <Link href={`${basePath}${customer.url}`} key={customer.customer}>
-                <a className="h-full flex">
+                <a className="h-full flex" target={customer.target ?? '_self'}>
                   <Card customer={customer} index={i} />
                 </a>
               </Link>

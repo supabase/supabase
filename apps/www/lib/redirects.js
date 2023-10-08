@@ -737,11 +737,6 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/blog/2021/02/09/case-study-roboflow',
-    destination: '/customers/roboflow',
-  },
-  {
-    permanent: true,
     source: '/blog/2021/02/27/cracking-postgres-interview',
     destination: '/blog/cracking-postgres-interview',
   },
@@ -1715,7 +1710,12 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/with-expo',
-    destination: '/docs/guides/getting-started/tutorials/with-expo',
+    destination: '/docs/guides/getting-started/tutorials/with-expo-react-native',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/tutorials/with-expo',
+    destination: '/docs/guides/getting-started/tutorials/with-expo-react-native',
   },
   {
     permanent: true,
@@ -1960,11 +1960,6 @@ module.exports = [
     permanent: true,
     source: '/blog/case-study-xendit',
     destination: '/customers/xendit',
-  },
-  {
-    permanent: true,
-    source: '/blog/case-study-roboflow',
-    destination: '/customers',
   },
   {
     permanent: true,

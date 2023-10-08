@@ -1,7 +1,7 @@
-import Link from 'next/link'
-import { IconChevronRight, useTheme } from 'ui'
-
 import { BASE_PATH } from 'lib/constants'
+import { useTheme } from 'next-themes'
+import Link from 'next/link'
+import { IconChevronRight } from 'ui'
 
 interface ExampleProjectProps {
   framework: string
@@ -11,7 +11,7 @@ interface ExampleProjectProps {
 }
 
 const ExampleProject = ({ framework, title, description, url }: ExampleProjectProps) => {
-  const { isDarkMode } = useTheme()
+  const { resolvedTheme } = useTheme()
 
   return (
     <Link href={url}>
@@ -30,7 +30,7 @@ const ExampleProject = ({ framework, title, description, url }: ExampleProjectPr
               className="transition-all group-hover:scale-110"
               src={`${BASE_PATH}/img/libraries/${framework.toLowerCase()}${
                 ['expo', 'nextjs'].includes(framework.toLowerCase())
-                  ? isDarkMode
+                  ? resolvedTheme === 'dark'
                     ? '-dark'
                     : ''
                   : ''
@@ -41,19 +41,19 @@ const ExampleProject = ({ framework, title, description, url }: ExampleProjectPr
             />
           </div>
           <div className="w-4/5 space-y-2">
-            <h5 className="text-scale-1200">{title}</h5>
-            <p className="text-sm text-scale-1000">{description}</p>
+            <h5 className="text-foreground">{title}</h5>
+            <p className="text-sm text-foreground-light">{description}</p>
           </div>
           <div
             className="
             absolute
             right-4
             top-3
-            text-scale-900
-            transition-all 
-            duration-200 
+            text-foreground-lighter
+            transition-all
+            duration-200
             group-hover:right-3
-            group-hover:text-scale-1200
+            group-hover:text-foreground
           "
           >
             <IconChevronRight />

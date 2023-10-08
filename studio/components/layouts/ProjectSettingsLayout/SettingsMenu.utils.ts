@@ -72,7 +72,7 @@ export const generateSettingsMenu = (
           ...(IS_PLATFORM
             ? [
                 {
-                  name: 'Auth',
+                  name: 'Authentication',
                   key: 'auth',
                   url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/auth`,
                   items: [],
@@ -85,6 +85,16 @@ export const generateSettingsMenu = (
                   name: 'Storage',
                   key: 'storage',
                   url: `/project/${ref}/settings/storage`,
+                  items: [],
+                },
+              ]
+            : []),
+          ...(IS_PLATFORM
+            ? [
+                {
+                  name: 'Edge Functions',
+                  key: 'functions',
+                  url: `/project/${ref}/settings/functions`,
                   items: [],
                 },
               ]

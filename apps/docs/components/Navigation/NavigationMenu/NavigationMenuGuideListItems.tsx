@@ -1,4 +1,4 @@
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -19,7 +19,7 @@ const HeaderLink = React.memo(function HeaderLink(props: {
       className={[
         ' ',
         !props.title && 'capitalize',
-        props.url === router.pathname ? 'text-brand' : 'hover:text-brand text-scale-1200',
+        props.url === router.asPath ? 'text-brand' : 'hover:text-brand text-scale-1200',
       ].join(' ')}
     >
       {props.title ?? props.id}
@@ -29,8 +29,8 @@ const HeaderLink = React.memo(function HeaderLink(props: {
 
 const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any) {
   const router = useRouter()
-  const { isDarkMode } = useTheme()
-  const activeItem = props.subItem.url === router.pathname
+  const { resolvedTheme } = useTheme()
+  const activeItem = props.subItem.url === router.asPath
   const activeItemRef = useRef(null)
 
   const LinkContainer = (props) => {
@@ -77,7 +77,8 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
               <Image
                 alt={props.subItem.name + router.basePath}
                 src={
-                  `${router.basePath}` + `${props.subItem.icon}${!isDarkMode ? '-light' : ''}.svg`
+                  `${router.basePath}` +
+                  `${props.subItem.icon}${resolvedTheme !== 'dark' ? '-light' : ''}.svg`
                 }
                 width={15}
                 height={15}
@@ -96,7 +97,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
                     <a
                       className={[
                         'cursor-pointer transition text-sm',
-                        subSubItem.url === router.pathname
+                        subSubItem.url === router.asPath
                           ? 'text-brand'
                           : 'hover:text-brand text-scale-1000',
                       ].join(' ')}
@@ -123,7 +124,7 @@ const ContentLink = React.memo(function ContentLink(props: any) {
         <a
           className={[
             'cursor-pointer transition text-sm',
-            props.url === router.pathname
+            props.url === router.asPath
               ? 'text-brand'
               : 'hover:text-scale-1200 dark:hover:text-scale-1100 text-scale-1000',
           ].join(' ')}

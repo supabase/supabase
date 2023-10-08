@@ -5,9 +5,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Thu, 07 Sep 2023 22:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Mon, 02 Oct 2023 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/postgres-dynamic-table-partitioning</guid>
+  <title>Dynamic Table Partitioning in Postgres</title>
+  <link>https://supabase.com/blog/postgres-dynamic-table-partitioning</link>
+  <description>Learn how to scale large postgres tables in place and increase query performance.</description>
+  <pubDate>Mon, 02 Oct 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/beta-update-august-2023</guid>
   <title>Supabase Beta August 2023</title>
   <link>https://supabase.com/blog/beta-update-august-2023</link>

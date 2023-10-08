@@ -2,7 +2,6 @@ import { useState } from 'react'
 import {
   Button,
   IconMessageCircle,
-  Popover,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
@@ -44,7 +43,7 @@ const FeedbackDropdown = ({ alt = false }: FeedbackDropdownProps) => {
           type="default"
           icon={
             alt ? null : (
-              <IconMessageCircle size={16} strokeWidth={1.5} className="text-scale-900" />
+              <IconMessageCircle size={16} strokeWidth={1.5} className="text-foreground-lighter" />
             )
           }
         >
