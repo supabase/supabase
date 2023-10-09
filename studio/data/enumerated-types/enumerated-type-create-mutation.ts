@@ -21,8 +21,9 @@ export async function createEnumeratedType({
   description,
   values,
 }: EnumeratedTypeCreateVariables) {
-  const createSql = `create type ${name} as enum (${values.map((x) => `'${x}'`).join(', ')});`
-  const commentSql = description !== undefined ? `comment on type ${name} is '${description}';` : ''
+  const createSql = `create type "${name}" as enum (${values.map((x) => `'${x}'`).join(', ')});`
+  const commentSql =
+    description !== undefined ? `comment on type "${name}" is '${description}';` : ''
   const sql = wrapWithTransaction(`${createSql} ${commentSql}`)
   const { result } = await executeSql({ projectRef, connectionString, sql })
   return result

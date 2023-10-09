@@ -1,11 +1,26 @@
-import { useEffect, useState } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect, useRef } from 'react'
 import { DragDropContext, Droppable, DroppableProvided } from 'react-beautiful-dnd'
+import { useFieldArray, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
-import { Button, IconPlus, Input, SidePanel } from 'ui'
+import {
+  Button,
+  FormControl_Shadcn_,
+  FormDescription_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
+  FormMessage_Shadcn_,
+  Form_Shadcn_,
+  IconPlus,
+  Input,
+  SidePanel,
+  cn,
+} from 'ui'
+import * as z from 'zod'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useEnumeratedTypeCreateMutation } from 'data/enumerated-types/enumerated-type-create-mutation'
-import { uuidv4 } from 'lib/helpers'
 import EnumeratedTypeValueRow from './EnumeratedTypeValueRow'
 
 interface CreateEnumeratedTypeSidePanelProps {
@@ -17,46 +32,41 @@ const CreateEnumeratedTypeSidePanel = ({
   visible,
   onClose,
 }: CreateEnumeratedTypeSidePanelProps) => {
-  // [Joshen] Opting states for simplicity
-  const [name, setName] = useState('')
-  const [description, setDescription] = useState('')
-  const [values, setValues] = useState([{ id: uuidv4(), value: '' }])
-
-  useEffect(() => {
-    if (visible) {
-      setName('')
-      setDescription('')
-      setValues([{ id: uuidv4(), value: '' }])
-    }
-  }, [visible])
-
+  const submitRef = useRef<HTMLButtonElement>(null)
   const { project } = useProjectContext()
   const { mutate: createEnumeratedType, isLoading: isCreating } = useEnumeratedTypeCreateMutation({
-    onSuccess: () => {
-      toast.success(`Successfully created type "${name}"`)
+    onSuccess: (res, vars) => {
+      toast.success(`Successfully created type "${vars.name}"`)
       onClose()
     },
   })
 
-  const updateValue = (id: string, value: string) => {
-    const updatedValues = values.map((x) => {
-      if (id === x.id) return { ...x, value }
-      return x
-    })
-    setValues(updatedValues)
-  }
+  const FormSchema = z.object({
+    name: z.string().min(1, 'Please provide a name for your enumerated type').default(''),
+    description: z.string().default('').optional(),
+    values: z
+      .object({ value: z.string().min(1, 'Please provide a value') })
+      .array()
+      .default([]),
+  })
+
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: { name: '', description: '', values: [{ value: '' }] },
+  })
+
+  const { fields, append, remove, move } = useFieldArray({
+    name: 'values',
+    control: form.control,
+  })
 
   const updateOrder = (result: any) => {
     // Dropped outside of the list
     if (!result.destination) return
-
-    const updatedValues = values.slice()
-    const [removed] = updatedValues.splice(result.source.index, 1)
-    updatedValues.splice(result.destination.index, 0, removed)
-    setValues(updatedValues)
+    move(result.source.index, result.destination.index)
   }
 
-  const saveEnumeratedType = () => {
+  const onSubmit = (data: z.infer<typeof FormSchema>) => {
     if (project?.ref === undefined) return console.error('Project ref required')
     if (project?.connectionString === undefined)
       return console.error('Project connectionString required')
@@ -64,11 +74,15 @@ const CreateEnumeratedTypeSidePanel = ({
     createEnumeratedType({
       projectRef: project.ref,
       connectionString: project.connectionString,
-      name,
-      description,
-      values: values.filter((x) => x.value.length > 0).map((x) => x.value),
+      name: data.name,
+      description: data.description,
+      values: data.values.filter((x) => x.value.length > 0).map((x) => x.value),
     })
   }
+
+  useEffect(() => {
+    if (visible) form.reset()
+  }, [visible])
 
   return (
     <SidePanel
@@ -77,45 +91,87 @@ const CreateEnumeratedTypeSidePanel = ({
       onCancel={onClose}
       header="Create a new enumerated type"
       confirmText="Create type"
-      onConfirm={() => saveEnumeratedType()}
+      onConfirm={() => {
+        if (submitRef.current) submitRef.current.click()
+      }}
     >
-      <SidePanel.Content className="py-4 space-y-4">
-        <Input label="Name" value={name} onChange={(e) => setName(e.target.value)} />
-        <Input
-          label="Description"
-          labelOptional="Optional"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-
-        <div>
-          <label className="text-sm text-foreground-light">Values</label>
-          <DragDropContext onDragEnd={(result: any) => updateOrder(result)}>
-            <Droppable droppableId="enum_type_values_droppable">
-              {(droppableProvided: DroppableProvided) => (
-                <div ref={droppableProvided.innerRef} className="mt-2 mb-3 space-y-2">
-                  {values.map((x, idx) => (
-                    <EnumeratedTypeValueRow
-                      key={x.id}
-                      index={idx}
-                      enumTypeValue={x}
-                      onUpdateValue={updateValue}
-                      onRemoveValue={() => setValues(values.filter((y) => y.id !== x.id))}
-                    />
-                  ))}
-                  {droppableProvided.placeholder}
-                </div>
+      <SidePanel.Content className="py-4">
+        <Form_Shadcn_ {...form}>
+          <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+            <FormField_Shadcn_
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem_Shadcn_>
+                  <FormLabel_Shadcn_>Name</FormLabel_Shadcn_>
+                  <FormControl_Shadcn_>
+                    <Input {...field} />
+                  </FormControl_Shadcn_>
+                  <FormMessage_Shadcn_ />
+                </FormItem_Shadcn_>
               )}
-            </Droppable>
-          </DragDropContext>
-          <Button
-            type="default"
-            icon={<IconPlus strokeWidth={1.5} />}
-            onClick={() => setValues(values.concat([{ id: uuidv4(), value: '' }]))}
-          >
-            Add value
-          </Button>
-        </div>
+            />
+            <FormField_Shadcn_
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem_Shadcn_>
+                  <FormLabel_Shadcn_>Description</FormLabel_Shadcn_>
+                  <FormControl_Shadcn_>
+                    <Input {...field} />
+                  </FormControl_Shadcn_>
+                  <FormDescription_Shadcn_>Optional</FormDescription_Shadcn_>
+                </FormItem_Shadcn_>
+              )}
+            />
+
+            <DragDropContext onDragEnd={(result: any) => updateOrder(result)}>
+              <Droppable droppableId="enum_type_values_droppable">
+                {(droppableProvided: DroppableProvided) => (
+                  <div ref={droppableProvided.innerRef}>
+                    {fields.map((field, index) => (
+                      <FormField_Shadcn_
+                        control={form.control}
+                        key={field.id}
+                        name={`values.${index}.value`}
+                        render={({ field: inputField }) => (
+                          <FormItem_Shadcn_>
+                            <FormLabel_Shadcn_ className={cn(index !== 0 && 'sr-only')}>
+                              Values
+                            </FormLabel_Shadcn_>
+                            <FormControl_Shadcn_>
+                              <EnumeratedTypeValueRow
+                                index={index}
+                                id={field.id}
+                                field={inputField}
+                                isDisabled={fields.length < 2}
+                                onRemoveValue={() => remove(index)}
+                              />
+                            </FormControl_Shadcn_>
+                            <FormMessage_Shadcn_ className="ml-6" />
+                          </FormItem_Shadcn_>
+                        )}
+                      />
+                    ))}
+                    {droppableProvided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
+
+            <Button
+              type="default"
+              icon={<IconPlus strokeWidth={1.5} />}
+              onClick={() => append({ value: '' })}
+            >
+              Add value
+            </Button>
+
+            <Button ref={submitRef} htmlType="submit" type="default" className="hidden">
+              Update
+            </Button>
+          </form>
+        </Form_Shadcn_>
       </SidePanel.Content>
     </SidePanel>
   )

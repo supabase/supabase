@@ -1,23 +1,32 @@
-import { useEffect, useState } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import Link from 'next/link'
+import { useEffect, useRef } from 'react'
+import { useFieldArray, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
+  FormControl_Shadcn_,
+  FormDescription_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
+  FormMessage_Shadcn_,
+  Form_Shadcn_,
   IconAlertCircle,
   IconExternalLink,
   IconPlus,
-  IconTrash,
   Input,
   SidePanel,
+  cn,
 } from 'ui'
+import * as z from 'zod'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { uuidv4 } from 'lib/helpers'
-import { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 import { useEnumeratedTypeUpdateMutation } from 'data/enumerated-types/enumerated-type-update-mutation'
-import Link from 'next/link'
+import { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 import { DragDropContext, Droppable, DroppableProvided } from 'react-beautiful-dnd'
 import EnumeratedTypeValueRow from './EnumeratedTypeValueRow'
 
@@ -32,28 +41,7 @@ const EditEnumeratedTypeSidePanel = ({
   selectedEnumeratedType,
   onClose,
 }: EditEnumeratedTypeSidePanelProps) => {
-  // [Joshen] Opting states for simplicity
-  const [name, setName] = useState('')
-  const [description, setDescription] = useState('')
-  const [values, setValues] = useState<
-    { id: string; originalValue: string; updatedValue: string }[]
-  >([])
-
-  const originalEnumeratedTypes = (selectedEnumeratedType?.enums ?? []).map((x) => ({
-    id: x,
-    originalValue: x,
-    updatedValue: x,
-  }))
-
-  useEffect(() => {
-    if (selectedEnumeratedType !== undefined) {
-      setName(selectedEnumeratedType.name)
-      setValues(originalEnumeratedTypes)
-      if (selectedEnumeratedType.comment) setDescription(selectedEnumeratedType.comment)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedEnumeratedType])
-
+  const submitRef = useRef<HTMLButtonElement>(null)
   const { project } = useProjectContext()
   const { mutate: updateEnumeratedType, isLoading: isCreating } = useEnumeratedTypeUpdateMutation({
     onSuccess: () => {
@@ -62,25 +50,46 @@ const EditEnumeratedTypeSidePanel = ({
     },
   })
 
-  const updateValue = (id: string, value: string) => {
-    const updatedValues = values.map((x) => {
-      if (id === x.id) return { ...x, updatedValue: value }
-      return x
-    })
-    setValues(updatedValues)
-  }
+  const FormSchema = z.object({
+    name: z.string().min(1, 'Please provide a name for your enumerated type').default(''),
+    description: z.string().default('').optional(),
+    values: z
+      .object({
+        isNew: z.boolean(),
+        originalValue: z.string(),
+        updatedValue: z.string().min(1, 'Please provide a value'),
+      })
+      .array()
+      .default([]),
+  })
+
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      name: '',
+      description: '',
+      values: [{ isNew: true, originalValue: '', updatedValue: '' }],
+    },
+  })
+
+  const { fields, append, remove, move } = useFieldArray({
+    name: 'values',
+    control: form.control,
+  })
 
   const updateOrder = (result: any) => {
     // Dropped outside of the list
     if (!result.destination) return
-
-    const updatedValues = values.slice()
-    const [removed] = updatedValues.splice(result.source.index, 1)
-    updatedValues.splice(result.destination.index, 0, removed)
-    setValues(updatedValues)
+    move(result.source.index, result.destination.index)
   }
 
-  const saveEnumeratedType = () => {
+  const originalEnumeratedTypes = (selectedEnumeratedType?.enums ?? []).map((x) => ({
+    isNew: false,
+    originalValue: x,
+    updatedValue: x,
+  }))
+
+  const onSubmit = (data: z.infer<typeof FormSchema>) => {
     if (project?.ref === undefined) return console.error('Project ref required')
     if (project?.connectionString === undefined)
       return console.error('Project connectionString required')
@@ -92,15 +101,17 @@ const EditEnumeratedTypeSidePanel = ({
       values: { original: string; updated: string; isNew: boolean }[]
       description?: string
     } = {
-      name: { original: selectedEnumeratedType.name, updated: name },
-      values: values
+      name: { original: selectedEnumeratedType.name, updated: data.name },
+      values: data.values
         .filter((x) => x.updatedValue.length !== 0)
         .map((x) => ({
           original: x.originalValue,
           updated: x.updatedValue,
-          isNew: x.id !== x.originalValue,
+          isNew: x.isNew,
         })),
-      ...(description !== selectedEnumeratedType.comment ? { description } : {}),
+      ...(data.description !== selectedEnumeratedType.comment
+        ? { description: data.description }
+        : {}),
     }
 
     updateEnumeratedType({
@@ -110,6 +121,17 @@ const EditEnumeratedTypeSidePanel = ({
     })
   }
 
+  useEffect(() => {
+    if (selectedEnumeratedType !== undefined) {
+      form.reset({
+        name: selectedEnumeratedType.name,
+        description: selectedEnumeratedType.comment ?? '',
+        values: originalEnumeratedTypes,
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedEnumeratedType])
+
   return (
     <SidePanel
       loading={isCreating}
@@ -117,75 +139,115 @@ const EditEnumeratedTypeSidePanel = ({
       onCancel={onClose}
       header={`Update type "${selectedEnumeratedType?.name}"`}
       confirmText="Update type"
-      onConfirm={() => saveEnumeratedType()}
+      onConfirm={() => {
+        if (submitRef.current) submitRef.current.click()
+      }}
     >
-      <SidePanel.Content className="py-4 space-y-4">
-        <Input label="Name" value={name} onChange={(e) => setName(e.target.value)} />
-        <Input
-          label="Description"
-          labelOptional="Optional"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-
-        <div>
-          <label className="text-sm text-foreground-light mb-1">Values</label>
-
-          <Alert_Shadcn_>
-            <IconAlertCircle strokeWidth={1.5} />
-            <AlertTitle_Shadcn_>Existing values cannot be deleted or sorted</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
-              You may only add or update values to an existing enumerated type. If you'd like to
-              delete existing values, you will need to delete and recreate the enumerated type with
-              the updated values.
-              <Link
-                passHref
-                href="https://www.postgresql.org/message-id/21012.1459434338%40sss.pgh.pa.us"
-              >
-                <Button
-                  asChild
-                  type="default"
-                  icon={<IconExternalLink strokeWidth={1.5} />}
-                  className="mt-2"
-                >
-                  <a target="_blank" rel="noreferrer">
-                    Learn more
-                  </a>
-                </Button>
-              </Link>
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
-
-          <DragDropContext onDragEnd={(result: any) => updateOrder(result)}>
-            <Droppable droppableId="enum_type_values_droppable">
-              {(droppableProvided: DroppableProvided) => (
-                <div ref={droppableProvided.innerRef} className="mt-2 mb-3 space-y-2">
-                  {values.map((x, idx) => (
-                    <EnumeratedTypeValueRow
-                      key={x.id}
-                      index={idx}
-                      isDisabled={x.id === x.originalValue}
-                      enumTypeValue={{ id: x.id, value: x.updatedValue }}
-                      onUpdateValue={updateValue}
-                      onRemoveValue={() => setValues(values.filter((y) => y.id !== x.id))}
-                    />
-                  ))}
-                  {droppableProvided.placeholder}
-                </div>
+      <SidePanel.Content className="py-4">
+        <Form_Shadcn_ {...form}>
+          <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+            <FormField_Shadcn_
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem_Shadcn_>
+                  <FormLabel_Shadcn_>Name</FormLabel_Shadcn_>
+                  <FormControl_Shadcn_>
+                    <Input {...field} />
+                  </FormControl_Shadcn_>
+                  <FormMessage_Shadcn_ />
+                </FormItem_Shadcn_>
               )}
-            </Droppable>
-          </DragDropContext>
+            />
+            <FormField_Shadcn_
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem_Shadcn_>
+                  <FormLabel_Shadcn_>Description</FormLabel_Shadcn_>
+                  <FormControl_Shadcn_>
+                    <Input {...field} />
+                  </FormControl_Shadcn_>
+                  <FormDescription_Shadcn_>Optional</FormDescription_Shadcn_>
+                </FormItem_Shadcn_>
+              )}
+            />
 
-          <Button
-            type="default"
-            icon={<IconPlus strokeWidth={1.5} />}
-            onClick={() =>
-              setValues(values.concat([{ id: uuidv4(), originalValue: '', updatedValue: '' }]))
-            }
-          >
-            Add value
-          </Button>
-        </div>
+            <DragDropContext onDragEnd={(result: any) => updateOrder(result)}>
+              <Droppable droppableId="enum_type_values_droppable">
+                {(droppableProvided: DroppableProvided) => (
+                  <div ref={droppableProvided.innerRef}>
+                    {fields.map((field, index) => (
+                      <FormField_Shadcn_
+                        control={form.control}
+                        key={field.id}
+                        name={`values.${index}.updatedValue`}
+                        render={({ field: inputField }) => (
+                          <FormItem_Shadcn_>
+                            <FormLabel_Shadcn_ className={cn(index !== 0 && 'sr-only')}>
+                              Values
+                            </FormLabel_Shadcn_>
+                            {index === 0 && (
+                              <Alert_Shadcn_>
+                                <IconAlertCircle strokeWidth={1.5} />
+                                <AlertTitle_Shadcn_>
+                                  Existing values cannot be deleted or sorted
+                                </AlertTitle_Shadcn_>
+                                <AlertDescription_Shadcn_>
+                                  You may only add or update values to an existing enumerated type.
+                                  If you'd like to delete existing values, you will need to delete
+                                  and recreate the enumerated type with the updated values.
+                                  <Link
+                                    passHref
+                                    href="https://www.postgresql.org/message-id/21012.1459434338%40sss.pgh.pa.us"
+                                  >
+                                    <Button
+                                      asChild
+                                      type="default"
+                                      icon={<IconExternalLink strokeWidth={1.5} />}
+                                      className="mt-2"
+                                    >
+                                      <a target="_blank" rel="noreferrer">
+                                        Learn more
+                                      </a>
+                                    </Button>
+                                  </Link>
+                                </AlertDescription_Shadcn_>
+                              </Alert_Shadcn_>
+                            )}
+                            <FormControl_Shadcn_>
+                              <EnumeratedTypeValueRow
+                                index={index}
+                                id={field.id}
+                                field={inputField}
+                                isDisabled={!field.isNew}
+                                onRemoveValue={() => remove(index)}
+                              />
+                            </FormControl_Shadcn_>
+                            <FormMessage_Shadcn_ className="ml-6" />
+                          </FormItem_Shadcn_>
+                        )}
+                      />
+                    ))}
+                    {droppableProvided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
+
+            <Button
+              type="default"
+              icon={<IconPlus strokeWidth={1.5} />}
+              onClick={() => append({ isNew: true, originalValue: '', updatedValue: '' })}
+            >
+              Add value
+            </Button>
+
+            <Button ref={submitRef} htmlType="submit" type="default" className="hidden">
+              Update
+            </Button>
+          </form>
+        </Form_Shadcn_>
       </SidePanel.Content>
     </SidePanel>
   )

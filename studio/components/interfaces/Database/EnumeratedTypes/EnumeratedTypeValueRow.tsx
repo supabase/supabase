@@ -4,21 +4,21 @@ import { Button, IconTrash, Input } from 'ui'
 
 interface EnumeratedTypeValueRowProps {
   index: number
+  id: string
+  field: any
   isDisabled?: boolean
-  enumTypeValue: { id: string; value: string }
-  onUpdateValue: (id: string, value: string) => void
   onRemoveValue: () => void
 }
 
 const EnumeratedTypeValueRow = ({
   index,
+  id,
+  field,
   isDisabled = false,
-  enumTypeValue,
-  onUpdateValue,
   onRemoveValue,
 }: EnumeratedTypeValueRowProps) => {
   return (
-    <Draggable draggableId={enumTypeValue.id} index={index} isDragDisabled={isDisabled}>
+    <Draggable draggableId={id} index={index} isDragDisabled={isDisabled}>
       {(draggableProvided: DraggableProvided) => (
         <div
           ref={draggableProvided.innerRef}
@@ -33,11 +33,7 @@ const EnumeratedTypeValueRow = ({
           >
             <GripVertical size={16} strokeWidth={1.5} />
           </div>
-          <Input
-            className="w-full"
-            value={enumTypeValue.value}
-            onChange={(e) => onUpdateValue(enumTypeValue.id, e.target.value)}
-          />
+          <Input {...field} className="w-full" />
           <Button
             type="default"
             size="small"
