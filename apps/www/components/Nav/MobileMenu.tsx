@@ -88,6 +88,31 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
     </>
   )
 
+  const RenderedAccordion = () => (
+    <Accordion
+      type="default"
+      openBehaviour="multiple"
+      size="large"
+      className="space-y-1"
+      justified
+      chevronAlign="right"
+    >
+      {menu.primaryNav
+        .filter((item: any) => item.hasDropdown)
+        .map((menuItem: any) => (
+          <div className="border-b [&>div]:!rounded-none" key={menuItem.title}>
+            <Accordion.Item
+              header={<m.span variants={listItem}>{menuItem.title}</m.span>}
+              id={menuItem.title}
+              className="block relative py-2 pl-3 pr-4 text-base font-medium text-foreground hover:bg-surface-200"
+            >
+              <AccordionMenuItem menuItem={menuItem} />
+            </Accordion.Item>
+          </div>
+        ))}
+    </Accordion>
+  )
+
   return (
     <LazyMotion features={domAnimation}>
       <AnimatePresence exitBeforeEnter>
@@ -135,28 +160,7 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
             </div>
             <div className="max-h-screen supports-[height:100cqh]:h-[100cqh] supports-[height:100svh]:h-[100svh] overflow-y-auto py-8 px-4">
               <div className="mt-10 mb-20 space-y-1">
-                <Accordion
-                  type="default"
-                  openBehaviour="multiple"
-                  size="large"
-                  className="space-y-1"
-                  justified
-                  chevronAlign="right"
-                >
-                  {menu.primaryNav
-                    .filter((item: any) => item.hasDropdown)
-                    .map((menuItem: any) => (
-                      <div className="border-b [&>div]:!rounded-none" key={menuItem.title}>
-                        <Accordion.Item
-                          header={<m.span variants={listItem}>{menuItem.title}</m.span>}
-                          id={menuItem.title}
-                          className="block relative py-2 pl-3 pr-4 text-base font-medium text-foreground hover:bg-surface-200"
-                        >
-                          <AccordionMenuItem menuItem={menuItem} />
-                        </Accordion.Item>
-                      </div>
-                    ))}
-                </Accordion>
+                <RenderedAccordion />
                 {menu.primaryNav
                   .filter((item: any) => !item.hasDropdown)
                   .map((menuItem: any) => (
