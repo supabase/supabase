@@ -3,8 +3,9 @@ import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import DefaultLayout from '~/components/Layouts/Default'
 
+import { useBreakpoint } from 'common'
 import { PRODUCT_SHORTNAMES } from '~/lib/constants'
-import pageData from '~/data/products/vector/pageData'
+import vectorPageData from '~/data/products/vector/pageData'
 
 import 'swiper/swiper.min.css'
 
@@ -20,10 +21,12 @@ const EnterpriseCta = dynamic(() => import('~/components/Sections/EnterpriseCta'
 
 function VectorPage() {
   // base path for images
+  const isXs = useBreakpoint(640)
   const { basePath } = useRouter()
   const meta_title = 'Supabase Vector | The Postgres Vector database.'
   const meta_description =
     'An open source Vector database for developing AI applications. Use pgvector to store, index, and access embeddings, and our AI toolkit to build AI applications with Hugging Face and OpenAI.'
+  const pageData = vectorPageData(isXs)
 
   return (
     <>
