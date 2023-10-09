@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import Nav from 'components/Nav/index'
 import Footer from 'components/Footer/index'
 
