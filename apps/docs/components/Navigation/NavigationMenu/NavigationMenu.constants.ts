@@ -869,6 +869,10 @@ export const functions: NavMenuConstant = {
         { name: 'Sending Emails with Resend', url: '/guides/functions/examples/send-emails' },
         { name: 'Upstash Redis', url: '/guides/functions/examples/upstash-redis' },
         { name: 'Type-Safe SQL with Kysely', url: '/guides/functions/kysely-postgres' },
+        {
+          name: 'Resizing & Compressing Images with Tinify',
+          url: '/guides/functions/examples/image-compress-resize'
+        }
       ],
     },
     {

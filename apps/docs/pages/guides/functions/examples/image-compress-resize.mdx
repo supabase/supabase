@@ -1,0 +1,154 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = { title: 'Resizing & Compressing Images with Tinify', description: 'Resize, compress and store an image using Tinify', }
+
+Resizing, compressing and storing images using [Tinify](https://tinypng.com).
+
+### Prerequisites
+
+To get the most out of this guide, you’ll need to:
+
+- [Create an API key](https://tinypng.com/developers)
+
+### 1. Create Supabase function
+
+Create a new function in your project:
+
+```bash
+supabase functions new image-resize-compress-store
+```
+
+### 2. Set up Environment Variable
+
+You'll need environment variables with the bucket name that you wish to add images to and the maximum longest dimension of an image (Default 1000px).
+
+```bash
+STORAGE_BUCKET: "images",
+MAX_IMAGE_SIZE: 1000
+```
+### 3. Add code
+
+Add the following code to the `index.ts` file:
+
+```ts index.ts
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { crypto } from "https://deno.land/std@0.201.0/crypto/mod.ts";
+import {
+	ImageMagick,
+	initialize,
+	MagickFormat,
+} from "https://deno.land/x/imagemagick_deno@0.0.25/mod.ts";
+import { Tinify } from "https://deno.land/x/tinify@v1.0.0/mod.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.33.2";
+
+const maxImageSize = Number(Deno.env.get("MAX_IMAGE_SIZE") || 1000);
+
+const base64ToArrayBuffer = (base64: string): ArrayBuffer => {
+	const binary_string =  atob(base64);
+	const len = binary_string.length;
+	const bytes = new Uint8Array( len );
+	for (let i = 0; i < len; i++)        {
+		bytes[i] = binary_string.charCodeAt(i);
+	}
+	return bytes.buffer;
+}
+
+serve(async (req) => {
+	const supabaseClient = createClient(
+		Deno.env.get("SUPABASE_URL") as string,
+		Deno.env.get("SUPABASE_ANON_KEY") as string
+	);
+
+	const data = new Uint8Array(await req.arrayBuffer());
+
+	const tinify = new Tinify({
+		api_key: Deno.env.get("TINIFY_API_KEY") as string
+	});
+
+	await initialize();
+
+	return new Promise((resolve) => {
+		ImageMagick.read(data, (img) => {
+			// Resize image, maintaining aspect ratio
+			const ratio = Math.min(maxImageSize / img.width, maxImageSize / img.height);
+
+			if (img.width > maxImageSize || img.height > maxImageSize) {
+				if (img.width === img.height) {
+					img.resize(maxImageSize, maxImageSize);
+				} else if (img.width > img.height) {
+					img.resize(maxImageSize, maxImageSize * ratio);
+				} else {
+					img.resize(maxImageSize * ratio, maxImageSize);
+				}
+			}
+	
+			img.write(
+				MagickFormat.Png,
+				async (data: Uint8Array) => {
+					// Tinify & convert response to buffer
+					const tinyImage = await tinify.compress(data);
+					const { base64 } = await tinyImage.toBase64();
+					const tinyImageBuffer = base64ToArrayBuffer(base64);
+	
+					// Upload buffer to store
+					const fileName = `${crypto.randomUUID()}-${new Date().getTime()}.png`;
+					const res = await supabaseClient.storage.from(Deno.env.get("STORAGE_BUCKET")).upload(fileName, tinyImageBuffer, {
+						contentType: "image/png"
+					});
+	
+					if (res.error) {
+						resolve(
+							new Response(JSON.stringify({
+								body: res.error.message
+							}), {
+								headers: {
+									"Content-Type": "application/json"
+								},
+								status: 200,
+							})
+						);
+					} else {
+						resolve(
+							new Response(JSON.stringify({
+								body: res.data
+							}), {
+								headers: {
+									"Content-Type": "application/json"
+								},
+								status: 200,
+							})
+						)
+					}
+				}
+			);
+		});
+	});
+});
+```
+
+### 4. Run locally
+
+```bash
+supabase start
+supabase functions serve --no-verify-jwt --env-file supabase/functions/image-resize-compress-store/.env
+```
+
+Upload a binary file
+
+```bash
+curl --request POST http://localhost:54321/functions/v1/image-compress-store \
+  --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs' \
+  --header 'Content-Type: image/jpeg' \
+  --data 'YOUR_IMAGE_BINARY'
+```
+
+### 5. Deploy to Supabase
+
+```bash
+supabase functions deploy image-compress-store --no-verify-jwt
+supabase secrets set --env-file supabase/functions/image-compress-store/.env
+```
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
