@@ -194,7 +194,7 @@ const EditEnumeratedTypeSidePanel = ({
                                   Existing values cannot be deleted or sorted
                                 </AlertTitle_Shadcn_>
                                 <AlertDescription_Shadcn_>
-                                  You may only add or update values to an existing enumerated type.
+                                  You can only add or update values to an existing enumerated type.
                                   If you'd like to delete existing values, you will need to delete
                                   and recreate the enumerated type with the updated values.
                                   <Link
