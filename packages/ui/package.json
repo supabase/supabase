@@ -15,6 +15,7 @@
     "generate-styles": "npm run copy-tokens && npm run build-tokens && npm run cleanse-css-for-tailwind && npm run generate-demo-tailwind-classes",
     "storybook-build": "storybook build",
     "storybook": "storybook dev -p 6006",
+    "transform-tokens": "node ./build-new/transformTokens.js",
     "test": "jest"
   },
   "dependencies": {
@@ -110,6 +111,7 @@
     "storybook": "^7.0.5",
     "storybook-dark-mode": "^3.0.0",
     "style-dictionary": "^3.7.1",
+    "@ctrl/tinycolor": "^3.4.0",
     "tsconfig-paths-webpack-plugin": "^4.0.1",
     "typescript": "^5.0.4",
     "ts-jest": "^29.1.1",
