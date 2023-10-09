@@ -33,6 +33,61 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
 
   useKey('Escape', () => setOpen(false))
 
+  const AccordionMenuItem = ({ menuItem }: any) => (
+    <>
+      {menuItem.title === 'Product' ? (
+        Object.values(menuItem.subMenu)?.map((component: any) => (
+          <MenuItem
+            key={component.name}
+            title={component.name}
+            href={component.url}
+            description={component.description_short}
+            icon={component.icon}
+          />
+        ))
+      ) : menuItem.title === 'Developers' ? (
+        <div className="px-3 mb-2 flex flex-col gap-2">
+          {menuItem.subMenu['navigation'].map((column: any) => (
+            <div key={column.label} className="flex flex-col gap-3">
+              {column.label !== 'Developers' && (
+                <label className="text-muted text-xs uppercase tracking-widest font-mono mt-4">
+                  {column.label}
+                </label>
+              )}
+              {column.links.map((link: any) => (
+                <TextLink
+                  hasChevron={false}
+                  key={link.text}
+                  url={link.url}
+                  label={link.text}
+                  className="focus-visible:ring-offset-4 focus-visible:ring-offset-background-overlay !mt-0"
+                />
+              ))}
+            </div>
+          ))}
+
+          <div className="flex flex-col py-2">
+            <label className="text-muted text-xs uppercase tracking-widest font-mono">
+              Troubleshooting
+            </label>
+            <TextLink
+              hasChevron={false}
+              url={menuItem.subMenu['footer']['support'].url}
+              label={menuItem.subMenu['footer']['support'].text}
+              className="focus-visible:ring-offset-4 focus-visible:ring-offset-background-overlay"
+            />
+            <TextLink
+              hasChevron={false}
+              url={menuItem.subMenu['footer']['systemStatus'].url}
+              label={menuItem.subMenu['footer']['systemStatus'].text}
+              className="focus-visible:ring-offset-4 focus-visible:ring-offset-background-overlay"
+            />
+          </div>
+        </div>
+      ) : null}
+    </>
+  )
+
   return (
     <LazyMotion features={domAnimation}>
       <AnimatePresence exitBeforeEnter>
@@ -93,60 +148,11 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
                     .map((menuItem: any) => (
                       <div className="border-b [&>div]:!rounded-none" key={menuItem.title}>
                         <Accordion.Item
-                          header={menuItem.title}
+                          header={<m.span variants={listItem}>{menuItem.title}</m.span>}
                           id={menuItem.title}
                           className="block relative py-2 pl-3 pr-4 text-base font-medium text-foreground hover:bg-surface-200"
                         >
-                          {menuItem.title === 'Product' ? (
-                            Object.values(menuItem.subMenu)?.map((component: any) => (
-                              <MenuItem
-                                key={component.name}
-                                title={component.name}
-                                href={component.url}
-                                description={component.description_short}
-                                icon={component.icon}
-                              />
-                            ))
-                          ) : menuItem.title === 'Developers' ? (
-                            <div className="px-3 mb-2 flex flex-col gap-2">
-                              {menuItem.subMenu['navigation'].map((column: any) => (
-                                <div key={column.label} className="flex flex-col gap-3">
-                                  {column.label !== 'Developers' && (
-                                    <label className="text-muted text-xs uppercase tracking-widest font-mono mt-4">
-                                      {column.label}
-                                    </label>
-                                  )}
-                                  {column.links.map((link: any) => (
-                                    <TextLink
-                                      hasChevron={false}
-                                      key={link.text}
-                                      url={link.url}
-                                      label={link.text}
-                                      className="focus-visible:ring-offset-4 focus-visible:ring-offset-background-overlay !mt-0"
-                                    />
-                                  ))}
-                                </div>
-                              ))}
-
-                              <div className="flex flex-col py-2">
-                                <label className="text-muted text-xs uppercase tracking-widest font-mono">
-                                  Troubleshooting
-                                </label>
-                                <TextLink
-                                  hasChevron={false}
-                                  url={menuItem.subMenu['footer']['support'].url}
-                                  label={menuItem.subMenu['footer']['support'].text}
-                                  className="focus-visible:ring-offset-4 focus-visible:ring-offset-background-overlay"
-                                />
-                                <TextLink
-                                  hasChevron={false}
-                                  url={menuItem.subMenu['footer']['systemStatus'].url}
-                                  label={menuItem.subMenu['footer']['systemStatus'].text}
-                                  className="focus-visible:ring-offset-4 focus-visible:ring-offset-background-overlay"
-                                />
-                              </div>
-                            </div>
-                          ) : null}
+                          <AccordionMenuItem menuItem={menuItem} />
                         </Accordion.Item>
                       </div>
                     ))}
@@ -156,9 +162,12 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
                   .map((menuItem: any) => (
                     <div className="border-b [&>div]:!rounded-none" key={menuItem.title}>
                       <Link href={menuItem.url}>
-                        <a className="block py-2 pl-3 pr-4 text-base font-medium text-strong hover:bg-surface-200 dark:text-white focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:rounded">
+                        <m.a
+                          variants={listItem}
+                          className="block py-2 pl-3 pr-4 text-base font-medium text-strong hover:bg-surface-200 dark:text-white focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:rounded"
+                        >
                           {menuItem.title}
-                        </a>
+                        </m.a>
                       </Link>
                     </div>
                   ))}
