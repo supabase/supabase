@@ -229,8 +229,8 @@ const GitHubIntegrationConnectionForm = ({
               Changing Supabase directory is currently not supported
             </AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_ className="text-xs">
-              You will need to disable Branching and opt back into Branching to change the Production Branch. 
-              your Git repository.
+              You will need to disable Branching and opt back into Branching to change the
+              Production Branch. your Git repository.
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
 
