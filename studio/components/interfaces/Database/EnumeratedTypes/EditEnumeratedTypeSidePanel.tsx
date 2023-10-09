@@ -127,8 +127,8 @@ const EditEnumeratedTypeSidePanel = ({
           onChange={(e) => setDescription(e.target.value)}
         />
 
-        <div className="">
-          <p className="text-sm text-foreground-light mb-1">Values</p>
+        <div>
+          <label className="text-sm text-foreground-light mb-1">Values</label>
 
           <Alert_Shadcn_>
             <IconAlertCircle strokeWidth={1.5} />

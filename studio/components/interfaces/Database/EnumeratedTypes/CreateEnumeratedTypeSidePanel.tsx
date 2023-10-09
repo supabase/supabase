@@ -88,7 +88,7 @@ const CreateEnumeratedTypeSidePanel = ({
         />
 
         <div>
-          <p className="text-sm text-foreground-light">Values</p>
+          <label className="text-sm text-foreground-light">Values</label>
           <DragDropContext onDragEnd={(result: any) => updateOrder(result)}>
             <Droppable droppableId="enum_type_values_droppable">
               {(droppableProvided: DroppableProvided) => (

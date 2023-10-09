@@ -152,7 +152,7 @@ const SchemaSelector = ({
                     >
                       <div className="flex items-center space-x-2">
                         <IconPlus />
-                        <p>Create a new schema</p>
+                        <span>Create a new schema</span>
                       </div>
                     </CommandItem_Shadcn_>
                   </CommandGroup_Shadcn_>
