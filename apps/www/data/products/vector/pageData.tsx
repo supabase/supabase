@@ -5,20 +5,21 @@ import PGvectorImg from '~/components/Products/VectorAI/PGvectorImg'
 import DeployGlobally from '~/components/Products/VectorAI/DeployGlobally'
 import IntegrationsImage from '~/components/Products/VectorAI/IntegrationsImage'
 
-export default {
+export default (isMobile?: boolean) => ({
   metaTitle: '',
   metaDescription: '',
   heroSection: {
     announcement: {
       url: 'https://www.ai.engineer/summit/schedule/supabase-vector',
       badge: 'AI Engineer Summit',
-      announcement: 'Join us in San Francisco, Oct 8–10',
+      announcement: isMobile ? 'Join us in San Francisco' : 'Join us in San Francisco, Oct 8–10',
       target: '_blank',
+      hasArrow: !isMobile,
     },
     title: 'Supabase Vector',
     h1: (
       <span key={'vector-h1'} className="heading-gradient">
-        The Postgres Vector database <br />
+        The Postgres Vector database <br className="hidden md:block" />
         and AI Toolkit
       </span>
     ),
@@ -337,4 +338,4 @@ docs.query(
       },
     ],
   },
-}
+})
