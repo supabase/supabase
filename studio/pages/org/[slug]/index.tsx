@@ -30,6 +30,9 @@ const ProjectsPage: NextPageWithLayout = () => {
   const githubConnections = integrations
     ?.filter((integration) => integration.integration.name === 'GitHub')
     .flatMap((integration) => integration.connections)
+  const vercelConnections = integrations
+    ?.filter((integration) => integration.integration.name === 'Vercel')
+    .flatMap((integration) => integration.connections)
 
   return (
     <ScaffoldContainer className="h-full overflow-y-auto">
@@ -82,6 +85,9 @@ const ProjectsPage: NextPageWithLayout = () => {
                         key={project.ref}
                         project={project}
                         githubIntegration={githubConnections?.find(
+                          (connection) => connection.supabase_project_ref === project.ref
+                        )}
+                        vercelIntegration={vercelConnections?.find(
                           (connection) => connection.supabase_project_ref === project.ref
                         )}
                       />

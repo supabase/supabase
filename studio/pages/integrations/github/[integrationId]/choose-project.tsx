@@ -33,8 +33,10 @@ const ChooseProjectGitHubPage: NextPageWithLayout = () => {
     orgSlug,
   })
   const { data: organizations } = useOrganizationsQuery()
-  const { data: allProjects } = useProjectsQuery()
-  const { data: allRepos } = useGitHubReposQuery({ integrationId })
+  const { data: allProjects, isLoading: isLoadingSupabaseProjectsData } = useProjectsQuery()
+  const { data: allRepos, isLoading: isLoadingGithubReposData } = useGitHubReposQuery({
+    integrationId,
+  })
 
   const integration = integrations?.find((integration) => integration.id === integrationId)
   const organization = organizations?.find((organization) => organization.slug === orgSlug)
@@ -93,6 +95,8 @@ This Supabase integration will allow you to link a Supabase project to a GitHub 
               onSkip={() => {
                 router.push(`/org/${orgSlug}/integrations`)
               }}
+              loadingForeignProjects={isLoadingGithubReposData}
+              loadingSupabaseProjects={isLoadingSupabaseProjectsData}
             />
           </ScaffoldContainer>
         </>

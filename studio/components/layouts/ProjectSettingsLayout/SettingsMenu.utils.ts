@@ -33,7 +33,7 @@ export const generateSettingsMenu = (
             ? [
                 {
                   name: 'Integrations',
-                  key: 'Integrations',
+                  key: 'integrations',
                   url: `/project/${ref}/settings/integrations`,
                   items: [],
                 },
