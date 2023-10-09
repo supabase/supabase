@@ -162,13 +162,12 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       icon,
       iconRight,
       iconLeft,
-      htmlType,
+      htmlType = 'button',
       ...props
     },
     ref
   ) => {
     const Comp = asChild ? Slot : 'button'
-    const resolvedHtmlType = asChild ? htmlType : 'button'
     const { className, disabled } = props
     const showIcon = loading || icon
     // decrecating 'showIcon' for rightIcon
@@ -179,7 +178,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <Comp
         ref={ref}
-        type={resolvedHtmlType}
+        type={htmlType}
         {...props}
         className={cn(buttonVariants({ type, size, disabled, block }), className)}
       >
