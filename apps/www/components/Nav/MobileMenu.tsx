@@ -82,22 +82,17 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
               <div className="mt-10 mb-20 space-y-1">
                 <Accordion
                   type="default"
-                  openBehaviour="single"
+                  openBehaviour="multiple"
                   size="large"
-                  collapsible
                   className="py-2 space-y-1"
                   justified
                   chevronAlign="right"
                 >
                   {menu.primaryNav.map((menuItem: any) => (
-                    <m.div
-                      variants={listItem}
-                      className="border-b [&>div]:!rounded-none"
-                      key={menuItem.title}
-                    >
+                    <div className="border-b [&>div]:!rounded-none" key={menuItem.title}>
                       {menuItem.hasDropdown ? (
                         <Accordion.Item
-                          header={<span>{menuItem.title}</span>}
+                          header={<m.span variants={listItem}>{menuItem.title}</m.span>}
                           id={menuItem.title}
                           className="block relative py-2 pl-3 pr-4 text-base font-medium text-foreground hover:bg-surface-200"
                         >
@@ -154,12 +149,15 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
                         </Accordion.Item>
                       ) : (
                         <Link href={menuItem.url}>
-                          <a className="block py-2 pl-3 pr-4 text-base font-medium text-strong hover:bg-surface-200 dark:text-white focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:rounded">
+                          <m.a
+                            variants={listItem}
+                            className="block py-2 pl-3 pr-4 text-base font-medium text-strong hover:bg-surface-200 dark:text-white focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:rounded"
+                          >
                             {menuItem.title}
-                          </a>
+                          </m.a>
                         </Link>
                       )}
-                    </m.div>
+                    </div>
                   ))}
                 </Accordion>
               </div>
