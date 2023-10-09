@@ -82,7 +82,7 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
               <div className="mt-10 mb-20 space-y-1">
                 <Accordion
                   type="default"
-                  openBehaviour="multiple"
+                  openBehaviour="single"
                   size="large"
                   collapsible
                   className="py-2 space-y-1"
