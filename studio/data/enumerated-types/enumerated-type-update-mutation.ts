@@ -23,7 +23,7 @@ export async function updateEnumeratedType({
 }: EnumeratedTypeUpdateVariables) {
   const statements: string[] = []
   if (name.original !== name.updated) {
-    statements.push(`alter type ${name.original} rename to ${name.updated};`)
+    statements.push(`alter type "${name.original}" rename to "${name.updated}";`)
   }
   if (values.length > 0) {
     values.forEach((x, idx) => {
@@ -32,24 +32,24 @@ export async function updateEnumeratedType({
           // Consider if any new enums were added before any existing enums
           const firstExistingEnumValue = values.find((x) => !x.isNew)
           statements.push(
-            `alter type ${name.updated} add value '${x.updated}' before '${firstExistingEnumValue?.original}';`
+            `alter type "${name.updated}" add value '${x.updated}' before '${firstExistingEnumValue?.original}';`
           )
         } else {
           statements.push(
-            `alter type ${name.updated} add value '${x.updated}' after '${
+            `alter type "${name.updated}" add value '${x.updated}' after '${
               values[idx - 1].updated
             }';`
           )
         }
       } else if (x.original !== x.updated) {
         statements.push(
-          `alter type ${name.updated} rename value '${x.original}' to '${x.updated}';`
+          `alter type "${name.updated}" rename value '${x.original}' to '${x.updated}';`
         )
       }
     })
   }
   if (description !== undefined) {
-    statements.push(`comment on type ${name.updated} is '${description}';`)
+    statements.push(`comment on type "${name.updated}" is '${description}';`)
   }
 
   const sql = wrapWithTransaction(statements.join(' '))

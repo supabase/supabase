@@ -69,18 +69,14 @@ const DeleteEnumeratedTypeModal = ({
               You will need to re-create the enumerated type if you want to revert the deletion.
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
-          <ul className="mt-4 space-y-5">
-            <li className="flex gap-3">
-              <div>
-                <strong className="text-sm">Before deleting this enumerated type, consider:</strong>
-                <ul className="space-y-2 mt-2 text-sm text-light">
-                  <li className="list-disc ml-6">
-                    This enumerated type is no longer in use in any tables or functions
-                  </li>
-                </ul>
-              </div>
-            </li>
-          </ul>
+          <div className="mt-4">
+            <strong className="text-sm">Before deleting this enumerated type, consider:</strong>
+            <ul className="space-y-2 mt-2 text-sm text-light">
+              <li className="list-disc ml-6">
+                This enumerated type is no longer in use in any tables or functions
+              </li>
+            </ul>
+          </div>
         </div>
       </Modal.Content>
     </ConfirmationModal>
