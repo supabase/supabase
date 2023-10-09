@@ -54,9 +54,6 @@ const ProductHeaderCentered = (props: Types) => (
         </div>
       )}
       <div className="relative w-full z-10 flex flex-col items-center space-y-2 mx-auto max-w-2xl">
-        {props.announcement && (
-          <AnnouncementBadge {...props.announcement} className="mt-4 mb-4 z-10" />
-        )}
         <div>
           {props.icon || props.title ? (
             <div className="mb-2 lg:mb-4 flex justify-center items-center gap-3">
@@ -72,6 +69,9 @@ const ProductHeaderCentered = (props: Types) => (
             </div>
           ) : null}
         </div>
+        {props.announcement && (
+          <AnnouncementBadge {...props.announcement} className="md:pt-2 md:pb-2 z-10" />
+        )}
         <div className={[styles['appear-from-bottom']].join(' ')}>
           <h1 className="h1 text-3xl md:text-4xl xl:!text-5xl tracking-[-1.5px]" key={`h1`}>
             {props.h1}
