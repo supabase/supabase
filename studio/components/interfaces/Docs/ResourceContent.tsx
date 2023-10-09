@@ -64,7 +64,7 @@ const ResourceContent = ({
         <div>
           {properties.map((x) => (
             <div className="doc-section py-4" key={x.id}>
-              <div className="text-foreground">
+              <div className="code-column text-foreground">
                 <Param
                   key={x.id}
                   name={x.id}
