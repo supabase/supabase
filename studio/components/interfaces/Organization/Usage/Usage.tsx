@@ -63,8 +63,6 @@ const Usage = () => {
     )
   }, [dateRange, subscription])
 
-  console.log({ currentBillingCycleSelected, dateRange, subscription })
-
   const startDate = useMemo(() => {
     // If end date is in future, set end date to now
     if (!dateRange?.period_start?.date) {
