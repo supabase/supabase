@@ -5,8 +5,8 @@ import { ChangeEvent, useRef, useState } from 'react'
 
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
-import { VercelIntegrationLayout } from 'components/layouts'
-import { ScaffoldColumn, ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
+import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
+import { ScaffoldColumn, ScaffoldContainer } from 'components/layouts/Scaffold'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
@@ -19,10 +19,9 @@ import { useSelectedOrganization, useStore } from 'hooks'
 import { AWS_REGIONS, DEFAULT_MINIMUM_PASSWORD_STRENGTH, PROVIDERS } from 'lib/constants'
 import { passwordStrength } from 'lib/helpers'
 import { getInitialMigrationSQLFromGitHubRepo } from 'lib/integration-utils'
-import { NextPageWithLayout } from 'types'
-import { Alert, Button, Checkbox, IconBook, IconLifeBuoy, Input, Listbox, LoadingLine } from 'ui'
-import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
+import { NextPageWithLayout } from 'types'
+import { Alert, Button, Checkbox, Input, Listbox } from 'ui'
 
 const VercelIntegration: NextPageWithLayout = () => {
   return (
@@ -30,7 +29,7 @@ const VercelIntegration: NextPageWithLayout = () => {
       <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
         <ScaffoldColumn className="mx-auto w-full max-w-md">
           <header>
-            <h1 className="text-xl text">New project</h1>
+            <h1 className="text-xl text-foreground">New project</h1>
             <Markdown
               className="text-foreground-light"
               content={`Choose the Supabase organization you wish to install in`}

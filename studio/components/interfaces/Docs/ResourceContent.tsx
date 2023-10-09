@@ -48,7 +48,7 @@ const ResourceContent = ({
       </h2>
 
       <div className="doc-section">
-        <article className="text">
+        <article className="text-foreground">
           <label className="font-mono text-xs uppercase text-foreground-lighter inline-block mb-2">
             Description
           </label>
@@ -64,7 +64,7 @@ const ResourceContent = ({
         <div>
           {properties.map((x) => (
             <div className="doc-section py-4" key={x.id}>
-              <div className="text">
+              <div className="text-foreground">
                 <Param
                   key={x.id}
                   name={x.id}
@@ -99,7 +99,7 @@ const ResourceContent = ({
         <>
           <h3 className="text-foreground mt-4 px-6">Read rows</h3>
           <div className="doc-section">
-            <article className="text ">
+            <article className="text-foreground">
               <p>
                 To read rows in <code>{resourceId}</code>, use the <code>select</code> method.
               </p>
@@ -137,7 +137,7 @@ const ResourceContent = ({
             </article>
           </div>
           <div className="doc-section">
-            <article className="text ">
+            <article className="text-foreground">
               <h4 className="mt-0 text-white">Filtering</h4>
               <p>Supabase provides a wide range of filters.</p>
               <p>
@@ -163,7 +163,7 @@ const ResourceContent = ({
         <>
           <h3 className="text-foreground mt-4 px-6">Insert rows</h3>
           <div className="doc-section">
-            <article className="text ">
+            <article className="text-foreground">
               <p>
                 <code>insert</code> lets you insert into your tables. You can also insert in bulk
                 and do UPSERT.
@@ -202,7 +202,7 @@ const ResourceContent = ({
         <>
           <h3 className="text-foreground mt-4 px-6">Update rows</h3>
           <div className="doc-section">
-            <article className="text ">
+            <article className="text-foreground">
               <p>
                 <code>update</code> lets you update rows. <code>update</code> will match all rows by
                 default. You can update specific rows using horizontal filters, e.g. <code>eq</code>
@@ -234,7 +234,7 @@ const ResourceContent = ({
         <>
           <h3 className="text-foreground mt-4 px-6">Delete rows</h3>
           <div className="doc-section">
-            <article className="text ">
+            <article className="text-foreground">
               <p>
                 <code>delete</code> lets you delete rows. <code>delete</code> will match all rows by
                 default, so remember to specify your filters!
@@ -262,7 +262,7 @@ const ResourceContent = ({
         <>
           <h3 className="text-foreground mt-4 px-6">Subscribe to changes</h3>
           <div className="doc-section">
-            <article className="text ">
+            <article className="text-foreground">
               <p>
                 Supabase provides realtime functionality and broadcasts database changes to
                 authorized users depending on Row Level Security (RLS) policies.

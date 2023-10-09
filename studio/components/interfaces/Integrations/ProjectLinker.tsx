@@ -2,6 +2,7 @@ import { ReactNode, useRef, useState } from 'react'
 import { toast } from 'react-hot-toast'
 import {
   Button,
+  cn,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
@@ -12,7 +13,6 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
-  cn,
 } from 'ui'
 
 import ShimmerLine from 'components/ui/ShimmerLine'
@@ -150,12 +150,12 @@ const ProjectLinker = ({
 
         {loadingForeignProjects || loadingSupabaseProjects ? (
           <div className="w-1/2 mx-auto space-y-2 py-4">
-            <p className="text text-center">Loading projects</p>
+            <p className="text-foreground text-center">Loading projects</p>
             <ShimmerLine active />
           </div>
         ) : noSupabaseProjects || noForeignProjects ? (
           <div className="text-center">
-            <h5 className="text">No {missingEntity} Projects found</h5>
+            <h5 className="text-foreground">No {missingEntity} Projects found</h5>
             <p className="text-light text-sm">
               You will need to create a {missingEntity} Project to link to a {oppositeMissingEntity}{' '}
               Project.
