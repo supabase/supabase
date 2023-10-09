@@ -34,7 +34,7 @@ const GitHubButton = () => {
       type="text"
       asChild
     >
-      <a href="https://github.com/supabase/supabase" target="_blank">
+      <a type={undefined} href="https://github.com/supabase/supabase" target="_blank">
         <span className="flex items-center gap-1">
           <svg
             className="w-6 h-6"
