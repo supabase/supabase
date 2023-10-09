@@ -26,7 +26,6 @@ const AccordionContext = createContext<ContextValue>({
 export interface AccordionProps {
   children?: React.ReactNode
   className?: string
-  collapsible?: boolean
   defaultActiveId?: (string | number)[]
   icon?: React.ReactNode
   iconPosition?: Align
@@ -42,7 +41,6 @@ export interface AccordionProps {
 function Accordion({
   children,
   className,
-  collapsible,
   onChange,
   openBehaviour = 'multiple',
   type = 'default',
@@ -80,7 +78,6 @@ function Accordion({
       @ts-expect-error */}
       <RadixAccordion.Root
         type={openBehaviour}
-        collapsible={collapsible}
         onValueChange={handleOnChange}
         defaultValue={defaultValue}
         className={containerClasses.join(' ')}
