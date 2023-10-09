@@ -135,19 +135,19 @@ const Nav = () => {
                     {isLoggedIn ? (
                       <Link href="/dashboard/projects" passHref>
                         <Button className="hidden text-white lg:block" asChild>
-                          <a>Dashboard</a>
+                          <a type={undefined}>Dashboard</a>
                         </Button>
                       </Link>
                     ) : (
                       <>
                         <Link href="https://supabase.com/dashboard" passHref>
                           <Button type="default" className="hidden lg:block" asChild>
-                            <a>Sign in</a>
+                            <a type={undefined}>Sign in</a>
                           </Button>
                         </Link>
                         <Link href="https://supabase.com/dashboard" passHref>
                           <Button className="hidden text-white lg:block" asChild>
-                            <a>Start your project</a>
+                            <a type={undefined}>Start your project</a>
                           </Button>
                         </Link>
                       </>
