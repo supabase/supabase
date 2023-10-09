@@ -116,13 +116,14 @@ const EditEnumeratedTypeSidePanel = ({
       visible={visible}
       onCancel={onClose}
       header={`Update type "${selectedEnumeratedType?.name}"`}
+      confirmText="Update type"
       onConfirm={() => saveEnumeratedType()}
     >
       <SidePanel.Content className="py-4 space-y-4">
         <Input label="Name" value={name} onChange={(e) => setName(e.target.value)} />
         <Input
           label="Description"
-          placeholder="Optional"
+          labelOptional="Optional"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />

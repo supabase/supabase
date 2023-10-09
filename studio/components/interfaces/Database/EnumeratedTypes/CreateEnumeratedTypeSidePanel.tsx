@@ -76,13 +76,14 @@ const CreateEnumeratedTypeSidePanel = ({
       visible={visible}
       onCancel={onClose}
       header="Create a new enumerated type"
+      confirmText="Create type"
       onConfirm={() => saveEnumeratedType()}
     >
       <SidePanel.Content className="py-4 space-y-4">
         <Input label="Name" value={name} onChange={(e) => setName(e.target.value)} />
         <Input
           label="Description"
-          placeholder="Optional"
+          labelOptional="Optional"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />

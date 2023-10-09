@@ -91,7 +91,6 @@ const SchemaSelector = ({
         <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
           <PopoverTrigger_Shadcn_ asChild>
             <Button
-              asChild
               size={size}
               type="outline"
               className={`w-full [&>span]:w-full ${size === 'small' ? 'py-1.5' : ''}`}
@@ -99,11 +98,9 @@ const SchemaSelector = ({
                 <IconCode className="text-foreground-light rotate-90" strokeWidth={2} size={12} />
               }
             >
-              <div>
-                <div className="w-full flex space-x-3 py-0.5">
-                  <p className="text-xs text-light">schema</p>
-                  <p className="text-xs">{selectedSchemaName}</p>
-                </div>
+              <div className="w-full flex space-x-3 py-0.5">
+                <p className="text-xs text-light">schema</p>
+                <p className="text-xs">{selectedSchemaName}</p>
               </div>
             </Button>
           </PopoverTrigger_Shadcn_>
@@ -116,9 +113,8 @@ const SchemaSelector = ({
                   <ScrollArea className={(schemas || []).length > 7 ? 'h-[210px]' : ''}>
                     {schemas?.map((schema) => (
                       <CommandItem_Shadcn_
-                        asChild
                         key={schema.id}
-                        className="cursor-pointer flex items-center space-x-2 w-full"
+                        className="cursor-pointer flex items-center justify-between space-x-2 w-full"
                         onSelect={() => {
                           onSelectSchema(schema.name)
                           setOpen(false)
@@ -128,12 +124,10 @@ const SchemaSelector = ({
                           setOpen(false)
                         }}
                       >
-                        <div className="w-full flex items-center justify-between">
-                          <p>{schema.name}</p>
-                          {schema.name === selectedSchemaName && (
-                            <IconCheck className="text-brand" strokeWidth={2} />
-                          )}
-                        </div>
+                        <span>{schema.name}</span>
+                        {schema.name === selectedSchemaName && (
+                          <IconCheck className="text-brand" strokeWidth={2} />
+                        )}
                       </CommandItem_Shadcn_>
                     ))}
                   </ScrollArea>
@@ -141,7 +135,6 @@ const SchemaSelector = ({
                 {onSelectCreateSchema !== undefined && (
                   <CommandGroup_Shadcn_ className="border-t">
                     <CommandItem_Shadcn_
-                      asChild
                       className="cursor-pointer flex items-center space-x-2 w-full"
                       onSelect={() => {
                         onSelectCreateSchema()
@@ -152,10 +145,8 @@ const SchemaSelector = ({
                         setOpen(false)
                       }}
                     >
-                      <div className="flex items-center space-x-2">
-                        <IconPlus />
-                        <span>Create a new schema</span>
-                      </div>
+                      <IconPlus />
+                      <span>Create a new schema</span>
                     </CommandItem_Shadcn_>
                   </CommandGroup_Shadcn_>
                 )}
