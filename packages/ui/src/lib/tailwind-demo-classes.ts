@@ -8,7 +8,9 @@ export default {
     "bg-surface-200",
     "bg-surface-300",
     "bg-overlay",
-    "bg-overlay-hover"
+    "bg-overlay-hover",
+    "bg-secondary",
+    "bg-muted"
   ],
   "border": [
     "border",
@@ -43,7 +45,8 @@ export default {
     "bg-brand-400",
     "bg-brand-500",
     "bg-brand-600",
-    "bg-brand"
+    "bg-brand",
+    "bg-testest"
   ],
   "palletes": [
     "bg-black",
