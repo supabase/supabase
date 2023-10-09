@@ -21,7 +21,7 @@ interface Props {
 const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
   const container = {
     hidden: { opacity: 0 },
-    show: { opacity: 1, transition: { duration: 0.1, staggerChildren: 0.05, ease: DEFAULT_EASE } },
+    show: { opacity: 1, transition: { duration: 0.15, staggerChildren: 0.05, ease: DEFAULT_EASE } },
     exit: { opacity: 0, transition: { duration: 0.15 } },
   }
 
@@ -88,7 +88,7 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
     </>
   )
 
-  const RenderedAccordion = () => (
+  const Menu = () => (
     <Accordion
       type="default"
       openBehaviour="multiple"
@@ -97,19 +97,25 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
       justified
       chevronAlign="right"
     >
-      {menu.primaryNav
-        .filter((item: any) => item.hasDropdown)
-        .map((menuItem: any) => (
-          <div className="border-b [&>div]:!rounded-none" key={menuItem.title}>
+      {menu.primaryNav.map((menuItem: any) => (
+        <m.div variants={listItem} className="border-b [&>div]:!rounded-none" key={menuItem.title}>
+          {menuItem.hasDropdown ? (
             <Accordion.Item
-              header={<m.span variants={listItem}>{menuItem.title}</m.span>}
+              header={menuItem.title}
               id={menuItem.title}
               className="block relative py-2 pl-3 pr-4 text-base font-medium text-foreground hover:bg-surface-200"
             >
               <AccordionMenuItem menuItem={menuItem} />
             </Accordion.Item>
-          </div>
-        ))}
+          ) : (
+            <Link href={menuItem.url}>
+              <a className="block py-2 pl-3 pr-4 text-base font-medium text-strong hover:bg-surface-200 dark:text-white focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:rounded">
+                {menuItem.title}
+              </a>
+            </Link>
+          )}
+        </m.div>
+      ))}
     </Accordion>
   )
 
@@ -124,7 +130,7 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
             exit="exit"
             className="bg-overlay fixed overflow-hidden inset-0 z-50 h-screen max-h-screen w-screen supports-[height:100cqh]:h-[100cqh] supports-[height:100svh]:h-[100svh] transform"
           >
-            <div className="absolute h-16 px-6 flex items-center justify-between w-screen left-0 top-0 z-50 bg-overlay">
+            <div className="absolute h-16 px-6 flex items-center justify-between w-screen left-0 top-0 z-50 bg-overlay before:content[''] before:absolute before:w-full before:h-3 before:inset-0 before:top-full before:bg-gradient-to-b before:from-background-overlay before:to-transparent">
               <Link href="/" as="/">
                 <a className="block w-auto h-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm">
                   <Image
@@ -158,24 +164,8 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
                 </svg>
               </button>
             </div>
-            <div className="max-h-screen supports-[height:100cqh]:h-[100cqh] supports-[height:100svh]:h-[100svh] overflow-y-auto py-8 px-4">
-              <div className="mt-10 mb-20 space-y-1">
-                <RenderedAccordion />
-                {menu.primaryNav
-                  .filter((item: any) => !item.hasDropdown)
-                  .map((menuItem: any) => (
-                    <div className="border-b [&>div]:!rounded-none" key={menuItem.title}>
-                      <Link href={menuItem.url}>
-                        <m.a
-                          variants={listItem}
-                          className="block py-2 pl-3 pr-4 text-base font-medium text-strong hover:bg-surface-200 dark:text-white focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:rounded"
-                        >
-                          {menuItem.title}
-                        </m.a>
-                      </Link>
-                    </div>
-                  ))}
-              </div>
+            <div className="max-h-screen supports-[height:100cqh]:h-[100cqh] supports-[height:100svh]:h-[100svh] overflow-y-auto pt-20 pb-32 px-4">
+              <Menu />
             </div>
             <div className="absolute bottom-0 left-0 right-0 top-auto w-full bg-alternative flex items-stretch p-4 gap-4">
               <Link href="https://supabase.com/dashboard" passHref>
