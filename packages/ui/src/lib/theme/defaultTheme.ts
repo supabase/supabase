@@ -112,6 +112,7 @@ export default {
           first:rounded-tl-md first:rounded-tr-md
           last:rounded-bl-md last:rounded-br-md
           overflow-hidden
+          will-change-transform
         `,
         trigger: `
           flex flex-row
