@@ -872,7 +872,7 @@ export const functions: NavMenuConstant = {
         {
           name: 'Resizing & Compressing Images with Tinify',
           url: '/guides/functions/examples/image-compress-resize'
-        }
+        },
       ],
     },
     {
