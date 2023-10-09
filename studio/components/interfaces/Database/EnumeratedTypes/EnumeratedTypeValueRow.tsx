@@ -1,4 +1,4 @@
-import { Menu } from 'lucide-react'
+import { GripVertical } from 'lucide-react'
 import { Draggable, DraggableProvided } from 'react-beautiful-dnd'
 import { Button, IconTrash, Input } from 'ui'
 
@@ -29,7 +29,7 @@ const EnumeratedTypeValueRow = ({
             {...draggableProvided.dragHandleProps}
             className={isDisabled ? 'text-foreground-lighter !cursor-default' : 'text-foreground'}
           >
-            <Menu size={16} strokeWidth={1.5} />
+            <GripVertical size={16} strokeWidth={1.5} />
           </div>
           <Input
             className="w-full"
