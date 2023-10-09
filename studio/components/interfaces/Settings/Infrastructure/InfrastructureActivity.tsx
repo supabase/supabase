@@ -194,6 +194,7 @@ const InfrastructureActivity = () => {
                 options={[...TIME_PERIODS_BILLING, ...TIME_PERIODS_REPORTS]}
                 loading={isLoadingSubscription}
                 currentBillingPeriodStart={subscription?.current_period_start}
+                currentBillingPeriodEnd={subscription?.current_period_end}
               />
               <p className="text-sm text-foreground-light">
                 {dayjs(startDate).format('DD MMM YYYY')} - {dayjs(endDate).format('DD MMM YYYY')}
