@@ -144,7 +144,6 @@ const PublishAppSidePanel = ({
     return errors
   }
 
-  console.log(scopes)
   const onSubmit = async (values: any) => {
     if (!slug) return console.error('Slug is required')
 
