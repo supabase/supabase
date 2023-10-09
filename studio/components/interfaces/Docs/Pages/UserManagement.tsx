@@ -27,7 +27,7 @@ export default function UserManagement({
     <>
       <h2 className="doc-heading">User Management</h2>
       <div className="doc-section">
-        <article className="text-foreground">
+        <article className="code-column text-foreground">
           <p>Supabase makes it easy to manage your users.</p>
           <p>
             Supabase assigns each user a unique ID. You can reference this ID anywhere in your
@@ -43,7 +43,7 @@ export default function UserManagement({
 
       <h2 className="doc-heading">Sign up</h2>
       <div className="doc-section ">
-        <article className="text-foreground">
+        <article className="code-column text-foreground">
           <p>Allow your users to sign up and create a new account.</p>
           <p>
             After they have signed up, all interactions using the Supabase JS client will be
@@ -60,7 +60,7 @@ export default function UserManagement({
 
       <h2 className="doc-heading">Log in with Email/Password</h2>
       <div className="doc-section ">
-        <article className="text-foreground">
+        <article className="code-column text-foreground">
           <p>If an account is created, users can login to your app.</p>
           <p>
             After they have logged in, all interactions using the Supabase JS client will be
@@ -77,7 +77,7 @@ export default function UserManagement({
 
       <h2 className="doc-heading">Log in with Magic Link via Email</h2>
       <div className="doc-section ">
-        <article className="text-foreground">
+        <article className="code-column text-foreground">
           <p>Send a user a passwordless link which they can use to redeem an access_token.</p>
           <p>
             After they have clicked the link, all interactions using the Supabase JS client will be
@@ -94,7 +94,7 @@ export default function UserManagement({
 
       <h2 className="doc-heading">Sign Up with Phone/Password</h2>
       <div className="doc-section ">
-        <article className="text-foreground">
+        <article className="code-column text-foreground">
           <p>
             A phone number can be used instead of an email as a primary account confirmation
             mechanism.
@@ -118,7 +118,7 @@ export default function UserManagement({
 
       <h2 className="doc-heading">Login via SMS OTP</h2>
       <div className="doc-section ">
-        <article className="text-foreground">
+        <article className="code-column text-foreground">
           <p>
             SMS OTPs work like magic links, except you have to provide an interface for the user to
             verify the 6 digit number they receive.
@@ -138,7 +138,7 @@ export default function UserManagement({
 
       <h2 className="doc-heading">Verify an SMS OTP</h2>
       <div className="doc-section ">
-        <article className="text-foreground">
+        <article className="code-column text-foreground">
           <p>
             Once the user has received the OTP, have them enter it in a form and send it for
             verification
@@ -158,7 +158,7 @@ export default function UserManagement({
 
       <h2 className="doc-heading">Log in with Third Party OAuth</h2>
       <div className="doc-section ">
-        <article className="text-foreground">
+        <article className="code-column text-foreground">
           <p>
             Users can log in with Third Party OAuth like Google, Facebook, GitHub, and more. You
             must first enable each of these in the Auth Providers settings{' '}
@@ -222,7 +222,7 @@ export default function UserManagement({
 
       <h2 className="doc-heading">User</h2>
       <div className="doc-section ">
-        <article className="text-foreground">
+        <article className="code-column text-foreground">
           <p>Get the JSON object for the logged in user.</p>
         </article>
         <article className="code">
@@ -235,7 +235,7 @@ export default function UserManagement({
 
       <h2 className="doc-heading">Forgotten Password Email</h2>
       <div className="doc-section ">
-        <article className="text-foreground">
+        <article className="code-column text-foreground">
           <p>
             Sends the user a log in link via email. Once logged in you should direct the user to a
             new password form. And use "Update User" below to save the new password.
@@ -251,7 +251,7 @@ export default function UserManagement({
 
       <h2 className="doc-heading">Update User</h2>
       <div className="doc-section ">
-        <article className="text-foreground">
+        <article className="code-column text-foreground">
           <p>
             Update the user with a new email or password. Each key (email, password, and data) is
             optional
@@ -267,7 +267,7 @@ export default function UserManagement({
 
       <h2 className="doc-heading">Log out</h2>
       <div className="doc-section ">
-        <article className="text-foreground">
+        <article className="code-column text-foreground">
           <p>
             After calling log out, all interactions using the Supabase JS client will be
             "anonymous".
@@ -283,7 +283,7 @@ export default function UserManagement({
 
       <h2 className="doc-heading">Send a User an Invite over Email</h2>
       <div className="doc-section ">
-        <article className="text-foreground">
+        <article className="code-column text-foreground">
           <p>Send a user a passwordless link which they can use to sign up and log in.</p>
           <p>
             After they have clicked the link, all interactions using the Supabase JS client will be

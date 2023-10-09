@@ -41,7 +41,7 @@ const RpcContent = ({
       </h2>
 
       <div className="doc-section">
-        <article className="text-foreground">
+        <article className="code-column text-foreground">
           <label className="font-mono text-xs uppercase text-foreground-lighter">Description</label>
           <Description content={summary} metadata={{ rpc: rpcId }} onChange={refreshDocs} />
         </article>
@@ -65,7 +65,7 @@ const RpcContent = ({
           {rpcParams.map((x, i) => {
             return (
               <div key={i} className="doc-section">
-                <article className="text-foreground">
+                <article className="code-column text-foreground">
                   <Param
                     key={x.name}
                     name={x.name}
