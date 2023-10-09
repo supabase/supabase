@@ -195,7 +195,7 @@ const EditEnumeratedTypeSidePanel = ({
                                 </AlertTitle_Shadcn_>
                                 <AlertDescription_Shadcn_>
                                   You can only add or update values to an existing enumerated type.
-                                  If you'd like to delete existing values, you will need to delete
+                                  To delete existing values, you need to delete
                                   and recreate the enumerated type with the updated values.
                                   <Link
                                     passHref
