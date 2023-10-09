@@ -54,9 +54,7 @@ const ProductHeaderCentered = (props: Types) => (
         </div>
       )}
       <div className="relative overflow-hidden w-full z-10 flex flex-col items-center space-y-2 mx-auto max-w-2xl">
-        {props.announcement && (
-          <AnnouncementBadge {...props.announcement} className="mt-1 mb-4 z-10" />
-        )}
+        {props.announcement && <AnnouncementBadge {...props.announcement} className="mb-4 z-10" />}
         <div>
           {props.icon || props.title ? (
             <div className="mb-4 flex justify-center items-center gap-3">
