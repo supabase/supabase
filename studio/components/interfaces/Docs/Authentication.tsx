@@ -25,7 +25,7 @@ const Authentication = ({ autoApiService, selectedLang, showApiKey }: Authentica
     <>
       <h2 className="doc-heading">Authentication</h2>
       <div className="doc-section">
-        <article className="text-foreground">
+        <article className="code-column text-foreground">
           <p>Supabase works through a mixture of JWT and Key auth.</p>
           <p>
             If no <code>Authorization</code> header is included, the API will assume that you are
@@ -41,7 +41,7 @@ const Authentication = ({ autoApiService, selectedLang, showApiKey }: Authentica
 
       <h2 className="doc-heading">Client API Keys</h2>
       <div className="doc-section ">
-        <article className="text-foreground">
+        <article className="code-column text-foreground">
           <p>
             Client keys allow "anonymous access" to your database, until the user has logged in.
             After logging in the keys will switch to the user's own login token.
@@ -75,7 +75,7 @@ const Authentication = ({ autoApiService, selectedLang, showApiKey }: Authentica
 
       <h2 className="doc-heading">Service Keys</h2>
       <div className="doc-section ">
-        <article className="text-foreground">
+        <article className="code-column text-foreground">
           <p>
             Service keys have FULL access to your data, bypassing any security policies. Be VERY
             careful where you expose these keys. They should only be used on a server and never on a

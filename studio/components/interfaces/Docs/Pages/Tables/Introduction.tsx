@@ -15,7 +15,7 @@ const Introduction = ({ selectedLang }: IntroductionProps) => {
     <>
       <h2 className="doc-heading">Introduction</h2>
       <div className="doc-section">
-        <article className="text-foreground">
+        <article className="code-column text-foreground">
           <p>
             All views and tables in the <code>public</code> schema and accessible by the active
             database role for a request are available for querying.
@@ -25,7 +25,7 @@ const Introduction = ({ selectedLang }: IntroductionProps) => {
 
       <h2 className="doc-heading">Non-exposed tables</h2>
       <div className="doc-section">
-        <article className="text-foreground">
+        <article className="code-column text-foreground">
           <p>
             If you don't want to expose tables in your API, simply add them to a different schema
             (not the <code>public</code> schema).
@@ -40,7 +40,7 @@ const Introduction = ({ selectedLang }: IntroductionProps) => {
         GraphQL <span className="lowercase">vs</span> Supabase
       </h2>
       <div className="doc-section">
-        <article className="text-foreground">
+        <article className="code-column text-foreground">
           <p>
             If you have a GraphQL background, you might be wondering if you can fetch your data in a
             single round-trip. The answer is yes!
