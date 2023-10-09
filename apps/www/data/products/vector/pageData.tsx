@@ -1,27 +1,33 @@
 import Link from 'next/link'
-import IntegrationsImage from '~/components/Products/VectorAI/IntegrationsImage'
 import OpenAIImage from '~/components/Products/VectorAI/OpenAIImage'
 import SecureAndScalableImg from '~/components/Products/VectorAI/SecureAndScalableImg'
 import PGvectorImg from '~/components/Products/VectorAI/PGvectorImg'
 import DeployGlobally from '~/components/Products/VectorAI/DeployGlobally'
+import IntegrationsImage from '~/components/Products/VectorAI/IntegrationsImage'
 
-export default {
+export default (isMobile?: boolean) => ({
   metaTitle: '',
   metaDescription: '',
   heroSection: {
+    announcement: {
+      url: 'https://www.ai.engineer/summit/schedule/supabase-vector',
+      badge: 'Happening now',
+      announcement: 'AI Engineer Summit',
+      target: '_blank',
+      hasArrow: !isMobile,
+    },
     title: 'Supabase Vector',
     h1: (
       <span key={'vector-h1'} className="heading-gradient">
-        The Postgres Vector database <br />
+        The Postgres Vector database <br className="hidden md:block" />
         and AI Toolkit
       </span>
     ),
     subheader: (
       <>
         An open source Vector database for developing AI applications.
-        <br className="hidden md:block" />
-        Use pgvector to store, index, and access embeddings, and our AI toolkit to build AI
-        applications with Hugging Face and OpenAI.
+        <br className="hidden md:block" /> Use pgvector to store, index, and access embeddings, and
+        our AI toolkit to build AI applications with Hugging Face and OpenAI.
       </>
     ),
     image: '/images/product/vector/vector-hero.svg',
@@ -73,7 +79,7 @@ export default {
   },
   integrations: {
     title: 'Leverage the tools you love',
-    image: <IntegrationsImage />,
+    image: IntegrationsImage,
   },
   useCasesSection: {
     title: (
@@ -331,4 +337,4 @@ docs.query(
       },
     ],
   },
-}
+})
