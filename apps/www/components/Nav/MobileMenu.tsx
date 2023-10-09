@@ -93,7 +93,7 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
                     .map((menuItem: any) => (
                       <div className="border-b [&>div]:!rounded-none" key={menuItem.title}>
                         <Accordion.Item
-                          header={<m.span variants={listItem}>{menuItem.title}</m.span>}
+                          header={menuItem.title}
                           id={menuItem.title}
                           className="block relative py-2 pl-3 pr-4 text-base font-medium text-foreground hover:bg-surface-200"
                         >
@@ -156,12 +156,9 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
                   .map((menuItem: any) => (
                     <div className="border-b [&>div]:!rounded-none" key={menuItem.title}>
                       <Link href={menuItem.url}>
-                        <m.a
-                          variants={listItem}
-                          className="block py-2 pl-3 pr-4 text-base font-medium text-strong hover:bg-surface-200 dark:text-white focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:rounded"
-                        >
+                        <a className="block py-2 pl-3 pr-4 text-base font-medium text-strong hover:bg-surface-200 dark:text-white focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:rounded">
                           {menuItem.title}
-                        </m.a>
+                        </a>
                       </Link>
                     </div>
                   ))}
