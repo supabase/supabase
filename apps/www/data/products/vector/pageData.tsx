@@ -26,9 +26,8 @@ export default (isMobile?: boolean) => ({
     subheader: (
       <>
         An open source Vector database for developing AI applications.
-        <br className="hidden md:block" />
-        Use pgvector to store, index, and access embeddings, and our AI toolkit to build AI
-        applications with Hugging Face and OpenAI.
+        <br className="hidden md:block" /> Use pgvector to store, index, and access embeddings, and
+        our AI toolkit to build AI applications with Hugging Face and OpenAI.
       </>
     ),
     image: '/images/product/vector/vector-hero.svg',
