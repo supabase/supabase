@@ -84,13 +84,14 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
                   type="default"
                   openBehaviour="multiple"
                   size="large"
-                  className="py-2 space-y-1"
+                  className="space-y-1"
                   justified
                   chevronAlign="right"
                 >
-                  {menu.primaryNav.map((menuItem: any) => (
-                    <div className="border-b [&>div]:!rounded-none" key={menuItem.title}>
-                      {menuItem.hasDropdown ? (
+                  {menu.primaryNav
+                    .filter((item: any) => item.hasDropdown)
+                    .map((menuItem: any) => (
+                      <div className="border-b [&>div]:!rounded-none" key={menuItem.title}>
                         <Accordion.Item
                           header={<m.span variants={listItem}>{menuItem.title}</m.span>}
                           id={menuItem.title}
@@ -147,19 +148,23 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
                             </div>
                           ) : null}
                         </Accordion.Item>
-                      ) : (
-                        <Link href={menuItem.url}>
-                          <m.a
-                            variants={listItem}
-                            className="block py-2 pl-3 pr-4 text-base font-medium text-strong hover:bg-surface-200 dark:text-white focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:rounded"
-                          >
-                            {menuItem.title}
-                          </m.a>
-                        </Link>
-                      )}
+                      </div>
+                    ))}
+                </Accordion>
+                {menu.primaryNav
+                  .filter((item: any) => !item.hasDropdown)
+                  .map((menuItem: any) => (
+                    <div className="border-b [&>div]:!rounded-none" key={menuItem.title}>
+                      <Link href={menuItem.url}>
+                        <m.a
+                          variants={listItem}
+                          className="block py-2 pl-3 pr-4 text-base font-medium text-strong hover:bg-surface-200 dark:text-white focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:rounded"
+                        >
+                          {menuItem.title}
+                        </m.a>
+                      </Link>
                     </div>
                   ))}
-                </Accordion>
               </div>
             </div>
             <div className="absolute bottom-0 left-0 right-0 top-auto w-full bg-alternative flex items-stretch p-4 gap-4">
