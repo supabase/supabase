@@ -3,11 +3,14 @@ const fs = require('fs')
 
 const cssFiles = glob.sync('build/css/**/*.css')
 
-function transformHSLValues(precision) {
+function transformCssFiles(precision) {
   cssFiles.forEach((file) => {
     const css = fs.readFileSync(file, 'utf8')
 
-    const transformedCss = css.replace(
+    let transformedCss = css
+
+    // transform hsl values to degrees, percentages
+    transformedCss = transformedCss.replace(
       /hsl\(([\d.]+)[,\s]+([\d.]+)%[,\s]+([\d.]+)%\)/g,
       (match, hue, saturation, lightness) => {
         hue = `${roundNumber(hue, precision)}deg`
@@ -16,6 +19,9 @@ function transformHSLValues(precision) {
         return `${hue} ${saturation} ${lightness}`
       }
     )
+
+    // remove --core prefix from files
+    transformedCss = transformedCss.replace(/--core-/g, '--')
 
     fs.writeFileSync(file, transformedCss)
   })
@@ -32,4 +38,4 @@ function transformHSLValues(precision) {
 }
 
 // Example usage:
-transformHSLValues(1)
+transformCssFiles(1)
