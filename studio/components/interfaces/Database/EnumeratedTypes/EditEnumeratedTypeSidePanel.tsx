@@ -194,9 +194,8 @@ const EditEnumeratedTypeSidePanel = ({
                                   Existing values cannot be deleted or sorted
                                 </AlertTitle_Shadcn_>
                                 <AlertDescription_Shadcn_>
-                                  You can only add or update values to an existing enumerated type.
-                                  To delete existing values, you need to delete
-                                  and recreate the enumerated type with the updated values.
+                                  You need to delete and recreate the enumerated type with the
+                                  updated values to delete existing values.
                                   <Link
                                     passHref
                                     href="https://www.postgresql.org/message-id/21012.1459434338%40sss.pgh.pa.us"
