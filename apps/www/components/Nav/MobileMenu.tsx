@@ -85,7 +85,7 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
                   openBehaviour="multiple"
                   size="large"
                   className="py-2 space-y-1"
-                  justified={true}
+                  justified
                   chevronAlign="right"
                 >
                   {menu.primaryNav.map((menuItem: any) => (
@@ -96,7 +96,7 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
                     >
                       {menuItem.hasDropdown ? (
                         <Accordion.Item
-                          header={menuItem.title}
+                          header={<span>{menuItem.title}</span>}
                           id={menuItem.title}
                           className="block relative py-2 pl-3 pr-4 text-base font-medium text-foreground hover:bg-surface-200"
                         >
