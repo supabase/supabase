@@ -12,15 +12,59 @@ In some cases, access to new features require upgrading or migrating your Supaba
 
 ## Upgrade your project
 
+There are a few methods available to upgrade your project.
+
+### pg_upgrade
+
 <Admonition type="note">
-  This is only available for projects on the Free plan. For projects on the Pro plan, please contact
-  support for assistance with upgrading.
+
+This upgrade method is currently in Beta, and is being slowly made available to projects.
+
+</Admonition>
+
+pg_upgrade performs an in-place upgrade on your database. For projects larger than 1GB, pg_upgrade is generally faster than a pause+restore cycle, and the speed advantage grows with the size of the database.
+
+Additionally, if a pg_upgrade upgrade should fail, your original DB would be brought back up online and be able to service requests.
+
+As a rough rule of thumb, pg_upgrade operates at ~100mbps (when executing an upgrade on your data). Using the size of your database, you can use this metric to derive an approximate sense of the downtime window necessary for the upgrade. During this window, you should plan for your DB and associated services to be unavailable.
+
+### Pause + Restore
+
+<Admonition type="note">
+
+This method is only available for projects on the Free plan. For projects on the Pro plan, please contact support for assistance with upgrading.
+
 </Admonition>
 
 When you pause and restore a project, the restored database includes the latest features. This method _does_ include downtime, so be aware that your project will be inaccessible for a short period of time.
 
 1. On the [General Settings](https://supabase.com/dashboard/project/_/settings/general) page in the Dashboard, click **Pause project**. You will be redirected to the home screen as your project is pausing. This process can take several minutes.
 1. After your project is paused, click **Restore project**. The restoration can take several minutes depending on how much data your database has. You will receive an email once the restoration is complete.
+
+Note that a pause + restore upgrade involves tearing down your project's resources before bringing them back up again. If the restore process should fail, manual intervention from Supabase support will be required to bring your project back online.
+
+### Caveats
+
+Regardless of the upgrade method, a few caveats apply:
+
+#### Logical Replication
+
+If you are using logical replication, the replication slots will not be preserved by the upgrade process. You will need to manually recreate them after the upgrade with the method `pg_create_logical_replication_slot`. Refer to the Postgres docs on [Replication Management Functions](https://www.postgresql.org/docs/current/functions-admin.html#FUNCTIONS-REPLICATION) for more details about the method.
+
+#### Breaking changes
+
+Newer versions of services can break functionality or change the performance characteristics you rely on. If your project is eligible for an upgrade, you will be able to find your current service versions from within [the Supabase dashboard](https://supabase.com/dashboard/project/_/settings/infrastructure).
+
+Breaking changes are generally only present in major version upgrades of Postgres and PostgREST. You can find their respective release notes at:
+
+- [Postgres](https://www.postgresql.org/docs/release/)
+- [PostgREST](https://github.com/PostgREST/postgrest/releases)
+
+If you are upgrading from a significantly older version, you will need to consider the release notes for any intermediary releases as well.
+
+#### Post-upgrade validation
+
+Supabase performs extensive pre- and post-upgrade validations to ensure that the database has been correctly upgraded. However, you should plan for your own application-level validations, as there might be changes you might not have anticipated, and this should be budgeted for when planning your downtime window.
 
 ## Migrate your project
 

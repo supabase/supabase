@@ -1,14 +1,20 @@
 import Link from 'next/link'
-import IntegrationsImage from '~/components/Products/VectorAI/IntegrationsImage'
 import OpenAIImage from '~/components/Products/VectorAI/OpenAIImage'
 import SecureAndScalableImg from '~/components/Products/VectorAI/SecureAndScalableImg'
 import PGvectorImg from '~/components/Products/VectorAI/PGvectorImg'
 import DeployGlobally from '~/components/Products/VectorAI/DeployGlobally'
+import IntegrationsImage from '~/components/Products/VectorAI/IntegrationsImage'
 
 export default {
   metaTitle: '',
   metaDescription: '',
   heroSection: {
+    announcement: {
+      url: 'https://www.ai.engineer/summit/schedule/supabase-vector',
+      badge: 'AI Engineer Summit',
+      announcement: 'Join us in San Francisco, Oct 8–10',
+      target: '_blank',
+    },
     title: 'Supabase Vector',
     h1: (
       <span key={'vector-h1'} className="heading-gradient">
@@ -73,7 +79,7 @@ export default {
   },
   integrations: {
     title: 'Leverage the tools you love',
-    image: <IntegrationsImage />,
+    image: IntegrationsImage,
   },
   useCasesSection: {
     title: (
