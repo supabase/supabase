@@ -3,6 +3,7 @@ import Link from 'next/link'
 import ProductIcon from '../ProductIcon'
 import Image from 'next/image'
 import styles from '~/styles/animations.module.css'
+import AnnouncementBadge from '../Announcement/Badge'
 
 interface Types {
   h1: string | React.ReactNode
@@ -12,6 +13,12 @@ interface Types {
   title?: string
   image?: string | React.ReactNode
   footer?: React.ReactNode
+  announcement?: {
+    url: string
+    announcement: string
+    badge?: string
+    target?: '_self' | '_blank' | string
+  }
   cta?: {
     label?: string
     link: string
@@ -47,6 +54,9 @@ const ProductHeaderCentered = (props: Types) => (
         </div>
       )}
       <div className="relative overflow-hidden w-full z-10 flex flex-col items-center space-y-2 mx-auto max-w-2xl">
+        {props.announcement && (
+          <AnnouncementBadge {...props.announcement} className="mt-1 mb-4 z-10" />
+        )}
         <div>
           {props.icon || props.title ? (
             <div className="mb-4 flex justify-center items-center gap-3">
