@@ -84,6 +84,7 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
                   type="default"
                   openBehaviour="multiple"
                   size="large"
+                  collapsible
                   className="py-2 space-y-1"
                   justified
                   chevronAlign="right"
