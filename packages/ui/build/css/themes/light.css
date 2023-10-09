@@ -1,9 +1,5 @@
-/**
- * Do not edit directly
- * Generated on Thu, 10 Aug 2023 03:54:37 GMT
- */
-
 .light {
+  --testest: 0deg 0% 100%;
   --brand-default: 152.9deg 60% 52.9%;
   --brand-600: 153.2deg 49.7% 33.5%;
   --brand-500: 148.7deg 42.7% 69.2%;
@@ -22,11 +18,11 @@
   --destructive-400: 7.1deg 91.3% 91%;
   --destructive-300: 7.1deg 100% 96.7%;
   --destructive-200: 0deg 100% 99.4%;
-  --background-alternative: 0deg 0% 100%;
   --background-muted: 0deg 0% 100%;
   --background-secondary: 0deg 0% 100%;
-  --border-control: var(--colors-slate-light-600);
+  --background-alternative: 0deg 0% 100%;
   --border-alternative: var(--colors-slate-light-500);
+  --border-control: var(--colors-slate-light-600);
   --border-overlay: var(--colors-slate-light-500);
   --border-secondary: var(--colors-gray-dark-400);
   --border-muted: var(--colors-gray-dark-400);
