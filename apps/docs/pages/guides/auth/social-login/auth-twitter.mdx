@@ -2,32 +2,32 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   id: 'auth-twitter',
-  title: 'Login with Twitter',
-  description: 'Add Twitter OAuth to your Supabase project',
+  title: 'Login with Twitter/X',
+  description: 'Add Twitter/X OAuth to your Supabase project',
 }
 
-To enable Twitter Auth for your project, you need to set up a Twitter OAuth application with [elevated access](https://developer.twitter.com/en/portal/products/elevated) and add the application credentials in the Supabase Dashboard.
+To enable Twitter/X Auth for your project, you need to set up a Twitter/X OAuth application with [elevated access](https://developer.twitter.com/en/portal/products/elevated) and add the application credentials in the Supabase Dashboard.
 
 ## Overview
 
-Setting up Twitter logins for your application consists of 3 parts:
+Setting up Twitter/X logins for your application consists of 3 parts:
 
-- Create and configure a Twitter Project and App on the [Twitter Developer Dashboard](https://developer.twitter.com/en/portal/dashboard).
-- Add your Twitter `API Key` and `API Secret Key` to your [Supabase Project](https://supabase.com/dashboard).
+- Create and configure a Twitter/X Project and App on the [Twitter/X Developer Dashboard](https://developer.twitter.com/en/portal/dashboard).
+- Add your Twitter/X `API Key` and `API Secret Key` to your [Supabase Project](https://supabase.com/dashboard).
 - Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
 
-## Access your Twitter Developer account
+## Access your Twitter/X Developer account
 
 - Go to [developer.twitter.com](https://developer.twitter.com).
 - Click on `Sign in` at the top right to log in.
 
-![Twitter Developer Portal.](/docs/img/guides/auth-twitter/twitter-portal.png)
+![Twitter/X Developer Portal.](/docs/img/guides/auth-twitter/twitter-portal.png)
 
 ## Find your callback URL
 
 <SocialProviderSetup provider="Twitter" />
 
-## Create a Twitter OAuth app
+## Create a Twitter/X OAuth app
 
 - Click `+ Create Project`.
   - Enter your project name, click `Next`.
@@ -47,9 +47,9 @@ Setting up Twitter logins for your application consists of 3 parts:
 - Enter your `Privacy policy URL`.
 - Click `Save`.
 
-## Enter your Twitter credentials into your Supabase Project
+## Enter your Twitter/X credentials into your Supabase Project
 
-<SocialProviderSettingsSupabase provider="Twitter" />
+<SocialProviderSettingsSupabase provider="Twitter/X" />
 
 ## Add login code to your client app
 
@@ -65,7 +65,7 @@ Setting up Twitter logins for your application consists of 3 parts:
 When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `twitter` as the `provider`:
 
 ```js
-async function signInWithTwitter() {
+async function signInWithTwitter/X() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'twitter',
   })
@@ -75,7 +75,7 @@ async function signInWithTwitter() {
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
-When your user signs in, call [loginWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Twitter` as the `Provider`:
+When your user signs in, call [loginWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Twitter/X` as the `Provider`:
 
 ```kotlin
 suspend fun signInWithTwitter() {
@@ -117,11 +117,17 @@ suspend fun signOut() {
 </TabPanel>
 </Tabs>
 
+## Frequently Asked Questions
+
+### Why is OAuth 2.0 Authorization Code Flow with PKCE not supported?
+
+Twitter/X only allows accessing the user's email address with the OAuth 1.0a API. An email address is a hard requirement for Supabase Auth at this time, so it is not possible to use the OAuth 2.0 Authorization Code Flow with PKCE.
+
 ## Resources
 
 - [Supabase Account - Free Plan OK](https://supabase.com)
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
-- [Twitter Developer Dashboard](https://developer.twitter.com/en/portal/dashboard)
+- [Twitter/X Developer Dashboard](https://developer.twitter.com/en/portal/dashboard)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
