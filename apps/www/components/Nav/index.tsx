@@ -97,14 +97,14 @@ const Nav = () => {
                 </div>
                 <NavigationMenu
                   delayDuration={0}
-                  className="hidden pl-4 sm:space-x-4 lg:flex h-16"
+                  className="hidden pl-8 sm:space-x-4 lg:flex h-16"
                   viewportClassName="rounded-xl bg-background"
                 >
                   <NavigationMenuList>
                     {menu.primaryNav.map((menuItem) =>
                       menuItem.hasDropdown ? (
                         <NavigationMenuItem className="text-sm font-medium" key={menuItem.title}>
-                          <NavigationMenuTrigger className="bg-transparent data-[state=open]:!text-brand data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground-strong">
+                          <NavigationMenuTrigger className="bg-transparent data-[state=open]:!text-brand data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground-strong p-2 h-auto">
                             {menuItem.title}
                           </NavigationMenuTrigger>
                           <NavigationMenuContent
