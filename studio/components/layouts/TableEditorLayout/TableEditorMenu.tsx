@@ -98,16 +98,15 @@ const TableEditorMenu = () => {
         className="pt-5 flex flex-col flex-grow space-y-4 h-full"
         style={{ maxHeight: 'calc(100vh - 48px)' }}
       >
-        <div className="mx-4">
-          <SchemaSelector
-            selectedSchemaName={snap.selectedSchemaName}
-            onSelectSchema={(name: string) => {
-              setSearchText('')
-              snap.setSelectedSchemaName(name)
-            }}
-            onSelectCreateSchema={() => snap.onAddSchema()}
-          />
-        </div>
+        <SchemaSelector
+          className="mx-4"
+          selectedSchemaName={snap.selectedSchemaName}
+          onSelectSchema={(name: string) => {
+            setSearchText('')
+            snap.setSelectedSchemaName(name)
+          }}
+          onSelectCreateSchema={() => snap.onAddSchema()}
+        />
 
         <div className="space-y-1 mx-4">
           {!isLocked ? (

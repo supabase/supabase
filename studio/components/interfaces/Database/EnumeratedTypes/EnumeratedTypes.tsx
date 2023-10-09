@@ -48,14 +48,13 @@ const EnumeratedTypes = () => {
     <>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-2">
-          <div className="w-[260px]">
-            <SchemaSelector
-              size="small"
-              showError={false}
-              selectedSchemaName={selectedSchema}
-              onSelectSchema={setSelectedSchema}
-            />
-          </div>
+          <SchemaSelector
+            className="w-[260px]"
+            size="small"
+            showError={false}
+            selectedSchemaName={selectedSchema}
+            onSelectSchema={setSelectedSchema}
+          />
           <Input
             size="small"
             value={search}
@@ -133,7 +132,7 @@ const EnumeratedTypes = () => {
                               onClick={() => setSelectedTypeToEdit(type)}
                             >
                               <IconPlus size="tiny" />
-                              <p>Add values</p>
+                              <p>Update type</p>
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="space-x-2"

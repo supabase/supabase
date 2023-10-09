@@ -24,6 +24,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { useSchemasQuery } from 'data/database/schemas-query'
 
 interface SchemaSelectorProps {
+  className?: string
   size?: 'tiny' | 'small'
   showError?: boolean
   selectedSchemaName: string
@@ -32,6 +33,7 @@ interface SchemaSelectorProps {
 }
 
 const SchemaSelector = ({
+  className,
   size = 'tiny',
   showError = true,
   selectedSchemaName,
@@ -56,7 +58,7 @@ const SchemaSelector = ({
   const schemas = (data ?? []).sort((a, b) => (a.name > b.name ? 0 : -1))
 
   return (
-    <div>
+    <div className={className}>
       {isSchemasLoading && (
         <Button
           type="outline"

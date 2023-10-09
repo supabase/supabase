@@ -35,16 +35,14 @@ const EnumeratedTypeValueRow = ({
             value={enumTypeValue.value}
             onChange={(e) => onUpdateValue(enumTypeValue.id, e.target.value)}
           />
-          <div>
-            <Button
-              type="default"
-              size="small"
-              disabled={isDisabled}
-              icon={<IconTrash strokeWidth={1.5} size={16} />}
-              className="px-2"
-              onClick={() => onRemoveValue()}
-            />
-          </div>
+          <Button
+            type="default"
+            size="small"
+            disabled={isDisabled}
+            icon={<IconTrash strokeWidth={1.5} size={16} />}
+            className="px-2"
+            onClick={() => onRemoveValue()}
+          />
         </div>
       )}
     </Draggable>
