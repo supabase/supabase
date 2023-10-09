@@ -15,7 +15,7 @@
     "generate-styles": "npm run copy-tokens && npm run build-tokens && npm run cleanse-css-for-tailwind && npm run generate-demo-tailwind-classes",
     "storybook-build": "storybook build",
     "storybook": "storybook dev -p 6006",
-    "transform-tokens": "node ./build-new/transformTokens.js",
+    "transform-tokens": "node ./transformTokens.js",
     "test": "jest"
   },
   "dependencies": {
