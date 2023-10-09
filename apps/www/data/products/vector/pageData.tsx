@@ -11,8 +11,8 @@ export default (isMobile?: boolean) => ({
   heroSection: {
     announcement: {
       url: 'https://www.ai.engineer/summit/schedule/supabase-vector',
-      badge: 'AI Engineer Summit',
-      announcement: isMobile ? 'Join us in San Francisco' : 'Join us in San Francisco, Oct 8–10',
+      badge: 'Happening now',
+      announcement: 'AI Engineer Summit',
       target: '_blank',
       hasArrow: !isMobile,
     },
