@@ -4,6 +4,9 @@
   "main": "./index.tsx",
   "types": "./index.tsx",
   "license": "MIT",
+  "scripts": {
+    "typecheck_CURRENTLY_IGNORED": "tsc --noEmit"
+  },
   "dependencies": {
     "config": "*",
     "lodash": "^4.17.21",

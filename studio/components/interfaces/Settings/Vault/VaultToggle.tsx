@@ -13,7 +13,7 @@ import { BASE_PATH } from 'lib/constants'
 const VaultToggle = () => {
   const { meta, ui } = useStore()
   const { ref } = useParams()
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
   const [isEnabling, setIsEnabling] = useState(false)
   const canToggleVault = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'extensions')
 
@@ -65,7 +65,7 @@ const VaultToggle = () => {
           backgroundSize: isNotAvailable ? '50%' : '40%',
           backgroundPosition: '100% 24%',
           backgroundImage:
-            theme === 'dark'
+            resolvedTheme === 'dark'
               ? `url("${BASE_PATH}/img/vault-dark.png")`
               : `url("${BASE_PATH}/img/vault-light.png")`,
         }}

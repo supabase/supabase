@@ -5,11 +5,11 @@ import Link from 'next/link'
 import Papa from 'papaparse'
 import SVG from 'react-inlinesvg'
 import {
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   IconChevronDown,
   IconCopy,
   IconDownload,
@@ -201,14 +201,14 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
       </Link>
       <div className="pr-3">
         {entity.type === ENTITY_TYPE.TABLE && isActive && !isLocked && (
-          <DropdownMenu_Shadcn_>
-            <DropdownMenuTrigger_Shadcn_>
+          <DropdownMenu>
+            <DropdownMenuTrigger>
               <div className="text-foreground-lighter transition-colors hover:text-foreground">
                 <IconChevronDown size={14} strokeWidth={2} />
               </div>
-            </DropdownMenuTrigger_Shadcn_>
-            <DropdownMenuContent_Shadcn_ side="bottom" align="start">
-              <DropdownMenuItem_Shadcn_
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="bottom" align="start">
+              <DropdownMenuItem
                 key="edit-table"
                 className="space-x-2"
                 onClick={(e) => {
@@ -218,8 +218,8 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
               >
                 <IconEdit size="tiny" />
                 <p>Edit Table</p>
-              </DropdownMenuItem_Shadcn_>
-              <DropdownMenuItem_Shadcn_
+              </DropdownMenuItem>
+              <DropdownMenuItem
                 key="duplicate-table"
                 className="space-x-2"
                 onClick={(e) => {
@@ -229,17 +229,17 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
               >
                 <IconCopy size="tiny" />
                 <p>Duplicate Table</p>
-              </DropdownMenuItem_Shadcn_>
-              <Link
-                key="view-policies"
-                href={`/project/${projectRef}/auth/policies?search=${entity.id}`}
-              >
-                <DropdownMenuItem_Shadcn_ key="delete-table" className="space-x-2">
+              </DropdownMenuItem>
+              <DropdownMenuItem key="delete-table" className="space-x-2" asChild>
+                <Link
+                  key="view-policies"
+                  href={`/project/${projectRef}/auth/policies?search=${entity.id}`}
+                >
                   <IconLock size="tiny" />
                   <p>View Policies</p>
-                </DropdownMenuItem_Shadcn_>
-              </Link>
-              <DropdownMenuItem_Shadcn_
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem
                 key="download-table-csv"
                 className="space-x-2"
                 onClick={(e) => {
@@ -249,9 +249,9 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
               >
                 <IconDownload size="tiny" />
                 <p>Export as CSV</p>
-              </DropdownMenuItem_Shadcn_>
-              <DropdownMenuSeparator_Shadcn_ />
-              <DropdownMenuItem_Shadcn_
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
                 key="delete-table"
                 className="space-x-2"
                 onClick={(e) => {
@@ -261,9 +261,9 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
               >
                 <IconTrash size="tiny" />
                 <p>Delete Table</p>
-              </DropdownMenuItem_Shadcn_>
-            </DropdownMenuContent_Shadcn_>
-          </DropdownMenu_Shadcn_>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
       </div>
     </div>

@@ -1,12 +1,3 @@
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@ui/components/shadcn/ui/form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { Meta } from '@storybook/react'
 import { Button } from '@ui/components/shadcn/ui/button'
@@ -31,6 +22,15 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@ui/components/shadcn/ui/dropdown-menu'
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@ui/components/shadcn/ui/form'
 import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
 import { toast } from '@ui/components/shadcn/ui/use-toast'
 import { cn } from '@ui/lib/utils'
@@ -52,7 +52,6 @@ import {
 import React from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
-import { CommandLabel } from '@ui/components/Command/Command.utils'
 
 const meta: Meta<typeof DropdownMenu> = {
   /* 👇 The title prop is optional.
@@ -472,7 +471,7 @@ export const ComboOrgPicker = {
               {selectedStatus ? (
                 <>
                   <selectedStatus.icon className="mr-2 h-4 w-4 shrink-0" />
-                  <span className="text">{selectedStatus.label}</span>
+                  <span className="text-foreground">{selectedStatus.label}</span>
                 </>
               ) : (
                 <>Organization</>
@@ -646,7 +645,7 @@ export const MultipleComboPickers = {
               {selectedStatus ? (
                 <>
                   <selectedStatus.icon className="mr-2 h-4 w-4 shrink-0" />
-                  <span className="text">{selectedStatus.label}</span>
+                  <span className="text-foreground">{selectedStatus.label}</span>
                 </>
               ) : (
                 <>Organization</>

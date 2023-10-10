@@ -209,12 +209,8 @@ const MigrateOrganizationBillingButton = observer(() => {
           <Modal.Content>
             <div className="text-foreground-light text-sm space-y-2">
               <p>
-                Migrating to new organization-based billing combines subscriptions for all projects
-                in the organization into a single subscription.
-              </p>
-
-              <p>
-                For a detailed breakdown of changes, see{' '}
+                With organization-based billing, you'll have a single subscription for your entire
+                organization. For a detailed breakdown of changes, see{' '}
                 <Link
                   href="https://supabase.com/docs/guides/platform/org-based-billing"
                   target="_blank"
@@ -230,7 +226,7 @@ const MigrateOrganizationBillingButton = observer(() => {
                   rel="noreferrer"
                   className="underline"
                 >
-                  General settings
+                  general project settings
                 </Link>
                 .
               </p>
@@ -269,7 +265,7 @@ const MigrateOrganizationBillingButton = observer(() => {
               >
                 Pricing
               </a>{' '}
-              for more details. Please contact support if you are an Enterprise customer.
+              for more details.
             </p>
 
             {tier !== '' && tier !== 'FREE' && (
@@ -404,7 +400,7 @@ const MigrateOrganizationBillingButton = observer(() => {
           {migrationPreviewIsSuccess && dbTier !== 'tier_free' && (
             <Modal.Content>
               <InformationBox
-                defaultVisibility={false}
+                defaultVisibility={true}
                 title={
                   <span>
                     Estimated monthly price is $
@@ -450,10 +446,10 @@ const MigrateOrganizationBillingButton = observer(() => {
 
                       <tbody>
                         <tr>
-                          <td className="py-2 text-sm">Total</td>
+                          <td className="py-2 text-sm font-medium">Total</td>
                           <td className="py-2 text-sm" />
                           <td className="py-2 text-sm" />
-                          <td className="py-2 text-sm text-right">
+                          <td className="py-2 text-sm text-right font-medium">
                             $
                             {migrationPreviewData.monthly_invoice_breakdown.reduce(
                               (prev, cur) => prev + cur.total_price,
@@ -463,6 +459,17 @@ const MigrateOrganizationBillingButton = observer(() => {
                         </tr>
                       </tbody>
                     </table>
+
+                    {migrationPreviewData.old_tiers.some((it) => it === 'tier_free') && (
+                      <div className="mt-2">
+                        <p>
+                          While paused projects do not incur compute costs, the breakdown assumes
+                          that none of your projects are paused. Unpausing projects is self-serve
+                          and pausing projects on paid plans is currently only possible via support
+                          due to infrastructure restrictions.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 }
               />
