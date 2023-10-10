@@ -18,7 +18,7 @@ import {
   IconAlertCircle,
   IconExternalLink,
   IconPlus,
-  Input,
+  Input_Shadcn_,
   SidePanel,
   cn,
 } from 'ui'
@@ -153,7 +153,7 @@ const EditEnumeratedTypeSidePanel = ({
                 <FormItem_Shadcn_>
                   <FormLabel_Shadcn_>Name</FormLabel_Shadcn_>
                   <FormControl_Shadcn_>
-                    <Input {...field} />
+                    <Input_Shadcn_ {...field} />
                   </FormControl_Shadcn_>
                   <FormMessage_Shadcn_ />
                 </FormItem_Shadcn_>
@@ -166,7 +166,7 @@ const EditEnumeratedTypeSidePanel = ({
                 <FormItem_Shadcn_>
                   <FormLabel_Shadcn_>Description</FormLabel_Shadcn_>
                   <FormControl_Shadcn_>
-                    <Input {...field} />
+                    <Input_Shadcn_ {...field} />
                   </FormControl_Shadcn_>
                   <FormDescription_Shadcn_>Optional</FormDescription_Shadcn_>
                 </FormItem_Shadcn_>
@@ -194,8 +194,10 @@ const EditEnumeratedTypeSidePanel = ({
                                   Existing values cannot be deleted or sorted
                                 </AlertTitle_Shadcn_>
                                 <AlertDescription_Shadcn_>
-                                  You need to delete and recreate the enumerated type with the
-                                  updated values to delete existing values.
+                                  <p className="!leading-normal track">
+                                    You will need to delete and recreate the enumerated type with
+                                    the updated values instead.
+                                  </p>
                                   <Link
                                     passHref
                                     href="https://www.postgresql.org/message-id/21012.1459434338%40sss.pgh.pa.us"

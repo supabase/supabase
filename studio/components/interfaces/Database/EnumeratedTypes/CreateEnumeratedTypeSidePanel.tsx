@@ -1,9 +1,13 @@
+import Link from 'next/link'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useRef } from 'react'
 import { DragDropContext, Droppable, DroppableProvided } from 'react-beautiful-dnd'
 import { useFieldArray, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Button,
   FormControl_Shadcn_,
   FormDescription_Shadcn_,
@@ -12,8 +16,10 @@ import {
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
   Form_Shadcn_,
+  IconAlertCircle,
+  IconExternalLink,
   IconPlus,
-  Input,
+  Input_Shadcn_,
   SidePanel,
   cn,
 } from 'ui'
@@ -105,7 +111,7 @@ const CreateEnumeratedTypeSidePanel = ({
                 <FormItem_Shadcn_>
                   <FormLabel_Shadcn_>Name</FormLabel_Shadcn_>
                   <FormControl_Shadcn_>
-                    <Input {...field} />
+                    <Input_Shadcn_ {...field} />
                   </FormControl_Shadcn_>
                   <FormMessage_Shadcn_ />
                 </FormItem_Shadcn_>
@@ -118,7 +124,7 @@ const CreateEnumeratedTypeSidePanel = ({
                 <FormItem_Shadcn_>
                   <FormLabel_Shadcn_>Description</FormLabel_Shadcn_>
                   <FormControl_Shadcn_>
-                    <Input {...field} />
+                    <Input_Shadcn_ {...field} />
                   </FormControl_Shadcn_>
                   <FormDescription_Shadcn_>Optional</FormDescription_Shadcn_>
                 </FormItem_Shadcn_>
@@ -139,6 +145,35 @@ const CreateEnumeratedTypeSidePanel = ({
                             <FormLabel_Shadcn_ className={cn(index !== 0 && 'sr-only')}>
                               Values
                             </FormLabel_Shadcn_>
+                            {index === 0 && (
+                              <Alert_Shadcn_>
+                                <IconAlertCircle strokeWidth={1.5} />
+                                <AlertTitle_Shadcn_>
+                                  After creation, values cannot be deleted or sorted
+                                </AlertTitle_Shadcn_>
+                                <AlertDescription_Shadcn_>
+                                  <p className="!leading-normal track">
+                                    You will need to delete and recreate the enumerated type with
+                                    the updated values instead.
+                                  </p>
+                                  <Link
+                                    passHref
+                                    href="https://www.postgresql.org/message-id/21012.1459434338%40sss.pgh.pa.us"
+                                  >
+                                    <Button
+                                      asChild
+                                      type="default"
+                                      icon={<IconExternalLink strokeWidth={1.5} />}
+                                      className="mt-2"
+                                    >
+                                      <a target="_blank" rel="noreferrer">
+                                        Learn more
+                                      </a>
+                                    </Button>
+                                  </Link>
+                                </AlertDescription_Shadcn_>
+                              </Alert_Shadcn_>
+                            )}
                             <FormControl_Shadcn_>
                               <EnumeratedTypeValueRow
                                 index={index}

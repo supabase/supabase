@@ -1,6 +1,6 @@
 import { GripVertical } from 'lucide-react'
 import { Draggable, DraggableProvided } from 'react-beautiful-dnd'
-import { Button, IconTrash, Input } from 'ui'
+import { Button, IconTrash, Input_Shadcn_ } from 'ui'
 
 interface EnumeratedTypeValueRowProps {
   index: number
@@ -33,7 +33,7 @@ const EnumeratedTypeValueRow = ({
           >
             <GripVertical size={16} strokeWidth={1.5} />
           </div>
-          <Input {...field} className="w-full" />
+          <Input_Shadcn_ {...field} className="w-full" />
           <Button
             type="default"
             size="small"
