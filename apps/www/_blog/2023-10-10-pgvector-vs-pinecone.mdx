@@ -26,6 +26,8 @@ So, before we dive into their performance, let us first introduce Pinecone's off
 
 ### Pinecone has 3 Pod types for indexes
 
+An index on Pinecone is made up of pods, which are units of cloud resources (vCPU, RAM, disk) that provide storage and compute for each index. 
+
 | Type | Capacity / Vectors                | QPS     | Accuracy | Price per unit per month |
 | ---- | --------------------------------- | ------- | -------- | ------------------------ |
 | s1   | 5,000,000 768d (~2,500,000 1536d) | Slowest | 0.98     | $80                      |
@@ -46,7 +48,7 @@ To compare Pinecone and pgvector on equal grounds, we opted for the following se
 - **pgvector**: A single Supabase \*\*\*\*2XL instance approximating ~410$/month (8-core ARM CPU and 32 GB RAM). An HNSW index with the following build parameters: `m='36'`, `ef_construction='128'`.
 - **Pinecone**: Vertically scaled pod to the minimum option that fits the dbpedia dataset into the index on a single pod. We then added replicas to match the budget (slightly exceeding in all cases with ~$480/month).
 
-### Measuring accuracy in Pincone
+### Measuring accuracy in Pinecone
 
 There is no available information on Pinecone's proprietary ANN index. Likewise, they doesn't provide information about query accuracy, nor does it support exact nearest neighbors search (KNN). So to measure Pinecone's accuracy, we had to compare its results with pgvector's exact search (KNN without indexes) for the same queries. This seems to be the only way to measure Pinecone's index accuracy.
 
@@ -136,7 +138,23 @@ It's only fair to note that Pinecone may be cheaper than pgvector since you coul
 
 Real user stories indicate this might not be problematic. For instance, Quivr expanded to 1 million vectors without using any indexes:
 
-<blockquote class="twitter-tweet"><p lang="en" dir="ltr">Is PGVector really that bad ?<br /><br />Almost 1M vectors on our <a href="https://twitter.com/supabase?ref_src=twsrc%5Etfw">@supabase</a> database and it is 🔥 for <a href="https://twitter.com/quivr_brain?ref_src=twsrc%5Etfw">@quivr_brain</a><br /><br />A few stats:<br />- 13117 users and 400 daily <br />- 9GB of Vectors<br />- 46% Memory Usage (4Gb DB)<br />- Less than 0.5s to retrieve content in similarity search with embedding using… <a href="https://t.co/ezQpot0CvA">pic.twitter.com/ezQpot0CvA</a></p>&mdash; Stan Girard (@_StanGirard) <a href="https://twitter.com/_StanGirard/status/1691135519948787719?ref_src=twsrc%5Etfw">August 14, 2023</a></blockquote><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<blockquote class="twitter-tweet">
+  <p lang="en" dir="ltr">
+    Is PGVector really that bad ?<br />
+    <br />
+    Almost 1M vectors on our{' '}
+    <a href="https://twitter.com/supabase?ref_src=twsrc%5Etfw">@supabase</a> database and it is 🔥
+    for <a href="https://twitter.com/quivr_brain?ref_src=twsrc%5Etfw">@quivr_brain</a>
+    <br />
+    <br />A few stats:
+    <br />- 13117 users and 400 daily <br />- 9GB of Vectors
+    <br />- 46% Memory Usage (4Gb DB)
+    <br />- Less than 0.5s to retrieve content in similarity search with embedding using… {/* prettier-ignore */}
+    <a href="https://t.co/ezQpot0CvA">pic.twitter.com/ezQpot0CvA</a>
+  </p>
+  &mdash; Stan Girard (@_StanGirard) <a href="https://twitter.com/_StanGirard/status/1691135519948787719?ref_src=twsrc%5Etfw">August 14, 2023</a>
+</blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
 ## pgvector's hidden cost-saving benefits
 
@@ -144,7 +162,7 @@ There are also a couple of benefits from a developer experience perspective that
 
 - Postgres offers numerous features applicable to your vectors: database backups, row-level security, client libraries support and ORMs for 18 languages, complete ACID compliance, bulk updates and deletes (metadata updates in seconds).
 - Having all your data in a sole Postgres instance (or a cluster) reduces roundtrips in production and allows running the entire developer setup locally.
-- Implementing additional databases would increase operational complexity and the learning curve.
+- Implementing additional databases can increase operational complexity and the learning curve.
 - Postgres is battle-tested and robust, whereas most specialized vector databases haven't had time to demonstrate their reliability.
 
 ## Start using HNSW
