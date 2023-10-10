@@ -26,7 +26,7 @@ So, before we dive into their performance, let us first introduce Pinecone's off
 
 ### Pinecone has 3 Pod types for indexes
 
-An index on Pinecone is made up of pods, which are units of cloud resources (vCPU, RAM, disk) that provide storage and compute for each index. 
+An index on Pinecone is made up of pods, which are units of cloud resources (vCPU, RAM, disk) that provide storage and compute for each index.
 
 | Type | Capacity / Vectors                | QPS     | Accuracy | Price per unit per month |
 | ---- | --------------------------------- | ------- | -------- | ------------------------ |
@@ -138,6 +138,7 @@ It's only fair to note that Pinecone may be cheaper than pgvector since you coul
 
 Real user stories indicate this might not be problematic. For instance, Quivr expanded to 1 million vectors without using any indexes:
 
+{/* prettier-ignore */}
 <blockquote class="twitter-tweet">
   <p lang="en" dir="ltr">
     Is PGVector really that bad ?<br />
@@ -149,7 +150,7 @@ Real user stories indicate this might not be problematic. For instance, Quivr ex
     <br />A few stats:
     <br />- 13117 users and 400 daily <br />- 9GB of Vectors
     <br />- 46% Memory Usage (4Gb DB)
-    <br />- Less than 0.5s to retrieve content in similarity search with embedding using… {/* prettier-ignore */}
+    <br />- Less than 0.5s to retrieve content in similarity search with embedding using… 
     <a href="https://t.co/ezQpot0CvA">pic.twitter.com/ezQpot0CvA</a>
   </p>
   &mdash; Stan Girard (@_StanGirard) <a href="https://twitter.com/_StanGirard/status/1691135519948787719?ref_src=twsrc%5Etfw">August 14, 2023</a>
