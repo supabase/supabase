@@ -113,6 +113,12 @@ const DowngradeModal = ({
               </div>
             </li>
           </ul>
+
+          {subscription?.billing_via_partner === true && (
+            <div className="mt-4 text-sm">
+              <p>Your organization will be downgraded at the end of your current billing cycle.</p>
+            </div>
+          )}
         </div>
       </Modal.Content>
     </Modal>

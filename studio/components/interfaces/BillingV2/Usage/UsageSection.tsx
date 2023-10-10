@@ -43,8 +43,6 @@ const UsageSection = ({
   subscription,
   currentBillingCycleSelected,
 }: UsageSectionProps) => {
-  const billingEnabled = useIsFeatureEnabled('billing:all')
-
   const { data: usage } = useProjectUsageQuery({ projectRef })
   const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === categoryKey)
 
@@ -267,15 +265,14 @@ const UsageSection = ({
                           </p>
                         </div>
                       </div>
-                      {billingEnabled && (
-                        <Link
-                          href={`/project/${projectRef}/settings/billing/subscription?panel=subscriptionPlan`}
-                        >
-                          <a>
-                            <Button type="primary">Upgrade plan</Button>
-                          </a>
-                        </Link>
-                      )}
+
+                      <Link
+                        href={`/project/${projectRef}/settings/billing/subscription?panel=subscriptionPlan`}
+                      >
+                        <a>
+                          <Button type="primary">Upgrade plan</Button>
+                        </a>
+                      </Link>
                     </div>
                   </Panel.Content>
                 </Panel>
