@@ -86,6 +86,12 @@ export const generateDatabaseMenu = (
           url: `/project/${ref}/database/indexes`,
           items: [],
         },
+        {
+          name: 'Enumerated Types',
+          key: 'types',
+          url: `/project/${ref}/database/types`,
+          items: [],
+        },
         ...(isNewAPIDocsEnabled
           ? [
               {

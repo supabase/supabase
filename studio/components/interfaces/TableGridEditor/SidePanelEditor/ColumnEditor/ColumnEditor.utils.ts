@@ -167,11 +167,6 @@ export const generateUpdateColumnPayload = (
   return payload
 }
 
-export const getSelectedEnumValues = (type: string, enums: PostgresType[]) => {
-  const enumType = find(enums, { name: type })
-  return (enumType?.enums ?? []) as string[]
-}
-
 export const validateFields = (field: ColumnField) => {
   const errors = {} as Dictionary<any>
   if (field.name.length === 0) {
