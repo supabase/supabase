@@ -29,7 +29,7 @@ const FeaturesSection = ({ title, paragraph, cta, features }: Props) => {
     <LazyMotion features={domAnimation}>
       <SectionContainer>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-10 justify-between">
-          <div className="col-span-full lg:col-span-4 gap-2 flex flex-col">
+          <div className="col-span-full lg:col-span-4 gap-2 flex flex-col items-start">
             <h2 className="text-2xl sm:text-3xl xl:text-4xl max-w-[280px] sm:max-w-xs xl:max-w-[360px] tracking-[-1px]">
               {title}
             </h2>

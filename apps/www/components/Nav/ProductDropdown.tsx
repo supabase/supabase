@@ -34,32 +34,34 @@ const ProductDropdown = () => {
       </ul>
       <div className="bg-overlay border-t xl:border-t-0 xl:border-l py-8 px-10 gap-8 grid grid-cols-5 xl:flex xl:flex-col w-full xl:w-[500px]">
         <div className="col-span-3 xl:w-auto">
-          <Link href="/customers">
-            <a className="group flex items-center gap-1 text-lighter hover:text-foreground text-xs uppercase tracking-widest font-mono mb-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm focus-visible:text-foreground">
-              Customer Stories
-              <IconChevronRight className="h-3 w-3 transition-transform will-change-transform -translate-x-1 group-hover:translate-x-0" />
-            </a>
+          <Link
+            href="/customers"
+            className="group flex items-center gap-1 text-lighter hover:text-foreground text-xs uppercase tracking-widest font-mono mb-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm focus-visible:text-foreground"
+          >
+            Customer Stories
+            <IconChevronRight className="h-3 w-3 transition-transform will-change-transform -translate-x-1 group-hover:translate-x-0" />
           </Link>
           <ul className="flex flex-col gap-2">
             {CustomersData.slice(0, isTablet ? 2 : 3).map((customer) => (
               <li key={customer.organization}>
-                <Link href={customer.url}>
-                  <a className="group flex items-center gap-3 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded">
-                    <div className="relative rounded-md bg-background p-2 border group-hover:border-foreground-muted/50 h-16 w-32 flex-shrink-0 overflow-auto">
-                      <Image
-                        src={`${basePath}/${customer.imgUrl}`}
-                        alt={customer.title}
-                        layout="fill"
-                        objectFit="contain"
-                        className="!p-4 brightness-50 contrast-50 dark:contrast-0 filter"
-                      />
-                    </div>
-                    <div className="flex flex-col">
-                      <h4 className="text-light group-hover:text-foreground group-focus-visible:text-foreground text-normal mb-0 text-sm">
-                        {customer.title}
-                      </h4>
-                    </div>
-                  </a>
+                <Link
+                  href={customer.url}
+                  className="group flex items-center gap-3 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded"
+                >
+                  <div className="relative rounded-md bg-background p-2 border group-hover:border-foreground-muted/50 h-16 w-32 flex-shrink-0 overflow-auto">
+                    <Image
+                      src={`${basePath}/${customer.imgUrl}`}
+                      alt={customer.title}
+                      layout="fill"
+                      objectFit="contain"
+                      className="!p-4 brightness-50 contrast-50 dark:contrast-0 filter"
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <h4 className="text-light group-hover:text-foreground group-focus-visible:text-foreground text-normal mb-0 text-sm">
+                      {customer.title}
+                    </h4>
+                  </div>
                 </Link>
               </li>
             ))}

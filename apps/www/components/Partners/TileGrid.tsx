@@ -38,12 +38,11 @@ export default function TileGrid({
             hover:shadow-lg"
                 >
                   <div className="flex w-full space-x-6">
-                    <div className="h-10 w-10 scale-100 transition-all group-hover:scale-110">
+                    <div className="relative h-[40px] min-w-[40px] w-[40px] rounded-full overflow-hidden scale-100 transition-all group-hover:scale-110">
                       <Image
-                        layout="fixed"
-                        width={40}
-                        height={40}
-                        className="h-10 w-10 rounded-full bg-gray-300"
+                        layout="fill"
+                        objectFit="cover"
+                        className="bg-gray-300"
                         src={p.logo}
                         alt={p.title}
                       />
@@ -82,12 +81,11 @@ export default function TileGrid({
             hover:shadow-lg"
                 >
                   <div className="flex w-full space-x-6">
-                    <div className="h-10 w-10 scale-100 transition-all group-hover:scale-110">
+                    <div className="relative h-[40px] min-w-[40px] w-[40px] rounded-full overflow-hidden scale-100 transition-all group-hover:scale-110">
                       <Image
-                        layout="fixed"
-                        width={40}
-                        height={40}
-                        className="h-10 w-10 rounded-full bg-gray-300"
+                        layout="fill"
+                        objectFit="cover"
+                        className="bg-gray-300"
                         src={p.logo}
                         alt={p.title}
                       />
