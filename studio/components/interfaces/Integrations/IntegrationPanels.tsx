@@ -241,8 +241,8 @@ const IntegrationConnectionOption = React.forwardRef<HTMLLIElement, IntegrationC
 
 const EmptyIntegrationConnection = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & { showNode?: boolean }
->(({ className, showNode = true, ...props }, ref) => {
+  React.HTMLAttributes<HTMLDivElement> & { showNode?: boolean; orgSlug?: string }
+>(({ className, showNode = true, orgSlug = '_', ...props }, ref) => {
   return (
     <div
       ref={ref}
@@ -266,7 +266,11 @@ const EmptyIntegrationConnection = React.forwardRef<
           'flex h-20 px-10 rounded-lg justify-center items-center'
         )}
       >
-        <Button type="default">Add new project connection</Button>
+        <Link href={`/org/${orgSlug}/integrations`}>
+          <a>
+            <Button type="default">Add new project connection</Button>
+          </a>
+        </Link>
       </div>
     </div>
   )

@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import OrganizationPicker from 'components/interfaces/Integrations/OrganizationPicker'
@@ -23,6 +23,7 @@ import {
   IconLifeBuoy,
   LoadingLine,
 } from 'ui'
+import { useGitHubIntegrationAutoInstall } from 'lib/github-integration'
 
 const GitHubIntegration: NextPageWithLayout = () => {
   const router = useRouter()
@@ -48,17 +49,26 @@ const GitHubIntegration: NextPageWithLayout = () => {
     },
   })
 
+  const onInstalled = useCallback(
+    (id: string, orgSlug?: string) => {
+      setOrganizationIntegrationId(id)
+
+      router.push({
+        pathname: `/integrations/github/${id}/choose-project`,
+        query: { ...router.query, slug: orgSlug },
+      })
+    },
+    [router]
+  )
+
   const { mutate, isLoading: isLoadingGitHubIntegrationCreateMutation } =
     useGitHubIntegrationCreateMutation({
       onSuccess({ id }) {
-        setOrganizationIntegrationId(id)
-
-        router.push({
-          pathname: `/integrations/github/${id}/choose-project`,
-          query: { ...router.query, slug: selectedOrg?.slug },
-        })
+        onInstalled(id, selectedOrg?.slug)
       },
     })
+
+  const isAutoInstalling = useGitHubIntegrationAutoInstall(onInstalled)
 
   const installed = useMemo(
     () =>
@@ -119,7 +129,7 @@ const GitHubIntegration: NextPageWithLayout = () => {
   return (
     <>
       <main className="overflow-auto flex flex-col h-full bg">
-        <LoadingLine loading={isLoadingGitHubIntegrationCreateMutation} />
+        <LoadingLine loading={isLoadingGitHubIntegrationCreateMutation || isAutoInstalling} />
         {organizationIntegrationId === null && (
           <>
             <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
@@ -151,8 +161,12 @@ const GitHubIntegration: NextPageWithLayout = () => {
                     <Button
                       size="medium"
                       className="self-end"
-                      disabled={isLoadingGitHubIntegrationCreateMutation || disableInstallationForm}
-                      loading={isLoadingGitHubIntegrationCreateMutation}
+                      disabled={
+                        isLoadingGitHubIntegrationCreateMutation ||
+                        isAutoInstalling ||
+                        disableInstallationForm
+                      }
+                      loading={isLoadingGitHubIntegrationCreateMutation || isAutoInstalling}
                       onClick={onInstall}
                     >
                       Install integration
