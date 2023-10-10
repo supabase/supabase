@@ -135,7 +135,7 @@ const SchemaSelector = ({
                 {onSelectCreateSchema !== undefined && (
                   <CommandGroup_Shadcn_ className="border-t">
                     <CommandItem_Shadcn_
-                      className="cursor-pointer flex items-center space-x-2 w-full"
+                      className="cursor-pointer flex items-center gap-x-2 w-full"
                       onSelect={() => {
                         onSelectCreateSchema()
                         setOpen(false)
@@ -146,7 +146,7 @@ const SchemaSelector = ({
                       }}
                     >
                       <IconPlus />
-                      <span>Create a new schema</span>
+                      Create a new schema
                     </CommandItem_Shadcn_>
                   </CommandGroup_Shadcn_>
                 )}
