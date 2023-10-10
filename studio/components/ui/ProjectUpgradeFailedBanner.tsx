@@ -6,11 +6,13 @@ import { useParams } from 'common/hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { useProjectUpgradingStatusQuery } from 'data/config/project-upgrade-status-query'
 import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
+import { useFlag } from 'hooks'
 
 // [Joshen] Think twice about the category though - it doesn't correspond
 
 const ProjectUpgradeFailedBanner = () => {
   const { ref } = useParams()
+  const showDbUpgrades = useFlag('databaseUpgrades')
   const { data } = useProjectUpgradingStatusQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { target_version, status, initiated_at, error } = data?.databaseUpgradeStatus ?? {}
 
@@ -32,7 +34,7 @@ const ProjectUpgradeFailedBanner = () => {
     localStorage.setItem(key, 'true')
   }
 
-  if (!isFailed || !showMessage) return null
+  if (!isFailed || !showMessage || !showDbUpgrades) return null
 
   return (
     <div className="max-w-7xl">
