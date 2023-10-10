@@ -108,7 +108,7 @@ export const ScopesPanel = ({
     <div className="-space-y-px">
       <Scope
         title="Auth"
-        description="Project's auth configurations and SSO providers."
+        description="Auth configurations and SSO providers."
         readScopeName={OAuthScope.AUTH_READ}
         writeScopeName={OAuthScope.AUTH_WRITE}
         scopes={scopes}
@@ -116,7 +116,7 @@ export const ScopesPanel = ({
       />
       <Scope
         title="Database"
-        description="Project's Postgres configurations, SQL snippets, SSL enforcement configurations and Typescript schema types."
+        description="Postgres configurations, SQL snippets, SSL enforcement configurations and Typescript schema types."
         readScopeName={OAuthScope.DATABASE_READ}
         writeScopeName={OAuthScope.DATABASE_WRITE}
         scopes={scopes}
@@ -124,7 +124,7 @@ export const ScopesPanel = ({
       />
       <Scope
         title="Domains"
-        description="Project's custom domains and vanity subdomains."
+        description="Custom domains and vanity subdomains."
         readScopeName={OAuthScope.DOMAINS_READ}
         writeScopeName={OAuthScope.DOMAINS_WRITE}
         scopes={scopes}
@@ -132,7 +132,7 @@ export const ScopesPanel = ({
       />
       <Scope
         title="Edge Functions"
-        description="Project's edge functions."
+        description="Edge functions."
         readScopeName={OAuthScope.EDGE_FUNCTIONS_READ}
         writeScopeName={OAuthScope.EDGE_FUNCTIONS_WRITE}
         scopes={scopes}
@@ -140,7 +140,7 @@ export const ScopesPanel = ({
       />
       <Scope
         title="Environment"
-        description="Project's environments/branches."
+        description="Environments/branches."
         readScopeName={OAuthScope.ENVIRONMENT_READ}
         writeScopeName={OAuthScope.ENVIRONMENT_WRITE}
         scopes={scopes}
@@ -156,7 +156,7 @@ export const ScopesPanel = ({
       />
       <Scope
         title="Projects"
-        description="Project's metadata, upgrade status, network restrictions and network bans."
+        description="Metadata, upgrade status, network restrictions and network bans."
         readScopeName={OAuthScope.PROJECTS_READ}
         writeScopeName={OAuthScope.PROJECTS_WRITE}
         scopes={scopes}
@@ -164,7 +164,7 @@ export const ScopesPanel = ({
       />
       <Scope
         title="REST"
-        description="Project's postgREST configurations."
+        description="PostgREST configurations."
         readScopeName={OAuthScope.REST_READ}
         writeScopeName={OAuthScope.REST_WRITE}
         scopes={scopes}
@@ -172,7 +172,7 @@ export const ScopesPanel = ({
       />
       <Scope
         title="Secrets"
-        description="Project's API keys, secrets and pgsodium configurations."
+        description="API keys, secrets and pgsodium configurations."
         readScopeName={OAuthScope.SECRETS_READ}
         writeScopeName={OAuthScope.SECRETS_WRITE}
         scopes={scopes}
