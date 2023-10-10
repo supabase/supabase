@@ -83,7 +83,7 @@ def seed():
     # create vector store client
     vx = vecs.create_client(DB_CONNECTION)
 
-    # create a collection of vectors with 3 dimensions
+    # create a collection of vectors with 512 dimensions
     images = vx.create_collection(name="image_vectors", dimension=512)
 
     # Load CLIP model
