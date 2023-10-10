@@ -10,20 +10,15 @@ export interface AuthorizeRequesterDetailsProps {
 
 const ScopeSection = ({
   description,
-  readScope,
-  writeScope,
-  allScopes,
+  hasReadScope,
+  hasWriteScope,
 }: {
   description: string
-  readScope: OAuthScope
-  writeScope: OAuthScope
-  allScopes: OAuthScope[]
+  hasReadScope: boolean
+  hasWriteScope: boolean
 }) => {
-  const hasRead = allScopes.includes(readScope)
-  const hasWrite = allScopes.includes(writeScope)
-
-  if (hasRead || hasWrite) {
-    const perms = [hasRead ? 'Read' : null, hasWrite ? 'Write' : null]
+  if (hasReadScope || hasWriteScope) {
+    const perms = [hasReadScope ? 'Read' : null, hasWriteScope ? 'Write' : null]
       .filter(Boolean)
 
       .map((str) => (
@@ -85,57 +80,48 @@ const AuthorizeRequesterDetails = ({
         <div className="pt-2">
           <ScopeSection
             description="access to auth configurations and SSO providers"
-            readScope={OAuthScope.AUTH_READ}
-            writeScope={OAuthScope.AUTH_WRITE}
-            allScopes={scopes}
+            hasReadScope={scopes.includes(OAuthScope.AUTH_READ)}
+            hasWriteScope={scopes.includes(OAuthScope.AUTH_WRITE)}
           />
           <ScopeSection
             description="access to Postgres configurations, SQL snippets, SSL enforcement configurations and Typescript schema types."
-            readScope={OAuthScope.DATABASE_READ}
-            writeScope={OAuthScope.DATABASE_WRITE}
-            allScopes={scopes}
+            hasReadScope={scopes.includes(OAuthScope.DATABASE_READ)}
+            hasWriteScope={scopes.includes(OAuthScope.DATABASE_WRITE)}
           />
           <ScopeSection
             description="access to custom domains and vanity subdomains."
-            readScope={OAuthScope.DOMAINS_READ}
-            writeScope={OAuthScope.DOMAINS_WRITE}
-            allScopes={scopes}
+            hasReadScope={scopes.includes(OAuthScope.DOMAINS_READ)}
+            hasWriteScope={scopes.includes(OAuthScope.DOMAINS_WRITE)}
           />
           <ScopeSection
             description="access to edge functions."
-            readScope={OAuthScope.EDGE_FUNCTIONS_READ}
-            writeScope={OAuthScope.EDGE_FUNCTIONS_WRITE}
-            allScopes={scopes}
+            hasReadScope={scopes.includes(OAuthScope.EDGE_FUNCTIONS_READ)}
+            hasWriteScope={scopes.includes(OAuthScope.EDGE_FUNCTIONS_WRITE)}
           />
           <ScopeSection
             description="access to environments/branches."
-            readScope={OAuthScope.ENVIRONMENT_READ}
-            writeScope={OAuthScope.ENVIRONMENT_WRITE}
-            allScopes={scopes}
+            hasReadScope={scopes.includes(OAuthScope.ENVIRONMENT_READ)}
+            hasWriteScope={scopes.includes(OAuthScope.ENVIRONMENT_WRITE)}
           />
           <ScopeSection
             description="access to the organization and all its members."
-            readScope={OAuthScope.ORGANIZATIONS_READ}
-            writeScope={OAuthScope.ORGANIZATIONS_WRITE}
-            allScopes={scopes}
+            hasReadScope={scopes.includes(OAuthScope.ORGANIZATIONS_READ)}
+            hasWriteScope={scopes.includes(OAuthScope.ORGANIZATIONS_WRITE)}
           />
           <ScopeSection
             description="access to metadata, its upgrade status, network restrictions and network bans."
-            readScope={OAuthScope.PROJECTS_READ}
-            writeScope={OAuthScope.PROJECTS_WRITE}
-            allScopes={scopes}
+            hasReadScope={scopes.includes(OAuthScope.PROJECTS_READ)}
+            hasWriteScope={scopes.includes(OAuthScope.PROJECTS_WRITE)}
           />
           <ScopeSection
             description="access to PostgREST configurations."
-            readScope={OAuthScope.REST_READ}
-            writeScope={OAuthScope.REST_WRITE}
-            allScopes={scopes}
+            hasReadScope={scopes.includes(OAuthScope.REST_READ)}
+            hasWriteScope={scopes.includes(OAuthScope.REST_WRITE)}
           />
           <ScopeSection
             description="access to API keys, secrets and pgsodium configurations."
-            readScope={OAuthScope.SECRETS_READ}
-            writeScope={OAuthScope.SECRETS_WRITE}
-            allScopes={scopes}
+            hasReadScope={scopes.includes(OAuthScope.SECRETS_READ)}
+            hasWriteScope={scopes.includes(OAuthScope.SECRETS_WRITE)}
           />
         </div>
       </div>
