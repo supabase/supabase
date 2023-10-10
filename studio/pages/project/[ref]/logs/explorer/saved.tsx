@@ -13,16 +13,19 @@ import { IconSave, Loading } from 'ui'
 export const LogsSavedPage: NextPageWithLayout = () => {
   const { ref } = useParams()
 
-  const { data: saved, isLoading } = useContentQuery(ref)
+  const { data, isLoading } = useContentQuery(ref)
 
   if (isLoading) {
     return <Loading active={true}>{null}</Loading>
   }
 
+  let saved = [...(data?.content ?? [])].filter((c) => c.type === 'log_sql')
+  saved.sort((a, b) => a.name.localeCompare(b.name))
+
   return (
     <div className="mx-auto w-full px-5 py-6 h-full">
       <LogsExplorerHeader subtitle="Saved Queries" />
-      {(saved?.content ?? []).length > 0 && (
+      {saved.length > 0 && (
         <div className="flex flex-col gap-3 py-6">
           <Table
             headTrClasses="expandable-tr"
@@ -35,13 +38,13 @@ export const LogsSavedPage: NextPageWithLayout = () => {
                 <Table.th></Table.th>
               </>
             }
-            body={(saved?.content ?? []).map((item) => (
+            body={saved.map((item) => (
               <LogsSavedQueriesItem key={item.id} item={item} />
             ))}
           />
         </div>
       )}
-      {(saved?.content ?? []).length === 0 && (
+      {saved.length === 0 && (
         <div className="my-auto flex h-full flex-grow flex-col items-center justify-center gap-1">
           <IconSave className="animate-bounce" />
           <h3 className="text-lg text-foreground">No Saved Queries Yet</h3>
