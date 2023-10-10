@@ -24,6 +24,7 @@ export type OrganizationCustomerProfileResponse = {
   invoice_settings: {
     default_payment_method: string | null
   }
+  billed_via_partner: boolean
 }
 
 export async function getOrganizationCustomerProfile(
