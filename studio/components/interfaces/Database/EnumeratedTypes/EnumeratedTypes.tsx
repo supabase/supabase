@@ -15,6 +15,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  IconEdit,
   IconMoreVertical,
   IconPlus,
   IconSearch,
@@ -131,7 +132,7 @@ const EnumeratedTypes = () => {
                               className="space-x-2"
                               onClick={() => setSelectedTypeToEdit(type)}
                             >
-                              <IconPlus size="tiny" />
+                              <IconEdit size="tiny" />
                               <p>Update type</p>
                             </DropdownMenuItem>
                             <DropdownMenuItem

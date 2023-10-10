@@ -1,4 +1,3 @@
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { Button, IconExternalLink } from 'ui'
 
@@ -47,4 +46,4 @@ DatabaseEnumeratedTypes.getLayout = (page) => (
   <DatabaseLayout title="Database">{page}</DatabaseLayout>
 )
 
-export default observer(DatabaseEnumeratedTypes)
+export default DatabaseEnumeratedTypes

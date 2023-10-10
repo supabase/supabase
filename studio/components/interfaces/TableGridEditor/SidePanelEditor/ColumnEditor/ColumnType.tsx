@@ -94,8 +94,6 @@ const ColumnType = ({
     }
   }
 
-  console.log(enumTypes)
-
   return (
     <div className="space-y-2">
       <Listbox
