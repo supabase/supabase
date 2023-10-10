@@ -783,7 +783,7 @@ functions:
   - id: auth-mfa-api
     title: 'Overview'
     notes: |
-      This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.auth.mfa` namespace. 
+      This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.auth.mfa` namespace.
 
       Currently, we only support time-based one-time password (TOTP) as the 2nd factor. We don't support recovery codes but we allow users to enroll more than 1 TOTP factor, with an upper limit of 10.
 
@@ -4714,7 +4714,46 @@ functions:
             .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'countries', filter: 'id=eq.200' }, handleRecordUpdated)
             .subscribe()
           ```
-
+  - id: broadcast-message
+    title: broadcastMessage()
+    description: |
+      Broadcast a message to all connected clients to a channel.
+    notes: |
+      - When using REST you don't need to subscribe to the channel
+      - REST calls are only available from 2.37.0 onwards
+    $ref: '@supabase/realtime-js.RealtimeChannel.send'
+    examples:
+      - id: send-a-message
+        name: Send a message via websocket
+        isSpotlight: true
+        code: |
+          ```js
+          supabase
+            .channel('any')
+            .subscribe((status) => {
+              if (status === 'SUBSCRIBED') {
+                channel.send({
+                  type: 'broadcast',
+                  event: 'cursor-pos',
+                  payload: { x: Math.random(), y: Math.random() },
+                })
+              }
+            })
+          ```
+      - id: send-a-message-via-rest
+        name: Send a message via REST
+        isSpotlight: true
+        code: |
+          ```js
+          supabase
+            .channel('any')
+            .send({
+              type: 'broadcast',
+              event: 'cursor-pos',
+              payload: { x: Math.random(), y: Math.random()
+              },
+            })
+          ```
   - id: get-channels
     title: getChannels()
     $ref: '@supabase/supabase-js.index.SupabaseClient.getChannels'

@@ -785,6 +785,13 @@
         "slug": "getchannels",
         "product": "realtime",
         "type": "function"
+      },
+      {
+        "id": "broadcast-message",
+        "title": "Broadcast a message",
+        "slug": "broadcastMessage",
+        "product": "realtime",
+        "type": "function"
       }
     ]
   },
