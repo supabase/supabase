@@ -20,7 +20,7 @@ const Users = () => {
   const [filterKeywords, setFilterKeywords] = useState('')
   const [filterVerified, setFilterVerified] = useState<'verified' | 'unverified'>()
 
-  const { data, isLoading, isSuccess, refetch } = useUsersQuery({
+  const { data, isLoading, isSuccess, refetch, isRefetching } = useUsersQuery({
     projectRef,
     page,
     keywords: filterKeywords,
@@ -101,7 +101,7 @@ const Users = () => {
             size="tiny"
             icon={<IconRefreshCw />}
             type="default"
-            loading={isLoading}
+            loading={isLoading || isRefetching}
             onClick={() => refetch()}
           >
             Reload
