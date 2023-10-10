@@ -39,8 +39,8 @@ import { useIsFeatureEnabled } from 'hooks'
 beforeEach(() => {
   useIsFeatureEnabled.mockReset()
   useIsFeatureEnabled.mockReturnValue({
-    'projectAuthAll': true,
-    'projectStorageAll': true,
+    projectAuthAll: true,
+    projectStorageAll: true,
   })
 })
 
