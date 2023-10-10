@@ -5,7 +5,7 @@ import { post } from 'data/fetchers'
 import { Content } from './content-query'
 import { contentKeys } from './keys'
 
-export type InsertContentPayload = Omit<components["schemas"]["CreateContentParams"], 'content'> & {
+export type InsertContentPayload = Omit<components['schemas']['CreateContentParams'], 'content'> & {
   content: Content['content']
 }
 
@@ -18,8 +18,6 @@ export async function insertContent(
   { projectRef, payload }: InsertContentVariables,
   signal?: AbortSignal
 ) {
-  console.log(projectRef)
-  console.log(payload)
   const { data, error } = await post('/platform/projects/{ref}/content', {
     params: { path: { ref: projectRef } },
     body: {
