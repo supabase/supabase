@@ -1,4 +1,4 @@
-import DataGrid, { Column } from '@supabase/react-data-grid'
+import DataGrid, { Column } from 'react-data-grid'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { SupaRow, SupaTable } from 'components/grid'
 import { IconKey } from 'ui'
@@ -73,7 +73,8 @@ const SelectorGrid = ({ table, rows, onRowSelect }: SelectorGridProps) => {
       columns={columns}
       rows={rows}
       style={{ height: '100%' }}
-      onRowClick={onRowSelect}
+      // [Next 18 refactor] need to fix
+      // onRowClick={onRowSelect}
       rowClass={() => 'cursor-pointer'}
     />
   )

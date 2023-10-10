@@ -121,7 +121,7 @@ const General = () => {
       )}
       {!isBranch && isOrgBilling && (
         <>
-          <div className="mt-6">
+          <div className="mt-6" id="restart-project">
             <FormPanel>
               <div className="flex w-full items-center justify-between px-8 py-4">
                 <div>
@@ -134,7 +134,10 @@ const General = () => {
                 </div>
                 <RestartServerButton />
               </div>
-              <div className="flex w-full items-center justify-between px-8 py-4">
+              <div
+                className="flex w-full items-center justify-between px-8 py-4"
+                id="pause-project"
+              >
                 <div>
                   <p className="text-sm">Pause project</p>
                   <div className="max-w-[420px]">

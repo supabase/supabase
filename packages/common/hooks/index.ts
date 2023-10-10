@@ -1,4 +1,5 @@
 export * from './useBreakpoint'
+export * from './useConsentValue'
 export * from './useDebounce'
 export * from './useParams'
 export * from './useTelemetryProps'

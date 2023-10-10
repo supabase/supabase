@@ -5,11 +5,11 @@ import Link from 'next/link'
 import {
   Badge,
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   IconChevronDown,
   IconEdit2,
   IconLoader,
@@ -23,8 +23,8 @@ export interface BucketRowProps {
   bucket: Bucket
   projectRef?: string
   isSelected: boolean
-  onSelectDeleteBucket: (bucket: any) => void
-  onSelectEditBucket: (bucket: any) => void
+  onSelectDeleteBucket: (bucket: Bucket) => void
+  onSelectEditBucket: (bucket: Bucket) => void
 }
 
 const BucketRow = ({
@@ -44,8 +44,9 @@ const BucketRow = ({
         isSelected && 'text-foreground bg-scale-300'
       )}
     >
+      {/* Even though we trim whitespaces from bucket names, there may be some existing buckets with trailing whitespaces. */}
       <Link
-        href={`/project/${projectRef}/storage/buckets/${bucket.id}`}
+        href={`/project/${projectRef}/storage/buckets/${encodeURIComponent(bucket.id)}`}
         className="py-1 px-3 w-full"
       >
         <div className="flex items-center justify-between space-x-2 truncate w-full">
@@ -62,8 +63,8 @@ const BucketRow = ({
       {false ? (
         <IconLoader className="animate-spin" size={16} strokeWidth={2} />
       ) : canUpdateBuckets && isSelected ? (
-        <DropdownMenu_Shadcn_>
-          <DropdownMenuTrigger_Shadcn_ asChild>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
             <Button
               asChild
               type="text"
@@ -74,27 +75,27 @@ const BucketRow = ({
             >
               <span></span>
             </Button>
-          </DropdownMenuTrigger_Shadcn_>
-          <DropdownMenuContent_Shadcn_ side="bottom" align="start">
-            <DropdownMenuItem_Shadcn_
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="bottom" align="start">
+            <DropdownMenuItem
               key="toggle-private"
               className="space-x-2"
               onClick={() => onSelectEditBucket(bucket)}
             >
               <IconEdit2 size="tiny" />
               <p>Edit bucket</p>
-            </DropdownMenuItem_Shadcn_>
-            <DropdownMenuSeparator_Shadcn_ />
-            <DropdownMenuItem_Shadcn_
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
               key="delete-bucket"
               className="space-x-2"
               onClick={() => onSelectDeleteBucket(bucket)}
             >
               <IconTrash size="tiny" />
               <p>Delete bucket</p>
-            </DropdownMenuItem_Shadcn_>
-          </DropdownMenuContent_Shadcn_>
-        </DropdownMenu_Shadcn_>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       ) : (
         <div className="w-5" />
       )}

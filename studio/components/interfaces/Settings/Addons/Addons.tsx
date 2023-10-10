@@ -37,9 +37,10 @@ import {
   IconExternalLink,
 } from 'ui'
 import { ComputeInstanceSidePanel, CustomDomainSidePanel, PITRSidePanel } from './'
+import Image from 'next/image'
 
 const Addons = () => {
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
   const { ref: projectRef, panel } = useParams()
   const snap = useSubscriptionPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
@@ -175,17 +176,17 @@ const Addons = () => {
                 <div className="flex space-x-6">
                   <div>
                     <div className="rounded-md bg-scale-100 dark:bg-scale-400 w-[160px] h-[96px] shadow">
-                      <img
+                      <Image
                         alt="Optimized Compute"
                         width={160}
                         height={96}
                         src={
                           computeInstance !== undefined
                             ? `${BASE_PATH}/img/optimized-compute-on${
-                                theme === 'dark' ? '' : '--light'
+                                resolvedTheme === 'dark' ? '' : '--light'
                               }.png`
                             : `${BASE_PATH}/img/optimized-compute-off${
-                                theme === 'dark' ? '' : '--light'
+                                resolvedTheme === 'dark' ? '' : '--light'
                               }.png`
                         }
                       />
@@ -364,15 +365,17 @@ const Addons = () => {
                 <div className="flex space-x-6">
                   <div>
                     <div className="rounded-md bg-scale-100 dark:bg-scale-400 w-[160px] h-[96px] shadow">
-                      <img
+                      <Image
                         alt="Point-In-Time-Recovery"
                         width={160}
                         height={96}
                         src={
                           pitr !== undefined
-                            ? `${BASE_PATH}/img/pitr-on${theme === 'dark' ? '' : '--light'}.png?v=2`
+                            ? `${BASE_PATH}/img/pitr-on${
+                                resolvedTheme === 'dark' ? '' : '--light'
+                              }.png?v=2`
                             : `${BASE_PATH}/img/pitr-off${
-                                theme === 'dark' ? '' : '--light'
+                                resolvedTheme === 'dark' ? '' : '--light'
                               }.png?v=2`
                         }
                       />
@@ -464,10 +467,10 @@ const Addons = () => {
                         src={
                           customDomain !== undefined
                             ? `${BASE_PATH}/img/custom-domain-on${
-                                theme === 'dark' ? '' : '--light'
+                                resolvedTheme === 'dark' ? '' : '--light'
                               }.png`
                             : `${BASE_PATH}/img/custom-domain-off${
-                                theme === 'dark' ? '' : '--light'
+                                resolvedTheme === 'dark' ? '' : '--light'
                               }.png`
                         }
                       />

@@ -1,4 +1,4 @@
-import { CalculatedColumn } from '@supabase/react-data-grid'
+import { CalculatedColumn } from 'react-data-grid'
 import { GridProps, SavedState, SupaTable } from '../../types'
 import { REFRESH_PAGE_IMMEDIATELY, TOTAL_ROWS_RESET } from '../../constants'
 import { IRowService, SqlRowService } from '../../services/row'

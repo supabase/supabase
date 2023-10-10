@@ -7,6 +7,7 @@
   "sideEffects": false,
   "scripts": {
     "build:icons": "node --experimental-modules internals/populate-icons.js",
+    "typecheck_CURRENTLY_IGNORED": "tsc --noEmit",
     "build-tokens": "node internals/tokens/build-tokens.js",
     "copy-tokens": "node internals/tokens/copy-tokens.js",
     "cleanse-css-for-tailwind": "node internals/tokens/cleanse-css-for-tailwind.js",
@@ -64,7 +65,7 @@
     "lucide-react": "^0.167.0",
     "next-themes": "^0.2.1",
     "openai": "^3.3.0",
-    "postcss": "^8.4.22",
+    "postcss": "^8.4.31",
     "prop-types": "^15.7.2",
     "react-copy-to-clipboard": "^5.1.0",
     "react-countdown": "^2.3.5",

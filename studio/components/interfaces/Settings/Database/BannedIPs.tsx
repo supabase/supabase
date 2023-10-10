@@ -61,7 +61,7 @@ const BannedIPs = () => {
   }
 
   return (
-    <div>
+    <div id="banned-ips">
       <div className="flex items-center justify-between">
         <FormHeader
           title="Banned IPs"

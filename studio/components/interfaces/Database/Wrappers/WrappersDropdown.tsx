@@ -6,11 +6,11 @@ import Link from 'next/link'
 import { Fragment } from 'react'
 import {
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   IconPlus,
 } from 'ui'
 
@@ -55,16 +55,16 @@ const WrapperDropdown = ({ buttonText = 'Add wrapper', align = 'end' }: WrapperD
   }
 
   return (
-    <DropdownMenu_Shadcn_>
-      <DropdownMenuTrigger_Shadcn_>
+    <DropdownMenu>
+      <DropdownMenuTrigger>
         <Button type="primary" icon={<IconPlus strokeWidth={1.5} />}>
           {buttonText}
         </Button>
-      </DropdownMenuTrigger_Shadcn_>
-      <DropdownMenuContent_Shadcn_ side="bottom" align={align}>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent side="bottom" align={align}>
         {WRAPPERS.map((wrapper, idx) => (
           <Fragment key={idx}>
-            <DropdownMenuItem_Shadcn_ asChild key={wrapper.name} className="space-x-2">
+            <DropdownMenuItem key={wrapper.name} className="space-x-2" asChild>
               <Link
                 href={`/project/${ref}/database/wrappers/new?type=${wrapper.name.toLowerCase()}`}
               >
@@ -76,12 +76,12 @@ const WrapperDropdown = ({ buttonText = 'Add wrapper', align = 'end' }: WrapperD
                 />
                 <p>{wrapper.label}</p>
               </Link>
-            </DropdownMenuItem_Shadcn_>
-            {idx !== WRAPPERS.length - 1 && <DropdownMenuSeparator_Shadcn_ />}
+            </DropdownMenuItem>
+            {idx !== WRAPPERS.length - 1 && <DropdownMenuSeparator />}
           </Fragment>
         ))}
-      </DropdownMenuContent_Shadcn_>
-    </DropdownMenu_Shadcn_>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
 

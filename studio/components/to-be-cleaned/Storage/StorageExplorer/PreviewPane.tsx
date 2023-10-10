@@ -7,10 +7,10 @@ import { isEmpty } from 'lodash'
 import SVG from 'react-inlinesvg'
 import {
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   IconAlertCircle,
   IconChevronDown,
   IconClipboard,
@@ -209,8 +209,8 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                   Get URL
                 </Button>
               ) : (
-                <DropdownMenu_Shadcn_>
-                  <DropdownMenuTrigger_Shadcn_>
+                <DropdownMenu>
+                  <DropdownMenuTrigger>
                     <Button
                       type="outline"
                       icon={<IconClipboard size={16} strokeWidth={2} />}
@@ -219,40 +219,40 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                     >
                       Get URL
                     </Button>
-                  </DropdownMenuTrigger_Shadcn_>
-                  <DropdownMenuContent_Shadcn_ side="bottom" align="center">
-                    <DropdownMenuItem_Shadcn_
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent side="bottom" align="center">
+                    <DropdownMenuItem
                       key="expires-one-week"
                       onClick={async () =>
                         onCopyUrl(file.name, await getFileUrl(file, URL_EXPIRY_DURATION.WEEK))
                       }
                     >
                       Expire in 1 week
-                    </DropdownMenuItem_Shadcn_>
-                    <DropdownMenuItem_Shadcn_
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
                       key="expires-one-month"
                       onClick={async () =>
                         onCopyUrl(file.name, await getFileUrl(file, URL_EXPIRY_DURATION.MONTH))
                       }
                     >
                       Expire in 1 month
-                    </DropdownMenuItem_Shadcn_>
-                    <DropdownMenuItem_Shadcn_
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
                       key="expires-one-year"
                       onClick={async () =>
                         onCopyUrl(file.name, await getFileUrl(file, URL_EXPIRY_DURATION.YEAR))
                       }
                     >
                       Expire in 1 year
-                    </DropdownMenuItem_Shadcn_>
-                    <DropdownMenuItem_Shadcn_
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
                       key="custom-expiry"
                       onClick={() => setSelectedFileCustomExpiry(file)}
                     >
                       Custom expiry
-                    </DropdownMenuItem_Shadcn_>
-                  </DropdownMenuContent_Shadcn_>
-                </DropdownMenu_Shadcn_>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
             </div>
             <Tooltip.Root delayDuration={0}>

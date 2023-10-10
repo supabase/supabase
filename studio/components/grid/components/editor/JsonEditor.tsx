@@ -1,5 +1,5 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { EditorProps } from '@supabase/react-data-grid'
+import { RenderEditCellProps } from 'react-data-grid'
 import { useCallback, useState } from 'react'
 import { IconMaximize, Popover } from 'ui'
 
@@ -8,7 +8,8 @@ import { useTrackedState } from 'components/grid/store'
 import { tryParseJson } from 'lib/helpers'
 import { isNil } from 'lodash'
 
-interface JsonEditorProps<TRow, TSummaryRow = unknown> extends EditorProps<TRow, TSummaryRow> {
+interface JsonEditorProps<TRow, TSummaryRow = unknown>
+  extends RenderEditCellProps<TRow, TSummaryRow> {
   isEditable: boolean
   onExpandEditor: (column: string, row: TRow) => void
 }

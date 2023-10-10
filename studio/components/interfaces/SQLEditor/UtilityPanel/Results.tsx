@@ -1,4 +1,4 @@
-import DataGrid, { Column } from '@supabase/react-data-grid'
+import DataGrid, { Column } from 'react-data-grid'
 import { useKeyboardShortcuts } from 'hooks'
 import { copyToClipboard } from 'lib/helpers'
 import { useState } from 'react'

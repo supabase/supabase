@@ -112,6 +112,7 @@ export default {
           first:rounded-tl-md first:rounded-tr-md
           last:rounded-bl-md last:rounded-br-md
           overflow-hidden
+          will-change-transform
         `,
         trigger: `
           flex flex-row
@@ -217,6 +218,7 @@ export default {
     dot: '-ml-0.5 mr-1.5 h-2 w-2 rounded-full',
     color: {
       brand: 'bg-brand-500 text-brand-600 border border-brand-400',
+      brandAlt: 'bg-brand bg-opacity-100 text-background border border-brand',
       scale: 'bg-scale-200 text-scale-1100 border border-scale-700',
       tomato: `bg-tomato-200 text-tomato-1100 border border-tomato-700`,
       red: `bg-red-200 text-red-1100 border border-red-700`,

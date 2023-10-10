@@ -11,7 +11,7 @@ const ConsentToast = ({ onAccept = noop, onOptOut = noop }: ConsentToastProps) =
   return (
     <div className="space-y-3 py-1">
       <div>
-        <p className="text">
+        <p className="text-foreground">
           We only collect analytics essential to ensuring smooth operation of our services.
         </p>
       </div>

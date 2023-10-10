@@ -596,7 +596,7 @@ const ListboxTable = observer(({}) => {
           >
             <div className="flex flex-row items-center space-x-1">
               <p className="text-sm text-foreground-light">{x.schema}</p>
-              <p className="text">{x.name}</p>
+              <p className="text-foreground">{x.name}</p>
             </div>
           </Listbox.Option>
         )

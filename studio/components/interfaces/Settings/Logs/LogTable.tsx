@@ -1,11 +1,11 @@
-import DataGrid, { Row, RowRendererProps } from '@supabase/react-data-grid'
+import DataGrid, { Row, RenderRowProps } from 'react-data-grid'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Alert, Button, IconClipboard, IconEye, IconEyeOff } from 'ui'
+import { isEqual } from 'lodash'
 
 import CSVButton from 'components/ui/CSVButton'
 import { useStore } from 'hooks'
 import { copyToClipboard } from 'lib/helpers'
-import { isEqual } from 'lodash'
 import { LogQueryError } from '.'
 import AuthColumnRenderer from './LogColumnRenderers/AuthColumnRenderer'
 import DatabaseApiColumnRender from './LogColumnRenderers/DatabaseApiColumnRender'
@@ -167,7 +167,7 @@ const LogTable = ({
   }, [stringData])
 
   const RowRenderer = useCallback(
-    (props: RowRendererProps<any>) => (
+    (props: RenderRowProps<any>) => (
       <Row {...props} isRowSelected={false} selectedCellIdx={undefined} />
     ),
     []
@@ -287,14 +287,6 @@ const LogTable = ({
               setFocusedLog(data[rowIdx] as LogData)
             }}
             selectedRows={new Set([])}
-            noRowsFallback={
-              !isLoading ? (
-                <div className="mx-auto flex h-full w-full items-center justify-center space-y-12 py-4 transition-all delay-200 duration-500">
-                  {!error && renderNoResultAlert()}
-                  {error && renderErrorAlert()}
-                </div>
-              ) : null
-            }
             columns={columns as any}
             rowClass={(row: LogData) =>
               [
@@ -310,8 +302,17 @@ const LogTable = ({
               const row = r as LogData
               return row.id
             }}
-            onRowClick={setFocusedLog}
-            rowRenderer={RowRenderer}
+            // [Next 18 refactor] need to fix
+            // onRowClick={setFocusedLog}
+            renderers={{
+              renderRow: RowRenderer as any,
+              noRowsFallback: !isLoading ? (
+                <div className="mx-auto flex h-full w-full items-center justify-center space-y-12 py-4 transition-all delay-200 duration-500">
+                  {!error && renderNoResultAlert()}
+                  {error && renderErrorAlert()}
+                </div>
+              ) : null,
+            }}
           />
           {logDataRows.length > 0 ? (
             <div

@@ -7,7 +7,7 @@ import { useTheme } from 'next-themes'
 import { BASE_PATH } from 'lib/constants'
 
 const Error404: NextPage = ({}) => {
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
   const [show404, setShow404] = useState<boolean>(false)
 
   useEffect(() => {
@@ -25,7 +25,7 @@ const Error404: NextPage = ({}) => {
               <Link href="/projects">
                 <Image
                   src={
-                    theme === 'dark'
+                    resolvedTheme === 'dark'
                       ? `${BASE_PATH}/img/supabase-dark.svg`
                       : `${BASE_PATH}/img/supabase-light.svg`
                   }

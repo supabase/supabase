@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTrackedState } from '../../store'
 import { useKeyboardShortcuts } from './Hooks'
-import { DataGridHandle } from '@supabase/react-data-grid'
+import { DataGridHandle } from 'react-data-grid'
 import { formatClipboardValue, copyToClipboard } from '../../utils'
 
 type ShortcutsProps = {
@@ -36,7 +36,7 @@ export function Shortcuts({ gridRef }: ShortcutsProps) {
           }
           gridRef.current!.selectCell(position)
         } else {
-          gridRef.current!.scrollToRow(Number(0))
+          gridRef.current!.scrollToCell({ rowIdx: Number(0) })
         }
       },
       [`${metaKey}+ArrowDown`]: (event) => {
@@ -48,7 +48,7 @@ export function Shortcuts({ gridRef }: ShortcutsProps) {
           }
           gridRef.current!.selectCell(position)
         } else {
-          gridRef.current!.scrollToRow(Number(rows.length))
+          gridRef.current!.scrollToCell({ rowIdx: Number(rows.length) })
         }
       },
       [`${metaKey}+ArrowLeft`]: (event) => {

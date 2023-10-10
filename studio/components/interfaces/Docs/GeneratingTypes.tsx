@@ -57,7 +57,7 @@ export default function GeneratingTypes({ selectedLang }: Props) {
         </Button>
       </h2>
       <div className="doc-section">
-        <article className="text ">
+        <article className="code-column text-foreground">
           <p>
             Supabase APIs are generated from your database, which means that we can use database
             introspection to generate type-safe API definitions.
