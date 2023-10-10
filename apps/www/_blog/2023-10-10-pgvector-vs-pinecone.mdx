@@ -14,13 +14,13 @@ image: 2023-10-10-pgvector-vs-pinecone/pgvector-pinecone-og.png
 thumb: 2023-10-10-pgvector-vs-pinecone/pgvector-pinecone-thumb.png
 ---
 
-At Supabase, we believe that a combination of Postgres and pgvector serves as a better alternative to single-purpose databases like Weaviate or Pinecone for AI tasks. This isn't the first time a Postgres-based solution has successfully rivaled specialized databases designed for specific data types. Timescale for time-series data and Greenplum for analytics are just a few examples.
+At Supabase, we believe that a combination of Postgres and pgvector serves as a better alternative to single-purpose databases like Pinecone for AI tasks. This isn't the first time a Postgres-based solution has successfully rivaled specialized databases designed for specific data types. Timescale for time-series data and Greenplum for analytics are just a few examples.
 
-Specialized vector databases claim better performance, as they are tailored specifically for this type of workload. However, we decided to put this to the test and run a direct comparison between pgvector and Pinecone.
+However, we decided to put this to the test and run a direct comparison between pgvector and Pinecone.
 
 ## What is Pinecone?
 
-Pinecone is a fully managed cloud Vector Database that is only suitable for storing and searching vector data. It offers straightforward start-up and scalability. However, it employs a proprietary ANN index and lacks support for exact nearest neighbors search or fine-tuning. The only setting that allows you to adjust the balance between query accuracy and speed is the choice of pod type when creating an index.
+Pinecone is a fully managed cloud Vector Database that is only suitable for storing and searching vector data. It offers straightforward start-up and scalability. It employs a proprietary ANN index and lacks support for exact nearest neighbors search or fine-tuning. The only setting that allows you to adjust the balance between query accuracy and speed is the choice of pod type when creating an index.
 
 So, before we dive into their performance, let us first introduce Pinecone's offerings.
 
@@ -45,7 +45,7 @@ We utilized the [ANN Benchmarks](https://github.com/erikbern/ann-benchmarks) met
 
 To compare Pinecone and pgvector on equal grounds, we opted for the following setups:
 
-- **pgvector**: A single Supabase \*\*\*\*2XL instance approximating ~410$/month (8-core ARM CPU and 32 GB RAM). An HNSW index with the following build parameters: `m='36'`, `ef_construction='128'`.
+- **pgvector**: A single Supabase 2XL instance approximating ~410$/month (8-core ARM CPU and 32 GB RAM). An HNSW index with the following build parameters: `m='36'`, `ef_construction='128'`.
 - **Pinecone**: Vertically scaled pod to the minimum option that fits the dbpedia dataset into the index on a single pod. We then added replicas to match the budget (slightly exceeding in all cases with ~$480/month).
 
 ### Measuring accuracy in Pinecone
