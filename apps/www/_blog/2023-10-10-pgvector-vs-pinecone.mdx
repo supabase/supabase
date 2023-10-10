@@ -138,24 +138,10 @@ It's only fair to note that Pinecone may be cheaper than pgvector since you coul
 
 Real user stories indicate this might not be problematic. For instance, Quivr expanded to 1 million vectors without using any indexes:
 
-{/* prettier-ignore */}
-<blockquote class="twitter-tweet">
-  <p lang="en" dir="ltr">
-    Is PGVector really that bad ?<br />
-    <br />
-    Almost 1M vectors on our{' '}
-    <a href="https://twitter.com/supabase?ref_src=twsrc%5Etfw">@supabase</a> database and it is 🔥
-    for <a href="https://twitter.com/quivr_brain?ref_src=twsrc%5Etfw">@quivr_brain</a>
-    <br />
-    <br />A few stats:
-    <br />- 13117 users and 400 daily <br />- 9GB of Vectors
-    <br />- 46% Memory Usage (4Gb DB)
-    <br />- Less than 0.5s to retrieve content in similarity search with embedding using… 
-    <a href="https://t.co/ezQpot0CvA">pic.twitter.com/ezQpot0CvA</a>
-  </p>
-  &mdash; Stan Girard (@_StanGirard) <a href="https://twitter.com/_StanGirard/status/1691135519948787719?ref_src=twsrc%5Etfw">August 14, 2023</a>
-</blockquote>
-<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<Img
+  alt="tweet about quivr getting to almost 1M vectors with Supabase"
+  src="/images/blog/2023-10-10-pgvector-vs-pinecone/quivr-tweet.png"
+/>
 
 ## pgvector's hidden cost-saving benefits
 
