@@ -16,7 +16,7 @@ import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useStore } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { Button, Checkbox, IconExternalLink, Input, SidePanel, Toggle } from 'ui'
+import { Button, Checkbox, IconExternalLink, IconPlus, Input, SidePanel, Toggle } from 'ui'
 import { ForeignKeySelector } from '..'
 import ActionBar from '../ActionBar'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
@@ -242,7 +242,17 @@ const ColumnEditor = ({
           <FormSectionLabel
             className="lg:!col-span-4"
             description={
-              <div>
+              <div className="space-y-2">
+                <Button
+                  asChild
+                  type="default"
+                  size="tiny"
+                  icon={<IconPlus size={14} strokeWidth={2} />}
+                >
+                  <Link href={`/project/${ref}/database/types`} target="_blank" rel="noreferrer">
+                    Create enum types
+                  </Link>
+                </Button>
                 <Button
                   asChild
                   type="default"
