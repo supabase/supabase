@@ -177,6 +177,16 @@ const nextConfig = {
         destination: '/project/:ref/sql/new',
         permanent: true,
       },
+      ...(process.env.NEXT_PUBLIC_BASE_PATH?.length
+        ? [
+            {
+              source: '/',
+              destination: process.env.NEXT_PUBLIC_BASE_PATH,
+              basePath: false,
+              permanent: true,
+            },
+          ]
+        : []),
     ]
   },
   async headers() {
