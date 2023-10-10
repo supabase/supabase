@@ -23,7 +23,7 @@ const ScopeSection = ({
   const hasWrite = allScopes.includes(writeScope)
 
   if (hasRead || hasWrite) {
-    const perms = [hasRead ? 'read' : null, hasWrite ? 'write' : null]
+    const perms = [hasRead ? 'Read' : null, hasWrite ? 'Write' : null]
       .filter(Boolean)
 
       .map((str) => (
@@ -59,7 +59,6 @@ const AuthorizeRequesterDetails = ({
   domain,
   scopes,
 }: AuthorizeRequesterDetailsProps) => {
-  console.log(scopes)
   return (
     <div className="flex space-y-4 flex-col">
       <div className="flex flex-row space-x-4">
@@ -79,33 +78,37 @@ const AuthorizeRequesterDetails = ({
       </div>
       <div>
         <h2>Permissions</h2>
+        <p className="text-sm text-foreground-light">
+          The following scopes will apply for the{' '}
+          <span className="text-amber-900">selected organization and all of its projects.</span>
+        </p>
         <div className="pt-2">
           <ScopeSection
-            description="access to all project's auth configurations and SSO providers"
+            description="access to auth configurations and SSO providers"
             readScope={OAuthScope.AUTH_READ}
             writeScope={OAuthScope.AUTH_WRITE}
             allScopes={scopes}
           />
           <ScopeSection
-            description="access to all project's Postgres configurations, SQL snippets, SSL enforcement configurations and Typescript schema types."
+            description="access to Postgres configurations, SQL snippets, SSL enforcement configurations and Typescript schema types."
             readScope={OAuthScope.DATABASE_READ}
             writeScope={OAuthScope.DATABASE_WRITE}
             allScopes={scopes}
           />
           <ScopeSection
-            description="access to all project's custom domains and vanity subdomains."
+            description="access to custom domains and vanity subdomains."
             readScope={OAuthScope.DOMAINS_READ}
             writeScope={OAuthScope.DOMAINS_WRITE}
             allScopes={scopes}
           />
           <ScopeSection
-            description="access to all project's edge functions."
+            description="access to edge functions."
             readScope={OAuthScope.EDGE_FUNCTIONS_READ}
             writeScope={OAuthScope.EDGE_FUNCTIONS_WRITE}
             allScopes={scopes}
           />
           <ScopeSection
-            description="access to all project's environments/branches."
+            description="access to environments/branches."
             readScope={OAuthScope.ENVIRONMENT_READ}
             writeScope={OAuthScope.ENVIRONMENT_WRITE}
             allScopes={scopes}
@@ -117,30 +120,25 @@ const AuthorizeRequesterDetails = ({
             allScopes={scopes}
           />
           <ScopeSection
-            description="access to all project's metadata, its upgrade status, network restrictions and network bans."
+            description="access to metadata, its upgrade status, network restrictions and network bans."
             readScope={OAuthScope.PROJECTS_READ}
             writeScope={OAuthScope.PROJECTS_WRITE}
             allScopes={scopes}
           />
           <ScopeSection
-            description="access to all project's postgREST configurations."
+            description="access to PostgREST configurations."
             readScope={OAuthScope.REST_READ}
             writeScope={OAuthScope.REST_WRITE}
             allScopes={scopes}
           />
           <ScopeSection
-            description="access to all project's API keys, secrets and pgsodium configurations."
+            description="access to API keys, secrets and pgsodium configurations."
             readScope={OAuthScope.SECRETS_READ}
             writeScope={OAuthScope.SECRETS_WRITE}
             allScopes={scopes}
           />
         </div>
       </div>
-
-      <p className="text-sm text-foreground-light">
-        Please note, the shown scopes will apply for the{' '}
-        <span className="text-amber-1200">selected organization and all of its projects.</span>
-      </p>
     </div>
   )
 }
