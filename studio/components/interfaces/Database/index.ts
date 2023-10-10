@@ -1,13 +1,13 @@
-import TableList from './Tables/TableList'
 import ColumnList from './Tables/ColumnList'
+import TableList from './Tables/TableList'
 
 import RolesList from './Roles/RolesList'
 
 import Extensions from './Extensions/Extensions'
 
-import Wrappers from './Wrappers/Wrappers'
 import CreateWrapper from './Wrappers/CreateWrapper'
 import EditWrapper from './Wrappers/EditWrapper'
+import Wrappers from './Wrappers/Wrappers'
 
 import PublicationsList from './Publications/PublicationsList'
 import PublicationsTables from './Publications/PublicationsTables'
@@ -22,20 +22,23 @@ import DeleteTrigger from './Triggers/DeleteTrigger'
 import CreateFunction from './Functions/CreateFunction'
 import DeleteFunction from './Functions/DeleteFunction'
 
+import EnumeratedTypes from './EnumeratedTypes/EnumeratedTypes'
+
 export {
-  TableList,
+  BackupsList,
   ColumnList,
-  RolesList,
-  Extensions,
-  Wrappers,
+  ConnectionPooling,
+  CreateFunction,
+  CreateTrigger,
   CreateWrapper,
+  DeleteFunction,
+  DeleteTrigger,
   EditWrapper,
+  EnumeratedTypes,
+  Extensions,
   PublicationsList,
   PublicationsTables,
-  BackupsList,
-  ConnectionPooling,
-  CreateTrigger,
-  DeleteTrigger,
-  CreateFunction,
-  DeleteFunction,
+  RolesList,
+  TableList,
+  Wrappers,
 }

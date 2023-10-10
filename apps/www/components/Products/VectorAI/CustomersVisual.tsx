@@ -1,18 +1,13 @@
-import React, { useRef } from 'react'
+import React from 'react'
 import { useTheme } from 'next-themes'
-import { LazyMotion, domAnimation, m, motion, useInView } from 'framer-motion'
-import { DEFAULT_EASE, INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
+import { m } from 'framer-motion'
+import { DEFAULT_EASE } from '~/lib/animations'
 
 const CustomersVisual = () => {
   const { resolvedTheme } = useTheme()
-  const ref = useRef<any>()
-  const isInView = useInView(ref, { margin: '-25%', once: true })
 
-  const initial = INITIAL_BOTTOM
-  const animate = getAnimation({})
-
-  return (
-    <LazyMotion features={domAnimation}>
+  const RenderedVisual = () => (
+    <>
       <div
         className="absolute inset-0 mx-auto aspect-[5.13/1] h-full z-10"
         style={{
@@ -22,9 +17,6 @@ const CustomersVisual = () => {
         }}
       />
       <m.svg
-        ref={ref}
-        initial={initial}
-        animate={isInView ? animate : initial}
         width="100%"
         height="100%"
         viewBox="0 0 1755 342"
@@ -559,7 +551,7 @@ const CustomersVisual = () => {
             <stop stopColor={resolvedTheme === 'dark' ? '#161616' : '#ffffff'} />
             <stop offset="1" stopColor={resolvedTheme === 'dark' ? '#161616' : '#F1F3F500'} />
           </radialGradient>
-          <motion.linearGradient
+          <m.linearGradient
             animate={{
               x2: [0 - 300, 1755 + 100],
               x1: [0, 1755 + 300],
@@ -582,7 +574,7 @@ const CustomersVisual = () => {
               stopOpacity="0.6"
             />
             <stop offset="1" stopColor="transparent" stopOpacity="0" />
-          </motion.linearGradient>
+          </m.linearGradient>
           <linearGradient
             id="paint6_linear_4353_100693"
             x1="865.086"
@@ -932,8 +924,10 @@ const CustomersVisual = () => {
           </linearGradient>
         </defs>
       </m.svg>
-    </LazyMotion>
+    </>
   )
+
+  return <RenderedVisual />
 }
 
 export default CustomersVisual
