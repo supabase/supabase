@@ -1,18 +1,10 @@
 import dayjs from 'dayjs'
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Input, Modal, Form, Button } from 'ui'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import { Button, Form, Input, Modal } from 'ui'
 
-import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import useLogsQuery from 'hooks/analytics/useLogsQuery'
-import { NextPageWithLayout, UserContent } from 'types'
-import { uuidv4 } from 'lib/helpers'
-import { LogsLayout } from 'components/layouts'
-import CodeEditor from 'components/ui/CodeEditor'
-import ShimmerLine from 'components/ui/ShimmerLine'
-import LoadingOpacity from 'components/ui/LoadingOpacity'
 import {
   DatePickerToFrom,
   LogsQueryPanel,
@@ -25,16 +17,25 @@ import {
   TEMPLATES,
   useEditorHints,
 } from 'components/interfaces/Settings/Logs'
-import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
+import { LogsLayout } from 'components/layouts'
+import CodeEditor from 'components/ui/CodeEditor'
+import LoadingOpacity from 'components/ui/LoadingOpacity'
 import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
+import ShimmerLine from 'components/ui/ShimmerLine'
+import { useContentInsertMutation } from 'data/content/content-insert-mutation'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { useLocalStorage, useStore } from 'hooks'
+import useLogsQuery from 'hooks/analytics/useLogsQuery'
+import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
+import { uuidv4 } from 'lib/helpers'
+import { LogSqlSnippets, NextPageWithLayout } from 'types'
 
 const PLACEHOLDER_QUERY =
   'select\n  cast(timestamp as datetime) as timestamp,\n  event_message, metadata \nfrom edge_logs \nlimit 5'
 export const LogsExplorerPage: NextPageWithLayout = () => {
   useEditorHints()
-  const { ui, content } = useStore()
+  const { ui } = useStore()
   const router = useRouter()
   const { ref: projectRef, q, ite, its } = useParams()
   const [editorId, setEditorId] = useState<string>(uuidv4())
@@ -49,6 +50,19 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       iso_timestamp_end: ite ? (ite as string) : undefined,
     }
   )
+  const [recentLogs, setRecentLogs] = useLocalStorage<LogSqlSnippets.Content[]>(
+    `project-content-${projectRef}-recent-log-sql`,
+    []
+  )
+  const addRecentLogSqlSnippet = (snippet: Partial<LogSqlSnippets.Content>) => {
+    const defaults: LogSqlSnippets.Content = {
+      schema_version: '1',
+      favorite: false,
+      sql: '',
+      content_id: '',
+    }
+    setRecentLogs([...recentLogs, { ...defaults, ...snippet }])
+  }
 
   const { showUpgradePrompt, setShowUpgradePrompt } = useUpgradePrompt(
     params.iso_timestamp_start as string
@@ -97,9 +111,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       pathname: router.pathname,
       query: { ...router.query, q: template.searchString },
     })
-    content.addRecentLogSqlSnippet({
-      sql: template.searchString,
-    })
+    addRecentLogSqlSnippet({ sql: template.searchString })
   }
 
   const handleRun = (value?: string | React.MouseEvent<HTMLButtonElement>) => {
@@ -113,9 +125,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       pathname: router.pathname,
       query: { ...router.query, q: query },
     })
-    content.addRecentLogSqlSnippet({
-      sql: query,
-    })
+    addRecentLogSqlSnippet({ sql: query })
   }
 
   const handleClear = () => {
@@ -150,6 +160,26 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       })
     }
   }
+
+  const { isLoading: isSubmitting, mutate: createContent } = useContentInsertMutation({
+    onError: (e) => {
+      const error = e as { message: string }
+      console.error(error)
+      setSaveModalOpen(false)
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to save query: ${error.message}`,
+      })
+    },
+    onSuccess: (values) => {
+      setSaveModalOpen(false)
+      ui.setNotification({
+        category: 'success',
+        message: `Saved "${values[0].name}" log query`,
+      })
+    },
+  })
 
   return (
     <div className="w-full h-full px-5 py-6 mx-auto">
@@ -213,41 +243,24 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
           onSubmit={async (values: any, { setSubmitting }: any) => {
             setSubmitting(true)
 
-            const payload: UserContent = {
+            const payload = {
+              id: uuidv4(),
               name: values.name,
               description: values.description || '',
-              type: 'log_sql',
+              type: 'log_sql' as const,
               content: {
                 content_id: editorId,
                 sql: editorValue,
                 schema_version: '1',
                 favorite: false,
               },
-              visibility: 'user',
+              visibility: 'user' as const,
             }
 
-            try {
-              const { data: query, error } = await content.create(payload)
-              if (error) throw error
-              setSubmitting(false)
-              setSaveModalOpen(false)
-              ui.setNotification({
-                category: 'success',
-                message: `Saved "${values.name}" log query`,
-              })
-            } catch (error: any) {
-              console.error(error)
-              setSubmitting(false)
-              setSaveModalOpen(false)
-              ui.setNotification({
-                error,
-                category: 'error',
-                message: `Failed to save query: ${error.message}`,
-              })
-            }
+            createContent({ projectRef: projectRef!, payload })
           }}
         >
-          {({ isSubmitting }: any) => (
+          {() => (
             <>
               <div className="py-4">
                 <Modal.Content>
