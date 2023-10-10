@@ -9,7 +9,7 @@ import styles from './hero.module.css'
 
 const OSSHero = () => (
   <>
-    <div className="absolute z-[-4] flex flex-col top-0 left-0 w-screen h-[500px] overflow-hidden pointer-events-none">
+    <div className="absolute z-[-4] flex flex-col top-0 left-0 w-full h-[500px] overflow-hidden pointer-events-none">
       <div className="absolute bottom-0 z-[1] w-full h-4/5 bg-gradient-to-t from-background to-transparent" />
       <div className="absolute top-0 z-[1] w-full h-2/5 bg-gradient-to-b from-background to-transparent" />
     </div>
