@@ -156,7 +156,7 @@ export const ScopesPanel = ({
       />
       <Scope
         title="Projects"
-        description="Project's metadata, its upgrade status, network restrictions and network bans."
+        description="Project's metadata, upgrade status, network restrictions and network bans."
         readScopeName={OAuthScope.PROJECTS_READ}
         writeScopeName={OAuthScope.PROJECTS_WRITE}
         scopes={scopes}
