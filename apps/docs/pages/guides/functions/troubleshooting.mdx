@@ -22,7 +22,7 @@ There are two debugging tools available: Invocations and Logs. Invocations shows
 ## Edge Function takes too long to respond
 
 - Head over to [supabase.com/dashboard/project/\_/functions](https://supabase.com/dashboard/project/_/functions), select your function from the list & click Logs.
-- In the looks, look for the `booted` event and check if they have consistent boot times.
+- In the logs, look for the `booted` event and check if they have consistent boot times.
   - If the boot times are similar, it's likely an issue with your function's code, like a large dependency etc.
   - If only some of the `booted` events are slow, please find the affected `region` in the metadata and submit a support request via the "Help" button at the top.
 
