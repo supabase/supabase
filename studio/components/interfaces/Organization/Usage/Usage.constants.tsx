@@ -1,5 +1,6 @@
 import { USAGE_APPROACHING_THRESHOLD } from 'components/interfaces/BillingV2/Billing.constants'
 import { EgressType, PricingMetric } from 'data/analytics/org-daily-stats-query'
+import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
 import { OrgUsageResponse } from 'data/usage/org-usage-query'
 import { Alert } from 'ui'
 
@@ -37,7 +38,7 @@ export interface CategoryAttribute {
   description: string
   chartPrefix?: 'Max' | 'Average'
   chartDescription: string
-  additionalInfo?: (usage?: OrgUsageResponse) => JSX.Element | null
+  additionalInfo?: (subscription?: OrgSubscription, usage?: OrgUsageResponse) => JSX.Element | null
 }
 
 export type CategoryMetaKey = 'bandwidth' | 'sizeCount' | 'activity'
@@ -93,7 +94,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
           },
         ],
         chartDescription: 'The data refreshes every 24 hours.',
-        additionalInfo: (usage?: OrgUsageResponse) => {
+        additionalInfo: (subscription?: OrgSubscription, usage?: OrgUsageResponse) => {
           const usageMeta = usage?.usages.find((x) => x.metric === PricingMetric.DATABASE_SIZE)
           const usageRatio =
             typeof usageMeta !== 'number'
@@ -104,6 +105,8 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
           const isApproachingLimit = hasLimit && usageRatio >= USAGE_APPROACHING_THRESHOLD
           const isExceededLimit = hasLimit && usageRatio >= 1
           const isCapped = usageMeta?.capped
+
+          const onFreePlan = subscription?.plan?.name === 'Free'
 
           return (
             <div>
@@ -120,7 +123,10 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
                   <div className="flex w-full items-center flex-col justify-center space-y-2 md:flex-row md:justify-between">
                     <div>
                       When you reach your database size limit, your project can go into read-only
-                      mode. Please upgrade your plan.
+                      mode.{' '}
+                      {onFreePlan
+                        ? 'Please upgrade your plan.'
+                        : 'Disable your spend cap to scale seamlessly and pay for over-usage beyond your plans quota.'}
                     </div>
                   </div>
                 </Alert>

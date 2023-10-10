@@ -92,7 +92,7 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
           </div>
           <div className="flex flex-col gap-0">
             <div className="flex items-center gap-2">
-              <span className="text text-sm font-medium">
+              <span className="text-foreground text-sm font-medium">
                 {integration.metadata?.account.name ||
                   (integration.metadata !== undefined &&
                     'gitHubConnectionOwner' in integration.metadata &&
@@ -291,7 +291,7 @@ const IntegrationConnectionHeader = React.forwardRef<HTMLDivElement, Integration
           className
         )}
       >
-        {props.title && <h5 className="text">{props.title}</h5>}
+        {props.title && <h5 className="text-foreground">{props.title}</h5>}
         <Markdown content={markdown} className="" />
       </div>
     )

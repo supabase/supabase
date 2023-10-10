@@ -696,7 +696,7 @@ import { cookies } from 'next/headers'
 import AccountForm from './account-form'
 
 export default async function Account() {
-  const cookeStore = cookies()
+  const cookieStore = cookies()
   const supabase = createServerComponentClient({ cookies: () => cookieStore })
 
   const {
