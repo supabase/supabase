@@ -344,7 +344,8 @@ const PublishAppSidePanel = ({
                         <span className="prose text-sm">Application permissions</span>
                         <span className="text-sm text-foreground-light">
                           The application permissions are organized in scopes and will be presented
-                          to the user when adding an app to their project.
+                          to the user when adding an app to their organization and all of its
+                          projects.
                         </span>
                       </div>
 
