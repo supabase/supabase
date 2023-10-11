@@ -36,7 +36,7 @@ export default {
     label: 'Integrations',
     title: (
       <>
-        Power your project <br className="hidden sm:block" />
+        Power your project <br />
         with the tools you love
       </>
     ),
@@ -45,8 +45,12 @@ export default {
       link: '/partners/integrations',
     },
     experts: {
-      paragraph:
-        'Need a different integration? Find a Supabase Expert to help build your next idea.',
+      paragraph: (
+        <>
+          Need a different integration? <br className="md:hidden" />
+          Find a Supabase Expert to help build your next idea.
+        </>
+      ),
       cta: {
         label: 'Find an expert',
         link: '/partners/experts',

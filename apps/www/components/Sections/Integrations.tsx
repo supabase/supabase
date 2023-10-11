@@ -19,7 +19,7 @@ interface Props {
   integrations: Partner[]
   cta?: CTA
   experts: {
-    paragraph?: string
+    paragraph?: string | ReactNode
     cta: CTA
   }
 }
@@ -53,7 +53,7 @@ const Integrations = ({ title, label, cta, integrations, experts }: Props) => {
   return (
     <div id="integrations">
       <SectionContainer className="!pb-0">
-        <div className="-mt-8">
+        <div className="-mt-20 lg:-mt-8">
           <div
             ref={ref}
             className="relative h-[320px] w-full max-w-[400vw] md:left-0 mx-auto md:w-full -mb-20 z-0"
@@ -90,7 +90,7 @@ const Integrations = ({ title, label, cta, integrations, experts }: Props) => {
           </div>
         </div>
         <div
-          className="relative my-4 lg:my-20 w-full group/integrations overflow-hidden flex flex-row gap-4 nowrap
+          className="relative my-8 lg:my-20 w-full group/integrations overflow-hidden flex flex-row gap-4 nowrap
             before:content[''] before:absolute before:inset-0 before:w-full before:bg-[linear-gradient(to_right,var(--colors-scale2)_0%,transparent_10%,transparent_90%,var(--colors-scale2)_100%)] before:z-10 before:pointer-events-none
           "
         >
@@ -126,7 +126,7 @@ const Integrations = ({ title, label, cta, integrations, experts }: Props) => {
           ))}
         </div>
         <SectionContainer className="!pt-0 flex flex-col md:flex-row justify-center items-center gap-4">
-          <p className="text-sm text-foreground-light">{experts.paragraph}</p>{' '}
+          <p className="text-center text-sm text-foreground-light">{experts.paragraph}</p>{' '}
           {experts.cta && (
             <Link href={experts.cta.link} passHref>
               <Button type="default" asChild>
