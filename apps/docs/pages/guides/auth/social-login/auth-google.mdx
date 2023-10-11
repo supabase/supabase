@@ -110,6 +110,7 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
     ```ts
     async function handleSignInWithGoogle(response) {
       const { data, error } = await supabase.auth.signInWithIdToken({
+        provider: 'google',
         token: response.credential,
         nonce: 'NONCE', // must be the same one as provided in data-nonce (if any)
       })
