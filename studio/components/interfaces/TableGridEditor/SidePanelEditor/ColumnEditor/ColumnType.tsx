@@ -20,6 +20,7 @@ import {
   RECOMMENDED_ALTERNATIVE_DATA_TYPE,
 } from '../SidePanelEditor.constants'
 import { PostgresDataTypeOption } from '../SidePanelEditor.types'
+import { ListPlus } from 'lucide-react'
 
 interface ColumnTypeProps {
   value: string
@@ -120,7 +121,7 @@ const ColumnType = ({
         */}
         {enumTypes.length > 0 ? (
           <Listbox.Option disabled key="header-1" value="header-1" label="header-1">
-            User-defined Enumerated Types
+            Enumerated Types
           </Listbox.Option>
         ) : (
           <></>
@@ -134,11 +135,14 @@ const ColumnType = ({
               value={enumType.name}
               label={enumType.name}
               addOnBefore={() => {
-                return <div className="mx-1 h-2 w-2 rounded-full bg-scale-1200" />
+                return <ListPlus size={16} className="text-foreground" strokeWidth={1.5} />
               }}
             >
               <div className="flex items-center space-x-4">
-                <p>{enumType.name}</p>
+                <p className="text-foreground">{enumType.name}</p>
+                {enumType.comment !== undefined && (
+                  <p className="text-foreground-lighter">{enumType.comment}</p>
+                )}
               </div>
             </Listbox.Option>
           ))
