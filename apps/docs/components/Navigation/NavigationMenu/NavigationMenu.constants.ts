@@ -1183,6 +1183,10 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/migrating-and-upgrading-projects',
         },
         {
+          name: 'Multi-factor Authentication',
+          url: '/guides/platform/multi-factor-authentication',
+        },
+        {
           name: 'Transfer Project',
           url: '/guides/platform/project-transfer',
         },
