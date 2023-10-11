@@ -21,7 +21,7 @@ const Home: NextPageWithLayout = () => {
     <div className="w-full mx-auto my-16 space-y-16 max-w-7xl">
       <div className="flex items-center justify-between mx-6 space-x-6">
         <h1 className="text-3xl">{projectName}</h1>
-        <ServiceStatus />
+        {IS_PLATFORM && <ServiceStatus />}
       </div>
 
       <div className="mx-6">

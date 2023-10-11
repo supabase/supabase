@@ -12,6 +12,7 @@ import {
 import { usePostgresServiceStatusQuery } from 'data/service-status/postgres-service-status-query'
 import { useProjectServiceStatusQuery } from 'data/service-status/service-status-query'
 import { useSelectedProject } from 'hooks'
+import { useEdgeFunctionServiceStatusQuery } from 'data/service-status/edge-functions-status-query'
 
 const ServiceStatus = () => {
   const { ref } = useParams()
@@ -20,11 +21,10 @@ const ServiceStatus = () => {
 
   const isBranch = project?.parentRef !== project?.ref
 
-  // Covers auth, storage, realtime, rest
-  const { data: status, isLoading } = useProjectServiceStatusQuery({ projectRef: ref })
-
   // [Joshen] Need pooler service check eventually
-  // [Joshen] Need edge functions check eventually
+  const { data: status, isLoading } = useProjectServiceStatusQuery({ projectRef: ref })
+  const { data: edgeFunctionsStatus, isLoading: isLoadingEdgeFunctions } =
+    useEdgeFunctionServiceStatusQuery({ projectRef: ref })
   const { isLoading: isLoadingPostgres, isSuccess: isSuccessPostgres } =
     usePostgresServiceStatusQuery({
       projectRef: ref,
@@ -46,6 +46,7 @@ const ServiceStatus = () => {
     { name: 'Auth', isLoading, isSuccess: authStatus?.healthy ?? false },
     { name: 'Realtime', isLoading, isSuccess: realtimeStatus?.healthy ?? false },
     { name: 'Storage', isLoading, isSuccess: storageStatus?.healthy ?? false },
+    { name: 'Edge Functions', isLoading, isSuccess: edgeFunctionsStatus?.healthy ?? false },
   ]
 
   const isLoadingChecks = services.some((service) => service.isLoading)
