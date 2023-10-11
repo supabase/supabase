@@ -9,13 +9,13 @@ export default (isMobile?: boolean) => ({
   metaTitle: '',
   metaDescription: '',
   heroSection: {
-    announcement: {
-      url: 'https://www.ai.engineer/summit/schedule/supabase-vector',
-      badge: 'Happening now',
-      announcement: 'AI Engineer Summit',
-      target: '_blank',
-      hasArrow: !isMobile,
-    },
+    // announcement: {
+    //   url: '',
+    //   badge: '',
+    //   announcement: '',
+    //   target: '_blank',
+    //   hasArrow: !isMobile,
+    // },
     title: 'Supabase Vector',
     h1: (
       <span key={'vector-h1'} className="heading-gradient">
