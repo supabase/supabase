@@ -7,18 +7,20 @@ import Hero from '~/components/Hero/Hero'
 
 // Import Swiper styles if swiper used on page
 import 'swiper/swiper.min.css'
+import supabase from '../lib/supabase'
 
-const Products = dynamic(() => import('~/components/Products/index'))
-const BuiltExamples = dynamic(() => import('components/BuiltWithSupabase/index'))
-const MadeForDevelopers = dynamic(() => import('components/MadeForDevelopers/index'))
 const AdminAccess = dynamic(() => import('components/AdminAccess/index'))
+const BuiltExamples = dynamic(() => import('components/BuiltWithSupabase/index'))
 const CTABanner = dynamic(() => import('components/CTABanner/index'))
 const CustomerStories = dynamic(() => import('components/CustomerStories'))
+const Integrations = dynamic(() => import('~/components/Sections/Integrations'))
+const MadeForDevelopers = dynamic(() => import('components/MadeForDevelopers/index'))
+const Products = dynamic(() => import('~/components/Products/index'))
 const TwitterSocialSection = dynamic(() => import('~/components/TwitterSocialSection'))
 
-type Props = { customerStories: PostTypes[]; blogPosts: PostTypes[] }
+type Props = { customerStories: PostTypes[]; blogPosts: PostTypes[]; integrations: any[] }
 
-const Index = ({ customerStories }: Props) => {
+const Index = ({ customerStories, integrations }: Props) => {
   return (
     <Layout>
       <Hero />
@@ -27,6 +29,7 @@ const Index = ({ customerStories }: Props) => {
       <BuiltExamples />
       <MadeForDevelopers />
       <AdminAccess />
+      <Integrations {...content.integrations} integrations={integrations} />
       <CustomerStories customerStories={customerStories} />
       <CTABanner />
     </Layout>
@@ -35,10 +38,19 @@ const Index = ({ customerStories }: Props) => {
 
 export async function getStaticProps() {
   const customerStories = getSortedPosts({ directory: '_customers', limit: 3 })
+  const { data: integrations } = await supabase
+    .from('partners')
+    .select('*')
+    .eq('approved', true)
+    .eq('type', 'technology')
+    .order('category')
+    .order('title')
+    .limit(10)
 
   return {
     props: {
       customerStories,
+      integrations,
     },
   }
 }

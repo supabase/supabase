@@ -1,5 +1,4 @@
 import solutions from '../Solutions'
-// import { frameworks } from '../frameworks'
 
 export default {
   heroSection: {
@@ -32,5 +31,18 @@ export default {
   },
   productsSection: {
     products: { ...solutions },
+  },
+  integrations: {
+    label: 'Integrations',
+    title: (
+      <>
+        Power your project <br className="hidden sm:block" />
+        with the tools you love
+      </>
+    ),
+    cta: {
+      label: 'Explore integrations',
+      link: '/partners/integrations',
+    },
   },
 }
