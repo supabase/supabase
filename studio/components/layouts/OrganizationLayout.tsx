@@ -53,7 +53,7 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
               )}
               {billingEnabled && <Tabs.Panel id="billing" label="Billing" className="!my-0" />}
               {isOrgBilling && <Tabs.Panel id="usage" label="Usage" className="!my-0" />}
-              <Tabs.Panel id="invoices" label="Invoices" className="!my-0" />
+              {billingEnabled && <Tabs.Panel id="invoices" label="Invoices" className="!my-0" />}
               {showOAuthApps && <Tabs.Panel id="apps" label="OAuth Apps" className="!my-0" />}
               {showAuditLogs && <Tabs.Panel id="audit" label="Audit Logs" className="!my-0" />}
             </Tabs>
