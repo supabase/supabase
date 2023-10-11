@@ -10,9 +10,9 @@ export default (isMobile?: boolean) => ({
   metaDescription: '',
   heroSection: {
     announcement: {
-      url: 'https://www.ai.engineer/summit/schedule/supabase-vector',
-      badge: 'Happening now',
-      announcement: 'AI Engineer Summit',
+      url: 'https://youtu.be/qw4PrtyvJI0?t=10584',
+      badge: 'AI Engineer Summit',
+      announcement: "Watch our CEO's talk",
       target: '_blank',
       hasArrow: !isMobile,
     },
