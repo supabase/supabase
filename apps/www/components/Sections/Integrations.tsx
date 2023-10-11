@@ -1,11 +1,12 @@
-import React, { ReactNode } from 'react'
+import React, { ReactNode, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { range } from 'lodash'
-import { Button } from 'ui'
+import { Button, cn } from 'ui'
 import { Partner } from '~/types/partners'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import InteractiveShimmerCard from '~/components/InteractiveShimmerCard'
 import Image from 'next/image'
+import styles from './integrations.module.css'
 
 interface Props {
   label?: string
@@ -19,17 +20,45 @@ interface Props {
 }
 
 const Integrations = ({ title, label, integrations }: Props) => {
+  const ref = useRef(null)
+
+  const handleCursor = (event: any) => {
+    if (!ref.current) return null
+
+    const element = ref.current as HTMLDivElement
+    const { x: elX, y: elY, width, height } = element.getBoundingClientRect()
+    const x = event.clientX - elX
+    const y = event.clientY - elY
+
+    element.style.setProperty('--x', x + 'px')
+    element.style.setProperty('--y', y + 'px')
+
+    console.log(x, y)
+  }
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    window.addEventListener('mousemove', handleCursor)
+    return () => {
+      window.removeEventListener('mousemove', handleCursor)
+    }
+  }, [])
+
   return (
     <div>
       <SectionContainer className="!pb-0">
         <div className="overflow-hidden -mt-8">
-          <div className="relative h-[320px] w-full max-w-[400vw] md:left-0 mx-auto md:w-full -mb-20 z-0">
+          <div
+            ref={ref}
+            className="relative h-[320px] w-full max-w-[400vw] md:left-0 mx-auto md:w-full -mb-20 z-0"
+          >
             <Image
               src="/images/index/integrations/integrations-02.svg"
               alt="Integrations grid"
               layout="fill"
               objectFit="contain"
-              className="absolute opacity-30"
+              className={cn('absolute', styles['reveal-mask'])}
             />
             <Image
               src="/images/index/integrations/integrations-01.svg"
