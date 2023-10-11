@@ -1,0 +1,54 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+import { IconCheck } from 'ui'
+
+export const meta = {
+  title: 'Multi-factor Authentication',
+  description: 'Enable multi-factor authentication (MFA) to keep your account secure.',
+  subtitle: 'Enable multi-factor authentication (MFA) to keep your account secure.',
+}
+
+<Admonition type="note">
+
+This guide is for adding MFA to your Supabase user account. If you want to enable MFA for users in your Supabase project, please refer to [**this guide**](/docs/guides/auth/auth-mfa) instead.
+
+</Admonition>
+
+Multi-factor authentication (MFA) adds an additional layer of security to your user account, by requiring a second factor to verify your user identity. Supabase allows users to enable MFA on their account and set it as a requirement for subsequent logins.
+
+## Supported Authentication Factors
+
+Currently, Supabase supports adding a unique time-based one-time password (TOTP) to your user account as an additional security factor. You can manage your TOTP factor using apps such as 1Password, Authy, Google Authenticator or Apple's Keychain.
+
+## Enable MFA
+
+You can enable MFA for your user account under your [Supabase account settings](/dashboard/account/security). Enabling MFA will result in all other user sessions to be automatically logged out and forced to sign-in again with MFA.
+
+<Admonition type="note">
+
+Supabase does not return recovery codes. Instead, we recommend that you register a backup TOTP factor to use in an event that you lose access to your primary TOTP factor. Make sure you use a different device and app, or store the secret in a secure location different than your primary one.
+
+</Admonition>
+
+<Admonition type="caution">
+
+If you lose access to your 2FA device, please reach out to [**our support team**](/dashboard/support/new). Do note that an MFA reset may take upwards of 3 days to process for security reasons.
+
+</Admonition>
+
+## Login with MFA
+
+Once you've enabled MFA for your Supabase user account, you will be prompted to enter your second factor challenge code as seen in your preferred TOTP app.
+
+## Disable MFA
+
+You can disable MFA for your user account under your [Supabase account settings](/dashboard/account/security). On subsequent login attempts, you will not be prompted to enter a MFA code.
+
+<Admonition type="caution">
+
+We strongly recommend that you do not disable MFA to avoid unauthorized access to your user account.
+
+</Admonition>
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
