@@ -37,7 +37,7 @@ An index on Pinecone is made up of pods, which are units of cloud resources (vCP
 Pods can be scaled in 2 dimensions: vertically and horizontally:
 
 - **vertical scaling** can be used to fit more vectors on a single pod: x1, x2, x4, x8;
-- **horizontal scaling** increases the number of pods or creates replicas to boost QPS. This works linearly for Pinecone: doubling the number of replica pods doubles your QPS.
+- **horizontal scaling** increases the number of pods or creates replicas to boost queries per second (QPS). This works linearly for Pinecone: doubling the number of replica pods doubles your QPS.
 
 ## Benchmarking methodology
 
@@ -47,6 +47,8 @@ To compare Pinecone and pgvector on equal grounds, we opted for the following se
 
 - **pgvector**: A single Supabase 2XL instance approximating ~410$/month (8-core ARM CPU and 32 GB RAM). An HNSW index with the following build parameters: `m='36'`, `ef_construction='128'`.
 - **Pinecone**: Vertically scaled pod to the minimum option that fits the dbpedia dataset into the index on a single pod. We then added replicas to match the budget (slightly exceeding in all cases with ~$480/month).
+
+To reduce network latency, we placed our clients in the same cloud provider and region as the database. Experiments were run in a parallel configuration, varying the number of concurrent clients from 5 to 100 to determine the maximum QPS for each setup.
 
 ### Measuring accuracy in Pinecone
 
