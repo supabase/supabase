@@ -89,7 +89,7 @@ const EnableBranchingModal = () => {
         <Modal.Content className="px-7 py-5 flex items-center space-x-4">
           <IconGitBranch strokeWidth={2} size={20} />
           <div>
-            <p className="text">Enable database branching</p>
+            <p className="text-foreground">Enable database branching</p>
             <p className="text-sm text-light">Manage environments in Supabase</p>
           </div>
         </Modal.Content>
@@ -173,7 +173,7 @@ const EnableBranchingModal = () => {
                   </figure>
                 </div>
                 <div>
-                  <p className="text-sm text">
+                  <p className="text-sm text-foreground">
                     You will not be able to use the dashboard to make changes to the database
                   </p>
                   <p className="text-sm text-light">
