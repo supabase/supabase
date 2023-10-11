@@ -51,7 +51,7 @@ const Integrations = ({ title, label, cta, integrations, experts }: Props) => {
   }, [])
 
   return (
-    <div>
+    <div id="integrations">
       <SectionContainer className="!pb-0">
         <div className="-mt-8">
           <div
