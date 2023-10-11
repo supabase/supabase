@@ -90,7 +90,7 @@ const Integrations = ({ title, label, cta, integrations, experts }: Props) => {
           </div>
         </div>
         <div
-          className="relative w-full group/integrations py-4 lg:py-20 overflow-hidden flex flex-row gap-4 nowrap
+          className="relative my-4 lg:my-20 w-full group/integrations overflow-hidden flex flex-row gap-4 nowrap
             before:content[''] before:absolute before:inset-0 before:w-full before:bg-[linear-gradient(to_right,var(--colors-scale2)_0%,transparent_10%,transparent_90%,var(--colors-scale2)_100%)] before:z-10 before:pointer-events-none
           "
         >
