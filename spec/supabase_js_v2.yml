@@ -4558,7 +4558,7 @@ functions:
         code: |
           ```js
           supabase
-            .channel('any')
+            .channel('room1')
             .on('broadcast', { event: 'cursor-pos' }, payload => {
               console.log('Cursor position received!', payload)
             })
@@ -4577,7 +4577,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          const channel = supabase.channel('any')
+          const channel = supabase.channel('room1')
           channel
             .on('presence', { event: 'sync' }, () => {
               console.log('Synced presence state: ', channel.presenceState())
@@ -4593,7 +4593,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          const channel = supabase.channel('any')
+          const channel = supabase.channel('room1')
           channel
             .on('presence', { event: 'join' }, ({ newPresences }) => {
               console.log('Newly joined presences: ', newPresences)
@@ -4609,7 +4609,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          const channel = supabase.channel('any')
+          const channel = supabase.channel('room1')
           channel
             .on('presence', { event: 'leave' }, ({ leftPresences }) => {
               console.log('Newly left presences: ', leftPresences)
@@ -4627,7 +4627,7 @@ functions:
         code: |
           ```js
           supabase
-            .channel('any')
+            .channel('room1')
             .on('postgres_changes', { event: '*', schema: '*' }, payload => {
               console.log('Change received!', payload)
             })
@@ -4638,7 +4638,7 @@ functions:
         code: |
           ```js
           supabase
-            .channel('any')
+            .channel('room1')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
             })
@@ -4649,7 +4649,7 @@ functions:
         code: |
           ```js
           supabase
-            .channel('any')
+            .channel('room1')
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
             })
@@ -4667,7 +4667,7 @@ functions:
         code: |
           ```js
           supabase
-            .channel('any')
+            .channel('room1')
             .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
             })
@@ -4685,7 +4685,7 @@ functions:
         code: |
           ```js
           supabase
-            .channel('any')
+            .channel('room1')
             .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
             })
@@ -4697,7 +4697,7 @@ functions:
         code: |
           ```js
           supabase
-            .channel('any')
+            .channel('room1')
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'countries' }, handleRecordInserted)
             .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'countries' }, handleRecordDeleted)
             .subscribe()
@@ -4710,7 +4710,7 @@ functions:
         code: |
           ```js
           supabase
-            .channel('any')
+            .channel('room1')
             .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'countries', filter: 'id=eq.200' }, handleRecordUpdated)
             .subscribe()
           ```
@@ -4729,7 +4729,7 @@ functions:
         code: |
           ```js
           supabase
-            .channel('any')
+            .channel('room1')
             .subscribe((status) => {
               if (status === 'SUBSCRIBED') {
                 channel.send({
@@ -4746,7 +4746,7 @@ functions:
         code: |
           ```js
           supabase
-            .channel('any')
+            .channel('room1')
             .send({
               type: 'broadcast',
               event: 'cursor-pos',
