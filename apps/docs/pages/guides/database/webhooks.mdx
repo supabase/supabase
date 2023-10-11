@@ -35,6 +35,20 @@ This video demonstrates how you can create a new customer in Stripe each time a 
 1. Select the table you want to hook into.
 1. Select one or more events (table inserts, updates, or deletes) you want to hook into.
 
+Since webhooks are just database triggers, you can also create one from SQL statement directly.
+
+```sql
+create trigger "my_webhook" after insert
+on "public"."my_table" for each row
+execute function "supabase_functions"."http_request"(
+  'http://localhost:3000',
+  'POST',
+  '{"Content-Type":"application/json"}',
+  '{}',
+  '1000'
+);
+```
+
 We currently support HTTP webhooks. These are sent as a `POST` request with a JSON payload.
 
 ## Payload
