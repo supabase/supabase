@@ -41,8 +41,16 @@ export default {
       </>
     ),
     cta: {
-      label: 'Explore integrations',
+      label: 'View all integrations',
       link: '/partners/integrations',
+    },
+    experts: {
+      paragraph:
+        'Need a different integration? Find a Supabase Expert to help build your next idea.',
+      cta: {
+        label: 'Find an expert',
+        link: '/partners/experts',
+      },
     },
   },
 }

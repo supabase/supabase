@@ -8,18 +8,23 @@ import InteractiveShimmerCard from '~/components/InteractiveShimmerCard'
 import Image from 'next/image'
 import styles from './integrations.module.css'
 
+interface CTA {
+  label?: string
+  link: string
+  isDisabled?: boolean
+}
 interface Props {
   label?: string
   title: string | ReactNode
   integrations: Partner[]
-  cta?: {
-    label?: string
-    link: string
-    isDisabled?: boolean
+  cta?: CTA
+  experts: {
+    paragraph?: string
+    cta: CTA
   }
 }
 
-const Integrations = ({ title, label, integrations }: Props) => {
+const Integrations = ({ title, label, cta, integrations, experts }: Props) => {
   const ref = useRef(null)
 
   const handleCursor = (event: any) => {
@@ -48,24 +53,26 @@ const Integrations = ({ title, label, integrations }: Props) => {
   return (
     <div>
       <SectionContainer className="!pb-0">
-        <div className="overflow-hidden -mt-8">
+        <div className="-mt-8">
           <div
             ref={ref}
             className="relative h-[320px] w-full max-w-[400vw] md:left-0 mx-auto md:w-full -mb-20 z-0"
           >
             <Image
-              src="/images/index/integrations/integrations-02.svg"
+              src="/images/index/integrations/integrations-02.jpg"
               alt="Integrations grid"
               layout="fill"
               objectFit="contain"
-              className={cn('absolute', styles['reveal-mask'])}
+              quality={100}
+              className={cn('absolute z-20', styles['reveal-mask'])}
             />
             <Image
-              src="/images/index/integrations/integrations-01.svg"
+              src="/images/index/integrations/integrations-01.jpg"
               alt="Integrations grid"
               layout="fill"
               objectFit="contain"
-              className="absolute"
+              quality={100}
+              className="absolute animate-pulse"
             />
           </div>
           <div className="relative z-10 flex flex-col text-center gap-4 items-center justify-center">
@@ -73,6 +80,13 @@ const Integrations = ({ title, label, integrations }: Props) => {
               {label}
             </div>
             <h2 className="heading-gradient text-2xl sm:text-3xl xl:text-4xl">{title}</h2>
+            {cta && (
+              <Link href={cta.link} passHref>
+                <Button size="medium" type="default" asChild>
+                  <a className="mt-4">{cta.label}</a>
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
         <div
@@ -112,14 +126,14 @@ const Integrations = ({ title, label, integrations }: Props) => {
           ))}
         </div>
         <SectionContainer className="!pt-0 flex flex-col md:flex-row justify-center items-center gap-4">
-          <p className="text-sm text-foreground-light">
-            Need a dirrerent integration? Find a Supabase Expert to help build your next idea.
-          </p>{' '}
-          <Link href="/partners/experts" passHref>
-            <Button type="default" asChild>
-              <a>Find an expert</a>
-            </Button>
-          </Link>
+          <p className="text-sm text-foreground-light">{experts.paragraph}</p>{' '}
+          {experts.cta && (
+            <Link href={experts.cta.link} passHref>
+              <Button type="default" asChild>
+                <a>{experts.cta.label}</a>
+              </Button>
+            </Link>
+          )}
         </SectionContainer>
       </SectionContainer>
     </div>
