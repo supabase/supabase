@@ -227,7 +227,7 @@ const AttributeUsage = ({
                   </div>
                 )}
 
-                {attribute.additionalInfo?.(usage)}
+                {attribute.additionalInfo?.(subscription, usage)}
 
                 <div className="space-y-1">
                   <p className="text-sm">

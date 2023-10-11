@@ -6,6 +6,8 @@ export const useStore = _useStore
 
 export const useParams = jest.fn().mockImplementation(() => ({ ref: '123' }))
 
+export const useLocalStorage = jest.fn().mockImplementation(() => [[], jest.fn()])
+
 // mocks browser event listener adding/removing
 window.matchMedia = jest.fn().mockReturnValue({
   removeEventListener: jest.fn(),
