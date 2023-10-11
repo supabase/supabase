@@ -72,7 +72,7 @@ You can add new Functions as `volumes/functions/<FUNCTION_NAME>/index.ts`. Resta
 You can connect to the Postgres database locally on port `5432`. For example, if you have `psql` on your local machine you can run:
 
 ```bash
-psql -h localhost -p 5432 -d postgres -U postgres
+psql -h 127.0.0.1 -p 5432 -d postgres -U postgres
 ```
 
 The default password is `your-super-secret-and-long-postgres-password`. You should change this as soon as possible using the [instructions below](#update-secrets). By default the database is not accessible from outside the local machine. You can [change this](#exposing-your-postgres-database) by updating the `docker-compose.yml` file.
