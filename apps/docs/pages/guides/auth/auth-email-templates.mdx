@@ -64,7 +64,7 @@ When the user clicks on the link, the request will hit `https://api.example.com/
 
 ```js
 const { token_hash, type } = Object.fromEntries(new URLSearchParams(window.location.search))
-const { data: { session }, error } = supabase.auth.verifyOtp({ token_hash, type })
+const { data: { session }, error } = await supabase.auth.verifyOtp({ token_hash, type })
 
 // subsequently redirect the user back to the client
 // ...
