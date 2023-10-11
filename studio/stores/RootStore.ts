@@ -2,7 +2,6 @@ import { configure } from 'mobx'
 import { Project } from 'types'
 import AppStore, { IAppStore } from './app/AppStore'
 import MetaStore, { IMetaStore } from './pgmeta/MetaStore'
-import ProjectContentStore, { IProjectContentStore } from './project/ProjectContentStore'
 import ProjectFunctionsStore, { IProjectFunctionsStore } from './project/ProjectFunctionsStore'
 import VaultStore, { IVaultStore } from './project/VaultStore'
 import UiStore, { IUiStore } from './UiStore'
@@ -17,7 +16,6 @@ export interface IRootStore {
   app: IAppStore
   ui: IUiStore
   meta: IMetaStore
-  content: IProjectContentStore
   functions: IProjectFunctionsStore
   vault: IVaultStore
 
@@ -29,7 +27,6 @@ export class RootStore implements IRootStore {
   app: IAppStore
   ui: IUiStore
   meta: IMetaStore
-  content: IProjectContentStore
   functions: IProjectFunctionsStore
   vault: IVaultStore
 
@@ -40,7 +37,6 @@ export class RootStore implements IRootStore {
     this.ui = new UiStore(this)
     this.meta = new MetaStore(this, { projectRef: '', connectionString: '' })
 
-    this.content = new ProjectContentStore(this, { projectRef: '' })
     this.functions = new ProjectFunctionsStore(this, { projectRef: '' })
     this.vault = new VaultStore(this)
   }
@@ -59,7 +55,6 @@ export class RootStore implements IRootStore {
 
     this.meta.setProjectDetails(project)
     this.functions.setProjectRef(project.ref)
-    this.content.setProjectRef(project.ref)
     // ui set must come last
     this.ui.setProjectRef(project.ref)
 
