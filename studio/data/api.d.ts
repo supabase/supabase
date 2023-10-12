@@ -1514,6 +1514,10 @@ export interface paths {
     /** Disables project's readonly mode for the next 15 minutes */
     post: operations["ReadOnlyController_temporarilyDisableReadonlyMode"];
   };
+  "/v1/projects/{ref}/health": {
+    /** Gets project's service health status */
+    get: operations["ServiceHealthController_checkServiceHealth"];
+  };
   "/v1/projects/{ref}/config/database/postgres": {
     /** Gets project's Postgres config */
     get: operations["AuthPostgresConfigController_getConfig"];
@@ -4248,6 +4252,32 @@ export interface components {
       enabled: boolean;
       override_enabled: boolean;
       override_active_until: string;
+    };
+    AuthHealthResponse: {
+      name: string;
+      version: string;
+      description: string;
+    };
+    RestHealthResponse: {
+      title: string;
+      version: string;
+      description: string;
+    };
+    RealtimeHealthResponse: {
+      healthy: boolean;
+      db_connected: boolean;
+      connected_cluster: number;
+    };
+    StorageHealthResponse: {
+      fileSizeLimit: number;
+      imageTransformationEnabled: boolean;
+    };
+    ServiceHealthResponse: {
+      info?: components["schemas"]["AuthHealthResponse"] | components["schemas"]["RestHealthResponse"] | components["schemas"]["RealtimeHealthResponse"] | components["schemas"]["StorageHealthResponse"];
+      /** @enum {string} */
+      name: "auth" | "realtime" | "rest" | "storage";
+      healthy: boolean;
+      error?: string;
     };
     V1PgbouncerConfigResponse: {
       /** @enum {string} */
@@ -11123,6 +11153,30 @@ export interface operations {
         content: never;
       };
       /** @description Failed to disable project's readonly mode */
+      500: {
+        content: never;
+      };
+    };
+  };
+  /** Gets project's service health status */
+  ServiceHealthController_checkServiceHealth: {
+    parameters: {
+      query: {
+        timeout_ms?: number;
+        services: ("auth" | "realtime" | "rest" | "storage")[];
+      };
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["ServiceHealthResponse"][];
+        };
+      };
+      /** @description Failed to retrieve project's service health status */
       500: {
         content: never;
       };
