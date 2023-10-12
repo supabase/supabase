@@ -533,6 +533,7 @@ functions:
     notes: |
       - Requires a `service_role` key.
       - This function should only be called on a server. Never expose your `service_role` key in the browser.
+      - The `inviteUserByEmail()` method is typically used by administrators to invite users to join the application.
     examples:
       - id: basic-example
         name: Basic example.
