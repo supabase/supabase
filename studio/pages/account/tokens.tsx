@@ -10,7 +10,7 @@ import {
 import { NewAccessToken } from 'data/access-tokens/access-tokens-create-mutation'
 
 import Link from 'next/link'
-import { Button, IconExternalLink } from 'ui'
+import { Alert, Button, IconExternalLink } from 'ui'
 
 const UserAccessTokens: NextPageWithLayout = () => {
   const [newToken, setNewToken] = useState<NewAccessToken | undefined>()
@@ -18,10 +18,18 @@ const UserAccessTokens: NextPageWithLayout = () => {
   return (
     <div className="1xl:px-28 mx-auto flex flex-col px-5 pt-6 pb-14 lg:px-16 xl:px-24 2xl:px-32">
       <div className="flex items-center justify-between">
-        <FormHeader
-          title="Access Tokens"
-          description="Personal access tokens can be used with our management API or the Supabase CLI. These tokens will have the same permissions as you have."
-        />
+        <div>
+          <FormHeader
+            title="Access Tokens"
+            description="Personal access tokens can be used with our Management API or CLI."
+          />
+          <Alert
+            withIcon
+            className="mb-6 mr-6"
+            variant="warning"
+            title="Personal access tokens can be used to control your whole account and use features added in the future. Be careful when sharing them!"
+          />
+        </div>
         <div className="flex items-center space-x-4 mb-6">
           <div className="flex items-center space-x-2">
             <Link href="https://supabase.com/docs/reference/api/introduction">
