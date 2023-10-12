@@ -5,7 +5,7 @@ const data = {
   meta_description:
     'Find help and support for Supabase. Our Support team provide answers on all types of issues, including account information, billing, and refunds.',
   hero: {
-    h1: 'Hello, how can we help?',
+    h1: 'Support',
     title: 'Hello, how can we help?',
   },
   cards: [
