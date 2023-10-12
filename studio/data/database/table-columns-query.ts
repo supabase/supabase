@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import { UseQueryOptions } from '@tanstack/react-query'
 import { ExecuteSqlData, useExecuteSqlPrefetch, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { createConsoleLogger } from 'configcat-js'
 
 export type TableColumn = {
   schemaname: string
@@ -10,8 +11,26 @@ export type TableColumn = {
   columns: any[]
 }
 
-export const getTableColumnsQuery = (table?: string) => {
+export const getTableColumnsQuery = (table?: string, schema?: string) => {
+
+  console.log('schema',schema);
+
+  let whereClause = '';
+  if (table !== undefined || schema !== undefined) {
+    whereClause = 'WHERE ';
+    if (table !== undefined) {
+      whereClause += `tablename = '${table}' `;
+    }
+    if (schema !== undefined) {
+      if (table !== undefined) {
+        whereClause += 'AND ';
+      }
+      whereClause += `schemaname = '${schema}'`;
+    }
+  }
+
   const sql = /* SQL */ `
+  
   SELECT
     tbl.schemaname,
     tbl.tablename,
@@ -67,10 +86,14 @@ export const getTableColumnsQuery = (table?: string) => {
       AND NOT a.attisdropped
       AND has_column_privilege(tbl.quoted_name, a.attname, 'SELECT, INSERT, UPDATE, REFERENCES')
     )
-  ${table !== undefined ? `WHERE tablename = '${table}'` : ''}
+  ${whereClause}
   GROUP BY schemaname, tablename, quoted_name, is_table;
 `.trim()
 
+
+if (sql) {
+  console.log('Query Successful. Data:', sql);
+}
   return sql
 }
 
@@ -78,21 +101,25 @@ export type TableColumnsVariables = {
   projectRef?: string
   connectionString?: string
   table?: string
+  schema?: string;
 }
 
 export type TableColumnsData = { result: TableColumn[] }
 export type TableColumnsError = unknown
 
 export const useTableColumnsQuery = <TData extends TableColumnsData = TableColumnsData>(
-  { projectRef, connectionString, table }: TableColumnsVariables,
+  { projectRef, connectionString, table, schema }: TableColumnsVariables,
+  tableColumnsVariables: TableColumnsVariables,
   options: UseQueryOptions<ExecuteSqlData, TableColumnsError, TData> = {}
 ) => {
+  console.log('Query Parameters:', { projectRef, connectionString, table, schema });
+
   return useExecuteSqlQuery(
     {
       projectRef,
       connectionString,
-      sql: getTableColumnsQuery(table),
-      queryKey: ['table-columns', table],
+      sql: getTableColumnsQuery(table, schema),
+      queryKey: ['table-columns', schema, table],
     },
     options
   )
