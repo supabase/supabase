@@ -42,11 +42,11 @@ const ServiceStatus = () => {
       isLoading: isLoadingPostgres,
       isSuccess: isSuccessPostgres,
     },
-    { name: 'PostgREST', isLoading, isSuccess: restStatus?.healthy ?? false },
-    { name: 'Auth', isLoading, isSuccess: authStatus?.healthy ?? false },
-    { name: 'Realtime', isLoading, isSuccess: realtimeStatus?.healthy ?? false },
-    { name: 'Storage', isLoading, isSuccess: storageStatus?.healthy ?? false },
-    { name: 'Edge Functions', isLoading, isSuccess: edgeFunctionsStatus?.healthy ?? false },
+    { name: 'PostgREST', isLoading, isSuccess: restStatus?.healthy },
+    { name: 'Auth', isLoading, isSuccess: authStatus?.healthy },
+    { name: 'Realtime', isLoading, isSuccess: realtimeStatus?.healthy },
+    { name: 'Storage', isLoading, isSuccess: storageStatus?.healthy },
+    { name: 'Edge Functions', isLoading, isSuccess: edgeFunctionsStatus?.healthy },
   ]
 
   const isLoadingChecks = services.some((service) => service.isLoading)
@@ -84,12 +84,16 @@ const ServiceStatus = () => {
             <div>
               <p>{service.name}</p>
               <p className="text-light">
-                {service.isLoading && 'Checking status'}
-                {service.isSuccess ? 'No issues' : 'Unable to connect'}
+                {service.isLoading
+                  ? 'Checking status'
+                  : service.isSuccess
+                  ? 'No issues'
+                  : 'Unable to connect'}
               </p>
             </div>
-            {service.isLoading && <IconLoader className="animate-spin" size="tiny" />}
-            {service.isSuccess ? (
+            {service.isLoading ? (
+              <IconLoader className="animate-spin" size="tiny" />
+            ) : service.isSuccess ? (
               <CheckCircle2 className="text-brand" size={18} strokeWidth={1.5} />
             ) : (
               <AlertTriangle className="text-amber-900" size={18} strokeWidth={1.5} />
