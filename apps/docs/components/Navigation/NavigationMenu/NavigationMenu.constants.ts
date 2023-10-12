@@ -140,6 +140,9 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       level: 'reference_kotlin',
       community: true,
     },
+  ],
+
+  [
     {
       label: 'Resources',
     },
