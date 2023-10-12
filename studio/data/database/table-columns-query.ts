@@ -1,7 +1,6 @@
 import { useCallback } from 'react'
 import { UseQueryOptions } from '@tanstack/react-query'
 import { ExecuteSqlData, useExecuteSqlPrefetch, useExecuteSqlQuery } from '../sql/execute-sql-query'
-import { createConsoleLogger } from 'configcat-js'
 
 export type TableColumn = {
   schemaname: string
