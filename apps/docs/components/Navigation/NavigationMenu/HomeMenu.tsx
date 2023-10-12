@@ -11,7 +11,6 @@ const NavigationMenuHome = () => {
         {HOMEPAGE_MENU_ITEMS.map((section, sectionIndex) => {
           return (
             <Fragment key={`section-container-${sectionIndex}-border`}>
-              {console.log(section,"section")}
               {sectionIndex !== 0 && (
                 <div
                   className="h-px w-full bg-blackA-300 dark:bg-whiteA-300"

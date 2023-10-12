@@ -6,7 +6,13 @@ type HomeMenuIcon = {
 }
 export function IconMenuHome({ width = 16, height = 16 }: HomeMenuIcon) {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width={width} height={height} viewBox="0 0 16 16" fill="none">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={width}
+      height={height}
+      viewBox="0 0 16 16"
+      fill="none"
+    >
       <path
         fillRule="evenodd"
         clipRule="evenodd"

@@ -78,7 +78,7 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       label: 'Development Cycle',
     },
     {
-      label: 'Local Dev / CLI' ,
+      label: 'Local Dev / CLI',
       icon: 'dev-cli',
       href: '/guides/cli',
       level: 'reference_javascript',
@@ -140,7 +140,6 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       level: 'reference_kotlin',
       community: true,
     },
-    
   ],
   [
     {
