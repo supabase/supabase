@@ -141,29 +141,45 @@ export default function MultiSelect({
       >
         <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
           <PopoverTrigger_Shadcn_ asChild>
-              <div
-                className={[
-                  'flex w-full flex-wrap items-start gap-1.5 p-1.5 cursor-pointer',
-                  `${selectedOptions.length === 0 ? 'h-9' : ''}`,
-                  `${error !== undefined ? 'bg-red-100 border border-red-700 focus:ring-red-500 placeholder-text-red-600 rounded' : ''}`,
-                ].join(' ')}
-                onClick={() => setOpen(true)}
-              >
-
+            <div
+              className={[
+                'flex w-full flex-wrap items-start gap-1.5 p-1.5 cursor-pointer',
+                `${selectedOptions.length === 0 ? 'h-9' : ''}`,
+                `${
+                  error !== undefined
+                    ? 'bg-red-100 border border-red-700 focus:ring-red-500 placeholder-text-red-600 rounded'
+                    : ''
+                }`,
+              ].join(' ')}
+              onClick={() => setOpen(true)}
+            >
               {error ? (
-              <div className="absolute inset-y-0 right-0 pl-3 pr-1 flex space-x-1 items-center ">
-                <div className="flex items-center right-3 pr-2 pl-2 inset-y-0 pointer-events-none text-red-900">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="sbui-icon">
-                    <circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line>
-                  </svg>
+                <div className="absolute inset-y-0 right-0 pl-3 pr-1 flex space-x-1 items-center ">
+                  <div className="flex items-center right-3 pr-2 pl-2 inset-y-0 pointer-events-none text-red-900">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      className="sbui-icon"
+                    >
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="8" x2="12" y2="12"></line>
+                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                  </div>
                 </div>
-              </div>
-              ) : ( 
+              ) : (
                 <div className="absolute inset-y-0 right-0 pl-3 pr-2 flex space-x-1 items-center cursor-pointer ">
-                <IconChevronDown size={16} strokeWidth={2} className="text-foreground-lighter" />
-              </div>
+                  <IconChevronDown size={16} strokeWidth={2} className="text-foreground-lighter" />
+                </div>
               )}
-        
+
               {selectedOptions.length === 0 && placeholder && (
                 <div className="px-2 text-sm text-foreground-light h-full flex items-center">
                   {placeholder}
@@ -189,8 +205,7 @@ export default function MultiSelect({
                   )
                 }
               })}
-              </div>
-           
+            </div>
           </PopoverTrigger_Shadcn_>
           <PopoverContent_Shadcn_
             className="p-0"
