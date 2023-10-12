@@ -13,21 +13,15 @@ export type TableColumn = {
 
 export const getTableColumnsQuery = (table?: string, schema?: string) => {
 
-  console.log('schema',schema);
-
-  let whereClause = '';
-  if (table !== undefined || schema !== undefined) {
-    whereClause = 'WHERE ';
-    if (table !== undefined) {
-      whereClause += `tablename = '${table}' `;
-    }
-    if (schema !== undefined) {
-      if (table !== undefined) {
-        whereClause += 'AND ';
-      }
-      whereClause += `schemaname = '${schema}'`;
-    }
+  const conditions = []
+  if (table) {
+    conditions.push(`tablename = '${table}' `)
   }
+  if (schema) {
+    conditions.push(`schemaname = '${schema}'`)
+  }
+
+  const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
   const sql = /* SQL */ `
   
@@ -90,10 +84,6 @@ export const getTableColumnsQuery = (table?: string, schema?: string) => {
   GROUP BY schemaname, tablename, quoted_name, is_table;
 `.trim()
 
-
-if (sql) {
-  console.log('Query Successful. Data:', sql);
-}
   return sql
 }
 
@@ -109,10 +99,8 @@ export type TableColumnsError = unknown
 
 export const useTableColumnsQuery = <TData extends TableColumnsData = TableColumnsData>(
   { projectRef, connectionString, table, schema }: TableColumnsVariables,
-  tableColumnsVariables: TableColumnsVariables,
   options: UseQueryOptions<ExecuteSqlData, TableColumnsError, TData> = {}
 ) => {
-  console.log('Query Parameters:', { projectRef, connectionString, table, schema });
 
   return useExecuteSqlQuery(
     {
