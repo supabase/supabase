@@ -11,6 +11,7 @@ export type ProjectRestoreVariables = {
 export async function restoreProject({ ref }: ProjectRestoreVariables) {
   const { data, error } = await post('/platform/projects/{ref}/restore', {
     params: { path: { ref } },
+    // @ts-ignore
     body: {},
   })
   if (error) throw error

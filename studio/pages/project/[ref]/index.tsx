@@ -1,6 +1,7 @@
 import { ClientLibrary, ExampleProject } from 'components/interfaces/Home'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
+import ServiceStatus from 'components/interfaces/Home/ServiceStatus'
 import { ProjectLayoutWithAuth } from 'components/layouts'
 import ProjectPausedState from 'components/layouts/ProjectLayout/ProjectPausedState'
 import ProjectUpgradeFailedBanner from 'components/ui/ProjectUpgradeFailedBanner'
@@ -18,8 +19,9 @@ const Home: NextPageWithLayout = () => {
 
   return (
     <div className="w-full mx-auto my-16 space-y-16 max-w-7xl">
-      <div className="flex items-center mx-6 space-x-6">
+      <div className="flex items-center justify-between mx-6 space-x-6">
         <h1 className="text-3xl">{projectName}</h1>
+        {IS_PLATFORM && <ServiceStatus />}
       </div>
 
       <div className="mx-6">
