@@ -83,7 +83,7 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
                       <Link passHref href={href} key={org.slug}>
                         <CommandItem_Shadcn_
                           asChild
-                          value={org.name}
+                          value={`${org.name} - ${org.slug}`}
                           className="cursor-pointer w-full flex items-center justify-between"
                           onSelect={() => {
                             setOpen(false)
