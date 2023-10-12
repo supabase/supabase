@@ -12,7 +12,6 @@ export type TableColumn = {
 }
 
 export const getTableColumnsQuery = (table?: string, schema?: string) => {
-
   const conditions = []
   if (table) {
     conditions.push(`tablename = '${table}'`)
