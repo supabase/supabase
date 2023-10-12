@@ -101,14 +101,13 @@ const Index = () => {
             </SearchButton>
           </SectionContainer>
         </div>
-        <SectionContainer className="text grid gap-5 md:grid-cols-2 max-w-7xl !pb-8">
+        <SectionContainer className="text grid gap-5 md:grid-cols-2 xl:grid-cols-3 max-w-7xl !pb-8">
           <InteractiveShimmerCard innerClassName="flex flex-col p-5">
             <div className="mb-4 lg:mb-8 flex-1">
-              <h2 className="text text-lg font-medium">Issues and Feature requests</h2>
+              <h2 className="text text-lg font-medium">Issues</h2>
               <div className="my-2 block">
                 <p className="text-light">
-                  Found a bug or want to suggest a new feature? We'd love to hear about it in our
-                  GitHub issues.
+                  Found a bug? We'd love to hear about it in our GitHub issues.
                 </p>
               </div>
             </div>
@@ -126,6 +125,31 @@ const Index = () => {
           </InteractiveShimmerCard>
 
           <InteractiveShimmerCard innerClassName="flex flex-col p-5">
+            <div className="mb-4 lg:mb-8 flex-1">
+              <h2 className="text text-lg font-medium">Feature requests</h2>
+              <div className="my-2 block">
+                <p className="text-light">
+                  Want to suggest a new feature? Share it with us and the community.
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Link
+                href="https://github.com/orgs/supabase/discussions/categories/feature-requests"
+                as="https://github.com/orgs/supabase/discussions/categories/feature-requests"
+                passHref
+              >
+                <Button size="small" type="default" iconRight={<IconGitHubSolid />} asChild>
+                  <a target="_blank">Request feature</a>
+                </Button>
+              </Link>
+            </div>
+          </InteractiveShimmerCard>
+
+          <InteractiveShimmerCard
+            outerClassName="col-span-full xl:col-span-1"
+            innerClassName="flex flex-col p-5"
+          >
             <div className="mb-4 lg:mb-8 flex-1">
               <h2 className="text text-lg font-medium">Ask the Community</h2>
               <div className="my-2 block">
