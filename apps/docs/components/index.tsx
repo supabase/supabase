@@ -53,6 +53,7 @@ import {
   IconMenuKotlin,
   IconMenuApi,
   IconMenuCli,
+  IconMenuCommand,
 } from './Navigation/NavigationMenu/HomeMenuIcons'
 
 const components = {
@@ -120,6 +121,7 @@ const components = {
   IconMenuSwift,
   IconMenuApi,
   IconMenuCli,
+  IconMenuCommand,
 }
 
 export default components

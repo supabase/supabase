@@ -145,7 +145,7 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
     },
     {
       label: 'CLI Commands',
-      icon: 'reference-cli',
+      icon: 'cli-command',
       href: '/reference/cli/introduction',
       level: 'reference_javascript',
     },
