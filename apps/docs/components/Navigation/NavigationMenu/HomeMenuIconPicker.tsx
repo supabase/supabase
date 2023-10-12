@@ -23,6 +23,7 @@ import {
   IconMenuStatus,
   IconMenuKotlin,
   IconMenuAI,
+  IconMenuLocal,
 } from './HomeMenuIcons'
 
 function getMenuIcon(menuKey: string, width: number = 16, height: number = 16) {
@@ -37,6 +38,8 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16) {
       return <IconMenuRestApis width={width} height={height} />
     case 'graphql':
       return <IconMenuGraphQL width={width} height={height} />
+    case 'local':
+      return <IconMenuLocal width={width} height={height} />
     case 'auth':
       return <IconMenuAuth width={width} height={height} />
     case 'edge-functions':
