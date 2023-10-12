@@ -36,17 +36,24 @@ const ServiceStatus = () => {
   const realtimeStatus = status?.find((service) => service.name === 'realtime')
   const storageStatus = status?.find((service) => service.name === 'storage')
 
+  // [Joshen] Need individual troubleshooting docs for each service eventually for users to self serve
   const services = [
     {
       name: 'Database',
+      docsUrls: undefined,
       isLoading: isLoadingPostgres,
       isSuccess: isSuccessPostgres,
     },
-    { name: 'PostgREST', isLoading, isSuccess: restStatus?.healthy },
-    { name: 'Auth', isLoading, isSuccess: authStatus?.healthy },
-    { name: 'Realtime', isLoading, isSuccess: realtimeStatus?.healthy },
-    { name: 'Storage', isLoading, isSuccess: storageStatus?.healthy },
-    { name: 'Edge Functions', isLoading, isSuccess: edgeFunctionsStatus?.healthy },
+    { name: 'PostgREST', docsUrls: undefined, isLoading, isSuccess: restStatus?.healthy },
+    { name: 'Auth', docsUrls: undefined, isLoading, isSuccess: authStatus?.healthy },
+    { name: 'Realtime', docsUrls: undefined, isLoading, isSuccess: realtimeStatus?.healthy },
+    { name: 'Storage', docsUrls: undefined, isLoading, isSuccess: storageStatus?.healthy },
+    {
+      name: 'Edge Functions',
+      docsUrl: 'https://supabase.com/docs/guides/functions/troubleshooting',
+      isLoading,
+      isSuccess: edgeFunctionsStatus?.healthy,
+    },
   ]
 
   const isLoadingChecks = services.some((service) => service.isLoading)
