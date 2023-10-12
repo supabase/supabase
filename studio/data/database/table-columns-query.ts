@@ -15,7 +15,7 @@ export const getTableColumnsQuery = (table?: string, schema?: string) => {
 
   const conditions = []
   if (table) {
-    conditions.push(`tablename = '${table}' `)
+    conditions.push(`tablename = '${table}'`)
   }
   if (schema) {
     conditions.push(`schemaname = '${schema}'`)
