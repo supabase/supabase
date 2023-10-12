@@ -47,7 +47,7 @@ const ServiceStatus = () => {
     { name: 'PostgREST', docsUrls: undefined, isLoading, isSuccess: restStatus?.healthy },
     { name: 'Auth', docsUrls: undefined, isLoading, isSuccess: authStatus?.healthy },
     { name: 'Realtime', docsUrls: undefined, isLoading, isSuccess: realtimeStatus?.healthy },
-    { name: 'Storage', docsUrls: undefined, isLoading, isSuccess: storageStatus?.healthy },
+    // { name: 'Storage', docsUrls: undefined, isLoading, isSuccess: storageStatus?.healthy },
     {
       name: 'Edge Functions',
       docsUrl: 'https://supabase.com/docs/guides/functions/troubleshooting',
