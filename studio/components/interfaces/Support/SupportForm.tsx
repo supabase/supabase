@@ -169,12 +169,16 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
     setUploadedDataUrls(updatedDataUrls)
   }
 
+  const [error, setError] = useState<string | null>(null);
   const onValidate = (values: any) => {
     const errors: any = {}
     if (!values.subject) errors.subject = 'Please add a subject heading'
     if (!values.message) errors.message = "Please add a message about the issue that you're facing"
     if (values.category === 'Problem' && values.library === 'no-library')
       errors.library = "Please select the library that you're facing issues with"
+    
+    setError(selectedServices.length === 0 ? 'Please select at least one service.' : null);
+
     return errors
   }
 
@@ -616,6 +620,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                           placeholder="No particular service"
                           searchPlaceholder="Search for a service"
                           onChange={setSelectedServices}
+                          error={error || undefined}
                         />
                       </div>
                     )}
