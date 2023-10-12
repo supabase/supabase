@@ -1016,6 +1016,7 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.inviteUserByEmail'
     notes: |
       - Sends an invite link to the user's email address.
+      - The `inviteUserByEmail()` method is typically used by administrators to invite users to join the application.
     examples:
       - id: invite-a-user
         name: Invite a user
