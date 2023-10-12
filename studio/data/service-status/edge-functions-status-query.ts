@@ -8,10 +8,7 @@ export type EdgeFunctionServiceStatusVariables = {
   projectRef?: string
 }
 
-export async function getEdgeFunctionServiceStatus(
-  { projectRef }: EdgeFunctionServiceStatusVariables,
-  signal?: AbortSignal
-) {
+export async function getEdgeFunctionServiceStatus(signal?: AbortSignal) {
   const res = await get(`https://obuldanrptloktxcffvn.supabase.co/functions/v1/health-check`, {
     signal,
   })
@@ -30,7 +27,7 @@ export const useEdgeFunctionServiceStatusQuery = <TData = EdgeFunctionServiceSta
 ) =>
   useQuery<EdgeFunctionServiceStatusData, EdgeFunctionServiceStatusError, TData>(
     serviceStatusKeys.edgeFunctions(projectRef),
-    ({ signal }) => getEdgeFunctionServiceStatus({ projectRef }, signal),
+    ({ signal }) => getEdgeFunctionServiceStatus(signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
       ...options,
