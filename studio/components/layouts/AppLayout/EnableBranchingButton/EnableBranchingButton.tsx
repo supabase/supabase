@@ -27,7 +27,7 @@ const EnableBranchingButton = ({ isNewNav = false }: EnableBranchingButtonProps)
       icon={<IconGitBranch strokeWidth={1.5} />}
       onClick={() => snap.setShowEnableBranchingModal(true)}
     >
-      Enable branching
+      Enable Branching
     </Button>
   )
 }

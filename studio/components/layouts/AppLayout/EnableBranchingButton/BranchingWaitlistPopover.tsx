@@ -20,15 +20,10 @@ const BranchingWaitlistPopover = ({ isNewNav = false }: BranchingWaitlistPopover
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
         <Button type={isNewNav ? 'default' : 'text'} icon={<IconGitBranch strokeWidth={1.5} />}>
-          Enable branching
+          Enable Branching
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_
-        align="start"
-        side="bottom"
-        className="space-y-4 w-80"
-        style={{ marginLeft: '-18px' }}
-      >
+      <PopoverContent_Shadcn_ align="start" side="bottom" className="space-y-4 w-80">
         <Badge color="scale">Alpha Testing</Badge>
         <div className="flex items-center space-x-2">
           <IconGitBranch strokeWidth={2} />
