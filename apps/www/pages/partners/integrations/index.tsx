@@ -7,7 +7,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import BecomeAPartner from '~/components/Partners/BecomeAPartner'
 import PartnerLinkBox from '~/components/Partners/PartnerLinkBox'
-import supabase from '~/lib/supabase'
+import supabase from '~/lib/supabaseMisc'
 import { Partner } from '~/types/partners'
 import TileGrid from '../../../components/Partners/TileGrid'
 
@@ -106,7 +106,7 @@ function IntegrationPartnersPage(props: Props) {
         <SectionContainer className="space-y-16">
           <div>
             <h1 className="h1">{meta_title}</h1>
-            <h2 className="text-scale-900 text-xl">{meta_description}</h2>
+            <p className="text-scale-900 text-xl">{meta_description}</p>
           </div>
           {/* Title */}
           <div className="grid space-y-12 md:gap-8 lg:grid-cols-12 lg:gap-16 lg:space-y-0 xl:gap-16">
@@ -120,7 +120,6 @@ function IntegrationPartnersPage(props: Props) {
                   icon={<IconSearch />}
                   placeholder="Search..."
                   type="text"
-                  // className="md:w-1/2"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   actions={
@@ -195,19 +194,6 @@ function IntegrationPartnersPage(props: Props) {
                     />
                   </div>
                 </div>
-                {/* <div className="flex flex-col space-y-1 sm:flex-row sm:space-y-0 sm:space-x-6">
-                  <Link href={`/partners/integrations`}>
-                    <a className="text-scale-1200">INTEGRATIONS</a>
-                  </Link>
-                  <Link href={`/partners/experts`}>
-                    <a className="transition-colors text-brand hover:text-brand-300">EXPERTS</a>
-                  </Link>
-                  <Link href={`/partners/integrations#become-a-partner`}>
-                    <a className="flex items-center space-x-1 transition-colors text-brand hover:text-brand-300">
-                      BECOME A PARTNER <IconArrowRight />
-                    </a>
-                  </Link>
-                </div> */}
               </div>
             </div>
             <div className="lg:col-span-8 xl:col-span-9">
@@ -216,14 +202,13 @@ function IntegrationPartnersPage(props: Props) {
                 {partners?.length ? (
                   <TileGrid partners={partners} />
                 ) : (
-                  <h2 className="h2">No Partners Found</h2>
+                  <p className="h2">No Partners Found</p>
                 )}
               </div>
             </div>
           </div>
-          {/* Become a partner form */}
         </SectionContainer>
-        <BecomeAPartner supabase={supabase} />
+        <BecomeAPartner />
       </DefaultLayout>
     </>
   )

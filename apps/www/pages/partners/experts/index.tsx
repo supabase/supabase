@@ -4,7 +4,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import BecomeAPartner from '~/components/Partners/BecomeAPartner'
 import PartnerLinkBox from '~/components/Partners/PartnerLinkBox'
-import supabase from '~/lib/supabase'
+import supabase from '~/lib/supabaseMisc'
 import { Partner } from '~/types/partners'
 import TileGrid from '../../../components/Partners/TileGrid'
 
@@ -56,7 +56,7 @@ function ExpertPartnersPage(props: Props) {
         <SectionContainer className="space-y-12">
           <div>
             <h1 className="h1">{meta_title}</h1>
-            <h2 className="text-scale-900 text-xl">{meta_description}</h2>
+            <p className="text-scale-900 text-xl">{meta_description}</p>
           </div>
           <div className="grid space-y-12 md:gap-8 lg:grid-cols-12 lg:gap-16 lg:space-y-0 xl:gap-16">
             <div className="lg:col-span-4 xl:col-span-3">
@@ -120,15 +120,14 @@ function ExpertPartnersPage(props: Props) {
                 {partners.length ? (
                   <TileGrid partners={partners} hideCategories={true} />
                 ) : (
-                  <h2 className="h2">No Partners Found</h2>
+                  <p className="h2">No Partners Found</p>
                 )}
               </div>
             </div>
           </div>
-
-          {/* Become a partner form */}
         </SectionContainer>
-        <BecomeAPartner supabase={supabase} />
+        {/* Become a partner form */}
+        <BecomeAPartner />
       </DefaultLayout>
     </>
   )

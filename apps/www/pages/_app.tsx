@@ -8,12 +8,15 @@ import { AppProps } from 'next/app'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { DefaultSeo } from 'next-seo'
-
+import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from 'lib/constants'
-import Meta from '~/components/Favicons'
 import { post } from '~/lib/fetchWrapper'
+import supabase from '~/lib/supabase'
+import { CommandMenuProvider } from 'ui'
 import PortalToast from 'ui/src/layout/PortalToast'
 import { AuthProvider, ThemeProvider, useConsent, useTelemetryProps } from 'common'
+
+import Meta from '~/components/Favicons'
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
@@ -89,18 +92,22 @@ export default function App({ Component, pageProps }: AppProps) {
           cardType: 'summary_large_image',
         }}
       />
-      <AuthProvider>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-          forcedTheme={forceDarkMode ? 'dark' : undefined}
-        >
-          <PortalToast />
-          <Component {...pageProps} />
-        </ThemeProvider>
-      </AuthProvider>
+      <SessionContextProvider supabaseClient={supabase}>
+        <AuthProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+            forcedTheme={forceDarkMode ? 'dark' : undefined}
+          >
+            <CommandMenuProvider site="website">
+              <PortalToast />
+              <Component {...pageProps} />
+            </CommandMenuProvider>
+          </ThemeProvider>
+        </AuthProvider>
+      </SessionContextProvider>
     </>
   )
 }
