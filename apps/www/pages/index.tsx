@@ -38,14 +38,11 @@ const Index = ({ customerStories, integrations }: Props) => {
 
 export async function getStaticProps() {
   const customerStories = getSortedPosts({ directory: '_customers', limit: 3 })
+
   const { data: integrations } = await supabase
     .from('partners')
     .select('*')
-    .eq('approved', true)
-    .eq('type', 'technology')
-    .order('category')
-    .order('title')
-    .limit(10)
+    .in('slug', content.integrations.featuredIntegrations)
 
   return {
     props: {

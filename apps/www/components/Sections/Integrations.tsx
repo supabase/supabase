@@ -37,8 +37,6 @@ const Integrations = ({ title, label, cta, integrations, experts }: Props) => {
 
     element.style.setProperty('--x', x + 'px')
     element.style.setProperty('--y', y + 'px')
-
-    console.log(x, y)
   }
 
   useEffect(() => {
@@ -105,19 +103,17 @@ const Integrations = ({ title, label, cta, integrations, experts }: Props) => {
                     <InteractiveShimmerCard
                       hasActiveOnHover
                       outerClassName="bg-transparent"
-                      innerClassName="px-6 py-6 flex flex-col justify-between h-full w-[230px] aspect-square"
+                      innerClassName="px-6 py-6 flex flex-col justify-between w-[230px] aspect-square"
                     >
                       <div className="flex gap-2 items-stretch">
-                        <div className="relative h-12 w-12 rounded-lg overflow-hidden transition-all group-hover:scale-110">
+                        <div className="relative min-h-12 h-12 w-12 min-w-12 rounded-lg overflow-hidden transition-all group-hover:scale-110 bg-surface-200">
                           <Image layout="fill" objectFit="cover" src={p.logo} alt={p.title} />
                         </div>
-                        <p className="text-scale-1100 m-0 bg-surface-200 rounded-lg flex items-center justify-center p-2 h-full grow text-base">
-                          {p.title}
-                        </p>
+                        <div className="bg-surface-200 rounded-lg flex items-center justify-center p-2 h-full grow text-sm">
+                          <p className="leading-[100%] text-scale-1100 m-0 w-min">{p.title}</p>
+                        </div>
                       </div>
-                      <p className="text-lighter text-sm line-clamp-2" title={p.description}>
-                        {p.description}
-                      </p>
+                      <p className="text-lighter text-sm line-clamp-2">{p.description}</p>
                     </InteractiveShimmerCard>
                   </a>
                 </Link>

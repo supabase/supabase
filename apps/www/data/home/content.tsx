@@ -56,5 +56,17 @@ export default {
         link: '/partners/experts',
       },
     },
+    featuredIntegrations: [
+      'clerk',
+      'cloudflare-workers',
+      'flutterflow',
+      'n8n',
+      'prisma',
+      'resend',
+      'retool',
+      'onesignal',
+      'vercel',
+      'zuplo',
+    ],
   },
 }
