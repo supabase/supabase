@@ -8,7 +8,19 @@ export const useParams = jest.fn().mockImplementation(() => ({ ref: '123' }))
 
 export const useLocalStorage = jest.fn().mockImplementation(() => [[], jest.fn()])
 
-export const useIsFeatureEnabled = jest.fn().mockImplementation(() => [])
+export const useIsFeatureEnabled = jest.fn().mockImplementation((arg) =>
+  typeof arg === 'string'
+    ? true
+    : new Proxy(
+        {},
+        {
+          get() {
+            // Always return true, regardless of the property name
+            return true
+          },
+        }
+      )
+)
 
 // mocks browser event listener adding/removing
 window.matchMedia = jest.fn().mockReturnValue({
