@@ -83,7 +83,7 @@ The maximum number of replication slots and WAL senders depends on your compute 
 
 <Admonition type="caution">
 
-As mentioned in the Postgres [documentation](https://postgresqlco.nf/doc/en/param/max_replication_slots/), setting `max_replication_slots` to a lower value than the current number of replication slots will prevent the server from starting. If you are downgrading your compute add-on, please ensure that you are using less slots than the maximum number of replication slots available for the new compute add-on.
+As mentioned in the Postgres [documentation](https://postgresqlco.nf/doc/en/param/max_replication_slots/), setting `max_replication_slots` to a lower value than the current number of replication slots will prevent the server from starting. If you are downgrading your compute add-on, please ensure that you are using fewer slots than the maximum number of replication slots available for the new compute add-on.
 
 </Admonition>
 
