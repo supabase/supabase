@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
-import { useFlag, useIsFeatureEnabled, useSelectedOrganization, useSelectedProject } from 'hooks'
+import { useFlag, useSelectedOrganization, useSelectedProject } from 'hooks'
 import FeedbackDropdown from '../ProjectLayout/LayoutHeader/FeedbackDropdown'
 import HelpPopover from '../ProjectLayout/LayoutHeader/HelpPopover'
 import NotificationsPopover from '../ProjectLayout/LayoutHeader/NotificationsPopover'
@@ -20,8 +20,6 @@ const AppHeader = () => {
   const organization = useSelectedOrganization()
   const enableBranchManagement = useFlag('branchManagement')
 
-  const projectCreationEnabled = useIsFeatureEnabled('projects:create')
-
   const isBranchingEnabled =
     project?.is_branch_enabled === true || project?.parent_project_ref !== undefined
 
@@ -37,7 +35,7 @@ const AppHeader = () => {
             />
           </a>
         </Link>
-        {projectCreationEnabled && <OrganizationDropdown isNewNav />}
+        <OrganizationDropdown isNewNav />
         {ref !== undefined && <ProjectDropdown isNewNav />}
         {ref !== undefined && enableBranchManagement && (
           <>

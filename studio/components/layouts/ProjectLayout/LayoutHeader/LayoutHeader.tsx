@@ -13,7 +13,7 @@ import {
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
-import { useFlag, useIsFeatureEnabled, useSelectedOrganization, useSelectedProject } from 'hooks'
+import { useFlag, useSelectedOrganization, useSelectedProject } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { Badge } from 'ui'
 import BreadcrumbsView from './BreadcrumbsView'
@@ -25,8 +25,6 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
   const { ref: projectRef } = useParams()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
-
-  const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
   const enableBranchManagement = useFlag('branchManagement')
 
@@ -87,7 +85,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
         {/* Organization is selected */}
         {projectRef && (
           <>
-            {projectCreationEnabled && <OrganizationDropdown />}
+            <OrganizationDropdown />
 
             {projectRef && (
               <>

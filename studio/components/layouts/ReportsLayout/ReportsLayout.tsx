@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
 import ProductMenu from 'components/ui/ProductMenu'
-import { useSelectedProject, withAuth } from 'hooks'
+import { useIsFeatureEnabled, useSelectedProject, withAuth } from 'hooks'
 import ProjectLayout from '../'
 import { useFlag } from 'hooks'
 
@@ -18,6 +18,9 @@ const ReportsLayout = ({ title, children }: PropsWithChildren<ReportsLayoutProps
   const ref = project?.ref ?? 'default'
 
   const storageReportFlag = useFlag('storageReport')
+
+  const storageEnabled = useIsFeatureEnabled('project_storage:all')
+
   const menuItems = [
     {
       title: '',
@@ -38,7 +41,7 @@ const ReportsLayout = ({ title, children }: PropsWithChildren<ReportsLayoutProps
           url: `/project/${ref}/reports/api-overview`,
           items: [],
         },
-        ...(storageReportFlag
+        ...(storageEnabled && storageReportFlag
           ? [
               {
                 name: 'Storage',
