@@ -21,6 +21,7 @@ export function deepFilterSections<T extends ICommonItem>(
       if ('items' in section) {
         const items = deepFilterSections(section.items, specFunctionIds)
 
+        // Only include this category (heading) if it has subitems
         if (items.length > 0) {
           return {
             ...section,
