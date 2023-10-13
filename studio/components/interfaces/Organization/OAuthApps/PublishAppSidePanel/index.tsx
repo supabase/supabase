@@ -378,7 +378,7 @@ const PublishAppSidePanel = ({
 
                 <Modal
                   hideFooter
-                  className="!w-[500px]"
+                  className="!max-w-[600px]"
                   visible={showPreview}
                   onCancel={() => setShowPreview(false)}
                 >
