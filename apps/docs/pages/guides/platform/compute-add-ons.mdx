@@ -62,6 +62,31 @@ If you need consistent disk performance, choose the 4XL or larger compute add-on
 
 If you're unsure of how much throughput or IOPS your application requires, you can load test your project and inspect these [metrics in the Dashboard](https://supabase.com/dashboard/project/_/reports). If the `Disk IO % consumed` stat is more than 1%, it indicates that your workload has burst beyond the baseline IO throughput during the day. If this metric goes to 100%, the workload has used up all available disk budget and will revert to baseline performance. Projects that use any disk budget are good candidates for upgrading to a larger compute add-on with higher baseline throughput.
 
+## Postgres Replication Slots and WAL Senders
+
+[Replication Slots](https://postgresqlco.nf/doc/en/param/max_replication_slots) and [WAL Senders](https://postgresqlco.nf/doc/en/param/max_wal_senders/) are used to enable [Postgres Replication](/docs/guides/database/replication).
+
+The maximum number of replication slots and WAL senders depends on your compute add-on plan, as follows:
+
+| Plan    | Max Replication Slots | Max WAL Senders |
+| ------- | --------------------- | --------------- |
+| Starter | 5                     | 5               |
+| Small   | 5                     | 5               |
+| Medium  | 5                     | 5               |
+| Large   | 8                     | 8               |
+| XL      | 24                    | 24              |
+| 2XL     | 80                    | 80              |
+| 4XL     | 80                    | 80              |
+| 8XL     | 80                    | 80              |
+| 12XL    | 80                    | 80              |
+| 16XL    | 80                    | 80              |
+
+<Admonition type="caution">
+
+As mentioned in the Postgres [documentation](https://postgresqlco.nf/doc/en/param/max_replication_slots/), setting `max_replication_slots` to a lower value than the current number of replication slots will prevent the server from starting. If you are downgrading your compute add-on, please ensure that you are using fewer slots than the maximum number of replication slots available for the new compute add-on.
+
+</Admonition>
+
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
 export default Page
