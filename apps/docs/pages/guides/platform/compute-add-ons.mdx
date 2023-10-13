@@ -64,9 +64,9 @@ If you're unsure of how much throughput or IOPS your application requires, you c
 
 ## Postgres Replication Slots and WAL Senders
 
-[Replication Slots](https://postgresqlco.nf/doc/en/param/max_replication_slots) and [WAL Senders](https://postgresqlco.nf/doc/en/param/max_wal_senders/) are used to enable Postgres Replication. Please refer to [Replication](/docs/guides/database/replication) for more information.
+[Replication Slots](https://postgresqlco.nf/doc/en/param/max_replication_slots) and [WAL Senders](https://postgresqlco.nf/doc/en/param/max_wal_senders/) are used to enable [Postgres Replication](/docs/guides/database/replication).
 
-The number of maximum replication slots and WAL senders available depends on your compute add-on plan, as following:
+The maximum number of replication slots and WAL senders depends on your compute add-on plan, as follows:
 
 | Plan    | Max Replication Slots | Max WAL Senders |
 | ------- | --------------------- | --------------- |
@@ -82,11 +82,9 @@ The number of maximum replication slots and WAL senders available depends on you
 | 16XL    | 80                    | 80              |
 
 <Admonition type="caution">
-  As mentioned on [documentation](https://postgresqlco.nf/doc/en/param/max_replication_slots/) for
-  `max_replication_slots`, setting it to a lower value than the number of currently existing
-  replication slots will prevent the server from starting. If you are downgrading your compute
-  add-on, please ensure that you are using less slots than the maximum number of replication slots
-  available for the new compute add-on.
+
+As mentioned in the Postgres [documentation](https://postgresqlco.nf/doc/en/param/max_replication_slots/), setting `max_replication_slots` to a lower value than the current number of replication slots will prevent the server from starting. If you are downgrading your compute add-on, please ensure that you are using less slots than the maximum number of replication slots available for the new compute add-on.
+
 </Admonition>
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
