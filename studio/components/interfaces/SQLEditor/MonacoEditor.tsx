@@ -100,6 +100,8 @@ const MonacoEditor = ({
     }
   }
 
+  // if an SQL query is passed by the content parameter, set the editor value to its content. This
+  // is usually used for sending the user to SQL editor from other pages with SQL.
   useEffect(() => {
     if (content && content.length > 0) {
       handleEditorChange(content)
