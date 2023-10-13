@@ -9,11 +9,12 @@ import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-or
 import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations/integrations-vercel-connections-create-mutation'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useSelectedOrganization } from 'hooks'
+import { useSelectedOrganization, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { EMPTY_ARR } from 'lib/void'
 import { SidePanel } from 'ui'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
+import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
 
 const VERCEL_ICON = (
   <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 512 512" className="w-6">
@@ -22,6 +23,7 @@ const VERCEL_ICON = (
 )
 
 const SidePanelVercelProjectLinker = () => {
+  const { ui } = useStore()
   const selectedOrganization = useSelectedOrganization()
   const sidePanelStateSnapshot = useSidePanelsStateSnapshot()
   const organizationIntegrationId = sidePanelStateSnapshot.vercelConnectionsIntegrationId
@@ -84,9 +86,22 @@ const SidePanelVercelProjectLinker = () => {
     [vercelProjectsById]
   )
 
+  const { mutateAsync: syncEnvs } = useIntegrationsVercelConnectionSyncEnvsMutation()
   const { mutate: createConnections, isLoading: isCreatingConnection } =
     useIntegrationVercelConnectionsCreateMutation({
-      onSuccess() {
+      async onSuccess({ id }) {
+        try {
+          await syncEnvs({ connectionId: id })
+        } catch (error) {
+          console.error('error:', error)
+
+          ui.setNotification({
+            category: 'error',
+            message: 'Failed to sync environment variables.',
+            description: 'Please try re-syncing manually from settings.',
+          })
+        }
+
         sidePanelStateSnapshot.setVercelConnectionsOpen(false)
       },
     })
