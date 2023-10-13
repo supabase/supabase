@@ -231,7 +231,8 @@ const AttributeUsage = ({
 
                 <div className="space-y-1">
                   <p className="text-sm">
-                    {attribute.chartPrefix || ''} {attribute.name} per day
+                    {attribute.chartPrefix || ''} {attribute.name}{' '}
+                    {attribute.chartSuffix || 'per day'}
                   </p>
                   {attribute.chartDescription.split('\n').map((paragraph, idx) => (
                     <p key={`para-${idx}`} className="text-sm text-foreground-light">

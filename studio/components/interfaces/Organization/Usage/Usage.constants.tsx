@@ -36,7 +36,8 @@ export interface CategoryAttribute {
     url: string
   }[]
   description: string
-  chartPrefix?: 'Max' | 'Average'
+  chartPrefix?: 'Max' | 'Average' | 'Cumulative'
+  chartSuffix?: string
   chartDescription: string
   additionalInfo?: (subscription?: OrgSubscription, usage?: OrgUsageResponse) => JSX.Element | null
 }
@@ -175,11 +176,13 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         key: PricingMetric.MONTHLY_ACTIVE_USERS,
         attributes: [{ key: PricingMetric.MONTHLY_ACTIVE_USERS.toLowerCase(), color: 'white' }],
         name: 'Monthly Active Users',
+        chartPrefix: 'Cumulative',
+        chartSuffix: 'in billing period',
         unit: 'absolute',
         description:
           'Users who log in or refresh their token count towards MAU.\nBilling is based on the sum of distinct users requesting your API throughout the billing period. Resets every billing cycle.',
         chartDescription:
-          'The data is refreshed over a period of 24 hours and resets at the beginning of every billing period.\nThe data points are relative to the beginning of your billing period.',
+          'The data is refreshed over a period of 24 hours and resets at the beginning of every billing period.\nThe data points are relative to the beginning of your billing period and will reset with your billing period.',
         links: [
           {
             name: 'Auth',
@@ -192,11 +195,13 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         key: PricingMetric.MONTHLY_ACTIVE_SSO_USERS,
         attributes: [{ key: PricingMetric.MONTHLY_ACTIVE_SSO_USERS.toLowerCase(), color: 'white' }],
         name: 'Monthly Active SSO Users',
+        chartPrefix: 'Cumulative',
+        chartSuffix: 'in billing period',
         unit: 'absolute',
         description:
           'SSO users who log in or refresh their token count towards SSO MAU.\nBilling is based on the sum of distinct Single Sign-On users requesting your API throughout the billing period. Resets every billing cycle.',
         chartDescription:
-          'The data refreshes over a period of 24 hours and resets at the beginning of every billing period.\nThe data points are relative to the beginning of your billing period.',
+          'The data refreshes over a period of 24 hours and resets at the beginning of every billing period.\nThe data points are relative to the beginning of your billing period and will reset with your billing period.',
         links: [
           {
             name: 'SSO with SAML 2.0',
@@ -211,11 +216,13 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
           { key: PricingMetric.STORAGE_IMAGES_TRANSFORMED.toLowerCase(), color: 'white' },
         ],
         name: 'Storage Image Transformations',
+        chartPrefix: 'Cumulative',
+        chartSuffix: 'in billing period',
         unit: 'absolute',
         description:
           'We count all images that were transformed in the billing period, ignoring any transformations.\nUsage example: You transform one image with four different size transformations and another image with just a single transformation. It counts as two, as only two images were transformed.\nBilling is based on the count of (origin) images that used transformations throughout the billing period. Resets every billing cycle.',
         chartDescription:
-          'The data refreshes every 24 hours.\nThe data points are relative to the beginning of your billing period.',
+          'The data refreshes every 24 hours.\nThe data points are relative to the beginning of your billing period and will reset with your billing period.',
         links: [
           {
             name: 'Documentation',
