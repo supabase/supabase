@@ -138,6 +138,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
     SMS_PROVIDER: 'twilio',
     SMS_TWILIO_ACCOUNT_SID: null,
     SMS_TWILIO_AUTH_TOKEN: null,
+    SMS_TWILIO_CONTENT_SID: null,
     SMS_TWILIO_MESSAGE_SERVICE_SID: null,
     SMS_TWILIO_VERIFY_ACCOUNT_SID: null,
     SMS_TWILIO_VERIFY_AUTH_TOKEN: null,

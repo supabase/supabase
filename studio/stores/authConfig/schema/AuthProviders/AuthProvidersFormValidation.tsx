@@ -116,6 +116,14 @@ const PROVIDER_PHONE = {
         matches: ['twilio'],
       },
     },
+    SMS_TWILIO_CONTENT_SID: {
+      type: 'string',
+      title: 'Twilio Content Sid (Optional, For WhatsApp Only)',
+      show: {
+        key: 'SMS_PROVIDER',
+        matches: ['twilio'],
+      },
+    },
 
     // Twilio Verify
     SMS_TWILIO_VERIFY_ACCOUNT_SID: {
