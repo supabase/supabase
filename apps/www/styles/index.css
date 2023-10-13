@@ -39,6 +39,13 @@ html {
   scroll-behavior: smooth !important;
 }
 
+/* Disable smooth scroll for FF, to fix not scrolling to top with next/link on page transitions */
+@-moz-document url-prefix() {
+  html {
+    scroll-behavior: auto !important;
+  }
+}
+
 body {
   @apply bg-scale-200;
   -webkit-font-smoothing: antialiased;
