@@ -511,7 +511,13 @@ export const auth = {
         {
           name: 'Native Mobile Login',
           url: '/guides/auth/native-mobile-login',
-          items: [...NativeMobileLoginItems],
+          items: [
+            ...NativeMobileLoginItems,
+            {
+              name: 'Deep Linking',
+              url: '/guides/auth/native-mobile-deep-linking',
+            },
+          ],
         },
         {
           name: 'Enterprise SSO',
@@ -1249,6 +1255,10 @@ export const platform: NavMenuConstant = {
         {
           name: 'Build a Supabase Integration',
           url: '/guides/platform/oauth-apps/build-a-supabase-integration',
+        },
+        {
+          name: 'OAuth Scopes',
+          url: '/guides/platform/oauth-apps/oauth-scopes',
         },
       ],
     },
