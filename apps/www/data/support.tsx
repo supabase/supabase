@@ -51,7 +51,7 @@ const data = {
           label: 'Join Discord',
           link: 'https://discord.supabase.com/',
           target: '_blank',
-          icon: <IconDiscord fill="hsl(var(--background-DEFAULT))" />,
+          icon: <IconDiscord fill="hsl(var(--background-alternative))" />,
           type: 'secondary',
         },
       ],
