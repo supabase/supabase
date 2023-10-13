@@ -6,15 +6,15 @@ import ProjectLinker, { ForeignProject } from 'components/interfaces/Integration
 import { Markdown } from 'components/interfaces/Markdown'
 import { vercelIcon } from 'components/to-be-cleaned/ListIcons'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
+import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
 import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations/integrations-vercel-connections-create-mutation'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { EMPTY_ARR } from 'lib/void'
-import { SidePanel } from 'ui'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
-import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
+import { SidePanel } from 'ui'
 
 const VERCEL_ICON = (
   <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 512 512" className="w-6">
