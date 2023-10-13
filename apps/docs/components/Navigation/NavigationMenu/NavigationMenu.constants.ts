@@ -511,7 +511,13 @@ export const auth = {
         {
           name: 'Native Mobile Login',
           url: '/guides/auth/native-mobile-login',
-          items: [...NativeMobileLoginItems],
+          items: [
+            ...NativeMobileLoginItems,
+            {
+              name: 'Deep Linking',
+              url: '/guides/auth/native-mobile-deep-linking',
+            },
+          ],
         },
         {
           name: 'Enterprise SSO',
