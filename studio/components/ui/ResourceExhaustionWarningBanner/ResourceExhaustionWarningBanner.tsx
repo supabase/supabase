@@ -82,7 +82,7 @@ const ResourceExhaustionWarningBanner = () => {
       ? undefined
       : metric === null
       ? '/project/[ref]/settings/[infra-path]'
-      : metric === 'disk_space'
+      : metric === 'disk_space' || metric === 'read_only'
       ? '/project/[ref]/settings/database'
       : `/project/[ref]/settings/[infra-path]#${metric}`
   )

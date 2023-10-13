@@ -1,6 +1,14 @@
 import { useParams, useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
-import { Input, Tabs } from 'ui'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconAlertTriangle,
+  Input,
+  Tabs,
+} from 'ui'
 
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -8,12 +16,19 @@ import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { pluckObjectFields } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
 import ResetDbPassword from './ResetDbPassword'
+import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 
 const DatabaseSettings = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const telemetryProps = useTelemetryProps()
+
   const { data, isLoading, isError } = useProjectSettingsQuery({ projectRef })
+  const { data: resourceWarnings } = useResourceWarningsQuery()
+
+  const isReadOnlyMode =
+    (resourceWarnings ?? [])?.find((warning) => warning.project === projectRef)
+      ?.is_readonly_mode_enabled ?? false
 
   if (isError) {
     return (
@@ -134,6 +149,18 @@ const DatabaseSettings = () => {
     <div className="space-y-10">
       <section className="space-y-6">
         <h3 className="text-foreground mb-2 text-xl">Database Settings</h3>
+
+        {isReadOnlyMode && (
+          <Alert_Shadcn_ variant="warning">
+            <IconAlertTriangle />
+            <AlertTitle_Shadcn_>Hello</AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>World</AlertDescription_Shadcn_>
+            <div className="mt-2">
+              <Button type="default">CTA</Button>
+            </div>
+          </Alert_Shadcn_>
+        )}
+
         <Panel
           title={
             <h5 key="panel-title" className="mb-0">
