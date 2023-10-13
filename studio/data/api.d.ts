@@ -829,6 +829,10 @@ export interface paths {
     /** Updates a project's health status. */
     put: operations["HealthReportingController_updateStatus"];
   };
+  "/system/projects/{ref}/ha-events": {
+    /** Records an HA event */
+    put: operations["HaEventsController_updateStatus"];
+  };
   "/system/projects/{ref}/credentials/aws": {
     /** Allows a project to obtain temporary credentials. */
     post: operations["AwsCredentialsController_getTemporaryCredentials"];
@@ -853,9 +857,21 @@ export interface paths {
     /** Previews the migration of the organization to the new org level billing. */
     post: operations["BillingMigrationController_preview"];
   };
+  "/system/billing/migrate/org-level-billing-attach": {
+    /** Attaches subscription id to org and projects. */
+    put: operations["BillingMigrationController_attachSubscriptionId"];
+  };
   "/system/projects/{ref}/config/update-jwt/complete": {
     /** Handle update project jwt on completion */
     post: operations["ProjectUpdateJwtController_completeUpdateJwt"];
+  };
+  "/system/projects": {
+    /** Create a project */
+    post: operations["ProjectsController_createProject"];
+  };
+  "/system/organizations/{slug}/usage": {
+    /** Gets usage stats */
+    get: operations["OrgUsageSystemController_getDailyStats"];
   };
   "/system/integrations/vercel/webhooks": {
     /** Processes Vercel event */
@@ -1498,6 +1514,10 @@ export interface paths {
     /** Disables project's readonly mode for the next 15 minutes */
     post: operations["ReadOnlyController_temporarilyDisableReadonlyMode"];
   };
+  "/v1/projects/{ref}/health": {
+    /** Gets project's service health status */
+    get: operations["ServiceHealthController_checkServiceHealth"];
+  };
   "/v1/projects/{ref}/config/database/postgres": {
     /** Gets project's Postgres config */
     get: operations["AuthPostgresConfigController_getConfig"];
@@ -1535,6 +1555,10 @@ export interface paths {
   "/v1/projects/{ref}/database/webhooks/enable": {
     /** Enables Database Webhooks on the project */
     post: operations["V1DatabaseWebhooksController_v1EnableDatabaseWebhooks"];
+  };
+  "/v1/projects/{ref}/database/backups/restore-pitr": {
+    /** Restores a PITR backup for a database */
+    post: operations["V1RestorePitrController_v1RestorePitr"];
   };
   "/v1/projects/{ref}/functions": {
     /**
@@ -1600,6 +1624,26 @@ export interface paths {
   "/v1/snippets/{id}": {
     /** Gets a specific SQL snippet */
     get: operations["SnippetsController_getSnippet"];
+  };
+  "/partners/flyio/callback": {
+    /** Redirects to Supabase dashboard after Fly sso with Gotrue */
+    get: operations["CallbackController_redirectToDashboardFlyioExtensionScreen"];
+  };
+  "/partners/flyio/extensions/{extension_id}": {
+    /** Gets database status */
+    get: operations["ExtensionController_getResourceStatus"];
+  };
+  "/partners/flyio/extensions/{extension_id}/sso": {
+    /** Starts Flyio single sign on */
+    get: operations["ExtensionController_startFlyioSSO"];
+  };
+  "/partners/flyio/extensions/{extension_id}/billing": {
+    /** Gets resource billing */
+    get: operations["ExtensionController_getResourceBilling"];
+  };
+  "/partners/flyio/extensions": {
+    /** Creates a database */
+    post: operations["ExtensionsController_provisionResource"];
   };
 }
 
@@ -1736,6 +1780,8 @@ export interface components {
       SMS_VONAGE_API_SECRET: string;
       SMS_VONAGE_FROM: string;
       SMS_TEMPLATE: string;
+      SMS_TEST_OTP: string;
+      SMS_TEST_OTP_VALID_UNTIL: string;
       EXTERNAL_APPLE_ENABLED: boolean;
       EXTERNAL_APPLE_CLIENT_ID: string;
       EXTERNAL_APPLE_SECRET: string;
@@ -1852,6 +1898,7 @@ export interface components {
       SMS_TEXTLOCAL_SENDER?: string;
       SMS_TWILIO_ACCOUNT_SID?: string;
       SMS_TWILIO_AUTH_TOKEN?: string;
+      SMS_TWILIO_CONTENT_SID?: string;
       SMS_TWILIO_MESSAGE_SERVICE_SID?: string;
       SMS_TWILIO_VERIFY_ACCOUNT_SID?: string;
       SMS_TWILIO_VERIFY_AUTH_TOKEN?: string;
@@ -1982,6 +2029,8 @@ export interface components {
       SMS_VONAGE_API_SECRET: string;
       SMS_VONAGE_FROM: string;
       SMS_TEMPLATE: string;
+      SMS_TEST_OTP: string;
+      SMS_TEST_OTP_VALID_UNTIL: string;
       EXTERNAL_APPLE_ENABLED: boolean;
       EXTERNAL_APPLE_CLIENT_ID: string;
       EXTERNAL_APPLE_SECRET: string;
@@ -3070,6 +3119,7 @@ export interface components {
       is_alpha_user: boolean;
       gotrue_id: string;
       free_project_limit: number;
+      disabled_features: ("organizations:create" | "organizations:delete" | "organization_members:create" | "organization_members:delete" | "projects:create" | "projects:transfer" | "project_auth:all" | "project_storage:all" | "project_edge_function:all" | "profile:update" | "billing:all")[];
     };
     UpdateProfileBody: {
       first_name: string;
@@ -3114,6 +3164,7 @@ export interface components {
        * @enum {string}
        */
       region: "us-east-1" | "us-west-1" | "us-west-2" | "ap-southeast-1" | "ap-northeast-1" | "ap-northeast-2" | "ap-southeast-2" | "eu-west-1" | "eu-west-2" | "eu-west-3" | "eu-central-1" | "ca-central-1" | "ap-south-1" | "sa-east-1";
+      /** @deprecated */
       kps_enabled?: boolean;
     };
     CreateProjectResponse: {
@@ -3244,9 +3295,6 @@ export interface components {
     };
     UpdateProjectBody: {
       name: string;
-    };
-    RestoreProjectBody: {
-      kps_enabled?: boolean;
     };
     BackupId: {
       id: number;
@@ -3997,6 +4045,10 @@ export interface components {
       value: string;
     };
     CreateSecretBody: {
+      /**
+       * @description Secret name must not start with the SUPABASE_ prefix. 
+       * @example string
+       */
       name: string;
       value: string;
     };
@@ -4004,6 +4056,11 @@ export interface components {
       /** @enum {string} */
       status: "ACTIVE_HEALTHY" | "ACTIVE_UNHEALTHY" | "COMING_UP" | "GOING_DOWN" | "INACTIVE" | "INIT_FAILED" | "REMOVED" | "RESTORING" | "UNKNOWN" | "UPGRADING" | "PAUSING";
       reportingToken: string;
+    };
+    EventBody: {
+      reportingToken: string;
+      eventType: string;
+      message: string;
     };
     CredentialsRequestBody: {
       projectToken: string;
@@ -4036,6 +4093,18 @@ export interface components {
       payment_method_id?: string;
       existing_org_subscription_id?: string;
       dryRun?: boolean;
+      force?: boolean;
+      billing_cycle_anchor?: string;
+    };
+    AttachSubscriptionIdBody: {
+      org_slug: string;
+      subscription_id: string;
+    };
+    DatabaseResponse: {
+      /** @description Database host */
+      host: string;
+      /** @description Database version */
+      version: string;
     };
     GetMetricsBody: {
       /** @enum {string} */
@@ -4077,12 +4146,6 @@ export interface components {
       git_branch?: string;
       created_at: string;
       updated_at: string;
-    };
-    DatabaseResponse: {
-      /** @description Database host */
-      host: string;
-      /** @description Database version */
-      version: string;
     };
     ApiKeyResponse: {
       name: string;
@@ -4191,6 +4254,28 @@ export interface components {
       override_enabled: boolean;
       override_active_until: string;
     };
+    AuthHealthResponse: {
+      name: string;
+      version: string;
+      description: string;
+    };
+    RestHealthResponse: {
+      title: string;
+      version: string;
+      description: string;
+    };
+    RealtimeHealthResponse: {
+      healthy: boolean;
+      db_connected: boolean;
+      connected_cluster: number;
+    };
+    ServiceHealthResponse: {
+      info?: components["schemas"]["AuthHealthResponse"] | components["schemas"]["RestHealthResponse"] | components["schemas"]["RealtimeHealthResponse"];
+      /** @enum {string} */
+      name: "auth" | "realtime" | "rest" | "storage";
+      healthy: boolean;
+      error?: string;
+    };
     V1PgbouncerConfigResponse: {
       /** @enum {string} */
       pool_mode?: "transaction" | "session" | "statement";
@@ -4296,6 +4381,9 @@ export interface components {
       created_at?: string;
       updated_at?: string;
     };
+    V1RestorePitrBody: {
+      recovery_time_target_unix: number;
+    };
     FunctionSlugResponse: {
       id: string;
       slug: string;
@@ -4377,6 +4465,71 @@ export interface components {
       owner: components["schemas"]["SnippetUser"];
       updated_by: components["schemas"]["SnippetUser"];
       content: components["schemas"]["SnippetContent"];
+    };
+    ResourceStatusResponse: {
+      /**
+       * @description Supabase project status 
+       * @example ACTIVE_HEALTHY 
+       * @enum {string}
+       */
+      status: "REMOVED" | "COMING_UP" | "INACTIVE" | "ACTIVE_HEALTHY" | "ACTIVE_UNHEALTHY" | "UNKNOWN" | "GOING_DOWN" | "INIT_FAILED" | "RESTORING" | "UPGRADING" | "PAUSING";
+    };
+    ResourceProvisioningBody: {
+      /** @description A UNIX epoch timestamp value */
+      timestamp: number;
+      /** @description A random unique string identifying the individual request */
+      nonce: string;
+      /** @description The full request target URL */
+      url: string;
+      /** @description Name of the extension */
+      name: string;
+      /** @description Unique ID representing the extension */
+      id: string;
+      /** @description Unique ID representing an organization */
+      organization_id: string;
+      /** @description Display name for an organization */
+      organization_name: string;
+      /** @description Obfuscated email that routes to all organization admins */
+      organization_email: string;
+      /** @description Obfuscated email that routes to the provisioning user */
+      user_email: string;
+      /** @description Unique ID representing an user */
+      user_id: string;
+      /** @description The three-letter, primary Fly.io region where the target app intends to write from */
+      primary_region: string;
+      /** @description An IPv6 address on the customer network assigned to this extension */
+      ip_address: string;
+      /**
+       * @description An array of Fly.io region codes where read replicas should be provisioned 
+       * @default []
+       */
+      read_regions: (string)[];
+      /** @description Database password (Optional, don't send to generate one) */
+      db_pass?: string;
+      user_name: string;
+    };
+    ResourceProvisioningConfigResponse: {
+      /**
+       * @description PSQL connection string 
+       * @example postgresql://postgres:dbpass@db.abcdefghijklmnop.supabase.co:5432/postgres
+       */
+      POSTGRES_URL: string;
+    };
+    ResourceProvisioningResponse: {
+      /** @description Supabase envs config */
+      config: components["schemas"]["ResourceProvisioningConfigResponse"];
+      /**
+       * @description The target Fly application for internal traffic 
+       * @example ext-db-pgshhamktpsgnptvcadw
+       */
+      fly_app_name: string;
+      /**
+       * @description Supabase project id 
+       * @example pgshhamktpsgnptvcadw
+       */
+      id: string;
+      /** @description Welcome message */
+      message: string;
     };
   };
   responses: never;
@@ -4811,11 +4964,7 @@ export interface operations {
       };
     };
     responses: {
-      201: {
-        content: {
-          "application/json": Record<string, never>;
-        };
-      };
+      201: never;
       /** @description Failed to restore project backup */
       500: never;
     };
@@ -4834,11 +4983,7 @@ export interface operations {
       };
     };
     responses: {
-      201: {
-        content: {
-          "application/json": Record<string, never>;
-        };
-      };
+      201: never;
       /** @description Failed to restore project with physical backup */
       500: never;
     };
@@ -4857,11 +5002,7 @@ export interface operations {
       };
     };
     responses: {
-      201: {
-        content: {
-          "application/json": Record<string, never>;
-        };
-      };
+      201: never;
       /** @description Failed to restore project to a previous point in time */
       500: never;
     };
@@ -7476,11 +7617,7 @@ export interface operations {
       };
     };
     responses: {
-      201: {
-        content: {
-          "application/json": Record<string, never>;
-        };
-      };
+      201: never;
       /** @description Failed to pause the project */
       500: never;
     };
@@ -7582,11 +7719,6 @@ export interface operations {
       path: {
         /** @description Project ref */
         ref: string;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["RestoreProjectBody"];
       };
     };
     responses: {
@@ -9179,6 +9311,25 @@ export interface operations {
       500: never;
     };
   };
+  /** Records an HA event */
+  HaEventsController_updateStatus: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["EventBody"];
+      };
+    };
+    responses: {
+      200: never;
+      /** @description Failed to record HA event. */
+      500: never;
+    };
+  };
   /** Allows a project to obtain temporary credentials. */
   AwsCredentialsController_getTemporaryCredentials: {
     parameters: {
@@ -9262,6 +9413,19 @@ export interface operations {
       500: never;
     };
   };
+  /** Attaches subscription id to org and projects. */
+  BillingMigrationController_attachSubscriptionId: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AttachSubscriptionIdBody"];
+      };
+    };
+    responses: {
+      200: never;
+      /** @description Failed to preview org billing organization */
+      500: never;
+    };
+  };
   /** Handle update project jwt on completion */
   ProjectUpdateJwtController_completeUpdateJwt: {
     parameters: {
@@ -9272,6 +9436,24 @@ export interface operations {
     };
     responses: {
       201: never;
+    };
+  };
+  /** Gets usage stats */
+  OrgUsageSystemController_getDailyStats: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["OrgUsageResponse"];
+        };
+      };
+      /** @description Failed to get usage stats */
+      500: never;
     };
   };
   /** Processes Vercel event */
@@ -9365,7 +9547,7 @@ export interface operations {
           "application/json": components["schemas"]["BranchDetailResponse"];
         };
       };
-      /** @description Failed to update database branch */
+      /** @description Failed to retrieve database branch */
       500: never;
     };
   };
@@ -10025,6 +10207,28 @@ export interface operations {
       500: never;
     };
   };
+  /** Gets project's service health status */
+  ServiceHealthController_checkServiceHealth: {
+    parameters: {
+      query: {
+        timeout_ms?: number;
+        services: ("auth" | "realtime" | "rest" | "storage")[];
+      };
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["ServiceHealthResponse"])[];
+        };
+      };
+      /** @description Failed to retrieve project's service health status */
+      500: never;
+    };
+  };
   /** Gets project's Postgres config */
   AuthPostgresConfigController_getConfig: {
     parameters: {
@@ -10274,6 +10478,23 @@ export interface operations {
       500: never;
     };
   };
+  /** Restores a PITR backup for a database */
+  V1RestorePitrController_v1RestorePitr: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["V1RestorePitrBody"];
+      };
+    };
+    responses: {
+      201: never;
+    };
+  };
   /**
    * Retrieve a function 
    * @description Retrieves a function with the specified slug and project.
@@ -10473,6 +10694,68 @@ export interface operations {
       };
       /** @description Failed to retrieve SQL snippet */
       500: never;
+    };
+  };
+  /** Redirects to Supabase dashboard after Fly sso with Gotrue */
+  CallbackController_redirectToDashboardFlyioExtensionScreen: {
+    responses: {
+      200: never;
+    };
+  };
+  /** Gets database status */
+  ExtensionController_getResourceStatus: {
+    parameters: {
+      path: {
+        extension_id: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["ResourceStatusResponse"];
+        };
+      };
+    };
+  };
+  /** Starts Flyio single sign on */
+  ExtensionController_startFlyioSSO: {
+    parameters: {
+      path: {
+        extension_id: string;
+      };
+    };
+    responses: {
+      200: never;
+    };
+  };
+  /** Gets resource billing */
+  ExtensionController_getResourceBilling: {
+    parameters: {
+      path: {
+        extension_id: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": Record<string, never>;
+        };
+      };
+    };
+  };
+  /** Creates a database */
+  ExtensionsController_provisionResource: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ResourceProvisioningBody"];
+      };
+    };
+    responses: {
+      201: {
+        content: {
+          "application/json": components["schemas"]["ResourceProvisioningResponse"];
+        };
+      };
     };
   };
 }
