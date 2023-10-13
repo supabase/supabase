@@ -69,8 +69,11 @@ Run `pg_dump --help` for a full list of options.
 
 <Admonition type="caution">
 
-- If you plan on migrating a database larger than 6 GB, we recommend [contacting support](https://supabase.com/dashboard/support/new) to ensure that you'll have the proper disk size pre-provisioned. You can read more about how the disk is managed on Supabase on the [Database usage](/docs/guides/platform/database-size#disk-management).
-- We also recommend upgrading to at least a [Large instance](/docs/guides/platform/compute-add-ons) for the migration (you can downgrade later) to avoid running out of IO-Budget.
+- If you're planning to migrate a database larger than 6 GB, we recommend [upgrading to at least a Large compute add-on](/docs/guides/platform/compute-add-ons). This will ensure you have the necessary resources to handle the migration efficiently.
+
+- For databases smaller than 150 GB, you can increase the size of the disk on paid projects by navigating to [Database Settings](/dashboard/project/_/settings/database).
+
+- If you're dealing with a database larger than 150 GB, we strongly advise you to [contact our support team](/dashboard/support/new) for assistance in provisioning the required resources and ensuring a smooth migration process.
 
 </Admonition>
 
