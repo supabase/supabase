@@ -113,7 +113,7 @@ const Integrations = ({ title, label, cta, integrations, experts }: Props) => {
                           <p className="leading-[100%] text-scale-1100 m-0 w-min">{p.title}</p>
                         </div>
                       </div>
-                      <p className="text-lighter text-sm line-clamp-2">{p.description}</p>
+                      <p className="text-lighter text-sm line-clamp-3">{p.description}</p>
                     </InteractiveShimmerCard>
                   </a>
                 </Link>
