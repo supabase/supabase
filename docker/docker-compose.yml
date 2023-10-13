@@ -132,7 +132,6 @@ services:
 
       GOTRUE_EXTERNAL_PHONE_ENABLED: ${ENABLE_PHONE_SIGNUP}
       GOTRUE_SMS_AUTOCONFIRM: ${ENABLE_PHONE_AUTOCONFIRM}
-      MFA_ENABLED: ${MFA_ENABLED}
 
   rest:
     container_name: supabase-rest
