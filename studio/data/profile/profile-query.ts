@@ -4,7 +4,7 @@ import { get } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { ResponseError } from 'types'
 import { profileKeys } from './keys'
-import { Feature, Profile } from './types'
+import { Profile } from './types'
 
 export type ProfileResponse = Profile
 

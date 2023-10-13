@@ -27,7 +27,7 @@ const ReportsLayout = ({ title, children }: PropsWithChildren<ReportsLayoutProps
       items: [
         {
           name: 'Custom reports',
-          key: '',
+          key: '[id]',
           url: `/project/${ref}/reports`,
           items: [],
         },
