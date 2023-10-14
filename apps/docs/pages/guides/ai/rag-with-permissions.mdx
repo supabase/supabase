@@ -76,7 +76,7 @@ where document_sections.embedding <#> embedding < -match_threshold
 order by document_sections.embedding <#> embedding;
 ```
 
-The above example only configures `select` access to users. If you wanted, you could create more RLS policies for inserts, updates, and deletes in order to apply the same permission logic for those other operations. See [Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security) for a more in-depth guide on RLS policies.
+The above example only configures `select` access to users. If you wanted, you could create more RLS policies for inserts, updates, and deletes in order to apply the same permission logic for those other operations. See [Row Level Security](/docs/guides/database/postgres/row-level-security) for a more in-depth guide on RLS policies.
 
 ## Alternative Scenarios
 
@@ -115,7 +115,7 @@ You may have an existing system that stores users, documents, and their permissi
 
 <Admonition>
 
-For data sources other than Postgres, see [Foreign Data Wrappers](https://supabase.com/docs/guides/database/extensions/wrappers/overview) for a list of external sources supported today. If your data lives in a source not provided in the list, please contact support and we’ll be happy to discuss your use case.
+For data sources other than Postgres, see [Foreign Data Wrappers](/docs/guides/database/extensions/wrappers/overview) for a list of external sources supported today. If your data lives in a source not provided in the list, please contact support and we’ll be happy to discuss your use case.
 
 </Admonition>
 
@@ -185,7 +185,7 @@ Since we’re managing users and authentication outside of Supabase, we have two
 
 #### Direct Postgres Connection
 
-You can directly connect to your Supabase Postgres DB using the [connection info](https://supabase.com/dashboard/project/_/settings/database) on your project’s database settings page. To use RLS with this method, we use a custom session variable that contains the current user’s ID:
+You can directly connect to your Supabase Postgres DB using the [connection info](/dashboard/project/_/settings/database) on your project’s database settings page. To use RLS with this method, we use a custom session variable that contains the current user’s ID:
 
 ```sql
 -- enable row level security
