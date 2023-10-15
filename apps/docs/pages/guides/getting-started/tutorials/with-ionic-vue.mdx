@@ -239,7 +239,7 @@ Let's create a new component for that called `Account.vue`.
         const toast = await toastController.create({ duration: 5000 })
         await loader.present()
         try {
-          let { data, error, status } = await supabase
+          const { data, error, status } = await supabase
             .from('profiles')
             .select(`username, website, avatar_url`)
             .eq('id', user.id)
@@ -274,7 +274,7 @@ Let's create a new component for that called `Account.vue`.
             updated_at: new Date(),
           }
           //
-          let { error } = await supabase.from('profiles').upsert(updates, {
+          const { error } = await supabase.from('profiles').upsert(updates, {
             returning: 'minimal', // Don't return the value after inserting
           })
           //
@@ -292,7 +292,7 @@ Let's create a new component for that called `Account.vue`.
         const toast = await toastController.create({ duration: 5000 })
         await loader.present()
         try {
-          let { error } = await supabase.auth.signOut()
+          const { error } = await supabase.auth.signOut()
           if (error) throw error
         } catch (error: any) {
           toast.message = error.message
@@ -472,7 +472,7 @@ Then create an **AvatarComponent**.
               .then((blob) => new File([blob], 'my-file', { type: `image/${photo.format}` }))
 
             const fileName = `${Math.random()}-${new Date().getTime()}.${photo.format}`
-            let { error: uploadError } = await supabase.storage
+            const { error: uploadError } = await supabase.storage
               .from('avatars')
               .upload(fileName, file)
             if (uploadError) {
