@@ -7,9 +7,7 @@ const botClient = new WebClient(slackBotToken);
 console.log(`Slack URL verification function up and running!`);
 serve(async (req) => {
   try {
-    const reqBody = await req.json();
-    console.log(JSON.stringify(reqBody, null, 2));
-    const { token, challenge, type, event } = reqBody;
+    const { token, challenge, type, event } = await req.json();
 
     if (type == 'url_verification') {
       return new Response(JSON.stringify({ challenge }), {
