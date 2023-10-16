@@ -141,7 +141,7 @@ async function getProfile() {
     loading.value = true
     const { user } = session.value
 
-    let { data, error, status } = await supabase
+    const { data, error, status } = await supabase
       .from('profiles')
       .select(`username, website, avatar_url`)
       .eq('id', user.id)
@@ -174,7 +174,7 @@ async function updateProfile() {
       updated_at: new Date(),
     }
 
-    let { error } = await supabase.from('profiles').upsert(updates)
+    const { error } = await supabase.from('profiles').upsert(updates)
 
     if (error) throw error
   } catch (error) {
@@ -187,7 +187,7 @@ async function updateProfile() {
 async function signOut() {
   try {
     loading.value = true
-    let { error } = await supabase.auth.signOut()
+    const { error } = await supabase.auth.signOut()
     if (error) throw error
   } catch (error) {
     alert(error.message)
@@ -313,7 +313,7 @@ const uploadAvatar = async (evt) => {
     const fileExt = file.name.split('.').pop()
     const filePath = `${Math.random()}.${fileExt}`
 
-    let { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file)
+    const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file)
 
     if (uploadError) throw uploadError
     emit('update:path', filePath)

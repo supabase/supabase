@@ -163,7 +163,7 @@ Update your `src/routes/+layout.svelte`:
 
 	export let data
 
-	let { supabase, session } = data
+	const { supabase, session } = data
 	$: ({ supabase, session } = data)
 
 	onMount(() => {
@@ -313,7 +313,7 @@ Create a new `src/routes/account/+page.svelte` file with the content below.
 	export let data
 	export let form
 
-	let { session, supabase, profile } = data
+	const { session, supabase, profile } = data
 	$: ({ session, supabase, profile } = data)
 
 	let profileForm: HTMLFormElement
@@ -517,7 +517,7 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
 			const fileExt = file.name.split('.').pop()
 			const filePath = `${Math.random()}.${fileExt}`
 
-			let { error } = await supabase.storage.from('avatars').upload(filePath, file)
+			const { error } = await supabase.storage.from('avatars').upload(filePath, file)
 
 			if (error) {
 				throw error
