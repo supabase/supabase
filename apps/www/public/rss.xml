@@ -5,9 +5,37 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Mon, 02 Oct 2023 22:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Mon, 09 Oct 2023 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/supabase-ai-content-storm</guid>
+  <title>AI ignites the rain: Content Storm is back</title>
+  <link>https://supabase.com/blog/supabase-ai-content-storm</link>
+  <description>We worked with dozens of content creators to drop a mountain of AI content simultaneously.</description>
+  <pubDate>Mon, 09 Oct 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/pgvector-vs-pinecone</guid>
+  <title>pgvector vs Pinecone: cost and performance</title>
+  <link>https://supabase.com/blog/pgvector-vs-pinecone</link>
+  <description>Direct performance comparison between pgvector and Pinecone.</description>
+  <pubDate>Mon, 09 Oct 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/react-native-offline-first-watermelon-db</guid>
+  <title>Offline-first React Native Apps with Expo, WatermelonDB, and Supabase</title>
+  <link>https://supabase.com/blog/react-native-offline-first-watermelon-db</link>
+  <description>Store your data locally and sync it with Postgres using WatermelonDB!</description>
+  <pubDate>Sat, 07 Oct 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/beta-update-september-2023</guid>
+  <title>Supabase Beta September 2023</title>
+  <link>https://supabase.com/blog/beta-update-september-2023</link>
+  <description>September was packed with so many new features and releases that it might have seemed like another Launch Week, but it wasn&apos;t!</description>
+  <pubDate>Tue, 03 Oct 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/postgres-dynamic-table-partitioning</guid>
   <title>Dynamic Table Partitioning in Postgres</title>
   <link>https://supabase.com/blog/postgres-dynamic-table-partitioning</link>

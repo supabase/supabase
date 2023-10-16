@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { IconLinkedinSolid, IconTwitterX, IconYCombinator } from 'ui'
 
 const ShareArticleActions = ({ title, slug }: { title: string; slug: string }) => (
   <div className="mt-4 flex items-center space-x-4">
@@ -7,18 +8,7 @@ const ShareArticleActions = ({ title, slug }: { title: string; slug: string }) =
       href={`https://twitter.com/share?text=${title}&url=https://supabase.com/blog/${slug}`}
     >
       <a target="_blank" className="text-scale-900 hover:text-scale-1200">
-        <svg
-          height="26"
-          width="26"
-          viewBox="-89 -46.8 644 446.8"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="currentColor"
-        >
-          <path
-            d="m154.729 400c185.669 0 287.205-153.876 287.205-287.312 0-4.37-.089-8.72-.286-13.052a205.304 205.304 0 0 0 50.352-52.29c-18.087 8.044-37.55 13.458-57.968 15.899 20.841-12.501 36.84-32.278 44.389-55.852a202.42 202.42 0 0 1 -64.098 24.511c-18.42-19.628-44.644-31.904-73.682-31.904-55.744 0-100.948 45.222-100.948 100.965 0 7.925.887 15.631 2.619 23.025-83.895-4.223-158.287-44.405-208.074-105.504a100.739 100.739 0 0 0 -13.668 50.754c0 35.034 17.82 65.961 44.92 84.055a100.172 100.172 0 0 1 -45.716-12.63c-.015.424-.015.837-.015 1.29 0 48.903 34.794 89.734 80.982 98.986a101.036 101.036 0 0 1 -26.617 3.553c-6.493 0-12.821-.639-18.971-1.82 12.851 40.122 50.115 69.319 94.296 70.135-34.549 27.089-78.07 43.224-125.371 43.224a204.9 204.9 0 0 1 -24.078-1.399c44.674 28.645 97.72 45.359 154.734 45.359"
-            fillRule="nonzero"
-          />
-        </svg>
+        <IconTwitterX size={24} />
       </a>
     </Link>
 
@@ -27,15 +17,7 @@ const ShareArticleActions = ({ title, slug }: { title: string; slug: string }) =
       href={`https://www.linkedin.com/shareArticle?url=https://supabase.com/blog/${slug}&title=${title}`}
     >
       <a target="_blank" className="text-scale-900 hover:text-scale-1200">
-        <svg
-          width="20"
-          height="20"
-          viewBox="0 5 1036 990"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="currentColor"
-        >
-          <path d="M0 120c0-33.334 11.667-60.834 35-82.5C58.333 15.833 88.667 5 126 5c36.667 0 66.333 10.666 89 32 23.333 22 35 50.666 35 86 0 32-11.333 58.666-34 80-23.333 22-54 33-92 33h-1c-36.667 0-66.333-11-89-33S0 153.333 0 120zm13 875V327h222v668H13zm345 0h222V622c0-23.334 2.667-41.334 8-54 9.333-22.667 23.5-41.834 42.5-57.5 19-15.667 42.833-23.5 71.5-23.5 74.667 0 112 50.333 112 151v357h222V612c0-98.667-23.333-173.5-70-224.5S857.667 311 781 311c-86 0-153 37-201 111v2h-1l1-2v-95H358c1.333 21.333 2 87.666 2 199 0 111.333-.667 267.666-2 469z" />
-        </svg>
+        <IconLinkedinSolid size={24} />
       </a>
     </Link>
     <Link
@@ -43,20 +25,7 @@ const ShareArticleActions = ({ title, slug }: { title: string; slug: string }) =
       href={`https://news.ycombinator.com/submitlink?u=https://supabase.com/blog/${slug}&t=${title}`}
     >
       <a target="_blank" className="text-scale-900 hover:text-scale-1200">
-        <svg
-          width="23"
-          height="23"
-          viewBox="0 0 23 23"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            fillRule="evenodd"
-            clipRule="evenodd"
-            d="M0.703125 0.878906H22.7031V22.8789H0.703125V0.878906ZM7.1522 6.23109L10.9656 13.3445V17.9644H12.4322V13.4177L16.2455 6.23109H14.6322L12.4322 10.7044C12.2855 10.9244 12.1389 11.1444 12.0656 11.3644C12.0233 11.5332 11.9568 11.6534 11.894 11.767C11.8477 11.8508 11.8033 11.931 11.7722 12.0244C11.7355 11.9877 11.7171 11.9327 11.6988 11.8776C11.6805 11.8227 11.6622 11.7677 11.6255 11.731C11.5888 11.6577 11.5704 11.6026 11.5521 11.5475C11.5338 11.4926 11.5155 11.4376 11.4789 11.3644V11.2911L11.4055 11.2177C11.3775 11.1617 11.3602 11.1164 11.3454 11.0777C11.3215 11.015 11.3042 10.9697 11.2589 10.9244C11.1855 10.8511 11.1122 10.7777 11.1122 10.7044L8.9122 6.23109H7.1522Z"
-            fill="currentColor"
-          />
-        </svg>
+        <IconYCombinator size={24} />
       </a>
     </Link>
   </div>
