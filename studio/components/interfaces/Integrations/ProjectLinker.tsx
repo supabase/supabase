@@ -80,7 +80,7 @@ const ProjectLinker = ({
     defaultSupabaseProjectRef
   )
   useEffect(() => {
-    if (defaultSupabaseProjectRef !== undefined && supabaseProjectRef == undefined)
+    if (defaultSupabaseProjectRef !== undefined && supabaseProjectRef === undefined)
       setSupabaseProjectRef(defaultSupabaseProjectRef)
   }, [defaultSupabaseProjectRef, supabaseProjectRef])
 
