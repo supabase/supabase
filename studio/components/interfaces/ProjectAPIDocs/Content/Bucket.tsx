@@ -8,7 +8,7 @@ import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
 import ResourceContent from '../ResourceContent'
 import { ContentProps } from './Content.types'
 
-const Bucket = ({ language }: ContentProps) => {
+const Bucket = ({ language, apikey, endpoint }: ContentProps) => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
   const { data } = useBucketsQuery({ projectRef: ref })
@@ -51,6 +51,8 @@ const Bucket = ({ language }: ContentProps) => {
         snippet={DOCS_RESOURCE_CONTENT.uploadFile}
         codeSnippets={DOCS_RESOURCE_CONTENT.uploadFile.code({
           name: resource,
+          apikey,
+          endpoint,
         })}
       />
       <ResourceContent
@@ -58,6 +60,8 @@ const Bucket = ({ language }: ContentProps) => {
         snippet={DOCS_RESOURCE_CONTENT.deleteFiles}
         codeSnippets={DOCS_RESOURCE_CONTENT.deleteFiles.code({
           name: resource,
+          apikey,
+          endpoint,
         })}
       />
       <ResourceContent
@@ -65,6 +69,8 @@ const Bucket = ({ language }: ContentProps) => {
         snippet={DOCS_RESOURCE_CONTENT.listFiles}
         codeSnippets={DOCS_RESOURCE_CONTENT.listFiles.code({
           name: resource,
+          apikey,
+          endpoint,
         })}
       />
       <ResourceContent
@@ -72,6 +78,8 @@ const Bucket = ({ language }: ContentProps) => {
         snippet={DOCS_RESOURCE_CONTENT.downloadFile}
         codeSnippets={DOCS_RESOURCE_CONTENT.downloadFile.code({
           name: resource,
+          apikey,
+          endpoint,
         })}
       />
       {bucket.public ? (
@@ -80,6 +88,8 @@ const Bucket = ({ language }: ContentProps) => {
           snippet={DOCS_RESOURCE_CONTENT.retrievePublicURL}
           codeSnippets={DOCS_RESOURCE_CONTENT.retrievePublicURL.code({
             name: resource,
+            apikey,
+            endpoint,
           })}
         />
       ) : (
@@ -88,6 +98,8 @@ const Bucket = ({ language }: ContentProps) => {
           snippet={DOCS_RESOURCE_CONTENT.createSignedURL}
           codeSnippets={DOCS_RESOURCE_CONTENT.createSignedURL.code({
             name: resource,
+            apikey,
+            endpoint,
           })}
         />
       )}
