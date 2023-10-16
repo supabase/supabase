@@ -10,8 +10,19 @@ export type TableColumn = {
   columns: any[]
 }
 
-export const getTableColumnsQuery = (table?: string) => {
+export const getTableColumnsQuery = (table?: string, schema?: string) => {
+  const conditions = []
+  if (table) {
+    conditions.push(`tablename = '${table}'`)
+  }
+  if (schema) {
+    conditions.push(`schemaname = '${schema}'`)
+  }
+
+  const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+
   const sql = /* SQL */ `
+  
   SELECT
     tbl.schemaname,
     tbl.tablename,
@@ -67,7 +78,7 @@ export const getTableColumnsQuery = (table?: string) => {
       AND NOT a.attisdropped
       AND has_column_privilege(tbl.quoted_name, a.attname, 'SELECT, INSERT, UPDATE, REFERENCES')
     )
-  ${table !== undefined ? `WHERE tablename = '${table}'` : ''}
+  ${whereClause}
   GROUP BY schemaname, tablename, quoted_name, is_table;
 `.trim()
 
@@ -78,21 +89,23 @@ export type TableColumnsVariables = {
   projectRef?: string
   connectionString?: string
   table?: string
+  schema?: string;
 }
 
 export type TableColumnsData = { result: TableColumn[] }
 export type TableColumnsError = unknown
 
 export const useTableColumnsQuery = <TData extends TableColumnsData = TableColumnsData>(
-  { projectRef, connectionString, table }: TableColumnsVariables,
+  { projectRef, connectionString, table, schema }: TableColumnsVariables,
   options: UseQueryOptions<ExecuteSqlData, TableColumnsError, TData> = {}
 ) => {
+
   return useExecuteSqlQuery(
     {
       projectRef,
       connectionString,
-      sql: getTableColumnsQuery(table),
-      queryKey: ['table-columns', table],
+      sql: getTableColumnsQuery(table, schema),
+      queryKey: ['table-columns', schema, table],
     },
     options
   )

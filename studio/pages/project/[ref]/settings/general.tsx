@@ -7,7 +7,7 @@ import {
 } from 'components/interfaces/Settings/General'
 import { SettingsLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useFlag, useSelectedOrganization } from 'hooks'
+import { useFlag, useIsFeatureEnabled, useSelectedOrganization } from 'hooks'
 import { NextPageWithLayout } from 'types'
 
 const ProjectSettings: NextPageWithLayout = () => {
@@ -15,7 +15,9 @@ const ProjectSettings: NextPageWithLayout = () => {
   const organization = useSelectedOrganization()
   const isBranch = !!project?.parent_project_ref
   const isOrgBilling = !!organization?.subscription_id
-  const transferProjectEnabled = useFlag('transferProject')
+  const transferProjectEnabledFlag = useFlag('transferProject')
+  const { projectsTransfer: projectTransferEnabled, billingAll: billingEnabled } =
+    useIsFeatureEnabled(['projects:transfer', 'billing:all'])
 
   // [Joshen] Opting for larger gap instead of gap-8 as compared to other pages for better grouping of content
   return (
@@ -24,8 +26,8 @@ const ProjectSettings: NextPageWithLayout = () => {
       {!isBranch ? (
         <>
           {!isOrgBilling && <Infrastructure />}
-          {<CustomDomainConfig />}
-          {transferProjectEnabled && <TransferProjectPanel />}
+          {billingEnabled && <CustomDomainConfig />}
+          {projectTransferEnabled && transferProjectEnabledFlag && <TransferProjectPanel />}
           <DeleteProjectPanel />
         </>
       ) : null}
