@@ -146,7 +146,7 @@ const Account: Component<Props> = ({ session }) => {
       setLoading(true)
       const { user } = session
 
-      let { data, error, status } = await supabase
+      const { data, error, status } = await supabase
         .from('profiles')
         .select(`username, website, avatar_url`)
         .eq('id', user.id)
@@ -185,7 +185,7 @@ const Account: Component<Props> = ({ session }) => {
         updated_at: new Date().toISOString(),
       }
 
-      let { error } = await supabase.from('profiles').upsert(updates)
+      const { error } = await supabase.from('profiles').upsert(updates)
 
       if (error) {
         throw error
@@ -336,7 +336,7 @@ const Avatar: Component<Props> = (props) => {
       const fileName = `${Math.random()}.${fileExt}`
       const filePath = `${fileName}`
 
-      let { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file)
+      const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file)
 
       if (uploadError) {
         throw uploadError

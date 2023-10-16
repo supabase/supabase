@@ -276,7 +276,7 @@ export default function Account({ session }: { session: Session }) {
       setLoading(true)
       if (!session?.user) throw new Error('No user on the session!')
 
-      let { data, error, status } = await supabase
+      const { data, error, status } = await supabase
         .from('profiles')
         .select(`username, website, avatar_url`)
         .eq('id', session?.user.id)
@@ -320,7 +320,7 @@ export default function Account({ session }: { session: Session }) {
         updated_at: new Date(),
       }
 
-      let { error } = await supabase.from('profiles').upsert(updates)
+      const { error } = await supabase.from('profiles').upsert(updates)
 
       if (error) {
         throw error
@@ -501,7 +501,7 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
       const fileExt = file.name.split('.').pop()
       const filePath = `${Math.random()}.${fileExt}`
 
-      let { error } = await supabase.storage.from('avatars').upload(filePath, formData)
+      const { error } = await supabase.storage.from('avatars').upload(filePath, formData)
 
       if (error) {
         throw error
