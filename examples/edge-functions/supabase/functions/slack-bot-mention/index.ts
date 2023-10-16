@@ -19,7 +19,7 @@ serve(async (req) => {
       });
     } else if (event.type == 'app_mention') {
       const { user, text, channel, ts } = event;
-      //Here you should process the text recieved and return a response:
+      //Here you should process the text received and return a response:
       const response = await bot_client.chat.postMessage({
         channel: channel,
         text: `Hello <@${user}>!`,
