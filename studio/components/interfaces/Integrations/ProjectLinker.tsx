@@ -88,7 +88,7 @@ const ProjectLinker = ({
     defaultForeignProjectId
   )
   useEffect(() => {
-    if (defaultForeignProjectId !== undefined && foreignProjectId == undefined)
+    if (defaultForeignProjectId !== undefined && foreignProjectId === undefined)
       setForeignProjectId(defaultForeignProjectId)
   }, [defaultForeignProjectId, foreignProjectId])
 
