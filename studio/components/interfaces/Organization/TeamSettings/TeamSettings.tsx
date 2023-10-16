@@ -1,31 +1,34 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useState } from 'react'
-import { Button, IconSearch, Input } from 'ui'
 
 import { useParams } from 'common/hooks'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import { useOrganizationDetailQuery } from 'data/organizations/organization-detail-query'
-import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
-import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useSelectedOrganization, useStore } from 'hooks'
-import { delete_, isResponseOk } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import { useProfile } from 'lib/profile'
-import InviteMemberButton from './InviteMemberButton'
-import MembersView from './MembersView'
-import { hasMultipleOwners, useGetRolesManagementPermissions } from './TeamSettings.utils'
 import {
+  ScaffoldActionsContainer,
   ScaffoldActionsGroup,
   ScaffoldContainerLegacy,
   ScaffoldFilterAndContent,
-  ScaffoldActionsContainer,
   ScaffoldSectionContent,
 } from 'components/layouts/Scaffold'
+import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { useOrganizationDetailQuery } from 'data/organizations/organization-detail-query'
 import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
+import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
+import { usePermissionsQuery } from 'data/permissions/permissions-query'
+import { useIsFeatureEnabled, useSelectedOrganization, useStore } from 'hooks'
+import { useProfile } from 'lib/profile'
+import { Button, IconSearch, Input } from 'ui'
+import InviteMemberButton from './InviteMemberButton'
+import MembersView from './MembersView'
+import { hasMultipleOwners, useGetRolesManagementPermissions } from './TeamSettings.utils'
 
 const TeamSettings = () => {
   const { ui } = useStore()
   const { slug } = useParams()
+
+  const {
+    organizationMembersCreate: organizationMembersCreationEnabled,
+    organizationMembersDelete: organizationMembersDeletionEnabled,
+  } = useIsFeatureEnabled(['organization_members:create', 'organization_members:delete'])
 
   const { profile } = useProfile()
   const selectedOrganization = useSelectedOrganization()
@@ -91,48 +94,54 @@ const TeamSettings = () => {
             placeholder="Filter members"
           />
           <ScaffoldActionsGroup>
-            {canAddMembers && profile !== undefined && selectedOrganization !== undefined && (
+            {organizationMembersCreationEnabled &&
+              canAddMembers &&
+              profile !== undefined &&
+              selectedOrganization !== undefined && (
+                <div>
+                  <InviteMemberButton
+                    orgId={selectedOrganization.id}
+                    userId={profile.id}
+                    members={members}
+                    roles={roles}
+                    rolesAddable={rolesAddable}
+                  />
+                </div>
+              )}
+            {/* if organizationMembersDeletionEnabled is false, you also can't delete yourself */}
+            {organizationMembersDeletionEnabled && (
               <div>
-                <InviteMemberButton
-                  orgId={selectedOrganization.id}
-                  userId={profile.id}
-                  members={members}
-                  roles={roles}
-                  rolesAddable={rolesAddable}
-                />
+                <Tooltip.Root delayDuration={0}>
+                  <Tooltip.Trigger>
+                    <Button
+                      type="default"
+                      disabled={!canLeave}
+                      onClick={() => leaveTeam()}
+                      loading={isLeaving}
+                    >
+                      Leave team
+                    </Button>
+                  </Tooltip.Trigger>
+                  {!canLeave && (
+                    <Tooltip.Portal>
+                      <Tooltip.Content side="bottom">
+                        <Tooltip.Arrow className="radix-tooltip-arrow" />
+                        <div
+                          className={[
+                            'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                            'border border-scale-200',
+                          ].join(' ')}
+                        >
+                          <span className="text-xs text-foreground">
+                            An organization requires at least 1 owner
+                          </span>
+                        </div>
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  )}
+                </Tooltip.Root>
               </div>
             )}
-            <div>
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
-                  <Button
-                    type="default"
-                    disabled={!canLeave}
-                    onClick={() => leaveTeam()}
-                    loading={isLeaving}
-                  >
-                    Leave team
-                  </Button>
-                </Tooltip.Trigger>
-                {!canLeave && (
-                  <Tooltip.Portal>
-                    <Tooltip.Content side="bottom">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                          'border border-scale-200',
-                        ].join(' ')}
-                      >
-                        <span className="text-xs text-foreground">
-                          An organization requires at least 1 owner
-                        </span>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Portal>
-                )}
-              </Tooltip.Root>
-            </div>
           </ScaffoldActionsGroup>
         </ScaffoldActionsContainer>
         <ScaffoldSectionContent className="w-full">
