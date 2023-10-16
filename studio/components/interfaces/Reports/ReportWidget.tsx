@@ -111,9 +111,9 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
       </Panel.Content>
 
       {props.append && (
-        <div className="p-px">
+        <>
           {props.append({ ...props, ...(props.appendProps || {}), router, projectRef })}
-        </div>
+        </>
       )}
     </Panel>
   )
