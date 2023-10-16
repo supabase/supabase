@@ -1,16 +1,18 @@
-import { toast } from 'react-hot-toast'
+import { OAuthScope } from '@supabase/shared-types/out/constants'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
 
 import { post } from 'lib/common/fetch'
 import { API_ADMIN_URL } from 'lib/constants'
-import { oauthAppKeys } from './keys'
 import { ResponseError } from 'types'
+import { oauthAppKeys } from './keys'
 
 export type OAuthAppCreateVariables = {
   slug: string
   name: string
   website: string
   icon?: string
+  scopes?: OAuthScope[]
   redirect_uris: string[]
 }
 
@@ -25,12 +27,14 @@ export async function createOAuthApp({
   name,
   website,
   icon,
+  scopes,
   redirect_uris,
 }: OAuthAppCreateVariables) {
   const response = await post(`${API_ADMIN_URL}/organizations/${slug}/oauth/apps`, {
     name,
     website,
     icon,
+    scopes,
     redirect_uris,
   })
   if (response.error) throw response.error
