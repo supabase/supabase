@@ -10,63 +10,105 @@ To enable Azure (Microsoft) Auth for your project, you need to set up an Azure O
 
 ## Overview
 
-Azure OAuth consists of four broad steps:
+Setting up OAuth with Azure consists of four broad steps:
 
-- Create an application under Azure Active Directory.
-- Obtain a `Application (client) ID` with “Sign In with Azure” capabilities. This will be used as the `client id`.
-- Create a `Secret ID` with “Sign In with Azure” capabilities. The value of the secret will be used as the `client secret`.
-- Add the callback url of your application to the allowlist.
+- Create an OAuth application under Azure Entra ID.
+- Add a secret to the application.
+- Add the Supabase Auth callback URL to the allowlist in the OAuth application in Azure.
+- Configure the client ID and secret of the OAuth application within the Supabase Auth dashboard.
 
 ## Access your Azure Developer account
 
 - Go to [portal.azure.com](https://portal.azure.com/#home).
-- Login and select "Azure Active Directory" under the list of Azure Services.
+- Login and select Microsoft Entra ID under the list of Azure Services.
 
 ## Register an application
 
-- Under Azure Active Directory, select "App registrations" in the side panel.
-- Select "New registration".
+- Under Microsoft Entra ID, select _App registrations_ in the side panel and select _New registration._
 - Choose a name and select your preferred option for the supported account types.
-- Specify the "Redirect URI".
-- The redirect / callback URI should look like this: `https://<project-ref>.supabase.co/auth/v1/callback`
-- Click "Register" at the bottom of the form.
+- Specify a _Web_ _Redirect URI_. It should should look like this: `https://<project-ref>.supabase.co/auth/v1/callback`
+- Finally, select _Register_ at the bottom of the screen.
 
 ![Register an application.](/docs/img/guides/auth-azure/azure-register-app.png)
 
-## Obtain a Client ID
+## Obtain a Client ID and Secret
 
-This will serve as the `client_id` when you make API calls to authenticate the user.
+- Once your app has been registered, the client ID can be found under the [list of app registrations](https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps) under the column titled _Application (client) ID_.
+- You can also find it in the app overview screen.
+- Place the Client ID in the Azure configuration screen in the Supabase AUth dashboard.
 
-- Once your app has been registered, the client id can be found under the [list of app registrations](https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps) under the column titled "Application (client) ID".
+![Obtain the client ID](/docs/img/guides/auth-azure/azure-client-id.png)
 
-![Obtain the client id](/docs/img/guides/auth-azure/azure-client-id.png)
-
-## Obtain a Secret ID
-
-This will serve as the `client_secret` when you make API calls to authenticate the user.
-
-- Click on the name of the app registered above.
-- Under "Essentials", click on "Client credentials".
-- Navigate to the "Client secrets" tab and select "New client secret".
-- Enter a description and choose your preferred expiry for the secret.
-- Once the secret is generated, save the `value` (not the secret ID).
+- Select _Add a certificate or secret_ in the app overview screen and open the _Client secrets_ tab.
+- Select _New client secret_ to create a new client secret.
+- Choose a preferred expiry time of the secret. Make sure you record this in your calendar days in advance so you have enough time to create a new one without suffering from any downtime.
+- Once the secret is generated place the _Value_ column (not _Secret ID_) in the Azure configuration screen in the Supabase Auth dashboard.
 
 ![Obtain the client secret](/docs/img/guides/auth-azure/azure-client-secret.png)
 
-## Obtain the Tenant URL (Optional)
+## Guarding Against Unverified Email Domains
 
-The default tenant url is `https://login.microsoftonline.com/common`. This will allow users with personal Azure accounts as well as with Azure work accounts, other than that of your own organization, to sign in to your app. This is set by default in Supabase and you can leave the `Azure Tenant URL` field blank in your provider settings.
+Microsoft Entra ID had a vulnerability that allowed tenants to configure any email address for their users without verification. This property could be used to gain access to already existing user accounts in Supabase Auth when a multi-tenant OAuth application was registered and Login with Azure was active.
 
-If you want to allow users from **your Azure organization only** to be able to log in to you app
+Supabase Auth projects _are only affected if_:
 
-- Select the Directory (Tenant) ID value
-- Set the tenant URL in your Supabase Azure Provider settings to `https://login.microsoftonline.com/<tenant-id>`
+- You use a single-tenant OAuth application
+- You have explicitly configured your OAuth application to send ID tokens with unverified email addresses to Supabase Auth
+
+However, it is strongly recommended that you configure the [additional `xms_edov` claim](https://learn.microsoft.com/en-us/azure/active-directory/develop/migrate-off-email-claim-authorization#using-the-xms_edov-optional-claim-to-determine-email-verification-status-and-migrate-users) so that Supabase Auth will be able to pick up any issues that may appear in the future. This claim, when configured, gives an indication whether the email address sent to Supabase Auth from Azure is verified or not.
+
+Configure this by:
+
+- Select the _App registrations_ menu in Microsoft Entra ID on the Azure portal.
+- Select the OAuth app.
+- Select the _Manifest_ menu in the sidebar.
+- Make a backup of the JSON just in case.
+- Identify the `optionalClaims` key.
+- Edit it by specifying the following object:
+  ```json
+    "optionalClaims": {
+        "idToken": [
+            {
+                "name": "xms_edov",
+                "source": null,
+                "essential": false,
+                "additionalProperties": []
+            },
+            {
+                "name": "email",
+                "source": null,
+                "essential": false,
+                "additionalProperties": []
+            }
+        ],
+        "accessToken": [
+            {
+                "name": "xms_edov",
+                "source": null,
+                "essential": false,
+                "additionalProperties": []
+            }
+        ],
+        "saml2Token": []
+    },
+  ```
+- Select _Save_ to apply the new configuraion.
+
+## Configure a Tenant URL (Optional)
+
+A Microsoft Entra tenant is the directory of users who are allowed to access your project. This section depends on what your OAuth registration uses for _Supported account types._
+
+By default, Supabase Auth uses the _common_ Microsoft tenant (`https://login.microsoftonline.com/common`) which generally allows any Microsoft account to sign in to your project. Microsoft Entra further limits what accounts can access your project depending on the type of OAuth application you registered.
+
+If your app is registered as _My organization only_ for the _Supported account types_ you may want to configure Supabase Auth with the organization's tenant URL. This will use the tenant's authorization flows instead, and will limit access at the Supabase Auth level to Microsoft accounts arising from only the specified tenant.
+
+Configure this by storing a value under _Azure Tenant URL_ in the Supabase Auth provider configuration page for Azure that has the following format `https://login.microsoftonline.com/<tenant-id>`.
 
 ## Add login code to your client app
 
 <Admonition type="tip">
 
-Supabase Auth requires that Azure returns a valid email address. Therefore you must request the `email` scope in the `signIn` method above.
+Supabase Auth requires that Azure returns a valid email address. Therefore you must request the `email` scope in the `signInWithOAuth` method.
 
 </Admonition>
 
@@ -99,9 +141,9 @@ When your user signs in, call [loginWith(Provider)](/docs/reference/kotlin/auth-
 
 ```kotlin
 suspend fun signInWithAzure() {
-	supabase.gotrue.loginWith(Azure) {
-		scopes.add("email")
-	}
+    supabase.gotrue.loginWith(Azure) {
+        scopes.add("email")
+    }
 }
 ```
 
@@ -132,7 +174,7 @@ When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) t
 
 ```kotlin
 suspend fun signOut() {
-	supabase.gotrue.logout()
+    supabase.gotrue.logout()
 }
 ```
 
@@ -168,9 +210,9 @@ async function signInWithAzure() {
 
 ```kotlin
 suspend fun signInWithAzure() {
-	supabase.gotrue.loginWith(Azure) {
-		scopes.add("offline_access")
-	}
+    supabase.gotrue.loginWith(Azure) {
+        scopes.add("offline_access")
+    }
 }
 ```
 
@@ -181,6 +223,7 @@ suspend fun signInWithAzure() {
 
 - [Azure Developer Account](https://portal.azure.com)
 - [GitHub Discussion](https://github.com/supabase/gotrue/pull/54#issuecomment-757043573)
+- [Potential Risk of Privilege Escalation in Azure AD Applications](https://msrc.microsoft.com/blog/2023/06/potential-risk-of-privilege-escalation-in-azure-ad-applications/)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
