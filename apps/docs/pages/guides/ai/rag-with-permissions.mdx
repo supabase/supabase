@@ -8,7 +8,7 @@ export const meta = {
   sidebar_label: 'RAG with Permissions',
 }
 
-Since pgvector is built on top of Postgres, you can implement fine-grain access control on your vector database using RLS policies. This means you can restrict which documents are returned during a vector similarity search to only users that should have access to them. Supabase also supports foreign data wrappers (FDW) which means you can choose to use an external database or data source to determine these permissions if your user data doesn’t exist in Supabase.
+Since pgvector is built on top of Postgres, you can implement fine-grain access control on your vector database using [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security). This means you can restrict which documents are returned during a vector similarity search to users that have access to them. Supabase also supports [Foreign Data Wrappers (FDW)](/docs/guides/database/extensions/wrappers/overview) which means you can use an external database or data source to determine these permissions if your user data doesn’t exist in Supabase.
 
 Use this guide to learn how to restrict access to documents when performing retrieval augmented generation (RAG).
 
