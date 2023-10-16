@@ -437,7 +437,7 @@ export default function AccountForm({ session }) {
     try {
       setLoading(true)
 
-      let { data, error, status } = await supabase
+      const { data, error, status } = await supabase
         .from('profiles')
         .select(`full_name, username, website, avatar_url`)
         .eq('id', user?.id)
@@ -468,7 +468,7 @@ export default function AccountForm({ session }) {
     try {
       setLoading(true)
 
-      let { error } = await supabase.from('profiles').upsert({
+      const { error } = await supabase.from('profiles').upsert({
         id: user?.id,
         full_name: fullname,
         username,
@@ -563,7 +563,7 @@ export default function AccountForm({ session }: { session: Session | null }) {
     try {
       setLoading(true)
 
-      let { data, error, status } = await supabase
+      const { data, error, status } = await supabase
         .from('profiles')
         .select(`full_name, username, website, avatar_url`)
         .eq('id', user?.id)
@@ -603,7 +603,7 @@ export default function AccountForm({ session }: { session: Session | null }) {
     try {
       setLoading(true)
 
-      let { error } = await supabase.from('profiles').upsert({
+      const { error } = await supabase.from('profiles').upsert({
         id: user?.id as string,
         full_name: fullname,
         username,
@@ -799,7 +799,7 @@ export default function Avatar({ uid, url, size, onUpload }) {
       const fileExt = file.name.split('.').pop()
       const filePath = `${uid}-${Math.random()}.${fileExt}`
 
-      let { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file)
+      const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file)
 
       if (uploadError) {
         throw uploadError
@@ -904,7 +904,7 @@ export default function Avatar({
       const fileExt = file.name.split('.').pop()
       const filePath = `${uid}-${Math.random()}.${fileExt}`
 
-      let { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file)
+      const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file)
 
       if (uploadError) {
         throw uploadError
