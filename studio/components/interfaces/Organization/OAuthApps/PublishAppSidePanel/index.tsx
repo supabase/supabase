@@ -21,6 +21,7 @@ import {
   DropdownMenuTrigger,
   Form,
   IconEdit,
+  IconExternalLink,
   IconUpload,
   Input,
   Modal,
@@ -28,6 +29,7 @@ import {
 } from 'ui'
 import AuthorizeRequesterDetails from '../AuthorizeRequesterDetails'
 import { ScopesPanel } from './Scopes'
+import Link from 'next/link'
 
 export interface PublishAppSidePanelProps {
   visible: boolean
@@ -340,13 +342,25 @@ const PublishAppSidePanel = ({
                     </SidePanel.Content>
                     <SidePanel.Separator />
                     <div className="p-6 ">
-                      <div className="pb-4 flex flex-col">
-                        <span className="prose text-sm">Application permissions</span>
-                        <span className="text-sm text-foreground-light">
-                          The application permissions are organized in scopes and will be presented
-                          to the user when adding an app to their organization and all of its
-                          projects.
-                        </span>
+                      <div className="flex items-start justify-between space-x-4 pb-4">
+                        <div className="flex flex-col">
+                          <span className="prose text-sm">Application permissions</span>
+                          <span className="text-sm text-foreground-light">
+                            The application permissions are organized in scopes and will be
+                            presented to the user when adding an app to their organization and all
+                            of its projects.
+                          </span>
+                        </div>
+                        <Link
+                          passHref
+                          href="https://supabase.com/docs/guides/platform/oauth-apps/oauth-scopes"
+                        >
+                          <Button asChild type="default" icon={<IconExternalLink />}>
+                            <a target="_blank" rel="noreferrer">
+                              Documentation
+                            </a>
+                          </Button>
+                        </Link>
                       </div>
 
                       <ScopesPanel scopes={scopes} setScopes={setScopes} />
