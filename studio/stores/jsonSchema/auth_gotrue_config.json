@@ -249,6 +249,18 @@
       "title": "Linkedin secret",
       "type": "string"
     },
+    "EXTERNAL_LINKEDIN_OIDC_ENABLED": {
+      "title": "Linkedin enabled",
+      "type": "boolean"
+    },
+    "EXTERNAL_LINKEDIN_OIDC_CLIENT_ID": {
+      "title": "Linkedin client ID",
+      "type": "string"
+    },
+    "EXTERNAL_LINKEDIN_OIDC_SECRET": {
+      "title": "Linkedin secret",
+      "type": "string"
+    },
     "EXTERNAL_NOTION_ENABLED": {
       "title": "Notion enabled",
       "type": "boolean"

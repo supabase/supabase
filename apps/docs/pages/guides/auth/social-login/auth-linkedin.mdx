@@ -64,7 +64,7 @@ When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/aut
 ```js
 async function signInWithLinkedIn() {
   const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'linkedin',
+    provider: 'linkedin_oidc',
   })
 }
 ```
