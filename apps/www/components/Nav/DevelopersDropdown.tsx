@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { ReactNode } from 'react'
 import Link from 'next/link'
 import { IconChevronRight } from 'ui'
 
@@ -9,7 +9,7 @@ type Props = {
   text: string
   description?: string
   url?: string
-  icon?: string
+  icon?: any
   svg?: any
 }
 
@@ -25,32 +25,11 @@ const DevelopersDropdown = () => {
               {column.label}
             </label>
             <ul className="flex flex-col gap-4">
-              {column.links.map((link: Props) => (
+              {column.links.map(({ icon: Icon, ...link }: Props) => (
                 <li key={link.text}>
                   <Link href={link.url!}>
                     <a className="flex group items-center gap-2 text-light text-sm hover:text-foreground focus-visible:text-foreground focus-visible:ring-2 focus-visible:outline-none focus-visible:rounded focus-visible:ring-foreground-lighter">
-                      <svg
-                        className="h-5 w-5"
-                        viewBox="0 0 14 14"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          {...(iconsWithFill.includes(link.text)
-                            ? {
-                                fillRule: 'evenodd',
-                                clipRule: 'evenodd',
-                                fill: 'currentColor',
-                              }
-                            : {
-                                stroke: 'currentColor',
-                                strokeMiterlimit: '10',
-                                strokeLinecap: 'round',
-                                strokeLinejoin: 'round',
-                              })}
-                          d={link.icon}
-                        />
-                      </svg>
+                      {Icon && <Icon size={16} strokeWidth={1.2} />}
                       <span>{link.text}</span>
                       <IconChevronRight
                         strokeWidth={2}
