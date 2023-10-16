@@ -1,5 +1,6 @@
 import Nav from 'components/Nav/index'
 import Footer from 'components/Footer/index'
+import { cn } from 'ui'
 
 type Props = {
   hideHeader?: boolean
@@ -21,9 +22,7 @@ const DefaultLayout = (props: Props) => {
   return (
     <>
       {!hideHeader && <Nav />}
-      <div className="min-h-screen">
-        <main className={className}>{children}</main>
-      </div>
+      <main className={cn('min-h-screen', className)}>{children}</main>
       {!hideFooter && <Footer className={footerClassName} />}
     </>
   )

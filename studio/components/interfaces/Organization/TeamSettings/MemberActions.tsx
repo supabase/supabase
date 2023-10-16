@@ -7,7 +7,7 @@ import { useOrganizationMemberDeleteMutation } from 'data/organizations/organiza
 import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
 import { useOrganizationMemberInviteDeleteMutation } from 'data/organizations/organization-member-invite-delete-mutation'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useIsFeatureEnabled, useSelectedOrganization, useStore } from 'hooks'
 import { observer } from 'mobx-react-lite'
 import { Member, Role } from 'types'
 import {
@@ -31,6 +31,9 @@ interface MemberActionsProps {
 const MemberActions = ({ member, roles }: MemberActionsProps) => {
   const { ui } = useStore()
   const { slug } = useParams()
+
+  const organizationMembersDeletionEnabled = useIsFeatureEnabled('organization_members:delete')
+
   const selectedOrganization = useSelectedOrganization()
   const { data: permissions } = usePermissionsQuery()
   const { rolesRemovable } = useGetRolesManagementPermissions(
@@ -186,10 +189,12 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
                 )}
               </>
             ) : (
-              <DropdownMenuItem className="space-x-2" onClick={handleMemberDelete}>
-                <IconTrash size={16} />
-                <p>Remove member</p>
-              </DropdownMenuItem>
+              organizationMembersDeletionEnabled && (
+                <DropdownMenuItem className="space-x-2" onClick={handleMemberDelete}>
+                  <IconTrash size={16} />
+                  <p>Remove member</p>
+                </DropdownMenuItem>
+              )
             )}
           </>
         </DropdownMenuContent>

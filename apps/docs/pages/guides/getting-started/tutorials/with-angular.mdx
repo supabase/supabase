@@ -246,7 +246,7 @@ export class AccountComponent implements OnInit {
     try {
       this.loading = true
       const { user } = this.session
-      let { data: profile, error, status } = await this.supabase.profile(user)
+      const { data: profile, error, status } = await this.supabase.profile(user)
 
       if (error && status !== 406) {
         throw error
