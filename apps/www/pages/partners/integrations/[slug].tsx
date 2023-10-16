@@ -104,7 +104,7 @@ function Partner({
                 layout="fixed"
                 width={56}
                 height={56}
-                className="bg-scale-400 flex-shrink-f0 h-14 w-14 rounded-full"
+                className="bg-surface-200 flex-shrink-f0 h-14 w-14 rounded-full"
                 src={partner.logo}
                 alt={partner.title}
               />
@@ -114,7 +114,7 @@ function Partner({
             </div>
 
             <div
-              className="bg-gradient-to-t from-scale-100 to-scale-200 border-b p-6 [&_.swiper-container]:overflow-visible"
+              className="bg-gradient-to-t from-background-alternative to-background border-b p-6 [&_.swiper-container]:overflow-visible"
               style={{ marginLeft: 'calc(50% - 50vw)', marginRight: 'calc(50% - 50vw)' }}
             >
               <SectionContainer className="!py-0 !px-3 lg:!px-12 xl:!p-0 mx-auto max-w-5xl">
@@ -256,7 +256,7 @@ function Partner({
               </div>
             </div>
             {partner.call_to_action_link && (
-              <div className="bg-scale-100 dark:bg-scale-300 hover:border-scale-600 hover:dark:border-scale-700 border-scale-300 dark:border-scale-400 rounded-2xl border p-10 drop-shadow-sm max-w-5xl mx-auto mt-12">
+              <div className="bg-background hover:border-border-control border-border rounded-2xl border p-10 drop-shadow-sm max-w-5xl mx-auto mt-12">
                 <div className="flex flex-row justify-between">
                   <h1 className="text-2xl font-medium self-center">
                     Get started with {partner.title} and Supabase.

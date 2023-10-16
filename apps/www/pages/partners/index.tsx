@@ -35,7 +35,7 @@ const Partners = () => {
         }}
       />
       <DefaultLayout>
-        <div className="relative bg-scale-500 dark:bg-scale-100 overflow-hidden">
+        <div className="relative bg-alternative overflow-hidden">
           <SectionContainer className="overflow-hidden pt-8 pb-12 md:pt-12">
             <ProductHeaderCentered {...pageData.heroSection} />
           </SectionContainer>
@@ -117,7 +117,7 @@ const Partners = () => {
                 hasActiveOnHover={true}
                 innerClassName="px-8 py-6 group flex flex-col gap-4"
               >
-                <div className="bg-scale-300 mb-4 dark:bg-scale-500 text-foreground group-hover:text-brand-900 flex h-12 w-12 items-center justify-center rounded-md border transition-all group-hover:scale-105">
+                <div className="bg-surface-200 mb-4 text-foreground flex h-12 w-12 items-center justify-center rounded-md border transition-all group-hover:scale-105">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-6 w-6"
@@ -148,7 +148,7 @@ const Partners = () => {
                 hasActiveOnHover={true}
                 innerClassName="px-8 py-6 group flex flex-col gap-4"
               >
-                <div className="bg-scale-300 mb-4 dark:bg-scale-500 text-foreground group-hover:text-brand-900 flex h-12 w-12 items-center justify-center rounded-md border transition-all group-hover:scale-105">
+                <div className="bg-surface-200 text-foreground flex h-12 w-12 items-center justify-center rounded-md border transition-all group-hover:scale-105">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-6 w-6"
@@ -203,7 +203,7 @@ const Partners = () => {
             })}
           </div>
         </SectionContainer>
-        <div className="bg-scale-400 dark:bg-scale-100 border-t border-b">
+        <div className="bg-alternative border-t border-b">
           <SectionContainer className="flex flex-col gap-8">
             <div className="flex flex-col lg:flex-row gap-8 xl:gap-10 justify-between">
               <div className="w-full lg:w-1/2 gap-2 flex flex-col items-start">
@@ -220,7 +220,7 @@ const Partners = () => {
                   label="Learn more"
                 />
               </div>
-              <div className="relative w-full lg:w-1/2 border bg-scale-300 flex items-center justify-center aspect-video rounded-xl overflow-hidden">
+              <div className="relative w-full lg:w-1/2 border bg-background flex items-center justify-center aspect-video rounded-xl overflow-hidden">
                 <Image
                   src="/images/partners/register-oauth-app.svg"
                   alt="Register app via API"
