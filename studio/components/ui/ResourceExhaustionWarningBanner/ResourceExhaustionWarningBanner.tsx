@@ -82,7 +82,7 @@ const ResourceExhaustionWarningBanner = () => {
       ? undefined
       : metric === null
       ? '/project/[ref]/settings/[infra-path]'
-      : metric === 'disk_space' || metric === 'read_only'
+      : metric === 'disk_space'
       ? '/project/[ref]/settings/database'
       : `/project/[ref]/settings/[infra-path]#${metric}`
   )
@@ -99,9 +99,7 @@ const ResourceExhaustionWarningBanner = () => {
   if (
     activeWarnings.length === 0 ||
     ((router.pathname.endsWith('/usage') || router.pathname.endsWith('/infrastructure')) &&
-      !activeWarnings.includes('is_readonly_mode_enabled')) ||
-    (activeWarnings.includes('is_readonly_mode_enabled') &&
-      router.pathname.endsWith('settings/database'))
+      !activeWarnings.includes('is_readonly_mode_enabled'))
   )
     return null
 
