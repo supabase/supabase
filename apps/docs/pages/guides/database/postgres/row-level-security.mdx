@@ -104,8 +104,8 @@ alter table profiles enable row level security;
 -- 3. Create Policy
 create policy "Users can create a profile."
 on profiles for insert
-to authenticated                    -- the Postgres Role (recommended)
-with check ( auth.id() = user_id );      -- the actual Policy
+to authenticated                          -- the Postgres Role (recommended)
+with check ( auth.uid() = user_id );      -- the actual Policy
 ```
 
 ### UPDATE Policies
@@ -128,8 +128,8 @@ alter table profiles enable row level security;
 -- 3. Create Policy
 create policy "Users can update their own profile."
 on profiles for update
-to authenticated                    -- the Postgres Role (recommended)
-using ( auth.id() = user_id );      -- the actual Policy
+to authenticated                     -- the Postgres Role (recommended)
+using ( auth.uid() = user_id );      -- the actual Policy
 ```
 
 ### DELETE Policies
@@ -152,8 +152,8 @@ alter table profiles enable row level security;
 -- 3. Create Policy
 create policy "Users can delete a profile."
 on profiles for delete
-to authenticated                    -- the Postgres Role (recommended)
-using ( auth.id() = user_id );      -- the actual Policy
+to authenticated                     -- the Postgres Role (recommended)
+using ( auth.uid() = user_id );      -- the actual Policy
 ```
 
 ## Bypassing Row Level Security
