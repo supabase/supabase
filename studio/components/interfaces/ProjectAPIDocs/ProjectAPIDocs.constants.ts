@@ -1015,6 +1015,9 @@ Upload a file to an existing bucket. RLS policy permissions required:
         title: undefined,
         bash: `
 curl -X POST '${endpoint}/storage/v1/object/${name}/folder/avatar1.png' \\
+-H 'Content-Type: image/png' \\
+-H "Authorization: Bearer ${apikey}" \\
+--data-binary @/path/to/your/file'
 -H 'Content-Type: multipart/form-data' \\
 -H "Authorization: Bearer ${apikey}" \\
 --data-raw $'your_file_data'
