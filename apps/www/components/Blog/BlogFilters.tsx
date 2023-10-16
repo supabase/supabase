@@ -167,7 +167,7 @@ const BlogFilters = ({ posts, setPosts, setCategory, allCategories, handlePosts 
                       setSearchKey('')
                       setShowSearchInput(false)
                     }}
-                    className="text-scale-1100 hover:text-scale-1200"
+                    className="text-light hover:text-foreground"
                   >
                     <IconX size="tiny" />
                   </Button>

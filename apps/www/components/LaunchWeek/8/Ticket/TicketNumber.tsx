@@ -18,7 +18,7 @@ export default function TicketNumber({ number, golden = false }: Props) {
             `
             md:absolute text-[16px] md:text-[22px] w-full px-2 py-8 md:w-[max-content] leading-[1]
             md:transform md:-rotate-90 md:origin-center
-            text-scale-1100 text-center font-mono tracking-[0.8rem]
+            text-light text-center font-mono tracking-[0.8rem]
           `,
             golden ? styles['ticket-number-gold'] : styles['ticket-number'],
           ].join(' ')}

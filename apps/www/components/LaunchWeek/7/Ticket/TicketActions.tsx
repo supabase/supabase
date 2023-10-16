@@ -59,7 +59,7 @@ export default function TicketActions({
         <>
           <div className="rounded-full bg-[#E6E8EB] text-scale-500 py-1 px-3 border border-[#dfe1e3] text-xs mb-1">
             <div className="flex items-center justify-center gap-2">
-              <div className="text-scale-900">
+              <div className="text-muted">
                 <IconCheckCircle size={10} strokeWidth={1} />
               </div>
               Connect with GitHub
@@ -79,7 +79,7 @@ export default function TicketActions({
               }`}
             >
               {userData.sharedOnTwitter && (
-                <div className="text-scale-900">
+                <div className="text-muted">
                   <IconCheckCircle size={10} strokeWidth={1} />
                 </div>
               )}
@@ -100,7 +100,7 @@ export default function TicketActions({
               }`}
             >
               {userData.sharedOnLinkedIn && (
-                <div className="text-scale-900">
+                <div className="text-muted">
                   <IconCheckCircle size={10} strokeWidth={1} />
                 </div>
               )}

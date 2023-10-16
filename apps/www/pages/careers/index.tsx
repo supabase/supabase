@@ -99,7 +99,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
         }}
       />
       <DefaultLayout>
-        <div className="text-scale-1200">
+        <div className="text-foreground">
           <div className="container relative mx-auto px-6 py-10 lg:pt-12 lg:px-16 xl:px-20 text-center space-y-4">
             <h1 className="text-sm text-brand md:text-base">
               <span className="sr-only">Supabase </span>Careers
@@ -107,7 +107,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
             <h2 className="text-3xl md:text-4xl xl:text-5xl lg:max-w-2xl xl:max-w-3xl lg:mx-auto tracking-[-1.5px]">
               We're on a mission to build the best developer platform
             </h2>
-            <p className="text-sm md:text-base text-scale-1000 max-w-sm sm:max-w-md md:max-w-lg mx-auto">
+            <p className="text-sm md:text-base text-lighter max-w-sm sm:max-w-md md:max-w-lg mx-auto">
               Explore remote possibilities and join our team to help us achieve it.
             </p>
             <a href="#positions">
@@ -127,7 +127,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                     <h2 className="text-3xl lg:text-4xl pt-3 tracking-[-1.5px]">
                       {company.number}
                     </h2>
-                    <ReactMarkdown className="text-scale-1100 text-sm lg:text-base">
+                    <ReactMarkdown className="text-light text-sm lg:text-base">
                       {company.text}
                     </ReactMarkdown>
                   </div>
@@ -147,7 +147,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                     <h2 className="text-2xl sm:text-3xl xl:text-4xl max-w-[300px] lg:max-w-xs tracking-[-1.5px]">
                       We work together, wherever we are
                     </h2>
-                    <p className="text-scale-1100 mt-4 text-xs sm:text-sm lg:text-base md:w-5/6 lg:w-full">
+                    <p className="text-light mt-4 text-xs sm:text-sm lg:text-base md:w-5/6 lg:w-full">
                       Working in a globally distributed team is rewarding but has its challenges. We
                       are across many different timezones, so we use tools like Notion, Slack, and
                       Discord to stay connected to our team, and our community.
@@ -169,7 +169,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                       <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1.5px]">
                         What is Supabase
                       </h2>
-                      <p className="text-scale-1100 text-xs sm:text-sm lg:text-base pt-2 sm:max-w-md xl:max-w-lg">
+                      <p className="text-light text-xs sm:text-sm lg:text-base pt-2 sm:max-w-md xl:max-w-lg">
                         Supabase is an open source Firebase alternative, built by developers for
                         developers. Supabase adds auth, realtime, storage, restful APIs, and edge
                         functions to Postgres without a single line of code. Supabase was
@@ -269,7 +269,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                 <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1.5px]">
                   Human powered
                 </h2>
-                <p className="text-scale-1000 text-xs sm:text-sm lg:text-base pt-3 sm:w-3/5 lg:max-w-sm">
+                <p className="text-lighter text-xs sm:text-sm lg:text-base pt-3 sm:w-3/5 lg:max-w-sm">
                   As a completely remote and asynchronous team, we focus on these five traits to
                   keep our team effective:
                 </p>
@@ -293,7 +293,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                           </div>
                           <div className="">
                             <h2 className="text-base">{human.title}</h2>
-                            <p className="text-scale-1100 text-xs lg:text-sm">{human.text}</p>
+                            <p className="text-light text-xs lg:text-sm">{human.text}</p>
                           </div>
                         </div>
                       )
@@ -319,7 +319,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                   <h2 className="text-2xl sm:text-3xl xl:text-4xl max-w-[300px] xl:max-w-none mx-auto tracking-[-1.5px]">
                     1,000 + Contributors building Supabase
                   </h2>
-                  <p className="text-scale-1100 text-xs sm:text-sm lg:text-base sm:max-w-lg lg:max-w-2xl mx-auto pt-3">
+                  <p className="text-light text-xs sm:text-sm lg:text-base sm:max-w-lg lg:max-w-2xl mx-auto pt-3">
                     We're building a community of communities, bringing together developers from
                     many different backgrounds, as well as new developers looking to get involved
                     with open source. We love celebrating everyone who contributes their time to the
@@ -434,7 +434,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
             </div>
             <div className="text-center sm:max-w-md md:w-3/4 lg:max-w-lg xl:max-w-2xl mx-auto">
               <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1.5px]">How we hire</h2>
-              <p className="text-xs sm:text-sm lg:text-base text-scale-1100 pt-3">
+              <p className="text-xs sm:text-sm lg:text-base text-light pt-3">
                 The entire process is fully remote and all communication happens over email or via
                 video chat in Google Meet. The calls are all 1:1 and usually take between 20-45
                 minutes. We know you are interviewing us too, so please ask questions. We are happy
@@ -458,7 +458,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                       <h2 className="sm:text-lg max-w-[75%] xl:max-w-none xl:w-11/12 lg:max-w-none">
                         {hiring.title}
                       </h2>
-                      <p className="text-scale-1100 text-xs sm:text-sm mt-1 md:w-3/4 lg:w-11/12">
+                      <p className="text-light text-xs sm:text-sm mt-1 md:w-3/4 lg:w-11/12">
                         {hiring.text}
                       </p>
                     </div>

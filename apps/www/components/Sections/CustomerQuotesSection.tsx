@@ -52,7 +52,7 @@ const CustomerQuotesSection = (props: Props) => {
       <m.div
         initial={initial}
         animate={isInView ? animate : initial}
-        className="bg-scale-100 dark:bg-scale-200 hover:border-scale-600 hover:dark:border-scale-700 border-scale-300 dark:border-scale-400 rounded-2xl border p-6 drop-shadow-sm flex flex-col justify-between"
+        className="bg-background hover:border-control border-background-overlay-default rounded-2xl border p-6 drop-shadow-sm flex flex-col justify-between"
       >
         <div className="flex flex-col gap-4">
           <div className="h-24 w-full flex items-center justify-center pb-3">
@@ -67,12 +67,12 @@ const CustomerQuotesSection = (props: Props) => {
             </div>
           </div>
           <div className="border-t pt-4">
-            <blockquote className="text-scale-1100 text-base">{customer.quote}</blockquote>
+            <blockquote className="text-light text-base">{customer.quote}</blockquote>
           </div>
         </div>
 
         <div>
-          <p className="text-scale-900 mt-4">
+          <p className="text-muted mt-4">
             {customer.author}, {customer.role}
           </p>
           {customer.url && (

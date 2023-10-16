@@ -41,10 +41,10 @@ const LayoutComparison = ({ components, props }: Props) => {
           <div className="border-scale-500 hover:bg-scale-100 dark:hover:bg-scale-300 cursor-pointer rounded border p-6 transition">
             <div className="space-y-4">
               <div>
-                <p className="text-scale-900 text-sm">{label}</p>
+                <p className="text-muted text-sm">{label}</p>
               </div>
               <div>
-                <h4 className="text-scale-1200 text-lg">{post.title}</h4>
+                <h4 className="text-foreground text-lg">{post.title}</h4>
                 <p className="small">{post.date}</p>
               </div>
             </div>
@@ -92,7 +92,7 @@ const LayoutComparison = ({ components, props }: Props) => {
             <div className="space-y-4">
               <p className="text-brand text-center">Alternative</p>
               <h1 className="h1 text-center">{props.blog.title}</h1>
-              <div className="text-scale-900 flex justify-center space-x-3 text-sm">
+              <div className="text-muted flex justify-center space-x-3 text-sm">
                 <p>{props.blog.date}</p>
                 <p>•</p>
                 <p>{generateReadingTime(props.blog.source)}</p>
@@ -116,8 +116,8 @@ const LayoutComparison = ({ components, props }: Props) => {
                               </div>
                             )}
                             <div className="flex flex-col">
-                              <span className="text-scale-1200 mb-0 text-sm">{author.author}</span>
-                              <span className="text-scale-900 mb-0 text-xs">{author.position}</span>
+                              <span className="text-foreground mb-0 text-sm">{author.author}</span>
+                              <span className="text-muted mb-0 text-xs">{author.position}</span>
                             </div>
                           </div>
                         </a>
@@ -134,13 +134,13 @@ const LayoutComparison = ({ components, props }: Props) => {
               <MDXRemote {...content} components={components} />
             </div>
             <div className="py-16">
-              <div className="text-scale-900 dark:text-scale-1000 text-sm">Share this article</div>
+              <div className="text-muted dark:text-lighter text-sm">Share this article</div>
               <div className="mt-4 flex items-center space-x-4">
                 <Link
                   passHref
                   href={`https://twitter.com/share?text=${props.blog.title}&url=https://supabase.com/blog/${props.blog.slug}`}
                 >
-                  <a target="_blank" className="text-scale-900 hover:text-scale-1200">
+                  <a target="_blank" className="text-muted hover:text-foreground">
                     <svg
                       height="26"
                       width="26"
@@ -160,7 +160,7 @@ const LayoutComparison = ({ components, props }: Props) => {
                   passHref
                   href={`https://www.linkedin.com/shareArticle?url=https://supabase.com/blog/${props.blog.slug}&title=${props.blog.title}`}
                 >
-                  <a target="_blank" className="text-scale-900 hover:text-scale-1200">
+                  <a target="_blank" className="text-muted hover:text-foreground">
                     <svg
                       width="20"
                       height="20"

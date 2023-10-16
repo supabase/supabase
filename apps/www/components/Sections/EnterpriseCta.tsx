@@ -10,7 +10,7 @@ const EnterpriseCta = () => {
         <h2 className="heading-gradient text-2xl sm:text-3xl xl:text-4xl">
           Supabase Vector for Enterprise
         </h2>
-        <p className="mx-auto text-scale-900 w-full">
+        <p className="mx-auto text-muted w-full">
           Talk to one of our experts about scaling Supabase Vector{' '}
           <br className="hidden md:block" />
           and managing embeddings at scale.

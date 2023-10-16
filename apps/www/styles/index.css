@@ -40,7 +40,7 @@ html {
 }
 
 body {
-  @apply bg-scale-200;
+  @apply bg-background;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -61,7 +61,7 @@ h6 { */
 .h4:not(.prose *):not(.overwrite),
 .h5:not(.prose *):not(.overwrite),
 .h6:not(.prose *):not(.overwrite) {
-  @apply text-scale-1200;
+  @apply text-foreground;
   margin-bottom: 16px;
 }
 
@@ -100,11 +100,11 @@ h6:not(.overwrite) {
 }
 
 .heading-gradient {
-  @apply text-[#F4FFFA00] bg-clip-text bg-gradient-to-b from-scale-1200 to-scale-1200 dark:to-scale-1100;
+  @apply text-[#F4FFFA00] bg-clip-text bg-gradient-to-b from-foreground to-foreground/70;
 }
 
 .heading-gradient-brand {
-  @apply text-[#3ECF8E00] bg-clip-text bg-gradient-to-b from-brand-600 to-brand dark:to-brand-300;
+  @apply text-[#3ECF8E00] bg-clip-text bg-gradient-to-b from-brand to-brand/80;
 }
 
 .toc-animate {
@@ -143,12 +143,12 @@ h6:not(.overwrite) {
 }
 
 .p:not(.prose *):not(.overwrite) {
-  @apply text-scale-1100;
+  @apply text-light;
   margin-bottom: 16px;
 }
 
 .small:not(.prose *):not(.overwrite) {
-  @apply text-scale-900 text-xs;
+  @apply text-lighter text-xs;
 }
 
 .sbui-border-fix select {
@@ -173,7 +173,7 @@ h6:not(.overwrite) {
 }
 
 .section--bg {
-  @apply bg-scale-100 dark:bg-scale-200;
+  @apply bg-background;
   position: relative;
   height: 100%;
   width: 100%;
@@ -191,7 +191,7 @@ h6:not(.overwrite) {
 .stroke-text {
   -webkit-text-fill-color: transparent; /* Will override color (regardless of order) */
   -webkit-text-stroke-width: 1px;
-  -webkit-text-stroke-color: var(--colors-scale9);
+  -webkit-text-stroke-color: hsl(var(--background-selection));
 }
 
 .stroke-text.fill {
@@ -205,7 +205,7 @@ h6:not(.overwrite) {
 }
 
 .sbui-tabs--alt div[role='tablist'] .sbui-btn-primary {
-  @apply dark:bg-scale-300 bg-gray-800 text-white dark:text-white;
+  @apply dark:bg-surface-100 bg-gray-800 text-white dark:text-white;
   text-shadow: none;
   font-weight: 400;
 }
@@ -348,50 +348,6 @@ launch week
 
 .launch-week-timeline-border--approaching {
   border-image: linear-gradient(to bottom, hsl(var(--brand-default)), var(--colors-purple7)) 1 100%;
-}
-
-.launch-week-gradientBg {
-  background-image: url('/images/launchweek/supabase-launch-week-5-bg--light.jpg');
-  background-color: var(--colors-scale2);
-  width: 100%;
-  left: 0;
-  right: 0;
-  margin: 0 auto;
-  height: 100%;
-  background-position: bottom;
-  background-position-y: -820px;
-  background-size: 1929px 1170px;
-  background-repeat: no-repeat;
-  position: absolute;
-  z-index: 0;
-}
-
-.dark .launch-week-gradientBg {
-  background-image: url('/images/launchweek/supabase-launch-week-5-bg.jpg');
-  background-color: #1c1c1c;
-}
-
-@media screen and (min-width: 1032px) {
-  .launch-week-gradientBg {
-    background-position-y: -780px;
-  }
-}
-
-.launch-week-gradientBg--announcement-bar {
-  background: radial-gradient(circle, rgba(51, 68, 60, 1) 0%, rgba(0, 0, 0, 1) 100%);
-  background-color: hsl(0, 0%, 11%);
-  width: 100%;
-  clear: both;
-  background-position: bottom;
-  background-position-y: -820px;
-  background-size: 1929px 1170px;
-  background-repeat: no-repeat;
-}
-
-@media screen and (min-width: 1032px) {
-  .launch-week-gradientBg--announcement-bar {
-    background-position-y: -780px;
-  }
 }
 
 .video-container {
@@ -564,8 +520,8 @@ launch week
     rgba(57, 97, 125, 0.32) 0%,
     rgba(57, 97, 125, 0.32) 5%,
     rgba(0, 222, 209, 0.75) 8%,
-    #121212 65%,
-    #121212 100%
+    hsl(var(--background-default)) 65%,
+    hsl(var(--background-default)) 100%
   );
 }
 
@@ -584,12 +540,20 @@ launch week
   margin: 0 auto;
   left: 0;
   right: 0;
-  background: radial-gradient(circle at 50% -60%, rgba(255, 255, 255, 0) 0%, #121212 65%);
+  background: radial-gradient(
+    circle at 50% -60%,
+    rgba(255, 255, 255, 0) 0%,
+    hsl(var(--background-default)) 65%
+  );
 }
 
 @media screen and (max-width: 769px) {
   .gradient-mask--masked {
-    background: radial-gradient(circle at 50% -40%, rgba(255, 255, 255, 0) 0%, #121212 65%);
+    background: radial-gradient(
+      circle at 50% -40%,
+      rgba(255, 255, 255, 0) 0%,
+      hsl(var(--background-default)) 65%
+    );
   }
 }
 
@@ -608,7 +572,7 @@ launch week
 /* The inside of the circle */
 .flair-mask-b {
   position: absolute;
-  background-color: #121212;
+  background-color: hsl(var(--background-default));
   top: 0px;
   width: 182%;
   left: -41%;
@@ -652,49 +616,6 @@ launch week
   }
 }
 
-.orbit {
-  width: 192px;
-  height: 192px;
-  border-radius: 50%;
-  background: var(--colors-scale2) content-box;
-  border: 1px solid gray;
-  box-shadow: 0 0 0 50px var(--colors-scale2), 0 0 0 51px gray, 0 0 0 100px var(--colors-scale2),
-    0 0 0 101px gray, 0 0 0 150px var(--colors-scale2), 0 0 0 151px gray;
-  margin: auto;
-  position: relative;
-}
-
-.orbit span {
-  position: absolute;
-  height: 45px;
-  width: 45px;
-  background: blue;
-  border-radius: inherit;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) rotate(var(--r, 0deg)) translateX(var(--d, 0px));
-}
-
-.planet1 {
-  --d: 96px;
-  --r: -90deg;
-}
-
-.planet2 {
-  --d: 146px;
-  --r: -137deg;
-}
-
-.planet3 {
-  --d: 196px;
-  --r: -45deg;
-}
-
-.planet4 {
-  --d: 246px;
-  --r: -110deg;
-}
-
 .radial-mask {
   -webkit-mask-image: linear-gradient(rgba(0, 0, 0, 1), transparent);
 }
@@ -733,8 +654,8 @@ launch week
   .gradient-text-scale-500 {
     background-image: -webkit-linear-gradient(
       45deg,
-      var(--colors-scale10) 0%,
-      var(--colors-scale12) 100%
+      hsl(var(--foreground-lighter)) 0%,
+      hsl(var(--foreground-default)) 100%
     );
   }
 
@@ -801,7 +722,7 @@ launch week
   transition-timing-function: cubic-bezier(0.24, 0.25, 0.05, 1) !important;
 }
 [data-rmiz-modal-overlay='visible'] {
-  @apply !bg-scale-100 dark:!bg-scale-200;
+  @apply !bg-background;
   opacity: 0.8;
 }
 [data-rmiz-modal-img] {

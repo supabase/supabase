@@ -54,7 +54,7 @@ function FunctionsUsecases(props: Props) {
                 <div
                   className={
                     'transition-colors ' +
-                    (active ? ' text-scale-1200' : ' text-scale-900 group-hover:text-scale-1200')
+                    (active ? ' text-foreground' : ' text-muted group-hover:text-foreground')
                   }
                 >
                   {feat.title}
@@ -62,7 +62,7 @@ function FunctionsUsecases(props: Props) {
                 <div
                   className={
                     'text-sm transition-colors ' +
-                    (active ? ' text-scale-1100' : ' text-scale-800 group-hover:text-scale-1100 ')
+                    (active ? ' text-light' : ' text-muted group-hover:text-light ')
                   }
                 >
                   {/*

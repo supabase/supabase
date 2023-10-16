@@ -83,7 +83,7 @@ export default function Ticket({
           isMobile && styles['ticket-hero'],
         ].join(' ')}
       >
-        <div className="text-scale-1200 flex flex-col w-full items-center text-white text-center lg:text-left lg:items-start gap-2 lg:gap-3 mb-3 lg:mb-6">
+        <div className="text-foreground flex flex-col w-full items-center text-white text-center lg:text-left lg:items-start gap-2 lg:gap-3 mb-3 lg:mb-6">
           <h1
             className={cn(
               styleUtils.appear,

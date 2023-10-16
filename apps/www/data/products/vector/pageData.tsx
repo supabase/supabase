@@ -60,7 +60,7 @@ export default (isMobile?: boolean) => ({
           <>
             Supabase is{' '}
             <Link href="https://forms.supabase.com/soc2">
-              <a className="text-scale-1100 hover:underline" target="_blank">
+              <a className="text-light hover:underline" target="_blank">
                 SOC2 type 2
               </a>
             </Link>{' '}

@@ -73,7 +73,7 @@ function ChangelogPage(props: any) {
           {/* Title and description */}
           <div className="py-10">
             <h1 className="h1">Changelog</h1>
-            <p className="text-scale-900 text-lg">New updates and product improvements</p>
+            <p className="text-muted text-lg">New updates and product improvements</p>
           </div>
 
           {/* Content */}
@@ -90,16 +90,14 @@ function ChangelogPage(props: any) {
                 "
                   >
                     <div className="flex w-full items-baseline gap-6">
-                      <div className="bg-scale-100 dark:bg-scale-500 border-scale-400 dark:border-scale-600 text-scale-900 -ml-2.5 flex h-5 w-5 items-center justify-center rounded border drop-shadow-sm">
+                      <div className="bg-scale-100 dark:bg-scale-500 border-scale-400 dark:border-scale-600 text-muted -ml-2.5 flex h-5 w-5 items-center justify-center rounded border drop-shadow-sm">
                         <IconGitCommit size={14} strokeWidth={1.5} />
                       </div>
                       <div className="flex w-full flex-col gap-1">
                         {changelog.name && (
-                          <h3 className="text-scale-1200 text-2xl">{changelog.name}</h3>
+                          <h3 className="text-foreground text-2xl">{changelog.name}</h3>
                         )}
-                        <p className="text-scale-900 text-lg">
-                          {dayjs(date[0]).format('MMM D, YYYY')}
-                        </p>
+                        <p className="text-muted text-lg">{dayjs(date[0]).format('MMM D, YYYY')}</p>
                       </div>
                     </div>
                   </div>

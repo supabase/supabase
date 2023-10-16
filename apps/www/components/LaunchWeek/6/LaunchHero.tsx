@@ -6,10 +6,10 @@ export default function LaunchHero() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-4 lg:gap-6">
-        <h1 className="text-scale-1200 text-4xl font-semibold tracking-tight md:text-5xl lg:text-7xl">
+        <h1 className="text-foreground text-4xl font-semibold tracking-tight md:text-5xl lg:text-7xl">
           {Controller.hero_header}
         </h1>
-        <h2 className="text-scale-1100 text-sm lg:text-xl">
+        <h2 className="text-light text-sm lg:text-xl">
           Stay tuned all week for daily announcements
         </h2>
       </div>

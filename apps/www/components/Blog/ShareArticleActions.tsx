@@ -6,7 +6,7 @@ const ShareArticleActions = ({ title, slug }: { title: string; slug: string }) =
       passHref
       href={`https://twitter.com/share?text=${title}&url=https://supabase.com/blog/${slug}`}
     >
-      <a target="_blank" className="text-scale-900 hover:text-scale-1200">
+      <a target="_blank" className="text-muted hover:text-foreground">
         <svg
           height="26"
           width="26"
@@ -26,7 +26,7 @@ const ShareArticleActions = ({ title, slug }: { title: string; slug: string }) =
       passHref
       href={`https://www.linkedin.com/shareArticle?url=https://supabase.com/blog/${slug}&title=${title}`}
     >
-      <a target="_blank" className="text-scale-900 hover:text-scale-1200">
+      <a target="_blank" className="text-muted hover:text-foreground">
         <svg
           width="20"
           height="20"
@@ -42,7 +42,7 @@ const ShareArticleActions = ({ title, slug }: { title: string; slug: string }) =
       passHref
       href={`https://news.ycombinator.com/submitlink?u=https://supabase.com/blog/${slug}&t=${title}`}
     >
-      <a target="_blank" className="text-scale-900 hover:text-scale-1200">
+      <a target="_blank" className="text-muted hover:text-foreground">
         <svg
           width="23"
           height="23"

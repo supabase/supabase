@@ -42,7 +42,7 @@ const ProductCard = ({
       >
         <div
           className={[
-            'relative z-10 flex flex-col lg:h-full gap-1 text-scale-1200 mx-auto items-center text-center h-full px-6 py-8',
+            'relative z-10 flex flex-col lg:h-full gap-1 text-foreground mx-auto items-center text-center h-full px-6 py-8',
             alignLeft && 'lg:mx-0 lg:pl-8 lg:items-start lg:text-left lg:max-w-[260px]',
           ].join(' ')}
         >
@@ -68,7 +68,7 @@ const ProductCard = ({
           </div>
           <h2 className="text-xl">{title}</h2>
           <div className="flex-1 flex flex-col justify-between gap-2">
-            <p className="text-sm text-scale-1000">{subtitle}</p>
+            <p className="text-sm text-lighter">{subtitle}</p>
             {highlights && <span className="hidden lg:block">{highlights}</span>}
           </div>
         </div>

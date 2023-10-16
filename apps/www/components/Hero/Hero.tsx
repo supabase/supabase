@@ -33,7 +33,7 @@ const Hero = () => {
                   {/* <div className="z-40 w-full flex justify-center mb-8 lg:mb-8">
                     <AnnouncementBadge />
                   </div> */}
-                  <h1 className="text-scale-1200 text-4xl sm:text-5xl sm:leading-none lg:text-7xl">
+                  <h1 className="text-foreground text-4xl sm:text-5xl sm:leading-none lg:text-7xl">
                     <span className="block text-[#F4FFFA00] bg-clip-text bg-gradient-to-b from-scale-1200 to-scale-1200 dark:to-scale-1100">
                       Build in a weekend
                     </span>
@@ -41,7 +41,7 @@ const Hero = () => {
                       Scale to millions
                     </span>
                   </h1>
-                  <p className="pt-2 text-scale-1200 my-3 text-sm sm:mt-5 lg:mb-0 sm:text-base lg:text-lg">
+                  <p className="pt-2 text-foreground my-3 text-sm sm:mt-5 lg:mb-0 sm:text-base lg:text-lg">
                     Supabase is an open source Firebase alternative.{' '}
                     <br className="hidden md:block" />
                     Start your project with a Postgres database, Authentication, instant APIs, Edge

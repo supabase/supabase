@@ -9,13 +9,11 @@ export default function LaunchHero() {
       <div className="col-span-12 flex flex-col gap-12 lg:col-span-6">
         <div className="flex flex-col gap-8">
           <div className="flex flex-col gap-3">
-            <h3 className="text-scale-1200 text-4xl tracking-tight">Launch Week Hackathon</h3>
+            <h3 className="text-foreground text-4xl tracking-tight">Launch Week Hackathon</h3>
             <div>
               <Badge color="red">Closed</Badge>
             </div>
-            <h4 className="text-scale-1100 text-xl">
-              Submissions close Sunday 21st Aug 23:59 (PT).
-            </h4>
+            <h4 className="text-light text-xl">Submissions close Sunday 21st Aug 23:59 (PT).</h4>
           </div>
 
           <div className="flex gap-3">
@@ -34,22 +32,22 @@ export default function LaunchHero() {
 
         <div className="grid grid-cols-2 gap-16">
           <div className="flex flex-col gap-3">
-            <h3 className="text-scale-1200 text-lg">Prizes</h3>
-            <p className="text-scale-1100 text-sm">
+            <h3 className="text-foreground text-lg">Prizes</h3>
+            <p className="text-light text-sm">
               There are 5 categories to win. There will be a prize for the winner and a runner-up
               prize in each category.
             </p>
           </div>
           <div className="flex flex-col gap-3">
-            <h3 className="text-scale-1200 text-lg">Submission</h3>
-            <p className="text-scale-1100 text-sm">
+            <h3 className="text-foreground text-lg">Submission</h3>
+            <p className="text-light text-sm">
               Submit your project through{' '}
               <a className="text-brand" href="https://madewithsupabase.com">
                 madewithsupabase.com
               </a>
               .
             </p>
-            <p className="text-scale-1100 text-sm">
+            <p className="text-light text-sm">
               All submissions must be open source and publically available.
             </p>
           </div>

@@ -84,7 +84,7 @@ export default function TicketActions({
             ].join(' ')}
           >
             {userData.sharedOnTwitter && (
-              <div className="text-scale-900">
+              <div className="text-muted">
                 <IconCheckCircle size={10} strokeWidth={1.5} />
               </div>
             )}
@@ -98,7 +98,7 @@ export default function TicketActions({
             ].join(' ')}
           >
             {userData.sharedOnLinkedIn && (
-              <div className="text-scale-900">
+              <div className="text-muted">
                 <IconCheckCircle size={10} strokeWidth={1.5} />
               </div>
             )}
