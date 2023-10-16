@@ -111,9 +111,7 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
       </Panel.Content>
 
       {props.append && (
-        <>
-          {props.append({ ...props, ...(props.appendProps || {}), router, projectRef })}
-        </>
+        <>{props.append({ ...props, ...(props.appendProps || {}), router, projectRef })}</>
       )}
     </Panel>
   )
