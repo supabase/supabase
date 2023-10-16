@@ -1,3 +1,4 @@
+import { OAuthScope } from '@supabase/shared-types/out/constants'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
@@ -12,6 +13,7 @@ export type OAuthAppUpdateVariables = {
   name: string
   website: string
   icon?: string | null
+  scopes?: OAuthScope[]
   redirect_uris: string[]
 }
 
@@ -21,6 +23,7 @@ export async function updateOAuthApp({
   name,
   website,
   icon,
+  scopes,
   redirect_uris,
 }: OAuthAppUpdateVariables) {
   if (!id) throw new Error('OAuth app ID is required')
@@ -33,6 +36,7 @@ export async function updateOAuthApp({
     name,
     website,
     icon,
+    scopes,
     redirect_uris,
   })
   if (response.error) throw response.error
