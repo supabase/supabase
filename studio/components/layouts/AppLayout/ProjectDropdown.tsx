@@ -2,6 +2,14 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ParsedUrlQuery } from 'querystring'
 import { useState } from 'react'
+
+import { useParams } from 'common'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useProjectsQuery } from 'data/projects/projects-query'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { useIsFeatureEnabled, useSelectedOrganization, useSelectedProject } from 'hooks'
+import { IS_PLATFORM } from 'lib/constants'
+import { Organization, Project } from 'types'
 import {
   Badge,
   Button,
@@ -19,14 +27,6 @@ import {
   Popover_Shadcn_,
   ScrollArea,
 } from 'ui'
-
-import { useParams } from 'common'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useProjectsQuery } from 'data/projects/projects-query'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { useSelectedOrganization, useSelectedProject } from 'hooks'
-import { IS_PLATFORM } from 'lib/constants'
-import { Organization, Project } from 'types'
 
 // [Fran] the idea is to let users change projects without losing the current page,
 // but at the same time we need to redirect correctly between urls that might be
@@ -110,6 +110,8 @@ const ProjectDropdown = ({ isNewNav = false }: ProjectDropdownProps) => {
   const selectedOrganization = useSelectedOrganization()
   const { data: allProjects, isLoading: isLoadingProjects } = useProjectsQuery()
 
+  const projectCreationEnabled = useIsFeatureEnabled('projects:create')
+
   const isBranch = projectDetails?.parentRef !== projectDetails?.ref
   const isOrgBilling = !!selectedOrganization?.subscription_id
   const { data: subscription, isSuccess } = useProjectSubscriptionV2Query(
@@ -165,30 +167,32 @@ const ProjectDropdown = ({ isNewNav = false }: ProjectDropdownProps) => {
                   ))}
                 </ScrollArea>
               </CommandGroup_Shadcn_>
-              <CommandGroup_Shadcn_ className="border-t">
-                <Link
-                  passHref
-                  href={`/new/${selectedOrganization?.slug}`}
-                  onClick={() => {
-                    setOpen(false)
-                  }}
-                >
-                  <CommandItem_Shadcn_
-                    asChild
-                    className="cursor-pointer flex items-center space-x-2 w-full"
-                    onSelect={() => {
+              {projectCreationEnabled && (
+                <CommandGroup_Shadcn_ className="border-t">
+                  <Link
+                    passHref
+                    href={`/new/${selectedOrganization?.slug}`}
+                    onClick={() => {
                       setOpen(false)
-                      router.push(`/new/${selectedOrganization?.slug}`)
                     }}
-                    onClick={() => setOpen(false)}
                   >
-                    <a>
-                      <IconPlus size={14} strokeWidth={1.5} />
-                      <p>New project</p>
-                    </a>
-                  </CommandItem_Shadcn_>
-                </Link>
-              </CommandGroup_Shadcn_>
+                    <CommandItem_Shadcn_
+                      asChild
+                      className="cursor-pointer flex items-center space-x-2 w-full"
+                      onSelect={() => {
+                        setOpen(false)
+                        router.push(`/new/${selectedOrganization?.slug}`)
+                      }}
+                      onClick={() => setOpen(false)}
+                    >
+                      <a>
+                        <IconPlus size={14} strokeWidth={1.5} />
+                        <p>New project</p>
+                      </a>
+                    </CommandItem_Shadcn_>
+                  </Link>
+                </CommandGroup_Shadcn_>
+              )}
             </CommandList_Shadcn_>
           </Command_Shadcn_>
         </PopoverContent_Shadcn_>
