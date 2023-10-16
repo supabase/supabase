@@ -1,6 +1,7 @@
 export * from './deprecated'
 export * from './misc/useCheckPermissions'
 export * from './misc/useImmutableValue'
+export * from './misc/useIsFeatureEnabled'
 export * from './misc/useLocalStorage'
 export * from './misc/useSelectedOrganization'
 export * from './misc/useSelectedProject'

@@ -11,13 +11,16 @@ import {
 
 import { usePostgresServiceStatusQuery } from 'data/service-status/postgres-service-status-query'
 import { useProjectServiceStatusQuery } from 'data/service-status/service-status-query'
-import { useSelectedProject } from 'hooks'
+import { useIsFeatureEnabled, useSelectedProject } from 'hooks'
 import { useEdgeFunctionServiceStatusQuery } from 'data/service-status/edge-functions-status-query'
 
 const ServiceStatus = () => {
   const { ref } = useParams()
   const project = useSelectedProject()
   const [open, setOpen] = useState(false)
+
+  const { projectAuthAll: authEnabled, projectEdgeFunctionAll: edgeFunctionsEnabled } =
+    useIsFeatureEnabled(['project_auth:all', 'project_edge_function:all'])
 
   const isBranch = project?.parentRef !== project?.ref
 
@@ -45,15 +48,21 @@ const ServiceStatus = () => {
       isSuccess: isSuccessPostgres,
     },
     { name: 'PostgREST', docsUrls: undefined, isLoading, isSuccess: restStatus?.healthy },
-    { name: 'Auth', docsUrls: undefined, isLoading, isSuccess: authStatus?.healthy },
+    ...(authEnabled
+      ? [{ name: 'Auth', docsUrls: undefined, isLoading, isSuccess: authStatus?.healthy }]
+      : []),
     { name: 'Realtime', docsUrls: undefined, isLoading, isSuccess: realtimeStatus?.healthy },
     // { name: 'Storage', docsUrls: undefined, isLoading, isSuccess: storageStatus?.healthy },
-    {
-      name: 'Edge Functions',
-      docsUrl: 'https://supabase.com/docs/guides/functions/troubleshooting',
-      isLoading,
-      isSuccess: edgeFunctionsStatus?.healthy,
-    },
+    ...(edgeFunctionsEnabled
+      ? [
+          {
+            name: 'Edge Functions',
+            docsUrl: 'https://supabase.com/docs/guides/functions/troubleshooting',
+            isLoading,
+            isSuccess: edgeFunctionsStatus?.healthy,
+          },
+        ]
+      : []),
   ]
 
   const isLoadingChecks = services.some((service) => service.isLoading)

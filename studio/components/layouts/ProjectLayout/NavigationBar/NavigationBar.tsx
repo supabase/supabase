@@ -5,6 +5,7 @@ import { FlaskConical } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+
 import {
   Button,
   DropdownMenu,
@@ -26,7 +27,7 @@ import {
 } from 'ui'
 
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useFlag } from 'hooks'
+import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -52,9 +53,19 @@ const NavigationBar = () => {
   const showFeaturePreviews = useFlag('featurePreviews')
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
 
+  const {
+    projectAuthAll: authEnabled,
+    projectEdgeFunctionAll: edgeFunctionsEnabled,
+    projectStorageAll: storageEnabled,
+  } = useIsFeatureEnabled(['project_auth:all', 'project_edge_function:all', 'project_storage:all'])
+
   const activeRoute = router.pathname.split('/')[3]
   const toolRoutes = generateToolRoutes(projectRef, project, supabaseAIEnabled)
-  const productRoutes = generateProductRoutes(projectRef, project)
+  const productRoutes = generateProductRoutes(projectRef, project, {
+    auth: authEnabled,
+    edgeFunctions: edgeFunctionsEnabled,
+    storage: storageEnabled,
+  })
   const otherRoutes = generateOtherRoutes(projectRef, project, isNewAPIDocsEnabled)
 
   return (

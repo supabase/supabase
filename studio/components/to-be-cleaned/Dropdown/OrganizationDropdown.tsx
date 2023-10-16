@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router'
 
+import { useIsFeatureEnabled } from 'hooks'
 import { EMPTY_ARR } from 'lib/void'
 import {
   Button,
@@ -19,6 +20,8 @@ const OrganizationDropdown = ({
 }) => {
   const router = useRouter()
 
+  const organizationCreationEnabled = useIsFeatureEnabled('organizations:create')
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -36,11 +39,15 @@ const OrganizationDropdown = ({
                 {x.name}
               </DropdownMenuItem>
             ))}
-          <DropdownMenuSeparator />
-          <DropdownMenuItem className="space-x-2" onClick={() => router.push(`/new`)}>
-            <IconPlus size="tiny" />
-            <p>New organization</p>
-          </DropdownMenuItem>
+          {organizationCreationEnabled && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="space-x-2" onClick={() => router.push(`/new`)}>
+                <IconPlus size="tiny" />
+                <p>New organization</p>
+              </DropdownMenuItem>
+            </>
+          )}
         </>
       </DropdownMenuContent>
     </DropdownMenu>

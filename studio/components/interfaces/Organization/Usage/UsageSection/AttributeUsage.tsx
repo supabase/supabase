@@ -21,6 +21,7 @@ import {
 } from '../Usage.utils'
 import UsageBarChart from '../UsageBarChart'
 import { ChartMeta } from './UsageSection'
+import { useIsFeatureEnabled } from 'hooks'
 
 export interface AttributeUsageProps {
   slug: string
@@ -54,6 +55,8 @@ const AttributeUsage = ({
   isSuccess,
   currentBillingCycleSelected,
 }: AttributeUsageProps) => {
+  const billingEnabled = useIsFeatureEnabled('billing:all')
+
   const upgradeUrl = getUpgradeUrl(slug ?? '', subscription)
   const usageRatio = (usageMeta?.usage ?? 0) / (usageMeta?.pricing_free_units ?? 0)
   const usageExcess = (usageMeta?.usage ?? 0) - (usageMeta?.pricing_free_units ?? 0)
@@ -149,7 +152,7 @@ const AttributeUsage = ({
                         )}
                       </div>
 
-                      {showUsageWarning && (
+                      {billingEnabled && showUsageWarning && (
                         <Link href={upgradeUrl}>
                           <a className="pb-1">
                             <Button type="default" size="tiny">
@@ -282,11 +285,13 @@ const AttributeUsage = ({
                         </p>
                       </div>
                     </div>
-                    <Link href={upgradeUrl}>
-                      <a>
-                        <Button type="primary">Upgrade plan</Button>
-                      </a>
-                    </Link>
+                    {billingEnabled && (
+                      <Link href={upgradeUrl}>
+                        <a>
+                          <Button type="primary">Upgrade plan</Button>
+                        </a>
+                      </Link>
+                    )}
                   </div>
                 </Panel.Content>
               </Panel>

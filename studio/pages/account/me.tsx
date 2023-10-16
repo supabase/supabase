@@ -11,7 +11,7 @@ import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProfileUpdateMutation } from 'data/profile/profile-update-mutation'
-import { useStore } from 'hooks'
+import { useIsFeatureEnabled, useStore } from 'hooks'
 import { useProfile } from 'lib/profile'
 import { NextPageWithLayout } from 'types'
 
@@ -41,6 +41,9 @@ export default User
 
 const ProfileCard = observer(() => {
   const { ui } = useStore()
+
+  const profileUpdateEnabled = useIsFeatureEnabled('profile:update')
+
   const { profile, error, isLoading, isError, isSuccess } = useProfile()
   const { mutateAsync: updateProfile, isLoading: isUpdating } = useProfileUpdateMutation({
     onSuccess: () => {
@@ -86,26 +89,28 @@ const ProfileCard = observer(() => {
           <section>
             <AccountInformation profile={profile} />
           </section>
-          <section>
-            {/* @ts-ignore */}
-            <SchemaFormPanel
-              title="Profile"
-              schema={{
-                type: 'object',
-                required: [],
-                properties: {
-                  first_name: { type: 'string' },
-                  last_name: { type: 'string' },
-                },
-              }}
-              model={{
-                first_name: profile?.first_name ?? '',
-                last_name: profile?.last_name ?? '',
-              }}
-              onSubmit={updateUser}
-              loading={isUpdating}
-            />
-          </section>
+          {profileUpdateEnabled && (
+            <section>
+              {/* @ts-ignore */}
+              <SchemaFormPanel
+                title="Profile"
+                schema={{
+                  type: 'object',
+                  required: [],
+                  properties: {
+                    first_name: { type: 'string' },
+                    last_name: { type: 'string' },
+                  },
+                }}
+                model={{
+                  first_name: profile?.first_name ?? '',
+                  last_name: profile?.last_name ?? '',
+                }}
+                onSubmit={updateUser}
+                loading={isUpdating}
+              />
+            </section>
+          )}
         </>
       )}
 

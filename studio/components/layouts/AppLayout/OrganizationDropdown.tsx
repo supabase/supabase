@@ -1,6 +1,11 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useIsFeatureEnabled, useSelectedOrganization } from 'hooks'
 import {
   Badge,
   Button,
@@ -19,11 +24,6 @@ import {
   ScrollArea,
 } from 'ui'
 
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from 'hooks'
-
 interface OrganizationDropdownProps {
   isNewNav?: boolean
 }
@@ -32,6 +32,8 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
   const router = useRouter()
   const selectedOrganization = useSelectedOrganization()
   const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
+
+  const organizationCreationEnabled = useIsFeatureEnabled('organizations:create')
 
   const slug = selectedOrganization?.slug
   const orgName = selectedOrganization?.name
@@ -101,24 +103,26 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
                   })}
                 </ScrollArea>
               </CommandGroup_Shadcn_>
-              <CommandGroup_Shadcn_ className="border-t">
-                <Link passHref href="/new">
-                  <CommandItem_Shadcn_
-                    asChild
-                    className="cursor-pointer flex items-center space-x-2 w-full"
-                    onSelect={(e) => {
-                      setOpen(false)
-                      router.push(`/new`)
-                    }}
-                    onClick={() => setOpen(false)}
-                  >
-                    <a>
-                      <IconPlus size={14} strokeWidth={1.5} />
-                      <p>New organization</p>
-                    </a>
-                  </CommandItem_Shadcn_>
-                </Link>
-              </CommandGroup_Shadcn_>
+              {organizationCreationEnabled && (
+                <CommandGroup_Shadcn_ className="border-t">
+                  <Link passHref href="/new">
+                    <CommandItem_Shadcn_
+                      asChild
+                      className="cursor-pointer flex items-center space-x-2 w-full"
+                      onSelect={(e) => {
+                        setOpen(false)
+                        router.push(`/new`)
+                      }}
+                      onClick={() => setOpen(false)}
+                    >
+                      <a>
+                        <IconPlus size={14} strokeWidth={1.5} />
+                        <p>New organization</p>
+                      </a>
+                    </CommandItem_Shadcn_>
+                  </Link>
+                </CommandGroup_Shadcn_>
+              )}
             </CommandList_Shadcn_>
           </Command_Shadcn_>
         </PopoverContent_Shadcn_>
