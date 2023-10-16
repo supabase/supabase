@@ -17,6 +17,8 @@ const Hero = () => {
     await Telemetry.sendEvent(event, telemetryProps, router)
   }
 
+  const isDefaultLocal = router.locale !== 'ja'
+
   return (
     <div className="relative -mt-[65px]">
       <SectionContainer className="pt-8 md:pt-16 overflow-hidden">
@@ -42,10 +44,13 @@ const Hero = () => {
                     </span>
                   </h1>
                   <p className="pt-2 text-scale-1200 my-3 text-sm sm:mt-5 lg:mb-0 sm:text-base lg:text-lg">
-                    Supabase is an open source Firebase alternative.{' '}
+                    {isDefaultLocal
+                      ? 'Supabase is an open source Firebase alternative.'
+                      : 'SupabaseはオープンソースのFirebaseの代替サービスです。'}
                     <br className="hidden md:block" />
-                    Start your project with a Postgres database, Authentication, instant APIs, Edge
-                    Functions, Realtime subscriptions, Storage, and Vector embeddings.
+                    {isDefaultLocal
+                      ? 'Start your project with a Postgres database, Authentication, instant APIs, Edge Functions, Realtime subscriptions, Storage, and Vector embeddings.'
+                      : 'Postgresデータベース、認証、自動生成されるAPI、Edge Functions、リアルタイム機能、ストレージ、ベクトルデータベースなどの機能を持ったプロジェクトを今すぐ始めましょう。'}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -59,7 +64,7 @@ const Hero = () => {
                       tabIndex={-1}
                     >
                       <Button size="medium" className="text-white">
-                        Start your project
+                        {isDefaultLocal ? 'Start your project' : 'プロジェクトを作る'}
                       </Button>
                     </a>
                   </Link>
@@ -69,7 +74,7 @@ const Hero = () => {
                       tabIndex={-1}
                     >
                       <Button size="medium" type="default" icon={<IconBookOpen />}>
-                        Documentation
+                        {isDefaultLocal ? 'Documentation' : 'ドキュメンテーション'}
                       </Button>
                     </a>
                   </Link>
