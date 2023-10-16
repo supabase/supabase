@@ -1256,6 +1256,10 @@ export const platform: NavMenuConstant = {
           name: 'Build a Supabase Integration',
           url: '/guides/platform/oauth-apps/build-a-supabase-integration',
         },
+        {
+          name: 'OAuth Scopes',
+          url: '/guides/platform/oauth-apps/oauth-scopes',
+        },
       ],
     },
     {

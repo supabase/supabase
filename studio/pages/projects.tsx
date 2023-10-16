@@ -1,3 +1,6 @@
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+
 import ProjectList from 'components/interfaces/Home/ProjectList'
 import { AccountLayout } from 'components/layouts'
 import OrganizationDropdown from 'components/to-be-cleaned/Dropdown/OrganizationDropdown'
@@ -8,8 +11,6 @@ import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
 import { useFlag } from 'hooks'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
 import { NextPageWithLayout } from 'types'
 
 const ProjectsPage: NextPageWithLayout = () => {
