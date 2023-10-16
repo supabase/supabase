@@ -159,7 +159,7 @@ export const TopApiRoutesRenderer = (
         }
       />
       <Collapsible.Trigger asChild>
-        <div className="flex flex-row justify-end w-full gap-2 pt-1">
+        <div className="flex flex-row justify-end w-full gap-2 p-1">
           <Button
             type="text"
             onClick={() => setShowMore(!showMore)}
