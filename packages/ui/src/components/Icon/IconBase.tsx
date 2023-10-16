@@ -106,6 +106,7 @@ function IconBase({
               width="100%"
               height="100%"
               strokeWidth={strokeWidth ?? undefined}
+              {...props}
             >
               {/* Import custom icon path from svg with 16x16px viewport */}
               {src}
