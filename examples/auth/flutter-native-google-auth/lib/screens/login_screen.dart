@@ -47,8 +47,8 @@ class _LoginScreenState extends State<LoginScreen> {
     /// TODO: update the iOS and Web client ID with your own.
     ///
     /// Client ID that you registered with Google Cloud.
-    /// Note that to perform Google login on Android, you need to
-    /// provide the web client ID, and not the Android client ID.
+    /// Note that in order to perform Google sign in on Android, you need to
+    /// provide the web client ID, not the Android client ID.
     final clientId = Platform.isIOS ? 'IOS_CLIENT_ID' : 'WEB_CLIENT_ID';
 
     late final String? idToken;
