@@ -783,7 +783,7 @@ functions:
   - id: auth-mfa-api
     title: 'Overview'
     notes: |
-      This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.auth.mfa` namespace. 
+      This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.auth.mfa` namespace.
 
       Currently, we only support time-based one-time password (TOTP) as the 2nd factor. We don't support recovery codes but we allow users to enroll more than 1 TOTP factor, with an upper limit of 10.
 
@@ -4559,7 +4559,7 @@ functions:
         code: |
           ```js
           supabase
-            .channel('any')
+            .channel('room1')
             .on('broadcast', { event: 'cursor-pos' }, payload => {
               console.log('Cursor position received!', payload)
             })
@@ -4578,7 +4578,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          const channel = supabase.channel('any')
+          const channel = supabase.channel('room1')
           channel
             .on('presence', { event: 'sync' }, () => {
               console.log('Synced presence state: ', channel.presenceState())
@@ -4594,7 +4594,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          const channel = supabase.channel('any')
+          const channel = supabase.channel('room1')
           channel
             .on('presence', { event: 'join' }, ({ newPresences }) => {
               console.log('Newly joined presences: ', newPresences)
@@ -4610,7 +4610,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          const channel = supabase.channel('any')
+          const channel = supabase.channel('room1')
           channel
             .on('presence', { event: 'leave' }, ({ leftPresences }) => {
               console.log('Newly left presences: ', leftPresences)
@@ -4628,7 +4628,7 @@ functions:
         code: |
           ```js
           supabase
-            .channel('any')
+            .channel('room1')
             .on('postgres_changes', { event: '*', schema: '*' }, payload => {
               console.log('Change received!', payload)
             })
@@ -4639,7 +4639,7 @@ functions:
         code: |
           ```js
           supabase
-            .channel('any')
+            .channel('room1')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
             })
@@ -4650,7 +4650,7 @@ functions:
         code: |
           ```js
           supabase
-            .channel('any')
+            .channel('room1')
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
             })
@@ -4668,7 +4668,7 @@ functions:
         code: |
           ```js
           supabase
-            .channel('any')
+            .channel('room1')
             .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
             })
@@ -4686,7 +4686,7 @@ functions:
         code: |
           ```js
           supabase
-            .channel('any')
+            .channel('room1')
             .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
             })
@@ -4698,7 +4698,7 @@ functions:
         code: |
           ```js
           supabase
-            .channel('any')
+            .channel('room1')
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'countries' }, handleRecordInserted)
             .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'countries' }, handleRecordDeleted)
             .subscribe()
@@ -4711,11 +4711,50 @@ functions:
         code: |
           ```js
           supabase
-            .channel('any')
+            .channel('room1')
             .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'countries', filter: 'id=eq.200' }, handleRecordUpdated)
             .subscribe()
           ```
-
+  - id: broadcast-message
+    title: broadcastMessage()
+    description: |
+      Broadcast a message to all connected clients to a channel.
+    notes: |
+      - When using REST you don't need to subscribe to the channel
+      - REST calls are only available from 2.37.0 onwards
+    $ref: '@supabase/realtime-js.RealtimeChannel.send'
+    examples:
+      - id: send-a-message
+        name: Send a message via websocket
+        isSpotlight: true
+        code: |
+          ```js
+          supabase
+            .channel('room1')
+            .subscribe((status) => {
+              if (status === 'SUBSCRIBED') {
+                channel.send({
+                  type: 'broadcast',
+                  event: 'cursor-pos',
+                  payload: { x: Math.random(), y: Math.random() },
+                })
+              }
+            })
+          ```
+      - id: send-a-message-via-rest
+        name: Send a message via REST
+        isSpotlight: true
+        code: |
+          ```js
+          supabase
+            .channel('room1')
+            .send({
+              type: 'broadcast',
+              event: 'cursor-pos',
+              payload: { x: Math.random(), y: Math.random()
+              },
+            })
+          ```
   - id: get-channels
     title: getChannels()
     $ref: '@supabase/supabase-js.index.SupabaseClient.getChannels'
