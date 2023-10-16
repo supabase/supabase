@@ -73,6 +73,7 @@ const components = {
   DatabaseSetup,
   ProjectSetup,
   KotlinProjectSetup,
+  MigrationWarnings,
   SocialProviderSetup,
   SocialProviderSettingsSupabase,
   StepHikeCompact,
