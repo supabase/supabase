@@ -86,7 +86,7 @@ for select using ( auth.uid() = user_id );
 
 ### INSERT Policies
 
-You can specify select policies with the `with check` clause.
+You can specify insert policies with the `with check` clause.
 
 Let's say you have a table called `profiles` in the public schema and you only want users to be able to create a profile for themselves. In that case, we want to check their User ID matches the value that they are trying to insert:
 
@@ -104,13 +104,13 @@ alter table profiles enable row level security;
 -- 3. Create Policy
 create policy "Users can create a profile."
 on profiles for insert
-to authenticated                    -- the Postgres Role (recommended)
-using ( auth.id() = user_id );      -- the actual Policy
+to authenticated                          -- the Postgres Role (recommended)
+with check ( auth.uid() = user_id );      -- the actual Policy
 ```
 
 ### UPDATE Policies
 
-You can specify select policies with the `using` clause.
+You can specify update policies with the `using` clause.
 
 Let's say you have a table called `profiles` in the public schema and you only want users to be able to update their own profile:
 
@@ -128,13 +128,13 @@ alter table profiles enable row level security;
 -- 3. Create Policy
 create policy "Users can update their own profile."
 on profiles for update
-to authenticated                    -- the Postgres Role (recommended)
-using ( auth.id() = user_id );      -- the actual Policy
+to authenticated                     -- the Postgres Role (recommended)
+using ( auth.uid() = user_id );      -- the actual Policy
 ```
 
 ### DELETE Policies
 
-You can specify select policies with the `using` clause.
+You can specify delete policies with the `using` clause.
 
 Let's say you have a table called `profiles` in the public schema and you only want users to be able to delete their own profile:
 
@@ -152,8 +152,8 @@ alter table profiles enable row level security;
 -- 3. Create Policy
 create policy "Users can delete a profile."
 on profiles for delete
-to authenticated                    -- the Postgres Role (recommended)
-using ( auth.id() = user_id );      -- the actual Policy
+to authenticated                     -- the Postgres Role (recommended)
+using ( auth.uid() = user_id );      -- the actual Policy
 ```
 
 ## Bypassing Row Level Security
