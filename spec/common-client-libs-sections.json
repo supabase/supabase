@@ -789,7 +789,7 @@
       {
         "id": "broadcast-message",
         "title": "Broadcast a message",
-        "slug": "broadcastMessage",
+        "slug": "broadcastmessage",
         "product": "realtime",
         "type": "function"
       }
