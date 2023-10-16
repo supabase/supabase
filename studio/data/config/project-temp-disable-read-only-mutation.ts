@@ -33,10 +33,7 @@ export const useDisableReadOnlyModeMutation = ({
     (vars) => tempDisableReadOnlyMode(vars),
     {
       async onSuccess(data, variables, context) {
-        setTimeout(
-          async () => await queryClient.invalidateQueries(usageKeys.resourceWarnings()),
-          2000
-        )
+        setTimeout(() => queryClient.invalidateQueries(usageKeys.resourceWarnings()), 2000)
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
