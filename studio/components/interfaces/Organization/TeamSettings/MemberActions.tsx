@@ -1,6 +1,5 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { observer } from 'mobx-react-lite'
 
 import { useParams } from 'common/hooks'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
@@ -8,9 +7,19 @@ import { useOrganizationMemberDeleteMutation } from 'data/organizations/organiza
 import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
 import { useOrganizationMemberInviteDeleteMutation } from 'data/organizations/organization-member-invite-delete-mutation'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useIsFeatureEnabled, useSelectedOrganization, useStore } from 'hooks'
+import { observer } from 'mobx-react-lite'
 import { Member, Role } from 'types'
-import { Button, Dropdown, IconMoreHorizontal, IconTrash } from 'ui'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  IconMoreHorizontal,
+  IconTrash,
+} from 'ui'
 import { isInviteExpired } from '../Organization.utils'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 
@@ -22,6 +31,9 @@ interface MemberActionsProps {
 const MemberActions = ({ member, roles }: MemberActionsProps) => {
   const { ui } = useStore()
   const { slug } = useParams()
+
+  const organizationMembersDeletionEnabled = useIsFeatureEnabled('organization_members:delete')
+
   const selectedOrganization = useSelectedOrganization()
   const { data: permissions } = usePermissionsQuery()
   const { rolesRemovable } = useGetRolesManagementPermissions(
@@ -42,7 +54,7 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
     resource: { role_id: roleId },
   })
 
-  const { mutate: deleteOrganizationMember, isLoading: isOrganizationMemberDeleteLoading } =
+  const { mutate: deleteOrganizationMember, isLoading: isDeletingMember } =
     useOrganizationMemberDeleteMutation({
       onSuccess: () => {
         ui.setNotification({
@@ -52,29 +64,21 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
       },
     })
 
-  const {
-    mutate: createOrganizationMemberInvite,
-    isLoading: isOrganizationMemberInviteCreateLoading,
-  } = useOrganizationMemberInviteCreateMutation({
-    onSuccess: () => {
-      ui.setNotification({ category: 'success', message: 'Resent the invitation.' })
-    },
-    onError: (error) => {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to resend invitation: ${error.message}`,
-      })
-    },
-  })
+  const { mutate: createOrganizationMemberInvite, isLoading: isCreatingInvite } =
+    useOrganizationMemberInviteCreateMutation({
+      onSuccess: () => {
+        ui.setNotification({ category: 'success', message: 'Resent the invitation.' })
+      },
+      onError: (error) => {
+        ui.setNotification({
+          category: 'error',
+          message: `Failed to resend invitation: ${error.message}`,
+        })
+      },
+    })
 
-  const {
-    mutate: deleteOrganizationMemberInvite,
-    isLoading: isOrganizationMemberInviteDeleteLoading,
-  } = useOrganizationMemberInviteDeleteMutation({
-    onSuccess: () => {
-      ui.setNotification({ category: 'success', message: 'Successfully revoked the invitation.' })
-    },
-  })
+  const { mutateAsync: asyncDeleteMemberInvite, isLoading: isDeletingInvite } =
+    useOrganizationMemberInviteDeleteMutation()
 
   const handleMemberDelete = async () => {
     confirmAlert({
@@ -89,13 +93,17 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
   }
 
   const handleResendInvite = async (member: Member) => {
-    if (!slug) return console.error('Slug is required')
-    if (!member.invited_id) return console.error('Member invited ID is required')
     const roleId = (member?.role_ids ?? [])[0]
+    const invitedId = member.invited_id
+
+    if (!slug) return console.error('Slug is required')
+    if (!invitedId) return console.error('Member invited ID is required')
+
+    await asyncDeleteMemberInvite({ slug, invitedId, invalidateDetail: false })
     createOrganizationMemberInvite({
       slug,
       invitedEmail: member.primary_email,
-      ownerId: member.invited_id,
+      ownerId: invitedId,
       roleId: roleId,
     })
   }
@@ -104,7 +112,12 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
     const invitedId = member.invited_id
     if (!slug) return console.error('Slug is required')
     if (!invitedId) return console.error('Member invited ID is required')
-    deleteOrganizationMemberInvite({ slug, invitedId })
+
+    await asyncDeleteMemberInvite({ slug, invitedId })
+    ui.setNotification({
+      category: 'success',
+      message: 'Successfully revoked the invitation.',
+    })
   }
 
   if (!canRemoveMember || (isPendingInviteAcceptance && !canResendInvite && !canRevokeInvite)) {
@@ -123,7 +136,7 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
                   'border border-scale-200 ', //border
                 ].join(' ')}
               >
-                <span className="text-xs text-scale-1200">
+                <span className="text-xs text-foreground">
                   You need additional permissions to manage this team member
                 </span>
               </div>
@@ -134,59 +147,58 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
     )
   }
 
-  const isLoading =
-    isOrganizationMemberDeleteLoading ||
-    isOrganizationMemberInviteDeleteLoading ||
-    isOrganizationMemberInviteCreateLoading
+  const isLoading = isDeletingMember || isDeletingInvite || isCreatingInvite
 
   return (
     <div className="flex items-center justify-end">
-      <Dropdown
-        side="bottom"
-        align="end"
-        size="small"
-        overlay={
+      <DropdownMenu>
+        <DropdownMenuTrigger>
+          <Button
+            asChild
+            type="text"
+            disabled={isLoading}
+            loading={isLoading}
+            icon={<IconMoreHorizontal />}
+          >
+            <span></span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent side="bottom" align="end">
           <>
             {isPendingInviteAcceptance ? (
               <>
                 {canRevokeInvite && (
-                  <Dropdown.Item onClick={() => handleRevokeInvitation(member)}>
+                  <DropdownMenuItem onClick={() => handleRevokeInvitation(member)}>
                     <div className="flex flex-col">
                       <p>Cancel invitation</p>
                       <p className="block opacity-50">Revoke this invitation.</p>
                     </div>
-                  </Dropdown.Item>
+                  </DropdownMenuItem>
                 )}
-                {canResendInvite && isExpired && (
+                {/* canResendInvite && isExpired */}
+                {true && (
                   <>
-                    <Dropdown.Separator />
-                    <Dropdown.Item onClick={() => handleResendInvite(member)}>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => handleResendInvite(member)}>
                       <div className="flex flex-col">
                         <p>Resend invitation</p>
                         <p className="block opacity-50">Invites expire after 24hrs.</p>
                       </div>
-                    </Dropdown.Item>
+                    </DropdownMenuItem>
                   </>
                 )}
               </>
             ) : (
-              <Dropdown.Item icon={<IconTrash size={16} />} onClick={handleMemberDelete}>
-                <p>Remove member</p>
-              </Dropdown.Item>
+              organizationMembersDeletionEnabled && (
+                <DropdownMenuItem className="space-x-2" onClick={handleMemberDelete}>
+                  <IconTrash size={16} />
+                  <p>Remove member</p>
+                </DropdownMenuItem>
+              )
             )}
           </>
-        }
-      >
-        <Button
-          asChild
-          type="text"
-          disabled={isLoading}
-          loading={isLoading}
-          icon={<IconMoreHorizontal />}
-        >
-          <span></span>
-        </Button>
-      </Dropdown>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   )
 }

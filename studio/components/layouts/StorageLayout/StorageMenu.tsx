@@ -44,7 +44,7 @@ const StorageMenu = () => {
                 block
                 type="default"
                 icon={
-                  <div className="text-scale-900">
+                  <div className="text-foreground-lighter">
                     <IconEdit size={14} />
                   </div>
                 }
@@ -65,7 +65,7 @@ const StorageMenu = () => {
                       'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">
+                    <span className="text-xs text-foreground">
                       You need additional permissions to create buckets
                     </span>
                   </div>
@@ -104,7 +104,7 @@ const StorageMenu = () => {
                       </Alert>
                     </div>
                   )}
-                  {buckets.map((bucket: any, idx: number) => {
+                  {buckets.map((bucket, idx: number) => {
                     const isSelected = bucketId === bucket.id
                     return (
                       <BucketRow

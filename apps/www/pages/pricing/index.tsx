@@ -10,15 +10,16 @@ import DefaultLayout from '~/components/Layouts/Default'
 import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/Pricing/PricingTableRow'
 import { pricing } from 'shared-data/pricing'
 import pricingFaq from '~/data/PricingFAQ.json'
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 import ComputePricingModal from '~/components/Pricing/ComputePricingModal'
 import { plans } from 'shared-data/plans'
-import { ArrowNarrowRightIcon } from '@heroicons/react/outline'
+import AnnouncementBadge from '../../components/Announcement/Badge'
+import Image from 'next/image'
 
 export default function IndexPage() {
   const router = useRouter()
   const { basePath, asPath } = useRouter()
-  const { isDarkMode } = useTheme()
+  const { resolvedTheme } = useTheme()
   const [showComputeModal, setShowComputeModal] = useState(false)
   const [activeMobilePlan, setActiveMobilePlan] = useState('Free')
 
@@ -151,7 +152,7 @@ export default function IndexPage() {
       />
 
       <div>
-        <div className="relative z-10 py-16 lg:py-28">
+        <div className="relative z-10 py-16 lg:py-20">
           <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
             <div className="mx-auto max-w-3xl space-y-2 lg:max-w-none">
               <h1 className="text-brand text-base">Pricing</h1>
@@ -159,45 +160,13 @@ export default function IndexPage() {
               <p className="p text-lg">
                 Start building for free, collaborate with a team, then scale to millions of users.
               </p>
-              <div className="w-full flex justify-center items-center opacity-0 !animate-[fadeIn_0.5s_cubic-bezier(0.25,0.25,0,1)_0.5s_both]">
-                <Link href="/blog/organization-based-billing" passHref>
-                  <a
-                    target="_blank"
-                    className="
-          group
-          relative
-          flex flex-row
-          items-center
-          pr-3 p-1
-          text-sm
-          w-auto
-          gap-2
-          text-left
-          rounded-full
-          bg-opacity-20
-          border
-          border-background-surface-100
-          hover:border-background-surface-300
-          overflow-hidden
-          focus:outline-none focus:ring-brand-600 focus:ring-2 focus:rounded-full
-          "
-                  >
-                    <Badge color="brand" size="large" className="py-1">
-                      Update
-                    </Badge>
-                    <span className="text-foreground">Changes to how we bill</span>
-                    <ArrowNarrowRightIcon className="h-4 ml-2 -translate-x-1 transition-transform group-hover:translate-x-0" />
-                    <div
-                      className="absolute inset-0 -z-10 bg-gradient-to-br
-            opacity-70
-            overflow-hidden rounded-full
-            from-background-surface-100
-            to-background-surface-300
-            backdrop-blur-md
-            "
-                    />
-                  </a>
-                </Link>
+              <div className="w-full inline-flex justify-center items-center pt-3 pb-6">
+                <AnnouncementBadge
+                  url="/blog/organization-based-billing"
+                  badge="Update"
+                  announcement="Changes to how we bill"
+                  target="_blank"
+                />
               </div>
             </div>
           </div>
@@ -372,22 +341,26 @@ export default function IndexPage() {
           <div className="grid lg:grid-cols-3 gap-4 mb-16">
             {addons.map((addon) => (
               <div className="bg-white dark:bg-scale-300 rounded-[4px]" key={addon.name}>
-                <div className="overflow-hidden rounded-lg">
-                  <img
+                <div className="overflow-hidden rounded-lg relative h-56">
+                  <Image
                     className="w-full"
+                    layout="fill"
+                    objectFit="contain"
                     src={`${basePath}/images/pricing/${addon.heroImg}${
-                      isDarkMode ? '' : '-light'
+                      resolvedTheme === 'dark' ? '' : '-light'
                     }.png`}
                   />
                 </div>
                 <div className="px-8 -mt-1">
                   <p className="text-[13px] text-scale-900">{addon.price}</p>
                   <div className="flex items-center gap-2 mt-2">
-                    <img
+                    <Image
                       src={`${basePath}/images/pricing/${addon.icon}${
-                        isDarkMode ? '' : '-light'
+                        resolvedTheme === 'dark' ? '' : '-light'
                       }.svg`}
                       className="file:"
+                      width={14}
+                      height={14}
                       alt="Compute"
                     />
                     <span className="text-sm text-scale-1200">{addon.name}</span>
@@ -437,7 +410,7 @@ export default function IndexPage() {
           id="cost-control"
           className="grid lg:grid-cols-2 gap-8 items-center mt-12 lg:mt-8 max-w-6xl mx-auto"
         >
-          <div>
+          <div className="lg:py-12">
             <span className="bg-brand-300 text-brand-600 rounded-md bg-opacity-30 inline-block  dark:bg-scale-400 dark:text-scale-1100 py-0.5 px-2 text-[13px] leading-4 mt-2">
               Available for Pro plan
             </span>
@@ -449,10 +422,14 @@ export default function IndexPage() {
               restrictions if you have the spend cap enabled and exhaust your quota.
             </p>
           </div>
-          <div>
-            <img
+          <div className="relative h-full min-h-[14rem]">
+            <Image
+              layout="fill"
+              objectFit="contain"
               className="w-full"
-              src={`${basePath}/images/pricing/spend-cap${isDarkMode ? '' : '-light'}.png`}
+              src={`${basePath}/images/pricing/spend-cap${
+                resolvedTheme === 'dark' ? '' : '-light'
+              }.png`}
             />
           </div>
         </div>
@@ -873,7 +850,7 @@ export default function IndexPage() {
                       >
                         <a>
                           <Button size="tiny" type="primary" block>
-                            Get started
+                            Get Started
                           </Button>
                         </a>
                       </Link>
@@ -886,7 +863,7 @@ export default function IndexPage() {
                       >
                         <a>
                           <Button size="tiny" type="primary" block>
-                            Get started
+                            Get Started
                           </Button>
                         </a>
                       </Link>
@@ -906,7 +883,7 @@ export default function IndexPage() {
                       <Link href="https://forms.supabase.com/enterprise">
                         <a>
                           <Button size="tiny" type="default" block>
-                            Contact us
+                            Contact Us
                           </Button>
                         </a>
                       </Link>

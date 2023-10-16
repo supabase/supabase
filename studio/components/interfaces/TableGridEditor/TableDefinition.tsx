@@ -1,25 +1,29 @@
 import Editor from '@monaco-editor/react'
-import { useTheme } from 'common'
+import { useTheme } from 'next-themes'
+import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
 import { useMemo, useRef } from 'react'
 import { format } from 'sql-formatter'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useTableDefinitionQuery } from 'data/database/table-definition-query'
 import { useViewDefinitionQuery } from 'data/database/view-definition-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import useEntityType from 'hooks/misc/useEntityType'
 import { timeout } from 'lib/helpers'
+import Link from 'next/link'
+import { Button } from 'ui'
 
 export interface TableDefinitionProps {
   id?: number
 }
 
 const TableDefinition = ({ id }: TableDefinitionProps) => {
+  const { ref } = useParams()
   const editorRef = useRef(null)
   const monacoRef = useRef(null)
-  const { isDarkMode } = useTheme()
+  const { resolvedTheme } = useTheme()
   const entityType = useEntityType(id)
   const { project } = useProjectContext()
 
@@ -91,19 +95,25 @@ const TableDefinition = ({ id }: TableDefinitionProps) => {
 
   if (isLoading) {
     return (
-      <div className="py-4 space-y-2">
-        <ShimmeringLoader />
-        <ShimmeringLoader className="w-3/4" />
-        <ShimmeringLoader className="w-1/2" />
+      <div className="p-4">
+        <GenericSkeletonLoader />
       </div>
     )
   }
 
   return (
-    <div className="flex-grow overflow-y-auto border-t border-scale-400">
+    <div className="flex-grow overflow-y-auto border-t border-scale-400 relative">
+      <Link
+        passHref
+        href={`/project/${ref}/sql/new?content=${encodeURIComponent(formattedDefinition ?? '')}`}
+      >
+        <Button asChild type="default" className="absolute top-2 right-5 z-10">
+          <a>Open in SQL Editor</a>
+        </Button>
+      </Link>
       <Editor
         className="monaco-editor"
-        theme={isDarkMode ? 'vs-dark' : 'vs'}
+        theme={resolvedTheme === 'dark' ? 'vs-dark' : 'vs'}
         onMount={handleEditorOnMount}
         defaultLanguage="pgsql"
         value={formattedDefinition}

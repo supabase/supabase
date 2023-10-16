@@ -29,7 +29,7 @@ const FormActions = ({
         helper ? 'justify-between' : 'justify-end',
       ].join(' ')}
     >
-      {helper && <span className="text-sm text-scale-900">{helper}</span>}
+      {helper && <span className="text-sm text-foreground-lighter">{helper}</span>}
       <div className="flex items-center gap-2">
         <Button disabled={isDisabled} type="default" htmlType="reset" onClick={() => handleReset()}>
           Cancel

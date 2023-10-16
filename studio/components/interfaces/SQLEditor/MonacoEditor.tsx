@@ -1,7 +1,8 @@
 import Editor, { Monaco, OnMount } from '@monaco-editor/react'
 import { useParams } from 'common'
+import { debounce } from 'lodash'
 import { useRouter } from 'next/router'
-import { MutableRefObject, useRef } from 'react'
+import { MutableRefObject, useEffect, useRef } from 'react'
 import { cn } from 'ui'
 
 import { SqlSnippet } from 'data/content/sql-snippets-query'
@@ -74,10 +75,14 @@ const MonacoEditor = ({
     }
   }
 
+  const debouncedSetSql = debounce((id, value) => {
+    snap.setSql(id, value)
+  }, 1000)
+
   function handleEditorChange(value: string | undefined) {
     if (id && value) {
       if (snap.snippets[id]) {
-        snap.setSql(id, value)
+        debouncedSetSql(id, value)
       } else {
         const snippet = createSqlSnippetSkeleton({
           id,
@@ -95,6 +100,14 @@ const MonacoEditor = ({
     }
   }
 
+  // if an SQL query is passed by the content parameter, set the editor value to its content. This
+  // is usually used for sending the user to SQL editor from other pages with SQL.
+  useEffect(() => {
+    if (content && content.length > 0) {
+      handleEditorChange(content)
+    }
+  }, [])
+
   return (
     <Editor
       className={cn(className, 'monaco-editor')}
@@ -102,7 +115,7 @@ const MonacoEditor = ({
       onMount={handleEditorOnMount}
       onChange={handleEditorChange}
       defaultLanguage="pgsql"
-      defaultValue={snippet?.snippet.content.sql ?? content}
+      defaultValue={snippet?.snippet.content.sql}
       path={id}
       options={{
         tabSize: 2,

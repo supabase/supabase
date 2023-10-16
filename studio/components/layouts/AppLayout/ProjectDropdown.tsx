@@ -2,6 +2,14 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ParsedUrlQuery } from 'querystring'
 import { useState } from 'react'
+
+import { useParams } from 'common'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useProjectsQuery } from 'data/projects/projects-query'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { useIsFeatureEnabled, useSelectedOrganization, useSelectedProject } from 'hooks'
+import { IS_PLATFORM } from 'lib/constants'
+import { Organization, Project } from 'types'
 import {
   Badge,
   Button,
@@ -19,14 +27,6 @@ import {
   Popover_Shadcn_,
   ScrollArea,
 } from 'ui'
-
-import { useParams } from 'common'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useProjectsQuery } from 'data/projects/projects-query'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { useSelectedOrganization, useSelectedProject } from 'hooks'
-import { IS_PLATFORM } from 'lib/constants'
-import { Organization, Project } from 'types'
 
 // [Fran] the idea is to let users change projects without losing the current page,
 // but at the same time we need to redirect correctly between urls that might be
@@ -99,33 +99,37 @@ const ProjectLink = ({
   )
 }
 
-const ProjectDropdown = () => {
+interface ProjectDropdownProps {
+  isNewNav?: boolean
+}
+
+const ProjectDropdown = ({ isNewNav = false }: ProjectDropdownProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const projectDetails = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
   const { data: allProjects, isLoading: isLoadingProjects } = useProjectsQuery()
 
-  const isBranch = projectDetails?.parent_project_ref !== undefined
-  const parentProject = isBranch
-    ? allProjects?.find((project) => project.ref === projectDetails.parent_project_ref)
-    : undefined
+  const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
+  const isBranch = projectDetails?.parentRef !== projectDetails?.ref
   const isOrgBilling = !!selectedOrganization?.subscription_id
   const { data: subscription, isSuccess } = useProjectSubscriptionV2Query(
     { projectRef: ref },
     { enabled: !isOrgBilling }
   )
-  const projects = allProjects
-    ?.filter((x) => x.organization_id === selectedOrganization?.id)
-    .sort((a, b) => a.name.localeCompare(b.name))
+  const projects = isNewNav
+    ? allProjects
+        ?.filter((x) => x.organization_id === selectedOrganization?.id)
+        .sort((a, b) => a.name.localeCompare(b.name))
+    : allProjects?.sort((a, b) => a.name.localeCompare(b.name))
   const selectedProject = isBranch
-    ? parentProject
-    : projectDetails || projects?.find((project) => project.ref === ref)
+    ? projects?.find((project) => project.ref === projectDetails?.parentRef)
+    : projects?.find((project) => project.ref === ref)
 
   const [open, setOpen] = useState(false)
 
-  if (isLoadingProjects) {
+  if (isLoadingProjects || !selectedProject) {
     return <ShimmeringLoader className="w-[90px]" />
   }
 
@@ -136,10 +140,12 @@ const ProjectDropdown = () => {
           <Button
             type="text"
             className="pr-2"
-            iconRight={<IconCode className="text-scale-1100 rotate-90" strokeWidth={2} size={12} />}
+            iconRight={
+              <IconCode className="text-foreground-light rotate-90" strokeWidth={2} size={12} />
+            }
           >
             <div className="flex items-center space-x-2">
-              <p className="text-sm">{selectedProject?.name}</p>
+              <p className={isNewNav ? 'text-sm' : 'text-xs'}>{selectedProject?.name}</p>
               {isSuccess && !isOrgBilling && <Badge color="slate">{subscription?.plan.name}</Badge>}
             </div>
           </Button>
@@ -161,30 +167,32 @@ const ProjectDropdown = () => {
                   ))}
                 </ScrollArea>
               </CommandGroup_Shadcn_>
-              <CommandGroup_Shadcn_ className="border-t">
-                <Link
-                  passHref
-                  href={`/new/${selectedOrganization?.slug}`}
-                  onClick={() => {
-                    setOpen(false)
-                  }}
-                >
-                  <CommandItem_Shadcn_
-                    asChild
-                    className="cursor-pointer flex items-center space-x-2 w-full"
-                    onSelect={() => {
+              {projectCreationEnabled && (
+                <CommandGroup_Shadcn_ className="border-t">
+                  <Link
+                    passHref
+                    href={`/new/${selectedOrganization?.slug}`}
+                    onClick={() => {
                       setOpen(false)
-                      router.push(`/new/${selectedOrganization?.slug}`)
                     }}
-                    onClick={() => setOpen(false)}
                   >
-                    <a>
-                      <IconPlus size={14} strokeWidth={1.5} />
-                      <p>New project</p>
-                    </a>
-                  </CommandItem_Shadcn_>
-                </Link>
-              </CommandGroup_Shadcn_>
+                    <CommandItem_Shadcn_
+                      asChild
+                      className="cursor-pointer flex items-center space-x-2 w-full"
+                      onSelect={() => {
+                        setOpen(false)
+                        router.push(`/new/${selectedOrganization?.slug}`)
+                      }}
+                      onClick={() => setOpen(false)}
+                    >
+                      <a>
+                        <IconPlus size={14} strokeWidth={1.5} />
+                        <p>New project</p>
+                      </a>
+                    </CommandItem_Shadcn_>
+                  </Link>
+                </CommandGroup_Shadcn_>
+              )}
             </CommandList_Shadcn_>
           </Command_Shadcn_>
         </PopoverContent_Shadcn_>
@@ -192,7 +200,7 @@ const ProjectDropdown = () => {
     </div>
   ) : (
     <Button type="text">
-      <span className="text-sm">{selectedProject?.name}</span>
+      <span className={isNewNav ? 'text-sm' : 'text-xs'}>{selectedProject?.name}</span>
     </Button>
   )
 }

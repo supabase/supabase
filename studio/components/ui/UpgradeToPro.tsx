@@ -5,7 +5,7 @@ import { ReactNode } from 'react'
 import { Button } from 'ui'
 
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { useCheckPermissions, useFlag } from 'hooks'
+import { useCheckPermissions, useFlag, useIsFeatureEnabled } from 'hooks'
 
 interface UpgradeToProProps {
   icon?: ReactNode
@@ -22,6 +22,8 @@ const UpgradeToPro = ({
   secondaryText,
   addon,
 }: UpgradeToProProps) => {
+  const billingEnabled = useIsFeatureEnabled('billing:all')
+
   const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
   const plan = subscription?.plan?.id
 
@@ -30,6 +32,8 @@ const UpgradeToPro = ({
     'stripe.subscriptions'
   )
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
+
+  if (!billingEnabled) return null
 
   return (
     <div
@@ -45,7 +49,7 @@ const UpgradeToPro = ({
           <div className="space-y-1">
             <p className="text-sm">{primaryText}</p>
             <div>
-              <p className="text-sm text-scale-1100">{secondaryText}</p>
+              <p className="text-sm text-foreground-light">{secondaryText}</p>
             </div>
           </div>
           <Tooltip.Root delayDuration={0}>
@@ -70,7 +74,7 @@ const UpgradeToPro = ({
                       'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">
+                    <span className="text-xs text-foreground">
                       {projectUpdateDisabled ? (
                         <>
                           Subscription changes are currently disabled.

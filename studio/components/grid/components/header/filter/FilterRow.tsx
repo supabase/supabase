@@ -1,8 +1,8 @@
-import { memo } from 'react'
-import { Button, Input, IconChevronDown, IconX } from 'ui'
+import { KeyboardEvent, memo } from 'react'
+import { Button, IconChevronDown, IconX, Input } from 'ui'
 
-import { Filter, FilterOperator, SupaTable } from 'components/grid/types'
 import { DropdownControl } from 'components/grid/components/common'
+import { Filter, FilterOperator, SupaTable } from 'components/grid/types'
 import { FilterOperatorOptions } from './Filter.constants'
 
 export interface FilterRowProps {
@@ -11,9 +11,10 @@ export interface FilterRowProps {
   filter: Filter
   onChange: (index: number, filter: Filter) => void
   onDelete: (index: number) => void
+  onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void
 }
 
-const FilterRow = ({ table, filter, filterIdx, onChange, onDelete }: FilterRowProps) => {
+const FilterRow = ({ table, filter, filterIdx, onChange, onDelete, onKeyDown }: FilterRowProps) => {
   const column = table.columns.find((x) => x.name === filter.column)
   const columnOptions =
     table.columns?.map((x) => {
@@ -38,7 +39,7 @@ const FilterRow = ({ table, filter, filterIdx, onChange, onDelete }: FilterRowPr
           asChild
           type="outline"
           icon={
-            <div className="text-scale-900">
+            <div className="text-foreground-lighter">
               <IconChevronDown strokeWidth={1.5} size={14} />
             </div>
           }
@@ -61,7 +62,7 @@ const FilterRow = ({ table, filter, filterIdx, onChange, onDelete }: FilterRowPr
           asChild
           type="outline"
           icon={
-            <div className="text-scale-900">
+            <div className="text-foreground-lighter">
               <IconChevronDown strokeWidth={1.5} size={14} />
             </div>
           }
@@ -80,6 +81,7 @@ const FilterRow = ({ table, filter, filterIdx, onChange, onDelete }: FilterRowPr
             value: event.target.value,
           })
         }
+        onKeyDown={onKeyDown}
       />
       <Button
         icon={<IconX strokeWidth={1.5} size={14} />}

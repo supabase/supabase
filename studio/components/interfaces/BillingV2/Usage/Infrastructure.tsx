@@ -1,18 +1,20 @@
+import dayjs from 'dayjs'
+import { IconBarChart2 } from 'ui'
+
+import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { DataPoint } from 'data/analytics/constants'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
-import dayjs from 'dayjs'
-import Link from 'next/link'
-import { Alert, Button, IconBarChart2 } from 'ui'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
+import { getAddons } from '../Subscription/Subscription.utils'
 import SectionContent from './SectionContent'
 import SectionHeader from './SectionHeader'
 import { USAGE_CATEGORIES } from './Usage.constants'
 import { getUpgradeUrl } from './Usage.utils'
 import UsageBarChart from './UsageBarChart'
-import Panel from 'components/ui/Panel'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { getAddons } from '../Subscription/Subscription.utils'
+import { CPUWarnings, DiskIOBandwidthWarnings, RAMWarnings } from './UsageWarningAlerts'
 
 export interface InfrastructureProps {
   projectRef: string
@@ -28,11 +30,12 @@ const Infrastructure = ({
   currentBillingCycleSelected,
 }: InfrastructureProps) => {
   const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
-
+  const { data: resourceWarnings } = useResourceWarningsQuery()
+  const projectResourceWarnings = resourceWarnings?.find((x) => x.project === projectRef)
   const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === 'infra')
 
   const upgradeUrl = getUpgradeUrl(projectRef, subscription)
-  const isFreeTier = subscription?.plan?.id === 'free'
+  const isFreePlan = subscription?.plan?.id === 'free'
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
   const selectedAddons = addons?.selected_addons ?? []
@@ -125,92 +128,25 @@ const Infrastructure = ({
             <SectionContent section={attribute}>
               {attribute.key === 'disk_io_consumption' && (
                 <>
-                  {hasLatest && latestIoBudgetConsumption >= 100 ? (
-                    <Alert withIcon variant="danger" title="Your Disk IO Budget has been used up">
-                      <p className="mb-4">
-                        Your workload has used up all your Disk IO Budget and is now running at the
-                        baseline performance. If you need consistent disk performance, consider
-                        upgrading to a larger compute add-on.
-                      </p>
-                      <Link href={upgradeUrl}>
-                        <a>
-                          <Button type="danger">
-                            {isFreeTier ? 'Upgrade project' : 'Change compute add-on'}
-                          </Button>
-                        </a>
-                      </Link>
-                    </Alert>
-                  ) : hasLatest && latestIoBudgetConsumption >= 80 ? (
-                    <Alert
-                      withIcon
-                      variant="danger"
-                      title="You are close to running out of Disk IO Budget"
-                    >
-                      <p className="mb-4">
-                        Your workload has consumed {latestIoBudgetConsumption}% of your Disk IO
-                        Budget. If you use up all your Disk IO Budget, your instance will reverted
-                        to baseline performance. If you need consistent disk performance, consider
-                        upgrading to a larger compute add-on.
-                      </p>
-                      <Link href={upgradeUrl}>
-                        <a>
-                          <Button type="danger">
-                            {isFreeTier ? 'Upgrade project' : 'Change compute add-on'}
-                          </Button>
-                        </a>
-                      </Link>
-                    </Alert>
-                  ) : currentBillingCycleSelected && highestIoBudgetConsumption >= 100 ? (
-                    <Alert
-                      withIcon
-                      variant="warning"
-                      title="You ran out of IO Budget at least once"
-                    >
-                      <p className="mb-4">
-                        Your workload has used up all your Disk IO Budget and reverted to baseline
-                        performance at least once during this billing cycle. If you need consistent
-                        disk performance, consider upgrading to a larger compute add-on.
-                      </p>
-                      <Link href={upgradeUrl}>
-                        <a>
-                          <Button type="warning">
-                            {isFreeTier ? 'Upgrade project' : 'Change compute add-on'}
-                          </Button>
-                        </a>
-                      </Link>
-                    </Alert>
-                  ) : currentBillingCycleSelected && highestIoBudgetConsumption >= 80 ? (
-                    <Alert
-                      withIcon
-                      variant="warning"
-                      title="You were close to using all your IO Budget at least once"
-                    >
-                      <p className="mb-4">
-                        Your workload has consumed {highestIoBudgetConsumption}% of your Disk IO
-                        budget during this billing cycle. If you use up all your Disk IO Budget,
-                        your instance will reverted to baseline performance. If you need consistent
-                        disk performance, consider upgrading to a larger compute add-on.
-                      </p>
-                      <Link href={upgradeUrl}>
-                        <a>
-                          <Button type="warning">
-                            {isFreeTier ? 'Upgrade project' : 'Change compute add-on'}
-                          </Button>
-                        </a>
-                      </Link>
-                    </Alert>
-                  ) : null}
+                  <DiskIOBandwidthWarnings
+                    upgradeUrl={upgradeUrl}
+                    isFreePlan={isFreePlan}
+                    hasLatest={hasLatest}
+                    currentBillingCycleSelected={currentBillingCycleSelected}
+                    latestIoBudgetConsumption={latestIoBudgetConsumption}
+                    highestIoBudgetConsumption={highestIoBudgetConsumption}
+                  />
                   <div className="space-y-1">
                     <p>Disk IO Bandwidth</p>
 
                     {currentComputeInstanceSpecs.baseline_disk_io_mbs ===
                     currentComputeInstanceSpecs.max_disk_io_mbs ? (
-                      <p className="text-sm text-scale-1000">
+                      <p className="text-sm text-foreground-light">
                         Your current compute can has a baseline and maximum disk throughput of{' '}
                         {currentComputeInstanceSpecs.max_disk_io_mbs?.toLocaleString()} Mbps.
                       </p>
                     ) : (
-                      <p className="text-sm text-scale-1000">
+                      <p className="text-sm text-foreground-light">
                         Your current compute can burst up to{' '}
                         {currentComputeInstanceSpecs.max_disk_io_mbs?.toLocaleString()} Mbps for 30
                         minutes a day and reverts to the baseline performance of{' '}
@@ -221,17 +157,19 @@ const Infrastructure = ({
                   <div>
                     <p className="text-sm mb-2">Overview</p>
                     <div className="flex items-center justify-between border-b py-1">
-                      <p className="text-xs text-scale-1000">Current compute instance</p>
+                      <p className="text-xs text-foreground-light">Current compute instance</p>
                       <p className="text-xs">{computeInstance?.variant?.name ?? 'Micro'}</p>
                     </div>
                     <div className="flex items-center justify-between border-b py-1">
-                      <p className="text-xs text-scale-1000">Maximum IO Bandwidth (burst limit)</p>
+                      <p className="text-xs text-foreground-light">
+                        Maximum IO Bandwidth (burst limit)
+                      </p>
                       <p className="text-xs">
                         {currentComputeInstanceSpecs.max_disk_io_mbs?.toLocaleString()} Mbps
                       </p>
                     </div>
                     <div className="flex items-center justify-between border-b py-1">
-                      <p className="text-xs text-scale-1000">Baseline IO Bandwidth</p>
+                      <p className="text-xs text-foreground-light">Baseline IO Bandwidth</p>
                       <p className="text-xs">
                         {currentComputeInstanceSpecs.baseline_disk_io_mbs?.toLocaleString()} Mbps
                       </p>
@@ -239,13 +177,28 @@ const Infrastructure = ({
                     {currentComputeInstanceSpecs.max_disk_io_mbs !==
                       currentComputeInstanceSpecs?.baseline_disk_io_mbs && (
                       <div className="flex items-center justify-between py-1">
-                        <p className="text-xs text-scale-1000">Daily burst time limit</p>
+                        <p className="text-xs text-foreground-light">Daily burst time limit</p>
                         <p className="text-xs">30 mins</p>
                       </div>
                     )}
                   </div>
                 </>
               )}
+              {attribute.key === 'max_cpu_usage' && (
+                <CPUWarnings
+                  isFreePlan={isFreePlan}
+                  upgradeUrl={upgradeUrl}
+                  severity={projectResourceWarnings?.cpu_exhaustion}
+                />
+              )}
+              {attribute.key === 'ram_usage' && (
+                <RAMWarnings
+                  isFreePlan={isFreePlan}
+                  upgradeUrl={upgradeUrl}
+                  severity={projectResourceWarnings?.memory_and_swap_exhaustion}
+                />
+              )}
+
               <div className="space-y-1">
                 <div className="flex flex-row justify-between">
                   {attribute.key === 'disk_io_consumption' ? (
@@ -262,7 +215,7 @@ const Infrastructure = ({
                 </div>
 
                 {attribute.key === 'ram_usage' && (
-                  <div className="text-sm text-scale-1000">
+                  <div className="text-sm text-foreground-light">
                     <p>
                       Your compute instance has {currentComputeInstanceSpecs.memory_gb} GB of
                       memory.
@@ -277,13 +230,13 @@ const Infrastructure = ({
                 )}
 
                 {attribute.key === 'max_cpu_usage' && (
-                  <p className="text-sm text-scale-1000">
+                  <p className="text-sm text-foreground-light">
                     Your compute instance has {currentComputeInstanceSpecs.cpu_cores} CPU cores.
                   </p>
                 )}
 
                 {attribute.chartDescription.split('\n').map((paragraph, idx) => (
-                  <p key={`para-${idx}`} className="text-sm text-scale-1000">
+                  <p key={`para-${idx}`} className="text-sm text-foreground-light">
                     {paragraph}
                   </p>
                 ))}
@@ -308,9 +261,11 @@ const Infrastructure = ({
                 <Panel>
                   <Panel.Content>
                     <div className="flex flex-col items-center justify-center space-y-2">
-                      <IconBarChart2 className="text-scale-1100 mb-2" />
+                      <IconBarChart2 className="text-foreground-light mb-2" />
                       <p className="text-sm">No data in period</p>
-                      <p className="text-sm text-scale-1000">May take a few minutes to show</p>
+                      <p className="text-sm text-foreground-light">
+                        May take a few minutes to show
+                      </p>
                     </div>
                   </Panel.Content>
                 </Panel>

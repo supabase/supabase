@@ -1,6 +1,11 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useIsFeatureEnabled, useSelectedOrganization } from 'hooks'
 import {
   Badge,
   Button,
@@ -19,15 +24,16 @@ import {
   ScrollArea,
 } from 'ui'
 
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from 'hooks'
+interface OrganizationDropdownProps {
+  isNewNav?: boolean
+}
 
-const OrganizationDropdown = () => {
+const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) => {
   const router = useRouter()
   const selectedOrganization = useSelectedOrganization()
   const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
+
+  const organizationCreationEnabled = useIsFeatureEnabled('organizations:create')
 
   const slug = selectedOrganization?.slug
   const orgName = selectedOrganization?.name
@@ -52,11 +58,11 @@ const OrganizationDropdown = () => {
               type="text"
               className="pr-2"
               iconRight={
-                <IconCode className="text-scale-1100 rotate-90" strokeWidth={2} size={12} />
+                <IconCode className="text-foreground-light rotate-90" strokeWidth={2} size={12} />
               }
             >
               <div className="flex items-center space-x-2">
-                <p className="text-sm">{orgName}</p>
+                <p className={isNewNav ? 'text-sm' : 'text-xs'}>{orgName}</p>
                 {isSuccess && <Badge color="scale">{subscription?.plan.name}</Badge>}
               </div>
             </Button>
@@ -72,12 +78,14 @@ const OrganizationDropdown = () => {
                   {organizations?.map((org) => {
                     const href = router.pathname.includes('[slug]')
                       ? router.pathname.replace('[slug]', org.slug)
-                      : `/org/${org.slug}`
+                      : isNewNav
+                      ? `/org/${org.slug}`
+                      : `/org/${org.slug}/general`
                     return (
                       <Link passHref href={href} key={org.slug}>
                         <CommandItem_Shadcn_
                           asChild
-                          value={org.name}
+                          value={`${org.name} - ${org.slug}`}
                           className="cursor-pointer w-full flex items-center justify-between"
                           onSelect={() => {
                             setOpen(false)
@@ -95,24 +103,26 @@ const OrganizationDropdown = () => {
                   })}
                 </ScrollArea>
               </CommandGroup_Shadcn_>
-              <CommandGroup_Shadcn_ className="border-t">
-                <Link passHref href="new">
-                  <CommandItem_Shadcn_
-                    asChild
-                    className="cursor-pointer flex items-center space-x-2 w-full"
-                    onSelect={(e) => {
-                      setOpen(false)
-                      router.push(`/new`)
-                    }}
-                    onClick={() => setOpen(false)}
-                  >
-                    <a>
-                      <IconPlus size={14} strokeWidth={1.5} />
-                      <p>New organization</p>
-                    </a>
-                  </CommandItem_Shadcn_>
-                </Link>
-              </CommandGroup_Shadcn_>
+              {organizationCreationEnabled && (
+                <CommandGroup_Shadcn_ className="border-t">
+                  <Link passHref href="/new">
+                    <CommandItem_Shadcn_
+                      asChild
+                      className="cursor-pointer flex items-center space-x-2 w-full"
+                      onSelect={(e) => {
+                        setOpen(false)
+                        router.push(`/new`)
+                      }}
+                      onClick={() => setOpen(false)}
+                    >
+                      <a>
+                        <IconPlus size={14} strokeWidth={1.5} />
+                        <p>New organization</p>
+                      </a>
+                    </CommandItem_Shadcn_>
+                  </Link>
+                </CommandGroup_Shadcn_>
+              )}
             </CommandList_Shadcn_>
           </Command_Shadcn_>
         </PopoverContent_Shadcn_>

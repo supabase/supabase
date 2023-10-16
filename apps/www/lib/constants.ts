@@ -35,7 +35,6 @@ export const SITE_URL =
     : 'http://localhost:3000/launch-week'
 export const SITE_ORIGIN = new URL(SITE_URL).origin
 export const TWITTER_USER_NAME = 'supabase'
-export const COOKIE = 'supa-lw8-ticket-user-id'
 export const LW7_DATE = 'April 10th 2023'
 export const LW8_DATE = 'August 7-11'
 export const LW8_LAUNCH_DATE = '2023-08-07T09:00:00.000-07:00'

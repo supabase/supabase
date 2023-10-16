@@ -12,10 +12,10 @@ dependencies:
   flutter:
     sdk: flutter
 
-  cupertino_icons: ^1.0.2
-  supabase_flutter: ^1.10.6
+  supabase_flutter: ^1.10.19
   flutter_appauth: ^6.0.0
   crypto: ^3.0.3
+  google_sign_in: ^6.1.5
 
 dev_dependencies:
   flutter_test:
