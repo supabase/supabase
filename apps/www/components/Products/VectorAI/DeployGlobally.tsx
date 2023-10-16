@@ -64,139 +64,139 @@ const DeployGlobally = ({ isHovered }: { isHovered: boolean }) => {
     }
   }, [isHovered])
 
-  return (
-    <>
-      <svg
-        ref={ref}
-        width="100%"
-        height="100%"
-        viewBox="0 0 284 210"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <circle cx="22.5" cy="27.5" r="2.5" fill={colors.gray} />
-        <circle cx="57.5" cy="27.5" r="2.5" fill={colors.gray} />
-        <circle cx="34.5" cy="27.5" r="2.5" fill={colors.green} />
-        <circle cx="68.5" cy="27.5" r="2.5" fill={colors.gray} />
-        <circle cx="45.5" cy="27.5" r="2.5" fill={colors.gray} />
-        <circle cx="83.5" cy="27.5" r="2.5" fill={colors.green} />
-        <circle cx="118.5" cy="27.5" r="2.5" fill={colors.green} />
-        <circle cx="95.5" cy="27.5" r="2.5" fill={colors.green} />
-        <circle cx="130.5" cy="27.5" r="2.5" fill={colors.gray} />
-        <circle cx="106.5" cy="27.5" r="2.5" fill={colors.gray} />
-        <circle cx="22.5" cy="38.5" r="2.5" fill={colors.gray} />
-        <circle cx="57.5" cy="38.5" r="2.5" fill={colors.green} />
-        <circle cx="34.5" cy="38.5" r="2.5" fill={colors.gray} />
-        <circle cx="68.5" cy="38.5" r="2.5" fill={colors.gray} />
-        <circle cx="45.5" cy="38.5" r="2.5" fill={colors.green} />
-        <circle cx="22.5" cy="49.5" r="2.5" fill={colors.gray} />
-        <circle cx="57.5" cy="49.5" r="2.5" fill={colors.green} />
-        <circle cx="34.5" cy="49.5" r="2.5" fill={colors.gray} />
-        <circle cx="68.5" cy="49.5" r="2.5" fill={colors.green} />
-        <circle cx="45.5" cy="49.5" r="2.5" fill={colors.green} />
-        <circle cx="22.5" cy="94.5" r="2.5" fill={colors.gray} />
-        <circle cx="57.5" cy="94.5" r="2.5" fill={colors.gray} />
-        <circle cx="34.5" cy="94.5" r="2.5" fill={colors.gray} />
-        <circle cx="68.5" cy="94.5" r="2.5" fill={colors.gray} />
-        <circle cx="45.5" cy="94.5" r="2.5" fill={colors.green} />
-        <circle cx="83.5" cy="94.5" r="2.5" fill={colors.gray} />
-        <circle cx="118.5" cy="94.5" r="2.5" fill={colors.green} />
-        <circle cx="95.5" cy="94.5" r="2.5" fill={colors.green} />
-        <circle cx="130.5" cy="94.5" r="2.5" fill={colors.gray} />
-        <circle cx="106.5" cy="94.5" r="2.5" fill={colors.gray} />
-        <circle cx="22.5" cy="105.5" r="2.5" fill={colors.gray} />
-        <circle cx="57.5" cy="105.5" r="2.5" fill={colors.green} />
-        <circle cx="34.5" cy="105.5" r="2.5" fill={colors.green} />
-        <circle cx="68.5" cy="105.5" r="2.5" fill={colors.gray} />
-        <circle cx="45.5" cy="105.5" r="2.5" fill={colors.gray} />
-        <circle cx="22.5" cy="116.5" r="2.5" fill={colors.gray} />
-        <circle cx="57.5" cy="116.5" r="2.5" fill={colors.gray} />
-        <circle cx="34.5" cy="116.5" r="2.5" fill={colors.gray} />
-        <circle cx="68.5" cy="116.5" r="2.5" fill={colors.gray} />
-        <circle cx="45.5" cy="116.5" r="2.5" fill={colors.green} />
-        <circle cx="22.5" cy="160.5" r="2.5" fill={colors.gray} />
-        <circle cx="57.5" cy="160.5" r="2.5" fill={colors.gray} />
-        <circle cx="34.5" cy="160.5" r="2.5" fill={colors.green} />
-        <circle cx="68.5" cy="160.5" r="2.5" fill={colors.green} />
-        <circle cx="45.5" cy="160.5" r="2.5" fill={colors.gray} />
-        <circle cx="83.5" cy="160.5" r="2.5" fill={colors.green} />
-        <circle cx="118.5" cy="160.5" r="2.5" fill={colors.green} />
-        <circle cx="95.5" cy="160.5" r="2.5" fill={colors.green} />
-        <circle cx="130.5" cy="160.5" r="2.5" fill={colors.gray} />
-        <circle cx="106.5" cy="160.5" r="2.5" fill={colors.gray} />
-        <circle cx="22.5" cy="171.5" r="2.5" fill={colors.gray} />
-        <circle cx="57.5" cy="171.5" r="2.5" fill={colors.green} />
-        <circle cx="34.5" cy="171.5" r="2.5" fill={colors.green} />
-        <circle cx="68.5" cy="171.5" r="2.5" fill={colors.gray} />
-        <circle cx="45.5" cy="171.5" r="2.5" fill={colors.gray} />
-        <circle cx="22.5" cy="182.5" r="2.5" fill={colors.green} />
-        <circle cx="57.5" cy="182.5" r="2.5" fill={colors.gray} />
-        <circle cx="34.5" cy="182.5" r="2.5" fill={colors.gray} />
-        <circle cx="68.5" cy="182.5" r="2.5" fill={colors.gray} />
-        <circle cx="45.5" cy="182.5" r="2.5" fill={colors.gray} />
-        <circle cx="154.5" cy="27.5" r="2.5" fill={colors.gray} />
-        <circle cx="189.5" cy="27.5" r="2.5" fill={colors.green} />
-        <circle cx="166.5" cy="27.5" r="2.5" fill={colors.gray} />
-        <circle cx="201.5" cy="27.5" r="2.5" fill={colors.gray} />
-        <circle cx="178.5" cy="27.5" r="2.5" fill={colors.gray} />
-        <circle cx="216.5" cy="27.5" r="2.5" fill={colors.green} />
-        <circle cx="250.5" cy="27.5" r="2.5" fill={colors.gray} />
-        <circle cx="227.5" cy="27.5" r="2.5" fill={colors.green} />
-        <circle cx="262.5" cy="27.5" r="2.5" fill={colors.green} />
-        <circle cx="239.5" cy="27.5" r="2.5" fill={colors.gray} />
-        <circle cx="154.5" cy="38.5" r="2.5" fill={colors.green} />
-        <circle cx="189.5" cy="38.5" r="2.5" fill={colors.gray} />
-        <circle cx="166.5" cy="38.5" r="2.5" fill={colors.green} />
-        <circle cx="201.5" cy="38.5" r="2.5" fill={colors.gray} />
-        <circle cx="178.5" cy="38.5" r="2.5" fill={colors.green} />
-        <circle cx="154.5" cy="49.5" r="2.5" fill={colors.gray} />
-        <circle cx="189.5" cy="49.5" r="2.5" fill={colors.green} />
-        <circle cx="166.5" cy="49.5" r="2.5" fill={colors.gray} />
-        <circle cx="201.5" cy="49.5" r="2.5" fill={colors.gray} />
-        <circle cx="178.5" cy="49.5" r="2.5" fill={colors.gray} />
-        <circle cx="154.5" cy="94.5" r="2.5" fill={colors.gray} />
-        <circle cx="189.5" cy="94.5" r="2.5" fill={colors.green} />
-        <circle cx="166.5" cy="94.5" r="2.5" fill={colors.green} />
-        <circle cx="201.5" cy="94.5" r="2.5" fill={colors.gray} />
-        <circle cx="178.5" cy="94.5" r="2.5" fill={colors.gray} />
-        <circle cx="216.5" cy="94.5" r="2.5" fill={colors.gray} />
-        <circle cx="250.5" cy="94.5" r="2.5" fill={colors.green} />
-        <circle cx="227.5" cy="94.5" r="2.5" fill={colors.green} />
-        <circle cx="262.5" cy="94.5" r="2.5" fill={colors.gray} />
-        <circle cx="239.5" cy="94.5" r="2.5" fill={colors.green} />
-        <circle cx="154.5" cy="105.5" r="2.5" fill={colors.gray} />
-        <circle cx="189.5" cy="105.5" r="2.5" fill={colors.green} />
-        <circle cx="166.5" cy="105.5" r="2.5" fill={colors.gray} />
-        <circle cx="201.5" cy="105.5" r="2.5" fill={colors.green} />
-        <circle cx="178.5" cy="105.5" r="2.5" fill={colors.green} />
-        <circle cx="154.5" cy="116.5" r="2.5" fill={colors.gray} />
-        <circle cx="189.5" cy="116.5" r="2.5" fill={colors.green} />
-        <circle cx="166.5" cy="116.5" r="2.5" fill={colors.gray} />
-        <circle cx="201.5" cy="116.5" r="2.5" fill={colors.gray} />
-        <circle cx="178.5" cy="116.5" r="2.5" fill={colors.gray} />
-        <circle cx="154.5" cy="160.5" r="2.5" fill={colors.green} />
-        <circle cx="189.5" cy="160.5" r="2.5" fill={colors.green} />
-        <circle cx="166.5" cy="160.5" r="2.5" fill={colors.green} />
-        <circle cx="201.5" cy="160.5" r="2.5" fill={colors.green} />
-        <circle cx="178.5" cy="160.5" r="2.5" fill={colors.gray} />
-        <circle cx="216.5" cy="160.5" r="2.5" fill={colors.green} />
-        <circle cx="250.5" cy="160.5" r="2.5" fill={colors.green} />
-        <circle cx="227.5" cy="160.5" r="2.5" fill={colors.green} />
-        <circle cx="262.5" cy="160.5" r="2.5" fill={colors.gray} />
-        <circle cx="239.5" cy="160.5" r="2.5" fill={colors.gray} />
-        <circle cx="154.5" cy="171.5" r="2.5" fill={colors.gray} />
-        <circle cx="189.5" cy="171.5" r="2.5" fill={colors.gray} />
-        <circle cx="166.5" cy="171.5" r="2.5" fill={colors.green} />
-        <circle cx="201.5" cy="171.5" r="2.5" fill={colors.gray} />
-        <circle cx="178.5" cy="171.5" r="2.5" fill={colors.gray} />
-        <circle cx="154.5" cy="182.5" r="2.5" fill={colors.gray} />
-        <circle cx="189.5" cy="182.5" r="2.5" fill={colors.green} />
-        <circle cx="166.5" cy="182.5" r="2.5" fill={colors.gray} />
-        <circle cx="201.5" cy="182.5" r="2.5" fill={colors.gray} />
-        <circle cx="178.5" cy="182.5" r="2.5" fill={colors.green} />
-      </svg>
-    </>
+  const RenderedSVG = () => (
+    <svg
+      ref={ref}
+      width="100%"
+      height="100%"
+      viewBox="0 0 284 210"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle cx="22.5" cy="27.5" r="2.5" fill={colors.gray} />
+      <circle cx="57.5" cy="27.5" r="2.5" fill={colors.gray} />
+      <circle cx="34.5" cy="27.5" r="2.5" fill={colors.green} />
+      <circle cx="68.5" cy="27.5" r="2.5" fill={colors.gray} />
+      <circle cx="45.5" cy="27.5" r="2.5" fill={colors.gray} />
+      <circle cx="83.5" cy="27.5" r="2.5" fill={colors.green} />
+      <circle cx="118.5" cy="27.5" r="2.5" fill={colors.green} />
+      <circle cx="95.5" cy="27.5" r="2.5" fill={colors.green} />
+      <circle cx="130.5" cy="27.5" r="2.5" fill={colors.gray} />
+      <circle cx="106.5" cy="27.5" r="2.5" fill={colors.gray} />
+      <circle cx="22.5" cy="38.5" r="2.5" fill={colors.gray} />
+      <circle cx="57.5" cy="38.5" r="2.5" fill={colors.green} />
+      <circle cx="34.5" cy="38.5" r="2.5" fill={colors.gray} />
+      <circle cx="68.5" cy="38.5" r="2.5" fill={colors.gray} />
+      <circle cx="45.5" cy="38.5" r="2.5" fill={colors.green} />
+      <circle cx="22.5" cy="49.5" r="2.5" fill={colors.gray} />
+      <circle cx="57.5" cy="49.5" r="2.5" fill={colors.green} />
+      <circle cx="34.5" cy="49.5" r="2.5" fill={colors.gray} />
+      <circle cx="68.5" cy="49.5" r="2.5" fill={colors.green} />
+      <circle cx="45.5" cy="49.5" r="2.5" fill={colors.green} />
+      <circle cx="22.5" cy="94.5" r="2.5" fill={colors.gray} />
+      <circle cx="57.5" cy="94.5" r="2.5" fill={colors.gray} />
+      <circle cx="34.5" cy="94.5" r="2.5" fill={colors.gray} />
+      <circle cx="68.5" cy="94.5" r="2.5" fill={colors.gray} />
+      <circle cx="45.5" cy="94.5" r="2.5" fill={colors.green} />
+      <circle cx="83.5" cy="94.5" r="2.5" fill={colors.gray} />
+      <circle cx="118.5" cy="94.5" r="2.5" fill={colors.green} />
+      <circle cx="95.5" cy="94.5" r="2.5" fill={colors.green} />
+      <circle cx="130.5" cy="94.5" r="2.5" fill={colors.gray} />
+      <circle cx="106.5" cy="94.5" r="2.5" fill={colors.gray} />
+      <circle cx="22.5" cy="105.5" r="2.5" fill={colors.gray} />
+      <circle cx="57.5" cy="105.5" r="2.5" fill={colors.green} />
+      <circle cx="34.5" cy="105.5" r="2.5" fill={colors.green} />
+      <circle cx="68.5" cy="105.5" r="2.5" fill={colors.gray} />
+      <circle cx="45.5" cy="105.5" r="2.5" fill={colors.gray} />
+      <circle cx="22.5" cy="116.5" r="2.5" fill={colors.gray} />
+      <circle cx="57.5" cy="116.5" r="2.5" fill={colors.gray} />
+      <circle cx="34.5" cy="116.5" r="2.5" fill={colors.gray} />
+      <circle cx="68.5" cy="116.5" r="2.5" fill={colors.gray} />
+      <circle cx="45.5" cy="116.5" r="2.5" fill={colors.green} />
+      <circle cx="22.5" cy="160.5" r="2.5" fill={colors.gray} />
+      <circle cx="57.5" cy="160.5" r="2.5" fill={colors.gray} />
+      <circle cx="34.5" cy="160.5" r="2.5" fill={colors.green} />
+      <circle cx="68.5" cy="160.5" r="2.5" fill={colors.green} />
+      <circle cx="45.5" cy="160.5" r="2.5" fill={colors.gray} />
+      <circle cx="83.5" cy="160.5" r="2.5" fill={colors.green} />
+      <circle cx="118.5" cy="160.5" r="2.5" fill={colors.green} />
+      <circle cx="95.5" cy="160.5" r="2.5" fill={colors.green} />
+      <circle cx="130.5" cy="160.5" r="2.5" fill={colors.gray} />
+      <circle cx="106.5" cy="160.5" r="2.5" fill={colors.gray} />
+      <circle cx="22.5" cy="171.5" r="2.5" fill={colors.gray} />
+      <circle cx="57.5" cy="171.5" r="2.5" fill={colors.green} />
+      <circle cx="34.5" cy="171.5" r="2.5" fill={colors.green} />
+      <circle cx="68.5" cy="171.5" r="2.5" fill={colors.gray} />
+      <circle cx="45.5" cy="171.5" r="2.5" fill={colors.gray} />
+      <circle cx="22.5" cy="182.5" r="2.5" fill={colors.green} />
+      <circle cx="57.5" cy="182.5" r="2.5" fill={colors.gray} />
+      <circle cx="34.5" cy="182.5" r="2.5" fill={colors.gray} />
+      <circle cx="68.5" cy="182.5" r="2.5" fill={colors.gray} />
+      <circle cx="45.5" cy="182.5" r="2.5" fill={colors.gray} />
+      <circle cx="154.5" cy="27.5" r="2.5" fill={colors.gray} />
+      <circle cx="189.5" cy="27.5" r="2.5" fill={colors.green} />
+      <circle cx="166.5" cy="27.5" r="2.5" fill={colors.gray} />
+      <circle cx="201.5" cy="27.5" r="2.5" fill={colors.gray} />
+      <circle cx="178.5" cy="27.5" r="2.5" fill={colors.gray} />
+      <circle cx="216.5" cy="27.5" r="2.5" fill={colors.green} />
+      <circle cx="250.5" cy="27.5" r="2.5" fill={colors.gray} />
+      <circle cx="227.5" cy="27.5" r="2.5" fill={colors.green} />
+      <circle cx="262.5" cy="27.5" r="2.5" fill={colors.green} />
+      <circle cx="239.5" cy="27.5" r="2.5" fill={colors.gray} />
+      <circle cx="154.5" cy="38.5" r="2.5" fill={colors.green} />
+      <circle cx="189.5" cy="38.5" r="2.5" fill={colors.gray} />
+      <circle cx="166.5" cy="38.5" r="2.5" fill={colors.green} />
+      <circle cx="201.5" cy="38.5" r="2.5" fill={colors.gray} />
+      <circle cx="178.5" cy="38.5" r="2.5" fill={colors.green} />
+      <circle cx="154.5" cy="49.5" r="2.5" fill={colors.gray} />
+      <circle cx="189.5" cy="49.5" r="2.5" fill={colors.green} />
+      <circle cx="166.5" cy="49.5" r="2.5" fill={colors.gray} />
+      <circle cx="201.5" cy="49.5" r="2.5" fill={colors.gray} />
+      <circle cx="178.5" cy="49.5" r="2.5" fill={colors.gray} />
+      <circle cx="154.5" cy="94.5" r="2.5" fill={colors.gray} />
+      <circle cx="189.5" cy="94.5" r="2.5" fill={colors.green} />
+      <circle cx="166.5" cy="94.5" r="2.5" fill={colors.green} />
+      <circle cx="201.5" cy="94.5" r="2.5" fill={colors.gray} />
+      <circle cx="178.5" cy="94.5" r="2.5" fill={colors.gray} />
+      <circle cx="216.5" cy="94.5" r="2.5" fill={colors.gray} />
+      <circle cx="250.5" cy="94.5" r="2.5" fill={colors.green} />
+      <circle cx="227.5" cy="94.5" r="2.5" fill={colors.green} />
+      <circle cx="262.5" cy="94.5" r="2.5" fill={colors.gray} />
+      <circle cx="239.5" cy="94.5" r="2.5" fill={colors.green} />
+      <circle cx="154.5" cy="105.5" r="2.5" fill={colors.gray} />
+      <circle cx="189.5" cy="105.5" r="2.5" fill={colors.green} />
+      <circle cx="166.5" cy="105.5" r="2.5" fill={colors.gray} />
+      <circle cx="201.5" cy="105.5" r="2.5" fill={colors.green} />
+      <circle cx="178.5" cy="105.5" r="2.5" fill={colors.green} />
+      <circle cx="154.5" cy="116.5" r="2.5" fill={colors.gray} />
+      <circle cx="189.5" cy="116.5" r="2.5" fill={colors.green} />
+      <circle cx="166.5" cy="116.5" r="2.5" fill={colors.gray} />
+      <circle cx="201.5" cy="116.5" r="2.5" fill={colors.gray} />
+      <circle cx="178.5" cy="116.5" r="2.5" fill={colors.gray} />
+      <circle cx="154.5" cy="160.5" r="2.5" fill={colors.green} />
+      <circle cx="189.5" cy="160.5" r="2.5" fill={colors.green} />
+      <circle cx="166.5" cy="160.5" r="2.5" fill={colors.green} />
+      <circle cx="201.5" cy="160.5" r="2.5" fill={colors.green} />
+      <circle cx="178.5" cy="160.5" r="2.5" fill={colors.gray} />
+      <circle cx="216.5" cy="160.5" r="2.5" fill={colors.green} />
+      <circle cx="250.5" cy="160.5" r="2.5" fill={colors.green} />
+      <circle cx="227.5" cy="160.5" r="2.5" fill={colors.green} />
+      <circle cx="262.5" cy="160.5" r="2.5" fill={colors.gray} />
+      <circle cx="239.5" cy="160.5" r="2.5" fill={colors.gray} />
+      <circle cx="154.5" cy="171.5" r="2.5" fill={colors.gray} />
+      <circle cx="189.5" cy="171.5" r="2.5" fill={colors.gray} />
+      <circle cx="166.5" cy="171.5" r="2.5" fill={colors.green} />
+      <circle cx="201.5" cy="171.5" r="2.5" fill={colors.gray} />
+      <circle cx="178.5" cy="171.5" r="2.5" fill={colors.gray} />
+      <circle cx="154.5" cy="182.5" r="2.5" fill={colors.gray} />
+      <circle cx="189.5" cy="182.5" r="2.5" fill={colors.green} />
+      <circle cx="166.5" cy="182.5" r="2.5" fill={colors.gray} />
+      <circle cx="201.5" cy="182.5" r="2.5" fill={colors.gray} />
+      <circle cx="178.5" cy="182.5" r="2.5" fill={colors.green} />
+    </svg>
   )
+
+  return <RenderedSVG />
 }
 
 export default DeployGlobally

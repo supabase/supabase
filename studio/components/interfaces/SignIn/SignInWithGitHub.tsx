@@ -35,7 +35,6 @@ const SignInWithGitHub = () => {
       if (error) throw error
     } catch (error) {
       console.error(error)
-    } finally {
       setLoading(false)
     }
   }
@@ -44,7 +43,8 @@ const SignInWithGitHub = () => {
     <Button
       block
       onClick={handleGithubSignIn}
-      icon={<IconGitHub width={18} height={18} />}
+      // set the width to 20 so that it matches the loading spinner and don't push the text when loading
+      icon={<IconGitHub width={20} height={18} />}
       size="large"
       type="default"
       loading={loading}

@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { Button, Form, IconDownload, Input } from 'ui'
 
-import supabase from '~/lib/supabase'
+import supabase from '~/lib/supabaseMisc'
 import CTABanner from 'components/CTABanner/index'
 import Layout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
