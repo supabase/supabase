@@ -1009,11 +1009,19 @@ Upload a file to an existing bucket. RLS policy permissions required:
 - \`buckets\` table permissions: none
 - \`objects\` table permissions: only \`insert\` when you are uploading new files and \`select\`, \`insert\`, and \`update\` when you are upserting files.
 `,
-    code: ({ name }: { name: string }) => [
+    code: ({ name, apikey, endpoint }: { name: string; apikey: string; endpoint: string }) => [
       {
         key: 'storage-upload-file',
         title: undefined,
-        bash: `# No command via bash available`,
+        bash: `
+curl -X POST '${endpoint}/storage/v1/object/${name}/folder/avatar1.png' \\
+-H 'Content-Type: image/png' \\
+-H "Authorization: Bearer ${apikey}" \\
+--data-binary @/path/to/your/file'
+-H 'Content-Type: multipart/form-data' \\
+-H "Authorization: Bearer ${apikey}" \\
+--data-raw $'your_file_data'
+        `,
         js: `
 const avatarFile = event.target.files[0]
 const { data, error } = await supabase
@@ -1037,11 +1045,16 @@ Delete files within the bucket. RLS policy permissions required:
 - \`buckets\` table permissions: none
 - \`objects\` table permissions: \`delete\` and \`select\`
 `,
-    code: ({ name }: { name: string }) => [
+    code: ({ name, apikey, endpoint }: { name: string; apikey: string; endpoint: string }) => [
       {
         key: 'storage-delete-files',
         title: undefined,
-        bash: `# No command via bash available`,
+        bash: `
+curl -X DELETE '${endpoint}/storage/v1/object/${name}' \\
+-H "Content-Type: application/json" \\
+-H "Authorization: Bearer ${apikey}" \\
+-d '{ "prefixes": ["file_name", "another_file_name"] }'
+`,
         js: `
 const { data, error } = await supabase
   .storage
@@ -1061,11 +1074,15 @@ List all files within the bucket. RLS policy permissions required:
 - \`buckets\` table permissions: none
 - \`objects\` table permissions: \`select\`
 `,
-    code: ({ name }: { name: string }) => [
+    code: ({ name, apikey, endpoint }: { name: string; apikey: string; endpoint: string }) => [
       {
         key: 'storage-list-files',
         title: undefined,
-        bash: `# No command via bash available`,
+        bash: `
+curl -X POST '${endpoint}/storage/v1/object/list/${name}' \\
+-H "Content-Type: application/json" \\
+-H "Authorization: Bearer ${apikey}" \\
+-d '{ "limit": 100, "offset": 0, "prefix": "", "sortBy": { "column": "name", "order": "asc" } }'`,
         js: `
 const { data, error } = await supabase
   .storage
@@ -1089,15 +1106,20 @@ Downloads a file from a private bucket. For public buckets, make a request to th
 - \`buckets\` table permissions: none
 - \`objects\` table permissions: \`select\`
 `,
-    code: ({ name }: { name: string }) => [
+    code: ({ name, apikey, endpoint }: { name: string; apikey: string; endpoint: string }) => [
       {
         key: 'storage-download-file',
         title: undefined,
-        bash: `# No command via bash available`,
+        bash: `
+curl -X GET '${endpoint}/storage/v1/object/${name}/folder/avatar1.png' \\
+-H "Content-Type: application/json" \\
+-H "Authorization: Bearer ${apikey}" \\
+--output avatar1.png
+`,
         js: `
 const { data, error } = await supabase
   .storage
-  .from('avatars')
+  .from('${name}')
   .download('folder/avatar1.png')
       `,
       },
@@ -1113,11 +1135,16 @@ Create a signed URL which can be used to share a file for a fixed amount of time
 - \`buckets\` table permissions: none
 - \`objects\` table permissions: \`select\`
 `,
-    code: ({ name }: { name: string }) => [
+    code: ({ name, apikey, endpoint }: { name: string; apikey: string; endpoint: string }) => [
       {
         key: 'storage-create-signed-url',
         title: undefined,
-        bash: `# No command via bash available`,
+        bash: `
+curl -X POST '${endpoint}/storage/v1/object/sign/${name}/folder/avatar1.png' \\
+-H "Content-Type: application/json" \\
+-H "Authorization: Bearer ${apikey}" \\
+-d '{ "expiresIn": 60 }'
+        `,
         js: `
 const { data, error } = await supabase
   .storage
@@ -1137,17 +1164,20 @@ A simple convenience function to get the URL for an asset in a public bucket. If
 
 This function does not verify if the bucket is public. If a public URL is created for a bucket which is not public, you will not be able to download the asset.
 
-The bucket needs to be set to public, either via updateBucket() or by going to Storage on supabase.com/dashboard, clicking the overflow menu on a bucket and choosing "Make public"
+The bucket needs to be set to public, either via \`updateBucket()\` or by going to Storage on supabase.com/dashboard, clicking the overflow menu on a bucket and choosing "Make public"
 
 RLS policy permissions required:
 - \`buckets\` table permissions: none
 - \`objects\` table permissions: none
 `,
-    code: ({ name }: { name: string }) => [
+    code: ({ name, apikey, endpoint }: { name: string; apikey: string; endpoint: string }) => [
       {
         key: 'storage-retrieve-public-url',
         title: undefined,
-        bash: `# No command via bash available`,
+        bash: `
+# No bash command available.
+# You can construct the public URL by concatenating the bucket URL with the path to the asset
+# e.g ${endpoint}/storage/v1/object/public/${name}/folder/avatar1.png`,
         js: `
 const { data } = supabase
   .storage
