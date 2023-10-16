@@ -1,8 +1,8 @@
 name: Automatically fix typos
 on:
   push:
-    branches:
-      - master
+#    branches:
+#      - master
 
 # Cancel old builds on new commit for same workflow + branch/PR
 concurrency:
