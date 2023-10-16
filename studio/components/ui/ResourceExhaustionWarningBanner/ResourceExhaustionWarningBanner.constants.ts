@@ -25,8 +25,8 @@ export const RESOURCE_WARNING_MESSAGES = {
       },
     },
     docsUrl: 'https://supabase.com/docs/guides/platform/database-size#disabling-read-only-mode',
-    buttonText: undefined,
-    metric: undefined,
+    buttonText: 'View database settings',
+    metric: 'read_only',
   },
   disk_io_exhaustion: {
     bannerContent: {
