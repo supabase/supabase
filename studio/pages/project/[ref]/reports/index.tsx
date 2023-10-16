@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 
 import { useParams } from 'common/hooks'
 import { ReportsLayout } from 'components/layouts'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { createReport } from 'components/to-be-cleaned/Reports/Reports.utils'
 import Loading from 'components/ui/Loading'
@@ -21,7 +20,6 @@ export const UserReportPage: NextPageWithLayout = () => {
 
   const { profile } = useProfile()
   const { ui } = useStore()
-  const { project } = useProjectContext()
 
   const contentStore = useProjectContentStore(ref)
   const canCreateReport = useCheckPermissions(PermissionAction.CREATE, 'user_content', {

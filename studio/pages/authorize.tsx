@@ -158,12 +158,13 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
         </div>
       }
     >
-      <div className="w-full md:w-[500px] px-8 py-6 space-y-8">
+      <div className="w-full px-8 py-6 space-y-8">
         {/* API Authorization requester details */}
         <AuthorizeRequesterDetails
           icon={requester.icon}
           name={requester.name}
           domain={requester.domain}
+          scopes={requester.scopes}
         />
 
         {/* Expiry warning */}

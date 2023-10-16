@@ -13,13 +13,15 @@ import {
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
-import { useFlag } from 'hooks'
+import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { Alert, Badge, Button, IconPackage, Input } from 'ui'
 import ProjectUpgradeAlert from '../General/Infrastructure/ProjectUpgradeAlert'
 
 const InfrastructureInfo = () => {
   const { ref } = useParams()
   const { project } = useProjectContext()
+
+  const authEnabled = useIsFeatureEnabled('project_auth:all')
 
   const {
     data,
@@ -77,12 +79,14 @@ const InfrastructureInfo = () => {
             )}
             {isSuccessUpgradeEligibility && (
               <>
-                <Input
-                  readOnly
-                  disabled
-                  label="GoTrue version"
-                  value={project?.serviceVersions?.gotrue ?? ''}
-                />
+                {authEnabled && (
+                  <Input
+                    readOnly
+                    disabled
+                    label="GoTrue version"
+                    value={project?.serviceVersions?.gotrue ?? ''}
+                  />
+                )}
                 <Input
                   readOnly
                   disabled

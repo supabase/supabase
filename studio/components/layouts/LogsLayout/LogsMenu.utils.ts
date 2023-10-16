@@ -2,8 +2,14 @@ import { Project } from 'types'
 import { ProductMenuGroup, ProductMenuGroupItem } from 'components/ui/ProductMenu/ProductMenu.types'
 import { IS_PLATFORM } from 'lib/constants'
 
-export const generateLogsMenu = (project?: Project): ProductMenuGroup[] => {
+export const generateLogsMenu = (
+  project?: Project,
+  features?: { auth?: boolean; storage?: boolean }
+): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
+
+  const authEnabled = features?.auth ?? true
+  const storageEnabled = features?.storage ?? true
 
   return [
     {
@@ -51,18 +57,22 @@ export const generateLogsMenu = (project?: Project): ProductMenuGroup[] => {
             }
           : null,
         ,
-        {
-          name: 'Auth',
-          key: 'auth-logs',
-          url: `/project/${ref}/logs/auth-logs`,
-          items: [],
-        },
-        {
-          name: 'Storage',
-          key: 'storage-logs',
-          url: `/project/${ref}/logs/storage-logs`,
-          items: [],
-        },
+        authEnabled
+          ? {
+              name: 'Auth',
+              key: 'auth-logs',
+              url: `/project/${ref}/logs/auth-logs`,
+              items: [],
+            }
+          : null,
+        storageEnabled
+          ? {
+              name: 'Storage',
+              key: 'storage-logs',
+              url: `/project/${ref}/logs/storage-logs`,
+              items: [],
+            }
+          : null,
         {
           name: 'Realtime',
           key: 'realtime-logs',
