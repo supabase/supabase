@@ -44,11 +44,12 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<AuthResponse> _googleSignIn() async {
-    /// TODO: update the iOS and Android client ID with your own.
+    /// TODO: update the iOS and Web client ID with your own.
     ///
     /// Client ID that you registered with Google Cloud.
-    /// You will have two different values for iOS and Android.
-    final clientId = Platform.isIOS ? 'IOS_CLIENT_ID' : 'ANDROID_CLIENT_ID';
+    /// Note that to perform Google login on Android, you need to
+    /// provide the web client ID, and not the Android client ID.
+    final clientId = Platform.isIOS ? 'IOS_CLIENT_ID' : 'WEB_CLIENT_ID';
 
     late final String? idToken;
     late final String? accessToken;
@@ -115,10 +116,10 @@ class _LoginScreenState extends State<LoginScreen> {
           'email',
         ],
       );
-      final res = await googleSignIn.signIn();
-      final authentication = await res!.authentication;
-      accessToken = authentication.accessToken;
-      idToken = authentication.idToken;
+      final googleUser = await googleSignIn.signIn();
+      final googleAuth = await googleUser!.authentication;
+      accessToken = googleAuth.accessToken;
+      idToken = googleAuth.idToken;
     }
 
     if (idToken == null) {
