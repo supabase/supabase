@@ -10,12 +10,12 @@ export const PricingTableRowDesktop = (props: any) => {
   return (
     <>
       <tr
-        className="divide-scale-600 dark:divide-scale-400 bg-scale-200"
+        className="divide-border-secondary"
         style={{ borderTop: 'none' }}
         id={`${props.sectionId}-desktop`}
       >
         <th
-          className="border-b border-scale-600 bg-scale-200 bg-scale-50 dark:bg-scale-200 text-scale-1200 sticky top-[62px] z-10 py-3 pl-6 text-left text-sm font-medium dark:text-white"
+          className="bg-background text-foreground sticky top-[62px] z-10 py-3 pl-6 text-left text-sm font-medium dark:text-white"
           scope="colgroup"
         >
           <div className="flex items-center gap-4">
@@ -23,24 +23,24 @@ export const PricingTableRowDesktop = (props: any) => {
             <h4 className="m-0 text-base font-normal">{category.title}</h4>
           </div>
         </th>
-        <td className="border-b-2 border-scale-700 bg-scale-50 dark:bg-scale-200 px-6 py-5 free"></td>
-        <td className="border-b-2 border-scale-700 bg-scale-50 dark:bg-scale-200 px-6 py-5 pro"></td>
-        <td className="border-b-2 border-scale-700 bg-scale-50 dark:bg-scale-200 px-6 py-5 team"></td>
-        <td className="border-b-2 border-scale-700 bg-scale-50 dark:bg-scale-200 px-6 py-5 enterprise"></td>
+        <td className="bg-background px-6 py-5 free"></td>
+        <td className="bg-background px-6 py-5 pro"></td>
+        <td className="bg-background px-6 py-5 team"></td>
+        <td className="bg-background px-6 py-5 enterprise"></td>
       </tr>
 
       {category.features.map((feat: any, i: number) => {
         return (
           <Fragment key={feat.title}>
-            <tr className="divide-scale-600 dark:divide-scale-400" key={i}>
+            <tr className="divide-border-secondary" key={i}>
               <th
-                className={`text-scale-1200 flex items-center px-6 py-5 last:pb-24 text-left text-xs font-normal dark:text-white `}
+                className={`text-foreground flex items-center px-6 py-5 last:pb-24 text-left text-xs font-normal dark:text-white `}
                 scope="row"
               >
                 <span>{feat.title}</span>
                 {feat.tooltips?.main && (
                   <span
-                    className="text-scale-900 hover:text-scale-1200 ml-2 cursor-pointer transition-colors"
+                    className="text-muted hover:text-foreground ml-2 cursor-pointer transition-colors"
                     data-tip={feat.tooltips.main}
                   >
                     <IconHelpCircle size={14} strokeWidth={2} />
@@ -63,14 +63,14 @@ export const PricingTableRowDesktop = (props: any) => {
                     {typeof planValue === 'boolean' && planValue === true ? (
                       <IconPricingIncludedCheck plan={planValue} />
                     ) : typeof planValue === 'boolean' && planValue === false ? (
-                      <div className="text-scale-900">
+                      <div className="text-muted">
                         <IconPricingMinus plan={planValue} />
                       </div>
                     ) : (
-                      <span className="text-scale-1200 text-xs dark:text-white flex items-center gap-3">
+                      <span className="text-foreground text-xs dark:text-white flex items-center gap-3">
                         {feat.tooltips?.[planName] && (
                           <span
-                            className="shrink-0 hover:text-scale-300 cursor-pointer transition-colors"
+                            className="shrink-0 hover:text-background-overlay-default cursor-pointer transition-colors"
                             data-tip={feat.tooltips[planName]}
                           >
                             <IconPricingInfo />
@@ -101,10 +101,10 @@ export const PricingTableRowMobile = (props: any) => {
   return (
     <>
       <table className="mt-8 w-full" id={`${props.sectionId}-mobile`}>
-        <caption className="bg-scale-50 dark:bg-dark-900 border-scale-400 border-t px-4 py-3 text-left text-sm font-medium dark:text-white">
+        <caption className="bg-background border-border border-t px-4 py-3 text-left text-sm font-medium dark:text-white">
           <div className="flex items-center gap-2">
             {category.icon ? <ProductIcon icon={props.icon} /> : null}
-            <span className="text-scale-1200 font-normal">{category.title}</span>
+            <span className="text-foreground font-normal">{category.title}</span>
           </div>
         </caption>
         <thead>
@@ -117,11 +117,11 @@ export const PricingTableRowMobile = (props: any) => {
             </th>
           </tr>
         </thead>
-        <tbody className="divide-scale-400 divide-y">
+        <tbody className="divide-border-border divide-y">
           {category.features.map((feat: any, i: number) => {
             return (
-              <tr key={i} className="border-scale-400 border-t">
-                <th className="text-scale-1100 px-4 py-3 text-left text-sm font-normal" scope="row">
+              <tr key={i} className="border-border border-t">
+                <th className="text-light px-4 py-3 text-left text-sm font-normal" scope="row">
                   <span>
                     <p>{feat.title}</p>
                   </span>
@@ -136,7 +136,7 @@ export const PricingTableRowMobile = (props: any) => {
                       <IconPricingMinus plan={plan} />
                     </div>
                   ) : (
-                    <span className="text-scale-1200 block text-sm">{feat.plans[plan]}</span>
+                    <span className="text-foreground block text-sm">{feat.plans[plan]}</span>
                   )}
                 </td>
               </tr>
