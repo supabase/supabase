@@ -8,7 +8,7 @@ import AlertError from 'components/ui/AlertError'
 import Connecting from 'components/ui/Loading/Loading'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
-import { useFlag } from 'hooks'
+import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import { NextPageWithLayout } from 'types'
@@ -22,6 +22,8 @@ const ProjectsPage: NextPageWithLayout = () => {
     isSuccess,
   } = useOrganizationsQuery()
   useAutoProjectsPrefetch()
+
+  const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
   const { isLoading: isProfileLoading } = useProfile()
   const isLoading = isOrganizationLoading || isProfileLoading
@@ -59,7 +61,7 @@ const ProjectsPage: NextPageWithLayout = () => {
 
       {!navLayoutV2 && isSuccess && (
         <div className="py-4 px-5">
-          {IS_PLATFORM && organizations.length !== 0 && (
+          {IS_PLATFORM && projectCreationEnabled && organizations.length !== 0 && (
             <div className="my-2">
               <div className="flex">
                 <div className="">
