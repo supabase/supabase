@@ -339,7 +339,7 @@ We need to create an event listener in the root `+layout.svelte` file in order t
 
   export let data
 
-  let { supabase, session } = data
+  const { supabase, session } = data
   $: ({ supabase, session } = data)
 
   onMount(() => {
@@ -368,7 +368,7 @@ We can access the supabase instance in our `+page.svelte` file through the data 
 <!-- // src/routes/auth/+page.svelte -->
 <script>
   export let data
-  let { supabase } = data
+  const { supabase } = data
   $: ({ supabase } = data)
 
   let email
@@ -685,7 +685,7 @@ For [row level security](https://supabase.com/docs/guides/auth/row-level-securit
 <script lang="ts">
   export let data
 
-  let { user, tableData } = data
+  const { user, tableData } = data
   $: ({ user, tableData } = data)
 </script>
 

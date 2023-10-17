@@ -31,6 +31,7 @@ Joel Lee
 Jon M
 Jonny Summers-Muir
 Joshen Lim
+Kamil Ogórek
 Kang Ming Tay
 Karlo Ison
 Kevin Brolly
@@ -42,8 +43,6 @@ Long Hoang
 Margarita Sandomirskaia
 Marijana Šimag
 Mark Burggraf
-Michel Pelletier
-Mickael Hebert
 Monica El Khoury
 Nikita Kotlyarov
 Oli R
