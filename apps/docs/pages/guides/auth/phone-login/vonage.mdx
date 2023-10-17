@@ -49,11 +49,11 @@ Select the country you want a number for. You will need a mobile phone number wi
 
 ### Configure Supabase
 
-Now go to the Auth > Settings page in the Supabase dashboard (https://supabase.com/dashboard/project/YOUR-PROJECT-REF/auth/settings).
+Now go to the [Auth > Providers](https://supabase.com/dashboard/project/_/auth/providers) page in the Supabase dashboard and select "Phone" from the Auth Providers list.
 
-You should see an option to enable Phone Signup.
+You should see an option to enable the Phone provider.
 
-Toggle it on, and copy the api key, api secret and phone number values over from the Vonage dashboard. Click save.
+Toggle it on, and copy the API key, API secret and phone number values over from the Vonage dashboard. Click save.
 
 Now the backend should be setup, we can proceed to add our client-side code!
 
@@ -61,7 +61,7 @@ Now the backend should be setup, we can proceed to add our client-side code!
 
 The SMS message sent to a phone containing an OTP code can be customized. This is useful if you need to mention a brand name or display a website address.
 
-Go to Auth > Templates page in the Supabase dashboard (https://supabase.com/dashboard/project/YOUR-PROJECT-REF/auth/templates).
+Go to [Auth > Templates](https://supabase.com/dashboard/project/_/auth/templates) page in the Supabase dashboard.
 
 Use the variable `.Code` in the template to display the code.
 
