@@ -298,25 +298,51 @@ This is currently available only in the Supabase JavaScript client version 2.37.
 
 You can also send a Broadcast message by making an HTTP request to Realtime servers. This is useful when you want to send messages from your server or client without having to first establish a WebSocket connection.
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
 ```js
 const channel = client.channel('test-channel')
 
 // No need to subscribe to channel
 
 channel
-  .send({
-    type: 'broadcast',
-    event: 'test',
-    payload: { message: 'Hi' },
-  })
-  .then((resp) => {
-    console.log(resp)
-  })
+.send({
+type: 'broadcast',
+event: 'test',
+payload: { message: 'Hi' },
+})
+.then((resp) => console.log(resp))
 
 // Remember to clean up the channel
 
 client.removeChannel(channel)
-```
+
+````
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+```dart
+// No need to subscribe to channel
+
+channel = client.channel('test-channel');
+final resp = await channel.send(
+  type: RealtimeListenTypes.broadcast,
+  payload: {
+    'message': 'Hi',
+  },
+  event: "test"
+);
+print(resp);
+````
+
+</TabPanel>
+</Tabs>
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
