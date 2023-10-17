@@ -47,7 +47,7 @@ serve(async (req) => {
       const response = await botClient.chat.postMessage({
         channel: channel,
         text: `Hello <@${user}>!`,
-        threadTs: ts,
+        thread_ts: ts,
       });
       return new Response('ok', { status: 200 });
     }
