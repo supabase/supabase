@@ -49,9 +49,10 @@ const GenericProjectPage: NextPage = () => {
       }
 
       const slugPath = slug.reduce((a, b) => `${a}/${b}`, '').slice(1)
+
       return [
         `/project/${projectRef}/${slugPath}`,
-        queryString ?? `?${queryString}`,
+        queryString.length > 0 ? `?${queryString}` : undefined,
         hash ?? `#${hash}`,
       ]
         .filter(Boolean)
