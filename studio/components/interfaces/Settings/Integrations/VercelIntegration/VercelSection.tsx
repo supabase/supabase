@@ -171,6 +171,7 @@ You can change the scope of the access for Supabase by configuring
                     )}
                     <EmptyIntegrationConnection
                       onClick={() => onAddVercelConnection(integration.id)}
+                      orgSlug={org?.slug}
                     >
                       Add new project connection
                     </EmptyIntegrationConnection>

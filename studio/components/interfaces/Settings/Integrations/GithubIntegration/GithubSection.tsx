@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
 
+import { useParams } from 'common'
 import { IntegrationConnectionItem } from 'components/interfaces/Integrations/IntegrationConnection'
 import {
   IntegrationConnectionHeader,
@@ -40,6 +41,7 @@ const GitHubSection = () => {
   const { ui } = useStore()
   const org = useSelectedOrganization()
   const { data } = useOrgIntegrationsQuery({ orgSlug: org?.slug })
+  const { ref: projectRef } = useParams()
 
   const githubIntegrations = data?.filter(
     (integration) => integration.integration.name === 'GitHub'
@@ -84,17 +86,21 @@ const GitHubSection = () => {
                 'connection'
               )} `
 
+              const connections = integration.connections.filter((connection) =>
+                projectRef ? connection.supabase_project_ref === projectRef : true
+              )
+
               return (
                 <div key={integration.id}>
                   <IntegrationInstallation title={'GitHub'} integration={integration} />
-                  {integration.connections.length > 0 ? (
+                  {connections.length > 0 ? (
                     <>
                       <IntegrationConnectionHeader
                       // title={ConnectionHeaderTitle}
                       // markdown={`Repository connections for GitHub`}
                       />
                       <ul className="flex flex-col">
-                        {integration.connections.map((connection) => (
+                        {connections.map((connection) => (
                           <div
                             key={connection.id}
                             className="relative flex flex-col -gap-[1px] [&>li]:pb-0"
@@ -120,8 +126,8 @@ const GitHubSection = () => {
                     </>
                   ) : (
                     <IntegrationConnectionHeader
-                      markdown={`### ${integration.connections.length} project ${pluralize(
-                        integration.connections.length,
+                      markdown={`### ${connections.length} project ${pluralize(
+                        connections.length,
                         'connection'
                       )} Repository connections for GitHub`}
                     />

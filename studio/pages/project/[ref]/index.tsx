@@ -1,3 +1,6 @@
+import { useEffect, useRef } from 'react'
+
+import { useParams } from 'common'
 import { ClientLibrary, ExampleProject } from 'components/interfaces/Home'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
@@ -7,10 +10,23 @@ import ProjectPausedState from 'components/layouts/ProjectLayout/ProjectPausedSt
 import ProjectUpgradeFailedBanner from 'components/ui/ProjectUpgradeFailedBanner'
 import { useSelectedProject } from 'hooks'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { useAppStateSnapshot } from 'state/app-state'
 import { NextPageWithLayout } from 'types'
 
 const Home: NextPageWithLayout = () => {
   const project = useSelectedProject()
+
+  const snap = useAppStateSnapshot()
+  const { enableBranching } = useParams()
+
+  const hasShownEnableBranchingModalRef = useRef(false)
+  useEffect(() => {
+    if (enableBranching && !hasShownEnableBranchingModalRef.current) {
+      hasShownEnableBranchingModalRef.current = true
+      snap.setShowEnableBranchingModal(true)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enableBranching])
 
   const projectName =
     project?.ref !== 'default' && project?.name !== undefined

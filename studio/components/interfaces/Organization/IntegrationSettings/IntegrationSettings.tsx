@@ -215,7 +215,10 @@ You can change the scope of the access for Supabase by configuring
                       )} Repository connections for Vercel`}
                     />
                   )}
-                  <EmptyIntegrationConnection onClick={() => onAddVercelConnection(integration.id)}>
+                  <EmptyIntegrationConnection
+                    onClick={() => onAddVercelConnection(integration.id)}
+                    orgSlug={org?.slug}
+                  >
                     Add new project connection
                   </EmptyIntegrationConnection>
                 </div>
@@ -303,7 +306,10 @@ These connections will be part of a GitHub workflow that is currently in develop
                       )} Repository connections for GitHub`}
                     />
                   )}
-                  <EmptyIntegrationConnection onClick={() => onAddGitHubConnection(integration.id)}>
+                  <EmptyIntegrationConnection
+                    onClick={() => onAddGitHubConnection(integration.id)}
+                    orgSlug={org?.slug}
+                  >
                     Add new project connection
                   </EmptyIntegrationConnection>
                 </div>
