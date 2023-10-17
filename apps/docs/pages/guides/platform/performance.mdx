@@ -203,23 +203,7 @@ Depending on the clients involved, you might be able to configure them to work w
 
 ### Allowing higher number of connections
 
-You can configure Postgres by executing the following statement, followed by a server restart:
-
-```sql
-alter system set max_connections = '<val-here>';
-```
-
-Note that the default configuration used by the Supabase platform optimizes the database to maximize resource utilization, and as a result, you might also need to configure other options (e.g. `work_mem`, `shared_buffers`, `maintenance_work_mem`) in order to tune them towards your use-case, and to avoid causing instability in your database.
-
-Once overridden, the Supabase platform will continue to respect your manually configured value (even if the add-on size is changed), unless the override is removed with the following statement, followed by a server restart:
-
-```sql
-alter system reset max_connections;
-alter system reset <other-overridden-conf>;
-...
-```
-
-Configuring the number of PgBouncer connections is not supported at this time.
+You can configure Postgres connection limit among other parameters by using [Custom Postgres Config](/docs/guides/platform/custom-postgres-config#custom-postgres-config).
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
