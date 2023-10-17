@@ -8,7 +8,7 @@ export const meta = {
   sidebar_label: 'RAG with Permissions',
 }
 
-Since pgvector is built on top of Postgres, you can implement fine-grain access control on your vector database using [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security). This means you can restrict which documents are returned during a vector similarity search to users that have access to them. Supabase also supports [Foreign Data Wrappers (FDW)](/docs/guides/database/extensions/wrappers/overview) which means you can use an external database or data source to determine these permissions if your user data doesn’t exist in Supabase.
+Since pgvector is built on top of Postgres, you can implement fine-grain access control on your vector database using [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security). This means you can restrict which documents are returned during a vector similarity search to users that have access to them. Supabase also supports [Foreign Data Wrappers (FDW)](/docs/guides/database/extensions/wrappers/overview) which means you can use an external database or data source to determine these permissions if your user data doesn't exist in Supabase.
 
 Use this guide to learn how to restrict access to documents when performing retrieval augmented generation (RAG).
 
@@ -35,7 +35,7 @@ create table document_sections (
 );
 ```
 
-Notice how we record the `owner_id` on each document. Let’s create an RLS policy that restricts access to `document_sections` based on whether or not they own the linked document:
+Notice how we record the `owner_id` on each document. Let's create an RLS policy that restricts access to `document_sections` based on whether or not they own the linked document:
 
 ```sql
 -- enable row level security
@@ -54,7 +54,7 @@ on document_sections for select to authenticated using (
 
 <Admonition>
 
-In this example (and in a standard Supabase setup), the current user is determined using the built-in `auth.uid()` function when the query is executed through your project’s auto-generated REST API. If you are connecting to your Supabase database through a direct Postgres connection, see [Alternative Scenarios](#alternative-scenarios) below for directions on how to achieve the same access control.
+In this example, the current user is determined using the built-in `auth.uid()` function when the query is executed through your project's auto-generated [REST API](/docs/guides/api). If you are connecting to your Supabase database through a direct Postgres connection, see [Direct Postgres Connection](#direct-postgres-connection) below for directions on how to achieve the same access control.
 
 </Admonition>
 
@@ -84,7 +84,7 @@ Every app has its own unique requirements and may differ from the above example.
 
 ### Documents owned by multiple people
 
-Instead of a one-to-many relationship between `users` and `documents`, you may require a many-to-many relationship so that multiple people can access the same document. Let’s reimplement this using a join table:
+Instead of a one-to-many relationship between `users` and `documents`, you may require a many-to-many relationship so that multiple people can access the same document. Let's reimplement this using a join table:
 
 ```sql
 create table document_owners (
@@ -111,15 +111,21 @@ Instead of directly querying the `documents` table, we query the join table.
 
 ### User and document data live outside of Supabase
 
-You may have an existing system that stores users, documents, and their permissions in a separate database. Let’s explore the scenario where this data exists in another Postgres database. We’ll use a foreign data wrapper (FDW) to connect to the external DB from within your Supabase DB:
+You may have an existing system that stores users, documents, and their permissions in a separate database. Let's explore the scenario where this data exists in another Postgres database. We'll use a foreign data wrapper (FDW) to connect to the external DB from within your Supabase DB:
 
-<Admonition>
+<Admonition type="caution">
 
-For data sources other than Postgres, see [Foreign Data Wrappers](/docs/guides/database/extensions/wrappers/overview) for a list of external sources supported today. If your data lives in a source not provided in the list, please contact support and we’ll be happy to discuss your use case.
+RLS is latency-sensitive, so extra caution should be taken before implementing this method. Use the [query plan analyzer](https://supabase.com/docs/guides/platform/performance#optimizing-poor-performing-queries) to measure execution times for your queries to ensure they are within expected ranges. For enterprise applications, contact enterprise@supabase.io.
 
 </Admonition>
 
-Let’s assume your external DB contains a `users` and `documents` table like this:
+<Admonition>
+
+For data sources other than Postgres, see [Foreign Data Wrappers](/docs/guides/database/extensions/wrappers/overview) for a list of external sources supported today. If your data lives in a source not provided in the list, please contact [support](https://supabase.com/dashboard/support/new) and we'll be happy to discuss your use case.
+
+</Admonition>
+
+Let's assume your external DB contains a `users` and `documents` table like this:
 
 ```sql
 create table public.users (
@@ -136,7 +142,7 @@ create table public.documents (
 );
 ```
 
-In your Supabase DB, let’s create foreign tables that link to the above tables:
+In your Supabase DB, let's create foreign tables that link to the above tables:
 
 ```sql
 create schema external;
@@ -159,13 +165,13 @@ import foreign schema public limit to (users, documents)
 
 <Admonition>
 
-This example maps the `authenticated` role in Supabase to the `postgres` user in the external DB. In production, it’s best to create a custom user on the external DB that has the minimum permissions necessary to access the information you need.
+This example maps the `authenticated` role in Supabase to the `postgres` user in the external DB. In production, it's best to create a custom user on the external DB that has the minimum permissions necessary to access the information you need.
 
 On the Supabase DB, we use the built-in `authenticated` role which is automatically used when end users make authenticated requests over your auto-generated REST API. If you plan to connect to your Supabase DB over a direct Postgres connection instead of the REST API, you can change this to any user you like. See [Direct Postgres Connection](#direct-postgres-connection) for more info.
 
 </Admonition>
 
-We’ll store `document_sections` and their embeddings in Supabase so that we can perform similarity search over them via pgvector.
+We'll store `document_sections` and their embeddings in Supabase so that we can perform similarity search over them via pgvector.
 
 ```sql
 create table document_sections (
@@ -178,14 +184,14 @@ create table document_sections (
 
 We maintain a reference to the foreign document via `document_id`, but without a foreign key reference since foreign keys can only be added to local tables. Be sure to use the same ID data type that you use on your external documents table.
 
-Since we’re managing users and authentication outside of Supabase, we have two options:
+Since we're managing users and authentication outside of Supabase, we have two options:
 
 1. Make a direct Postgres connection to the Supabase DB and set the current user every request
 2. Issue a custom JWT from your system and use it to authenticate with the REST API
 
 #### Direct Postgres Connection
 
-You can directly connect to your Supabase Postgres DB using the [connection info](/dashboard/project/_/settings/database) on your project’s database settings page. To use RLS with this method, we use a custom session variable that contains the current user’s ID:
+You can directly connect to your Supabase Postgres DB using the [connection info](/dashboard/project/_/settings/database) on your project's database settings page. To use RLS with this method, we use a custom session variable that contains the current user's ID:
 
 ```sql
 -- enable row level security
@@ -204,7 +210,7 @@ on document_sections for select to authenticated using (
 
 The session variable is accessed through the `current_setting()` function. We name the variable `app.current_user_id` here, but you can modify this to any name you like. We also cast it to a `bigint` since that was the data type of the `user.id` column. Change this to whatever data type you use for your ID.
 
-Now for every request, we set the user’s ID at the beginning of the session:
+Now for every request, we set the user's ID at the beginning of the session:
 
 ```sql
 set app.current_user_id = '<current-user-id>';
@@ -228,7 +234,7 @@ You might be tempted to discard RLS completely and simply filter by user within 
 
 #### Custom JWT with REST API
 
-If you would like to use the auto-generated REST API to query your Supabase database, you can get your auth provider to issue a custom JWT for Supabase based on the users in your external system.
+If you would like to use the auto-generated REST API to query your Supabase database using JWTs from an external auth provider, you can get your auth provider to issue a custom JWT for Supabase.
 
 See the [Clerk Supabase docs](https://clerk.com/docs/integrations/databases/supabase) for an example of how this can be done. Modify the instructions to work with your own auth provider as needed.
 
@@ -249,7 +255,7 @@ on document_sections for select to authenticated using (
 );
 ```
 
-Under the hood, `auth.uid()` references `current_setting('request.jwt.claim.sub')` which corresponds to the JWT’s `sub` (subject) claim. This setting is automatically set at the beginning of each session by the REST API.
+Under the hood, `auth.uid()` references `current_setting('request.jwt.claim.sub')` which corresponds to the JWT's `sub` (subject) claim. This setting is automatically set at the beginning of each request to the REST API.
 
 All subsequent queries will inherit the permission of that user:
 
@@ -265,7 +271,7 @@ order by document_sections.embedding <#> embedding;
 
 There are endless approaches to this problem based on the complexities of each system. Luckily Postgres comes with all the primitives needed to provide access control in the way that works best for your project.
 
-If the examples above didn’t fit your use case or you need to adjust them slightly to better fit your existing system, feel free to reach out to support and we’ll be happy to assist you.
+If the examples above didn't fit your use case or you need to adjust them slightly to better fit your existing system, feel free to reach out to [support](https://supabase.com/dashboard/support/new) and we'll be happy to assist you.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
