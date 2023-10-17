@@ -33,17 +33,18 @@ const Header = () => {
 const GenericProjectPage: NextPage = () => {
   const router = useRouter()
   const { routeSlug, ...queryParams } = router.query
-  const queryString =
-    Object.keys(queryParams).length > 0
-      ? new URLSearchParams(queryParams as Record<string, string>).toString()
-      : ''
+  const queryString = new URLSearchParams(queryParams as Record<string, string>)
 
   const urlRewriterFactory = (slug: string | string[] | undefined) => {
     return (projectRef: string) => {
       const hash = location.hash
 
       if (!Array.isArray(slug)) {
-        return [`/project/${projectRef}`, queryString ?? `?${queryString}`, hash ?? `#${hash}`]
+        return [
+          `/project/${projectRef}`,
+          queryString.size > 0 ? `?${queryString}` : undefined,
+          hash ?? `#${hash}`,
+        ]
           .filter(Boolean)
           .join('')
       }
@@ -52,7 +53,7 @@ const GenericProjectPage: NextPage = () => {
 
       return [
         `/project/${projectRef}/${slugPath}`,
-        queryString.length > 0 ? `?${queryString}` : undefined,
+        queryString.size > 0 ? `?${queryString}` : undefined,
         hash ?? `#${hash}`,
       ]
         .filter(Boolean)
