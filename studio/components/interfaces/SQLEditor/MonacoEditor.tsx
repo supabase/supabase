@@ -1,9 +1,9 @@
 import Editor, { Monaco, OnMount } from '@monaco-editor/react'
 import { useParams } from 'common'
+import { debounce } from 'lodash'
 import { useRouter } from 'next/router'
-import { MutableRefObject, useRef } from 'react'
+import { MutableRefObject, useEffect, useRef } from 'react'
 import { cn } from 'ui'
-import { debounce, memoize } from 'lodash'
 
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useSelectedProject } from 'hooks'
@@ -100,6 +100,14 @@ const MonacoEditor = ({
     }
   }
 
+  // if an SQL query is passed by the content parameter, set the editor value to its content. This
+  // is usually used for sending the user to SQL editor from other pages with SQL.
+  useEffect(() => {
+    if (content && content.length > 0) {
+      handleEditorChange(content)
+    }
+  }, [])
+
   return (
     <Editor
       className={cn(className, 'monaco-editor')}
@@ -107,7 +115,7 @@ const MonacoEditor = ({
       onMount={handleEditorOnMount}
       onChange={handleEditorChange}
       defaultLanguage="pgsql"
-      defaultValue={snippet?.snippet.content.sql ?? content}
+      defaultValue={snippet?.snippet.content.sql}
       path={id}
       options={{
         tabSize: 2,
