@@ -1,6 +1,7 @@
 import clsx from 'clsx'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 
+import { OAuthScope } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import {
   OAuthAppCreateResponse,
@@ -20,12 +21,15 @@ import {
   DropdownMenuTrigger,
   Form,
   IconEdit,
+  IconExternalLink,
   IconUpload,
   Input,
   Modal,
   SidePanel,
 } from 'ui'
-import AuthorizeRequesterDetails from './AuthorizeRequesterDetails'
+import AuthorizeRequesterDetails from '../AuthorizeRequesterDetails'
+import { ScopesPanel } from './Scopes'
+import Link from 'next/link'
 
 export interface PublishAppSidePanelProps {
   visible: boolean
@@ -88,6 +92,7 @@ const PublishAppSidePanel = ({
   const [iconUrl, setIconUrl] = useState<string>()
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const [urls, setUrls] = useState<{ id: string; value: string }[]>([{ id: uuidv4(), value: '' }])
+  const [scopes, setScopes] = useState<OAuthScope[]>([])
 
   useEffect(() => {
     if (visible) {
@@ -101,9 +106,11 @@ const PublishAppSidePanel = ({
             return { id: uuidv4(), value: url }
           })
         )
+        setScopes(selectedApp.scopes)
         setIconUrl(selectedApp.icon === null ? undefined : selectedApp.icon)
       } else {
         setUrls([{ id: uuidv4(), value: '' }])
+        setScopes([])
         setIconUrl(undefined)
       }
     }
@@ -164,6 +171,7 @@ const PublishAppSidePanel = ({
         name,
         website,
         redirect_uris,
+        scopes,
         icon: uploadedIconUrl,
       })
     } else {
@@ -174,6 +182,7 @@ const PublishAppSidePanel = ({
         name,
         website,
         redirect_uris,
+        scopes,
         icon: uploadedIconUrl === undefined ? null : uploadedIconUrl,
       })
     }
@@ -332,6 +341,30 @@ const PublishAppSidePanel = ({
                       </div>
                     </SidePanel.Content>
                     <SidePanel.Separator />
+                    <div className="p-6 ">
+                      <div className="flex items-start justify-between space-x-4 pb-4">
+                        <div className="flex flex-col">
+                          <span className="prose text-sm">Application permissions</span>
+                          <span className="text-sm text-foreground-light">
+                            The application permissions are organized in scopes and will be
+                            presented to the user when adding an app to their organization and all
+                            of its projects.
+                          </span>
+                        </div>
+                        <Link
+                          passHref
+                          href="https://supabase.com/docs/guides/platform/oauth-apps/oauth-scopes"
+                        >
+                          <Button asChild type="default" icon={<IconExternalLink />}>
+                            <a target="_blank" rel="noreferrer">
+                              Documentation
+                            </a>
+                          </Button>
+                        </Link>
+                      </div>
+
+                      <ScopesPanel scopes={scopes} setScopes={setScopes} />
+                    </div>
                   </div>
 
                   <SidePanel.Separator />
@@ -359,7 +392,7 @@ const PublishAppSidePanel = ({
 
                 <Modal
                   hideFooter
-                  className="!w-[500px]"
+                  className="!max-w-[600px]"
                   visible={showPreview}
                   onCancel={() => setShowPreview(false)}
                 >
@@ -376,6 +409,7 @@ const PublishAppSidePanel = ({
                         icon={iconUrl || null}
                         name={values.name}
                         domain={values.website}
+                        scopes={scopes}
                       />
                       <div className="pt-4 space-y-2">
                         <p className="prose text-sm">
