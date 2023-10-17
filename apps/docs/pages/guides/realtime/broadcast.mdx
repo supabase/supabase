@@ -317,9 +317,7 @@ type: 'broadcast',
 event: 'test',
 payload: { message: 'Hi' },
 })
-.then((resp) => {
-console.log(resp)
-})
+.then((resp) => console.log(resp))
 
 // Remember to clean up the channel
 
@@ -336,7 +334,7 @@ channel = client.channel('test-channel');
 final resp = await channel.send(
   type: RealtimeListenTypes.broadcast,
   payload: {
-    'message': 'Hi,
+    'message': 'Hi',
   },
   event: "test"
 );
