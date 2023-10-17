@@ -82,13 +82,24 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
 }
 
 const PolicyEditorFooter = ({ onViewTemplates = () => {}, onReviewPolicy = () => {} }) => (
-  <div className="flex w-full items-center justify-end space-x-4 border-t px-6 py-3 dark:border-dark">
-    <Button type="default" onClick={onViewTemplates}>
-      View templates
-    </Button>
-    <Button type="primary" onClick={onReviewPolicy}>
-      Review
-    </Button>
+  <div className="flex items-center justify-between border-t px-6 py-4 dark:border-dark">
+    <a
+      href="https://supabase.com/docs/guides/storage/access-control"
+      target="_blank"
+      rel="noreferrer"
+    >
+      <Button type="link" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
+        Documentation
+      </Button>
+    </a>
+    <div className="flex w-full items-center justify-end gap-2">
+      <Button type="default" onClick={onViewTemplates}>
+        View templates
+      </Button>
+      <Button type="primary" onClick={onReviewPolicy}>
+        Review
+      </Button>
+    </div>
   </div>
 )
 
