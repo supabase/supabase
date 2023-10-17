@@ -42,6 +42,7 @@ const GenericProjectPage: NextPage = () => {
       if (!Array.isArray(slug)) {
         return [
           `/project/${projectRef}`,
+          // @ts-ignore [Joshen] https://github.com/microsoft/TypeScript/issues/54466
           queryString.size > 0 ? `?${queryString}` : undefined,
           hash ?? `#${hash}`,
         ]
@@ -53,6 +54,7 @@ const GenericProjectPage: NextPage = () => {
 
       return [
         `/project/${projectRef}/${slugPath}`,
+        // @ts-ignore [Joshen] https://github.com/microsoft/TypeScript/issues/54466
         queryString.size > 0 ? `?${queryString}` : undefined,
         hash ?? `#${hash}`,
       ]
