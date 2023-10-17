@@ -64,7 +64,10 @@ const handleInserts = (payload) => {
 }
 
 // Listen to inserts
-const { data: todos, error } = await supabase.from('todos').on('INSERT', handleInserts).subscribe()
+supabase
+  .channel('todos')
+  .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'todos' }, handleInserts)
+  .subscribe()
 ```
 
 Use [subscribe()](/docs/reference/javascript/subscribe) to listen to database changes.
