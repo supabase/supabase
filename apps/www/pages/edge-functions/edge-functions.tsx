@@ -151,7 +151,7 @@ function Database() {
 
                     <div>
                       <h3 className="text-foreground text-lg">{item.title}</h3>
-                      <p className="text-muted text-sm">{item.description}</p>
+                      <p className="text-light text-sm">{item.description}</p>
                     </div>
                   </div>
                 )
@@ -179,14 +179,14 @@ function Database() {
                         key={`featureHighlighted-${i}`}
                         className={cn(
                           'bg-background hover:bg-surface-100 group rounded-md border px-6 py-4 text-left transition-all hover:border',
-                          active ? '!bg-surface-200' : ' border-border'
+                          active ? '!bg-surface-100 border-foreground-lighter' : ''
                         )}
                         onClick={() => setCurrentSelection(feat.highlightLines)}
                       >
                         <div
                           className={cn(
                             'transition-colors ',
-                            active ? ' text-foreground' : ' text-muted group-hover:text-foreground'
+                            active ? ' text-foreground' : ' text-light group-hover:text-foreground'
                           )}
                         >
                           {feat.title}
@@ -194,7 +194,7 @@ function Database() {
                         <div
                           className={cn(
                             'text-sm transition-colors ',
-                            active ? ' text-light' : ' text-muted group-hover:text-light '
+                            active ? ' text-light' : ' text-light group-hover:text-light '
                           )}
                         >
                           {feat.description}
