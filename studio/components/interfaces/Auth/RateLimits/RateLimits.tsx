@@ -96,8 +96,8 @@ const RateLimits = () => {
   useEffect(() => {
     if (isSuccess) {
       form.reset({
-        RATE_LIMIT_TOKEN_REFRESH: 360,
-        RATE_LIMIT_VERIFY: 360,
+        RATE_LIMIT_TOKEN_REFRESH: 30,
+        RATE_LIMIT_VERIFY: 30,
         RATE_LIMIT_EMAIL_SENT: authConfig.RATE_LIMIT_EMAIL_SENT,
         RATE_LIMIT_SMS_SENT: authConfig.RATE_LIMIT_SMS_SENT,
       })
@@ -109,7 +109,7 @@ const RateLimits = () => {
     <div>
       <FormHeader
         title="Rate Limits"
-        description="Safeguard against bursts of incoming traffic to prevent abuse and maximise stability"
+        description="Safeguard against bursts of incoming traffic to prevent abuse and maximize stability"
         docsUrl="https://supabase.com/docs/guides/platform/going-into-prod#rate-limiting-resource-allocation--abuse-prevention"
       />
 
@@ -259,7 +259,7 @@ const RateLimits = () => {
                   <FormSectionLabel
                     description={
                       <p className="text-foreground-light text-sm">
-                        How many emails can be sent per hour
+                        How many sessions can be refreshed in a 5 minute interval
                       </p>
                     }
                   >
@@ -276,6 +276,11 @@ const RateLimits = () => {
                         <FormControl_Shadcn_>
                           <Input_Shadcn_ disabled type="number" {...field} />
                         </FormControl_Shadcn_>
+                        {field.value > 0 && (
+                          <p className="text-foreground-lighter text-sm">
+                            This is equivalent to {field.value * 12} requests per hour
+                          </p>
+                        )}
                         <FormMessage_Shadcn_ />
                       </FormItem_Shadcn_>
                     )}
@@ -288,7 +293,7 @@ const RateLimits = () => {
                   <FormSectionLabel
                     description={
                       <p className="text-foreground-light text-sm">
-                        How many emails can be sent per hour
+                        How many OTP/Magic link verifications can be made in a 5 minute interval
                       </p>
                     }
                   >
@@ -305,6 +310,11 @@ const RateLimits = () => {
                         <FormControl_Shadcn_>
                           <Input_Shadcn_ disabled type="number" {...field} />
                         </FormControl_Shadcn_>
+                        {field.value > 0 && (
+                          <p className="text-foreground-lighter text-sm">
+                            This is equivalent to {field.value * 12} requests per hour
+                          </p>
+                        )}
                         <FormMessage_Shadcn_ />
                       </FormItem_Shadcn_>
                     )}
