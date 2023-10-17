@@ -33,6 +33,7 @@ import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useCheckPermissions } from 'hooks'
 import { isSmtpEnabled } from '../SmtpForm/SmtpForm.utils'
+import toast from 'react-hot-toast'
 
 const RateLimits = () => {
   const formId = 'auth-rate-limits-form'
@@ -46,16 +47,23 @@ const RateLimits = () => {
     isError,
     isSuccess,
   } = useAuthConfigQuery({ projectRef })
-  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
+  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation({
+    onSuccess: () => {
+      toast.success('Rate limits successfully updated')
+    },
+    onError: (error) => {
+      toast.error(`Failed to update rate limits: ${error.message}`)
+    },
+  })
 
   const canUpdateEmailLimit = authConfig?.EXTERNAL_EMAIL_ENABLED && isSmtpEnabled(authConfig)
   const canUpdateSMSRateLimit = authConfig?.EXTERNAL_PHONE_ENABLED && !authConfig?.SMS_AUTOCONFIRM
 
   const FormSchema = z.object({
-    RATE_LIMIT_TOKEN_REFRESH: z.number().min(0, 'Please provide a value above 0'),
-    RATE_LIMIT_VERIFY: z.number().min(0, 'Please provide a value above 0'),
-    RATE_LIMIT_EMAIL_SENT: z.number().min(0, 'Please provide a value above 0'),
-    RATE_LIMIT_SMS_SENT: z.number().min(0, 'Please provide a value above 0'),
+    RATE_LIMIT_TOKEN_REFRESH: z.coerce.number().min(0, 'Please provide a value above 0'),
+    RATE_LIMIT_VERIFY: z.coerce.number().min(0, 'Please provide a value above 0'),
+    RATE_LIMIT_EMAIL_SENT: z.coerce.number().min(0, 'Please provide a value above 0'),
+    RATE_LIMIT_SMS_SENT: z.coerce.number().min(0, 'Please provide a value above 0'),
   })
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -69,7 +77,17 @@ const RateLimits = () => {
   })
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
-    console.log('onSubmit', data)
+    if (!projectRef) return console.error('Project ref is required')
+
+    // [Joshen] Temporarily removing RATE_LIMIT_TOKEN_REFRESH and RATE_LIMIT_VERIFY until BE supports it
+    const payload: Partial<z.infer<typeof FormSchema>> = {}
+    if (data.RATE_LIMIT_EMAIL_SENT !== authConfig?.RATE_LIMIT_EMAIL_SENT) {
+      payload.RATE_LIMIT_EMAIL_SENT = data.RATE_LIMIT_EMAIL_SENT
+    }
+    if (data.RATE_LIMIT_SMS_SENT !== authConfig?.RATE_LIMIT_SMS_SENT) {
+      payload.RATE_LIMIT_SMS_SENT = data.RATE_LIMIT_SMS_SENT
+    }
+    updateAuthConfig({ projectRef, config: payload }, { onSuccess: () => form.reset(data) })
   }
 
   useEffect(() => {
@@ -98,15 +116,15 @@ const RateLimits = () => {
 
       {isSuccess && (
         <Form_Shadcn_ {...form}>
-          <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+          <form id={formId} className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
             <FormPanel
               footer={
                 <div className="flex py-4 px-8">
                   <FormActions
                     form={formId}
                     isSubmitting={isUpdatingConfig}
-                    hasChanges={false}
-                    handleReset={() => {}}
+                    hasChanges={form.formState.isDirty}
+                    handleReset={() => form.reset()}
                     disabled={!canUpdateConfig}
                     helper={
                       !canUpdateConfig
