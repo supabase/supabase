@@ -67,7 +67,7 @@ export const ApiReport: NextPageWithLayout = () => {
         data={report.data.totalRequests || []}
         renderer={TotalRequestsChartRenderer}
         append={TopApiRoutesRenderer}
-        appendProps={{ data: report.data.topRoutes || [] }}
+        appendProps={{ data: report.data.topRoutes || [], params: report.params.topRoutes }}
       />
       <ReportWidget
         isLoading={report.isLoading}
@@ -76,7 +76,10 @@ export const ApiReport: NextPageWithLayout = () => {
         tooltip="Error responses with 4XX or 5XX status codes"
         data={report.data.errorCounts || []}
         renderer={ErrorCountsChartRenderer}
-        appendProps={{ data: report.data.topErrorRoutes || [] }}
+        appendProps={{
+          data: report.data.topErrorRoutes || [],
+          params: report.params.topErrorRoutes,
+        }}
         append={TopApiRoutesRenderer}
       />
       <ReportWidget
@@ -86,7 +89,7 @@ export const ApiReport: NextPageWithLayout = () => {
         tooltip="Average response speed (in miliseconds) of a request"
         data={report.data.responseSpeed || []}
         renderer={ResponseSpeedChartRenderer}
-        appendProps={{ data: report.data.topSlowRoutes || [] }}
+        appendProps={{ data: report.data.topSlowRoutes || [], params: report.params.topSlowRoutes }}
         append={TopApiRoutesRenderer}
       />
 

@@ -93,8 +93,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           request.path, request.method, request.search, response.status_code
         order by
           count desc
-        limit
-        3
+        limit 10
         `,
       },
       errorCounts: {
@@ -138,8 +137,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           request.path, request.method, request.search, response.status_code
         order by
           count desc
-        limit
-        3
+        limit 10
         `,
       },
       responseSpeed: {
@@ -181,8 +179,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           request.path, request.method, request.search, response.status_code
         order by
           avg desc
-        limit
-        3
+        limit 10
         `,
       },
       networkTraffic: {
