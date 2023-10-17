@@ -52,7 +52,8 @@ const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: 
     <>
       {filteredHooks.map((x: any) => {
         const isEdgeFunction = (url: string) =>
-          url.includes(`https://${ref}.functions.supabase.${restUrlTld}/`)
+          url.includes(`https://${ref}.functions.supabase.${restUrlTld}/`) ||
+          url.includes(`https://${ref}.supabase.${restUrlTld}/functions/`)
         const [url, method] = x.function_args
 
         return (

@@ -134,7 +134,7 @@ In this scenario we'll be using the user's mobile phone number and a correspondi
 Using supabase-js on the client you'll want to use the same `signUp` method that you'd use for email based sign ups, but with the `phone` param instead of the `email param`:
 
 ```js
-let { user, error } = await supabase.auth.signUp({
+const { user, error } = await supabase.auth.signUp({
   phone: '+13334445555',
   password: 'some-password',
 })
@@ -180,7 +180,7 @@ The user will now receive an SMS with a 6-digit pin that you will need to receiv
 You should present a form to the user so they can input the 6 digit pin, then send it along with the phone number to `verifyOtp`:
 
 ```js
-let { session, error } = await supabase.auth.verifyOtp({
+const { session, error } = await supabase.auth.verifyOtp({
   phone: '+13334445555',
   token: '123456',
   type: 'sms',
@@ -242,7 +242,7 @@ Also now that the mobile has been verified, the user can use the number and pass
 <TabPanel id="js" label="JavaScript">
 
 ```js
-let { user, error } = await supabase.auth.signInWithPassword({
+const { user, error } = await supabase.auth.signInWithPassword({
   phone: '+13334445555',
   password: 'some-password',
 })
@@ -290,7 +290,7 @@ In this scenario you are granting your user's the ability to login to their acco
 In JavaScript we can use the `signIn` method with a single parameter: `phone`
 
 ```js
-let { user, error } = await supabase.auth.signInWithOtp({
+const { user, error } = await supabase.auth.signInWithOtp({
   phone: '+13334445555',
 })
 ```
@@ -333,7 +333,7 @@ The second step is the same as the previous section, you need to collect the 6-d
 <TabPanel id="js" label="JavaScript">
 
 ```js
-let { session, error } = await supabase.auth.verifyOtp({
+const { session, error } = await supabase.auth.verifyOtp({
   phone: '+13334445555',
   token: '123456',
   type: 'sms',
@@ -429,7 +429,7 @@ There is no change in the verification process, you should continue to use the `
 
 ```js
 // After receiving a WhatsApp OTP
-let { data, error } = await supabase.auth.verifyOtp({
+const { data, error } = await supabase.auth.verifyOtp({
   phone: '+57336567365',
   token: '123456',
   type: 'sms',

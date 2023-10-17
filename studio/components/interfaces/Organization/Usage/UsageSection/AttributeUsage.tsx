@@ -21,6 +21,7 @@ import {
 } from '../Usage.utils'
 import UsageBarChart from '../UsageBarChart'
 import { ChartMeta } from './UsageSection'
+import { useIsFeatureEnabled } from 'hooks'
 
 export interface AttributeUsageProps {
   slug: string
@@ -54,6 +55,8 @@ const AttributeUsage = ({
   isSuccess,
   currentBillingCycleSelected,
 }: AttributeUsageProps) => {
+  const billingEnabled = useIsFeatureEnabled('billing:all')
+
   const upgradeUrl = getUpgradeUrl(slug ?? '', subscription)
   const usageRatio = (usageMeta?.usage ?? 0) / (usageMeta?.pricing_free_units ?? 0)
   const usageExcess = (usageMeta?.usage ?? 0) - (usageMeta?.pricing_free_units ?? 0)
@@ -149,8 +152,8 @@ const AttributeUsage = ({
                         )}
                       </div>
 
-                      {showUsageWarning && (
-                        <Button asChild type="default" size="tiny">
+                      {billingEnabled && showUsageWarning && (
+                        <Button type="default" size="tiny" asChild>
                           <Link href={upgradeUrl} className="pb-1">
                             {subscription?.plan?.id === 'free'
                               ? 'Upgrade plan'
@@ -229,7 +232,8 @@ const AttributeUsage = ({
 
                 <div className="space-y-1">
                   <p className="text-sm">
-                    {attribute.chartPrefix || ''} {attribute.name} per day
+                    {attribute.chartPrefix || ''} {attribute.name}{' '}
+                    {attribute.chartSuffix || 'per day'}
                   </p>
                   {attribute.chartDescription.split('\n').map((paragraph, idx) => (
                     <p key={`para-${idx}`} className="text-sm text-foreground-light">
@@ -279,9 +283,11 @@ const AttributeUsage = ({
                         </p>
                       </div>
                     </div>
-                    <Button asChild type="primary">
-                      <Link href={upgradeUrl}>Upgrade plan</Link>
-                    </Button>
+                    {billingEnabled && (
+                      <Button type="primary" asChild>
+                        <Link href={upgradeUrl}>Upgrade plan</Link>
+                      </Button>
+                    )}
                   </div>
                 </Panel.Content>
               </Panel>

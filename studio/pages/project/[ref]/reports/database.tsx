@@ -1,11 +1,8 @@
+import { useParams } from 'common/hooks'
 import dayjs from 'dayjs'
 import { observer } from 'mobx-react-lite'
+import Link from 'next/link'
 import { useState } from 'react'
-
-import { useParams } from 'common/hooks'
-import { TIME_PERIODS_INFRA, USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
-import { formatBytes } from 'lib/helpers'
-import { NextPageWithLayout } from 'types'
 import { Badge, Button, IconArrowRight, IconExternalLink } from 'ui'
 
 import { ReportsLayout } from 'components/layouts'
@@ -18,7 +15,9 @@ import { useDatabaseSizeQuery } from 'data/database/database-size-query'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 import { useSelectedOrganization } from 'hooks'
-import Link from 'next/link'
+import { GB, TIME_PERIODS_INFRA, USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
+import { formatBytes } from 'lib/helpers'
+import { NextPageWithLayout } from 'types'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -70,6 +69,8 @@ const DatabaseUsage = observer(() => {
 
   // Can be null or undefined, thus !=
   const orgLevelBilling = selectedOrganization?.subscription_id != undefined
+  const maxDiskVolumeSize =
+    (usage?.disk_volume_size_gb ?? 0 > 0 ? usage?.disk_volume_size_gb ?? 0 : Infinity) * GB
 
   return (
     <>
@@ -83,11 +84,7 @@ const DatabaseUsage = observer(() => {
                   <SparkBar
                     type="horizontal"
                     value={databaseSize}
-                    max={
-                      usage?.disk_volume_size_gb ?? 0 > 0
-                        ? usage?.disk_volume_size_gb ?? 0
-                        : Infinity
-                    }
+                    max={maxDiskVolumeSize}
                     barClass={`${
                       diskSizeUsageRatio >= 0.9 && !isPaidTier
                         ? 'bg-red-900'
