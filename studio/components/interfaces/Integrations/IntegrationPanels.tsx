@@ -185,7 +185,7 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
                   alt={`icon`}
                 />
               )}
-              <span className="text-sm">{connection.metadata?.name}</span>
+              <span className="text-sm truncate">{connection.metadata?.name}</span>
             </div>
 
             <div className="flex flex-col gap-0">
