@@ -54,7 +54,7 @@ export default function TileGrid({
                           {p.title}
                         </h3>
                         <p
-                          className="text-muted text-sm line-clamp-4 min-h-[80px]"
+                          className="text-lighter text-sm line-clamp-4 min-h-[80px]"
                           title={p.description}
                         >
                           {p.description}
@@ -100,7 +100,7 @@ export default function TileGrid({
                           {p.title}
                         </h3>
                         <p
-                          className="text-muted text-sm line-clamp-4 min-h-[80px]"
+                          className="text-lighter text-sm line-clamp-4 min-h-[80px]"
                           title={p.description}
                         >
                           {p.description}

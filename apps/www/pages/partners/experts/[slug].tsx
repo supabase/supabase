@@ -152,13 +152,13 @@ function Partner({
                 <div className="text-foreground divide-y">
                   {partner.type === 'technology' && (
                     <div className="flex items-center justify-between py-2">
-                      <span className="text-muted">Developer</span>
+                      <span className="text-lighter">Developer</span>
                       <span className="text-foreground">{partner.developer}</span>
                     </div>
                   )}
 
                   <div className="flex items-center justify-between py-2">
-                    <span className="text-muted">Category</span>
+                    <span className="text-lighter">Category</span>
                     <Link href={`/partners/experts#${partner.category.toLowerCase()}`}>
                       <a className="text-brand hover:text-brand-300 transition-colors">
                         {partner.category}
@@ -167,7 +167,7 @@ function Partner({
                   </div>
 
                   <div className="flex items-center justify-between py-2">
-                    <span className="text-muted">Website</span>
+                    <span className="text-lighter">Website</span>
                     <a
                       href={partner.website}
                       target="_blank"
@@ -180,7 +180,7 @@ function Partner({
 
                   {partner.type === 'technology' && partner.docs && (
                     <div className="flex items-center justify-between py-2">
-                      <span className="text-muted">Documentation</span>
+                      <span className="text-lighter">Documentation</span>
                       <a
                         href={partner.docs}
                         target="_blank"

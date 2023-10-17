@@ -106,7 +106,7 @@ function IntegrationPartnersPage(props: Props) {
         <SectionContainer className="space-y-16">
           <div>
             <h1 className="h1">{meta_title}</h1>
-            <p className="text-muted text-xl">{meta_description}</p>
+            <p className="text-lighter text-xl">{meta_description}</p>
           </div>
           {/* Title */}
           <div className="grid space-y-12 md:gap-8 lg:grid-cols-12 lg:gap-16 lg:space-y-0 xl:gap-16">
@@ -131,7 +131,7 @@ function IntegrationPartnersPage(props: Props) {
                   }
                 />
                 <div className="hidden lg:block">
-                  <div className="text-muted mb-2 text-sm">Categories</div>
+                  <div className="text-lighter mb-2 text-sm">Categories</div>
                   <div className="space-y-1">
                     {allCategories.map((category) => (
                       <button
@@ -145,7 +145,7 @@ function IntegrationPartnersPage(props: Props) {
                   </div>
                 </div>
                 <div className="space-y-4">
-                  <div className="text-muted mb-2 text-sm">Explore more</div>
+                  <div className="text-lighter mb-2 text-sm">Explore more</div>
                   <div className="grid grid-cols-2 gap-8 lg:grid-cols-1">
                     <PartnerLinkBox
                       title="Experts"
