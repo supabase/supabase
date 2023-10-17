@@ -330,21 +330,17 @@ client.removeChannel(channel)
 </TabPanel>
 <TabPanel id="dart" label="Dart">
 ```dart
-import 'dart:developer' as developer;
-
 // No need to subscribe to channel
 
 channel = client.channel('test-channel');
-channel.send(
+final resp = await channel.send(
   type: RealtimeListenTypes.broadcast,
   payload: {
-    'myKey': 'myValue',
+    'message': 'Hi,
   },
   event: "test"
-).then(
-  (value) => developer.log(value);,
-  onError: (e) => developer.log(e),
 );
+print(resp);
 ````
 
 </TabPanel>
