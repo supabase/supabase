@@ -2,7 +2,17 @@ import dayjs from 'dayjs'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { Button, Form, Input, Modal } from 'ui'
+import {
+  Button,
+  DialogContent_Shadcn_,
+  DialogDescription_Shadcn_,
+  DialogFooter_Shadcn_,
+  DialogHeader_Shadcn_,
+  DialogTitle_Shadcn_,
+  Dialog_Shadcn_,
+  Form,
+  Input,
+} from 'ui'
 
 import { useParams } from 'common/hooks'
 import {
@@ -228,58 +238,55 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
           </div>
         </div>
       </div>
-      <Modal
-        size="medium"
-        onCancel={() => setSaveModalOpen(!saveModalOpen)}
-        header="Save log query"
-        visible={saveModalOpen}
-        hideFooter
-      >
-        <Form
-          initialValues={{
-            name: '',
-            desdcription: '',
-          }}
-          onSubmit={async (values: any, { setSubmitting }: any) => {
-            setSubmitting(true)
+      <Dialog_Shadcn_ open={saveModalOpen} onOpenChange={(v) => setSaveModalOpen(v)}>
+        <DialogContent_Shadcn_>
+          <Form
+            initialValues={{
+              name: '',
+              desdcription: '',
+            }}
+            onSubmit={async (values: any, { setSubmitting }: any) => {
+              setSubmitting(true)
 
-            const payload = {
-              id: uuidv4(),
-              name: values.name,
-              description: values.description || '',
-              type: 'log_sql' as const,
-              content: {
-                content_id: editorId,
-                sql: editorValue,
-                schema_version: '1',
-                favorite: false,
-              },
-              visibility: 'user' as const,
-            }
+              const payload = {
+                id: uuidv4(),
+                name: values.name,
+                description: values.description || '',
+                type: 'log_sql' as const,
+                content: {
+                  content_id: editorId,
+                  sql: editorValue,
+                  schema_version: '1',
+                  favorite: false,
+                },
+                visibility: 'user' as const,
+              }
 
-            createContent({ projectRef: projectRef!, payload })
-          }}
-        >
-          {() => (
-            <>
-              <div className="py-4">
-                <Modal.Content>
-                  <div className="space-y-6">
-                    <Input layout="horizontal" label="Name" id="name" />
-                    <div className="text-area-text-sm">
-                      <Input.TextArea
-                        layout="horizontal"
-                        labelOptional="Optional"
-                        label="Description"
-                        id="description"
-                        rows={2}
-                      />
+              createContent({ projectRef: projectRef!, payload })
+            }}
+          >
+            {() => (
+              <>
+                <DialogHeader_Shadcn_>
+                  <DialogTitle_Shadcn_>Save log query</DialogTitle_Shadcn_>
+                </DialogHeader_Shadcn_>
+                <DialogDescription_Shadcn_ asChild>
+                  <div className="py-4">
+                    <div className="space-y-6">
+                      <Input layout="horizontal" label="Name" id="name" />
+                      <div className="text-area-text-sm">
+                        <Input.TextArea
+                          layout="horizontal"
+                          labelOptional="Optional"
+                          label="Description"
+                          id="description"
+                          rows={2}
+                        />
+                      </div>
                     </div>
                   </div>
-                </Modal.Content>
-              </div>
-              <div className="py-3 border-t bg-scale-300">
-                <Modal.Content>
+                </DialogDescription_Shadcn_>
+                <DialogFooter_Shadcn_>
                   <div className="flex items-center justify-end gap-2">
                     <Button
                       size="tiny"
@@ -292,12 +299,12 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
                       Save
                     </Button>
                   </div>
-                </Modal.Content>
-              </div>
-            </>
-          )}
-        </Form>
-      </Modal>
+                </DialogFooter_Shadcn_>
+              </>
+            )}
+          </Form>
+        </DialogContent_Shadcn_>
+      </Dialog_Shadcn_>
     </div>
   )
 }
