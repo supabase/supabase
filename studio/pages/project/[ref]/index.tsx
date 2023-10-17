@@ -17,16 +17,16 @@ const Home: NextPageWithLayout = () => {
   const project = useSelectedProject()
 
   const snap = useAppStateSnapshot()
-  const { enabledBranching } = useParams()
+  const { enableBranching } = useParams()
 
   const hasShownEnableBranchingModalRef = useRef(false)
   useEffect(() => {
-    if (enabledBranching && !hasShownEnableBranchingModalRef.current) {
+    if (enableBranching && !hasShownEnableBranchingModalRef.current) {
       hasShownEnableBranchingModalRef.current = true
       snap.setShowEnableBranchingModal(true)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabledBranching])
+  }, [enableBranching])
 
   const projectName =
     project?.ref !== 'default' && project?.name !== undefined
