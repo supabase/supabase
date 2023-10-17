@@ -838,7 +838,7 @@ export default function IndexPage() {
                   />
                 </tbody>
                 <tfoot>
-                  <tr className="border-scale-200 dark:border-scale-600 border-t">
+                  <tr className="border-border border-t">
                     <th className="sr-only" scope="row">
                       Choose your plan
                     </th>
