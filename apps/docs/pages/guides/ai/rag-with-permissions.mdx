@@ -160,7 +160,7 @@ create user mapping for authenticated
 
 -- Import foreign 'users' and 'documents' tables into 'external' schema
 import foreign schema public limit to (users, documents)
-    from server foreign_server into external;
+  from server foreign_server into external;
 ```
 
 <Admonition>
