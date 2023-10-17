@@ -30,7 +30,7 @@ export const LaunchSection = (props: WeekDayProps) => {
       ></div>
       {/* END timeline dot */}
       <div className="flex items-center gap-3">
-        <span className="text-scale-1100 text-sm">{props.date}</span>
+        <span className="text-light text-sm">{props.date}</span>
         {props.shipped ? (
           <Badge>
             <div className="flex items-center gap-2">
@@ -44,11 +44,11 @@ export const LaunchSection = (props: WeekDayProps) => {
           <Badge color="purple">Not shipped yet</Badge>
         )}
       </div>
-      <h4 className="text-scale-1200 text-2xl md:text-3xl lg:text-4xl">
+      <h4 className="text-foreground text-2xl md:text-3xl lg:text-4xl">
         {props.shipped ? props.title : props.dd + ' 08:00 PT | 11:00 ET'}
       </h4>
 
-      {props.shipped && <p className="text-scale-1100 text-base">{props.description}</p>}
+      {props.shipped && <p className="text-light text-base">{props.description}</p>}
     </div>
   )
 
@@ -104,7 +104,7 @@ export const LaunchSection = (props: WeekDayProps) => {
                 >
                   <PlayIcon
                     strokeWidth={1.5}
-                    className="text-scale-1200 absolute w-24 opacity-50 transition-all group-hover:scale-105 group-hover:opacity-100"
+                    className="text-foreground absolute w-24 opacity-50 transition-all group-hover:scale-105 group-hover:opacity-100"
                   />
                 </div>
               </div>
@@ -116,9 +116,9 @@ export const LaunchSection = (props: WeekDayProps) => {
                 hideFooter
                 header={
                   <div className="flex items-center justify-between">
-                    <span className="text-scale-1200">{props.title}</span>
+                    <span className="text-foreground">{props.title}</span>
                     <XIcon
-                      className="text-scale-900 hover:text-scale-1200 w-4 cursor-pointer transition"
+                      className="text-muted hover:text-foreground w-4 cursor-pointer transition"
                       onClick={() => setVideoVisible(false)}
                     />
                   </div>
@@ -179,7 +179,7 @@ export const LaunchSection = (props: WeekDayProps) => {
                       <div className="bg-scale-300 dark:bg-scale-400 h-px w-full"></div>
 
                       <div className="flex flex-col gap-6 p-6 px-10 pb-10">
-                        <h3 className="text-scale-1100 text-sm">New releases</h3>
+                        <h3 className="text-light text-sm">New releases</h3>
                         {article.products &&
                           article.products.map((product: Product, index) => (
                             <ProductButtonListItem key={product.url + index} {...product} />

@@ -22,7 +22,7 @@ const ProductHeader = (props: Types) => (
             <div className="mb-4 flex items-center gap-3">
               {props.icon && <ProductIcon icon={props.icon} />}
               {props.title && (
-                <span className="text-scale-1200" key={`product-name-${props.title}`}>
+                <span className="text-foreground" key={`product-name-${props.title}`}>
                   {props.title}
                 </span>
               )}

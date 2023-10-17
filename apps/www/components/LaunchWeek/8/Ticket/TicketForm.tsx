@@ -146,7 +146,7 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
             htmlType="submit"
             disabled={formState === 'loading' || Boolean(session)}
           >
-            <span className={`flex items-center gap-2 ${username && 'text-scale-900'}`}>
+            <span className={`flex items-center gap-2 ${username && 'text-muted'}`}>
               {session ? (
                 <>
                   <IconCheckCircle />
@@ -162,7 +162,7 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
             {session ? <span className={ticketFormStyles.checkIcon}></span> : null}
           </Button>
         </div>
-        {/* {!session && <p className={'text-xs text-scale-900'}>Only public info will be used.</p>} */}
+        {/* {!session && <p className={'text-xs text-muted'}>Only public info will be used.</p>} */}
       </div>
     </form>
   )

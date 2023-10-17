@@ -147,7 +147,7 @@ function Blog(props: any) {
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-scale-800 col-span-full">No results</p>
+                <p className="text-sm text-muted col-span-full">No results</p>
               )}
             </ol>
           </div>
@@ -185,7 +185,7 @@ function FeaturedThumb(blog: PostTypes) {
             />
           </div>
           <div className="flex flex-col space-y-2">
-            <div className="text-scale-900 flex space-x-2 text-sm">
+            <div className="text-muted flex space-x-2 text-sm">
               <p>{blog.date}</p>
               <p>•</p>
               <p>{blog.readingTime}</p>
@@ -212,8 +212,8 @@ function FeaturedThumb(blog: PostTypes) {
                       </div>
                     )}
                     <div className="flex flex-col">
-                      <span className="text-scale-1200 m-0 text-sm">{author.author}</span>
-                      <span className="text-scale-900 m-0 text-xs">{author.position}</span>
+                      <span className="text-foreground m-0 text-sm">{author.author}</span>
+                      <span className="text-muted m-0 text-xs">{author.position}</span>
                     </div>
                   </div>
                 )

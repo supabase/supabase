@@ -66,7 +66,7 @@ const Header = () => {
           container relative mx-auto px-6 py-16 text-center md:py-24 lg:px-16 lg:py-24
           xl:px-20"
       >
-        <h1 className="text-scale-1200 text-5xl">
+        <h1 className="text-foreground text-5xl">
           Join one of the world's fastest growing open source communities.
         </h1>
       </div>
@@ -95,7 +95,7 @@ const Team = () => {
         <div className="grid grid-cols-2 md:grid-cols-12">
           <div className="col-span-8 ">
             <p>
-              <p className="text-scale-1200 text-lg">
+              <p className="text-foreground text-lg">
                 Supabase is fully remote, with a strong affinity for open source maintainers and
                 ex-Founders. Our engineering team is made up of developers from AWS, Google,
                 Palantir, Stripe, and other YC companies.
@@ -208,15 +208,15 @@ const Community = () => {
                 />
               </div>
               <div>
-                <h1 className="text-scale-1200 mb-0 text-4xl">{x.stat}</h1>
-                <p className="text-scale-1100 text-sm">{x.statLabel}</p>
+                <h1 className="text-foreground mb-0 text-4xl">{x.stat}</h1>
+                <p className="text-light text-sm">{x.statLabel}</p>
               </div>
             </div>
           ))}
         </div>
         <div className="space-y-8">
           <div className="max-w-3xl">
-            <p className="text-scale-1100 text-sm">
+            <p className="text-light text-sm">
               With developer signups from the world's leading brands.
             </p>
           </div>
@@ -275,7 +275,7 @@ const Investors = () => {
           </div>
         ))}
       </div>
-      <h2 className="text-scale-1200 text-2xl">Individual investors</h2>
+      <h2 className="text-foreground text-2xl">Individual investors</h2>
       <div className="mx-auto mt-5 grid grid-cols-2 gap-5 lg:max-w-none lg:grid-cols-4">
         {InvestorData.filter((x) => x.lead === false)
           .sort((a, b) => a.name.localeCompare(b.name))
@@ -285,8 +285,8 @@ const Investors = () => {
 
               <div className="flex flex-col justify-center space-y-2">
                 <div>
-                  <h1 className="text-scale-1200 mb-0 text-base">{x.name}</h1>
-                  <p className="text-scale-1000 mb-0 text-xs">{x.title}</p>
+                  <h1 className="text-foreground mb-0 text-base">{x.name}</h1>
+                  <p className="text-lighter mb-0 text-xs">{x.title}</p>
                 </div>
               </div>
             </div>
@@ -309,8 +309,8 @@ const Press = () => {
               <Card key={`press_${x.href}`} hoverable className="dark:bg-scale-400 h-36 bg-white">
                 <Space className="h-40 justify-between" direction="vertical">
                   <div>
-                    <h1 className="text-scale-1200 text-xl">{x.type.toUpperCase()}</h1>
-                    <p className="text-scale-1100 line-clamp block h-12 overflow-hidden text-ellipsis text-base">
+                    <h1 className="text-foreground text-xl">{x.type.toUpperCase()}</h1>
+                    <p className="text-light line-clamp block h-12 overflow-hidden text-ellipsis text-base">
                       {x.title}
                     </p>
                   </div>
@@ -327,8 +327,8 @@ const Press = () => {
               <Card key={`press_${x.href}`} hoverable className="dark:bg-scale-400 h-36 bg-white">
                 <Space className="h-40 justify-between" direction="vertical">
                   <div>
-                    <h1 className="text-scale-1200 text-xl">{x.type.toUpperCase()}</h1>
-                    <p className="text-scale-1100 line-clamp block h-12 overflow-hidden text-ellipsis text-base">
+                    <h1 className="text-foreground text-xl">{x.type.toUpperCase()}</h1>
+                    <p className="text-light line-clamp block h-12 overflow-hidden text-ellipsis text-base">
                       {x.title}
                     </p>
                   </div>

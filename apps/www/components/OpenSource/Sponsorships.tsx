@@ -10,7 +10,7 @@ const Sponsorships = ({ sponsorships }: { sponsorships: any[] }) => {
         <h2 className="text-3xl xl:text-4xl max-w-[280px] sm:max-w-xs xl:max-w-[360px] tracking-[-1px]">
           Sponsored Projects
         </h2>
-        <p className="text-scale-900 mb-4 max-w-sm">
+        <p className="text-muted mb-4 max-w-sm">
           We don't just live and breath open-source, we also sponsor projects we love.
         </p>
       </div>

@@ -38,9 +38,9 @@ const Index = () => {
         <Container>
           <SectionContainer className="pb-0 md:pb-0 lg:pb-0">
             <div className="max-w-xl">
-              <h1 className="text-scale-1200 text-5xl">Brand assets</h1>
-              <p className="text-scale-1200 text-2xl">Download official Supabase logos</p>
-              <p className="text-scale-1200 text-sm">
+              <h1 className="text-foreground text-5xl">Brand assets</h1>
+              <p className="text-foreground text-2xl">Download official Supabase logos</p>
+              <p className="text-foreground text-sm">
                 All Supabase trademarks, logos, or other brand elements can never be modified or
                 used for any other purpose other than to represent Supabase Inc.
               </p>
@@ -59,8 +59,8 @@ const Index = () => {
               <div className="col-span-12 flex items-center lg:col-span-7">
                 <div className="p-16">
                   <div className="space-y-2">
-                    <h1 className="text-scale-1200 text-4xl">Supabase logos</h1>
-                    <p className="text-scale-1100 text-sm">
+                    <h1 className="text-foreground text-4xl">Supabase logos</h1>
+                    <p className="text-light text-sm">
                       <p>
                         Download Supabase official logos, including as SVG's, in both light and dark
                         theme.
@@ -90,8 +90,8 @@ const Index = () => {
               <div className="col-span-12 flex items-center lg:col-span-7">
                 <div className="p-16">
                   <div className="space-y-2">
-                    <h1 className="text-scale-1200 text-4xl">Supabase Integrations</h1>
-                    <p className="text-scale-1100 text-sm">
+                    <h1 className="text-foreground text-4xl">Supabase Integrations</h1>
+                    <p className="text-light text-sm">
                       <p>
                         When building a{' '}
                         <a

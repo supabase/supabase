@@ -144,7 +144,7 @@ export const AccordionHeader = ({ date, day, title, shipped }: any) => {
           </span>
         </Badge>
 
-        <span className="text-scale-900 text-sm">
+        <span className="text-muted text-sm">
           <span className="inline sm:hidden md:inline">{day} </span>
           {date && (
             <span>
@@ -153,7 +153,7 @@ export const AccordionHeader = ({ date, day, title, shipped }: any) => {
           )}
         </span>
       </div>
-      {shipped && <span className="text-scale-1200 text-lg mt-3 sm:mt-0">{title}</span>}
+      {shipped && <span className="text-foreground text-lg mt-3 sm:mt-0">{title}</span>}
     </div>
   )
 }
@@ -161,7 +161,7 @@ export const MultistepSectionHeader = ({ title, blog }: any) => {
   return (
     <div className="flex flex-1 flex-col sm:flex-row py-8">
       <div className="flex gap-4 w-full items-center justify-between md:justify-start">
-        {title && <span className="text-scale-1200 text-lg mt-3 sm:mt-0">{title}</span>}
+        {title && <span className="text-foreground text-lg mt-3 sm:mt-0">{title}</span>}
         {!!blog && (
           <ChipLink href={blog} className="!w-auto !text-left !justify-between !flex-none">
             Blog post

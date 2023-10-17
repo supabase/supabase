@@ -35,7 +35,7 @@ const Partners = () => {
         }}
       />
       <DefaultLayout>
-        <div className="relative bg-scale-500 dark:bg-scale-100 overflow-hidden">
+        <div className="relative bg-alternative overflow-hidden">
           <SectionContainer className="overflow-hidden pt-8 pb-12 md:pt-12">
             <ProductHeaderCentered {...pageData.heroSection} />
           </SectionContainer>
@@ -81,7 +81,7 @@ const Partners = () => {
             {range(0, 3).map((_) => (
               <div className="flex gap-2 animate-marquee will-change-transform">
                 {pageData.featuredApps.map((app) => (
-                  <div className="w-20 h-20 md:w-28 md:h-28 rounded-2xl bg-gradient-to-t from-scale-300 dark:from-scale-200 to-scale-100 border border-scale-200 flex items-center justify-center shadow-xl">
+                  <div className="w-20 h-20 md:w-28 md:h-28 rounded-2xl bg-gradient-to-t from-background to-background-alternative border border-background flex items-center justify-center shadow-xl">
                     <Image
                       src={app.logo}
                       alt={app.name}
@@ -102,7 +102,7 @@ const Partners = () => {
               <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-.5px]">
                 Explore our marketplace
               </h2>
-              <p className="text-scale-1000 text-xs sm:text-sm lg:text-base py-3 lg:max-w-md">
+              <p className="text-lighter text-xs sm:text-sm lg:text-base py-3 lg:max-w-md">
                 Discover how technology and consulting partners are already working with Supabase.
               </p>
               <TextLink
@@ -117,7 +117,7 @@ const Partners = () => {
                 hasActiveOnHover={true}
                 innerClassName="px-8 py-6 group flex flex-col gap-4"
               >
-                <div className="bg-scale-300 mb-4 dark:bg-scale-500 text-scale-1200 group-hover:text-brand-900 flex h-12 w-12 items-center justify-center rounded-md border transition-all group-hover:scale-105">
+                <div className="bg-surface-200 mb-4 text-foreground flex h-12 w-12 items-center justify-center rounded-md border transition-all group-hover:scale-105">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-6 w-6"
@@ -135,10 +135,8 @@ const Partners = () => {
                 </div>
 
                 <div>
-                  <h3 className="text-scale-1200 text-lg">Experts</h3>
-                  <p className="text-scale-900 text-sm">
-                    Find an expert to help build your next idea.
-                  </p>
+                  <h3 className="text-foreground text-lg">Experts</h3>
+                  <p className="text-muted text-sm">Find an expert to help build your next idea.</p>
                 </div>
 
                 <Link href="/partners/experts">
@@ -150,7 +148,7 @@ const Partners = () => {
                 hasActiveOnHover={true}
                 innerClassName="px-8 py-6 group flex flex-col gap-4"
               >
-                <div className="bg-scale-300 mb-4 dark:bg-scale-500 text-scale-1200 group-hover:text-brand-900 flex h-12 w-12 items-center justify-center rounded-md border transition-all group-hover:scale-105">
+                <div className="bg-surface-200 text-foreground flex h-12 w-12 items-center justify-center rounded-md border transition-all group-hover:scale-105">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-6 w-6"
@@ -168,8 +166,8 @@ const Partners = () => {
                 </div>
 
                 <div>
-                  <h3 className="text-scale-1200 text-lg">Integrations</h3>
-                  <p className="text-scale-900 text-sm">Use your favorite tools with Supabase.</p>
+                  <h3 className="text-foreground text-lg">Integrations</h3>
+                  <p className="text-muted text-sm">Use your favorite tools with Supabase.</p>
                 </div>
                 <Link href="/partners/integrations">
                   <a className="absolute inset-0" />
@@ -197,15 +195,15 @@ const Partners = () => {
                   </div>
 
                   <div>
-                    <h3 className="text-scale-1200 text-lg">{item.title}</h3>
-                    <p className="text-scale-900 text-sm">{item.description}</p>
+                    <h3 className="text-foreground text-lg">{item.title}</h3>
+                    <p className="text-muted text-sm">{item.description}</p>
                   </div>
                 </div>
               )
             })}
           </div>
         </SectionContainer>
-        <div className="bg-scale-400 dark:bg-scale-100 border-t border-b">
+        <div className="bg-alternative border-t border-b">
           <SectionContainer className="flex flex-col gap-8">
             <div className="flex flex-col lg:flex-row gap-8 xl:gap-10 justify-between">
               <div className="w-full lg:w-1/2 gap-2 flex flex-col items-start">
@@ -213,7 +211,7 @@ const Partners = () => {
                 <h2 className="text-3xl xl:text-4xl mt-2 max-w-[280px] sm:max-w-xs xl:max-w-[360px] tracking-[-1px]">
                   Publish an OAuth App
                 </h2>
-                <p className="text-scale-900 mb-4 max-w-sm">
+                <p className="text-muted mb-4 max-w-sm">
                   Supabase lets you build a third-party app that can control organizations or
                   projects programmatically.
                 </p>
@@ -222,7 +220,7 @@ const Partners = () => {
                   label="Learn more"
                 />
               </div>
-              <div className="relative w-full lg:w-1/2 border bg-scale-300 flex items-center justify-center aspect-video rounded-xl overflow-hidden">
+              <div className="relative w-full lg:w-1/2 border bg-background flex items-center justify-center aspect-video rounded-xl overflow-hidden">
                 <Image
                   src="/images/partners/register-oauth-app.svg"
                   alt="Register app via API"

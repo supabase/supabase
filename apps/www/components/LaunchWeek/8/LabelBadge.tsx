@@ -8,7 +8,7 @@ interface Props {
 export default function LabelBadge({ text, className }: Props) {
   return (
     <span className={['bg-[#222428] rounded px-1 py-[1px] text-xs', className].join(' ')}>
-      <span className="text-scale-1000">{text}</span>
+      <span className="text-lighter">{text}</span>
     </span>
   )
 }

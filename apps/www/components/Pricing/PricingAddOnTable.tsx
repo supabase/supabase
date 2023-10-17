@@ -35,7 +35,7 @@ const PricingAddOnTable = ({ icon, pricing }: PricingAddOnTableProps) => {
         <Collapsible.Trigger asChild>
           <button
             className={classNames(
-              'text-scale-1200 bg-scale-100 dark:bg-scale-200 border-scale-300 group flex w-full flex-col items-start rounded-t-md dark:border lg:flex-row lg:items-center',
+              'text-foreground bg-blue-500 border-scale-300 group flex w-full flex-col items-start rounded-t-md dark:border lg:flex-row lg:items-center',
               !isAddOnOpen && 'rounded-b-md'
             )}
             type="button"
@@ -70,7 +70,7 @@ const PricingAddOnTable = ({ icon, pricing }: PricingAddOnTableProps) => {
 
         <Collapsible.Content>
           <div>
-            <table className="text-scale-1200 m-0 hidden w-full table-auto overflow-hidden rounded-b lg:table">
+            <table className="text-foreground m-0 hidden w-full table-auto overflow-hidden rounded-b lg:table">
               <thead>
                 <tr className="bg-scale-500">
                   {columnNames.map((column) => (
@@ -93,7 +93,7 @@ const PricingAddOnTable = ({ icon, pricing }: PricingAddOnTableProps) => {
               </tbody>
             </table>
 
-            <table className="text-scale-1200 m-0 w-full table-auto overflow-hidden rounded-b lg:hidden">
+            <table className="text-foreground m-0 w-full table-auto overflow-hidden rounded-b lg:hidden">
               <tbody>
                 {pricing.rows.map((row, i) => (
                   <Fragment key={i}>

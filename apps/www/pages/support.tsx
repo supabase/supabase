@@ -61,16 +61,16 @@ const Index = () => {
                   group
                   items-center
                   justify-between
-                  bg-scale-200
+                  bg-background
                   border
                   border-scale-500
-                  hover:bg-scale-300
+                  hover:bg-surface-100
                   hover:border-scale-600
                   transition 
                   rounded"
               >
                 <div className="flex items-center flex-1 space-x-2">
-                  <IconSearch className="text-scale-1100" size={18} strokeWidth={2} />
+                  <IconSearch className="text-light" size={18} strokeWidth={2} />
                   <p
                     ref={typerRef}
                     className="text-lighter text-sm group-hover:text-light transition"

@@ -14,7 +14,7 @@ export default function Avatar(props: Props) {
         style={{ margin: 0 }}
         alt={`${caption} avatar`}
       />
-      <figcaption style={{ marginTop: 0 }} className="text-scale-1000">
+      <figcaption style={{ marginTop: 0 }} className="text-lighter">
         <p>{caption}</p>
       </figcaption>
     </div>

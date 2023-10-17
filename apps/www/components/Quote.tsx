@@ -13,7 +13,7 @@ export default function Quote(props: Props) {
   return (
     <figure className="quote-figure p-0 mt-8">
       <div className="relative flex flex-col gap-5 pl-8 py-2">
-        <p className="text-scale-1100 text-lg border-none" style={{ margin: 0, padding: 0 }}>
+        <p className="text-light text-lg border-none" style={{ margin: 0, padding: 0 }}>
           {children}
         </p>
         {caption && img && (

@@ -50,9 +50,7 @@ const TicketCustomizationForm = ({ supabase, user }: Props) => {
     <form className="w-full flex flex-col gap-2 mt-4" onChange={() => debouncedChangeHandler()}>
       <div className="flex items-center justify-between">
         {!IS_SAVED && !HAS_ERROR && (
-          <span className="opacity-0 animate-fade-in text-scale-1000 text-xs">
-            Connected account
-          </span>
+          <span className="opacity-0 animate-fade-in text-lighter text-xs">Connected account</span>
         )}
         {IS_SAVED && <span className="opacity-0 animate-fade-in text-xs text-brand">Saved</span>}
         {HAS_ERROR && (
@@ -63,7 +61,7 @@ const TicketCustomizationForm = ({ supabase, user }: Props) => {
         <Badge color="brand">@{user.username}</Badge>
       </div>
       <Input
-        className="[&_input]:border-scale-200"
+        className="[&_input]:border-background"
         size="small"
         type="text"
         required
@@ -73,7 +71,7 @@ const TicketCustomizationForm = ({ supabase, user }: Props) => {
         icon={<IconCheck strokeWidth={2} className="w-3 text-brand" />}
       />
       <Input
-        className="[&_input]:border-scale-200"
+        className="[&_input]:border-background"
         size="small"
         type="text"
         placeholder="role (optional)"
@@ -95,7 +93,7 @@ const TicketCustomizationForm = ({ supabase, user }: Props) => {
         }
       />
       <Input
-        className="[&_input]:border-scale-200"
+        className="[&_input]:border-background"
         size="small"
         type="text"
         placeholder="company (optional)"
@@ -117,7 +115,7 @@ const TicketCustomizationForm = ({ supabase, user }: Props) => {
         }
       />
       <Input
-        className="[&_input]:border-scale-200"
+        className="[&_input]:border-background"
         size="small"
         type="text"
         placeholder="location (optional)"

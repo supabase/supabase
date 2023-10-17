@@ -142,10 +142,10 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
           <div className="border-scale-500 hover:bg-scale-100 dark:hover:bg-scale-300 cursor-pointer rounded border p-6 transition">
             <div className="space-y-4">
               <div>
-                <p className="text-scale-900 text-sm">{label}</p>
+                <p className="text-muted text-sm">{label}</p>
               </div>
               <div>
-                <h4 className="text-scale-1200 text-lg">{post.title}</h4>
+                <h4 className="text-foreground text-lg">{post.title}</h4>
                 <p className="small">{post.date}</p>
               </div>
             </div>
@@ -170,7 +170,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
       </div>
       <div>
         <div>
-          <p className="text-scale-1200 mb-4">On this page</p>
+          <p className="text-foreground mb-4">On this page</p>
           <div className="prose-toc">
             <ReactMarkdown>{props.blog.toc.content}</ReactMarkdown>
           </div>
@@ -242,7 +242,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
               <p>
                 <a
                   href={'/blog'}
-                  className="text-scale-900 hover:text-scale-1200 flex cursor-pointer items-center text-sm transition"
+                  className="text-muted hover:text-foreground flex cursor-pointer items-center text-sm transition"
                 >
                   <IconChevronLeft style={{ padding: 0 }} />
                   Back
@@ -255,7 +255,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                 <div className="space-y-4">
                   <p className="text-brand">Blog post</p>
                   <h1 className="h1">{props.blog.title}</h1>
-                  <div className="text-scale-900 flex space-x-3 text-sm">
+                  <div className="text-muted flex space-x-3 text-sm">
                     <p>{props.blog.date}</p>
                     <p>•</p>
                     <p>{generateReadingTime(props.blog.source)}</p>
@@ -281,10 +281,10 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                                     </div>
                                   )}
                                   <div className="flex flex-col">
-                                    <span className="text-scale-1200 mb-0 text-sm">
+                                    <span className="text-foreground mb-0 text-sm">
                                       {author.author}
                                     </span>
-                                    <span className="text-scale-900 mb-0 text-xs">
+                                    <span className="text-muted mb-0 text-xs">
                                       {author.position}
                                     </span>
                                   </div>
@@ -331,9 +331,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                   </article>
                   {isLaunchWeek7 && <BlogLinks />}
                   <div className="block lg:hidden py-8">
-                    <div className="text-scale-900 dark:text-scale-1000 text-sm">
-                      Share this article
-                    </div>
+                    <div className="text-muted dark:text-lighter text-sm">Share this article</div>
                     <ShareArticleActions title={props.blog.title} slug={props.blog.slug} />
                   </div>
                   <div className="grid gap-8 py-8 lg:grid-cols-1">
@@ -353,7 +351,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                     <div className="hidden lg:block">{toc}</div>
                     <div>
                       <div className="mb-4">
-                        <p className="text-scale-1200 text-sm">Related articles</p>
+                        <p className="text-foreground text-sm">Related articles</p>
                       </div>
                       <div className="space-y-2">
                         {props.relatedPosts.map((post) => (
@@ -361,10 +359,10 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                             <div>
                               <p className="cursor-pointer">
                                 <div className="flex gap-2">
-                                  {/* <div className="text-scale-900">
+                                  {/* <div className="text-muted">
                                     <IconFile size={'small'} style={{ minWidth: '1.2rem' }} />
                                   </div> */}
-                                  <span className="text-scale-1100 hover:text-gray-1200 text-sm">
+                                  <span className="text-light hover:text-gray-1200 text-sm">
                                     {post.title}
                                   </span>
                                 </div>
@@ -375,13 +373,13 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                         ))}
                         <div className="mt-2">
                           <Link href={`/blog`} passHref>
-                            <a className="text-scale-1100 hover:text-scale-1200 cursor-pointer text-xs">
+                            <a className="text-light hover:text-foreground cursor-pointer text-xs">
                               View all posts
                             </a>
                           </Link>
                         </div>
                         <div className="py-4 hidden lg:block">
-                          <div className="text-scale-1200 text-sm">Share this article</div>
+                          <div className="text-foreground text-sm">Share this article</div>
                           <ShareArticleActions title={props.blog.title} slug={props.blog.slug} />
                         </div>
                       </div>

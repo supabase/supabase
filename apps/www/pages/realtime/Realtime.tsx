@@ -71,7 +71,7 @@ function RealtimePage() {
                 ].join(' ')}
               >
                 <p
-                  className={`text-scale-1200 text-[18px] font-medium ${RealtimeStyles['button-text']}`}
+                  className={`text-foreground text-[18px] font-medium ${RealtimeStyles['button-text']}`}
                 >
                   Start a project
                 </p>
@@ -114,9 +114,9 @@ function RealtimePage() {
               </div> */}
               <div className="bg-scale-200 border-scale-500 absolute top-0 flex h-9 w-full items-center justify-between border-b">
                 <div className="flex items-center">
-                  <IconMenu className="text-scale-1200 mx-3" strokeWidth={1} size={16} />
-                  <IconGrid className="text-scale-1200 mx-3" strokeWidth={1} size={15} />
-                  <IconLayers className="text-scale-1200 mx-3" strokeWidth={1} size={15} />
+                  <IconMenu className="text-foreground mx-3" strokeWidth={1} size={16} />
+                  <IconGrid className="text-foreground mx-3" strokeWidth={1} size={15} />
+                  <IconLayers className="text-foreground mx-3" strokeWidth={1} size={15} />
                 </div>
                 <div className="mx-3 flex items-center">
                   <div className="border-scale-300 dark:border-scale-1200 bg-tomato-900 dark:bg-tomato-900 relative -right-4 h-5 w-5 rounded-full border" />

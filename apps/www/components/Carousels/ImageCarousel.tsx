@@ -170,7 +170,7 @@ function ImageCarousel(props: ImageCarouselProps) {
           {props.content.map((content, i) => {
             return (
               <SwiperSlide key={i} className="py-4">
-                <h4 className="text-scale-1200 mb-4 text-xl">{content.title}</h4>
+                <h4 className="text-foreground mb-4 text-xl">{content.title}</h4>
                 <p className="p text-base">{content.text}</p>
                 <TextLink
                   label={content.cta ? content.cta : 'View documentation'}
