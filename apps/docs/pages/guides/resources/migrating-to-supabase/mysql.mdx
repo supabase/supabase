@@ -63,7 +63,7 @@ alter schema 'public' owner to 'postgres';
 set wal_buffers = '64MB', max_wal_senders = 0, statement_timeout = 0, work_mem to '2GB';
 ```
 
-##Run the migration with pgloader
+## Run the migration with pgloader
 
 ```bash
 pgloader config.load
