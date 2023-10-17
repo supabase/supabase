@@ -189,7 +189,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
                   </a>
                 </Link>
               </div>
-              <p className="text-sm text-scale-1000 mt-3">
+              <p className="text-sm text-foreground-light mt-3">
                 If you reach 95% of the disk space, your project will enter read-only mode. Your
                 disk storage expands automatically when the database reaches 90% of the disk size.
                 The disk is expanded to be 50% larger. Auto-scaling can only take place once every 6

@@ -42,7 +42,7 @@ const ProjectUsageSection = observer(() => {
           <IconLoader className="animate-spin" size={14} />
           <p className="text-sm">Retrieving project usage statistics</p>
         </div>
-      ) : true ? (
+      ) : hasProjectData ? (
         <ProjectUsage />
       ) : (
         <NewProjectPanel />

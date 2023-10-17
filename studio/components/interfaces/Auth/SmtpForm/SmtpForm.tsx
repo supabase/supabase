@@ -30,10 +30,10 @@ import {
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useCheckPermissions, useStore } from 'hooks'
+import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
 import { urlRegex } from './../Auth.constants'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
-import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
 
 const SmtpForm = () => {
   const { ui } = useStore()
@@ -267,7 +267,7 @@ const SmtpForm = () => {
                 header={
                   <FormSectionLabel>
                     <span>SMTP Provider Settings</span>
-                    <p className="my-4 text-scale-900">
+                    <p className="my-4 text-foreground-lighter">
                       Your SMTP Credentials will always be encrypted in our database.
                     </p>
                   </FormSectionLabel>
@@ -306,7 +306,7 @@ const SmtpForm = () => {
                     name="SMTP_MAX_FREQUENCY"
                     label="Minimum interval between emails being sent"
                     descriptionText="How long between each email can a new email be sent via your SMTP server."
-                    actions={<span className="mr-3 text-scale-900">seconds</span>}
+                    actions={<span className="mr-3 text-foreground-lighter">seconds</span>}
                     disabled={!canUpdateConfig}
                   />
                   <InputNumber
@@ -315,7 +315,7 @@ const SmtpForm = () => {
                     min={0}
                     label="Rate limit for sending emails"
                     descriptionText="How many emails can be sent per hour."
-                    actions={<span className="mr-3 text-scale-900">emails per hour</span>}
+                    actions={<span className="mr-3 text-foreground-lighter">emails per hour</span>}
                     disabled={!canUpdateConfig}
                   />
                   <Input

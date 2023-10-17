@@ -1,5 +1,4 @@
-import * as React from 'react'
-import { Children, FC } from 'react'
+import { Children } from 'react'
 import * as CopyToClipboard from 'react-copy-to-clipboard'
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { monokaiCustomTheme } from './CodeBlock.utils'
@@ -16,7 +15,7 @@ import json from 'react-syntax-highlighter/dist/cjs/languages/hljs/json'
 import kotlin from 'react-syntax-highlighter/dist/cjs/languages/hljs/kotlin'
 
 import { useState } from 'react'
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 
 export interface CodeBlockProps {
   title?: string
@@ -39,8 +38,8 @@ export const CodeBlock = ({
   hideCopy = false,
   hideLineNumbers = false,
 }: CodeBlockProps) => {
-  const { isDarkMode } = useTheme()
-  const monokaiTheme = monokaiCustomTheme(isDarkMode)
+  const { theme } = useTheme()
+  const monokaiTheme = monokaiCustomTheme(theme === 'dark')
 
   const [copied, setCopied] = useState(false)
 
@@ -137,7 +136,7 @@ export const CodeBlock = ({
             <div
               className={[
                 'absolute right-2',
-                `${isDarkMode ? 'dark' : ''}`,
+                `${theme === 'dark' ? 'dark' : ''}`,
                 `${!title ? 'top-2' : 'top-[3.25rem]'}`,
               ].join(' ')}
             >

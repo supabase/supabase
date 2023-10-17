@@ -6,9 +6,9 @@ import { Badge, IconExternalLink, IconLoader, Toggle } from 'ui'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { useCheckPermissions, useStore } from 'hooks'
 import { isResponseOk } from 'lib/common/fetch'
-import EnableExtensionModal from './EnableExtensionModal'
 import Link from 'next/link'
 import { extensions } from 'shared-data'
+import EnableExtensionModal from './EnableExtensionModal'
 
 interface ExtensionCardProps {
   extension: any
@@ -77,12 +77,17 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
           ].join(' ')}
         >
           <div className="flex items-center gap-1 max-w-[85%]">
-            <h3
-              title={extension.name}
-              className="h-5 m-0 text-sm uppercase truncate cursor-pointer text-scale-1200"
-            >
-              {extension.name}
-            </h3>
+            <div className="flex items-center space-x-2 truncate">
+              <h3
+                title={extension.name}
+                className="h-5 m-0 text-sm truncate cursor-pointer text-foreground"
+              >
+                {extension.name}
+              </h3>
+              <p className="text-sm text-light">
+                {extension?.installed_version ?? extension.default_version}
+              </p>
+            </div>
             {extensions.find((item: any) => item.name === extension.name) ? (
               <Link
                 href={
@@ -123,13 +128,13 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
           ].join(' ')}
         >
           <div className="py-3 px-4">
-            <p className="text-sm text-scale-1100 capitalize-sentence">{extension.comment}</p>
+            <p className="text-sm text-foreground-light capitalize-sentence">{extension.comment}</p>
           </div>
           {isOn && extension.schema && (
             <div className="py-3 px-4">
-              <div className="flex items-center flex-grow space-x-2 text-sm text-scale-1100">
+              <div className="flex items-center flex-grow space-x-2 text-sm text-foreground-light">
                 <span>Schema:</span>
-                <Badge>{`${extension.schema}`}</Badge>
+                <Badge color="scale">{`${extension.schema}`}</Badge>
               </div>
             </div>
           )}

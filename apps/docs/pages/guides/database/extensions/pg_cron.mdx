@@ -18,6 +18,7 @@ The `pg_cron` extension is a simple cron-based job scheduler for PostgreSQL that
   size="small"
   type="underlined"
   defaultActiveId="dashboard"
+  queryGroup="database-method"
 >
 <TabPanel id="dashboard" label="Dashboard">
 
@@ -32,13 +33,8 @@ The `pg_cron` extension is a simple cron-based job scheduler for PostgreSQL that
 -- Example: enable the "pg_cron" extension
 create extension pg_cron with schema extensions;
 
--- If you're planning to use a non-superuser role to schedule jobs,
--- ensure that they are granted access to the cron schema and its underlying objects beforehand.
--- Failure to do so would result in jobs by these roles to not run at all.
-
-grant usage on schema cron to {{DB user}};
-grant all privileges on all tables in schema cron to {{DB user}};
-
+grant usage on schema cron to postgres;
+grant all privileges on all tables in schema cron to postgres;
 
 -- Example: disable the "pg_cron" extension
 drop extension if exists pg_cron;
@@ -99,7 +95,7 @@ select
     $$
     select
       net.http_post(
-          url:='https://project-ref.functions.supabase.co/function-name',
+          url:='https://project-ref.supabase.co/functions/v1/function-name',
           headers:='{"Content-Type": "application/json", "Authorization": "Bearer YOUR_ANON_KEY"}'::jsonb,
           body:=concat('{"time": "', now(), '"}')::jsonb
       ) as request_id;

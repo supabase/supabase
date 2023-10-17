@@ -111,6 +111,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                   size="tiny"
                   type="rounded-pills"
                   scrollable
+                  queryGroup="example"
                 >
                   {item.examples &&
                     item.examples.map((example, exampleIndex) => {

@@ -47,7 +47,7 @@ const AISettingsModal = (props: ModalProps) => {
           />
           <div className="grid gap-2">
             <p className="text-sm">Include anonymous database metadata in AI queries</p>
-            <p className="text-sm text-scale-1000">
+            <p className="text-sm text-foreground-light">
               Includes table names, column names and their corresponding data types in the request.
               This will generate queries that are more relevant to your project.
             </p>

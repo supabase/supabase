@@ -9,6 +9,7 @@ import SparkBar from 'components/ui/SparkBar'
 import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
 import { OrgUsageResponse, UsageMetric } from 'data/usage/org-usage-query'
 import { USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
+import { useMemo } from 'react'
 import { ResponseError } from 'types'
 import { Button, IconAlertTriangle, IconBarChart2 } from 'ui'
 import SectionContent from '../SectionContent'
@@ -20,7 +21,7 @@ import {
 } from '../Usage.utils'
 import UsageBarChart from '../UsageBarChart'
 import { ChartMeta } from './UsageSection'
-import { useMemo } from 'react'
+import { useIsFeatureEnabled } from 'hooks'
 
 export interface AttributeUsageProps {
   slug: string
@@ -54,6 +55,8 @@ const AttributeUsage = ({
   isSuccess,
   currentBillingCycleSelected,
 }: AttributeUsageProps) => {
+  const billingEnabled = useIsFeatureEnabled('billing:all')
+
   const upgradeUrl = getUpgradeUrl(slug ?? '', subscription)
   const usageRatio = (usageMeta?.usage ?? 0) / (usageMeta?.pricing_free_units ?? 0)
   const usageExcess = (usageMeta?.usage ?? 0) - (usageMeta?.pricing_free_units ?? 0)
@@ -134,11 +137,11 @@ const AttributeUsage = ({
                                     'border border-scale-200',
                                   ].join(' ')}
                                 >
-                                  <p className="text-xs text-scale-1200">
+                                  <p className="text-xs text-foreground">
                                     Exceeding your plans included usage will lead to restrictions to
                                     your project.
                                   </p>
-                                  <p className="text-xs text-scale-1200">
+                                  <p className="text-xs text-foreground">
                                     Upgrade to a usage-based plan or disable the spend cap to avoid
                                     restrictions.
                                   </p>
@@ -149,7 +152,7 @@ const AttributeUsage = ({
                         )}
                       </div>
 
-                      {showUsageWarning && (
+                      {billingEnabled && showUsageWarning && (
                         <Link href={upgradeUrl}>
                           <a className="pb-1">
                             <Button type="default" size="tiny">
@@ -184,7 +187,7 @@ const AttributeUsage = ({
                     {
                       <div>
                         <div className="flex items-center justify-between border-b py-1">
-                          <p className="text-xs text-scale-1000">
+                          <p className="text-xs text-foreground-light">
                             Included in {subscription?.plan?.name.toLowerCase()} plan
                           </p>
                           {usageMeta.unlimited ? (
@@ -199,7 +202,7 @@ const AttributeUsage = ({
                         </div>
                         {currentBillingCycleSelected && (
                           <div className="flex items-center justify-between py-1">
-                            <p className="text-xs text-scale-1000">
+                            <p className="text-xs text-foreground-light">
                               {attribute.chartPrefix || 'Used '} in period
                             </p>
                             <p className="text-xs">
@@ -212,7 +215,7 @@ const AttributeUsage = ({
                         {currentBillingCycleSelected &&
                           (usageMeta?.pricing_free_units ?? 0) > 0 && (
                             <div className="flex items-center justify-between border-t py-1">
-                              <p className="text-xs text-scale-1000">Overage in period</p>
+                              <p className="text-xs text-foreground-light">Overage in period</p>
                               <p className="text-xs">
                                 {(usageMeta?.pricing_free_units ?? 0) === -1 || usageExcess < 0
                                   ? `0${attribute.unit === 'bytes' ? ' GB' : ''}`
@@ -227,14 +230,15 @@ const AttributeUsage = ({
                   </div>
                 )}
 
-                {attribute.additionalInfo?.(usage)}
+                {attribute.additionalInfo?.(subscription, usage)}
 
                 <div className="space-y-1">
                   <p className="text-sm">
-                    {attribute.chartPrefix || ''} {attribute.name} per day
+                    {attribute.chartPrefix || ''} {attribute.name}{' '}
+                    {attribute.chartSuffix || 'per day'}
                   </p>
                   {attribute.chartDescription.split('\n').map((paragraph, idx) => (
-                    <p key={`para-${idx}`} className="text-sm text-scale-1000">
+                    <p key={`para-${idx}`} className="text-sm text-foreground-light">
                       {paragraph}
                     </p>
                   ))}
@@ -259,9 +263,11 @@ const AttributeUsage = ({
                   <Panel>
                     <Panel.Content>
                       <div className="flex flex-col items-center justify-center">
-                        <IconBarChart2 className="text-scale-1100 mb-2" />
+                        <IconBarChart2 className="text-foreground-light mb-2" />
                         <p className="text-sm">No data in period</p>
-                        <p className="text-sm text-scale-1000">May take up to 24 hours to show</p>
+                        <p className="text-sm text-foreground-light">
+                          May take up to 24 hours to show
+                        </p>
                       </div>
                     </Panel.Content>
                   </Panel>
@@ -274,16 +280,18 @@ const AttributeUsage = ({
                     <div className="space-y-1">
                       <p className="text-sm">Not included in plan</p>
                       <div>
-                        <p className="text-sm text-scale-1100">
+                        <p className="text-sm text-foreground-light">
                           You need to be on a higher plan in order to use this feature.
                         </p>
                       </div>
                     </div>
-                    <Link href={upgradeUrl}>
-                      <a>
-                        <Button type="primary">Upgrade plan</Button>
-                      </a>
-                    </Link>
+                    {billingEnabled && (
+                      <Link href={upgradeUrl}>
+                        <a>
+                          <Button type="primary">Upgrade plan</Button>
+                        </a>
+                      </Link>
+                    )}
                   </div>
                 </Panel.Content>
               </Panel>

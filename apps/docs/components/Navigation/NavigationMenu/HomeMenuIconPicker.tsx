@@ -5,6 +5,7 @@ import {
   IconMenuCli,
   IconMenuCsharp,
   IconMenuDatabase,
+  IconMenuGraphQL,
   IconMenuEdgeFunctions,
   IconMenuFlutter,
   IconMenuGettingStarted,
@@ -16,12 +17,13 @@ import {
   IconMenuRealtime,
   IconMenuResources,
   IconMenuSelfHosting,
-  IconMenuServerlessApis,
+  IconMenuRestApis,
   IconMenuStorage,
   IconMenuSwift,
   IconMenuStatus,
   IconMenuKotlin,
   IconMenuAI,
+  IconMenuDevCli,
 } from './HomeMenuIcons'
 
 function getMenuIcon(menuKey: string, width: number = 16, height: number = 16) {
@@ -32,8 +34,10 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16) {
       return <IconMenuGettingStarted width={width} height={height} />
     case 'database':
       return <IconMenuDatabase width={width} height={height} />
-    case 'serverless-apis':
-      return <IconMenuServerlessApis width={width} height={height} />
+    case 'rest':
+      return <IconMenuRestApis width={width} height={height} />
+    case 'graphql':
+      return <IconMenuGraphQL width={width} height={height} />
     case 'auth':
       return <IconMenuAuth width={width} height={height} />
     case 'edge-functions':
@@ -66,6 +70,8 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16) {
       return <IconMenuKotlin width={width} height={height} />
     case 'reference-api':
       return <IconMenuApi width={width} height={height} />
+    case 'dev-cli':
+      return <IconMenuDevCli width={width} height={height} />
     case 'reference-cli':
       return <IconMenuCli width={width} height={height} />
     case 'status':

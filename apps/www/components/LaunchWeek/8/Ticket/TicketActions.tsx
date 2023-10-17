@@ -30,7 +30,7 @@ export default function TicketActions({
   const { userData, supabase } = useConfData()
   const tweetUrl = `https://twitter.com/intent/tweet?url=${permalink}&via=supabase&text=${encodedText}`
   const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${permalink}`
-  const downloadUrl = `https://obuldanrptloktxcffvn.functions.supabase.co/lw8-ticket?username=${encodeURIComponent(
+  const downloadUrl = `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lw8-ticket?username=${encodeURIComponent(
     username
   )}`
   const params = useParams()
@@ -84,7 +84,7 @@ export default function TicketActions({
             ].join(' ')}
           >
             {userData.sharedOnTwitter && (
-              <div className="text-scale-900">
+              <div className="text-muted">
                 <IconCheckCircle size={10} strokeWidth={1.5} />
               </div>
             )}
@@ -98,7 +98,7 @@ export default function TicketActions({
             ].join(' ')}
           >
             {userData.sharedOnLinkedIn && (
-              <div className="text-scale-900">
+              <div className="text-muted">
                 <IconCheckCircle size={10} strokeWidth={1.5} />
               </div>
             )}

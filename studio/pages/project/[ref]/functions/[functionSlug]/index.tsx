@@ -1,23 +1,22 @@
-import dayjs, { Dayjs } from 'dayjs'
-import { useMemo, useState } from 'react'
-import { useRouter } from 'next/router'
-import { Button } from 'ui'
-import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useCheckPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
-import { ChartIntervals, NextPageWithLayout } from 'types'
-import NoPermission from 'components/ui/NoPermission'
-import FunctionsLayout from 'components/layouts/FunctionsLayout'
-import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
-import { useFunctionsInvStatsQuery } from 'data/analytics/functions-inv-stats-query'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import BarChart from 'components/ui/Charts/BarChart'
-import AreaChart from 'components/ui/Charts/AreaChart'
 import { isUnixMicro, unixMicroToIsoTimestamp } from 'components/interfaces/Settings/Logs'
-import meanBy from 'lodash/meanBy'
-import sumBy from 'lodash/sumBy'
+import FunctionsLayout from 'components/layouts/FunctionsLayout'
+import AreaChart from 'components/ui/Charts/AreaChart'
+import BarChart from 'components/ui/Charts/BarChart'
+import NoPermission from 'components/ui/NoPermission'
+import { useFunctionsInvStatsQuery } from 'data/analytics/functions-inv-stats-query'
+import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
+import dayjs, { Dayjs } from 'dayjs'
+import { useCheckPermissions } from 'hooks'
 import useFillTimeseriesSorted from 'hooks/analytics/useFillTimeseriesSorted'
+import sumBy from 'lodash/sumBy'
+import { observer } from 'mobx-react-lite'
+import { useRouter } from 'next/router'
+import { useMemo, useState } from 'react'
+import { ChartIntervals, NextPageWithLayout } from 'types'
+import { Button } from 'ui'
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {
@@ -106,7 +105,7 @@ const PageLayout: NextPageWithLayout = () => {
           })}
         </div>
 
-        <span className="text-xs text-scale-1000">
+        <span className="text-xs text-foreground-light">
           Statistics for past {selectedInterval.label}
         </span>
       </div>

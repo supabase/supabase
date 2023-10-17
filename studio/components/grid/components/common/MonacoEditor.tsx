@@ -5,6 +5,7 @@ type MonacoEditorProps = {
   height?: string | number | undefined
   value?: string | undefined
   language?: string | undefined
+  readOnly?: boolean
   onChange: (value: string | undefined) => void
   onMount?: (editor: any) => void
 }
@@ -14,6 +15,7 @@ export const MonacoEditor = ({
   height,
   value,
   language,
+  readOnly = false,
   onChange,
   onMount,
 }: MonacoEditorProps) => {
@@ -54,6 +56,7 @@ export const MonacoEditor = ({
       onChange={onChange}
       onMount={handleEditorOnMount}
       options={{
+        readOnly,
         tabSize: 2,
         fontSize: 13,
         minimap: {

@@ -35,6 +35,7 @@ export interface Project extends ProjectBase {
   maxDatabasePreprovisionGb?: string | null
   parent_project_ref?: string
   is_branch_enabled?: boolean
+  serviceVersions: { gotrue: string; postgrest: string; 'supabase-postgres': string }
 
   /**
    * postgrestStatus is available on client side only.
@@ -42,6 +43,11 @@ export interface Project extends ProjectBase {
    * If not we will show ConnectingState and run a polling until it's back online
    */
   postgrestStatus?: 'ONLINE' | 'OFFLINE'
+  /**
+   * Only available on client side only, for components that require the parentRef
+   * irregardless of being on any branch, such as ProjectDropdown and Vercel integration
+   * */
+  parentRef?: string
 }
 
 export interface User {

@@ -4,6 +4,7 @@ import { ColumnType, SupaColumn, SupaRow, SupaTable } from '../types'
 import {
   isArrayColumn,
   isBoolColumn,
+  isCiTextColumn,
   isDateColumn,
   isDateTimeColumn,
   isEnumColumn,
@@ -77,8 +78,8 @@ export function getGridColumns(
           foreignKey={x.foreignKey}
         />
       ),
-      editor: options?.editable
-        ? getColumnEditor(x, columnType, options.onExpandJSONEditor)
+      editor: options
+        ? getColumnEditor(x, columnType, options?.editable ?? false, options.onExpandJSONEditor)
         : undefined,
       formatter: getColumnFormatter(x, columnType),
     }
@@ -97,14 +98,29 @@ export function getGridColumns(
 function getColumnEditor(
   columnDefinition: SupaColumn,
   columnType: ColumnType,
+  isEditable: boolean,
   onExpandJSONEditor: (column: string, row: any) => void
 ) {
+  if (!isEditable) {
+    if (['array', 'json'].includes(columnType)) {
+      // eslint-disable-next-line react/display-name
+      return (p: any) => (
+        <JsonEditor {...p} isEditable={isEditable} onExpandEditor={onExpandJSONEditor} />
+      )
+    } else if (!['number', 'boolean'].includes(columnType)) {
+      // eslint-disable-next-line react/display-name
+      return (p: any) => <TextEditor {...p} isEditable={isEditable} />
+    } else {
+      return
+    }
+  }
   if (columnDefinition.isPrimaryKey || !columnDefinition.isUpdatable) {
     return
   }
 
   switch (columnType) {
     case 'boolean': {
+      // eslint-disable-next-line react/display-name
       return (p: any) => <BooleanEditor {...p} isNullable={columnDefinition.isNullable} />
     }
     case 'date': {
@@ -120,17 +136,23 @@ function getColumnEditor(
       const options = columnDefinition.enum!.map((x) => {
         return { label: x, value: x }
       })
+      // eslint-disable-next-line react/display-name
       return (p: any) => <SelectEditor {...p} options={options} />
     }
     case 'array':
     case 'json': {
+      // eslint-disable-next-line react/display-name
       return (p: any) => <JsonEditor {...p} onExpandEditor={onExpandJSONEditor} />
     }
     case 'number': {
       return NumberEditor
     }
+    case 'citext':
     case 'text': {
-      return (p: any) => <TextEditor {...p} isNullable={columnDefinition.isNullable} />
+      // eslint-disable-next-line react/display-name
+      return (p: any) => (
+        <TextEditor {...p} isEditable={isEditable} isNullable={columnDefinition.isNullable} />
+      )
     }
     default: {
       return undefined
@@ -170,6 +192,8 @@ function getColumnType(columnDef: SupaColumn): ColumnType {
     return 'json'
   } else if (isTextColumn(columnDef.dataType)) {
     return 'text'
+  } else if (isCiTextColumn(columnDef.format)) {
+    return 'citext'
   } else if (isDateColumn(columnDef.format)) {
     return 'date'
   } else if (isTimeColumn(columnDef.format)) {

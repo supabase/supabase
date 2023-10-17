@@ -4,16 +4,19 @@ import type {
   PostgresTable,
   PostgresType,
 } from '@supabase/postgres-meta'
-import { useParams } from 'common'
-import { Dictionary } from 'components/grid'
 import { isEmpty, noop } from 'lodash'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Button, Checkbox, IconExternalLink, Input, SidePanel, Toggle } from 'ui'
 
+import { useParams } from 'common'
+import { Dictionary } from 'components/grid'
 import { EncryptionKeySelector } from 'components/interfaces/Settings/Vault'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
+import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useStore } from 'hooks'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { Button, Checkbox, IconExternalLink, IconPlus, Input, SidePanel, Toggle } from 'ui'
 import { ForeignKeySelector } from '..'
 import ActionBar from '../ActionBar'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
@@ -35,9 +38,6 @@ import {
 import ColumnForeignKey from './ColumnForeignKey'
 import ColumnType from './ColumnType'
 import HeaderTitle from './HeaderTitle'
-
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 
 export interface ColumnEditorProps {
   column?: PostgresColumn
@@ -83,9 +83,7 @@ const ColumnEditor = ({
   const foreignKeyMeta = data || []
 
   const keys = vault.listKeys()
-  const enumTypes = meta.types.list(
-    (type: PostgresType) => !meta.excludedSchemas.includes(type.schema)
-  )
+  const enumTypes = meta.types.list((type: PostgresType) => !EXCLUDED_SCHEMAS.includes(type.schema))
 
   const [pgsodiumExtension] = meta.extensions.list(
     (ext: PostgresExtension) => ext.name.toLowerCase() === 'pgsodium'
@@ -130,6 +128,7 @@ const ColumnEditor = ({
     table: PostgresTable
     column: PostgresColumn
     deletionAction: string
+    updateAction: string
   }) => {
     onUpdateField({
       foreignKey:
@@ -144,6 +143,7 @@ const ColumnEditor = ({
               target_table_name: foreignKeyConfiguration.table.name,
               target_column_name: foreignKeyConfiguration.column.name,
               deletion_action: foreignKeyConfiguration.deletionAction,
+              update_action: foreignKeyConfiguration.updateAction,
             }
           : undefined,
       ...(foreignKeyConfiguration !== undefined && {
@@ -242,7 +242,19 @@ const ColumnEditor = ({
           <FormSectionLabel
             className="lg:!col-span-4"
             description={
-              <div>
+              <div className="space-y-2">
+                <Link href={`/project/${ref}/database/types`} passHref>
+                  <Button
+                    asChild
+                    type="default"
+                    size="tiny"
+                    icon={<IconPlus size={14} strokeWidth={2} />}
+                  >
+                    <a target="_blank" rel="noreferrer">
+                      Create enum types
+                    </a>
+                  </Button>
+                </Link>
                 <Link href="https://supabase.com/docs/guides/database/tables#data-types" passHref>
                   <Button
                     asChild

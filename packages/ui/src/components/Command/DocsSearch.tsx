@@ -33,13 +33,13 @@ export enum PageType {
 }
 
 export interface PageSection {
-  slug: string
-  heading: string
+  slug?: string
+  heading?: string
 }
 
 export interface PageMetadata {
   title: string
-  description: string
+  description?: string
 }
 
 export interface PageResult {
@@ -185,9 +185,11 @@ const DocsSearch = () => {
                     <CommandLabel>
                       <TextHighlighter text={page.meta.title} query={search} />
                     </CommandLabel>
-                    <div className="text-xs text-scale-900">
-                      <TextHighlighter text={page.meta.description} query={search} />
-                    </div>
+                    {page.meta.description && (
+                      <div className="text-xs text-scale-900">
+                        <TextHighlighter text={page.meta.description} query={search} />
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -216,9 +218,11 @@ const DocsSearch = () => {
                               query={search}
                             />
                           </cite>
-                          <CommandLabel>
-                            <TextHighlighter text={section.heading} query={search} />
-                          </CommandLabel>
+                          {section.heading && (
+                            <CommandLabel>
+                              <TextHighlighter text={section.heading} query={search} />
+                            </CommandLabel>
+                          )}
                         </div>
                       </div>
                       <ChevronArrow />
@@ -302,9 +306,9 @@ export function formatSectionUrl(page: PageResult, section: PageSection) {
   switch (page.type) {
     case PageType.Markdown:
     case PageType.GithubDiscussion:
-      return `${formatPageUrl(page)}#${section.slug}`
+      return `${formatPageUrl(page)}#${section.slug ?? ''}`
     case PageType.Reference:
-      return `${formatPageUrl(page)}/${section.slug}`
+      return `${formatPageUrl(page)}/${section.slug ?? ''}`
     default:
       throw new Error(`Unknown page type '${page.type}'`)
   }

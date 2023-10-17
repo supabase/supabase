@@ -8,8 +8,7 @@ import TextLink from '../TextLink'
 const CustomerStories = ({ customerStories }: any) => {
   const caseStudyThumbs = customerStories.map((blog: PostTypes, idx: number) => {
     return {
-      logo: blog.logo,
-      logoInverse: blog.logo_inverse,
+      logo: blog.logo_inverse,
       title: blog.title,
       link: blog.url,
     }

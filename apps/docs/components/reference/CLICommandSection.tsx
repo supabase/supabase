@@ -138,6 +138,7 @@ const CliCommandSection = (props) => {
               size="tiny"
               type="rounded-pills"
               scrollable
+              queryGroup="example"
             >
               {command.examples ? (
                 command.examples.map((example) => {

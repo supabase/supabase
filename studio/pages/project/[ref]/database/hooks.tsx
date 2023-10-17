@@ -1,39 +1,48 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import clsx from 'clsx'
-import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
-import { IconLoader } from 'ui'
 
+import { useParams } from 'common'
 import DeleteHookModal from 'components/interfaces/Database/Hooks/DeleteHookModal'
 import EditHookPanel from 'components/interfaces/Database/Hooks/EditHookPanel'
 import HooksList from 'components/interfaces/Database/Hooks/HooksList/HooksList'
 import { DatabaseLayout } from 'components/layouts'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import NoPermission from 'components/ui/NoPermission'
 import { useHooksEnableMutation } from 'data/database/hooks-enable-mutation'
+import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions, useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import { IconLoader } from 'ui'
 
 const HooksPage: NextPageWithLayout = () => {
+  const { project } = useProjectContext()
   const { meta, ui } = useStore()
 
-  const { ref } = useParams()
-  const schemas = meta.schemas.list()
-  const { isLoading: isLoadingSchemas } = meta.schemas
+  const { ref: projectRef } = useParams()
+
+  const {
+    data: schemas,
+    isLoading: isLoadingSchemas,
+    refetch,
+  } = useSchemasQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   const [selectedHook, setSelectedHook] = useState<any>()
   const [showCreateHookForm, setShowCreateHookForm] = useState<boolean>(false)
   const [showDeleteHookForm, setShowDeleteHookForm] = useState<boolean>(false)
 
-  const isHooksEnabled = schemas.some((schema: any) => schema.name === 'supabase_functions')
+  const isHooksEnabled = schemas?.some((schema) => schema.name === 'supabase_functions')
   const canReadWebhooks = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'triggers')
   const canCreateWebhooks = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
 
   const { mutate: enableHooks, isLoading: isEnablingHooks } = useHooksEnableMutation({
     onSuccess: () => {
-      meta.schemas.load()
+      refetch()
       ui.setNotification({
         category: 'success',
         message: `Successfully enabled webhooks`,
@@ -46,8 +55,8 @@ const HooksPage: NextPageWithLayout = () => {
   }, [ui.selectedProjectRef])
 
   const enableHooksForProject = async () => {
-    if (!ref) return console.error('Project ref is required')
-    enableHooks({ ref })
+    if (!projectRef) return console.error('Project ref is required')
+    enableHooks({ ref: projectRef })
   }
 
   const createHook = () => {
@@ -73,7 +82,7 @@ const HooksPage: NextPageWithLayout = () => {
     return (
       <div className="w-full h-full flex items-center justify-center space-x-2">
         <IconLoader className="animate-spin" size="tiny" strokeWidth={1.5} />
-        <p className="text-sm text-scale-1100">Checking if hooks are enabled</p>
+        <p className="text-sm text-foreground-light">Checking if hooks are enabled</p>
       </div>
     )
   }
@@ -92,11 +101,11 @@ const HooksPage: NextPageWithLayout = () => {
             !canCreateWebhooks ? 'You need additional permissions to enable webhooks' : undefined
           }
         >
-          <p className="text-sm text-scale-1100">
+          <p className="text-sm text-foreground-light">
             Database Webhooks can be used to trigger serverless functions or send requests to an
             HTTP endpoint.
           </p>
-          <p className="text-sm text-scale-1100">Enable database webhooks on your project.</p>
+          <p className="text-sm text-foreground-light">Enable database webhooks on your project.</p>
         </ProductEmptyState>
       </div>
     )
@@ -104,8 +113,8 @@ const HooksPage: NextPageWithLayout = () => {
 
   return (
     <>
-      <ScaffoldContainer>
-        <ScaffoldSection>
+      <ScaffoldContainer className="h-full">
+        <ScaffoldSection className="h-full">
           <div className="col-span-12">
             <HooksList createHook={createHook} editHook={editHook} deleteHook={deleteHook} />
           </div>

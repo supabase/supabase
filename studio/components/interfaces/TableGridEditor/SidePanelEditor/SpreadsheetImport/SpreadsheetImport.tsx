@@ -1,7 +1,8 @@
+import Link from 'next/link'
 import { PostgresTable } from '@supabase/postgres-meta'
 import { debounce, includes, noop } from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
-import { SidePanel, Tabs } from 'ui'
+import { Button, IconExternalLink, SidePanel, Tabs } from 'ui'
 
 import { useStore } from 'hooks'
 import ActionBar from '../ActionBar'
@@ -17,6 +18,9 @@ import {
   parseSpreadsheetText,
 } from './SpreadsheetImport.utils'
 import SpreadsheetImportPreview from './SpreadsheetImportPreview'
+import toast from 'react-hot-toast'
+
+const MAX_CSV_SIZE = 1024 * 1024 * 100 // 100 MB
 
 interface SpreadsheetImportProps {
   debounceDuration?: number
@@ -74,6 +78,25 @@ const SpreadsheetImport = ({
     setParseProgress(0)
     event.persist()
     const [file] = event.target.files || event.dataTransfer.files
+
+    if (file.size > MAX_CSV_SIZE) {
+      event.target.value = ''
+      return toast(
+        <div className="space-y-1">
+          <p>The dashboard currently only supports importing of CSVs below 100MB.</p>
+          <p>For bulk data loading, we recommend doing so directly through the database.</p>
+          <Link passHref href="https://supabase.com/docs/guides/database/tables#bulk-data-loading">
+            <Button asChild type="default" icon={<IconExternalLink />} className="!mt-2">
+              <a target="_blank" rel="noreferrer">
+                Learn more
+              </a>
+            </Button>
+          </Link>
+        </div>,
+        { duration: Infinity }
+      )
+    }
+
     if (!file || !includes(UPLOAD_FILE_TYPES, file?.type) || !acceptedFileExtension(file)) {
       ui.setNotification({
         category: 'info',

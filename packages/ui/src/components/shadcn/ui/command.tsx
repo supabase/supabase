@@ -40,11 +40,11 @@ const CommandInput = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
 >(({ className, ...props }, ref) => (
   <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
-    <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+    <Search className="h-4 w-4 shrink-0 opacity-50" />
     <CommandPrimitive.Input
       ref={ref}
       className={cn(
-        'flex h-9 w-full rounded-md bg-transparent py-3 text-sm text outline-none placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-50',
+        'flex h-9 w-full rounded-md bg-transparent py-3 text-xs text outline-none placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-50 border-none focus:ring-0',
         className
       )}
       {...props}
@@ -73,7 +73,7 @@ const CommandEmpty = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Empty
     ref={ref}
-    className={cn('py-6 text-center text-sm', className)}
+    className={cn('py-6 text-center text-xs', className)}
     {...props}
   />
 ))
@@ -115,7 +115,7 @@ const CommandItem = React.forwardRef<
   <CommandPrimitive.Item
     ref={ref}
     className={cn(
-      'relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-overlay-hover aria-selected:text-strong data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+      'relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-xs outline-none aria-selected:bg-overlay-hover aria-selected:text-strong data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
       className
     )}
     {...props}

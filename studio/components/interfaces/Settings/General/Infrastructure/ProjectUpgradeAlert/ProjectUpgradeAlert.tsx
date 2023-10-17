@@ -94,7 +94,7 @@ const ProjectUpgradeAlert = () => {
                                 if (change !== undefined)
                                   return (
                                     <li key={reason}>
-                                      <p className="text-scale-1200">{change.title}</p>
+                                      <p className="text-foreground">{change.title}</p>
                                       <p className="flex items-center space-x-1">
                                         <span>This update has breaking changes. Read more </span>
                                         <Link href={change.url}>

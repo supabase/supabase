@@ -6,10 +6,17 @@ export type UtilityPanelProps = {
   id: string
   isExecuting?: boolean
   isDisabled?: boolean
+  prettifyQuery: () => void
   executeQuery: () => void
 }
 
-const UtilityPanel = ({ id, isExecuting, isDisabled, executeQuery }: UtilityPanelProps) => {
+const UtilityPanel = ({
+  id,
+  isExecuting,
+  isDisabled,
+  prettifyQuery,
+  executeQuery,
+}: UtilityPanelProps) => {
   return (
     <>
       <div className="flex justify-between overflow-visible px-6 py-2">
@@ -20,6 +27,7 @@ const UtilityPanel = ({ id, isExecuting, isDisabled, executeQuery }: UtilityPane
             id={id}
             isExecuting={isExecuting}
             isDisabled={isDisabled}
+            prettifyQuery={prettifyQuery}
             executeQuery={executeQuery}
           />
         </div>

@@ -78,7 +78,7 @@ verify_jwt = false
 You can invoke Edge Functions using curl:
 
 ```bash
-curl --request POST 'https://<project_ref>.functions.supabase.co/hello-world' \
+curl --request POST 'https://<project_ref>.supabase.co/functions/v1/hello-world' \
   --header 'Authorization: Bearer ANON_KEY' \
   --header 'Content-Type: application/json' \
   --data '{ "name":"Functions" }'
@@ -105,6 +105,34 @@ const { data, error } = await supabase.functions.invoke('hello-world', {
 ```
 
 After invoking your Edge Function you should see the response `{ "message":"Hello Functions!" }`.
+
+### Error Handling
+
+When interacting with Edge Functions, it's important to be prepared for potential errors that might occur during the invocation. To handle errors effectively, the following error handling code can be used:
+
+```js
+import { FunctionsHttpError, FunctionsRelayError, FunctionsFetchError } from '@supabase/supabase-js'
+
+const { data, error } = await supabase.functions.invoke('hello', {
+  headers: {
+    'my-custom-header': 'my-custom-header-value',
+  },
+  body: { foo: 'bar' },
+})
+
+if (error instanceof FunctionsHttpError) {
+  const errorMessage = await error.context.json()
+  console.log('Function returned an error', errorMessage)
+} else if (error instanceof FunctionsRelayError) {
+  console.log('Relay error:', error.message)
+} else if (error instanceof FunctionsFetchError) {
+  console.log('Fetch error:', error.message)
+}
+```
+
+In the provided error handling code, we're checking the type of error that occurred using the "instanceof" operator. This helps us differentiate between different types of errors and handle them appropriately. Depending on the type of error, we either log the error message or information specific to that type of error.
+
+This error handling mechanism ensures that your application can gracefully handle errors that might arise during the execution of Edge Functions, providing a more robust user experience.
 
 ## Importing Node npm modules
 

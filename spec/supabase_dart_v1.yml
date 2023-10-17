@@ -190,7 +190,7 @@ functions:
         isSpotlight: true
         code: |
           ```dart
-          final AuthResponse = await supabase.auth.signInWithApple();
+          final AuthResponse res = await supabase.auth.signInWithApple();
           ```
   - id: sign-in-with-oauth
     title: 'signInWithOAuth()'
@@ -992,7 +992,7 @@ functions:
           ```dart
           await supabase
             .from('users')
-            .upsert({ 'username': 'supabot' }, { 'onConflict': 'username' });
+            .upsert({ 'username': 'supabot' }, onConflict: 'username');
           ```
       - id: return-the-exact-number-of-rows
         name: Return the exact number of rows

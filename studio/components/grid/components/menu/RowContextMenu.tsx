@@ -1,11 +1,13 @@
-import { Menu, Item, ItemParams, PredicateParams, Separator } from 'react-contexify'
-import { IconTrash, IconClipboard, IconEdit } from 'ui'
-import { useDispatch, useTrackedState } from '../../store'
-import { formatClipboardValue, copyToClipboard } from '../../utils'
-import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { Item, ItemParams, Menu, PredicateParams, Separator } from 'react-contexify'
+import { IconClipboard, IconEdit, IconTrash } from 'ui'
+
 import { SupaRow, SupaTable } from 'components/grid/types'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
+import { useDispatch, useTrackedState } from '../../store'
+import { copyToClipboard, formatClipboardValue } from '../../utils'
+import { useCallback } from 'react'
 
 export const ROW_CONTEXT_MENU_ID = 'row-context-menu-id'
 
@@ -65,23 +67,26 @@ const RowContextMenu = ({ table, rows }: RowContextMenuProps) => {
     return false
   }
 
-  function onCopyCellContent(p: ItemParams) {
-    const { props } = p
+  const onCopyCellContent = useCallback(
+    (p: ItemParams) => {
+      const { props } = p
 
-    if (!state.selectedCellPosition || !props) {
-      return
-    }
+      if (!state.selectedCellPosition || !props) {
+        return
+      }
 
-    const { rowIdx } = props
-    const row = rows[rowIdx]
+      const { rowIdx } = props
+      const row = rows[rowIdx]
 
-    const columnKey = state.gridColumns[state.selectedCellPosition?.idx as number].key
+      const columnKey = state.gridColumns[state.selectedCellPosition?.idx as number].key
 
-    const value = row[columnKey]
-    const text = formatClipboardValue(value)
+      const value = row[columnKey]
+      const text = formatClipboardValue(value)
 
-    copyToClipboard(text)
-  }
+      copyToClipboard(text)
+    },
+    [rows, state.gridColumns, state.selectedCellPosition]
+  )
 
   return (
     <>
@@ -94,7 +99,7 @@ const RowContextMenu = ({ table, rows }: RowContextMenuProps) => {
           <IconEdit size="tiny" />
           <span className="ml-2 text-xs">Edit row</span>
         </Item>
-        <Separator />
+        {state.editable && <Separator />}
         <Item onClick={onDeleteRow} hidden={isItemHidden} data="delete">
           <IconTrash size="tiny" stroke="red" />
           <span className="ml-2 text-xs">Delete row</span>

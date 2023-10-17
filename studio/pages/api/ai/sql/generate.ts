@@ -1,6 +1,7 @@
 import { SchemaBuilder } from '@serafin/schema-builder'
 import { codeBlock, stripIndent } from 'common-tags'
 import { isError } from 'data/utils/error-check'
+import { jsonrepair } from 'jsonrepair'
 import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
 import type {
@@ -143,7 +144,10 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    const generateSqlResult: GenerateSqlResult = JSON.parse(sqlResponseString)
+    // Attempt to repair broken JSON from OpenAI (eg. multiline strings)
+    const repairedJsonString = jsonrepair(sqlResponseString)
+
+    const generateSqlResult: GenerateSqlResult = JSON.parse(repairedJsonString)
 
     if (!generateSqlResult.sql) {
       console.error(`AI SQL generation failed: Unable to generate SQL for the given prompt`)
@@ -158,7 +162,9 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return res.json(generateSqlResult)
   } catch (error) {
     console.error(
-      `AI SQL editing failed: ${isError(error) ? error.message : 'An unknown error occurred'}`
+      `AI SQL editing failed: ${
+        isError(error) ? error.message : 'An unknown error occurred'
+      }, sqlResponseString: ${sqlResponseString}`
     )
 
     return res.status(500).json({

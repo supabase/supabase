@@ -2,7 +2,6 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import dayjs from 'dayjs'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
-import { Alert, Button, IconArrowDown, IconArrowUp, IconRefreshCw, IconUser } from 'ui'
 
 import { useParams } from 'common'
 import { FilterPopover, LogDetailsPanel } from 'components/interfaces/AuditLogs'
@@ -19,6 +18,20 @@ import { useOrganizationDetailQuery } from 'data/organizations/organization-deta
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { useIsFeatureEnabled } from 'hooks'
+import Link from 'next/link'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconAlertTriangle,
+  IconArrowDown,
+  IconArrowUp,
+  IconRefreshCw,
+  IconUser,
+} from 'ui'
 
 // [Joshen considerations]
 // - Maybe fix the height of the table to the remaining height of the viewport, so that the search input is always visible
@@ -40,16 +53,30 @@ const AuditLogs = () => {
     projects: [], // project_ref[]
   })
 
+  const billingEnabled = useIsFeatureEnabled('billing:all')
+
   const { data: projects } = useProjectsQuery()
   const { data: organizations } = useOrganizationsQuery()
   const { data: detailData } = useOrganizationDetailQuery({ slug })
   const { data: rolesData } = useOrganizationRolesQuery({ slug })
   const { data, error, isLoading, isSuccess, isError, isRefetching, refetch } =
-    useOrganizationAuditLogsQuery({
-      slug,
-      iso_timestamp_start: dateRange.from,
-      iso_timestamp_end: dateRange.to,
-    })
+    useOrganizationAuditLogsQuery(
+      {
+        slug,
+        iso_timestamp_start: dateRange.from,
+        iso_timestamp_end: dateRange.to,
+      },
+      {
+        retry(_failureCount, error) {
+          if (error.message.endsWith('upgrade to team or enterprise plan to access audit logs.')) {
+            return false
+          }
+          return true
+        },
+        retryOnMount: false,
+        refetchOnWindowFocus: false,
+      }
+    )
 
   // This feature depends on the subscription tier of the user. Free user can view logs up to 1 day
   // in the past. The API limits the logs to maximum of 1 day and 5 minutes so when the page is
@@ -184,7 +211,39 @@ const AuditLogs = () => {
             </div>
           )}
 
-          {isError && <AlertError error={error} subject="Failed to retrieve audit logs" />}
+          {isError ? (
+            error.message.endsWith('upgrade to team or enterprise plan to access audit logs.') ? (
+              <Alert_Shadcn_
+                variant="default"
+                title="Organization Audit Logs are not available on Free or Pro plans"
+              >
+                <IconAlertTriangle className="h-4 w-4 mt-3" />
+                <div className="flex flex-row pt-3 pb-2">
+                  <div className="grow">
+                    <AlertTitle_Shadcn_>
+                      Organization Audit Logs are not available on Free or Pro plans
+                    </AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_ className="flex flex-row justify-between gap-3">
+                      <p>
+                        Upgrade to Team or Enterprise to view up to 28 days of Audit Logs for your
+                        organization.
+                      </p>
+                    </AlertDescription_Shadcn_>
+                  </div>
+
+                  {billingEnabled && (
+                    <div className="flex items-center">
+                      <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
+                        <Button type="primary">Upgrade subscription</Button>
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              </Alert_Shadcn_>
+            ) : (
+              <AlertError error={error} subject="Failed to retrieve audit logs" />
+            )
+          ) : null}
 
           {isSuccess && (
             <>
@@ -239,7 +298,7 @@ const AuditLogs = () => {
                                     'border border-scale-200',
                                   ].join(' ')}
                                 >
-                                  <span className="text-xs text-scale-1200">
+                                  <span className="text-xs text-foreground">
                                     {dateSortDesc ? 'Sort latest first' : 'Sort earliest first'}
                                   </span>
                                 </div>
@@ -292,9 +351,11 @@ const AuditLogs = () => {
                             <div className="flex items-center space-x-4">
                               <div>{userIcon}</div>
                               <div>
-                                <p className="text-scale-1100">{user?.username ?? '-'}</p>
+                                <p className="text-foreground-light">{user?.username ?? '-'}</p>
                                 {role && (
-                                  <p className="mt-0.5 text-xs text-scale-1000">{role?.name}</p>
+                                  <p className="mt-0.5 text-xs text-foreground-light">
+                                    {role?.name}
+                                  </p>
                                 )}
                               </div>
                             </div>
@@ -313,7 +374,7 @@ const AuditLogs = () => {
                           </Table.td>
                           <Table.td>
                             <p
-                              className="text-scale-1100 max-w-[230px] truncate"
+                              className="text-foreground-light max-w-[230px] truncate"
                               title={project?.name ?? organization?.name ?? '-'}
                             >
                               {project?.name
@@ -324,7 +385,7 @@ const AuditLogs = () => {
                               {project?.name ?? organization?.name ?? 'Unknown'}
                             </p>
                             <p
-                              className="text-scale-1000 text-xs mt-0.5 truncate"
+                              className="text-foreground-light text-xs mt-0.5 truncate"
                               title={
                                 log.target.metadata.project_ref ?? log.target.metadata.org_slug
                               }

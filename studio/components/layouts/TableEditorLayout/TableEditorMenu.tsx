@@ -1,11 +1,18 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
+import { partition } from 'lodash'
 import { useMemo, useState } from 'react'
-import { noop, partition } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import {
-  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Button,
-  Dropdown,
-  IconCheck,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
   IconChevronsDown,
   IconEdit,
   IconLoader,
@@ -13,41 +20,25 @@ import {
   IconSearch,
   IconX,
   Input,
-  Listbox,
   Menu,
+  Modal,
 } from 'ui'
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import type { PostgresSchema } from '@supabase/postgres-meta'
 
-import { useParams } from 'common/hooks'
-import { useCheckPermissions, useStore, useLocalStorage } from 'hooks'
-import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import { Entity } from 'data/entity-types/entity-type-query'
-import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import InfiniteList from 'components/ui/InfiniteList'
+import SchemaSelector from 'components/ui/SchemaSelector'
+import { useSchemasQuery } from 'data/database/schemas-query'
+import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
+import { useCheckPermissions, useLocalStorage } from 'hooks'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
 
-export interface TableEditorMenuProps {
-  selectedSchema?: string
-  onSelectSchema: (schema: string) => void
-  onAddTable: () => void
-  onEditTable: (table: Entity) => void
-  onDeleteTable: (table: Entity) => void
-  onDuplicateTable: (table: Entity) => void
-}
-
-const TableEditorMenu = ({
-  selectedSchema,
-  onSelectSchema = noop,
-  onAddTable = noop,
-  onEditTable = noop,
-  onDeleteTable = noop,
-  onDuplicateTable = noop,
-}: TableEditorMenuProps) => {
-  const { meta } = useStore()
+const TableEditorMenu = () => {
   const { id } = useParams()
+  const snap = useTableEditorStateSnapshot()
 
+  const [showModal, setShowModal] = useState(false)
   const [searchText, setSearchText] = useState<string>('')
   const [sort, setSort] = useLocalStorage<'alphabetical' | 'grouped-alphabetical'>(
     'table-editor-sort',
@@ -68,7 +59,7 @@ const TableEditorMenu = ({
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      schema: selectedSchema,
+      schema: snap.selectedSchemaName,
       search: searchText || undefined,
       sort,
     },
@@ -83,97 +74,42 @@ const TableEditorMenu = ({
     [data?.pages]
   )
 
-  const schemas: PostgresSchema[] = meta.schemas.list()
-  const schema = schemas.find((schema) => schema.name === selectedSchema)
-  const canCreateTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  const { data: schemas } = useSchemasQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
-  const isLoadingTableMetadata = id ? !meta.tables.byId(id) : true
+  const schema = schemas?.find((schema) => schema.name === snap.selectedSchemaName)
+  const canCreateTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   const refreshTables = async () => {
     await refetch()
   }
 
-  const [protectedSchemas, openSchemas] = partition(schemas, (schema) =>
-    meta.excludedSchemas.includes(schema?.name ?? '')
+  const [protectedSchemas] = partition(
+    (schemas ?? []).sort((a, b) => a.name.localeCompare(b.name)),
+    (schema) => EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
   )
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
 
   return (
-    <div
-      className="pt-6 flex flex-col flex-grow space-y-6 h-full"
-      style={{ maxHeight: 'calc(100vh - 48px)' }}
-    >
-      {/* Schema selection dropdown */}
-      <div className="px-3 mx-4">
-        {!meta.schemas.isInitialized ? (
-          <div className="flex h-[26px] items-center space-x-3 rounded border border-gray-500 px-3">
-            <IconLoader className="animate-spin" size={12} />
-            <span className="text-xs text-scale-900">Loading schemas...</span>
-          </div>
-        ) : meta.schemas.hasError ? (
-          <Alert variant="warning" title="Failed to load schemas" className="!px-3 !py-3">
-            <p className="mb-2">Error: {meta.schemas?.error?.message}</p>
-            <Button type="default" size="tiny" onClick={() => meta.schemas.load()}>
-              Reload schemas
-            </Button>
-          </Alert>
-        ) : (
-          <Listbox
-            size="tiny"
-            value={selectedSchema}
-            onChange={(name: string) => {
-              setSearchText('')
-              onSelectSchema(name)
-            }}
-          >
-            <Listbox.Option
-              disabled
-              key="normal-schemas"
-              value="normal-schemas"
-              label="Schemas"
-              className="!w-[200px]"
-            >
-              <p className="text-xs text-scale-1100">Schemas</p>
-            </Listbox.Option>
-            {openSchemas.map((schema) => (
-              <Listbox.Option
-                key={schema.id}
-                value={schema.name}
-                label={schema.name}
-                className="!w-[200px]"
-                addOnBefore={() => <span className="text-scale-900 text-xs">schema</span>}
-              >
-                <span className="text-scale-1200 text-xs">{schema.name}</span>
-              </Listbox.Option>
-            ))}
-            <Listbox.Option
-              disabled
-              key="protected-schemas"
-              value="protected-schemas"
-              label="Protected schemas"
-              className="!w-[200px]"
-            >
-              <p className="text-xs text-scale-1100">Protected schemas</p>
-            </Listbox.Option>
-            {protectedSchemas.map((schema) => (
-              <Listbox.Option
-                key={schema.id}
-                value={schema.name}
-                label={schema.name}
-                className="!w-[200px]"
-                addOnBefore={() => <span className="text-scale-900 text-xs">schema</span>}
-              >
-                <span className="text-scale-1200 text-xs">{schema.name}</span>
-              </Listbox.Option>
-            ))}
-          </Listbox>
-        )}
-      </div>
+    <>
+      <div
+        className="pt-5 flex flex-col flex-grow space-y-4 h-full"
+        style={{ maxHeight: 'calc(100vh - 48px)' }}
+      >
+        <SchemaSelector
+          className="mx-4"
+          selectedSchemaName={snap.selectedSchemaName}
+          onSelectSchema={(name: string) => {
+            setSearchText('')
+            snap.setSelectedSchemaName(name)
+          }}
+          onSelectCreateSchema={() => snap.onAddSchema()}
+        />
 
-      <div className="space-y-1 mx-4">
-        {!isLocked && (
-          <div className="px-3">
-            {/* Add new table button */}
+        <div className="space-y-1 mx-4">
+          {!isLocked ? (
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger className="w-full">
                 <Button
@@ -182,13 +118,13 @@ const TableEditorMenu = ({
                   disabled={!canCreateTables}
                   size="tiny"
                   icon={
-                    <div className="text-scale-900">
+                    <div className="text-foreground-lighter">
                       <IconEdit size={14} strokeWidth={1.5} />
                     </div>
                   }
                   type="default"
                   style={{ justifyContent: 'start' }}
-                  onClick={onAddTable}
+                  onClick={snap.onAddTable}
                 >
                   <span>New table</span>
                 </Button>
@@ -203,7 +139,7 @@ const TableEditorMenu = ({
                         'border border-scale-200',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text-foreground">
                         You need additional permissions to create tables
                       </span>
                     </div>
@@ -211,162 +147,198 @@ const TableEditorMenu = ({
                 </Tooltip.Portal>
               )}
             </Tooltip.Root>
-          </div>
-        )}
-        {/* Table search input */}
-        <div className="mb-2 block px-3">
-          <Input
-            className="table-editor-search border-none"
-            icon={
-              isSearching ? (
-                <IconLoader className="animate-spin text-scale-900" size={12} strokeWidth={1.5} />
-              ) : (
-                <IconSearch className="text-scale-900" size={12} strokeWidth={1.5} />
-              )
-            }
-            placeholder="Search tables"
-            onChange={(e) => setSearchText(e.target.value.trim())}
-            value={searchText}
-            size="tiny"
-            actions={
-              searchText && (
-                <Button size="tiny" type="text" onClick={() => setSearchText('')}>
-                  <IconX size={12} strokeWidth={2} />
+          ) : (
+            <Alert_Shadcn_>
+              <AlertTitle_Shadcn_ className="text-xs tracking-normal">
+                Viewing protected schema
+              </AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_ className="text-xs">
+                <p className="mb-2">
+                  This schema is managed by Supabase and is read-only through the table editor
+                </p>
+                <Button type="default" size="tiny" onClick={() => setShowModal(true)}>
+                  Learn more
                 </Button>
-              )
-            }
-          />
-        </div>
-      </div>
+              </AlertDescription_Shadcn_>
+            </Alert_Shadcn_>
+          )}
 
-      {isLoading ? (
-        <div className="mx-7 flex items-center space-x-2">
-          <IconLoader className="animate-spin" size={14} strokeWidth={1.5} />
-          <p className="text-sm text-scale-1000">Loading entities...</p>
-        </div>
-      ) : searchText.length === 0 && (entityTypes?.length ?? 0) === 0 ? (
-        <div className="mx-7 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
-          <p className="text-xs">No entities available</p>
-          <p className="text-xs text-scale-1100">This schema has no entities available yet</p>
-        </div>
-      ) : searchText.length > 0 && (entityTypes?.length ?? 0) === 0 ? (
-        <div className="mx-7 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
-          <p className="text-xs">No results found</p>
-          <p className="text-xs text-scale-1100">There are no entities that match your search</p>
-        </div>
-      ) : (
-        <Menu
-          type="pills"
-          className="flex flex-auto px-4 space-y-6 pb-4"
-          ulClassName="flex flex-auto flex-col"
-        >
-          <Menu.Group
-            // @ts-ignore
-            title={
-              <>
-                <div className="flex w-full items-center justify-between">
-                  <div className="flex items-center space-x-1">
-                    <p>Tables</p>
-                    {totalCount !== undefined && (
-                      <p style={{ fontVariantNumeric: 'tabular-nums' }}>({totalCount})</p>
-                    )}
-                  </div>
-
-                  <div className="flex gap-3 items-center">
-                    <Dropdown
-                      size="small"
-                      side="bottom"
-                      align="start"
-                      style={{ zIndex: 1 }}
-                      overlay={[
-                        <Dropdown.Item
-                          key="alphabetical"
-                          icon={
-                            sort === 'alphabetical' ? (
-                              <IconCheck size="tiny" />
-                            ) : (
-                              <div className="w-[14px] h-[14px]" />
-                            )
-                          }
-                          onClick={() => {
-                            setSort('alphabetical')
-                          }}
-                        >
-                          Alphabetical
-                        </Dropdown.Item>,
-                        <Dropdown.Item
-                          key="grouped-alphabetical"
-                          icon={
-                            sort === 'grouped-alphabetical' ? (
-                              <IconCheck size="tiny" />
-                            ) : (
-                              <div className="w-[14px] h-[14px]" />
-                            )
-                          }
-                          onClick={() => {
-                            setSort('grouped-alphabetical')
-                          }}
-                        >
-                          Entity Type
-                        </Dropdown.Item>,
-                      ]}
-                    >
-                      <Tooltip.Root delayDuration={0}>
-                        <Tooltip.Trigger asChild>
-                          <div className="text-scale-900 transition-colors hover:text-scale-1200">
-                            <IconChevronsDown size={18} strokeWidth={1} />
-                          </div>
-                        </Tooltip.Trigger>
-                        <Tooltip.Portal>
-                          <Tooltip.Content side="bottom">
-                            <Tooltip.Arrow className="radix-tooltip-arrow" />
-                            <div
-                              className={[
-                                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                'border border-scale-200',
-                              ].join(' ')}
-                            >
-                              <span className="text-xs">Sort By</span>
-                            </div>
-                          </Tooltip.Content>
-                        </Tooltip.Portal>
-                      </Tooltip.Root>
-                    </Dropdown>
-
-                    <button
-                      className="cursor-pointer text-scale-900 transition-colors hover:text-scale-1200"
-                      onClick={refreshTables}
-                    >
-                      <IconRefreshCw className={isRefetching ? 'animate-spin' : ''} size={14} />
-                    </button>
-                  </div>
-                </div>
-              </>
-            }
-          />
-
-          <div className="flex flex-1">
-            <InfiniteList
-              items={entityTypes}
-              ItemComponent={EntityListItem}
-              itemProps={{
-                projectRef: project?.ref,
-                id: Number(id),
-                onEditTable,
-                onDeleteTable,
-                onDuplicateTable,
-                isLoadingTableMetadata,
-              }}
-              getItemSize={() => 28}
-              hasNextPage={hasNextPage}
-              isLoadingNextPage={isFetchingNextPage}
-              onLoadNextPage={() => fetchNextPage()}
+          {/* Table search input */}
+          <div className="mb-2 block">
+            <Input
+              className="table-editor-search border-none"
+              icon={
+                isSearching ? (
+                  <IconLoader
+                    className="animate-spin text-foreground-lighter"
+                    size={12}
+                    strokeWidth={1.5}
+                  />
+                ) : (
+                  <IconSearch className="text-foreground-lighter" size={12} strokeWidth={1.5} />
+                )
+              }
+              placeholder="Search tables"
+              onChange={(e) => setSearchText(e.target.value.trim())}
+              value={searchText}
+              size="tiny"
+              actions={
+                searchText && (
+                  <Button size="tiny" type="text" onClick={() => setSearchText('')}>
+                    <IconX size={12} strokeWidth={2} />
+                  </Button>
+                )
+              }
             />
           </div>
-        </Menu>
-      )}
-    </div>
+        </div>
+
+        {isLoading ? (
+          <div className="mx-4 flex items-center space-x-2">
+            <IconLoader className="animate-spin" size={14} strokeWidth={1.5} />
+            <p className="text-sm text-foreground-light">Loading entities...</p>
+          </div>
+        ) : searchText.length === 0 && (entityTypes?.length ?? 0) === 0 ? (
+          <div className="mx-4 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
+            <p className="text-xs">No entities available</p>
+            <p className="text-xs text-foreground-light">
+              This schema has no entities available yet
+            </p>
+          </div>
+        ) : searchText.length > 0 && (entityTypes?.length ?? 0) === 0 ? (
+          <div className="mx-4 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
+            <p className="text-xs">No results found</p>
+            <p className="text-xs text-foreground-light">
+              There are no entities that match your search
+            </p>
+          </div>
+        ) : (
+          <Menu
+            type="pills"
+            className="flex flex-auto px-2 space-y-6 pb-4"
+            ulClassName="flex flex-auto flex-col"
+          >
+            <Menu.Group
+              // @ts-ignore
+              title={
+                <>
+                  <div className="flex w-full items-center justify-between">
+                    <div className="flex items-center space-x-1">
+                      <p>Tables</p>
+                      {totalCount !== undefined && (
+                        <p style={{ fontVariantNumeric: 'tabular-nums' }}>({totalCount})</p>
+                      )}
+                    </div>
+
+                    <div className="flex gap-3 items-center">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger>
+                          <Tooltip.Root delayDuration={0}>
+                            <Tooltip.Trigger asChild>
+                              <div className="text-foreground-lighter transition-colors hover:text-foreground">
+                                <IconChevronsDown size={18} strokeWidth={1} />
+                              </div>
+                            </Tooltip.Trigger>
+                            <Tooltip.Portal>
+                              <Tooltip.Content side="bottom">
+                                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                <div
+                                  className={[
+                                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                    'border border-scale-200',
+                                  ].join(' ')}
+                                >
+                                  <span className="text-xs">Sort By</span>
+                                </div>
+                              </Tooltip.Content>
+                            </Tooltip.Portal>
+                          </Tooltip.Root>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent side="bottom" align="start" className="w-48">
+                          <DropdownMenuRadioGroup
+                            value={sort}
+                            onValueChange={(value: any) => setSort(value)}
+                          >
+                            <DropdownMenuRadioItem key="alphabetical" value="alphabetical">
+                              Alphabetical
+                            </DropdownMenuRadioItem>
+                            <DropdownMenuRadioItem
+                              key="grouped-alphabetical"
+                              value="grouped-alphabetical"
+                            >
+                              Entity Type
+                            </DropdownMenuRadioItem>
+                          </DropdownMenuRadioGroup>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+
+                      <button
+                        className="cursor-pointer text-foreground-lighter transition-colors hover:text-foreground"
+                        onClick={refreshTables}
+                      >
+                        <IconRefreshCw className={isRefetching ? 'animate-spin' : ''} size={14} />
+                      </button>
+                    </div>
+                  </div>
+                </>
+              }
+            />
+
+            <div className="flex flex-1">
+              <InfiniteList
+                items={entityTypes}
+                ItemComponent={EntityListItem}
+                itemProps={{
+                  projectRef: project?.ref,
+                  id: Number(id),
+                }}
+                getItemSize={() => 28}
+                hasNextPage={hasNextPage}
+                isLoadingNextPage={isFetchingNextPage}
+                onLoadNextPage={() => fetchNextPage()}
+              />
+            </div>
+          </Menu>
+        )}
+      </div>
+
+      <Modal
+        size="medium"
+        visible={showModal}
+        header="Schemas managed by Supabase"
+        customFooter={
+          <div className="flex items-center justify-end space-x-2">
+            <Button type="default" onClick={() => setShowModal(false)}>
+              Understood
+            </Button>
+          </div>
+        }
+        onCancel={() => setShowModal(false)}
+      >
+        <Modal.Content className="py-4 space-y-2">
+          <p className="text-sm">
+            The following schemas are managed by Supabase and are currently protected from write
+            access through the Table Editor.
+          </p>
+          <div className="flex flex-wrap gap-1">
+            {EXCLUDED_SCHEMAS.map((schema) => (
+              <code key={schema} className="text-xs">
+                {schema}
+              </code>
+            ))}
+          </div>
+          <p className="text-sm !mt-4">
+            These schemas are critical to the functionality of your Supabase project and hence we
+            highly recommend not altering them.
+          </p>
+          <p className="text-sm">
+            You can, however, still interact with those schemas through the SQL Editor although we
+            advise you only do so if you know what you are doing.
+          </p>
+        </Modal.Content>
+      </Modal>
+    </>
   )
 }
 
-export default observer(TableEditorMenu)
+export default TableEditorMenu

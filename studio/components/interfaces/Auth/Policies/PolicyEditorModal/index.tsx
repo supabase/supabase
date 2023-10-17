@@ -194,8 +194,8 @@ const PolicyEditorModal = ({
       <div className="">
         <ConfirmationModal
           visible={isClosingPolicyEditorModal}
-          header="Confirm to close"
-          buttonLabel="Confirm"
+          header="Discard changes"
+          buttonLabel="Discard"
           onSelectCancel={() => setIsClosingPolicyEditorModal(false)}
           onSelectConfirm={() => {
             onSelectCancel()
@@ -204,7 +204,7 @@ const PolicyEditorModal = ({
           }}
         >
           <Modal.Content>
-            <p className="py-4 text-sm text-scale-1100">
+            <p className="py-4 text-sm text-foreground-light">
               There are unsaved changes. Are you sure you want to close the editor? Your changes
               will be lost.
             </p>

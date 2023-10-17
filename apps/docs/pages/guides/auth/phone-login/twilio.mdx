@@ -122,21 +122,32 @@ Use the variable `.Code` in the template to display the OTP code. Here's an exam
 
 In this scenario we'll be using the user's mobile phone number and a corresponding password as an alternative to signing up with an email address. Note: please thoroughly consider potential security implications when signing up with a combination of phone number and password. Phone numbers are sometimes recycled by phone networks when users cancel their phone contracts or move countries, thereby granting access to the user's account to the subsequent owner of the phone number. In the near future Supabase will support multifactor authentication, which will mitigate this risk, but for now you may want to consider allowing your users to recover their account by some other means in an emergency.
 
-Using supabase-js on the client you'll want to use the same `signUp` method that you'd use for email based sign ups, but with the `phone` param instead of the `email param`:
-
 <Tabs
   scrollable
   size="small"
   type="underlined"
   defaultActiveId="js"
+  queryGroup="language"
 >
 <TabPanel id="js" label="JavaScript">
 
+Using supabase-js on the client you'll want to use the same `signUp` method that you'd use for email based sign ups, but with the `phone` param instead of the `email param`:
+
 ```js
-let { user, error } = await supabase.auth.signUp({
+const { user, error } = await supabase.auth.signUp({
   phone: '+13334445555',
   password: 'some-password',
 })
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+supabase.gotrue.signUpWith(Phone) {
+    phoneNumber = "+13334445555"
+    password = "some-password"
+}
 ```
 
 </TabPanel>
@@ -157,22 +168,36 @@ curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/signup' \
 
 The user will now receive an SMS with a 6-digit pin that you will need to receive from them within 60-seconds before they can login to their account.
 
-You should present a form to the user so they can input the 6 digit pin, then send it along with the phone number to `verifyOTP`:
-
 <Tabs
   scrollable
   size="small"
   type="underlined"
   defaultActiveId="js"
+  queryGroup="language"
 >
 <TabPanel id="js" label="JavaScript">
 
+You should present a form to the user so they can input the 6 digit pin, then send it along with the phone number to `verifyOtp`:
+
 ```js
-let { session, error } = await supabase.auth.verifyOtp({
+const { session, error } = await supabase.auth.verifyOtp({
   phone: '+13334445555',
   token: '123456',
   type: 'sms',
 })
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+You should present a form to the user so they can input the 6 digit pin, then send it along with the phone number to `verifyPhoneOtp`:
+
+```kotlin
+supabase.gotrue.verifyPhoneOtp(
+    type = OtpType.Phone.SMS,
+    phoneNumber = "+13334445555",
+    token = "123456"
+)
 ```
 
 </TabPanel>
@@ -212,14 +237,25 @@ Also now that the mobile has been verified, the user can use the number and pass
   size="small"
   type="underlined"
   defaultActiveId="js"
+  queryGroup="language"
 >
 <TabPanel id="js" label="JavaScript">
 
 ```js
-let { user, error } = await supabase.auth.signInWithPassword({
+const { user, error } = await supabase.auth.signInWithPassword({
   phone: '+13334445555',
   password: 'some-password',
 })
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+supabase.gotrue.loginWith(Phone) {
+    phoneNumber = "+13334445555"
+    password = "some-password"
+}
 ```
 
 </TabPanel>
@@ -242,20 +278,32 @@ curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/token?grant_type=
 
 In this scenario you are granting your user's the ability to login to their account without needing to set a password on their account, all they have to do to log in is verify their mobile each time using the OTP.
 
-In javascript we can use the `signIn` method with a single parameter: `phone`
-
 <Tabs
   scrollable
   size="small"
   type="underlined"
   defaultActiveId="js"
+  queryGroup="language"
 >
 <TabPanel id="js" label="JavaScript">
 
+In JavaScript we can use the `signIn` method with a single parameter: `phone`
+
 ```js
-let { user, error } = await supabase.auth.signInWithOtp({
+const { user, error } = await supabase.auth.signInWithOtp({
   phone: '+13334445555',
 })
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+In Kotlin, we can use the `sendOtpTo` method and change the property `phoneNumber`
+
+```kotlin
+supabase.gotrue.sendOtpTo(Phone) {
+    phoneNumber = "+13334445555"
+}
 ```
 
 </TabPanel>
@@ -280,15 +328,27 @@ The second step is the same as the previous section, you need to collect the 6-d
   size="small"
   type="underlined"
   defaultActiveId="js"
+  queryGroup="language"
 >
 <TabPanel id="js" label="JavaScript">
 
 ```js
-let { session, error } = await supabase.auth.verifyOtp({
+const { session, error } = await supabase.auth.verifyOtp({
   phone: '+13334445555',
   token: '123456',
   type: 'sms',
 })
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+supabase.gotrue.verifyPhoneOtp(
+    type = OtpType.Phone.SMS,
+    phoneNumber = "+13334445555",
+    token = "123456"
+)
 ```
 
 </TabPanel>
@@ -329,14 +389,17 @@ In some cases, you may wish to use WhatsApp as a delivery channel instead. Here 
 - You wish for a secure channel
 - Your users mostly use WhatsApp as a messaging platform
 
-WhatsApp OTPs can be used with Twilio Verify without additional configuration. To make use of WhatsApp OTP with Twilio Programmable Messaging, please complete the following steps:
+Twilio Verify can be used with WhatsApp OTPs with no additional configuration.
 
-- Go through the [Twilio self sign up guide for WhatsApp](https://www.twilio.com/docs/whatsapp/self-sign-up)
-- Submit a template via the [Twilio Guide For Submitting WhatsApp templates](https://www.twilio.com/docs/whatsapp/tutorial/send-whatsapp-notification-messages-templates#creating-message-templates-and-submitting-them-for-approval)
+Complete the following steps to use WhatsApp OTP with Twilio Programmable Messaging:
+
+1. Go through the [Twilio self sign up guide for WhatsApp](https://www.twilio.com/docs/whatsapp/self-sign-up).
+2. Follow the [Twilio Guide for Submitting Templates](https://www.twilio.com/docs/whatsapp/tutorial/send-whatsapp-notification-messages-templates#creating-message-templates-and-submitting-them-for-approval) and submit a Basic Authentication Message for approval (e.g. Your Code is 123456).
 
 <Admonition type="caution">
-  The message template submitted to Twilio must exactly match the SMS Body entered on the Supabase
-  dashboard.
+
+Twilio Programmable Messaging can only be used with the Basic Authentication Message. For advanced customization options, please use Twilio Verify.
+
 </Admonition>
 
 The sign in process with WhatsApp is similar to the sign in process for SMS. Do note the additional `whatsapp` parameter added:
@@ -366,7 +429,7 @@ There is no change in the verification process, you should continue to use the `
 
 ```js
 // After receiving a WhatsApp OTP
-let { data, error } = await supabase.auth.verifyOtp({
+const { data, error } = await supabase.auth.verifyOtp({
   phone: '+57336567365',
   token: '123456',
   type: 'sms',

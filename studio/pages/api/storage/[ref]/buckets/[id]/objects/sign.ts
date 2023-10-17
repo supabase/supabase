@@ -32,6 +32,7 @@ const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
   const parsed = new URL(process.env.SUPABASE_PUBLIC_URL!)
   signedUrl.protocol = parsed.protocol
   signedUrl.host = parsed.host
+  signedUrl.port = parsed.port
   data.signedUrl = signedUrl.href
 
   return res.status(200).json(data)

@@ -26,9 +26,9 @@ const SpendCapModal = ({ visible, onHide }: SpendCapModalProps) => {
             {/* Maybe ideate this in Figma first but this is good enough for now */}
             <div className="border rounded border-scale-600 bg-scale-500">
               <div className="flex items-center px-4 pt-2 pb-1">
-                <p className="w-[50%] text-sm text-scale-1100">Item</p>
-                <p className="w-[25%] text-sm text-scale-1100">Limit</p>
-                <p className="w-[25%] text-sm text-scale-1100">Rate</p>
+                <p className="w-[50%] text-sm text-foreground-light">Item</p>
+                <p className="w-[25%] text-sm text-foreground-light">Limit</p>
+                <p className="w-[25%] text-sm text-foreground-light">Rate</p>
               </div>
               <div className="py-2">
                 <div className="flex items-center px-4 py-1">
@@ -64,7 +64,7 @@ const SpendCapModal = ({ visible, onHide }: SpendCapModalProps) => {
                                 'border border-scale-200 ', //border
                               ].join(' ')}
                             >
-                              <span className="text-xs text-scale-1200">
+                              <span className="text-xs text-foreground">
                                 Monthly Active Users: A user that has made an API request in the
                                 last month
                               </span>
@@ -98,7 +98,7 @@ const SpendCapModal = ({ visible, onHide }: SpendCapModalProps) => {
                                 'border border-scale-200 ', //border
                               ].join(' ')}
                             >
-                              <span className="text-xs text-scale-1200">
+                              <span className="text-xs text-foreground">
                                 Single Sign-On Monthly Active Users: A user that has made an API
                                 request in the last month
                               </span>

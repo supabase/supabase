@@ -3,13 +3,13 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
+import { AddNewPaymentMethodModal } from 'components/interfaces/BillingV2'
 import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
 import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { getURL } from 'lib/helpers'
 import { Button, IconAlertCircle, IconCreditCard, IconLoader, IconPlus, Listbox } from 'ui'
-import { AddNewPaymentMethodModal } from 'components/interfaces/BillingV2'
 
 export interface PaymentMethodSelectionProps {
   selectedPaymentMethod?: string
@@ -75,11 +75,11 @@ const PaymentMethodSelection = ({
         {isLoading ? (
           <div className="flex items-center px-4 py-2 space-x-4 border rounded-md border-scale-700 bg-scale-400">
             <IconLoader className="animate-spin" size={14} />
-            <p className="text-sm text-scale-1100">Retrieving payment methods</p>
+            <p className="text-sm text-foreground-light">Retrieving payment methods</p>
           </div>
         ) : paymentMethods.length === 0 ? (
           <div className="flex items-center justify-between px-4 py-2 border border-dashed rounded-md bg-scale-100">
-            <div className="flex items-center space-x-4 text-scale-1100">
+            <div className="flex items-center space-x-4 text-foreground-light">
               <IconAlertCircle size={16} strokeWidth={1.5} />
               <p className="text-sm">No saved payment methods</p>
             </div>
@@ -105,7 +105,7 @@ const PaymentMethodSelection = ({
                         'w-48 border border-scale-200 text-center', //border
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text-foreground">
                         You need additional permissions to add new payment methods to this
                         organization
                       </span>
@@ -145,7 +145,7 @@ const PaymentMethodSelection = ({
               onClick={() => setShowAddNewPaymentMethodModal(true)}
             >
               <IconPlus size={16} />
-              <p className="transition text-scale-1000 group-hover:text-scale-1200">
+              <p className="transition text-foreground-light group-hover:text-foreground">
                 Add new payment method
               </p>
             </div>

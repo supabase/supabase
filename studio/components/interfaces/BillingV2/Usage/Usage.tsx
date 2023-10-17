@@ -1,15 +1,18 @@
 import clsx from 'clsx'
 import { useParams } from 'common'
+import dayjs from 'dayjs'
+import { useMemo, useRef, useState } from 'react'
+import { InView } from 'react-intersection-observer'
+import { Button, cn, IconAlertCircle, IconExternalLink, IconInfo, IconLoader } from 'ui'
+
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
+import InformationBox from 'components/ui/InformationBox'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
-import dayjs from 'dayjs'
 import { useSelectedOrganization } from 'hooks'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants'
-import { useMemo, useRef, useState } from 'react'
-import { InView } from 'react-intersection-observer'
-import { IconAlertCircle, IconLoader, cn } from 'ui'
+import Link from 'next/link'
 import Activity from './Activity'
 import Bandwidth from './Bandwidth'
 import Infrastructure from './Infrastructure'
@@ -136,7 +139,7 @@ const Usage = () => {
     <>
       <div>
         <div className="1xl:px-28 mx-auto flex flex-col px-5 lg:px-16 2xl:px-32 pt-6 space-y-4">
-          <h3 className="text-scale-1200 text-xl">{isOrgBilling ? 'Project ' : ''}Usage</h3>
+          <h3 className="text-foreground text-xl">{isOrgBilling ? 'Project ' : ''}Usage</h3>
         </div>
       </div>
       <div>
@@ -151,6 +154,7 @@ const Usage = () => {
                     options={[...TIME_PERIODS_BILLING, ...TIME_PERIODS_REPORTS]}
                     loading={isLoadingSubscription}
                     currentBillingPeriodStart={subscription?.current_period_start}
+                    currentBillingPeriodEnd={subscription?.current_period_end}
                   />
                 )}
 
@@ -164,7 +168,7 @@ const Usage = () => {
                       {isOrgBilling ? 'Organization' : 'Project'} is on the {subscription.plan.name}{' '}
                       plan
                     </p>
-                    <p className="text-sm text-scale-1000">
+                    <p className="text-sm text-foreground-light">
                       {billingCycleStart.format('DD MMM YYYY')} -{' '}
                       {billingCycleEnd.format('DD MMM YYYY')}
                     </p>
@@ -193,7 +197,7 @@ const Usage = () => {
                     className={cn(
                       'flex items-center space-x-2 py-3 hover:opacity-100 transition cursor-pointer',
                       activeTab === category.key
-                        ? 'border-b border-scale-1200 text-scale-1200'
+                        ? 'border-b border-scale-1200 text-foreground'
                         : 'opacity-50'
                     )}
                   >
@@ -212,6 +216,47 @@ const Usage = () => {
               })}
             </div>
           </div>
+        </div>
+
+        <div className="1xl:px-28 mx-auto flex flex-col gap-10 px-5 lg:px-16 2xl:px-32 pt-8">
+          <InformationBox
+            icon={<IconInfo size="large" strokeWidth={1.5} />}
+            defaultVisibility={true}
+            hideCollapse
+            title="We're upgrading our billing system"
+            description={
+              <div className="space-y-3">
+                <p className="text-sm leading-normal">
+                  This organization uses the legacy project-based billing. We’ve recently made some
+                  big improvements to our billing system. To migrate to the new organization-based
+                  billing, head over to your{' '}
+                  <Link href={`/org/${organization?.slug}/billing`}>
+                    <a className="text-sm text-green-900 transition hover:text-green-1000">
+                      organization billing settings
+                    </a>
+                  </Link>
+                  .
+                </p>
+
+                <div className="space-x-3">
+                  <Link href="https://supabase.com/blog/organization-based-billing" passHref>
+                    <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                      <a target="_blank" rel="noreferrer">
+                        Announcement
+                      </a>
+                    </Button>
+                  </Link>
+                  <Link href="https://supabase.com/docs/guides/platform/org-based-billing" passHref>
+                    <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                      <a target="_blank" rel="noreferrer">
+                        Documentation
+                      </a>
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            }
+          />
         </div>
 
         <InView as="div" threshold={0.2} onChange={(inView) => inView && setActiveTab('infra')}>

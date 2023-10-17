@@ -1,22 +1,18 @@
 import { createClient } from '@supabase/supabase-js'
 import dotenv from 'dotenv'
+import minimist from 'minimist'
 import 'openai'
 import { Configuration, OpenAIApi } from 'openai'
 import { inspect } from 'util'
 import { v4 as uuidv4 } from 'uuid'
 import { fetchSources } from './sources'
-import yargs from 'yargs'
 
 dotenv.config()
 
 async function generateEmbeddings() {
-  const argv = await yargs.option('refresh', {
-    alias: 'r',
-    description: 'Refresh data',
-    type: 'boolean',
-  }).argv
+  const argv = minimist(process.argv.slice(2))
 
-  const shouldRefresh = argv.refresh
+  const shouldRefresh = Boolean(argv.refresh)
 
   const requiredEnvVars = [
     'NEXT_PUBLIC_SUPABASE_URL',

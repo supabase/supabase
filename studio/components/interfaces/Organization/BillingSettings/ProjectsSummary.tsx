@@ -93,7 +93,7 @@ const ProjectsSummary = ({ projects }: ProjectsSummaryProps) => {
         ))}
         {projects.length === 0 && (
           <Panel.Content>
-            <p className="text-sm text-scale-1100">No projects created yet</p>
+            <p className="text-sm text-foreground-light">No projects created yet</p>
           </Panel.Content>
         )}
       </Panel>

@@ -8,7 +8,16 @@ import { useRouter } from 'next/router'
 import { useMemo, useRef } from 'react'
 import { CSVLink } from 'react-csv'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { Button, Dropdown, IconChevronDown, IconClipboard, IconDownload } from 'ui'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  IconChevronDown,
+  IconClipboard,
+  IconDownload,
+} from 'ui'
 // @ts-ignore
 import MarkdownTable from 'markdown-table'
 
@@ -96,37 +105,38 @@ const ResultsDropdown = ({ id, isExecuting }: ResultsDropdownProps) => {
   }
 
   return (
-    <Dropdown
-      side="bottom"
-      align="start"
-      overlay={
+    <DropdownMenu>
+      <DropdownMenuTrigger>
+        <Button asChild type="text" iconRight={<IconChevronDown />}>
+          <span>
+            Results
+            {!isExecuting &&
+              result &&
+              result.rows.length > 0 &&
+              ` (${result.rows.length.toLocaleString()})`}
+          </span>
+        </Button>
+        <CSVLink
+          ref={csvRef}
+          className="hidden"
+          headers={headers}
+          data={csvData}
+          filename={`supabase_${project?.ref}_${snap.snippets[id]?.snippet.name}`}
+        />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent side="bottom" align="start">
         <>
-          <Dropdown.Item icon={<IconDownload size="tiny" />} onClick={onDownloadCSV}>
-            Download CSV
-          </Dropdown.Item>
-          <Dropdown.Item icon={<IconClipboard size="tiny" />} onClick={onCopyAsMarkdown}>
-            Copy as markdown
-          </Dropdown.Item>
+          <DropdownMenuItem onClick={onDownloadCSV} className="space-x-2">
+            <IconDownload size="tiny" />
+            <p>Download CSV</p>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={onCopyAsMarkdown} className="space-x-2">
+            <IconClipboard size="tiny" />
+            <p>Copy as markdown</p>
+          </DropdownMenuItem>
         </>
-      }
-    >
-      <Button asChild type="text" iconRight={<IconChevronDown />}>
-        <span>
-          Results
-          {!isExecuting &&
-            result &&
-            result.rows.length > 0 &&
-            ` (${result.rows.length.toLocaleString()})`}
-        </span>
-      </Button>
-      <CSVLink
-        ref={csvRef}
-        className="hidden"
-        headers={headers}
-        data={csvData}
-        filename={`supabase_${project?.ref}_${snap.snippets[id]?.snippet.name}`}
-      />
-    </Dropdown>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
 

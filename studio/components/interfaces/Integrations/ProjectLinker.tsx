@@ -1,14 +1,8 @@
-import { ReactNode, useRef, useState } from 'react'
-
-import {
-  IntegrationConnectionsCreateVariables,
-  IntegrationProjectConnection,
-} from 'data/integrations/integrations.types'
-import { useSelectedOrganization } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
+import { ReactNode, useEffect, useRef, useState } from 'react'
 import { toast } from 'react-hot-toast'
 import {
   Button,
+  cn,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
@@ -19,8 +13,15 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
-  cn,
 } from 'ui'
+
+import ShimmerLine from 'components/ui/ShimmerLine'
+import {
+  IntegrationConnectionsCreateVariables,
+  IntegrationProjectConnection,
+} from 'data/integrations/integrations.types'
+import { useSelectedOrganization } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
 
 export interface Project {
   id: string
@@ -78,9 +79,18 @@ const ProjectLinker = ({
   const [supabaseProjectRef, setSupabaseProjectRef] = useState<string | undefined>(
     defaultSupabaseProjectRef
   )
+  useEffect(() => {
+    if (defaultSupabaseProjectRef !== undefined && supabaseProjectRef === undefined)
+      setSupabaseProjectRef(defaultSupabaseProjectRef)
+  }, [defaultSupabaseProjectRef, supabaseProjectRef])
+
   const [foreignProjectId, setForeignProjectId] = useState<string | undefined>(
     defaultForeignProjectId
   )
+  useEffect(() => {
+    if (defaultForeignProjectId !== undefined && foreignProjectId === undefined)
+      setForeignProjectId(defaultForeignProjectId)
+  }, [defaultForeignProjectId, foreignProjectId])
 
   // create a flat array of foreign project ids. ie, ["prj_MlkO6AiLG5ofS9ojKrkS3PhhlY3f", ..]
   const flatInstalledConnectionsIds = new Set(installedConnections.map((x) => x.foreign_project_id))
@@ -145,11 +155,16 @@ const ProjectLinker = ({
         <div
           className="absolute inset-0 bg-grid-black/5 [mask-image:linear-gradient(0deg,#fff,rgba(255,255,255,0.6))] dark:bg-grid-white/5 dark:[mask-image:linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]"
           style={{ backgroundPosition: '10px 10px' }}
-        ></div>
-        {(noSupabaseProjects || noForeignProjects) &&
-        (!loadingForeignProjects || !loadingSupabaseProjects) ? (
+        />
+
+        {loadingForeignProjects || loadingSupabaseProjects ? (
+          <div className="w-1/2 mx-auto space-y-2 py-4">
+            <p className="text-foreground text-center">Loading projects</p>
+            <ShimmerLine active />
+          </div>
+        ) : noSupabaseProjects || noForeignProjects ? (
           <div className="text-center">
-            <h5 className="text">No {missingEntity} Projects found</h5>
+            <h5 className="text-foreground">No {missingEntity} Projects found</h5>
             <p className="text-light text-sm">
               You will need to create a {missingEntity} Project to link to a {oppositeMissingEntity}{' '}
               Project.
@@ -305,6 +320,7 @@ const ProjectLinker = ({
           </div>
         )}
       </div>
+
       <div className="flex w-full justify-end gap-2">
         {onSkip !== undefined && (
           <Button

@@ -11,7 +11,6 @@ import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send
 import { useProjectDeleteMutation } from 'data/projects/project-delete-mutation'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useCheckPermissions, useStore } from 'hooks'
-import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 
 export interface DeleteProjectButtonProps {
   type?: 'danger' | 'default'
@@ -109,7 +108,7 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
                   'border border-scale-200 ', //border
                 ].join(' ')}
               >
-                <span className="text-xs text-scale-1200">
+                <span className="text-xs text-foreground">
                   You need additional permissions to delete this project
                 </span>
               </div>
@@ -147,7 +146,7 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
           <>
             <div className="space-y-1">
               <h4 className="text-base">We're sad that you're leaving.</h4>
-              <p className="text-sm text-scale-1100">
+              <p className="text-sm text-foreground-light">
                 We always strive to improve Supabase as much as we can. Please let us know the
                 reasons you are deleting your project so that we can improve in the future.
               </p>
@@ -165,7 +164,7 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
                         `${
                           active
                             ? ` bg-scale-1200 text-scale-100 opacity-100 hover:bg-opacity-75`
-                            : ` bg-scale-700 text-scale-1200 opacity-25 hover:opacity-50`
+                            : ` bg-scale-700 text-foreground opacity-25 hover:opacity-50`
                         }`,
                       ].join(' ')}
                     >

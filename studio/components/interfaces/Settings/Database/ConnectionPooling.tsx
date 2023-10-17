@@ -80,7 +80,7 @@ const ConnectionPooling = () => {
               }
             >
               <Panel.Content>
-                <p className="text-scale-1000">
+                <p className="text-foreground-light">
                   Please start a new project to enable this feature.
                 </p>
               </Panel.Content>
@@ -122,6 +122,7 @@ interface ConfigProps {
 
 export const PgbouncerConfig = ({ projectRef, bouncerInfo, connectionInfo }: ConfigProps) => {
   const { ui } = useStore()
+  const { project } = useProjectContext()
   const [updates, setUpdates] = useState({
     pool_mode: bouncerInfo.pool_mode || 'transaction',
     default_pool_size: bouncerInfo.default_pool_size || undefined,
@@ -140,7 +141,12 @@ export const PgbouncerConfig = ({ projectRef, bouncerInfo, connectionInfo }: Con
 
   const canUpdateConnectionPoolingConfiguration = useCheckPermissions(
     PermissionAction.UPDATE,
-    'projects'
+    'projects',
+    {
+      resource: {
+        project_id: project?.id,
+      },
+    }
   )
 
   const updateConfig = async (updatedConfig: any) => {
@@ -194,7 +200,7 @@ export const PgbouncerConfig = ({ projectRef, bouncerInfo, connectionInfo }: Con
   }
 
   return (
-    <div>
+    <div id="connection-pooling">
       <SchemaFormPanel
         title="Connection Pooling Custom Configuration"
         schema={formSchema}
@@ -217,7 +223,7 @@ export const PgbouncerConfig = ({ projectRef, bouncerInfo, connectionInfo }: Con
                 errorMessage="You must select one of the two options"
               />
               <div className="!mt-1 flex" style={{ marginLeft: 'calc(33% + 0.5rem)' }}>
-                <p className="text-sm text-scale-900">
+                <p className="text-sm text-foreground-lighter">
                   Specify when a connection can be returned to the pool. To find out the most
                   suitable mode for your use case,{' '}
                   <a

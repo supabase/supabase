@@ -8,7 +8,11 @@ import { format } from 'sql-formatter'
 import {
   AiIconAnimation,
   Button,
-  Dropdown,
+  cn,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   IconCheck,
   IconChevronDown,
   IconCornerDownLeft,
@@ -16,7 +20,6 @@ import {
   IconSettings,
   IconX,
   Input_Shadcn_,
-  cn,
 } from 'ui'
 
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
@@ -26,6 +29,8 @@ import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { useFormatQueryMutation } from 'data/sql/format-sql-query'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { isError } from 'data/utils/error-check'
 import {
   useFlag,
@@ -36,17 +41,14 @@ import {
   useStore,
 } from 'hooks'
 import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
-import { removeCommentsFromSql, uuidv4 } from 'lib/helpers'
+import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import Telemetry from 'lib/telemetry'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { subscriptionHasHipaaAddon } from '../BillingV2/Subscription/Subscription.utils'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
 import AISettingsModal from './AISettingsModal'
-import {
-  destructiveSqlRegex,
-  sqlAiDisclaimerComment,
-  untitledSnippetTitle,
-} from './SQLEditor.constants'
+import { sqlAiDisclaimerComment, untitledSnippetTitle } from './SQLEditor.constants'
 import {
   ContentDiff,
   DiffType,
@@ -55,13 +57,12 @@ import {
   SQLEditorContextValues,
 } from './SQLEditor.types'
 import {
+  checkDestructiveQuery,
   createSqlSnippetSkeleton,
   getDiffTypeButtonLabel,
   getDiffTypeDropdownLabel,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
-import { subscriptionHasHipaaAddon } from '../BillingV2/Subscription/Subscription.utils'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -98,6 +99,7 @@ const SQLEditor = () => {
   const project = useSelectedProject()
   const snap = useSqlEditorStateSnapshot()
 
+  const { mutate: formatQuery } = useFormatQueryMutation()
   const { mutateAsync: generateSql, isLoading: isGenerateSqlLoading } = useSqlGenerateMutation()
   const { mutateAsync: editSql, isLoading: isEditSqlLoading } = useSqlEditMutation()
   const { mutateAsync: titleSql } = useSqlTitleGenerateMutation()
@@ -203,6 +205,44 @@ const SQLEditor = () => {
     [generateSqlTitle, snap]
   )
 
+  const prettifyQuery = useCallback(async () => {
+    if (isDiffOpen) return
+
+    // use the latest state
+    const state = getSqlEditorStateSnapshot()
+    const snippet = state.snippets[id]
+
+    if (editorRef.current && project) {
+      const editor = editorRef.current
+      const selection = editor.getSelection()
+      const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
+      const sql = snippet
+        ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql
+        : selectedValue || editorRef.current?.getValue()
+      formatQuery(
+        {
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+          sql,
+        },
+        {
+          onSuccess: (res) => {
+            const editorModel = editorRef?.current?.getModel()
+            if (editorRef.current && editorModel) {
+              editorRef.current.executeEdits('apply-prettify-edit', [
+                {
+                  text: res.result,
+                  range: editorModel.getFullModelRange(),
+                },
+              ])
+              snap.setSql(id, res.result)
+            }
+          },
+        }
+      )
+    }
+  }, [formatQuery, id, isDiffOpen, project, snap])
+
   const executeQuery = useCallback(
     async (force: boolean = false) => {
       if (isDiffOpen) return
@@ -220,9 +260,7 @@ const SQLEditor = () => {
           ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql
           : selectedValue || editorRef.current?.getValue()
 
-        const containsDestructiveOperations = destructiveSqlRegex.some((regex) =>
-          regex.test(removeCommentsFromSql(sql))
-        )
+        const containsDestructiveOperations = checkDestructiveQuery(sql)
 
         if (!force && containsDestructiveOperations) {
           setIsConfirmModalOpen(true)
@@ -664,38 +702,39 @@ const SQLEditor = () => {
                         >
                           {getDiffTypeButtonLabel(selectedDiffType)}
                         </Button>
-                        <Dropdown
-                          align="end"
-                          side="bottom"
-                          overlay={Object.values(DiffType)
-                            .filter((diffType) => diffType !== selectedDiffType)
-                            .map((diffType) => (
-                              <Dropdown.Item
-                                key={diffType}
-                                onClick={() => {
-                                  setSelectedDiffType(diffType)
-                                  switch (diffType) {
-                                    case DiffType.Modification:
-                                      return compareAsModification()
-                                    case DiffType.Addition:
-                                      return compareAsAddition()
-                                    case DiffType.NewSnippet:
-                                      return compareAsNewSnippet()
-                                    default:
-                                      throw new Error(`Unknown diff type '${diffType}'`)
-                                  }
-                                }}
-                              >
-                                {getDiffTypeDropdownLabel(diffType)}
-                              </Dropdown.Item>
-                            ))}
-                        >
-                          <Button
-                            type="primary"
-                            className="rounded-l-none border-l-0 px-[4px] py-[5px]"
-                            icon={<IconChevronDown />}
-                          />
-                        </Dropdown>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              type="primary"
+                              className="rounded-l-none border-l-0 px-[4px] py-[5px] flex"
+                              icon={<IconChevronDown />}
+                            />
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" side="bottom">
+                            {Object.values(DiffType)
+                              .filter((diffType) => diffType !== selectedDiffType)
+                              .map((diffType) => (
+                                <DropdownMenuItem
+                                  key={diffType}
+                                  onClick={() => {
+                                    setSelectedDiffType(diffType)
+                                    switch (diffType) {
+                                      case DiffType.Modification:
+                                        return compareAsModification()
+                                      case DiffType.Addition:
+                                        return compareAsAddition()
+                                      case DiffType.NewSnippet:
+                                        return compareAsNewSnippet()
+                                      default:
+                                        throw new Error(`Unknown diff type '${diffType}'`)
+                                    }
+                                  }}
+                                >
+                                  <p>{getDiffTypeDropdownLabel(diffType)}</p>
+                                </DropdownMenuItem>
+                              ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                       <Button
                         type="alternative"
@@ -886,6 +925,7 @@ const SQLEditor = () => {
                 id={id}
                 isExecuting={isExecuting}
                 isDisabled={isDiffOpen}
+                prettifyQuery={prettifyQuery}
                 executeQuery={executeQuery}
               />
             )}

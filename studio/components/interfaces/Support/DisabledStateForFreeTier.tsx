@@ -14,7 +14,7 @@ const DisabledStateForFreeTier = ({ projectRef, category }: DisabledStateForFree
       <InformationBox
         hideCollapse
         defaultVisibility={true}
-        icon={<IconAlertCircle className="text-scale-1200" size="large" strokeWidth={1.5} />}
+        icon={<IconAlertCircle className="text-foreground" size="large" strokeWidth={1.5} />}
         title={`Support for ${category} is only available on the Pro plan`}
         description={
           <div className="space-y-4 mb-1">

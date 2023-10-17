@@ -17,22 +17,25 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
   ],
   [
     {
+      label: 'Product',
+    },
+    {
       label: 'Database',
       icon: 'database',
       href: '/guides/database',
       level: 'database',
     },
     {
-      label: 'Serverless APIs',
-      icon: 'serverless-apis',
-      href: '/guides/api',
-      level: 'api',
-    },
-    {
       label: 'Auth',
       icon: 'auth',
       href: '/guides/auth',
       level: 'auth',
+    },
+    {
+      label: 'Storage',
+      icon: 'storage',
+      href: '/guides/storage',
+      level: 'storage',
     },
     {
       label: 'Edge Functions',
@@ -47,12 +50,6 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       level: 'realtime',
     },
     {
-      label: 'Storage',
-      icon: 'storage',
-      href: '/guides/storage',
-      level: 'storage',
-    },
-    {
       label: 'AI & Vectors',
       icon: 'ai',
       href: '/guides/ai',
@@ -61,8 +58,28 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
   ],
   [
     {
+      label: 'API',
+    },
+    {
+      label: 'REST',
+      icon: 'rest',
+      href: '/guides/api',
+      level: 'api',
+    },
+    {
+      label: 'GraphQL',
+      icon: 'graphql',
+      href: '/guides/graphql',
+      level: 'graphql',
+    },
+  ],
+  [
+    {
+      label: 'Development Cycle',
+    },
+    {
       label: 'Local Dev / CLI',
-      icon: 'reference-cli',
+      icon: 'dev-cli',
       href: '/guides/cli',
       level: 'reference_javascript',
     },
@@ -123,6 +140,8 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       level: 'reference_kotlin',
       community: true,
     },
+  ],
+  [
     {
       label: 'Resources',
     },
@@ -280,8 +299,8 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/tutorials/with-flutter',
         },
         {
-          name: 'Expo',
-          url: '/guides/getting-started/tutorials/with-expo',
+          name: 'Expo React Native',
+          url: '/guides/getting-started/tutorials/with-expo-react-native',
         },
         {
           name: 'Android Kotlin',
@@ -315,6 +334,19 @@ export const cli = {
     },
   ],
 }
+
+export const NativeMobileLoginItems = [
+  {
+    name: 'Apple',
+    icon: '/docs/img/icons/apple-icon',
+    url: '/guides/auth/social-login/auth-apple?platform=react-native',
+  },
+  {
+    name: 'Google',
+    icon: '/docs/img/icons/google-icon',
+    url: '/guides/auth/social-login/auth-google?platform=react-native',
+  },
+]
 
 export const SocialLoginItems = [
   {
@@ -475,6 +507,17 @@ export const auth = {
           name: 'Social Login',
           url: '/guides/auth/social-login',
           items: [...SocialLoginItems],
+        },
+        {
+          name: 'Native Mobile Login',
+          url: '/guides/auth/native-mobile-login',
+          items: [
+            ...NativeMobileLoginItems,
+            {
+              name: 'Deep Linking',
+              url: '/guides/auth/native-mobile-deep-linking',
+            },
+          ],
         },
         {
           name: 'Enterprise SSO',
@@ -741,12 +784,15 @@ export const database: NavMenuConstant = {
 }
 
 export const api: NavMenuConstant = {
-  icon: 'serverless-apis',
-  title: 'Serverless APIs',
+  icon: 'rest',
+  title: 'REST API',
   url: '/guides/api',
   items: [
     { name: 'Overview', url: '/guides/api', items: [] },
     { name: 'Quickstart', url: '/guides/api/quickstart', items: [] },
+    { name: 'Client Libraries', url: '/guides/api/rest/client-libs', items: [] },
+    { name: 'Auto-generated Docs', url: '/guides/api/rest/auto-generated-docs', items: [] },
+    { name: 'Generating Types', url: '/guides/api/rest/generating-types', items: [] },
     {
       name: 'Guides',
       url: '/guides/api',
@@ -762,20 +808,16 @@ export const api: NavMenuConstant = {
         { name: 'Using custom schemas', url: '/guides/api/using-custom-schemas', items: [] },
       ],
     },
-    {
-      name: 'REST & REALTIME',
-      url: undefined,
-      items: [
-        { name: 'Auto-generated Docs', url: '/guides/api/rest/auto-generated-docs', items: [] },
-        { name: 'Client Libraries', url: '/guides/api/rest/client-libs', items: [] },
-        { name: 'Generating Types', url: '/guides/api/rest/generating-types', items: [] },
-      ],
-    },
-    {
-      name: 'GRAPHQL',
-      url: undefined,
-      items: [{ name: 'GraphiQL Documentation', url: '/guides/api/graphql/graphiql', items: [] }],
-    },
+  ],
+}
+
+export const graphql: NavMenuConstant = {
+  icon: 'graphql',
+  title: 'GraphQL',
+  url: '/guides/graphql',
+  items: [
+    { name: 'Overview', url: '/guides/graphql', items: [] },
+    { name: 'API', url: '/guides/graphql/api', items: [] },
   ],
 }
 
@@ -875,7 +917,7 @@ export const realtime: NavMenuConstant = {
       url: '/guides/realtime/concepts',
     },
     {
-      name: 'Features',
+      name: 'Usage',
       url: undefined,
       items: [
         { name: 'Broadcast', url: '/guides/realtime/broadcast' },
@@ -891,13 +933,12 @@ export const realtime: NavMenuConstant = {
       url: undefined,
       items: [
         {
-          name: 'Subscribing to Database Changes',
-          url: '/guides/realtime/subscribing-to-database-changes',
+          name: 'Throttling messages',
+          url: '/guides/realtime/guides/client-side-throttling',
         },
         {
-          name: 'Bring Your Own Database',
-          url: '/guides/realtime/bring-your-own-database',
-          items: [],
+          name: 'Subscribing to Database Changes',
+          url: '/guides/realtime/subscribing-to-database-changes',
         },
         {
           name: 'Using Realtime with Next.js',
@@ -911,7 +952,12 @@ export const realtime: NavMenuConstant = {
       items: [
         { name: 'Quotas', url: '/guides/realtime/quotas' },
         { name: 'Architecture', url: '/guides/realtime/architecture' },
-        { name: 'Protocol', url: '/guides/realtime/protocol' },
+        { name: 'Message Protocol', url: '/guides/realtime/protocol' },
+        {
+          name: 'Bring Your Own Database',
+          url: '/guides/realtime/bring-your-own-database',
+          items: [],
+        },
       ],
     },
   ],
@@ -964,61 +1010,35 @@ export const ai = {
       url: '/guides/ai/structured-unstructured',
     },
     {
-      name: 'Quickstarts',
+      name: 'Learn',
       url: undefined,
       items: [
-        { name: 'Developing locally with Vecs', url: '/guides/ai/vecs-python-client' },
-        { name: 'Creating and managing collections', url: '/guides/ai/quickstarts/hello-world' },
-        {
-          name: 'Generate Embeddings',
-          url: '/guides/ai/quickstarts/generate-text-embeddings',
-        },
-        { name: 'Text Deduplication', url: '/guides/ai/quickstarts/text-deduplication' },
-        { name: 'Face similarity search', url: '/guides/ai/quickstarts/face-similarity' },
-      ],
-    },
-    {
-      name: 'Python Client',
-      url: undefined,
-      items: [
-        { name: 'API', url: '/guides/ai/python/api' },
-        { name: 'Collections', url: '/guides/ai/python/collections' },
-        { name: 'Indexes', url: '/guides/ai/python/indexes' },
-        { name: 'Metadata', url: '/guides/ai/python/metadata' },
-      ],
-    },
-    {
-      name: 'Guides',
-      url: undefined,
-      items: [
-        { name: 'Managing collections', url: '/guides/ai/managing-collections' },
         { name: 'Vector columns', url: '/guides/ai/vector-columns' },
         { name: 'Vector indexes', url: '/guides/ai/vector-indexes', items: vectorIndexItems },
         { name: 'Engineering for scale', url: '/guides/ai/engineering-for-scale' },
         { name: 'Choosing Compute Add-on', url: '/guides/ai/choosing-compute-addon' },
         { name: 'Going to Production', url: '/guides/ai/going-to-prod' },
+        { name: 'RAG with Permissions', url: '/guides/ai/rag-with-permissions' },
       ],
     },
     {
-      name: 'Examples',
+      name: 'JavaScript Examples',
       url: undefined,
       items: [
         {
           name: 'OpenAI completions using Edge Functions',
           url: '/guides/ai/examples/openai',
         },
-        {
-          name: 'Image search with OpenAI CLIP',
-          url: '/guides/ai/examples/image-search-openai-clip',
-        },
+
         {
           name: 'Generate image captions using Hugging Face',
           url: '/guides/ai/examples/huggingface-image-captioning',
         },
         {
-          name: 'Building ChatGPT Plugins',
-          url: '/guides/ai/examples/building-chatgpt-plugins',
+          name: 'Generate Embeddings',
+          url: '/guides/ai/quickstarts/generate-text-embeddings',
         },
+
         {
           name: 'Adding generative Q&A to your documentation',
           url: '/guides/ai/examples/headless-vector-search',
@@ -1026,6 +1046,36 @@ export const ai = {
         {
           name: 'Adding generative Q&A to your Next.js site',
           url: '/guides/ai/examples/nextjs-vector-search',
+        },
+      ],
+    },
+    {
+      name: 'Python Client',
+      url: undefined,
+      items: [
+        { name: 'Choosing a Client', url: '/guides/ai/python-clients' },
+        { name: 'API', url: '/guides/ai/python/api' },
+        { name: 'Collections', url: '/guides/ai/python/collections' },
+        { name: 'Indexes', url: '/guides/ai/python/indexes' },
+        { name: 'Metadata', url: '/guides/ai/python/metadata' },
+      ],
+    },
+    {
+      name: 'Python Examples',
+      url: undefined,
+      items: [
+        { name: 'Developing locally with Vecs', url: '/guides/ai/vecs-python-client' },
+        { name: 'Creating and managing collections', url: '/guides/ai/quickstarts/hello-world' },
+
+        { name: 'Text Deduplication', url: '/guides/ai/quickstarts/text-deduplication' },
+        { name: 'Face similarity search', url: '/guides/ai/quickstarts/face-similarity' },
+        {
+          name: 'Image search with OpenAI CLIP',
+          url: '/guides/ai/examples/image-search-openai-clip',
+        },
+        {
+          name: 'Building ChatGPT Plugins',
+          url: '/guides/ai/examples/building-chatgpt-plugins',
         },
       ],
     },
@@ -1142,6 +1192,10 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/migrating-and-upgrading-projects',
         },
         {
+          name: 'Multi-factor Authentication',
+          url: '/guides/platform/multi-factor-authentication',
+        },
+        {
           name: 'Transfer Project',
           url: '/guides/platform/project-transfer',
         },
@@ -1202,6 +1256,10 @@ export const platform: NavMenuConstant = {
         {
           name: 'Build a Supabase Integration',
           url: '/guides/platform/oauth-apps/build-a-supabase-integration',
+        },
+        {
+          name: 'OAuth Scopes',
+          url: '/guides/platform/oauth-apps/oauth-scopes',
         },
       ],
     },

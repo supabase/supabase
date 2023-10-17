@@ -3,13 +3,15 @@ import CliGenerator from './cli'
 import ConfigGenerator from './config'
 import SdkGenerator from './sdk'
 import LegacyGenerator from './legacy'
+import * as minimist from 'minimist'
 
 const main = (command: string[], options: any) => {
   handleInput(command[0], options)
 }
 
 // Run everything
-const argv = require('minimist')(process.argv.slice(2))
+/* @ts-ignore - required for Next.js build */
+const argv = minimist(process.argv.slice(2))
 main(argv['_'], argv)
 
 function handleInput(command: string, options: any) {

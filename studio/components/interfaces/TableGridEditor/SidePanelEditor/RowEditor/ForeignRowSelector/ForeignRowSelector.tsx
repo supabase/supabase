@@ -1,22 +1,22 @@
 import { PostgresTable } from '@supabase/postgres-meta'
+import { useState } from 'react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
+
 import { parseSupaTable } from 'components/grid'
-import RefreshButton from 'components/grid/components/header/RefreshButton'
 import FilterPopover from 'components/grid/components/header/filter'
+import RefreshButton from 'components/grid/components/header/RefreshButton'
 import SortPopover from 'components/grid/components/header/sort'
 import { formatFilterURLParams, formatSortURLParams } from 'components/grid/SupabaseGrid.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
-import { useStore } from 'hooks'
+import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
+import { useTableQuery } from 'data/tables/table-query'
 import { IconLoader, SidePanel } from 'ui'
-
 import ActionBar from '../../ActionBar'
 import { useEncryptedColumns } from './ForeignRowSelector.utils'
-import SelectorGrid from './SelectorGrid'
-import { useEffect, useState } from 'react'
 import Pagination from './Pagination'
+import SelectorGrid from './SelectorGrid'
 
 export interface ForeignRowSelectorProps {
   visible: boolean
@@ -31,23 +31,21 @@ const ForeignRowSelector = ({
   onSelect,
   closePanel,
 }: ForeignRowSelectorProps) => {
-  const { meta } = useStore()
   const { project } = useProjectContext()
 
   const {
-    target_id: tableId,
+    target_id: _tableId,
     target_schema: schemaName,
     target_table: tableName,
     target_columns: columnName,
   } = foreignKey ?? {}
+  const tableId = _tableId ? Number(_tableId) : undefined
 
-  const table = tableId ? meta.tables.byId(tableId) : undefined
-
-  useEffect(() => {
-    if (!table && tableId) {
-      meta.tables.loadById(tableId)
-    }
-  }, [table, tableId])
+  const { data: table } = useTableQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id: tableId,
+  })
 
   const encryptedColumns = useEncryptedColumns({ schemaName, tableName })
 
@@ -107,13 +105,13 @@ const ForeignRowSelector = ({
           {isLoading && (
             <div className="flex h-full py-6 flex-col items-center justify-center space-y-2">
               <IconLoader className="animate-spin" />
-              <p className="text-sm text-scale-1100">Loading rows</p>
+              <p className="text-sm text-foreground-light">Loading rows</p>
             </div>
           )}
 
           {isError && (
             <div className="flex h-full py-6 flex-col items-center justify-center">
-              <p className="text-sm text-scale-1100">
+              <p className="text-sm text-foreground-light">
                 Unable to load rows from{' '}
                 <code>
                   {schemaName}.{tableName}
@@ -166,7 +164,7 @@ const ForeignRowSelector = ({
                 />
               ) : (
                 <div className="flex h-full items-center justify-center border-b border-t border-scale-500">
-                  <span className="text-scale-1100 text-sm">No Rows Found</span>
+                  <span className="text-foreground-light text-sm">No Rows Found</span>
                 </div>
               )}
             </div>

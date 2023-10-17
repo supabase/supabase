@@ -93,8 +93,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           request.path, request.method, request.search, response.status_code
         order by
           count desc
-        limit
-        3
+        limit 10
         `,
       },
       errorCounts: {
@@ -138,8 +137,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           request.path, request.method, request.search, response.status_code
         order by
           count desc
-        limit
-        3
+        limit 10
         `,
       },
       responseSpeed: {
@@ -181,8 +179,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           request.path, request.method, request.search, response.status_code
         order by
           avg desc
-        limit
-        3
+        limit 10
         `,
       },
       networkTraffic: {
@@ -227,6 +224,52 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
   [Presets.AUTH]: {
     title: '',
     queries: {},
+  },
+  [Presets.STORAGE]: {
+    title: 'Storage',
+    queries: {
+      cacheHitRate: {
+        queryType: 'logs',
+        // storage report does not perform any filtering
+        sql: (_filters) => `
+-- cache-hit-rate
+SELECT
+  timestamp_trunc(timestamp, hour) as timestamp,
+  countif( h.cf_cache_status in ('HIT', 'STALE', 'REVALIDATED', 'UPDATING') ) as hit_count,
+  countif( h.cf_cache_status in ('MISS', 'NONE/UNKNOWN', 'EXPIRED', 'BYPASS', 'DYNAMIC') ) as miss_count
+from edge_logs f
+  cross join unnest(f.metadata) as m
+  cross join unnest(m.request) as r
+  cross join unnest(m.response) as res
+  cross join unnest(res.headers) as h
+where starts_with(r.path, '/storage/v1/object') and r.method = 'GET'
+group by timestamp
+order by timestamp desc
+`,
+      },
+      topCacheMisses: {
+        queryType: 'logs',
+        // storage report does not perform any filtering
+        sql: (_filters) => `
+-- top-cache-misses
+SELECT
+  r.path as path,
+  r.search as search,
+  count(id) as count
+from edge_logs f
+  cross join unnest(f.metadata) as m
+  cross join unnest(m.request) as r
+  cross join unnest(m.response) as res
+  cross join unnest(res.headers) as h
+where starts_with(r.path, '/storage/v1/object') 
+  and r.method = 'GET'
+  and h.cf_cache_status in ('MISS', 'NONE/UNKNOWN', 'EXPIRED', 'BYPASS', 'DYNAMIC')
+group by path, search
+order by count desc
+limit 12
+    `,
+      },
+    },
   },
   [Presets.QUERY_PERFORMANCE]: {
     title: 'Query performance',

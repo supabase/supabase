@@ -69,7 +69,7 @@ const BillingAddress = () => {
       <ScaffoldSectionDetail>
         <div className="sticky space-y-2 top-12">
           <p className="text-base m-0">Billing Address</p>
-          <p className="text-sm text-scale-1000 m-0">
+          <p className="text-sm text-foreground-light m-0">
             This will be reflected in every upcoming invoice, past invoices are not affected
           </p>
         </div>

@@ -12,7 +12,7 @@ export const meta = {
 
 The Auth Helpers will assist you in implementing user authentication within your server-side rendering (SSR) framework.
 
-<Tabs scrollable size="small" type="underlined" defaultActiveId="nextjs">
+<Tabs scrollable size="small" type="underlined" defaultActiveId="nextjs" queryGroup="framework">
 
 <TabPanel id="nextjs" label="NextJS">
 
@@ -36,7 +36,7 @@ npm install @supabase/auth-helpers-sveltekit @supabase/supabase-js
 
 Create an `.env.local` file in your project root directory. You can get your `SITE_URL` and `ANON_KEY` from inside of the [dashboard](https://supabase.com/dashboard/project/_/settings/api).
 
-<Tabs scrollable size="small" type="underlined" defaultActiveId="nextjs">
+<Tabs scrollable size="small" type="underlined" defaultActiveId="nextjs" queryGroup="framework">
 
 <TabPanel id="nextjs" label="NextJS">
 
@@ -65,6 +65,7 @@ When using the Supabase client on the server, you must perform extra steps to en
   size="small"
   type="underlined"
   defaultActiveId="nextjs"
+  queryGroup="framework"
 >
 <TabPanel id="nextjs" label="NextJS">
 Next.js Server Components allow you to read a cookie but not write back to it. Middleware on the other hand allow you to both read and write to cookies.
@@ -92,9 +93,8 @@ Create a new `hooks.server.js` file in the root of your project and populate wit
 ```ts src/hooks.server.js
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
 import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit'
-import type { Handle } from '@sveltejs/kit'
 
-export const handle: Handle = async ({ event, resolve }) => {
+export const handle = async ({ event, resolve }) => {
   event.locals.supabase = createSupabaseServerClient({
     supabaseUrl: PUBLIC_SUPABASE_URL,
     supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
@@ -128,6 +128,7 @@ In order to use the updated email links we will need to setup a endpoint for ver
   size="small"
   type="underlined"
   defaultActiveId="nextjs"
+  queryGroup="framework"
 >
 <TabPanel id="nextjs" label="NextJS">
 Create a new file at `app/auth/confirm/route.js` and populate with the following:
@@ -144,7 +145,8 @@ export async function GET(req) {
   const next = searchParams.get('next') ?? '/'
 
   if (token_hash && type) {
-    const supabase = createRouteHandlerClient({ cookies })
+    const cookieStore = cookies()
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
     const { error } = await supabase.auth.verifyOtp({ type, token_hash })
     if (!error) {
       return NextResponse.redirect(new URL(`/${next.slice(1)}`, req.url))
