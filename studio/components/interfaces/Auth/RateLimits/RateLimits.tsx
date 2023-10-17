@@ -1,0 +1,301 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
+import Link from 'next/link'
+import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormMessage_Shadcn_,
+  Form_Shadcn_,
+  IconAlertCircle,
+  Input_Shadcn_,
+} from 'ui'
+import * as z from 'zod'
+
+import AlertError from 'components/ui/AlertError'
+import {
+  FormActions,
+  FormHeader,
+  FormPanel,
+  FormSection,
+  FormSectionContent,
+  FormSectionLabel,
+} from 'components/ui/Forms'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useCheckPermissions } from 'hooks'
+import { isSmtpEnabled } from '../SmtpForm/SmtpForm.utils'
+
+const RateLimits = () => {
+  const formId = 'auth-rate-limits-form'
+  const { ref: projectRef } = useParams()
+  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+
+  const {
+    data: authConfig,
+    error,
+    isLoading,
+    isError,
+    isSuccess,
+  } = useAuthConfigQuery({ projectRef })
+  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
+
+  const canUpdateEmailLimit = authConfig?.EXTERNAL_EMAIL_ENABLED && isSmtpEnabled(authConfig)
+  const canUpdateSMSRateLimit = authConfig?.EXTERNAL_PHONE_ENABLED && !authConfig?.SMS_AUTOCONFIRM
+
+  const FormSchema = z.object({
+    RATE_LIMIT_TOKEN_REFRESH: z.number().min(0, 'Please provide a value above 0'),
+    RATE_LIMIT_VERIFY: z.number().min(0, 'Please provide a value above 0'),
+    RATE_LIMIT_EMAIL_SENT: z.number().min(0, 'Please provide a value above 0'),
+    RATE_LIMIT_SMS_SENT: z.number().min(0, 'Please provide a value above 0'),
+  })
+
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      RATE_LIMIT_TOKEN_REFRESH: 0,
+      RATE_LIMIT_VERIFY: 0,
+      RATE_LIMIT_EMAIL_SENT: 0,
+      RATE_LIMIT_SMS_SENT: 0,
+    },
+  })
+
+  const onSubmit = (data: z.infer<typeof FormSchema>) => {
+    console.log('onSubmit', data)
+  }
+
+  useEffect(() => {
+    if (isSuccess) {
+      form.reset({
+        RATE_LIMIT_TOKEN_REFRESH: 360,
+        RATE_LIMIT_VERIFY: 360,
+        RATE_LIMIT_EMAIL_SENT: authConfig.RATE_LIMIT_EMAIL_SENT,
+        RATE_LIMIT_SMS_SENT: authConfig.RATE_LIMIT_SMS_SENT,
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccess])
+
+  return (
+    <div>
+      <FormHeader
+        title="Rate Limits"
+        description="Safeguard against bursts of incoming traffic to prevent abuse and maximise stability"
+        docsUrl="https://supabase.com/docs/guides/platform/going-into-prod#rate-limiting-resource-allocation--abuse-prevention"
+      />
+
+      {isError && <AlertError subject="Failed to retrieve auth config rate limits" error={error} />}
+
+      {isLoading && <GenericSkeletonLoader />}
+
+      {isSuccess && (
+        <Form_Shadcn_ {...form}>
+          <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+            <FormPanel
+              footer={
+                <div className="flex py-4 px-8">
+                  <FormActions
+                    form={formId}
+                    isSubmitting={isUpdatingConfig}
+                    hasChanges={false}
+                    handleReset={() => {}}
+                    disabled={!canUpdateConfig}
+                    helper={
+                      !canUpdateConfig
+                        ? 'You need additional permissions to update authentication settings'
+                        : undefined
+                    }
+                  />
+                </div>
+              }
+            >
+              <FormSection
+                header={
+                  <FormSectionLabel
+                    description={
+                      <p className="text-foreground-light text-sm">
+                        How many emails can be sent per hour
+                      </p>
+                    }
+                  >
+                    Rate limit for sending emails
+                  </FormSectionLabel>
+                }
+              >
+                <FormSectionContent loading={false}>
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="RATE_LIMIT_EMAIL_SENT"
+                    render={({ field }) => (
+                      <FormItem_Shadcn_>
+                        <FormControl_Shadcn_>
+                          <Input_Shadcn_ disabled={!canUpdateEmailLimit} type="number" {...field} />
+                        </FormControl_Shadcn_>
+                        <FormMessage_Shadcn_ />
+                        {!canUpdateEmailLimit && (
+                          <Alert_Shadcn_>
+                            <IconAlertCircle strokeWidth={1.5} />
+                            <AlertTitle_Shadcn_>
+                              {!authConfig.EXTERNAL_EMAIL_ENABLED &&
+                                'Enable email-based logins to update this configuration'}
+                              {!isSmtpEnabled(authConfig) &&
+                                'Custom SMTP provider is required to update this configuration'}
+                            </AlertTitle_Shadcn_>
+                            <AlertDescription_Shadcn_>
+                              <p className="!leading-tight">
+                                {!authConfig.EXTERNAL_EMAIL_ENABLED &&
+                                  'Head over to the providers page to enable email provider before updating your rate limit'}
+                                {!isSmtpEnabled(authConfig) &&
+                                  'The built-in email service has a fixed rate limit. You will need to set up your own custom SMTP provider to update your email rate limit'}
+                              </p>
+                              <Link
+                                passHref
+                                href={
+                                  !authConfig.EXTERNAL_EMAIL_ENABLED
+                                    ? `/project/${projectRef}/auth/providers`
+                                    : `/project/${projectRef}/settings/auth`
+                                }
+                              >
+                                <Button asChild type="default" className="mt-2">
+                                  <a>
+                                    {!authConfig.EXTERNAL_EMAIL_ENABLED
+                                      ? 'View providers configuration'
+                                      : 'View SMTP settings'}
+                                  </a>
+                                </Button>
+                              </Link>
+                            </AlertDescription_Shadcn_>
+                          </Alert_Shadcn_>
+                        )}
+                      </FormItem_Shadcn_>
+                    )}
+                  />
+                </FormSectionContent>
+              </FormSection>
+
+              <FormSection
+                header={
+                  <FormSectionLabel
+                    description={
+                      <p className="text-foreground-light text-sm">
+                        How many SMS messages can be sent per hour
+                      </p>
+                    }
+                  >
+                    Rate limit for sending SMS messages
+                  </FormSectionLabel>
+                }
+              >
+                <FormSectionContent loading={false}>
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="RATE_LIMIT_SMS_SENT"
+                    render={({ field }) => (
+                      <FormItem_Shadcn_>
+                        <FormControl_Shadcn_>
+                          <Input_Shadcn_
+                            disabled={!canUpdateSMSRateLimit}
+                            type="number"
+                            {...field}
+                          />
+                        </FormControl_Shadcn_>
+                        <FormMessage_Shadcn_ />
+                        {!canUpdateSMSRateLimit && (
+                          <Alert_Shadcn_>
+                            <IconAlertCircle strokeWidth={1.5} />
+                            <AlertTitle_Shadcn_>
+                              Enable phone-based logins to update this configuration
+                            </AlertTitle_Shadcn_>
+                            <AlertDescription_Shadcn_>
+                              <p className="!leading-tight">
+                                Head over to the providers page to enable phone provider and phone
+                                confirmations before updating your rate limit
+                              </p>
+                              <Link passHref href={`/project/${projectRef}/auth/providers`}>
+                                <Button asChild type="default" className="mt-2">
+                                  <a>View providers configuration</a>
+                                </Button>
+                              </Link>
+                            </AlertDescription_Shadcn_>
+                          </Alert_Shadcn_>
+                        )}
+                      </FormItem_Shadcn_>
+                    )}
+                  />
+                </FormSectionContent>
+              </FormSection>
+
+              <FormSection
+                header={
+                  <FormSectionLabel
+                    description={
+                      <p className="text-foreground-light text-sm">
+                        How many emails can be sent per hour
+                      </p>
+                    }
+                  >
+                    Rate limit for token refreshes
+                  </FormSectionLabel>
+                }
+              >
+                <FormSectionContent loading={false}>
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="RATE_LIMIT_TOKEN_REFRESH"
+                    render={({ field }) => (
+                      <FormItem_Shadcn_>
+                        <FormControl_Shadcn_>
+                          <Input_Shadcn_ disabled type="number" {...field} />
+                        </FormControl_Shadcn_>
+                        <FormMessage_Shadcn_ />
+                      </FormItem_Shadcn_>
+                    )}
+                  />
+                </FormSectionContent>
+              </FormSection>
+
+              <FormSection
+                header={
+                  <FormSectionLabel
+                    description={
+                      <p className="text-foreground-light text-sm">
+                        How many emails can be sent per hour
+                      </p>
+                    }
+                  >
+                    Rate limit for token verifications
+                  </FormSectionLabel>
+                }
+              >
+                <FormSectionContent loading={false}>
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="RATE_LIMIT_VERIFY"
+                    render={({ field }) => (
+                      <FormItem_Shadcn_>
+                        <FormControl_Shadcn_>
+                          <Input_Shadcn_ disabled type="number" {...field} />
+                        </FormControl_Shadcn_>
+                        <FormMessage_Shadcn_ />
+                      </FormItem_Shadcn_>
+                    )}
+                  />
+                </FormSectionContent>
+              </FormSection>
+            </FormPanel>
+          </form>
+        </Form_Shadcn_>
+      )}
+    </div>
+  )
+}
+
+export default RateLimits
