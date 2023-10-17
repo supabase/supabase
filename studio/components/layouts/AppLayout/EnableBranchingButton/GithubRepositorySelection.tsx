@@ -100,7 +100,7 @@ const GithubRepositorySelection = ({
           </p>
           {!hasGithubIntegrationInstalled && (
             <Link passHref href={githubIntegrationAppUrl}>
-              <a target="_blank" rel="noreferrer">
+              <a>
                 <Button type="default" className="!mt-3">
                   Install Github Integration
                 </Button>
