@@ -139,6 +139,7 @@ const RateLimits = () => {
               }
             >
               <FormSection
+                id="email-sent"
                 header={
                   <FormSectionLabel
                     description={
@@ -203,6 +204,7 @@ const RateLimits = () => {
               </FormSection>
 
               <FormSection
+                id="sms-sent"
                 header={
                   <FormSectionLabel
                     description={
@@ -255,6 +257,7 @@ const RateLimits = () => {
               </FormSection>
 
               <FormSection
+                id="token-refresh"
                 header={
                   <FormSectionLabel
                     description={
@@ -289,6 +292,7 @@ const RateLimits = () => {
               </FormSection>
 
               <FormSection
+                id="verify"
                 header={
                   <FormSectionLabel
                     description={
