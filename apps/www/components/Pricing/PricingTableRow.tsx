@@ -15,7 +15,7 @@ export const PricingTableRowDesktop = (props: any) => {
         id={`${props.sectionId}-desktop`}
       >
         <th
-          className="border-b border-secondary bg-background text-foreground sticky top-[62px] z-10 py-3 pl-6 text-left text-sm font-medium dark:text-white"
+          className="bg-background text-foreground sticky top-[62px] z-10 py-3 pl-6 text-left text-sm font-medium dark:text-white"
           scope="colgroup"
         >
           <div className="flex items-center gap-4">
@@ -23,10 +23,10 @@ export const PricingTableRowDesktop = (props: any) => {
             <h4 className="m-0 text-base font-normal">{category.title}</h4>
           </div>
         </th>
-        <td className="border-b border-border bg-background px-6 py-5 free"></td>
-        <td className="border-b border-border bg-background px-6 py-5 pro"></td>
-        <td className="border-b border-border bg-background px-6 py-5 team"></td>
-        <td className="border-b border-border bg-background px-6 py-5 enterprise"></td>
+        <td className="bg-background px-6 py-5 free"></td>
+        <td className="bg-background px-6 py-5 pro"></td>
+        <td className="bg-background px-6 py-5 team"></td>
+        <td className="bg-background px-6 py-5 enterprise"></td>
       </tr>
 
       {category.features.map((feat: any, i: number) => {
@@ -101,7 +101,7 @@ export const PricingTableRowMobile = (props: any) => {
   return (
     <>
       <table className="mt-8 w-full" id={`${props.sectionId}-mobile`}>
-        <caption className="bg-background border-secondary border-t px-4 py-3 text-left text-sm font-medium dark:text-white">
+        <caption className="bg-background border-border border-t px-4 py-3 text-left text-sm font-medium dark:text-white">
           <div className="flex items-center gap-2">
             {category.icon ? <ProductIcon icon={props.icon} /> : null}
             <span className="text-foreground font-normal">{category.title}</span>
@@ -117,10 +117,10 @@ export const PricingTableRowMobile = (props: any) => {
             </th>
           </tr>
         </thead>
-        <tbody className="divide-border-secondary divide-y">
+        <tbody className="divide-border-border divide-y">
           {category.features.map((feat: any, i: number) => {
             return (
-              <tr key={i} className="border-secondary border-t">
+              <tr key={i} className="border-border border-t">
                 <th className="text-light px-4 py-3 text-left text-sm font-normal" scope="row">
                   <span>
                     <p>{feat.title}</p>
