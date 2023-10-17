@@ -87,11 +87,11 @@ const SidePanelVercelProjectLinker = () => {
 
   const { mutate: createConnections, isLoading: isCreatingConnection } =
     useIntegrationVercelConnectionsCreateMutation({
-      async onSuccess({ env_sync_error }) {
-        if (env_sync_error) {
+      async onSuccess({ env_sync_error: envSyncError }) {
+        if (envSyncError) {
           ui.setNotification({
             category: 'error',
-            message: `Failed to sync environment variables: ${env_sync_error.message}`,
+            message: `Failed to sync environment variables: ${envSyncError.message}`,
             description: 'Please try re-syncing manually from settings.',
           })
         }
