@@ -1,0 +1,66 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'storage-logs',
+  title: 'Logs',
+  description: 'Learn how to check Storage Logs',
+  sidebar_label: 'Debugging',
+}
+
+By accessing the [Storage Logs](https://supabase.green/dashboard/project/__/logs/explorer?q=select+id%2C+storage_logs.timestamp%2C+event_message+from+storage_logs%0A++%0A++order+by+timestamp+desc%0A++limit+100%0A++) you will be able to explore all request logs coming to your Storage service.
+You will also be able to filter logs and dive into specific parts of your requests
+
+### Common Log Queries
+
+#### Filter by status 5XX error
+
+```sql
+select id, storage_logs.timestamp, event_message, r.statusCode, e.message as errorMessage e.raw as rawError
+  from storage_logs
+  cross join unnest(metadata) as m
+  cross join unnest(m.res) as r
+  cross join unnest(m.error) as e
+  where r.statusCode >= 500
+  order by timestamp desc
+  limit 100
+```
+
+#### Filter by status 4XX error
+
+```sql
+select id, storage_logs.timestamp, event_message, r.statusCode, e.message as errorMessage e.raw as rawError
+  from storage_logs
+  cross join unnest(metadata) as m
+  cross join unnest(m.res) as r
+  cross join unnest(m.error) as e
+  where r.statusCode >= 400 and r.statusCode < 500
+  order by timestamp desc
+  limit 100
+```
+
+#### Filter by Method
+```sql
+select id, storage_logs.timestamp, event_message, r.method
+  from storage_logs
+  cross join unnest(metadata) as m
+  cross join unnest(m.req) as r
+  where r.method IN ("POST")
+  order by timestamp desc
+  limit 100
+```
+
+#### Filter by IP Address
+```sql
+select id, storage_logs.timestamp, event_message, r.remoteAddress
+  from storage_logs
+  cross join unnest(metadata) as m
+  cross join unnest(m.req) as r
+  where r.remoteAddress IN ("IP_ADDRESS")
+  order by timestamp desc
+  limit 100
+
+```
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

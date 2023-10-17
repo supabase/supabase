@@ -1,0 +1,101 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'storage-access-control',
+  title: 'Uploading Access Control',
+  description: 'Learn how to restrict Supabase file uploads.',
+  sidebar_label: 'Uploads',
+  tocVideo: '4ERX__Y908k',
+}
+
+To allow users to start uploading files you will need to setup RLS policies on the `storage.objects` table.
+
+Policies are just SQL, and they're easy once you get the hang of them. For example, here is a Policy that allows public access to any files in a bucket called "my_bucket_id".
+
+```sql
+create policy "Public Access"
+on storage.objects
+for select                              -- Allow read access
+to anon, authenticated                  -- Allow access to anonymous and authenticated users
+using ( bucket_id = 'my_bucket_id' );   -- Identify the bucket
+```
+
+### RLS Requirements
+
+The only RLS policy required for uploading, is to grant the `INSERT` action to the `storage.objects` table.
+
+If you allow to overwrite files using the `upsert` functionality you will need to additionally grant `SELECT` and `UPDATE`
+
+
+### RLS examples
+
+By default Storage will not allow anonymous users or authenticated users to upload without RLS policies, that's because we take a whitelist approach other then blacklist, which has the benefit to not allow unintentional access to your objects.
+
+An easy way to get started would be to create RLS policies for `SELECT`, `INSERT`, `UPDATE`, `DELETE` operations and restrict the policies to meet your security requirements. For example, one can start with the following `INSERT` policy:
+
+```sql
+create policy "policy_name"
+ON storage.objects
+for insert with check (
+  true
+);
+```
+
+and modify it to only allow authenticated users to upload assets to a specific bucket by changing it to:
+
+```sql
+create policy "policy_name"
+on storage.objects for insert to authenticated with check (
+    -- restrict bucket
+    bucket_id = 'my_bucket_id'
+);
+```
+
+This example demonstrates how you would allow authenticated users to upload files to a folder called `private` inside `my_bucket_id`:
+
+```sql
+create policy "Allow authenticated uploads"
+on storage.objects
+for insert
+to authenticated
+with check (
+  bucket_id = 'my_bucket_id' and
+  storage.foldername(name)[1] = 'private'
+);
+```
+
+This example demonstrates how you would allow authenticated users to upload files to a folder called with their `users.id` inside `my_bucket_id`:
+
+```sql
+create policy "Allow authenticated uploads"
+on storage.objects
+for insert
+to authenticated
+with check (
+  bucket_id = 'my_bucket_id' and
+  storage.foldername(name)[1] = auth.uid()
+);
+```
+
+---
+
+{/* Finish with a video. This also appears in the Sidebar via the "tocVideo" metadata */}
+
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/4ERX__Y908k"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
+### Server Only
+
+If you upload files on the server and you want to bypass the RLS policies you can use the `service key` as the `Authorization` header.
+
+Remember you should not share the service key publicly.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

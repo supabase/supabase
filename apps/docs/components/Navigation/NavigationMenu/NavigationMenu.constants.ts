@@ -975,18 +975,57 @@ export const storage: NavMenuConstant = {
     { name: 'Overview', url: '/guides/storage' },
     { name: 'Quickstart', url: '/guides/storage/quickstart' },
     {
-      name: 'Fundamentals',
+      name: 'Buckets',
       url: undefined,
       items: [
-        { name: 'Uploading files to Storage', url: '/guides/storage/uploads' },
-        { name: 'Image Transformations', url: '/guides/storage/image-transformations' },
-        { name: 'How caching works', url: '/guides/storage/cdn' },
+        { name: 'Fundamentals', url: '/guides/storage/buckets/fundamentals' },
+        { name: 'Creating Buckets', url: '/guides/storage/buckets/creating-buckets' },
       ],
     },
     {
-      name: 'Access and security',
+      name: 'Uploads',
       url: undefined,
-      items: [{ name: 'Access Control', url: '/guides/storage/access-control' }],
+      items: [
+        { name: 'Access Control', url: '/guides/storage/uploads/access-control' },
+        { name: 'Standard Upload', url: '/guides/storage/uploads/standard-uploads' },
+        { name: 'Resumable Upload', url: '/guides/storage/uploads/resumable-uploads' },
+        { name: 'Limits', url: '/guides/storage/uploads/file-limits' },
+      ],
+    },
+    {
+      name: 'Serving Files',
+      url: undefined,
+      items: [
+        { name: 'Public Assets', url: '/guides/storage/serving/public-assets' },
+        { name: 'Private Assets', url: '/guides/storage/serving/private-assets' },
+        { name: 'Image Transformations', url: '/guides/storage/serving/image-transformations' },
+      ],
+    },
+    {
+      name: 'CDN',
+      url: undefined,
+      items: [
+        { name: 'Fundamentals', url: '/guides/storage/cdn/fundamentals' },
+        { name: 'Cache Duration', url: '/guides/storage/cdn/cache-duration' },
+        { name: 'Metrics', url: '/guides/storage/cdn/metrics' },
+      ],
+    },
+    {
+      name: 'Debugging',
+      url: undefined,
+      items: [
+        { name: 'Logs', url: '/guides/storage/debugging/logs' },
+        { name: 'Error Codes', url: '/guides/storage/debugging/error-codes' },
+      ],
+    },
+    {
+      name: 'Schema',
+      url: undefined,
+      items: [
+        { name: 'Database Design', url: '/guides/storage/schema/design' },
+        { name: 'Helper Functions', url: '/guides/storage/schema/helper-functions' },
+        { name: 'Optimisations', url: '/guides/storage/schema/optimizations' },
+      ],
     },
   ],
 }

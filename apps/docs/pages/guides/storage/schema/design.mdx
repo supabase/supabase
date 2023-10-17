@@ -1,0 +1,40 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'storage-schema-design',
+  title: 'Storage Schema Design',
+  description: 'Learn the storage schema',
+  subtitle: 'Learn the storage schema',
+  sidebar_label: 'Schema',
+}
+
+Storage uses Postgres to store and read information about your buckets and objects references by leveraging the power of RLS policies for access control. It uses a dedicated schema in your project named `storage`
+
+
+<Admonition type="note">
+It is important to treat any records present in Storage tables as Read-Only when utilising SQL.
+All operations such as upload, copy, move, delete should **always go trough the API**.
+
+This is important because the records stored are only references to real object present in S3. If you delete or modify these references you'll not be able to access the files.
+</Admonition>
+
+Following is the schema that represent the Storage service
+
+<img
+    alt="Storage schema design"
+    src="/docs/img/storage/schema-design.png"
+  />
+
+
+Because Storage uses Postgres we have a lot of advantages when we want to dig deeper on specific files and asset metadata.
+You can query the table directly and retrieve all the information you need for specific files.
+
+## Modifying the Schema
+
+We strongly advice to not alter the Storage Schema in anyway and treated it as read-only, this is because it might create issues when we release future migrations updates.
+
+However, adding custom indexes is an acceptable alteration which would allow you to speed up your custom RLS checks when necessary.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
