@@ -84,11 +84,6 @@ const PROVIDER_PHONE = {
         { label: 'Twilio Verify', value: 'twilio_verify', icon: 'twilio-icon.svg' },
       ],
     },
-    RATE_LIMIT_SMS_SENT: {
-      type: 'number',
-      title: 'Rate limit for sending SMS messages',
-      description: 'How many SMS messages can be sent per hour',
-    },
 
     // Twilio
     SMS_TWILIO_ACCOUNT_SID: {
