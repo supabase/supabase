@@ -87,7 +87,7 @@ const SidePanelVercelProjectLinker = () => {
 
   const { mutate: createConnections, isLoading: isCreatingConnection } =
     useIntegrationVercelConnectionsCreateMutation({
-      async onSuccess({ id, env_sync_error }) {
+      async onSuccess({ env_sync_error }) {
         if (env_sync_error) {
           ui.setNotification({
             category: 'error',
