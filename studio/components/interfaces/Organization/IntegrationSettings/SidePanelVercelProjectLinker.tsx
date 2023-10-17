@@ -6,7 +6,6 @@ import ProjectLinker, { ForeignProject } from 'components/interfaces/Integration
 import { Markdown } from 'components/interfaces/Markdown'
 import { vercelIcon } from 'components/to-be-cleaned/ListIcons'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
-import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
 import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations/integrations-vercel-connections-create-mutation'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
@@ -86,18 +85,13 @@ const SidePanelVercelProjectLinker = () => {
     [vercelProjectsById]
   )
 
-  const { mutateAsync: syncEnvs } = useIntegrationsVercelConnectionSyncEnvsMutation()
   const { mutate: createConnections, isLoading: isCreatingConnection } =
     useIntegrationVercelConnectionsCreateMutation({
-      async onSuccess({ id }) {
-        try {
-          await syncEnvs({ connectionId: id })
-        } catch (error) {
-          console.error('error:', error)
-
+      async onSuccess({ id, env_sync_error }) {
+        if (env_sync_error) {
           ui.setNotification({
             category: 'error',
-            message: 'Failed to sync environment variables.',
+            message: `Failed to sync environment variables: ${env_sync_error.message}`,
             description: 'Please try re-syncing manually from settings.',
           })
         }
