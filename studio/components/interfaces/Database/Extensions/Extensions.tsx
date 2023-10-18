@@ -3,7 +3,7 @@ import { isNull, partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Button, IconAlertCircle, IconBookOpen, IconSearch, Input } from 'ui'
+import { Button, IconAlertCircle, IconExternalLink, IconSearch, Input } from 'ui'
 
 import { useParams } from 'common/hooks'
 import InformationBox from 'components/ui/InformationBox'
@@ -44,9 +44,10 @@ const Extensions = () => {
         <div className="flex items-center justify-between">
           <Input
             size="small"
-            placeholder={'Filter'}
+            placeholder="Search for an extension"
             value={filterString}
             onChange={(e) => setFilterString(e.target.value)}
+            className="w-64"
             icon={<IconSearch size="tiny" />}
           />
           {!canUpdateExtensions ? (
@@ -57,13 +58,13 @@ const Extensions = () => {
               />
             </div>
           ) : (
-            <Button asChild type="default" iconRight={<IconBookOpen />}>
+            <Button asChild type="default" icon={<IconExternalLink />}>
               <Link
                 href="https://supabase.com/docs/guides/database/extensions"
                 target="_blank"
                 rel="noreferrer"
               >
-                Learn more about extensions
+                Documentation
               </Link>
             </Button>
           )}

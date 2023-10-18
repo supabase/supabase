@@ -61,11 +61,10 @@ export default (isMobile?: boolean) => ({
             Supabase is{' '}
             <Link
               href="https://forms.supabase.com/soc2"
-              className="text-scale-1100 hover:underline"
-              target="_blank">
-              
-                SOC2 type 2
-              
+              className="text-light hover:underline"
+              target="_blank"
+            >
+              SOC2 type 2
             </Link>{' '}
             compliant, and comes with an advanced permissions system.
           </>

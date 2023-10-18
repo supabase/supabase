@@ -197,7 +197,7 @@ export const AccordionHeader = ({
 }) => (
   <div
     className={[
-      'h-[79px] hover:cursor-default flex flex-1 items-center scroll-mt-20 text-scale-900',
+      'h-[79px] hover:cursor-default flex flex-1 items-center scroll-mt-20 text-muted',
     ].join(' ')}
   >
     <div
@@ -271,7 +271,7 @@ export const VideoPreviewTrigger = ({
   title?: string
   thumbnail: string
 }) => (
-  <div className="flex items-center h-full gap-3 text-xs group/vid text-scale-1100 hover:text-scale-1200 transition-colors">
+  <div className="flex items-center h-full gap-3 text-xs group/vid text-light hover:text-foreground transition-colors">
     <div className="relative h-10 !aspect-video flex items-center justify-center rounded overflow-hidden border border-scale-1000 opacity-80 group-hover/vid:opacity-100 transition-colors">
       <div className="absolute z-10 w-2.5 h-2.5 text-white opacity-100">
         <svg viewBox="0 0 81 91" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -291,7 +291,7 @@ export const MultistepSectionHeader = ({ title, blog }: any) => {
   return (
     <div className="flex flex-1 flex-col sm:flex-row py-8">
       <div className="flex gap-4 w-full items-center justify-between md:justify-start">
-        {title && <span className="text-scale-1200 text-lg mt-3 sm:mt-0">{title}</span>}
+        {title && <span className="text-foreground text-lg mt-3 sm:mt-0">{title}</span>}
         {!!blog && (
           <ChipLink href={blog} className="!w-auto !text-left !justify-between !flex-none">
             Blog post

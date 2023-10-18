@@ -33,7 +33,7 @@ const UseCasesSection = ({ title, paragraph, useCases }: Props) => {
       <SectionContainer className="flex flex-col gap-12">
         <div className="flex flex-col text-center gap-4 items-center justify-center">
           <h2 className="heading-gradient text-2xl sm:text-3xl xl:text-4xl">{title}</h2>
-          <p className="mx-auto text-scale-900 lg:w-1/2">{paragraph}</p>
+          <p className="mx-auto text-muted lg:w-1/2">{paragraph}</p>
         </div>
         <div
           ref={ref}
@@ -80,7 +80,7 @@ const UseCase = ({
               </svg>
               <h4 className="text-base sm:text-lg m-0">{useCase.title}</h4>
             </div>
-            <p className="text-sm text-scale-900 mt-2">{useCase.description}</p>
+            <p className="text-sm text-muted mt-2">{useCase.description}</p>
           </div>
           {useCase.cta &&
             (useCase.cta.isDisabled ? (

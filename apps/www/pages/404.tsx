@@ -45,7 +45,7 @@ const Error404 = () => {
         </div>
         <div className="absolute">
           <h1
-            className={`text-scale-1200 select-none text-[14rem] opacity-[5%] filter transition duration-200 sm:text-[18rem] lg:text-[28rem] ${
+            className={`text-foreground select-none text-[14rem] opacity-[5%] filter transition duration-200 sm:text-[18rem] lg:text-[28rem] ${
               show404 ? 'blur-sm' : 'blur-none'
             }`}
           >
@@ -57,7 +57,7 @@ const Error404 = () => {
             show404 ? 'opacity-100' : 'opacity-0'
           }`}
         >
-          <div className="text-scale-1200 flex w-[320px] flex-col items-center justify-center space-y-3">
+          <div className="text-foreground flex w-[320px] flex-col items-center justify-center space-y-3">
             <h1 className="m-2 text-2xl">Looking for something? 🔍</h1>
             <p className="text-center text-sm">
               We couldn't find the page that you're looking for!

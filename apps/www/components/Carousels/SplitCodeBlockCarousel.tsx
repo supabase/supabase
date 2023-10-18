@@ -117,7 +117,7 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
             return (
               <SwiperSlide key={i}>
                 <p>
-                  <span className="text-scale-1200 mb-4 block text-lg dark:text-white">
+                  <span className="text-foreground mb-4 block text-lg dark:text-white">
                     {extension.detail_title}
                   </span>
                 </p>

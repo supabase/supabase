@@ -5,7 +5,7 @@ function TextLink({ url = '', label, ...props }: any) {
   return (
     <Link
       href={url}
-      className="text-scale-1100 hover:text-scale-1200 mt-3 block cursor-pointer text-sm"
+      className="text-light hover:text-foreground mt-3 block cursor-pointer text-sm"
       {...props}
     >
       <div className="group flex items-center gap-1">

@@ -66,7 +66,7 @@ export default function TicketContainer({ user, sharePage, referrals, supabase }
           isMobile && styles['ticket-hero'],
         ].join(' ')}
       >
-        <div className="text-scale-1200 flex flex-col w-full items-center text-white text-center lg:text-left lg:items-start gap-3">
+        <div className="text-foreground flex flex-col w-full items-center text-white text-center lg:text-left lg:items-start gap-3">
           <h1 className={cn('text-2xl tracking-[-0.02rem] leading-7 block text-white')}>
             {!sharePage ? (
               name ? (
@@ -104,7 +104,7 @@ export default function TicketContainer({ user, sharePage, referrals, supabase }
             )}
           </h1>
 
-          <div className="text-sm text-scale-1100 leading-5">
+          <div className="text-sm text-light leading-5">
             {!sharePage ? (
               golden ? (
                 <p>
@@ -114,7 +114,7 @@ export default function TicketContainer({ user, sharePage, referrals, supabase }
               ) : (
                 <p>
                   Customize your ticket and boost your chances of winning{' '}
-                  <Link href="#lw8-prizes" className="underline hover:text-scale-1200">
+                  <Link href="#lw8-prizes" className="underline hover:text-foreground">
                     limited edition awards
                   </Link>{' '}
                   by sharing it with the community.
@@ -124,7 +124,7 @@ export default function TicketContainer({ user, sharePage, referrals, supabase }
               <>
                 <p>
                   Generate and share your own custom ticket for a chance to win{' '}
-                  <Link href="#lw8-prizes" className="underline hover:text-scale-1200">
+                  <Link href="#lw8-prizes" className="underline hover:text-foreground">
                     awesome swag
                   </Link>
                   .

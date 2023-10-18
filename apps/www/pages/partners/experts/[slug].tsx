@@ -44,7 +44,7 @@ function Partner({
             {/* Back button */}
             <Link
               href="/partners/experts"
-              className="text-scale-1200 hover:text-scale-1000 flex cursor-pointer items-center transition-colors"
+              className="text-foreground hover:text-lighter flex cursor-pointer items-center transition-colors"
             >
               <IconChevronLeft style={{ padding: 0 }} />
               Back
@@ -115,7 +115,7 @@ function Partner({
             <div className="grid gap-3 space-y-16 lg:grid-cols-4 lg:space-y-0 lg:space-x-3">
               <div className="lg:col-span-3">
                 <h2
-                  className="text-scale-1200"
+                  className="text-foreground"
                   style={{ fontSize: '1.5rem', marginBottom: '1rem' }}
                 >
                   Overview
@@ -144,22 +144,22 @@ function Partner({
 
               <div>
                 <h2
-                  className="text-scale-1200"
+                  className="text-foreground"
                   style={{ fontSize: '1.5rem', marginBottom: '1rem' }}
                 >
                   Details
                 </h2>
 
-                <div className="text-scale-1200 divide-y">
+                <div className="text-foreground divide-y">
                   {partner.type === 'technology' && (
                     <div className="flex items-center justify-between py-2">
-                      <span className="text-scale-900">Developer</span>
-                      <span className="text-scale-1200">{partner.developer}</span>
+                      <span className="text-lighter">Developer</span>
+                      <span className="text-foreground">{partner.developer}</span>
                     </div>
                   )}
 
                   <div className="flex items-center justify-between py-2">
-                    <span className="text-scale-900">Category</span>
+                    <span className="text-lighter">Category</span>
                     <Link
                       href={`/partners/experts#${partner.category.toLowerCase()}`}
                       className="text-brand hover:text-brand-300 transition-colors"
@@ -169,7 +169,7 @@ function Partner({
                   </div>
 
                   <div className="flex items-center justify-between py-2">
-                    <span className="text-scale-900">Website</span>
+                    <span className="text-lighter">Website</span>
                     <a
                       href={partner.website}
                       target="_blank"
@@ -182,7 +182,7 @@ function Partner({
 
                   {partner.type === 'technology' && partner.docs && (
                     <div className="flex items-center justify-between py-2">
-                      <span className="text-scale-900">Documentation</span>
+                      <span className="text-lighter">Documentation</span>
                       <a
                         href={partner.docs}
                         target="_blank"

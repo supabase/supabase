@@ -94,7 +94,7 @@ const SectionHeader = (props: any) => {
   const { sectionNumber, header } = props
   return (
     <div className="col-span-12">
-      <span className="block mb-3 font-mono text-3xl text-scale-1200">0{sectionNumber}</span>
+      <span className="block mb-3 font-mono text-3xl text-foreground">0{sectionNumber}</span>
       <h3 className="text-6xl text-black dark:text-white">{header}</h3>
     </div>
   )
@@ -112,10 +112,10 @@ const Hero = (props: Props) => {
         backgroundSize: '65%',
         backgroundPosition: '120% 50%',
       }}
-      className="py-16 bg-no-repeat dark:bg-scale-300 bg-gray-50 lg:py-36"
+      className="py-16 bg-no-repeat bg-surface-100 lg:py-36"
     >
       <div className="container grid items-center h-full grid-cols-12 gap-4 px-8 py-20 mx-auto text-dark-300 lg:px-28">
-        <div className="col-span-12 text-scale-900 dark:text-white md:col-span-9 lg:col-span-8 xl:col-span-6">
+        <div className="col-span-12 text-muted dark:text-white md:col-span-9 lg:col-span-8 xl:col-span-6">
           <p className="mb-10 text-4xl">Supabase is an open source Firebase alternative.</p>
           <p className="text-2xl">
             Today, we're moving to <span className="text-brand">Beta</span>
@@ -134,7 +134,7 @@ const Introduction = () => {
     <div className="container grid grid-cols-12 gap-4 px-8 py-20 mx-auto text-dark-300 lg:px-28">
       <div className="col-span-12 sm:col-span-9 xl:col-span-8">
         <p>
-          <span className="block text-2xl text-scale-1200">
+          <span className="block text-2xl text-foreground">
             After the launch of our{' '}
             <a
               href="https://news.ycombinator.com/item?id=23319901"
@@ -147,7 +147,7 @@ const Introduction = () => {
           </span>
         </p>
       </div>
-      <div className="col-span-12 mb-20 text-base text-scale-1200 sm:col-span-9 xl:col-span-6">
+      <div className="col-span-12 mb-20 text-base text-foreground sm:col-span-9 xl:col-span-6">
         <p>
           we've been fortunate to work with thousands of early adopters on improving both our Open
           Source, and Hosted offerings. Companies like{' '}
@@ -179,7 +179,7 @@ const Introduction = () => {
       </div>
 
       <div className="col-span-12 mb-10 text-base">
-        <p className="pb-2 border-b-2 border-dark-200 text-scale-1100 dark:border-dark-400 w-60">
+        <p className="pb-2 border-b-2 border-dark-200 text-light dark:border-dark-400 w-60">
           Alpha Program in Numbers
         </p>
       </div>
@@ -199,15 +199,15 @@ const Introduction = () => {
               </div>
             </div>
             <div className="col-span-7 sm-col-span-8 text-dark-400 md:col-span-9 xl:col-span-10">
-              <p className="text-5xl text-scale-1200 lg:text-6xl">
+              <p className="text-5xl text-foreground lg:text-6xl">
                 <CountUp triggerAnimOnScroll={true} referenceElId="alphaNumbers">
                   {stat.value}
                 </CountUp>
-                {stat.unit && <span className="ml-1 text-2xl text-scale-1200">{stat.unit}</span>}
+                {stat.unit && <span className="ml-1 text-2xl text-foreground">{stat.unit}</span>}
               </p>
             </div>
             <div className="col-span-12 col-start-0 sm:col-span-9 sm:col-start-5 md:col-span-10 md:col-start-4 xl:col-start-3">
-              <p className="text-xs text-scale-1000 lg:text-base">{stat.name}</p>
+              <p className="text-xs text-lighter lg:text-base">{stat.name}</p>
             </div>
           </div>
         ))}
@@ -219,7 +219,7 @@ const Introduction = () => {
 const TableOfContents = (props: any) => {
   const { scrollTo } = props
   return (
-    <div className="dark:bg-scale-300 text-dark-400 dark:text-dark-200 bg-gray-50">
+    <div className="bg-surface-100 dark:text-dark-200">
       <div className="container grid grid-cols-12 gap-4 px-8 py-20 mx-auto lg:px-28">
         <div className="col-span-12 mb-10 text-base">
           <p className="text-2xl text-black dark:text-white">
@@ -229,7 +229,7 @@ const TableOfContents = (props: any) => {
         <div className="grid grid-cols-12 col-span-12 gap-y-10">
           {IntroductionSegments.map((segment: any, segmentIdx: number) => (
             <div key={`introSegment_${segmentIdx}`} className="grid grid-cols-12 col-span-12">
-              <div className="col-span-12 mb-10 text-scale-1200 sm:col-span-5 sm:mb-0 xl:col-span-4">
+              <div className="col-span-12 mb-10 text-foreground sm:col-span-5 sm:mb-0 xl:col-span-4">
                 <p>{segment.description}</p>
               </div>
               <div className="hidden sm:col-span-1 sm:block xl:col-span-2" />
@@ -240,7 +240,7 @@ const TableOfContents = (props: any) => {
                     className="flex items-center mb-5 cursor-pointer"
                     onClick={() => scrollTo(chapter.key)}
                   >
-                    <p className="font-mono text-xs text-scale-1200">{`0${chapter.no}`}</p>
+                    <p className="font-mono text-xs text-foreground">{`0${chapter.no}`}</p>
                     <p className="ml-4 text-base text-black transition border-b border-gray-400 hover:text-gray-1000 dark:hover:text-gray-1000 dark:text-white">
                       {chapter.name}
                     </p>
@@ -335,11 +335,11 @@ const Performance = () => {
   }
 
   return (
-    <div id="performance" className="bg-white dark:bg-scale-200">
+    <div id="performance" className="bg-background">
       <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-300 gap-y-10 lg:px-28">
         <SectionHeader sectionNumber={1} header="Performance" />
 
-        <div className="grid items-center grid-cols-12 col-span-12 mb-10 text-scale-1200 gap-x-2 lg:gap-x-8">
+        <div className="grid items-center grid-cols-12 col-span-12 mb-10 text-foreground gap-x-2 lg:gap-x-8">
           <div className="col-span-12 text-base sm:col-span-9 xl:col-span-7">
             <p className="mb-10">
               We started Supabase to give developers a web-ready database that is delightful to use,
@@ -418,11 +418,11 @@ const Performance = () => {
 
 const Security = () => {
   return (
-    <div id="security" className="dark:bg-scale-300 bg-gray-50">
+    <div id="security" className="bg-surface-100">
       <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-200 gap-y-10 lg:px-28">
         <SectionHeader sectionNumber={2} header="Security" />
 
-        <div className="grid grid-cols-12 col-span-12 text-scale-1200 gap-x-2 lg:gap-x-8">
+        <div className="grid grid-cols-12 col-span-12 text-foreground gap-x-2 lg:gap-x-8">
           <div className="col-span-12 text-base sm:col-span-9 xl:col-span-7">
             <p className="mb-10">
               As an infrastructure provider, security has been a priority from day one. While we had
@@ -478,11 +478,11 @@ const Security = () => {
 
 const Reliability = () => {
   return (
-    <div id="reliability" className="bg-white dark:bg-scale-200">
+    <div id="reliability" className="bg-background">
       <div className="container grid grid-cols-12 px-8 py-12 mx-auto text-dark-400 dark:text-dark-300 gap-y-10 lg:px-28 ">
         <SectionHeader sectionNumber={3} header="Reliability" />
 
-        <div className="grid grid-cols-12 col-span-12 mb-10 text-scale-1200 gap-x-2 lg:gap-x-8">
+        <div className="grid grid-cols-12 col-span-12 mb-10 text-foreground gap-x-2 lg:gap-x-8">
           <div className="col-span-12 text-base sm:col-span-9 xl:col-span-7">
             <p className="mb-5">
               During Alpha we experienced 2 availability incidents, neither affecting customer
@@ -531,11 +531,11 @@ const Reliability = () => {
 const NewFeaturesAndIntegrations = () => {
   const { basePath } = useRouter()
   return (
-    <div id="newFeaturesAndIntegrations" className="dark:bg-scale-300 bg-gray-50">
+    <div id="newFeaturesAndIntegrations" className="bg-surface-100">
       <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-200 gap-y-10 lg:px-28">
         <SectionHeader sectionNumber={4} header="New Features & Integrations" />
 
-        <div className="grid grid-cols-12 col-span-12 mb-10 text-scale-1200 gap-x-2 lg:gap-x-8">
+        <div className="grid grid-cols-12 col-span-12 mb-10 text-foreground gap-x-2 lg:gap-x-8">
           <div className="col-span-12 text-base sm:col-span-9 xl:col-span-7">
             <p className="mb-5">
               If you're new to Supabase, here's a few of the things you get when you choose us as
@@ -655,11 +655,11 @@ const NewFeaturesAndIntegrations = () => {
 }
 
 const BetaPricing = () => (
-  <div id="betaPricing" className="bg-white dark:bg-scale-200">
+  <div id="betaPricing" className="bg-background">
     <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-300 gap-y-10 lg:px-28">
       <SectionHeader sectionNumber={5} header="Beta Pricing" />
 
-      <div className="grid grid-cols-12 col-span-12 mb-10 text-scale-1200 gap-x-2 lg:gap-x-8">
+      <div className="grid grid-cols-12 col-span-12 mb-10 text-foreground gap-x-2 lg:gap-x-8">
         <div className="col-span-12 text-base sm:col-span-9 xl:col-span-7">
           <p className="mb-10">For up to date pricing info see: https://supabase.com/pricing</p>
           <p className="mb-10">
@@ -723,11 +723,11 @@ const BetaPricing = () => (
 )
 
 const OpenSource = () => (
-  <div id="openSource" className="dark:bg-scale-300 bg-gray-50">
+  <div id="openSource" className="bg-surface-100">
     <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-200 gap-y-10 lg:px-28">
       <SectionHeader sectionNumber={6} header="Open Source" />
 
-      <div className="grid grid-cols-12 col-span-12 mb-10 text-scale-1200 gap-x-2 lg:gap-x-8">
+      <div className="grid grid-cols-12 col-span-12 mb-10 text-foreground gap-x-2 lg:gap-x-8">
         <div className="col-span-12 text-base sm:col-span-9 xl:col-span-7">
           <p className="mb-10">
             Great software is multi generational and stretches beyond any single company.
@@ -790,10 +790,10 @@ const OpenSource = () => (
 )
 
 const FundingPartners = () => (
-  <div id="fundingPartners" className="bg-white dark:bg-scale-200">
+  <div id="fundingPartners" className="bg-background">
     <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-300 gap-y-10 lg:px-28">
       <SectionHeader sectionNumber={7} header="Funding Partners" />
-      <div className="grid grid-cols-12 col-span-12 mb-10 text-scale-1200 gap-x-2 lg:gap-x-8">
+      <div className="grid grid-cols-12 col-span-12 mb-10 text-foreground gap-x-2 lg:gap-x-8">
         <div className="col-span-12 text-base sm:col-span-9 xl:col-span-7">
           <p className="mb-10">
             Building a platform that can offer all the amazing features of Firebase will take
@@ -827,11 +827,11 @@ const FundingPartners = () => (
 )
 
 const ScalingOurTeam = () => (
-  <div id="scalingOurTeam" className="dark:bg-scale-300 bg-gray-50">
+  <div id="scalingOurTeam" className="bg-surface-100">
     <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-200 gap-y-10 lg:px-28">
       <SectionHeader sectionNumber={8} header="Scaling Our Team" />
 
-      <div className="grid grid-cols-12 col-span-12 mb-10 text-scale-1200 gap-x-2 lg:gap-x-8">
+      <div className="grid grid-cols-12 col-span-12 mb-10 text-foreground gap-x-2 lg:gap-x-8">
         <div className="col-span-12 text-base sm:col-span-9 xl:col-span-7">
           <p className="mb-10">
             We are extremely proud of our team. We're a mix of 11 engineers, from 8 different
@@ -864,14 +864,11 @@ const ScalingOurTeam = () => (
 )
 
 const WhatsNext = () => (
-  <div
-    id="whatsNext"
-    className="bg-white border-b-px dark:bg-scale-200 dark:border-scale-600 border-gray-50"
-  >
+  <div id="whatsNext" className="border-b-px bg-background dark:border-scale-600 border-gray-50">
     <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-300 gap-y-10 lg:px-28">
       <SectionHeader sectionNumber={9} header="What's Next" />
 
-      <div className="grid grid-cols-12 col-span-12 mb-10 text-scale-1200 gap-x-2 lg:gap-x-8">
+      <div className="grid grid-cols-12 col-span-12 mb-10 text-foreground gap-x-2 lg:gap-x-8">
         <div className="col-span-12 text-base sm:col-span-9 xl:col-span-7">
           <p className="mb-5">
             If you watch our repos you'll see that development never stops, we ship every day (and

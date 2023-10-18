@@ -46,25 +46,37 @@ const ProductCard = ({
           alignLeft && 'lg:mx-0 lg:pl-8 lg:items-start lg:text-left lg:max-w-[260px]',
         ].join(' ')}
       >
-        <div className="flex items-center justify-center h-12 w-12 bg-alternative rounded-lg mb-3">
-          {icon && (
-            <svg
-              width="25"
-              height="25"
-              viewBox="0 0 25 25"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d={icon}
-                stroke="var(--colors-brand9)"
-                strokeMiterlimit="10"
-                strokeLinejoin="round"
-                strokeLinecap="round"
-                strokeWidth="1.5"
-              />
-            </svg>
-          )}
+        <div
+          className={[
+            'relative z-10 flex flex-col lg:h-full gap-1 text-foreground mx-auto items-center text-center h-full px-6 py-8',
+            alignLeft && 'lg:mx-0 lg:pl-8 lg:items-start lg:text-left lg:max-w-[260px]',
+          ].join(' ')}
+        >
+          <div className="flex items-center justify-center h-12 w-12 bg-alternative rounded-lg mb-3">
+            {icon && (
+              <svg
+                width="25"
+                height="25"
+                viewBox="0 0 25 25"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d={icon}
+                  stroke="var(--colors-brand9)"
+                  strokeMiterlimit="10"
+                  strokeLinejoin="round"
+                  strokeLinecap="round"
+                  strokeWidth="1.5"
+                />
+              </svg>
+            )}
+          </div>
+          <h2 className="text-xl">{title}</h2>
+          <div className="flex-1 flex flex-col justify-between gap-2">
+            <p className="text-sm text-lighter">{subtitle}</p>
+            {highlights && <span className="hidden lg:block">{highlights}</span>}
+          </div>
         </div>
         <h2 className="text-xl">{title}</h2>
         <div className="flex-1 flex flex-col justify-between gap-2">

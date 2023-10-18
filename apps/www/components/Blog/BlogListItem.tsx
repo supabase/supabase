@@ -46,10 +46,10 @@ const BlogListItem = ({ post }: Props) => {
               />
             </div>
 
-            <h3 className="text-scale-1200 max-w-sm text-xl">{post.title}</h3>
-            <p className="text-scale-1100 max-w-sm text-base">{post.description}</p>
+            <h3 className="text-foreground max-w-sm text-xl">{post.title}</h3>
+            <p className="text-light max-w-sm text-base">{post.description}</p>
             {post.date && (
-              <div className="text-scale-900 flex items-center space-x-1.5 text-sm">
+              <div className="text-muted flex items-center space-x-1.5 text-sm">
                 <p>{post.date}</p>
                 {post.readingTime && (
                   <>
