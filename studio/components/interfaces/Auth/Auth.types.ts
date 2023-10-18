@@ -56,6 +56,10 @@ export interface AuthConfig {
   EXTERNAL_LINKEDIN_CLIENT_ID: string | null
   EXTERNAL_LINKEDIN_SECRET: string | null
 
+  EXTERNAL_LINKEDIN_OIDC_ENABLED: boolean
+  EXTERNAL_LINKEDIN_OIDC_CLIENT_ID: string | null
+  EXTERNAL_LINKEDIN_OIDC_SECRET: string | null
+
   EXTERNAL_NOTION_ENABLED: boolean
   EXTERNAL_NOTION_CLIENT_ID: string | null
   EXTERNAL_NOTION_SECRET: string | null

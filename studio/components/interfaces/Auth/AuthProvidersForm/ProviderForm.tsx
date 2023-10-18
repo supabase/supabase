@@ -57,11 +57,18 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
     return initialValues
   }
 
+  const isSAMLEnabled: boolean =
+    provider.title === 'SAML 2.0' && config && (config as any)['SAML_ENABLED']
+  // [Joel] Introduced as the new LinkedIn provider has a corresponding config var of LINKEDIN_OIDC
+  const isLinkedInOIDCEnabled: boolean =
+    provider.title === 'LinkedIn (OIDC)' &&
+    config &&
+    (config as any)['EXTERNAL_LINKEDIN_OIDC_ENABLED']
+  const isExternalProviderAndEnabled: boolean =
+    config && (config as any)[`EXTERNAL_${provider?.title?.toUpperCase()}_ENABLED`]
+
   // [Joshen] Doing this check as SAML doesn't follow the same naming structure as the other provider options
-  const isActive: boolean =
-    provider.title === 'SAML 2.0'
-      ? (config && (config as any)['SAML_ENABLED']) ?? false
-      : (config && (config as any)[`EXTERNAL_${provider?.title?.toUpperCase()}_ENABLED`]) ?? false
+  const isActive: boolean = isSAMLEnabled || isExternalProviderAndEnabled || isLinkedInOIDCEnabled
   const INITIAL_VALUES = generateInitialValues()
 
   const onSubmit = (values: any, { resetForm }: any) => {
@@ -139,39 +146,45 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
             <Collapsible.Content>
               <div
                 className="
-                  group border-t
-                  border-scale-500 bg-scale-100 py-6 px-6 text-foreground dark:bg-scale-300
-                "
+            group border-t
+            border-scale-500 bg-scale-100 py-6 px-6 text-foreground dark:bg-scale-300
+            "
               >
                 <div className="mx-auto my-6 max-w-lg space-y-6">
-                  {provider.title === 'LinkedIn' && (
+                  {provider.title === 'LinkedIn (Deprecated)' && (
                     <Alert_Shadcn_ variant="warning">
                       <IconAlertTriangle strokeWidth={2} />
-                      <AlertTitle_Shadcn_>
-                        LinkedIn provider temporarily unavailable
-                      </AlertTitle_Shadcn_>
+                      <AlertTitle_Shadcn_>LinkedIn (Deprecated) Provider</AlertTitle_Shadcn_>
                       <AlertDescription_Shadcn_>
-                        Linkedin has updated their OAuth APIs, which has broken the current Supabase
-                        implementation. We're actively tracking{' '}
-                        <a
-                          className="underline"
-                          href="https://github.com/supabase/gotrue/issues/1216"
-                        >
-                          this issue
-                        </a>{' '}
-                        and you can subscribe to it for future updates.
+                        As of 1st August, LinkedIn has updated their OAuth API scopes. Please use
+                        the new LinkedIn provider below. Developers using this provider should move
+                        over to the new provider. Please refer to our
+                        [docs](/docs/pages/guides/auth/social-login/auth-linkedin) for more details.
                       </AlertDescription_Shadcn_>
                     </Alert_Shadcn_>
                   )}
-                  {Object.keys(provider.properties).map((x: string) => (
-                    <FormField
-                      key={x}
-                      name={x}
-                      properties={provider.properties[x]}
-                      formValues={values}
-                      disabled={!canUpdateConfig}
-                    />
-                  ))}
+                  {/* TODO (Joel): Remove after 30th November when we disable the provider */}
+                  {provider.title === 'LinkedIn (Deprecated)' &&
+                    Object.keys(provider.properties).map((x: string) => (
+                      <FormField
+                        key={x}
+                        name={x}
+                        properties={provider.properties[x]}
+                        formValues={values}
+                        disabled={x === 'EXTERNAL_LINKEDIN_ENABLED' ? !canUpdateConfig : true}
+                      />
+                    ))}
+
+                  {provider.title !== 'LinkedIn (Deprecated)' &&
+                    Object.keys(provider.properties).map((x: string) => (
+                      <FormField
+                        key={x}
+                        name={x}
+                        properties={provider.properties[x]}
+                        formValues={values}
+                        disabled={!canUpdateConfig}
+                      />
+                    ))}
                   {provider?.misc?.alert && (
                     <Alert title={provider.misc.alert.title} variant="warning" withIcon>
                       <ReactMarkdown>{provider.misc.alert.description}</ReactMarkdown>
