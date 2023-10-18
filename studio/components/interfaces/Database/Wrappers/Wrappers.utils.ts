@@ -1,3 +1,6 @@
+import { WRAPPERS, WRAPPER_HANDLERS } from './Wrappers.constants'
+import { WrapperMeta } from './Wrappers.types'
+
 export const makeValidateRequired = (options: { name: string; required: boolean }[]) => {
   const requiredOptionsSet = new Set(
     options.filter((option) => option.required).map((option) => option.name)
@@ -46,10 +49,40 @@ export const makeValidateRequired = (options: { name: string; required: boolean 
   }
 }
 
-export const formatWrapperTables = (tables: any[]) => {
-  return tables.map((table, index: number) => {
+export const formatWrapperTables = (wrapper: any, wrapperMeta?: WrapperMeta) => {
+  const tables = wrapper?.tables ?? []
+
+  return tables.map((table: any) => {
+    let index: number = 0
+    const options = Object.fromEntries(table.options.map((option: string) => option.split('=')))
+
+    switch (wrapper.handler) {
+      case WRAPPER_HANDLERS.STRIPE:
+        index =
+          wrapperMeta?.tables.findIndex(
+            (x) => x.options.find((x) => x.name === 'object')?.defaultValue === options.object
+          ) ?? 0
+        break
+      case WRAPPER_HANDLERS.FIREBASE:
+        if (options.object === 'auth/users') {
+          index =
+            wrapperMeta?.tables.findIndex((x) =>
+              x.options.find((x) => x.defaultValue === 'auth/users')
+            ) ?? 0
+        } else {
+          index = wrapperMeta?.tables.findIndex((x) => x.label === 'Firestore Collection') ?? 0
+        }
+        break
+      case WRAPPER_HANDLERS.S3:
+      case WRAPPER_HANDLERS.AIRTABLE:
+      case WRAPPER_HANDLERS.LOGFLARE:
+      case WRAPPER_HANDLERS.BIG_QUERY:
+      case WRAPPER_HANDLERS.CLICK_HOUSE:
+        break
+    }
+
     return {
-      ...Object.fromEntries(table.options.map((option: string) => option.split('='))),
+      ...options,
       index,
       columns: table.columns,
       is_new_schema: false,
