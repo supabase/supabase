@@ -80,7 +80,7 @@ const Panel = ({
     >
       <div
         className={[
-          'relative z-10 h-full rounded-xl bg overflow-hidden transition-all text-scale-1100',
+          'relative z-10 h-full rounded-xl bg overflow-hidden transition-all text-light',
           innerClassName,
         ].join(' ')}
       >

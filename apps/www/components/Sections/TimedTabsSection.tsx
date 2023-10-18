@@ -20,7 +20,7 @@ const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }
   <button
     onClick={onClick}
     className={`text-left text-lg flex flex-col group gap-1 transition-all ${
-      isActive ? 'flex-[2] text-scale-1200' : 'flex-[1] text-scale-1100'
+      isActive ? 'flex-[2] text-foreground' : 'flex-[1] text-light'
     }`}
     aria-selected={isActive}
     role="tab"
@@ -43,7 +43,7 @@ const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1, transition: { delay: 0.2 } }}
-          className="hidden md:block mt-1 text-scale-900 text-sm"
+          className="hidden md:block mt-1 text-muted text-sm"
         >
           {paragraph}
         </motion.p>
@@ -133,7 +133,7 @@ const TimedTabsSection = ({
           <h2 className="text-3xl xl:text-4xl max-w-[280px] sm:max-w-xs xl:max-w-[360px] tracking-[-1px]">
             {title}
           </h2>
-          <p className="text-scale-900 mb-4 max-w-sm">{paragraph}</p>
+          <p className="text-muted mb-4 max-w-sm">{paragraph}</p>
           {cta && (
             <Link href={cta.link}>
               <a className="">
@@ -195,7 +195,7 @@ const TimedTabsSection = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1, transition: { duration: 0.1, delay: 0.2 } }}
             exit={{ opacity: 0, transition: { duration: 0.05 } }}
-            className="text-scale-900 text-sm"
+            className="text-muted text-sm"
           >
             {tabs[activeTab]?.paragraph}
           </motion.p>
@@ -210,7 +210,7 @@ const OpenInColab = ({ colabUrl, className }: { colabUrl: string; className?: st
     <a
       target="_blank"
       className={[
-        'flex items-center z-10 h-10 bg-[#fff] hover:bg-[#fff] dark:bg-scale-300 dark:hover:bg-scale-400 hover:text-scale-900 text-sm text-scale-900 shadow-lg hover:shadow-md rounded-full py-1 px-3 gap-2',
+        'flex items-center z-10 h-10 bg-[#fff] hover:bg-[#fff] dark:bg-scale-300 dark:hover:bg-scale-400 hover:text-muted text-sm text-muted shadow-lg hover:shadow-md rounded-full py-1 px-3 gap-2',
         className,
       ].join(' ')}
     >
