@@ -57,11 +57,14 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
     return initialValues
   }
 
+  const isSAMLEnabled: boolean = provider.title === 'SAML 2.0'&& (config && (config as any)['SAML_ENABLED'])
+  // [Joel] Introduced as the new LinkedIn provider has a corresponding config var of LINKEDIN_OIDC
+  const isLinkedInOIDCEnabled: boolean = provider.title ==='LinkedIn (OIDC)' && (config && (config as any)['EXTERNAL_LINKEDIN_OIDC_ENABLED'])
+  const isExternalProviderAndEnabled: boolean =  (config && (config as any)[`EXTERNAL_${provider?.title?.toUpperCase()}_ENABLED`])
+
+
   // [Joshen] Doing this check as SAML doesn't follow the same naming structure as the other provider options
-  const isActive: boolean =
-    provider.title === 'SAML 2.0'
-      ? (config && (config as any)['SAML_ENABLED']) ?? false
-      : (config && (config as any)[`EXTERNAL_${provider?.title?.toUpperCase()}_ENABLED`]) ?? false
+  const isActive: boolean = isSAMLEnabled || isExternalProviderAndEnabled || isLinkedInOIDCEnabled
   const INITIAL_VALUES = generateInitialValues()
 
   const onSubmit = (values: any, { resetForm }: any) => {
@@ -89,163 +92,171 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
 
   return (
     <Collapsible
-      open={open}
-      onOpenChange={setOpen}
-      className={ProviderCollapsibleClasses.join(' ')}
+    open={open}
+    onOpenChange={setOpen}
+    className={ProviderCollapsibleClasses.join(' ')}
     >
-      <Collapsible.Trigger asChild>
-        <button
-          type="button"
-          className="group flex w-full items-center justify-between rounded py-3 px-6 text-foreground"
-        >
-          <div className="flex items-center gap-3">
-            <IconChevronUp
-              className="text-scale-800 transition data-open-parent:rotate-0 data-closed-parent:rotate-180"
-              strokeWidth={2}
-              width={14}
-            />
-            <img
-              src={`${BASE_PATH}/img/icons/${provider.misc.iconKey}.svg`}
-              width={18}
-              alt={`${provider.title} auth icon`}
-            />
-            <span className="text-sm">{provider.title}</span>
-          </div>
-          <div className="flex items-center gap-3">
-            {isActive ? (
-              <div className="flex items-center gap-1 rounded-full border border-brand-400 bg-brand-200 py-1 px-1 text-xs text-brand">
-                <span className="rounded-full bg-brand p-0.5 text-xs text-brand-200">
-                  <IconCheck strokeWidth={2} size={12} />
-                </span>
-                <span className="px-1">Enabled</span>
-              </div>
-            ) : (
-              <div className="rounded-md border border-scale-500 bg-scale-100 py-1 px-3 text-xs text-foreground-lighter dark:border-scale-700 dark:bg-scale-300">
-                Disabled
-              </div>
-            )}
-          </div>
-        </button>
-      </Collapsible.Trigger>
-      <Form
-        name={`provider-${provider.title}-form`}
-        initialValues={INITIAL_VALUES}
-        validationSchema={provider.validationSchema}
-        onSubmit={onSubmit}
-      >
-        {({ handleReset, initialValues, values }: any) => {
-          const noChanges = JSON.stringify(initialValues) === JSON.stringify(values)
-          return (
-            <Collapsible.Content>
-              <div
-                className="
-                  group border-t
-                  border-scale-500 bg-scale-100 py-6 px-6 text-foreground dark:bg-scale-300
-                "
-              >
-                <div className="mx-auto my-6 max-w-lg space-y-6">
-                  {provider.title === 'LinkedIn' && (
-                    <Alert_Shadcn_ variant="warning">
-                      <IconAlertTriangle strokeWidth={2} />
-                      <AlertTitle_Shadcn_>
-                        LinkedIn provider temporarily unavailable
-                      </AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_>
-                        Linkedin has updated their OAuth APIs, which has broken the current Supabase
-                        implementation. We're actively tracking{' '}
-                        <a
-                          className="underline"
-                          href="https://github.com/supabase/gotrue/issues/1216"
-                        >
-                          this issue
-                        </a>{' '}
-                        and you can subscribe to it for future updates.
-                      </AlertDescription_Shadcn_>
-                    </Alert_Shadcn_>
-                  )}
-                  {Object.keys(provider.properties).map((x: string) => (
-                    <FormField
-                      key={x}
-                      name={x}
-                      properties={provider.properties[x]}
-                      formValues={values}
-                      disabled={!canUpdateConfig}
-                    />
-                  ))}
-                  {provider?.misc?.alert && (
-                    <Alert title={provider.misc.alert.title} variant="warning" withIcon>
-                      <ReactMarkdown>{provider.misc.alert.description}</ReactMarkdown>
-                    </Alert>
-                  )}
-                  {provider.misc.requiresRedirect && (
-                    <>
-                      <Input
-                        copy
-                        readOnly
-                        disabled
-                        label="Callback URL (for OAuth)"
-                        value={
-                          customDomainData?.customDomain?.status === 'active'
-                            ? `https://${customDomainData.customDomain?.hostname}/auth/v1/callback`
-                            : `https://${projectRef}.supabase.co/auth/v1/callback`
-                        }
-                        descriptionText={
-                          <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                            {provider.misc.helper}
-                          </ReactMarkdown>
-                        }
-                      />
-                    </>
-                  )}
-                  <div className="flex items-center justify-end gap-3">
+    <Collapsible.Trigger asChild>
+    <button
+    type="button"
+    className="group flex w-full items-center justify-between rounded py-3 px-6 text-foreground"
+    >
+    <div className="flex items-center gap-3">
+    <IconChevronUp
+    className="text-scale-800 transition data-open-parent:rotate-0 data-closed-parent:rotate-180"
+    strokeWidth={2}
+    width={14}
+    />
+    <img
+    src={`${BASE_PATH}/img/icons/${provider.misc.iconKey}.svg`}
+    width={18}
+    alt={`${provider.title} auth icon`}
+    />
+    <span className="text-sm">{provider.title}</span>
+    </div>
+    <div className="flex items-center gap-3">
+    {isActive ? (
+      <div className="flex items-center gap-1 rounded-full border border-brand-400 bg-brand-200 py-1 px-1 text-xs text-brand">
+        <span className="rounded-full bg-brand p-0.5 text-xs text-brand-200">
+          <IconCheck strokeWidth={2} size={12} />
+        </span>
+        <span className="px-1">Enabled</span>
+      </div>
+    ) : (
+      <div className="rounded-md border border-scale-500 bg-scale-100 py-1 px-3 text-xs text-foreground-lighter dark:border-scale-700 dark:bg-scale-300">
+        Disabled
+      </div>
+    )}
+    </div>
+    </button>
+    </Collapsible.Trigger>
+    <Form
+    name={`provider-${provider.title}-form`}
+    initialValues={INITIAL_VALUES}
+    validationSchema={provider.validationSchema}
+    onSubmit={onSubmit}
+    >
+    {({ handleReset, initialValues, values }: any) => {
+      const noChanges = JSON.stringify(initialValues) === JSON.stringify(values)
+      return (
+        <Collapsible.Content>
+          <div
+            className="
+            group border-t
+            border-scale-500 bg-scale-100 py-6 px-6 text-foreground dark:bg-scale-300
+            "
+          >
+            <div className="mx-auto my-6 max-w-lg space-y-6">
+              {provider.title === 'LinkedIn (Deprecated)' && (
+                <Alert_Shadcn_ variant="warning">
+                  <IconAlertTriangle strokeWidth={2} />
+                  <AlertTitle_Shadcn_>
+                    LinkedIn (Deprecated) Provider
+                  </AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_>
+                    As of 1st August, LinkedIn has updated their OAuth API scopes. Please usethe new LinkedIn
+                    provider below. Developers using this provider should move over to the new provider. Please refer to our docs (insert link)
+                    for more details.
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+
+              )}
+              {/* TODO (Joel): Remove after 30th November when we disable the provider */}
+              {provider.title === 'LinkedIn (Deprecated)' && (
+                Object.keys(provider.properties).map((x: string) => (
+                  <FormField
+                    key={x}
+                    name={x}
+                    properties={provider.properties[x]}
+                    formValues={values}
+                    disabled={x === 'EXTERNAL_LINKEDIN_ENABLED' ? !canUpdateConfig : true}
+                  />
+              )))}
+
+
+              {provider.title !== 'LinkedIn (Deprecated)' && (Object.keys(provider.properties).map((x: string) => (
+                <FormField
+                  key={x}
+                  name={x}
+                  properties={provider.properties[x]}
+                  formValues={values}
+                  disabled={!canUpdateConfig}
+                />
+              )))}
+              {provider?.misc?.alert && (
+                <Alert title={provider.misc.alert.title} variant="warning" withIcon>
+                  <ReactMarkdown>{provider.misc.alert.description}</ReactMarkdown>
+                </Alert>
+              )}
+              {provider.misc.requiresRedirect && (
+                <>
+                  <Input
+                    copy
+                    readOnly
+                    disabled
+                    label="Callback URL (for OAuth)"
+                    value={
+                    customDomainData?.customDomain?.status === 'active'
+                    ? `https://${customDomainData.customDomain?.hostname}/auth/v1/callback`
+                    : `https://${projectRef}.supabase.co/auth/v1/callback`
+                    }
+                    descriptionText={
+                      <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                        {provider.misc.helper}
+                      </ReactMarkdown>
+                    }
+                  />
+                </>
+              )}
+              <div className="flex items-center justify-end gap-3">
+                <Button
+                  type="default"
+                  htmlType="reset"
+                  onClick={() => {
+                    handleReset()
+                    setOpen(false)
+                  }}
+                  disabled={isUpdatingConfig}
+                >
+                  Cancel
+                </Button>
+                <Tooltip.Root delayDuration={0}>
+                  <Tooltip.Trigger type="button">
                     <Button
-                      type="default"
-                      htmlType="reset"
-                      onClick={() => {
-                        handleReset()
-                        setOpen(false)
-                      }}
-                      disabled={isUpdatingConfig}
+                      htmlType="submit"
+                      loading={isUpdatingConfig}
+                      disabled={isUpdatingConfig || !canUpdateConfig || noChanges}
                     >
-                      Cancel
+                      Save
                     </Button>
-                    <Tooltip.Root delayDuration={0}>
-                      <Tooltip.Trigger type="button">
-                        <Button
-                          htmlType="submit"
-                          loading={isUpdatingConfig}
-                          disabled={isUpdatingConfig || !canUpdateConfig || noChanges}
+                  </Tooltip.Trigger>
+                  {!canUpdateConfig && (
+                    <Tooltip.Portal>
+                      <Tooltip.Content side="bottom">
+                        <Tooltip.Arrow className="radix-tooltip-arrow" />
+                        <div
+                          className={[
+                            'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                            'border border-scale-200',
+                          ].join(' ')}
                         >
-                          Save
-                        </Button>
-                      </Tooltip.Trigger>
-                      {!canUpdateConfig && (
-                        <Tooltip.Portal>
-                          <Tooltip.Content side="bottom">
-                            <Tooltip.Arrow className="radix-tooltip-arrow" />
-                            <div
-                              className={[
-                                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                'border border-scale-200',
-                              ].join(' ')}
-                            >
-                              <span className="text-xs text-foreground">
-                                You need additional permissions to update provider settings
-                              </span>
-                            </div>
-                          </Tooltip.Content>
-                        </Tooltip.Portal>
-                      )}
-                    </Tooltip.Root>
-                  </div>
-                </div>
+                          <span className="text-xs text-foreground">
+                            You need additional permissions to update provider settings
+                          </span>
+                        </div>
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  )}
+                </Tooltip.Root>
               </div>
-            </Collapsible.Content>
-          )
-        }}
+            </div>
+          </div>
+        </Collapsible.Content>
+      )
+    }}
       </Form>
     </Collapsible>
-  )
-}
+              )
+    }
 
 export default ProviderForm

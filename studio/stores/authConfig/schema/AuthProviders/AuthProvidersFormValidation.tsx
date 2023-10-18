@@ -1009,10 +1009,10 @@ const EXTERNAL_PROVIDER_KEYCLOAK = {
 const EXTERNAL_PROVIDER_LINKEDIN = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
-  title: 'LinkedIn',
+  title: 'LinkedIn (Deprecated)',
   properties: {
     EXTERNAL_LINKEDIN_ENABLED: {
-      title: 'Linkedin enabled',
+      title: 'Linkedin (Deprecated) enabled',
       type: 'boolean',
     },
     // [TODO] Update docs
@@ -1049,10 +1049,10 @@ const EXTERNAL_PROVIDER_LINKEDIN = {
 const EXTERNAL_PROVIDER_LINKEDIN_OIDC = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
-  title: 'LinkedIn',
+  title: 'LinkedIn (OIDC)',
   properties: {
     EXTERNAL_LINKEDIN_OIDC_ENABLED: {
-      title: 'Linkedin enabled',
+      title: 'LinkedIn enabled',
       type: 'boolean',
     },
     EXTERNAL_LINKEDIN_OIDC_CLIENT_ID: {

@@ -11,9 +11,7 @@ To enable LinkedIn Auth for your project, you need to set up a LinkedIn OAuth ap
 ## Overview
 
 <Admonition type="caution" label="update">
-
-Linkedin has updated their [OAuth APIs](https://learn.microsoft.com/en-us/linkedin/shared/authentication/authorization-code-flow?context=linkedin%2Fcontext&tabs=HTTPS1), which has broken the current Supabase implementation. We're actively tracking [this issue](https://github.com/supabase/gotrue/issues/1216) and you can subscribe to it for future updates.
-
+We will be replacing the existing LinkedIn provider with a new LinkedIn (OIDC) provider. Developers with LinkedIn OAuth Applications created prior to 1st August 2023 should create a new OAuth application and migrate their credentials from the *LinkedIn* provider to the *LinkedIn (OIDC)* provider. [Read this section](/docs/guides/auth/social-login/auth-linkedin#linkedin-open-id-connect-oidc) to find out more.
 </Admonition>
 
 Setting up LinkedIn logins for your application consists of 3 parts:
@@ -39,14 +37,16 @@ Setting up LinkedIn logins for your application consists of 3 parts:
 - Click on `Create App` at the top right
 - Enter your `LinkedIn Page` and `App Logo`
 - Save your app
+- Click `Products` from the top menu
+- Look for `Sign In with LinkedIn using OpenID Connect` and click on Request Access
 - Click `Auth` from the top menu
 - Add your `Redirect URL` to the `Authorized Redirect URLs for your app` section
 - Copy and save your newly-generated `Client ID`
 - Copy and save your newly-generated `Client Secret`
 
-## Enter your LinkedIn credentials into your Supabase Project
+## Enter your LinkedIn (OIDC) credentials into your Supabase Project
 
-<SocialProviderSettingsSupabase provider="LinkedIn" />
+<SocialProviderSettingsSupabase provider="LinkedIn (OIDC)" />
 
 ## Add login code to your client app
 
@@ -59,7 +59,7 @@ Setting up LinkedIn logins for your application consists of 3 parts:
 >
 <TabPanel id="js" label="JavaScript">
 
-When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `linkedin` as the `provider`:
+When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `linkedin_oidc` as the `provider`:
 
 ```js
 async function signInWithLinkedIn() {
@@ -113,6 +113,16 @@ suspend fun signOut() {
 
 </TabPanel>
 </Tabs>
+
+## LinkedIn Open ID Connect (OIDC)
+To support recent changes to the LinkedIn [OAuth APIs](https://learn.microsoft.com/en-us/linkedin/shared/authentication/authorization-code-flow?context=linkedin%2Fcontext&tabs=HTTPS1), we will be replacing the *LinkedIn* provider with a new *LinkedIn (OIDC)* provider which utilizes the [Open ID Connect standard](https://learn.microsoft.com/en-us/linkedin/consumer/integrations/self-serve/sign-in-with-linkedin-v2#validating-id-tokens). Consequently, we have disabled edits on the *LinkedIn* provider and will be removing it effective 30th November 2023. Developers with LinkedIn OAuth Applications created prior to 1st August 2023 should create a new OAuth application [via the steps outlined above](/docs/guides/auth/social-login/auth-linkedin#create-a-linkedin-oauth-app) and migrate their credentials from the *LinkedIn* provider to the *LinkedIn (OIDC)* provider. Developers using the Supabase CLI to test their LinkedIn OAuth application should also update their `config.toml` to make use of the new provider:
+```
+[auth.external.linkedin_oidc]
+enabled = true
+client_id = ...
+secret = ...
+```
+Do reach out to support if you have any concerns around this change.
 
 ## Resources
 
