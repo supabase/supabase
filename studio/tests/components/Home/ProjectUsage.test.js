@@ -34,6 +34,15 @@ ProjectUsage.mockImplementation((props) => {
 
 jest.mock('data/subscriptions/project-subscription-v2-query')
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { useIsFeatureEnabled } from 'hooks'
+
+beforeEach(() => {
+  useIsFeatureEnabled.mockReset()
+  useIsFeatureEnabled.mockReturnValue({
+    projectAuthAll: true,
+    projectStorageAll: true,
+  })
+})
 
 useProjectSubscriptionV2Query.mockReturnValue({
   data: undefined,

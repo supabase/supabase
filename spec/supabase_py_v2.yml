@@ -1988,7 +1988,3 @@ functions:
           ```
           res = supabase.storage.from_('bucket_name').list()
           ```
-  - id: subscribe
-    title: on().subscribe()
-    notes: |
-      - We are implementing this feature at the moment. If you have queries feel free to open an issue on the [realtime-py](https://github.com/supabase-community/realtime-py) repository.

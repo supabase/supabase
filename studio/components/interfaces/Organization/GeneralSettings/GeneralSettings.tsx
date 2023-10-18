@@ -18,7 +18,7 @@ import {
 } from 'components/ui/Forms'
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useIsFeatureEnabled, useSelectedOrganization, useStore } from 'hooks'
 import { OPT_IN_TAGS } from 'lib/constants'
 import OrganizationDeletePanel from './OrganizationDeletePanel'
 
@@ -33,6 +33,8 @@ const GeneralSettings = () => {
   const formId = 'org-general-settings'
   const isOptedIntoAi = opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL)
   const initialValues = { name: name ?? '', isOptedIntoAi }
+
+  const organizationDeletionEnabled = useIsFeatureEnabled('organizations:delete')
 
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
   const canDeleteOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
@@ -189,7 +191,7 @@ const GeneralSettings = () => {
         }}
       </Form>
 
-      {canDeleteOrganization && <OrganizationDeletePanel />}
+      {organizationDeletionEnabled && canDeleteOrganization && <OrganizationDeletePanel />}
     </ScaffoldContainerLegacy>
   )
 }
