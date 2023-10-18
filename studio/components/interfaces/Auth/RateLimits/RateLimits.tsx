@@ -144,7 +144,7 @@ const RateLimits = () => {
                   <FormSectionLabel
                     description={
                       <p className="text-foreground-light text-sm">
-                        How many emails can be sent per hour
+                        Number of emails that can be sent per hour from your project
                       </p>
                     }
                   >
@@ -209,7 +209,7 @@ const RateLimits = () => {
                   <FormSectionLabel
                     description={
                       <p className="text-foreground-light text-sm">
-                        How many SMS messages can be sent per hour
+                        Number of SMS messages that can be sent per hour from your project
                       </p>
                     }
                   >
@@ -262,7 +262,7 @@ const RateLimits = () => {
                   <FormSectionLabel
                     description={
                       <p className="text-foreground-light text-sm">
-                        How many sessions can be refreshed in a 5 minute interval
+                        Number of sessions that can be refreshed in a 5 minute interval
                       </p>
                     }
                   >
@@ -297,7 +297,8 @@ const RateLimits = () => {
                   <FormSectionLabel
                     description={
                       <p className="text-foreground-light text-sm">
-                        How many OTP/Magic link verifications can be made in a 5 minute interval
+                        Number of OTP/Magic link verifications that can be made in a 5 minute
+                        interval
                       </p>
                     }
                   >
