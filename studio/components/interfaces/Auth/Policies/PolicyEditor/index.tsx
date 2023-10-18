@@ -17,6 +17,7 @@ interface PolicyEditorProps {
   onUpdatePolicyFormFields: (value: any) => void
   onViewTemplates: () => void
   onReviewPolicy: () => void
+  onSelectCancel: () => void
 }
 
 const PolicyEditor = ({
@@ -26,6 +27,7 @@ const PolicyEditor = ({
   onUpdatePolicyFormFields = () => {},
   onViewTemplates = () => {},
   onReviewPolicy = () => {},
+  onSelectCancel = () => {}
 }: PolicyEditorProps) => {
   const operation = policyFormFields?.command ?? ''
   const definition = policyFormFields?.definition ?? ''
@@ -80,6 +82,7 @@ const PolicyEditor = ({
         showTemplates={isNewPolicy}
         onViewTemplates={onViewTemplates}
         onReviewPolicy={onReviewPolicy}
+        onSelectCancel={onSelectCancel}
       />
     </div>
   )
