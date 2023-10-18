@@ -63,9 +63,8 @@ const Index = () => {
                   justify-between
                   bg-background
                   border
-                  border-scale-500
+                  border-control
                   hover:bg-surface-100
-                  hover:border-scale-600
                   transition 
                   rounded"
               >
@@ -77,7 +76,7 @@ const Index = () => {
                   />
                 </div>
                 <div className="flex items-center h-full space-x-1">
-                  <div className="hidden text-lighter md:flex items-center justify-center h-5 w-10 border rounded bg-scale-500 border-scale-700 gap-1">
+                  <div className="hidden text-lighter md:flex items-center justify-center h-5 w-10 border rounded bg-surface-300 border-foreground-lighter/30 gap-1">
                     <IconCommand size={12} strokeWidth={1.5} />
                     <span className="text-[12px]">K</span>
                   </div>

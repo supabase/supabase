@@ -144,6 +144,7 @@ const Partners = () => {
                 </Link>
               </InteractiveShimmerCard>
               <InteractiveShimmerCard
+                hasShimmer
                 hasInnerShimmer={false}
                 hasActiveOnHover={true}
                 innerClassName="px-8 py-6 group flex flex-col gap-4"

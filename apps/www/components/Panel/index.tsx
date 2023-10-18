@@ -41,19 +41,19 @@ const Panel = ({
     if (hasShimmer) {
       const activeGlow =
         hasActiveOnHover && isActive
-          ? `radial-gradient(65rem circle at ${x}px ${y}px, var(${
-              activeColor === 'brand' ? '--colors-brand9' : '--colors-scale9'
-            }), transparent), `
+          ? `radial-gradient(65rem circle at ${x}px ${y}px, ${
+              activeColor === 'brand' ? 'var(--colors-brand9)' : 'hsl(var(--foreground-muted))'
+            }, transparent), `
           : ''
       outerElement.style.backgroundImage = `
       ${activeGlow}radial-gradient(30rem circle at ${x}px ${y}px, ${
-        shimmerFromColor ?? 'var(--colors-scale8)'
-      }, ${shimmerToColor ?? 'var(--colors-scale5)'})`
+        shimmerFromColor ?? 'hsl(var(--border-strong))'
+      }, ${shimmerToColor ?? 'hsl(var(--background-surface-300))'})`
     }
 
     if (hasInnerShimmer) {
       innerElement.style.backgroundImage = isActive
-        ? `radial-gradient(7rem circle at ${x}px ${y}px, var(--colors-scale5), transparent), radial-gradient(20rem circle at ${x}px ${y}px, var(--colors-scale4), transparent)`
+        ? `radial-gradient(7rem circle at ${x}px ${y}px, hsl(var(--background-surface-300)), transparent), radial-gradient(20rem circle at ${x}px ${y}px, hsl(var(--background-surface-200)), transparent)`
         : ''
     }
   }
@@ -71,8 +71,8 @@ const Panel = ({
     <motion.div
       ref={outerRef}
       className={[
-        'relative z-0 rounded-xl bg-gradient-to-b from-background-surface-300 to-scale-400 p-px shadow-md',
-        !trackCursor && hasActiveOnHover ? 'hover:bg-none hover:!bg-scale-700' : '',
+        'relative z-0 rounded-xl bg-gradient-to-b from-border to-surface-200 p-px shadow-md',
+        !trackCursor && hasActiveOnHover ? 'hover:bg-none hover:!bg-border-hover' : '',
         outerClassName,
       ].join(' ')}
       whileHover="hover"

@@ -40,19 +40,19 @@ const InteractiveShimmerCard = ({
     if (hasShimmer) {
       const activeGlow =
         hasActiveOnHover && isActive
-          ? `radial-gradient(65rem circle at ${x}px ${y}px, var(${
-              activeColor === 'brand' ? '--colors-brand9' : '--colors-scale9'
-            }), transparent), `
+          ? `radial-gradient(65rem circle at ${x}px ${y}px, ${
+              activeColor === 'brand' ? 'var(--colors-brand9)' : 'hsl(var(--foreground-muted))'
+            }, transparent), `
           : ''
       outerElement.style.backgroundImage = `
       ${activeGlow}radial-gradient(30rem circle at ${x}px ${y}px, ${
-        shimmerFromColor ?? 'var(--colors-scale8)'
-      }, ${shimmerToColor ?? 'var(--colors-scale5)'})`
+        shimmerFromColor ?? 'hsl(var(--border-strong))'
+      }, ${shimmerToColor ?? 'hsl(var(--background-surface-300))'})`
     }
 
     if (hasInnerShimmer) {
       innerElement.style.backgroundImage = isActive
-        ? `radial-gradient(7rem circle at ${x}px ${y}px, var(--colors-scale5), transparent), radial-gradient(20rem circle at ${x}px ${y}px, var(--colors-scale4), transparent)`
+        ? `radial-gradient(7rem circle at ${x}px ${y}px, hsl(var(--background-surface-300)), transparent), radial-gradient(20rem circle at ${x}px ${y}px, hsl(var(--background-surface-200)), transparent)`
         : ''
     }
   }
@@ -70,18 +70,18 @@ const InteractiveShimmerCard = ({
     <div
       ref={outerRef}
       className={cn(
-        'relative rounded-xl bg-scale-400 from-scale-800 to-scale-800 p-px transition-all shadow-md',
+        'relative rounded-xl bg-surface-100 bg-gradient-to-b from-border to-surface-200 p-px transition-all shadow-md',
         !trackCursor && hasActiveOnHover
           ? activeColor === 'brand'
             ? 'hover:bg-none hover:!bg-brand'
-            : 'hover:bg-none hover:!bg-scale-900'
+            : 'hover:bg-none hover:!bg-foreground-muted'
           : '',
         outerClassName
       )}
     >
       <div
         className={cn(
-          'relative h-full z-10 rounded-xl bg-scale-200 dark:bg-scale-300 overflow-hidden transition-all text-light',
+          'relative h-full z-10 rounded-xl bg-surface-100 overflow-hidden transition-all text-light',
           innerClassName
         )}
       >
