@@ -73,7 +73,7 @@ Migrating projects can be achieved using the Supabase CLI. This is particularly 
 ### Before you begin
 
 - Install [Postgres](https://www.postgresql.org/download/) so you can run `psql` and `pg_dump`.
-- Install [Supabase CLI](https://supabase.com/docs/guides/cli#installation).
+- Install [Supabase CLI](/docs/guides/cli#installation).
 - Create a new [Supabase project](https://supabase.com/dashboard).
 - Install [Docker Desktop](https://www.docker.com) for your platform.
 - Set environment variables for the old project's database URL as `$OLD_DB_URL` and the new project's as `$NEW_DB_URL`.
@@ -96,6 +96,20 @@ In your new project:
 1. Enable [Database Webhooks](https://supabase.com/dashboard/project/_/database/hooks) if you enabled them in your old project.
 2. Enable any [extensions](https://supabase.com/dashboard/project/_/database/extensions) that were enabled in your old project.
 
+If you use [column encryption](/docs/guides/database/column-encryption), first copy the root encryption key to your new project using your [Personal Access Token](https://supabase.com/dashboard/account/tokens).
+
+```bash
+export OLD_PROJECT_REF="<old_project_ref>"
+export NEW_PROJECT_REF="<new_project_ref>"
+export SUPABASE_ACCESS_TOKEN="<personal_access_token>"
+
+curl "https://api.supabase.com/v1/projects/$OLD_PROJECT_REF/pgsodium" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" |
+curl "https://api.supabase.com/v1/projects/$NEW_PROJECT_REF/pgsodium" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -X PUT --json @-
+```
+
 Then run the following command from your terminal:
 
 ```bash
@@ -104,14 +118,26 @@ psql \
   --variable ON_ERROR_STOP=1 \
   --file roles.sql \
   --file schema.sql \
+  --command 'SET session_replication_role = replica' \
   --file data.sql \
   --dbname "$NEW_DB_URL"
 ```
 
-Notes:
+Setting the `session_replication_role` to `replica` disables all triggers so that columns are not double encrypted.
+
+Troubleshooting notes:
 
 - If you have created any [custom roles](https://supabase.com/dashboard/project/_/database/roles) with `login` attribute, you have to manually set their passwords in the new project.
-- If you receive any permission errors when running `supabase db dump --db-url "$OLD_DB_URL" -f schema.sql`, you may need to edit the `schema.sql` file and change any lines saying `OWNER TO "supabase_admin"` to `OWNER TO "postgres"`.
+- If you run into any permission errors related to `supabase_admin` during restore, edit the `schema.sql` file and comment out any lines containing `ALTER ... OWNER TO "supabase_admin"`.
+
+### Schema changes to `auth` and `storage`
+
+If you have modified the `auth` and `storage` schemas in your old project, such as adding triggers or RLS policies, you have to restore them separately. The Supabase CLI can help you diff the changes to these schemas using the following commands.
+
+```bash
+supabase link --project-ref "$OLD_PROJECT_REF"
+supabase db diff --linked --schema auth,storage > changes.sql
+```
 
 ### Enable publication on tables
 

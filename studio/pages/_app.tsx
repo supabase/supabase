@@ -42,6 +42,10 @@ import {
   CommandMenuWrapper,
   RouteValidationWrapper,
 } from 'components/interfaces/App'
+import {
+  FeaturePreviewContextProvider,
+  FeaturePreviewModal,
+} from 'components/interfaces/App/FeaturePreview'
 import FlagProvider from 'components/ui/Flag/FlagProvider'
 import PageTelemetry from 'components/ui/PageTelemetry'
 import { useRootQueryClient } from 'data/query-client'
@@ -55,10 +59,6 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { RootStore } from 'stores'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
-import {
-  FeaturePreviewContextProvider,
-  FeaturePreviewModal,
-} from 'components/interfaces/App/FeaturePreview'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -105,8 +105,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
       : undefined
   )
 
-  const getSavingState = () => rootStore.content.savingState
-
   useEffect(() => {
     // Check for telemetry consent
     if (typeof window !== 'undefined') {
@@ -132,25 +130,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
         )
       }
     }
-
-    // prompt the user if they try and leave with unsaved content store changes
-    const warningText = 'You have unsaved changes - are you sure you wish to leave this page?'
-
-    const handleWindowClose = (e: BeforeUnloadEvent) => {
-      const savingState = getSavingState()
-      const unsavedChanges =
-        savingState === 'UPDATING_REQUIRED' ||
-        savingState === 'UPDATING' ||
-        savingState === 'UPDATING_FAILED'
-
-      if (!unsavedChanges) return
-      e.preventDefault()
-      return (e.returnValue = warningText)
-    }
-
-    window.addEventListener('beforeunload', handleWindowClose)
-
-    return () => window.removeEventListener('beforeunload', handleWindowClose)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

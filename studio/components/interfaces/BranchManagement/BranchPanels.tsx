@@ -100,7 +100,7 @@ const MainBranchPanel = ({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="bottom" align="end">
-                  <Link passHref href={`/project/${ref}/settings/general`}>
+                  <Link passHref href={`/project/${ref}/settings/integrations`}>
                     <DropdownMenuItem
                       asChild
                       className="flex gap-2"
