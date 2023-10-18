@@ -77,7 +77,7 @@ function CustomerStoriesPage(props: any) {
         }}
       />
       <DefaultLayout>
-        <div className="relative z-0 dark:bg-scale-200 bg-scale-200 overflow-hidden">
+        <div className="relative z-0 bg-background overflow-hidden">
           <div className="container mx-auto mt-44 px-8 sm:px-4 xl:px-20">
             <div className="mx-auto relative z-10">
               <motion.div
@@ -123,7 +123,7 @@ function CustomerStoriesPage(props: any) {
             </div>
             <div
               className={[
-                'absolute inset-0 h-[300px] dark:bg-scale-200 bg-bg-scale-200 z-0 after:!bg-scale-200',
+                'absolute inset-0 h-[300px] bg-background z-0 after:!bg-background',
                 styles['bg-visual'],
               ].join(' ')}
             />
