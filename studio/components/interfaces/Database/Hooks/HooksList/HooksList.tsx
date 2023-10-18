@@ -83,6 +83,7 @@ const HooksList = ({
                 size="small"
                 icon={<IconSearch size="tiny" />}
                 value={filterString}
+                className="w-64"
                 onChange={(e) => setFilterString(e.target.value)}
               />
               <div className="flex items-center space-x-2">

@@ -28,6 +28,7 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useStore } from 'hooks'
 import CreateIndexSidePanel from './CreateIndexSidePanel'
+import SchemaSelector from 'components/ui/SchemaSelector'
 
 const Indexes = () => {
   const { ui } = useStore()
@@ -96,26 +97,26 @@ const Indexes = () => {
     <>
       <div className="pb-8">
         <div className="flex items-center justify-between mb-6">
-          <div>
-            <h3 className="mb-1 text-xl text-foreground">Database Indexes</h3>
+          <div className="space-y-1">
+            <h3 className="text-xl text-foreground">Database Indexes</h3>
             <div className="text-sm text-foreground-lighter">
               Improve query performance against your database
             </div>
           </div>
           <div className="flex items-center space-x-2">
             <Link href="https://supabase.com/docs/guides/database/query-optimization">
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+              <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                <a target="_blank" rel="noreferrer">
                   Documentation
-                </Button>
-              </a>
+                </a>
+              </Button>
             </Link>
             <Link href="https://supabase.com/docs/guides/database/extensions/index_advisor">
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+              <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                <a target="_blank" rel="noreferrer">
                   Optimization with index_advisor
-                </Button>
-              </a>
+                </a>
+              </Button>
             </Link>
           </div>
         </div>
@@ -130,28 +131,18 @@ const Indexes = () => {
               </div>
             )}
             {isSuccessSchemas && (
-              <Listbox
-                size="small"
-                value={selectedSchema}
-                onChange={setSelectedSchema}
+              <SchemaSelector
                 className="w-[260px]"
-              >
-                {(schemas ?? []).map((schema) => (
-                  <Listbox.Option
-                    key={schema.name}
-                    value={schema.name}
-                    label={schema.name}
-                    addOnBefore={() => <span className="text-foreground-lighter">schema</span>}
-                  >
-                    {schema.name}
-                  </Listbox.Option>
-                ))}
-              </Listbox>
+                size="small"
+                showError={false}
+                selectedSchemaName={selectedSchema}
+                onSelectSchema={setSelectedSchema}
+              />
             )}
             <Input
               size="small"
               value={search}
-              className="w-[250px]"
+              className="w-64"
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search for an index"
               icon={<IconSearch size={14} />}

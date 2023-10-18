@@ -113,21 +113,19 @@ const TriggerList = ({
                 {canUpdateTriggers ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger>
-                      <Button asChild type="default" icon={<IconMoreVertical />}>
-                        <span></span>
+                      <Button asChild type="default" className="px-1" icon={<IconMoreVertical />}>
+                        <span />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent side="bottom" align="end">
-                      <>
-                        <DropdownMenuItem className="space-x-2" onClick={() => editTrigger(x)}>
-                          <IconEdit3 size="tiny" />
-                          <p>Edit trigger</p>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="space-x-2" onClick={() => deleteTrigger(x)}>
-                          <IconTrash stroke="red" size="tiny" />
-                          <p>Delete trigger</p>
-                        </DropdownMenuItem>
-                      </>
+                    <DropdownMenuContent side="bottom" align="end" className="w-36">
+                      <DropdownMenuItem className="space-x-2" onClick={() => editTrigger(x)}>
+                        <IconEdit3 size="tiny" />
+                        <p>Edit trigger</p>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="space-x-2" onClick={() => deleteTrigger(x)}>
+                        <IconTrash stroke="red" size="tiny" />
+                        <p>Delete trigger</p>
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 ) : (

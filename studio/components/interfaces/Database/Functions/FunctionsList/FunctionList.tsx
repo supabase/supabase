@@ -55,7 +55,7 @@ const FunctionList = ({
   if (_functions.length === 0 && filterString.length === 0) {
     return (
       <Table.tr key={schema}>
-        <Table.td colSpan={4}>
+        <Table.td colSpan={5}>
           <p className="text-sm text-foreground">No functions created yet</p>
           <p className="text-sm text-light">
             There are no functions found in the schema "{schema}"
@@ -68,7 +68,7 @@ const FunctionList = ({
   if (_functions.length === 0 && filterString.length > 0) {
     return (
       <Table.tr key={schema}>
-        <Table.td colSpan={4}>
+        <Table.td colSpan={5}>
           <p className="text-sm text-foreground">No results found</p>
           <p className="text-sm text-light">
             Your search for "{filterString}" did not return any results

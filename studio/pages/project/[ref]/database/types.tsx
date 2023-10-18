@@ -33,7 +33,7 @@ const DatabaseEnumeratedTypes: NextPageWithLayout = () => {
               </Link>
             </div>
           </ScaffoldSectionDetail>
-          <div className="col-span-12 mt-6">
+          <div className="col-span-12 mt-3">
             <EnumeratedTypes />
           </div>
         </ScaffoldSection>

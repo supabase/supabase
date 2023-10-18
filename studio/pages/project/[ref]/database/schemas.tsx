@@ -9,6 +9,7 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { NextPageWithLayout } from 'types'
 import { IconLock, Listbox } from 'ui'
+import SchemaSelector from 'components/ui/SchemaSelector'
 
 const SchemasPage: NextPageWithLayout = () => {
   const { project } = useProjectContext()
@@ -40,45 +41,13 @@ const SchemasPage: NextPageWithLayout = () => {
           {isError && <AlertError error={error} subject="Failed to retrieve schemas" />}
 
           {isSuccess && (
-            <Listbox
+            <SchemaSelector
               className="w-[260px]"
               size="small"
-              value={selectedSchema}
-              onChange={setSelectedSchema}
-              icon={isLocked && <IconLock size={14} strokeWidth={2} />}
-            >
-              <Listbox.Option disabled key="normal-schemas" value="normal-schemas" label="Schemas">
-                <p className="text-sm">Schemas</p>
-              </Listbox.Option>
-              {openSchemas.map((schema) => (
-                <Listbox.Option
-                  key={schema.id}
-                  value={schema.name}
-                  label={schema.name}
-                  addOnBefore={() => <span className="text-foreground-lighter">schema</span>}
-                >
-                  <span className="text-foreground text-sm">{schema.name}</span>
-                </Listbox.Option>
-              ))}
-              <Listbox.Option
-                disabled
-                key="protected-schemas"
-                value="protected-schemas"
-                label="Protected schemas"
-              >
-                <p className="text-sm">Protected schemas</p>
-              </Listbox.Option>
-              {protectedSchemas.map((schema) => (
-                <Listbox.Option
-                  key={schema.id}
-                  value={schema.name}
-                  label={schema.name}
-                  addOnBefore={() => <span className="text-foreground-lighter">schema</span>}
-                >
-                  <span className="text-foreground text-sm">{schema.name}</span>
-                </Listbox.Option>
-              ))}
-            </Listbox>
+              showError={false}
+              selectedSchemaName={selectedSchema}
+              onSelectSchema={setSelectedSchema}
+            />
           )}
         </div>
 
