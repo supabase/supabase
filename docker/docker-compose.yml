@@ -5,9 +5,8 @@
 #   Destroy:        docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml down -v --remove-orphans
 
 version: "3.8"
-
+name: "supabase"
 services:
-
   studio:
     container_name: supabase-studio
     image: supabase/studio:20230921-d657f29
