@@ -24,18 +24,15 @@ const HIPAA = () => {
   return (
     <>
       <ScaffoldSection>
-        <ScaffoldSectionDetail>
-          <div className="sticky space-y-6 top-12">
-            <p className="text-base m-0">HIPAA</p>
-            <div className="space-y-2">
-              <p className="text-sm text-foreground-light m-0">
-                For organizations on Teams plan or above, you can request for a paid HIPAA add-on.
-              </p>
-              <p>
-                This is only for HIPAA requests, please ignore this if you already have HIPAA
-                enabled.
-              </p>
-            </div>
+        <ScaffoldSectionDetail className="sticky space-y-6 top-12">
+          <p className="text-base m-0">HIPAA</p>
+          <div className="space-y-2 text-sm text-foreground-light m-0">
+            <p>
+              For organizations on Teams plan or above, you can request for a paid HIPAA add-on.
+            </p>
+            <p>
+              This is only for HIPAA requests, please ignore this if you already have HIPAA enabled.
+            </p>
           </div>
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>

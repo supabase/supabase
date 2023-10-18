@@ -7,47 +7,40 @@ import { Button, IconExternalLink } from 'ui'
 
 const DPA = () => {
   return (
-    <>
-      <ScaffoldSection>
-        <ScaffoldSectionDetail>
-          <div className="sticky space-y-6 top-12">
-            <p className="text-base m-0">Data Processing Addendum (DPA)</p>
-            <div className="space-y-2">
-              <p className="text-sm text-foreground-light m-0">
-                For the document to be considered executed, sign and return the signed DPA document
-                to{' '}
-                <a
-                  href="mailto:privacy@supabase.com"
-                  target="_blank"
-                  className="text-brand hover:text-brand"
-                >
-                  privacy@supabase.com
-                </a>
-                .
-              </p>
-              <p>
-                This is only to access the document, please ignore this if you have sent the signed
-                document to us.
-              </p>
-            </div>
-          </div>
-        </ScaffoldSectionDetail>
-        <ScaffoldSectionContent>
-          <div className="flex items-center justify-center h-full">
+    <ScaffoldSection>
+      <ScaffoldSectionDetail className="sticky space-y-6 top-12">
+        <p className="text-base m-0">Data Processing Addendum (DPA)</p>
+        <div className="space-y-2 text-sm text-foreground-light m-0">
+          <p>
+            For the document to be considered executed, sign and return the signed DPA document to{' '}
             <a
-              href="https://supabase.com/downloads/docs/Supabase+DPA+230907.pdf"
+              href="mailto:privacy@supabase.com"
               target="_blank"
-              rel="noreferrer noopener"
-              download={true}
+              className="text-brand hover:text-brand"
             >
-              <Button type="default" iconRight={<IconExternalLink />}>
-                View DPA
-              </Button>
+              privacy@supabase.com
             </a>
-          </div>
-        </ScaffoldSectionContent>
-      </ScaffoldSection>
-    </>
+            .
+          </p>
+          <p>
+            This is only to access the document, please ignore this if you have sent the signed
+            document to us.
+          </p>
+        </div>
+      </ScaffoldSectionDetail>
+      <ScaffoldSectionContent className="flex items-center justify-center h-full">
+        <a
+          href="https://supabase.com/downloads/docs/Supabase+DPA+230907.pdf"
+          target="_blank"
+          rel="noreferrer noopener"
+          download={true}
+        >
+          <Button type="default" iconRight={<IconExternalLink />}>
+            View DPA
+          </Button>
+        </a>
+      </ScaffoldSectionContent>
+    </ScaffoldSection>
   )
 }
 
