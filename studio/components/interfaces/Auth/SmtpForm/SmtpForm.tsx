@@ -309,15 +309,6 @@ const SmtpForm = () => {
                     actions={<span className="mr-3 text-foreground-lighter">seconds</span>}
                     disabled={!canUpdateConfig}
                   />
-                  <InputNumber
-                    name="RATE_LIMIT_EMAIL_SENT"
-                    id="RATE_LIMIT_EMAIL_SENT"
-                    min={0}
-                    label="Rate limit for sending emails"
-                    descriptionText="How many emails can be sent per hour."
-                    actions={<span className="mr-3 text-foreground-lighter">emails per hour</span>}
-                    disabled={!canUpdateConfig}
-                  />
                   <Input
                     name="SMTP_USER"
                     id="SMTP_USER"
