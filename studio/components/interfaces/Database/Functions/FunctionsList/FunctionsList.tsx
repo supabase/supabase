@@ -97,7 +97,7 @@ const FunctionsList = ({
                 size="small"
                 icon={<IconSearch size="tiny" />}
                 value={filterString}
-                className="w-[250px]"
+                className="w-64"
                 onChange={(e) => setFilterString(e.target.value)}
               />
             </div>

@@ -47,7 +47,7 @@ const Extensions = () => {
             placeholder="Search for an extension"
             value={filterString}
             onChange={(e) => setFilterString(e.target.value)}
-            className="w-[250px]"
+            className="w-64"
             icon={<IconSearch size="tiny" />}
           />
           {!canUpdateExtensions ? (

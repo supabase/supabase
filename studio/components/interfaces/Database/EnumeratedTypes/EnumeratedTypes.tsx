@@ -59,7 +59,7 @@ const EnumeratedTypes = () => {
           <Input
             size="small"
             value={search}
-            className="w-[250px]"
+            className="w-64"
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search for a type"
             icon={<IconSearch size={14} />}

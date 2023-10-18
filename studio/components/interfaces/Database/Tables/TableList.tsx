@@ -105,7 +105,7 @@ const TableList = ({
           />
           <Input
             size="small"
-            className="w-[250px]"
+            className="w-64"
             placeholder="Search for a table"
             value={filterString}
             onChange={(e: any) => setFilterString(e.target.value)}
