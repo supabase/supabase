@@ -49,7 +49,7 @@ function VectorPage() {
         <HighlightCards {...pageData.highlightsSection} />
         <CenteredTitleImage {...pageData.integrations} />
         <TimedTabsSection {...pageData.APIsection} />
-        <div className="bg-white dark:bg-[#121212]">
+        <div className="bg-alternative">
           <UseCasesSection {...pageData.useCasesSection} />
           <FeaturesSection {...pageData.featuresSection} />
         </div>
@@ -57,7 +57,7 @@ function VectorPage() {
         <div className="bg-gradient-to-t from-alternative to-transparent">
           <EnterpriseCta />
         </div>
-        <div className="bg-scale-200">
+        <div className="bg-background">
           <div className="w-full h-[1px] bg-gradient-to-r from-background-alternative via-border to-background-alternative" />
           <ProductsCta currentProduct={PRODUCT_SHORTNAMES.VECTOR} />
         </div>
