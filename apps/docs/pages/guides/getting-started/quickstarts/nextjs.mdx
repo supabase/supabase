@@ -95,7 +95,7 @@ export const meta = {
         import { cookies } from "next/headers";
 
         export default async function Index() {
-          const cookeStore = cookies()
+          const cookieStore = cookies()
           const supabase = createServerComponentClient({ cookies: () => cookieStore })
 
           const { data: countries } = await supabase.from("countries").select();

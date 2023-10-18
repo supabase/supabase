@@ -17,7 +17,6 @@ import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
-import { IntegrationName } from 'data/integrations/integrations.types'
 import { useSelectedOrganization, useStore } from 'hooks'
 import { useAppStateSnapshot } from 'state/app-state'
 import GithubRepositorySelection from './GithubRepositorySelection'
@@ -29,7 +28,6 @@ const EnableBranchingModal = () => {
 
   const snap = useAppStateSnapshot()
   const [selectedBranch, setSelectedBranch] = useState<string>()
-  const [addConnectionType, setAddConnectionType] = useState<IntegrationName>()
 
   const isOrgBilling = !!selectedOrg?.subscription_id
 
@@ -59,17 +57,8 @@ const EnableBranchingModal = () => {
   const githubIntegration = integrations?.find(
     (integration) =>
       integration.integration.name === 'GitHub' &&
-      integration.connections.some((connection) => connection.supabase_project_ref === ref)
+      integration.organization.slug === selectedOrg?.slug
   )
-
-  // [Joshen] Leaving this out first
-  // const hasVercelIntegrationInstalled =
-  //   integrations?.some((integration) => integration.integration.name === 'Vercel') ?? false
-  // const vercelIntegration = integrations?.find(
-  //   (integration) =>
-  //     integration.integration.name === 'Vercel' &&
-  //     integration.connections.some((connection) => connection.supabase_project_ref === ref)
-  // )
 
   const onEnableBranching = () => {
     if (!ref) return console.error('Project ref is required')
@@ -89,7 +78,7 @@ const EnableBranchingModal = () => {
         <Modal.Content className="px-7 py-5 flex items-center space-x-4">
           <IconGitBranch strokeWidth={2} size={20} />
           <div>
-            <p className="text">Enable database branching</p>
+            <p className="text-foreground">Enable database branching</p>
             <p className="text-sm text-light">Manage environments in Supabase</p>
           </div>
         </Modal.Content>
@@ -160,7 +149,6 @@ const EnableBranchingModal = () => {
                   hasGithubIntegrationInstalled={hasGithubIntegrationInstalled}
                   setSelectedBranch={setSelectedBranch}
                 />
-                {/* <VercelProjectSelection integration={vercelIntegration} /> */}
               </>
             )}
 
@@ -173,7 +161,7 @@ const EnableBranchingModal = () => {
                   </figure>
                 </div>
                 <div>
-                  <p className="text-sm text">
+                  <p className="text-sm text-foreground">
                     You will not be able to use the dashboard to make changes to the database
                   </p>
                   <p className="text-sm text-light">

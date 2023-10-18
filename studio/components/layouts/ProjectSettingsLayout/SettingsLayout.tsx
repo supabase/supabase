@@ -1,4 +1,11 @@
-import { useFlag, useSelectedOrganization, useSelectedProject, useStore, withAuth } from 'hooks'
+import {
+  useFlag,
+  useIsFeatureEnabled,
+  useSelectedOrganization,
+  useSelectedProject,
+  useStore,
+  withAuth,
+} from 'hooks'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
@@ -25,7 +32,24 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
     ? router.pathname.split('/')[5]
     : router.pathname.split('/')[4]
 
-  const menuRoutes = generateSettingsMenu(ref, project, organization)
+  const {
+    projectAuthAll: authEnabled,
+    projectEdgeFunctionAll: edgeFunctionsEnabled,
+    projectStorageAll: storageEnabled,
+    billingAll: billingEnabled,
+  } = useIsFeatureEnabled([
+    'project_auth:all',
+    'project_edge_function:all',
+    'project_storage:all',
+    'billing:all',
+  ])
+
+  const menuRoutes = generateSettingsMenu(ref, project, organization, {
+    auth: authEnabled,
+    edgeFunctions: edgeFunctionsEnabled,
+    storage: storageEnabled,
+    billing: billingEnabled,
+  })
 
   useEffect(() => {
     if (ui.selectedProjectRef) {
