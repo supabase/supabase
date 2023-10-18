@@ -136,8 +136,8 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
             </div>
           </SectionContainer>
 
-          <div className="py-[1.25px] bg-gradient-to-r from-scale-100 via-scale-700 to-scale-100">
-            <div className="bg-scale-100 overflow-clip">
+          <div className="py-[1.25px] bg-gradient-to-r from-background via-border to-background">
+            <div className="bg-alternative overflow-clip">
               <SectionContainer className="!py-0 !pb-16 lg:!pt-16">
                 <div className="lg:flex lg:h-[500px]">
                   <div className="relative aspect-square -top-[110px] -left-[200px] w-[575px] sm:-top-[150px] sm:-left-[300px] sm:w-[850px] lg:-top-[225px] lg:-left-[330px] lg:w-[800px] lg:h-[800px] xl:-left-[200px] xl:-top-[210px] xl:w-[1000px]">
@@ -332,7 +332,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                       <div
                         className={`${
                           Styles[`contributors-${i}`]
-                        } absolute w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full border-[1.5px] border-scale-600 z-10
+                        } absolute w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full border-[1.5px] border-border z-10
                           transition-all hover:scale-105 drop-shadow-sm hover:drop-shadow-md
                         `}
                         key={i}
@@ -356,22 +356,22 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                   <div
                     className={`${Styles['contributors-bg-circle']} w-[100%] lg:w-[80%] left-[0%] lg:left-[10%] -bottom-[30%] xs:-bottom-[36%] sm:-bottom-[52%] md:-bottom-[64%] lg:-bottom-[80%] xl:-bottom-[100%]`}
                   >
-                    <div className="flex flex-col justify-between h-full bg-scale-100 rounded-full p-4"></div>
+                    <div className="flex flex-col justify-between h-full bg-alternative rounded-full p-4"></div>
                   </div>
                   <div
                     className={`${Styles['contributors-bg-circle']} w-[80%] lg:w-[60%] left-[10%] lg:left-[20%] -bottom-[25%] xs:-bottom-[30%] sm:-bottom-[44%] md:-bottom-[54%] lg:-bottom-[60%] xl:-bottom-[75%]`}
                   >
-                    <div className="flex flex-col justify-between h-full bg-scale-100 rounded-full p-4"></div>
+                    <div className="flex flex-col justify-between h-full bg-alternative rounded-full p-4"></div>
                   </div>
                   <div
                     className={`${Styles['contributors-bg-circle']} w-[60%] lg:w-[40%] left-[20%] lg:left-[30%] -bottom-[20%] xs:-bottom-[25%] sm:-bottom-[38%] md:-bottom-[44%] lg:-bottom-[40%] xl:-bottom-[50%]`}
                   >
-                    <div className="flex flex-col justify-between h-full bg-scale-100 rounded-full p-4"></div>
+                    <div className="flex flex-col justify-between h-full bg-alternative rounded-full p-4"></div>
                   </div>
                   <div
                     className={`${Styles['contributors-bg-circle']} w-[40%] lg:w-[20%] left-[30%] lg:left-[40%] -bottom-[15%] xs:-bottom-[19%] sm:-bottom-[30%] md:-bottom-[34%] lg:-bottom-[20%] xl:-bottom-[25%]`}
                   >
-                    <div className="flex flex-col justify-between h-full bg-scale-100 rounded-full p-4"></div>
+                    <div className="flex flex-col justify-between h-full bg-alternative rounded-full p-4"></div>
                   </div>
                 </div>
               </SectionContainer>
@@ -489,7 +489,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                     return (
                       <div className="cursor-pointer md:cursor-default" key={i}>
                         <Link href={job.absolute_url}>
-                          <div className="bg-white border-scale-300 drop-shadow-sm dark:bg-scale-300 border dark:border-scale-400 p-4 px-7 rounded-md sm:flex sm:items-center transition ease-out hover:bg-scale-100 dark:hover:bg-scale-400 hover:drop-shadow-md hover:cursor-pointer">
+                          <div className="bg-white border-scale-300 drop-shadow-sm dark:bg-scale-300 border dark:border-scale-400 p-4 px-7 rounded-md sm:flex sm:items-center transition ease-out hover:bg-alternative dark:hover:bg-scale-400 hover:drop-shadow-md hover:cursor-pointer">
                             <h2 className="text-base min-w-[240px] lg:min-w-[316px] truncate mr-6">
                               {job.title}
                             </h2>
