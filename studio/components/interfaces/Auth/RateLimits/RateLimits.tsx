@@ -256,7 +256,8 @@ const RateLimits = () => {
                 </FormSectionContent>
               </FormSection>
 
-              <FormSection
+              {/* [Joshen] The bottom 2 fields are hidden for now until BE support is ready */}
+              {/* <FormSection
                 id="token-refresh"
                 header={
                   <FormSectionLabel
@@ -280,18 +281,20 @@ const RateLimits = () => {
                           <Input_Shadcn_ disabled type="number" {...field} />
                         </FormControl_Shadcn_>
                         {field.value > 0 && (
-                          <p className="text-foreground-lighter text-sm">
-                            This is equivalent to {field.value * 12} requests per hour
-                          </p>
+                          <>
+                            <p className="text-foreground-lighter text-sm">
+                              This is equivalent to {field.value * 12} requests per hour
+                            </p>
+                          </>
                         )}
                         <FormMessage_Shadcn_ />
                       </FormItem_Shadcn_>
                     )}
                   />
                 </FormSectionContent>
-              </FormSection>
+              </FormSection> */}
 
-              <FormSection
+              {/* <FormSection
                 id="verify"
                 header={
                   <FormSectionLabel
@@ -325,7 +328,7 @@ const RateLimits = () => {
                     )}
                   />
                 </FormSectionContent>
-              </FormSection>
+              </FormSection> */}
             </FormPanel>
           </form>
         </Form_Shadcn_>
