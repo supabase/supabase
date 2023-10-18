@@ -15,7 +15,7 @@ const data = {
       links: [
         {
           label: 'Open GitHub Issue',
-          link: '',
+          link: 'https://github.com/supabase/supabase/issues',
           target: '_blank',
           icon: <IconGitHubSolid />,
           type: 'default',
