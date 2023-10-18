@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.100.1
+  version: 1.106.1
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -867,6 +867,7 @@ commands:
     subcommands:
       - supabase-projects-api-keys
       - supabase-projects-create
+      - supabase-projects-delete
       - supabase-projects-list
     flags: []
   - id: supabase-projects-list
@@ -876,6 +877,14 @@ commands:
     tags: []
     links: []
     usage: supabase projects list
+    subcommands: []
+    flags: []
+  - id: supabase-projects-delete
+    title: supabase projects delete
+    summary: Delete a Supabase project
+    tags: []
+    links: []
+    usage: supabase projects delete <ref>
     subcommands: []
     flags: []
   - id: supabase-projects-create
@@ -2379,6 +2388,40 @@ commands:
         name: --project-ref <string>
         description: Project ref of the Supabase project.
         default_value: ''
+  - id: supabase-encryption
+    title: supabase encryption
+    summary: Manage encryption keys of Supabase projects
+    tags:
+      - management-api
+    links: []
+    subcommands:
+      - supabase-encryption-get-root-key
+      - supabase-encryption-update-root-key
+    flags: []
+  - id: supabase-encryption-update-root-key
+    title: supabase encryption update-root-key
+    summary: Update root encryption key of a Supabase project
+    tags: []
+    links: []
+    usage: supabase encryption update-root-key
+    subcommands: []
+    flags:
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
+  - id: supabase-encryption-get-root-key
+    title: supabase encryption get-root-key
+    summary: Get the root encryption key of a Supabase project
+    tags: []
+    links: []
+    usage: supabase encryption get-root-key
+    subcommands: []
+    flags:
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
   - id: supabase-domains
     title: supabase domains
     summary: Manage custom domain names for Supabase projects
@@ -2636,7 +2679,7 @@ commands:
     summary: Pull schema from the remote database
     description: |2
 
-      Pulls schema changes from a remote database.
+      Pulls schema changes from a remote database. A new migration file will be created under `supabase/migrations` directory.
 
       Requires your local project to be linked to a remote database by running `supabase link`. For self-hosted databases, you can pass in the connection parameters using `--db-url` flag.
 
@@ -2667,7 +2710,7 @@ commands:
         default_value: ''
       - id: schema
         name: -s, --schema <strings>
-        description: List of schema to include.
+        description: Comma separated list of schema to include.
         default_value: all
   - id: supabase-db-lint
     title: supabase db lint
@@ -2737,7 +2780,7 @@ commands:
         default_value: 'true'
       - id: schema
         name: -s, --schema <strings>
-        description: List of schema to include.
+        description: Comma separated list of schema to include.
         default_value: all
   - id: supabase-db-dump
     title: supabase db dump
@@ -2814,7 +2857,7 @@ commands:
         default_value: 'false'
       - id: schema
         name: -s, --schema <strings>
-        description: List of schema to include.
+        description: Comma separated list of schema to include.
         default_value: all
       - id: use-copy
         name: --use-copy
@@ -2895,7 +2938,7 @@ commands:
         default_value: 'true'
       - id: schema
         name: -s, --schema <strings>
-        description: List of schema to include.
+        description: Comma separated list of schema to include.
         default_value: all
       - id: use-migra
         name: --use-migra
