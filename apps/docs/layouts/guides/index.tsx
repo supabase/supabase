@@ -74,6 +74,21 @@ const Layout: FC<Props> = (props) => {
     }&title=${props.meta?.title}&description=${props.meta?.description}`
   )
 
+  const fileName = router.asPath.split('/')[5]
+  const foreignDataWrappers = [
+    'airtable',
+    's3',
+    'bigquery',
+    'clickhouse',
+    'firebase',
+    'logflare',
+    'stripe',
+  ]
+  const referGithubDocsUrl = [
+    `https://github.com/supabase/supabase/edit/master/apps/docs/pages${router.asPath}.mdx`,
+    `https://github.com/supabase/wrappers/blob/main/docs/${fileName}.md`,
+  ]
+
   return (
     <>
       <Head>
@@ -136,7 +151,11 @@ const Layout: FC<Props> = (props) => {
                 <div className="mt-16 not-prose">
                   <div>
                     <a
-                      href={`https://github.com/supabase/supabase/edit/master/apps/docs/pages${router.asPath}.mdx`}
+                      href={
+                        foreignDataWrappers.includes(fileName)
+                          ? referGithubDocsUrl[1]
+                          : referGithubDocsUrl[0]
+                      }
                       className="text-sm transition flex items-center gap-1 text-scale-1000 hover:text-scale-1200 w-fit"
                     >
                       Edit this page on GitHub <IconExternalLink size={14} strokeWidth={1.5} />
