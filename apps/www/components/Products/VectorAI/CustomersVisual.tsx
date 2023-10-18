@@ -11,9 +11,7 @@ const CustomersVisual = () => {
       <div
         className="absolute inset-0 mx-auto aspect-[5.13/1] h-full z-10"
         style={{
-          background: `radial-gradient(50% 50% at 50% 50%, transparent, ${
-            resolvedTheme === 'dark' ? 'var(--colors-scale1)' : 'var(--colors-scale3)'
-          })`,
+          background: `radial-gradient(50% 50% at 50% 50%, transparent, hsl(var(--background-alternative))`,
         }}
       />
       <m.svg

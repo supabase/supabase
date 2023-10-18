@@ -44,7 +44,7 @@ function VectorPage() {
           ],
         }}
       />
-      <DefaultLayout className="!bg-scale-300 dark:!bg-scale-100">
+      <DefaultLayout className="!bg-alternative">
         <ProductHeaderCentered {...pageData.heroSection} />
         <HighlightCards {...pageData.highlightsSection} />
         <CenteredTitleImage {...pageData.integrations} />
@@ -54,11 +54,11 @@ function VectorPage() {
           <FeaturesSection {...pageData.featuresSection} />
         </div>
         <CustomerQuotesSection {...pageData.quotesSection} />
-        <div className="bg-gradient-to-t from-white dark:from-[#121212] to-transparent">
+        <div className="bg-gradient-to-t from-alternative to-transparent">
           <EnterpriseCta />
         </div>
         <div className="bg-scale-200">
-          <div className="w-full h-[1px] bg-gradient-to-r from-scale-100 via-scale-500 dark:via-scale-600 to-scale-100" />
+          <div className="w-full h-[1px] bg-gradient-to-r from-background-alternative via-border to-background-alternative" />
           <ProductsCta currentProduct={PRODUCT_SHORTNAMES.VECTOR} />
         </div>
       </DefaultLayout>
