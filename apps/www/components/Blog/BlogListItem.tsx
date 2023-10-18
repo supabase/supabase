@@ -30,7 +30,7 @@ const BlogListItem = ({ post }: Props) => {
           <div className="flex flex-col space-y-6">
             <div className="flex flex-col space-y-3">
               <div
-                className={`border-scale-300 relative mb-4 h-60 w-full overflow-auto rounded-lg border shadow-sm`}
+                className={`border-border relative mb-4 h-60 w-full overflow-auto rounded-lg border shadow-sm`}
               >
                 <Image
                   layout="fill"
@@ -50,7 +50,7 @@ const BlogListItem = ({ post }: Props) => {
               <h3 className="text-foreground max-w-sm text-xl">{post.title}</h3>
               <p className="text-light max-w-sm text-base">{post.description}</p>
               {post.date && (
-                <div className="text-muted flex items-center space-x-1.5 text-sm">
+                <div className="text-light flex items-center space-x-1.5 text-sm">
                   <p>{post.date}</p>
                   {post.readingTime && (
                     <>

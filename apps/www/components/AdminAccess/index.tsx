@@ -1,11 +1,7 @@
 import React, { useState } from 'react'
-import Tabs from 'components/AdminAccess/tabs'
-import SectionHeader from 'components/UI/SectionHeader'
 import { useRouter } from 'next/router'
-import SectionContainer from '../Layouts/SectionContainer'
-import ImageCarousel from '../Carousels/ImageCarousel'
-
-import TableViewCarouselData from 'data/products/database/table-view-carousel.json'
+import ImageCarousel from '~/components/Carousels/ImageCarousel'
+import SectionContainer from '~/components/Layouts/SectionContainer'
 
 import AdminAccessData from 'data/home/admin-access.json'
 
