@@ -6,7 +6,7 @@ import Typed from 'typed.js'
 import { Button, ButtonProps, cn, IconCommand, IconSearch, SearchButton } from 'ui'
 
 import DefaultLayout from '~/components/Layouts/Default'
-import InteractiveShimmerCard from '~/components/InteractiveShimmerCard'
+import Panel from '~/components/Panel'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { questions } from 'shared-data'
 import data from '~/data/support'
@@ -87,7 +87,7 @@ const Index = () => {
         </div>
         <SectionContainer className="text grid gap-5 md:grid-cols-2 xl:grid-cols-3 max-w-7xl !pb-8">
           {data.cards.map((card) => (
-            <InteractiveShimmerCard
+            <Panel
               key={card.title}
               outerClassName={cn(card.className)}
               innerClassName="flex flex-col p-5"
@@ -112,7 +112,7 @@ const Index = () => {
                   </Link>
                 ))}
               </div>
-            </InteractiveShimmerCard>
+            </Panel>
           ))}
         </SectionContainer>
         <SectionContainer className="!pt-0 max-w-7xl">

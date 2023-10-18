@@ -8,9 +8,9 @@ import { range } from 'lodash'
 import { useBreakpoint } from 'common'
 import { Badge, Button, IconCode, TextLink } from 'ui'
 import DefaultLayout from '~/components/Layouts/Default'
-import InteractiveShimmerCard from '~/components/InteractiveShimmerCard'
 import ProductHeaderCentered from '~/components/Sections/ProductHeaderCentered'
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import Panel from '~/components/Panel'
 
 import pageData from '~/data/partners'
 
@@ -111,10 +111,9 @@ const Partners = () => {
               />
             </div>
             <div className="col-span-1 lg:col-span-3 w-full max-w-4xl grid gap-8 rounded md:grid-cols-2">
-              <InteractiveShimmerCard
+              <Panel
                 hasShimmer
-                hasInnerShimmer={false}
-                hasActiveOnHover={true}
+                hasActiveOnHover
                 innerClassName="px-8 py-6 group flex flex-col gap-4"
               >
                 <div className="bg-surface-200 mb-4 text-foreground flex h-12 w-12 items-center justify-center rounded-md border transition-all group-hover:scale-105">
@@ -142,11 +141,10 @@ const Partners = () => {
                 <Link href="/partners/experts">
                   <a className="absolute inset-0" />
                 </Link>
-              </InteractiveShimmerCard>
-              <InteractiveShimmerCard
+              </Panel>
+              <Panel
                 hasShimmer
-                hasInnerShimmer={false}
-                hasActiveOnHover={true}
+                hasActiveOnHover
                 innerClassName="px-8 py-6 group flex flex-col gap-4"
               >
                 <div className="bg-surface-200 text-foreground flex h-12 w-12 items-center justify-center rounded-md border transition-all group-hover:scale-105">
@@ -173,7 +171,7 @@ const Partners = () => {
                 <Link href="/partners/integrations">
                   <a className="absolute inset-0" />
                 </Link>
-              </InteractiveShimmerCard>
+              </Panel>
             </div>
           </div>
         </SectionContainer>

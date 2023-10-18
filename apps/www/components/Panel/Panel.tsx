@@ -1,30 +1,35 @@
 import React, { PropsWithChildren, useEffect, useRef } from 'react'
+import { motion } from 'framer-motion'
 import { cn } from 'ui'
+import { isBrowser } from 'common'
 
 interface Props {
   outerClassName?: string
   innerClassName?: string
+  hasActiveOnHover?: boolean
   activeColor?: 'default' | 'brand'
   hasShimmer?: boolean
-  hasActiveOnHover?: boolean
   hasInnerShimmer?: boolean
   shimmerFromColor?: string
   shimmerToColor?: string
+  hasMotion?: boolean
 }
 
-const InteractiveShimmerCard = ({
+const Panel = ({
   outerClassName,
   innerClassName,
+  hasActiveOnHover = false,
   activeColor = 'default',
   hasShimmer = false,
-  hasActiveOnHover = false,
   hasInnerShimmer = false,
   shimmerFromColor,
   shimmerToColor,
+  hasMotion = false,
   children,
 }: PropsWithChildren<Props>) => {
   const outerRef = useRef(null)
   const innerRef = useRef(null)
+  const Component = hasMotion ? motion.div : 'div'
   const trackCursor = hasShimmer || hasInnerShimmer
 
   const handleGlow = (event: any) => {
@@ -58,7 +63,7 @@ const InteractiveShimmerCard = ({
   }
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    if (!isBrowser) return
 
     window.addEventListener('mousemove', handleGlow)
     return () => {
@@ -67,7 +72,7 @@ const InteractiveShimmerCard = ({
   }, [])
 
   return (
-    <div
+    <Component
       ref={outerRef}
       className={cn(
         'relative rounded-xl bg-surface-100 bg-gradient-to-b from-border to-surface-200 p-px transition-all shadow-md',
@@ -78,18 +83,22 @@ const InteractiveShimmerCard = ({
           : '',
         outerClassName
       )}
+      {...(hasMotion ? { whileHover: 'hover', animate: 'initial' } : undefined)}
     >
       <div
         className={cn(
-          'relative h-full z-10 rounded-xl bg-surface-100 overflow-hidden transition-all text-light',
+          'relative z-10 w-full h-full rounded-xl bg-surface-100 overflow-hidden text-light',
           innerClassName
         )}
       >
         {children}
-        <div ref={innerRef} className="absolute z-0 inset-0 w-full h-full pointer-events-none" />
+        <div
+          ref={innerRef}
+          className="absolute z-10 inset-0 w-full h-full pointer-events-none opacity-20"
+        />
       </div>
-    </div>
+    </Component>
   )
 }
 
-export default InteractiveShimmerCard
+export default Panel

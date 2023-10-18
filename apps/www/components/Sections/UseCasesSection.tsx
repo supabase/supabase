@@ -1,10 +1,11 @@
 import Link from 'next/link'
 import React, { ReactNode, useRef } from 'react'
 import { Button, IconArrowUpRight } from 'ui'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import InteractiveShimmerCard from '../InteractiveShimmerCard'
 import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
 import { INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
+
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import Panel from '~/components/Panel'
 
 interface UseCase {
   img?: string
@@ -62,10 +63,7 @@ const UseCase = ({
 
   return (
     <m.div initial={initial} animate={isInView ? animate : initial} className="flex">
-      <InteractiveShimmerCard
-        outerClassName="w-full"
-        innerClassName="p-4 md:p-8 h-full !bg-scale-200"
-      >
+      <Panel outerClassName="w-full" innerClassName="p-4 md:p-8 h-full !bg-scale-200">
         <div className="h-full flex flex-col gap-4 items-start justify-between">
           <div className="prose">
             <div className="flex items-center gap-2">
@@ -97,7 +95,7 @@ const UseCase = ({
               </Link>
             ))}
         </div>
-      </InteractiveShimmerCard>
+      </Panel>
     </m.div>
   )
 }

@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import React from 'react'
-import InteractiveShimmerCard from '../InteractiveShimmerCard'
 import { IconArrowUpRight, cn } from 'ui'
+
+import Panel from '~/components/Panel'
 
 const Sponsorships = ({ sponsorships }: { sponsorships: any[] }) => {
   return (
@@ -18,7 +19,7 @@ const Sponsorships = ({ sponsorships }: { sponsorships: any[] }) => {
         {sponsorships.map((link) => (
           <Link href={link.url} key={link.name}>
             <a target="_blank">
-              <InteractiveShimmerCard
+              <Panel
                 outerClassName=""
                 innerClassName={cn(
                   'relative group flex flex-col gap-2 p-4 ',
@@ -53,7 +54,7 @@ const Sponsorships = ({ sponsorships }: { sponsorships: any[] }) => {
                 <div className="text-sm w-full flex justify-between text-lighter mt-2">
                   <IconArrowUpRight className="w-4 stroke-[1.5px]" />
                 </div>
-              </InteractiveShimmerCard>
+              </Panel>
             </a>
           </Link>
         ))}

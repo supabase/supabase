@@ -1,8 +1,9 @@
 import React, { useRef, useState } from 'react'
 import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import InteractiveShimmerCard from '~/components/InteractiveShimmerCard'
 import { INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
+
+import Panel from '~/components/Panel'
+import SectionContainer from '~/components/Layouts/SectionContainer'
 
 interface Highlight {
   image?: React.ReactNode
@@ -43,7 +44,7 @@ const HighlightCard = ({ highlight, index }: { highlight: Highlight; index: numb
       onMouseLeave={() => setIsHovered(false)}
       animate={isInView ? animate : initial}
     >
-      <InteractiveShimmerCard hasShimmer innerClassName="flex flex-col !bg-scale-100">
+      <Panel hasShimmer innerClassName="flex flex-col !bg-scale-100">
         <div className="relative w-full aspect-[1.35/1] mb-4">
           <div
             className="absolute inset-0 w-full h-full z-10"
@@ -58,7 +59,7 @@ const HighlightCard = ({ highlight, index }: { highlight: Highlight; index: numb
           <h3 className="text-lg text-foreground mb-2">{highlight.title}</h3>
           <p className="text-muted">{highlight.paragraph}</p>
         </div>
-      </InteractiveShimmerCard>
+      </Panel>
     </m.div>
   )
 }
