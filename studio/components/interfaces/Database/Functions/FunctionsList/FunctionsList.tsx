@@ -43,7 +43,7 @@ const FunctionsList = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const [protectedSchemas, openSchemas] = partition(schemas ?? [], (schema) =>
+  const [protectedSchemas] = partition(schemas ?? [], (schema) =>
     EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
   )
   const schema = schemas?.find((schema) => schema.name === selectedSchema)
