@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import OrganizationPicker from 'components/interfaces/Integrations/OrganizationPicker'
@@ -23,13 +23,13 @@ import {
   IconLifeBuoy,
   LoadingLine,
 } from 'ui'
+import { useGitHubIntegrationAutoInstall } from 'lib/github-integration'
 
 const GitHubIntegration: NextPageWithLayout = () => {
   const router = useRouter()
   const { ui } = useStore()
   const { installation_id: installationId } = useParams()
   const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null)
-  const [organizationIntegrationId, setOrganizationIntegrationId] = useState<string | null>(null)
 
   /**
    * Fetch the list of organization based integration installations for GitHub.
@@ -48,17 +48,24 @@ const GitHubIntegration: NextPageWithLayout = () => {
     },
   })
 
+  const onInstalled = useCallback(
+    (id: string, orgSlug?: string) => {
+      router.push({
+        pathname: `/integrations/github/${id}/choose-project`,
+        query: { ...router.query, slug: orgSlug },
+      })
+    },
+    [router]
+  )
+
   const { mutate, isLoading: isLoadingGitHubIntegrationCreateMutation } =
     useGitHubIntegrationCreateMutation({
       onSuccess({ id }) {
-        setOrganizationIntegrationId(id)
-
-        router.push({
-          pathname: `/integrations/github/${id}/choose-project`,
-          query: { ...router.query, slug: selectedOrg?.slug },
-        })
+        onInstalled(id, selectedOrg?.slug)
       },
     })
+
+  const isAutoInstalling = useGitHubIntegrationAutoInstall(onInstalled)
 
   const installed = useMemo(
     () =>
@@ -119,61 +126,55 @@ const GitHubIntegration: NextPageWithLayout = () => {
   return (
     <>
       <main className="overflow-auto flex flex-col h-full bg">
-        <LoadingLine loading={isLoadingGitHubIntegrationCreateMutation} />
-        {organizationIntegrationId === null && (
-          <>
-            <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
-              <ScaffoldColumn className="mx-auto">
-                <h1 className="text-xl text-foreground">Choose organization</h1>
-                <>
-                  <Markdown content={`Choose the Supabase organization you wish to install in`} />
-                  <OrganizationPicker
-                    integrationName="GitHub"
-                    selectedOrg={selectedOrg}
-                    onSelectedOrgChange={(org) => {
-                      router.query.organizationSlug = org.slug
-                      setSelectedOrg(org)
-                    }}
-                    configurationId={installationId}
-                  />
-                  {disableInstallationForm && (
-                    <Alert_Shadcn_ variant="warning">
-                      <IconAlertTriangle className="h-4 w-4" strokeWidth={2} />
-                      <AlertTitle_Shadcn_>
-                        GitHub Integration is already installed.
-                      </AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_>
-                        You will need to choose another organization to install the integration.
-                      </AlertDescription_Shadcn_>
-                    </Alert_Shadcn_>
-                  )}
-                  <div className="flex flex-row w-full justify-end">
-                    <Button
-                      size="medium"
-                      className="self-end"
-                      disabled={isLoadingGitHubIntegrationCreateMutation || disableInstallationForm}
-                      loading={isLoadingGitHubIntegrationCreateMutation}
-                      onClick={onInstall}
-                    >
-                      Install integration
-                    </Button>
-                  </div>
-                </>
-              </ScaffoldColumn>
-            </ScaffoldContainer>
-            <ScaffoldContainer className="flex flex-col gap-6 py-3">
-              <Alert
-                withIcon
-                variant="info"
-                title="You can uninstall this Integration at any time."
-              >
-                <Markdown
-                  content={`Remove this integration at any time via GitHub or the Supabase dashboard.`}
-                />
-              </Alert>
-            </ScaffoldContainer>
-          </>
-        )}
+        <LoadingLine loading={isLoadingGitHubIntegrationCreateMutation || isAutoInstalling} />
+        <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
+          <ScaffoldColumn className="mx-auto">
+            <h1 className="text-xl text-foreground">Choose organization</h1>
+            <>
+              <Markdown content={`Choose the Supabase organization you wish to install in`} />
+              <OrganizationPicker
+                integrationName="GitHub"
+                selectedOrg={selectedOrg}
+                onSelectedOrgChange={(org) => {
+                  router.query.organizationSlug = org.slug
+                  setSelectedOrg(org)
+                }}
+                configurationId={installationId}
+              />
+              {disableInstallationForm && (
+                <Alert_Shadcn_ variant="warning">
+                  <IconAlertTriangle className="h-4 w-4" strokeWidth={2} />
+                  <AlertTitle_Shadcn_>GitHub Integration is already installed.</AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_>
+                    You will need to choose another organization to install the integration.
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+              )}
+              <div className="flex flex-row w-full justify-end">
+                <Button
+                  size="medium"
+                  className="self-end"
+                  disabled={
+                    isLoadingGitHubIntegrationCreateMutation ||
+                    isAutoInstalling ||
+                    disableInstallationForm
+                  }
+                  loading={isLoadingGitHubIntegrationCreateMutation || isAutoInstalling}
+                  onClick={onInstall}
+                >
+                  Install integration
+                </Button>
+              </div>
+            </>
+          </ScaffoldColumn>
+        </ScaffoldContainer>
+        <ScaffoldContainer className="flex flex-col gap-6 py-3">
+          <Alert withIcon variant="info" title="You can uninstall this Integration at any time.">
+            <Markdown
+              content={`Remove this integration at any time via GitHub or the Supabase dashboard.`}
+            />
+          </Alert>
+        </ScaffoldContainer>
 
         <ScaffoldDivider />
       </main>

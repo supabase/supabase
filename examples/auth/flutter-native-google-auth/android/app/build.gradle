@@ -48,15 +48,15 @@ android {
         applicationId "com.example.myauthapp"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion 20
+        minSdkVersion 21
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        // You need an empty manifestPlaceholders for appauth to not throw an error
         manifestPlaceholders += [
-                // *account_id* will be unique for every single app
-                'appAuthRedirectScheme': 'com.googleusercontent.apps.*account_id*'
+                'appAuthRedirectScheme': ''
         ]
-
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -74,4 +74,5 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'androidx.multidex:multidex:2.0.1'
 }

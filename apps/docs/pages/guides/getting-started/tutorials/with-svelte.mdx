@@ -173,7 +173,7 @@ Let's create a new component for that called `Account.svelte`.
         updated_at: new Date().toISOString(),
       }
 
-      let { error } = await supabase.from('profiles').upsert(updates)
+      const { error } = await supabase.from('profiles').upsert(updates)
 
       if (error) {
         throw error
@@ -306,7 +306,7 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
       const fileExt = file.name.split('.').pop()
       const filePath = `${Math.random()}.${fileExt}`
 
-      let { error } = await supabase.storage.from('avatars').upload(filePath, file)
+      const { error } = await supabase.storage.from('avatars').upload(filePath, file)
 
       if (error) {
         throw error

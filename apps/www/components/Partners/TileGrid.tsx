@@ -31,8 +31,8 @@ export default function TileGrid({
                 <a>
                   <div
                     className="
-                bg-scale-100 dark:bg-scale-300
-                hover:bg-scale-200 hover:dark:bg-scale-400
+                bg-surface-100
+                hover:bg-surface-200
                 group flex h-full w-full flex-col rounded-xl border px-6
                 py-6 shadow
                 transition-all
@@ -50,11 +50,11 @@ export default function TileGrid({
                         />
                       </div>
                       <div>
-                        <h3 className="text-scale-1100 group-hover:text-scale-1200 mb-2 text-xl transition-colors">
+                        <h3 className="text-light group-hover:text-foreground mb-2 text-xl transition-colors">
                           {p.title}
                         </h3>
                         <p
-                          className="text-scale-900 text-sm line-clamp-4 min-h-[80px]"
+                          className="text-lighter text-sm line-clamp-4 min-h-[80px]"
                           title={p.description}
                         >
                           {p.description}
@@ -77,8 +77,8 @@ export default function TileGrid({
                 <a>
                   <div
                     className="
-                bg-scale-100 dark:bg-scale-300
-                hover:bg-scale-200 hover:dark:bg-scale-400
+                bg-surface-100
+                hover:bg-surface-200
                 group flex h-full w-full flex-col rounded-xl border px-6
                 py-6 shadow
                 transition-all
@@ -96,11 +96,11 @@ export default function TileGrid({
                         />
                       </div>
                       <div>
-                        <h3 className="text-scale-1100 group-hover:text-scale-1200 mb-2 text-xl transition-colors">
+                        <h3 className="text-light group-hover:text-foreground mb-2 text-xl transition-colors">
                           {p.title}
                         </h3>
                         <p
-                          className="text-scale-900 text-sm line-clamp-4 min-h-[80px]"
+                          className="text-lighter text-sm line-clamp-4 min-h-[80px]"
                           title={p.description}
                         >
                           {p.description}
