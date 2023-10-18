@@ -58,7 +58,10 @@ import { useState } from 'react'
 
 function MyApp({ Component, pageProps }) {
   // Create a new supabase browser client on every first render.
-  const [supabaseClient] = useState(() => createPagesBrowserClient())
+  const [supabaseClient] = useState(() => createPagesBrowserClient({
+    supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  }))
 
   return (
     <SessionContextProvider
@@ -88,7 +91,10 @@ function MyApp({
   initialSession: Session
 }>) {
   // Create a new supabase browser client on every first render.
-  const [supabaseClient] = useState(() => createPagesBrowserClient())
+  const [supabaseClient] = useState(() => createPagesBrowserClient({
+    supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  }))
 
   return (
     <SessionContextProvider
@@ -178,7 +184,10 @@ Creating a new supabase client object:
 import { createPagesBrowserClient } from '@supabase/auth-helpers-nextjs'
 import { Database } from '../database.types'
 
-const supabaseClient = createPagesBrowserClient<Database>()
+const supabaseClient = createPagesBrowserClient<Database>({
+  supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+  supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+})
 ```
 
 Retrieving a supabase client object from the SessionContext:
@@ -869,7 +878,10 @@ The `supabaseClient` and `supabaseServerClient` have been removed in favor of th
 ```tsx
 // client-side
 import type { Database } from 'types_db'
-const [supabaseClient] = useState(() => createPagesBrowserClient<Database>())
+const [supabaseClient] = useState(() => createPagesBrowserClient<Database>({
+  supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+  supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+}))
 
 // server-side API route
 import type { NextApiRequest, NextApiResponse } from 'next'
@@ -897,7 +909,10 @@ Creating a new supabase client object:
 ```tsx
 import { Database } from '../database.types'
 
-const [supabaseClient] = useState(() => createPagesBrowserClient<Database>())
+const [supabaseClient] = useState(() => createPagesBrowserClient<Database>({
+  supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+  supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+}))
 ```
 
 Retrieving a supabase client object from the SessionContext:
