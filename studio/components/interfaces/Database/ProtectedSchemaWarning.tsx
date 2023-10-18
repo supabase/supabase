@@ -34,7 +34,7 @@ export const ProtectedSchemaModal = ({
       <Modal.Content className="py-4 space-y-2">
         <p className="text-sm">
           The following schemas are managed by Supabase and are currently protected from write
-          access through the Table Editor.
+          access through the dashboard.
         </p>
         <div className="flex flex-wrap gap-1">
           {EXCLUDED_SCHEMAS.map((schema) => (

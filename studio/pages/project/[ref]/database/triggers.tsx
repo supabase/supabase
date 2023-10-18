@@ -54,7 +54,7 @@ const TriggersPage: NextPageWithLayout = () => {
         <ScaffoldSection>
           <div className="col-span-12">
             <div className="mb-4">
-              <h3 className="mb-1 text-xl text-foreground">Database Triggers</h3>
+              <h3 className="text-xl text-foreground">Database Triggers</h3>
             </div>
             <TriggersList
               createTrigger={createTrigger}
