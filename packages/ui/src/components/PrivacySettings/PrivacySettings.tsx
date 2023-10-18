@@ -56,7 +56,7 @@ const PrivacySettings = ({ children, ...props }: PropsWithChildren<{ className?:
               descriptionText={
                 <>
                   These cookies are necessary for Supabase to function.{' '}
-                  <Link href="https://supabase.com/privacy#4-how-we-use-cookies-and-other-tracking-technology-to-collect-information">
+                  <Link href="https://supabase.com/privacy#8-cookies-and-similar-technologies-used-on-our-european-services">
                     <a className="underline">Learn more</a>
                   </Link>
                 </>
