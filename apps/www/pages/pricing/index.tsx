@@ -1,20 +1,22 @@
-import { Accordion, Badge, Button, IconCheck, Select } from 'ui'
-import Solutions from 'data/Solutions'
-import { NextSeo } from 'next-seo'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { NextSeo } from 'next-seo'
+import { useTheme } from 'next-themes'
+import { Accordion, Button, IconCheck, Select } from 'ui'
+
+import AnnouncementBadge from '~/components/Announcement/Badge'
 import CTABanner from '~/components/CTABanner'
+import ComputePricingModal from '~/components/Pricing/ComputePricingModal'
 import DefaultLayout from '~/components/Layouts/Default'
 import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/Pricing/PricingTableRow'
-import { pricing } from 'shared-data/pricing'
+
+import Solutions from '~/data/Solutions'
 import pricingFaq from '~/data/PricingFAQ.json'
-import { useTheme } from 'next-themes'
-import ComputePricingModal from '~/components/Pricing/ComputePricingModal'
+import { pricing } from 'shared-data/pricing'
 import { plans } from 'shared-data/plans'
-import AnnouncementBadge from '../../components/Announcement/Badge'
-import Image from 'next/image'
 
 export default function IndexPage() {
   const router = useRouter()
