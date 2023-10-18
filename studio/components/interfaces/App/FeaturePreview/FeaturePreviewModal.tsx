@@ -22,7 +22,7 @@ const FEATURE_PREVIEWS = [
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
     name: 'Project API documentation',
     content: <APISidePanelPreview />,
-    discussionsUrl: 'https://github.com/orgs/supabase/discussions',
+    discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
   },
 ]
 
