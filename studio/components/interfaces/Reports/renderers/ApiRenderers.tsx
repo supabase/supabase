@@ -6,10 +6,12 @@ import Table from 'components/to-be-cleaned/Table'
 import BarChart from 'components/ui/Charts/BarChart'
 import useFillTimeseriesSorted from 'hooks/analytics/useFillTimeseriesSorted'
 import sumBy from 'lodash/sumBy'
-import { Fragment } from 'react'
+import { Fragment, useState } from 'react'
 import { Button, Collapsible, IconChevronRight } from 'ui'
 import { queryParamsToObject } from '../Reports.utils'
 import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
+import Link from 'next/link'
+import { useParams } from 'common/hooks'
 
 export const NetworkTrafficRenderer = (
   props: ReportWidgetProps<{
@@ -105,42 +107,89 @@ export const TopApiRoutesRenderer = (
     avg?: number
   }>
 ) => {
+  const { ref: projectRef } = useParams()
+
+  const [showMore, setShowMore] = useState(false)
   if (props.data.length === 0) return null
   const headerClasses = '!text-xs !py-2 p-0 font-bold !bg-scale-400'
   const cellClasses = '!text-xs !py-2'
+
   return (
-    <Table
-      head={
-        <>
-          <Table.th className={headerClasses}>Request</Table.th>
-          <Table.th className={headerClasses + ' text-right'}>Count</Table.th>
-          {props.data[0].avg !== undefined && (
-            <Table.th className={headerClasses + ' text-right'}>Avg</Table.th>
-          )}
-        </>
-      }
-      body={
-        <>
-          {props.data.map((datum) => (
-            <Fragment key={datum.path + (datum.search || '')}>
-              <Table.tr className="p-0">
-                <Table.td className={[cellClasses].join(' ')}>
-                  <RouteTdContent {...datum} />
-                </Table.td>
-                <Table.td className={[cellClasses, 'text-right align-top'].join(' ')}>
-                  {datum.count}
-                </Table.td>
-                {props.data[0].avg !== undefined && (
-                  <Table.td className={[cellClasses, 'text-right align-top'].join(' ')}>
-                    {Number(datum.avg).toFixed(2)}ms
-                  </Table.td>
-                )}
-              </Table.tr>
-            </Fragment>
-          ))}
-        </>
-      }
-    />
+    <Collapsible>
+      <Table
+        head={
+          <>
+            <Table.th className={headerClasses}>Request</Table.th>
+            <Table.th className={headerClasses + ' text-right'}>Count</Table.th>
+            {props.data[0].avg !== undefined && (
+              <Table.th className={headerClasses + ' text-right'}>Avg</Table.th>
+            )}
+          </>
+        }
+        body={
+          <>
+            {props.data.map((datum, index) => (
+              <Fragment key={datum.path + (datum.search || '')}>
+                <Table.tr
+                  className={[
+                    'p-0 transition transform duration-700',
+                    showMore && index >= 3 ? 'w-full h-full opacity-100' : '',
+                    !showMore && index >= 3 ? ' w-0 h-0 translate-y-10 opacity-0' : '',
+                  ].join(' ')}
+                >
+                  {(!showMore && index < 3) || showMore ? (
+                    <>
+                      <Table.td className={[cellClasses].join(' ')}>
+                        <RouteTdContent {...datum} />
+                      </Table.td>
+                      <Table.td className={[cellClasses, 'text-right align-top'].join(' ')}>
+                        {datum.count}
+                      </Table.td>
+                      {props.data[0].avg !== undefined && (
+                        <Table.td className={[cellClasses, 'text-right align-top'].join(' ')}>
+                          {Number(datum.avg).toFixed(2)}ms
+                        </Table.td>
+                      )}
+                    </>
+                  ) : null}
+                </Table.tr>
+              </Fragment>
+            ))}
+          </>
+        }
+      />
+      <Collapsible.Trigger asChild>
+        <div className="flex flex-row justify-end w-full gap-2 p-1">
+          <Button
+            type="text"
+            onClick={() => setShowMore(!showMore)}
+            className={[
+              'transition',
+              showMore ? 'text-foreground' : 'text-foreground-lighter',
+              props.data.length <= 3 ? 'hidden' : '',
+            ].join(' ')}
+          >
+            {!showMore ? 'Show more' : 'Show less'}
+          </Button>
+          <Button
+            type="text"
+            className="text-foreground-lighter"
+            onClick={() => {
+              props.router.push({
+                pathname: `/project/${projectRef}/logs/explorer`,
+                query: {
+                  q: props.params?.sql,
+                  its: props.params!.iso_timestamp_start,
+                  ite: props.params!.iso_timestamp_end,
+                },
+              })
+            }}
+          >
+            Open in Logs Explorer
+          </Button>
+        </div>
+      </Collapsible.Trigger>
+    </Collapsible>
   )
 }
 

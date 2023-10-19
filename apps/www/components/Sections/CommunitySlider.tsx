@@ -109,12 +109,12 @@ const CommunitySlider = () => {
           <Image src={card.avatar!} layout="responsive" width="64" height="64" alt={card.author} />
         </div>
         <div>
-          <p className="text-scale-1200 font-medium">{card.author}</p>
-          <p className="text-scale-900 text-sm">{card.role}</p>
+          <p className="text-foreground font-medium">{card.author}</p>
+          <p className="text-muted text-sm">{card.role}</p>
         </div>
       </div>
 
-      <p className="text-scale-900 mt-2 text-base">{card.quote}</p>
+      <p className="text-muted mt-2 text-base">{card.quote}</p>
 
       <div className="mt-3 pt-3 border-t">
         <div className="relative h-10">
@@ -127,7 +127,7 @@ const CommunitySlider = () => {
           />
         </div>
       </div>
-      <p className="text-scale-900 my-3 text-base">{card.abstract}</p>
+      <p className="text-muted my-3 text-base">{card.abstract}</p>
 
       {card.url && (
         <div className="text-brand block cursor-pointer text-sm">Read Customer Story</div>

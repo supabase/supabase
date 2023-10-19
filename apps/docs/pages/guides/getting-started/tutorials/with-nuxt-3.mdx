@@ -128,7 +128,7 @@ const avatar_path = ref('')
 loading.value = true
 const user = useSupabaseUser()
 
-let { data } = await supabase
+const { data } = await supabase
   .from('profiles')
   .select(`username, website, avatar_url`)
   .eq('id', user.value.id)
@@ -155,7 +155,7 @@ async function updateProfile() {
       updated_at: new Date(),
     }
 
-    let { error } = await supabase.from('profiles').upsert(updates, {
+    const { error } = await supabase.from('profiles').upsert(updates, {
       returning: 'minimal', // Don't return the value after inserting
     })
     if (error) throw error
@@ -169,7 +169,7 @@ async function updateProfile() {
 async function signOut() {
   try {
     loading.value = true
-    let { error } = await supabase.auth.signOut()
+    const { error } = await supabase.auth.signOut()
     if (error) throw error
     user.value = null
   } catch (error) {
@@ -283,7 +283,7 @@ const uploadAvatar = async (evt) => {
     const fileName = `${Math.random()}.${fileExt}`
     const filePath = `${fileName}`
 
-    let { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file)
+    const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file)
 
     if (uploadError) throw uploadError
 
@@ -349,7 +349,7 @@ const avatar_path = ref('')
 loading.value = true
 const user = useSupabaseUser()
 
-let { data } = await supabase
+const { data } = await supabase
   .from('profiles')
   .select(`username, website, avatar_url`)
   .eq('id', user.value.id)
@@ -376,7 +376,7 @@ async function updateProfile() {
       updated_at: new Date(),
     }
 
-    let { error } = await supabase.from('profiles').upsert(updates, {
+    const { error } = await supabase.from('profiles').upsert(updates, {
       returning: 'minimal', // Don't return the value after inserting
     })
 
@@ -391,7 +391,7 @@ async function updateProfile() {
 async function signOut() {
   try {
     loading.value = true
-    let { error } = await supabase.auth.signOut()
+    const { error } = await supabase.auth.signOut()
     if (error) throw error
   } catch (error) {
     alert(error.message)

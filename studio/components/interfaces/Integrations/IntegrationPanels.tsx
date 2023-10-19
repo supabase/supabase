@@ -185,7 +185,7 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
                   alt={`icon`}
                 />
               )}
-              <span className="text-sm">{connection.metadata?.name}</span>
+              <span className="text-sm truncate">{connection.metadata?.name}</span>
             </div>
 
             <div className="flex flex-col gap-0">
@@ -241,8 +241,12 @@ const IntegrationConnectionOption = React.forwardRef<HTMLLIElement, IntegrationC
 
 const EmptyIntegrationConnection = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & { showNode?: boolean }
->(({ className, showNode = true, ...props }, ref) => {
+  React.HTMLAttributes<HTMLDivElement> & {
+    showNode?: boolean
+    orgSlug?: string
+    onClick: () => void
+  }
+>(({ className, showNode = true, orgSlug = '_', onClick, ...props }, ref) => {
   return (
     <div
       ref={ref}
@@ -266,7 +270,9 @@ const EmptyIntegrationConnection = React.forwardRef<
           'flex h-20 px-10 rounded-lg justify-center items-center'
         )}
       >
-        <Button type="default">Add new project connection</Button>
+        <Button type="default" onClick={() => onClick()}>
+          Add new project connection
+        </Button>
       </div>
     </div>
   )

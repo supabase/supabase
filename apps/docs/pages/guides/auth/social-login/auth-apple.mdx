@@ -229,7 +229,7 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
     import SwiftUI
     import AuthenticationServices
     import Supabase
-    @_spi(Experimental) import GoTrue
+    import GoTrue
 
     struct SignInView: View {
         let client = SupabaseClient(supabaseURL: URL(string: "your url")!, supabaseKey: "your anon key")
