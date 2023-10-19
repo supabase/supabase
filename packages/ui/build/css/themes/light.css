@@ -1,4 +1,5 @@
 .light {
+  --secondary: 0deg 0% 100%;
   --brand-accent: 152.9deg 60% 52.9%;
   --brand-default: 152.9deg 60% 52.9%;
   --brand-600: 153.2deg 49.7% 33.5%;
@@ -22,8 +23,8 @@
   --background-secondary: 0deg 0% 100%;
   --background-alternative: 0deg 0% 100%;
   --foreground-contrast: 210deg 25% 98.4%;
-  --border-strong: var(--colors-gray-light-800);
-  --border-hover: var(--colors-gray-light-700);
+  --border-stronger: var(--colors-gray-light-800);
+  --border-strong: var(--colors-gray-light-700);
   --border-alternative: var(--colors-slate-light-500);
   --border-control: var(--colors-slate-light-600);
   --border-overlay: var(--colors-slate-light-500);
@@ -32,6 +33,7 @@
   --border-default: var(--colors-slate-light-500);
   --background-overlay-hover: var(--colors-slate-light-300);
   --background-overlay-default: var(--colors-slate-light-100);
+  --background-surface-contrast-300: var(--colors-slate-light-400);
   --background-surface-300: var(--colors-slate-light-400);
   --background-surface-200: var(--colors-slate-light-300);
   --background-surface-100: var(--colors-slate-light-100);

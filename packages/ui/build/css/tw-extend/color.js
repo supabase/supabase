@@ -451,6 +451,10 @@ module.exports = {
   cssVariable: "var(--background-surface-300)",
   value: "hsl(202.5, 10.5%, 14.9%)"
 },
+"background-surface-_contrast-300": {
+  cssVariable: "var(--background-surface-contrast-300)",
+  value: "hsl(202.5, 10.5%, 14.9%)"
+},
 "background-overlay-DEFAULT": {
   cssVariable: "var(--background-overlay-default)",
   value: "hsl(192, 14.3%, 6.9%)"
@@ -491,12 +495,12 @@ module.exports = {
   cssVariable: "var(--border-alternative)",
   value: "hsl(190.89999999999998, 16.4%, 13.1%)"
 },
-"border-hover": {
-  cssVariable: "var(--border-hover)",
-  value: "hsl(188, 16.5%, 17.8%)"
-},
 "border-strong": {
   cssVariable: "var(--border-strong)",
+  value: "hsl(188, 16.5%, 17.8%)"
+},
+"border-stronger": {
+  cssVariable: "var(--border-stronger)",
   value: "hsl(190, 16.1%, 22%)"
 },
 "destructive-200": {
@@ -574,5 +578,9 @@ module.exports = {
 "brand-accent": {
   cssVariable: "var(--brand-accent)",
   value: "hsl(160, 100%, 50%)"
+},
+"secondary": {
+  cssVariable: "var(--secondary)",
+  value: "hsl(0, 0%, 100%)"
 }
 }
