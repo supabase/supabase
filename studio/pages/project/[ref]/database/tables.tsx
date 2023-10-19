@@ -25,7 +25,6 @@ const DatabaseTables: NextPageWithLayout = () => {
   }, [ui.selectedProjectRef])
 
   const [selectedTable, setSelectedTable] = useState<Table | undefined>(undefined)
-  const [selectedTableToEdit, setSelectedTableToEdit] = useState<Table | undefined>(undefined)
 
   return (
     <>
@@ -35,31 +34,18 @@ const DatabaseTables: NextPageWithLayout = () => {
             {selectedTable === undefined ? (
               <TableList
                 onAddTable={snap.onAddTable}
-                onEditTable={(table) => {
-                  setSelectedTableToEdit(table)
+                onEditTable={() => {
                   snap.onEditTable()
                 }}
-                onDeleteTable={(table) => {
-                  setSelectedTableToEdit(table)
-                  snap.onDeleteTable()
-                }}
+                onDeleteTable={snap.onDeleteTable}
                 onOpenTable={setSelectedTable}
               />
             ) : (
               <ColumnList
                 selectedTable={selectedTable}
-                onAddColumn={() => {
-                  setSelectedTableToEdit(selectedTable)
-                  snap.onAddColumn()
-                }}
-                onEditColumn={(col) => {
-                  setSelectedTableToEdit(selectedTable)
-                  snap.onEditColumn(col)
-                }}
-                onDeleteColumn={(col) => {
-                  setSelectedTableToEdit(selectedTable)
-                  snap.onDeleteColumn(col)
-                }}
+                onAddColumn={snap.onAddColumn}
+                onEditColumn={snap.onEditColumn}
+                onDeleteColumn={snap.onDeleteColumn}
                 onSelectBack={() => setSelectedTable(undefined)}
               />
             )}
@@ -67,8 +53,8 @@ const DatabaseTables: NextPageWithLayout = () => {
         </ScaffoldSection>
       </ScaffoldContainer>
 
-      <DeleteConfirmationDialogs projectRef={projectRef} selectedTable={selectedTableToEdit} />
-      <SidePanelEditor selectedTable={selectedTableToEdit} />
+      <DeleteConfirmationDialogs projectRef={projectRef} selectedTable={selectedTable} />
+      <SidePanelEditor selectedTable={selectedTable} />
     </>
   )
 }
