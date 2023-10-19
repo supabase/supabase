@@ -1324,6 +1324,21 @@ export const resources: NavMenuConstant = {
           url: '/guides/resources/migrating-to-supabase/amazon-rds',
           items: [],
         },
+        {
+          name: 'Postgres',
+          url: '/guides/resources/migrating-to-supabase/postgres',
+          items: [],
+        },
+        {
+          name: 'MySQL',
+          url: '/guides/resources/migrating-to-supabase/mysql',
+          items: [],
+        },
+        {
+          name: 'MSSQL',
+          url: '/guides/resources/migrating-to-supabase/mssql',
+          items: [],
+        },
       ],
     },
   ],
