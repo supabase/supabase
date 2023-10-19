@@ -18,14 +18,17 @@ export default {
     "border-secondary",
     "border-overlay",
     "border-control",
-    "border-alternative"
+    "border-alternative",
+    "border-hover",
+    "border-strong"
   ],
   "text": [
     "text",
     "text-strong",
     "text-light",
     "text-lighter",
-    "text-muted"
+    "text-muted",
+    "text-contrast"
   ],
   "colors": [
     "bg-destructive-200",
@@ -46,7 +49,7 @@ export default {
     "bg-brand-500",
     "bg-brand-600",
     "bg-brand",
-    "bg-testest"
+    "bg-brand-accent"
   ],
   "palletes": [
     "bg-black",

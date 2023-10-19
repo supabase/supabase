@@ -409,51 +409,55 @@ module.exports = {
 },
 "foreground-light": {
   cssVariable: "var(--foreground-light)",
-  value: "hsl(0, 0%, 62.7%)"
+  value: "hsl(0, 0%, 69%)"
 },
 "foreground-lighter": {
   cssVariable: "var(--foreground-lighter)",
-  value: "hsl(0, 0%, 49.4%)"
+  value: "hsl(197.10000000000002, 3.1%, 55.9%)"
 },
 "foreground-muted": {
   cssVariable: "var(--foreground-muted)",
-  value: "hsl(0, 0%, 43.9%)"
+  value: "hsl(198, 5.4%, 36.1%)"
+},
+"foreground-contrast": {
+  cssVariable: "var(--foreground-contrast)",
+  value: "hsl(201.79999999999995, 16.9%, 12.7%)"
 },
 "background-DEFAULT": {
   cssVariable: "var(--background-default)",
-  value: "hsl(0, 0%, 11%)"
+  value: "hsl(200, 11.1%, 5.3%)"
 },
 "background-alternative": {
   cssVariable: "var(--background-alternative)",
-  value: "hsl(0, 0%, 8.6%)"
+  value: "hsl(200, 20%, 2.9%)"
 },
 "background-selection": {
   cssVariable: "var(--background-selection)",
-  value: "hsl(0, 0%, 20.4%)"
+  value: "hsl(192, 9.8%, 10%)"
 },
 "background-control": {
   cssVariable: "var(--background-control)",
-  value: "hsl(0, 0%, 13.7%)"
+  value: "hsl(192, 9.4%, 10.4%)"
 },
 "background-surface-100": {
   cssVariable: "var(--background-surface-100)",
-  value: "hsl(0, 0%, 13.7%)"
+  value: "hsl(195, 10%, 7.8%)"
 },
 "background-surface-200": {
   cssVariable: "var(--background-surface-200)",
-  value: "hsl(0, 0%, 15.7%)"
+  value: "hsl(192, 9.1%, 10.8%)"
 },
 "background-surface-300": {
   cssVariable: "var(--background-surface-300)",
-  value: "hsl(0, 0%, 18%)"
+  value: "hsl(202.5, 10.5%, 14.9%)"
 },
 "background-overlay-DEFAULT": {
   cssVariable: "var(--background-overlay-default)",
-  value: "hsl(0, 0%, 13.7%)"
+  value: "hsl(192, 14.3%, 6.9%)"
 },
 "background-overlay-hover": {
   cssVariable: "var(--background-overlay-hover)",
-  value: "hsl(0, 0%, 18%)"
+  value: "hsl(190, 10.7%, 11%)"
 },
 "background-secondary": {
   cssVariable: "var(--background-secondary)",
@@ -465,27 +469,35 @@ module.exports = {
 },
 "border-DEFAULT": {
   cssVariable: "var(--border-default)",
-  value: "hsl(0, 0%, 18%)"
+  value: "hsl(186, 17.9%, 11%)"
 },
 "border-muted": {
   cssVariable: "var(--border-muted)",
-  value: "hsl(0, 0%, 15.7%)"
+  value: "hsl(197.10000000000002, 14.9%, 9.2%)"
 },
 "border-secondary": {
   cssVariable: "var(--border-secondary)",
-  value: "hsl(0, 0%, 15.7%)"
+  value: "hsl(196.39999999999998, 21.6%, 10%)"
 },
 "border-overlay": {
   cssVariable: "var(--border-overlay)",
-  value: "hsl(0, 0%, 15.7%)"
+  value: "hsl(186.70000000000005, 33.3%, 5.3%)"
 },
 "border-control": {
   cssVariable: "var(--border-control)",
-  value: "hsl(0, 0%, 20.4%)"
+  value: "hsl(180, 9.1%, 12.9%)"
 },
 "border-alternative": {
   cssVariable: "var(--border-alternative)",
-  value: "hsl(0, 0%, 18%)"
+  value: "hsl(190.89999999999998, 16.4%, 13.1%)"
+},
+"border-hover": {
+  cssVariable: "var(--border-hover)",
+  value: "hsl(188, 16.5%, 17.8%)"
+},
+"border-strong": {
+  cssVariable: "var(--border-strong)",
+  value: "hsl(190, 16.1%, 22%)"
 },
 "destructive-200": {
   cssVariable: "var(--destructive-200)",
@@ -537,30 +549,30 @@ module.exports = {
 },
 "brand-200": {
   cssVariable: "var(--brand-200)",
-  value: "hsl(152.5, 75%, 6.3%)"
+  value: "hsl(162, 100%, 2%)"
 },
 "brand-300": {
   cssVariable: "var(--brand-300)",
-  value: "hsl(153.79999999999995, 69.6%, 9%)"
+  value: "hsl(158.39999999999998, 100%, 4.9%)"
 },
 "brand-400": {
   cssVariable: "var(--brand-400)",
-  value: "hsl(153.29999999999995, 65.2%, 13.5%)"
+  value: "hsl(160.39999999999998, 100%, 9.6%)"
 },
 "brand-500": {
   cssVariable: "var(--brand-500)",
-  value: "hsl(153.5, 61.8%, 21.6%)"
+  value: "hsl(160.39999999999998, 100%, 19.2%)"
 },
 "brand-600": {
   cssVariable: "var(--brand-600)",
-  value: "hsl(153, 59.5%, 70%)"
+  value: "hsl(176, 59.5%, 70%)"
 },
 "brand-DEFAULT": {
   cssVariable: "var(--brand-default)",
-  value: "hsl(152.89999999999998, 60%, 52.9%)"
+  value: "hsl(159.89999999999998, 100%, 38.6%)"
 },
-"testest": {
-  cssVariable: "var(--testest)",
-  value: "hsl(0, 0%, 100%)"
+"brand-accent": {
+  cssVariable: "var(--brand-accent)",
+  value: "hsl(160, 100%, 50%)"
 }
 }

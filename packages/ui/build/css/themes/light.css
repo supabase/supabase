@@ -1,5 +1,5 @@
 .light {
-  --testest: 0deg 0% 100%;
+  --brand-accent: 152.9deg 60% 52.9%;
   --brand-default: 152.9deg 60% 52.9%;
   --brand-600: 153.2deg 49.7% 33.5%;
   --brand-500: 148.7deg 42.7% 69.2%;
@@ -21,6 +21,9 @@
   --background-muted: 0deg 0% 100%;
   --background-secondary: 0deg 0% 100%;
   --background-alternative: 0deg 0% 100%;
+  --foreground-contrast: 210deg 25% 98.4%;
+  --border-strong: var(--colors-gray-light-800);
+  --border-hover: var(--colors-gray-light-700);
   --border-alternative: var(--colors-slate-light-500);
   --border-control: var(--colors-slate-light-600);
   --border-overlay: var(--colors-slate-light-500);
