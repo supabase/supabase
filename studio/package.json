@@ -24,6 +24,7 @@
     "@headlessui/react": "^1.7.17",
     "@monaco-editor/react": "^4.5.2",
     "@next/bundle-analyzer": "^13.5.3",
+    "@radix-ui/react-popover": "^1.0.7",
     "@radix-ui/react-portal": "^1.0.4",
     "@radix-ui/react-tooltip": "^1.0.7",
     "@scaleleap/pg-format": "^1.0.0",

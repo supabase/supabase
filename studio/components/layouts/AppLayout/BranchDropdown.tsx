@@ -42,7 +42,6 @@ const BranchLink = ({
 
   return (
     <CommandItem_Shadcn_
-      asChild
       value={branch.name}
       className="cursor-pointer w-full flex items-center justify-between"
       onSelect={() => {
@@ -136,7 +135,6 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
                   </CommandGroup_Shadcn_>
                   <CommandGroup_Shadcn_ className="border-t">
                     <CommandItem_Shadcn_
-                      asChild
                       className="cursor-pointer flex items-center space-x-2 w-full"
                       onSelect={(e) => {
                         setOpen(false)

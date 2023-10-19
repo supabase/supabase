@@ -5,18 +5,7 @@ import { debounce, isUndefined } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useRef, useState } from 'react'
-import {
-  Alert,
-  Button,
-  IconExternalLink,
-  IconHelpCircle,
-  IconInfo,
-  IconUsers,
-  Input,
-  Listbox,
-  Toggle,
-} from 'ui'
+import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 
 import { SpendCapModal } from 'components/interfaces/BillingV2'
 import {
@@ -54,6 +43,17 @@ import {
 } from 'lib/constants'
 import { passwordStrength, pluckObjectFields } from 'lib/helpers'
 import { NextPageWithLayout } from 'types'
+import {
+  Alert,
+  Button,
+  IconExternalLink,
+  IconHelpCircle,
+  IconInfo,
+  IconUsers,
+  Input,
+  Listbox,
+  Toggle,
+} from 'ui'
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
@@ -696,7 +696,7 @@ const Wizard: NextPageWithLayout = () => {
   )
 }
 
-const PageLayout = withAuth(({ children }) => {
+const PageLayout = withAuth(({ children }: PropsWithChildren) => {
   const { slug } = useParams()
 
   const { data: organizations } = useOrganizationsQuery()

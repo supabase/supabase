@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { ComponentType, useEffect } from 'react'
+import { ComponentType, PropsWithChildren, useEffect } from 'react'
 
 import { useParams } from 'common/hooks'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
@@ -8,8 +8,8 @@ import { useAuthenticatorAssuranceLevelQuery } from 'data/profile/mfa-authentica
 import { useSelectedProject, useStore } from 'hooks'
 import { useAuth } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
-import { getReturnToPath, STORAGE_KEY } from 'lib/gotrue'
-import { isNextPageWithLayout, NextPageWithLayout } from 'types'
+import { STORAGE_KEY, getReturnToPath } from 'lib/gotrue'
+import { NextPageWithLayout, isNextPageWithLayout } from 'types'
 import Error500 from '../../pages/500'
 
 const PLATFORM_ONLY_PAGES = [
@@ -96,6 +96,8 @@ export function withAuth<T>(
       return <Error500 />
     }
 
+    const InnerComponent = WrappedComponent as any
+
     return (
       <>
         <Head>
@@ -111,7 +113,7 @@ export function withAuth<T>(
             />
           )}
         </Head>
-        <WrappedComponent {...props} />
+        <InnerComponent {...props} />
       </>
     )
   }
