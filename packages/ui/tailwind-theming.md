@@ -37,7 +37,7 @@ The following tailwind classes are a combination of tailwind utilities and our p
 
 ### Foreground (Text)
 
-|                        |                                      |
+| Value                  | Usage                                |
 | ---------------------- | ------------------------------------ |
 | `foreground-(default)` | Default text (_default_ is optional) |
 | `foreground-light`     | Light text                           |
@@ -58,7 +58,7 @@ bg-foreground-light
 
 ### Background
 
-|                                               |                                                              |
+| Value                                         | Usage                                                        |
 | --------------------------------------------- | ------------------------------------------------------------ |
 | `{background}` or `{background}-(background)` | Main body background (background is optional)                |
 | `{background}-surface-100`                    | Panels and surfaces on the same level of the main background |
@@ -83,7 +83,7 @@ text-background-surface-100
 
 ### Border
 
-|                                  |                                      |
+| Value                            | Usage                                |
 | -------------------------------- | ------------------------------------ |
 | `{border}` or `{border}-default` | Default border (default is optional) |
 | `{border}-secondary`             | Secondary border                     |
@@ -103,36 +103,36 @@ text-border-control
 
 ### Brand
 
-|           |     |
-| --------- | --- |
-| `200`     |     |
-| `300`     |     |
-| `400`     |     |
-| `500`     |     |
-| `DEFAULT` |     |
-| `600`     |     |
+| Value     |
+| --------- |
+| `200`     |
+| `300`     |
+| `400`     |
+| `500`     |
+| `DEFAULT` |
+| `600`     |
 
 ### Destructive
 
-|           |     |
-| --------- | --- |
-| `200`     |     |
-| `300`     |     |
-| `400`     |     |
-| `500`     |     |
-| `DEFAULT` |     |
-| `600`     |     |
+| Value     |
+| --------- |
+| `200`     |
+| `300`     |
+| `400`     |
+| `500`     |
+| `DEFAULT` |
+| `600`     |
 
 ### Warning
 
-|           |     |
-| --------- | --- |
-| `200`     |     |
-| `300`     |     |
-| `400`     |     |
-| `500`     |     |
-| `DEFAULT` |     |
-| `600`     |     |
+| Value     |
+| --------- |
+| `200`     |
+| `300`     |
+| `400`     |
+| `500`     |
+| `DEFAULT` |
+| `600`     |
 
 ## Storybook
 
