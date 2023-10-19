@@ -16,6 +16,7 @@ import { createSqlSnippetSkeleton } from './SQLEditor.utils'
 export type MonacoEditorProps = {
   id: string
   editorRef: MutableRefObject<IStandaloneCodeEditor | null>
+  monacoRef: MutableRefObject<Monaco | null>
   autoFocus?: boolean
   executeQuery: () => void
   className?: string
@@ -24,6 +25,7 @@ export type MonacoEditorProps = {
 const MonacoEditor = ({
   id,
   editorRef,
+  monacoRef,
   autoFocus = true,
   className,
   executeQuery,
@@ -36,7 +38,6 @@ const MonacoEditor = ({
   const snap = useSqlEditorStateSnapshot({ sync: true })
   const snippet = snap.snippets[id]
 
-  const monacoRef = useRef<Monaco | null>(null)
   const executeQueryRef = useRef(executeQuery)
   executeQueryRef.current = executeQuery
 

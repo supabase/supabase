@@ -64,12 +64,24 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
       </div>
     )
   } else if (result?.error) {
+    const formattedError = (result.error?.formattedError.split('\n') ?? []).filter(
+      (x: string) => x.length > 0
+    )
+
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
-        <div className="flex flex-row justify-between items-center pr-8">
-          <p className="m-0 border-0 px-6 py-4 font-mono text-sm">
-            Error running SQL: {result.error.message ?? result.error}
-          </p>
+        <div className="flex flex-row justify-between items-start py-4 px-6">
+          <div>
+            {formattedError.length > 0 ? (
+              formattedError.map((x: string, i: number) => (
+                <pre key={`error-${i}`} className="font-mono text-sm">
+                  {x}
+                </pre>
+              ))
+            ) : (
+              <p className="font-mono text-sm">{result.error.error}</p>
+            )}
+          </div>
           {supabaseAIEnabled && !hasHipaaAddon && (
             <Button
               icon={
