@@ -63,6 +63,7 @@ import {
   getDiffTypeDropdownLabel,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
+import { Monaco } from '@monaco-editor/react'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -137,6 +138,7 @@ const SQLEditor = () => {
 
   const [selectedDiffType, setSelectedDiffType] = useState(DiffType.Modification)
   const [isFirstRender, setIsFirstRender] = useState(true)
+  const [lineHighlights, setLineHighlights] = useState<string[]>([])
 
   const isAiLoading = isGenerateSqlLoading || isEditSqlLoading
 
@@ -171,8 +173,35 @@ const SQLEditor = () => {
       // Refetching instead of invalidating since invalidate doesn't work with `enabled` flag
       refetchEntityDefinitions()
     },
-    onError(error) {
-      if (id) snap.addResultError(id, error)
+    onError(error: any) {
+      if (id) {
+        if (error.position && monacoRef.current) {
+          const editor = editorRef.current
+          const monaco = monacoRef.current
+
+          const formattedError = error.formattedError ?? ''
+          const lineError = formattedError.slice(formattedError.indexOf('LINE'))
+          const line = Number(lineError.slice(0, lineError.indexOf(':')).split(' ')[1])
+
+          if (!isNaN(line)) {
+            const decorations = editor?.deltaDecorations(
+              [],
+              [
+                {
+                  range: new monaco.Range(line, 1, line, 20),
+                  options: { isWholeLine: true, inlineClassName: 'bg-amber-800' },
+                },
+              ]
+            )
+            if (decorations) {
+              editor?.revealLineInCenter(line)
+              setLineHighlights(decorations)
+            }
+          }
+        }
+
+        snap.addResultError(id, error)
+      }
     },
   })
 
@@ -191,6 +220,7 @@ const SQLEditor = () => {
   )
 
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
+  const monacoRef = useRef<Monaco | null>(null)
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
 
   /**
@@ -270,6 +300,11 @@ const SQLEditor = () => {
         if (supabaseAIEnabled && !hasHipaaAddon && snippet?.snippet.name === untitledSnippetTitle) {
           // Intentionally don't await title gen (lazy)
           setAiTitle(id, sql)
+        }
+
+        if (lineHighlights.length > 0) {
+          editor?.deltaDecorations(lineHighlights, [])
+          setLineHighlights([])
         }
 
         execute({
@@ -911,6 +946,7 @@ const SQLEditor = () => {
                     autoFocus
                     id={id}
                     editorRef={editorRef}
+                    monacoRef={monacoRef}
                     executeQuery={executeQuery}
                   />
                 </motion.div>
