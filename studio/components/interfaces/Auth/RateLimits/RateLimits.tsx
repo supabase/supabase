@@ -82,22 +82,25 @@ const RateLimits = () => {
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
 
-    // [Joshen] Temporarily removing RATE_LIMIT_TOKEN_REFRESH and RATE_LIMIT_VERIFY until BE supports it
     const payload: Partial<z.infer<typeof FormSchema>> = {}
-    if (data.RATE_LIMIT_EMAIL_SENT !== authConfig?.RATE_LIMIT_EMAIL_SENT) {
-      payload.RATE_LIMIT_EMAIL_SENT = data.RATE_LIMIT_EMAIL_SENT
-    }
-    if (data.RATE_LIMIT_SMS_SENT !== authConfig?.RATE_LIMIT_SMS_SENT) {
-      payload.RATE_LIMIT_SMS_SENT = data.RATE_LIMIT_SMS_SENT
-    }
+    const params = [
+      'RATE_LIMIT_TOKEN_REFRESH',
+      'RATE_LIMIT_VERIFY',
+      'RATE_LIMIT_EMAIL_SENT',
+      'RATE_LIMIT_SMS_SENT',
+    ] as (keyof typeof payload)[]
+    params.forEach((param) => {
+      if (data[param] !== authConfig?.[param]) payload[param] = data[param]
+    })
+
     updateAuthConfig({ projectRef, config: payload }, { onSuccess: () => form.reset(data) })
   }
 
   useEffect(() => {
     if (isSuccess) {
       form.reset({
-        RATE_LIMIT_TOKEN_REFRESH: 30,
-        RATE_LIMIT_VERIFY: 30,
+        RATE_LIMIT_TOKEN_REFRESH: authConfig.RATE_LIMIT_TOKEN_REFRESH,
+        RATE_LIMIT_VERIFY: authConfig.RATE_LIMIT_VERIFY,
         RATE_LIMIT_EMAIL_SENT: authConfig.RATE_LIMIT_EMAIL_SENT,
         RATE_LIMIT_SMS_SENT: authConfig.RATE_LIMIT_SMS_SENT,
       })
@@ -256,8 +259,7 @@ const RateLimits = () => {
                 </FormSectionContent>
               </FormSection>
 
-              {/* [Joshen] The bottom 2 fields are hidden for now until BE support is ready */}
-              {/* <FormSection
+              <FormSection
                 id="token-refresh"
                 header={
                   <FormSectionLabel
@@ -278,7 +280,7 @@ const RateLimits = () => {
                     render={({ field }) => (
                       <FormItem_Shadcn_>
                         <FormControl_Shadcn_>
-                          <Input_Shadcn_ disabled type="number" {...field} />
+                          <Input_Shadcn_ type="number" {...field} />
                         </FormControl_Shadcn_>
                         {field.value > 0 && (
                           <>
@@ -292,9 +294,9 @@ const RateLimits = () => {
                     )}
                   />
                 </FormSectionContent>
-              </FormSection> */}
+              </FormSection>
 
-              {/* <FormSection
+              <FormSection
                 id="verify"
                 header={
                   <FormSectionLabel
@@ -316,7 +318,7 @@ const RateLimits = () => {
                     render={({ field }) => (
                       <FormItem_Shadcn_>
                         <FormControl_Shadcn_>
-                          <Input_Shadcn_ disabled type="number" {...field} />
+                          <Input_Shadcn_ type="number" {...field} />
                         </FormControl_Shadcn_>
                         {field.value > 0 && (
                           <p className="text-foreground-lighter text-sm">
@@ -328,7 +330,7 @@ const RateLimits = () => {
                     )}
                   />
                 </FormSectionContent>
-              </FormSection> */}
+              </FormSection>
             </FormPanel>
           </form>
         </Form_Shadcn_>
