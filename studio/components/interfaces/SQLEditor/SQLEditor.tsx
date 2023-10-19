@@ -189,7 +189,7 @@ const SQLEditor = () => {
             [
               {
                 range: new monaco.Range(line, 1, line, 20),
-                options: { isWholeLine: true, inlineClassName: 'text-amber-900 bg-amber-800' },
+                options: { isWholeLine: true, inlineClassName: 'bg-amber-800' },
               },
             ]
           )
