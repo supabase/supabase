@@ -22,12 +22,15 @@ import {
 
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import Table from 'components/to-be-cleaned/Table'
+import AlertError from 'components/ui/AlertError'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useCheckPermissions } from 'hooks'
+import useTable from 'hooks/misc/useTable'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
 
 interface ColumnListProps {
-  selectedTable: PostgresTable
+  table: PostgresTable
   onSelectBack: () => void
   onAddColumn: () => void
   onEditColumn: (column: any) => void
@@ -35,19 +38,21 @@ interface ColumnListProps {
 }
 
 const ColumnList = ({
-  selectedTable,
+  table,
   onSelectBack = noop,
   onAddColumn = noop,
   onEditColumn = noop,
   onDeleteColumn = noop,
 }: ColumnListProps) => {
   const [filterString, setFilterString] = useState<string>('')
+  const { data: selectedTable, error, isError, isLoading, isSuccess } = useTable(table.id)
+
   const columns =
     (filterString.length === 0
-      ? selectedTable.columns
-      : selectedTable.columns?.filter((column: any) => column.name.includes(filterString))) ?? []
+      ? selectedTable?.columns ?? []
+      : selectedTable?.columns?.filter((column: any) => column.name.includes(filterString))) ?? []
 
-  const isLocked = EXCLUDED_SCHEMAS.includes(selectedTable.schema ?? '')
+  const isLocked = EXCLUDED_SCHEMAS.includes(table.schema ?? '')
   const canUpdateColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
 
   return (
@@ -56,7 +61,7 @@ const ColumnList = ({
         <div className="flex items-center space-x-2">
           <h3 className="mb-1 text-xl text-foreground">Database Tables</h3>
           <IconChevronRight strokeWidth={1.5} className="text-light" />
-          <h3 className="mb-1 text-xl text-foreground">{selectedTable.name}</h3>
+          <h3 className="mb-1 text-xl text-foreground">{table.name}</h3>
         </div>
       </div>
 
@@ -110,118 +115,136 @@ const ColumnList = ({
         )}
       </div>
 
-      {isLocked && <ProtectedSchemaWarning schema={selectedTable.schema} entity="columns" />}
+      {isLocked && <ProtectedSchemaWarning schema={table.schema} entity="columns" />}
 
-      {columns.length === 0 ? (
-        <NoSearchResults />
-      ) : (
-        <div>
-          <Table
-            head={[
-              <Table.th key="name">Name</Table.th>,
-              <Table.th key="description" className="hidden lg:table-cell">
-                Description
-              </Table.th>,
-              <Table.th key="type" className="hidden xl:table-cell">
-                Data Type
-              </Table.th>,
-              <Table.th key="format" className="hidden xl:table-cell">
-                Format
-              </Table.th>,
-              <Table.th key="buttons"></Table.th>,
-            ]}
-            body={columns.map((x: any, i: number) => (
-              <Table.tr className="border-t" key={x.name}>
-                <Table.td>
-                  <p>{x.name}</p>
-                </Table.td>
-                <Table.td className="break-all whitespace-normal">
-                  {x.comment !== null ? (
-                    <p title={x.comment}>{x.comment}</p>
-                  ) : (
-                    <p className="text-scale-800">No description</p>
-                  )}
-                </Table.td>
-                <Table.td>
-                  <code className="text-xs">{x.data_type}</code>
-                </Table.td>
-                <Table.td className="font-mono text-xs">
-                  <code className="text-xs">{x.format}</code>
-                </Table.td>
-                <Table.td className="text-right">
-                  {!isLocked && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger>
-                        <Button asChild type="default" icon={<IconMoreVertical />} className="px-1">
-                          <span />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent side="bottom" align="end" className="w-32">
-                        <DropdownMenuItem
-                          disabled={!canUpdateColumns}
-                          onClick={() => onEditColumn(x)}
-                        >
-                          <Tooltip.Root delayDuration={0}>
-                            <Tooltip.Trigger className="flex items-center space-x-2">
-                              <IconEdit size="tiny" />
-                              <p>Edit column</p>
-                            </Tooltip.Trigger>
-                            {!canUpdateColumns && (
-                              <Tooltip.Portal>
-                                <Tooltip.Content side="bottom">
-                                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                  <div
-                                    className={[
-                                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                      'border border-scale-200',
-                                    ].join(' ')}
-                                  >
-                                    <span className="text-xs text-foreground">
-                                      Additional permissions required to edit column
-                                    </span>
-                                  </div>
-                                </Tooltip.Content>
-                              </Tooltip.Portal>
-                            )}
-                          </Tooltip.Root>
-                        </DropdownMenuItem>
+      {isLoading && <GenericSkeletonLoader />}
 
-                        <DropdownMenuItem
-                          disabled={!canUpdateColumns || isLocked}
-                          onClick={() => onDeleteColumn(x)}
-                        >
-                          <Tooltip.Root delayDuration={0}>
-                            <Tooltip.Trigger className="flex items-center space-x-2">
-                              <IconTrash stroke="red" size="tiny" />
-                              <p>Delete column</p>
-                            </Tooltip.Trigger>
-                            {!canUpdateColumns && (
-                              <Tooltip.Portal>
-                                <Tooltip.Content side="bottom">
-                                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                  <div
-                                    className={[
-                                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                      'border border-scale-200',
-                                    ].join(' ')}
-                                  >
-                                    <span className="text-xs text-foreground">
-                                      Additional permissions required to edit column
-                                    </span>
-                                  </div>
-                                </Tooltip.Content>
-                              </Tooltip.Portal>
-                            )}
-                          </Tooltip.Root>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
-                </Table.td>
-              </Table.tr>
-            ))}
-          />
-        </div>
+      {isError && (
+        <AlertError
+          error={error as any}
+          subject={`Failed to retrieve columns for table "${table.schema}.${table.name}"`}
+        />
+      )}
+
+      {isSuccess && (
+        <>
+          {columns.length === 0 ? (
+            <NoSearchResults />
+          ) : (
+            <div>
+              <Table
+                head={[
+                  <Table.th key="name">Name</Table.th>,
+                  <Table.th key="description" className="hidden lg:table-cell">
+                    Description
+                  </Table.th>,
+                  <Table.th key="type" className="hidden xl:table-cell">
+                    Data Type
+                  </Table.th>,
+                  <Table.th key="format" className="hidden xl:table-cell">
+                    Format
+                  </Table.th>,
+                  <Table.th key="buttons"></Table.th>,
+                ]}
+                body={columns.map((x: any, i: number) => (
+                  <Table.tr className="border-t" key={x.name}>
+                    <Table.td>
+                      <p>{x.name}</p>
+                    </Table.td>
+                    <Table.td className="break-all whitespace-normal">
+                      {x.comment !== null ? (
+                        <p title={x.comment}>{x.comment}</p>
+                      ) : (
+                        <p className="text-scale-800">No description</p>
+                      )}
+                    </Table.td>
+                    <Table.td>
+                      <code className="text-xs">{x.data_type}</code>
+                    </Table.td>
+                    <Table.td className="font-mono text-xs">
+                      <code className="text-xs">{x.format}</code>
+                    </Table.td>
+                    <Table.td className="text-right">
+                      {!isLocked && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger>
+                            <Button
+                              asChild
+                              type="default"
+                              icon={<IconMoreVertical />}
+                              className="px-1"
+                            >
+                              <span />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent side="bottom" align="end" className="w-32">
+                            <DropdownMenuItem
+                              disabled={!canUpdateColumns}
+                              onClick={() => onEditColumn(x)}
+                            >
+                              <Tooltip.Root delayDuration={0}>
+                                <Tooltip.Trigger className="flex items-center space-x-2">
+                                  <IconEdit size="tiny" />
+                                  <p>Edit column</p>
+                                </Tooltip.Trigger>
+                                {!canUpdateColumns && (
+                                  <Tooltip.Portal>
+                                    <Tooltip.Content side="bottom">
+                                      <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                      <div
+                                        className={[
+                                          'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                          'border border-scale-200',
+                                        ].join(' ')}
+                                      >
+                                        <span className="text-xs text-foreground">
+                                          Additional permissions required to edit column
+                                        </span>
+                                      </div>
+                                    </Tooltip.Content>
+                                  </Tooltip.Portal>
+                                )}
+                              </Tooltip.Root>
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                              disabled={!canUpdateColumns || isLocked}
+                              onClick={() => onDeleteColumn(x)}
+                            >
+                              <Tooltip.Root delayDuration={0}>
+                                <Tooltip.Trigger className="flex items-center space-x-2">
+                                  <IconTrash stroke="red" size="tiny" />
+                                  <p>Delete column</p>
+                                </Tooltip.Trigger>
+                                {!canUpdateColumns && (
+                                  <Tooltip.Portal>
+                                    <Tooltip.Content side="bottom">
+                                      <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                      <div
+                                        className={[
+                                          'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                          'border border-scale-200',
+                                        ].join(' ')}
+                                      >
+                                        <span className="text-xs text-foreground">
+                                          Additional permissions required to edit column
+                                        </span>
+                                      </div>
+                                    </Tooltip.Content>
+                                  </Tooltip.Portal>
+                                )}
+                              </Tooltip.Root>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
+                    </Table.td>
+                  </Table.tr>
+                ))}
+              />
+            </div>
+          )}
+        </>
       )}
     </div>
   )

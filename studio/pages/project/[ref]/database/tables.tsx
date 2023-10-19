@@ -13,19 +13,17 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { NextPageWithLayout } from 'types'
 
 const DatabaseTables: NextPageWithLayout = () => {
-  const snap = useTableEditorStateSnapshot()
   const { ui, meta } = useStore()
-
   const { ref: projectRef } = useParams()
+
+  const snap = useTableEditorStateSnapshot()
+  const [selectedTable, setSelectedTable] = useState<Table | undefined>(undefined)
 
   useEffect(() => {
     if (ui.selectedProjectRef) {
       meta.types.load()
     }
   }, [ui.selectedProjectRef])
-
-  const [selectedTable, setSelectedTable] = useState<Table | undefined>(undefined)
-  const [selectedTableToEdit, setSelectedTableToEdit] = useState<Table | undefined>(undefined)
 
   return (
     <>
@@ -35,19 +33,15 @@ const DatabaseTables: NextPageWithLayout = () => {
             {selectedTable === undefined ? (
               <TableList
                 onAddTable={snap.onAddTable}
-                onEditTable={(table) => {
-                  setSelectedTableToEdit(table)
+                onEditTable={() => {
                   snap.onEditTable()
                 }}
-                onDeleteTable={(table) => {
-                  setSelectedTableToEdit(table)
-                  snap.onDeleteTable()
-                }}
+                onDeleteTable={snap.onDeleteTable}
                 onOpenTable={setSelectedTable}
               />
             ) : (
               <ColumnList
-                selectedTable={selectedTable}
+                table={selectedTable}
                 onAddColumn={snap.onAddColumn}
                 onEditColumn={snap.onEditColumn}
                 onDeleteColumn={snap.onDeleteColumn}
@@ -58,8 +52,8 @@ const DatabaseTables: NextPageWithLayout = () => {
         </ScaffoldSection>
       </ScaffoldContainer>
 
-      <DeleteConfirmationDialogs projectRef={projectRef} selectedTable={selectedTableToEdit} />
-      <SidePanelEditor selectedTable={selectedTableToEdit} />
+      <DeleteConfirmationDialogs projectRef={projectRef} selectedTable={selectedTable} />
+      <SidePanelEditor selectedTable={selectedTable} />
     </>
   )
 }
