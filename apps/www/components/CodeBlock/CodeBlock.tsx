@@ -63,8 +63,8 @@ function CodeBlock(props: CodeBlockProps) {
       {filename && (
         <div
           className="
-            bg-scale-200
-            text-scale-900
+            bg-background
+            text-muted
             flex
             h-8 w-full
             items-center
