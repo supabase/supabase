@@ -19,7 +19,7 @@ We (the Supabase Design team ✨) define primitive color values using Figma Vari
 
 These values are exported from Figma as a .json file and transformed into tailwind utilities through some scripts under `packages/ui/internals/tokens`.
 
-Primitives work the same way as any other color. They should follow some basic usage patterns such as _foreground_ on text and _background_, but they can also be combined with any tailwind utility to achieve more advanced layouts.
+Primitives work the same way as any other color. They should follow some basic usage patterns such as _foreground_ on text and _background_ on surfaces, but they can also be combined with any tailwind utility to achieve more advanced layouts.
 
 For example, `foreground-light` can also be applied on borders and backgrounds as `border-foreground-light` and `bg-foreground-light`, if needed.
 
