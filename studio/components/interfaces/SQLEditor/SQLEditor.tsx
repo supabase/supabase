@@ -183,7 +183,7 @@ const SQLEditor = () => {
           const lineError = formattedError.slice(formattedError.indexOf('LINE'))
           const line = Number(lineError.slice(0, lineError.indexOf(':')).split(' ')[1])
 
-          if (line) {
+          if (!isNaN(line)) {
             const decorations = editor?.deltaDecorations(
               [],
               [
