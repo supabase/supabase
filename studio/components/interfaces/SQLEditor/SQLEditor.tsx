@@ -175,14 +175,13 @@ const SQLEditor = () => {
     },
     onError(error: any) {
       if (id) {
-        const formattedError = error.formattedError ?? ''
-        const lineError = formattedError.slice(formattedError.indexOf('LINE'))
-        const line = Number(lineError.slice(0, lineError.indexOf(':')).split(' ')[1])
-
-        if (line && monacoRef.current) {
-          // Highlight line
+        if (error.position && monacoRef.current) {
           const editor = editorRef.current
           const monaco = monacoRef.current
+
+          const formattedError = error.formattedError ?? ''
+          const lineError = formattedError.slice(formattedError.indexOf('LINE'))
+          const line = Number(lineError.slice(0, lineError.indexOf(':')).split(' ')[1])
 
           const decorations = editor?.deltaDecorations(
             [],
