@@ -48,9 +48,18 @@ const DatabaseTables: NextPageWithLayout = () => {
             ) : (
               <ColumnList
                 selectedTable={selectedTable}
-                onAddColumn={snap.onAddColumn}
-                onEditColumn={snap.onEditColumn}
-                onDeleteColumn={snap.onDeleteColumn}
+                onAddColumn={() => {
+                  setSelectedTableToEdit(selectedTable)
+                  snap.onAddColumn()
+                }}
+                onEditColumn={(col) => {
+                  setSelectedTableToEdit(selectedTable)
+                  snap.onEditColumn(col)
+                }}
+                onDeleteColumn={(col) => {
+                  setSelectedTableToEdit(selectedTable)
+                  snap.onDeleteColumn(col)
+                }}
                 onSelectBack={() => setSelectedTable(undefined)}
               />
             )}
