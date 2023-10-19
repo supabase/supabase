@@ -183,18 +183,20 @@ const SQLEditor = () => {
           const lineError = formattedError.slice(formattedError.indexOf('LINE'))
           const line = Number(lineError.slice(0, lineError.indexOf(':')).split(' ')[1])
 
-          const decorations = editor?.deltaDecorations(
-            [],
-            [
-              {
-                range: new monaco.Range(line, 1, line, 20),
-                options: { isWholeLine: true, inlineClassName: 'bg-amber-800' },
-              },
-            ]
-          )
-          if (decorations) {
-            editor?.revealLineInCenter(line)
-            setLineHighlights(decorations)
+          if (line) {
+            const decorations = editor?.deltaDecorations(
+              [],
+              [
+                {
+                  range: new monaco.Range(line, 1, line, 20),
+                  options: { isWholeLine: true, inlineClassName: 'bg-amber-800' },
+                },
+              ]
+            )
+            if (decorations) {
+              editor?.revealLineInCenter(line)
+              setLineHighlights(decorations)
+            }
           }
         }
 
