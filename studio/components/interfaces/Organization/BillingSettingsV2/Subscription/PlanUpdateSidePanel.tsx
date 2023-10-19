@@ -73,6 +73,9 @@ const PlanUpdateSidePanel = () => {
     }
   )
 
+  const billingViaPartner = subscription?.billing_via_partner === true
+  const paymentViaInvoice = subscription?.payment_method_type === 'invoice'
+
   const {
     data: subscriptionPreview,
     error: subscriptionPreviewError,
@@ -115,7 +118,7 @@ const PlanUpdateSidePanel = () => {
   const onUpdateSubscription = async () => {
     if (!slug) return console.error('org slug is required')
     if (!selectedTier) return console.error('Selected plan is required')
-    if (!selectedPaymentMethod) {
+    if (!selectedPaymentMethod && !paymentViaInvoice) {
       return ui.setNotification({ category: 'error', message: 'Please select a payment method' })
     }
 
@@ -392,19 +395,29 @@ const PlanUpdateSidePanel = () => {
         </Modal.Content>
 
         <Modal.Content>
-          <div className="py-4 space-y-2">
-            <p className="text-sm">
-              Upon clicking confirm, your monthly invoice will be adjusted and your credit card will
-              be charged immediately. Changing the plan resets your billing cycle and may result in
-              a prorated charge for previous usage.
-            </p>
-            <div className="!mt-4">
-              <PaymentMethodSelection
-                selectedPaymentMethod={selectedPaymentMethod}
-                onSelectPaymentMethod={setSelectedPaymentMethod}
-              />
+          {!billingViaPartner ? (
+            <div className="py-4 space-y-2">
+              <p className="text-sm">
+                Upon clicking confirm, your monthly invoice will be adjusted and your credit card
+                will be charged immediately. Changing the plan resets your billing cycle and may
+                result in a prorated charge for previous usage.
+              </p>
+
+              <div className="!mt-4">
+                <PaymentMethodSelection
+                  selectedPaymentMethod={selectedPaymentMethod}
+                  onSelectPaymentMethod={setSelectedPaymentMethod}
+                />
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="py-4 space-y-2">
+              <p className="text-sm">
+                This organization is billed through one of our partners and you will be charged by
+                them directly.
+              </p>
+            </div>
+          )}
         </Modal.Content>
       </Modal>
 
