@@ -6,6 +6,7 @@ out
 tmp
 .swp
 
+
 coverage
 allure-results
 allure-report
