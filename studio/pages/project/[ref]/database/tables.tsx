@@ -13,18 +13,17 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { NextPageWithLayout } from 'types'
 
 const DatabaseTables: NextPageWithLayout = () => {
-  const snap = useTableEditorStateSnapshot()
   const { ui, meta } = useStore()
-
   const { ref: projectRef } = useParams()
+
+  const snap = useTableEditorStateSnapshot()
+  const [selectedTable, setSelectedTable] = useState<Table | undefined>(undefined)
 
   useEffect(() => {
     if (ui.selectedProjectRef) {
       meta.types.load()
     }
   }, [ui.selectedProjectRef])
-
-  const [selectedTable, setSelectedTable] = useState<Table | undefined>(undefined)
 
   return (
     <>
@@ -42,7 +41,7 @@ const DatabaseTables: NextPageWithLayout = () => {
               />
             ) : (
               <ColumnList
-                selectedTable={selectedTable}
+                table={selectedTable}
                 onAddColumn={snap.onAddColumn}
                 onEditColumn={snap.onEditColumn}
                 onDeleteColumn={snap.onDeleteColumn}
