@@ -25,7 +25,6 @@ try {
   }
 
   // Write "core" to a separate JSON file
-  // Write "core" to a separate JSON file
   fs.writeFileSync(
     path.join(coreDirectory, 'core.json'),
     JSON.stringify({ core: coreData }, null, 2)
