@@ -83,15 +83,15 @@ text-background-surface-100
 
 ### Border
 
-| Value                            | Usage                                |
-| -------------------------------- | ------------------------------------ |
-| `{border}` or `{border}-default` | Default border (default is optional) |
-| `{border}-secondary`             | Secondary border                     |
-| `{border}-alternative`           | Alernative border (inverted)         |
-| `{border}-overlay`               | Overlays, Dropdowns, Popovers        |
-| `{border}-control`               | Inputs, Radios, Checkboxes           |
-| `{border}-strong`                | Hover, Focus                         |
-| `{border}-stronger`              | Highlighted border                   |
+| Value                        | Usage                                |
+| ---------------------------- | ------------------------------------ |
+| `border` or `border-default` | Default border (default is optional) |
+| `border-secondary`           | Secondary border                     |
+| `border-alternative`         | Alernative border (inverted)         |
+| `border-overlay`             | Overlays, Dropdowns, Popovers        |
+| `border-control`             | Inputs, Radios, Checkboxes           |
+| `border-strong`              | Hover, Focus                         |
+| `border-stronger`            | Highlighted border                   |
 
 Examples:
 
