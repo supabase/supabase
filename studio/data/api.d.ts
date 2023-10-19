@@ -4141,8 +4141,13 @@ export interface components {
       organization_integration_id: string
       connection: components['schemas']['IntegrationConnection']
     }
+    SyncVercelEnvError: {
+      message: string
+      details: string
+    }
     CreateVercelConnectionResponse: {
       id: string
+      env_sync_error?: components['schemas']['SyncVercelEnvError']
     }
     UpdateVercelConnectionsBody: {
       metadata: Record<string, never>
