@@ -60,13 +60,22 @@ const RateLimits = () => {
   const canUpdateSMSRateLimit = authConfig?.EXTERNAL_PHONE_ENABLED && !authConfig?.SMS_AUTOCONFIRM
 
   const FormSchema = z.object({
-    RATE_LIMIT_TOKEN_REFRESH: z.coerce.number().min(0, 'Must be not be lower than 0'),
-    RATE_LIMIT_VERIFY: z.coerce.number().min(0, 'Must be not be lower than 0'),
+    RATE_LIMIT_TOKEN_REFRESH: z.coerce
+      .number()
+      .min(0, 'Must be not be lower than 0')
+      .max(32767, 'Must not be more than 32,767 an 5 minutes'),
+    RATE_LIMIT_VERIFY: z.coerce
+      .number()
+      .min(0, 'Must be not be lower than 0')
+      .max(32767, 'Must not be more than 32,767 an 5 minutes'),
     RATE_LIMIT_EMAIL_SENT: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
       .max(32767, 'Must not be more than 32,767 an hour'),
-    RATE_LIMIT_SMS_SENT: z.coerce.number().min(0, 'Must be not be lower than 0'),
+    RATE_LIMIT_SMS_SENT: z.coerce
+      .number()
+      .min(0, 'Must be not be lower than 0')
+      .max(32767, 'Must not be more than 32,767 an hour'),
   })
 
   const form = useForm<z.infer<typeof FormSchema>>({
