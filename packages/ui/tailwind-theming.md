@@ -17,7 +17,7 @@ We (the Supabase Design team ✨) define primitive color values using Figma Vari
 - `destructive`
 - `warning`
 
-These values are exported from Figma as a .json file and transformed into tailwind utilities through some scripts under `packages/ui/internals`.
+These values are exported from Figma as a .json file and transformed into tailwind utilities through some scripts under `packages/ui/internals/tokens`.
 
 Primitives work the same way as any other color. They should follow some basic usage patterns such as _foreground_ on text and _background_, but they can also be combined with any tailwind utility to achieve more advanced layouts.
 
