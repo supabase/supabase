@@ -37,17 +37,17 @@ The following tailwind classes are a combination of tailwind utilities and our p
 
 ### Foreground (Text)
 
-| Value                  | Usage                                |
-| ---------------------- | ------------------------------------ |
-| `foreground-(default)` | Default text (_default_ is optional) |
-| `foreground-light`     | Light text                           |
-| `foreground-lighter`   | Lighter text                         |
-| `foreground-muted`     | Muted text                           |
+| Value                  | Usage                                  |
+| ---------------------- | -------------------------------------- |
+| `foreground-{DEFAULT}` | Default text (**DEFAULT** is optional) |
+| `foreground-light`     | Light text                             |
+| `foreground-lighter`   | Lighter text                           |
+| `foreground-muted`     | Muted text                             |
 
 Examples:
 
 ```
-text-foreground (or text or text-foreground-default)
+text-foreground
 text-foreground-light
 text-foreground-lighter
 text-foreground-muted
@@ -58,15 +58,15 @@ bg-foreground-light
 
 ### Background
 
-| Value                                         | Usage                                                        |
-| --------------------------------------------- | ------------------------------------------------------------ |
-| `{background}` or `{background}-(background)` | Main body background (background is optional)                |
-| `{background}-surface-100`                    | Panels and surfaces on the same level of the main background |
-| `{background}-surface-200`                    | Surfaces that overlap the main content (ex. drodowns)        |
-| `{background}-surface-300`                    | Surfaces that are stacked above {background}-surface-200     |
-| `{background}-alternative`                    | Alernative background (inverted)                             |
-| `{background}-overlay`                        | Overlays, Dropdowns, Popovers                                |
-| `{background}-control`                        | Inputs, Radios, Checkboxes                                   |
+| Value                      | Usage                                                        |
+| -------------------------- | ------------------------------------------------------------ |
+| `{background}-{DEFAULT}`   | Main body background (**DEFAULT** is optional)               |
+| `{background}-surface-100` | Panels and surfaces on the same level of the main background |
+| `{background}-surface-200` | Surfaces that overlap the main content (ex. drodowns)        |
+| `{background}-surface-300` | Surfaces that are stacked above {background}-surface-200     |
+| `{background}-alternative` | Alernative background (inverted)                             |
+| `{background}-overlay`     | Overlays, Dropdowns, Popovers                                |
+| `{background}-control`     | Inputs, Radios, Checkboxes                                   |
 
 The `background` part can be omitted when used on the `bg` tailwind utility.
 
@@ -83,15 +83,15 @@ text-background-surface-100
 
 ### Border
 
-| Value                        | Usage                                |
-| ---------------------------- | ------------------------------------ |
-| `border` or `border-default` | Default border (default is optional) |
-| `border-secondary`           | Secondary border                     |
-| `border-alternative`         | Alernative border (inverted)         |
-| `border-overlay`             | Overlays, Dropdowns, Popovers        |
-| `border-control`             | Inputs, Radios, Checkboxes           |
-| `border-strong`              | Hover, Focus                         |
-| `border-stronger`            | Highlighted border                   |
+| Value                | Usage                                    |
+| -------------------- | ---------------------------------------- |
+| `border-{DEFAULT}`   | Default border (**DEFAULT** is optional) |
+| `border-secondary`   | Secondary border                         |
+| `border-alternative` | Alernative border (inverted)             |
+| `border-overlay`     | Overlays, Dropdowns, Popovers            |
+| `border-control`     | Inputs, Radios, Checkboxes               |
+| `border-strong`      | Hover, Focus                             |
+| `border-stronger`    | Highlighted border                       |
 
 Examples:
 
