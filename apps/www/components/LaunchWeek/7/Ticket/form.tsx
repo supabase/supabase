@@ -129,7 +129,7 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
           align === 'Left' ? 'text-center xl:text-left' : 'text-center'
         )}
       >
-        <p className="text-scale-1000 text-base max-w-[420px]">
+        <p className="text-lighter text-base max-w-[420px]">
           Register to get your ticket and stay tuned all week for daily announcements
         </p>
       </div>
@@ -162,7 +162,7 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
               transition-all
               border border-scale-300 bg-scaleA-200 h-10
               focus:border-scale-500 focus:ring-scaleA-300
-              text-scale-1200 text-base rounded-full w-full px-5
+              text-foreground text-base rounded-full w-full px-5
             `}
             type="email"
             autoComplete="email"
@@ -179,7 +179,7 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
             type="submit"
             className={[
               'transition-all',
-              'absolute bg-scale-300 text-scale-1200 border border-scale-600 text-sm hover:bg-scale-400',
+              'absolute bg-scale-300 text-foreground border border-scale-600 text-sm hover:bg-scale-400',
               'rounded-full px-4',
               'focus:invalid:border-scale-500 focus:invalid:ring-scaleA-300',
               'absolute right-1 my-auto h-8 top-0 bottom-0',

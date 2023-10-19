@@ -5,12 +5,18 @@ import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 export const generateSettingsMenu = (
   ref?: string,
   project?: ProjectBase,
-  organization?: Organization
+  organization?: Organization,
+  features?: { auth?: boolean; edgeFunctions?: boolean; storage?: boolean; billing?: boolean }
 ): ProductMenuGroup[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}/building`
 
   const isOrgBilling = !!organization?.subscription_id
+
+  const authEnabled = features?.auth ?? true
+  const edgeFunctionsEnabled = features?.edgeFunctions ?? true
+  const storageEnabled = features?.storage ?? true
+  const billingEnabled = features?.billing ?? true
 
   if (isOrgBilling) {
     return [
@@ -39,12 +45,16 @@ export const generateSettingsMenu = (
                 },
               ]
             : []),
-          {
-            name: 'Add Ons',
-            key: 'addons',
-            url: `/project/${ref}/settings/addons`,
-            items: [],
-          },
+          ...(billingEnabled
+            ? [
+                {
+                  name: 'Add Ons',
+                  key: 'addons',
+                  url: `/project/${ref}/settings/addons`,
+                  items: [],
+                },
+              ]
+            : []),
           {
             name: 'Vault',
             key: 'vault',
@@ -69,7 +79,7 @@ export const generateSettingsMenu = (
             url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
             items: [],
           },
-          ...(IS_PLATFORM
+          ...(IS_PLATFORM && authEnabled
             ? [
                 {
                   name: 'Authentication',
@@ -79,7 +89,7 @@ export const generateSettingsMenu = (
                 },
               ]
             : []),
-          ...(IS_PLATFORM
+          ...(IS_PLATFORM && storageEnabled
             ? [
                 {
                   name: 'Storage',
@@ -89,7 +99,7 @@ export const generateSettingsMenu = (
                 },
               ]
             : []),
-          ...(IS_PLATFORM
+          ...(IS_PLATFORM && edgeFunctionsEnabled
             ? [
                 {
                   name: 'Edge Functions',
@@ -103,14 +113,18 @@ export const generateSettingsMenu = (
       },
 
       {
-        title: 'Billing',
+        title: billingEnabled ? 'Billing' : '',
         items: [
-          {
-            name: 'Subscription',
-            key: 'subscription',
-            url: `/org/${organization?.slug}/billing`,
-            items: [],
-          },
+          ...(billingEnabled
+            ? [
+                {
+                  name: 'Subscription',
+                  key: 'subscription',
+                  url: `/org/${organization?.slug}/billing`,
+                  items: [],
+                },
+              ]
+            : []),
           {
             name: 'Usage',
             key: 'usage',
@@ -153,7 +167,7 @@ export const generateSettingsMenu = (
                 },
               ]
             : []),
-          ...(IS_PLATFORM
+          ...(IS_PLATFORM && authEnabled
             ? [
                 {
                   name: 'Auth',
@@ -163,7 +177,7 @@ export const generateSettingsMenu = (
                 },
               ]
             : []),
-          ...(IS_PLATFORM
+          ...(IS_PLATFORM && storageEnabled
             ? [
                 {
                   name: 'Storage',
@@ -185,30 +199,38 @@ export const generateSettingsMenu = (
       ...(IS_PLATFORM
         ? [
             {
-              title: 'Billing',
+              title: billingEnabled ? 'Billing' : '',
               items: [
-                {
-                  name: 'Subscription',
-                  key: 'subscription',
-                  url: isProjectBuilding
-                    ? buildingUrl
-                    : `/project/${ref}/settings/billing/subscription`,
-                  items: [],
-                },
+                ...(billingEnabled
+                  ? [
+                      {
+                        name: 'Subscription',
+                        key: 'subscription',
+                        url: isProjectBuilding
+                          ? buildingUrl
+                          : `/project/${ref}/settings/billing/subscription`,
+                        items: [],
+                      },
+                    ]
+                  : []),
                 {
                   name: 'Usage',
                   key: 'usage',
                   url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/billing/usage`,
                   items: [],
                 },
-                {
-                  name: 'Invoices',
-                  key: 'invoices',
-                  url: isProjectBuilding
-                    ? buildingUrl
-                    : `/project/${ref}/settings/billing/invoices`,
-                  items: [],
-                },
+                ...(billingEnabled
+                  ? [
+                      {
+                        name: 'Invoices',
+                        key: 'invoices',
+                        url: isProjectBuilding
+                          ? buildingUrl
+                          : `/project/${ref}/settings/billing/invoices`,
+                        items: [],
+                      },
+                    ]
+                  : []),
               ],
             },
           ]

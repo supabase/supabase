@@ -170,12 +170,16 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
             <div className="absolute bottom-0 left-0 right-0 top-auto w-full bg-alternative flex items-stretch p-4 gap-4">
               <Link href="https://supabase.com/dashboard" passHref>
                 <Button block type="default" asChild>
-                  <a className="">Sign in</a>
+                  <a type={undefined} className="">
+                    Sign in
+                  </a>
                 </Button>
               </Link>
               <Link href="https://supabase.com/dashboard" passHref>
                 <Button block asChild>
-                  <a className="h-10 py-4">Start your project</a>
+                  <a type={undefined} className="h-10 py-4">
+                    Start your project
+                  </a>
                 </Button>
               </Link>
             </div>

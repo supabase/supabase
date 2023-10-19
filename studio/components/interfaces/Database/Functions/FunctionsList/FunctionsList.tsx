@@ -15,6 +15,8 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions, useStore } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import FunctionList from './FunctionList'
+import SchemaSelector from 'components/ui/SchemaSelector'
+import ProtectedSchemaWarning from '../../ProtectedSchemaWarning'
 
 interface FunctionsListProps {
   createFunction: () => void
@@ -41,7 +43,7 @@ const FunctionsList = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const [protectedSchemas, openSchemas] = partition(schemas ?? [], (schema) =>
+  const [protectedSchemas] = partition(schemas ?? [], (schema) =>
     EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
   )
   const schema = schemas?.find((schema) => schema.name === selectedSchema)
@@ -83,57 +85,19 @@ const FunctionsList = ({
         <div className="w-full space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="w-[260px]">
-                <Listbox
-                  size="small"
-                  value={selectedSchema}
-                  onChange={setSelectedSchema}
-                  icon={isLocked && <IconLock size={14} strokeWidth={2} />}
-                >
-                  <Listbox.Option
-                    disabled
-                    key="normal-schemas"
-                    value="normal-schemas"
-                    label="Schemas"
-                  >
-                    <p className="text-sm">Schemas</p>
-                  </Listbox.Option>
-                  {/* @ts-ignore */}
-                  {openSchemas.map((schema) => (
-                    <Listbox.Option
-                      key={schema.id}
-                      value={schema.name}
-                      label={schema.name}
-                      addOnBefore={() => <span className="text-foreground-lighter">schema</span>}
-                    >
-                      <span className="text-foreground text-sm">{schema.name}</span>
-                    </Listbox.Option>
-                  ))}
-                  <Listbox.Option
-                    disabled
-                    key="protected-schemas"
-                    value="protected-schemas"
-                    label="Protected schemas"
-                  >
-                    <p className="text-sm">Protected schemas</p>
-                  </Listbox.Option>
-                  {protectedSchemas.map((schema) => (
-                    <Listbox.Option
-                      key={schema.id}
-                      value={schema.name}
-                      label={schema.name}
-                      addOnBefore={() => <span className="text-foreground-lighter">schema</span>}
-                    >
-                      <span className="text-foreground text-sm">{schema.name}</span>
-                    </Listbox.Option>
-                  ))}
-                </Listbox>
-              </div>
+              <SchemaSelector
+                className="w-[260px]"
+                size="small"
+                showError={false}
+                selectedSchemaName={selectedSchema}
+                onSelectSchema={setSelectedSchema}
+              />
               <Input
-                placeholder="Filter by name"
+                placeholder="Search for a function"
                 size="small"
                 icon={<IconSearch size="tiny" />}
                 value={filterString}
+                className="w-64"
                 onChange={(e) => setFilterString(e.target.value)}
               />
             </div>
@@ -165,6 +129,8 @@ const FunctionsList = ({
               )}
             </Tooltip.Root>
           </div>
+
+          {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="functions" />}
 
           <Table
             className="table-fixed"

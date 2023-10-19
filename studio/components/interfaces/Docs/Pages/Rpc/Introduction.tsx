@@ -3,7 +3,7 @@ const Introduction = () => {
     <>
       <h2 className="doc-heading">Introduction</h2>
       <div className="doc-section">
-        <article className="text-foreground">
+        <article className="code-column text-foreground">
           <p>
             All of your database stored procedures are available on your API. This means you can
             build your logic directly into the database (if you're brave enough)!

@@ -8,7 +8,7 @@ const GitHubButton = () => {
 
   const kFormatter = (num: number) => {
     const kFormat = num / 1000
-    const decimals = kFormat.toString().split('.')[1]
+    const decimals = kFormat.toFixed(2).split('.')[1]
     const firstDecimal = decimals.split('')[0]
     const showDecimals = firstDecimal !== '0'
 
@@ -34,7 +34,7 @@ const GitHubButton = () => {
       type="text"
       asChild
     >
-      <a href="https://github.com/supabase/supabase" target="_blank">
+      <a type={undefined} href="https://github.com/supabase/supabase" target="_blank">
         <span className="flex items-center gap-1">
           <svg
             className="w-6 h-6"

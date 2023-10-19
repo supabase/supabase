@@ -573,7 +573,7 @@ If your application uses the Supabase Database, Storage or Edge Functions, just 
 
 ### Why is there a challenge and verify API when challenge does not do much?
 
-TOTP is not going to be the only MFA factor Supabase Auth is going to support in the future. By separating out the challenge and verify steps, we're making the library forward compatible with new factors we may add in the future -- such as SMS or WebAuthn. For example, for SMS the `challenge` endpoint would actually send out the SMS with the authentication code.
+TOTP is not going to be the only MFA factor Supabase Auth is going to support in the future. By separating out the challenge and verify steps, we're making the library forward compatible with new factors we may add in the future -- such as SMS or WebAuthn. For example, for SMS the `challenge` endpoint would actually send out the SMS with the authentication code. For convenience, you may use `challengeAndVerify` to create and verify a challenge in a single step.
 
 ### What's inside the QR code?
 

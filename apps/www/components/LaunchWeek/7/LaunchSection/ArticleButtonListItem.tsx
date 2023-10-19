@@ -9,10 +9,10 @@ const ArticleButtonListItem = (props: Article) => {
         <div className="flex flex-row">
           <div>
             <div className="flex flex-col">
-              <span className="text-scale-1200 group-hover:text-brand text-left text-base transition">
+              <span className="text-foreground group-hover:text-brand text-left text-base transition">
                 {props.title}
               </span>
-              <p className="text-scale-1100 text-left text-sm transition">{props.description}</p>
+              <p className="text-light text-left text-sm transition">{props.description}</p>
             </div>
           </div>
         </div>

@@ -28,6 +28,7 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useGithubBranchesQuery } from 'data/integrations/integrations-github-branches-query'
 import { Integration } from 'data/integrations/integrations.types'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
+import { useSelectedOrganization } from 'hooks'
 
 interface GithubRepositorySelectionProps {
   integration?: Integration
@@ -42,6 +43,7 @@ const GithubRepositorySelection = ({
   hasGithubIntegrationInstalled,
   setSelectedBranch,
 }: GithubRepositorySelectionProps) => {
+  const org = useSelectedOrganization()
   const { ref } = useParams()
   const [open, setOpen] = useState(false)
   const comboBoxRef = useRef<HTMLButtonElement>(null)
@@ -54,10 +56,10 @@ const GithubRepositorySelection = ({
   const sidePanels = useSidePanelsStateSnapshot()
   const githubIntegrationAppUrl =
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
-      ? ' https://github.com/apps/supabase'
+      ? `https://github.com/apps/supabase/installations/new?state=${ref}`
       : process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-      ? 'https://github.com/apps/supabase-staging'
-      : 'https://github.com/apps/supabase-local-testing'
+      ? `https://github.com/apps/supabase-staging/installations/new?state=${ref}`
+      : `https://github.com/apps/supabase-local-testing/installations/new?state=${ref}`
 
   const {
     data: githubBranches,
@@ -98,7 +100,7 @@ const GithubRepositorySelection = ({
           </p>
           {!hasGithubIntegrationInstalled && (
             <Link passHref href={githubIntegrationAppUrl}>
-              <a target="_blank" rel="noreferrer">
+              <a>
                 <Button type="default" className="!mt-3">
                   Install Github Integration
                 </Button>
@@ -106,7 +108,11 @@ const GithubRepositorySelection = ({
             </Link>
           )}
           {hasGithubIntegrationInstalled && !githubConnection && (
-            <EmptyIntegrationConnection showNode={false} onClick={() => onSelectConnectRepo()} />
+            <EmptyIntegrationConnection
+              showNode={false}
+              onClick={() => onSelectConnectRepo()}
+              orgSlug={org?.slug}
+            />
           )}
           {integration && githubConnection && (
             <>
