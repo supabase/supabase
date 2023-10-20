@@ -235,7 +235,7 @@ const HeaderLogo = memo(function HeaderLogo() {
   )
 })
 
-const Container = memo(function Container(props) {
+const Container = memo(function Container(props: PropsWithChildren) {
   const mobileMenuOpen = useMenuMobileOpen()
 
   return (
