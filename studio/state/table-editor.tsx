@@ -1,4 +1,4 @@
-import { PostgresColumn } from '@supabase/postgres-meta'
+import { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { Dictionary } from 'components/grid'
 import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
 import { JsonEditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
@@ -14,7 +14,7 @@ type ForeignKey = {
 export type SidePanel =
   | { type: 'row'; row?: Dictionary<any> }
   | { type: 'column'; column?: PostgresColumn }
-  | { type: 'table'; mode: 'new' | 'edit' | 'duplicate' }
+  | { type: 'table'; mode: 'new' | 'edit' | 'duplicate'; table?: PostgresTable }
   | { type: 'schema'; mode: 'new' | 'edit' }
   | { type: 'json'; jsonValue: JsonEditValue }
   | {
@@ -24,7 +24,7 @@ export type SidePanel =
   | { type: 'csv-import' }
 
 export type ConfirmationDialog =
-  | { type: 'table'; isDeleteWithCascade: boolean }
+  | { type: 'table'; isDeleteWithCascade: boolean; table?: PostgresTable }
   | { type: 'column'; column: PostgresColumn; isDeleteWithCascade: boolean }
 
 export type UIState =
@@ -76,10 +76,11 @@ export const createTableEditorState = () => {
         sidePanel: { type: 'table', mode: 'new' },
       }
     },
-    onEditTable: () => {
+    onEditTable: (table: PostgresTable) => {
+      console.log('table here', table)
       state.ui = {
         open: 'side-panel',
-        sidePanel: { type: 'table', mode: 'edit' },
+        sidePanel: { type: 'table', mode: 'edit', table },
       }
     },
     onDuplicateTable: () => {
@@ -88,10 +89,10 @@ export const createTableEditorState = () => {
         sidePanel: { type: 'table', mode: 'duplicate' },
       }
     },
-    onDeleteTable: () => {
+    onDeleteTable: (table: PostgresTable) => {
       state.ui = {
         open: 'confirmation-dialog',
-        confirmationDialog: { type: 'table', isDeleteWithCascade: false },
+        confirmationDialog: { type: 'table', isDeleteWithCascade: false, table },
       }
     },
 

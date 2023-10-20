@@ -33,8 +33,8 @@ const DatabaseTables: NextPageWithLayout = () => {
             {selectedTable === undefined ? (
               <TableList
                 onAddTable={snap.onAddTable}
-                onEditTable={() => {
-                  snap.onEditTable()
+                onEditTable={(table) => {
+                  snap.onEditTable(table)
                 }}
                 onDeleteTable={snap.onDeleteTable}
                 onOpenTable={setSelectedTable}
