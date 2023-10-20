@@ -98,7 +98,7 @@
     "react-virtualized-auto-sizer": "^1.0.20",
     "react-window": "^1.8.6",
     "react-window-infinite-loader": "^1.0.7",
-    "reactflow": "^11.9.2",
+    "reactflow": "^11.9.4",
     "recharts": "^2.8.0",
     "sass": "^1.68.0",
     "scheduler": "^0.20.2",
