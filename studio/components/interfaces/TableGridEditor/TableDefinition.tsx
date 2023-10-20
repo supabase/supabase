@@ -95,7 +95,7 @@ const TableDefinition = ({ id }: TableDefinitionProps) => {
 
   if (isLoading) {
     return (
-      <div className="p-4">
+      <div className="p-4 h-full">
         <GenericSkeletonLoader />
       </div>
     )

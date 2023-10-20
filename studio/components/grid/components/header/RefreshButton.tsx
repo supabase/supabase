@@ -5,9 +5,10 @@ import { sqlKeys } from 'data/sql/keys'
 import { useEffect, useState } from 'react'
 import { Button, IconCheck, IconRefreshCw } from 'ui'
 import { SupabaseGridQueue } from '../../constants'
+import { TableLike } from 'hooks/misc/useTable'
 
 export type RefreshButtonProps = {
-  table: SupaTable
+  table: TableLike
   isRefetching: boolean
 }
 

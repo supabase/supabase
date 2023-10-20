@@ -198,11 +198,10 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>(
               onImportData={onImportData}
               onEditForeignKeyColumnValue={onEditForeignKeyColumnValue}
             />
-            <Footer isLoading={isLoading || isRefetching} />
-            <Shortcuts gridRef={gridRef} />
           </>
         )}
-
+        <Shortcuts gridRef={gridRef} />
+        <Footer isLoading={isLoading || isRefetching} isRefetching={isRefetching} />
         {mounted &&
           createPortal(
             <RowContextMenu table={props.table} rows={data?.rows ?? []} />,
