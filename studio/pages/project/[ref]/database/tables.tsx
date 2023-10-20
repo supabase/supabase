@@ -18,6 +18,9 @@ const DatabaseTables: NextPageWithLayout = () => {
 
   const snap = useTableEditorStateSnapshot()
   const [selectedTable, setSelectedTable] = useState<Table>()
+
+  // [Joshen] Separate state required to handle edit/delete table
+  // since selectedTable above handles the state for ColumnList
   const [selectedTableToEdit, setSelectedTableToEdit] = useState<Table>()
 
   useEffect(() => {
