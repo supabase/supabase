@@ -54,7 +54,7 @@ const PolicyTableRow = ({
                 withIcon
                 variant="warning"
                 className="!px-4 !py-3 !mt-3"
-                title="Warning: RLS is disabled. Your table is publicly readable and writable."
+                title="Warning: Row Level Security is disabled. Your table is publicly readable and writable."
               >
                 Anyone with the anon. key can modify or delete your data. You should turn on RLS and
                 create access policies to keep your data secure.

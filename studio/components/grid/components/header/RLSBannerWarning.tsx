@@ -46,10 +46,10 @@ export default function RLSBannerWarning() {
     <>
       {!isAcknowledged && !rlsEnabled && isPublicTable ? (
         <div>
-          <div className="text-center bg-amber-500 text-amber-1100 dark:text-amber-900 text-xs py-2.5 flex items-center justify-center relative">
+          <div className="text-center text-xs py-2.5 flex items-center justify-center relative">
             <IconAlertCircle size={16} strokeWidth={2} />
-            <span className="uppercase font-bold ml-2">Warning</span>: You are allowing anonymous
-            access to your table.{' '}
+            <span className="font-bold mx-2">Table is public</span> You are allowing anonymous
+            access to your data.{' '}
             <Link href={`/project/${projectRef}/auth/policies?search=${tableID}`}>
               <a className="underline ml-2 opacity-80 hover:opacity-100 transition">
                 Enable Row Level Security
@@ -58,7 +58,7 @@ export default function RLSBannerWarning() {
             <div className="ml-20 absolute right-2">
               <Button
                 type="outline"
-                className="hover:text-foreground text-amber-900 dark:text-amber-900 border border-amber-800"
+                className="hover:text-foreground"
                 onClick={() => setIsOpen(true)}
               >
                 Dismiss

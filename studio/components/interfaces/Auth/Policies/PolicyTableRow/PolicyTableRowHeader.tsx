@@ -42,7 +42,7 @@ const PolicyTableRowHeader = ({
           </Badge>
         ) : (
           <Badge color={table.rls_enabled ? 'green' : 'yellow'}>
-            {table.rls_enabled ? 'RLS enabled' : 'RLS disabled'}
+            {table.rls_enabled ? 'Row Level Security enabled' : 'Row Level Security disabled'}
           </Badge>
         )}
       </div>
