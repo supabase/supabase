@@ -12,16 +12,16 @@ const defaults = {
   },
   text: {
     brand: 'text-purple-600',
-    body: 'text-scale-600 dark:text-scaleDark-200',
-    title: 'text-scale-700 dark:text-scaleDark-100',
+    body: 'text-foreground-light',
+    title: 'text-foreground',
   },
   border: {
     brand: 'border-brand-600',
-    primary: 'border-scale-700',
-    secondary: 'border-scale-400',
-    alternative: 'border-scale-600 dark:border-scaleDark-200',
+    primary: 'border-border',
+    secondary: 'border-secondary',
+    alternative: 'border-alternative',
   },
-  placeholder: 'placeholder-scale-800',
+  placeholder: 'placeholder-foreground-muted',
   focus: `
     outline-none
     focus:ring-current focus:ring-2
@@ -52,7 +52,7 @@ const defaults = {
     },
   },
   overlay: {
-    base: `absolute inset-0 bg-scale-200 opacity-50`,
+    base: `absolute inset-0 bg-background opacity-50`,
     container: `fixed inset-0 transition-opacity`,
   },
 }
@@ -125,7 +125,7 @@ export default {
           outline-none
           focus-visible:ring-1
           focus-visible:z-10
-          ring-scale-1100
+          ring-foreground-light
         `,
         content: `
           data-open:animate-slide-down
@@ -143,7 +143,7 @@ export default {
         container: `
           group
           border
-          border-scale-700
+          border-border
 
           first:rounded-tl-md first:rounded-tr-md
           last:rounded-bl-md last:rounded-br-md
@@ -163,10 +163,10 @@ export default {
           outline-none
           focus-visible:ring-1
           focus-visible:z-10
-          ring-scale-1100
+          ring-foreground-light
 
           transition-colors
-          hover:bg-scale-200
+          hover:bg-background
 
           overflow-hidden
 
@@ -179,15 +179,15 @@ export default {
         `,
         panel: `
           px-6 py-3
-          border-t border-scale-700
-          bg-scale-200
+          border-t border-strong
+          bg-background
         `,
       },
     },
     justified: `justify-between`,
     chevron: {
       base: `
-        text-scale-900
+        text-lighter
         rotate-0
         group-state-open:rotate-180
         group-data-[state=open]:rotate-180
@@ -219,7 +219,7 @@ export default {
     color: {
       brand: 'bg-brand-500 text-brand-600 border border-brand-400',
       brandAlt: 'bg-brand bg-opacity-100 text-background border border-brand',
-      scale: 'bg-scale-200 text-scale-1100 border border-scale-700',
+      scale: 'bg-background text-light border border-strong',
       tomato: `bg-tomato-200 text-tomato-1100 border border-tomato-700`,
       red: `bg-red-200 text-red-1100 border border-red-700`,
       crimson: `bg-crimson-200 text-crimson-1100 border border-crimson-700`,
@@ -265,10 +265,10 @@ export default {
         description: `text-amber-1100`,
       },
       info: {
-        base: `bg-scale-400 border-scale-500 dark:bg-scale-100 dark:border-scale-300`,
-        icon: `text-scale-900`,
-        header: `text-scale-1200`,
-        description: `text-scale-1100`,
+        base: `bg-alternative border-alternative`,
+        icon: `text-lighter`,
+        header: `text-foreground`,
+        description: `text-light`,
       },
       success: {
         base: `bg-brand-300 dark:bg-brand-100 border-brand-400`,
@@ -277,17 +277,17 @@ export default {
         description: `text-brand-600`,
       },
       neutral: {
-        base: `bg-scale-300 dark:bg-scale-300 border-scale-500`,
-        icon: `text-scale-900`,
-        header: `text-scale-1200`,
-        description: `text-scale-1100`,
+        base: `bg-surface-100 border-border`,
+        icon: `text-muted`,
+        header: `text-foreground`,
+        description: `text-light`,
       },
     },
     close: `
       absolute
       right-6 top-4
       p-0 m-0
-      text-scale-900
+      text-muted
       cursor-pointer transition ease-in-out
       bg-transparent border-transparent focus:outline-none
       opacity-50 hover:opacity-100`,
@@ -299,7 +299,7 @@ export default {
 
   card: {
     base: `
-      bg-white dark:bg-scaleDark-700
+      bg-surface-100
 
       border
       ${defaults.border.primary}
@@ -328,7 +328,7 @@ export default {
       base: `
         relative
         cursor-pointer
-        text-scale-900
+        text-lighter
         flex
         items-center
         space-x-2
@@ -336,15 +336,15 @@ export default {
         transition
         focus:outline-none
         focus-visible:ring
-        focus-visible:ring-scale-700
-        focus-visible:border-scale-900
+        focus-visible:ring-foreground-muted
+        focus-visible:border-foreground-muted
       `,
       inactive: `
-        hover:text-scale-1200
+        hover:text-foreground
       `,
       active: `
-        !text-scale-1200
-        border-b-2 border-scale-1200
+        !text-foreground
+        border-b-2 border-foreground
       `,
     },
     pills: {
@@ -362,18 +362,18 @@ export default {
         border
         focus:outline-none
         focus-visible:ring
-        focus-visible:ring-scale-700
-        focus-visible:border-scale-900
+        focus-visible:ring-foreground-muted
+        focus-visible:border-foreground-muted
         `,
       inactive: `
-        bg-scale-200
-        border-scale-700 hover:border-scale-900
-        text-scale-900 hover:text-scale-1200
+        bg-background
+        border-strong hover:border-foreground-muted
+        text-muted hover:text-foreground
       `,
       active: `
-        bg-scale-600
-        text-scale-1200
-        border-scale-800
+        bg-selection
+        text-foreground
+        border-stronger
       `,
     },
     'rounded-pills': {
@@ -390,18 +390,18 @@ export default {
         rounded-full
         focus:outline-none
         focus-visible:ring
-        focus-visible:ring-scale-700
-        focus-visible:border-scale-900
+        focus-visible:ring-foreground-muted
+        focus-visible:border-foreground-muted
         `,
       inactive: `
-        bg-scale-400 hover:bg-scale-500
-        hover:border-scale-900
-        text-scale-900 hover:text-scale-1200
+        bg-surface-200 hover:bg-surface-300
+        hover:border-foreground-lighter
+        text-foreground-lighter hover:text-foreground
       `,
       active: `
-        bg-scale-1200
-        text-scale-200
-        border-scale-1200
+        bg-foreground
+        text-background
+        border-foreground
       `,
     },
     block: 'w-full flex items-center justify-center',
@@ -424,24 +424,24 @@ export default {
       rounded-md
       shadow-sm
       transition-all
-      text-scale-1200
+      text-foreground
       border
       focus:shadow-md
       ${defaults.focus}
-      focus:border-scale-900
-      focus:ring-scale-400
+      focus:border-foreground-muted
+      focus:ring-border-control
       ${defaults.placeholder}
     `,
     variants: {
       standard: `
         bg-scaleA-200
-        border border-scale-700
+        border border-strong
         `,
       error: `
-        bg-red-100
-        border border-red-700
-        focus:ring-red-500
-        placeholder:text-red-600
+        bg-destructive-200
+        border border-destructive-500
+        focus:ring-destructive-400
+        placeholder:text-destructive-400
        `,
     },
     container: 'relative',
@@ -467,12 +467,12 @@ export default {
       rounded-md
       shadow-sm
       transition-all
-      text-scale-1200
+      text-foreground
       border
       focus:shadow-md
       ${defaults.focus}
-      focus:border-scale-900
-      focus:ring-scale-400
+      focus:border-foreground-muted
+      focus:ring-border-control
       ${defaults.placeholder}
 
       appearance-none
@@ -480,14 +480,14 @@ export default {
     `,
     variants: {
       standard: `
-        bg-scaleA-200
-        border border-scale-700
+        bg-background
+        border border-strong
         `,
       error: `
-        bg-red-100
-        border border-red-700
-        focus:ring-red-500
-        placeholder:text-red-600
+        bg-destructive-200
+        border border-destructive-500
+        focus:ring-destructive-400
+        placeholder:text-destructive-400
        `,
     },
     container: 'relative',
@@ -498,7 +498,7 @@ export default {
     disabled: 'opacity-50',
     actions_container: 'absolute inset-y-0 right-0 pl-3 pr-1 mr-5 flex items-center',
     chevron_container: 'absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none',
-    chevron: 'h-5 w-5 text-scale-800',
+    chevron: 'h-5 w-5 text-lighter',
   },
 
   /*
@@ -513,12 +513,12 @@ export default {
       rounded-md
       shadow-sm
       transition-all
-      text-scale-1200
+      text-foreground
       border
       focus:shadow-md
       ${defaults.focus}
-      focus:border-scale-900
-      focus:ring-scale-400
+      focus:border-foreground-muted
+      focus:ring-border-control
       ${defaults.placeholder}
 
       appearance-none
@@ -526,14 +526,14 @@ export default {
     `,
     variants: {
       standard: `
-        bg-scaleA-200
-        border border-scale-700
+        bg-background
+        border border-strong
       `,
       error: `
-        bg-red-100
-        border border-red-700
-        focus:ring-red-500
-        placeholder:text-red-600
+        bg-destructive-200
+        border border-destructive-500
+        focus:ring-destructive-400
+        placeholder:text-destructive-400
        `,
     },
     disabled: 'opacity-50',

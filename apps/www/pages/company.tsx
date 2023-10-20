@@ -252,10 +252,9 @@ const Investors = () => {
           <div key={x.name}>
             <div
               className="
-              dark:bg-scale-400
+              bg-surface-100
               col-span-1 flex h-32 content-end
-              items-center justify-center
-              bg-gray-50"
+              items-center justify-center"
             >
               <div className="relative h-8 w-full overflow-auto">
                 <Image
@@ -306,7 +305,7 @@ const Press = () => {
         {PressData.filter((x) => x.type == 'article').map((x) => (
           <Link href={x.href} key={x.href}>
             <a target="_blank">
-              <Card key={`press_${x.href}`} hoverable className="dark:bg-scale-400 h-36 bg-white">
+              <Card key={`press_${x.href}`} hoverable className="h-36">
                 <Space className="h-40 justify-between" direction="vertical">
                   <div>
                     <h1 className="text-foreground text-xl">{x.type.toUpperCase()}</h1>
@@ -324,7 +323,7 @@ const Press = () => {
         {PressData.filter((x) => x.type == 'podcast').map((x) => (
           <Link href={x.href} key={x.href}>
             <a target="_blank">
-              <Card key={`press_${x.href}`} hoverable className="dark:bg-scale-400 h-36 bg-white">
+              <Card key={`press_${x.href}`} hoverable className="h-36">
                 <Space className="h-40 justify-between" direction="vertical">
                   <div>
                     <h1 className="text-foreground text-xl">{x.type.toUpperCase()}</h1>
