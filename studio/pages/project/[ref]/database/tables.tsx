@@ -18,6 +18,7 @@ const DatabaseTables: NextPageWithLayout = () => {
 
   const snap = useTableEditorStateSnapshot()
   const [selectedTable, setSelectedTable] = useState<Table | undefined>(undefined)
+  const [currentTable, setCurrentTable] = useState<Table | undefined>(undefined)
 
   useEffect(() => {
     if (ui.selectedProjectRef) {
@@ -34,7 +35,7 @@ const DatabaseTables: NextPageWithLayout = () => {
               <TableList
                 onAddTable={snap.onAddTable}
                 onEditTable={(table) => {
-                  setSelectedTable(table)
+                  setCurrentTable(table)
                   snap.onEditTable(table)
                 }}
                 onDeleteTable={(table) => {
@@ -57,7 +58,7 @@ const DatabaseTables: NextPageWithLayout = () => {
       </ScaffoldContainer>
 
       <DeleteConfirmationDialogs projectRef={projectRef} selectedTable={selectedTable} />
-      <SidePanelEditor selectedTable={selectedTable} />
+      <SidePanelEditor selectedTable={currentTable} />
     </>
   )
 }
