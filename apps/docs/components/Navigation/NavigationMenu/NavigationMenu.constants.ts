@@ -898,6 +898,10 @@ export const functions: NavMenuConstant = {
           name: 'Taking Screenshots with Puppeteer',
           url: '/guides/functions/examples/screenshots',
         },
+        {
+          name: 'Slack Bot responding to mentions',
+          url: '/guides/functions/examples/slack-bot-mention',
+        },
       ],
     },
   ],
