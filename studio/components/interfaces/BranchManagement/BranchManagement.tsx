@@ -30,6 +30,7 @@ import { MainBranchPanel } from './BranchPanels'
 import CreateBranchSidePanel from './CreateBranchSidePanel'
 import PreviewBranches from './PreviewBranches'
 import PullRequests from './PullRequests'
+import CreateBranchModal from './CreateBranchModal'
 
 const BranchManagement = () => {
   const { ui } = useStore()
@@ -247,10 +248,12 @@ const BranchManagement = () => {
         </Modal.Content>
       </ConfirmationModal>
 
-      <CreateBranchSidePanel
+      {/* <CreateBranchSidePanel
         visible={showCreateBranch}
         onClose={() => setShowCreateBranch(false)}
-      />
+      /> */}
+
+      <CreateBranchModal visible={showCreateBranch} onClose={() => setShowCreateBranch(false)} />
     </>
   )
 }

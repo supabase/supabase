@@ -122,7 +122,7 @@ const GithubRepositorySelection = ({
 
               <div>
                 <label className="block text-sm text-light mb-2" htmlFor="branch-selector">
-                  Enter your production branch:
+                  Choose your production branch:
                 </label>
                 <Input_Shadcn_
                   placeholder="e.g main"
