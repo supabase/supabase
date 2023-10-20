@@ -426,16 +426,16 @@ export default {
       transition-all
       text-foreground
       border
-      focus:shadow-md
+      focus-visible:shadow-md
       ${defaults.focus}
-      focus:border-foreground-muted
-      focus:ring-border-control
+      focus-visible:border-foreground-lighter
+      focus-visible:ring-background-control
       ${defaults.placeholder}
     `,
     variants: {
       standard: `
-        bg-background
-        border border-strong
+        bg-control
+        border border-control
         `,
       error: `
         bg-destructive-200
@@ -469,10 +469,10 @@ export default {
       transition-all
       text-foreground
       border
-      focus:shadow-md
+      focus-visible:shadow-md
       ${defaults.focus}
-      focus:border-foreground-muted
-      focus:ring-border-control
+      focus-visible:border-foreground-lighter
+      focus-visible:ring-background-control
       ${defaults.placeholder}
 
       appearance-none
@@ -515,10 +515,10 @@ export default {
       transition-all
       text-foreground
       border
-      focus:shadow-md
+      focus-visible:shadow-md
       ${defaults.focus}
-      focus:border-foreground-muted
-      focus:ring-border-control
+      focus-visible:border-foreground-lighter
+      focus-visible:ring-background-control
       ${defaults.placeholder}
 
       appearance-none
@@ -526,7 +526,7 @@ export default {
     `,
     variants: {
       standard: `
-        bg-background
+        bg-control
         border border-strong
       `,
       error: `
@@ -1287,10 +1287,10 @@ export default {
       shadow-sm
       text-foreground
       border
-      focus:shadow-md
+      focus-visible:shadow-md
       ${defaults.focus}
-      focus:border-foreground-muted
-      focus:ring-border-muted
+      focus-visible:border-foreground-lighter
+      focus-visible:ring-background-control
       ${defaults.placeholder}
       indent-px
       transition-all
@@ -1300,8 +1300,8 @@ export default {
     label: `truncate`,
     variants: {
       standard: `
-        bg-background
-        border border-foreground-muted/70
+        bg-control
+        border border-control
 
         aria-expanded:border-foreground-muted
         aria-expanded:ring-border-muted
