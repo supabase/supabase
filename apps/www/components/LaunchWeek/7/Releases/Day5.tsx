@@ -84,6 +84,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                       objectPosition={!!layer.mobileImg && isTablet ? '50% 50%' : '50% 50%'}
                       objectFit="cover"
                       quality={100}
+                      alt=""
                     />
                   </motion.div>
                 )
@@ -144,6 +145,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                       objectPosition={!!layer.mobileImg && isMobile ? '50% 50%' : '80% 50%'}
                       objectFit="cover"
                       quality={100}
+                      alt=""
                     />
                   </motion.div>
                 )
@@ -193,6 +195,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                       objectPosition={!!layer.mobileImg && isMobile ? '50% 50%' : '80% 50%'}
                       objectFit="cover"
                       quality={100}
+                      alt=""
                     />
                   </motion.div>
                 )
@@ -244,6 +247,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                       objectPosition={isMobile ? '50% 70%' : '50% 50%'}
                       objectFit="cover"
                       quality={100}
+                      alt=""
                     />
                   </motion.div>
                 )
@@ -295,6 +299,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                       objectPosition={isMobile ? '50% 90%' : '50% 50%'}
                       objectFit="cover"
                       quality={100}
+                      alt=""
                     />
                   </motion.div>
                 )
@@ -346,6 +351,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                       objectPosition={!!layer.mobileImg && isTablet ? '50% 50%' : '50% 50%'}
                       objectFit="cover"
                       quality={100}
+                      alt=""
                     />
                   </motion.div>
                 )
@@ -397,6 +403,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                       objectPosition={!!layer.mobileImg && isTablet ? '50% 50%' : '50% 50%'}
                       objectFit="cover"
                       quality={100}
+                      alt=""
                     />
                   </motion.div>
                 )
@@ -448,6 +455,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                       objectPosition={isMobile ? '0% 50%' : isDesktop ? '100% 50%' : '0% 50%'}
                       objectFit={isMobile ? 'cover' : isDesktop ? 'contain' : 'cover'}
                       quality={100}
+                      alt=""
                     />
                   </motion.div>
                 )
@@ -499,6 +507,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                       objectPosition={!!layer.mobileImg && isTablet ? '50% 50%' : '50% 50%'}
                       objectFit="cover"
                       quality={100}
+                      alt=""
                     />
                   </motion.div>
                 )
@@ -550,6 +559,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                       objectPosition={!!layer.mobileImg && isTablet ? '50% 50%' : '50% 50%'}
                       objectFit="cover"
                       quality={100}
+                      alt=""
                     />
                   </motion.div>
                 )
@@ -601,6 +611,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                       objectPosition={!!layer.mobileImg && isTablet ? '50% 50%' : '50% 50%'}
                       objectFit="cover"
                       quality={100}
+                      alt=""
                     />
                   </motion.div>
                 )
@@ -652,6 +663,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                       objectPosition={!!layer.mobileImg && isTablet ? '50% 50%' : '50% 50%'}
                       objectFit="cover"
                       quality={100}
+                      alt=""
                     />
                   </motion.div>
                 )
@@ -698,6 +710,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                       objectPosition={!!layer.mobileImg && isMobile ? '50% 50%' : '80% 50%'}
                       objectFit="cover"
                       quality={100}
+                      alt=""
                     />
                   </motion.div>
                 )
@@ -740,6 +753,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                       }
                       objectFit={i == 1 && !!layer.mobileImg && isMobile ? 'contain' : 'cover'}
                       quality={100}
+                      alt=""
                     />
                   </motion.div>
                 )

@@ -46,6 +46,7 @@ const ProductHeaderCentered = (props: Types) => (
             layout="fill"
             objectFit="contain"
             objectPosition="top"
+            alt=""
           />
         </div>
       ) : (

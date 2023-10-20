@@ -91,6 +91,7 @@ export default function LW8Releases() {
                                 layout="fill"
                                 objectPosition="100%"
                                 objectFit="cover"
+                                alt=""
                               />
                             </div>
                           )
@@ -134,6 +135,7 @@ export default function LW8Releases() {
                                 layout="fill"
                                 objectPosition="20% 50%"
                                 objectFit="cover"
+                                alt=""
                               />
                             </div>
                           )
@@ -173,6 +175,7 @@ export default function LW8Releases() {
                                   isTablet ? '50%' : isDesktop ? '100% 50%' : '30% 50%'
                                 }
                                 objectFit="contain"
+                                alt=""
                               />
                             </div>
                           )
@@ -231,6 +234,7 @@ export default function LW8Releases() {
                               layout="fill"
                               objectPosition={isTablet ? '50%' : '90% 50%'}
                               objectFit="contain"
+                              alt=""
                             />
                           </div>
                         )
@@ -287,6 +291,7 @@ export default function LW8Releases() {
                                 `}
                               layout="fill"
                               objectFit="cover"
+                              alt=""
                             />
                           </div>
                         )
@@ -355,6 +360,7 @@ export default function LW8Releases() {
                               layout="fill"
                               objectPosition={isTablet ? '50%' : '100% 50%'}
                               objectFit={i == 1 && isTablet ? 'contain' : 'cover'}
+                              alt=""
                             />
                           </div>
                         )
@@ -409,6 +415,7 @@ export default function LW8Releases() {
                               layout="fill"
                               objectPosition={isTablet ? '50%' : '100% 50%'}
                               objectFit={i == 1 && isTablet ? 'contain' : 'cover'}
+                              alt=""
                             />
                           </div>
                         )
@@ -445,6 +452,7 @@ export default function LW8Releases() {
                               className="absolute opacity-90 w-full h-full -z-10 transition-all duration-300"
                               layout="fill"
                               objectFit="cover"
+                              alt=""
                             />
                           </div>
                         )
@@ -498,6 +506,7 @@ export default function LW8Releases() {
                               className="absolute opacity-90 w-full h-full -z-10 transition-all duration-300"
                               layout="fill"
                               objectFit="cover"
+                              alt=""
                             />
                           </div>
                         )
@@ -535,6 +544,7 @@ export default function LW8Releases() {
                               className="absolute opacity-90 w-full h-full -z-10 transition-all duration-300"
                               layout="fill"
                               objectFit="cover"
+                              alt=""
                             />
                           </div>
                         )
@@ -573,6 +583,7 @@ export default function LW8Releases() {
                               layout="fill"
                               objectFit="cover"
                               objectPosition={isTablet ? '50%' : '100% 50%'}
+                              alt=""
                             />
                           </div>
                         )

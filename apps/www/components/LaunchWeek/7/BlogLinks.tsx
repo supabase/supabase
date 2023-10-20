@@ -67,6 +67,7 @@ before:border-[#1f3536] before:-z-10
             layout="fill"
             objectPosition="100% 50%"
             objectFit="cover"
+            alt=""
           />
         </motion.div>
       )}

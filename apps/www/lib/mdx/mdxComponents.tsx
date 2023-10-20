@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react'
 import Image from 'next/image'
 import Avatar from '~/components/Avatar'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
@@ -112,7 +113,7 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
         )}
       </figure>
     ),
-    Link: (props: HTMLAnchorElement) => (
+    Link: (props: PropsWithChildren<HTMLAnchorElement>) => (
       <a href={props.href} target={props.target}>
         {props.children}
       </a>
@@ -121,5 +122,5 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
     BlogCollapsible: (props: any) => <BlogCollapsible {...props} />,
   }
 
-  return components
+  return components as any
 }

@@ -65,7 +65,7 @@ export default function TicketsGrid({ loadedUsers, isLoading, pageCount, offset 
               <div className="relative inset-0 w-full pt-[50%] bg-[#2f2e2e] overflow-hidden rounded-lg sm:rounded-xl">
                 <Image
                   src={imgUrl}
-                  alt={user.username}
+                  alt={user.username ?? ''}
                   layout="fill"
                   objectFit="cover"
                   objectPosition="center"

@@ -161,9 +161,9 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
         <div className="flex flex-wrap gap-2">
           {props.blog.tags?.map((tag: string) => {
             return (
-              <a href={`/blog/tags/${tag}`} key={`category-badge-${tag}`}>
+              <Link href={`/blog/tags/${tag}`} key={`category-badge-${tag}`}>
                 <Badge>{tag}</Badge>
-              </a>
+              </Link>
             )
           })}
         </div>
@@ -240,13 +240,13 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
             <div className="col-span-12 mb-2 lg:col-span-2">
               {/* Back button */}
               <p>
-                <a
+                <Link
                   href={'/blog'}
                   className="text-muted hover:text-foreground flex cursor-pointer items-center text-sm transition"
                 >
                   <IconChevronLeft style={{ padding: 0 }} />
                   Back
-                </a>
+                </Link>
               </p>
             </div>
             <div className="col-span-12 lg:col-span-12 xl:col-span-10">
@@ -277,9 +277,8 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                                       src={author.author_image_url}
                                       className="dark:border-dark rounded-full border"
                                       alt={`${author.author} avatar`}
-                                      width="100%"
-                                      height="100%"
-                                      layout="responsive"
+                                      width={40}
+                                      height={40}
                                     />
                                   </div>
                                 )}
@@ -372,10 +371,11 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                           </Link>
                         ))}
                         <div className="mt-2">
-                          <Link href={`/blog`} passHref>
-                            <a className="text-light hover:text-foreground cursor-pointer text-xs">
-                              View all posts
-                            </a>
+                          <Link
+                            href={`/blog`}
+                            className="text-light hover:text-foreground cursor-pointer text-xs"
+                          >
+                            View all posts
                           </Link>
                         </div>
                         <div className="py-4 hidden lg:block">

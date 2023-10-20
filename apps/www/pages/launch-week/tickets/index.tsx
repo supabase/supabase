@@ -156,6 +156,7 @@ export default function TicketsPage({ users }: Props) {
               objectPosition="top"
               priority
               draggable={false}
+              alt=""
             />
           </div>
         </div>

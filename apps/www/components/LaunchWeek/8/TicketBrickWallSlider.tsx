@@ -63,7 +63,7 @@ export function TicketBrickWallSlider({ users, reverse, speed = 50000, animate }
                         getOgUrl(user.username!, !!user.golden) ??
                         '/images/launchweek/8/lw8-ticket-empty.jpg'
                       }
-                      alt={user.username}
+                      alt={user.username ?? ''}
                       layout="fill"
                       objectFit="cover"
                       objectPosition="center"

@@ -345,6 +345,7 @@ export default function IndexPage() {
                     src={`${basePath}/images/pricing/${addon.heroImg}${
                       resolvedTheme === 'dark' ? '' : '-light'
                     }.png`}
+                    alt=""
                   />
                 </div>
                 <div className="px-8 -mt-1">
@@ -423,6 +424,7 @@ export default function IndexPage() {
               src={`${basePath}/images/pricing/spend-cap${
                 resolvedTheme === 'dark' ? '' : '-light'
               }.png`}
+              alt=""
             />
           </div>
         </div>

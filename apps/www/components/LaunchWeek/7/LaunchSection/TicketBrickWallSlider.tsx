@@ -74,7 +74,7 @@ export function TicketBrickWallSlider({ users, reverse, speed = 10000 }: Props) 
                   <div className="absolute inset-[1px] w-full h-full rounded-md md:rounded-lg overflow-hidden p-[1px]">
                     <Image
                       src={getOgUrl(user.username!, !!user.golden)}
-                      alt={user.username}
+                      alt={user.username ?? ''}
                       layout="fill"
                       objectFit="cover"
                       objectPosition="center"
