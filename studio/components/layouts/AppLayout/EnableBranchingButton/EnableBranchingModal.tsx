@@ -145,7 +145,6 @@ const EnableBranchingModal = () => {
               <>
                 <GithubRepositorySelection
                   integration={githubIntegration}
-                  selectedBranch={selectedBranch}
                   hasGithubIntegrationInstalled={hasGithubIntegrationInstalled}
                   setSelectedBranch={setSelectedBranch}
                 />
