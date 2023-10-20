@@ -1,7 +1,7 @@
 import { PropsWithChildren, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Modal, Toggle } from 'ui'
-import { useConsentValue, LOCAL_STORAGE_KEYS } from 'common'
+import { Modal, Toggle, useConsentValue } from 'ui'
+import { LOCAL_STORAGE_KEYS } from 'common'
 
 const PrivacySettings = ({ children, ...props }: PropsWithChildren<{ className?: string }>) => {
   const [isOpen, setIsOpen] = useState(false)
