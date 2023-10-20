@@ -8,7 +8,7 @@ import { SupabaseGridQueue } from '../../constants'
 import { TableLike } from 'hooks/misc/useTable'
 
 export type RefreshButtonProps = {
-  table: TableLike
+  table: TableLike | SupaTable
   isRefetching: boolean
 }
 

@@ -29,7 +29,6 @@ import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useCheckPermissions, useStore, useUrlState } from 'hooks'
 import FilterDropdown from './filter'
-import RefreshButton from './RefreshButton'
 import RLSBannerWarning from './RLSBannerWarning'
 import SortPopover from './sort'
 
