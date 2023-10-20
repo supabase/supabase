@@ -9,13 +9,17 @@ export const meta = {
 }
 
 <Admonition type="note">
-  Resumable upload is in **Beta**. We are rolling this feature gradually, please contact us if you
-  want to be prioritized.
+
+Resumable upload is in **Beta**. We are rolling this feature gradually, please contact us if you want to be prioritized.
+  
 </Admonition>
 
-The Resumable upload method is recommended for uploading large files that may exceed 6MB in size or for scenarios where network stability is a concern or if you simply want to have a progress bar for your uploads.
+The resumable upload method is recommended when:
+- Uploading large files that may exceed 6MB in size
+- Network stability is a concern
+- You simply want to have a progress bar for your uploads
 
-  Supabase Storage implements the [TUS protocol](https://tus.io/) to enable resumable uploads. TUS stands for The Upload Server and is an open protocol for supporting resumable uploads. The protocol allows the upload process to be resumed from where it left off in case of interruptions. This method can be implemented using the tus-js-client library, or other client-side libraries like [Uppy-js](https://uppy.io/docs/tus/) that support the TUS protocol.
+Supabase Storage implements the [TUS protocol](https://tus.io/) to enable resumable uploads. TUS stands for The Upload Server and is an open protocol for supporting resumable uploads. The protocol allows the upload process to be resumed from where it left off in case of interruptions. This method can be implemented using the [tus-js-client](https://github.com/tus/tus-js-client) library, or other client-side libraries like [Uppy-js](https://uppy.io/docs/tus/) that support the TUS protocol.
 
 <Tabs
   scrollable
@@ -126,7 +130,7 @@ This URL will be valid for **up to 24 hours**. If the upload is not completed wi
 
 ### Concurrency
 
-When two or more clients try to upload to the same Upload URL only one of them will succeed. The other clients will receive a `409 Conflict` error. Only 1 client can upload to the same Upload URL at a time which prevents data corruption.
+When two or more clients try to upload to the same upload URL only one of them will succeed. The other clients will receive a `409 Conflict` error. Only 1 client can upload to the same upload URL at a time which prevents data corruption.
 
 When two or more clients upload a file to the same path using different upload URLs, the first client to complete the upload will succeed and the other clients will receive a `409 Conflict` error.
 
@@ -134,9 +138,9 @@ If you provide the `x-upsert` header the last client to complete the upload will
 
 ### UppyJS Example
 
-You can check a full example using UppyJS [Here](https://github.com/supabase/supabase/tree/master/examples/storage/resumable-upload-uppy)
+You can check a [full example using UppyJS](https://github.com/supabase/supabase/tree/master/examples/storage/resumable-upload-uppy).
 
-Framework integration for UppyJS:
+Below are the different framework integrations for UppyJS:
 
 - [React](https://uppy.io/docs/react/)
 - [Svelte](https://uppy.io/docs/svelte/)
@@ -148,21 +152,21 @@ Framework integration for UppyJS:
 When uploading a file to a path that already exists, the default behavior is to return a `400 Asset Already Exists` error.
 If you want to overwrite a file on a specific path you can set the `x-upsert` header to `true`.
 
-We do advise against overwriting files when possible, as the CDN will take sometime to propagate the changes to all the edge nodes leading to stale content.
+We do advise against overwriting files when possible, as the CDN will take some time to propagate the changes to all the edge nodes leading to stale content.
 Uploading a file to a new path is the recommended way to avoid propagation delays and stale content.
 
-If you want to know more about our CDN, check the [CDN](/docs/guides/storage/cdn) guide.
+To learn more, see the [CDN](/docs/guides/storage/cdn) guide.
 
 ## Access Control with RLS Policies
 
 Both the standard file upload and TUS resumable file upload methods in Supabase Storage support Row-Level Security (RLS) policies. RLS allows you to define fine-grained access control rules to restrict access to files based on user roles, permissions, or other criteria. This ensures that your files are secure and accessible only to authorized users.
 
-  For more information on RLS policies, see the [Storage Access Control](/docs/guides/storage/access-control) guide.
+For more information on RLS policies, see the [Storage Access Control](/docs/guides/storage/access-control) guide.
 
 ## Conclusion
 
 Supabase Storage provides multiple options for uploading files, including standard file upload and TUS resumable file upload, both of which use RLS policies for access control.
-  Additionally, there are client-side libraries like Uppy-js that make it easy to implement TUS uploads in your application. Choose the upload method that best fits your needs based on file size, network stability, and other requirements.
+Additionally, there are client-side libraries like Uppy-js that make it easy to implement TUS uploads in your application. Choose the upload method that best fits your needs based on file size, network stability, and other requirements.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

@@ -12,45 +12,44 @@ Buckets allows you to keep your files organised, determining the **Security Acce
 ## Security Access Model
 
 There are 2 Security models for buckets, **public** and **private** buckets.
-It is important to understand the simple difference
 
 ### Private Buckets
 When a bucket is set to **Private** all operations are subject to Access Control via [RLS policies](/guides/storage/uploads/access-control).
-This also applies for serving & downloading the assets within.
+This also applies for serving & downloading the assets.
 
 The only ways to download an assets within a private bucket is to:
 
-- Use the `download` method by providing a user authorization header that passes the RLS policy you have created on the `storage.objects` table
-- Create a signed temporary URL with the `createSignedUrl` method that can be accessed for a limited time
+- Use the `download` method by providing a authorization header containing your user's JWT. The RLS policy you have created on the `storage.objects` table will use this user to determine whether or not they have access.
+- Create a signed temporary URL with the `createSignedUrl` method that can be accessed for a limited time.
 
 #### Performance:
 
-Performance might be impacted when serving / downloading an asset, since we can only partition the CDN cache on a user level.
-This means that the cache is not shared across users resulting in a lot of more cache MISS.
-Consider using Public buckets if your assets are frequently accessed.
+Performance on private buckets might be impacted when serving / downloading an asset, since the CDN cache must be partitioned on a user level.
+This means that the cache is not shared across users resulting more often with a cache MISS.
+Consider using public buckets if your assets are frequently accessed.
 
 
 #### Example Use Cases:
 
-- Uploading users confidential documents
-- Upload private assets
-- Need the power of RLS to determine the access control to view the asset
+- Uploading users' confidential documents
+- Uploading private assets
+- Needing the power of RLS to set fine-grain access control on the asset
 
 
 ### Public Buckets
-When a bucket is set to be **Public** the Access Control for **retrieving** and **serving** the files within this bucket are bypassed.
+When a bucket is set to be **Public** the access control for **retrieving** and **serving** the files within this bucket are bypassed.
 Anyone will be able to view these assets if they access the asset URL.
 
 Access control is still honored for other types of operations, such as: Upload, Delete, Move, Copy
 
 #### Performance:
-Since Public buckets allows serving and downloading files without checking for permissions, we can safely share the CDN cache across all users around the globe.
+Since public buckets allow serving and downloading files without checking for permissions, the CDN cache is shared across all users globally.
 This resulting in a very high cache HIT ratio and much lower latency.
 
 #### Example Use Cases:
 
-- Users profile pictures
-- Users public media
+- User profile pictures
+- User public media
 - Blog post contents
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
