@@ -1018,6 +1018,7 @@ export const ai = {
         { name: 'Engineering for scale', url: '/guides/ai/engineering-for-scale' },
         { name: 'Choosing Compute Add-on', url: '/guides/ai/choosing-compute-addon' },
         { name: 'Going to Production', url: '/guides/ai/going-to-prod' },
+        { name: 'RAG with Permissions', url: '/guides/ai/rag-with-permissions' },
       ],
     },
     {
@@ -1321,6 +1322,21 @@ export const resources: NavMenuConstant = {
         {
           name: 'Amazon RDS',
           url: '/guides/resources/migrating-to-supabase/amazon-rds',
+          items: [],
+        },
+        {
+          name: 'Postgres',
+          url: '/guides/resources/migrating-to-supabase/postgres',
+          items: [],
+        },
+        {
+          name: 'MySQL',
+          url: '/guides/resources/migrating-to-supabase/mysql',
+          items: [],
+        },
+        {
+          name: 'MSSQL',
+          url: '/guides/resources/migrating-to-supabase/mssql',
           items: [],
         },
       ],

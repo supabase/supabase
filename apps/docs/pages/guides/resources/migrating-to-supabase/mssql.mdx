@@ -1,25 +1,22 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-  title: 'Migrate from Amazon RDS to Supabase',
-  description: 'Migrate your Amazon RDS MySQL or MS SQL database to Supabase Postgres database.',
+  title: 'Migrate Your MSSQL Database to Supabase',
+  description: 'Migrate your Microsoft SQL Server database to Supabase Postgres database.',
 }
 
-This guide aims to exhibit the process of transferring your Amazon RDS database from any of these engines Postgres, MySQL or MS SQL to Supabase's Postgres database. Although Amazon RDS is a favored managed database service provided by AWS, it may not suffice for all use cases. Supabase, on the other hand, provides an excellent free and open source option that encompasses all the necessary backend features to develop a product: a Postgres database, authentication, instant APIs, edge functions, real-time subscriptions, and storage.
+This guide aims to demonstrate the process of transferring your Microsoft SQL Server database to Supabase's PostgreSQL database. Supabase is a powerful and open-source platform offering a wide range of backend features, including a PostgreSQL database, authentication, instant APIs, edge functions, real-time subscriptions, and storage. Migrating your MSSQL database to Supabase's Postgres enables you to leverage Postgres's capabilities and access all the features you need for your project.
 
-Supabase's core is Postgres, enabling the use of row-level security and providing access to over 40 Postgres extensions. By migrating from Amazon RDS to Supabase, you can leverage Postgres to its fullest potential and acquire all the features you need to complete your project.
+## Retrieve Your MSSQL Database Credentials
 
-## Retrieve your Amazon RDS database credentials [#retrieve-rds-credentials]
+Before you begin the migration, you need to collect essential information about your MSSQL database. Follow these steps:
 
-1. Log in to your [Amazon RDS account](https://aws.amazon.com/rds/).
-1. Select the region where your RDS database is located.
-1. Navigate to the **Databases** tab.
-1. Select the database that you want to migrate.
-1. In the **Connectivity & Security** tab, note down the Endpoint and the port number.
-1. In the **Configuration** tab, note down the Database name and the Username.
-1. If you do not have the password, create a new one and note it down.
-
-![Copying RDS credentials from AWS Management Console](/docs/img/guides/resources/migrating-to-supabase/amazon-rds/amazon-rds_credentials.png)
+1. Log in to your MSSQL database provider.
+1. Locate and note the following database details:
+   - Hostname or IP address
+   - Database name
+   - Username
+   - Password
 
 ## Retrieve your Supabase Host [#retrieve-supabase-host]
 
@@ -46,30 +43,10 @@ Alternatively, you can use [pgloader](https://github.com/dimitri/pgloader), a fl
 >
 <TabPanel id="colab" label="Migrate using Colab">
 
-1. Select the Dabase Engine from the Source database in the dropdown
+1. Select the Dabase Engine from the Source database in the dropdown.
 1. Set the environment variables (`HOST`, `USER`, `SOURCE_DB`,`PASSWORD`, `SUPABASE_URL`, and `SUPABASE_PASSWORD`) in the Colab notebook.
 1. Run the first two steps in [the notebook](https://colab.research.google.com/github/mansueli/Supa-Migrate/blob/main/Amazon_RDS_to_Supabase.ipynb) in order. The first sets engine and installs the necessary files.
 1. Run the third step to start the migration. This will take a few minutes.
-
-</TabPanel>
-<TabPanel id="MySQL" label="Migrate from MySQL with pgloader">
-
-    Install pgloader.
-    Create a configuration file (e.g., config.load).
-
-```sql
-load database
-  from mysql://user:password@host/source_db
-  into postgres://postgres:password@db.xxxx.supabase.co:6543/postgres
-alter schema 'public' owner to 'postgres';
-set wal_buffers = '64MB', max_wal_senders = 0, statement_timeout = 0, work_mem to '2GB';
-```
-
-##Run the migration with pgloader
-
-```bash
-pgloader config.load
-```
 
 </TabPanel>
 <TabPanel id="MS SQL" label="Migrate from MSSQL">
@@ -85,7 +62,7 @@ ALTER SCHEMA 'public' OWNER TO 'postgres';
 set wal_buffers = '64MB', max_wal_senders = 0, statement_timeout = 0, work_mem to '2GB';
 ```
 
-##Run the migration with pgloader
+## Run the migration with pgloader
 
 ```bash
 pgloader config.load

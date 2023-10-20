@@ -45,7 +45,7 @@ const EditWrapper = () => {
   const formId = 'edit-wrapper-form'
   const router = useRouter()
   const queryClient = useQueryClient()
-  const { ui, meta, vault } = useStore()
+  const { ui, vault } = useStore()
   const { ref, id } = useParams()
   const { project } = useProjectContext()
 
@@ -93,7 +93,7 @@ const EditWrapper = () => {
 
   useEffect(() => {
     if (wrapper?.id) {
-      setWrapperTables(formatWrapperTables(wrapper?.tables ?? []))
+      setWrapperTables(formatWrapperTables(wrapper, wrapperMeta))
     }
   }, [wrapper?.id])
 
@@ -328,41 +328,45 @@ const EditWrapper = () => {
                       </div>
                     ) : (
                       <div className="space-y-2">
-                        {wrapperTables.map((table, i) => (
-                          <div
-                            key={`${table.schema_name}.${table.table_name}`}
-                            className="flex items-center justify-between px-4 py-2 border rounded-md border-scale-600"
-                          >
-                            <div>
-                              <p className="text-sm">
-                                {table.schema_name}.{table.table_name}
-                              </p>
-                              <p className="text-sm text-foreground-light">
-                                {wrapperMeta.tables[table.index].label}:{' '}
-                                {table.columns.map((column: any) => column.name).join(', ')}
-                              </p>
+                        {wrapperTables.map((table, i) => {
+                          const label = wrapperMeta.tables[table.index].label
+
+                          return (
+                            <div
+                              key={`${table.schema_name}.${table.table_name}`}
+                              className="flex items-center justify-between px-4 py-2 border rounded-md border-scale-600"
+                            >
+                              <div>
+                                <p className="text-sm">
+                                  {table.schema_name}.{table.table_name}
+                                </p>
+                                <p className="text-sm text-foreground-light">
+                                  {label}:{' '}
+                                  {table.columns.map((column: any) => column.name).join(', ')}
+                                </p>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Button
+                                  type="default"
+                                  className="px-1"
+                                  icon={<IconEdit />}
+                                  onClick={() => {
+                                    setIsEditingTable(true)
+                                    setSelectedTableToEdit({ ...table, tableIndex: i })
+                                  }}
+                                />
+                                <Button
+                                  type="default"
+                                  className="px-1"
+                                  icon={<IconTrash />}
+                                  onClick={() => {
+                                    setWrapperTables((prev) => prev.filter((_, j) => j !== i))
+                                  }}
+                                />
+                              </div>
                             </div>
-                            <div className="flex items-center space-x-2">
-                              <Button
-                                type="default"
-                                className="px-1"
-                                icon={<IconEdit />}
-                                onClick={() => {
-                                  setIsEditingTable(true)
-                                  setSelectedTableToEdit({ ...table, tableIndex: i })
-                                }}
-                              />
-                              <Button
-                                type="default"
-                                className="px-1"
-                                icon={<IconTrash />}
-                                onClick={() => {
-                                  setWrapperTables((prev) => prev.filter((_, j) => j !== i))
-                                }}
-                              />
-                            </div>
-                          </div>
-                        ))}
+                          )
+                        })}
                       </div>
                     )}
                     {wrapperTables.length > 0 && (
