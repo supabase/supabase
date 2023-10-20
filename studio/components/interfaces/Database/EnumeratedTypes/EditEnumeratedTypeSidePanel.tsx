@@ -110,7 +110,7 @@ const EditEnumeratedTypeSidePanel = ({
           isNew: x.isNew,
         })),
       ...(data.description !== selectedEnumeratedType.comment
-        ? { description: data.description }
+        ? { description: data.description?.replaceAll("'", "''") }
         : {}),
     }
 

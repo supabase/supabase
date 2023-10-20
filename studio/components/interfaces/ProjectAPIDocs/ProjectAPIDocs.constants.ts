@@ -69,7 +69,7 @@ const supabase = createClient(SUPABASE_URL, process.env.SUPABASE_KEY);`,
 
   After they have signed up, all interactions using the Supabase client will be performed as "that user".`,
     js: (apikey?: string, endpoint?: string) => `
-let { data, error } = await supabase.auth.signUp({
+const { data, error } = await supabase.auth.signUp({
   email: 'someone@email.com',
   password: 'some-secure-password'
 })`,
@@ -91,7 +91,7 @@ If an account is created, users can login to your app.
 
 After they have logged in, all interactions using the Supabase JS client will be performed as "that user".`,
     js: (apikey?: string, endpoint?: string) => `
-let { data, error } = await supabase.auth.signInWithPassword({
+const { data, error } = await supabase.auth.signInWithPassword({
   email: 'someone@email.com',
   password: 'some-secure-password'
 })
@@ -115,7 +115,7 @@ Send a user a passwordless link which they can use to redeem an access_token.
 
 After they have clicked the link, all interactions using the Supabase JS client will be performed as "that user".`,
     js: (apikey?: string, endpoint?: string) => `
-let { data, error } = await supabase.auth.signInWithOtp({
+const { data, error } = await supabase.auth.signInWithOtp({
   email: 'someone@email.com'
 })
     `,
@@ -139,7 +139,7 @@ The user will receive a mobile OTP via sms with which they can verify that they 
 
 You must enter your own twilio credentials on the auth settings page to enable sms confirmations.`,
     js: (apikey?: string, endpoint?: string) => `
-let { data, error } = await supabase.auth.signUp({
+const { data, error } = await supabase.auth.signUp({
   phone: '+13334445555',
   password: 'some-password'
 })
@@ -163,7 +163,7 @@ SMS OTPs work like magic links, except you have to provide an interface for the 
 
 You must enter your own twilio credentials on the auth settings page to enable SMS-based Logins.`,
     js: (apikey?: string, endpoint?: string) => `
-let { data, error } = await supabase.auth.signInWithOtp({
+const { data, error } = await supabase.auth.signInWithOtp({
   phone: '+13334445555'
 })
     `,
@@ -185,7 +185,7 @@ Once the user has received the OTP, have them enter it in a form and send it for
 
 You must enter your own twilio credentials on the auth settings page to enable SMS-based OTP verification.`,
     js: (apikey?: string, endpoint?: string) => `
-let { data, error } = await supabase.auth.verifyOtp({
+const { data, error } = await supabase.auth.verifyOtp({
   phone: '+13334445555',
   token: '123456',
   type: 'sms'
@@ -215,7 +215,7 @@ After they have logged in, all interactions using the Supabase JS client will be
 
 Generate your Client ID and secret from: [Google](https://console.developers.google.com/apis/credentials), [Github](https://github.com/settings/applications/new), [Gitlab](https://gitlab.com/oauth/applications), [Facebook](https://developers.facebook.com/apps), and [Bitbucket](https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud).`,
     js: (apikey?: string, endpoint?: string) => `
-let { data, error } = await supabase.auth.signInWithOAuth({
+const { data, error } = await supabase.auth.signInWithOAuth({
   provider: 'github'
 })
     `,
@@ -241,7 +241,7 @@ curl -X GET '${endpoint}/auth/v1/user' \\
     title: `Forgot password / email`,
     description: `Sends the user a log in link via email. Once logged in you should direct the user to a new password form. And use "Update User" below to save the new password.`,
     js: (apikey?: string, endpoint?: string) => `
-let { data, error } = await supabase.auth.resetPasswordForEmail(email)
+const { data, error } = await supabase.auth.resetPasswordForEmail(email)
     `,
     bash: (apikey?: string, endpoint?: string) => `
 curl -X POST '${endpoint}/auth/v1/recover' \\
@@ -284,7 +284,7 @@ curl -X PUT '${endpoint}/auth/v1/user' \\
     title: `Log out`,
     description: `After calling log out, all interactions using the Supabase JS client will be "anonymous".`,
     js: (apikey?: string, endpoint?: string) => `
-let { error } = await supabase.auth.signOut()
+const { error } = await supabase.auth.signOut()
     `,
     bash: (apikey?: string, endpoint?: string) => `
 curl -X POST '${endpoint}/auth/v1/logout' \\
@@ -304,7 +304,7 @@ After they have clicked the link, all interactions using the Supabase JS client 
 
 This endpoint requires you use the \`service_role_key\` when initializing the client, and should only be invoked from the server, never from the client.`,
     js: (apikey?: string, endpoint?: string) => `
-let { data, error } = await supabase.auth.api.inviteUserByEmail('someone@email.com')
+const { data, error } = await supabase.auth.api.inviteUserByEmail('someone@email.com')
     `,
     bash: (apikey?: string, endpoint?: string) => `
 curl -X POST '${endpoint}/auth/v1/invite' \\
@@ -1009,11 +1009,19 @@ Upload a file to an existing bucket. RLS policy permissions required:
 - \`buckets\` table permissions: none
 - \`objects\` table permissions: only \`insert\` when you are uploading new files and \`select\`, \`insert\`, and \`update\` when you are upserting files.
 `,
-    code: ({ name }: { name: string }) => [
+    code: ({ name, apikey, endpoint }: { name: string; apikey: string; endpoint: string }) => [
       {
         key: 'storage-upload-file',
         title: undefined,
-        bash: `# No command via bash available`,
+        bash: `
+curl -X POST '${endpoint}/storage/v1/object/${name}/folder/avatar1.png' \\
+-H 'Content-Type: image/png' \\
+-H "Authorization: Bearer ${apikey}" \\
+--data-binary @/path/to/your/file'
+-H 'Content-Type: multipart/form-data' \\
+-H "Authorization: Bearer ${apikey}" \\
+--data-raw $'your_file_data'
+        `,
         js: `
 const avatarFile = event.target.files[0]
 const { data, error } = await supabase
@@ -1037,11 +1045,16 @@ Delete files within the bucket. RLS policy permissions required:
 - \`buckets\` table permissions: none
 - \`objects\` table permissions: \`delete\` and \`select\`
 `,
-    code: ({ name }: { name: string }) => [
+    code: ({ name, apikey, endpoint }: { name: string; apikey: string; endpoint: string }) => [
       {
         key: 'storage-delete-files',
         title: undefined,
-        bash: `# No command via bash available`,
+        bash: `
+curl -X DELETE '${endpoint}/storage/v1/object/${name}' \\
+-H "Content-Type: application/json" \\
+-H "Authorization: Bearer ${apikey}" \\
+-d '{ "prefixes": ["file_name", "another_file_name"] }'
+`,
         js: `
 const { data, error } = await supabase
   .storage
@@ -1061,11 +1074,15 @@ List all files within the bucket. RLS policy permissions required:
 - \`buckets\` table permissions: none
 - \`objects\` table permissions: \`select\`
 `,
-    code: ({ name }: { name: string }) => [
+    code: ({ name, apikey, endpoint }: { name: string; apikey: string; endpoint: string }) => [
       {
         key: 'storage-list-files',
         title: undefined,
-        bash: `# No command via bash available`,
+        bash: `
+curl -X POST '${endpoint}/storage/v1/object/list/${name}' \\
+-H "Content-Type: application/json" \\
+-H "Authorization: Bearer ${apikey}" \\
+-d '{ "limit": 100, "offset": 0, "prefix": "", "sortBy": { "column": "name", "order": "asc" } }'`,
         js: `
 const { data, error } = await supabase
   .storage
@@ -1089,15 +1106,20 @@ Downloads a file from a private bucket. For public buckets, make a request to th
 - \`buckets\` table permissions: none
 - \`objects\` table permissions: \`select\`
 `,
-    code: ({ name }: { name: string }) => [
+    code: ({ name, apikey, endpoint }: { name: string; apikey: string; endpoint: string }) => [
       {
         key: 'storage-download-file',
         title: undefined,
-        bash: `# No command via bash available`,
+        bash: `
+curl -X GET '${endpoint}/storage/v1/object/${name}/folder/avatar1.png' \\
+-H "Content-Type: application/json" \\
+-H "Authorization: Bearer ${apikey}" \\
+--output avatar1.png
+`,
         js: `
 const { data, error } = await supabase
   .storage
-  .from('avatars')
+  .from('${name}')
   .download('folder/avatar1.png')
       `,
       },
@@ -1113,11 +1135,16 @@ Create a signed URL which can be used to share a file for a fixed amount of time
 - \`buckets\` table permissions: none
 - \`objects\` table permissions: \`select\`
 `,
-    code: ({ name }: { name: string }) => [
+    code: ({ name, apikey, endpoint }: { name: string; apikey: string; endpoint: string }) => [
       {
         key: 'storage-create-signed-url',
         title: undefined,
-        bash: `# No command via bash available`,
+        bash: `
+curl -X POST '${endpoint}/storage/v1/object/sign/${name}/folder/avatar1.png' \\
+-H "Content-Type: application/json" \\
+-H "Authorization: Bearer ${apikey}" \\
+-d '{ "expiresIn": 60 }'
+        `,
         js: `
 const { data, error } = await supabase
   .storage
@@ -1137,17 +1164,20 @@ A simple convenience function to get the URL for an asset in a public bucket. If
 
 This function does not verify if the bucket is public. If a public URL is created for a bucket which is not public, you will not be able to download the asset.
 
-The bucket needs to be set to public, either via updateBucket() or by going to Storage on supabase.com/dashboard, clicking the overflow menu on a bucket and choosing "Make public"
+The bucket needs to be set to public, either via \`updateBucket()\` or by going to Storage on supabase.com/dashboard, clicking the overflow menu on a bucket and choosing "Make public"
 
 RLS policy permissions required:
 - \`buckets\` table permissions: none
 - \`objects\` table permissions: none
 `,
-    code: ({ name }: { name: string }) => [
+    code: ({ name, apikey, endpoint }: { name: string; apikey: string; endpoint: string }) => [
       {
         key: 'storage-retrieve-public-url',
         title: undefined,
-        bash: `# No command via bash available`,
+        bash: `
+# No bash command available.
+# You can construct the public URL by concatenating the bucket URL with the path to the asset
+# e.g ${endpoint}/storage/v1/object/public/${name}/folder/avatar1.png`,
         js: `
 const { data } = supabase
   .storage

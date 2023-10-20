@@ -67,12 +67,7 @@ psql -h $SUPABASE_HOST -U postgres -f heroku_dump.sql
 
 Run `pg_dump --help` for a full list of options.
 
-<Admonition type="caution">
-
-- If you plan on migrating a database larger than 6 GB, we recommend [contacting support](https://supabase.com/dashboard/support/new) to ensure that you'll have the proper disk size pre-provisioned. You can read more about how the disk is managed on Supabase on the [Database usage](/docs/guides/platform/database-size#disk-management).
-- We also recommend upgrading to at least a [Large instance](/docs/guides/platform/compute-add-ons) for the migration (you can downgrade later) to avoid running out of IO-Budget.
-
-</Admonition>
+<MigrationWarnings />
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
