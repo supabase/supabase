@@ -37,7 +37,10 @@ const DatabaseTables: NextPageWithLayout = () => {
                   setSelectedTable(table)
                   snap.onEditTable(table)
                 }}
-                onDeleteTable={snap.onDeleteTable}
+                onDeleteTable={(table) => {
+                  setSelectedTable(table)
+                  snap.onDeleteTable(table)
+                }}
                 onOpenTable={setSelectedTable}
               />
             ) : (

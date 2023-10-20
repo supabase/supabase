@@ -24,7 +24,7 @@ export type SidePanel =
   | { type: 'csv-import' }
 
 export type ConfirmationDialog =
-  | { type: 'table'; isDeleteWithCascade: boolean; table?: PostgresTable }
+  | { type: 'table'; isDeleteWithCascade: boolean; table: PostgresTable }
   | { type: 'column'; column: PostgresColumn; isDeleteWithCascade: boolean }
 
 export type UIState =
