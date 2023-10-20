@@ -49,13 +49,11 @@ You will need the following values to get started:
 - Live API Key / Test API Key
 - MessageBird originator
 
-Now go to the Auth > Settings page in the Supabase dashboard (https://supabase.com/dashboard/project/YOUR-PROJECT-REF/auth/settings).
+Now go to the [Auth > Providers](https://supabase.com/dashboard/project/_/auth/providers) page in the Supabase dashboard and select "Phone" from the Auth Providers list.
 
-You should see an option to enable Phone Signup.
+You should see an option to enable the Phone provider.
 
-![Enable Phone Sign-Up](/docs/img/guides/auth-twilio/7.png)
-
-Toggle it on, and copy the 2 values over from the messagebird dashboard. Click save.
+Toggle it on, and copy the 2 values over from the Messagebird dashboard. Click save.
 
 Note: If you use the Test API Key, the OTP will not be delivered to the mobile number specified but messagebird will log the response in the dashboard.
 If the Live API Key is used instead, the OTP will be delivered and there will be a deduction in your free credits.
@@ -68,7 +66,7 @@ Now the backend should be setup, we can proceed to add our client-side code!
 
 The SMS message sent to a phone containing an OTP code can be customized. This is useful if you need to mention a brand name or display a website address.
 
-Go to Auth > Templates page in the Supabase dashboard (https://supabase.com/dashboard/project/YOUR-PROJECT-REF/auth/templates).
+Go to [Auth > Templates](https://supabase.com/dashboard/project/_/auth/templates) page in the Supabase dashboard.
 
 Use the variable `.Code` in the template to display the code.
 
