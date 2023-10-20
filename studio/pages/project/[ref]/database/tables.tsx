@@ -34,6 +34,7 @@ const DatabaseTables: NextPageWithLayout = () => {
               <TableList
                 onAddTable={snap.onAddTable}
                 onEditTable={(table) => {
+                  setSelectedTable(table)
                   snap.onEditTable(table)
                 }}
                 onDeleteTable={snap.onDeleteTable}
