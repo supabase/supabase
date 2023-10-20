@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import { useRouter } from 'next/router'
 import { IconChevronRight, IconArrowLeft } from '~/../../packages/ui'
 import { REFERENCES } from './NavigationMenu/NavigationMenu.constants'

@@ -4,7 +4,7 @@ import { highlightSelectedNavItem } from '~/components/CustomHTMLElements/Custom
 import { useRouter } from 'next/router'
 import { useNavigationMenuContext } from '~/components/Navigation/NavigationMenu/NavigationMenu.Context'
 import { menuState } from '~/hooks/useMenuState'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 
 interface ISectionContainer {
   id: string

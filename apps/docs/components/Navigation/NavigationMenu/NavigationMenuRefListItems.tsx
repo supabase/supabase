@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { IconChevronLeft, IconChevronUp, cn } from 'ui'
 import * as NavItems from './NavigationMenu.constants'
 
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 
 import RevVersionDropdown from '~/components/RefVersionDropdown'
 import { useMenuActiveRefId } from '~/hooks/useMenuState'

@@ -1,5 +1,5 @@
 import { useTheme } from 'next-themes'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useEffect, useRef } from 'react'
