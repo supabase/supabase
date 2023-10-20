@@ -1,9 +1,16 @@
+import { configure } from 'mobx'
 import { Project } from 'types'
 import UiStore, { IUiStore } from './UiStore'
 import AppStore, { IAppStore } from './app/AppStore'
 import MetaStore, { IMetaStore } from './pgmeta/MetaStore'
 import ProjectFunctionsStore, { IProjectFunctionsStore } from './project/ProjectFunctionsStore'
 import VaultStore, { IVaultStore } from './project/VaultStore'
+
+// Temporary disable mobx warnings
+// TODO: need to remove this after refactoring old stores.
+configure({
+  enforceActions: 'never',
+})
 
 export interface IRootStore {
   app: IAppStore

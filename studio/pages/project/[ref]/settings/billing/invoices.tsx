@@ -39,7 +39,7 @@ export default ProjectBilling
 
 const Settings = () => {
   const selectedOrganization = useSelectedOrganization()
-  const orgSlug = selectedOrganization?.slug ?? ''
+  const orgSlug = selectedOrganization?.slug ?? '_'
 
   return (
     <div className="container max-w-4xl p-4 space-y-8">
