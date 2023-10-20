@@ -1,25 +1,23 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-  title: 'Migrate from Amazon RDS to Supabase',
-  description: 'Migrate your Amazon RDS MySQL or MS SQL database to Supabase Postgres database.',
+  title: 'Migrate Your MySQL Database to Supabase',
+  description: 'Migrate your MySQL database to Supabase Postgres database.',
 }
 
-This guide aims to exhibit the process of transferring your Amazon RDS database from any of these engines Postgres, MySQL or MS SQL to Supabase's Postgres database. Although Amazon RDS is a favored managed database service provided by AWS, it may not suffice for all use cases. Supabase, on the other hand, provides an excellent free and open source option that encompasses all the necessary backend features to develop a product: a Postgres database, authentication, instant APIs, edge functions, real-time subscriptions, and storage.
+This guide aims to exhibit the process of transferring your MySQL database to Supabase's Postgres database. Supabase is a robust and open-source platform offering a wide range of backend features, including a PostgreSQL database, authentication, instant APIs, edge functions, real-time subscriptions, and storage. Migrating your MySQL database to Supabase's PostgreSQL enables you to leverage PostgreSQL's capabilities and access all the features you need for your project.
 
-Supabase's core is Postgres, enabling the use of row-level security and providing access to over 40 Postgres extensions. By migrating from Amazon RDS to Supabase, you can leverage Postgres to its fullest potential and acquire all the features you need to complete your project.
+## Retrieve Your MySQL Database Credentials
 
-## Retrieve your Amazon RDS database credentials [#retrieve-rds-credentials]
+Before you begin the migration, you need to collect essential information about your MySQL database. Follow these steps:
 
-1. Log in to your [Amazon RDS account](https://aws.amazon.com/rds/).
-1. Select the region where your RDS database is located.
-1. Navigate to the **Databases** tab.
-1. Select the database that you want to migrate.
-1. In the **Connectivity & Security** tab, note down the Endpoint and the port number.
-1. In the **Configuration** tab, note down the Database name and the Username.
-1. If you do not have the password, create a new one and note it down.
+1. Log in to your MySQL database provider.
 
-![Copying RDS credentials from AWS Management Console](/docs/img/guides/resources/migrating-to-supabase/amazon-rds/amazon-rds_credentials.png)
+1. Locate and note the following database details:
+   - Hostname or IP address
+   - Database name
+   - Username
+   - Password
 
 ## Retrieve your Supabase Host [#retrieve-supabase-host]
 
@@ -65,27 +63,7 @@ alter schema 'public' owner to 'postgres';
 set wal_buffers = '64MB', max_wal_senders = 0, statement_timeout = 0, work_mem to '2GB';
 ```
 
-##Run the migration with pgloader
-
-```bash
-pgloader config.load
-```
-
-</TabPanel>
-<TabPanel id="MS SQL" label="Migrate from MSSQL">
-
-    Install pgloader.
-    Create a configuration file (e.g., config.load).
-
-```sql
-LOAD DATABASE
-    FROM mssql://USER:PASSWORD@HOST/SOURCE_DB
-    INTO postgres://postgres:password@db.xxxx.supabase.co:6543/postgres
-ALTER SCHEMA 'public' OWNER TO 'postgres';
-set wal_buffers = '64MB', max_wal_senders = 0, statement_timeout = 0, work_mem to '2GB';
-```
-
-##Run the migration with pgloader
+## Run the migration with pgloader
 
 ```bash
 pgloader config.load

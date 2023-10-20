@@ -121,6 +121,8 @@ const AuditLogs = () => {
       }
     })
 
+  const currentOrganization = organizations?.find((o) => o.slug === slug)
+
   return (
     <>
       <ScaffoldContainerLegacy>
@@ -138,7 +140,9 @@ const AuditLogs = () => {
               />
               <FilterPopover
                 name="Projects"
-                options={projects ?? []}
+                options={
+                  projects?.filter((p) => p.organization_id === currentOrganization?.id) ?? []
+                }
                 labelKey="name"
                 valueKey="ref"
                 activeOptions={filters.projects}
