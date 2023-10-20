@@ -1,7 +1,7 @@
+import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
 
-import { useParams } from 'common'
 import { ColumnList, TableList } from 'components/interfaces/Database'
 import { SidePanelEditor } from 'components/interfaces/TableGridEditor'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
@@ -17,7 +17,11 @@ const DatabaseTables: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
 
   const snap = useTableEditorStateSnapshot()
-  const [selectedTable, setSelectedTable] = useState<Table | undefined>(undefined)
+  const [selectedTable, setSelectedTable] = useState<Table>()
+
+  // [Joshen] Separate state required to handle edit/delete table
+  // since selectedTable above handles the state for ColumnList
+  const [selectedTableToEdit, setSelectedTableToEdit] = useState<Table>()
 
   useEffect(() => {
     if (ui.selectedProjectRef) {
@@ -33,10 +37,14 @@ const DatabaseTables: NextPageWithLayout = () => {
             {selectedTable === undefined ? (
               <TableList
                 onAddTable={snap.onAddTable}
-                onEditTable={() => {
+                onEditTable={(table) => {
+                  setSelectedTableToEdit(table)
                   snap.onEditTable()
                 }}
-                onDeleteTable={snap.onDeleteTable}
+                onDeleteTable={(table) => {
+                  setSelectedTableToEdit(table)
+                  snap.onDeleteTable()
+                }}
                 onOpenTable={setSelectedTable}
               />
             ) : (
@@ -52,8 +60,8 @@ const DatabaseTables: NextPageWithLayout = () => {
         </ScaffoldSection>
       </ScaffoldContainer>
 
-      <DeleteConfirmationDialogs projectRef={projectRef} selectedTable={selectedTable} />
-      <SidePanelEditor selectedTable={selectedTable} />
+      <DeleteConfirmationDialogs projectRef={projectRef} selectedTable={selectedTableToEdit} />
+      <SidePanelEditor selectedTable={selectedTableToEdit} />
     </>
   )
 }
