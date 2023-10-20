@@ -21,9 +21,9 @@ import {
   IconX,
   Input,
   Menu,
-  Modal,
 } from 'ui'
 
+import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import InfiniteList from 'components/ui/InfiniteList'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { useSchemasQuery } from 'data/database/schemas-query'
@@ -302,41 +302,7 @@ const TableEditorMenu = () => {
         )}
       </div>
 
-      <Modal
-        size="medium"
-        visible={showModal}
-        header="Schemas managed by Supabase"
-        customFooter={
-          <div className="flex items-center justify-end space-x-2">
-            <Button type="default" onClick={() => setShowModal(false)}>
-              Understood
-            </Button>
-          </div>
-        }
-        onCancel={() => setShowModal(false)}
-      >
-        <Modal.Content className="py-4 space-y-2">
-          <p className="text-sm">
-            The following schemas are managed by Supabase and are currently protected from write
-            access through the Table Editor.
-          </p>
-          <div className="flex flex-wrap gap-1">
-            {EXCLUDED_SCHEMAS.map((schema) => (
-              <code key={schema} className="text-xs">
-                {schema}
-              </code>
-            ))}
-          </div>
-          <p className="text-sm !mt-4">
-            These schemas are critical to the functionality of your Supabase project and hence we
-            highly recommend not altering them.
-          </p>
-          <p className="text-sm">
-            You can, however, still interact with those schemas through the SQL Editor although we
-            advise you only do so if you know what you are doing.
-          </p>
-        </Modal.Content>
-      </Modal>
+      <ProtectedSchemaModal visible={showModal} onClose={() => setShowModal(false)} />
     </>
   )
 }
