@@ -168,6 +168,14 @@ export interface paths {
     /** Gets usage stats */
     get: operations['OrgUsageController_getDailyStats']
   }
+  '/platform/organizations/{slug}/documents/standard-security-questionnaire': {
+    /** Get standard security questionnaire URL */
+    get: operations['OrgDocumentsController_getStandardSecurityQuestionnaireUrl']
+  }
+  '/platform/organizations/{slug}/documents/soc2-type-2-report': {
+    /** Get SOC2 Type 2 report URL */
+    get: operations['OrgDocumentsController_getSoc2Type2ReportUrl']
+  }
   '/platform/organizations/{slug}/audit': {
     /** Gets an organization's audit logs */
     get: operations['OrgAuditLogsController_getAuditLogs']
@@ -1726,6 +1734,8 @@ export interface components {
       cpu_exhaustion: 'critical' | 'warning' | null
       /** @enum {string|null} */
       memory_and_swap_exhaustion: 'critical' | 'warning' | null
+      /** @enum {string|null} */
+      auth_rate_limit_exhaustion: 'critical' | 'warning' | null
       project: string
       is_readonly_mode_enabled: boolean
     }
@@ -1762,6 +1772,8 @@ export interface components {
       SECURITY_CAPTCHA_SECRET: string
       RATE_LIMIT_EMAIL_SENT: number
       RATE_LIMIT_SMS_SENT: number
+      RATE_LIMIT_VERIFY?: number
+      RATE_LIMIT_TOKEN_REFRESH?: number
       MAILER_SECURE_EMAIL_CHANGE_ENABLED: boolean
       REFRESH_TOKEN_ROTATION_ENABLED: boolean
       PASSWORD_MIN_LENGTH: number
@@ -1820,6 +1832,7 @@ export interface components {
       EXTERNAL_GOOGLE_CLIENT_ID: string
       EXTERNAL_GOOGLE_SECRET: string
       EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS?: string
+      EXTERNAL_GOOGLE_SKIP_NONCE_CHECK?: boolean
       EXTERNAL_KAKAO_ENABLED: boolean
       EXTERNAL_KAKAO_CLIENT_ID: string
       EXTERNAL_KAKAO_SECRET: string
@@ -1830,6 +1843,9 @@ export interface components {
       EXTERNAL_LINKEDIN_ENABLED: boolean
       EXTERNAL_LINKEDIN_CLIENT_ID: string
       EXTERNAL_LINKEDIN_SECRET: string
+      EXTERNAL_LINKEDIN_OIDC_ENABLED: boolean
+      EXTERNAL_LINKEDIN_OIDC_CLIENT_ID: string
+      EXTERNAL_LINKEDIN_OIDC_SECRET: string
       EXTERNAL_NOTION_ENABLED: boolean
       EXTERNAL_NOTION_CLIENT_ID: string
       EXTERNAL_NOTION_SECRET: string
@@ -1886,6 +1902,8 @@ export interface components {
       SECURITY_CAPTCHA_SECRET?: string
       RATE_LIMIT_EMAIL_SENT?: number
       RATE_LIMIT_SMS_SENT?: number
+      RATE_LIMIT_VERIFY?: number
+      RATE_LIMIT_TOKEN_REFRESH?: number
       MAILER_SECURE_EMAIL_CHANGE_ENABLED?: boolean
       REFRESH_TOKEN_ROTATION_ENABLED?: boolean
       PASSWORD_MIN_LENGTH?: number
@@ -1945,6 +1963,7 @@ export interface components {
       EXTERNAL_GOOGLE_CLIENT_ID?: string
       EXTERNAL_GOOGLE_SECRET?: string
       EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS?: string
+      EXTERNAL_GOOGLE_SKIP_NONCE_CHECK?: boolean
       EXTERNAL_KAKAO_ENABLED?: boolean
       EXTERNAL_KAKAO_CLIENT_ID?: string
       EXTERNAL_KAKAO_SECRET?: string
@@ -1955,6 +1974,9 @@ export interface components {
       EXTERNAL_LINKEDIN_ENABLED?: boolean
       EXTERNAL_LINKEDIN_CLIENT_ID?: string
       EXTERNAL_LINKEDIN_SECRET?: string
+      EXTERNAL_LINKEDIN_OIDC_ENABLED?: boolean
+      EXTERNAL_LINKEDIN_OIDC_CLIENT_ID?: string
+      EXTERNAL_LINKEDIN_OIDC_SECRET?: string
       EXTERNAL_NOTION_ENABLED?: boolean
       EXTERNAL_NOTION_CLIENT_ID?: string
       EXTERNAL_NOTION_SECRET?: string
@@ -2011,6 +2033,8 @@ export interface components {
       SECURITY_CAPTCHA_SECRET: string
       RATE_LIMIT_EMAIL_SENT: number
       RATE_LIMIT_SMS_SENT: number
+      RATE_LIMIT_VERIFY?: number
+      RATE_LIMIT_TOKEN_REFRESH?: number
       MAILER_SECURE_EMAIL_CHANGE_ENABLED: boolean
       REFRESH_TOKEN_ROTATION_ENABLED: boolean
       PASSWORD_MIN_LENGTH: number
@@ -2069,6 +2093,7 @@ export interface components {
       EXTERNAL_GOOGLE_CLIENT_ID: string
       EXTERNAL_GOOGLE_SECRET: string
       EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS?: string
+      EXTERNAL_GOOGLE_SKIP_NONCE_CHECK?: boolean
       EXTERNAL_KAKAO_ENABLED: boolean
       EXTERNAL_KAKAO_CLIENT_ID: string
       EXTERNAL_KAKAO_SECRET: string
@@ -2079,6 +2104,9 @@ export interface components {
       EXTERNAL_LINKEDIN_ENABLED: boolean
       EXTERNAL_LINKEDIN_CLIENT_ID: string
       EXTERNAL_LINKEDIN_SECRET: string
+      EXTERNAL_LINKEDIN_OIDC_ENABLED: boolean
+      EXTERNAL_LINKEDIN_OIDC_CLIENT_ID: string
+      EXTERNAL_LINKEDIN_OIDC_SECRET: string
       EXTERNAL_NOTION_ENABLED: boolean
       EXTERNAL_NOTION_CLIENT_ID: string
       EXTERNAL_NOTION_SECRET: string
@@ -2383,6 +2411,9 @@ export interface components {
       usage_billing_enabled: boolean
       slugs: string[]
       usages: components['schemas']['OrgMetricUsage'][]
+    }
+    OrgDocumentUrlResponse: {
+      fileUrl: string
     }
     AuditLogsResponse: {
       result: Record<string, never>[]
@@ -3882,9 +3913,7 @@ export interface components {
     Invoice: {
       id: string
       invoice_pdf: string
-      custom_fields: Record<string, never>[]
       subscription: string
-      hosted_invoice_url: string
       subtotal: number
       number: string
       period_end: number
@@ -3893,91 +3922,6 @@ export interface components {
     OverdueInvoiceCount: {
       organization_id: number
       overdue_invoice_count: number
-    }
-    StripeInvoice: {
-      id: string
-      object: Record<string, never>
-      account_country: string
-      account_name: string
-      account_tax_ids: Record<string, never>
-      amount_due: number
-      amount_paid: number
-      amount_remaining: number
-      application: string
-      application_fee_amount: number
-      attempt_count: number
-      attempted: boolean
-      auto_advance?: boolean
-      automatic_tax: Record<string, never>
-      billing_reason: Record<string, never>
-      charge: Record<string, never>
-      collection_method: Record<string, never>
-      created: number
-      currency: string
-      custom_fields: Record<string, never>
-      customer: Record<string, never>
-      customer_address: Record<string, never>
-      customer_email: string
-      customer_name: string
-      customer_phone: string
-      customer_shipping: Record<string, never>
-      customer_tax_exempt: Record<string, never>
-      customer_tax_ids?: Record<string, never>
-      default_payment_method: Record<string, never>
-      default_source: Record<string, never>
-      default_tax_rates: Record<string, never>
-      deleted?: Record<string, never>
-      description: string
-      discount: Record<string, never>
-      discounts: Record<string, never>
-      due_date: number
-      ending_balance: number
-      footer: string
-      hosted_invoice_url?: string
-      invoice_pdf?: string
-      last_finalization_error: Record<string, never>
-      lines: Record<string, never>
-      livemode: boolean
-      metadata: Record<string, never>
-      next_payment_attempt: number
-      number: string
-      on_behalf_of: Record<string, never>
-      paid: boolean
-      paid_out_of_band: boolean
-      payment_intent: Record<string, never>
-      payment_settings: Record<string, never>
-      period_end: number
-      period_start: number
-      post_payment_credit_notes_amount: number
-      pre_payment_credit_notes_amount: number
-      quote: Record<string, never>
-      receipt_number: string
-      rendering_options: Record<string, never>
-      starting_balance: number
-      statement_descriptor: string
-      status: Record<string, never>
-      status_transitions: Record<string, never>
-      subscription: Record<string, never>
-      subscription_proration_date?: number
-      subtotal: number
-      subtotal_excluding_tax: number
-      tax: number
-      test_clock: Record<string, never>
-      threshold_reason?: Record<string, never>
-      total: number
-      total_discount_amounts: Record<string, never>
-      total_excluding_tax: number
-      total_tax_amounts: Record<string, never>
-      transfer_data: Record<string, never>
-      webhooks_delivered_at: number
-      lastResponse: {
-        headers?: Record<string, never>
-        requestId?: string
-        statusCode?: number
-        apiVersion?: string
-        idempotencyKey?: string
-        stripeAccount?: string
-      }
     }
     GoogleAnalyticBody: {
       language?: string
@@ -4676,6 +4620,10 @@ export interface components {
       content: components['schemas']['SnippetContent']
     }
     ResourceStatusResponse: {
+      /** @description Supabase project instance compute size */
+      compute: string
+      /** @description Unique ID representing the fly extension */
+      id: string
       /**
        * @description Supabase project status
        * @example ACTIVE_HEALTHY
@@ -5621,6 +5569,38 @@ export interface operations {
       }
       /** @description Failed to get usage stats */
       500: never
+    }
+  }
+  /** Get standard security questionnaire URL */
+  OrgDocumentsController_getStandardSecurityQuestionnaireUrl: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['OrgDocumentUrlResponse']
+        }
+      }
+    }
+  }
+  /** Get SOC2 Type 2 report URL */
+  OrgDocumentsController_getSoc2Type2ReportUrl: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['OrgDocumentUrlResponse']
+        }
+      }
     }
   }
   /** Gets an organization's audit logs */
@@ -8845,7 +8825,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['StripeInvoice']
+          'application/json': components['schemas']['Invoice']
         }
       }
       /** @description Failed to retrieve invoice */
@@ -9264,6 +9244,10 @@ export interface operations {
   /** Gets github branches for a given repo */
   GitHubBranchController_getBranches: {
     parameters: {
+      query?: {
+        per_page?: number
+        page?: number
+      }
       path: {
         organization_integration_id: string
         repo_owner: string
