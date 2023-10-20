@@ -26,6 +26,12 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
                 items: [],
               },
               {
+                name: 'Rate Limits',
+                key: 'rate-limits',
+                url: `/project/${ref}/auth/rate-limits`,
+                items: [],
+              },
+              {
                 name: 'Email Templates',
                 key: 'templates',
                 url: `/project/${ref}/auth/templates`,
