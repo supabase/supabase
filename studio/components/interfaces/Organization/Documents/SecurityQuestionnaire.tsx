@@ -46,7 +46,7 @@ const SecurityQuestionnaire = () => {
           <p className="text-base m-0">Standard Security Questionnaire</p>
           <div className="space-y-2 text-sm text-foreground-light m-0">
             <p>
-              For organizations on Teams plan or above, you have access to our standard security
+              Organizations on Teams plan or above have access to our standard security
               questionnaire.
             </p>
           </div>

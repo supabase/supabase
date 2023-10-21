@@ -12,18 +12,18 @@ const DPA = () => {
         <p className="text-base m-0">Data Processing Addendum (DPA)</p>
         <div className="space-y-2 text-sm text-foreground-light m-0">
           <p>
-            For the document to be considered executed, sign and return the signed DPA document to{' '}
+            Sign and return the signed DPA document to{' '}
             <a
               href="mailto:privacy@supabase.com"
               target="_blank"
               className="text-brand hover:text-brand"
             >
               privacy@supabase.com
-            </a>
-            .
+            </a>{' '}
+            for the document to be considered executed.
           </p>
           <p>
-            This is only to access the document, please ignore this if you have sent the signed
+            This is only to access the document. Please ignore this if you have sent the signed
             document to us.
           </p>
         </div>

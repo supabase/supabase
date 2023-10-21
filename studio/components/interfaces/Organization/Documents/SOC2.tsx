@@ -46,8 +46,7 @@ const SOC2 = () => {
         <p className="text-base m-0">SOC2 Type 2</p>
         <div className="space-y-2 text-sm text-foreground-light m-0">
           <p>
-            For organizations on Teams plan or above, you have access to our most recent SOC2 Type 2
-            report.
+            Organizations on Teams plan or above have access to our most recent SOC2 Type 2 report.
           </p>
         </div>
       </ScaffoldSectionDetail>
