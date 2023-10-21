@@ -48,16 +48,19 @@ Setting up OAuth with Azure consists of four broad steps:
 
 ## Guarding Against Unverified Email Domains
 
-Microsoft Entra ID had a vulnerability that allowed tenants to configure any email address for their users without verification. This property could be used to gain access to already existing user accounts in Supabase Auth when a multi-tenant OAuth application was registered and Login with Azure was active.
+Microsoft Entra ID can send out unverified email domains in certain cases. This may open up your project to a vulnerability where a malicious user can impersonate already existing accounts on your project.
 
-Supabase Auth projects _are only affected if_:
+This only applies in at least one of these cases:
 
-- You use a single-tenant OAuth application
-- You have explicitly configured your OAuth application to send ID tokens with unverified email addresses to Supabase Auth
+- You have configured the `authenticationBehaviors` setting of your OAuth application to allow unverified email domains
+- You are using an OAuth app configured as single-tenant in the supported account types
+- Your OAuth app was created before June 20th 2023 after Microsoft announced this vulnerability, and the app had used unverified emails prior
 
-However, it is strongly recommended that you configure the [additional `xms_edov` claim](https://learn.microsoft.com/en-us/azure/active-directory/develop/migrate-off-email-claim-authorization#using-the-xms_edov-optional-claim-to-determine-email-verification-status-and-migrate-users) so that Supabase Auth will be able to pick up any issues that may appear in the future. This claim, when configured, gives an indication whether the email address sent to Supabase Auth from Azure is verified or not.
+This means that most OAuth apps _are not susceptible_ to this vulnerability.
 
-Configure this by:
+Despite this, we recommend configuring the [optional `xms_edov` claim](https://learn.microsoft.com/en-us/azure/active-directory/develop/migrate-off-email-claim-authorization#using-the-xms_edov-optional-claim-to-determine-email-verification-status-and-migrate-users) on the OAuth app. This claim allows Supabase Auth to identify with certainty whether the email address sent over by Microsoft Entra ID is verified or not.
+
+Configure this in the following way:
 
 - Select the _App registrations_ menu in Microsoft Entra ID on the Azure portal.
 - Select the OAuth app.
