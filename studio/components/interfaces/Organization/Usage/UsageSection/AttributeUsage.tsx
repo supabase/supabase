@@ -283,13 +283,12 @@ const AttributeUsage = ({
                         </p>
                       </div>
                     </div>
-                    {billingEnabled && (
-                      <Link href={upgradeUrl}>
-                        <a>
-                          <Button type="primary">Upgrade plan</Button>
-                        </a>
-                      </Link>
-                    )}
+
+                    <Link href={upgradeUrl}>
+                      <a>
+                        <Button type="primary">Upgrade plan</Button>
+                      </a>
+                    </Link>
                   </div>
                 </Panel.Content>
               </Panel>
