@@ -53,6 +53,16 @@ Every Supabase project comes with PgBouncer for connection pooling. A connection
 
 ## Supavisor
 
+<Admonition type="note">
+
+PgBouncer is being deprecated in favor of Supavisor.
+
+On 15th January 2024 PgBouncer will be disabled. Your Supabase database domain (db.projectref.supabase.co) will start resolving to IPv6 addresses. No changes are required if your network supports communicating via IPv6. If it doesn't, update your applications to use Supavisor which will continue to return IPv4 addresses.
+
+[Full details here](https://github.com/orgs/supabase/discussions/17817).
+
+</Admonition>
+
 Supavisor is a new connection pooler by Supabase. It can provide a more scalable connection pool than PgBouncer, and runs on a high-availability cluster segregated from your database.
 
 This can free up some CPU cycles for your database to use for queries. It also makes connecting to Postgres in a serverless environment much easier.
