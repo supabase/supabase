@@ -8,6 +8,7 @@ import Usage from './Usage/Usage'
 import AuditLogs from './AuditLogs/AuditLogs'
 import OAuthApps from './OAuthApps/OAuthApps'
 import TeamSettings from './TeamSettings/TeamSettings'
+import Documents from './Documents/Documents'
 
 export {
   BillingSettings,
@@ -20,4 +21,5 @@ export {
   AuditLogs,
   TeamSettings,
   Usage,
+  Documents,
 }
