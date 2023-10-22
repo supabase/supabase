@@ -44,13 +44,13 @@ GoTrue is responsible for issuing access tokens for your users, sends confirmati
 
 The community even recently built in the functionality to request custom OAuth scopes, if your users need to interact more closely with the provider. See the scopes parameter here: [https://github.com/supabase/gotrue#get-authorize](https://github.com/supabase/gotrue#get-authorize).
 
-So let's say you want to send emails on behalf of a user via gmail, you might request the gmail.send scope by directing them to:
+So let's say you want to send emails on behalf of a user via Gmail, you might request the gmail.send scope by directing them to:
 
 ```
 https://sjvwsaokcugktsdaxxze.supabase.co/auth/v1/authorize?provider=google&https://www.googleapis.com/auth/gmail.send
 ```
 
-You'll have to make sure your google app is verified of course in order to request these advanced scopes.
+You'll have to make sure your Google app is verified of course in order to request these advanced scopes.
 
 [gotrue-js](https://github.com/supabase/gotrue-js) (and also [gotrue-csharp](https://github.com/supabase/gotrue-csharp), [gotrue-py](https://github.com/j0/gotrue-py), [gotrue-kt](https://github.com/supabase/gotrue-kt), and [gotrue-dart](https://github.com/supabase/gotrue-dart)) are all wrappers around the GoTrue API endpoints, and make for easier session management inside your client.
 
