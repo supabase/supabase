@@ -192,7 +192,8 @@ const PolicyEditorModal = ({
       onCancel={isClosingPolicyEditor}
     >
       <IconX
-        className="absolute right-3 top-3 text-muted hover:text-foreground w-8 cursor-pointer transition"
+        size={18}
+        className="absolute right-3 top-4 cursor-pointer"
         onClick={() => setIsClosingPolicyEditorModal(true)}
       />
       <div className="">
@@ -219,6 +220,7 @@ const PolicyEditorModal = ({
             description="Write rules with PostgreSQL's policies to fit your unique business needs."
             onViewTemplates={onViewTemplates}
             onViewEditor={onViewEditor}
+            onSelectCancel={() => setIsClosingPolicyEditorModal(true)}
           />
         ) : view === POLICY_MODAL_VIEWS.EDITOR ? (
           <PolicyEditor
@@ -235,6 +237,7 @@ const PolicyEditorModal = ({
             templates={getGeneralPolicyTemplates(schema, table)}
             templatesNote="* References a specific column in the table"
             onUseTemplate={onUseTemplate}
+            onSelectCancel={() => setIsClosingPolicyEditorModal(true)}
           />
         ) : view === POLICY_MODAL_VIEWS.REVIEW ? (
           <PolicyReview

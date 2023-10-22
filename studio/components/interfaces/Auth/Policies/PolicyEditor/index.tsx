@@ -27,7 +27,7 @@ const PolicyEditor = ({
   onUpdatePolicyFormFields = () => {},
   onViewTemplates = () => {},
   onReviewPolicy = () => {},
-  onSelectCancel = () => {}
+  onSelectCancel = () => {},
 }: PolicyEditorProps) => {
   const operation = policyFormFields?.command ?? ''
   const definition = policyFormFields?.definition ?? ''

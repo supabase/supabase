@@ -1,5 +1,5 @@
 import { noop } from 'lodash'
-import { IconEdit, IconGrid, Modal } from 'ui'
+import { Button, IconEdit, IconGrid, Modal } from 'ui'
 
 import CardButton from 'components/ui/CardButton'
 
@@ -7,12 +7,14 @@ interface PolicySelectionProps {
   description: string
   onViewTemplates: () => void
   onViewEditor: () => void
+  onSelectCancel: () => void
 }
 
 const PolicySelection = ({
   description = '',
   onViewTemplates = noop,
   onViewEditor = noop,
+  onSelectCancel = () => {},
 }: PolicySelectionProps) => {
   return (
     <Modal.Content>
@@ -58,18 +60,23 @@ const PolicySelection = ({
             onClick={onViewEditor}
           />
         </div>
-        <p className="text-sm text-foreground-light">
-          Not sure what policies are? Check out our resources{' '}
-          <a
-            target="_blank"
-            rel="noreferrer"
-            className="text-brand transition-colors hover:text-brand-600"
-            href="https://supabase.com/docs/guides/auth#policies"
-          >
-            here
-          </a>
-          .
-        </p>
+        <div>
+          <p className="text-sm text-foreground-light">
+            Not sure what policies are? Check out our resources{' '}
+            <a
+              target="_blank"
+              rel="noreferrer"
+              className="text-brand transition-colors hover:text-brand-600"
+              href="https://supabase.com/docs/guides/auth#policies"
+            >
+              here
+            </a>
+            .
+          </p>
+          <div className="flex justify-end w-full items-center space-x-3" onClick={onSelectCancel}>
+            <Button type="default">Cancel</Button>
+          </div>
+        </div>
       </div>
     </Modal.Content>
   )
