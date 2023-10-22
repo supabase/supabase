@@ -1,24 +1,23 @@
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
-import { useEffect } from 'react'
 
 import { useParams } from 'common'
 import RecentQueriesItem from 'components/interfaces/Settings/Logs/RecentQueriesItem'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import Table from 'components/to-be-cleaned/Table'
 import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
-import { useStore } from 'hooks'
+import { useLocalStorage } from 'hooks'
 import { LogSqlSnippets, NextPageWithLayout } from 'types'
 import { Button, IconClock } from 'ui'
 
 export const LogsSavedPage: NextPageWithLayout = () => {
-  const { content } = useStore()
   const { ref } = useParams()
 
-  useEffect(() => {
-    content.loadPersistentData()
-  }, [ref])
-  const recent = content.recentLogSqlSnippets.slice().reverse()
+  const [recentLogSnippets, setRecentLogSnippets] = useLocalStorage<LogSqlSnippets.Content[]>(
+    `project-content-${ref}-recent-log-sql`,
+    []
+  )
+  const recent = recentLogSnippets.slice().reverse()
 
   return (
     <div className="mx-auto w-full px-5 py-6 h-full">
@@ -29,13 +28,7 @@ export const LogsSavedPage: NextPageWithLayout = () => {
             <>
               <Table.th>Snippets</Table.th>
               <Table.th className="w-24">
-                <Button
-                  size="tiny"
-                  type="default"
-                  onClick={() => {
-                    content.clearRecentLogSqlSnippets()
-                  }}
-                >
+                <Button size="tiny" type="default" onClick={() => setRecentLogSnippets([])}>
                   Clear history
                 </Button>
               </Table.th>

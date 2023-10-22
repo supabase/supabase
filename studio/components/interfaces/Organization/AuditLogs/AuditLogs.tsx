@@ -2,18 +2,6 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import dayjs from 'dayjs'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
-import {
-  Alert,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertTriangle,
-  IconArrowDown,
-  IconArrowUp,
-  IconRefreshCw,
-  IconUser,
-} from 'ui'
 
 import { useParams } from 'common'
 import { FilterPopover, LogDetailsPanel } from 'components/interfaces/AuditLogs'
@@ -30,7 +18,20 @@ import { useOrganizationDetailQuery } from 'data/organizations/organization-deta
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { useIsFeatureEnabled } from 'hooks'
 import Link from 'next/link'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconAlertTriangle,
+  IconArrowDown,
+  IconArrowUp,
+  IconRefreshCw,
+  IconUser,
+} from 'ui'
 
 // [Joshen considerations]
 // - Maybe fix the height of the table to the remaining height of the viewport, so that the search input is always visible
@@ -51,6 +52,8 @@ const AuditLogs = () => {
     users: [], // gotrue_id[]
     projects: [], // project_ref[]
   })
+
+  const billingEnabled = useIsFeatureEnabled('billing:all')
 
   const { data: projects } = useProjectsQuery()
   const { data: organizations } = useOrganizationsQuery()
@@ -118,6 +121,8 @@ const AuditLogs = () => {
       }
     })
 
+  const currentOrganization = organizations?.find((o) => o.slug === slug)
+
   return (
     <>
       <ScaffoldContainerLegacy>
@@ -135,7 +140,9 @@ const AuditLogs = () => {
               />
               <FilterPopover
                 name="Projects"
-                options={projects ?? []}
+                options={
+                  projects?.filter((p) => p.organization_id === currentOrganization?.id) ?? []
+                }
                 labelKey="name"
                 valueKey="ref"
                 activeOptions={filters.projects}
@@ -228,11 +235,13 @@ const AuditLogs = () => {
                     </AlertDescription_Shadcn_>
                   </div>
 
-                  <div className="flex items-center">
-                    <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
-                      <Button type="primary">Upgrade subscription</Button>
-                    </Link>
-                  </div>
+                  {billingEnabled && (
+                    <div className="flex items-center">
+                      <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
+                        <Button type="primary">Upgrade subscription</Button>
+                      </Link>
+                    </div>
+                  )}
                 </div>
               </Alert_Shadcn_>
             ) : (
