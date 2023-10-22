@@ -10,12 +10,14 @@ interface PolicyTemplatesProps {
   templates: PolicyTemplate[]
   templatesNote: string
   onUseTemplate: (template: PolicyTemplate) => void
+  onSelectCancel: () => void
 }
 
 const PolicyTemplates = ({
   templates = [],
   templatesNote = '',
   onUseTemplate = noop,
+  onSelectCancel = () => {},
 }: PolicyTemplatesProps) => {
   const [selectedTemplate, setSelectedTemplate] = useState(templates[0])
   return (
@@ -33,6 +35,9 @@ const PolicyTemplates = ({
         <span className="text-sm text-foreground-lighter">
           This will override any existing code you've written
         </span>
+        <Button type="default" onClick={onSelectCancel}>
+          Cancel
+        </Button>
         <Button
           type="primary"
           disabled={isEmpty(selectedTemplate)}
