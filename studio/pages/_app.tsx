@@ -90,9 +90,10 @@ loader.config({
 // the dashboard, all other layout components should not be doing that
 
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
-  const consentToastId = useRef<string>()
-  const queryClient = useRootQueryClient()
   const snap = useAppStateSnapshot()
+  const queryClient = useRootQueryClient()
+
+  const consentToastId = useRef<string>()
   const [rootStore] = useState(() => new RootStore())
 
   // [Joshen] Some issues with using createBrowserSupabaseClient
@@ -103,6 +104,24 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
           process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
         )
       : undefined
+  )
+
+  useAutoAuthRedirect(queryClient)
+
+  const getLayout = Component.getLayout ?? ((page) => page)
+
+  const AuthContainer = useMemo(
+    // eslint-disable-next-line react/display-name
+    () => (props: any) => {
+      return IS_PLATFORM ? (
+        <SessionContextProvider supabaseClient={supabase as any}>
+          <AuthProvider>{props.children}</AuthProvider>
+        </SessionContextProvider>
+      ) : (
+        <AuthProvider>{props.children}</AuthProvider>
+      )
+    },
+    [supabase]
   )
 
   useEffect(() => {
@@ -132,24 +151,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  useAutoAuthRedirect(queryClient)
-
-  const getLayout = Component.getLayout ?? ((page) => page)
-
-  const AuthContainer = useMemo(
-    // eslint-disable-next-line react/display-name
-    () => (props: any) => {
-      return IS_PLATFORM ? (
-        <SessionContextProvider supabaseClient={supabase as any}>
-          <AuthProvider>{props.children}</AuthProvider>
-        </SessionContextProvider>
-      ) : (
-        <AuthProvider>{props.children}</AuthProvider>
-      )
-    },
-    [supabase]
-  )
 
   return (
     <QueryClientProvider client={queryClient}>
