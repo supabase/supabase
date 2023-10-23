@@ -48,10 +48,8 @@ const UpgradingState = () => {
   const isFailed = status === DatabaseUpgradeStatus.Failed
   const isCompleted = status === DatabaseUpgradeStatus.Upgraded
 
-  const initiatedAt = dayjs(initiated_at ?? 0).format('DD MMM YYYY HH:mm:ss (ZZ)')
-  const initiatedAtUTC = dayjs(initiated_at ?? 0)
-    .utc()
-    .format('DD MMM YYYY HH:mm:ss')
+  const initiatedAtUTC = dayjs.utc(initiated_at ?? 0).format('DD MMM YYYY HH:mm:ss')
+  const initiatedAt = dayjs.utc(initiated_at ?? 0).local().format('DD MMM YYYY HH:mm:ss (ZZ)')
 
   const refetchProjectDetails = async () => {
     setLoading(true)
@@ -177,7 +175,7 @@ const UpgradingState = () => {
                                 />
                               </div>
                             ) : isCompleted ? (
-                              <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-brand-300 border-brand-400">
+                              <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-brand-600 dark:bg-brand-300 border-brand-400">
                                 <IconCheck size={12} className="text-white" strokeWidth={2} />
                               </div>
                             ) : (
