@@ -1,83 +1,138 @@
 # Tailwind theming
 
 Supabase is migrating to use tailwind classes that use CSS properties.
-
 This is to support the concept of theming, so that:
 
 1. It is easy for the team to update the theme without changing 100s of files.
 2. We could offer custom or additional themes in future.
 
-## Classes
+## Primitives
 
-The classes are a work in progress but some are now in use and will probably be permanent fixtures.
+We (the Supabase Design team ✨) define primitive color values using Figma Variables.
 
-The following are some of the most used classes.
+- `foreground`
+- `background`
+- `border`
+- `brand` (could become primary)
+- `destructive`
+- `warning`
 
-It is still a work in progress and class names are likely to change.
+These values are exported from Figma as a .json file and transformed into tailwind utilities through some scripts under `packages/ui/internals/tokens`.
 
-### Text
+Primitives work the same way as any other color. They should follow some basic usage patterns such as _foreground_ on text and _background_ on surfaces, but they can also be combined with any tailwind utility to achieve more advanced layouts.
 
-Default text
+For example, `foreground-light` can also be applied on borders and backgrounds as `border-foreground-light` and `bg-foreground-light`, if needed.
 
-`text-foreground`
+Similarly, background and border primitives can be used on other tailwind utilities.
 
-Light text
+```
+border-surface-100
+bg-border-overlay
+text-background-surface-100
+```
 
-`text-foreground-light`
+## Usage
 
-Lighter text
+The following tailwind classes are a combination of tailwind utilities and our primitives. They're under development and are likely to change but most are now in use and will probably be permanent fixtures.
 
-`text-foreground-lighter`
+### Foreground (Text)
+
+| Value                  | Usage                                  |
+| ---------------------- | -------------------------------------- |
+| `foreground-{DEFAULT}` | Default text (**DEFAULT** is optional) |
+| `foreground-light`     | Light text                             |
+| `foreground-lighter`   | Lighter text                           |
+| `foreground-muted`     | Muted text                             |
+
+Examples:
+
+```
+text-foreground
+text-foreground-light
+text-foreground-lighter
+text-foreground-muted
+bg-foreground-light
+```
 
 ---
 
 ### Background
 
-App background
-(considering changing this to "bg-body")
-`bg`
+| Value                      | Usage                                                        |
+| -------------------------- | ------------------------------------------------------------ |
+| `{background}-{DEFAULT}`   | Main body background (**DEFAULT** is optional)               |
+| `{background}-surface-100` | Panels and surfaces on the same level of the main background |
+| `{background}-surface-200` | Surfaces that overlap the main content (ex. drodowns)        |
+| `{background}-surface-300` | Surfaces that are stacked above {background}-surface-200     |
+| `{background}-alternative` | Alernative background (inverted)                             |
+| `{background}-overlay`     | Overlays, Dropdowns, Popovers                                |
+| `{background}-control`     | Inputs, Radios, Checkboxes                                   |
 
-Panels
+The `background` part can be omitted when used on the `bg` tailwind utility.
 
-`bg-surface-100`
+Examples:
 
-`bg-surface-200`
-
-`bg-surface-300`
-
-Alernative background (inverted)
-`bg-alternative`
-
-Overlays, Dropdowns, Popovers
-
-`bg-overlay`
-
-Inputs, Radios, Checkboxes
-
-`bg-control`
+```
+bg-surface-100
+bg-overlay
+bg-alternative
+text-background-surface-100
+```
 
 ---
 
 ### Border
 
-Default border
+| Value                | Usage                                    |
+| -------------------- | ---------------------------------------- |
+| `border-{DEFAULT}`   | Default border (**DEFAULT** is optional) |
+| `border-secondary`   | Secondary border                         |
+| `border-alternative` | Alernative border (inverted)             |
+| `border-overlay`     | Overlays, Dropdowns, Popovers            |
+| `border-control`     | Inputs, Radios, Checkboxes               |
+| `border-strong`      | Hover, Focus                             |
+| `border-stronger`    | Highlighted border                       |
 
-`border`
+Examples:
 
-Secondary border
+```
+border-overlay
+border-alternative
+text-border-control
+```
 
-`border-secondary`
+### Brand
 
-Alernative border (inverted)
-`border-alternative`
+| Value     |
+| --------- |
+| `200`     |
+| `300`     |
+| `400`     |
+| `500`     |
+| `DEFAULT` |
+| `600`     |
 
-Overlays, Dropdowns, Popovers
+### Destructive
 
-`border-overlay`
+| Value     |
+| --------- |
+| `200`     |
+| `300`     |
+| `400`     |
+| `500`     |
+| `DEFAULT` |
+| `600`     |
 
-Inputs, Radios, Checkboxes
+### Warning
 
-`border-control`
+| Value     |
+| --------- |
+| `200`     |
+| `300`     |
+| `400`     |
+| `500`     |
+| `DEFAULT` |
+| `600`     |
 
 ## Storybook
 

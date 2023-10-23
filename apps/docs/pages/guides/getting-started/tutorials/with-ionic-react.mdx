@@ -10,8 +10,9 @@ export const meta = {
 ![Supabase User Management example](/docs/img/ionic-demos/ionic-angular-account.png)
 
 <Admonition type="note">
-  If you get stuck while working through this guide, refer to the [full example on
-  GitHub](https://github.com/mhartington/supabase-ionic-react).
+
+If you get stuck while working through this guide, refer to the [full example on GitHub](https://github.com/mhartington/supabase-ionic-react).
+
 </Admonition>
 
 <ProjectSetup />
@@ -176,7 +177,7 @@ export function AccountPage() {
     await showLoading();
     try {
       const user = supabase.auth.user();
-      let { data, error, status } = await supabase
+      const { data, error, status } = await supabase
         .from('profiles')
         .select(`username, website, avatar_url`)
         .eq('id', user!.id)
@@ -219,7 +220,7 @@ export function AccountPage() {
         updated_at: new Date(),
       };
 
-      let { error } = await supabase.from('profiles').upsert(updates, {
+      const { error } = await supabase.from('profiles').upsert(updates, {
         returning: 'minimal', // Don't return the value after inserting
       });
 
@@ -430,7 +431,7 @@ export function Avatar({
       const fileName = `${Math.random()}-${new Date().getTime()}.${
         photo.format
       }`;
-      let { error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(fileName, file);
       if (uploadError) {

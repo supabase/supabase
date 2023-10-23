@@ -16,7 +16,7 @@ export interface CommandMenuContextValue {
   pages: string[]
   setPages: React.Dispatch<React.SetStateAction<string[]>>
   currentPage?: string
-  site: 'studio' | 'docs'
+  site: 'studio' | 'docs' | 'website'
 
   /**
    * Project metadata for easy retrieval
@@ -46,7 +46,7 @@ export const useCommandMenu = () => {
 }
 
 export interface CommandMenuProviderProps {
-  site: 'studio' | 'docs'
+  site: 'studio' | 'docs' | 'website'
   projectRef?: string
   /**
    * Project's API keys, for easy access through CMDK

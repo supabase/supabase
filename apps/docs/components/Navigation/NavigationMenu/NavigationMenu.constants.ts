@@ -511,7 +511,13 @@ export const auth = {
         {
           name: 'Native Mobile Login',
           url: '/guides/auth/native-mobile-login',
-          items: [...NativeMobileLoginItems],
+          items: [
+            ...NativeMobileLoginItems,
+            {
+              name: 'Deep Linking',
+              url: '/guides/auth/native-mobile-deep-linking',
+            },
+          ],
         },
         {
           name: 'Enterprise SSO',
@@ -892,6 +898,10 @@ export const functions: NavMenuConstant = {
           name: 'Taking Screenshots with Puppeteer',
           url: '/guides/functions/examples/screenshots',
         },
+        {
+          name: 'Slack Bot responding to mentions',
+          url: '/guides/functions/examples/slack-bot-mention',
+        },
       ],
     },
   ],
@@ -1012,6 +1022,7 @@ export const ai = {
         { name: 'Engineering for scale', url: '/guides/ai/engineering-for-scale' },
         { name: 'Choosing Compute Add-on', url: '/guides/ai/choosing-compute-addon' },
         { name: 'Going to Production', url: '/guides/ai/going-to-prod' },
+        { name: 'RAG with Permissions', url: '/guides/ai/rag-with-permissions' },
       ],
     },
     {
@@ -1250,6 +1261,10 @@ export const platform: NavMenuConstant = {
           name: 'Build a Supabase Integration',
           url: '/guides/platform/oauth-apps/build-a-supabase-integration',
         },
+        {
+          name: 'OAuth Scopes',
+          url: '/guides/platform/oauth-apps/oauth-scopes',
+        },
       ],
     },
     {
@@ -1311,6 +1326,21 @@ export const resources: NavMenuConstant = {
         {
           name: 'Amazon RDS',
           url: '/guides/resources/migrating-to-supabase/amazon-rds',
+          items: [],
+        },
+        {
+          name: 'Postgres',
+          url: '/guides/resources/migrating-to-supabase/postgres',
+          items: [],
+        },
+        {
+          name: 'MySQL',
+          url: '/guides/resources/migrating-to-supabase/mysql',
+          items: [],
+        },
+        {
+          name: 'MSSQL',
+          url: '/guides/resources/migrating-to-supabase/mssql',
           items: [],
         },
       ],
