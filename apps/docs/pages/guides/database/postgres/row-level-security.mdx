@@ -216,9 +216,10 @@ using ( (select auth.uid()) = user_id );
 
 This method works well for JWT functions like `auth.uid()` and `auth.jwt()` as well as `security definer` Functions. Wrapping the function causes an initPlan to be run by the Postgres optimizer, which allows it to "cache" the results per-statement, rather than calling the function on each row.
 
-{/* prettier-ignore */}
 <Admonition type="caution">
+
 You can only use this technique if the results of the query or function do not change based on the row data.
+
 </Admonition>
 
 #### Benchmarks
@@ -298,9 +299,10 @@ to authenticated
 using ( private.has_good_role() );
 ```
 
-{/* prettier-ignore */}
 <Admonition type="caution">
-Security-definer functions should never be created in a schema in the "Exposed schemas" inside your [API settings](https://supabase.com/dashboard/project/_/settings/api)`. 
+
+Security-definer functions should never be created in a schema in the "Exposed schemas" inside your [API settings](https://supabase.com/dashboard/project/_/settings/api)`.
+
 </Admonition>
 
 ### Minimize joins
@@ -337,7 +339,6 @@ using (
 
 In this case you can also consider [using a `security definer` function](#use-security-definer-functions) to bypass RLS on the join table:
 
-{/* prettier-ignore */}
 <Admonition type="note">
 
 If the list exceeds 1000 items, a different approach may be needed or you may need to analyze the approach to ensure that the performance is acceptable.

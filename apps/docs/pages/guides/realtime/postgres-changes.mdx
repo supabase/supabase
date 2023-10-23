@@ -961,9 +961,10 @@ You may choose to sign your own tokens to customize claims that can be checked i
 
 Your project JWT secret is found with your [Project API keys](https://app.supabase.com/project/_/settings/api) in your dashboard.
 
-{/* prettier-ignore */}
 <Admonition type="caution">
-  Do not expose the `service_role` token on the client because the role is authorized to bypass row-level security.
+
+Do not expose the `service_role` token on the client because the role is authorized to bypass row-level security.
+
 </Admonition>
 
 To use your own JWT with Realtime make sure to set the token after instantiating the Supabase client and before connecting to a Channel.
