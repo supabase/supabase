@@ -161,7 +161,9 @@ const SecondLevelNav = () => {
                 type="default"
                 icon={<IconExternalLink strokeWidth={1.5} />}
               >
-                <a>Documentation</a>
+                <a target="_blank" rel="noreferrer">
+                  Documentation
+                </a>
               </Button>
             </Link>
           </AlertDescription_Shadcn_>
