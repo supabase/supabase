@@ -230,10 +230,6 @@ const nextConfig = {
     ],
   },
   transpilePackages: ['ui', 'common', 'shared-data'],
-  // Ref: https://nextjs.org/docs/advanced-features/output-file-tracing#caveats
-  // experimental: {
-  //   outputFileTracingRoot: path.join(__dirname, '../../'),
-  // },
   webpack(config) {
     config.module?.rules
       .find((rule) => rule.oneOf)
