@@ -73,8 +73,8 @@ const PolicySelection = ({
             </a>
             .
           </p>
-          <div className="flex justify-end w-full items-center space-x-3" onClick={onSelectCancel}>
-            <Button type="default">Cancel</Button>
+          <div className="flex justify-end w-full items-center space-x-3">
+            <Button type="default" onClick={onSelectCancel}>Cancel</Button>
           </div>
         </div>
       </div>
