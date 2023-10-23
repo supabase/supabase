@@ -7,8 +7,11 @@ export default {
     "bg-surface-100",
     "bg-surface-200",
     "bg-surface-300",
+    "bg-surface-_contrast-300",
     "bg-overlay",
-    "bg-overlay-hover"
+    "bg-overlay-hover",
+    "bg-secondary",
+    "bg-muted"
   ],
   "border": [
     "border",
@@ -16,14 +19,17 @@ export default {
     "border-secondary",
     "border-overlay",
     "border-control",
-    "border-alternative"
+    "border-alternative",
+    "border-strong",
+    "border-stronger"
   ],
   "text": [
     "text",
     "text-strong",
     "text-light",
     "text-lighter",
-    "text-muted"
+    "text-muted",
+    "text-contrast"
   ],
   "colors": [
     "bg-destructive-200",
@@ -43,7 +49,9 @@ export default {
     "bg-brand-400",
     "bg-brand-500",
     "bg-brand-600",
-    "bg-brand"
+    "bg-brand",
+    "bg-brand-accent",
+    "bg-secondary"
   ],
   "palletes": [
     "bg-black",
