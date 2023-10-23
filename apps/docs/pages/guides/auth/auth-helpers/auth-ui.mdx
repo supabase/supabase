@@ -345,12 +345,7 @@ import { Auth } from '@supabase/auth-ui-react'
 
 const supabase = createClient('<INSERT PROJECT URL>', '<INSERT PROJECT ANON API KEY>')
 
-const App = () => (
-  <Auth
-    supabaseClient={supabase}
-    showLinks={false}
-  />
-)
+const App = () => <Auth supabaseClient={supabase} showLinks={false} />
 ```
 
 Setting `showLinks` to `false` will hide the following links:
@@ -363,4 +358,3 @@ Setting `showLinks` to `false` will hide the following links:
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
 export default Page
-  
