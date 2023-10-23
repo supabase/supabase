@@ -93,8 +93,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           request.path, request.method, request.search, response.status_code
         order by
           count desc
-        limit
-        3
+        limit 10
         `,
       },
       errorCounts: {
@@ -138,8 +137,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           request.path, request.method, request.search, response.status_code
         order by
           count desc
-        limit
-        3
+        limit 10
         `,
       },
       responseSpeed: {
@@ -181,8 +179,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           request.path, request.method, request.search, response.status_code
         order by
           avg desc
-        limit
-        3
+        limit 10
         `,
       },
       networkTraffic: {
@@ -355,6 +352,29 @@ select
     'table hit rate' as name,
     sum(heap_blks_hit) / nullif(sum(heap_blks_hit) + sum(heap_blks_read),0) as ratio
   from pg_statio_user_tables;`,
+      },
+    },
+  },
+  [Presets.DATABASE]: {
+    title: 'database',
+    queries: {
+      largeObjects: {
+        queryType: 'db',
+        sql: (_) => `SELECT 
+        SCHEMA_NAME,
+        relname,
+        table_size
+      FROM
+        (SELECT 
+          pg_catalog.pg_namespace.nspname AS SCHEMA_NAME,
+          relname,
+          pg_relation_size(pg_catalog.pg_class.oid) AS table_size
+        FROM pg_catalog.pg_class
+        JOIN pg_catalog.pg_namespace ON relnamespace = pg_catalog.pg_namespace.oid
+        ) t
+      WHERE SCHEMA_NAME NOT LIKE 'pg_%'
+      ORDER BY table_size DESC
+      LIMIT 5;`,
       },
     },
   },

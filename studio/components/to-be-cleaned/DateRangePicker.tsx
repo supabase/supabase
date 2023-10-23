@@ -34,6 +34,7 @@ interface DateRangePickerProps {
   }) => void
   options: { key: string; label: string; interval?: string }[]
   currentBillingPeriodStart?: number
+  currentBillingPeriodEnd?: number
 }
 
 const DateRangePicker = ({
@@ -42,6 +43,7 @@ const DateRangePicker = ({
   options,
   loading,
   currentBillingPeriodStart,
+  currentBillingPeriodEnd,
 }: DateRangePickerProps) => {
   const [timePeriod, setTimePeriod] = useState(value)
 
@@ -68,10 +70,7 @@ const DateRangePicker = ({
             time_period: '1d',
           },
           period_end: {
-            date: dayjs
-              .unix(currentBillingPeriodStart ?? 0)
-              .add(1, 'month')
-              .format(DATE_FORMAT),
+            date: dayjs.unix(currentBillingPeriodEnd ?? 0).format(DATE_FORMAT),
             time_period: 'today',
           },
           interval: '1d',

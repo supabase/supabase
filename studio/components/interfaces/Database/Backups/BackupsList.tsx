@@ -92,6 +92,7 @@ const BackupsList = () => {
                   <BackupItem
                     key={x.id}
                     backup={x}
+                    projectRef={projectRef}
                     index={i}
                     onSelectBackup={() => setSelectedBackup(x)}
                   />

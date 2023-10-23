@@ -129,7 +129,7 @@ export const formatNotificationText = (project: Project, notification: Notificat
     const buttons = notification.data.linked_buttons ?? []
     return (
       <>
-        <Markdown content={notification.data.message} className="text" />
+        <Markdown content={notification.data.message} className="text-foreground" />
         {buttons.map((button, index) => {
           return (
             <a href={button.url} key={index} target="_blank">
