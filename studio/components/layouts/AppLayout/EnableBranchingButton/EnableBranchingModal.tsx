@@ -77,7 +77,6 @@ const EnableBranchingModal = () => {
       .refine((val) => val.length > 1, `Please enter a branch name from ${repoOwner}/${repoName}`)
       .refine(async (val) => {
         try {
-          console.log('Async check', val)
           await checkGithubBranchValidity({
             organizationIntegrationId: githubIntegration?.id,
             repoOwner,
@@ -94,7 +93,7 @@ const EnableBranchingModal = () => {
   })
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onBlur',
-    reValidateMode: 'onBlur',
+    reValidateMode: 'onChange',
     resolver: zodResolver(FormSchema),
     defaultValues: { branchName: '' },
   })
@@ -114,15 +113,15 @@ const EnableBranchingModal = () => {
 
   return (
     <>
-      <Form_Shadcn_ {...form}>
-        <form id={formId} className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
-          <Modal
-            hideFooter
-            visible={snap.showEnableBranchingModal}
-            onCancel={() => snap.setShowEnableBranchingModal(false)}
-            className="!bg"
-            size="medium"
-          >
+      <Modal
+        hideFooter
+        visible={snap.showEnableBranchingModal}
+        onCancel={() => snap.setShowEnableBranchingModal(false)}
+        className="!bg"
+        size="medium"
+      >
+        <Form_Shadcn_ {...form}>
+          <form id={formId} className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
             <Modal.Content className="px-7 py-5 flex items-center space-x-4">
               <IconGitBranch strokeWidth={2} size={20} />
               <div>
@@ -253,9 +252,9 @@ const EnableBranchingModal = () => {
                 </Modal.Content>
               </>
             )}
-          </Modal>
-        </form>
-      </Form_Shadcn_>
+          </form>
+        </Form_Shadcn_>
+      </Modal>
 
       <SidePanelGitHubRepoLinker projectRef={ref} />
     </>

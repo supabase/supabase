@@ -1,13 +1,31 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { GitBranch } from 'lucide-react'
 import Link from 'next/link'
-import { IconExternalLink, Input, Modal } from 'ui'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
+import {
+  Button,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormMessage_Shadcn_,
+  Form_Shadcn_,
+  IconCheck,
+  IconExternalLink,
+  IconLoader,
+  Input_Shadcn_,
+  Modal,
+} from 'ui'
+import * as z from 'zod'
 
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useBranchesQuery } from 'data/branches/branches-query'
+import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
+import { useCheckGithubBranchValidity } from 'data/integrations/integrations-github-branch-check'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useSelectedOrganization, useSelectedProject } from 'hooks'
-import { useCheckGithubBranchValidity } from 'data/integrations/integrations-github-branch-check'
+import AlertError from 'components/ui/AlertError'
+import { useBranchesQuery } from 'data/branches/branches-query'
 
 interface CreateBranchModalProps {
   visible: boolean
@@ -18,6 +36,11 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
   const { ref } = useParams()
   const projectDetails = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
+
+  // [Joshen] There's something weird with RHF that I can't figure out atm
+  // but calling form.formState.isValid somehow removes the onBlur check,
+  // and makes the validation run onChange instead. This is a workaround
+  const [isValid, setIsValid] = useState(false)
 
   const isBranch = projectDetails?.parent_project_ref !== undefined
   const projectRef =
@@ -34,13 +57,15 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
   })
 
   const { data: branches } = useBranchesQuery({ projectRef })
+  const { mutateAsync: checkGithubBranchValidity, isLoading: isChecking } =
+    useCheckGithubBranchValidity({
+      onError: () => {},
+    })
 
-  const { mutate: checkGithubBranchValidity } = useCheckGithubBranchValidity({
-    onSuccess: (data) => {
-      // setSelectedBranch(data)
-    },
-    onError: (error) => {
-      // setError(error)
+  const { mutate: createBranch, isLoading: isCreating } = useBranchCreateMutation({
+    onSuccess: () => {
+      toast.success('Successfully created new branch')
+      onClose()
     },
   })
 
@@ -56,42 +81,134 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
   )
   const [repoOwner, repoName] = githubConnection?.metadata.name.split('/') || []
 
+  const formId = 'create-branch-form'
+  const FormSchema = z.object({
+    branchName: z
+      .string()
+      .refine((val) => val.length > 1, `Please enter a branch name from ${repoOwner}/${repoName}`)
+      .refine(async (val) => {
+        try {
+          console.log('Async check', val)
+          await checkGithubBranchValidity({
+            organizationIntegrationId: githubIntegration?.id,
+            repoOwner,
+            repoName,
+            branchName: val,
+          })
+          setIsValid(true)
+          return true
+        } catch (error) {
+          setIsValid(false)
+          return false
+        }
+      }, `Unable to find branch from ${repoOwner}/${repoName}`),
+  })
+  const form = useForm<z.infer<typeof FormSchema>>({
+    mode: 'onBlur',
+    reValidateMode: 'onBlur',
+    resolver: zodResolver(FormSchema),
+    defaultValues: { branchName: '' },
+  })
+
+  const canSubmit = form.getValues('branchName').length > 0 && !isChecking && isValid
+  const onSubmit = (data: z.infer<typeof FormSchema>) => {
+    if (!projectRef) return console.error('Project ref is required')
+    createBranch({ projectRef, branchName: data.branchName, gitBranch: data.branchName })
+  }
+
+  useEffect(() => {
+    if (form && visible) {
+      setIsValid(false)
+      form.reset()
+    }
+  }, [form, visible])
+
   return (
-    <Modal
-      alignFooter="right"
-      size="small"
-      visible={visible}
-      onCancel={onClose}
-      header="Create a new preview branch"
-      confirmText="Create Preview Branch"
-    >
-      <Modal.Content className="pt-3 pb-1">
-        {isLoadingIntegrations && <GenericSkeletonLoader />}
-        {isSuccessIntegrations && (
-          <div>
-            <p className="text-sm text-foreground-light">
-              Your project is currently connected to the repository:
+    <Form_Shadcn_ {...form}>
+      <form id={formId} className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+        <Modal
+          hideFooter
+          size="medium"
+          visible={visible}
+          onCancel={onClose}
+          header="Create a new preview branch"
+          confirmText="Create Preview Branch"
+        >
+          <Modal.Content className="pt-3 pb-1">
+            {isLoadingIntegrations && <GenericSkeletonLoader />}
+            {isErrorIntegrations && (
+              <AlertError
+                error={integrationsError}
+                subject="Failed to retrieve Github repository information"
+              />
+            )}
+            {isSuccessIntegrations && (
+              <div>
+                <p className="text-sm text-foreground-light">
+                  Your project is currently connected to the repository:
+                </p>
+                <div className="flex items-center space-x-2">
+                  <p>{githubConnection?.metadata.name}</p>
+                  <Link passHref href={`https://github.com/${repoOwner}/${repoName}`}>
+                    <a target="_blank" rel="noreferrer">
+                      <IconExternalLink size={14} strokeWidth={1.5} />
+                    </a>
+                  </Link>
+                </div>
+              </div>
+            )}
+          </Modal.Content>
+
+          <Modal.Separator />
+
+          <Modal.Content className="pt-1 pb-3 space-y-3">
+            <p className="text-sm">
+              Choose a Git Branch to base your Preview Branch on. Any migration changes added to
+              this Git Branch will be run on this new Preview Branch.
             </p>
-            <div className="flex items-center space-x-2">
-              <p>{githubConnection?.metadata.name}</p>
-              <Link passHref href={`https://github.com/${repoOwner}/${repoName}`}>
-                <a target="_blank" rel="noreferrer">
-                  <IconExternalLink size={14} strokeWidth={1.5} />
-                </a>
-              </Link>
+            <FormField_Shadcn_
+              control={form.control}
+              name="branchName"
+              render={({ field }) => (
+                <FormItem_Shadcn_ className="relative">
+                  <label className="text-sm text-foreground-light">
+                    Choose your branch to create a preview from
+                  </label>
+                  <FormControl_Shadcn_>
+                    <Input_Shadcn_ {...field} placeholder="e.g feat/some-feature" />
+                  </FormControl_Shadcn_>
+                  <div className="absolute top-9 right-3">
+                    {isChecking && <IconLoader className="animate-spin" />}
+                    {isValid && <IconCheck className="text-brand" strokeWidth={2} />}
+                  </div>
+
+                  <FormMessage_Shadcn_ />
+                </FormItem_Shadcn_>
+              )}
+            />
+          </Modal.Content>
+
+          <Modal.Separator />
+
+          <Modal.Content>
+            <div className="flex items-center justify-end space-x-2 py-2 pb-4">
+              <Button disabled={isCreating} type="default" onClick={() => onClose()}>
+                Cancel
+              </Button>
+              <Button
+                form={formId}
+                disabled={isCreating || !canSubmit}
+                loading={isCreating}
+                type="primary"
+                htmlType="submit"
+              >
+                Create Preview branch
+              </Button>
             </div>
-          </div>
-        )}
-      </Modal.Content>
-      <Modal.Separator />
-      <Modal.Content className="pt-1 pb-3 space-y-3">
-        <p className="text-sm">
-          Choose a Git Branch to base your Preview Branch on. Any migration changes added to this
-          Git Branch will be run on this new Preview Branch.
-        </p>
-        <Input label="Branch name" icon={<GitBranch size={16} />} placeholder="Enter branch name" />
-      </Modal.Content>
-    </Modal>
+          </Modal.Content>
+        </Modal>
+      </form>
+    </Form_Shadcn_>
   )
 }
 
