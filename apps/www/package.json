@@ -53,7 +53,7 @@
     "recharts": "^2.8.0",
     "rehype-slug": "^5.1.0",
     "remark": "^15.0.1",
-    "remark-gfm": "^4.0.0",
+    "remark-gfm": "^3.0.1",
     "remark-html": "^16.0.1",
     "shared-data": "*",
     "swiper": "^6.5.0",
