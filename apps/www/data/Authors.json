@@ -1,0 +1,26 @@
+{
+  "paul_copplestone": {
+    "name": "Paul Copplestone",
+    "job_title": "CEO and Co-Founder",
+    "username": "kiwicopple",
+    "avatar_url": "https://avatars0.githubusercontent.com/u/10214025?v=4"
+  },
+  "anthony_wilson": {
+    "name": "Anthony Wilson",
+    "job_title": "CTO and Co-Founder",
+    "username": "awalias",
+    "avatar_url": "https://avatars3.githubusercontent.com/u/458736?v=4"
+  },
+  "rory": {
+    "name": "Rory Wilding",
+    "job_title": "Head of Growth",
+    "username": "roryw10",
+    "avatar_url": "https://avatars0.githubusercontent.com/u/10214025?v=4"
+  },
+  "inian": {
+    "name": "Inian Parameshwaran",
+    "job_title": "Engineer",
+    "username": "everconfusedguy",
+    "avatar_url": "https://avatars0.githubusercontent.com/u/2155545?v=4"
+  }
+}

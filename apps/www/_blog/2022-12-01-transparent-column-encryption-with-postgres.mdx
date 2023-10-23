@@ -1,0 +1,264 @@
+---
+title: Transparent Column Encryption with Postgres
+description: Using pgsodium's Transparent Column Encryption to encrypt data and provide your users with row-level encryption.
+author: michel
+image: transparent-column-encryption-with-postgres.jpg
+thumb: transparent-column-encryption-with-postgres.jpg
+categories:
+  - postgres
+tags:
+  - postgres
+  - planetpg
+date: '2022-12-01'
+toc_depth: 3
+---
+
+One of the more common questions we receive at Supabase is “how do I encrypt sensitive data”?
+
+pgsodium's Transparent Column Encryption (TCE) is one of the safest ways, and can be used to encrypt one or more text columns in any number of tables. Using TCE, you can encrypt data so that it doesn't leak into logs as well as providing your users with row-level encryption.
+
+To understand how TCE works, let's first do a deep-dive into an important encryption topic: key derivation.
+
+<div className="bg-gray-300 rounded-lg px-6 py-2 bold">
+
+👀 Transparent Column Encryption (TCE) is the foundational feature of the Supabase Vault, a safe and easy way to store encrypted secrets and other data in your Postgres database. [Learn more about Supabase Vault](https://supabase.com/docs/guides/database/vault)
+
+</div>
+
+## How Key Derivation Works
+
+The current state-of-the-art in encryption libraries is [libsodium](https://doc.libsodium.org/).
+
+**libsodium** offers a range of APIs for authenticated secret and public key encryption, key derivation, encrypted streaming, [AEAD](https://en.wikipedia.org/wiki/Authenticated_encryption), various forms of hashing, and much more.
+
+This powerful API is available to PostgreSQL using the [**pgsodium**](https://github.com/michelp/pgsodium) extension. **pgsodium** provides all the functionality of the full **libsodium** API, but previously it required developers to set up database encryption themselves, which remained a challenge even for those familiar with database administration.
+
+To solve this problem, **pgsodium** now has a full key management API, primarily via the table `pgsodium.key` and the `pgsodium.create_key()` function. This key table contains no raw keys, but instead uses libsodium Key IDs to derive keys that are used internally for encryption. A [key derivation function](https://libsodium.gitbook.io/doc/key_derivation) is used with an internal root key that is unavailable to SQL and not stored in the database, but rather managed by you externally using flexible scripts, or by Supabase automatically as part of our service offering.
+
+The simplest way to use **pgsodium** to encrypt and decrypt data is to first create a **Key ID**. Valid Key IDs are stored in pgsodium in a special extension table, and they can be created using the `pgsodium.create_key()` function. This function takes a number of arguments depending on how it's used, but the simplest case is to create a new key with no arguments:
+
+```sql
+select * from pgsodium.create_key();
+-[ RECORD 1 ]---+-------------------------------------
+id              | eaa20d8c-c77c-4985-9f73-2a5f5d1f1e6d
+name            |
+status          | valid
+key_type        | aead-det
+key_id          | 2
+key_context     | \x7067736f6469756d
+created         | 2022-11-13 21:19:35.765823+00
+expires         |
+associated_data |
+```
+
+This key can now be used with pgsodium encryption functions by its UUID (`eaa20d8c-c77c-4985-9f73-2a5f5d1f1e6d`). For example:
+
+```sql
+select * from pgsodium.crypto_aead_det_encrypt (
+	'this is the message',  -- a message to encrypt
+	'this is associated data',  -- some authenticated associated data
+	'eaa20d8c-c77c-4985-9f73-2a5f5d1f1e6d'::uuid -- key ID
+);
+```
+
+This produces the following encrypted “ciphertext” using the `aead-det` algorithm from the libsodium [XChaCha20-SIV](https://github.com/jedisct1/libsodium-xchacha20-siv) encryption function.
+
+```
+-[ RECORD 1 ]-----------+---------------------------------------------------------------------------------------------------------
+crypto_aead_det_encrypt | \\x099baa820250d7375ed141f8f1936af384bc229f3de1010a6eff6ffdaf3998baffbae75b5cd83d1c469407ff2d3764a428b742
+```
+
+Now to decrypt the ciphertext, pass it to the decryption function _with the same Key ID_:
+
+```sql
+select *
+from convert_from(pgsodium.crypto_aead_det_decrypt (
+	'\\x099baa820250d7375ed141f8f1936af384bc229f3de1010a6eff6ffdaf3998baffbae75b5cd83d1c469407ff2d3764a428b742',
+	'this is associated data',
+	'eaa20d8c-c77c-4985-9f73-2a5f5d1f1e6d'::uuid
+), 'utf8');
+```
+
+Which recovers the original “plaintext” message:
+
+```
+-[ RECORD 1 ]+--------------------
+convert_from | this is the message
+```
+
+In the above example, there is _no raw key_, only a Key ID which is used to derive the key used to encrypt the message and authenticate it with the associated data. In fact, it is impossible for a SQL user to derive the key used above, and if the Key ID is stored, then no encryption keys or decrypted information will leak into backups, disk storage, or the database WAL stream.
+
+## Transparent Column Encryption
+
+As of **pgsodium** 3.0.0 and up, the extension offers a simple and declarative Transparent Column Encryption feature (TCE). This feature is now shipped with all Supabase projects. TCE allows you to specify encrypted columns within a table and generates a new view that “wraps” that table to decrypt the contents.
+
+TCE works using two dynamically generated objects for tables that contain encrypted columns:
+
+- an `INSERT UPDATE` trigger that encrypts data when it is inserted or modified
+- a view that is created to wrap the table to decrypt the data when it is accessed
+
+To “transparently” decrypt the table, access the dynamically generated view _instead of the table_. For every encrypted column in the table, the view will have an additional decrypted column that shows the decrypted result.
+
+It's worth noting at this point that sometimes there is some confusion about handling encrypted data with TCE. The `T` stands for **Transparent** which means, you can always see decrypted data through the view, where the decrypted data can't be see is when stored on disk, or in pg_dumps, backups, WAL streams, etc. This is often called **Encryption At Rest** and is one layer in many that may be used to encrypt and protect your data.
+
+Often Transparent encryption is understood to be “Transparent Disk Encryption” or “Full Disk Encryption”, this is where a drive is encrypted but reading and writing that drive is decrypted. TCE is similar to this, where data on disk is encrypted, but it is more fine grained, only particular columns are encrypted. The data is also encrypted in the sense that the table stored on disk contains encrypted data, without the view or the key, pg_dumps and backups still contain encrypted data, this is not possible with disk-only encryption.
+
+For the moment TCE only works for columns of type `text` (or types castable to `text` like `json`). Soon we will also support `bytea` and possibly more as use cases and tests get better.
+
+TCE uses one of PostgreSQL's lesser-known features: [`SECURITY LABEL`](https://www.postgresql.org/docs/current/sql-security-label.html). A security label can be thought of as a simple label which is attached to an object (a table, column, etc). Each label is scoped to an extension and that extension can provide security features depending on the label.
+
+Let's see a simple example of using `SECURITY LABEL` to encrypt a column using **pgsodium**.
+
+<div className="bg-gray-300 rounded-lg p-6 italic">
+
+Note: We're using “credit cards” in our examples below, because they are very easy to understand. Please don't store credit cards in your Supabase database - we are not a certified PCI Service Provider.
+
+</div>
+
+### One Key ID for the Entire Column
+
+For the simplest case, a column can be encrypted with one Key ID which must be of the type `aead-det` (as created above):
+
+```sql
+CREATE TABLE credit_cards (
+	id bigserial primary key,
+	credit_card_number text
+);
+
+SECURITY LABEL FOR pgsodium
+	ON COLUMN credit_cards.credit_card_number
+	IS 'ENCRYPT WITH KEY ID e348034b-3f07-4878-aad6-000511d12826';
+```
+
+The advantage of this approach is simplicity - the user creates one key and labels a column with it. The cryptographic algorithm for this approach uses a _nonceless_ encryption algorithm called `crypto_aead_det_xchacha20()`. This algorithm is written by the author of libsodium and can be found [here](https://github.com/jedisct1/libsodium-xchacha20-siv).
+
+Using one key for an entire column means that whoever can decrypt one row can decrypt them all from a database dump. Also changing (rotating) the key means rewriting the whole table.
+
+### One Key ID per Row
+
+A more fine grained approach would be storing one Key ID per row:
+
+```sql
+CREATE TABLE credit_cards (
+	id bigserial primary key,
+  	credit_card_number text,
+	key_id uuid not null DEFAULT 'e348034b-3f07-4878-aad6-000511d12826'::uuid
+);
+
+SECURITY LABEL FOR pgsodium
+	ON COLUMN credit_cards.credit_card_number
+  	IS 'ENCRYPT WITH KEY COLUMN key_id';
+```
+
+This approach ensures that a key for one user doesn't necessarily decrypt any others. While rows can share key IDs, they don't necessarily have to (unlike the first example above where one key id was used for the entire column). It also acts as a natural partition that can work in conjunction with Row Level Security to share distinct keys between owners.
+
+Notice also how there is a `DEFAULT` value for the `key_id`. In a way, this gives you the best of both approaches - encrypting the column when a per-row key ID is not provided. The downside to this approach is that you need to store one key ID per row, which takes up more disk space (but that's cheap!).
+
+### One Key ID per Row with Nonce Support
+
+The default cryptographic algorithm for the above approach uses a _nonceless_ encryption algorithm called [`crypto_aead_det_xchacha20()`](https://github.com/jedisct1/libsodium-xchacha20-siv). This algorithm has the advantage that it does not require nonce values, the disadvantage is that duplicate plaintexts will produce duplicate ciphertexts.
+
+Nonces are some extra cryptographic context that is used in many cryptographic algorithms to produce different ciphertexts, even if the plaintexts are the same. The nonce does not have to be secret, but it _does_ have to be unique. **pgsodium** comes with a useful function `pgsodium.crypto_aead_det_noncegen()` that will generate a cryptographically secure nonce for you, and in almost all cases it's best to use that function unless you know specifically what you are doing. In password hashing approaches, this is often similar to how a “salt” value is used to deduplicate password hashes.
+
+Duplicate ciphertexts cannot be used to “attack the key”, it can only reveal the duplication. However, duplication is still information. In our examples so far, an attacker might be able to use this information to determine that two accounts share the same credit card number. While not technically breaking the encryption, this still leaks information to an attacker.
+
+```sql
+CREATE TABLE credit_cards (
+	id bigserial primary key,
+  	credit_card_number text,
+	key_id uuid not null DEFAULT 'e348034b-3f07-4878-aad6-000511d12826'::uuid,
+  	nonce bytea default pgsodium.crypto_aead_det_noncegen()
+);
+
+SECURITY LABEL FOR pgsodium
+	ON COLUMN credit_cards.credit_card_number
+  	IS 'ENCRYPT WITH KEY COLUMN key_id NONCE nonce';
+```
+
+This is the most secure form of TCE - there is a unique key ID and a unique nonce per row.
+
+### One Key ID per Row with Associated Data
+
+The encryption that is used for TCE is one of a family of functions provided by **libsodium** to do Authenticated Encryption with Associated Data or [AEAD Encryption](https://en.wikipedia.org/wiki/Authenticated_encryption). The “associated” data is plaintext (unencrypted) information that is mixed into the authentication signature of the encrypted data, such that when you authenticate the data, you also know that the associated data is authentic.
+
+AEAD is helpful because often you have metadata associated with a secret, which isn't confidential but must not be forged.
+
+In our credit card example, we might associate a "`credit_card_number`" with an "`account_id`". But what if a malicious actor wanted to use someone else's credit card on their own account? If someone could forge the `account_id` data column, swapping an `account_id` with their own `account_id`, then you could be tricked into using the wrong credit card. By “associating” the `account_id` with the `credit_card_number`, it cannot be forged without throwing an error.
+
+Like above, this is done simply by extending the security label with the associated data column:
+
+```sql
+CREATE TABLE credit_cards (
+	id bigserial primary key,
+  	credit_card_number text,
+  	account_id integer,
+	key_id uuid not null DEFAULT 'e348034b-3f07-4878-aad6-000511d12826'::uuid,
+  	nonce bytea default pgsodium.crypto_aead_det_noncegen()
+);
+
+SECURITY LABEL FOR pgsodium
+	ON COLUMN credit_cards.credit_card_number
+  	IS 'ENCRYPT WITH KEY COLUMN key_id ASSOCIATED (account_id) NONCE nonce';
+```
+
+The new label indicates which column is to be associated with the secret, and that's it! Your `account_id` and credit card number are now protected under the same authentication signature as the secret itself.
+
+## Using an Encrypted Table
+
+Now that you have TCE setup for a table, it's easy to use by simply inserting data into the table, and querying that data by looking at its generated view. The view is named `decrypted_<table_name>` and by default is in the same schema as your table:
+
+```sql
+insert into credit_cards
+  (credit_card_number, account_id)
+values
+  ('1234-5678-8765-4321', 123);
+```
+
+Now that you have inserted data, look at the table and notice how the credit card number is encrypted. This is the data that is stored on disk, the encrypted card number, the key id, and the account id, **but the key itself is not stored**. This means if someone gets a backup or dump of your database, they cannot decrypt the credit card number, they do not have the key, only the key ID:
+
+```sql
+> select * from credit_cards where account_id = 123;
+-[ RECORD 1 ]------+---------------------------------------------------------------------
+id                 | 1
+credit_card_number | jf8KfImkKTr+j4gzyDZQtLDEFL9eSlFuKjNlNEJvDg+OIKUr2wjF/8NnYcLisb5F9xiN
+account_id         | 123
+key_id             | 7f753c4f-8c68-457a-8801-1798b2e9f44d
+nonce              | \x300a14aa721184ff7cf0f6bf088da267
+```
+
+For you, the developer, you need the unencrypted credit card number for you application. No problem, you can access that data using the dynamically generated decryption view `decrypted_credit_cards`:
+
+```sql
+> select * from decrypted_credit_cards where account_id = 123;
+-[ RECORD 1 ]----------------+---------------------------------------------------------------------
+id                           | 1
+credit_card_number           | jf8KfImkKTr+j4gzyDZQtLDEFL9eSlFuKjNlNEJvDg+OIKUr2wjF/8NnYcLisb5F9xiN
+decrypted_credit_card_number | 1234-5678-8765-4321
+account_id                   | 123
+key_id                       | 7f753c4f-8c68-457a-8801-1798b2e9f44d
+nonce                        | \x300a14aa721184ff7cf0f6bf088da267
+```
+
+Notice how there is a new column called `decrypted_credit_card_number`. This column is not stored in database or on disk at all, it is generated “on-the-fly” as you select from the view. Database dumps do not contain this information, only the view itself, and most importantly, **raw decryption keys are never stored**.
+
+## Future possibilities
+
+We're always thinking about the future possibilities for features and tools that we can bring to the PostgreSQL community, and we'd love to hear from you about what kind of encryption features you'd like to see. Some things we've considered but not yet explored yet are:
+
+- Built-in Key Management Server (KMS) with REST API ala AWS or GCP.
+- Seamless Integration with external KMS services for key management.
+- Signcryption-based Token formats for exchanging AEAD tokens.
+- End-to-End encryption for user data using libsodium's `crypto_secretstream()` API.
+- Group encryption using [signcryption](https://github.com/jedisct1/libsodium-signcryption)
+- Your idea here?
+
+There's a lot of potential in the world of cryptography with Postgres and pgsodium, and we'd love to hear any ideas you may have as well. Join us in our [Discord #encryption channel](https://discord.com/channels/839993398554656828/1009906326480101417) if you want to chat more about it with us!
+
+## More Postgres Resources
+
+- [Postgres Full Text Search vs the rest](https://supabase.com/blog/postgres-full-text-search-vs-the-rest)
+- [Postgres WASM by Snaplet and Supabase](https://supabase.com/blog/postgres-wasm)
+- [Choosing a Postgres Primary Key](https://supabase.com/blog/choosing-a-postgres-primary-key)
+- [Implementing "seen by" functionality with Postgres](https://supabase.com/blog/seen-by-in-postgresql)
+- [Partial data dumps using Postgres Row Level Security](https://supabase.com/blog/partial-postgresql-data-dumps-with-rls)
+- [Realtime Postgres RLS on Supabase](https://supabase.com/blog/realtime-row-level-security-in-postgresql)

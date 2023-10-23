@@ -1,0 +1,58 @@
+---
+title: Monitoro Built a Web Crawler Handling Millions of API Requests
+description: See how Monitoro built an automated scraping platform using Supabase.
+author: rory_wilding
+author_title: Supabase
+author_url: https://github.com/roryw10
+author_image_url: https://github.com/roryw10.png
+authorURL: https://github.com/roryw10
+image: /images/blog/supabase-monitoro.png
+categories:
+  - company
+tags:
+  - no-code
+date: '12-02-2020'
+video: https://www.youtube.com/v/8A6_pg41M2s
+---
+
+Omar Kamali is the founder of [Monitoro](https://www.monitoro.xyz/), a service for scraping countless websites 24/7 to notify customers when these websites change. To create this product, Monitoro's team needed to handle massive data throughput whilst ensuring the product was reliable and resilient to satisfy a rapidly growing user base.
+
+Learn how Monitoro was able to build fast, ensure reliability, and keep scaling by building with Supabase and Svelte.
+
+### From Zero to One Million
+
+In one month, Monitoro scaled from nothing to nearly one million API requests per day.
+
+![This image Monitoro's API requests every day for a month. They went from zero to 800 thousand daily requests.](/images/blog/monitoro-requests.png)
+
+### Customer discovery to development
+
+Monitoro spent time on customer discovery and building out a version 1. After getting some initial feedback and spending time learning from their customers, they realised to build out the functionality they wanted, Monitoro would need real-time functionality.
+
+From experience, the team understood from day one that using a technology such as Firebase would have been unthinkable. Monitoro also wanted to avoid vendor lock-in as well as leverage PostgreSQL's large ecosystem of tools in other parts of their processes. They didn't want to spend time setting up MongoDB, and whilst Hasura seemed like a possibility, it was over-engineered for Monitoro's use case.
+
+### Supabase turbo-charges Monitoro
+
+Omar saw Supabase mentioned on Hacker News and realised immediately it had the potential to solve Monitoro's problems. Using Supabase would help them launch version 2 of Monitoro with the real-time functionality their users would value, without sacrificing moving fast.
+
+Within a couple of days, the team had a version ready they could deploy. Monitoro's team developed and deployed a custom web service to handle the massive throughput required then used Supabase as their backend to power the web application their users interact with. This means Monitoro's users can view the extracted data and integrate the data with other tools without code.
+
+Fast forward to today, and Monitoro's user base has been ramping up, as they use Monitoro to monitor changes to websites all over the world. Despite how fast their user base has grown, the Monitoro team have peace of mind as they scale because they used Supabase, knowing it will just work without worrying about DevOps.
+
+![Quote from Omar - Supabase was exactly the solution I needed so when I saw it on Hacker News I was instantly excited. Supabase allowed us to go further, faster, with our product functionality. We had a fast-growing user base which would have been challenging to support without being able to depend on Supabase.](/images/blog/omar-monitoro.png)
+
+### Prototype fast, and keep going
+
+Thanks to Supabase, Monitoro could deliver the features required needed faster than they anticipated. This meant the team could spend more time focusing on speaking to customers and marketing. As a result, their user base has grown massively in a short space of time. There was no need to worry about how to create a database which had real-time functionality which could be set up quickly and scale. Monitoro could focus on launching fast.
+
+Learn more about Monitoro:
+
+<div className="video-container">
+  <iframe
+    className="w-full video-with-border"
+    src="https://www.youtube-nocookie.com/embed/8A6_pg41M2s"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>

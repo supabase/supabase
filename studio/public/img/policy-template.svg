@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="33px" height="38px" viewBox="0 0 33 38" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 59.1 (86144) - https://sketch.com -->
+    <title>Group 4</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Desktop-HD-Copy" transform="translate(-316.000000, -442.000000)">
+            <g id="Group-4" transform="translate(316.000000, 442.000000)">
+                <g id="Group-2" transform="translate(18.421864, 21.486924) rotate(10.000000) translate(-18.421864, -21.486924) translate(6.921864, 6.986924)" stroke="#6F6F6F">
+                    <path d="M2.70588235,0 L13.5294118,0 L20,0 C21.6568542,-7.48448398e-16 23,1.34314575 23,3 L23,9.47058824 L23,9.47058824 L23,25.7058824 C23,27.2002999 21.7885352,28.4117647 20.2941176,28.4117647 L2.70588235,28.4117647 C1.21146479,28.4117647 0,27.2002999 0,25.7058824 L0,2.70588235 C0,1.21146479 1.21146479,0 2.70588235,0 Z" id="Rectangle" fill="#888888" fill-rule="nonzero"></path>
+                    <line x1="3.68" y1="23" x2="20.24" y2="23" id="Line" stroke-linecap="round"></line>
+                    <line x1="3.68" y1="18.4" x2="20.24" y2="18.4" id="Line" stroke-linecap="round"></line>
+                    <line x1="3.68" y1="13.8" x2="20.24" y2="13.8" id="Line" stroke-linecap="round"></line>
+                    <line x1="3.68" y1="9.2" x2="20.24" y2="9.2" id="Line" stroke-linecap="round"></line>
+                    <line x1="3.68" y1="4.6" x2="20.24" y2="4.6" id="Line" stroke-linecap="round"></line>
+                </g>
+                <g id="Group-3" transform="translate(14.500000, 17.500000) rotate(5.000000) translate(-14.500000, -17.500000) translate(2.000000, 2.000000)">
+                    <g id="file-filled" transform="translate(12.500000, 15.500000) scale(-1, 1) rotate(180.000000) translate(-12.500000, -15.500000) " fill-rule="nonzero">
+                        <path d="M2.94117647,0 L14.7058824,0 L14.7058824,0 L25,10.2941176 L25,27.9411765 C25,29.5655434 23.6831904,30.8823529 22.0588235,30.8823529 L2.94117647,30.8823529 C1.31680956,30.8823529 0,29.5655434 0,27.9411765 L0,2.94117647 C0,1.31680956 1.31680956,0 2.94117647,0 Z" id="Rectangle" stroke="#6F6F6F" fill="#888888"></path>
+                        <path d="M14.7058824,0 L25,10.2941176 L17.6470588,10.2941176 C16.0226919,10.2941176 14.7058824,8.97730809 14.7058824,7.35294118 L14.7058824,0 L14.7058824,0 Z" id="Triangle" fill="#727272"></path>
+                    </g>
+                    <rect id="Rectangle" stroke="#6F6F6F" fill="#888888" x="3.5" y="3.5" width="9" height="9" rx="2"></rect>
+                    <line x1="16" y1="4" x2="21.5" y2="4" id="Line" stroke="#6F6F6F" stroke-linecap="round"></line>
+                    <line x1="16" y1="12" x2="21.5" y2="12" id="Line" stroke="#6F6F6F" stroke-linecap="round"></line>
+                    <line x1="16" y1="8" x2="21.5" y2="8" id="Line" stroke="#6F6F6F" stroke-linecap="round"></line>
+                    <line x1="3.5" y1="22.5" x2="21.5" y2="22.5" id="Line" stroke="#6F6F6F" stroke-linecap="round"></line>
+                    <line x1="3.5" y1="17.5" x2="21.5" y2="17.5" id="Line" stroke="#6F6F6F" stroke-linecap="round"></line>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

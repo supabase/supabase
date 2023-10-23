@@ -1,0 +1,213 @@
+clisCommon: '001'
+commands:
+  - id: supabase-test
+    title: supabase test
+    product: 'general'
+
+  - id: supabase-login
+    title: supabase login
+    product: 'general'
+
+  - id: supabase-link
+    title: supabase link
+    product: 'general'
+
+  - id: supabase-init
+    title: supabase init
+    product: 'general'
+
+  - id: supabase-test-db
+    title: supabase test db
+    product: 'general'
+
+  - id: supabase-stop
+    title: supabase stop
+    product: 'general'
+
+  - id: supabase-status
+    title: supabase status
+    product: 'general'
+
+  - id: supabase-start
+    title: supabase start
+    product: 'general'
+
+  - id: supabase-gen
+    title: supabase gen
+    product: 'general'
+
+  - id: supabase-gen-types
+    title: supabase gen types
+    product: 'general'
+
+  - id: supabase-gen-types-typescript
+    title: supabase gen types typescript
+    product: 'general'
+
+  - id: supabase-secrets
+    title: supabase secrets
+    product: 'secrets'
+
+  - id: supabase-secrets-unset
+    title: supabase secrets unset
+    product: 'secrets'
+
+  - id: supabase-secrets-set
+    title: supabase secrets set
+    product: 'secrets'
+
+  - id: supabase-secrets-list
+    title: supabase secrets list
+    product: 'secrets'
+
+  - id: supabase-projects
+    title: supabase projects
+    product: 'projects'
+
+  - id: supabase-projects-list
+    title: supabase projects list
+    product: 'projects'
+
+  - id: supabase-projects-create
+    title: supabase projects create
+    product: 'projects'
+
+  - id: supabase-orgs
+    title: supabase orgs
+    product: 'organizations'
+
+  - id: supabase-orgs-list
+    title: supabase orgs list
+    product: 'organizations'
+
+  - id: supabase-migration
+    title: supabase migration
+    product: 'migration'
+
+  - id: supabase-migration-new
+    title: supabase migration new
+    product: 'migration'
+
+  - id: supabase-migration-list
+    title: supabase migration list
+    product: 'migration'
+
+  - id: supabase-functions
+    title: supabase functions
+    product: 'functions'
+
+  - id: supabase-functions-serve
+    title: supabase functions serve
+    product: 'functions'
+
+  - id: supabase-functions-new
+    title: supabase functions new
+    product: 'functions'
+
+  - id: supabase-functions-deploy
+    title: supabase functions deploy
+    product: 'functions'
+
+  - id: supabase-functions-delete
+    title: supabase functions delete
+    product: 'functions'
+
+  - id: supabase-domains
+    title: supabase domains
+    product: 'domains'
+
+  - id: supabase-domains-reverify
+    title: supabase domains reverify
+    product: 'domains'
+
+  - id: supabase-domains-get
+    title: supabase domains get
+    product: 'domains'
+
+  - id: supabase-domains-delete
+    title: supabase domains delete
+    product: 'domains'
+
+  - id: supabase-domains-create
+    title: supabase domains create
+    product: 'domains'
+
+  - id: supabase-domains-activate
+    title: supabase domains activate
+    product: 'domains'
+
+  - id: supabase-db
+    title: supabase db
+    product: 'database'
+
+  - id: supabase-db-reset
+    title: supabase db reset
+    product: 'database'
+
+  - id: supabase-db-remote
+    title: supabase db remote
+    product: 'database'
+
+  - id: supabase-db-remote-commit
+    title: supabase db remote commit
+    product: 'database'
+
+  - id: supabase-db-remote-changes
+    title: supabase db remote changes
+    product: 'database'
+
+  - id: supabase-db-push
+    title: supabase db push
+    product: 'database'
+
+  - id: supabase-db-lint
+    title: supabase db lint
+    product: 'database'
+
+  - id: supabase-db-diff
+    title: supabase db diff
+    product: 'database'
+
+  - id: supabase-completion
+    title: supabase completion
+    product: 'completion'
+
+  - id: supabase-completion-zsh
+    title: supabase completion zsh
+    product: 'completion'
+
+  - id: supabase-completion-powershell
+    title: supabase completion powershell
+    product: 'completion'
+
+  - id: supabase-completion-fish
+    title: supabase completion fish
+    product: 'completion'
+
+  - id: supabase-completion-bash
+    title: supabase completion bash
+    product: 'completion'
+
+  - id: supabase-sso
+    title: supabase sso
+    product: 'auth'
+
+  - id: supabase-sso-add
+    title: supabase sso add
+    product: 'auth'
+
+  - id: supabase-sso-remove
+    title: supabase sso remove
+    product: 'auth'
+
+  - id: supabase-sso-update
+    title: supabase sso update
+    product: 'auth'
+
+  - id: supabase-sso-list
+    title: supabase sso list
+    product: 'auth'
+
+  - id: supabase-sso-show
+    title: supabase sso show
+    product: 'auth'

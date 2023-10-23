@@ -1,0 +1,1 @@
+apps/docs/public/.well-known/security.txt

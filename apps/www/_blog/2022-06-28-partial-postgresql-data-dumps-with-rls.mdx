@@ -1,0 +1,192 @@
+---
+title: Partial data dumps using Postgres Row Level Security
+description: Using RLS to create seed files for local PostgreSQL testing.
+author: paul_copplestone
+image: partial-dumps/og-partial-dumps-with-rls.png
+thumb: partial-dumps/og-partial-dumps-with-rls.png
+categories:
+  - postgres
+tags:
+  - postgresql
+  - data
+  - planetpg
+date: '2022-06-28'
+toc_depth: 3
+---
+
+When working with databases, it's common to create a `seed.sql` file which contains a subset of production data for testing.
+
+During early development, it's fine to dump the entire database and restore it on your development machine.
+However, once you have production users this becomes a security issue - do you really want to dump your users' data onto your local machines?
+
+There are many ways to solve this, but recently I stumbled upon a neat way to do it using PostgreSQL's Row Level Security (RLS).
+
+The concept is simple:
+
+1. Create a database user with restricted access.
+2. Define some RLS rules for that user, limiting what data they can access.
+3. Run `pg_dump` as that user.
+
+For this scenario, let's imagine that you have a table called `profiles` in your database:
+
+```sql hideCopy
+create table profiles (
+  id serial primary key,
+  name text,
+  email text
+);
+```
+
+| `id` | `name`       | `email`                  |
+| ---- | ------------ | ------------------------ |
+| `1`  | `Employee 1` | `employee1@supabase.com` |
+| `2`  | `Employee 2` | `employee2@supabase.com` |
+| `3`  | `Employee 3` | `employee3@supabase.com` |
+| `4`  | `Jenny`      | `jenny@example.com`      |
+| `5`  | `Joe`        | `joe@example.com`        |
+
+In this case, if we ran a `pg_dump` we will save Jenny and Joe's personal data. We don't want that, so let's create a Postgres user called `exporter`, who can only dump the data we want.
+
+### Step 1: Prepare a user
+
+Create a user to connect to the database. We'll call them `exporter` and grant them access to the public schema:
+
+```sql hideCopy
+-- Create a new user with login privileges
+create user exporter
+  with password 'exporter_secure_password';
+
+-- Allow this user to select the rows we need
+grant usage on schema public to exporter;
+grant select on profiles to exporter;
+```
+
+### Step 2: Create data access rules
+
+Let's turn on RLS for this table and limit the data which `exporter` can access:
+
+```sql hideCopy hideLineNumbers
+-- Turn on Row Level Security
+alter table profiles
+  enable row level security;
+
+-- Only dump data for internal team members 1, 2, 3
+create policy "Data dump rule" on profiles
+  for select
+  to exporter
+  using (
+    id in (1, 2, 3)
+  );
+```
+
+### Step 3: Export the data
+
+Now we can use `pg_dump` to get only the data that we need.
+
+Run the dump with the `exporter` user that we created above and use the `--enable-row-security` flag to ensure that the dump succeeds.
+
+```bash hideCopy hideLineNumbers
+# Dump all the data into a "seed.sql" file
+# which we can use to restore our local databases.
+pg_dump \
+-h db.host.supabase.co \
+-U exporter \
+-d postgres \
+-n public \
+--data-only \
+--enable-row-security \
+--table=profiles \
+> seed.sql
+```
+
+```bash hideCopy hideLineNumbers
+-h db.host.supabase.co \
+```
+
+And that's it. You can follow this same pattern for any tables that you want to dump.
+
+## Data access patterns
+
+RLS is a bit like appending a “where” clause to a `select`, so you can create all sorts of data access patterns. Let's see a few more which are useful for extracting seed data.
+
+### Using email rules
+
+Instead of using hardcoded numbers in our RLS policies, we could use email extensions to determine the users who we want to export:
+
+```sql hideCopy
+-- Only dump data for supabase employees
+create policy "Data dump rule" on profiles
+  for select
+  to exporter
+  using (
+    substring(email from '@(.*)$') = 'supabase.com'
+  );
+
+```
+
+### Only recent data
+
+If we have a table with a lot of data, like an `analytics` table, we might only care about the last 2 months of data.
+
+```sql hideCopy
+-- A fake analytics table where we store actions a user takes
+create table analytics (
+  id serial primary key,
+  ts timestamptz default now(),
+  profile_id references profiles,
+  event text
+);
+alter table profiles
+  enable row level security;
+
+-- Here is an "age" rule so that we only dump the most recent analytics
+create policy "Data dump rule" on logs
+  for select
+  to exporter
+  using (
+    profile_id in (1, 2, 3) and
+    ts > now() - interval '2 MONTHS' -- here's the magic
+  );
+```
+
+### Using flags
+
+If you don't mind having some additional columns in you database, you can add flags to each row to determine whether it's safe to export.
+
+```sql hideCopy
+create table profiles (
+  id serial primary key,
+  name text,
+  email text,
+  is_exportable boolean -- make this "TRUE" if you want to allow access
+);
+alter table profiles
+  enable row level security;
+
+-- Only dump data for internal team members 1, 2, 3
+create policy "Data dump rule" on profiles
+  for select
+  to exporter
+  using ( is_exportable = true );
+
+```
+
+## Conclusion
+
+Using `seed` data isn't the only way to run development environments. It's also possible to run fully-masked copies of your database using tools like
+[Snaplet](https://docs.snaplet.dev/tutorials/supabase-clone-environments).
+
+We're also bullish on copy-on-write strategies which allow users to "fork" a database at a point in time,
+a strategy used by [Database Lab Engine](https://postgres.ai/docs/database-lab).
+DLE uses the ZFS file system to achieve this, but it's within reach of the Postgres core once alternative storage strategies become easier to implement.
+
+If you want to try out the steps we described in this article, fire up a full PostgreSQL database: [database.new](https://database.new)
+
+## More Postgres resources
+
+- [Implementing "seen by" functionality with Postgres](https://supabase.com/blog/seen-by-in-postgresql)
+- [Postgres Views](https://supabase.com/blog/postgresql-views)
+- [Postgres Auditing in 150 lines of SQL](https://supabase.com/blog/audit)
+- [Cracking PostgreSQL Interview Questions](https://supabase.com/blog/cracking-postgres-interview)
+- [What are PostgreSQL Templates?](https://supabase.com/blog/postgresql-templates)
+- [Realtime Postgres RLS on Supabase](https://supabase.com/blog/realtime-row-level-security-in-postgresql)

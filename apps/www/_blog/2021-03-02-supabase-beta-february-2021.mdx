@@ -1,0 +1,112 @@
+---
+title: Supabase Beta February 2021
+description: One year of building.
+author: paul_copplestone
+author_title: Supabase
+author_url: https://github.com/kiwicopple
+author_image_url: https://github.com/kiwicopple.png
+authorURL: https://github.com/kiwicopple
+image: /images/blog/release-feb-2021.jpg
+categories:
+  - product
+tags:
+  - release-notes
+date: '03-02-2021'
+video: https://www.youtube.com/v/h-ses99G45g
+---
+
+Supabase is an open source Firebase alternative. We've now been building for one year. Here's what we released last month.
+
+### Quick demo
+
+Watch a full demo:
+
+<div className="video-container">
+  <iframe
+    className="video-with-border w-full"
+    src="https://www.youtube-nocookie.com/embed/h-ses99G45g"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
+### Dashboard Sidebars
+
+We've improved the UX of our Dashboard with sidebars in every section, including the Table view, the Auth section, and the SQL Editor.
+
+![Our dashboard has sidebars](/images/blog/feb/sidebar-tables.png)
+
+### SQL Autocomplete
+
+Writing SQL just got 10x easier. We added autocomplete to the SQL editor, including table & column suggestions.
+
+<video width="99%" autoPlay muted playsInline controls={true}>
+  <source src="/images/blog/feb/autocomplete.mp4" type="video/mp4" />
+</video>
+
+### Auth Redirects
+
+Redirect your users to specific route within your site on [`signIn()`](/docs/reference/javascript/v1/auth-signin#sign-in-with-redirect) and [`signUp()`](/docs/reference/javascript/auth-signup#sign-up-with-redirect).
+
+![Redirect your users after sign up](/images/blog/feb/auth-redirect.png)
+
+### Replication management
+
+We added a page to the Database section for managing Postgres Replication. It's still basic, but you can use it to manage your realtime API - choosing which tables are enabled, and which events to send.
+
+![Replication management](/images/blog/feb/manage-replication.png)
+
+### Learning Resources
+
+We've released a new [Resources](/docs/resources) section in our docs, as well as two new Auth modules: [GoTrue Overview](/docs/learn/auth-deep-dive/auth-gotrue) and [Google OAuth](/docs/learn/auth-deep-dive/auth-google-oauth).
+
+![Our dashboard has sidebars](/images/blog/feb/docs-resources.png)
+
+### New Region
+
+Launch your database in South Africa.
+
+![Launch your database in South Africa](/images/blog/feb/new-region-south-africa.png)
+
+### Kaizen
+
+- We filled up our [Examples](/docs/guides/examples) page with a lot of new content.
+- We released a [Docker Compose](https://github.com/supabase/supabase/blob/master/docker/docker-compose.yml) file for running Supabase locally. This will be used in our upcoming CLI.
+- We have a couple of pending RFCs which you may want to participate in:
+  - [Planning our CLI and Local Development](https://github.com/supabase/cli/pull/2)
+  - [Connection Pooling on Supabase](https://github.com/supabase/postgres/blob/rfc/connection_pooling/rfcs/0001-connection-pooling.md)
+
+### Community
+
+One of the community, [@ftonato](https://github.com/ftonato), has built an amazing [example](https://github.com/supabase/examples/tree/main/supabase-js-v1/with-stencil) that shows how to use Supabase with [Stencil](https://stenciljs.com/) (a Web Component compiler built by they [Ionic](https://ionicframework.com/) team.)
+
+[Check it out!](https://github.com/supabase/examples/tree/main/supabase-js-v1/with-stencil)
+
+![Supabase with Stencil](/images/blog/feb/supabase-stencil.png)
+
+- @kiwicopple on the LogRocket Podcast. [Link](https://podrocket.logrocket.com/9)
+- @bdougie Livestream: More Fullstack React w RedwoodJS + Supabase. [Link](https://www.twitch.tv/videos/907698954)
+- @gbibeaul created `useSupabase`: Supabase React Hooks. [GitHub](https://www.npmjs.com/package/use-supabase)
+
+We hit 6000 GitHub stars on [GitHub](https://github.com/supabase/supabase)
+
+![This image shows the Supabase GitHub star growth.](/images/blog/feb/github-stars-feb-2021.png)
+
+<small>
+  Source: <a href="https://repository.surf/supabase">repository.surf/supabase</a>
+</small>
+
+### Coming next
+
+Waiting for Supabase Storage? Here's a sneak peek for the upcoming Launch Week at the end of March.
+
+![Supabase Storage coming soon](/images/blog/feb/supabase-storage.png)
+
+### Get started
+
+- Start using Supabase today: [supabase.com/dashboard](https://supabase.com/dashboard/)
+- Make sure to [star us on GitHub](https://github.com/supabase/supabase)
+- Follow us [on Twitter](https://twitter.com/supabase)
+- Subscribe to our [YouTube channel](https://www.youtube.com/c/supabase)
+- Become a [sponsor](https://github.com/sponsors/supabase)

@@ -1,0 +1,87 @@
+---
+title: Physical vs Logical Backups in PostgreSQL
+description: What are physical and logical backups in Postgres?
+author: angelico_de_los_reyes
+author_title: Supabase
+author_url: https://github.com/dragarcia
+author_image_url: https://avatars0.githubusercontent.com/u/26374889?s=400&u=f5e35e9b47a50fa2b4d8c4bb96babd921071bcf1&v=4
+authorURL: https://github.com/dragarcia
+categories:
+  - postgres
+tags:
+  - postgres
+  - planetpg
+date: '07-07-2020'
+---
+
+PostgreSQL backups can be categorized into two types: _logical_ and _physical_. This post briefly covers each type and discusses the situations where you would use either one.
+
+We'll cover some of the many tools you can use for Postgres backups in future posts.
+
+## Logical Backups
+
+This form of backup is typically achieved by [translating all the data into a set of SQL commands and writing it into a single file](https://www.postgresql.org/docs/current/backup-dump.html). This can then be fed to any database cluster to recreate everything. In your CLI, performing logical backups can be as easy as:
+
+```shell
+pg_dump db_name > file_name.sql
+```
+
+for a single database, and:
+
+```shell
+pg_dumpall > file_name.sql
+```
+
+for an entire database cluster. Both the [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) and [pg_dumpall](https://www.postgresql.org/docs/current/app-pg-dumpall.html) utilities have their respective additional options for you to choose from and set up your desired logical backup setting. Recovering from them is comparably as simple:
+
+```shell
+psql -d db_name -f file_name.sql
+```
+
+### What is it good for?
+
+#### Simpler and quicker way of performing backups
+
+As shown above, a single command is enough to perform a logical backup and another to recover from it. As a novice with databases, this would be an ideal and non-intimidating ensure that your database is backed up at all times.
+
+#### Migration between different major versions of Postgres
+
+If you are planning to migrate to a different major version of Postgres (for example, from Postgres 11 to Postgres 12), logical backups via `pg_dumpall` would surely be your [tool of choice](https://www.postgresql.org/docs/current/upgrading.html). This is mainly because internal data storage formats may differ between major versions. This is the basis of physical backups, eliminating it as an option when upgrading. We'll go deeper into migrations and how to perform them in another post.
+
+#### Backing up a single specific database
+
+With `pg_dump`, you can constantly back up a single, targeted database.
+
+## Physical Backups
+
+Physical backups pertain to the actual set of files or file systems where your database data is stored. One option for physical backups involves [taking a snapshot](https://www.postgresql.org/docs/current/backup-file.html) of your data files by making a copy of them.
+
+### What is it good for?
+
+#### More ideal for larger databases
+
+As your database grows to the size of a few gigabytes, backing it up through physical backups is more ideal than through logical backups. As explained [here](https://devcenter.heroku.com/articles/heroku-postgres-data-safety-and-continuous-protection#the-performance-impact-of-logical-backups), over time, performing logical backups in large databases could lead to degraded performance for other queries. Given the long run time as well to successfully perform a logical backup on a large database, errors have a higher chance of occurring, making the eventual backup unusable.
+
+#### Achieving Point in Time Recovery
+
+Postgres also generates [Write Ahead Log](https://www.postgresql.org/docs/current/wal-intro.html) (WAL) files, which can be used together with a backed-up file system to [recover a database up to any chosen point in time](https://www.postgresql.org/docs/current/continuous-archiving.html). When disaster strikes, this is one of the best options for recreating your database up to the point right before the unfortunate happens. This greatly minimizes [Recovery Point Objective (RPO)](https://www.ibm.com/services/business-continuity/rpo) along the way. Even better, tools such as [WAL-G](https://github.com/wal-g/wal-g) are readily available to simplify the steps involved in setting this up.
+
+## Conclusion
+
+All in all, logical and physical backups are generated differently from one another. Neither has an advantage over the other. Depending on your needs, each brings unique uses to the table:
+
+| Logical                                                           | Physical                                                     |
+| :---------------------------------------------------------------- | :----------------------------------------------------------- |
+| Simpler way of getting started with backups.                      | Better way of handling backups for larger database clusters. |
+| Using it to migrate between different major versions of Postgres. | Using it for Point in Time Recovery.                         |
+| Having the option to back up a single database.                   |                                                              |
+
+## More Postgres resources
+
+- [Implementing "seen by" functionality with Postgres](https://supabase.com/blog/seen-by-in-postgresql)
+- [Partial data dumps using Postgres Row Level Security](https://supabase.com/blog/partial-postgresql-data-dumps-with-rls)
+- [Postgres Views](https://supabase.com/blog/postgresql-views)
+- [Postgres Auditing in 150 lines of SQL](https://supabase.com/blog/audit)
+- [Cracking PostgreSQL Interview Questions](https://supabase.com/blog/cracking-postgres-interview)
+- [What are PostgreSQL Templates?](https://supabase.com/blog/postgresql-templates)
+- [Realtime Postgres RLS on Supabase](https://supabase.com/blog/realtime-row-level-security-in-postgresql)

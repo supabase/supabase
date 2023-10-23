@@ -1,0 +1,168 @@
+---
+title: Supabase Beta August 2021
+description: Fundraising, Realtime Security, custom SMS templates, and deployments in South Korea.
+author: paul_copplestone
+author_url: https://github.com/kiwicopple
+author_image_url: https://github.com/kiwicopple.png
+authorURL: https://github.com/kiwicopple
+image: 2021-august/release-august-2021.jpg
+thumb: 2021-august/release-august-2021-cover.jpg
+categories:
+  - product
+tags:
+  - release-notes
+date: '2021-09-10'
+toc_depth: 3
+video: https://www.youtube.com/v/YYpTh2DAvho
+---
+
+We've raised $30M and shipped a bunch of features. Let's dive into what's been happening at Supabase during the month of August.
+
+### Quick recap
+
+Watch a recap of this month's release.
+
+<div className="video-container">
+  <iframe
+    className="video-with-border w-full"
+    src="https://www.youtube-nocookie.com/embed/YYpTh2DAvho"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
+## We raised $30 million
+
+Hot off the press, we raised our Series A.
+We'll use the funds to do more of the same - ship features and hire open source developers.
+We'll release more details soon. Read more on [TechCrunch](https://techcrunch.com/2021/09/09/supabase-raises-30m-for-its-open-source-insta-backend/).
+
+![Supabase Series A](/images/blog/2021-august/supabase-series-a.png)
+
+## Realtime Security, codename: WALRUS
+
+If you've been waiting for Row Level Security to land in Postgres [subscriptions](/docs/reference/javascript/subscribe),
+then you're going to love our new repo:
+[Write Ahead Log Realtime Unified Security (WALRUS)](https://github.com/supabase/walrus).
+The name might be a bit forced, but the security design is deliberate.
+It's not in production yet, but we're making the repo public for comments using an
+[RFC process](https://github.com/supabase/walrus/blob/master/README.md#rfc-process).
+
+![Realtime Security, codename: WALRUS](/images/blog/2021-august/walrus.jpg)
+
+## Custom SMS templates
+
+If you're using SMS login in [Auth v2](/blog/2021/07/28/supabase-auth-passwordless-sms-login), you can now customize the SMS which is sent to your users. Read more in the [docs](/docs/guides/auth/phone-login/twilio#sms-custom-template).
+
+![Custom SMS templates](/images/blog/2021-august/custom-sms.png)
+
+## Dart and Flutter Docs
+
+Thanks entirely to [@dshukertjr](https://twitter.com/dshukertjr), we now have in-depth [reference Dart documentation](/docs/reference/dart/installing) for CRUD, Auth, Realtime and more!
+
+![Dart and Flutter Docs](/images/blog/2021-august/supabase-flutter.jpg)
+
+## We launched the South Korea region
+
+We added another region for those wanting to host their data and APIs in Seoul. We now have 12 regions to choose from
+
+![We launched the South Korea Region](/images/blog/2021-august/south-korea.png)
+
+## Table creation is even easier
+
+You can now create columns while creating your table. We've also added improvements for composite primary keys and foreign key creation.
+
+![Table creation is even easier](/images/blog/2021-august/create-tables.png)
+
+## Unbreakable CSV Imports
+
+Our previous importer would choke on CSV files which were too large. Not any more!
+
+![Unbreakable CSV Imports](/images/blog/2021-august/csv-imports.png)
+
+## Connection strings
+
+We now provide a handy copy utility for various database connection strings because we were so tired of looking them up on Stack Overflow.
+
+![Caption](/images/blog/2021-august/connection-strings.png)
+
+## We released a primer on Row Level Security
+
+RLS can be a bit foreign for developers getting started with Postgres.
+This video by [@\_dijonmusters](https://twitter.com/_dijonmusters) demystifies it. If you find the video a useful medium for learning, consider [subscribing to our channel](https://www.youtube.com/c/supabase).
+
+<div className="video-container">
+  <iframe
+    className="video-with-border w-full"
+    src="https://www.youtube-nocookie.com/embed/Ow_Uzedfohk"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
+## Community
+
+### We had a community Hackathon
+
+We held a one-week async Hackathon. Check out [all the winners](/blog/hackathon-winners) - it was truly impressive what people were able to build in just 7 days.
+
+![We had a community Hackathon](/images/blog/2021-august/hackathon.png)
+
+### We had a team Hackathon
+
+The Supabase team didn't want to miss out on the fun so we held our own hackathon. It was a good way to dog food. Some notable projects include
+
+- [Supaflix](https://supaflix.vercel.app/) by [@abc3](https://twitter.com/abc3erl) [[GitHub](https://github.com/abc3/supaflix)] - a Netflix clone build with Supabase
+- [Personal-Casts](https://github.com/inian/personal-casts) by [@everconfusedguy](https://twitter.com/everconfusedguy) [[GitHub](https://github.com/inian/personal-casts)] - converts Youtube videos and articles into a personal podcast feed.
+- And it wouldn't be a Supabase hackathon without a high-effort meme entry.
+  Check out [meme.town](http://meme.town) by [@Joshenlimek](https://twitter.com/joshenlimek) [[GitHub](https://github.com/joshenlim/meme-maker)]
+
+![We had a team Hackathon](/images/blog/2021-august/meme-town.png)
+
+### GitHub Trending
+
+We hit 18,000 stars on GitHub, and got to the [top of GitHub trending](https://twitter.com/supabase/status/1435868863518760964) for Typescript.
+
+![GitHub Trending](/images/blog/2021-august/github-stars.png)
+
+<small>
+  Source: <a href="https://repository.surf/supabase">repository.surf/supabase</a>
+</small>
+
+If you want to keep up to date, make sure you [subscribe to our YouTube channel](https://www.youtube.com/c/supabase) or
+[follow us on Twitter](https://twitter.com/supabase).
+
+## Dependency contributions
+
+### GoTrue (Auth)
+
+- HCaptcha - users can add captcha on their passwordless logins to prevent abuse<br />
+  [https://github.com/supabase/gotrue/pull/192](https://github.com/supabase/gotrue/pull/192)
+- Email change endpoint is fixed (sends out 2 emails, one to the old email and one to the new one)<br />
+  [https://github.com/supabase/gotrue/pull/132](https://github.com/supabase/gotrue/pull/132)
+
+### PostgREST (APIs)
+
+- Allow a function with single unnamed parameter to be called with POST<br />
+  [https://github.com/PostgREST/postgrest/issues/1735](https://github.com/PostgREST/postgrest/issues/1735)
+
+### pg_net (Database Webhooks)
+
+- Better handling of URL errors<br />
+  [https://github.com/supabase/pg_net/issues/39](https://github.com/supabase/pg_net/issues/39)
+
+## Coming Next
+
+Last December we [moved from Alpha to Beta](/beta), with a focus on Security, Performance, and Reliability. After a couple of Launch Weeks pushing out new and sexy features, we have decided it's time to focus on these again.
+
+By the time we're done, Supabase will be production-ready for all use cases.
+
+## Get started
+
+- Start using Supabase today: [supabase.com/dashboard](https://supabase.com/dashboard/)
+- Make sure to [star us on GitHub](https://github.com/supabase/supabase)
+- Follow us [on Twitter](https://twitter.com/supabase)
+- Subscribe to our [YouTube channel](https://www.youtube.com/c/supabase)
+- Become a [sponsor](https://github.com/sponsors/supabase)

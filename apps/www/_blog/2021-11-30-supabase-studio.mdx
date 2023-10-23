@@ -1,0 +1,113 @@
+---
+title: 'Supabase Studio'
+description: "The same Dashboard that you're using on our Platform is now available for local development and Self-Hosting."
+author: paul_copplestone
+author_url: https://github.com/kiwicopple
+author_image_url: https://github.com/kiwicopple.png
+authorURL: https://github.com/kiwicopple
+image: launch-week-three/studio/open-source-studio-og.png
+thumb: launch-week-three/studio/open-source-studio-thumb.png
+categories:
+  - product
+tags:
+  - launch-week
+  - frontend
+  - studio
+date: '2021-11-30'
+toc_depth: 2
+---
+
+Today we're releasing [Supabase Studio](https://github.com/supabase/supabase/tree/master/studio).
+The same Dashboard that you're using on our Platform is now available for [Local Development](https://supabase.com/docs/guides/local-development)
+and [Self-Hosting](https://supabase.com/docs/guides/hosting/overview).
+
+## Background
+
+Let's get the obvious question out of the way - why wasn't it already open source?
+
+When Ant and I started Supabase the codebase was one large monorepo which contained everything from the dashboard to cloud infrastructure code to experimental code.
+This is our preferred development setup - we like to keep all code in one place so that we have a single source of truth and tightly coupled CI workflows.
+
+The original Dashboard really wasn't much except a couple of buttons which allowed our Alpha users to start and stop a Supabase project - back then only a PostgreSQL connection string.
+
+Then time went on, and we started gaining traction - a lot faster than expected.
+The nice thing about building for developers is that they are very vocal about the features they want to see next.
+And so we kept shipping - a SQL editor, a Table view, User management, auto-generated Docs, and everything else you can find on the Dashboard today.
+
+We've been planning to make the Dashboard public for a long time now, starting with [Supabase UI](https://ui.supabase.com/),
+[`supabase/grid`](https://github.com/supabase/grid), and a standalone [PR](https://github.com/supabase/supabase/pull/2281) for Supabase Studio.
+But as feature requests kept rolling in it became a Sisyphean task to maintain separate code bases.
+
+After the last Launch Week, we decided to prioritize the Studio.
+
+## Approaches for managing shared codebases
+
+We investigated a few different approaches used in the open source world. There are three popular strategies that we found amongst OSS projects and some of our YC alum:
+
+- Maintain separate code bases. Pluck changes from one to another.
+- Keep two repos in sync using some mixture of git submodules or a tool like [copycat](https://github.com/atomix/copycat)
+- Use the same codebase, abstracting platform-specific code behind an API and feature flags.
+
+Our frontend [team](https://github.com/orgs/supabase/teams/frontend/members) experimented with the first two approaches where they plucked (injected, merged, and wrangled) code for our Platform.
+Time-to-production become a lot slower, an unacceptable outcome at Supabase.
+
+Eventually we decided to open source all the frontend code, a shared codebase for both the Platform and Self Hosting.
+
+<details>
+  <summary>
+    <a>Special shout out</a>
+  </summary>
+  Sentry do a fantastic job of <a href="https://develop.sentry.dev/sentry-vs-getsentry/">
+    documenting their strategy
+  </a> for managing a shared codebase and served as a great model for Supabase.
+</details>
+
+## Build in public
+
+For the past week, the dashboard you've been using on the Platform has been deployed from our [main repository](https://github.com/supabase/supabase/tree/master/studio).
+
+This fits one of our core philosophies at Supabase: do less. Less code to manage means less bugs. Fewer codebases means faster shipping.
+
+![Open Source Table Editor](/images/blog/launch-week-three/studio/open-source-studio-table-editor.png)
+
+It also fits the development philosophy of every other part of Supabase: building in public, "warts and all".
+
+This is a huge step forward for the community. Supabase users can now spot a bug, fix it in the open source repository,
+and have it shipped to both the Platform and Self-Hosted environments - all in a few hours.
+
+## Technical details
+
+Let's jump into some of the technical implementation for Supabase Studio.
+
+### Tech stack
+
+Studio is a Javascript application with a few key pieces of technology:
+
+- [Next.js](https://nextjs.org/) - A frontend Javascript framework built with React.
+- [Tailwind](https://tailwindcss.com/) - A utility-first CSS framework.
+- [Supabase UI](https://ui.supabase.com/) - Our own component library.
+- [MobX](https://www.mobxjs.com/) - A state management library.
+- A host of other [useful libraries](https://github.com/supabase/supabase/blob/master/studio/package.json), including [Radix UI](https://www.radix-ui.com), [Lottiefiles](https://lottiefiles.com/), [react-grid-layout](https://github.com/react-grid-layout/react-grid-layout), and [zxcvbn](https://github.com/dropbox/zxcvbn).
+
+### What's included
+
+Studio is designed to work with existing deployments - either the local hosted, docker setup, or our CLI.
+It is not intended for managing the deployment and administration of projects - that's out of scope.
+
+The features exposed on Studio for existing deployments are limited to those which manage your database:
+
+- Table & SQL editors. (Saved queries are unavailable for now)
+- Database management: Policies, roles, extensions, replication.
+- API documentation.
+
+Over time we'll expose a lot more of the codebase in the self-hosted Dashboard, this was as much as we could do for this Launch Week!
+
+## How to contribute?
+
+Check out the full instructions in our [Studio Readme](https://github.com/supabase/supabase/tree/master/studio).
+
+### We are live and launched on Product Hunt
+
+Our new open source Studio is also on Product Hunt right now. If you like what you see, please give it an upvote and a review.
+
+[![Open Source Table Editor](https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=321226&theme=light)](https://www.producthunt.com/posts/open-source-postgresql-studio?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-open-source-postgresql-studio)

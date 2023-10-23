@@ -1,0 +1,26 @@
+[
+  {
+    "type": "Blog post",
+    "title": "Tayfa Built a No-Code Website Builder Deployed in Seven Days",
+    "description": "",
+    "postMeta": {
+      "name": "Paul Copplestone",
+      "avatarUrl": "/blog/2020/12/02/case-study-xendit",
+      "publishDate": "",
+      "readLength": 6
+    },
+    "ctaText": "View blog post"
+  },
+  {
+    "type": "Blog post",
+    "title": "Supabase Partners With Strive School To Help Teach Open Source",
+    "description": "",
+    "postMeta": {
+      "name": "Paul Copplestone",
+      "avatarUrl": "/blog/2020/12/02/supabase-striveschool",
+      "publishDate": "",
+      "readLength": 6
+    },
+    "ctaText": "View blog post"
+  }
+]

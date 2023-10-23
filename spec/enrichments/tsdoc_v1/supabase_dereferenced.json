@@ -1,0 +1,4782 @@
+{
+  "id": 0,
+  "name": "@supabase/supabase-js",
+  "kind": 1,
+  "flags": {},
+  "originalName": "",
+  "children": [
+    {
+      "id": 105,
+      "name": "index",
+      "kind": 2,
+      "kindString": "Module",
+      "flags": {},
+      "children": [
+        {
+          "id": 202,
+          "name": "SupabaseClientOptions",
+          "kind": 16777216,
+          "kindString": "Reference",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/index.ts",
+              "line": 27,
+              "character": 2
+            }
+          ],
+          "target": 79
+        },
+        {
+          "id": 203,
+          "name": "SupabaseRealtimePayload",
+          "kind": 16777216,
+          "kindString": "Reference",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/index.ts",
+              "line": 28,
+              "character": 2
+            }
+          ],
+          "target": 92
+        },
+        {
+          "id": 111,
+          "name": "SupabaseClient",
+          "kind": 128,
+          "kindString": "Class",
+          "flags": {},
+          "comment": {
+            "shortText": "Supabase Client.",
+            "text": "An isomorphic Javascript client for interacting with Postgres.\n"
+          },
+          "children": [
+            {
+              "id": 112,
+              "name": "constructor",
+              "kind": 512,
+              "kindString": "Constructor",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "src/SupabaseClient.ts",
+                  "line": 61,
+                  "character": 2
+                }
+              ],
+              "signatures": [
+                {
+                  "id": 113,
+                  "name": "new SupabaseClient",
+                  "kind": 16384,
+                  "kindString": "Constructor signature",
+                  "flags": {},
+                  "comment": {
+                    "shortText": "Create a new client for use in the browser."
+                  },
+                  "parameters": [
+                    {
+                      "id": 114,
+                      "name": "supabaseUrl",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {},
+                      "comment": {
+                        "shortText": "The unique Supabase URL which is supplied when you create a new project in your project dashboard."
+                      },
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
+                    },
+                    {
+                      "id": 115,
+                      "name": "supabaseKey",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {},
+                      "comment": {
+                        "shortText": "The unique Supabase Key which is supplied when you create a new project in your project dashboard."
+                      },
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
+                    },
+                    {
+                      "id": 116,
+                      "name": "options",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {
+                        "isOptional": true
+                      },
+                      "type": {
+                        "type": "reference",
+                        "id": 79,
+                        "name": "SupabaseClientOptions",
+                        "dereferenced": {
+                          "id": 79,
+                          "name": "SupabaseClientOptions",
+                          "kind": 4194304,
+                          "kindString": "Type alias",
+                          "flags": {},
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 12,
+                              "character": 12
+                            }
+                          ],
+                          "type": {
+                            "type": "reflection",
+                            "declaration": {
+                              "id": 80,
+                              "name": "__type",
+                              "kind": 65536,
+                              "kindString": "Type literal",
+                              "flags": {},
+                              "children": [
+                                {
+                                  "id": 83,
+                                  "name": "autoRefreshToken",
+                                  "kind": 1024,
+                                  "kindString": "Property",
+                                  "flags": {
+                                    "isOptional": true
+                                  },
+                                  "comment": {
+                                    "shortText": "Automatically refreshes the token for logged in users."
+                                  },
+                                  "sources": [
+                                    {
+                                      "fileName": "src/lib/types.ts",
+                                      "line": 24,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  }
+                                },
+                                {
+                                  "id": 91,
+                                  "name": "cookieOptions",
+                                  "kind": 1024,
+                                  "kindString": "Property",
+                                  "flags": {
+                                    "isOptional": true
+                                  },
+                                  "comment": {
+                                    "shortText": "Options passed to the gotrue-js instance"
+                                  },
+                                  "sources": [
+                                    {
+                                      "fileName": "src/lib/types.ts",
+                                      "line": 60,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "indexedAccess",
+                                    "indexType": {
+                                      "type": "literal",
+                                      "value": "cookieOptions"
+                                    },
+                                    "objectType": {
+                                      "type": "reference",
+                                      "id": 73,
+                                      "name": "SupabaseAuthClientOptions"
+                                    }
+                                  }
+                                },
+                                {
+                                  "id": 86,
+                                  "name": "detectSessionInUrl",
+                                  "kind": 1024,
+                                  "kindString": "Property",
+                                  "flags": {
+                                    "isOptional": true
+                                  },
+                                  "comment": {
+                                    "shortText": "Detect a session from the URL. Used for OAuth login callbacks."
+                                  },
+                                  "sources": [
+                                    {
+                                      "fileName": "src/lib/types.ts",
+                                      "line": 36,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  }
+                                },
+                                {
+                                  "id": 89,
+                                  "name": "fetch",
+                                  "kind": 1024,
+                                  "kindString": "Property",
+                                  "flags": {
+                                    "isOptional": true
+                                  },
+                                  "comment": {
+                                    "shortText": "A custom `fetch` implementation."
+                                  },
+                                  "sources": [
+                                    {
+                                      "fileName": "src/lib/types.ts",
+                                      "line": 50,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "reference",
+                                    "id": 78,
+                                    "name": "Fetch"
+                                  }
+                                },
+                                {
+                                  "id": 82,
+                                  "name": "headers",
+                                  "kind": 1024,
+                                  "kindString": "Property",
+                                  "flags": {
+                                    "isOptional": true
+                                  },
+                                  "comment": {
+                                    "shortText": "Optional headers for initializing the client."
+                                  },
+                                  "sources": [
+                                    {
+                                      "fileName": "src/lib/types.ts",
+                                      "line": 20,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "reference",
+                                    "id": 74,
+                                    "name": "GenericObject"
+                                  }
+                                },
+                                {
+                                  "id": 87,
+                                  "name": "localStorage",
+                                  "kind": 1024,
+                                  "kindString": "Property",
+                                  "flags": {
+                                    "isOptional": true
+                                  },
+                                  "comment": {
+                                    "shortText": "A storage provider. Used to store the logged in session."
+                                  },
+                                  "sources": [
+                                    {
+                                      "fileName": "src/lib/types.ts",
+                                      "line": 40,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "indexedAccess",
+                                    "indexType": {
+                                      "type": "literal",
+                                      "value": "localStorage"
+                                    },
+                                    "objectType": {
+                                      "type": "reference",
+                                      "id": 73,
+                                      "name": "SupabaseAuthClientOptions"
+                                    }
+                                  }
+                                },
+                                {
+                                  "id": 84,
+                                  "name": "multiTab",
+                                  "kind": 1024,
+                                  "kindString": "Property",
+                                  "flags": {
+                                    "isOptional": true
+                                  },
+                                  "comment": {
+                                    "shortText": "Allows to enable/disable multi-tab/window events"
+                                  },
+                                  "sources": [
+                                    {
+                                      "fileName": "src/lib/types.ts",
+                                      "line": 28,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  }
+                                },
+                                {
+                                  "id": 85,
+                                  "name": "persistSession",
+                                  "kind": 1024,
+                                  "kindString": "Property",
+                                  "flags": {
+                                    "isOptional": true
+                                  },
+                                  "comment": {
+                                    "shortText": "Whether to persist a logged in session to storage."
+                                  },
+                                  "sources": [
+                                    {
+                                      "fileName": "src/lib/types.ts",
+                                      "line": 32,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  }
+                                },
+                                {
+                                  "id": 88,
+                                  "name": "realtime",
+                                  "kind": 1024,
+                                  "kindString": "Property",
+                                  "flags": {
+                                    "isOptional": true
+                                  },
+                                  "comment": {
+                                    "shortText": "Options passed to the realtime-js instance"
+                                  },
+                                  "sources": [
+                                    {
+                                      "fileName": "src/lib/types.ts",
+                                      "line": 45,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "reference",
+                                    "qualifiedName": "Options",
+                                    "package": "@supabase/realtime-js",
+                                    "name": "RealtimeClientOptions"
+                                  }
+                                },
+                                {
+                                  "id": 81,
+                                  "name": "schema",
+                                  "kind": 1024,
+                                  "kindString": "Property",
+                                  "flags": {
+                                    "isOptional": true
+                                  },
+                                  "comment": {
+                                    "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to 'public'."
+                                  },
+                                  "sources": [
+                                    {
+                                      "fileName": "src/lib/types.ts",
+                                      "line": 16,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  }
+                                },
+                                {
+                                  "id": 90,
+                                  "name": "shouldThrowOnError",
+                                  "kind": 1024,
+                                  "kindString": "Property",
+                                  "flags": {
+                                    "isOptional": true
+                                  },
+                                  "comment": {
+                                    "shortText": "Throw errors, instead of returning them."
+                                  },
+                                  "sources": [
+                                    {
+                                      "fileName": "src/lib/types.ts",
+                                      "line": 55,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  }
+                                }
+                              ],
+                              "groups": [
+                                {
+                                  "title": "Properties",
+                                  "kind": 1024,
+                                  "children": [83, 91, 86, 89, 82, 87, 84, 85, 88, 81, 90]
+                                }
+                              ],
+                              "sources": [
+                                {
+                                  "fileName": "src/lib/types.ts",
+                                  "line": 12,
+                                  "character": 36
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ],
+                  "type": {
+                    "type": "reference",
+                    "id": 111,
+                    "name": "default"
+                  }
+                }
+              ]
+            },
+            {
+              "id": 117,
+              "name": "auth",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {},
+              "comment": {
+                "shortText": "Supabase Auth allows you to create and manage user sessions for access to data that is secured by access policies."
+              },
+              "sources": [
+                {
+                  "fileName": "src/SupabaseClient.ts",
+                  "line": 30,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "name": "SupabaseAuthClient"
+              }
+            },
+            {
+              "id": 121,
+              "name": "authUrl",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isProtected": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/SupabaseClient.ts",
+                  "line": 35,
+                  "character": 12
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 131,
+              "name": "changedAccessToken",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isProtected": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/SupabaseClient.ts",
+                  "line": 41,
+                  "character": 12
+                }
+              ],
+              "type": {
+                "type": "union",
+                "types": [
+                  {
+                    "type": "intrinsic",
+                    "name": "undefined"
+                  },
+                  {
+                    "type": "intrinsic",
+                    "name": "string"
+                  }
+                ]
+              }
+            },
+            {
+              "id": 126,
+              "name": "fetch",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isProtected": true,
+                "isOptional": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/SupabaseClient.ts",
+                  "line": 40,
+                  "character": 12
+                }
+              ],
+              "type": {
+                "type": "reflection",
+                "declaration": {
+                  "id": 127,
+                  "name": "__type",
+                  "kind": 65536,
+                  "kindString": "Type literal",
+                  "flags": {},
+                  "signatures": [
+                    {
+                      "id": 128,
+                      "name": "__type",
+                      "kind": 4096,
+                      "kindString": "Call signature",
+                      "flags": {},
+                      "parameters": [
+                        {
+                          "id": 129,
+                          "name": "input",
+                          "kind": 32768,
+                          "kindString": "Parameter",
+                          "flags": {},
+                          "type": {
+                            "type": "union",
+                            "types": [
+                              {
+                                "type": "reference",
+                                "qualifiedName": "RequestInfo",
+                                "package": "typescript",
+                                "name": "RequestInfo"
+                              },
+                              {
+                                "type": "reference",
+                                "qualifiedName": "URL",
+                                "package": "typescript",
+                                "name": "URL"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "id": 130,
+                          "name": "init",
+                          "kind": 32768,
+                          "kindString": "Parameter",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "type": {
+                            "type": "reference",
+                            "qualifiedName": "RequestInit",
+                            "package": "typescript",
+                            "name": "RequestInit"
+                          }
+                        }
+                      ],
+                      "type": {
+                        "type": "reference",
+                        "typeArguments": [
+                          {
+                            "type": "reference",
+                            "qualifiedName": "Response",
+                            "package": "typescript",
+                            "name": "Response"
+                          }
+                        ],
+                        "qualifiedName": "Promise",
+                        "package": "typescript",
+                        "name": "Promise"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "id": 123,
+              "name": "functionsUrl",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isProtected": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/SupabaseClient.ts",
+                  "line": 37,
+                  "character": 12
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 133,
+              "name": "headers",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isProtected": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/SupabaseClient.ts",
+                  "line": 44,
+                  "character": 12
+                }
+              ],
+              "type": {
+                "type": "reflection",
+                "declaration": {
+                  "id": 134,
+                  "name": "__type",
+                  "kind": 65536,
+                  "kindString": "Type literal",
+                  "flags": {},
+                  "indexSignature": {
+                    "id": 135,
+                    "name": "__index",
+                    "kind": 8192,
+                    "kindString": "Index signature",
+                    "flags": {},
+                    "parameters": [
+                      {
+                        "id": 136,
+                        "name": "key",
+                        "kind": 32768,
+                        "flags": {},
+                        "type": {
+                          "type": "intrinsic",
+                          "name": "string"
+                        }
+                      }
+                    ],
+                    "type": {
+                      "type": "intrinsic",
+                      "name": "string"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "id": 125,
+              "name": "multiTab",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isProtected": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/SupabaseClient.ts",
+                  "line": 39,
+                  "character": 12
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "boolean"
+              }
+            },
+            {
+              "id": 124,
+              "name": "realtime",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isProtected": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/SupabaseClient.ts",
+                  "line": 38,
+                  "character": 12
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "qualifiedName": "RealtimeClient",
+                "package": "@supabase/realtime-js",
+                "name": "default"
+              }
+            },
+            {
+              "id": 120,
+              "name": "realtimeUrl",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isProtected": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/SupabaseClient.ts",
+                  "line": 34,
+                  "character": 12
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 119,
+              "name": "restUrl",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isProtected": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/SupabaseClient.ts",
+                  "line": 33,
+                  "character": 12
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 118,
+              "name": "schema",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isProtected": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/SupabaseClient.ts",
+                  "line": 32,
+                  "character": 12
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 132,
+              "name": "shouldThrowOnError",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isProtected": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/SupabaseClient.ts",
+                  "line": 42,
+                  "character": 12
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "boolean"
+              }
+            },
+            {
+              "id": 122,
+              "name": "storageUrl",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isProtected": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/SupabaseClient.ts",
+                  "line": 36,
+                  "character": 12
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 138,
+              "name": "supabaseKey",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isProtected": true
+              },
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 137,
+              "name": "supabaseUrl",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isProtected": true
+              },
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 139,
+              "name": "functions",
+              "kind": 262144,
+              "kindString": "Accessor",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "src/SupabaseClient.ts",
+                  "line": 106,
+                  "character": 6
+                }
+              ],
+              "getSignature": [
+                {
+                  "id": 140,
+                  "name": "functions",
+                  "kind": 524288,
+                  "kindString": "Get signature",
+                  "flags": {},
+                  "comment": {
+                    "shortText": "Supabase Functions allows you to deploy and invoke edge functions."
+                  },
+                  "type": {
+                    "type": "reference",
+                    "qualifiedName": "FunctionsClient",
+                    "package": "@supabase/functions-js",
+                    "name": "FunctionsClient"
+                  }
+                }
+              ]
+            },
+            {
+              "id": 141,
+              "name": "storage",
+              "kind": 262144,
+              "kindString": "Accessor",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "src/SupabaseClient.ts",
+                  "line": 116,
+                  "character": 6
+                }
+              ],
+              "getSignature": [
+                {
+                  "id": 142,
+                  "name": "storage",
+                  "kind": 524288,
+                  "kindString": "Get signature",
+                  "flags": {},
+                  "comment": {
+                    "shortText": "Supabase Storage allows you to manage user-generated content, such as photos or videos."
+                  },
+                  "type": {
+                    "type": "reference",
+                    "qualifiedName": "StorageClient",
+                    "package": "@supabase/storage-js",
+                    "name": "StorageClient"
+                  }
+                }
+              ]
+            },
+            {
+              "id": 171,
+              "name": "_closeSubscription",
+              "kind": 2048,
+              "kindString": "Method",
+              "flags": {
+                "isPrivate": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/SupabaseClient.ts",
+                  "line": 194,
+                  "character": 16
+                }
+              ],
+              "signatures": [
+                {
+                  "id": 172,
+                  "name": "_closeSubscription",
+                  "kind": 4096,
+                  "kindString": "Call signature",
+                  "flags": {},
+                  "parameters": [
+                    {
+                      "id": 173,
+                      "name": "subscription",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {},
+                      "type": {
+                        "type": "reference",
+                        "qualifiedName": "RealtimeSubscription",
+                        "package": "@supabase/realtime-js",
+                        "name": "default"
+                      }
+                    }
+                  ],
+                  "type": {
+                    "type": "reference",
+                    "typeArguments": [
+                      {
+                        "type": "reflection",
+                        "declaration": {
+                          "id": 174,
+                          "name": "__type",
+                          "kind": 65536,
+                          "kindString": "Type literal",
+                          "flags": {},
+                          "children": [
+                            {
+                              "id": 175,
+                              "name": "error",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {},
+                              "sources": [
+                                {
+                                  "fileName": "src/SupabaseClient.ts",
+                                  "line": 196,
+                                  "character": 15
+                                }
+                              ],
+                              "type": {
+                                "type": "union",
+                                "types": [
+                                  {
+                                    "type": "literal",
+                                    "value": null
+                                  },
+                                  {
+                                    "type": "reference",
+                                    "qualifiedName": "Error",
+                                    "package": "typescript",
+                                    "name": "Error"
+                                  }
+                                ]
+                              }
+                            }
+                          ],
+                          "groups": [
+                            {
+                              "title": "Properties",
+                              "kind": 1024,
+                              "children": [175]
+                            }
+                          ]
+                        }
+                      }
+                    ],
+                    "qualifiedName": "Promise",
+                    "package": "typescript",
+                    "name": "Promise"
+                  }
+                }
+              ]
+            },
+            {
+              "id": 191,
+              "name": "_getAuthHeaders",
+              "kind": 2048,
+              "kindString": "Method",
+              "flags": {
+                "isPrivate": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/SupabaseClient.ts",
+                  "line": 271,
+                  "character": 10
+                }
+              ],
+              "signatures": [
+                {
+                  "id": 192,
+                  "name": "_getAuthHeaders",
+                  "kind": 4096,
+                  "kindString": "Call signature",
+                  "flags": {},
+                  "type": {
+                    "type": "reference",
+                    "id": 74,
+                    "name": "GenericObject"
+                  }
+                }
+              ]
+            },
+            {
+              "id": 197,
+              "name": "_handleTokenChanged",
+              "kind": 2048,
+              "kindString": "Method",
+              "flags": {
+                "isPrivate": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/SupabaseClient.ts",
+                  "line": 313,
+                  "character": 10
+                }
+              ],
+              "signatures": [
+                {
+                  "id": 198,
+                  "name": "_handleTokenChanged",
+                  "kind": 4096,
+                  "kindString": "Call signature",
+                  "flags": {},
+                  "parameters": [
+                    {
+                      "id": 199,
+                      "name": "event",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {},
+                      "type": {
+                        "type": "reference",
+                        "qualifiedName": "AuthChangeEvent",
+                        "package": "@supabase/gotrue-js",
+                        "name": "AuthChangeEvent"
+                      }
+                    },
+                    {
+                      "id": 200,
+                      "name": "token",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {},
+                      "type": {
+                        "type": "union",
+                        "types": [
+                          {
+                            "type": "intrinsic",
+                            "name": "undefined"
+                          },
+                          {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "id": 201,
+                      "name": "source",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {},
+                      "type": {
+                        "type": "union",
+                        "types": [
+                          {
+                            "type": "literal",
+                            "value": "CLIENT"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "STORAGE"
+                          }
+                        ]
+                      }
+                    }
+                  ],
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "void"
+                  }
+                }
+              ]
+            },
+            {
+              "id": 189,
+              "name": "_initPostgRESTClient",
+              "kind": 2048,
+              "kindString": "Method",
+              "flags": {
+                "isPrivate": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/SupabaseClient.ts",
+                  "line": 262,
+                  "character": 10
+                }
+              ],
+              "signatures": [
+                {
+                  "id": 190,
+                  "name": "_initPostgRESTClient",
+                  "kind": 4096,
+                  "kindString": "Call signature",
+                  "flags": {},
+                  "type": {
+                    "type": "reference",
+                    "qualifiedName": "PostgrestClient",
+                    "package": "@supabase/postgrest-js",
+                    "name": "default"
+                  }
+                }
+              ]
+            },
+            {
+              "id": 186,
+              "name": "_initRealtimeClient",
+              "kind": 2048,
+              "kindString": "Method",
+              "flags": {
+                "isPrivate": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/SupabaseClient.ts",
+                  "line": 255,
+                  "character": 10
+                }
+              ],
+              "signatures": [
+                {
+                  "id": 187,
+                  "name": "_initRealtimeClient",
+                  "kind": 4096,
+                  "kindString": "Call signature",
+                  "flags": {},
+                  "parameters": [
+                    {
+                      "id": 188,
+                      "name": "options",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {
+                        "isOptional": true
+                      },
+                      "type": {
+                        "type": "reference",
+                        "qualifiedName": "Options",
+                        "package": "@supabase/realtime-js",
+                        "name": "Options"
+                      }
+                    }
+                  ],
+                  "type": {
+                    "type": "reference",
+                    "qualifiedName": "RealtimeClient",
+                    "package": "@supabase/realtime-js",
+                    "name": "default"
+                  }
+                }
+              ]
+            },
+            {
+              "id": 183,
+              "name": "_initSupabaseAuthClient",
+              "kind": 2048,
+              "kindString": "Method",
+              "flags": {
+                "isPrivate": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/SupabaseClient.ts",
+                  "line": 228,
+                  "character": 10
+                }
+              ],
+              "signatures": [
+                {
+                  "id": 184,
+                  "name": "_initSupabaseAuthClient",
+                  "kind": 4096,
+                  "kindString": "Call signature",
+                  "flags": {},
+                  "parameters": [
+                    {
+                      "id": 185,
+                      "name": "__namedParameters",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {},
+                      "type": {
+                        "type": "reference",
+                        "id": 79,
+                        "name": "SupabaseClientOptions",
+                        "dereferenced": {
+                          "id": 79,
+                          "name": "SupabaseClientOptions",
+                          "kind": 4194304,
+                          "kindString": "Type alias",
+                          "flags": {},
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 12,
+                              "character": 12
+                            }
+                          ],
+                          "type": {
+                            "type": "reflection",
+                            "declaration": {
+                              "id": 80,
+                              "name": "__type",
+                              "kind": 65536,
+                              "kindString": "Type literal",
+                              "flags": {},
+                              "children": [
+                                {
+                                  "id": 83,
+                                  "name": "autoRefreshToken",
+                                  "kind": 1024,
+                                  "kindString": "Property",
+                                  "flags": {
+                                    "isOptional": true
+                                  },
+                                  "comment": {
+                                    "shortText": "Automatically refreshes the token for logged in users."
+                                  },
+                                  "sources": [
+                                    {
+                                      "fileName": "src/lib/types.ts",
+                                      "line": 24,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  }
+                                },
+                                {
+                                  "id": 91,
+                                  "name": "cookieOptions",
+                                  "kind": 1024,
+                                  "kindString": "Property",
+                                  "flags": {
+                                    "isOptional": true
+                                  },
+                                  "comment": {
+                                    "shortText": "Options passed to the gotrue-js instance"
+                                  },
+                                  "sources": [
+                                    {
+                                      "fileName": "src/lib/types.ts",
+                                      "line": 60,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "indexedAccess",
+                                    "indexType": {
+                                      "type": "literal",
+                                      "value": "cookieOptions"
+                                    },
+                                    "objectType": {
+                                      "type": "reference",
+                                      "id": 73,
+                                      "name": "SupabaseAuthClientOptions"
+                                    }
+                                  }
+                                },
+                                {
+                                  "id": 86,
+                                  "name": "detectSessionInUrl",
+                                  "kind": 1024,
+                                  "kindString": "Property",
+                                  "flags": {
+                                    "isOptional": true
+                                  },
+                                  "comment": {
+                                    "shortText": "Detect a session from the URL. Used for OAuth login callbacks."
+                                  },
+                                  "sources": [
+                                    {
+                                      "fileName": "src/lib/types.ts",
+                                      "line": 36,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  }
+                                },
+                                {
+                                  "id": 89,
+                                  "name": "fetch",
+                                  "kind": 1024,
+                                  "kindString": "Property",
+                                  "flags": {
+                                    "isOptional": true
+                                  },
+                                  "comment": {
+                                    "shortText": "A custom `fetch` implementation."
+                                  },
+                                  "sources": [
+                                    {
+                                      "fileName": "src/lib/types.ts",
+                                      "line": 50,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "reference",
+                                    "id": 78,
+                                    "name": "Fetch"
+                                  }
+                                },
+                                {
+                                  "id": 82,
+                                  "name": "headers",
+                                  "kind": 1024,
+                                  "kindString": "Property",
+                                  "flags": {
+                                    "isOptional": true
+                                  },
+                                  "comment": {
+                                    "shortText": "Optional headers for initializing the client."
+                                  },
+                                  "sources": [
+                                    {
+                                      "fileName": "src/lib/types.ts",
+                                      "line": 20,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "reference",
+                                    "id": 74,
+                                    "name": "GenericObject"
+                                  }
+                                },
+                                {
+                                  "id": 87,
+                                  "name": "localStorage",
+                                  "kind": 1024,
+                                  "kindString": "Property",
+                                  "flags": {
+                                    "isOptional": true
+                                  },
+                                  "comment": {
+                                    "shortText": "A storage provider. Used to store the logged in session."
+                                  },
+                                  "sources": [
+                                    {
+                                      "fileName": "src/lib/types.ts",
+                                      "line": 40,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "indexedAccess",
+                                    "indexType": {
+                                      "type": "literal",
+                                      "value": "localStorage"
+                                    },
+                                    "objectType": {
+                                      "type": "reference",
+                                      "id": 73,
+                                      "name": "SupabaseAuthClientOptions"
+                                    }
+                                  }
+                                },
+                                {
+                                  "id": 84,
+                                  "name": "multiTab",
+                                  "kind": 1024,
+                                  "kindString": "Property",
+                                  "flags": {
+                                    "isOptional": true
+                                  },
+                                  "comment": {
+                                    "shortText": "Allows to enable/disable multi-tab/window events"
+                                  },
+                                  "sources": [
+                                    {
+                                      "fileName": "src/lib/types.ts",
+                                      "line": 28,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  }
+                                },
+                                {
+                                  "id": 85,
+                                  "name": "persistSession",
+                                  "kind": 1024,
+                                  "kindString": "Property",
+                                  "flags": {
+                                    "isOptional": true
+                                  },
+                                  "comment": {
+                                    "shortText": "Whether to persist a logged in session to storage."
+                                  },
+                                  "sources": [
+                                    {
+                                      "fileName": "src/lib/types.ts",
+                                      "line": 32,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  }
+                                },
+                                {
+                                  "id": 88,
+                                  "name": "realtime",
+                                  "kind": 1024,
+                                  "kindString": "Property",
+                                  "flags": {
+                                    "isOptional": true
+                                  },
+                                  "comment": {
+                                    "shortText": "Options passed to the realtime-js instance"
+                                  },
+                                  "sources": [
+                                    {
+                                      "fileName": "src/lib/types.ts",
+                                      "line": 45,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "reference",
+                                    "qualifiedName": "Options",
+                                    "package": "@supabase/realtime-js",
+                                    "name": "RealtimeClientOptions"
+                                  }
+                                },
+                                {
+                                  "id": 81,
+                                  "name": "schema",
+                                  "kind": 1024,
+                                  "kindString": "Property",
+                                  "flags": {
+                                    "isOptional": true
+                                  },
+                                  "comment": {
+                                    "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to 'public'."
+                                  },
+                                  "sources": [
+                                    {
+                                      "fileName": "src/lib/types.ts",
+                                      "line": 16,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  }
+                                },
+                                {
+                                  "id": 90,
+                                  "name": "shouldThrowOnError",
+                                  "kind": 1024,
+                                  "kindString": "Property",
+                                  "flags": {
+                                    "isOptional": true
+                                  },
+                                  "comment": {
+                                    "shortText": "Throw errors, instead of returning them."
+                                  },
+                                  "sources": [
+                                    {
+                                      "fileName": "src/lib/types.ts",
+                                      "line": 55,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  }
+                                }
+                              ],
+                              "groups": [
+                                {
+                                  "title": "Properties",
+                                  "kind": 1024,
+                                  "children": [83, 91, 86, 89, 82, 87, 84, 85, 88, 81, 90]
+                                }
+                              ],
+                              "sources": [
+                                {
+                                  "fileName": "src/lib/types.ts",
+                                  "line": 12,
+                                  "character": 36
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ],
+                  "type": {
+                    "type": "reference",
+                    "name": "SupabaseAuthClient"
+                  }
+                }
+              ]
+            },
+            {
+              "id": 195,
+              "name": "_listenForAuthEvents",
+              "kind": 2048,
+              "kindString": "Method",
+              "flags": {
+                "isPrivate": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/SupabaseClient.ts",
+                  "line": 306,
+                  "character": 10
+                }
+              ],
+              "signatures": [
+                {
+                  "id": 196,
+                  "name": "_listenForAuthEvents",
+                  "kind": 4096,
+                  "kindString": "Call signature",
+                  "flags": {},
+                  "type": {
+                    "type": "union",
+                    "types": [
+                      {
+                        "type": "literal",
+                        "value": null
+                      },
+                      {
+                        "type": "reference",
+                        "qualifiedName": "Subscription",
+                        "package": "@supabase/gotrue-js",
+                        "name": "Subscription"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "id": 193,
+              "name": "_listenForMultiTabEvents",
+              "kind": 2048,
+              "kindString": "Method",
+              "flags": {
+                "isPrivate": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/SupabaseClient.ts",
+                  "line": 279,
+                  "character": 10
+                }
+              ],
+              "signatures": [
+                {
+                  "id": 194,
+                  "name": "_listenForMultiTabEvents",
+                  "kind": 4096,
+                  "kindString": "Call signature",
+                  "flags": {},
+                  "type": {
+                    "type": "union",
+                    "types": [
+                      {
+                        "type": "literal",
+                        "value": null
+                      },
+                      {
+                        "type": "intrinsic",
+                        "name": "void"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "id": 176,
+              "name": "_unsubscribeSubscription",
+              "kind": 2048,
+              "kindString": "Method",
+              "flags": {
+                "isPrivate": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/SupabaseClient.ts",
+                  "line": 209,
+                  "character": 10
+                }
+              ],
+              "signatures": [
+                {
+                  "id": 177,
+                  "name": "_unsubscribeSubscription",
+                  "kind": 4096,
+                  "kindString": "Call signature",
+                  "flags": {},
+                  "parameters": [
+                    {
+                      "id": 178,
+                      "name": "subscription",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {},
+                      "type": {
+                        "type": "reference",
+                        "qualifiedName": "RealtimeSubscription",
+                        "package": "@supabase/realtime-js",
+                        "name": "default"
+                      }
+                    }
+                  ],
+                  "type": {
+                    "type": "reference",
+                    "typeArguments": [
+                      {
+                        "type": "reflection",
+                        "declaration": {
+                          "id": 179,
+                          "name": "__type",
+                          "kind": 65536,
+                          "kindString": "Type literal",
+                          "flags": {},
+                          "children": [
+                            {
+                              "id": 180,
+                              "name": "error",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {},
+                              "sources": [
+                                {
+                                  "fileName": "src/SupabaseClient.ts",
+                                  "line": 211,
+                                  "character": 15
+                                }
+                              ],
+                              "type": {
+                                "type": "union",
+                                "types": [
+                                  {
+                                    "type": "literal",
+                                    "value": null
+                                  },
+                                  {
+                                    "type": "reference",
+                                    "qualifiedName": "Error",
+                                    "package": "typescript",
+                                    "name": "Error"
+                                  }
+                                ]
+                              }
+                            }
+                          ],
+                          "groups": [
+                            {
+                              "title": "Properties",
+                              "kind": 1024,
+                              "children": [180]
+                            }
+                          ]
+                        }
+                      }
+                    ],
+                    "qualifiedName": "Promise",
+                    "package": "typescript",
+                    "name": "Promise"
+                  }
+                }
+              ]
+            },
+            {
+              "id": 143,
+              "name": "from",
+              "kind": 2048,
+              "kindString": "Method",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "src/SupabaseClient.ts",
+                  "line": 125,
+                  "character": 2
+                }
+              ],
+              "signatures": [
+                {
+                  "id": 144,
+                  "name": "from",
+                  "kind": 4096,
+                  "kindString": "Call signature",
+                  "flags": {},
+                  "comment": {
+                    "shortText": "Perform a table operation."
+                  },
+                  "typeParameter": [
+                    {
+                      "id": 145,
+                      "name": "T",
+                      "kind": 131072,
+                      "kindString": "Type parameter",
+                      "flags": {},
+                      "default": {
+                        "type": "intrinsic",
+                        "name": "any"
+                      }
+                    }
+                  ],
+                  "parameters": [
+                    {
+                      "id": 146,
+                      "name": "table",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {},
+                      "comment": {
+                        "shortText": "The table name to operate on.\n"
+                      },
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
+                    }
+                  ],
+                  "type": {
+                    "type": "reference",
+                    "id": 2,
+                    "typeArguments": [
+                      {
+                        "type": "reference",
+                        "id": 145,
+                        "name": "T"
+                      }
+                    ],
+                    "name": "SupabaseQueryBuilder"
+                  }
+                }
+              ]
+            },
+            {
+              "id": 181,
+              "name": "getSubscriptions",
+              "kind": 2048,
+              "kindString": "Method",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "src/SupabaseClient.ts",
+                  "line": 224,
+                  "character": 2
+                }
+              ],
+              "signatures": [
+                {
+                  "id": 182,
+                  "name": "getSubscriptions",
+                  "kind": 4096,
+                  "kindString": "Call signature",
+                  "flags": {},
+                  "comment": {
+                    "shortText": "Returns an array of all your subscriptions."
+                  },
+                  "type": {
+                    "type": "array",
+                    "elementType": {
+                      "type": "reference",
+                      "qualifiedName": "RealtimeSubscription",
+                      "package": "@supabase/realtime-js",
+                      "name": "default"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "id": 156,
+              "name": "removeAllSubscriptions",
+              "kind": 2048,
+              "kindString": "Method",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "src/SupabaseClient.ts",
+                  "line": 162,
+                  "character": 8
+                }
+              ],
+              "signatures": [
+                {
+                  "id": 157,
+                  "name": "removeAllSubscriptions",
+                  "kind": 4096,
+                  "kindString": "Call signature",
+                  "flags": {},
+                  "comment": {
+                    "shortText": "Closes and removes all subscriptions and returns a list of removed\nsubscriptions and their errors."
+                  },
+                  "type": {
+                    "type": "reference",
+                    "typeArguments": [
+                      {
+                        "type": "array",
+                        "elementType": {
+                          "type": "reflection",
+                          "declaration": {
+                            "id": 158,
+                            "name": "__type",
+                            "kind": 65536,
+                            "kindString": "Type literal",
+                            "flags": {},
+                            "children": [
+                              {
+                                "id": 159,
+                                "name": "data",
+                                "kind": 1024,
+                                "kindString": "Property",
+                                "flags": {},
+                                "sources": [
+                                  {
+                                    "fileName": "src/SupabaseClient.ts",
+                                    "line": 163,
+                                    "character": 6
+                                  }
+                                ],
+                                "type": {
+                                  "type": "reflection",
+                                  "declaration": {
+                                    "id": 160,
+                                    "name": "__type",
+                                    "kind": 65536,
+                                    "kindString": "Type literal",
+                                    "flags": {},
+                                    "children": [
+                                      {
+                                        "id": 161,
+                                        "name": "subscription",
+                                        "kind": 1024,
+                                        "kindString": "Property",
+                                        "flags": {},
+                                        "sources": [
+                                          {
+                                            "fileName": "src/SupabaseClient.ts",
+                                            "line": 163,
+                                            "character": 14
+                                          }
+                                        ],
+                                        "type": {
+                                          "type": "reference",
+                                          "qualifiedName": "RealtimeSubscription",
+                                          "package": "@supabase/realtime-js",
+                                          "name": "default"
+                                        }
+                                      }
+                                    ],
+                                    "groups": [
+                                      {
+                                        "title": "Properties",
+                                        "kind": 1024,
+                                        "children": [161]
+                                      }
+                                    ]
+                                  }
+                                }
+                              },
+                              {
+                                "id": 162,
+                                "name": "error",
+                                "kind": 1024,
+                                "kindString": "Property",
+                                "flags": {},
+                                "sources": [
+                                  {
+                                    "fileName": "src/SupabaseClient.ts",
+                                    "line": 163,
+                                    "character": 52
+                                  }
+                                ],
+                                "type": {
+                                  "type": "union",
+                                  "types": [
+                                    {
+                                      "type": "literal",
+                                      "value": null
+                                    },
+                                    {
+                                      "type": "reference",
+                                      "qualifiedName": "Error",
+                                      "package": "typescript",
+                                      "name": "Error"
+                                    }
+                                  ]
+                                }
+                              }
+                            ],
+                            "groups": [
+                              {
+                                "title": "Properties",
+                                "kind": 1024,
+                                "children": [159, 162]
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ],
+                    "qualifiedName": "Promise",
+                    "package": "typescript",
+                    "name": "Promise"
+                  }
+                }
+              ]
+            },
+            {
+              "id": 163,
+              "name": "removeSubscription",
+              "kind": 2048,
+              "kindString": "Method",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "src/SupabaseClient.ts",
+                  "line": 182,
+                  "character": 8
+                }
+              ],
+              "signatures": [
+                {
+                  "id": 164,
+                  "name": "removeSubscription",
+                  "kind": 4096,
+                  "kindString": "Call signature",
+                  "flags": {},
+                  "comment": {
+                    "shortText": "Closes and removes a subscription and returns the number of open subscriptions."
+                  },
+                  "parameters": [
+                    {
+                      "id": 165,
+                      "name": "subscription",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {},
+                      "comment": {
+                        "shortText": "The subscription you want to close and remove.\n"
+                      },
+                      "type": {
+                        "type": "reference",
+                        "qualifiedName": "RealtimeSubscription",
+                        "package": "@supabase/realtime-js",
+                        "name": "default"
+                      }
+                    }
+                  ],
+                  "type": {
+                    "type": "reference",
+                    "typeArguments": [
+                      {
+                        "type": "reflection",
+                        "declaration": {
+                          "id": 166,
+                          "name": "__type",
+                          "kind": 65536,
+                          "kindString": "Type literal",
+                          "flags": {},
+                          "children": [
+                            {
+                              "id": 167,
+                              "name": "data",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {},
+                              "sources": [
+                                {
+                                  "fileName": "src/SupabaseClient.ts",
+                                  "line": 184,
+                                  "character": 15
+                                }
+                              ],
+                              "type": {
+                                "type": "reflection",
+                                "declaration": {
+                                  "id": 168,
+                                  "name": "__type",
+                                  "kind": 65536,
+                                  "kindString": "Type literal",
+                                  "flags": {},
+                                  "children": [
+                                    {
+                                      "id": 169,
+                                      "name": "openSubscriptions",
+                                      "kind": 1024,
+                                      "kindString": "Property",
+                                      "flags": {},
+                                      "sources": [
+                                        {
+                                          "fileName": "src/SupabaseClient.ts",
+                                          "line": 184,
+                                          "character": 23
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "number"
+                                      }
+                                    }
+                                  ],
+                                  "groups": [
+                                    {
+                                      "title": "Properties",
+                                      "kind": 1024,
+                                      "children": [169]
+                                    }
+                                  ]
+                                }
+                              }
+                            },
+                            {
+                              "id": 170,
+                              "name": "error",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {},
+                              "sources": [
+                                {
+                                  "fileName": "src/SupabaseClient.ts",
+                                  "line": 184,
+                                  "character": 52
+                                }
+                              ],
+                              "type": {
+                                "type": "union",
+                                "types": [
+                                  {
+                                    "type": "literal",
+                                    "value": null
+                                  },
+                                  {
+                                    "type": "reference",
+                                    "qualifiedName": "Error",
+                                    "package": "typescript",
+                                    "name": "Error"
+                                  }
+                                ]
+                              }
+                            }
+                          ],
+                          "groups": [
+                            {
+                              "title": "Properties",
+                              "kind": 1024,
+                              "children": [167, 170]
+                            }
+                          ]
+                        }
+                      }
+                    ],
+                    "qualifiedName": "Promise",
+                    "package": "typescript",
+                    "name": "Promise"
+                  }
+                }
+              ]
+            },
+            {
+              "id": 147,
+              "name": "rpc",
+              "kind": 2048,
+              "kindString": "Method",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "src/SupabaseClient.ts",
+                  "line": 146,
+                  "character": 2
+                }
+              ],
+              "signatures": [
+                {
+                  "id": 148,
+                  "name": "rpc",
+                  "kind": 4096,
+                  "kindString": "Call signature",
+                  "flags": {},
+                  "comment": {
+                    "shortText": "Perform a function call."
+                  },
+                  "typeParameter": [
+                    {
+                      "id": 149,
+                      "name": "T",
+                      "kind": 131072,
+                      "kindString": "Type parameter",
+                      "flags": {},
+                      "default": {
+                        "type": "intrinsic",
+                        "name": "any"
+                      }
+                    }
+                  ],
+                  "parameters": [
+                    {
+                      "id": 150,
+                      "name": "fn",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {},
+                      "comment": {
+                        "shortText": "The function name to call."
+                      },
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
+                    },
+                    {
+                      "id": 151,
+                      "name": "params",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {
+                        "isOptional": true
+                      },
+                      "comment": {
+                        "shortText": "The parameters to pass to the function call."
+                      },
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "object"
+                      }
+                    },
+                    {
+                      "id": 152,
+                      "name": "__namedParameters",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {},
+                      "type": {
+                        "type": "reflection",
+                        "declaration": {
+                          "id": 153,
+                          "name": "__type",
+                          "kind": 65536,
+                          "kindString": "Type literal",
+                          "flags": {},
+                          "children": [
+                            {
+                              "id": 155,
+                              "name": "count",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isOptional": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "src/SupabaseClient.ts",
+                                  "line": 152,
+                                  "character": 25
+                                }
+                              ],
+                              "type": {
+                                "type": "union",
+                                "types": [
+                                  {
+                                    "type": "literal",
+                                    "value": null
+                                  },
+                                  {
+                                    "type": "literal",
+                                    "value": "exact"
+                                  },
+                                  {
+                                    "type": "literal",
+                                    "value": "planned"
+                                  },
+                                  {
+                                    "type": "literal",
+                                    "value": "estimated"
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "id": 154,
+                              "name": "head",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isOptional": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "src/SupabaseClient.ts",
+                                  "line": 152,
+                                  "character": 9
+                                }
+                              ],
+                              "type": {
+                                "type": "intrinsic",
+                                "name": "boolean"
+                              }
+                            }
+                          ],
+                          "groups": [
+                            {
+                              "title": "Properties",
+                              "kind": 1024,
+                              "children": [155, 154]
+                            }
+                          ]
+                        }
+                      },
+                      "defaultValue": "{}"
+                    }
+                  ],
+                  "type": {
+                    "type": "reference",
+                    "typeArguments": [
+                      {
+                        "type": "reference",
+                        "id": 149,
+                        "name": "T"
+                      }
+                    ],
+                    "qualifiedName": "PostgrestFilterBuilder",
+                    "package": "@supabase/postgrest-js",
+                    "name": "default"
+                  }
+                }
+              ]
+            }
+          ],
+          "groups": [
+            {
+              "title": "Constructors",
+              "kind": 512,
+              "children": [112]
+            },
+            {
+              "title": "Properties",
+              "kind": 1024,
+              "children": [
+                117, 121, 131, 126, 123, 133, 125, 124, 120, 119, 118, 132, 122, 138, 137
+              ]
+            },
+            {
+              "title": "Accessors",
+              "kind": 262144,
+              "children": [139, 141]
+            },
+            {
+              "title": "Methods",
+              "kind": 2048,
+              "children": [171, 191, 197, 189, 186, 183, 195, 193, 176, 143, 181, 156, 163, 147]
+            }
+          ],
+          "sources": [
+            {
+              "fileName": "src/SupabaseClient.ts",
+              "line": 26,
+              "character": 21
+            }
+          ]
+        },
+        {
+          "id": 106,
+          "name": "createClient",
+          "kind": 64,
+          "kindString": "Function",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/index.ts",
+              "line": 16,
+              "character": 6
+            }
+          ],
+          "signatures": [
+            {
+              "id": 107,
+              "name": "createClient",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "comment": {
+                "shortText": "Creates a new Supabase Client."
+              },
+              "parameters": [
+                {
+                  "id": 108,
+                  "name": "supabaseUrl",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "string"
+                  }
+                },
+                {
+                  "id": 109,
+                  "name": "supabaseKey",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "string"
+                  }
+                },
+                {
+                  "id": 110,
+                  "name": "options",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "reference",
+                    "id": 79,
+                    "name": "SupabaseClientOptions",
+                    "dereferenced": {
+                      "id": 79,
+                      "name": "SupabaseClientOptions",
+                      "kind": 4194304,
+                      "kindString": "Type alias",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 12,
+                          "character": 12
+                        }
+                      ],
+                      "type": {
+                        "type": "reflection",
+                        "declaration": {
+                          "id": 80,
+                          "name": "__type",
+                          "kind": 65536,
+                          "kindString": "Type literal",
+                          "flags": {},
+                          "children": [
+                            {
+                              "id": 83,
+                              "name": "autoRefreshToken",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isOptional": true
+                              },
+                              "comment": {
+                                "shortText": "Automatically refreshes the token for logged in users."
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "src/lib/types.ts",
+                                  "line": 24,
+                                  "character": 2
+                                }
+                              ],
+                              "type": {
+                                "type": "intrinsic",
+                                "name": "boolean"
+                              }
+                            },
+                            {
+                              "id": 91,
+                              "name": "cookieOptions",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isOptional": true
+                              },
+                              "comment": {
+                                "shortText": "Options passed to the gotrue-js instance"
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "src/lib/types.ts",
+                                  "line": 60,
+                                  "character": 2
+                                }
+                              ],
+                              "type": {
+                                "type": "indexedAccess",
+                                "indexType": {
+                                  "type": "literal",
+                                  "value": "cookieOptions"
+                                },
+                                "objectType": {
+                                  "type": "reference",
+                                  "id": 73,
+                                  "name": "SupabaseAuthClientOptions"
+                                }
+                              }
+                            },
+                            {
+                              "id": 86,
+                              "name": "detectSessionInUrl",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isOptional": true
+                              },
+                              "comment": {
+                                "shortText": "Detect a session from the URL. Used for OAuth login callbacks."
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "src/lib/types.ts",
+                                  "line": 36,
+                                  "character": 2
+                                }
+                              ],
+                              "type": {
+                                "type": "intrinsic",
+                                "name": "boolean"
+                              }
+                            },
+                            {
+                              "id": 89,
+                              "name": "fetch",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isOptional": true
+                              },
+                              "comment": {
+                                "shortText": "A custom `fetch` implementation."
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "src/lib/types.ts",
+                                  "line": 50,
+                                  "character": 2
+                                }
+                              ],
+                              "type": {
+                                "type": "reference",
+                                "id": 78,
+                                "name": "Fetch"
+                              }
+                            },
+                            {
+                              "id": 82,
+                              "name": "headers",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isOptional": true
+                              },
+                              "comment": {
+                                "shortText": "Optional headers for initializing the client."
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "src/lib/types.ts",
+                                  "line": 20,
+                                  "character": 2
+                                }
+                              ],
+                              "type": {
+                                "type": "reference",
+                                "id": 74,
+                                "name": "GenericObject"
+                              }
+                            },
+                            {
+                              "id": 87,
+                              "name": "localStorage",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isOptional": true
+                              },
+                              "comment": {
+                                "shortText": "A storage provider. Used to store the logged in session."
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "src/lib/types.ts",
+                                  "line": 40,
+                                  "character": 2
+                                }
+                              ],
+                              "type": {
+                                "type": "indexedAccess",
+                                "indexType": {
+                                  "type": "literal",
+                                  "value": "localStorage"
+                                },
+                                "objectType": {
+                                  "type": "reference",
+                                  "id": 73,
+                                  "name": "SupabaseAuthClientOptions"
+                                }
+                              }
+                            },
+                            {
+                              "id": 84,
+                              "name": "multiTab",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isOptional": true
+                              },
+                              "comment": {
+                                "shortText": "Allows to enable/disable multi-tab/window events"
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "src/lib/types.ts",
+                                  "line": 28,
+                                  "character": 2
+                                }
+                              ],
+                              "type": {
+                                "type": "intrinsic",
+                                "name": "boolean"
+                              }
+                            },
+                            {
+                              "id": 85,
+                              "name": "persistSession",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isOptional": true
+                              },
+                              "comment": {
+                                "shortText": "Whether to persist a logged in session to storage."
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "src/lib/types.ts",
+                                  "line": 32,
+                                  "character": 2
+                                }
+                              ],
+                              "type": {
+                                "type": "intrinsic",
+                                "name": "boolean"
+                              }
+                            },
+                            {
+                              "id": 88,
+                              "name": "realtime",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isOptional": true
+                              },
+                              "comment": {
+                                "shortText": "Options passed to the realtime-js instance"
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "src/lib/types.ts",
+                                  "line": 45,
+                                  "character": 2
+                                }
+                              ],
+                              "type": {
+                                "type": "reference",
+                                "qualifiedName": "Options",
+                                "package": "@supabase/realtime-js",
+                                "name": "RealtimeClientOptions"
+                              }
+                            },
+                            {
+                              "id": 81,
+                              "name": "schema",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isOptional": true
+                              },
+                              "comment": {
+                                "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to 'public'."
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "src/lib/types.ts",
+                                  "line": 16,
+                                  "character": 2
+                                }
+                              ],
+                              "type": {
+                                "type": "intrinsic",
+                                "name": "string"
+                              }
+                            },
+                            {
+                              "id": 90,
+                              "name": "shouldThrowOnError",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isOptional": true
+                              },
+                              "comment": {
+                                "shortText": "Throw errors, instead of returning them."
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "src/lib/types.ts",
+                                  "line": 55,
+                                  "character": 2
+                                }
+                              ],
+                              "type": {
+                                "type": "intrinsic",
+                                "name": "boolean"
+                              }
+                            }
+                          ],
+                          "groups": [
+                            {
+                              "title": "Properties",
+                              "kind": 1024,
+                              "children": [83, 91, 86, 89, 82, 87, 84, 85, 88, 81, 90]
+                            }
+                          ],
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 12,
+                              "character": 36
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "id": 111,
+                "name": "default"
+              }
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "References",
+          "kind": 16777216,
+          "children": [202, 203]
+        },
+        {
+          "title": "Classes",
+          "kind": 128,
+          "children": [111]
+        },
+        {
+          "title": "Functions",
+          "kind": 64,
+          "children": [106]
+        }
+      ],
+      "sources": [
+        {
+          "fileName": "src/index.ts",
+          "line": 1,
+          "character": 0
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "name": "lib/SupabaseQueryBuilder",
+      "kind": 2,
+      "kindString": "Module",
+      "flags": {},
+      "children": [
+        {
+          "id": 2,
+          "name": "SupabaseQueryBuilder",
+          "kind": 128,
+          "kindString": "Class",
+          "flags": {},
+          "children": [
+            {
+              "id": 3,
+              "name": "constructor",
+              "kind": 512,
+              "kindString": "Constructor",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "src/lib/SupabaseQueryBuilder.ts",
+                  "line": 13,
+                  "character": 2
+                }
+              ],
+              "signatures": [
+                {
+                  "id": 4,
+                  "name": "new SupabaseQueryBuilder",
+                  "kind": 16384,
+                  "kindString": "Constructor signature",
+                  "flags": {},
+                  "typeParameter": [
+                    {
+                      "id": 5,
+                      "name": "T",
+                      "kind": 131072,
+                      "kindString": "Type parameter",
+                      "flags": {}
+                    }
+                  ],
+                  "parameters": [
+                    {
+                      "id": 6,
+                      "name": "url",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {},
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
+                    },
+                    {
+                      "id": 7,
+                      "name": "__namedParameters",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {},
+                      "type": {
+                        "type": "reflection",
+                        "declaration": {
+                          "id": 8,
+                          "name": "__type",
+                          "kind": 65536,
+                          "kindString": "Type literal",
+                          "flags": {},
+                          "children": [
+                            {
+                              "id": 13,
+                              "name": "fetch",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isOptional": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "src/lib/SupabaseQueryBuilder.ts",
+                                  "line": 27,
+                                  "character": 6
+                                }
+                              ],
+                              "type": {
+                                "type": "reflection",
+                                "declaration": {
+                                  "id": 14,
+                                  "name": "__type",
+                                  "kind": 65536,
+                                  "kindString": "Type literal",
+                                  "flags": {},
+                                  "signatures": [
+                                    {
+                                      "id": 15,
+                                      "name": "__type",
+                                      "kind": 4096,
+                                      "kindString": "Call signature",
+                                      "flags": {},
+                                      "parameters": [
+                                        {
+                                          "id": 16,
+                                          "name": "input",
+                                          "kind": 32768,
+                                          "kindString": "Parameter",
+                                          "flags": {},
+                                          "type": {
+                                            "type": "union",
+                                            "types": [
+                                              {
+                                                "type": "reference",
+                                                "qualifiedName": "RequestInfo",
+                                                "package": "typescript",
+                                                "name": "RequestInfo"
+                                              },
+                                              {
+                                                "type": "reference",
+                                                "qualifiedName": "URL",
+                                                "package": "typescript",
+                                                "name": "URL"
+                                              }
+                                            ]
+                                          }
+                                        },
+                                        {
+                                          "id": 17,
+                                          "name": "init",
+                                          "kind": 32768,
+                                          "kindString": "Parameter",
+                                          "flags": {
+                                            "isOptional": true
+                                          },
+                                          "type": {
+                                            "type": "reference",
+                                            "qualifiedName": "RequestInit",
+                                            "package": "typescript",
+                                            "name": "RequestInit"
+                                          }
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "reference",
+                                        "typeArguments": [
+                                          {
+                                            "type": "reference",
+                                            "qualifiedName": "Response",
+                                            "package": "typescript",
+                                            "name": "Response"
+                                          }
+                                        ],
+                                        "qualifiedName": "Promise",
+                                        "package": "typescript",
+                                        "name": "Promise"
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            },
+                            {
+                              "id": 9,
+                              "name": "headers",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isOptional": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "src/lib/SupabaseQueryBuilder.ts",
+                                  "line": 23,
+                                  "character": 6
+                                }
+                              ],
+                              "type": {
+                                "type": "reference",
+                                "id": 74,
+                                "name": "GenericObject"
+                              }
+                            },
+                            {
+                              "id": 11,
+                              "name": "realtime",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {},
+                              "sources": [
+                                {
+                                  "fileName": "src/lib/SupabaseQueryBuilder.ts",
+                                  "line": 25,
+                                  "character": 6
+                                }
+                              ],
+                              "type": {
+                                "type": "reference",
+                                "qualifiedName": "RealtimeClient",
+                                "package": "@supabase/realtime-js",
+                                "name": "default"
+                              }
+                            },
+                            {
+                              "id": 10,
+                              "name": "schema",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {},
+                              "sources": [
+                                {
+                                  "fileName": "src/lib/SupabaseQueryBuilder.ts",
+                                  "line": 24,
+                                  "character": 6
+                                }
+                              ],
+                              "type": {
+                                "type": "intrinsic",
+                                "name": "string"
+                              }
+                            },
+                            {
+                              "id": 18,
+                              "name": "shouldThrowOnError",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isOptional": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "src/lib/SupabaseQueryBuilder.ts",
+                                  "line": 28,
+                                  "character": 6
+                                }
+                              ],
+                              "type": {
+                                "type": "intrinsic",
+                                "name": "boolean"
+                              }
+                            },
+                            {
+                              "id": 12,
+                              "name": "table",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {},
+                              "sources": [
+                                {
+                                  "fileName": "src/lib/SupabaseQueryBuilder.ts",
+                                  "line": 26,
+                                  "character": 6
+                                }
+                              ],
+                              "type": {
+                                "type": "intrinsic",
+                                "name": "string"
+                              }
+                            }
+                          ],
+                          "groups": [
+                            {
+                              "title": "Properties",
+                              "kind": 1024,
+                              "children": [13, 9, 11, 10, 18, 12]
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  "type": {
+                    "type": "reference",
+                    "id": 2,
+                    "typeArguments": [
+                      {
+                        "type": "reference",
+                        "id": 5,
+                        "name": "T"
+                      }
+                    ],
+                    "name": "SupabaseQueryBuilder"
+                  },
+                  "overwrites": {
+                    "type": "reference",
+                    "name": "PostgrestQueryBuilder<T>.constructor"
+                  }
+                }
+              ],
+              "overwrites": {
+                "type": "reference",
+                "name": "PostgrestQueryBuilder<T>.constructor"
+              }
+            },
+            {
+              "id": 21,
+              "name": "_headers",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isPrivate": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/SupabaseQueryBuilder.ts",
+                  "line": 9,
+                  "character": 10
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "id": 74,
+                "name": "GenericObject"
+              }
+            },
+            {
+              "id": 20,
+              "name": "_realtime",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isPrivate": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/SupabaseQueryBuilder.ts",
+                  "line": 8,
+                  "character": 10
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "qualifiedName": "RealtimeClient",
+                "package": "@supabase/realtime-js",
+                "name": "default"
+              }
+            },
+            {
+              "id": 22,
+              "name": "_schema",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isPrivate": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/SupabaseQueryBuilder.ts",
+                  "line": 10,
+                  "character": 10
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 19,
+              "name": "_subscription",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isPrivate": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/SupabaseQueryBuilder.ts",
+                  "line": 7,
+                  "character": 10
+                }
+              ],
+              "type": {
+                "type": "union",
+                "types": [
+                  {
+                    "type": "literal",
+                    "value": null
+                  },
+                  {
+                    "type": "reference",
+                    "id": 33,
+                    "name": "SupabaseRealtimeClient"
+                  }
+                ]
+              },
+              "defaultValue": "null"
+            },
+            {
+              "id": 23,
+              "name": "_table",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isPrivate": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/SupabaseQueryBuilder.ts",
+                  "line": 11,
+                  "character": 10
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 24,
+              "name": "on",
+              "kind": 2048,
+              "kindString": "Method",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "src/lib/SupabaseQueryBuilder.ts",
+                  "line": 44,
+                  "character": 2
+                }
+              ],
+              "signatures": [
+                {
+                  "id": 25,
+                  "name": "on",
+                  "kind": 4096,
+                  "kindString": "Call signature",
+                  "flags": {},
+                  "comment": {
+                    "shortText": "Subscribe to realtime changes in your database."
+                  },
+                  "parameters": [
+                    {
+                      "id": 26,
+                      "name": "event",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {},
+                      "comment": {
+                        "shortText": "The database event which you would like to receive updates for, or you can use the special wildcard `*` to listen to all changes."
+                      },
+                      "type": {
+                        "type": "reference",
+                        "id": 102,
+                        "name": "SupabaseEventTypes",
+                        "dereferenced": {
+                          "id": 102,
+                          "name": "SupabaseEventTypes",
+                          "kind": 4194304,
+                          "kindString": "Type alias",
+                          "flags": {},
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 75,
+                              "character": 12
+                            }
+                          ],
+                          "type": {
+                            "type": "union",
+                            "types": [
+                              {
+                                "type": "literal",
+                                "value": "INSERT"
+                              },
+                              {
+                                "type": "literal",
+                                "value": "UPDATE"
+                              },
+                              {
+                                "type": "literal",
+                                "value": "DELETE"
+                              },
+                              {
+                                "type": "literal",
+                                "value": "*"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "id": 27,
+                      "name": "callback",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {},
+                      "comment": {
+                        "shortText": "A callback that will handle the payload that is sent whenever your database changes.\n"
+                      },
+                      "type": {
+                        "type": "reflection",
+                        "declaration": {
+                          "id": 28,
+                          "name": "__type",
+                          "kind": 65536,
+                          "kindString": "Type literal",
+                          "flags": {},
+                          "signatures": [
+                            {
+                              "id": 29,
+                              "name": "__type",
+                              "kind": 4096,
+                              "kindString": "Call signature",
+                              "flags": {},
+                              "parameters": [
+                                {
+                                  "id": 30,
+                                  "name": "payload",
+                                  "kind": 32768,
+                                  "kindString": "Parameter",
+                                  "flags": {},
+                                  "type": {
+                                    "type": "reference",
+                                    "id": 92,
+                                    "typeArguments": [
+                                      {
+                                        "type": "reference",
+                                        "id": 5,
+                                        "name": "T"
+                                      }
+                                    ],
+                                    "name": "SupabaseRealtimePayload"
+                                  }
+                                }
+                              ],
+                              "type": {
+                                "type": "intrinsic",
+                                "name": "void"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  "type": {
+                    "type": "reference",
+                    "id": 33,
+                    "name": "SupabaseRealtimeClient"
+                  }
+                }
+              ]
+            }
+          ],
+          "groups": [
+            {
+              "title": "Constructors",
+              "kind": 512,
+              "children": [3]
+            },
+            {
+              "title": "Properties",
+              "kind": 1024,
+              "children": [21, 20, 22, 19, 23]
+            },
+            {
+              "title": "Methods",
+              "kind": 2048,
+              "children": [24]
+            }
+          ],
+          "sources": [
+            {
+              "fileName": "src/lib/SupabaseQueryBuilder.ts",
+              "line": 6,
+              "character": 13
+            }
+          ],
+          "typeParameter": [
+            {
+              "id": 31,
+              "name": "T",
+              "kind": 131072,
+              "kindString": "Type parameter",
+              "flags": {}
+            }
+          ],
+          "extendedTypes": [
+            {
+              "type": "reference",
+              "typeArguments": [
+                {
+                  "type": "reference",
+                  "id": 5,
+                  "name": "T"
+                }
+              ],
+              "qualifiedName": "PostgrestQueryBuilder",
+              "package": "@supabase/postgrest-js",
+              "name": "default"
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "Classes",
+          "kind": 128,
+          "children": [2]
+        }
+      ],
+      "sources": [
+        {
+          "fileName": "src/lib/SupabaseQueryBuilder.ts",
+          "line": 1,
+          "character": 0
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "name": "lib/SupabaseRealtimeClient",
+      "kind": 2,
+      "kindString": "Module",
+      "flags": {},
+      "children": [
+        {
+          "id": 33,
+          "name": "SupabaseRealtimeClient",
+          "kind": 128,
+          "kindString": "Class",
+          "flags": {},
+          "children": [
+            {
+              "id": 34,
+              "name": "constructor",
+              "kind": 512,
+              "kindString": "Constructor",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "src/lib/SupabaseRealtimeClient.ts",
+                  "line": 7,
+                  "character": 2
+                }
+              ],
+              "signatures": [
+                {
+                  "id": 35,
+                  "name": "new SupabaseRealtimeClient",
+                  "kind": 16384,
+                  "kindString": "Constructor signature",
+                  "flags": {},
+                  "parameters": [
+                    {
+                      "id": 36,
+                      "name": "socket",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {},
+                      "type": {
+                        "type": "reference",
+                        "qualifiedName": "RealtimeClient",
+                        "package": "@supabase/realtime-js",
+                        "name": "default"
+                      }
+                    },
+                    {
+                      "id": 37,
+                      "name": "headers",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {},
+                      "type": {
+                        "type": "reference",
+                        "id": 74,
+                        "name": "GenericObject",
+                        "dereferenced": {
+                          "id": 74,
+                          "name": "GenericObject",
+                          "kind": 4194304,
+                          "kindString": "Type alias",
+                          "flags": {},
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 8,
+                              "character": 12
+                            }
+                          ],
+                          "type": {
+                            "type": "reflection",
+                            "declaration": {
+                              "id": 75,
+                              "name": "__type",
+                              "kind": 65536,
+                              "kindString": "Type literal",
+                              "flags": {},
+                              "sources": [
+                                {
+                                  "fileName": "src/lib/types.ts",
+                                  "line": 8,
+                                  "character": 28
+                                }
+                              ],
+                              "indexSignature": {
+                                "id": 76,
+                                "name": "__index",
+                                "kind": 8192,
+                                "kindString": "Index signature",
+                                "flags": {},
+                                "parameters": [
+                                  {
+                                    "id": 77,
+                                    "name": "key",
+                                    "kind": 32768,
+                                    "flags": {},
+                                    "type": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    }
+                                  }
+                                ],
+                                "type": {
+                                  "type": "intrinsic",
+                                  "name": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "id": 38,
+                      "name": "schema",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {},
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
+                    },
+                    {
+                      "id": 39,
+                      "name": "tableName",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {},
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
+                    }
+                  ],
+                  "type": {
+                    "type": "reference",
+                    "id": 33,
+                    "name": "SupabaseRealtimeClient"
+                  }
+                }
+              ]
+            },
+            {
+              "id": 40,
+              "name": "subscription",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "src/lib/SupabaseRealtimeClient.ts",
+                  "line": 5,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "qualifiedName": "RealtimeSubscription",
+                "package": "@supabase/realtime-js",
+                "name": "default"
+              }
+            },
+            {
+              "id": 41,
+              "name": "getPayloadRecords",
+              "kind": 2048,
+              "kindString": "Method",
+              "flags": {
+                "isPrivate": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/SupabaseRealtimeClient.ts",
+                  "line": 19,
+                  "character": 10
+                }
+              ],
+              "signatures": [
+                {
+                  "id": 42,
+                  "name": "getPayloadRecords",
+                  "kind": 4096,
+                  "kindString": "Call signature",
+                  "flags": {},
+                  "parameters": [
+                    {
+                      "id": 43,
+                      "name": "payload",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {},
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "any"
+                      }
+                    }
+                  ],
+                  "type": {
+                    "type": "reflection",
+                    "declaration": {
+                      "id": 44,
+                      "name": "__type",
+                      "kind": 65536,
+                      "kindString": "Type literal",
+                      "flags": {},
+                      "children": [
+                        {
+                          "id": 45,
+                          "name": "new",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {},
+                          "sources": [
+                            {
+                              "fileName": "src/lib/SupabaseRealtimeClient.ts",
+                              "line": 21,
+                              "character": 6
+                            }
+                          ],
+                          "type": {
+                            "type": "reflection",
+                            "declaration": {
+                              "id": 46,
+                              "name": "__type",
+                              "kind": 65536,
+                              "kindString": "Type literal",
+                              "flags": {}
+                            }
+                          },
+                          "defaultValue": "{}"
+                        },
+                        {
+                          "id": 47,
+                          "name": "old",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {},
+                          "sources": [
+                            {
+                              "fileName": "src/lib/SupabaseRealtimeClient.ts",
+                              "line": 22,
+                              "character": 6
+                            }
+                          ],
+                          "type": {
+                            "type": "reflection",
+                            "declaration": {
+                              "id": 48,
+                              "name": "__type",
+                              "kind": 65536,
+                              "kindString": "Type literal",
+                              "flags": {}
+                            }
+                          },
+                          "defaultValue": "{}"
+                        }
+                      ],
+                      "groups": [
+                        {
+                          "title": "Properties",
+                          "kind": 1024,
+                          "children": [45, 47]
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "id": 49,
+              "name": "on",
+              "kind": 2048,
+              "kindString": "Method",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "src/lib/SupabaseRealtimeClient.ts",
+                  "line": 42,
+                  "character": 2
+                }
+              ],
+              "signatures": [
+                {
+                  "id": 50,
+                  "name": "on",
+                  "kind": 4096,
+                  "kindString": "Call signature",
+                  "flags": {},
+                  "comment": {
+                    "shortText": "The event you want to listen to."
+                  },
+                  "parameters": [
+                    {
+                      "id": 51,
+                      "name": "event",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {},
+                      "comment": {
+                        "shortText": "The event"
+                      },
+                      "type": {
+                        "type": "reference",
+                        "id": 102,
+                        "name": "SupabaseEventTypes",
+                        "dereferenced": {
+                          "id": 102,
+                          "name": "SupabaseEventTypes",
+                          "kind": 4194304,
+                          "kindString": "Type alias",
+                          "flags": {},
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 75,
+                              "character": 12
+                            }
+                          ],
+                          "type": {
+                            "type": "union",
+                            "types": [
+                              {
+                                "type": "literal",
+                                "value": "INSERT"
+                              },
+                              {
+                                "type": "literal",
+                                "value": "UPDATE"
+                              },
+                              {
+                                "type": "literal",
+                                "value": "DELETE"
+                              },
+                              {
+                                "type": "literal",
+                                "value": "*"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "id": 52,
+                      "name": "callback",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {},
+                      "comment": {
+                        "shortText": "A callback function that is called whenever the event occurs.\n"
+                      },
+                      "type": {
+                        "type": "reflection",
+                        "declaration": {
+                          "id": 53,
+                          "name": "__type",
+                          "kind": 65536,
+                          "kindString": "Type literal",
+                          "flags": {},
+                          "signatures": [
+                            {
+                              "id": 54,
+                              "name": "__type",
+                              "kind": 4096,
+                              "kindString": "Call signature",
+                              "flags": {},
+                              "parameters": [
+                                {
+                                  "id": 55,
+                                  "name": "payload",
+                                  "kind": 32768,
+                                  "kindString": "Parameter",
+                                  "flags": {},
+                                  "type": {
+                                    "type": "reference",
+                                    "id": 92,
+                                    "typeArguments": [
+                                      {
+                                        "type": "intrinsic",
+                                        "name": "any"
+                                      }
+                                    ],
+                                    "name": "SupabaseRealtimePayload"
+                                  }
+                                }
+                              ],
+                              "type": {
+                                "type": "intrinsic",
+                                "name": "void"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  "type": {
+                    "type": "reference",
+                    "id": 33,
+                    "name": "SupabaseRealtimeClient"
+                  }
+                }
+              ]
+            },
+            {
+              "id": 56,
+              "name": "subscribe",
+              "kind": 2048,
+              "kindString": "Method",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "src/lib/SupabaseRealtimeClient.ts",
+                  "line": 64,
+                  "character": 2
+                }
+              ],
+              "signatures": [
+                {
+                  "id": 57,
+                  "name": "subscribe",
+                  "kind": 4096,
+                  "kindString": "Call signature",
+                  "flags": {},
+                  "comment": {
+                    "shortText": "Enables the subscription."
+                  },
+                  "parameters": [
+                    {
+                      "id": 58,
+                      "name": "callback",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {},
+                      "type": {
+                        "type": "reference",
+                        "qualifiedName": "Function",
+                        "package": "typescript",
+                        "name": "Function"
+                      },
+                      "defaultValue": "..."
+                    }
+                  ],
+                  "type": {
+                    "type": "reference",
+                    "qualifiedName": "RealtimeSubscription",
+                    "package": "@supabase/realtime-js",
+                    "name": "default"
+                  }
+                }
+              ]
+            }
+          ],
+          "groups": [
+            {
+              "title": "Constructors",
+              "kind": 512,
+              "children": [34]
+            },
+            {
+              "title": "Properties",
+              "kind": 1024,
+              "children": [40]
+            },
+            {
+              "title": "Methods",
+              "kind": 2048,
+              "children": [41, 49, 56]
+            }
+          ],
+          "sources": [
+            {
+              "fileName": "src/lib/SupabaseRealtimeClient.ts",
+              "line": 4,
+              "character": 13
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "Classes",
+          "kind": 128,
+          "children": [33]
+        }
+      ],
+      "sources": [
+        {
+          "fileName": "src/lib/SupabaseRealtimeClient.ts",
+          "line": 1,
+          "character": 0
+        }
+      ]
+    },
+    {
+      "id": 59,
+      "name": "lib/constants",
+      "kind": 2,
+      "kindString": "Module",
+      "flags": {},
+      "children": [
+        {
+          "id": 60,
+          "name": "DEFAULT_HEADERS",
+          "kind": 32,
+          "kindString": "Variable",
+          "flags": {
+            "isConst": true
+          },
+          "sources": [
+            {
+              "fileName": "src/lib/constants.ts",
+              "line": 3,
+              "character": 13
+            }
+          ],
+          "type": {
+            "type": "reflection",
+            "declaration": {
+              "id": 61,
+              "name": "__type",
+              "kind": 65536,
+              "kindString": "Type literal",
+              "flags": {},
+              "children": [
+                {
+                  "id": 62,
+                  "name": "X-Client-Info",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {},
+                  "sources": [
+                    {
+                      "fileName": "src/lib/constants.ts",
+                      "line": 3,
+                      "character": 33
+                    }
+                  ],
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "string"
+                  },
+                  "defaultValue": "..."
+                }
+              ],
+              "groups": [
+                {
+                  "title": "Properties",
+                  "kind": 1024,
+                  "children": [62]
+                }
+              ]
+            }
+          },
+          "defaultValue": "..."
+        },
+        {
+          "id": 63,
+          "name": "STORAGE_KEY",
+          "kind": 32,
+          "kindString": "Variable",
+          "flags": {
+            "isConst": true
+          },
+          "sources": [
+            {
+              "fileName": "src/lib/constants.ts",
+              "line": 4,
+              "character": 13
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": "supabase.auth.token"
+          },
+          "defaultValue": "'supabase.auth.token'"
+        }
+      ],
+      "groups": [
+        {
+          "title": "Variables",
+          "kind": 32,
+          "children": [60, 63]
+        }
+      ],
+      "sources": [
+        {
+          "fileName": "src/lib/constants.ts",
+          "line": 2,
+          "character": 0
+        }
+      ]
+    },
+    {
+      "id": 64,
+      "name": "lib/helpers",
+      "kind": 2,
+      "kindString": "Module",
+      "flags": {},
+      "children": [
+        {
+          "id": 70,
+          "name": "isBrowser",
+          "kind": 64,
+          "kindString": "Function",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/lib/helpers.ts",
+              "line": 15,
+              "character": 13
+            }
+          ],
+          "signatures": [
+            {
+              "id": 71,
+              "name": "isBrowser",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "intrinsic",
+                "name": "boolean"
+              }
+            }
+          ]
+        },
+        {
+          "id": 67,
+          "name": "stripTrailingSlash",
+          "kind": 64,
+          "kindString": "Function",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/lib/helpers.ts",
+              "line": 11,
+              "character": 16
+            }
+          ],
+          "signatures": [
+            {
+              "id": 68,
+              "name": "stripTrailingSlash",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 69,
+                  "name": "url",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "string"
+                  }
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            }
+          ]
+        },
+        {
+          "id": 65,
+          "name": "uuid",
+          "kind": 64,
+          "kindString": "Function",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/lib/helpers.ts",
+              "line": 3,
+              "character": 16
+            }
+          ],
+          "signatures": [
+            {
+              "id": 66,
+              "name": "uuid",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "Functions",
+          "kind": 64,
+          "children": [70, 67, 65]
+        }
+      ],
+      "sources": [
+        {
+          "fileName": "src/lib/helpers.ts",
+          "line": 3,
+          "character": 0
+        }
+      ]
+    },
+    {
+      "id": 72,
+      "name": "lib/types",
+      "kind": 2,
+      "kindString": "Module",
+      "flags": {},
+      "children": [
+        {
+          "id": 73,
+          "name": "SupabaseAuthClientOptions",
+          "kind": 256,
+          "kindString": "Interface",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/lib/types.ts",
+              "line": 6,
+              "character": 17
+            }
+          ],
+          "extendedTypes": [
+            {
+              "type": "reference",
+              "name": "GoTrueClientOptions"
+            }
+          ]
+        },
+        {
+          "id": 78,
+          "name": "Fetch",
+          "kind": 4194304,
+          "kindString": "Type alias",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/lib/types.ts",
+              "line": 10,
+              "character": 12
+            }
+          ],
+          "type": {
+            "type": "query",
+            "queryType": {
+              "type": "reference",
+              "id": 14,
+              "qualifiedName": "fetch",
+              "package": "typescript",
+              "name": "fetch"
+            }
+          }
+        },
+        {
+          "id": 74,
+          "name": "GenericObject",
+          "kind": 4194304,
+          "kindString": "Type alias",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/lib/types.ts",
+              "line": 8,
+              "character": 12
+            }
+          ],
+          "type": {
+            "type": "reflection",
+            "declaration": {
+              "id": 75,
+              "name": "__type",
+              "kind": 65536,
+              "kindString": "Type literal",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 8,
+                  "character": 28
+                }
+              ],
+              "indexSignature": {
+                "id": 76,
+                "name": "__index",
+                "kind": 8192,
+                "kindString": "Index signature",
+                "flags": {},
+                "parameters": [
+                  {
+                    "id": 77,
+                    "name": "key",
+                    "kind": 32768,
+                    "flags": {},
+                    "type": {
+                      "type": "intrinsic",
+                      "name": "string"
+                    }
+                  }
+                ],
+                "type": {
+                  "type": "intrinsic",
+                  "name": "string"
+                }
+              }
+            }
+          }
+        },
+        {
+          "id": 79,
+          "name": "SupabaseClientOptions",
+          "kind": 4194304,
+          "kindString": "Type alias",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/lib/types.ts",
+              "line": 12,
+              "character": 12
+            }
+          ],
+          "type": {
+            "type": "reflection",
+            "declaration": {
+              "id": 80,
+              "name": "__type",
+              "kind": 65536,
+              "kindString": "Type literal",
+              "flags": {},
+              "children": [
+                {
+                  "id": 83,
+                  "name": "autoRefreshToken",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "comment": {
+                    "shortText": "Automatically refreshes the token for logged in users."
+                  },
+                  "sources": [
+                    {
+                      "fileName": "src/lib/types.ts",
+                      "line": 24,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "boolean"
+                  }
+                },
+                {
+                  "id": 91,
+                  "name": "cookieOptions",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "comment": {
+                    "shortText": "Options passed to the gotrue-js instance"
+                  },
+                  "sources": [
+                    {
+                      "fileName": "src/lib/types.ts",
+                      "line": 60,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "indexedAccess",
+                    "indexType": {
+                      "type": "literal",
+                      "value": "cookieOptions"
+                    },
+                    "objectType": {
+                      "type": "reference",
+                      "id": 73,
+                      "name": "SupabaseAuthClientOptions"
+                    }
+                  }
+                },
+                {
+                  "id": 86,
+                  "name": "detectSessionInUrl",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "comment": {
+                    "shortText": "Detect a session from the URL. Used for OAuth login callbacks."
+                  },
+                  "sources": [
+                    {
+                      "fileName": "src/lib/types.ts",
+                      "line": 36,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "boolean"
+                  }
+                },
+                {
+                  "id": 89,
+                  "name": "fetch",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "comment": {
+                    "shortText": "A custom `fetch` implementation."
+                  },
+                  "sources": [
+                    {
+                      "fileName": "src/lib/types.ts",
+                      "line": 50,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "reference",
+                    "id": 78,
+                    "name": "Fetch"
+                  }
+                },
+                {
+                  "id": 82,
+                  "name": "headers",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "comment": {
+                    "shortText": "Optional headers for initializing the client."
+                  },
+                  "sources": [
+                    {
+                      "fileName": "src/lib/types.ts",
+                      "line": 20,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "reference",
+                    "id": 74,
+                    "name": "GenericObject"
+                  }
+                },
+                {
+                  "id": 87,
+                  "name": "localStorage",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "comment": {
+                    "shortText": "A storage provider. Used to store the logged in session."
+                  },
+                  "sources": [
+                    {
+                      "fileName": "src/lib/types.ts",
+                      "line": 40,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "indexedAccess",
+                    "indexType": {
+                      "type": "literal",
+                      "value": "localStorage"
+                    },
+                    "objectType": {
+                      "type": "reference",
+                      "id": 73,
+                      "name": "SupabaseAuthClientOptions"
+                    }
+                  }
+                },
+                {
+                  "id": 84,
+                  "name": "multiTab",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "comment": {
+                    "shortText": "Allows to enable/disable multi-tab/window events"
+                  },
+                  "sources": [
+                    {
+                      "fileName": "src/lib/types.ts",
+                      "line": 28,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "boolean"
+                  }
+                },
+                {
+                  "id": 85,
+                  "name": "persistSession",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "comment": {
+                    "shortText": "Whether to persist a logged in session to storage."
+                  },
+                  "sources": [
+                    {
+                      "fileName": "src/lib/types.ts",
+                      "line": 32,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "boolean"
+                  }
+                },
+                {
+                  "id": 88,
+                  "name": "realtime",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "comment": {
+                    "shortText": "Options passed to the realtime-js instance"
+                  },
+                  "sources": [
+                    {
+                      "fileName": "src/lib/types.ts",
+                      "line": 45,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "reference",
+                    "qualifiedName": "Options",
+                    "package": "@supabase/realtime-js",
+                    "name": "RealtimeClientOptions"
+                  }
+                },
+                {
+                  "id": 81,
+                  "name": "schema",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "comment": {
+                    "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to 'public'."
+                  },
+                  "sources": [
+                    {
+                      "fileName": "src/lib/types.ts",
+                      "line": 16,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "string"
+                  }
+                },
+                {
+                  "id": 90,
+                  "name": "shouldThrowOnError",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "comment": {
+                    "shortText": "Throw errors, instead of returning them."
+                  },
+                  "sources": [
+                    {
+                      "fileName": "src/lib/types.ts",
+                      "line": 55,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "boolean"
+                  }
+                }
+              ],
+              "groups": [
+                {
+                  "title": "Properties",
+                  "kind": 1024,
+                  "children": [83, 91, 86, 89, 82, 87, 84, 85, 88, 81, 90]
+                }
+              ],
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 12,
+                  "character": 36
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": 102,
+          "name": "SupabaseEventTypes",
+          "kind": 4194304,
+          "kindString": "Type alias",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/lib/types.ts",
+              "line": 75,
+              "character": 12
+            }
+          ],
+          "type": {
+            "type": "union",
+            "types": [
+              {
+                "type": "literal",
+                "value": "INSERT"
+              },
+              {
+                "type": "literal",
+                "value": "UPDATE"
+              },
+              {
+                "type": "literal",
+                "value": "DELETE"
+              },
+              {
+                "type": "literal",
+                "value": "*"
+              }
+            ]
+          }
+        },
+        {
+          "id": 92,
+          "name": "SupabaseRealtimePayload",
+          "kind": 4194304,
+          "kindString": "Type alias",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/lib/types.ts",
+              "line": 63,
+              "character": 12
+            }
+          ],
+          "typeParameter": [
+            {
+              "id": 101,
+              "name": "T",
+              "kind": 131072,
+              "kindString": "Type parameter",
+              "flags": {}
+            }
+          ],
+          "type": {
+            "type": "reflection",
+            "declaration": {
+              "id": 93,
+              "name": "__type",
+              "kind": 65536,
+              "kindString": "Type literal",
+              "flags": {},
+              "children": [
+                {
+                  "id": 94,
+                  "name": "commit_timestamp",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {},
+                  "sources": [
+                    {
+                      "fileName": "src/lib/types.ts",
+                      "line": 64,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "string"
+                  }
+                },
+                {
+                  "id": 100,
+                  "name": "errors",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {},
+                  "sources": [
+                    {
+                      "fileName": "src/lib/types.ts",
+                      "line": 72,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "union",
+                    "types": [
+                      {
+                        "type": "array",
+                        "elementType": {
+                          "type": "intrinsic",
+                          "name": "string"
+                        }
+                      },
+                      {
+                        "type": "literal",
+                        "value": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "id": 95,
+                  "name": "eventType",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {},
+                  "sources": [
+                    {
+                      "fileName": "src/lib/types.ts",
+                      "line": 65,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "union",
+                    "types": [
+                      {
+                        "type": "literal",
+                        "value": "INSERT"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "UPDATE"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "DELETE"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "id": 98,
+                  "name": "new",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {},
+                  "comment": {
+                    "shortText": "The new record. Present for 'INSERT' and 'UPDATE' events."
+                  },
+                  "sources": [
+                    {
+                      "fileName": "src/lib/types.ts",
+                      "line": 69,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "reference",
+                    "id": 101,
+                    "name": "T"
+                  }
+                },
+                {
+                  "id": 99,
+                  "name": "old",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {},
+                  "comment": {
+                    "shortText": "The previous record. Present for 'UPDATE' and 'DELETE' events."
+                  },
+                  "sources": [
+                    {
+                      "fileName": "src/lib/types.ts",
+                      "line": 71,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "reference",
+                    "id": 101,
+                    "name": "T"
+                  }
+                },
+                {
+                  "id": 96,
+                  "name": "schema",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {},
+                  "sources": [
+                    {
+                      "fileName": "src/lib/types.ts",
+                      "line": 66,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "string"
+                  }
+                },
+                {
+                  "id": 97,
+                  "name": "table",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {},
+                  "sources": [
+                    {
+                      "fileName": "src/lib/types.ts",
+                      "line": 67,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "string"
+                  }
+                }
+              ],
+              "groups": [
+                {
+                  "title": "Properties",
+                  "kind": 1024,
+                  "children": [94, 100, 95, 98, 99, 96, 97]
+                }
+              ],
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 63,
+                  "character": 41
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "groups": [
+        {
+          "title": "Interfaces",
+          "kind": 256,
+          "children": [73]
+        },
+        {
+          "title": "Type Aliases",
+          "kind": 4194304,
+          "children": [78, 74, 79, 102, 92]
+        }
+      ],
+      "sources": [
+        {
+          "fileName": "src/lib/types.ts",
+          "line": 1,
+          "character": 0
+        }
+      ]
+    },
+    {
+      "id": 103,
+      "name": "lib/version",
+      "kind": 2,
+      "kindString": "Module",
+      "flags": {},
+      "children": [
+        {
+          "id": 104,
+          "name": "version",
+          "kind": 32,
+          "kindString": "Variable",
+          "flags": {
+            "isConst": true
+          },
+          "sources": [
+            {
+              "fileName": "src/lib/version.ts",
+              "line": 1,
+              "character": 13
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": "0.0.0-automated"
+          },
+          "defaultValue": "'0.0.0-automated'"
+        }
+      ],
+      "groups": [
+        {
+          "title": "Variables",
+          "kind": 32,
+          "children": [104]
+        }
+      ],
+      "sources": [
+        {
+          "fileName": "src/lib/version.ts",
+          "line": 1,
+          "character": 0
+        }
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "title": "Modules",
+      "kind": 2,
+      "children": [105, 1, 32, 59, 64, 72, 103]
+    }
+  ]
+}

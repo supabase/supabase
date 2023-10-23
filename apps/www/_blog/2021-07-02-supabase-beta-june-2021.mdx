@@ -1,0 +1,174 @@
+---
+title: Supabase Beta June 2021
+description: Discord Logins, Vercel Integration, Full text search, and OAuth guides.
+author: paul_copplestone
+author_url: https://github.com/kiwicopple
+author_image_url: https://github.com/kiwicopple.png
+authorURL: https://github.com/kiwicopple
+image: 2021-june/release-june-2021.jpg
+thumb: 2021-june/release-june-2021-cover.jpg
+categories:
+  - product
+tags:
+  - release-notes
+date: '2021-06-02'
+toc_depth: 3
+video: https://www.youtube.com/v/m3yRPNyYolk
+---
+
+Supabase is gearing up for another Launch Week on July the 26th. Until then, here's a few new things to try.
+
+### Quick demo
+
+Watch a full demo of this month's releases
+
+<div className="video-container">
+  <iframe
+    className="video-with-border w-full"
+    src="https://www.youtube-nocookie.com/embed/m3yRPNyYolk"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
+## Vercel integration
+
+Vercel just released their new integrations, which means you can now deploy a Postgres database on Supabase directly from your Vercel account.
+Check it out! [vercel.com/integrations/supabase](https://vercel.com/integrations/supabase)
+
+![Supabase Vercel Integration](/images/blog/2021-june/supabase-vercel.png)
+
+## Discord logins are now available
+
+Building a community? There's almost no better tool than Discord (we're even trialling it ourselves).
+If you're building a community product, Discord logins are the perfect option.
+
+![Discord logins](/images/blog/2021-june/supabase-discord.png)
+
+## New Guides
+
+We spent the month building up a new [Guides section](/docs/guides) in our Docs. Here are a few highlights:
+
+### Postgres Full Text Search
+
+Ever wanted to build a Search Engine? We just released a guide which shows you how to implement
+[Full Text Search using Postgres](/docs/guides/database/full-text-search).
+
+![Postgres Full Text Search](/images/blog/2021-june/postgres-fts.png)
+
+### OAuth Guides
+
+We released step-by-step guides to help you set up OAuth with
+[Apple](/docs/guides/auth/social-login/auth-apple),
+[Bitbucket](/docs/guides/auth/social-login/auth-bitbucket),
+[Facebook](/docs/guides/auth/social-login/auth-facebook),
+[GitHub](/docs/guides/auth/social-login/auth-github),
+[GitLab](/docs/guides/auth/social-login/auth-gitlab),
+[Google](/docs/guides/auth/social-login/auth-google), and
+[Twitter](/docs/guides/auth/social-login/auth-twitter).
+
+![Image of Apple's developer Portal](/images/blog/2021-june/apple-developer-portal.png)
+
+### Javascript + Postgres
+
+Did you know that you can use Javascript inside your Postgres database? Here's how, with the
+[`plv8` extension](/docs/guides/database/extensions/plv8).
+
+![Postgres and Javascript with plv8](/images/blog/2021-june/supabase-plv8.png)
+
+## Public Storage Buckets
+
+Want to share all your favourite memes? Now it's even easier with Public Storage Buckets. Simply mark a bucket as
+"Public" and the content will be accessible without a login.
+
+<video width="99%" autoPlay muted playsInline controls={true}>
+  <source src="/images/blog/2021-june/public-buckets.mp4" type="video/mp4" />
+</video>
+
+## Storage upserts
+
+Supabase Storage now supports `upsert`. Shoutout to [@ankitjena](https://github.com/ankitjena) for
+[this Pull Request](https://github.com/supabase/storage-api/pull/32).
+
+![Storage now supports upserts](/images/blog/2021-june/supabase-storage-upsert.png)
+
+## Server restarts
+
+When things go wrong, sometime the best thing you can do is reboot. We released a restart button in the Dashboard,
+the first of many debugging tools we'll be releasing over the next few months.
+
+![You can now restart you Supabase servers](/images/blog/2021-june/server-restarts.png)
+
+## Policy editor
+
+We added a new Table Policy Editor which makes Row Level Security even easier. We even included a few templates to get you started.
+
+![New editor for Row Level Security](/images/blog/2021-june/policy-editor.png)
+
+## Build in Public
+
+We run a weekly 1-hour live stream where we build in public.
+
+- [Build in Public 003](https://youtu.be/a2r-GGILQiA): Redwood PR, GitHub Discussions, Pricing Pages, Postgres Policies, Styling docs
+- [Build in Public 004](https://youtu.be/7yhFmKmplDg): Svelte Quickstart, new `supabase-js` release, monthly GitHub release
+- [Build in Public 006](https://youtu.be/LHYrqBb4q9I): Supabase Studio
+- [Build in Public 007](https://youtu.be/R4gJhX_JFTo): Supabase Studio - API Docs
+
+<div className="video-container">
+  <iframe
+    className="video-with-border w-full"
+    src="https://www.youtube-nocookie.com/embed/LHYrqBb4q9I"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
+## Community
+
+- [@dabit3](https://twitter.com/dabit3) released a complete guide to Supabase on FreeCodeCamp. [Twitter](https://twitter.com/freeCodeCamp/status/1404469119525732357) | [Blog](https://www.freecodecamp.org/news/the-complete-guide-to-full-stack-development-with-supabas/)
+- [@raddevon](https://twitter.com/raddevon) built a social network using Supabase and Vue3. [Twitter](https://twitter.com/raddevon/status/1410401132845801479) | [YouTube](https://www.youtube.com/watch?v=x25a_q0vHUY)
+- [@JonoYeong](https://twitter.com/JonoYeong) built live with Supabase + SvelteKit. [Twitter](https://twitter.com/JonoYeong/status/1409960155093946368) | [Twitch](https://www.twitch.tv/videos/1066520882)
+
+**Supabase GitHub Star Growth**
+
+![14200 stars on GitHub.](/images/blog/2021-june/github-june-2021.png)
+
+<small>
+  Source: <a href="https://repository.surf/supabase">repository.surf/supabase</a>
+</small>
+
+If you want to keep up to date, make sure you [subscribe to our YouTube channel](https://www.youtube.com/c/supabase) or
+[follow us on Twitter](https://twitter.com/supabase).
+
+## External contributions
+
+### PostgREST
+
+- Primarily for Prisma users, we patched PostgREST [openapi-mode](https://github.com/PostgREST/postgrest/pull/1881) to ignore anon privileges for the OpenAPI output.
+  Credit to [@steve-chavez](https://github.com/steve-chavez/).
+- We added better [PostgREST logging](https://github.com/PostgREST/postgrest/pull/1872) to include timestamps for every error
+  Credit to [@steve-chavez](https://github.com/steve-chavez/).
+
+### Auth0
+
+- We fixed a XSS bug in the Auth0 Next.js library. [GitHub](https://github.com/auth0/nextjs-auth0/security/advisories/GHSA-954c-jjx6-cxv7)
+  Credit to [@inian](https://github.com/inian) and [Ishan Patel](https://github.com/git-ishanpatel) (a Supabase community member)
+
+## Coming Next
+
+Launch Week!! Remember that time we did a [Launch Week](/blog/launch-week)? Well we're doing it again at the end of July.
+Strap in, because we're shipping one thing every day for a week.
+
+Let's goooooo.
+
+![Launch week coming up.](/images/blog/supabase-launch-week.png)
+
+### Get started
+
+- Start using Supabase today: [supabase.com/dashboard](https://supabase.com/dashboard/)
+- Make sure to [star us on GitHub](https://github.com/supabase/supabase)
+- Follow us [on Twitter](https://twitter.com/supabase)
+- Subscribe to our [YouTube channel](https://www.youtube.com/c/supabase)
+- Become a [sponsor](https://github.com/sponsors/supabase)

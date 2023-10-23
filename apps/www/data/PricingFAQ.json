@@ -1,0 +1,38 @@
+[
+  {
+    "question": "Can I cap my usage so my bill doesn't run over?",
+    "answer": "Yes. Spend caps are on by default on the Pro plan. You can turn spend caps off for usage beyond the plan limits to pay as you grow."
+  },
+  {
+    "question": "I'm worried I could end up with a huge bill at the end of the month.",
+    "answer": "Spend caps are on by default and you need to toggle them off from your dashboard to enable pay as you grow pricing."
+  },
+  {
+    "question": "When will I be billed?",
+    "answer": "Our Pro plan is charged up front, and billed on a monthly basis. Additional usage costs are also billed at the end of the month."
+  },
+  {
+    "question": "Are you going to change your pricing in the future?",
+    "answer": "Our pricing is in Beta. You can read more about our decisions in our [pricing blog post](/blog/2021/03/29/pricing). Pricing may change in the future, however as a team of developers we are committed to pricing being as developer friendly as possible."
+  },
+  {
+    "question": "What happens if I cancel my subscription?",
+    "answer": "The organization is allocated credits for unused time during the billing month. Those credits can be used for other projects."
+  },
+  {
+    "question": "Do I get a notification if I am approaching my usage limits?",
+    "answer": "Yes, we will email you when you are within 20% of your plan limits."
+  },
+  {
+    "question": "What if I need one project for development and one for production?",
+    "answer": "We are working on multi-environment projects. For now, you can create a project for your development backend and production backend. We give you 2 free projects as part of our free plan. This means you could have a development and a production server as part of your free plan."
+  },
+  {
+    "question": "Can I self-host Supabase for free?",
+    "answer": "Yes, you can use the [Docker setup](https://supabase.com/docs/guides/hosting/docker) or the [Supabase CLI](https://github.com/supabase/cli). [Supabase Studio](https://supabase.com/blog/supabase-studio) is also available in the Docker setup."
+  },
+  {
+    "question": "Can I pause a free project?",
+    "answer": "Yes, you can pause a project at any time. Our Free plan gives you 2 free projects, but you can have as many paused projects as you want. Just pause and unpause them as needed."
+  }
+]

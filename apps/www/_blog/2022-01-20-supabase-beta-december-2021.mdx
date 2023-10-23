@@ -1,0 +1,175 @@
+---
+title: Supabase Beta December 2021
+description: New crypto extension, Postgres videos, and a bunch of cool integrations.
+author: paul_copplestone
+author_url: https://github.com/kiwicopple
+author_image_url: https://github.com/kiwicopple.png
+authorURL: https://github.com/kiwicopple
+image: 2021-dec/release-dec-2021.png
+thumb: 2021-dec/release-dec-2021-cover.png
+categories:
+  - product
+tags:
+  - release-notes
+date: '2022-01-20'
+toc_depth: 3
+video: https://www.youtube.com/v/I6nnp9AINJk
+---
+
+Happy 2022. We're looking forward to a year of shipping product and helping our users build great things!
+
+Here's a bunch of stuff we shipped throughout December...
+
+## Hackathon Winners
+
+We had a ton of awesome projects [submitted for our Holiday Hackdays](/blog/holiday-hackdays-winners-2021), all of the submissions are open source so come and check out the code for some of our top picks!
+
+[![hackathon winners](/images/blog/2021-dec/hackathon.png)](/blog/holiday-hackdays-winners-2021)
+
+## New crypto extension - pg_crypto
+
+We just added pg_sodium as an extension inside all postgres instances.
+Which means you can easily do encryption, decryption, hashing, and cryptographic signing from within your postgres functions and queries.
+Enable it from the Database > Extensions tab in the [Supabase Dashboard](https://supabase.com/dashboard).
+
+[![pg sodium support](/images/blog/2021-dec/pgsodium.png)](https://supabase.com/dashboard)
+
+## PostgreSQL Videos
+
+### Call Postgres functions from JavaScript with RPC
+
+Jon Meyers walks you through how to write more complex queries and logic in your database, and invoke it via the API.
+
+<div className="video-container">
+  <iframe
+    className="video-with-border w-full"
+    src="https://www.youtube-nocookie.com/embed/I6nnp9AINJk"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
+### Call any API using PostgreSQL functions
+
+We recently added the ability to call any external HTTP endpoint from your postgres functions. Jon shows you how!
+
+<div className="video-container">
+  <iframe
+    className="video-with-border w-full"
+    src="https://www.youtube-nocookie.com/embed/rARgrELRCwY"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
+### Create PostgreSQL Functions with Supabase
+
+Triggers allow you to execute SQL in response to any table changes. Learn how to write PostgreSQL triggers with Jon!
+
+<div className="video-container">
+  <iframe
+    className="video-with-border w-full"
+    src="https://www.youtube-nocookie.com/embed/MJZCCpCYEqk"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
+### Hiring
+
+We're Hiring - for a ton of new roles across engineering, marketing, and HR. We hire fully remotely, and you'll get to work alongside some incredible people, on one of the fastest growing open source companies. [See which roles we're hiring for](https://about.supabase.com/careers).
+
+[![supabase is hiring](/images/blog/2021-dec/hiring.png)](https://about.supabase.com/careers)
+
+## Community
+
+There was a lot of activity this month.
+
+### Learn With Jason
+
+Let Jason and Jon show you how to build an app with Next.js and Supabase on top of Netlify!
+
+<div className="video-container">
+  <iframe
+    className="video-with-border w-full"
+    src="https://www.youtube-nocookie.com/embed/8vqY1KT4TLU"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
+### Divjoy integration
+
+Divjoy announced their [Supabase Integration](https://divjoy.com/?database=supabase) - The React codebase generator allows you to choose your stack, choose your template, and generate your codebase.
+
+![pg sodium support](/images/blog/2021-dec/divjoy.png)
+
+### n8n + Supabase
+
+[n8n](https://n8n.io/) added a Supabase node.
+
+<blockquote class="twitter-tweet" data-theme="dark">
+  <p lang="en" dir="ltr">
+    We released n8n@0.158.0 with new nodes for
+    <a href="https://twitter.com/supabase?ref_src=twsrc%5Etfw">@supabase</a>,<a href="https://twitter.com/syncromsp?ref_src=twsrc%5Etfw">
+      @syncromsp
+    </a>, and
+    <a href="https://twitter.com/Microsoft?ref_src=twsrc%5Etfw">@Microsoft</a> Graph Security. We
+    also made improvements to existing nodes ✨
+    <a href="https://t.co/IdeUe4eWBK">pic.twitter.com/IdeUe4eWBK</a>
+  </p>
+  &mdash; n8n.io (@n8n_io) <a href="https://twitter.com/n8n_io/status/1480502781320572931?ref_src=twsrc%5Etfw">January 10, 2022</a>
+</blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+### Python Upgrades
+
+The Community released a whole bunch of updated Python libs including: supabase v0.0.4 - gotrue v0.3.0 - realtime v0.0.4 - storage3 v0.1.0
+
+See the full list of [community supported libs](https://github.com/supabase-community/).
+
+[![supabase community libs](/images/blog/2021-dec/python.png)](https://github.com/supabase-community/)
+
+### Twitter
+
+We're having a 24/7\*365 meme-fest on [Twitter](https://twitter.com/supabase)
+
+<blockquote class="twitter-tweet" data-theme="dark">
+  <p lang="en" dir="ltr">
+    invest in good relationships <a href="https://t.co/bGiBE7FRFQ">pic.twitter.com/bGiBE7FRFQ</a>
+  </p>
+  &mdash; Supabase (@supabase) <a href="https://twitter.com/supabase/status/1475876907212316678?ref_src=twsrc%5Etfw">December 28, 2021</a>
+</blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+### TikTok
+
+Check us out on [TikTok](https://www.tiktok.com/@supabase.com?fromUrl=%2Fsupabase.com&lang=en)
+
+[![tiktok](/images/blog/2021-dec/tiktok.png)](https://www.tiktok.com/@supabase.com?fromUrl=%2Fsupabase.com&lang=en)
+
+### Swag Store
+
+A reminder that we have a [Supabase Swag Store](https://supabase.store)
+
+[![swag store](/images/blog/2021-dec/swag.jpg)](https://supabase.store)
+
+### GitHub
+
+We hit 26K stars!!: [github.com/supabase/supabase](http://github.com/supabase/supabase)
+
+![GitHub](/images/blog/2021-dec/stars.png)
+
+Source: [repository.surf/supabase](https://repository.surf/supabase)
+
+Check out some of our other community stats in our latest [Series A Blog Post](/blog/supabase-series-a).
+
+## Get started
+
+- Start using Supabase today: **[supabase.com/dashboard](https://supabase.com/dashboard/)**
+- Make sure to **[star us on GitHub](https://github.com/supabase/supabase)**
+- Follow us **[on Twitter](https://twitter.com/supabase)**
+- Subscribe to our **[YouTube channel](https://www.youtube.com/c/supabase)**
+- Become a **[sponsor](https://github.com/sponsors/supabase)**

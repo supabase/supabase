@@ -1,0 +1,354 @@
+[
+  {
+    "author_id": "angelico_de_los_reyes",
+    "author": "Angelico de los Reyes",
+    "position": "Engineering",
+    "author_url": "https://github.com/dragarcia",
+    "author_image_url": "https://github.com/dragarcia.png"
+  },
+  {
+    "author_id": "ant_wilson",
+    "author": "Ant Wilson",
+    "position": "CTO and Co-Founder",
+    "author_url": "https://github.com/awalias",
+    "author_image_url": "https://github.com/awalias.png"
+  },
+  {
+    "author_id": "soedirgo",
+    "author": "Bobbie Soedirgo",
+    "username": "soedirgo",
+    "position": "Engineering",
+    "author_url": "https://github.com/soedirgo",
+    "author_image_url": "https://github.com/soedirgo.png"
+  },
+  {
+    "author_id": "div_arora",
+    "author": "Div Arora",
+    "username": "darora",
+    "position": "Engineering",
+    "author_url": "https://github.com/darora",
+    "author_image_url": "https://github.com/darora.png"
+  },
+  {
+    "author_id": "fracek",
+    "author": "Francesco Ceccon",
+    "username": "fracek",
+    "position": "Engineering",
+    "author_url": "https://github.com/fracek",
+    "author_image_url": "https://github.com/fracek.png"
+  },
+  {
+    "author_id": "gurjeet",
+    "author": "Gurjeet Singh",
+    "username": "gurjeet",
+    "position": "Engineering",
+    "author_url": "https://github.com/gurjeet",
+    "author_image_url": "https://github.com/gurjeet.png"
+  },
+  {
+    "author_id": "inian",
+    "author": "Inian Parameshwaran",
+    "username": "inian",
+    "position": "Engineering",
+    "author_url": "https://twitter.com/everConfusedGuy",
+    "author_image_url": "https://avatars.githubusercontent.com/u/2155545?v=4"
+  },
+  {
+    "author_id": "kangmingtay",
+    "author": "Kang Ming Tay",
+    "username": "kangmingtay",
+    "position": "Engineering",
+    "author_url": "https://github.com/kangmingtay",
+    "author_image_url": "https://github.com/kangmingtay.png"
+  },
+  {
+    "author_id": "oli_rice",
+    "author": "Oliver Rice",
+    "username": "olirice",
+    "position": "Engineering",
+    "author_url": "https://github.com/olirice",
+    "author_image_url": "https://github.com/olirice.png"
+  },
+  {
+    "author_id": "paul_copplestone",
+    "author": "Paul Copplestone",
+    "position": "CEO and Co-Founder",
+    "author_url": "https://github.com/kiwicopple",
+    "author_image_url": "https://github.com/kiwicopple.png"
+  },
+  {
+    "author_id": "qiao",
+    "author": "Qiao Han",
+    "position": "Engineering",
+    "author_url": "https://github.com/sweatybridge",
+    "author_image_url": "https://github.com/sweatybridge.png"
+  },
+  {
+    "author_id": "rory_wilding",
+    "author": "Rory Wilding",
+    "position": "Head of Growth",
+    "author_url": "https://github.com/roryw10",
+    "author_image_url": "https://github.com/roryw10.png"
+  },
+  {
+    "author_id": "steve_chavez",
+    "author": "Steve Chavez",
+    "username": "steve-chavez",
+    "position": "Engineering & PostgREST maintainer",
+    "author_url": "https://github.com/steve-chavez",
+    "author_image_url": "https://github.com/steve-chavez.png"
+  },
+  {
+    "author_id": "supabase",
+    "author": "Supabase",
+    "position": "",
+    "author_url": "https://github.com/supabase",
+    "author_image_url": "https://github.com/supabase.png"
+  },
+  {
+    "author_id": "thor_schaeff",
+    "author": "Thor Schaeff",
+    "position": "DevRel & DX",
+    "author_url": "https://twitter.com/thorwebdev",
+    "author_image_url": "https://github.com/thorwebdev.png"
+  },
+  {
+    "author_id": "wenbo_xie",
+    "author": "Wen Bo Xie",
+    "username": "w3b6x9",
+    "position": "Engineering",
+    "author_url": "https://github.com/w3b6x9",
+    "author_image_url": "https://github.com/w3b6x9.png"
+  },
+  {
+    "author_id": "dthyresson",
+    "author": "David Thyresson",
+    "username": "dthyresson",
+    "position": "Engineering",
+    "author_url": "https://github.com/dthyresson",
+    "author_image_url": "https://github.com/dthyresson.png"
+  },
+  {
+    "author_id": "shanerice",
+    "author": "Shane Rice",
+    "username": "shanerice",
+    "position": "Marketing",
+    "author_url": "https://github.com/shanerice",
+    "author_image_url": "https://github.com/shanerice.png"
+  },
+  {
+    "author_id": "alaister",
+    "author": "Alaister Young",
+    "username": "alaister",
+    "position": "Engineering",
+    "author_url": "https://github.com/alaister",
+    "author_image_url": "https://github.com/alaister.png"
+  },
+  {
+    "author_id": "tyler_shukert",
+    "author": "Tyler Shukert",
+    "username": "dshukertjr",
+    "position": "DevRel & Flutter",
+    "author_url": "https://twitter.com/dshukertjr",
+    "author_image_url": "https://github.com/dshukertjr.png"
+  },
+  {
+    "author_id": "victor",
+    "author": "Victor",
+    "username": "t3hmrman",
+    "position": "Guest Author",
+    "author_url": "https://github.com/t3hmrman",
+    "author_image_url": "https://github.com/t3hmrman.png"
+  },
+  {
+    "author_id": "andrew_smith",
+    "author": "Andrew Smith",
+    "username": "silentworks",
+    "position": "DevRel & DX",
+    "author_url": "https://github.com/silentworks",
+    "author_image_url": "https://github.com/silentworks.png"
+  },
+  {
+    "author_id": "rodrigo_mansueli",
+    "author": "Rodrigo Mansueli Nunes",
+    "username": "mansueli",
+    "position": "Support Engineer",
+    "author_url": "https://github.com/mansueli",
+    "author_image_url": "https://github.com/mansueli.png"
+  },
+  {
+    "author_id": "stas",
+    "author": "Stanislav Muzhyk",
+    "username": "abc3",
+    "position": "Engineering",
+    "author_url": "https://github.com/abc3",
+    "author_image_url": "https://github.com/abc3.png"
+  },
+  {
+    "author_id": "jonmeyers_io",
+    "author": "Jon Meyers",
+    "position": "Developer Advocate",
+    "author_url": "https://twitter.com/jonmeyers_io",
+    "author_image_url": "https://github.com/dijonmusters.png"
+  },
+  {
+    "author_id": "michel",
+    "author": "Michel Pelletier",
+    "position": "Engineering",
+    "author_url": "https://github.com/michelp",
+    "author_image_url": "https://github.com/michelp.png"
+  },
+  {
+    "author_id": "joel",
+    "author": "Joel Lee",
+    "username": "j0",
+    "position": "Engineering",
+    "author_url": "https://github.com/j0",
+    "author_image_url": "https://github.com/j0.png"
+  },
+  {
+    "author_id": "simon_grimm",
+    "author": "Simon Grimm",
+    "username": "schlimmson",
+    "position": "Guest Author",
+    "author_url": "https://twitter.com/schlimmson",
+    "author_image_url": "https://github.com/saimon24.png"
+  },
+  {
+    "author_id": "burggraf",
+    "author": "Mark Burggraf",
+    "username": "burggraf",
+    "position": "Engineering",
+    "author_url": "https://github.com/burggraf",
+    "author_image_url": "https://github.com/burggraf.png"
+  },
+  {
+    "author_id": "pavel",
+    "author": "Pavel Borisov",
+    "username": "pavel",
+    "position": "Postgres Engineer",
+    "author_url": "https://github.com/pashkinelfe",
+    "author_image_url": "https://avatars.githubusercontent.com/u/63344111?v=4"
+  },
+  {
+    "author_id": "ramiro",
+    "author": "Ramiro Nunez Dosio",
+    "position": "Growth Marketer",
+    "author_url": "https://twitter.com/ramiro__nd",
+    "author_image_url": "https://avatars.githubusercontent.com/u/20600542?v=4"
+  },
+  {
+    "author_id": "jonny",
+    "author": "Jonathan Summers-Muir",
+    "position": "Engineering",
+    "author_url": "https://github.com/mildtomato",
+    "author_image_url": "https://github.com/mildtomato.png"
+  },
+  {
+    "author_id": "fabrizio",
+    "author": "Fabrizio Fenoglio",
+    "position": "Engineering",
+    "author_url": "https://github.com/fenos",
+    "author_image_url": "https://github.com/fenos.png"
+  },
+  {
+    "author_id": "bo_lu",
+    "author": "Bo Lu",
+    "position": "Engineering",
+    "author_url": "https://github.com/burmecia",
+    "author_image_url": "https://github.com/burmecia.png"
+  },
+  {
+    "author_id": "stojan",
+    "author": "Stojan Dimitrovski",
+    "position": "Engineering",
+    "author_url": "https://github.com/hf",
+    "author_image_url": "https://github.com/hf.png"
+  },
+  {
+    "author_id": "gregnr",
+    "author": "Greg Richardson",
+    "position": "Engineering",
+    "author_url": "https://github.com/gregnr",
+    "author_image_url": "https://github.com/gregnr.png"
+  },
+  {
+    "author_id": "fsansalvadore",
+    "author": "Francesco Sansalvadore",
+    "position": "Engineering",
+    "author_url": "https://github.com/fsansalvadore",
+    "author_image_url": "https://github.com/fsansalvadore.png"
+  },
+  {
+    "author_id": "marijana",
+    "author": "Marijana Šimag",
+    "position": "Design",
+    "author_url": "https://dribbble.com/marijanasimag",
+    "author_image_url": "https://github.com/marijanasimag.png"
+  },
+  {
+    "author_id": "ziinc",
+    "author": "Lee TzeYiing",
+    "position": "Engineering",
+    "author_url": "https://github.com/Ziinc",
+    "author_image_url": "https://github.com/Ziinc.png"
+  },
+  {
+    "author_id": "chasers",
+    "author": "Chase Granberry",
+    "position": "Engineering",
+    "author_url": "https://github.com/chasers",
+    "author_image_url": "https://github.com/chasers.png"
+  },
+  {
+    "author_id": "joshenlim",
+    "author": "Joshen Lim",
+    "username": "joshenlim",
+    "position": "Engineering",
+    "author_url": "https://github.com/joshenlim",
+    "author_image_url": "https://github.com/joshenlim.png"
+  },
+  {
+    "author_id": "laktek",
+    "author": "Lakshan Perera",
+    "position": "Engineering",
+    "author_url": "https://github.com/laktek",
+    "author_image_url": "https://github.com/laktek.png"
+  },
+  {
+    "author_id": "saltcod",
+    "author": "Terry Sutton",
+    "position": "Engineering",
+    "author_url": "https://github.com/saltcod",
+    "author_image_url": "https://github.com/saltcod.png"
+  },
+  {
+    "author_id": "daltjoh-aws",
+    "author": "John Dalton",
+    "position": "Product Management Leader @ AWS",
+    "author_url": "https://github.com/daltjoh-aws",
+    "author_image_url": "https://github.com/daltjoh-aws.png"
+  },
+  {
+    "author_id": "egor_romanov",
+    "author": "Egor Romanov",
+    "position": "Engineering",
+    "author_url": "https://github.com/egor-romanov",
+    "author_image_url": "https://github.com/egor-romanov.png"
+  },
+  {
+    "author_id": "kevcodez",
+    "author": "Kevin Grüneberg",
+    "position": "Engineering",
+    "author_url": "https://github.com/kevcodez",
+    "author_image_url": "https://github.com/kevcodez.png"
+  },
+  {
+    "author_id": "benediktmueller",
+    "author": "Benedikt Müller",
+    "username": "bndkt",
+    "position": "Guest Author",
+    "author_url": "https://twitter.com/bndkt",
+    "author_image_url": "https://github.com/bndkt.png"
+  }
+]

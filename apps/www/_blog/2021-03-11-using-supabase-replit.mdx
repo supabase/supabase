@@ -1,0 +1,138 @@
+---
+title: Using Supabase in Replit
+description: Free hosted relational database from within your node.js repl
+author: ant_wilson
+author_title: Supabase
+author_url: https://github.com/awalias
+author_image_url: https://github.com/awalias.png
+authorURL: https://github.com/awalias
+image: replit-og.jpg
+thumb: replit-og.jpg
+categories:
+  - engineering
+tags:
+  - replit
+  - node-js
+  - postgres
+date: '03-11-2021'
+video: https://www.youtube.com/v/lQ5iIxaYduI
+---
+
+[Replit.com](http://replit.com) is an awesome new browser based IDE where you can code alone or collaboratively with friends using their awesome multiplayer features! It's particularly useful for education, and sharing code examples with others.
+
+They support a ton of different languages and execution environments and even recently introduced a simple key value store you can use to persist data.
+
+As a Replit user, if you want to access larger amounts of data direct from your repl, or if you fancy accessing some super-powerful query tools, at some point you may want to start interacting with a relational database. Supabase is a good fit here; just like Replit, you don't need to worry about servers, and hosting, you can just click a few buttons and get a fully featured relational database which you can start communicating with directly from javacript, using supabase-js.
+
+<div className="video-container">
+  <iframe
+    className="video-with-border w-full"
+    src="https://www.youtube-nocookie.com/embed/lQ5iIxaYduI"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
+Here's how to start a Supabase + Node.js repl:
+
+Sign up for [replit.com](http://replit.com) and hit new repl in the top left
+
+![Untitled-2](/images/blog/2021-march/u3dljulzsyqu58i75epn.png)
+
+Select node.js, give it a name, and click Create repl
+
+![Untitled-1](/images/blog/2021-march/7rcfbb12sfabevto571j.png)
+
+Import supabase's createClient method and hit run to install the required libs:
+
+```jsx
+const { createClient } = require('@supabase/supabase-js')
+```
+
+Setup a new Supabase project and grab the URL and anon key from Settings > API. Create the client in javascript using:
+
+```jsx
+const supabase = createClient(
+  'https://ajsstlnzcmdmzbtcgbbd.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+)
+```
+
+![Untitled-3](/images/blog/2021-march/5j5aqyjdh74qm83slmli.png)
+
+Now that supabase is connected you'll want to add some data to your db, you can grab any SQL dataset on the web, or make your own, but the fasted way to test is to open the SQL tab in the Supabase dashboard and click the Countries sample database and click Run.
+
+![Untitled-4](/images/blog/2021-march/54yykm6h9hqpric87zad.png)
+
+From within your repl you can now query your countries table like:
+
+```jsx
+// .then() syntax
+supabase.
+  .from('countries')
+  .select('*')
+  .limit(5)
+  .then(console.log)
+  .catch(console.error)
+
+// or...
+// async/await syntax
+const main = async() => {
+  const { data, error } = supabase
+    .from('countries')
+    .select('*')
+    .limit(5)
+
+  if (error) {
+    console.log(error)
+    return
+  }
+
+  console.log(data)
+}
+main()
+```
+
+Once this is working, if you want to learn more about the [query interface](/docs/reference/javascript/filter) you might want to try some of these challenges:
+
+```jsx
+// 1. List all the countries in Antarctica
+// 2. Fetch the iso3 code of the country with ID 3
+// 3. List the countries with 'Island' in the name
+// 4. Count the number of countries that start with 'Z' or 'Q'
+// 5. Fetch all the Countries where continents is null
+```
+
+There are full solutions provided in the video version of this blog, but some examples you may find useful are:
+
+```jsx
+// or
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .or('id.eq.20,id.eq.30')
+
+// is
+const { data, error } = await supabase.from('cities').select('name, country_id').is('name', null)
+
+// in
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .in('name', ['Rio de Janeiro', 'San Francisco'])
+
+// neq (not equal to)
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .neq('name', 'The shire')
+
+// full docs here: /docs/reference/javascript/filter
+```
+
+We look forward to showing off some more Supabase + Replit examples.
+
+You can find my example repl here: [https://repl.it/@awalias/supabase-test#index.js](https://repl.it/@awalias/supabase-test#index.js)
+
+Supabase has a free plan, head over to [https://supabase.com/dashboard](https://supabase.com/dashboard) to get started.

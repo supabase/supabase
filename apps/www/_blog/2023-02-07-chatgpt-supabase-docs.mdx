@@ -1,0 +1,129 @@
+---
+title: 'Supabase Clippy: ChatGPT for Supabase Docs'
+description: Creating a ChatGPT interface for the Supabase documentation.
+author: paul_copplestone
+image: docsgpt/og_supabase_clippy.png
+thumb: docsgpt/og_supabase_clippy.png
+categories:
+  - product
+tags:
+  - AI
+  - docs
+date: '2023-02-07'
+toc_depth: 3
+---
+
+<div className="bg-gray-300 rounded-lg px-6 py-2 bold">
+
+🆕 Want to build your own Clippy based on your own content? Use our [Next.js OpenAI Doc Search Template](https://github.com/supabase-community/nextjs-openai-doc-search) to deploy your own now!
+
+</div>
+
+We all know that Microsoft's real agenda for pouring billions into OpenAI is to revive their favorite friend Clippy.
+Today, we're doing our part to support the momentum by releasing “Supabase Clippy” for our docs (and we don't expect this name to last long before the lawyers catch on).
+
+![Clippy](/images/blog/docsgpt/clippy.png)
+
+Want to try it out? It's a hidden feature while in MVP - visit [supabase.com/docs](/docs) and hit `cmd` + `/` to pull up the search box (sorry mobile users).
+
+# ChatGPT for Supabase Docs
+
+Last launch week we [released](/blog/new-supabase-docs-built-with-nextjs) our new documentation site to improve the developer experience, especially for new users.
+
+When we first started Supabase our docs were very concise. We deliberately withheld "non-critical information" so that developers could consume everything in one sitting.
+
+Our product suite has grown in the past 2 years and our docs have grown as a result. There's a lot to read. We're also attracting developers who've never used Postgres before, and it's becoming incumbent on us to train these developers on best-practices.
+
+![Missing indexes](/images/blog/docsgpt/indexes.png)
+
+### The “ask” interface
+
+Developers have recently gained the ability to trust a bot. Where Clippy failed, ChatGPT succeeded.
+
+This is convenient timing for us, since our documentation content is more than the average developer wants to consume in one go. Today we're providing a similar interface to ChatGPT which is trained on our own docs.
+
+<video width="100%" autoPlay loop muted playsInline controls={true}>
+  <source src="/images/blog/embeddings/embeddings.mp4" type="video/mp4" />
+</video>
+
+To keep your expectations low, this implementation is a 1-week MVP. We're sharing this iteration to gather feedback and to teach you how to build something similar.
+
+## How it's built
+
+It's built with Supabase/Postgres, and consists of several key parts:
+
+1. Parsing the Supabase docs into sections.
+2. Creating embeddings for each section using OpenAI's embeddings API.
+3. Storing the embeddings in Postgres using the pgvector extension.
+4. Getting a user's question.
+5. Query the Postgres database for the most relevant documents related to the question.
+6. Inject these documents as context for GPT-3 to reference in its answer.
+7. Streaming the results back to the user in realtime.
+
+All the changes we made are in [this](https://github.com/supabase/supabase/pull/12056) Pull Request. Greg is here to explain every step in full detail:
+
+<div class="video-container">
+  <iframe
+    title="ClippyGPT"
+    src="https://www.youtube-nocookie.com/embed/Yhtjd7yGGGA"
+    frameborder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen
+  ></iframe>
+</div>
+
+You can find a full write up in our previous blog post: [Storing OpenAI embeddings in Postgres with pgvector](https://supabase.com/blog/openai-embeddings-postgres-vector).
+
+## What's next
+
+This current version is very basic, which makes it a good starting point if you want to build something similar.
+
+- **Expand the knowledge base:** Create embeddings for our reference docs, GitHub Discussions, Discord discussions, etc. The current iteration is only using the Guides.
+- **Caching:** Cache queries so that we can provide answers instantly to similar/matching questions.
+- **User-assisted improvements:** Ability to thumbs-up responses for relevance.
+- **Beyond search:** perhaps we can make this interface interactive, guiding users through instructions.
+
+## Bonus: The power of open source
+
+One of the most interesting things about this feature was _how_ it happened - almost completely from open source contributions. A short series of events:
+
+### A friendly email
+
+A few weeks ago I received an email, drawing our attention to a [Pull Request](https://github.com/supabase/postgres/pull/472) in our [`postgres`](https://github.com/supabase/postgres) GitHub repo:
+
+![Greg](/images/blog/docsgpt/greg.png)
+
+### A friendly chat
+
+After we merged the PR, I reached out to see if Greg was interested in helping with some documentation or a blog post to help the community to use pgvector. On the call, Greg surprised me with an initial prototype where he had ingested the Supabase docs for a ChatGPT-like experience. I was suitably impressed and suggested that we could explore ways to work together to build it into the Supabase docs. He wasted no time:
+
+<div class="video-container">
+  <iframe
+    title="ClippyGPT"
+    src="https://www.youtube-nocookie.com/embed/yAsR7oe5vng"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen
+  ></iframe>
+</div>
+
+### A friendly collaboration
+
+We sponsored Greg to work on an MVP with us, along with some guides to help developers do the same. He [pushed all his changes](https://github.com/supabase/supabase/pull/12056) to the Supabase Docs, and we wrote a [blog post](/blog/openai-embeddings-postgres-vector) together to help developers build something similar.
+
+If you re-read the events above and swap “Supabase” for any other big-tech company, you'll grasp how impossible this series of events is for any company that's not open source. All the code that was contributed is licensed liberally, so we didn't need to jump through IP checklists. Our docs are publicly available on GitHub, so Greg could build his prototype without being granted access.
+
+We're incredibly grateful for Greg's work here, so if you like what he's done then consider supporting him by checking out [prmpts.ai](https://prmpts.ai/) and following him on twitter: [@ggrdson](https://twitter.com/ggrdson).
+
+While you're at it, consider supporting [@ankane](https://github.com/ankane)'s great work on [pgvector](https://github.com/pgvector/pgvector) by starring them on GitHub, and sending your thanks.
+
+## Try it out
+
+Want to try Supabase Clippy? It's a hidden feature while in MVP - visit [supabase.com/docs](/docs) and hit `cmd` + `/` to pull up the search box (sorry mobile users).
+
+## More pgvector and ChatGPT resources
+
+- [AI docs](https://supabase.com/docs/guides/ai)
+- [A ChatGPT Plugins Template built with Supabase Edge Runtime](https://supabase.com/blog/building-chatgpt-plugins-template)
+- [Template for building your own custom ChatGPT style doc search](https://github.com/supabase-community/nextjs-openai-doc-search)
+- [Supabase + LangChain Starter Template](https://blog.langchain.dev/langchain-x-supabase/)

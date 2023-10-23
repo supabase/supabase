@@ -1,0 +1,129 @@
+---
+title: 'Supabase acquires Logflare'
+description: "Today, we're ecstatic to announce that Logflare is joining Supabase."
+author: paul_copplestone
+author_url: https://github.com/kiwicopple
+author_image_url: https://github.com/kiwicopple.png
+authorURL: https://github.com/kiwicopple
+image: launch-week-three/supabase-acquires-logflare/supabase-acquires-logflare-og.png
+thumb: launch-week-three/supabase-acquires-logflare/supabase-acquires-logflare-thumb.png
+categories:
+  - company
+tags:
+  - launch-week
+  - logging
+date: '2021-12-02'
+toc_depth: 3
+video: https://www.youtube.com/v/MdKWR_Zpu50
+---
+
+Back in May 2020, we [tweeted about](https://twitter.com/supabase/status/1265922290237071361?lang=bg) one of the most impressive products we had ever used: Logflare, a log ingestion platform.
+
+<div>
+  <blockquote className="twitter-tweet" data-theme="dark">
+    <p lang="en" dir="ltr">
+      Really impressed with
+      <a href="https://twitter.com/logflare_logs?ref_src=twsrc%5Etfw">@logflare_logs</a>. We&#39;ve been
+      on the front page of
+      <a href="https://twitter.com/hashtag/hackernews?src=hash&amp;ref_src=twsrc%5Etfw">
+        #hackernews
+      </a>
+      for 24 hours anticipating the HN hug of death. Looks like we made it through OK and Logflare has
+      been ingesting everything without breaking a sweat <a href="https://t.co/RWKHIgmWh6">
+        https://t.co/RWKHIgmWh6
+      </a> <a href="https://t.co/dQ2xqFTdco">pic.twitter.com/dQ2xqFTdco</a>
+    </p>
+    &mdash; Supabase (@supabase) <a href="https://twitter.com/supabase/status/1265922290237071361?ref_src=twsrc%5Etfw">May 28, 2020</a>
+  </blockquote>
+</div>
+
+Today, we're ecstatic to announce that Logflare is joining Supabase.
+
+## Why logging?
+
+A log platform might seem like a strange acquisition for Supabase - after all, there are no "Firebase Logs".
+
+Logging is one of the most unappreciated parts of a tech stack, often an after-thought. But when leveraged correctly, logs give developers superpowers.
+
+### Debugging
+
+Logs are an integral part of the developer workflow. When you're programming in Javascript, or Rust, or Go, how often do you rely on the console output to inspect and fix errors? Database debuggers have a lot to learn from programmer tooling.
+
+We want to provide the best database developer experience in the world, and so we're making debugging a first-class citizen.
+
+### Observability
+
+Databases can be a black box when it comes to spotting errors, finding slow queries, and testing performance optimizations.
+
+The full Supabase stack is more than just a database. It includes various tools working together - APIs, Storage, Auth, and CDNs. A broad tech stack needs a unified measurement system to give a birds-eye view of everything happening within your Supabase project.
+
+This is especially true for our enterprise customers, who need to know that their servers are not just operating, but optimized with alerting the instant anything goes wrong.
+
+### Analytics
+
+While it's not immediately apparent, logs are analytics! Especially when a developer can correlate log entries, and enrich them with database data.
+
+Imagine tracing one of your user's network requests from the browser to a database query. Perhaps you'd like to know which of your users are making the most API requests, or downloading the most files, or spending the most time connected to the application?
+
+With granular logs, this becomes possible and paves the way for an incredible developer experience: managing your API versioning, predicting growth, and managing billing costs.
+
+## Why Logflare?
+
+Since that first tweet in May 2020, our platform has generated billions of log entries. During that time, Logflare has been a staple product in our day-to-day operations. There are a few reasons why Logflare is such a great match for Supabase.
+
+- Chase! The founder of Logflare, [Chase](https://twitter.com/chasers), is an accomplished founder, incredibly product-focused, and an all-around mensch. With over 10 years of experience in data aggregation, Chase is the type of talented person that every team dreams of working with.
+- Elixir. Logflare is built with Elixir, the same as our Realtime Engine. We love Elixir at Supabase, and it's nice to have it power another key part of the Supabase stack.
+- Real-time. Logflare isn't just for querying logs, it displays what's happening in realtime, allowing you to debug your systems live.
+- Branding. Who doesn't love the vivid green with dark mode? 😎
+
+![supabase-realtime-processing-per-subscription](/images/blog/launch-week-three/supabase-acquires-logflare/logflare-screenshot.png)
+
+## Why is Logflare joining Supabase?
+
+<Quote img="chase-granberry.png" caption="Chase Granberry, Founder of Logflare.">
+  <p>
+    I really like how Supabase is taking an existing, proven, piece of technology and making it more
+    accessible for more users. A lot of people already use Postgres, but they don't take advantage
+    of powerful features built into the database. Supabase is exposing these features more
+    prominently, making them more accessible to more developers with technology, and educating
+    people on how to leverage these features for a better experience for end users.
+  </p>
+  <p>
+    With Logflare, we've been trying to do this exact thing for analytics oriented databases. We've
+    started with BigQuery. Logflare makes it easier to stream inserts with by automatically adapting
+    the underlying schema for you. We make it easier to inspect and query your stream. And with
+    Logflare Endpoints we're starting to make it easier to operationalize analytics by allowing
+    people to build APIs from SQL statements. With Endpoints developers can enhance user facing
+    applications without setting up traditionally tedious and brittle data pipelines. We've started
+    with BigQuery but will soon be supporting other backends optimized for various analytics use
+    cases.
+  </p>
+</Quote>
+
+## Supabase + Logs
+
+We still have a lot of technical work to integrate Logflare into Supabase, with plans of fully supporting the existing Vercel and Cloudflare integrations.
+
+In just the past 10 days, we've been working on a few of the new Dashboard features, which you'll be able to see very soon.
+
+Over the next few weeks, we plan to release these features (once we have a chance to polish them up), and you'll be able to query your logs with your favorite language - SQL 😀.
+
+<div className="video-container">
+  <iframe
+    className="w-full video-with-border"
+    src="https://www.youtube-nocookie.com/embed/MdKWR_Zpu50"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
+## Open source
+
+Right now, Logflare works natively with Big Query. But as our track record has proven, we're 100% committed to open source. We're working on the future of a fully open-source version of Logflare, with support for various storage engines.
+
+## Next steps
+
+If you're an existing Logflare user, we'll be migrating everything to Supabase in the coming months. We'll work closely with you to ensure that the transition is seamless, and introduce the same [pricing levels](https://logflare.app/pricing) that Logflare offers today.
+
+We've worked with Chase on a list of potential questions you might have about the transition. If you have any concerns or questions, you can reach out to support@supabase.io.
