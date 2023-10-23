@@ -49,7 +49,10 @@ const UpgradingState = () => {
   const isCompleted = status === DatabaseUpgradeStatus.Upgraded
 
   const initiatedAtUTC = dayjs.utc(initiated_at ?? 0).format('DD MMM YYYY HH:mm:ss')
-  const initiatedAt = dayjs.utc(initiated_at ?? 0).local().format('DD MMM YYYY HH:mm:ss (ZZ)')
+  const initiatedAt = dayjs
+    .utc(initiated_at ?? 0)
+    .local()
+    .format('DD MMM YYYY HH:mm:ss (ZZ)')
 
   const refetchProjectDetails = async () => {
     setLoading(true)

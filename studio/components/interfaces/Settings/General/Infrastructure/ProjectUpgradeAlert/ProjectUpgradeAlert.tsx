@@ -122,68 +122,69 @@ const ProjectUpgradeAlert = () => {
                         title="Your project will be offline while the upgrade is in progress"
                       >
                         <p>
-                          Based on your current database's size it is estimated the upgrade will take up to: 
+                          Based on your current database's size it is estimated the upgrade will
+                          take up to:
                         </p>
                         <p className="text-sm text-green-900">
                           {durationEstimateHours} hour{durationEstimateHours === 1 ? '' : 's'}
                         </p>
                         <p>
-                          It is advised to upgrade at a time when there will be minimal impact for your application.
+                          It is advised to upgrade at a time when there will be minimal impact for
+                          your application.
                         </p>
                       </Alert>
-                      {legacyAuthCustomRoles.length > 0 && 
-                        (<Alert
+                      {legacyAuthCustomRoles.length > 0 && (
+                        <Alert
                           withIcon
-                          variant='warning'
-                          title='Custom Postgres roles using md5 authentication have been detected'
+                          variant="warning"
+                          title="Custom Postgres roles using md5 authentication have been detected"
                         >
                           <p>
-                            New Postgres versions use scram-sha-256 authentication by default and do not support md5,
-                            as it has been deprecated. 
+                            New Postgres versions use scram-sha-256 authentication by default and do
+                            not support md5, as it has been deprecated.
                           </p>
                           <p>
-                            After upgrading your database to the latest version you will not be able to use the existing 
-                            custom roles until you update them to use scram-sha-256 authentication.
+                            After upgrading your database to the latest version you will not be able
+                            to use the existing custom roles until you update them to use
+                            scram-sha-256 authentication.
                           </p>
-                          <p>
-                            You can do so by running the following commands after the upgrade:
-                          </p>
-                            <div className="flex items-baseline gap-2">
-                              <code className="text-xs">
-                                {legacyAuthCustomRoles.map((role) => (
-                                  <div key={role}>
-                                    ALTER ROLE <span className="text-green-900">{role}</span> WITH ENCRYPTED PASSWORD '<span className="text-green-900">newpassword</span>';
-                                  </div>
-                                ))}
-                              </code>
+                          <p>You can do so by running the following commands after the upgrade:</p>
+                          <div className="flex items-baseline gap-2">
+                            <code className="text-xs">
+                              {legacyAuthCustomRoles.map((role) => (
+                                <div key={role}>
+                                  ALTER ROLE <span className="text-green-900">{role}</span> WITH
+                                  ENCRYPTED PASSWORD '
+                                  <span className="text-green-900">newpassword</span>';
+                                </div>
+                              ))}
+                            </code>
                           </div>
                         </Alert>
-                        )}
-                        {extensionDependentObjects.length > 0 && 
-                        (<Alert
+                      )}
+                      {extensionDependentObjects.length > 0 && (
+                        <Alert
                           withIcon
-                          variant='warning'
-                          title='Objects dependent on extensions have been detected'
+                          variant="warning"
+                          title="Objects dependent on extensions have been detected"
                         >
                           <p>
-                            A small numbers of extensions are toggled off and on during the upgrade process,
-                            which may cause objects dependent on them to be dropped:
+                            A small numbers of extensions are toggled off and on during the upgrade
+                            process, which may cause objects dependent on them to be dropped:
                           </p>
                           <div className="flex items-baseline gap-2">
-                              <code className="text-xs">
-                                {extensionDependentObjects.map((object) => (
-                                  <div key={object}>
-                                    {object}
-                                  </div>
-                                ))}
-                              </code>
+                            <code className="text-xs">
+                              {extensionDependentObjects.map((object) => (
+                                <div key={object}>{object}</div>
+                              ))}
+                            </code>
                           </div>
                           <p>
-                            We are taking additional steps to preserve these objects, but we recommend that you
-                            export their definitions before upgrading.
+                            We are taking additional steps to preserve these objects, but we
+                            recommend that you export their definitions before upgrading.
                           </p>
                         </Alert>
-                        )}
+                      )}
                       <Listbox
                         id="version"
                         name="version"
