@@ -73,12 +73,12 @@ import { copycat } from '@snaplet/copycat'
 export default defineConfig({
    generate: {
       async run(snaplet) {
-        await snaplet.Post({
+        await snaplet.posts({
           title: "There is a lot of snow around here!"
-          User: {
+          userByCreatedBy: {
             email: copycat.email(seed, { domain: 'acme.org' })
           },
-          Comment: (x) => x(3)
+          comments: (x) => x(3)
         })
       }
    }
