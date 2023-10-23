@@ -49,7 +49,7 @@
     "@radix-ui/react-toast": "^1.1.4",
     "@radix-ui/react-toggle": "^1.0.3",
     "@radix-ui/react-tooltip": "^1.0.6",
-    "@supabase/auth-helpers-react": "^0.3.1",
+    "@supabase/auth-helpers-react": "^0.4.2",
     "@tailwindcss/forms": "^0.5.0",
     "@tailwindcss/typography": "^0.5.9",
     "autoprefixer": "^10.4.14",
