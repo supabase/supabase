@@ -224,7 +224,7 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
 <a href="https://supabase.com">
   <img
     width="168"
-    height="28"
+    height="30"
     src="https://supabase.com/badge-made-with-supabase.svg"
     alt="Made with Supabase"
   />
@@ -241,7 +241,7 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
 <a href="https://supabase.com">
   <img
     width="168"
-    height="28"
+    height="30"
     src="https://supabase.com/badge-made-with-supabase-dark.svg"
     alt="Made with Supabase"
   />

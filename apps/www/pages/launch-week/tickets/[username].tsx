@@ -5,7 +5,7 @@ import Image from 'next/image'
 import Error from 'next/error'
 import dynamic from 'next/dynamic'
 import { Session, SupabaseClient, createClient } from '@supabase/supabase-js'
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -41,8 +41,8 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
 
   const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
   const [session, setSession] = useState<Session | null>(null)
-  const { isDarkMode, toggleTheme } = useTheme()
-  const [initialDarkMode] = useState(isDarkMode)
+  const { theme, setTheme } = useTheme()
+  const [initialDarkMode] = useState(theme === 'dark')
 
   const [pageState, setPageState] = useState<PageState>('ticket')
 
@@ -58,15 +58,6 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
           process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!
         )
       )
-    }
-  }, [])
-
-  useEffect(() => {
-    toggleTheme(true)
-    document.body.className = 'dark bg-[#020405]'
-    return () => {
-      document.body.className = ''
-      toggleTheme(initialDarkMode)
     }
   }, [])
 

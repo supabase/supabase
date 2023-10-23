@@ -1,11 +1,10 @@
 import Link from 'next/link'
-import React from 'react'
 import { Alert, Button, IconAlertOctagon, IconBookOpen, IconLock, IconShieldOff } from 'ui'
 
 export default function RLSDisableModalContent() {
   return (
     <div className="my-6">
-      <div className="text-sm text-scale-1100 grid gap-4">
+      <div className="text-sm text-foreground-light grid gap-4">
         <div className="grid gap-1">
           <Alert
             variant="warning"

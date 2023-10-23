@@ -15,6 +15,8 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions, useStore } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import FunctionList from './FunctionList'
+import SchemaSelector from 'components/ui/SchemaSelector'
+import ProtectedSchemaWarning from '../../ProtectedSchemaWarning'
 
 interface FunctionsListProps {
   createFunction: () => void
@@ -41,7 +43,7 @@ const FunctionsList = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const [protectedSchemas, openSchemas] = partition(schemas ?? [], (schema) =>
+  const [protectedSchemas] = partition(schemas ?? [], (schema) =>
     EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
   )
   const schema = schemas?.find((schema) => schema.name === selectedSchema)
@@ -70,11 +72,11 @@ const FunctionsList = ({
             disabled={!canCreateFunctions}
             disabledMessage="You need additional permissions to create functions"
           >
-            <p className="text-sm text-scale-1100">
+            <p className="text-sm text-foreground-light">
               PostgreSQL functions, also known as stored procedures, is a set of SQL and procedural
               commands such as declarations, assignments, loops, flow-of-control, etc.
             </p>
-            <p className="text-sm text-scale-1100">
+            <p className="text-sm text-foreground-light">
               It's stored on the database server and can be invoked using the SQL interface.
             </p>
           </ProductEmptyState>
@@ -83,57 +85,19 @@ const FunctionsList = ({
         <div className="w-full space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="w-[260px]">
-                <Listbox
-                  size="small"
-                  value={selectedSchema}
-                  onChange={setSelectedSchema}
-                  icon={isLocked && <IconLock size={14} strokeWidth={2} />}
-                >
-                  <Listbox.Option
-                    disabled
-                    key="normal-schemas"
-                    value="normal-schemas"
-                    label="Schemas"
-                  >
-                    <p className="text-sm">Schemas</p>
-                  </Listbox.Option>
-                  {/* @ts-ignore */}
-                  {openSchemas.map((schema) => (
-                    <Listbox.Option
-                      key={schema.id}
-                      value={schema.name}
-                      label={schema.name}
-                      addOnBefore={() => <span className="text-scale-900">schema</span>}
-                    >
-                      <span className="text-scale-1200 text-sm">{schema.name}</span>
-                    </Listbox.Option>
-                  ))}
-                  <Listbox.Option
-                    disabled
-                    key="protected-schemas"
-                    value="protected-schemas"
-                    label="Protected schemas"
-                  >
-                    <p className="text-sm">Protected schemas</p>
-                  </Listbox.Option>
-                  {protectedSchemas.map((schema) => (
-                    <Listbox.Option
-                      key={schema.id}
-                      value={schema.name}
-                      label={schema.name}
-                      addOnBefore={() => <span className="text-scale-900">schema</span>}
-                    >
-                      <span className="text-scale-1200 text-sm">{schema.name}</span>
-                    </Listbox.Option>
-                  ))}
-                </Listbox>
-              </div>
+              <SchemaSelector
+                className="w-[260px]"
+                size="small"
+                showError={false}
+                selectedSchemaName={selectedSchema}
+                onSelectSchema={setSelectedSchema}
+              />
               <Input
-                placeholder="Filter by name"
+                placeholder="Search for a function"
                 size="small"
                 icon={<IconSearch size="tiny" />}
                 value={filterString}
+                className="w-64"
                 onChange={(e) => setFilterString(e.target.value)}
               />
             </div>
@@ -155,7 +119,7 @@ const FunctionsList = ({
                           'border border-scale-200',
                         ].join(' ')}
                       >
-                        <span className="text-xs text-scale-1200">
+                        <span className="text-xs text-foreground">
                           You need additional permissions to create functions
                         </span>
                       </div>
@@ -166,18 +130,21 @@ const FunctionsList = ({
             </Tooltip.Root>
           </div>
 
+          {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="functions" />}
+
           <Table
             className="table-fixed"
             head={
               <>
-                <Table.th key="name" className="w-1/3 space-x-4">
-                  Name
-                </Table.th>
+                <Table.th key="name">Name</Table.th>
                 <Table.th key="arguments" className="hidden md:table-cell">
                   Arguments
                 </Table.th>
                 <Table.th key="return_type" className="hidden lg:table-cell">
                   Return type
+                </Table.th>
+                <Table.th key="return_type" className="hidden lg:table-cell w-[100px]">
+                  Security
                 </Table.th>
                 <Table.th key="buttons" className="w-1/6"></Table.th>
               </>

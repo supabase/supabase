@@ -26,10 +26,10 @@ const PageLayout: NextPageWithLayout = () => {
         infoButtonLabel="About storage"
         infoButtonUrl="https://supabase.com/docs/guides/storage"
       >
-        <p className="text-scale-1100 text-sm">
+        <p className="text-foreground-light text-sm">
           Create buckets to store and serve any type of digital content.
         </p>
-        <p className="text-scale-1100 text-sm">
+        <p className="text-foreground-light text-sm">
           Make your buckets private or public depending on your security preference.
         </p>
       </ProductEmptyState>

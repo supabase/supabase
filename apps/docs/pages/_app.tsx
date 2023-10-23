@@ -153,7 +153,12 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     <>
       <Favicons />
       <AuthContainer>
-        <ThemeProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
           <CommandMenuProvider site="docs">
             <TabsProvider>
               <SiteLayout>

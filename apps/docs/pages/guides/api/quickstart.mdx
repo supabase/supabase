@@ -174,64 +174,6 @@ response = supabase.table('todos').select("*").execute()
 </TabPanel>
 </Tabs>
 
-### GraphQL
-
-Every table can be accessed through the GraphQL API by switching `/rest/v1` with `/graphql/v1`.
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="urql"
-  queryGroup="library"
->
-<TabPanel id="urql" label="urql">
-
-```javascript
-import { createClient, useQuery } from 'urql'
-
-const URL = '<SUPABASE_URL>/graphql/v1'
-const ANON_KEY = '<SUPABASE_ANON_KEY>'
-
-// Prepare API key and Authorization header
-const headers = {
-  apikey: `${ANON_KEY}`,
-  authorization: `Bearer ${ANON_KEY}`,
-}
-
-const client = createClient({
-  url: URL,
-  fetchOptions: function createFetchOptions() {
-    return { headers }
-  },
-})
-
-// Prepare our GraphQL query
-const TodosQuery = `
-  query {
-    todosCollection {
-      edges {
-        node {
-          id
-          task
-        }
-      }
-    }
-  }
-`
-
-// Query for the data (React)
-const [result, reexecuteQuery] = useQuery({
-  query: TodosQuery,
-})
-
-// Read the result
-const { data, fetching, error } = result
-```
-
-</TabPanel>
-</Tabs>
-
 export const Page = ({ children }) => <Layout meta={meta} children={children} hideToc={true} />
 
 export default Page

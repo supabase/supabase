@@ -86,15 +86,14 @@ npx create-expo-app@latest cloudApp --template tabs@49
 
 # Install dependencies
 npm i @supabase/supabase-js
-npm i react-native-url-polyfill base64-arraybuffer react-native-loading-spinner-overlay
+npm i react-native-url-polyfill base64-arraybuffer react-native-loading-spinner-overlay @react-native-async-storage/async-storage
 
 # Install Expo packages
-npx expo install expo-secure-store
 npx expo install expo-image-picker
 npx expo install expo-file-system
 ```
 
-We will use the [Expo Secure Store](https://docs.expo.dev/versions/latest/sdk/securestore/) to store the Supabase session, and the [Expo Image Picker](https://docs.expo.dev/versions/latest/sdk/imagepicker/) to select images from the device. We also need the [Expo File System](https://docs.expo.dev/versions/latest/sdk/filesystem/) to read the image from the device and upload its data.
+We will use the [Expo AsyncStorage](https://docs.expo.dev/versions/latest/sdk/async-storage/) to store the Supabase session, and the [Expo Image Picker](https://docs.expo.dev/versions/latest/sdk/imagepicker/) to select images from the device. We also need the [Expo File System](https://docs.expo.dev/versions/latest/sdk/filesystem/) to read the image from the device and upload its data.
 
 You can now already run your project with `npx expo` and then select a platform to run on.
 
@@ -116,23 +115,10 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=
 We can now simply read those values from the environment variables and initialize the Supabase client, so create a file at `config/initSupabase.ts` and add the following code:
 
 ```ts
-import * as SecureStore from 'expo-secure-store'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import 'react-native-url-polyfill/auto'
 
 import { createClient } from '@supabase/supabase-js'
-
-// Use a custom secure storage solution for the Supabase client to store the JWT
-const ExpoSecureStoreAdapter = {
-  getItem: (key: string) => {
-    return SecureStore.getItemAsync(key)
-  },
-  setItem: (key: string, value: string) => {
-    SecureStore.setItemAsync(key, value)
-  },
-  removeItem: (key: string) => {
-    SecureStore.deleteItemAsync(key)
-  },
-}
 
 const url = process.env.EXPO_PUBLIC_SUPABASE_URL
 const key = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY
@@ -140,13 +126,13 @@ const key = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY
 // Initialize the Supabase client
 export const supabase = createClient(url, key, {
   auth: {
-    storage: ExpoSecureStoreAdapter as any,
+    storage: AsyncStorage,
     detectSessionInUrl: false,
   },
 })
 ```
 
-We are using the SecureStore from Expo to handle the session of our Supabase client and add in the `createClient` function.
+We are using the AsyncStorage from Expo to handle the session of our Supabase client and add in the `createClient` function.
 
 Later we can import the `supabase` client from this file and use it in our app whenever we need to access Supabase.
 

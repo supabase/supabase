@@ -81,7 +81,7 @@ const InteractiveShimmerCard = ({
     >
       <div
         className={cn(
-          'relative h-full z-10 rounded-xl bg-scale-200 dark:bg-scale-300 overflow-hidden transition-all text-scale-1100',
+          'relative h-full z-10 rounded-xl bg-scale-200 dark:bg-scale-300 overflow-hidden transition-all text-light',
           innerClassName
         )}
       >

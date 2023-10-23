@@ -11,19 +11,19 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import {
   FormActions,
   FormPanel,
+  FormsContainer,
   FormSection,
   FormSectionContent,
   FormSectionLabel,
-  FormsContainer,
 } from 'components/ui/Forms'
 import { invalidateSchemasQuery } from 'data/database/schemas-query'
 import { useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
 import { useCheckPermissions, useStore } from 'hooks'
 import { Button, Form, IconArrowLeft, IconEdit, IconExternalLink, IconTrash, Input } from 'ui'
 import InputField from './InputField'
-import WrapperTableEditor from './WrapperTableEditor'
 import { WRAPPERS } from './Wrappers.constants'
 import { makeValidateRequired } from './Wrappers.utils'
+import WrapperTableEditor from './WrapperTableEditor'
 
 const CreateWrapper = () => {
   const formId = 'create-wrapper-form'
@@ -71,7 +71,7 @@ const CreateWrapper = () => {
       <div className="flex flex-col items-center justify-center w-full h-full space-y-4">
         <div className="space-y-2 flex flex-col items-center w-[400px]">
           <p>Unsupported wrapper type</p>
-          <p className="text-sm text-center text-scale-1000">
+          <p className="text-sm text-center text-foreground-light">
             The wrapper type {type} not supported by the dashboard. Head back to create a different
             wrapper.
           </p>
@@ -138,7 +138,7 @@ const CreateWrapper = () => {
               </a>
             </Link>
           </div>
-          <h3 className="mb-2 text-xl text-scale-1200">Create a {wrapperMeta.label} Wrapper</h3>
+          <h3 className="mb-2 text-xl text-foreground">Create a {wrapperMeta.label} Wrapper</h3>
           <div className="flex items-center space-x-2">
             <Link href={wrapperMeta.docsUrl}>
               <a target="_blank" rel="noreferrer">
@@ -210,7 +210,7 @@ const CreateWrapper = () => {
                   header={
                     <FormSectionLabel>
                       <p>Foreign Tables</p>
-                      <p className="text-scale-1000 mt-2 w-[90%]">
+                      <p className="text-foreground-light mt-2 w-[90%]">
                         You can query your data from these foreign tables after the wrapper is
                         created
                       </p>
@@ -235,7 +235,7 @@ const CreateWrapper = () => {
                               <p className="text-sm">
                                 {table.schema_name}.{table.table_name}
                               </p>
-                              <p className="text-sm text-scale-1000">
+                              <p className="text-sm text-foreground-light">
                                 {wrapperMeta.tables[table.index].label}:{' '}
                                 {table.columns.map((column: any) => column.name).join(', ')}
                               </p>

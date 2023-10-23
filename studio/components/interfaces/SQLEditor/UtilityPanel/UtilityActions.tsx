@@ -1,7 +1,7 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
 import { Button, IconAlignLeft, IconCommand, IconCornerDownLeft } from 'ui'
-import * as Tooltip from '@radix-ui/react-tooltip'
 
 import FavoriteButton from './FavoriteButton'
 import SavingIndicator from './SavingIndicator'
@@ -46,7 +46,7 @@ const UtilityActions = ({
                 'border border-scale-200',
               ].join(' ')}
             >
-              <span className="text-xs text-scale-1200">Prettify SQL</span>
+              <span className="text-xs text-foreground">Prettify SQL</span>
             </div>
           </Tooltip.Content>
         </Tooltip.Portal>
@@ -63,7 +63,7 @@ const UtilityActions = ({
             {os === 'macos' ? (
               <IconCommand size={10} strokeWidth={1.5} />
             ) : (
-              <p className="text-xs text-scale-1100">CTRL</p>
+              <p className="text-xs text-foreground-light">CTRL</p>
             )}
             <IconCornerDownLeft size={10} strokeWidth={1.5} />
           </div>

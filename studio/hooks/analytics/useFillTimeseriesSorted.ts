@@ -7,7 +7,7 @@ import { useMemo } from 'react'
 const useFillTimeseriesSorted = (...args: Parameters<typeof fillTimeseries>) => {
   return useMemo(() => {
     const [data, timestampKey] = args
-    if (!data[0]?.[timestampKey]) return data;
+    if (!data[0]?.[timestampKey]) return data
 
     const filled = fillTimeseries(...args)
     return filled.sort((a, b) => {

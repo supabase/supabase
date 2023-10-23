@@ -37,14 +37,14 @@ const ProjectSettingsMenuItem = ({ project }: ProjectSettingsMenuItemProps) => {
     <AccordionItem_Shadcn_ value={project.ref} className="!border-none">
       <AccordionTrigger_Shadcn_
         hideIcon
-        className="py-1.5 hover:!no-underline [&[data-state=open]>div>svg]:!rotate-90 [&[data-state=open]>div>p]:text-scale-1200"
+        className="py-1.5 hover:!no-underline [&[data-state=open]>div>svg]:!rotate-90 [&[data-state=open]>div>p]:text-foreground"
       >
         <div className="flex items-center space-x-2">
           <IconChevronRight
             className="h-4 w-4 transition-transform duration-200"
             strokeWidth={1.5}
           />
-          <p className="text-scale-1100 text-sm font-normal transition duration-200">
+          <p className="text-foreground-light text-sm font-normal transition duration-200">
             {project.name}
           </p>
         </div>

@@ -120,7 +120,7 @@ const AddRestrictionModal = ({
             <>
               <Modal.Content>
                 <div className="py-6 space-y-4">
-                  <p className="text-sm text-scale-1100">
+                  <p className="text-sm text-foreground-light">
                     This will add an IP address range to a list of allowed ranges that can access
                     your database. Only IPv4 addresses are supported at the moment.
                   </p>
@@ -156,7 +156,7 @@ const AddRestrictionModal = ({
                                       'border border-scale-200 w-[300px]',
                                     ].join(' ')}
                                   >
-                                    <span className="text-xs text-scale-1200">
+                                    <span className="text-xs text-foreground">
                                       Classless inter-domain routing (CIDR) notation is the notation
                                       used to identify networks and hosts in the networks. The block
                                       size tells us how many bits we need to take for the network
@@ -198,11 +198,11 @@ const AddRestrictionModal = ({
                       </code>{' '}
                       will be restricted
                     </p>
-                    <p className="text-sm text-scale-1000">
+                    <p className="text-sm text-foreground-light">
                       Selected address space: <code className="text-xs">{addressRange.start}</code>{' '}
                       to <code className="text-xs">{addressRange.end}</code>{' '}
                     </p>
-                    <p className="text-sm text-scale-1000">
+                    <p className="text-sm text-foreground-light">
                       Number of addresses: {availableAddresses}
                     </p>
                   </div>
@@ -211,7 +211,7 @@ const AddRestrictionModal = ({
                 <Modal.Content>
                   <div className="pt-2 pb-4">
                     <div className="h-[68px] flex items-center">
-                      <p className="text-sm text-scale-1000">
+                      <p className="text-sm text-foreground-light">
                         A summary of your restriction will be shown here after entering a valid IP
                         address and CIDR block size
                       </p>

@@ -15,7 +15,7 @@ const SignUpPage: NextPageWithLayout = () => {
             <div className="w-full border-t border-scale-700" />
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="bg-scale-200 px-2 text-sm text-scale-1200">or</span>
+            <span className="bg-scale-200 px-2 text-sm text-foreground">or</span>
           </div>
         </div>
 
@@ -23,9 +23,11 @@ const SignUpPage: NextPageWithLayout = () => {
       </div>
 
       <div className="my-8 self-center text-sm">
-        <span className="text-scale-1000">Have an account?</span>{' '}
+        <span className="text-foreground-light">Have an account?</span>{' '}
         <Link href="/sign-in">
-          <a className="underline text-scale-1200 hover:text-scale-1100 transition">Sign In Now</a>
+          <a className="underline text-foreground hover:text-foreground-light transition">
+            Sign In Now
+          </a>
         </Link>
       </div>
     </>

@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
-import { Button, InputNumber, IconArrowRight, IconArrowLeft, IconLoader } from 'ui'
-import { useUrlState } from 'hooks'
-import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
-import { DropdownControl } from '../../common'
-import { useDispatch, useTrackedState } from '../../../store'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
+import { useUrlState } from 'hooks'
+import { useEffect, useState } from 'react'
+import { Button, IconArrowLeft, IconArrowRight, IconLoader, InputNumber } from 'ui'
+import { useDispatch, useTrackedState } from '../../../store'
+import { DropdownControl } from '../../common'
 
 const updatePage = (payload: number, dispatch: (value: unknown) => void) => {
   dispatch({
@@ -143,7 +143,7 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
 
   return (
     <div className="sb-grid-pagination">
-      {isLoading && <p className="text-sm text-scale-1100">Loading records count...</p>}
+      {isLoading && <p className="text-sm text-foreground-light">Loading records count...</p>}
 
       {isSuccess && (
         <>
@@ -154,7 +154,7 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
             onClick={onPreviousPage}
             style={{ padding: '3px 10px' }}
           />
-          <p className="text-sm text-scale-1100">Page</p>
+          <p className="text-sm text-foreground-light">Page</p>
           <div className="sb-grid-pagination-input-container">
             <InputNumber
               // [Fran] we'll have to upgrade the UI component types to accept the null value when users delete the input content
@@ -169,7 +169,7 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
               min={1}
             />
           </div>
-          <p className="text-sm text-scale-1100">{`of ${totalPages}`}</p>
+          <p className="text-sm text-foreground-light">{`of ${totalPages}`}</p>
           <Button
             icon={<IconArrowRight />}
             type="outline"
@@ -188,7 +188,7 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
               <span>{`${state.rowsPerPage} rows`}</span>
             </Button>
           </DropdownControl>
-          <p className="text-sm text-scale-1100">{`${data.count.toLocaleString()} ${
+          <p className="text-sm text-foreground-light">{`${data.count.toLocaleString()} ${
             data.count === 0 || data.count > 1 ? `records` : 'record'
           }`}</p>
           {isLoadingRows && <IconLoader size={14} className="animate-spin" />}
@@ -196,7 +196,7 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
       )}
 
       {isError && (
-        <p className="text-sm text-scale-1100">
+        <p className="text-sm text-foreground-light">
           Error fetching records count. Please refresh the page.
         </p>
       )}

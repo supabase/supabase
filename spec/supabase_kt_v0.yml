@@ -576,7 +576,7 @@ functions:
         name: With Parameters
         code: |
           ```kotlin
-          val rpcParams = City(name "The Shire")
+          val rpcParams = City(name = "The Shire")
           client.postgrest.rpc("echo_city", rpcParams)
           ```
   - id: using-filters

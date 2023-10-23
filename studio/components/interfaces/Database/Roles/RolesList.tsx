@@ -1,19 +1,19 @@
-import { partition } from 'lodash'
-import { useState, useEffect } from 'react'
-import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PostgresRole } from '@supabase/postgres-meta'
-import { Button, Input, IconPlus, IconSearch, IconX, Badge } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { partition } from 'lodash'
+import { observer } from 'mobx-react-lite'
+import { useEffect, useState } from 'react'
+import { Badge, Button, IconPlus, IconSearch, IconX, Input } from 'ui'
 
-import { useCheckPermissions, useStore } from 'hooks'
-import SparkBar from 'components/ui/SparkBar'
 import { FormHeader } from 'components/ui/Forms'
-import RoleRow from './RoleRow'
-import { SUPABASE_ROLES } from './Roles.constants'
+import NoSearchResults from 'components/ui/NoSearchResults'
+import SparkBar from 'components/ui/SparkBar'
+import { useCheckPermissions, useStore } from 'hooks'
 import CreateRolePanel from './CreateRolePanel'
 import DeleteRoleModal from './DeleteRoleModal'
-import NoSearchResults from 'components/ui/NoSearchResults'
+import RoleRow from './RoleRow'
+import { SUPABASE_ROLES } from './Roles.constants'
 
 const RolesList = ({}) => {
   const { meta } = useStore()
@@ -89,8 +89,8 @@ const RolesList = ({}) => {
                 className={[
                   'text-xs w-[90px] h-full text-center rounded-l-full flex items-center justify-center transition',
                   filterType === 'all'
-                    ? 'bg-scale-500 text-scale-1200'
-                    : 'hover:bg-scale-400 text-scale-1100',
+                    ? 'bg-scale-500 text-foreground'
+                    : 'hover:bg-scale-400 text-foreground-light',
                 ].join(' ')}
                 onClick={() => setFilterType('all')}
               >
@@ -101,8 +101,8 @@ const RolesList = ({}) => {
                 className={[
                   'text-xs w-[90px] h-full text-center rounded-r-full flex items-center justify-center transition',
                   filterType === 'active'
-                    ? 'bg-scale-500 text-scale-1200'
-                    : 'hover:bg-scale-400 text-scale-1100',
+                    ? 'bg-scale-500 text-foreground'
+                    : 'hover:bg-scale-400 text-foreground-light',
                 ].join(' ')}
                 onClick={() => setFilterType('active')}
               >
@@ -140,9 +140,9 @@ const RolesList = ({}) => {
                     'border border-scale-200 space-y-1',
                   ].join(' ')}
                 >
-                  <p className="text-xs text-scale-1100 pr-2">Connections by roles:</p>
+                  <p className="text-xs text-foreground-light pr-2">Connections by roles:</p>
                   {rolesWithActiveConnections.map((role: PostgresRole) => (
-                    <div key={role.id} className="text-xs text-scale-1200">
+                    <div key={role.id} className="text-xs text-foreground">
                       {role.name}: {role.active_connections}
                     </div>
                   ))}
@@ -181,7 +181,7 @@ const RolesList = ({}) => {
           <div>
             {supabaseRoles.length > 0 && (
               <div className="bg-scale-100 dark:bg-scale-200 border border-scale-300 dark:border-scale-500 px-6 py-3 rounded-t flex items-center space-x-4">
-                <p className="text-sm text-scale-1100">Roles managed by Supabase</p>
+                <p className="text-sm text-foreground-light">Roles managed by Supabase</p>
                 <Badge color="green">Protected</Badge>
               </div>
             )}
@@ -198,7 +198,7 @@ const RolesList = ({}) => {
           <div>
             {otherRoles.length > 0 && (
               <div className="bg-scale-100 dark:bg-scale-200 border border-scale-300 dark:border-scale-500 px-6 py-3 rounded-t">
-                <p className="text-sm text-scale-1100">Other database roles</p>
+                <p className="text-sm text-foreground-light">Other database roles</p>
               </div>
             )}
             {otherRoles.map((role: PostgresRole, i: number) => (

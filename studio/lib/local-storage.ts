@@ -19,7 +19,7 @@ export function clearLocalStorage() {
 
 function inferSignInClicks() {
   // remove old data from local storage
-  ['', '_v2'].forEach(suffix => {
+  ;['', '_v2'].forEach((suffix) => {
     localStorage.removeItem(`supabase.dashboard.sign_in_clicks${suffix}`)
   })
 

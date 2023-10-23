@@ -1,6 +1,6 @@
+import { useParams } from 'common'
 import { find } from 'lodash'
 import { observer } from 'mobx-react-lite'
-import { useParams } from 'common'
 
 import { StorageLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -26,7 +26,7 @@ const PageLayout: NextPageWithLayout = () => {
       {isSuccess ? (
         !bucket ? (
           <div className="flex h-full w-full items-center justify-center">
-            <p className="text-sm text-scale-1100">Bucket {bucketId} cannot be found</p>
+            <p className="text-sm text-foreground-light">Bucket {bucketId} cannot be found</p>
           </div>
         ) : (
           // @ts-ignore

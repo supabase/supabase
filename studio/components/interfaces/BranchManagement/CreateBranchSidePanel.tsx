@@ -113,7 +113,7 @@ const CreateBranchSidePanel = ({ visible, onClose }: CreateBranchSidePanelProps)
           {isLoadingIntegrations && <GenericSkeletonLoader />}
           {isSuccessIntegrations && (
             <div>
-              <p className="text-sm text-scale-1100">
+              <p className="text-sm text-foreground-light">
                 Your project is currently connected to the repository:
               </p>
               <div className="flex items-center space-x-2">

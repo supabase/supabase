@@ -1,8 +1,8 @@
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
 import NavigationMenu from '~/components/Navigation/NavigationMenu/NavigationMenu'
-import TopNavBarRef from '~/components/Navigation/NavigationMenu/TopNavBarRef'
+import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
 
 import Head from 'next/head'
 import { PropsWithChildren, memo } from 'react'
@@ -23,8 +23,12 @@ const levelsData = {
     name: 'Database',
   },
   api: {
-    icon: '/docs/img/icons/menu/database',
-    name: 'Serverless APIs',
+    icon: '/docs/img/icons/menu/rest',
+    name: 'REST API',
+  },
+  graphql: {
+    icon: '/docs/img/icons/menu/graphql',
+    name: 'GraphQL',
   },
   auth: {
     icon: '/docs/img/icons/menu/auth',
@@ -216,13 +220,13 @@ const MobileMenuBackdrop = memo(function MobileMenuBackdrop() {
 })
 
 const HeaderLogo = memo(function HeaderLogo() {
-  const { isDarkMode } = useTheme()
+  const { resolvedTheme } = useTheme()
   return (
     <Link href="/">
       <a className="px-10 flex items-center gap-2">
         <Image
           className="cursor-pointer"
-          src={isDarkMode ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'}
+          src={resolvedTheme === 'dark' ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'}
           width={96}
           height={24}
           alt="Supabase Logo"
@@ -330,7 +334,7 @@ const SiteLayout = ({ children }: PropsWithChildren<{}>) => {
           <NavContainer />
           <Container>
             <div className={['lg:sticky top-0 z-10 overflow-hidden'].join(' ')}>
-              <TopNavBarRef />
+              <TopNavBar />
             </div>
             <div
               className={[

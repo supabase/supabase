@@ -33,7 +33,8 @@ export const getResourcesExceededLimitsOrg = (usageMetrics: UsageMetric[]): stri
 
   return usageMetrics
     .filter((usageMetric) => {
-      if (!usageMetric.capped || !usageMetric.available_in_plan || usageMetric.unlimited) return false
+      if (!usageMetric.capped || !usageMetric.available_in_plan || usageMetric.unlimited)
+        return false
 
       const freeUnits = usageMetric.pricing_free_units || 0
 

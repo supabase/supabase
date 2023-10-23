@@ -66,7 +66,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     indexHitRate && tableHitRate && (indexHitRate <= 0.99 || tableHitRate <= 0.99)
 
   const headerText = (
-    <p className="whitespace-pre-wrap prose text-sm max-w-2xl text-scale-1000">
+    <p className="whitespace-pre-wrap prose text-sm max-w-2xl text-foreground-light">
       Identify the queries that consume the most time and database resources.
       {'\n\n'}It relies on the <code>pg_stat_statements</code> table. Read more about{' '}
       <Link
@@ -96,7 +96,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   Look for queries with high or mean execution times. These are often good candidates for optimization.
 `
   const panelClassNames = 'text-sm max-w-none flex flex-col gap-8 py-4'
-  const helperTextClassNames = 'prose text-sm max-w-2xl text-scale-1000'
+  const helperTextClassNames = 'prose text-sm max-w-2xl text-foreground-light'
 
   return (
     <ReportPadding>
@@ -155,7 +155,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                   </div>
                 </div>
                 <div className="px-8 pt-4 m-0">
-                  <p className="text-scale-1100 text-sm max-w-2xl">
+                  <p className="text-foreground-light text-sm max-w-2xl">
                     For best performance, ensure that the cache hit rate ratios above 99%. <br />{' '}
                     Consider upgrading to an instance with more memory if the ratios dip below 95%.
                   </p>

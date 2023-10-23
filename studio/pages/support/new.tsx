@@ -74,7 +74,7 @@ const SupportPage = () => {
                         'border border-scale-200',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">Check Supabase status page</span>
+                      <span className="text-xs text-foreground">Check Supabase status page</span>
                     </div>
                   </Tooltip.Content>
                 </Tooltip.Portal>

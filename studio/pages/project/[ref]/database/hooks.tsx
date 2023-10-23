@@ -82,7 +82,7 @@ const HooksPage: NextPageWithLayout = () => {
     return (
       <div className="w-full h-full flex items-center justify-center space-x-2">
         <IconLoader className="animate-spin" size="tiny" strokeWidth={1.5} />
-        <p className="text-sm text-scale-1100">Checking if hooks are enabled</p>
+        <p className="text-sm text-foreground-light">Checking if hooks are enabled</p>
       </div>
     )
   }
@@ -101,11 +101,11 @@ const HooksPage: NextPageWithLayout = () => {
             !canCreateWebhooks ? 'You need additional permissions to enable webhooks' : undefined
           }
         >
-          <p className="text-sm text-scale-1100">
+          <p className="text-sm text-foreground-light">
             Database Webhooks can be used to trigger serverless functions or send requests to an
             HTTP endpoint.
           </p>
-          <p className="text-sm text-scale-1100">Enable database webhooks on your project.</p>
+          <p className="text-sm text-foreground-light">Enable database webhooks on your project.</p>
         </ProductEmptyState>
       </div>
     )
@@ -113,8 +113,8 @@ const HooksPage: NextPageWithLayout = () => {
 
   return (
     <>
-      <ScaffoldContainer>
-        <ScaffoldSection>
+      <ScaffoldContainer className="h-full">
+        <ScaffoldSection className="h-full">
           <div className="col-span-12">
             <HooksList createHook={createHook} editHook={editHook} deleteHook={deleteHook} />
           </div>

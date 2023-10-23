@@ -18,7 +18,7 @@ import {
 } from 'components/ui/Forms'
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useIsFeatureEnabled, useSelectedOrganization, useStore } from 'hooks'
 import { OPT_IN_TAGS } from 'lib/constants'
 import OrganizationDeletePanel from './OrganizationDeletePanel'
 
@@ -33,6 +33,8 @@ const GeneralSettings = () => {
   const formId = 'org-general-settings'
   const isOptedIntoAi = opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL)
   const initialValues = { name: name ?? '', isOptedIntoAi }
+
+  const organizationDeletionEnabled = useIsFeatureEnabled('organizations:delete')
 
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
   const canDeleteOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
@@ -127,13 +129,13 @@ const GeneralSettings = () => {
                             size={16}
                             className={clsx('transition-all', open ? 'rotate-90' : '')}
                           />
-                          <p className="text-sm text-scale-1000 underline">
+                          <p className="text-sm text-foreground-light underline">
                             Important information regarding opting in
                           </p>
                         </div>
                       </Collapsible.Trigger>
                       <Collapsible.Content>
-                        <div className="space-y-2 py-4 ml-16 text-sm text-scale-1100">
+                        <div className="space-y-2 py-4 ml-16 text-sm text-foreground-light">
                           <p>
                             Supabase AI is a chatbot support tool powered by OpenAI. Supabase will
                             share the query you submit and information about the databases you
@@ -189,7 +191,7 @@ const GeneralSettings = () => {
         }}
       </Form>
 
-      {canDeleteOrganization && <OrganizationDeletePanel />}
+      {organizationDeletionEnabled && canDeleteOrganization && <OrganizationDeletePanel />}
     </ScaffoldContainerLegacy>
   )
 }

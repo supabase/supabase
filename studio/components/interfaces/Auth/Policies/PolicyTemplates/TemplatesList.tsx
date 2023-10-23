@@ -46,7 +46,7 @@ const TemplatesList = ({
     </div>
     {templatesNote && (
       <div className="px-4 py-2">
-        <p className="text-xs text-scale-900">{templatesNote}</p>
+        <p className="text-xs text-foreground-lighter">{templatesNote}</p>
       </div>
     )}
   </div>

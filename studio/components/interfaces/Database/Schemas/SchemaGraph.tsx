@@ -18,7 +18,7 @@ import ReactFlow, {
 } from 'reactflow'
 
 import { PostgresTable } from '@supabase/postgres-meta'
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTablesQuery } from 'data/tables/tables-query'
 import 'reactflow/dist/style.css'
@@ -301,11 +301,13 @@ function TableNode({ data, targetPosition, sourcePosition }: NodeProps<TableNode
 }
 
 const TablesGraph = ({ tables }: { tables: PostgresTable[] }) => {
-  const { isDarkMode } = useTheme()
-  const backgroundPatternColor = isDarkMode ? '#2e2e2e' : '#e6e8eb'
-  const edgeStrokeColor = isDarkMode ? '#ededed' : '#111318'
+  const { resolvedTheme } = useTheme()
+  const backgroundPatternColor = resolvedTheme === 'dark' ? '#2e2e2e' : '#e6e8eb'
+  const edgeStrokeColor = resolvedTheme === 'dark' ? '#ededed' : '#111318'
+
   const miniMapNodeColor = '#111318'
-  const miniMapMaskColor = isDarkMode ? 'rgb(17, 19, 24, .8)' : 'rgb(237, 237, 237, .8)'
+  const miniMapMaskColor =
+    resolvedTheme === 'dark' ? 'rgb(17, 19, 24, .8)' : 'rgb(237, 237, 237, .8)'
 
   const reactFlowInstance = useReactFlow()
   const nodeTypes = useMemo(
@@ -321,7 +323,7 @@ const TablesGraph = ({ tables }: { tables: PostgresTable[] }) => {
       reactFlowInstance.setEdges(edges)
       setTimeout(() => reactFlowInstance.fitView({})) // it needs to happen during next event tick
     })
-  }, [tables, isDarkMode])
+  }, [tables, resolvedTheme])
 
   return (
     <>
@@ -374,14 +376,14 @@ const SchemaGraph = ({ schema }: { schema: string }) => {
     return (
       <div className="flex h-full w-full items-center justify-center space-x-2">
         <IconLoader className="animate-spin" size={14} />
-        <p className="text-sm text-scale-1000">Loading table...</p>
+        <p className="text-sm text-foreground-light">Loading table...</p>
       </div>
     )
   }
 
   if (isError) {
     return (
-      <div className="px-6 py-4 text-scale-1000">
+      <div className="px-6 py-4 text-foreground-light">
         <p>Error connecting to API</p>
         <p>{`${error?.message ?? 'Unknown error'}`}</p>
       </div>

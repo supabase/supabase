@@ -112,6 +112,7 @@ export default {
           first:rounded-tl-md first:rounded-tr-md
           last:rounded-bl-md last:rounded-br-md
           overflow-hidden
+          will-change-transform
         `,
         trigger: `
           flex flex-row
@@ -217,6 +218,7 @@ export default {
     dot: '-ml-0.5 mr-1.5 h-2 w-2 rounded-full',
     color: {
       brand: 'bg-brand-500 text-brand-600 border border-brand-400',
+      brandAlt: 'bg-brand bg-opacity-100 text-background border border-brand',
       scale: 'bg-scale-200 text-scale-1100 border border-scale-700',
       tomato: `bg-tomato-200 text-tomato-1100 border border-tomato-700`,
       red: `bg-red-200 text-red-1100 border border-red-700`,
@@ -1056,99 +1058,6 @@ export default {
       large: 'text-base',
       xlarge: 'text-base',
     },
-  },
-
-  /*
-   *  Dropdown
-   */
-
-  dropdown: {
-    // root:
-    trigger: `
-      flex
-      border-none
-      rounded
-      bg-transparent p-0
-      outline-none
-      outline-offset-1
-      transition-all
-      focus:outline-4
-      focus:outline-scale-600
-    `,
-    item_nested: `
-      border-none
-      focus:outline-none
-      focus:bg-scale-300 dark:focus:bg-scale-500
-      focus:text-scale-1200
-      data-open:bg-scale-300 dark:data-open:bg-scale-500
-      data-open:text-scale-1200
-    `,
-    content: `
-      z-40
-      bg-overlay
-      border
-      rounded
-      shadow-lg
-      py-1.5
-      origin-dropdown
-      data-open:animate-dropdown-content-show
-      data-closed:animate-dropdown-content-hide
-      min-w-fit
-    `,
-    size: {
-      tiny: `w-40`,
-      small: `w-48`,
-      medium: `w-64`,
-      large: `w-80`,
-      xlarge: `w-96`,
-      content: `w-auto`,
-    },
-    arrow: `
-      fill-current
-      border-0 border-t
-    `,
-    item: `
-      group
-      relative
-      text-sm
-      text-body-light
-      px-4 py-1.5 flex items-center space-x-2
-      cursor-pointer
-      focus:bg-selection
-      focus:text-body
-      border-none
-      focus:outline-none
-    `,
-    disabled: `opacity-50 cursor-default`,
-    label: `
-      text-body-lighter
-      px-4 flex items-center space-x-2 py-1.5
-      text-xs
-    `,
-    separator: `
-      w-full
-      my-2
-      border-t-[1px]
-    `,
-    misc: `
-      px-4 py-1.5
-    `,
-    check: `
-      absolute left-3
-      flex items-center
-      data-checked:text-scale-1200
-    `,
-    input: `
-      flex items-center space-x-0 pl-8 pr-4
-    `,
-    right_slot: `
-      text-scale-900
-      group-focus:text-scale-1000
-      absolute
-      -translate-y-1/2
-      right-2
-      top-1/2
-    `,
   },
 
   /*

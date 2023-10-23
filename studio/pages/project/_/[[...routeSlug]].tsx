@@ -33,19 +33,21 @@ const Header = () => {
 const GenericProjectPage: NextPage = () => {
   const router = useRouter()
   const { routeSlug, ...queryParams } = router.query
-  const queryString =
-    Object.keys(queryParams).length > 0
-      ? new URLSearchParams(queryParams as Record<string, string>).toString()
-      : ''
+
+  const query = Object.keys(queryParams).length
+    ? `?${new URLSearchParams(queryParams as Record<string, string>)}`
+    : undefined
 
   const urlRewriterFactory = (slug: string | string[] | undefined) => {
     return (projectRef: string) => {
+      const hash = location.hash ? `#${location.hash}` : undefined
+
       if (!Array.isArray(slug)) {
-        return `/project/${projectRef}?${queryString}`
+        return [`/project/${projectRef}`, query, hash].filter(Boolean).join('')
       }
 
-      const slugPath = slug.reduce((a: string, b: string) => `${a}/${b}`, '').slice(1)
-      return `/project/${projectRef}/${slugPath}?${queryString}`
+      const slugPath = slug.reduce((a, b) => `${a}/${b}`, '').slice(1)
+      return [`/project/${projectRef}/${slugPath}`, query, hash].filter(Boolean).join('')
     }
   }
 

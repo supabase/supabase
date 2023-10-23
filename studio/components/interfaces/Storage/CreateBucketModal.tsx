@@ -67,6 +67,10 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
     if (!values.name) {
       errors.name = 'Please provide a name for your bucket'
     }
+    if (values.name && values.name.endsWith(' ')) {
+      errors.name = 'The name of the bucket cannot end with a whitespace'
+    }
+
     if (values.has_file_size_limit && values.formatted_size_limit < 0) {
       errors.formatted_size_limit = 'File size upload limit has to be at least 0'
     }
@@ -159,7 +163,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                     <IconChevronDown
                       size={18}
                       strokeWidth={2}
-                      className={clsx('text-scale-1100', showConfiguration && 'rotate-180')}
+                      className={clsx('text-foreground-light', showConfiguration && 'rotate-180')}
                     />
                   </div>
                 </Collapsible.Trigger>
@@ -209,7 +213,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                           </div>
                           {IS_PLATFORM && (
                             <div className="col-span-12">
-                              <p className="text-scale-1000 text-sm">
+                              <p className="text-foreground-light text-sm">
                                 Note: The{' '}
                                 <Link href={`/project/${ref}/settings/storage`}>
                                   <a className="text-brand opacity-80 hover:opacity-100 transition">

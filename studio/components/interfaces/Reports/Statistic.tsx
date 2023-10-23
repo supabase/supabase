@@ -29,7 +29,7 @@ const Statistic: React.FC<Props> = ({
     <div className="w-full">
       <div className="flex flex-row justify-center">
         <span>{prefix}</span>
-        <span className="text-3xl text-scale-1200">{value}</span>
+        <span className="text-3xl text-foreground">{value}</span>
         <span>{suffix}</span>
       </div>
       {startingValue && (

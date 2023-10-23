@@ -41,7 +41,7 @@
   {
     "type": "example",
     "products": ["database"],
-    "title": "Expo Starter",
+    "title": "Expo React Native Starter",
     "description": "Template bottom tabs with auth flow (Typescript)",
     "author": "codingki",
     "author_url": "https://github.com/codingki",

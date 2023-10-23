@@ -18,7 +18,7 @@ const FreeProjectLimitWarning = ({
   return (
     <div>
       <InformationBox
-        icon={<IconAlertCircle className="text-scale-1200" size="large" strokeWidth={1.5} />}
+        icon={<IconAlertCircle className="text-foreground" size="large" strokeWidth={1.5} />}
         defaultVisibility={true}
         hideCollapse
         title="The organization has members who have exceeded their free project limits"

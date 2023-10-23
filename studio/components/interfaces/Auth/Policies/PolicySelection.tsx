@@ -18,7 +18,7 @@ const PolicySelection = ({
     <Modal.Content>
       <div className="space-y-6 py-8">
         <div>
-          <p className="text-sm text-scale-1100">{description}</p>
+          <p className="text-sm text-foreground-light">{description}</p>
         </div>
         <div className="grid grid-cols-1 gap-2 lg:grid-cols-1">
           <CardButton
@@ -58,7 +58,7 @@ const PolicySelection = ({
             onClick={onViewEditor}
           />
         </div>
-        <p className="text-sm text-scale-1100">
+        <p className="text-sm text-foreground-light">
           Not sure what policies are? Check out our resources{' '}
           <a
             target="_blank"

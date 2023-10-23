@@ -187,7 +187,7 @@ const VercelIntegration: NextPageWithLayout = () => {
     <>
       <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
         <ScaffoldColumn className="mx-auto w-full max-w-md">
-          <h1 className="text-xl text-scale-1200">Choose organization</h1>
+          <h1 className="text-xl text-foreground">Choose organization</h1>
           <>
             <Markdown content={`Choose the Supabase organization you wish to install in`} />
             <OrganizationPicker

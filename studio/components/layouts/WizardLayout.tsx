@@ -5,9 +5,9 @@ import { IconChevronRight } from 'ui'
 
 import { useFlag, withAuth } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
+import { Organization, Project } from 'types'
 import FeedbackDropdown from './ProjectLayout/LayoutHeader/FeedbackDropdown'
 import HelpPopover from './ProjectLayout/LayoutHeader/HelpPopover'
-import { Organization, Project } from 'types'
 
 interface WizardLayoutProps {
   organization: Organization | null | undefined
@@ -56,16 +56,16 @@ const Header = ({ organization, project }: WizardLayoutProps) => {
                   />
                 </a>
               </Link>
-              <IconChevronRight size="small" className="text-scale-1100" />
+              <IconChevronRight size="small" className="text-foreground-light" />
               <p className="text-sm">
                 {organization ? `Organization: ${organization.name}` : 'Create an organization'}
               </p>
-              <IconChevronRight size="small" className="text-scale-1100" />
-              <p className={`text-sm ${stepNumber < 1 ? 'text-scale-1100' : ''}`}>
+              <IconChevronRight size="small" className="text-foreground-light" />
+              <p className={`text-sm ${stepNumber < 1 ? 'text-foreground-light' : ''}`}>
                 {project ? project.name : 'Create a new project'}
               </p>
-              <IconChevronRight size="small" className="text-scale-1100" />
-              <p className={`text-sm ${stepNumber < 2 ? 'text-scale-1100' : ''}`}>
+              <IconChevronRight size="small" className="text-foreground-light" />
+              <p className={`text-sm ${stepNumber < 2 ? 'text-foreground-light' : ''}`}>
                 {project ? project.name : 'Extend your database'}
               </p>
             </div>

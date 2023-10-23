@@ -1,7 +1,7 @@
+import { ListTree } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
-import { ListTree } from 'lucide-react'
 
 import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -19,7 +19,6 @@ import {
   IconAlertCircle,
   IconCheck,
   IconCode,
-  IconGitBranch,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
@@ -102,7 +101,7 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
                 type="text"
                 className="pr-2"
                 iconRight={
-                  <IconCode className="text-scale-1100 rotate-90" strokeWidth={2} size={12} />
+                  <IconCode className="text-foreground-light rotate-90" strokeWidth={2} size={12} />
                 }
               >
                 <div className="flex items-center space-x-2">

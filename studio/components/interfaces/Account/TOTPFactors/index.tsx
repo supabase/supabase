@@ -49,7 +49,7 @@ const TOTPFactors = () => {
                 {data.totp.map((factor) => {
                   return (
                     <div key={factor.id} className="flex flex-row justify-between py-2">
-                      <p className="text-sm text flex items-center space-x-2">
+                      <p className="text-sm text-foreground flex items-center space-x-2">
                         <span className="text-light">Name:</span>{' '}
                         <span>{factor.friendly_name ?? 'No name provided'}</span>
                       </p>

@@ -33,14 +33,14 @@ const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDeleteProp
     <>
       <Panel.Content>
         <div className="w-full space-y-2">
-          <p className="text-xs text-scale-1100">Active custom domain:</p>
+          <p className="text-xs text-foreground-light">Active custom domain:</p>
           <div className="flex items-center space-x-2">
             <code className="text-lg mx-0 flex items-center space-x-2">
               <div className="h-2 w-2 rounded-full bg-brand" />
               <span>{customDomain.hostname}</span>
             </code>
           </div>
-          <p className="text-sm text-scale-1100">
+          <p className="text-sm text-foreground-light">
             Your custom domain is currently active and is serving traffic
           </p>
         </div>

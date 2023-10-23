@@ -227,7 +227,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                       className={clsx('graphiql-query-editor', styles.graphiqlQueryEditor)}
                       aria-label="Query Editor"
                     >
-                      <div className="graphiql-query-editor-wrapper">
+                      <div className="graphiql-query-editor-wrapper text-sm">
                         <QueryEditor />
                       </div>
                       <div className="graphiql-toolbar" role="toolbar" aria-label="Editor Commands">
@@ -306,7 +306,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                   </div>
                   <div ref={editorToolsResize.secondRef}>
                     <section
-                      className="graphiql-editor-tool"
+                      className="graphiql-editor-tool text-sm"
                       aria-label={activeSecondaryEditor === 'variables' ? 'Variables' : 'Headers'}
                     >
                       <VariableEditor
@@ -327,7 +327,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
               <div ref={editorResize.secondRef}>
                 <div
                   className={clsx(
-                    'graphiql-response',
+                    'graphiql-response text-sm',
                     hasSingleTab
                       ? styles.graphiqlResponseSingleTab
                       : styles.graphiqlResponseMultiTab
