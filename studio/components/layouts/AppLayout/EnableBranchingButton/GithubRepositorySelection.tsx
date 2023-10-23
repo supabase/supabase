@@ -121,8 +121,11 @@ const GithubRepositorySelection = ({
                       <Input_Shadcn_ {...field} placeholder="e.g main" />
                     </FormControl_Shadcn_>
                     <div className="absolute top-9 right-3">
-                      {isChecking && <IconLoader className="animate-spin" />}
-                      {isValid && <IconCheck className="text-brand" strokeWidth={2} />}
+                      {isChecking ? (
+                        <IconLoader className="animate-spin" />
+                      ) : isValid ? (
+                        <IconCheck className="text-brand" strokeWidth={2} />
+                      ) : null}
                     </div>
 
                     <FormMessage_Shadcn_ />

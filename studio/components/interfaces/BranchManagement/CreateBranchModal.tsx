@@ -83,12 +83,17 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
 
   const formId = 'create-branch-form'
   const FormSchema = z.object({
-    branchName: z
-      .string()
-      .refine((val) => val.length > 1, `Please enter a branch name from ${repoOwner}/${repoName}`)
-      .refine(async (val) => {
+    branchName: z.string().superRefine(async (val, ctx) => {
+      if ((branches ?? []).some((branch) => branch.git_branch === val)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'This branch already has a Preview Branch',
+        })
+        return
+      }
+
+      if (val.length > 0) {
         try {
-          console.log('Async check', val)
           await checkGithubBranchValidity({
             organizationIntegrationId: githubIntegration?.id,
             repoOwner,
@@ -96,12 +101,15 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
             branchName: val,
           })
           setIsValid(true)
-          return true
         } catch (error) {
-          setIsValid(false)
-          return false
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Unable to find branch from ${repoOwner}/${repoName}`,
+          })
+          return
         }
-      }, `Unable to find branch from ${repoOwner}/${repoName}`),
+      }
+    }),
   })
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onBlur',
@@ -129,6 +137,7 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
         <Modal
           hideFooter
           size="medium"
+          modal={false}
           visible={visible}
           onCancel={onClose}
           header="Create a new preview branch"
@@ -178,8 +187,11 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
                     <Input_Shadcn_ {...field} placeholder="e.g feat/some-feature" />
                   </FormControl_Shadcn_>
                   <div className="absolute top-9 right-3">
-                    {isChecking && <IconLoader className="animate-spin" />}
-                    {isValid && <IconCheck className="text-brand" strokeWidth={2} />}
+                    {isChecking ? (
+                      <IconLoader className="animate-spin" />
+                    ) : isValid ? (
+                      <IconCheck className="text-brand" strokeWidth={2} />
+                    ) : null}
                   </div>
 
                   <FormMessage_Shadcn_ />
