@@ -16,6 +16,7 @@ import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import {
   Alert,
   AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
   IconCalendar,
@@ -126,22 +127,27 @@ const CostControl = ({}: CostControlProps) => {
               {subscription?.scheduled_plan_change?.target_plan === 'pro' &&
                 subscription?.scheduled_plan_change?.usage_billing_enabled === false &&
                 subscription?.plan.id === 'pro' && (
-                  <Alert_Shadcn_ className="mb-2">
+                  <Alert_Shadcn_ className="mb-2" title="Scheduled downgrade">
                     <IconCalendar className="h-4 w-4" />
-                    <AlertDescription_Shadcn_ className="flex justify-between items-center">
-                      <p>
-                        Spend cap will be enabled on{' '}
-                        {dayjs(subscription?.scheduled_plan_change?.at).format('MMMM D, YYYY')}
-                      </p>
-                      <Button
-                        type="default"
-                        loading={cancelSubscriptionScheduleLoading}
-                        onClick={() => {
-                          return cancelSubscriptionSchedule({ slug: slug! })
-                        }}
-                      >
-                        Cancel
-                      </Button>
+                    <AlertTitle_Shadcn_>Scheduled change</AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                      <div>
+                        Your spend cap will be enabled on{' '}
+                        {dayjs(subscription?.scheduled_plan_change?.at).format('MMMM D, YYYY')}. You
+                        will not be charged for any over-usage moving on. If you would like to keep
+                        the spend cap disabled and scale as you go, cancel the scheduled change.
+                      </div>
+                      <div>
+                        <Button
+                          type="default"
+                          loading={cancelSubscriptionScheduleLoading}
+                          onClick={() => {
+                            return cancelSubscriptionSchedule({ slug: slug! })
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
                     </AlertDescription_Shadcn_>
                   </Alert_Shadcn_>
                 )}
