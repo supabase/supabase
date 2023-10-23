@@ -78,7 +78,6 @@ const EnableBranchingModal = () => {
       .refine(async (val) => {
         try {
           if (val.length > 0) {
-            console.log('async check')
             await checkGithubBranchValidity({
               organizationIntegrationId: githubIntegration?.id,
               repoOwner,
