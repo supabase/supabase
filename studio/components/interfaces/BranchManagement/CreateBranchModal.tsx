@@ -106,6 +106,7 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
             code: z.ZodIssueCode.custom,
             message: `Unable to find branch from ${repoOwner}/${repoName}`,
           })
+          setIsValid(false)
           return
         }
       }
@@ -133,7 +134,12 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
 
   return (
     <Form_Shadcn_ {...form}>
-      <form id={formId} className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+      <form
+        id={formId}
+        className="space-y-4"
+        onSubmit={form.handleSubmit(onSubmit)}
+        onChange={() => setIsValid(false)}
+      >
         <Modal
           hideFooter
           size="medium"

@@ -77,13 +77,16 @@ const EnableBranchingModal = () => {
       .refine((val) => val.length > 1, `Please enter a branch name from ${repoOwner}/${repoName}`)
       .refine(async (val) => {
         try {
-          await checkGithubBranchValidity({
-            organizationIntegrationId: githubIntegration?.id,
-            repoOwner,
-            repoName,
-            branchName: val,
-          })
-          setIsValid(true)
+          if (val.length > 0) {
+            console.log('async check')
+            await checkGithubBranchValidity({
+              organizationIntegrationId: githubIntegration?.id,
+              repoOwner,
+              repoName,
+              branchName: val,
+            })
+            setIsValid(true)
+          }
           return true
         } catch (error) {
           setIsValid(false)
@@ -121,7 +124,12 @@ const EnableBranchingModal = () => {
         size="medium"
       >
         <Form_Shadcn_ {...form}>
-          <form id={formId} className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+          <form
+            id={formId}
+            className="space-y-4"
+            onSubmit={form.handleSubmit(onSubmit)}
+            onChange={() => setIsValid(false)}
+          >
             <Modal.Content className="px-7 py-5 flex items-center space-x-4">
               <IconGitBranch strokeWidth={2} size={20} />
               <div>
