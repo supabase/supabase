@@ -335,6 +335,26 @@ const App = () => (
 
 Currently, translating error messages (e.g. "Invalid credentials") is not supported. Check [related issue.](https://github.com/supabase/auth-ui/issues/86)
 
+### Hiding links [#hiding-links]
+
+You can hide links by setting the `showLinks` prop to `false`
+
+```js mark=9 /src/index.js
+import { createClient } from '@supabase/supabase-js'
+import { Auth } from '@supabase/auth-ui-react'
+
+const supabase = createClient('<INSERT PROJECT URL>', '<INSERT PROJECT ANON API KEY>')
+
+const App = () => <Auth supabaseClient={supabase} showLinks={false} />
+```
+
+Setting `showLinks` to `false` will hide the following links:
+
+- Don't have an account? Sign up
+- Already have an account? Sign in
+- Send a magic link email
+- Forgot your password?
+
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
 export default Page
