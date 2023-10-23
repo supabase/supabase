@@ -1,6 +1,8 @@
+import { useRouter } from 'next/router'
 import { useMonaco } from '@monaco-editor/react'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef } from 'react'
+import { useParams } from 'common'
 
 import { useFunctionsQuery } from 'data/database/functions-query'
 import { useKeywordsQuery } from 'data/database/keywords-query'
@@ -14,14 +16,19 @@ import { SQLEditorLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import getPgsqlCompletionProvider from 'components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
 import getPgsqlSignatureHelpProvider from 'components/ui/CodeEditor/Providers/PgSQLSignatureHelpProvider'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { useParams } from 'common'
+import { useAppStateSnapshot } from 'state/app-state'
+import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
 
 const SqlEditor: NextPageWithLayout = () => {
+  const router = useRouter()
   const monaco = useMonaco()
-  const { id } = useParams()
+  const { id, ref } = useParams()
+
   const { project } = useProjectContext()
   const snap = useSqlEditorStateSnapshot()
+  const appSnap = useAppStateSnapshot()
+
+  const snippets = useSnippets(ref)
   const { mutateAsync: formatQuery } = useFormatQueryMutation()
 
   async function formatPgsql(value: string) {
@@ -71,6 +78,13 @@ const SqlEditor: NextPageWithLayout = () => {
     pgInfoRef.current.keywords = keywords?.result
     pgInfoRef.current.functions = functions?.result
   }
+
+  useEffect(() => {
+    if (id === 'new' && appSnap.dashboardHistory.sql !== undefined) {
+      const snippet = snippets.find((snippet) => snippet.id === appSnap.dashboardHistory.sql)
+      if (snippet !== undefined) router.push(`/project/${ref}/sql/${appSnap.dashboardHistory.sql}`)
+    }
+  }, [id, snippets])
 
   // Enable pgsql format
   useEffect(() => {
