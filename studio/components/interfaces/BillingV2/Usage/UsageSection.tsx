@@ -268,10 +268,11 @@ const UsageSection = ({
 
                       <Link
                         href={`/project/${projectRef}/settings/billing/subscription?panel=subscriptionPlan`}
+                        passHref
                       >
-                        <a>
-                          <Button type="primary">Upgrade plan</Button>
-                        </a>
+                        <Button type="primary" asChild>
+                          <a>Upgrade plan</a>
+                        </Button>
                       </Link>
                     </div>
                   </Panel.Content>

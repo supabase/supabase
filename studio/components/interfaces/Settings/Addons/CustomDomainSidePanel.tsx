@@ -256,11 +256,9 @@ const CustomDomainSidePanel = () => {
                 subscription.scheduled_plan_change?.target_plan !== undefined && (
                   <Alert_Shadcn_ variant={'warning'} className="mb-2">
                     <IconAlertTriangle className="h-4 w-4" />
-                    <AlertDescription_Shadcn_ className="flex justify-between items-center">
-                      <p className="text-sm">
-                        You have a scheduled subscription change that will be canceled if you change
-                        your custom domain add on.
-                      </p>
+                    <AlertDescription_Shadcn_>
+                      You have a scheduled subscription change that will be canceled if you change
+                      your custom domain add on.
                     </AlertDescription_Shadcn_>
                   </Alert_Shadcn_>
                 )}
