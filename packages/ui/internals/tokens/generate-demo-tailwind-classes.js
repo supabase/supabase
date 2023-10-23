@@ -23,10 +23,10 @@ function writeJsFile(file) {
   )
   const palletes = Object.keys(color).filter((x) => x.includes('colors-'))
 
-  console.log('Example tailwind classes: ')
+  // console.log('Example tailwind classes: ')
 
   function santizieDefaults(x) {
-    console.log(x)
+    // console.log(x)
     let value = x
     value = value.replace('-DEFAULT', '')
     value = value.replace('background', 'bg')

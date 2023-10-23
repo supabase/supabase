@@ -1,3 +1,4 @@
+import SVG from 'react-inlinesvg'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { Fragment } from 'react'
@@ -10,6 +11,7 @@ import { useIsFeatureEnabled } from 'hooks'
 import { useAppStateSnapshot } from 'state/app-state'
 import { navigateToSection } from './Content/Content.utils'
 import { DOCS_CONTENT, DOCS_MENU } from './ProjectAPIDocs.constants'
+import { BASE_PATH } from 'lib/constants'
 
 const Separator = () => <div className="border-t !mt-3 pb-1 mx-3" />
 
@@ -149,7 +151,29 @@ const FirstLevelNav = () => {
         <Link passHref href="https://supabase.com/docs/guides/api">
           <Button block asChild type="text" size="small" icon={<IconBookOpen />}>
             <a target="_blank" rel="noreferrer" className="!justify-start">
-              API Reference
+              REST guide
+            </a>
+          </Button>
+        </Link>
+        <Link passHref href="https://supabase.com/docs/guides/graphql">
+          <Button
+            block
+            asChild
+            type="text"
+            size="small"
+            icon={
+              <SVG
+                src={`${BASE_PATH}/img/graphql.svg`}
+                style={{ width: `${16}px`, height: `${16}px` }}
+                className="text-foreground"
+                preProcessor={(code) =>
+                  code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
+                }
+              />
+            }
+          >
+            <a target="_blank" rel="noreferrer" className="!justify-start">
+              GraphQL guide
             </a>
           </Button>
         </Link>

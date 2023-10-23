@@ -8,11 +8,11 @@
   "scripts": {
     "build:icons": "node --experimental-modules internals/populate-icons.js",
     "typecheck_CURRENTLY_IGNORED": "tsc --noEmit",
-    "build-tokens": "node internals/tokens/build-tokens.js",
-    "copy-tokens": "node internals/tokens/copy-tokens.js",
-    "cleanse-css-for-tailwind": "node internals/tokens/cleanse-css-for-tailwind.js",
     "generate-demo-tailwind-classes": "node internals/tokens/generate-demo-tailwind-classes.js",
-    "generate-styles": "npm run copy-tokens && npm run build-tokens && npm run cleanse-css-for-tailwind && npm run generate-demo-tailwind-classes",
+    "cleanse-css-for-tailwind": "node internals/tokens/cleanse-css-for-tailwind.js",
+    "transform-tokens": "node ./transformTokens.js",
+    "extract-design-tokens": "node internals/tokens/extract-design-tokens.js",
+    "generate-styles": "npm run extract-design-tokens && npm run transform-tokens && npm run cleanse-css-for-tailwind && npm run generate-demo-tailwind-classes",
     "storybook-build": "storybook build",
     "storybook": "storybook dev -p 6006",
     "test": "jest"
@@ -110,6 +110,7 @@
     "storybook": "^7.0.5",
     "storybook-dark-mode": "^3.0.0",
     "style-dictionary": "^3.7.1",
+    "@ctrl/tinycolor": "^3.4.0",
     "tsconfig-paths-webpack-plugin": "^4.0.1",
     "typescript": "^5.0.4",
     "ts-jest": "^29.1.1",
