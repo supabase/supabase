@@ -898,6 +898,10 @@ export const functions: NavMenuConstant = {
           name: 'Taking Screenshots with Puppeteer',
           url: '/guides/functions/examples/screenshots',
         },
+        {
+          name: 'Slack Bot responding to mentions',
+          url: '/guides/functions/examples/slack-bot-mention',
+        },
       ],
     },
   ],
@@ -1322,6 +1326,21 @@ export const resources: NavMenuConstant = {
         {
           name: 'Amazon RDS',
           url: '/guides/resources/migrating-to-supabase/amazon-rds',
+          items: [],
+        },
+        {
+          name: 'Postgres',
+          url: '/guides/resources/migrating-to-supabase/postgres',
+          items: [],
+        },
+        {
+          name: 'MySQL',
+          url: '/guides/resources/migrating-to-supabase/mysql',
+          items: [],
+        },
+        {
+          name: 'MSSQL',
+          url: '/guides/resources/migrating-to-supabase/mssql',
           items: [],
         },
       ],

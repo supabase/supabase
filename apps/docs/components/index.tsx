@@ -22,6 +22,7 @@ import SocialProviderSettingsSupabase from './MDX/social_provider_settings_supab
 import SocialProviderSetup from './MDX/social_provider_setup.mdx'
 import StorageManagement from './MDX/storage_management.mdx'
 import KotlinProjectSetup from './MDX/kotlin_project_setup.mdx'
+import MigrationWarnings from './MDX/migration_warnings.mdx'
 import { CH } from '@code-hike/mdx/components'
 import RefHeaderSection from './reference/RefHeaderSection'
 
@@ -72,6 +73,7 @@ const components = {
   DatabaseSetup,
   ProjectSetup,
   KotlinProjectSetup,
+  MigrationWarnings,
   SocialProviderSetup,
   SocialProviderSettingsSupabase,
   StepHikeCompact,
