@@ -1,5 +1,5 @@
-import '../../../packages/ui/build/css/themes/dark.css'
-import '../../../packages/ui/build/css/themes/light.css'
+import '../../packages/ui/build/css/themes/dark.css'
+import '../../packages/ui/build/css/themes/light.css'
 
 import 'styles/code.scss'
 import 'styles/contextMenu.scss'

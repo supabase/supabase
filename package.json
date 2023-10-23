@@ -8,7 +8,7 @@
   "workspaces": [
     "apps/www",
     "apps/docs",
-    "apps/studio",
+    "studio",
     "tests",
     "packages/*"
   ],
