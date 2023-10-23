@@ -19,13 +19,13 @@ import {
 } from 'ui'
 import * as z from 'zod'
 
+import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
+import { useBranchesQuery } from 'data/branches/branches-query'
 import { useCheckGithubBranchValidity } from 'data/integrations/integrations-github-branch-check'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useSelectedOrganization, useSelectedProject } from 'hooks'
-import AlertError from 'components/ui/AlertError'
-import { useBranchesQuery } from 'data/branches/branches-query'
 
 interface CreateBranchModalProps {
   visible: boolean
