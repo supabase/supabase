@@ -18,7 +18,6 @@ export async function checkGithubBranchValidity(
   if (!organizationIntegrationId) throw new Error('Organization integration ID is required')
 
   const { data, error } = await get(
-    // @ts-ignore [Joshen] to remove ignore statement once API changes are in
     '/platform/integrations/github/branches/{organization_integration_id}/{repo_owner}/{repo_name}/{branch_name}',
     {
       params: {

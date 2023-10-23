@@ -1,39 +1,48 @@
 import clsx from 'clsx'
 import { useParams } from 'common'
 import Link from 'next/link'
-import { Badge, Button, Input_Shadcn_, Modal } from 'ui'
+import {
+  Badge,
+  Button,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormMessage_Shadcn_,
+  IconCheck,
+  IconLoader,
+  Input_Shadcn_,
+  Modal,
+} from 'ui'
 
 import {
   EmptyIntegrationConnection,
   IntegrationConnection,
 } from 'components/interfaces/Integrations/IntegrationPanels'
-import { useCheckGithubBranchValidity } from 'data/integrations/integrations-github-branch-check'
 import { Integration } from 'data/integrations/integrations.types'
 import { useSelectedOrganization } from 'hooks'
-import { useState } from 'react'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 
 interface GithubRepositorySelectionProps {
+  form: any
+  isChecking: boolean
+  isValid: boolean
   integration?: Integration
   hasGithubIntegrationInstalled: boolean
-  setSelectedBranch: (name?: string) => void
 }
 
 const GithubRepositorySelection = ({
+  form,
+  isChecking,
+  isValid,
   integration,
   hasGithubIntegrationInstalled,
-  setSelectedBranch,
 }: GithubRepositorySelectionProps) => {
   const { ref } = useParams()
   const org = useSelectedOrganization()
 
-  const [error, setError] = useState()
-  const [branchName, setBranchName] = useState('')
-
   const githubConnection = integration?.connections.find(
     (connection) => connection.supabase_project_ref === ref
   )
-  const [repoOwner, repoName] = githubConnection?.metadata.name.split('/') ?? []
 
   const sidePanels = useSidePanelsStateSnapshot()
   const githubIntegrationAppUrl =
@@ -43,31 +52,11 @@ const GithubRepositorySelection = ({
       ? `https://github.com/apps/supabase-staging/installations/new?state=${ref}`
       : `https://github.com/apps/supabase-local-testing/installations/new?state=${ref}`
 
-  const { mutate: checkGithubBranchValidity } = useCheckGithubBranchValidity({
-    onSuccess: (data) => {
-      // setSelectedBranch(data)
-    },
-    onError: (error) => {
-      // setError(error)
-    },
-  })
-
   function onSelectConnectRepo() {
     if (integration) {
       sidePanels.setGithubConnectionsOpen(true)
       sidePanels.setGithubConnectionsIntegrationId(integration.id)
     }
-  }
-
-  const onBlur = async () => {
-    console.log('Validate')
-    setSelectedBranch(undefined)
-    // checkGithubBranchValidity({
-    //   organizationIntegrationId: integration?.id,
-    //   repoOwner,
-    //   repoName,
-    //   branchName,
-    // })
   }
 
   return (
@@ -120,17 +109,26 @@ const GithubRepositorySelection = ({
                 />
               </ul>
 
-              <div>
-                <label className="block text-sm text-light mb-2" htmlFor="branch-selector">
-                  Choose your production branch:
-                </label>
-                <Input_Shadcn_
-                  placeholder="e.g main"
-                  value={branchName}
-                  onBlur={onBlur}
-                  onChange={(e) => setBranchName(e.target.value)}
-                />
-              </div>
+              <FormField_Shadcn_
+                control={form.control}
+                name="branchName"
+                render={({ field }) => (
+                  <FormItem_Shadcn_ className="relative">
+                    <label className="text-sm text-foreground-light">
+                      Choose your production branch
+                    </label>
+                    <FormControl_Shadcn_>
+                      <Input_Shadcn_ {...field} placeholder="e.g main" />
+                    </FormControl_Shadcn_>
+                    <div className="absolute top-9 right-3">
+                      {isChecking && <IconLoader className="animate-spin" />}
+                      {isValid && <IconCheck className="text-brand" strokeWidth={2} />}
+                    </div>
+
+                    <FormMessage_Shadcn_ />
+                  </FormItem_Shadcn_>
+                )}
+              />
             </>
           )}
         </div>
