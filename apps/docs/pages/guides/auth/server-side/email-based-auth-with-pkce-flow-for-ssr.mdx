@@ -238,7 +238,7 @@ Let's update the URL in our email templates to point to our new confirmation end
 <h2>Confirm Change of Email</h2>
 
 <p>Follow this link to confirm the update of your email from {{ .Email }} to {{ .NewEmail }}:</p>
-<p><a href="{{ .ConfirmationURL }}">Change Email</a></p>
+<p><a href="{{ .SiteURL }}/api/store/auth/confirm?token_hash={{ .TokenHash }}&type=email_change">Change Email</a></p>
 ```
 
 **Reset Password template**
