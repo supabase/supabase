@@ -87,11 +87,12 @@ to authenticated
 using ( team_id in (select auth.jwt() -> 'app_metadata' -> 'teams'));
 ```
 
-{/* prettier-ignore */}
 <Admonition type="caution">
+
 Keep in mind that a JWT is not always "fresh". In the example above, even if you remove a user from a team and update the `app_metadata` field, that will not be reflected using `auth.jwt()` until the user's JWT is refreshed. 
 
 Also, if you are using Cookies for Auth, then you must be mindful of the JWT size. Some browsers are limited to 4096 bytes for each cookie, and so the total size of your JWT should be small enough to fit inside this limitation.
+
 </Admonition>
 
 ## Important considerations

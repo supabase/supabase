@@ -51,7 +51,9 @@ select
 The "service_role" is a predefined Postgres role with elevated privileges, designed to perform various administrative and service-related tasks. It can bypass Row Level Security, so it should only be used on a private server.
 
 <Admonition type="caution">
-  Never expose the `service_role` key in a browser or anywhere where a user can see it.
+
+Never expose the `service_role` key in a browser or anywhere where a user can see it.
+
 </Admonition>
 
 A common use case for the `service_role` key is running data analytics jobs on the backend. To support joins on user id, it is often useful to grant the service role read access to `auth.users` table.

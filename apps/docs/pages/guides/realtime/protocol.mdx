@@ -39,8 +39,9 @@ In the initial message, the client sends a message specifying the features they 
 ```
 
 <Admonition type="note">
-  The `in` filter has the format `COLUMN_NAME=in.(value1,value2,value3)`. However, other filters use
-  the format `COLUMN_NAME=FILTER_NAME.value`.
+
+The `in` filter has the format `COLUMN_NAME=in.(value1,value2,value3)`. However, other filters use the format `COLUMN_NAME=FILTER_NAME.value`.
+
 </Admonition>
 
 In response, the server sends the Postgres configuration with a unique ID. With this ID, the client should route incoming changes to the appropriate callback.

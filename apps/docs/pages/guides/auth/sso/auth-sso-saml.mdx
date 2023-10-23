@@ -8,8 +8,9 @@ export const meta = {
 }
 
 <Admonition>
-  Looking for guides on how to use Single Sign-On with the Supabase dashboard? Head on over to
-  [Enable SSO for Your Organization](/docs/guides/platform/sso).
+
+Looking for guides on how to use Single Sign-On with the Supabase dashboard? Head on over to [Enable SSO for Your Organization](/docs/guides/platform/sso).
+
 </Admonition>
 
 Supabase Auth supports enterprise-level Single Sign-On (SSO) for any identity providers compatible with the using the SAML 2.0 protocol. This is a non-exclusive list of supported identity providers:
@@ -101,8 +102,9 @@ Here are some commonly used statements to extract SSO related information from t
   Returns the identity provider's SAML 2.0 `EntityID`
 
 <Admonition type="caution">
-  If you use [Multi-Factor Authentication](/guides/auth/auth-mfa) with SSO, the `amr` array may have
-  a different method at index `0`!
+
+If you use [Multi-Factor Authentication](/guides/auth/auth-mfa) with SSO, the `amr` array may have a different method at index `0`!
+
 </Admonition>
 
 A common use case with SSO is to use the UUID of the identity provider as the identifier for the organization the user belongs to -- frequently known as a tenant. By associating the identity provider's UUID with your tenants, you can use restrictive RLS policies to scope down actions and data that a user is able to access.
