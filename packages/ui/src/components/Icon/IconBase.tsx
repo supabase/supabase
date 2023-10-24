@@ -114,7 +114,7 @@ function IconBase({
           </div>
         ) : (
           // feather icon
-          <IconComponent />
+          IconComponent()
         )
 
         return background ? <div className={__styles.container}>{Icon}</div> : Icon
