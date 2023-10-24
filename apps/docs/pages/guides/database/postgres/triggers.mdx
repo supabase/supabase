@@ -22,7 +22,7 @@ An example of a trigger is:
 create trigger "trigger_name"
 after insert on "table_name"
 for each row
-execute statement trigger_function();
+execute function trigger_function();
 ```
 
 ## Trigger Functions
@@ -82,7 +82,7 @@ Executes before the triggering event.
 create trigger before_insert_trigger
 before insert on orders
 for each row
-execute statement before_insert_function();
+execute function before_insert_function();
 ```
 
 ### Trigger after changed are made
@@ -93,7 +93,7 @@ Executes after the triggering event.
 create trigger after_delete_trigger
 after delete on customers
 for each row
-execute statement after_delete_function();
+execute function after_delete_function();
 ```
 
 ## Execution frequency
