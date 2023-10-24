@@ -203,11 +203,7 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>(
           </>
         )}
 
-        {mounted &&
-          createPortal(
-            <RowContextMenu table={props.table} rows={data?.rows ?? []} />,
-            document.body
-          )}
+        {mounted && createPortal(<RowContextMenu rows={data?.rows ?? []} />, document.body)}
       </div>
     )
   }

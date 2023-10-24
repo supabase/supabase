@@ -12,6 +12,8 @@ import { TableLike } from 'hooks/misc/useTable'
 import { noop } from 'lib/void'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Alert, Button, Checkbox, IconExternalLink, Modal } from 'ui'
+import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
+import toast from 'react-hot-toast'
 
 export type DeleteConfirmationDialogsProps = {
   projectRef?: string
@@ -24,18 +26,24 @@ const DeleteConfirmationDialogs = ({
   selectedTable,
   onAfterDeleteTable = noop,
 }: DeleteConfirmationDialogsProps) => {
+  const { meta, ui } = useStore()
+  const queryClient = useQueryClient()
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
-
   const [, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
-
-  const queryClient = useQueryClient()
-
-  const { meta, ui } = useStore()
 
   const getTables = useGetTables({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+  })
+
+  const { mutate: deleteRows } = useTableRowDeleteMutation({
+    onSuccess: () => {
+      snap.closeConfirmationDialog()
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete row: ${error.message}`)
+    },
   })
 
   const removeDeletedColumnFromFiltersAndSorts = (columnName: string) => {
@@ -57,7 +65,8 @@ const DeleteConfirmationDialogs = ({
     })
   }
 
-  const isDeleteWithCascade = snap.confirmationDialog?.isDeleteWithCascade ?? false
+  const isDeleteWithCascade =
+    snap.confirmationDialog?.type === 'column' ? snap.confirmationDialog.isDeleteWithCascade : false
 
   const onConfirmDeleteColumn = async () => {
     if (!(snap.confirmationDialog?.type === 'column')) return
@@ -136,6 +145,20 @@ const DeleteConfirmationDialogs = ({
     }
   }
 
+  const onConfirmDeleteRow = async () => {
+    if (!project) return console.error('Project ref is required')
+    if (!selectedTable) return console.error('Selected table required')
+    if (snap.confirmationDialog?.type !== 'row') return
+    const selectedRowToDelete = snap.confirmationDialog.row
+
+    deleteRows({
+      projectRef: project.ref,
+      connectionString: project.connectionString,
+      table: selectedTable as any,
+      rows: [selectedRowToDelete],
+    })
+  }
+
   return (
     <>
       <ConfirmationModal
@@ -187,6 +210,7 @@ const DeleteConfirmationDialogs = ({
           </div>
         </Modal.Content>
       </ConfirmationModal>
+
       <ConfirmationModal
         danger
         size="small"
@@ -233,6 +257,25 @@ const DeleteConfirmationDialogs = ({
                 </Button>
               </Alert>
             )}
+          </div>
+        </Modal.Content>
+      </ConfirmationModal>
+
+      <ConfirmationModal
+        danger
+        size="small"
+        visible={snap.confirmationDialog?.type === 'row'}
+        header={<span className="break-words">Confirm to delete row</span>}
+        buttonLabel="Delete"
+        buttonLoadingLabel="Deleting"
+        onSelectCancel={() => snap.closeConfirmationDialog()}
+        onSelectConfirm={() => onConfirmDeleteRow()}
+      >
+        <Modal.Content>
+          <div className="py-4 space-y-4">
+            <p className="text-sm text-foreground-light">
+              Are you sure you want to delete this row? This action cannot be undone.
+            </p>
           </div>
         </Modal.Content>
       </ConfirmationModal>
