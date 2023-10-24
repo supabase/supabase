@@ -44,7 +44,6 @@ const FunctionList = ({
     includes(x.name.toLowerCase(), filterString.toLowerCase())
   )
   const _functions = filteredFunctions.filter((x) => x.schema == schema)
-  const isApiDocumentAvailable = schema == 'public'
   const projectRef = selectedProject?.ref
 
   const canUpdateFunctions = useCheckPermissions(
@@ -81,6 +80,8 @@ const FunctionList = ({
   return (
     <>
       {_functions.map((x) => {
+        const isApiDocumentAvailable = schema == 'public' && x.return_type !== 'trigger'
+
         return (
           <Table.tr key={x.id}>
             <Table.td className="truncate">
