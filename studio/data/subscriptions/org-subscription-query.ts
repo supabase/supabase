@@ -63,6 +63,11 @@ export type OrgSubscription = {
   }
   project_addons: ProjectAddon[]
   billing_via_partner?: boolean
+  scheduled_plan_change: {
+    at: string
+    target_plan: PlanId
+    usage_billing_enabled: boolean
+  } | null
 }
 
 export async function getOrgSubscription(

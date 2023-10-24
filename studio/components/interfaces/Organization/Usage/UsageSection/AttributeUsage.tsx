@@ -55,8 +55,6 @@ const AttributeUsage = ({
   isSuccess,
   currentBillingCycleSelected,
 }: AttributeUsageProps) => {
-  const billingEnabled = useIsFeatureEnabled('billing:all')
-
   const upgradeUrl = getUpgradeUrl(slug ?? '', subscription)
   const usageRatio = (usageMeta?.usage ?? 0) / (usageMeta?.pricing_free_units ?? 0)
   const usageExcess = (usageMeta?.usage ?? 0) - (usageMeta?.pricing_free_units ?? 0)
@@ -152,7 +150,7 @@ const AttributeUsage = ({
                         )}
                       </div>
 
-                      {billingEnabled && showUsageWarning && (
+                      {showUsageWarning && (
                         <Button type="default" size="tiny" asChild>
                           <Link href={upgradeUrl} className="pb-1">
                             {subscription?.plan?.id === 'free'
@@ -283,11 +281,10 @@ const AttributeUsage = ({
                         </p>
                       </div>
                     </div>
-                    {billingEnabled && (
-                      <Button type="primary" asChild>
-                        <Link href={upgradeUrl}>Upgrade plan</Link>
-                      </Button>
-                    )}
+
+                    <Button type="primary" asChild>
+                      <Link href={upgradeUrl}>Upgrade plan</Link>
+                    </Button>
                   </div>
                 </Panel.Content>
               </Panel>
