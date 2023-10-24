@@ -145,17 +145,14 @@ export const Grid = memo(
 
       return (
         <div
-          className={containerClass}
+          className={`${containerClass} flex flex-col`}
           style={{ width: width || '100%', height: height || '50vh' }}
         >
           <DataGrid
             ref={ref}
-            className={gridClass}
+            className={`${gridClass} flex-grow`}
             rowClass={rowClass}
             columns={state.gridColumns}
-            // [Joshen] Temp fix with magic numbers until we can find a better solution
-            // Nav Header: 48px, Editor Header: 40px, Editor Footer: 40px
-            style={{ height: `calc(100vh - 128px)` }} // [Joshen] THis is still broken
             rows={rows ?? []}
             renderers={{
               renderRow: RowRenderer,
