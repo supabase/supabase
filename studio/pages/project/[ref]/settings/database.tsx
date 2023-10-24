@@ -18,9 +18,9 @@ const ProjectSettings: NextPageWithLayout = () => {
         <DatabaseSettings />
         <ConnectionPooling />
         <SSLConfiguration />
-        <BannedIPs />
         <DiskSizeConfiguration />
         <NetworkRestrictions />
+        <BannedIPs />
       </div>
     </div>
   )
