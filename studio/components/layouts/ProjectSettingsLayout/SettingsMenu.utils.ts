@@ -6,7 +6,12 @@ export const generateSettingsMenu = (
   ref?: string,
   project?: ProjectBase,
   organization?: Organization,
-  features?: { auth?: boolean; edgeFunctions?: boolean; storage?: boolean; billing?: boolean }
+  features?: {
+    auth?: boolean
+    edgeFunctions?: boolean
+    storage?: boolean
+    invoices?: boolean
+  }
 ): ProductMenuGroup[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}/building`
@@ -16,7 +21,7 @@ export const generateSettingsMenu = (
   const authEnabled = features?.auth ?? true
   const edgeFunctionsEnabled = features?.edgeFunctions ?? true
   const storageEnabled = features?.storage ?? true
-  const billingEnabled = features?.billing ?? true
+  const invoicesEnabled = features?.invoices ?? true
 
   if (isOrgBilling) {
     return [
@@ -45,16 +50,14 @@ export const generateSettingsMenu = (
                 },
               ]
             : []),
-          ...(billingEnabled
-            ? [
-                {
-                  name: 'Add Ons',
-                  key: 'addons',
-                  url: `/project/${ref}/settings/addons`,
-                  items: [],
-                },
-              ]
-            : []),
+          ...[
+            {
+              name: 'Add Ons',
+              key: 'addons',
+              url: `/project/${ref}/settings/addons`,
+              items: [],
+            },
+          ],
           {
             name: 'Vault',
             key: 'vault',
@@ -113,18 +116,15 @@ export const generateSettingsMenu = (
       },
 
       {
-        title: billingEnabled ? 'Billing' : '',
+        title: 'Billing',
         items: [
-          ...(billingEnabled
-            ? [
-                {
-                  name: 'Subscription',
-                  key: 'subscription',
-                  url: `/org/${organization?.slug}/billing`,
-                  items: [],
-                },
-              ]
-            : []),
+          {
+            name: 'Subscription',
+            key: 'subscription',
+            url: `/org/${organization?.slug}/billing`,
+            items: [],
+          },
+
           {
             name: 'Usage',
             key: 'usage',
@@ -199,27 +199,24 @@ export const generateSettingsMenu = (
       ...(IS_PLATFORM
         ? [
             {
-              title: billingEnabled ? 'Billing' : '',
+              title: 'Billing',
               items: [
-                ...(billingEnabled
-                  ? [
-                      {
-                        name: 'Subscription',
-                        key: 'subscription',
-                        url: isProjectBuilding
-                          ? buildingUrl
-                          : `/project/${ref}/settings/billing/subscription`,
-                        items: [],
-                      },
-                    ]
-                  : []),
+                {
+                  name: 'Subscription',
+                  key: 'subscription',
+                  url: isProjectBuilding
+                    ? buildingUrl
+                    : `/project/${ref}/settings/billing/subscription`,
+                  items: [],
+                },
+
                 {
                   name: 'Usage',
                   key: 'usage',
                   url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/billing/usage`,
                   items: [],
                 },
-                ...(billingEnabled
+                ...(invoicesEnabled
                   ? [
                       {
                         name: 'Invoices',

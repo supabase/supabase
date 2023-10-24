@@ -7,8 +7,15 @@ import PaymentMethods from './PaymentMethods/PaymentMethods'
 import Subscription from './Subscription/Subscription'
 import TaxID from './TaxID/TaxID'
 import BillingBreakdown from './BillingBreakdown/BillingBreakdown'
+import { useIsFeatureEnabled } from 'hooks'
 
 const BillingSettings = () => {
+  const {
+    billingAccountData: billingAccountDataEnabled,
+    billingPaymentMethods: billingPaymentMethodsEnabled,
+    billingCredits: billingCreditsEnabled,
+  } = useIsFeatureEnabled(['billing:account_data', 'billing:payment_methods', 'billing:credits'])
+
   return (
     <>
       <ScaffoldContainer id="subscription">
@@ -27,35 +34,47 @@ const BillingSettings = () => {
         <BillingBreakdown />
       </ScaffoldContainer>
 
-      <ScaffoldDivider />
+      {billingCreditsEnabled && (
+        <>
+          <ScaffoldDivider />
 
-      <ScaffoldContainer id="credits-balance">
-        <CreditBalance />
-      </ScaffoldContainer>
+          <ScaffoldContainer id="credits-balance">
+            <CreditBalance />
+          </ScaffoldContainer>
+        </>
+      )}
 
-      <ScaffoldDivider />
+      {billingPaymentMethodsEnabled && (
+        <>
+          <ScaffoldDivider />
 
-      <ScaffoldContainer id="payment-methods">
-        <PaymentMethods />
-      </ScaffoldContainer>
+          <ScaffoldContainer id="payment-methods">
+            <PaymentMethods />
+          </ScaffoldContainer>
+        </>
+      )}
 
-      <ScaffoldDivider />
+      {billingAccountDataEnabled && (
+        <>
+          <ScaffoldDivider />
 
-      <ScaffoldContainer id="email">
-        <BillingEmail />
-      </ScaffoldContainer>
+          <ScaffoldContainer id="email">
+            <BillingEmail />
+          </ScaffoldContainer>
 
-      <ScaffoldDivider />
+          <ScaffoldDivider />
 
-      <ScaffoldContainer id="address">
-        <BillingAddress />
-      </ScaffoldContainer>
+          <ScaffoldContainer id="address">
+            <BillingAddress />
+          </ScaffoldContainer>
 
-      <ScaffoldDivider />
+          <ScaffoldDivider />
 
-      <ScaffoldContainer id="taxId">
-        <TaxID />
-      </ScaffoldContainer>
+          <ScaffoldContainer id="taxId">
+            <TaxID />
+          </ScaffoldContainer>
+        </>
+      )}
     </>
   )
 }

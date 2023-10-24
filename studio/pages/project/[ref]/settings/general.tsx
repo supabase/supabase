@@ -16,8 +16,7 @@ const ProjectSettings: NextPageWithLayout = () => {
   const isBranch = !!project?.parent_project_ref
   const isOrgBilling = !!organization?.subscription_id
   const transferProjectEnabledFlag = useFlag('transferProject')
-  const { projectsTransfer: projectTransferEnabled, billingAll: billingEnabled } =
-    useIsFeatureEnabled(['projects:transfer', 'billing:all'])
+  const { projectsTransfer: projectTransferEnabled } = useIsFeatureEnabled(['projects:transfer'])
 
   // [Joshen] Opting for larger gap instead of gap-8 as compared to other pages for better grouping of content
   return (
@@ -26,7 +25,7 @@ const ProjectSettings: NextPageWithLayout = () => {
       {!isBranch ? (
         <>
           {!isOrgBilling && <Infrastructure />}
-          {billingEnabled && <CustomDomainConfig />}
+          <CustomDomainConfig />
           {projectTransferEnabled && transferProjectEnabledFlag && <TransferProjectPanel />}
           <DeleteProjectPanel />
         </>

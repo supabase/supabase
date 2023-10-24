@@ -36,19 +36,19 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
     projectAuthAll: authEnabled,
     projectEdgeFunctionAll: edgeFunctionsEnabled,
     projectStorageAll: storageEnabled,
-    billingAll: billingEnabled,
+    billingInvoices: invoicesEnabled,
   } = useIsFeatureEnabled([
     'project_auth:all',
     'project_edge_function:all',
     'project_storage:all',
-    'billing:all',
+    'billing:invoices',
   ])
 
   const menuRoutes = generateSettingsMenu(ref, project, organization, {
     auth: authEnabled,
     edgeFunctions: edgeFunctionsEnabled,
     storage: storageEnabled,
-    billing: billingEnabled,
+    invoices: invoicesEnabled,
   })
 
   useEffect(() => {

@@ -53,8 +53,6 @@ const AuditLogs = () => {
     projects: [], // project_ref[]
   })
 
-  const billingEnabled = useIsFeatureEnabled('billing:all')
-
   const { data: projects } = useProjectsQuery()
   const { data: organizations } = useOrganizationsQuery()
   const { data: detailData } = useOrganizationDetailQuery({ slug })
@@ -235,13 +233,11 @@ const AuditLogs = () => {
                     </AlertDescription_Shadcn_>
                   </div>
 
-                  {billingEnabled && (
-                    <div className="flex items-center">
-                      <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
-                        <Button type="primary">Upgrade subscription</Button>
-                      </Link>
-                    </div>
-                  )}
+                  <div className="flex items-center">
+                    <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
+                      <Button type="primary">Upgrade subscription</Button>
+                    </Link>
+                  </div>
                 </div>
               </Alert_Shadcn_>
             ) : (

@@ -416,6 +416,12 @@ const PlanUpdateSidePanel = () => {
                 This organization is billed through one of our partners and you will be charged by
                 them directly.
               </p>
+              {subscriptionPreview?.billed_via_partner &&
+                subscriptionPreview?.plan_change_type === 'downgrade' && (
+                  <p className="text-sm">
+                    Your organization will be downgraded at the end of your current billing cycle.
+                  </p>
+                )}
             </div>
           )}
         </Modal.Content>
