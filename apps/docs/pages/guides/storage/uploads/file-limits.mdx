@@ -13,7 +13,7 @@ You can customize the Max file size for file uploads.
 
 You can set the max file size across all your buckets by setting this global value in the dashboard [here](https://supabase.com/dashboard/project/_/settings/storage).
 
-For Free projects the limit cannot exceed 50MB. On the Pro Plan and above, you can set this value to up to 5GB to allow file uploads larger than 50MB as illustrated in the table below.
+For Free projects the limit cannot exceed 50MB. On the Pro Plan and above, you can set this value to up to 5GB.
 
 | Plan       | Max File Size Limit |
 | ---------- | ------------------- |
@@ -27,12 +27,12 @@ If you need more than 5GB please [contact us](https://supabase.com/dashboard/sup
 Remember, this option is a global limit, which applies to all your buckets.
 You can additionally specify the max file size on a per [bucket level](/docs/guides/storage/buckets/creating-buckets#restricting-uploads) but it cannot be higher than this global limit.
 
-It is a good practice to have the Global limit set to the highest possible file size that your application accepts, and apply per bucket limits.
+It is a good practice to have the global limit set to the highest possible file size that your application accepts, and apply per bucket limits.
 
 ## Per Bucket Restrictions
 
 You can have different restrictions on a per bucket level.
-You are able to restrict the file types such as: `pdf`,`images`,`videos` and the max file size which should be lower then the Global Limit.
+You are able to restrict the file types (eg. `pdf`, `images`, `videos`) along with the max file size which should be lower then the global limit.
 
 To apply these limit on a bucket level see [Creating Bucket](/docs/guides/storage/buckets/creating-buckets#restricting-uploads)
 
