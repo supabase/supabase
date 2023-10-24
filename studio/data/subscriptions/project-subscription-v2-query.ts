@@ -46,6 +46,12 @@ export type ProjectSubscriptionResponse = {
     expiry_month: number
     expiry_year: number
   }
+  billing_via_partner?: boolean
+  scheduled_plan_change: {
+    at: string
+    target_plan: PlanId
+    usage_billing_enabled: boolean
+  } | null
 }
 
 export async function getProjectSubscription(

@@ -1,0 +1,41 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'storage-file-limits',
+  title: 'Limits',
+  description: 'Learn how to increase Supabase file limits.',
+  sidebar_label: 'Uploads',
+}
+
+You can customize the Max file size for file uploads.
+
+## Global File Size
+
+You can set the max file size across all your buckets by setting this global value in the dashboard [here](https://supabase.com/dashboard/project/_/settings/storage).
+
+For Free projects the limit cannot exceed 50MB. On the Pro Plan and above, you can set this value to up to 5GB.
+
+| Plan       | Max File Size Limit |
+| ---------- | ------------------- |
+| Free       | 50MB                |
+| Pro        | 5GB                 |
+| Team       | 5GB                 |
+| Enterprise | 5GB                 |
+
+If you need more than 5GB please [contact us](https://supabase.com/dashboard/support/new).
+
+Remember, this option is a global limit, which applies to all your buckets.
+You can additionally specify the max file size on a per [bucket level](/docs/guides/storage/buckets/creating-buckets#restricting-uploads) but it cannot be higher than this global limit.
+
+It is a good practice to have the global limit set to the highest possible file size that your application accepts, and apply per bucket limits.
+
+## Per Bucket Restrictions
+
+You can have different restrictions on a per bucket level.
+You are able to restrict the file types (eg. `pdf`, `images`, `videos`) along with the max file size which should be lower then the global limit.
+
+To apply these limit on a bucket level see [Creating Bucket](/docs/guides/storage/buckets/creating-buckets#restricting-uploads)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

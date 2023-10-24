@@ -360,17 +360,11 @@
         "title": "Show API keys for a project",
         "slug": "supabase-projects-api-keys",
         "type": "cli-command"
-      }
-    ]
-  },
-  {
-    "type": "category",
-    "title": "Services",
-    "items": [
+      },
       {
-        "id": "supabase-services",
-        "title": "Show versions of all Supabase services",
-        "slug": "supabase-services",
+        "id": "supabase-projects-delete",
+        "title": "Delete a project",
+        "slug": "supabase-projects-delete",
         "type": "cli-command"
       }
     ]
@@ -521,6 +515,30 @@
         "id": "supabase-secrets-unset",
         "title": "Unset a secret",
         "slug": "supabase-secrets-unset",
+        "type": "cli-command"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Encryption",
+    "items": [
+      {
+        "id": "supabase-encryption",
+        "title": "Manage encryption keys",
+        "slug": "supabase-encryption",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-encryption-get-root-key",
+        "title": "Retrieve the root encryption key",
+        "slug": "supabase-encryption-get-root-key",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-encryption-update-root-key",
+        "title": "Update root encryption key",
+        "slug": "supabase-encryption-update-root-key",
         "type": "cli-command"
       }
     ]
@@ -711,7 +729,7 @@
       },
       {
         "id": "supabase-ssl-enforcement-get",
-        "title": "Get the current SSL enforcement configurations",
+        "title": "Retrieve the current SSL enforcement configurations",
         "slug": "supabase-ssl-enforcement-get",
         "type": "cli-command"
       },
@@ -735,7 +753,7 @@
       },
       {
         "id": "supabase-postgres-config-get",
-        "title": "Get the current Postgres config overrides",
+        "title": "Retrieve the current Postgres config overrides",
         "slug": "supabase-postgres-config-get",
         "type": "cli-command"
       },
@@ -767,6 +785,18 @@
         "id": "supabase-snippets-download",
         "title": "Download SQL snippet content",
         "slug": "supabase-snippets-download",
+        "type": "cli-command"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Services",
+    "items": [
+      {
+        "id": "supabase-services",
+        "title": "Show versions of all Supabase services",
+        "slug": "supabase-services",
         "type": "cli-command"
       }
     ]

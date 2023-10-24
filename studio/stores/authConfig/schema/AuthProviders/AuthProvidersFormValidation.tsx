@@ -84,11 +84,6 @@ const PROVIDER_PHONE = {
         { label: 'Twilio Verify', value: 'twilio_verify', icon: 'twilio-icon.svg' },
       ],
     },
-    RATE_LIMIT_SMS_SENT: {
-      type: 'number',
-      title: 'Rate limit for sending SMS messages',
-      description: 'How many SMS messages can be sent per hour',
-    },
 
     // Twilio
     SMS_TWILIO_ACCOUNT_SID: {
@@ -1009,10 +1004,10 @@ const EXTERNAL_PROVIDER_KEYCLOAK = {
 const EXTERNAL_PROVIDER_LINKEDIN = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
-  title: 'LinkedIn',
+  title: 'LinkedIn (Deprecated)',
   properties: {
     EXTERNAL_LINKEDIN_ENABLED: {
-      title: 'Linkedin enabled',
+      title: 'Linkedin (Deprecated) enabled',
       type: 'boolean',
     },
     // [TODO] Update docs
@@ -1035,6 +1030,44 @@ const EXTERNAL_PROVIDER_LINKEDIN = {
       otherwise: (schema) => schema,
     }),
     EXTERNAL_LINKEDIN_SECRET: string().when('EXTERNAL_LINKEDIN_ENABLED', {
+      is: true,
+      then: (schema) => schema.required('API Secret Key is required'),
+      otherwise: (schema) => schema,
+    }),
+  }),
+  misc: {
+    iconKey: 'linkedin-icon',
+    requiresRedirect: true,
+  },
+}
+
+const EXTERNAL_PROVIDER_LINKEDIN_OIDC = {
+  $schema: JSON_SCHEMA_VERSION,
+  type: 'object',
+  title: 'LinkedIn (OIDC)',
+  properties: {
+    EXTERNAL_LINKEDIN_OIDC_ENABLED: {
+      title: 'LinkedIn enabled',
+      type: 'boolean',
+    },
+    EXTERNAL_LINKEDIN_OIDC_CLIENT_ID: {
+      title: 'API Key',
+      type: 'string',
+    },
+    EXTERNAL_LINKEDIN_OIDC_SECRET: {
+      title: 'API Secret Key',
+      type: 'string',
+      isSecret: true,
+    },
+  },
+  validationSchema: object().shape({
+    EXTERNAL_LINKEDIN_OIDC_ENABLED: boolean().required(),
+    EXTERNAL_LINKEDIN_OIDC_CLIENT_ID: string().when('EXTERNAL_LINKEDIN_OIDC_ENABLED', {
+      is: true,
+      then: (schema) => schema.required('API Key is required'),
+      otherwise: (schema) => schema,
+    }),
+    EXTERNAL_LINKEDIN_OIDC_SECRET: string().when('EXTERNAL_LINKEDIN_OIDC_ENABLED', {
       is: true,
       then: (schema) => schema.required('API Secret Key is required'),
       otherwise: (schema) => schema,
@@ -1359,6 +1392,7 @@ export const PROVIDERS_SCHEMAS = [
   EXTERNAL_PROVIDER_KAKAO,
   EXTERNAL_PROVIDER_KEYCLOAK,
   EXTERNAL_PROVIDER_LINKEDIN,
+  EXTERNAL_PROVIDER_LINKEDIN_OIDC,
   EXTERNAL_PROVIDER_NOTION,
   EXTERNAL_PROVIDER_TWITCH,
   EXTERNAL_PROVIDER_TWITTER,
