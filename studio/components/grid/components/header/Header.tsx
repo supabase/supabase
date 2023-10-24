@@ -1,7 +1,19 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import clsx from 'clsx'
 import saveAs from 'file-saver'
 import Papa from 'papaparse'
 import { ReactNode, useState } from 'react'
+
+import { useDispatch, useTrackedState } from 'components/grid/store'
+import { Filter, Sort, SupaTable } from 'components/grid/types'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { useTableRowDeleteAllMutation } from 'data/table-rows/table-row-delete-all-mutation'
+import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
+import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-mutation'
+import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
+import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
+import { useCheckPermissions, useStore, useUrlState } from 'hooks'
 import {
   Button,
   cn,
@@ -15,19 +27,8 @@ import {
   IconFileText,
   IconTrash,
   IconX,
+  Modal,
 } from 'ui'
-
-import clsx from 'clsx'
-import { useDispatch, useTrackedState } from 'components/grid/store'
-import { Filter, Sort, SupaTable } from 'components/grid/types'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { ConfirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import { useTableRowDeleteAllMutation } from 'data/table-rows/table-row-delete-all-mutation'
-import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
-import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-mutation'
-import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
-import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { useCheckPermissions, useStore, useUrlState } from 'hooks'
 import FilterDropdown from './filter'
 import RefreshButton from './RefreshButton'
 import RLSBannerWarning from './RLSBannerWarning'
@@ -310,49 +311,49 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
     })
   }
 
+  const [isConfirmDeleteModalOpen, setIsConfirmDeleteModalOpen] = useState(false)
+
   const onRowsDelete = () => {
-    const numRows = allRowsSelected ? totalRows : selectedRows.size
-    ConfirmAlert({
-      title: 'Confirm to delete',
-      message: `Are you sure you want to delete the selected ${numRows} row${
-        numRows > 1 ? 's' : ''
-      }? This action cannot be undone.`,
-      confirmText: `Delete ${numRows} rows`,
-      onAsyncConfirm: async () => {
-        if (!project) return
+    setIsConfirmDeleteModalOpen(true)
+  }
 
-        if (allRowsSelected) {
-          try {
-            if (filters.length === 0) {
-              await truncateRows({
-                projectRef: project.ref,
-                connectionString: project.connectionString,
-                table,
-              })
-            } else {
-              await deleteAllRows({
-                projectRef: project.ref,
-                connectionString: project.connectionString,
-                table,
-                filters,
-              })
-            }
-          } catch (error) {}
+  const numRows = allRowsSelected ? totalRows : selectedRows.size
+
+  const onRowsConfirmDelete = async () => {
+    if (!project) return
+
+    if (allRowsSelected) {
+      try {
+        if (filters.length === 0) {
+          await truncateRows({
+            projectRef: project.ref,
+            connectionString: project.connectionString,
+            table,
+          })
         } else {
-          const rowIdxs = Array.from(selectedRows) as number[]
-          const rows = allRows.filter((x) => rowIdxs.includes(x.idx))
-
-          try {
-            await deleteRows({
-              projectRef: project?.ref,
-              connectionString: project?.connectionString,
-              table,
-              rows,
-            })
-          } catch (error) {}
+          await deleteAllRows({
+            projectRef: project.ref,
+            connectionString: project.connectionString,
+            table,
+            filters,
+          })
         }
-      },
-    })
+      } catch (error) {}
+    } else {
+      const rowIdxs = Array.from(selectedRows) as number[]
+      const rows = allRows.filter((x) => rowIdxs.includes(x.idx))
+
+      try {
+        await deleteRows({
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+          table,
+          rows,
+        })
+      } catch (error) {}
+    }
+
+    setIsConfirmDeleteModalOpen(false)
   }
 
   const [isExporting, setIsExporting] = useState(false)
@@ -396,54 +397,74 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   }
 
   return (
-    <div className="flex items-center gap-6">
-      <div className="flex items-center gap-3">
-        <Button
-          type="default"
-          style={{ padding: '3px' }}
-          icon={<IconX size="tiny" strokeWidth={2} />}
-          onClick={deselectRows}
-        />
-        <span className="text-xs text-foreground">
-          {allRowsSelected
-            ? `${totalRows} rows selected`
-            : selectedRows.size > 1
-            ? `${selectedRows.size} rows selected`
-            : `${selectedRows.size} row selected`}
-        </span>
-        {!allRowsSelected && totalRows > allRows.length && (
-          <Button type="link" onClick={() => onSelectAllRows()}>
-            Select all {totalRows} rows
-          </Button>
-        )}
-      </div>
-      <div className="h-[20px] border-r border-gray-700" />
-      <div className="flex items-center gap-2">
-        <Button
-          type="primary"
-          size="tiny"
-          icon={<IconDownload />}
-          loading={isExporting}
-          disabled={isExporting}
-          onClick={onRowsExportCSV}
-        >
-          Export to CSV
-        </Button>
-        {editable && (
+    <>
+      <div className="flex items-center gap-6">
+        <div className="flex items-center gap-3">
           <Button
             type="default"
-            size="tiny"
-            icon={<IconTrash size="tiny" />}
-            onClick={onRowsDelete}
-          >
+            style={{ padding: '3px' }}
+            icon={<IconX size="tiny" strokeWidth={2} />}
+            onClick={deselectRows}
+          />
+          <span className="text-xs text-foreground">
             {allRowsSelected
-              ? `Delete ${totalRows} rows`
+              ? `${totalRows} rows selected`
               : selectedRows.size > 1
-              ? `Delete ${selectedRows.size} rows`
-              : `Delete ${selectedRows.size} row`}
+              ? `${selectedRows.size} rows selected`
+              : `${selectedRows.size} row selected`}
+          </span>
+          {!allRowsSelected && totalRows > allRows.length && (
+            <Button type="link" onClick={() => onSelectAllRows()}>
+              Select all {totalRows} rows
+            </Button>
+          )}
+        </div>
+        <div className="h-[20px] border-r border-gray-700" />
+        <div className="flex items-center gap-2">
+          <Button
+            type="primary"
+            size="tiny"
+            icon={<IconDownload />}
+            loading={isExporting}
+            disabled={isExporting}
+            onClick={onRowsExportCSV}
+          >
+            Export to CSV
           </Button>
-        )}
+          {editable && (
+            <Button
+              type="default"
+              size="tiny"
+              icon={<IconTrash size="tiny" />}
+              onClick={onRowsDelete}
+            >
+              {allRowsSelected
+                ? `Delete ${totalRows} rows`
+                : selectedRows.size > 1
+                ? `Delete ${selectedRows.size} rows`
+                : `Delete ${selectedRows.size} row`}
+            </Button>
+          )}
+        </div>
       </div>
-    </div>
+
+      <ConfirmationModal
+        visible={isConfirmDeleteModalOpen}
+        header="Confirm to delete"
+        buttonLabel={`Delete ${numRows} rows`}
+        onSelectCancel={() => setIsConfirmDeleteModalOpen(false)}
+        onSelectConfirm={() => {
+          onRowsConfirmDelete()
+        }}
+      >
+        <Modal.Content>
+          <p className="py-4 text-sm text-foreground-light">
+            {`Are you sure you want to delete the selected ${numRows} row${
+              numRows > 1 ? 's' : ''
+            }? This action cannot be undone.`}
+          </p>
+        </Modal.Content>
+      </ConfirmationModal>
+    </>
   )
 }
