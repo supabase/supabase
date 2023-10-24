@@ -17,11 +17,11 @@ If your project has high egress, these are some optimisations that will help you
 #### Resize Images
 
 Images usually contribute to the majority of your egress. By keeping their size as small as possible, you can reduce your egress and increase the performance of your application at the same time.
-You can use our [Image Transformation](/docs/guides/storage/serving/image-transformations) to optimise any image on the fly.
+You can use our [Image Transformation](/docs/guides/storage/serving/image-transformations) to optimize any image on the fly.
 
 #### Set a high cache-control value
 
-Utilising the browser cache will help reduce your egress as the asset will be stored on the user's browser after it is first downloaded. Setting a high `cache-control` value will ensure that the asset is stored on the user's browser for a long time. This will reduce the number of times the asset is downloaded from the server.
+Utilizing the browser cache will help reduce your egress as the asset will be stored on the user's browser after it is first downloaded. Setting a high `cache-control` value will ensure that the asset is stored on the user's browser for a long time. This will reduce the number of times the asset is downloaded from the server.
 
 #### Limit the upload size
 

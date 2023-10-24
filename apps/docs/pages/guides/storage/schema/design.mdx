@@ -11,7 +11,7 @@ export const meta = {
 Storage uses Postgres to store metadata about your buckets and objects and users can leverage the power of RLS policies for access control. It uses a dedicated schema in your project named `storage`
 
 <Admonition type="note">
-It is important to treat any records present in Storage tables as Read-Only when utilising SQL.
+It is important to treat any records present in Storage tables as Read-Only when utilizing SQL.
 All operations such as upload, copy, move, delete should **always go trough the API**.
 
 This is important because the storage schema only stores the metadata and the actual objects are stored in a provider like S3. Deleting the metadata doesn't delete the object in the underlying storage provider. This makes your object inaccessible, but you will still be billed for it.
