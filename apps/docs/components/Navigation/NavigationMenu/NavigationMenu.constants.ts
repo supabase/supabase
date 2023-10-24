@@ -1027,7 +1027,6 @@ export const storage: NavMenuConstant = {
       items: [
         { name: 'Database Design', url: '/guides/storage/schema/design' },
         { name: 'Helper Functions', url: '/guides/storage/schema/helper-functions' },
-        { name: 'Scaling', url: '/guides/storage/schema/scaling' },
       ],
     },
     {
