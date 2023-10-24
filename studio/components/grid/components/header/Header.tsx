@@ -32,6 +32,7 @@ import FilterDropdown from './filter'
 import RefreshButton from './RefreshButton'
 import RLSBannerWarning from './RLSBannerWarning'
 import SortPopover from './sort'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
 // just too large for a browser to keep all the rows in memory before
@@ -235,6 +236,8 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   const dispatch = useDispatch()
 
   const { project } = useProjectContext()
+  const snap = useTableEditorStateSnapshot()
+
   // [Joshen] Passing blank error handlers here as the errors are handled via the
   // error handler in tracked state within catch block
   const { mutateAsync: deleteRows } = useTableRowDeleteMutation({
@@ -311,48 +314,59 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   }
 
   const onRowsDelete = () => {
-    const numRows = allRowsSelected ? totalRows : selectedRows.size
-    ConfirmAlert({
-      title: 'Confirm to delete',
-      message: `Are you sure you want to delete the selected ${numRows} row${
-        numRows > 1 ? 's' : ''
-      }? This action cannot be undone.`,
-      confirmText: `Delete ${numRows} rows`,
-      onAsyncConfirm: async () => {
-        if (!project) return
-
-        if (allRowsSelected) {
-          try {
-            if (filters.length === 0) {
-              await truncateRows({
-                projectRef: project.ref,
-                connectionString: project.connectionString,
-                table,
-              })
-            } else {
-              await deleteAllRows({
-                projectRef: project.ref,
-                connectionString: project.connectionString,
-                table,
-                filters,
-              })
-            }
-          } catch (error) {}
-        } else {
-          const rowIdxs = Array.from(selectedRows) as number[]
-          const rows = allRows.filter((x) => rowIdxs.includes(x.idx))
-
-          try {
-            await deleteRows({
-              projectRef: project?.ref,
-              connectionString: project?.connectionString,
-              table,
-              rows,
-            })
-          } catch (error) {}
-        }
-      },
+    const rowIdxs = Array.from(selectedRows) as number[]
+    const rows = allRows.filter((x) => rowIdxs.includes(x.idx))
+    snap.onDeleteRows(rows, () => {
+      dispatch({ type: 'REMOVE_ROWS', payload: { rowIdxs } })
+      dispatch({
+        type: 'SELECTED_ROWS_CHANGE',
+        payload: { selectedRows: new Set() },
+      })
     })
+
+    // const numRows = allRowsSelected ? totalRows : selectedRows.size
+
+    // ConfirmAlert({
+    //   title: 'Confirm to delete',
+    //   message: `Are you sure you want to delete the selected ${numRows} row${
+    //     numRows > 1 ? 's' : ''
+    //   }? This action cannot be undone.`,
+    //   confirmText: `Delete ${numRows} rows`,
+    //   onAsyncConfirm: async () => {
+    //     if (!project) return
+
+    //     if (allRowsSelected) {
+    //       try {
+    //         if (filters.length === 0) {
+    //           await truncateRows({
+    //             projectRef: project.ref,
+    //             connectionString: project.connectionString,
+    //             table,
+    //           })
+    //         } else {
+    //           await deleteAllRows({
+    //             projectRef: project.ref,
+    //             connectionString: project.connectionString,
+    //             table,
+    //             filters,
+    //           })
+    //         }
+    //       } catch (error) {}
+    //     } else {
+    //       const rowIdxs = Array.from(selectedRows) as number[]
+    //       const rows = allRows.filter((x) => rowIdxs.includes(x.idx))
+
+    //       try {
+    //         await deleteRows({
+    //           projectRef: project?.ref,
+    //           connectionString: project?.connectionString,
+    //           table,
+    //           rows,
+    //         })
+    //       } catch (error) {}
+    //     }
+    //   },
+    // })
   }
 
   const [isExporting, setIsExporting] = useState(false)

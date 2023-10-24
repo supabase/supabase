@@ -222,8 +222,7 @@ export const Grid = memo(
             onRowsChange={onRowsChange}
             onSelectedCellChange={onSelectedCellChange}
             onSelectedRowsChange={onSelectedRowsChange}
-            // [Next 18 Refactor] Double check if this is correct, props has been removed
-            // onRowDoubleClick={onRowDoubleClick}
+            onCellDoubleClick={(props) => onRowDoubleClick(props.row, props.column)}
           />
         </div>
       )

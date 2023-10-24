@@ -14,6 +14,7 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Alert, Button, Checkbox, IconExternalLink, Modal } from 'ui'
 import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
 import toast from 'react-hot-toast'
+import { SupaRow } from 'components/grid'
 
 export type DeleteConfirmationDialogsProps = {
   projectRef?: string
@@ -39,10 +40,15 @@ const DeleteConfirmationDialogs = ({
 
   const { mutate: deleteRows } = useTableRowDeleteMutation({
     onSuccess: () => {
+      if (snap.confirmationDialog?.type === 'row') {
+        snap.confirmationDialog.callback?.()
+      }
+      toast.success(`Successfully deleted selected row(s)`)
       snap.closeConfirmationDialog()
     },
     onError: (error) => {
       toast.error(`Failed to delete row: ${error.message}`)
+      snap.closeConfirmationDialog()
     },
   })
 
@@ -149,13 +155,13 @@ const DeleteConfirmationDialogs = ({
     if (!project) return console.error('Project ref is required')
     if (!selectedTable) return console.error('Selected table required')
     if (snap.confirmationDialog?.type !== 'row') return
-    const selectedRowToDelete = snap.confirmationDialog.row
+    const selectedRowsToDelete = snap.confirmationDialog.rows
 
     deleteRows({
       projectRef: project.ref,
       connectionString: project.connectionString,
       table: selectedTable as any,
-      rows: [selectedRowToDelete],
+      rows: selectedRowsToDelete as SupaRow[],
     })
   }
 

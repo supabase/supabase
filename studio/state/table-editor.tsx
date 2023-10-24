@@ -26,7 +26,7 @@ export type SidePanel =
 export type ConfirmationDialog =
   | { type: 'table'; isDeleteWithCascade: boolean }
   | { type: 'column'; column: PostgresColumn; isDeleteWithCascade: boolean }
-  | { type: 'row'; row: SupaRow }
+  | { type: 'row'; rows: SupaRow[]; callback?: () => void }
 
 export type UIState =
   | {
@@ -129,10 +129,10 @@ export const createTableEditorState = () => {
         sidePanel: { type: 'row', row },
       }
     },
-    onDeleteRow: (row: SupaRow) => {
+    onDeleteRows: (rows: SupaRow[], callback?: () => void) => {
       state.ui = {
         open: 'confirmation-dialog',
-        confirmationDialog: { type: 'row', row },
+        confirmationDialog: { type: 'row', rows, callback },
       }
     },
 

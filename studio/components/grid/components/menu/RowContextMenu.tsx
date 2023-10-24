@@ -1,7 +1,7 @@
 import { Item, ItemParams, Menu, PredicateParams, Separator } from 'react-contexify'
 import { IconClipboard, IconEdit, IconTrash } from 'ui'
 
-import { SupaRow, SupaTable } from 'components/grid/types'
+import { SupaRow } from 'components/grid/types'
 import { useCallback } from 'react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTrackedState } from '../../store'
@@ -21,8 +21,7 @@ const RowContextMenu = ({ rows }: RowContextMenuProps) => {
     const { props } = p
     const { rowIdx } = props
     const row = rows[rowIdx]
-
-    if (row) snap.onDeleteRow(row)
+    if (row) snap.onDeleteRows([row])
   }
 
   function onEditRowClick(p: ItemParams) {

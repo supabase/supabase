@@ -73,8 +73,7 @@ const SelectorGrid = ({ table, rows, onRowSelect }: SelectorGridProps) => {
       columns={columns}
       rows={rows}
       style={{ height: '100%' }}
-      // [Next 18 refactor] need to fix
-      // onRowClick={onRowSelect}
+      onCellClick={(props) => onRowSelect(props.row)}
       rowClass={() => 'cursor-pointer'}
     />
   )
