@@ -15,6 +15,7 @@ import { Alert, Button } from 'ui'
 import { BILLING_BREAKDOWN_METRICS } from './BillingBreakdown.constants'
 import BillingMetric from './BillingMetric'
 import UpcomingInvoice from './UpcomingInvoice'
+import { useIsFeatureEnabled } from 'hooks'
 
 const BillingBreakdown = () => {
   const snap = useOrgSettingsPageStateSnapshot()
@@ -33,6 +34,8 @@ const BillingBreakdown = () => {
     isError: isErrorSubscription,
     isSuccess: isSuccessSubscription,
   } = useOrgSubscriptionQuery({ orgSlug })
+
+  const invoiceFeatureEnabled = useIsFeatureEnabled('billing:invoices')
 
   const currentPlan = subscription?.plan
   const isUsageBillingEnabled = subscription?.usage_billing_enabled
@@ -145,17 +148,21 @@ const BillingBreakdown = () => {
               </div>
             )}
 
-            <p className="!mt-10 text-sm">Upcoming cost for next invoice</p>
-            <p className="text-sm text-foreground-light">
-              The following table shows your upcoming costs. Depending on your usage, the final
-              amount may vary. Next invoice on{' '}
-              <span className="text-foreground-light whitespace-nowrap">
-                {billingCycleEnd.format('MMM DD, YYYY')}
-              </span>
-              .
-            </p>
+            {invoiceFeatureEnabled && (
+              <>
+                <p className="!mt-10 text-sm">Upcoming cost for next invoice</p>
+                <p className="text-sm text-foreground-light">
+                  The following table shows your upcoming costs. Depending on your usage, the final
+                  amount may vary. Next invoice on{' '}
+                  <span className="text-foreground-light whitespace-nowrap">
+                    {billingCycleEnd.format('MMM DD, YYYY')}
+                  </span>
+                  .
+                </p>
 
-            <UpcomingInvoice slug={orgSlug} />
+                <UpcomingInvoice slug={orgSlug} />
+              </>
+            )}
           </>
         )}
       </ScaffoldSectionContent>
