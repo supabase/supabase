@@ -140,12 +140,13 @@ export const createTableEditorState = () => {
     },
     onDeleteRows: (
       rows: SupaRow[],
-      {
-        numRows,
-        allRowsSelected = false,
-        callback,
-      }: { numRows?: number; allRowsSelected: boolean; callback?: () => void }
+      meta: { numRows?: number; allRowsSelected: boolean; callback?: () => void } = {
+        numRows: 0,
+        allRowsSelected: false,
+        callback: () => {},
+      }
     ) => {
+      const { numRows, allRowsSelected, callback } = meta
       state.ui = {
         open: 'confirmation-dialog',
         confirmationDialog: { type: 'row', rows, numRows, allRowsSelected, callback },
