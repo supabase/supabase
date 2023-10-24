@@ -43,10 +43,10 @@ const FreeProjectLimitWarning = ({
 
             {orgLevelBilling && (
               <div>
-                <Link href={`/org/${orgSlug}/billing?panel=subscriptionPlan`} passHref>
-                  <a target="_blank">
-                    <Button type="primary">Upgrade plan</Button>
-                  </a>
+                <Link passHref href={`/org/${orgSlug}/billing?panel=subscriptionPlan`}>
+                  <Button asChild type="primary">
+                    <a>Upgrade plan</a>
+                  </Button>
                 </Link>
               </div>
             )}

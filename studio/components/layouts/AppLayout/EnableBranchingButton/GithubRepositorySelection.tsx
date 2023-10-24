@@ -1,57 +1,48 @@
 import clsx from 'clsx'
 import { useParams } from 'common'
 import Link from 'next/link'
-import { useRef, useState } from 'react'
 import {
   Badge,
   Button,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Command_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormMessage_Shadcn_,
   IconCheck,
-  IconChevronDown,
+  IconLoader,
+  Input_Shadcn_,
   Modal,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
 } from 'ui'
 
 import {
   EmptyIntegrationConnection,
   IntegrationConnection,
 } from 'components/interfaces/Integrations/IntegrationPanels'
-import AlertError from 'components/ui/AlertError'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useGithubBranchesQuery } from 'data/integrations/integrations-github-branches-query'
 import { Integration } from 'data/integrations/integrations.types'
-import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { useSelectedOrganization } from 'hooks'
+import { useSidePanelsStateSnapshot } from 'state/side-panels'
 
 interface GithubRepositorySelectionProps {
+  form: any
+  isChecking: boolean
+  isValid: boolean
   integration?: Integration
-  selectedBranch?: string
   hasGithubIntegrationInstalled: boolean
-  setSelectedBranch: (name: string) => void
 }
 
 const GithubRepositorySelection = ({
+  form,
+  isChecking,
+  isValid,
   integration,
-  selectedBranch,
   hasGithubIntegrationInstalled,
-  setSelectedBranch,
 }: GithubRepositorySelectionProps) => {
-  const org = useSelectedOrganization()
   const { ref } = useParams()
-  const [open, setOpen] = useState(false)
-  const comboBoxRef = useRef<HTMLButtonElement>(null)
+  const org = useSelectedOrganization()
 
   const githubConnection = integration?.connections.find(
     (connection) => connection.supabase_project_ref === ref
   )
-  const [repoOwner, repoName] = githubConnection?.metadata.name.split('/') ?? []
 
   const sidePanels = useSidePanelsStateSnapshot()
   const githubIntegrationAppUrl =
@@ -60,18 +51,6 @@ const GithubRepositorySelection = ({
       : process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
       ? `https://github.com/apps/supabase-staging/installations/new?state=${ref}`
       : `https://github.com/apps/supabase-local-testing/installations/new?state=${ref}`
-
-  const {
-    data: githubBranches,
-    error: githubBranchesError,
-    isLoading: isLoadingBranches,
-    isSuccess: isSuccessBranches,
-    isError: isErrorBranches,
-  } = useGithubBranchesQuery({
-    organizationIntegrationId: integration?.id,
-    repoOwner,
-    repoName,
-  })
 
   function onSelectConnectRepo() {
     if (integration) {
@@ -130,77 +109,29 @@ const GithubRepositorySelection = ({
                 />
               </ul>
 
-              <div>
-                <label className="block text-sm text-light mb-2" htmlFor="branch-selector">
-                  Select your production branch:
-                </label>
-                {isLoadingBranches && <ShimmeringLoader />}
-                {isErrorBranches && (
-                  <AlertError
-                    error={githubBranchesError}
-                    subject="Failed to retrieve Github branches"
-                  />
+              <FormField_Shadcn_
+                control={form.control}
+                name="branchName"
+                render={({ field }) => (
+                  <FormItem_Shadcn_ className="relative">
+                    <label className="text-sm text-foreground-light">
+                      Choose your production branch
+                    </label>
+                    <FormControl_Shadcn_>
+                      <Input_Shadcn_ {...field} placeholder="e.g main" />
+                    </FormControl_Shadcn_>
+                    <div className="absolute top-9 right-3">
+                      {isChecking ? (
+                        <IconLoader className="animate-spin" />
+                      ) : isValid ? (
+                        <IconCheck className="text-brand" strokeWidth={2} />
+                      ) : null}
+                    </div>
+
+                    <FormMessage_Shadcn_ />
+                  </FormItem_Shadcn_>
                 )}
-                {isSuccessBranches && (
-                  <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-                    <PopoverTrigger_Shadcn_ asChild name="branch-selector">
-                      <Button
-                        block
-                        type="default"
-                        size="medium"
-                        ref={comboBoxRef}
-                        className={clsx(
-                          'justify-start',
-                          selectedBranch === undefined ? 'text-light' : 'text'
-                        )}
-                        iconRight={
-                          <span className="grow flex justify-end">
-                            <IconChevronDown className={''} />
-                          </span>
-                        }
-                      >
-                        {selectedBranch || 'Select a branch'}
-                      </Button>
-                    </PopoverTrigger_Shadcn_>
-                    <PopoverContent_Shadcn_
-                      className="p-0"
-                      side="bottom"
-                      align="start"
-                      style={{ width: comboBoxRef.current?.offsetWidth }}
-                    >
-                      <Command_Shadcn_>
-                        <CommandInput_Shadcn_ placeholder="Find branch..." />
-                        <CommandList_Shadcn_>
-                          <CommandEmpty_Shadcn_>No branches found</CommandEmpty_Shadcn_>
-                          <CommandGroup_Shadcn_>
-                            {githubBranches?.map((branch) => (
-                              <CommandItem_Shadcn_
-                                asChild
-                                key={branch.name}
-                                value={branch.name}
-                                className="cursor-pointer w-full flex items-center justify-between"
-                                onSelect={() => {
-                                  setOpen(false)
-                                  setSelectedBranch(branch.name)
-                                }}
-                                onClick={() => {
-                                  setOpen(false)
-                                  setSelectedBranch(branch.name)
-                                }}
-                              >
-                                <a>
-                                  {branch.name}
-                                  {branch.name === selectedBranch && <IconCheck />}
-                                </a>
-                              </CommandItem_Shadcn_>
-                            ))}
-                          </CommandGroup_Shadcn_>
-                        </CommandList_Shadcn_>
-                      </Command_Shadcn_>
-                    </PopoverContent_Shadcn_>
-                  </Popover_Shadcn_>
-                )}
-              </div>
+              />
             </>
           )}
         </div>

@@ -4,11 +4,6 @@ import dayjs from 'dayjs'
 import { noop } from 'lodash'
 import Link from 'next/link'
 import { forwardRef, PropsWithChildren, useState } from 'react'
-
-import { Markdown } from 'components/interfaces/Markdown'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { Branch } from 'data/branches/branches-query'
-import { GitHubPullRequest } from 'data/integrations/integrations-github-pull-requests-query'
 import {
   Badge,
   Button,
@@ -25,6 +20,11 @@ import {
   IconShield,
   IconTrash,
 } from 'ui'
+
+import { Markdown } from 'components/interfaces/Markdown'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { Branch } from 'data/branches/branches-query'
+import { GitHubPullRequest } from 'data/integrations/integrations-github-pull-requests-query'
 
 interface BranchPanelProps {
   repo?: string
@@ -99,7 +99,7 @@ const MainBranchPanel = ({
                     <span></span>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent side="bottom" align="end">
+                <DropdownMenuContent side="bottom" align="end" className="w-48">
                   <Link passHref href={`/project/${ref}/settings/integrations`}>
                     <DropdownMenuItem
                       asChild
