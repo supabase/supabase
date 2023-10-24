@@ -184,7 +184,7 @@ function StoragePage() {
                     title="CDN"
                     text="Serve from over 285 cities globally to reduce latency."
                   />
-                  <Link href="/docs/guides/storage/cdn" passHref>
+                  <Link href="/docs/guides/storage/cdn/fundamentals" passHref>
                     <a>
                       <Button
                         size="small"
@@ -203,7 +203,7 @@ function StoragePage() {
                     title="Image Optimizations and Transformations"
                     text="Resize and compress your media files on the fly."
                   />
-                  <Link href="/docs/guides/storage/image-transformations" passHref>
+                  <Link href="/docs/guides/storage/serving/image-transformations" passHref>
                     <a>
                       <Button
                         size="small"

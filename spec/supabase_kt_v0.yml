@@ -54,7 +54,7 @@ functions:
           install(GoTrue) {
              host = "deeplink host" // this can be anything, eg. your package name or app/company url (not your supabase url)
              scheme = "deeplink scheme"
-             
+
              //Android only, you can also change that OAuth/SSO logins open in a custom tab, rather than an external browser:
              defaultExternalAuthAction = ExternalAuthAction.CUSTOM_TABS //defaults to EXTERNAL_BROWSER
           }
@@ -84,7 +84,7 @@ functions:
         code: |
           ```kotlin
           val client = createSupabaseClient(
-              supabaseUrl = "https://xyzcompany.supabase.co", 
+              supabaseUrl = "https://xyzcompany.supabase.co",
               supabaseKey = "public-anon-key"
           ) {
               install(GoTrue)
@@ -97,7 +97,7 @@ functions:
         code: |
           ```kotlin
           val client = createSupabaseClient(
-              supabaseUrl = "https://xyzcompany.supabase.co", 
+              supabaseUrl = "https://xyzcompany.supabase.co",
               supabaseKey = "public-anon-key"
           ) {
               install(GoTrue) {
@@ -114,7 +114,7 @@ functions:
 
           `autoLoadFromStorage` - whether the GoTrue plugin should automatically load the session from the session manager. Default: `true`
 
-          `autoSaveToStorage` - whether the GoTrue plugin should automatically save the session to the session manager. Default: `true`	
+          `autoSaveToStorage` - whether the GoTrue plugin should automatically save the session to the session manager. Default: `true`
 
           `flowType` - Which authentication flow to use. Currently available: FlowType.PKCE and FlowType.IMPLICIT. Default: `FlowType.IMPLICIT`
 
@@ -134,7 +134,7 @@ functions:
 
           `host` - The host for the redirect url, when using deep linking. Default: `login`
 
-          **Android:** 
+          **Android:**
 
           `enableLifecycleCallbacks` - Whether to stop auto-refresh on focus loss, and resume it on focus again. Default: `true`
 
@@ -154,7 +154,7 @@ functions:
         code: |
           ```kotlin
           val client = createSupabaseClient(
-              supabaseUrl = "https://xyzcompany.supabase.co", 
+              supabaseUrl = "https://xyzcompany.supabase.co",
               supabaseKey = "public-anon-key"
           ) {
               install(Postgrest) {
@@ -176,7 +176,7 @@ functions:
         code: |
           ```kotlin
           val client = createSupabaseClient(
-              supabaseUrl = "https://xyzcompany.supabase.co", 
+              supabaseUrl = "https://xyzcompany.supabase.co",
               supabaseKey = "public-anon-key"
           ) {
               install(Storage) {
@@ -203,7 +203,7 @@ functions:
         code: |
           ```kotlin
           val client = createSupabaseClient(
-              supabaseUrl = "https://xyzcompany.supabase.co", 
+              supabaseUrl = "https://xyzcompany.supabase.co",
               supabaseKey = "public-anon-key"
           ) {
               install(Realtime) {
@@ -230,7 +230,7 @@ functions:
         code: |
           ```kotlin
           val client = createSupabaseClient(
-              supabaseUrl = "https://xyzcompany.supabase.co", 
+              supabaseUrl = "https://xyzcompany.supabase.co",
               supabaseKey = "public-anon-key"
           ) {
               install(Functions) {
@@ -247,7 +247,7 @@ functions:
         code: |
           ```kotlin
           val client = createSupabaseClient(
-              supabaseUrl = "https://xyzcompany.supabase.co", 
+              supabaseUrl = "https://xyzcompany.supabase.co",
               supabaseKey = "public-anon-key"
           ) {
               install(GraphQL) {
@@ -325,7 +325,7 @@ functions:
           ```kotlin
           val message = client.postgrest["messages"]
                       .select(columns = Columns.raw(
-                                        """            
+                                        """
                                         content,
                                         from: sender_id(name),
                                         to: receiver_id(name)
@@ -511,7 +511,7 @@ functions:
         code: |
           ```kotlin
           let toUpsert = User(username = "supabot")
-          client.postgrest["users"].insert(toUpsert, upsert = true, onConflict = "username")                          
+          client.postgrest["users"].insert(toUpsert, upsert = true, onConflict = "username")
           ```
       - id: upsert-return-row-count
         name: Return the exact number of rows
@@ -519,7 +519,7 @@ functions:
         code: |
           ```kotlin
           let toUpsert = User(username = "supabot")
-          val count = client.postgrest["users"].insert(toUpsert, upsert = true, onConflict = "username", count = Count.EXACT).count()   
+          val count = client.postgrest["users"].insert(toUpsert, upsert = true, onConflict = "username", count = Count.EXACT).count()
           ```
 
   - id: delete
@@ -542,7 +542,7 @@ functions:
              City::id eq 666
              //or
              eq("id", 666)
-          }      
+          }
           ```
       - id: fetch-delete-records
         name: Fetch deleted records
@@ -552,7 +552,7 @@ functions:
              City::id eq 666
              //or
              eq("id", 666)
-          }.decodeSingle<City>()   
+          }.decodeSingle<City>()
           ```
   - id: rpc
     title: 'Stored Procedures: rpc()'
@@ -595,8 +595,8 @@ functions:
       City::countryId eq 1
       ```
 
-      As you can see on the property syntax: 
-      the name of the `countryId` gets converted to `country_id`. 
+      As you can see on the property syntax:
+      the name of the `countryId` gets converted to `country_id`.
 
       By default, this is done by converting camel case to snake case, but you can customize this by changing the `PropertyConversionMethod` in the Postgrest Config
 
@@ -613,7 +613,7 @@ functions:
               City::name eq "The Shire"
               //or
               eq("name", "The Shire")
-          }      
+          }
           ```
       - id: multiple-filters
         name: Multiple filters on one column
@@ -631,7 +631,7 @@ functions:
                  City::name eq "London"
                  City::name eq "Berlin"
               }
-          }  
+          }
           ```
       - id: filter-by-value-within-json-column
         name: Filter by values within a JSON column
@@ -673,7 +673,7 @@ functions:
           ```kotlin
           client.postgrest["users"].select {
              eq("address->postcode", 90210)
-          }      
+          }
           ```
       - id: filter-foreign-tables
         name: Filter Foreign Tables
@@ -684,11 +684,11 @@ functions:
                                       name,
                                       cities!inner (
                                         name
-                                      )  
+                                      )
                                       """)
           ) {
               eq("cities.name", "Bali")
-          }      
+          }
           ```
         data:
           sql: |
@@ -749,7 +749,7 @@ functions:
                   eq("id", 2)
                   eq("name", "Algeria")
               }
-          }      
+          }
           ```
       - id: use-or-with-and
         name: Use `or` with `and`
@@ -763,7 +763,7 @@ functions:
                      Country::name eq "Afghanistan"
                   }
               }
-          }      
+          }
           ```
 
   - id: not
@@ -780,7 +780,7 @@ functions:
           ```kotlin
           client.postgrest["countries"].select {
               filterNot("name", FilterOperation.IS, "")
-          }   
+          }
           ```
 
   - id: eq
@@ -797,7 +797,7 @@ functions:
               City::name eq "The Shire"
               //or
               eq("name", "The Shire")
-          }      
+          }
           ```
       - id: with-update
         name: With `update()`
@@ -808,7 +808,7 @@ functions:
               City::name eq "San Francisco"
               //or
               eq("name", "San Francisco")
-          }                 
+          }
           ```
       - id: with-delete
         name: With `delete()`
@@ -818,7 +818,7 @@ functions:
               City::name eq "Mordor"
               //or
               eq("name", "Mordor")
-          }   
+          }
           ```
       - id: with-rpc
         name: With `rpc()`
@@ -828,7 +828,7 @@ functions:
               City::name eq "Mordor"
               //or
               eq("name", "Mordor")
-          }      
+          }
           ```
 
   - id: neq
@@ -845,7 +845,7 @@ functions:
               City::name neq "The Shire"
               //or
               neq("name", "The Shire")
-          }      
+          }
           ```
       - id: with-update
         name: With `update()`
@@ -874,7 +874,7 @@ functions:
           ```kotlin
           client.rpc("echo_all_cities") {
               neq("address->postcode", 90210)
-          }      
+          }
           ```
 
   - id: gt
@@ -922,7 +922,7 @@ functions:
              City::countryId gt 250
              //or
              gt("country_id", 300)
-          }      
+          }
           ```
 
   - id: gte
@@ -970,7 +970,7 @@ functions:
              City::countryId gte 250
              //or
              gte("country_id", 300)
-          }      
+          }
           ```
 
   - id: lt
@@ -1018,7 +1018,7 @@ functions:
              City::countryId lt 250
              //or
              lt("country_id", 300)
-          }      
+          }
           ```
 
   - id: lte
@@ -1066,7 +1066,7 @@ functions:
              City::countryId lte 250
              //or
              lte("country_id", 300)
-          }      
+          }
           ```
 
   - id: like
@@ -1083,7 +1083,7 @@ functions:
              City::name like "%la%"
              //or
              like("name", "%la%")
-          }      
+          }
           ```
       - id: with-update
         name: With `update()`
@@ -1094,7 +1094,7 @@ functions:
              City::name like "%la%"
              //or
              like("name", "%la%")
-          }      
+          }
           ```
       - id: with-delete
         name: With `delete()`
@@ -1104,7 +1104,7 @@ functions:
              City::name like "%la%"
              //or
              like("name", "%la%")
-          }      
+          }
           ```
       - id: with-rpc
         name: With `rpc()`
@@ -1114,7 +1114,7 @@ functions:
              City::name like "%la%"
              //or
              like("name", "%la%")
-          }     
+          }
           ```
 
   - id: ilike
@@ -1131,7 +1131,7 @@ functions:
              City::name ilike "%la%"
              //or
              ilike("name", "%la%")
-          }      
+          }
           ```
       - id: with-update
         name: With `update()`
@@ -1142,7 +1142,7 @@ functions:
              City::name ilike "%la%"
              //or
              ilike("name", "%la%")
-          }      
+          }
           ```
       - id: with-delete
         name: With `delete()`
@@ -1152,7 +1152,7 @@ functions:
              City::name ilike "%la%"
              //or
              ilike("name", "%la%")
-          }      
+          }
           ```
       - id: with-rpc
         name: With `rpc()`
@@ -1162,7 +1162,7 @@ functions:
              City::name ilike "%la%"
              //or
              ilike("name", "%la%")
-          }     
+          }
           ```
 
   - id: is
@@ -1181,7 +1181,7 @@ functions:
              City::name isExact null
              //or
              exact("name", null)
-          }      
+          }
           ```
       - id: with-update
         name: With `update()`
@@ -1192,7 +1192,7 @@ functions:
              City::name isExact null
              //or
              exact("name", null)
-          }      
+          }
           ```
       - id: with-delete
         name: With `delete()`
@@ -1202,7 +1202,7 @@ functions:
               City::name isExact null
              //or
              exact("name", null)
-          }      
+          }
           ```
       - id: with-rpc
         name: With `rpc()`
@@ -1212,7 +1212,7 @@ functions:
              City::name isExact null
              //or
              exact("name", null)
-          }     
+          }
           ```
 
   - id: in
@@ -1229,7 +1229,7 @@ functions:
              City::name isIn listOf("Rio de Janeiro", "San Francisco")
              //or
              isIn("name", listOf("Rio de Janeiro", "San Francisco"))
-          }      
+          }
           ```
       - id: with-update
         name: With `update()`
@@ -1240,7 +1240,7 @@ functions:
              City::name isIn listOf("Rio de Janeiro", "San Francisco")
              //or
              isIn("name", listOf("Rio de Janeiro", "San Francisco"))
-          }      
+          }
           ```
       - id: with-delete
         name: With `delete()`
@@ -1250,7 +1250,7 @@ functions:
              City::name isIn listOf("Rio de Janeiro", "San Francisco")
              //or
              isIn("name", listOf("Rio de Janeiro", "San Francisco"))
-          }      
+          }
           ```
       - id: with-rpc
         name: With `rpc()`
@@ -1260,7 +1260,7 @@ functions:
              City::name isIn listOf("Rio de Janeiro", "San Francisco")
              //or
              isIn("name", listOf("Rio de Janeiro", "San Francisco"))
-          }     
+          }
           ```
 
   - id: contains
@@ -1275,7 +1275,7 @@ functions:
              City::mainExports contains listOf("oil")
              //or
              contains("main_exports", listOf("oil"))
-          }      
+          }
           ```
       - id: with-update
         name: With `update()`
@@ -1286,7 +1286,7 @@ functions:
              City::mainExports contains listOf("oil")
              //or
              contains("main_exports", listOf("oil"))
-          }      
+          }
           ```
       - id: with-delete
         name: With `delete()`
@@ -1296,7 +1296,7 @@ functions:
              City::mainExports contains listOf("oil")
              //or
              contains("main_exports", listOf("oil"))
-          }      
+          }
           ```
       - id: with-rpc
         name: With `rpc()`
@@ -1306,7 +1306,7 @@ functions:
              City::mainExports contains listOf("oil")
              //or
              contains("main_exports", listOf("oil"))
-          }     
+          }
           ```
 
   - id: range-lt
@@ -1322,8 +1322,8 @@ functions:
             client.postgrest["reservations"].select {
                Reservation::during rangeLt ("2000-01-02 08:30" to "2000-01-02 09:30")
                //or
-               rangeLt("during", "2000-01-02 08:30" to "2000-01-02 09:30") 
-            }      
+               rangeLt("during", "2000-01-02 08:30" to "2000-01-02 09:30")
+            }
           ```
         data:
           sql: |
@@ -1376,8 +1376,8 @@ functions:
             client.postgrest["reservations"].select {
                Reservation::during rangeGt ("2000-01-02 08:30" to "2000-01-02 09:30")
                //or
-               rangeGt("during", "2000-01-02 08:30" to "2000-01-02 09:30") 
-            }      
+               rangeGt("during", "2000-01-02 08:30" to "2000-01-02 09:30")
+            }
           ```
         data:
           sql: |
@@ -1429,8 +1429,8 @@ functions:
             client.postgrest["reservations"].select {
                Reservation::during rangeGte ("2000-01-02 08:30" to "2000-01-02 09:30")
                //or
-               rangeGte("during", "2000-01-02 08:30" to "2000-01-02 09:30") 
-            }      
+               rangeGte("during", "2000-01-02 08:30" to "2000-01-02 09:30")
+            }
           ```
         data:
           sql: |
@@ -1484,8 +1484,8 @@ functions:
             client.postgrest["reservations"].select {
                Reservation::during rangeLte ("2000-01-02 08:30" to "2000-01-02 09:30")
                //or
-               rangeLte("during", "2000-01-02 08:30" to "2000-01-02 09:30") 
-            }      
+               rangeLte("during", "2000-01-02 08:30" to "2000-01-02 09:30")
+            }
           ```
         data:
           sql: |
@@ -1538,8 +1538,8 @@ functions:
             client.postgrest["reservations"].select {
                Reservation::during adjacent ("2000-01-02 08:30" to "2000-01-02 09:30")
                //or
-               adjacent("during", "2000-01-02 08:30" to "2000-01-02 09:30") 
-            }      
+               adjacent("during", "2000-01-02 08:30" to "2000-01-02 09:30")
+            }
           ```
         data:
           sql: |
@@ -1589,7 +1589,7 @@ functions:
              Issue::tags overlaps listOf("is:closed", "severity:high")
              //or
              overlaps("tags", listOf("is:closed", "severity:high"))
-          }      
+          }
           ```
         data:
           sql: |
@@ -1629,7 +1629,7 @@ functions:
              Issue::tags overlaps listOf("is:closed", "severity:high")
              //or
              overlaps("tags", listOf("is:closed", "severity:high"))
-          }      
+          }
           ```
         data:
           sql: |
@@ -1732,7 +1732,7 @@ functions:
           ```kotlin
           client.postgrest["countries"].select {
              filter(column = "name", operator = FilterOperator.IN, value = "('Algeria', 'Japan')")
-          }      
+          }
           ```
         data:
           sql: |
@@ -1775,7 +1775,7 @@ functions:
                                    """)
           ) {
              filter(column = "cities.name", operator = FilterOperator.EQ, value = "Bali")
-          }        
+          }
           ```
         data:
           sql: |
@@ -2112,7 +2112,7 @@ functions:
         code: |
           ```kotlin
           val user = client.gotrue.signUpWith(Email) {
-              email = "example@email.com" 
+              email = "example@email.com"
               password = "example-password"
           }
           ```
@@ -2122,7 +2122,7 @@ functions:
         code: |
           ```kotlin
           val user = client.gotrue.signUpWith(Phone) {
-              phoneNumber = "+4912345679" 
+              phoneNumber = "+4912345679"
               password = "example-password"
           }
           ```
@@ -2132,13 +2132,13 @@ functions:
         code: |
           ```kotlin
           val user = client.gotrue.signUpWith(Email) {
-              email = "example@email.com" 
+              email = "example@email.com"
               password = "example-password"
               data = buildJsonObject {
                  put("first_name", "John")
                  put("age", 24)
               }
-          }                     
+          }
           ```
       - id: sign-up-with-redirect
         name: Sign up with a redirect URL
@@ -2147,7 +2147,7 @@ functions:
         code: |
           ```kotlin
           val user = client.gotrue.signUpWith(Email, redirectUrl = "https://example.com") {
-              email = "example@email.com" 
+              email = "example@email.com"
               password = "example-password"
           }
           ```
@@ -2164,7 +2164,7 @@ functions:
         code: |
           ```kotlin
           client.gotrue.loginWith(Email) {
-              email = "example@email.com" 
+              email = "example@email.com"
               password = "example-password"
           }
           ```
@@ -2174,7 +2174,7 @@ functions:
         code: |
           ```kotlin
           client.gotrue.loginWith(Phone) {
-              phoneNumber = "+4912345679" 
+              phoneNumber = "+4912345679"
               password = "example-password"
           }
           ```
@@ -2216,7 +2216,7 @@ functions:
         code: |
           ```kotlin
           client.gotrue.sendOtpTo(Email) {
-              email = "example@email.com" 
+              email = "example@email.com"
           }
           ```
       - id: sign-in-with-sms-otp
@@ -2226,7 +2226,7 @@ functions:
         code: |
           ```kotlin
           client.gotrue.sendOtpTo(Phone) {
-              phoneNumber = "+4912345679" 
+              phoneNumber = "+4912345679"
           }
           ```
   - id: sign-in-with-oauth
@@ -2300,7 +2300,7 @@ functions:
             // authentication flow with the correct identity provider.
 
             client.gotrue.loginWith(SSO.withDomain("company.com"))
-            
+
             //the url was opened automatically, if you don't want that, provide a custom redirect url
           ```
       - id: sign-in-with-provider-uuid
@@ -2312,7 +2312,7 @@ functions:
             // to different rules that can't use email domains.
 
             client.gotrue.loginWith(SSO.withProvider("21648a9d-8d5a-4555-a9d1-d6375dc14e92"))
-            
+
             //the url was opened automatically, if you don't want that, provide a custom redirect url
           ```
   - id: sign-out
@@ -2564,9 +2564,9 @@ functions:
           ```
         description: |
           Types of statuses:
-          - `NotAuthenticated`, 
-          - `LoadingFromStorage`, 
-          - `NetworkError`, 
+          - `NotAuthenticated`,
+          - `LoadingFromStorage`,
+          - `NetworkError`,
           - `Authenticated(session)`
   - id: reset-password-for-email
     title: 'Send a password reset request'
@@ -2993,7 +2993,7 @@ functions:
         code: |
           ```kotlin
           client.gotrue.admin.updateUserById(uid = "id") {
-              userMetadata = buildJsonObject { 
+              userMetadata = buildJsonObject {
                   put("key", "value")
               }
           }
@@ -3004,7 +3004,7 @@ functions:
         code: |
           ```kotlin
           client.gotrue.admin.updateUserById(uid = "id") {
-              appMetadata = buildJsonObject { 
+              appMetadata = buildJsonObject {
                   put("key", "value")
               }
           }
@@ -3089,8 +3089,8 @@ functions:
         code: |
           ```kotlin
           val function = client.functions.buildEdgeFunction(
-            function = "function", 
-            headers = Headers.build { 
+            function = "function",
+            headers = Headers.build {
                 /*Default headers*/
                 //when you are sending a body you may want to add this header:
                 append(HttpHeaders.ContentType, "application/json")
@@ -3373,7 +3373,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: list-buckets
         name: List buckets
@@ -3390,7 +3390,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: get-bucket
         name: Get bucket
@@ -3407,7 +3407,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: `insert`
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: create-bucket
         name: Create bucket
@@ -3426,7 +3426,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: `select` and `update`
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: update-bucket
         name: Update bucket
@@ -3447,7 +3447,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
         - `objects` table permissions: `select` and `delete`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: empty-bucket
         name: Empty bucket
@@ -3463,7 +3463,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: `select` and `delete`
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: delete-bucket
         name: Delete bucket
@@ -3480,7 +3480,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `insert`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
       - Resumable uploads use a `Disk` cache by default to store the upload urls. You can customize that in the GoTrue config by changing the `resumable.cache` property.
     examples:
       - id: upload-file
@@ -3521,7 +3521,7 @@ functions:
               source = "this is for continuing previous uploads later",
               size = dataSize,
               path = "icon.png"
-          )                
+          )
           ```
       - id: start-resumable-upload
         name: Start and resumable upload
@@ -3568,7 +3568,7 @@ functions:
                   upload.startOrResumeUploading()
               }
 
-          //on other platforms you may have to continue uploads from the source (Probably better to write an extension function): 
+          //on other platforms you may have to continue uploads from the source (Probably better to write an extension function):
           bucket.resumable.continuePreviousUploads { source, offset ->
               //create ByteReadChannel from source and seek to offset
           }
@@ -3585,7 +3585,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `update` and `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: update-file
         name: Update file
@@ -3605,7 +3605,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `update` and `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: move-file
         name: Move file
@@ -3622,7 +3622,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `insert` and `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: copy-file
         name: Copy file
@@ -3638,7 +3638,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: create-signed-url
         name: Create Signed URL
@@ -3657,7 +3657,7 @@ functions:
               size(100, 100)
               fill()
               quality = 80
-          }    
+          }
           ```
   - id: from-create-signed-urls
     title: from.createSignedUrls()
@@ -3665,7 +3665,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: create-signed-urls
         name: Create Signed URLs
@@ -3681,7 +3681,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `insert`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: create-signed-upload-url
         name: Create Signed Upload URL
@@ -3697,7 +3697,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: upload-to-signed-url
         name: Upload to a signed URL
@@ -3716,7 +3716,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: returns-the-url-for-an-asset-in-a-public-bucket
         name: Returns the URL for an asset in a public bucket
@@ -3742,7 +3742,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: download-file-authenticated
         name: Download file from non-public bucket
@@ -3809,7 +3809,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `delete` and `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: delete-file
         name: Delete file
@@ -3827,7 +3827,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: list-files-in-a-bucket
         name: List files in a bucket

@@ -37,25 +37,25 @@ Please note that SAML 2.0 support is offered on plans Pro and above. Check the [
 
 The number of SAML and SSO acronyms can often be overwhelming. Here's a glossary which you can refer back to at any time:
 
-- **Identity Provider**, **IdP**, or **IDP**  
+- **Identity Provider**, **IdP**, or **IDP**
   An identity provider is a service that manages user accounts at a company or organization. It can verify the identity of a user and exchange that information with your Supabase project and other applications. It acts as a single source of truth for user identities and access rights. Commonly used identity providers are: Microsoft Active Directory (Azure AD, Microsoft Entra), Okta, Google Workspaces (GSuite), PingIdentity, OneLogin, and many others. There are also self-hosted and on-prem versions of identity providers, and sometimes they are accessible only by having access to a company VPN or being in a specific building.
-- **Service Provider**, **SP**  
+- **Service Provider**, **SP**
   This is the software that is asking for user information from an identity provider. In Supabase, this is your project's Auth server.
-- **Assertion**  
+- **Assertion**
   An assertion is a statement issued by an identity provider that contains information about a user.
-- **EntityID**  
+- **EntityID**
   A globally unique ID (usually a URL) that identifies an Identity Provider or Service Provider across the world.
-- **NameID**  
+- **NameID**
   A unique ID (usually an email address) that identifies a user at an Identity Provider.
-- **Metadata**  
+- **Metadata**
   An XML document that describes the features and configuration of an Identity Provider or Service Provider. It can be as a standalone document or as a URL. Usually (but not always) the `EntityID` is the URL at which you can access the Metadata.
-- **Certificate**  
+- **Certificate**
   Supabase Auth (the Service Provider) trusts assertions from an Identity Provider based on the signature attached to the assertion. The signature is verified according to the certificate present in the Metadata.
-- **Assertion Consumer Service (ACS) URL**  
+- **Assertion Consumer Service (ACS) URL**
   This is one of the most important SAML URLs. It is the URL where Supabase Auth will accept assertions from an identity provider. Basically, once the identity provider verifies the user's identity it will redirect to this URL and the redirect request will contain the assertion.
-- **Binding (Redirect, POST, or Artifact)**  
+- **Binding (Redirect, POST, or Artifact)**
   This is a description of the way an identity provider communicates with Supabase Auth. When using the Redirect binding, the communication occurs using HTTP 301 redirects. When it's `POST`, it's using `POST` requests sent with `<form>` elements on a page. When using Artifact, it's using a more secure exchange over a Redirect or `POST`.
-- **RelayState**  
+- **RelayState**
   State used by Supabase Auth to hold information about a request to verify the identity of a user.
 
 ## Important SAML 2.0 information
@@ -81,11 +81,11 @@ Alternatively, you can use the `supabase sso info --project-ref <your-project>` 
 
 User accounts and identities created via SSO differ from regular (email, phone, password, social login...) accounts in these ways:
 
-- **No automatic linking.**  
+- **No automatic linking.**
   Each user account verified using a SSO identity provider will not be automatically linked to existing user accounts in the system. That is, if a user `jane.doe@company.com` had signed up with a password, and then uses their company SSO login with your project, there will be two `jane.doe@company.com` user accounts in the system.
-- **Emails are not necessarily unique.**  
+- **Emails are not necessarily unique.**
   Given the behavior with no automatic linking, email addresses are no longer a unique identifier for a user account. Please always use the user's UUID to correctly reference user accounts.
-- **Sessions may have a maximum duration.**  
+- **Sessions may have a maximum duration.**
   Depending on the configuration of the identity provider, a login session established with SSO may forcibly log out a user after a certain period of time.
 
 ### Row Level Security
@@ -103,7 +103,7 @@ Here are some commonly used statements to extract SSO related information from t
 
 <Admonition type="caution">
 
-If you use [Multi-Factor Authentication](/guides/auth/auth-mfa) with SSO, the `amr` array may have a different method at index `0`!
+If you use [Multi-Factor Authentication](/docs/guides/auth/auth-mfa) with SSO, the `amr` array may have a different method at index `0`!
 
 </Admonition>
 

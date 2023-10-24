@@ -9,7 +9,7 @@ export const meta = {
   tocVideo: 'dLqSmxX3r7I',
 }
 
-Supabase Storage offers the functionality to transform and resize images dynamically. Any image stored in your buckets can be transformed and optimized for fast delivery.
+Supabase Storage offers the functionality to optimize and resize images on the fly. Any image stored in your buckets can be transformed and optimized for fast delivery.
 
 <Admonition type="note">
 
@@ -28,7 +28,7 @@ Image Resizing is currently enabled for [Pro plan and above](https://supabase.co
 >
 <TabPanel id="js" label="JavaScript">
 
-You can pass a `transform` option to the functions you are currently using to interact with your objects. This returns the public URL that serves the resized image.
+Our client libraries methods like `getPublicUrl` and `createSignedUrl` support the `transform` option. This returns the URL that serves the transformed image.
 
 ```ts
 supabase.storage.from('bucket').getPublicUrl('image.jpg', {
@@ -57,7 +57,7 @@ An example URL could look like this:
 
 ## Signing URLs with transformation options
 
-To share a transformed image for a fixed amount of time, provide the transform options when you create the signed URL:
+To share a transformed image in a private bucket for a fixed amount of time, provide the transform option when you create the signed URL:
 
 <Tabs
   scrollable
@@ -89,7 +89,7 @@ val url = supabase.storage["bucket"].createSignedUrl("image.jpg", 60.seconds) {
 </TabPanel>
 </Tabs>
 
-The transformation options are embedded into the token—they cannot be changed once signed.
+The transformation options are embedded into the token attached to the URL — they cannot be changed once signed.
 
 ## Downloading images
 
@@ -133,7 +133,7 @@ supabase.storage["bucket"].downloadAuthenticatedTo("image.jpg", file) {
 
 ## Automatic Image Optimisation (WebP)
 
-When using the image transformation API we will automatically find the best format supported by the browser and return that to the client, without any code change. For instance, if you use Chrome when viewing a jpeg image and using transformation options, you'll see that the content-type returned is `webp`.
+When using the image transformation API, Storage will automatically find the best format supported by the client and return that to the client, without any code change. For instance, if you use Chrome when viewing a jpeg image and using transformation options, you'll see that images are automatically optimized as `webp` images.
 
 As a result, this will lower the bandwidth that you send to your users and your application will load much faster.
 
@@ -188,7 +188,7 @@ supabase.storage["bucket"].downloadAuthenticatedTo("image.jpg", file) {
 
 ## NextJS Loader
 
-You can use Supabase Image Transformation to optimise your NextJS images using a custom [Loader](https://nextjs.org/docs/api-reference/next/image#loader-configuration).
+You can use Supabase Image Transformation to optimize your NextJS images using a custom [Loader](https://nextjs.org/docs/api-reference/next/image#loader-configuration).
 
 To get started, create a `supabase-image-loader.js` file in your NextJS project which exports a default function:
 
@@ -307,7 +307,7 @@ supabase.storage["bucket"].downloadAuthenticatedTo("image.jpg", file) {
 
 ## Self Hosting
 
-Our solution to image resizing and optimisation can be self-hosted as with any other Supabase product. Under the hood we use the awesome [Imgproxy](https://imgproxy.net/)
+Our solution to image resizing and optimisation can be self-hosted as with any other Supabase product. Under the hood we use [Imgproxy](https://imgproxy.net/)
 
 #### Imgproxy Configuration:
 

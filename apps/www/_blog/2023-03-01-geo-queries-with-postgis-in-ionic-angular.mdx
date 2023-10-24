@@ -27,7 +27,7 @@ In this tutorial you will learn to:
 - Store and retrieve geolocation data
 - Use [database functions](https://supabase.com/docs/guides/database/functions) for geo-queries with PostGIS
 - Display a [Capacitor Google Map](https://capacitorjs.com/docs/apis/google-maps) with a marker
-- Upload files to Supabase Storage and use [image transformations](https://supabase.com/docs/guides/storage/image-transformations)
+- Upload files to Supabase Storage and use [image transformations](https://supabase.com/docs/guides/storage/serving/image-transformations)
 
 Since there are quite some code snippets we need I've put together the [full source code on Github](https://github.com/saimon24/supabase-postgis-ionic-angular) so you can easily run the project yourself!
 
@@ -901,7 +901,7 @@ To wrap this up, let's take a look at one more cool Supabase feature.
 
 We have the marker and store ID, so we can simply load the information from our Supabase database.
 
-Now a store might have an image, and while we download the image from our storage bucket we can use [image transformations](https://supabase.com/docs/guides/storage/image-transformations) to get an image exactly in the right dimensions to save time and bandwidth!
+Now a store might have an image, and while we download the image from our storage bucket we can use [image transformations](https://supabase.com/docs/guides/storage/serving/image-transformations) to get an image exactly in the right dimensions to save time and bandwidth!
 
 For this, add two new functions to our **src/app/services/stores.service.ts**:
 
