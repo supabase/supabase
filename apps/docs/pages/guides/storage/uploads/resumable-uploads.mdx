@@ -93,37 +93,30 @@ Supabase Storage implements the [TUS protocol](https://tus.io/) to enable resuma
     Kotlin supports resumable uploads natively for all targets:
 
     ```kotlin
-    //Or on JVM/Android: (This will stream the data from the file to supabase)
     suspend fun uploadFile(file: File) {
-    val upload: ResumableUpload = supabase.storage["bucket_name"].resumable.createOrContinueUpload("file_path", file)
+        val upload: ResumableUpload = supabase.storage["bucket_name"]
+            .resumable.createOrContinueUpload("file_path", file)
+        upload.stateFlow
+            .onEach {
+                println(it.progress)
+            }
+            .launchIn(yourCoroutineScope)
+        upload.startOrResumeUploading()
+    }
 
-    upload.stateFlow
-    .onEach {
-    println(it.progress)
-
-}
-.launchIn(yourCoroutineScope)
-
-    upload.startOrResumeUploading()
-
-}
-
-    //On other platforms you might have to give the bytes directly and specify a source if you want to continue it alter:
+    // On other platforms you might have to give the bytes directly and specify a source if you want to continue it later:
     suspend fun uploadData(bytes: ByteArray) {
-    val upload: ResumableUpload = supabase.storage["bucket_name"].resumable.createOrContinueUpload(bytes, "source", "file_path")
+        val upload: ResumableUpload = supabase.storage["bucket_name"]
+            .resumable.createOrContinueUpload(bytes, "source", "file_path")
 
-    upload.stateFlow
-    .onEach {
-    println(it.progress)
-
-}
-.launchIn(yourCoroutineScope)
-
-    upload.startOrResumeUploading()
-
-}
-
-```
+        upload.stateFlow
+            .onEach {
+                println(it.progress)
+            }
+            .launchIn(yourCoroutineScope)
+        upload.startOrResumeUploading()
+    }
+    ```
 
   </TabPanel>
 </Tabs>

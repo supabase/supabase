@@ -7,7 +7,7 @@ export const meta = {
   sidebar_label: 'Buckets',
 }
 
-Buckets allow you to keep your files organized and determines the **Access Model** for your assets. Settings like max file size for uploads and allowed content types are also defined at the bucket level.
+Buckets allow you to keep your files organized and determines the [Access Model](#access-model) for your assets. [Upload restrictions](/docs/guides/storage/buckets/creating-buckets#restricting-uploads) like max file size and allowed content types are also defined at the bucket level.
 
 ## Access Model
 
@@ -15,38 +15,31 @@ There are 2 access models for buckets, **public** and **private** buckets.
 
 ### Private Buckets
 
-When a bucket is set to **Private** all operations are subject to Access Control via [RLS policies](/guides/storage/uploads/access-control). This also applies when downloading assets.
+When a bucket is set to **Private** all operations are subject to Access Control via [RLS policies](/docs/guides/storage/uploads/access-control). This also applies when downloading assets. Buckets are private by default.
 
 The only ways to download assets within a private bucket is to:
 
-- Use the [download method](https://supabase.com/docs/reference/javascript/storage-from-download) by providing a authorization header containing your user's JWT. The RLS policy you have created on the `storage.objects` table will use this user to determine if they have access.
-- Create a signed URL with the [createSignedUrl method](https://supabase.com/docs/reference/javascript/storage-from-createsignedurl) that can be accessed for a limited time.
-
-#### Performance:
-
-For private buckets, assets are partitioned in our CDN cache on a user level. Since the cache is not shared across different users, this results in a lower cache hit ratio and higher latency than public buckets.
+- Use the [download method](/docs/reference/javascript/storage-from-download) by providing a authorization header containing your user's JWT. The RLS policy you create on the `storage.objects` table will use this user to determine if they have access.
+- Create a signed URL with the [createSignedUrl method](/docs/reference/javascript/storage-from-createsignedurl) that can be accessed for a limited time.
 
 #### Example Use Cases:
 
-- Uploading users' confidential documents
-- Uploading private assets
-- Needing the power of RLS to set fine-grain access control on the asset
+- Uploading users' sensitive documents
+- Securing private assets by using RLS to set up fine-grain access controls
 
 ### Public Buckets
 
-When a bucket is set to be **Public** the access control for **retrieving** and **serving** files within the bucket are bypassed. Anyone with access to the asset URL will be able to access the file.
+When a bucket is designated as 'Public,' it effectively bypasses access controls for both retrieving and serving files within the bucket. This means that anyone who possesses the asset URL can readily access the file.
 
-Access control is still honored for other types of operations, such as: Upload, Delete, Move, Copy
-
-#### Performance:
-
-The CDN cache for public buckets is shared across all users, leading to a higher cache hit ratio and lower latency.
+Access control is still enforced for other types of operations including uploading, deleting, moving, and copying.
 
 #### Example Use Cases:
 
 - User profile pictures
 - User public media
 - Blog post content
+
+Public buckets are more performant than private buckets since they are [cached differently](/docs/guides/storage/cdn/fundamentals#public-vs-private-buckets).
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

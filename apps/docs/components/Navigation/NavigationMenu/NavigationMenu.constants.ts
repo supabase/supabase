@@ -983,21 +983,24 @@ export const storage: NavMenuConstant = {
       ],
     },
     {
+      name: 'Security',
+      url: undefined,
+      items: [{ name: 'Access Control', url: '/guides/storage/security/access-control' }],
+    },
+    {
       name: 'Uploads',
       url: undefined,
       items: [
-        { name: 'Access Control', url: '/guides/storage/uploads/access-control' },
-        { name: 'Standard Upload', url: '/guides/storage/uploads/standard-uploads' },
-        { name: 'Resumable Upload', url: '/guides/storage/uploads/resumable-uploads' },
+        { name: 'Standard Uploads', url: '/guides/storage/uploads/standard-uploads' },
+        { name: 'Resumable Uploads', url: '/guides/storage/uploads/resumable-uploads' },
         { name: 'Limits', url: '/guides/storage/uploads/file-limits' },
       ],
     },
     {
-      name: 'Serving Files',
+      name: 'Serving',
       url: undefined,
       items: [
-        { name: 'Public Assets', url: '/guides/storage/serving/public-assets' },
-        { name: 'Private Assets', url: '/guides/storage/serving/private-assets' },
+        { name: 'Serving assets', url: '/guides/storage/serving/downloads' },
         { name: 'Image Transformations', url: '/guides/storage/serving/image-transformations' },
       ],
     },
@@ -1006,7 +1009,7 @@ export const storage: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Fundamentals', url: '/guides/storage/cdn/fundamentals' },
-        { name: 'Cache Duration', url: '/guides/storage/cdn/cache-duration' },
+        { name: 'Smart CDN', url: '/guides/storage/cdn/smart-cdn' },
         { name: 'Metrics', url: '/guides/storage/cdn/metrics' },
       ],
     },
@@ -1024,8 +1027,13 @@ export const storage: NavMenuConstant = {
       items: [
         { name: 'Database Design', url: '/guides/storage/schema/design' },
         { name: 'Helper Functions', url: '/guides/storage/schema/helper-functions' },
-        { name: 'Optimisations', url: '/guides/storage/schema/optimizations' },
+        { name: 'Scaling', url: '/guides/storage/schema/scaling' },
       ],
+    },
+    {
+      name: 'Going to production',
+      url: undefined,
+      items: [{ name: 'Scaling', url: '/guides/storage/production/scaling' }],
     },
   ],
 }

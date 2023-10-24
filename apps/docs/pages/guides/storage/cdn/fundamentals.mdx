@@ -21,6 +21,14 @@ A user from the United States requests an object and is routed to the U.S. CDN. 
 Another user, also in the United States, requests the same object and is served directly from the CDN cache in the United States instead of routing the request back to Singapore.
 ![CDN cache hit](/docs/img/cdn-cache-hit.png)
 
+<Admonition type="note">
+
+Note that CDNs might still evict your object from their cache if it has not been requested for a while from a specific region. For example, if no user from United States requests your object, it will be removed from the CDN cache even if we set a very long cache control duration.
+
+</Admonition>
+
+The cache status of a particular request is sent in the `cf-cache-status` header. A cache status of `MISS` indicates that the CDN node did not have the object in its cache and had to ping the origin to get it. A cache status of `HIT` indicates that the object was sent directly from the CDN.
+
 ### Public vs Private Buckets
 
 Objects in public buckets do not require any authorization to access objects. This leads to a better cache hit rate compared to private buckets.
