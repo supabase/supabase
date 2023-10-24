@@ -71,7 +71,7 @@ export const generateDocsMenu = (
             <SVG
               src={`${BASE_PATH}/img/graphql.svg`}
               style={{ width: `${16}px`, height: `${16}px` }}
-              className="text-scale-1200"
+              className="text-foreground"
               preProcessor={(code) => code.replace(/svg/, 'svg class="m-auto text-color-inherit"')}
             />
           ),

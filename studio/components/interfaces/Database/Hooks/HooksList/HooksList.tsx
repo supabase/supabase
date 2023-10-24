@@ -62,7 +62,7 @@ const HooksList = ({
             disabled={!canCreateWebhooks}
             disabledMessage="You need additional permissions to create webhooks"
           >
-            <p className="text-sm text-scale-1100">
+            <p className="text-sm text-foreground-light">
               Database Webhooks can be used to trigger serverless functions or send requests to an
               HTTP endpoint.
             </p>
@@ -83,6 +83,7 @@ const HooksList = ({
                 size="small"
                 icon={<IconSearch size="tiny" />}
                 value={filterString}
+                className="w-64"
                 onChange={(e) => setFilterString(e.target.value)}
               />
               <div className="flex items-center space-x-2">
@@ -109,7 +110,7 @@ const HooksList = ({
                             'border border-scale-200',
                           ].join(' ')}
                         >
-                          <span className="text-xs text-scale-1200">
+                          <span className="text-xs text-foreground">
                             You need additional permissions to create webhooks
                           </span>
                         </div>

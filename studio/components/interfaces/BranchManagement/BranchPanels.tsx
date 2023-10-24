@@ -3,22 +3,22 @@ import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { noop } from 'lodash'
 import Link from 'next/link'
-import { PropsWithChildren, forwardRef, useState } from 'react'
+import { forwardRef, PropsWithChildren, useState } from 'react'
 import {
   Badge,
   Button,
-  Dropdown,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  cn,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   IconExternalLink,
   IconGitBranch,
   IconGitHub,
   IconMoreVertical,
   IconShield,
   IconTrash,
-  cn,
 } from 'ui'
 
 import { Markdown } from 'components/interfaces/Markdown'
@@ -88,8 +88,8 @@ const MainBranchPanel = ({
               {isActive && <Badge color="green">Selected</Badge>}
             </div>
             <div className="flex items-center space-x-4">
-              <DropdownMenu_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
-                <DropdownMenuTrigger_Shadcn_>
+              <DropdownMenu open={open} onOpenChange={() => setOpen(!open)} modal={false}>
+                <DropdownMenuTrigger>
                   <Button
                     asChild
                     type="text"
@@ -98,26 +98,26 @@ const MainBranchPanel = ({
                   >
                     <span></span>
                   </Button>
-                </DropdownMenuTrigger_Shadcn_>
-                <DropdownMenuContent_Shadcn_ side="bottom" align="end">
-                  <Link passHref href={`/project/${ref}/settings/general`}>
-                    <DropdownMenuItem_Shadcn_
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="bottom" align="end" className="w-48">
+                  <Link passHref href={`/project/${ref}/settings/integrations`}>
+                    <DropdownMenuItem
                       asChild
                       className="flex gap-2"
                       onSelect={() => onSelectUpdate()}
                     >
                       <a>Change production branch</a>
-                    </DropdownMenuItem_Shadcn_>
+                    </DropdownMenuItem>
                   </Link>
-                  <Dropdown.Separator />
-                  <DropdownMenuItem_Shadcn_
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
                     className="flex gap-2"
                     onSelect={() => onSelectDisableBranching()}
                   >
                     Disable branching
-                  </DropdownMenuItem_Shadcn_>
-                </DropdownMenuContent_Shadcn_>
-              </DropdownMenu_Shadcn_>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </>
         )}
@@ -175,19 +175,19 @@ const BranchPanel = ({
             </Button>
           </a>
         </Link>
-        <DropdownMenu_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
-          <DropdownMenuTrigger_Shadcn_>
+        <DropdownMenu open={open} onOpenChange={() => setOpen(!open)} modal={false}>
+          <DropdownMenuTrigger>
             <Button asChild type="text" className="px-1" icon={<IconMoreVertical size={14} />}>
               <span></span>
             </Button>
-          </DropdownMenuTrigger_Shadcn_>
-          <DropdownMenuContent_Shadcn_ side="bottom" align="end">
-            <DropdownMenuItem_Shadcn_ className="flex gap-2" onSelect={() => onSelectDelete()}>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="bottom" align="end">
+            <DropdownMenuItem className="flex gap-2" onSelect={() => onSelectDelete()}>
               <IconTrash size={14} />
               Delete branch
-            </DropdownMenuItem_Shadcn_>
-          </DropdownMenuContent_Shadcn_>
-        </DropdownMenu_Shadcn_>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </BranchContainer>
   )
@@ -241,7 +241,7 @@ const PullRequestPanel = ({
                   : `Created ${formattedTimeFromNow}`}
               </p>
             </div>
-            <p className="text-scale-1000 ml-8 mt-0.5">{pr.title}</p>
+            <p className="text-foreground-light ml-8 mt-0.5">{pr.title}</p>
           </div>
           <div className="flex items-center space-x-4">
             <Link passHref href={pr.url}>
@@ -251,19 +251,19 @@ const PullRequestPanel = ({
                 </Button>
               </a>
             </Link>
-            <DropdownMenu_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
-              <DropdownMenuTrigger_Shadcn_>
+            <DropdownMenu open={open} onOpenChange={() => setOpen(!open)} modal={false}>
+              <DropdownMenuTrigger>
                 <Button asChild type="text" className="px-1" icon={<IconMoreVertical size={14} />}>
                   <span></span>
                 </Button>
-              </DropdownMenuTrigger_Shadcn_>
-              <DropdownMenuContent_Shadcn_ side="bottom" align="end">
-                <DropdownMenuItem_Shadcn_ className="flex gap-2" onSelect={() => onSelectDelete()}>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="bottom" align="end">
+                <DropdownMenuItem className="flex gap-2" onSelect={() => onSelectDelete()}>
                   <IconTrash size={14} />
                   Delete branch
-                </DropdownMenuItem_Shadcn_>
-              </DropdownMenuContent_Shadcn_>
-            </DropdownMenu_Shadcn_>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>

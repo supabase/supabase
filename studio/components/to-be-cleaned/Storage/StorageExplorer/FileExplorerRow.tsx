@@ -1,37 +1,44 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { find, isEmpty, isEqual } from 'lodash'
+import { useContextMenu } from 'react-contexify'
+import SVG from 'react-inlinesvg'
 import {
   Checkbox,
-  Dropdown,
-  IconMoreVertical,
-  IconLoader,
-  IconImage,
-  IconMusic,
-  IconFilm,
-  IconFile,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuSub,
+  DropdownMenuTrigger,
   IconAlertCircle,
+  IconClipboard,
   IconDownload,
   IconEdit,
+  IconFile,
+  IconFilm,
+  IconImage,
+  IconLoader,
+  IconMoreVertical,
   IconMove,
-  IconClipboard,
+  IconMusic,
   IconTrash2,
-  IconChevronRight,
 } from 'ui'
-import SVG from 'react-inlinesvg'
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { useContextMenu } from 'react-contexify'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useCheckPermissions } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
+import { formatBytes } from 'lib/helpers'
+import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import {
-  STORAGE_VIEWS,
-  STORAGE_ROW_TYPES,
-  STORAGE_ROW_STATUS,
   CONTEXT_MENU_KEYS,
+  STORAGE_ROW_STATUS,
+  STORAGE_ROW_TYPES,
+  STORAGE_VIEWS,
   URL_EXPIRY_DURATION,
 } from '../Storage.constants'
-import { formatBytes } from 'lib/helpers'
-import { BASE_PATH } from 'lib/constants'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import FileExplorerRowEditing from './FileExplorerRowEditing'
 import { copyPathToFolder } from './StorageExplorer.utils'
 
@@ -368,7 +375,7 @@ const FileExplorerRow = ({
           {item.isCorrupted && (
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger>
-                <IconAlertCircle size={18} strokeWidth={2} className="text-scale-1000" />
+                <IconAlertCircle size={18} strokeWidth={2} className="text-foreground-light" />
               </Tooltip.Trigger>
               <Tooltip.Portal>
                 <Tooltip.Content side="bottom">
@@ -379,7 +386,7 @@ const FileExplorerRow = ({
                       'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">
+                    <span className="text-xs text-foreground">
                       File is corrupted, please delete and reupload again.
                     </span>
                   </div>
@@ -414,61 +421,51 @@ const FileExplorerRow = ({
               strokeWidth={2}
             />
           ) : (
-            <Dropdown
-              modal={false}
-              side="bottom"
-              align="end"
-              overlay={[
-                rowOptions.map((option) => {
+            <DropdownMenu modal={false}>
+              <DropdownMenuTrigger>
+                <div className="storage-row-menu opacity-0">
+                  <IconMoreVertical size={16} strokeWidth={2} />
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="bottom" align="end">
+                {rowOptions.map((option) => {
                   if ((option?.children ?? []).length > 0) {
                     return (
-                      <Dropdown
-                        isNested
-                        key={option.name}
-                        side="right"
-                        align="start"
-                        overlay={(option?.children ?? [])?.map((child) => {
-                          return (
-                            <Dropdown.Item key={child.name} onClick={child.onClick}>
-                              <p className="text-xs">{child.name}</p>
-                            </Dropdown.Item>
-                          )
-                        })}
-                      >
-                        <div
-                          className={[
-                            'flex items-center justify-between px-4 py-1.5 text-xs text-scale-1100',
-                            'w-full focus:bg-scale-300 dark:focus:bg-scale-500 focus:text-scale-1200',
-                          ].join(' ')}
-                        >
-                          <div className="flex items-center space-x-2">
-                            {option.icon}
-                            <p className="text">{option.name}</p>
-                          </div>
-                          <IconChevronRight size="tiny" />
-                        </div>
-                      </Dropdown>
+                      <DropdownMenuSub key={option.name}>
+                        <DropdownMenuSubTrigger className="space-x-2">
+                          {option.icon || <></>}
+                          <p>{option.name}</p>
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuPortal>
+                          <DropdownMenuSubContent>
+                            {(option?.children ?? [])?.map((child) => {
+                              return (
+                                <DropdownMenuItem key={child.name} onClick={child.onClick}>
+                                  <p>{child.name}</p>
+                                </DropdownMenuItem>
+                              )
+                            })}
+                          </DropdownMenuSubContent>
+                        </DropdownMenuPortal>
+                      </DropdownMenuSub>
                     )
                   } else if (option.name === 'Separator') {
-                    return <Dropdown.Separator key="row-separator" />
+                    return <DropdownMenuSeparator key={option.name} />
                   } else {
                     return (
-                      <Dropdown.Item
+                      <DropdownMenuItem
+                        className="space-x-2"
                         key={option.name}
-                        icon={option.icon || <></>}
                         onClick={option.onClick}
                       >
-                        <p className="text-xs">{option.name}</p>
-                      </Dropdown.Item>
+                        {option.icon || <></>}
+                        <p>{option.name}</p>
+                      </DropdownMenuItem>
                     )
                   }
-                }),
-              ]}
-            >
-              <div className="storage-row-menu opacity-0">
-                <IconMoreVertical size={16} strokeWidth={2} />
-              </div>
-            </Dropdown>
+                })}
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
         </div>
       </div>

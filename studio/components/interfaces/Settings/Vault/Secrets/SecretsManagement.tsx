@@ -129,7 +129,7 @@ const SecretsManagement = () => {
                         'border border-scale-200',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text-foreground">
                         You need additional permissions to add secrets
                       </span>
                     </div>
@@ -144,8 +144,12 @@ const SecretsManagement = () => {
         <div className="border border-scale-500 rounded">
           {!vault.isLoaded ? (
             <div className="px-6 py-6 space-x-2 flex items-center justify-center">
-              <IconLoader className="animate-spin text-scale-1100" size={16} strokeWidth={1.5} />
-              <p className="text-sm text-scale-1200">Loading secrets from the Vault</p>
+              <IconLoader
+                className="animate-spin text-foreground-light"
+                size={16}
+                strokeWidth={1.5}
+              />
+              <p className="text-sm text-foreground">Loading secrets from the Vault</p>
             </div>
           ) : (
             <>
@@ -165,15 +169,15 @@ const SecretsManagement = () => {
                 <>
                   {searchValue.length === 0 ? (
                     <div className="px-6 py-6 space-y-1 flex flex-col items-center justify-center">
-                      <p className="text-sm text-scale-1200">No secrets added yet</p>
-                      <p className="text-sm text-scale-1100">
+                      <p className="text-sm text-foreground">No secrets added yet</p>
+                      <p className="text-sm text-foreground-light">
                         The Vault allows you to store sensitive information like API keys
                       </p>
                     </div>
                   ) : (
                     <div className="px-6 py-4 space-y-1">
-                      <p className="text-sm text-scale-1200">No results found</p>
-                      <p className="text-sm text-scale-1100">
+                      <p className="text-sm text-foreground">No results found</p>
+                      <p className="text-sm text-foreground-light">
                         Your search for "{searchValue}" did not return any results
                       </p>
                     </div>

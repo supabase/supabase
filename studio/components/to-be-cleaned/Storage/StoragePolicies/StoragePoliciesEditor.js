@@ -1,19 +1,18 @@
-import { Badge, Button, Checkbox, Input, Modal } from 'ui'
-import { get } from 'lodash'
+import { Badge, Button, Checkbox, Modal } from 'ui'
 
+import { PolicyName, PolicyRoles } from 'components/interfaces/Auth/Policies/PolicyEditor'
+import SqlEditor from 'components/ui/SqlEditor'
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from '../Storage.constants'
 import { deriveAllowedClientLibraryMethods } from '../Storage.utils'
-import SqlEditor from 'components/ui/SqlEditor'
-import { PolicyName, PolicyRoles } from 'components/interfaces/Auth/Policies/PolicyEditor'
 
 const PolicyDefinition = ({ definition = '', onUpdatePolicyDefinition = () => {} }) => {
   return (
     <div className="flex space-x-12">
       <div className="flex w-1/3 flex-col space-y-2">
-        <label className="text-base text-scale-1100" htmlFor="policy-name">
+        <label className="text-base text-foreground-light" htmlFor="policy-name">
           Policy definition
         </label>
-        <p className="text-sm text-scale-900">
+        <p className="text-sm text-foreground-lighter">
           Provide a SQL conditional expression that returns a boolean.
         </p>
       </div>
@@ -29,10 +28,10 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
   return (
     <div className="flex justify-between space-x-12">
       <div className="flex w-1/3 flex-col space-y-2">
-        <label className="text-base text-scale-1100" htmlFor="allowed-operation">
+        <label className="text-base text-foreground-light" htmlFor="allowed-operation">
           Allowed operation
         </label>
-        <p className="text-sm text-scale-900">
+        <p className="text-sm text-foreground-lighter">
           Based on the operations you have selected, you can use the highlighted functions in the{' '}
           <a
             href="https://supabase.com/docs/reference/javascript/storage-from-list"

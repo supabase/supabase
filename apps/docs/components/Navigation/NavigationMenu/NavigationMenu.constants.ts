@@ -17,22 +17,25 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
   ],
   [
     {
+      label: 'Product',
+    },
+    {
       label: 'Database',
       icon: 'database',
       href: '/guides/database',
       level: 'database',
     },
     {
-      label: 'Serverless APIs',
-      icon: 'serverless-apis',
-      href: '/guides/api',
-      level: 'api',
-    },
-    {
       label: 'Auth',
       icon: 'auth',
       href: '/guides/auth',
       level: 'auth',
+    },
+    {
+      label: 'Storage',
+      icon: 'storage',
+      href: '/guides/storage',
+      level: 'storage',
     },
     {
       label: 'Edge Functions',
@@ -47,12 +50,6 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       level: 'realtime',
     },
     {
-      label: 'Storage',
-      icon: 'storage',
-      href: '/guides/storage',
-      level: 'storage',
-    },
-    {
       label: 'AI & Vectors',
       icon: 'ai',
       href: '/guides/ai',
@@ -61,8 +58,28 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
   ],
   [
     {
+      label: 'API',
+    },
+    {
+      label: 'REST',
+      icon: 'rest',
+      href: '/guides/api',
+      level: 'api',
+    },
+    {
+      label: 'GraphQL',
+      icon: 'graphql',
+      href: '/guides/graphql',
+      level: 'graphql',
+    },
+  ],
+  [
+    {
+      label: 'Development Cycle',
+    },
+    {
       label: 'Local Dev / CLI',
-      icon: 'reference-cli',
+      icon: 'dev-cli',
       href: '/guides/cli',
       level: 'reference_javascript',
     },
@@ -123,6 +140,8 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       level: 'reference_kotlin',
       community: true,
     },
+  ],
+  [
     {
       label: 'Resources',
     },
@@ -280,8 +299,8 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/tutorials/with-flutter',
         },
         {
-          name: 'Expo',
-          url: '/guides/getting-started/tutorials/with-expo',
+          name: 'Expo React Native',
+          url: '/guides/getting-started/tutorials/with-expo-react-native',
         },
         {
           name: 'Android Kotlin',
@@ -315,6 +334,19 @@ export const cli = {
     },
   ],
 }
+
+export const NativeMobileLoginItems = [
+  {
+    name: 'Apple',
+    icon: '/docs/img/icons/apple-icon',
+    url: '/guides/auth/social-login/auth-apple?platform=react-native',
+  },
+  {
+    name: 'Google',
+    icon: '/docs/img/icons/google-icon',
+    url: '/guides/auth/social-login/auth-google?platform=react-native',
+  },
+]
 
 export const SocialLoginItems = [
   {
@@ -475,6 +507,17 @@ export const auth = {
           name: 'Social Login',
           url: '/guides/auth/social-login',
           items: [...SocialLoginItems],
+        },
+        {
+          name: 'Native Mobile Login',
+          url: '/guides/auth/native-mobile-login',
+          items: [
+            ...NativeMobileLoginItems,
+            {
+              name: 'Deep Linking',
+              url: '/guides/auth/native-mobile-deep-linking',
+            },
+          ],
         },
         {
           name: 'Enterprise SSO',
@@ -741,12 +784,15 @@ export const database: NavMenuConstant = {
 }
 
 export const api: NavMenuConstant = {
-  icon: 'serverless-apis',
-  title: 'Serverless APIs',
+  icon: 'rest',
+  title: 'REST API',
   url: '/guides/api',
   items: [
     { name: 'Overview', url: '/guides/api', items: [] },
     { name: 'Quickstart', url: '/guides/api/quickstart', items: [] },
+    { name: 'Client Libraries', url: '/guides/api/rest/client-libs', items: [] },
+    { name: 'Auto-generated Docs', url: '/guides/api/rest/auto-generated-docs', items: [] },
+    { name: 'Generating Types', url: '/guides/api/rest/generating-types', items: [] },
     {
       name: 'Guides',
       url: '/guides/api',
@@ -762,20 +808,16 @@ export const api: NavMenuConstant = {
         { name: 'Using custom schemas', url: '/guides/api/using-custom-schemas', items: [] },
       ],
     },
-    {
-      name: 'REST & REALTIME',
-      url: undefined,
-      items: [
-        { name: 'Auto-generated Docs', url: '/guides/api/rest/auto-generated-docs', items: [] },
-        { name: 'Client Libraries', url: '/guides/api/rest/client-libs', items: [] },
-        { name: 'Generating Types', url: '/guides/api/rest/generating-types', items: [] },
-      ],
-    },
-    {
-      name: 'GRAPHQL',
-      url: undefined,
-      items: [{ name: 'GraphiQL Documentation', url: '/guides/api/graphql/graphiql', items: [] }],
-    },
+  ],
+}
+
+export const graphql: NavMenuConstant = {
+  icon: 'graphql',
+  title: 'GraphQL',
+  url: '/guides/graphql',
+  items: [
+    { name: 'Overview', url: '/guides/graphql', items: [] },
+    { name: 'API', url: '/guides/graphql/api', items: [] },
   ],
 }
 
@@ -856,6 +898,10 @@ export const functions: NavMenuConstant = {
           name: 'Taking Screenshots with Puppeteer',
           url: '/guides/functions/examples/screenshots',
         },
+        {
+          name: 'Slack Bot responding to mentions',
+          url: '/guides/functions/examples/slack-bot-mention',
+        },
       ],
     },
   ],
@@ -929,18 +975,64 @@ export const storage: NavMenuConstant = {
     { name: 'Overview', url: '/guides/storage' },
     { name: 'Quickstart', url: '/guides/storage/quickstart' },
     {
-      name: 'Fundamentals',
+      name: 'Buckets',
       url: undefined,
       items: [
-        { name: 'Uploading files to Storage', url: '/guides/storage/uploads' },
-        { name: 'Image Transformations', url: '/guides/storage/image-transformations' },
-        { name: 'How caching works', url: '/guides/storage/cdn' },
+        { name: 'Fundamentals', url: '/guides/storage/buckets/fundamentals' },
+        { name: 'Creating Buckets', url: '/guides/storage/buckets/creating-buckets' },
       ],
     },
     {
-      name: 'Access and security',
+      name: 'Security',
       url: undefined,
-      items: [{ name: 'Access Control', url: '/guides/storage/access-control' }],
+      items: [{ name: 'Access Control', url: '/guides/storage/security/access-control' }],
+    },
+    {
+      name: 'Uploads',
+      url: undefined,
+      items: [
+        { name: 'Standard Uploads', url: '/guides/storage/uploads/standard-uploads' },
+        { name: 'Resumable Uploads', url: '/guides/storage/uploads/resumable-uploads' },
+        { name: 'Limits', url: '/guides/storage/uploads/file-limits' },
+      ],
+    },
+    {
+      name: 'Serving',
+      url: undefined,
+      items: [
+        { name: 'Serving assets', url: '/guides/storage/serving/downloads' },
+        { name: 'Image Transformations', url: '/guides/storage/serving/image-transformations' },
+      ],
+    },
+    {
+      name: 'CDN',
+      url: undefined,
+      items: [
+        { name: 'Fundamentals', url: '/guides/storage/cdn/fundamentals' },
+        { name: 'Smart CDN', url: '/guides/storage/cdn/smart-cdn' },
+        { name: 'Metrics', url: '/guides/storage/cdn/metrics' },
+      ],
+    },
+    {
+      name: 'Debugging',
+      url: undefined,
+      items: [
+        { name: 'Logs', url: '/guides/storage/debugging/logs' },
+        { name: 'Error Codes', url: '/guides/storage/debugging/error-codes' },
+      ],
+    },
+    {
+      name: 'Schema',
+      url: undefined,
+      items: [
+        { name: 'Database Design', url: '/guides/storage/schema/design' },
+        { name: 'Helper Functions', url: '/guides/storage/schema/helper-functions' },
+      ],
+    },
+    {
+      name: 'Going to production',
+      url: undefined,
+      items: [{ name: 'Scaling', url: '/guides/storage/production/scaling' }],
     },
   ],
 }
@@ -976,6 +1068,7 @@ export const ai = {
         { name: 'Engineering for scale', url: '/guides/ai/engineering-for-scale' },
         { name: 'Choosing Compute Add-on', url: '/guides/ai/choosing-compute-addon' },
         { name: 'Going to Production', url: '/guides/ai/going-to-prod' },
+        { name: 'RAG with Permissions', url: '/guides/ai/rag-with-permissions' },
       ],
     },
     {
@@ -1149,6 +1242,10 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/migrating-and-upgrading-projects',
         },
         {
+          name: 'Multi-factor Authentication',
+          url: '/guides/platform/multi-factor-authentication',
+        },
+        {
           name: 'Transfer Project',
           url: '/guides/platform/project-transfer',
         },
@@ -1209,6 +1306,10 @@ export const platform: NavMenuConstant = {
         {
           name: 'Build a Supabase Integration',
           url: '/guides/platform/oauth-apps/build-a-supabase-integration',
+        },
+        {
+          name: 'OAuth Scopes',
+          url: '/guides/platform/oauth-apps/oauth-scopes',
         },
       ],
     },
@@ -1271,6 +1372,21 @@ export const resources: NavMenuConstant = {
         {
           name: 'Amazon RDS',
           url: '/guides/resources/migrating-to-supabase/amazon-rds',
+          items: [],
+        },
+        {
+          name: 'Postgres',
+          url: '/guides/resources/migrating-to-supabase/postgres',
+          items: [],
+        },
+        {
+          name: 'MySQL',
+          url: '/guides/resources/migrating-to-supabase/mysql',
+          items: [],
+        },
+        {
+          name: 'MSSQL',
+          url: '/guides/resources/migrating-to-supabase/mssql',
           items: [],
         },
       ],

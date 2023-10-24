@@ -14,10 +14,12 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { ResourceWarning, useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { IS_PLATFORM } from 'lib/constants'
 import { makeRandomString } from 'lib/helpers'
+import { useState } from 'react'
 import { Organization, Project, ResponseError } from 'types'
 import ProjectCard from './ProjectCard'
 import ShimmeringCard from './ShimmeringCard'
-import { useState } from 'react'
+import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
+import { useSelectedOrganization } from 'hooks'
 
 export interface ProjectListProps {
   rewriteHref?: (projectRef: string) => string
@@ -98,7 +100,16 @@ const OrganizationProjects = ({
   projectsError,
   rewriteHref,
 }: OrganizationProjectsProps) => {
+  const organization = useSelectedOrganization()
   const isEmpty = !projects || projects.length === 0
+
+  const { data: integrations } = useOrgIntegrationsQuery({ orgSlug: organization?.slug })
+  const githubConnections = integrations
+    ?.filter((integration) => integration.integration.name === 'GitHub')
+    .flatMap((integration) => integration.connections)
+  const vercelConnections = integrations
+    ?.filter((integration) => integration.integration.name === 'Vercel')
+    .flatMap((integration) => integration.connections)
 
   const [orgBillingMigrationModalVisible, setOrgBillingMigrationModalVisible] = useState(false)
 
@@ -158,6 +169,12 @@ const OrganizationProjects = ({
                 resourceWarnings={resourceWarnings.find(
                   (resourceWarning) => resourceWarning.project === project.ref
                 )}
+                githubIntegration={githubConnections?.find(
+                  (connection) => connection.supabase_project_ref === project.ref
+                )}
+                vercelIntegration={vercelConnections?.find(
+                  (connection) => connection.supabase_project_ref === project.ref
+                )}
               />
             ))
           )}
@@ -184,6 +201,11 @@ const OrganizationProjects = ({
                 </a>
               </Link>
               .
+            </p>
+
+            <p className="text-sm leading-normal">
+              Please do this until the <span className="font-medium">18th of October</span>, as
+              remaining organizations will be migrated.
             </p>
 
             <div className="space-x-3">
@@ -214,7 +236,7 @@ const NoProjectsState = ({ slug }: { slug: string }) => {
     <div className="col-span-4 space-y-4 rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
       <div className="space-y-1">
         <p>No projects</p>
-        <p className="text-sm text-scale-1100">Get started by creating a new project.</p>
+        <p className="text-sm text-foreground-light">Get started by creating a new project.</p>
       </div>
       <div>
         <Link href={`/new/${slug}`}>

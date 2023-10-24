@@ -165,7 +165,7 @@ const BillingAddress = () => {
                     <div className="border-t border-scale-400" />
                     <Panel.Content className="flex justify-between">
                       {!canUpdateBillingAddress ? (
-                        <p className="text-sm text-scale-1000">
+                        <p className="text-sm text-foreground-light">
                           You need additional permissions to update this organization's billing
                           address
                         </p>

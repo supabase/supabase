@@ -161,7 +161,7 @@ const Policies = ({ tables, hasTables, isLocked }: PoliciesProps) => {
                   </div>
                 }
               />
-              <p className="text-sm text-scale-1100">
+              <p className="text-sm text-foreground-light">
                 Create a table in this schema first before creating a policy.
               </p>
             </div>

@@ -72,7 +72,7 @@ const GenericOrganizationPage: NextPage = () => {
             <div className="col-span-4 space-y-4 rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
               <div className="space-y-1">
                 <p>You are not part of any organizations yet</p>
-                <p className="text-sm text-scale-1100">
+                <p className="text-sm text-foreground-light">
                   Get started by creating a new organization.
                 </p>
               </div>
@@ -102,7 +102,7 @@ const GenericOrganizationPage: NextPage = () => {
                     }
                     footer={
                       <div className="flex items-end justify-between">
-                        <span className="text-sm lowercase text-scale-1000">
+                        <span className="text-sm lowercase text-foreground-light">
                           {organization.slug}
                         </span>
                       </div>

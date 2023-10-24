@@ -1,10 +1,11 @@
 import React, { Fragment, useMemo } from 'react'
 import { useRouter } from 'next/router'
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 import { IconXCircle, Modal } from 'ui'
 import pricingAddOn from '~/data/PricingAddOnTable.json'
 import { IconPricingIncludedCheck, IconPricingMinus } from './PricingIcons'
 import Link from 'next/link'
+import Image from 'next/image'
 
 interface Props {
   showComputeModal: boolean
@@ -13,7 +14,7 @@ interface Props {
 
 export default function ComputePricingModal({ showComputeModal, setShowComputeModal }: Props) {
   const { basePath } = useRouter()
-  const { isDarkMode } = useTheme()
+  const { resolvedTheme } = useTheme()
   const columnNames = useMemo(
     () =>
       pricingAddOn.database.rows.map((row) =>
@@ -31,17 +32,19 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
     >
       <>
         <IconXCircle
-          className="absolute right-3 top-3 text-scale-900 hover:text-scale-1200 w-8 cursor-pointer transition"
+          className="absolute right-3 top-3 text-muted hover:text-foreground w-8 cursor-pointer transition"
           onClick={() => setShowComputeModal(false)}
         />
         <div className="p-5">
           <div className="grid lg:flex gap-8">
             <div className="prose">
               <div className="bg-brand-200 dark:bg-brand-200 rounded-xl w-12 h-12 flex justify-center items-center">
-                <img
+                <Image
+                  width={24}
+                  height={24}
                   className="w-6"
                   src={`${basePath}/images/pricing/compute-upgrade${
-                    isDarkMode ? '-green' : ''
+                    resolvedTheme === 'dark' ? '-green' : '-light'
                   }.svg`}
                 />
               </div>
@@ -79,7 +82,7 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
           </div>
         </div>
         <div className="p-5">
-          <table className="text-scale-1200 m-0 hidden w-full table-auto overflow-hidden rounded-b lg:table text-xs">
+          <table className="text-foreground m-0 hidden w-full table-auto overflow-hidden rounded-b lg:table text-xs">
             <thead>
               <tr className="">
                 {columnNames.map((column) => (
@@ -126,7 +129,7 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
           </table>
         </div>
 
-        <table className="text-scale-1200 m-0 w-full table-auto overflow-hidden rounded-b lg:hidden text-xs">
+        <table className="text-foreground m-0 w-full table-auto overflow-hidden rounded-b lg:hidden text-xs">
           <tbody>
             {pricingAddOn.database.rows.map((row, i) => (
               <Fragment key={i}>

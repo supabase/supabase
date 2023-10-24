@@ -110,7 +110,7 @@ function CaseStudyPage(props: any) {
               <p>
                 <a
                   href={'/customers'}
-                  className="text-scale-900 hover:text-scale-1200 flex cursor-pointer items-center text-sm transition"
+                  className="text-muted hover:text-foreground flex cursor-pointer items-center text-sm transition"
                 >
                   <IconChevronLeft style={{ padding: 0 }} />
                   Back
@@ -129,10 +129,10 @@ function CaseStudyPage(props: any) {
                     <Link passHref href="/customers">
                       <a className="text-brand hover:text-brand-600 mb-2 mt-0">Customer Stories</a>
                     </Link>
-                    <h1 className="text-scale-1200 text-4xl font-semibold xl:text-5xl">
+                    <h1 className="text-foreground text-4xl font-semibold xl:text-5xl">
                       {props.blog.title}
                     </h1>
-                    <h2 className="text-scale-1200 text-xl xl:text-2xl">
+                    <h2 className="text-foreground text-xl xl:text-2xl">
                       {props.blog.description}
                     </h2>
                   </div>
@@ -161,7 +161,7 @@ function CaseStudyPage(props: any) {
                         </div>
 
                         <div className="flex flex-col space-y-2">
-                          <span className="text-scale-900">About</span>
+                          <span className="text-muted">About</span>
                           <p>{props.blog.about}</p>
                           <span className="not-prose ">
                             <a
@@ -178,8 +178,8 @@ function CaseStudyPage(props: any) {
                         {props.blog.misc.map((x: any) => {
                           return (
                             <div className="flex flex-col gap-0">
-                              <span className="text-scale-900">{x.label}</span>
-                              <span className="text-scale-1100">{x.text}</span>
+                              <span className="text-muted">{x.label}</span>
+                              <span className="text-light">{x.text}</span>
                             </div>
                           )
                         })}

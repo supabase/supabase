@@ -58,7 +58,7 @@ export default function RLSBannerWarning() {
             <div className="ml-20 absolute right-2">
               <Button
                 type="outline"
-                className="hover:text-scale-1200 text-amber-900 dark:text-amber-900 border border-amber-800"
+                className="hover:text-foreground text-amber-900 dark:text-amber-900 border border-amber-800"
                 onClick={() => setIsOpen(true)}
               >
                 Dismiss

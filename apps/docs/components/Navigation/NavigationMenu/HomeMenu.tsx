@@ -1,16 +1,10 @@
-import { useTheme } from 'common/Providers'
-import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { Fragment } from 'react'
 import { Badge, cn } from 'ui'
 import { HOMEPAGE_MENU_ITEMS } from './NavigationMenu.constants'
 import HomeMenuIconPicker from './HomeMenuIconPicker'
 
 const NavigationMenuHome = () => {
-  const router = useRouter()
-  const { isDarkMode } = useTheme()
-
   return (
     <div className="transition-all duration-150 ease-out opacity-100 ml-0 delay-150">
       <ul className="relative w-full flex flex-col gap-4 pb-5">

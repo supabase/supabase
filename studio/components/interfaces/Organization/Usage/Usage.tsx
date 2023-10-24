@@ -6,18 +6,18 @@ import { useParams } from 'common'
 import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import AlertError from 'components/ui/AlertError'
+import InformationBox from 'components/ui/InformationBox'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useSelectedOrganization } from 'hooks'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants'
+import Link from 'next/link'
 import { Alert, Button, IconExternalLink, IconInfo, Listbox } from 'ui'
 import Activity from './Activity'
 import Bandwidth from './Bandwidth'
 import SizeAndCounts from './SizeAndCounts'
-import InformationBox from 'components/ui/InformationBox'
-import Link from 'next/link'
-import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 
 const Usage = () => {
   const { slug, projectRef } = useParams()
@@ -121,6 +121,7 @@ const Usage = () => {
                 options={[...TIME_PERIODS_BILLING, ...TIME_PERIODS_REPORTS]}
                 loading={isLoadingSubscription}
                 currentBillingPeriodStart={subscription?.current_period_start}
+                currentBillingPeriodEnd={subscription?.current_period_end}
               />
 
               <Listbox
@@ -157,7 +158,7 @@ const Usage = () => {
                 <p className={clsx('text-sm transition', isLoadingSubscription && 'opacity-50')}>
                   Organization is on the {subscription.plan.name} plan
                 </p>
-                <p className="text-sm text-scale-1000">
+                <p className="text-sm text-foreground-light">
                   {billingCycleStart.format('DD MMM YYYY')} -{' '}
                   {billingCycleEnd.format('DD MMM YYYY')}
                 </p>

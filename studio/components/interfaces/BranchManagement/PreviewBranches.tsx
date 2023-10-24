@@ -90,14 +90,16 @@ const PreviewBranches = ({
             <BranchContainer>
               <div className="flex items-center flex-col justify-center w-full py-8">
                 <p>No database preview branches</p>
-                <p className="text-scale-1000">Database preview branches will be shown here</p>
+                <p className="text-foreground-light">
+                  Database preview branches will be shown here
+                </p>
                 <div className="w-[500px] border rounded-md mt-4">
                   <div className="px-5 py-3 bg-surface-100 flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                      <IconGitBranch strokeWidth={2} className="text-scale-1100" />
+                      <IconGitBranch strokeWidth={2} className="text-foreground-light" />
                       <div>
                         <p>Create a preview branch</p>
-                        <p className="text-scale-1000">Start developing in preview</p>
+                        <p className="text-foreground-light">Start developing in preview</p>
                       </div>
                     </div>
                     <Button type="default" onClick={() => onSelectCreateBranch()}>
@@ -107,7 +109,7 @@ const PreviewBranches = ({
                   <div className="px-5 py-3 border-t flex items-center justify-between">
                     <div>
                       <p>Not sure what to do?</p>
-                      <p className="text-scale-1000">Browse our documentation</p>
+                      <p className="text-foreground-light">Browse our documentation</p>
                     </div>
                     <Button type="default" iconRight={<IconExternalLink />}>
                       Docs

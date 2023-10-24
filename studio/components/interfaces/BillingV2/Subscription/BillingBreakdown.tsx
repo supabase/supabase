@@ -58,7 +58,7 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
       <div className="col-span-12 lg:col-span-5">
         <div className="sticky top-16">
           <p className="text-base">Billing breakdown</p>
-          <p className="text-sm text-scale-1000">
+          <p className="text-sm text-foreground-light">
             Current billing cycle: {billingCycleStart.format('MMM DD')} -{' '}
             {billingCycleEnd.format('MMM DD')}
           </p>
@@ -74,13 +74,13 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
         <div className="col-span-12 lg:col-span-7 space-y-6">
           <p className="text-sm">Included usage summary</p>
           {isUsageBillingEnabled ? (
-            <p className="text-sm text-scale-1000">
+            <p className="text-sm text-foreground-light">
               Your plan includes a limited amount of usage. If the usage on your project exceeds
               these quotas, your subscription will be charged for the overages. It may take up to 24
               hours for usage stats to update.
             </p>
           ) : (
-            <p className="text-sm text-scale-1000">
+            <p className="text-sm text-foreground-light">
               Your plan includes a limited amount of usage. If the usage on your project exceeds
               these quotas, you may experience restrictions, as you are currently not billed for
               overages. It may take up to 24 hours for usage stats to update.
@@ -158,7 +158,7 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                       <Link href={`/project/${projectRef}/settings/billing/usage#${metric.anchor}`}>
                         <a>
                           <div className="group flex items-center space-x-2">
-                            <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition cursor-pointer">
+                            <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                               {metric.name}
                             </p>
                             <IconChevronRight
@@ -176,7 +176,7 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                               <IconInfo
                                 size={14}
                                 strokeWidth={2}
-                                className="hover:text-scale-1000"
+                                className="hover:text-foreground-light"
                               />
                             </div>
                           </Tooltip.Trigger>
@@ -189,7 +189,7 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                                   'border border-scale-200',
                                 ].join(' ')}
                               >
-                                <div className="text-xs text-scale-1200">
+                                <div className="text-xs text-foreground">
                                   {usageFee.pricingStrategy === 'UNIT' ? (
                                     <div>
                                       <p>
@@ -260,11 +260,11 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                                     'border border-scale-200',
                                   ].join(' ')}
                                 >
-                                  <p className="text-xs text-scale-1200">
+                                  <p className="text-xs text-foreground">
                                     Exceeding your plans included usage will lead to restrictions to
                                     your project.
                                   </p>
-                                  <p className="text-xs text-scale-1200">
+                                  <p className="text-xs text-foreground">
                                     Upgrade to a usage-based plan or disable the spend cap to avoid
                                     restrictions.
                                   </p>
@@ -294,7 +294,7 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                           }
                           bgClass="bg-gray-300 dark:bg-gray-600"
                           labelBottom={usageLabel}
-                          labelBottomClass="!text-scale-1000"
+                          labelBottomClass="!text-foreground-light"
                           labelTop={hasLimit ? percentageLabel : undefined}
                           labelTopClass={
                             !hasLimit
@@ -309,7 +309,7 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                       ) : (
                         // [Joshen] Needs a better CTA here
                         <div className="flex items-center justify-between flex-grow">
-                          <p className="text-sm text-scale-1000">Unavailable in your plan</p>
+                          <p className="text-sm text-foreground-light">Unavailable in your plan</p>
                           <Button
                             type="default"
                             onClick={() => snap.setPanelKey('subscriptionPlan')}
@@ -320,7 +320,7 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                       )
                     ) : (
                       <div className="flex items-center justify-between flex-grow">
-                        <p className="text-sm text-scale-1000">
+                        <p className="text-sm text-foreground-light">
                           The usage for this metric is missing.
                         </p>
                       </div>
@@ -332,10 +332,10 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
           )}
 
           <p className="!mt-10 text-sm">Upcoming cost for next invoice</p>
-          <p className="text-sm text-scale-1000">
+          <p className="text-sm text-foreground-light">
             The following table shows your upcoming costs. Depending on your usage, the final amount
             may vary. Next invoice on{' '}
-            <span className="text-scale-1100">{billingCycleEnd.format('MMM DD, YYYY')}</span>.
+            <span className="text-foreground-light">{billingCycleEnd.format('MMM DD, YYYY')}</span>.
           </p>
 
           {isLoadingUpcomingInvoice ? (
@@ -369,10 +369,18 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
             <table className="w-full">
               <thead>
                 <tr className="border-b">
-                  <th className="py-2 font-normal text-left text-sm text-scale-1000 w-1/2">Item</th>
-                  <th className="py-2 font-normal text-left text-sm text-scale-1000">Count</th>
-                  <th className="py-2 font-normal text-left text-sm text-scale-1000">Unit price</th>
-                  <th className="py-2 font-normal text-right text-sm text-scale-1000">Price</th>
+                  <th className="py-2 font-normal text-left text-sm text-foreground-light w-1/2">
+                    Item
+                  </th>
+                  <th className="py-2 font-normal text-left text-sm text-foreground-light">
+                    Count
+                  </th>
+                  <th className="py-2 font-normal text-left text-sm text-foreground-light">
+                    Unit price
+                  </th>
+                  <th className="py-2 font-normal text-right text-sm text-foreground-light">
+                    Price
+                  </th>
                 </tr>
               </thead>
               <tbody>

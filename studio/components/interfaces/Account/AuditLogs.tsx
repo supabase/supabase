@@ -198,7 +198,7 @@ const AuditLogs = () => {
                                   'border border-scale-200',
                                 ].join(' ')}
                               >
-                                <span className="text-xs text-scale-1200">
+                                <span className="text-xs text-foreground">
                                   {dateSortDesc ? 'Sort latest first' : 'Sort earliest first'}
                                 </span>
                               </div>
@@ -241,7 +241,7 @@ const AuditLogs = () => {
                         </Table.td>
                         <Table.td>
                           <p
-                            className="text-scale-1100 max-w-[230px] truncate"
+                            className="text-foreground-light max-w-[230px] truncate"
                             title={project?.name ?? organization?.name ?? '-'}
                           >
                             {project?.name
@@ -252,7 +252,7 @@ const AuditLogs = () => {
                             {project?.name ?? organization?.name ?? '-'}
                           </p>
                           <p
-                            className="text-scale-1000 text-xs mt-0.5 truncate"
+                            className="text-foreground-light text-xs mt-0.5 truncate"
                             title={log.target.metadata.project_ref ?? log.target.metadata.org_slug}
                           >
                             {log.target.metadata.project_ref

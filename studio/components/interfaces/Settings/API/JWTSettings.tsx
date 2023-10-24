@@ -12,7 +12,11 @@ import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  Dropdown,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   IconAlertCircle,
   IconAlertTriangle,
   IconChevronDown,
@@ -94,7 +98,7 @@ const JWTSettings = () => {
           {isError ? (
             <div className="flex items-center justify-center py-8 space-x-2">
               <IconAlertCircle size={16} strokeWidth={1.5} />
-              <p className="text-sm text-scale-1100">Failed to retrieve JWT settings</p>
+              <p className="text-sm text-foreground-light">Failed to retrieve JWT settings</p>
             </div>
           ) : (
             <>
@@ -158,7 +162,7 @@ const JWTSettings = () => {
                                       'border border-scale-200',
                                     ].join(' ')}
                                   >
-                                    <span className="text-xs text-scale-1200">
+                                    <span className="text-xs text-foreground">
                                       You need additional permissions to generate a new JWT secret
                                     </span>
                                   </div>
@@ -166,31 +170,30 @@ const JWTSettings = () => {
                               </Tooltip.Portal>
                             </Tooltip.Root>
                           ) : (
-                            <Dropdown
-                              align="end"
-                              side="bottom"
-                              overlay={
-                                <>
-                                  <Dropdown.Item
-                                    onClick={() => setIsGeneratingKey(true)}
-                                    icon={<IconRefreshCw size={16} />}
-                                  >
-                                    Generate a random secret
-                                  </Dropdown.Item>
-                                  <Dropdown.Separator />
-                                  <Dropdown.Item
-                                    onClick={() => setIsCreatingKey(true)}
-                                    icon={<IconPenTool size={16} />}
-                                  >
-                                    Create my own secret
-                                  </Dropdown.Item>
-                                </>
-                              }
-                            >
-                              <Button asChild type="default" iconRight={<IconChevronDown />}>
-                                <span>Generate a new secret</span>
-                              </Button>
-                            </Dropdown>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger>
+                                <Button asChild type="default" iconRight={<IconChevronDown />}>
+                                  <span>Generate a new secret</span>
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" side="bottom">
+                                <DropdownMenuItem
+                                  className="space-x-2"
+                                  onClick={() => setIsGeneratingKey(true)}
+                                >
+                                  <IconRefreshCw size={16} />
+                                  <p>Generate a random secret</p>
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                  className="space-x-2"
+                                  onClick={() => setIsCreatingKey(true)}
+                                >
+                                  <IconPenTool size={16} />
+                                  <p>Create my own secret</p>
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           )}
                         </div>
                       </div>
@@ -226,13 +229,13 @@ const JWTSettings = () => {
             <IconAlertTriangle />
             <AlertTitle_Shadcn_>This will invalidate all existing API keys</AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_>
-              Generating a new JWT secret will invalidate <u className="text">all</u> of your API
-              keys, including your <code className="text-xs">service_role</code> and{' '}
+              Generating a new JWT secret will invalidate <u className="text-foreground">all</u> of
+              your API keys, including your <code className="text-xs">service_role</code> and{' '}
               <code className="text-xs">anon</code> keys. Your project will also be restarted during
               this process, which will terminate any existing connections.
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
-          <p className="text text-sm">
+          <p className="text-foreground text-sm">
             This action cannot be undone and the old JWT secret will be lost. All existing API keys
             will be invalidated, and any open connections will be terminated.
           </p>
@@ -266,7 +269,7 @@ const JWTSettings = () => {
       >
         <Modal.Content>
           <div className="py-4 space-y-2">
-            <p className="text-sm text-scale-1100">
+            <p className="text-sm text-foreground-light">
               Create a custom JWT secret. Make sure it is a strong combination of characters that
               cannot be guessed easily.
             </p>
@@ -274,8 +277,8 @@ const JWTSettings = () => {
               <IconAlertTriangle />
               <AlertTitle_Shadcn_>This will invalidate all existing API keys</AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
-                Generating a new JWT secret will invalidate <u className="text">all</u> of your API
-                keys, including your <code className="text-xs">service_role</code> and{' '}
+                Generating a new JWT secret will invalidate <u className="text-foreground">all</u>{' '}
+                of your API keys, including your <code className="text-xs">service_role</code> and{' '}
                 <code className="text-xs">anon</code> keys. Your project will also be restarted
                 during this process, which will terminate any existing connections.
               </AlertDescription_Shadcn_>

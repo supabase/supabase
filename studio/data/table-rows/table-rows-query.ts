@@ -1,7 +1,12 @@
 import { QueryKey, UseQueryOptions } from '@tanstack/react-query'
 import { Filter, Query, Sort, SupaRow, SupaTable } from 'components/grid'
 import { useCallback } from 'react'
-import { ExecuteSqlData, useExecuteSqlPrefetch, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import {
+  ExecuteSqlData,
+  executeSql,
+  useExecuteSqlPrefetch,
+  useExecuteSqlQuery,
+} from '../sql/execute-sql-query'
 import { getPagination } from '../utils/pagination'
 import { formatFilterValue } from './utils'
 
@@ -11,6 +16,66 @@ type GetTableRowsArgs = {
   sorts?: Sort[]
   limit?: number
   page?: number
+}
+
+// [Joshen] From components/grid/services/row/SqlRowService.ts, we should remove the logic from SqlRowService eventually
+export const fetchAllTableRows = async ({
+  projectRef,
+  connectionString,
+  table,
+  filters = [],
+  sorts = [],
+}: {
+  projectRef: string
+  connectionString?: string
+  table: SupaTable
+  filters?: Filter[]
+  sorts?: Sort[]
+}) => {
+  if (!connectionString) {
+    console.error('Connection string is required')
+    return []
+  }
+
+  const rows: any[] = []
+  const query = new Query()
+
+  let queryChains = query.from(table.name, table.schema ?? undefined).select()
+  filters
+    .filter((filter) => filter.value && filter.value !== '')
+    .forEach((filter) => {
+      const value = formatFilterValue(table, filter)
+      queryChains = queryChains.filter(filter.column, filter.operator, value)
+    })
+  sorts.forEach((sort) => {
+    queryChains = queryChains.order(sort.column, sort.ascending, sort.nullsFirst)
+  })
+
+  // Starting from page 0, fetch 500 records per call
+  let page = -1
+  let from = 0
+  let to = 0
+  let pageData = []
+  const rowsPerPage = 500
+
+  await (async () => {
+    do {
+      page += 1
+      from = page * rowsPerPage
+      to = (page + 1) * rowsPerPage - 1
+      const query = queryChains.range(from, to).toSql()
+
+      try {
+        const { result } = await executeSql({ projectRef, connectionString, sql: query })
+        rows.push(...result)
+        pageData = result
+      } catch (error) {
+        return { data: { rows: [] } }
+      }
+    } while (pageData.length === rowsPerPage)
+  })()
+
+  return rows
 }
 
 export const getTableRowsSqlQuery = ({

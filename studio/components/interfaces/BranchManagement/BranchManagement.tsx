@@ -10,8 +10,6 @@ import {
   Button,
   IconAlertTriangle,
   IconGitBranch,
-  IconSearch,
-  Input,
   Modal,
 } from 'ui'
 
@@ -27,11 +25,11 @@ import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
 import { OPT_IN_TAGS } from 'lib/constants'
-import { useAppUiStateSnapshot } from 'state/app'
+import { useAppStateSnapshot } from 'state/app-state'
 import { MainBranchPanel } from './BranchPanels'
-import CreateBranchSidePanel from './CreateBranchSidePanel'
 import PreviewBranches from './PreviewBranches'
 import PullRequests from './PullRequests'
+import CreateBranchModal from './CreateBranchModal'
 
 const BranchManagement = () => {
   const { ui } = useStore()
@@ -48,7 +46,7 @@ const BranchManagement = () => {
   const projectRef =
     project !== undefined ? (isBranch ? project.parent_project_ref : ref) : undefined
 
-  const snap = useAppUiStateSnapshot()
+  const snap = useAppStateSnapshot()
   const [showCreateBranch, setShowCreateBranch] = useState(false)
   const [showDisableBranching, setShowDisableBranching] = useState(false)
   const [selectedBranchToDelete, setSelectedBranchToDelete] = useState<Branch>()
@@ -249,10 +247,12 @@ const BranchManagement = () => {
         </Modal.Content>
       </ConfirmationModal>
 
-      <CreateBranchSidePanel
+      {/* <CreateBranchSidePanel
         visible={showCreateBranch}
         onClose={() => setShowCreateBranch(false)}
-      />
+      /> */}
+
+      <CreateBranchModal visible={showCreateBranch} onClose={() => setShowCreateBranch(false)} />
     </>
   )
 }

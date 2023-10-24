@@ -1,10 +1,10 @@
-import { IconMaximize, Popover } from 'ui'
-import { useState, useCallback } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { EditorProps } from '@supabase/react-data-grid'
+import { useCallback, useState } from 'react'
+import { IconMaximize, Popover } from 'ui'
 
-import { useTrackedState } from 'components/grid/store'
 import { BlockKeys, MonacoEditor, NullValue } from 'components/grid/components/common'
+import { useTrackedState } from 'components/grid/store'
 import { tryParseJson } from 'lib/helpers'
 import { isNil } from 'lodash'
 
@@ -92,13 +92,13 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
                   <div className="px-1.5 py-[2.5px] rounded bg-scale-600 border border-scale-700 flex items-center justify-center">
                     <span className="text-[10px]">⏎</span>
                   </div>
-                  <p className="text-xs text-scale-1100">Save changes</p>
+                  <p className="text-xs text-foreground-light">Save changes</p>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="px-1 py-[2.5px] rounded bg-scale-600 border border-scale-700 flex items-center justify-center">
                     <span className="text-[10px]">Esc</span>
                   </div>
-                  <p className="text-xs text-scale-1100">Cancel changes</p>
+                  <p className="text-xs text-foreground-light">Cancel changes</p>
                 </div>
               </div>
             ) : (
@@ -125,7 +125,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
                       'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">Expand editor</span>
+                    <span className="text-xs text-foreground">Expand editor</span>
                   </div>
                 </Tooltip.Content>
               </Tooltip.Portal>

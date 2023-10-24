@@ -4,13 +4,13 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { IconAlertCircle, IconLoader, Input } from 'ui'
 
-import { useProjectApiQuery } from 'data/config/project-api-query'
-import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
-import { useCheckPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
 import Snippets from 'components/interfaces/Docs/Snippets'
-import Panel from 'components/ui/Panel'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
+import Panel from 'components/ui/Panel'
+import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
+import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useCheckPermissions } from 'hooks'
 
 const APIKeys = () => {
   const { ref: projectRef } = useParams()
@@ -59,7 +59,7 @@ const APIKeys = () => {
       title={
         <div className="space-y-3">
           <h5 className="text-base">Project API</h5>
-          <p className="text-sm text-scale-1000">
+          <p className="text-sm text-foreground-light">
             Your API is secured behind an API gateway which requires an API Key for every request.
             <br />
             You can use the parameters below to use Supabase client libraries.
@@ -70,14 +70,14 @@ const APIKeys = () => {
       {isProjectSettingsError || isJwtSecretUpdateStatusError ? (
         <div className="flex items-center justify-center py-8 space-x-2">
           <IconAlertCircle size={16} strokeWidth={1.5} />
-          <p className="text-sm text-scale-1100">
+          <p className="text-sm text-foreground-light">
             {isProjectSettingsError ? 'Failed to retrieve API keys' : 'Failed to update JWT secret'}
           </p>
         </div>
       ) : isApiKeysEmpty || isProjectSettingsLoading || isJwtSecretUpdateStatusLoading ? (
         <div className="flex items-center justify-center py-8 space-x-2">
           <IconLoader className="animate-spin" size={16} strokeWidth={1.5} />
-          <p className="text-sm text-scale-1100">
+          <p className="text-sm text-foreground-light">
             {isProjectSettingsLoading || isApiKeysEmpty
               ? 'Retrieving API keys'
               : 'JWT secret is being updated'}
@@ -155,7 +155,7 @@ const APIKeys = () => {
                     key={language.key}
                     className={[
                       'px-3 py-1 text-sm cursor-pointer transition',
-                      `${!isSelected ? 'bg-scale-200 text-scale-1000' : 'bg-scale-300'}`,
+                      `${!isSelected ? 'bg-scale-200 text-foreground-light' : 'bg-scale-300'}`,
                     ].join(' ')}
                     onClick={() => setSelectedLanguage(language)}
                   >

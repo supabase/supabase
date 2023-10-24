@@ -35,7 +35,7 @@ const Security: NextPageWithLayout = () => {
         <Collapsible.Trigger asChild>
           <button
             type="button"
-            className="group flex w-full items-center justify-between rounded py-3 px-6 text-scale-1200"
+            className="group flex w-full items-center justify-between rounded py-3 px-6 text-foreground"
           >
             <div className="flex flex-row gap-4 items-center py-1">
               <IconSmartphone strokeWidth={1.5} />
@@ -49,7 +49,7 @@ const Security: NextPageWithLayout = () => {
             ) : null}
           </button>
         </Collapsible.Trigger>
-        <Collapsible.Content className="group border-t border-scale-500 bg-scale-100 py-6 px-6 text-scale-1200 dark:bg-scale-300">
+        <Collapsible.Content className="group border-t border-scale-500 bg-scale-100 py-6 px-6 text-foreground dark:bg-scale-300">
           <TOTPFactors />
         </Collapsible.Content>
       </Collapsible>

@@ -12,7 +12,16 @@ import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscr
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import Telemetry from 'lib/telemetry'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
-import { Alert, Button, IconExternalLink, Radio, SidePanel } from 'ui'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconAlertTriangle,
+  IconExternalLink,
+  Radio,
+  SidePanel,
+} from 'ui'
 
 const CustomDomainSidePanel = () => {
   const { ui } = useStore()
@@ -184,10 +193,12 @@ const CustomDomainSidePanel = () => {
                     <p className="text-sm">No custom domain</p>
                   </div>
                   <div className="px-4 py-2">
-                    <p className="text-scale-1000">Use the default supabase domain for your API</p>
+                    <p className="text-foreground-light">
+                      Use the default supabase domain for your API
+                    </p>
                     <div className="flex items-center space-x-1 mt-2">
-                      <p className="text-scale-1200 text-sm">$0</p>
-                      <p className="text-scale-1000 translate-y-[1px]"> / month</p>
+                      <p className="text-foreground text-sm">$0</p>
+                      <p className="text-foreground-light translate-y-[1px]"> / month</p>
                     </div>
                   </div>
                 </div>
@@ -207,10 +218,12 @@ const CustomDomainSidePanel = () => {
                       <p className="text-sm">{option.name}</p>
                     </div>
                     <div className="px-4 py-2">
-                      <p className="text-scale-1000">Present a branded experience to your users</p>
+                      <p className="text-foreground-light">
+                        Present a branded experience to your users
+                      </p>
                       <div className="flex items-center space-x-1 mt-2">
-                        <p className="text-scale-1200 text-sm">${option.price}</p>
-                        <p className="text-scale-1000 translate-y-[1px]"> / month</p>
+                        <p className="text-foreground text-sm">${option.price}</p>
+                        <p className="text-foreground-light translate-y-[1px]"> / month</p>
                       </div>
                     </div>
                   </div>
@@ -223,14 +236,14 @@ const CustomDomainSidePanel = () => {
             <>
               {selectedOption === 'cd_none' ||
               (selectedCustomDomain?.price ?? 0) < (subscriptionCDOption?.variant.price ?? 0) ? (
-                <p className="text-sm text-scale-1100">
+                <p className="text-sm text-foreground-light">
                   Upon clicking confirm, the amount of that's unused during the current billing
                   cycle will be returned as credits that can be used for subsequent billing cycles
                 </p>
               ) : (
-                <p className="text-sm text-scale-1100">
+                <p className="text-sm text-foreground-light">
                   Upon clicking confirm, the amount of{' '}
-                  <span className="text-scale-1200">
+                  <span className="text-foreground">
                     ${selectedCustomDomain?.price.toLocaleString()}
                   </span>{' '}
                   will be added to your monthly invoice. You're immediately charged for the
@@ -238,6 +251,17 @@ const CustomDomainSidePanel = () => {
                   of a downgrade, you get credits for the remaining time.
                 </p>
               )}
+
+              {subscription?.billing_via_partner &&
+                subscription.scheduled_plan_change?.target_plan !== undefined && (
+                  <Alert_Shadcn_ variant={'warning'} className="mb-2">
+                    <IconAlertTriangle className="h-4 w-4" />
+                    <AlertDescription_Shadcn_>
+                      You have a scheduled subscription change that will be canceled if you change
+                      your custom domain add on.
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
+                )}
             </>
           )}
 

@@ -2,12 +2,12 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { Badge, IconCircle, IconLoader } from 'ui'
 
+import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { useProjectStatusQuery } from 'data/projects/project-status-query'
 import { invalidateProjectsQuery } from 'data/projects/projects-query'
 import { PROJECT_STATUS } from 'lib/constants'
-import { Project } from 'types'
 import { useEffect, useState } from 'react'
-import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
+import { Project } from 'types'
 
 export interface PausingStateProps {
   project: Project
@@ -59,10 +59,10 @@ const PausingState = ({ project }: PausingStateProps) => {
                 <div className="absolute flex h-full w-full items-center justify-center">
                   <IconLoader className="animate-spin" size={20} strokeWidth={2} />
                 </div>
-                <IconCircle className="text-scale-900" size={50} strokeWidth={1.5} />
+                <IconCircle className="text-foreground-lighter" size={50} strokeWidth={1.5} />
               </div>
               <p className="text-center">Pausing {project.name}</p>
-              <p className="mt-4 text-center text-sm text-scale-1100">
+              <p className="mt-4 text-center text-sm text-foreground-light">
                 You may restore your project anytime thereafter, and your data will be restored to
                 when it was initially paused.
               </p>

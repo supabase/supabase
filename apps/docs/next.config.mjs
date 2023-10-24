@@ -52,6 +52,7 @@ const nextConfig = {
     domains: [
       'avatars.githubusercontent.com',
       'github.com',
+      'supabase.github.io',
       'user-images.githubusercontent.com',
       'raw.githubusercontent.com',
       'weweb-changelog.ghost.io',
@@ -104,15 +105,7 @@ const nextConfig = {
 
 const configExport = () => {
   const plugins = [
-    withTM([
-      'ui',
-      'common',
-      '@supabase/auth-helpers-nextjs',
-      'mermaid',
-      'mdx-mermaid',
-      'dayjs',
-      'shared-data',
-    ]),
+    withTM(['ui', 'common', 'mermaid', 'mdx-mermaid', 'dayjs', 'shared-data']),
     withMDX,
     withYaml,
     withBundleAnalyzer,

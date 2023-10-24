@@ -11,7 +11,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/7/LaunchSection/LaunchWeekLogoHeader'
 import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import LW7BgGraphic from '~/components/LaunchWeek/7/LW7BgGraphic'
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 
 const LW7Releases = dynamic(() => import('~/components/LaunchWeek/7/Releases'))
 const LaunchWeekPrizeSection = dynamic(
@@ -32,20 +32,11 @@ const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!
 )
 export default function TicketHome({ users }: Props) {
-  const { isDarkMode, toggleTheme } = useTheme()
+  const { theme, setTheme } = useTheme()
 
   const TITLE = 'Supabase LaunchWeek 7'
   const DESCRIPTION = 'Supabase Launch Week 7 | 10–14 April 2023'
   const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/seven/launch-week-7-teaser.jpg`
-
-  useEffect(() => {
-    toggleTheme(true)
-    document.body.className = 'bg-[#1C1C1C]'
-    return () => {
-      document.body.className = ''
-      isDarkMode ? toggleTheme(true) : toggleTheme(false)
-    }
-  }, [])
 
   return (
     <>

@@ -204,7 +204,7 @@ const PolicyEditorModal = ({
           }}
         >
           <Modal.Content>
-            <p className="py-4 text-sm text-scale-1100">
+            <p className="py-4 text-sm text-foreground-light">
               There are unsaved changes. Are you sure you want to close the editor? Your changes
               will be lost.
             </p>

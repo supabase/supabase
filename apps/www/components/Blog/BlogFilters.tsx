@@ -1,13 +1,23 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
 import { startCase } from 'lodash'
+import { useRouter } from 'next/router'
+import { useCallback, useEffect, useState } from 'react'
 
-import { Button, Dropdown, IconChevronDown, IconSearch, IconX, Input } from 'ui'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  IconChevronDown,
+  IconSearch,
+  IconX,
+  Input,
+} from 'ui'
 import { useParams } from '~/hooks/useParams'
 
-import PostTypes from '~/types/post'
 import { useBreakpoint } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
+import PostTypes from '~/types/post'
 
 interface Props {
   posts: PostTypes[]
@@ -72,32 +82,32 @@ const BlogFilters = ({ posts, setPosts, setCategory, allCategories, handlePosts 
             exit={{ opacity: 0, transition: { duration: 0.05 } }}
             className="flex lg:hidden"
           >
-            <Dropdown
-              side="bottom"
-              align="start"
-              size="large"
-              overlay={allCategories.map((category: string) => (
-                <Dropdown.Item
-                  key="custom-expiry"
-                  onClick={() => setCategory(category)}
-                  className={[
-                    (category === 'all' && !activeCategory) || category === activeCategory
-                      ? 'text-brand-600'
-                      : '',
-                  ].join(' ')}
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Button
+                  type="outline"
+                  iconRight={<IconChevronDown />}
+                  className="w-full min-w-[200px] flex justify-between items-center py-2"
                 >
-                  {category === 'all' ? 'All Posts' : startCase(category.replaceAll('-', ' '))}
-                </Dropdown.Item>
-              ))}
-            >
-              <Button
-                type="outline"
-                iconRight={<IconChevronDown />}
-                className="w-full min-w-[200px] flex justify-between items-center py-2"
-              >
-                {!activeCategory ? 'All Posts' : startCase(activeCategory?.replaceAll('-', ' '))}
-              </Button>
-            </Dropdown>
+                  {!activeCategory ? 'All Posts' : startCase(activeCategory?.replaceAll('-', ' '))}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="bottom" align="start">
+                {allCategories.map((category: string) => (
+                  <DropdownMenuItem
+                    key="custom-expiry"
+                    onClick={() => setCategory(category)}
+                    className={[
+                      (category === 'all' && !activeCategory) || category === activeCategory
+                        ? 'text-brand-600'
+                        : '',
+                    ].join(' ')}
+                  >
+                    {category === 'all' ? 'All Posts' : startCase(category.replaceAll('-', ' '))}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </motion.div>
         )}
         <div className="hidden lg:flex flex-wrap items-center flex-grow gap-2">
@@ -157,7 +167,7 @@ const BlogFilters = ({ posts, setPosts, setCategory, allCategories, handlePosts 
                       setSearchKey('')
                       setShowSearchInput(false)
                     }}
-                    className="text-scale-1100 hover:text-scale-1200"
+                    className="text-light hover:text-foreground"
                   >
                     <IconX size="tiny" />
                   </Button>

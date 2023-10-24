@@ -3,18 +3,20 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop, partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
-import { Button, IconLock, IconSearch, Input, Listbox } from 'ui'
+import { Button, IconSearch, Input } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlphaPreview from 'components/to-be-cleaned/AlphaPreview'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
+import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions, useStore } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import TriggerList from './TriggerList'
+import ProtectedSchemaWarning from '../../ProtectedSchemaWarning'
 
 interface TriggersListProps {
   createTrigger: () => void
@@ -36,7 +38,7 @@ const TriggersList = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const [protectedSchemas, openSchemas] = partition(schemas ?? [], (schema) =>
+  const [protectedSchemas] = partition(schemas ?? [], (schema) =>
     EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
   )
   const schema = schemas?.find((schema) => schema.name === selectedSchema)
@@ -63,11 +65,11 @@ const TriggersList = ({
             onClickCta={() => createTrigger()}
           >
             <AlphaPreview />
-            <p className="text-sm text-scale-1100">
+            <p className="text-sm text-foreground-light">
               A PostgreSQL trigger is a function invoked automatically whenever an event associated
               with a table occurs.
             </p>
-            <p className="text-sm text-scale-1100">
+            <p className="text-sm text-foreground-light">
               An event could be any of the following: INSERT, UPDATE, DELETE. A trigger is a special
               user-defined function associated with a table.
             </p>
@@ -77,57 +79,19 @@ const TriggersList = ({
         <div className="w-full space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="w-[260px]">
-                <Listbox
-                  size="small"
-                  value={selectedSchema}
-                  onChange={setSelectedSchema}
-                  icon={isLocked && <IconLock size={14} strokeWidth={2} />}
-                >
-                  <Listbox.Option
-                    disabled
-                    key="normal-schemas"
-                    value="normal-schemas"
-                    label="Schemas"
-                  >
-                    <p className="text-sm">Schemas</p>
-                  </Listbox.Option>
-                  {/* @ts-ignore */}
-                  {openSchemas.map((schema) => (
-                    <Listbox.Option
-                      key={schema.id}
-                      value={schema.name}
-                      label={schema.name}
-                      addOnBefore={() => <span className="text-scale-900">schema</span>}
-                    >
-                      <span className="text-scale-1200 text-sm">{schema.name}</span>
-                    </Listbox.Option>
-                  ))}
-                  <Listbox.Option
-                    disabled
-                    key="protected-schemas"
-                    value="protected-schemas"
-                    label="Protected schemas"
-                  >
-                    <p className="text-sm">Protected schemas</p>
-                  </Listbox.Option>
-                  {protectedSchemas.map((schema) => (
-                    <Listbox.Option
-                      key={schema.id}
-                      value={schema.name}
-                      label={schema.name}
-                      addOnBefore={() => <span className="text-scale-900">schema</span>}
-                    >
-                      <span className="text-scale-1200 text-sm">{schema.name}</span>
-                    </Listbox.Option>
-                  ))}
-                </Listbox>
-              </div>
+              <SchemaSelector
+                className="w-[260px]"
+                size="small"
+                showError={false}
+                selectedSchemaName={selectedSchema}
+                onSelectSchema={setSelectedSchema}
+              />
               <Input
-                placeholder="Filter by name"
+                placeholder="Search for a trigger"
                 size="small"
                 icon={<IconSearch size="tiny" />}
                 value={filterString}
+                className="w-64"
                 onChange={(e) => setFilterString(e.target.value)}
               />
             </div>
@@ -148,7 +112,7 @@ const TriggersList = ({
                         'border border-scale-200',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text-foreground">
                         You need additional permissions to create triggers
                       </span>
                     </div>
@@ -157,6 +121,8 @@ const TriggersList = ({
               )}
             </Tooltip.Root>
           </div>
+
+          {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="triggers" />}
 
           <Table
             className="table-fixed"

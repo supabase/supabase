@@ -13,9 +13,18 @@ import SparkBar from 'components/ui/SparkBar'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useFlag } from 'hooks'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import { Alert, Button, IconExternalLink } from 'ui'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconCalendar,
+  IconExternalLink,
+} from 'ui'
 import ProjectUpdateDisabledTooltip from '../../BillingSettings/ProjectUpdateDisabledTooltip'
 import PlanUpdateSidePanel from './PlanUpdateSidePanel'
+import { useOrganizationBillingSubscriptionCancelSchedule } from 'data/subscriptions/org-subscription-cancel-schedule-mutation'
 
 const Subscription = () => {
   const { slug } = useParams()
@@ -29,6 +38,9 @@ const Subscription = () => {
     isError,
     isSuccess,
   } = useOrgSubscriptionQuery({ orgSlug: slug })
+
+  const { mutate: cancelSubscriptionSchedule, isLoading: cancelSubscriptionScheduleLoading } =
+    useOrganizationBillingSubscriptionCancelSchedule()
 
   const currentPlan = subscription?.plan
   const planName = currentPlan?.name ?? 'Unknown'
@@ -46,7 +58,7 @@ const Subscription = () => {
           <div className="sticky space-y-6 top-12">
             <p className="text-base m-0">Subscription Plan</p>
             <div className="space-y-2">
-              <p className="text-sm text-scale-1100 m-0">More information</p>
+              <p className="text-sm text-foreground-light m-0">More information</p>
               <div>
                 <Link href="https://supabase.com/pricing">
                   <a target="_blank" rel="noreferrer">
@@ -77,6 +89,38 @@ const Subscription = () => {
                 <p className="text-sm">This organization is currently on the plan:</p>
                 <p className="text-2xl text-brand uppercase">{currentPlan?.name ?? 'Unknown'}</p>
               </div>
+
+              {subscription?.scheduled_plan_change &&
+                subscription?.scheduled_plan_change?.target_plan !== subscription.plan.id && (
+                  <Alert_Shadcn_ className="mb-2" title="Scheduled downgrade">
+                    <IconCalendar className="h-4 w-4" />
+                    <AlertTitle_Shadcn_>Scheduled downgrade</AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                      <div>
+                        Your organization will automatically be downgraded from the{' '}
+                        <span>{subscription.plan.name}</span> plan to the{' '}
+                        <span className="capitalize">
+                          {subscription?.scheduled_plan_change?.target_plan}
+                        </span>{' '}
+                        plan on{' '}
+                        {dayjs(subscription?.scheduled_plan_change?.at).format('MMMM D, YYYY')}. If
+                        you would like to stay on the <span>{subscription.plan.name}</span> plan,
+                        cancel the scheduled downgrade.
+                      </div>
+                      <div>
+                        <Button
+                          type="default"
+                          loading={cancelSubscriptionScheduleLoading}
+                          onClick={() => {
+                            return cancelSubscriptionSchedule({ slug: slug! })
+                          }}
+                        >
+                          Cancel downgrade
+                        </Button>
+                      </div>
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
+                )}
 
               <div>
                 <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
@@ -140,7 +184,7 @@ const Subscription = () => {
                     )
                   }
                 >
-                  <div className="text-sm text-scale-1000 mr-2">
+                  <div className="text-sm text-foreground-light mr-2">
                     When this organization exceeds its{' '}
                     <Link href="#breakdown">
                       <a className="text-sm text-green-900 transition hover:text-green-1000">
@@ -172,7 +216,7 @@ const Subscription = () => {
                   'MMM DD'
                 )} - ${billingCycleEnd.format('MMM DD')})`}
                 bgClass="bg-gray-300 dark:bg-gray-600"
-                labelBottomClass="!text-scale-1000 pb-1"
+                labelBottomClass="!text-foreground-light pb-1"
                 labelTop={`${daysToCycleEnd} days remaining`}
               />
             </div>

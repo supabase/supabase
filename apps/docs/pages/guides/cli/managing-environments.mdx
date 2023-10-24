@@ -87,8 +87,7 @@ This command recreates your local database from scratch and applies all migratio
 
 <Admonition type="tip">
 
-The new migration command also supports stdin as input.
-This allows you to pipe in an existing script from another file or stdout:
+The new migration command also supports stdin as input. This allows you to pipe in an existing script from another file or stdout:
 
 `supabase migration new new_employee < create_employees_table.sql`
 
@@ -143,6 +142,7 @@ Commit the new migration script to git and you are ready to deploy.
 <Admonition type="tip">
 
 Alternatively, you may pass in the `--use-migra` experimental flag to generate a more concise migration using [migra](https://github.com/djrobstep/migra).
+
 Without the `-f` file flag, the output is written to stdout by default.
 
 `supabase db diff --use-migra`
