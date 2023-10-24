@@ -6,19 +6,19 @@ import '../styles/main.scss?v=1.0.0'
 import '../styles/new-docs.scss'
 import '../styles/prism-okaidia.scss'
 
-import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
+import { createClient } from '@supabase/supabase-js'
 import { AuthProvider, ThemeProvider, useConsent, useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import { AppPropsWithLayout } from 'types'
 import { CommandMenuProvider } from 'ui'
 import { TabsProvider } from 'ui/src/components/Tabs'
+import PortalToast from 'ui/src/layout/PortalToast'
 import Favicons from '~/components/Favicons'
 import SiteLayout from '~/layouts/SiteLayout'
-import { API_URL, IS_PLATFORM, LOCAL_SUPABASE } from '~/lib/constants'
+import { API_URL, IS_PLATFORM } from '~/lib/constants'
 import { post } from '~/lib/fetchWrappers'
-import PortalToast from 'ui/src/layout/PortalToast'
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
@@ -26,7 +26,12 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const { consentValue, hasAcceptedConsent } = useConsent()
 
   const [supabase] = useState(() =>
-    IS_PLATFORM || LOCAL_SUPABASE ? createBrowserSupabaseClient() : undefined
+    IS_PLATFORM
+      ? createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+        )
+      : undefined
   )
 
   const handlePageTelemetry = useCallback(
@@ -140,7 +145,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const SITE_TITLE = 'Supabase Documentation'
 
   const AuthContainer = (props) => {
-    return IS_PLATFORM || LOCAL_SUPABASE ? (
+    return IS_PLATFORM ? (
       <SessionContextProvider supabaseClient={supabase}>
         <AuthProvider>{props.children}</AuthProvider>
       </SessionContextProvider>
