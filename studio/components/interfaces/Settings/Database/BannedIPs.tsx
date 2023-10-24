@@ -64,7 +64,7 @@ const BannedIPs = () => {
     <div id="banned-ips">
       <div className="flex items-center justify-between">
         <FormHeader
-          title="Banned IPs"
+          title="Network Bans"
           description="We monitor unsuccessful logins and block IPs for security"
         />
         <div className="flex items-center space-x-2 mb-6">
