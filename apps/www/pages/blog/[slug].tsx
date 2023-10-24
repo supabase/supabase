@@ -320,10 +320,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                               src={'/images/blog/' + props.blog.thumb}
                               alt={props.blog.title}
                               fill
-                              style={{
-                                objectFit: 'cover',
-                                margin: 0,
-                              }}
+                              className="object-cover m-0"
                             />
                           </div>
                         )
