@@ -1,3 +1,4 @@
+import '@code-hike/mdx/styles'
 import 'config/code-hike.scss'
 import '../../../packages/ui/build/css/themes/dark.css'
 import '../../../packages/ui/build/css/themes/light.css'

@@ -44,7 +44,7 @@
     "gen:analytics:usage": "ts-node ./generator/index.ts gen --type api --input ../../spec/transforms/analytics_v0_openapi_deparsed.json --output ./docs/reference/analytics/generated/usage.mdx"
   },
   "dependencies": {
-    "@code-hike/mdx": "^0.8.3",
+    "@code-hike/mdx": "^0.9.0",
     "@mdx-js/loader": "^2.1.5",
     "@mdx-js/react": "^2.3.0",
     "@next/bundle-analyzer": "^13.5.3",

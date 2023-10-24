@@ -1,6 +1,7 @@
 import '../../../packages/ui/build/css/themes/dark.css'
 import '../../../packages/ui/build/css/themes/light.css'
 
+import '@code-hike/mdx/styles'
 import 'config/code-hike.scss'
 import '../styles/main.scss?v=1.0.0'
 import '../styles/new-docs.scss'
