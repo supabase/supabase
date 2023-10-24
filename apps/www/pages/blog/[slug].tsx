@@ -319,8 +319,11 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                             <Image
                               src={'/images/blog/' + props.blog.thumb}
                               alt={props.blog.title}
-                              layout="fill"
-                              objectFit="cover"
+                              fill
+                              style={{
+                                objectFit: 'cover',
+                                margin: 0,
+                              }}
                             />
                           </div>
                         )
@@ -356,7 +359,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                         {props.relatedPosts.map((post) => (
                           <Link href={`${post.path}`} as={`${post.path}`} key={post.slug}>
                             <div>
-                              <p className="cursor-pointer">
+                              <div className="cursor-pointer">
                                 <div className="flex gap-2">
                                   {/* <div className="text-muted">
                                     <IconFile size={'small'} style={{ minWidth: '1.2rem' }} />
@@ -365,7 +368,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                                     {post.title}
                                   </span>
                                 </div>
-                              </p>
+                              </div>
                               <Divider light className="mt-2" />
                             </div>
                           </Link>

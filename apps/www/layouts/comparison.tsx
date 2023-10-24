@@ -104,13 +104,13 @@ const LayoutComparison = ({ components, props }: Props) => {
                       <Link href={author.author_url} className="cursor-pointer">
                         <div className="flex items-center gap-3">
                           {author.author_image_url && (
-                            <div className="w-10 relative">
+                            <div className="w-10 h-10 relative">
                               <Image
                                 src={author.author_image_url}
                                 alt="author avatar"
                                 className="dark:border-dark rounded-full border w-full"
-                                layout="fill"
-                                objectFit="cover"
+                                fill
+                                style={{ objectFit: 'cover' }}
                               />
                             </div>
                           )}
