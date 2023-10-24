@@ -975,18 +975,64 @@ export const storage: NavMenuConstant = {
     { name: 'Overview', url: '/guides/storage' },
     { name: 'Quickstart', url: '/guides/storage/quickstart' },
     {
-      name: 'Fundamentals',
+      name: 'Buckets',
       url: undefined,
       items: [
-        { name: 'Uploading files to Storage', url: '/guides/storage/uploads' },
-        { name: 'Image Transformations', url: '/guides/storage/image-transformations' },
-        { name: 'How caching works', url: '/guides/storage/cdn' },
+        { name: 'Fundamentals', url: '/guides/storage/buckets/fundamentals' },
+        { name: 'Creating Buckets', url: '/guides/storage/buckets/creating-buckets' },
       ],
     },
     {
-      name: 'Access and security',
+      name: 'Security',
       url: undefined,
-      items: [{ name: 'Access Control', url: '/guides/storage/access-control' }],
+      items: [{ name: 'Access Control', url: '/guides/storage/security/access-control' }],
+    },
+    {
+      name: 'Uploads',
+      url: undefined,
+      items: [
+        { name: 'Standard Uploads', url: '/guides/storage/uploads/standard-uploads' },
+        { name: 'Resumable Uploads', url: '/guides/storage/uploads/resumable-uploads' },
+        { name: 'Limits', url: '/guides/storage/uploads/file-limits' },
+      ],
+    },
+    {
+      name: 'Serving',
+      url: undefined,
+      items: [
+        { name: 'Serving assets', url: '/guides/storage/serving/downloads' },
+        { name: 'Image Transformations', url: '/guides/storage/serving/image-transformations' },
+      ],
+    },
+    {
+      name: 'CDN',
+      url: undefined,
+      items: [
+        { name: 'Fundamentals', url: '/guides/storage/cdn/fundamentals' },
+        { name: 'Smart CDN', url: '/guides/storage/cdn/smart-cdn' },
+        { name: 'Metrics', url: '/guides/storage/cdn/metrics' },
+      ],
+    },
+    {
+      name: 'Debugging',
+      url: undefined,
+      items: [
+        { name: 'Logs', url: '/guides/storage/debugging/logs' },
+        { name: 'Error Codes', url: '/guides/storage/debugging/error-codes' },
+      ],
+    },
+    {
+      name: 'Schema',
+      url: undefined,
+      items: [
+        { name: 'Database Design', url: '/guides/storage/schema/design' },
+        { name: 'Helper Functions', url: '/guides/storage/schema/helper-functions' },
+      ],
+    },
+    {
+      name: 'Going to production',
+      url: undefined,
+      items: [{ name: 'Scaling', url: '/guides/storage/production/scaling' }],
     },
   ],
 }
