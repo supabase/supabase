@@ -20,9 +20,9 @@ The standard file upload method is ideal for small files that are not larger tha
 It uses the traditional `multipart/form-data` format and is simple to implement using the supabase-js SDK. Here's an example of how to upload a file using the standard upload method:
 
 <Admonition type="note">
-  Though you can upload up to 5GB files using the standard upload method, we recommend use [TUS
-  Resumable Upload](#resumable-upload) for uploading files greater than 6MB in size for better
-  reliability.
+
+Though you can upload up to 5GB files using the standard upload method, we recommend use [TUS Resumable Upload](#resumable-upload) for uploading files greater than 6MB in size for better reliability.
+
 </Admonition>
 
 <Tabs
@@ -75,8 +75,9 @@ suspend fun uploadFile(file: File) {
 ## Resumable Upload
 
 <Admonition type="note">
-  Resumable upload is in **Beta**. We are rolling this feature gradually, please contact us if you
-  want to be prioritized.
+
+Resumable upload is in **Beta**. We are rolling this feature gradually, please contact us if you want to be prioritized.
+
 </Admonition>
 
 The Resumable upload method is recommended for uploading large files that may exceed 6MB in size or for scenarios where network stability is a concern or if you simply want to have a progress bar for your uploads.
@@ -195,9 +196,9 @@ This URL will be valid for **up to 24 hours**. If the upload is not completed wi
 When two or more clients try to upload to the same Upload URL only one of them will succeed. The other clients will receive a `409 Conflict` error. Only 1 client can upload to the same Upload URL at a time which prevents data corruption.
 
 <Admonition type="note">
-  We do not yet support checksum validation for the uploaded chunks. This means if a client changes
-  the file mid way through the upload, the final upload will be an amalgamation of both the files.
-  This has to be done intentionally by the client and is unlikely to happen in normal circumstances.
+
+We do not yet support checksum validation for the uploaded chunks. This means if a client changes the file mid way through the upload, the final upload will be an amalgamation of both the files. This has to be done intentionally by the client and is unlikely to happen in normal circumstances.
+
 </Admonition>
 
 When two or more clients upload a file to the same path using different upload URLs, the first client to complete the upload will succeed and the other clients will receive a `409 Conflict` error.
