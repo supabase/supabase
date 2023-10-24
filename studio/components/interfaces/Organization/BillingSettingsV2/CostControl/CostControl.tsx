@@ -135,7 +135,7 @@ const CostControl = ({}: CostControlProps) => {
                         Your spend cap will be enabled on{' '}
                         {dayjs(subscription?.scheduled_plan_change?.at).format('MMMM D, YYYY')}. You
                         will not be charged for any over-usage moving on. If you would like to keep
-                        the spend cap disabled and scale as you go, cancel the scheduled change.
+                        the spend cap disabled and scale as you go, you may still cancel the scheduled change.
                       </div>
                       <div>
                         <Button
