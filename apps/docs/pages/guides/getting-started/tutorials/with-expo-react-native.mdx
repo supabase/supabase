@@ -35,8 +35,7 @@ cd expo-user-management
 Then let's install the additional dependencies: [supabase-js](https://github.com/supabase/supabase-js)
 
 ```bash
-npm install @supabase/supabase-js
-npm install react-native-elements @react-native-async-storage/async-storage react-native-url-polyfill
+npx expo install @supabase/supabase-js @react-native-async-storage/async-storage react-native-elements react-native-url-polyfill
 ```
 
 Now let's create a helper file to initialize the Supabase client.
@@ -191,12 +190,16 @@ export default function Auth() {
 
   async function signUpWithEmail() {
     setLoading(true)
-    const { error } = await supabase.auth.signUp({
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.signUp({
       email: email,
       password: password,
     })
 
     if (error) Alert.alert(error.message)
+    if (!session) Alert.alert('Please check your inbox for email verification!')
     setLoading(false)
   }
 
@@ -248,6 +251,14 @@ const styles = StyleSheet.create({
   },
 })
 ```
+
+<Admonition type="note">
+
+By default Supabase Auth requires email verification before a session is created for the users. To support email verification you need to [implement deep link handling](/docs/guides/auth/native-mobile-deep-linking?platform=react-native)!
+
+While testing, you can disable email confirmation in your [project's email auth provider settings](/dashboard/project/_/auth/providers).
+
+</Admonition>
 
 ### Account page
 
