@@ -1,20 +1,23 @@
 import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
+import toast from 'react-hot-toast'
+import { Alert, Button, Checkbox, IconExternalLink, Modal } from 'ui'
 
+import { SupaRow } from 'components/grid'
+import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { sqlKeys } from 'data/sql/keys'
+import { useTableRowDeleteAllMutation } from 'data/table-rows/table-row-delete-all-mutation'
+import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
+import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-mutation'
 import { tableKeys } from 'data/tables/keys'
 import { useGetTables } from 'data/tables/tables-query'
 import { useStore, useUrlState } from 'hooks'
 import { TableLike } from 'hooks/misc/useTable'
 import { noop } from 'lib/void'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { Alert, Button, Checkbox, IconExternalLink, Modal } from 'ui'
-import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
-import toast from 'react-hot-toast'
-import { SupaRow } from 'components/grid'
 
 export type DeleteConfirmationDialogsProps = {
   projectRef?: string
@@ -31,7 +34,9 @@ const DeleteConfirmationDialogs = ({
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
-  const [, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
+
+  const [{ filter }, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
+  const filters = formatFilterURLParams(filter as string[])
 
   const getTables = useGetTables({
     projectRef: project?.ref,
@@ -51,6 +56,43 @@ const DeleteConfirmationDialogs = ({
       snap.closeConfirmationDialog()
     },
   })
+
+  const { mutateAsync: deleteAllRows } = useTableRowDeleteAllMutation({
+    onSuccess: () => {
+      if (snap.confirmationDialog?.type === 'row') {
+        snap.confirmationDialog.callback?.()
+      }
+      toast.success(`Successfully deleted selected rows`)
+      snap.closeConfirmationDialog()
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete rows: ${error.message}`)
+      snap.closeConfirmationDialog()
+    },
+  })
+
+  const { mutateAsync: truncateRows } = useTableRowTruncateMutation({
+    onSuccess: () => {
+      if (snap.confirmationDialog?.type === 'row') {
+        snap.confirmationDialog.callback?.()
+      }
+      toast.success(`Successfully deleted all rows from table`)
+      snap.closeConfirmationDialog()
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete rows: ${error.message}`)
+      snap.closeConfirmationDialog()
+    },
+  })
+
+  const isAllRowsSelected =
+    snap.confirmationDialog?.type === 'row' ? snap.confirmationDialog.allRowsSelected : false
+  const numRows =
+    snap.confirmationDialog?.type === 'row'
+      ? snap.confirmationDialog.allRowsSelected
+        ? snap.confirmationDialog.numRows ?? 0
+        : snap.confirmationDialog.rows.length
+      : 0
 
   const removeDeletedColumnFromFiltersAndSorts = (columnName: string) => {
     setParams((prevParams) => {
@@ -157,12 +199,29 @@ const DeleteConfirmationDialogs = ({
     if (snap.confirmationDialog?.type !== 'row') return
     const selectedRowsToDelete = snap.confirmationDialog.rows
 
-    deleteRows({
-      projectRef: project.ref,
-      connectionString: project.connectionString,
-      table: selectedTable as any,
-      rows: selectedRowsToDelete as SupaRow[],
-    })
+    if (snap.confirmationDialog.allRowsSelected) {
+      if (filters.length === 0) {
+        truncateRows({
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+          table: selectedTable as any,
+        })
+      } else {
+        deleteAllRows({
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+          table: selectedTable as any,
+          filters,
+        })
+      }
+    } else {
+      deleteRows({
+        projectRef: project.ref,
+        connectionString: project.connectionString,
+        table: selectedTable as any,
+        rows: selectedRowsToDelete as SupaRow[],
+      })
+    }
   }
 
   return (
@@ -271,7 +330,11 @@ const DeleteConfirmationDialogs = ({
         danger
         size="small"
         visible={snap.confirmationDialog?.type === 'row'}
-        header={<span className="break-words">Confirm to delete row</span>}
+        header={
+          <span className="break-words">
+            Confirm to delete the selected row{numRows > 1 && 's'}
+          </span>
+        }
         buttonLabel="Delete"
         buttonLoadingLabel="Deleting"
         onSelectCancel={() => snap.closeConfirmationDialog()}
@@ -280,7 +343,9 @@ const DeleteConfirmationDialogs = ({
         <Modal.Content>
           <div className="py-4 space-y-4">
             <p className="text-sm text-foreground-light">
-              Are you sure you want to delete this row? This action cannot be undone.
+              Are you sure you want to delete {isAllRowsSelected ? 'all' : 'the selected'}{' '}
+              {numRows > 1 && `${numRows} `}row
+              {numRows > 1 && 's'}? This action cannot be undone.
             </p>
           </div>
         </Modal.Content>
