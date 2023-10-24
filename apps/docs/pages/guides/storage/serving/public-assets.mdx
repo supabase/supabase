@@ -7,7 +7,7 @@ export const meta = {
   sidebar_label: 'Serving',
 }
 
-As mentioned in the [Buckets Fundamentals](/guides/storage/buckets/fundamentals) all files uploaded in a public bucket are publicly accessible and benefit a high CDN cache HIT ratio.
+As mentioned in the [Buckets Fundamentals](/docs/guides/storage/buckets/fundamentals) all files uploaded in a public bucket are publicly accessible and benefit a high CDN cache HIT ratio.
 
 You can access them by using this conventional URL:
 
@@ -18,12 +18,11 @@ https://[project_id].supabase.co/storage/v1/public/[bucket]/[asset-name]
 You can also use the Supabase SDK `getPublicUrl` to generate this url for you
 
 ```js
-
 const publicUrl = supabase.storage.from('bucket').getPublicUrl('filePath.jpg')
-
 ```
 
 ### Downloading
+
 If you want the browser to start an automatic download of the asset instead of trying serving it, you can add the `?download` querystring parameter.
 
 By default it will use the asset name to save the file on disk. You can optionally pass a custom name to the `download` parameter as following: `?download=customname.jpg`

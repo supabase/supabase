@@ -7,7 +7,7 @@ export const meta = {
   sidebar_label: 'Buckets',
 }
 
-You can create a bucket using the Supabase Dashboard. Since the storage is interoperable with your Postgres database, you can also use SQL or our client libraries.
+You can create a bucket using the Supabase Dashboard. Since storage is interoperable with your Postgres database, you can also use SQL or our client libraries.
 Here we create a bucket called "avatars":
 
 <Tabs
@@ -23,7 +23,7 @@ Here we create a bucket called "avatars":
 // Use the JS library to create a bucket.
 
 const { data, error } = await supabase.storage.createBucket('avatars', {
-    public: true, // default: false
+  public: true, // default: false
 })
 ```
 
@@ -67,8 +67,8 @@ void main() async {
 </TabPanel>
 </Tabs>
 
-
 ## Restricting uploads
+
 When creating a bucket you can add additional configurations to restrict the type or size of files you want this bucket to contain.
 For example, imagine you want to allow your users to upload only images to the `avatars` bucket and the size must not be greater than 1MB.
 
@@ -78,9 +78,9 @@ You can achieve the following by providing: `allowedMimeTypes` and `maxFileSize`
 // Use the JS library to create a bucket.
 
 const { data, error } = await supabase.storage.createBucket('avatars', {
-    public: true,
-    allowedMimeTypes: ['image/*'],
-    maxFileSize: '1MB'
+  public: true,
+  allowedMimeTypes: ['image/*'],
+  maxFileSize: '1MB',
 })
 ```
 
@@ -90,4 +90,6 @@ For more information check the [File Validation](/docs/guides/storage/uploads/fi
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
-export default Page
+export default Pag
+
+e

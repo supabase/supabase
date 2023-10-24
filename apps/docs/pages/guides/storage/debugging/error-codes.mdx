@@ -10,39 +10,51 @@ export const meta = {
 Following is the list of the most common error codes and their possible resolution:
 
 ## 404 not_found
+
 Indicates that the resource is not found or you don't have the correct permission to access it
 **Resolution:**
+
 - Add RLS policy to grant permission
 - Make sure you pass the user Authorization header
 - Make sure the object exists
 
 ## 409 already_exists
+
 Indicates that the resource already exists.
 **Resolution:**
+
 - Use the `upsert` functionality in order to overwrite the file
 
 ## 403 unauthorized
+
 You don't have permission to action this request
 **Resolution:**
+
 - Add RLS policy to grant permission
 - Make sure you pass the user Authorization header
 
 ## 429 Too many requests
+
 This issue is usually occurring when too many clients are concurrently operating on the Storage service and pgBouncer reached the max_clients limit.
 **Resolution:**
- - Increase the max_clients limits in pgBouncer
- - Upgrade to a bigger database compute instance
+
+- Increase the max_clients limits in pgBouncer
+- Upgrade to a bigger database compute instance
 
 ## 544 database_timeout
+
 This issue occurs when too many clients are concurrently operating on the Storage service and Postgres don't have enough available connections to issue to Storage in a timely manner.
 
 **Resolution:**
- - Increase the pool_size limits in pgBouncer
- - Upgrade to a bigger database compute instance
+
+- Increase the pool_size limits in pgBouncer
+- Upgrade to a bigger database compute instance
 
 ## 500 internal_server_error
+
 This issue occurs where there is a not handled use case.
 **Resolution:**
+
 - File a support ticket to Storage team, they will be very quick at assisting you.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />

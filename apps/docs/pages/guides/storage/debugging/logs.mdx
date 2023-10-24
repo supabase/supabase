@@ -39,26 +39,29 @@ select id, storage_logs.timestamp, event_message, r.statusCode, e.message as err
 ```
 
 #### Filter by Method
+
 ```sql
 select id, storage_logs.timestamp, event_message, r.method
-  from storage_logs
+from
+  storage_logs
   cross join unnest(metadata) as m
   cross join unnest(m.req) as r
-  where r.method IN ("POST")
-  order by timestamp desc
-  limit 100
+where r.method in ("POST")
+order by timestamp desc
+limit 100;
 ```
 
 #### Filter by IP Address
+
 ```sql
 select id, storage_logs.timestamp, event_message, r.remoteAddress
-  from storage_logs
+from
+  storage_logs
   cross join unnest(metadata) as m
   cross join unnest(m.req) as r
-  where r.remoteAddress IN ("IP_ADDRESS")
-  order by timestamp desc
-  limit 100
-
+where r.remoteAddress in ("IP_ADDRESS")
+order by timestamp desc
+limit 100;
 ```
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />

@@ -7,27 +7,24 @@ export const meta = {
   sidebar_label: 'Buckets',
 }
 
-Buckets allows you to keep your files organised, determining the **Security Access Model** for your assets and apply restrictions to the type of files that can be uploaded.
+Buckets allow you to keep your files organised and determines the **Access Model** for your assets. Settings like max file size for uploads and allowed content types are also defined at the bucket level.
 
-## Security Access Model
+## Access Model
 
-There are 2 Security models for buckets, **public** and **private** buckets.
+There are 2 access models for buckets, **public** and **private** buckets.
 
 ### Private Buckets
-When a bucket is set to **Private** all operations are subject to Access Control via [RLS policies](/guides/storage/uploads/access-control).
-This also applies for serving & downloading the assets.
 
-The only ways to download an assets within a private bucket is to:
+When a bucket is set to **Private** all operations are subject to Access Control via [RLS policies](/guides/storage/uploads/access-control). This also applies when downloading assets.
 
-- Use the `download` method by providing a authorization header containing your user's JWT. The RLS policy you have created on the `storage.objects` table will use this user to determine whether or not they have access.
-- Create a signed temporary URL with the `createSignedUrl` method that can be accessed for a limited time.
+The only ways to download assets within a private bucket is to:
+
+- Use the [download method](https://supabase.com/docs/reference/javascript/storage-from-download) by providing a authorization header containing your user's JWT. The RLS policy you have created on the `storage.objects` table will use this user to determine if they have access.
+- Create a signed URL with the [createSignedUrl method](https://supabase.com/docs/reference/javascript/storage-from-createsignedurl) that can be accessed for a limited time.
 
 #### Performance:
 
-Performance on private buckets might be impacted when serving / downloading an asset, since the CDN cache must be partitioned on a user level.
-This means that the cache is not shared across users resulting more often with a cache MISS.
-Consider using public buckets if your assets are frequently accessed.
-
+For private buckets, assets are partitioned in our CDN cache on a user level. Since the cache is not shared across different users, this results in a lower cache hit ratio and higher latency than public buckets.
 
 #### Example Use Cases:
 
@@ -35,22 +32,21 @@ Consider using public buckets if your assets are frequently accessed.
 - Uploading private assets
 - Needing the power of RLS to set fine-grain access control on the asset
 
-
 ### Public Buckets
-When a bucket is set to be **Public** the access control for **retrieving** and **serving** the files within this bucket are bypassed.
-Anyone will be able to view these assets if they access the asset URL.
+
+When a bucket is set to be **Public** the access control for **retrieving** and **serving** files within the bucket are bypassed. Anyone with access to the asset URL will be able to access the file.
 
 Access control is still honored for other types of operations, such as: Upload, Delete, Move, Copy
 
 #### Performance:
-Since public buckets allow serving and downloading files without checking for permissions, the CDN cache is shared across all users globally.
-This resulting in a very high cache HIT ratio and much lower latency.
+
+The CDN cache for public buckets is shared across all users, leading to a higher cache hit ratio and lower latency.
 
 #### Example Use Cases:
 
 - User profile pictures
 - User public media
-- Blog post contents
+- Blog post content
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

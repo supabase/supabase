@@ -3,39 +3,38 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'storage-schema-optimisations',
   title: 'Storage Optimisations',
-  description: 'Learn how to optimize Storage',
-  subtitle: 'Learn how to optimize Storage',
+  description: 'Learn how to scale Storage',
+  subtitle: 'Learn how to scale Storage',
   sidebar_label: 'Schema',
 }
 
-When your Storage project grows and hitting the Millions for stored assets, there are a few optimisations that we encourage to look for.
+Here are some optimisations that you can consider to improve performance and reduce costs as you start scaling Storage.
 
 ## Egress
 
-If you are experiencing a high amount of egress, there are optimisations that will help you reduce it drastically.
+If your project has high egress, these are some optimisations that will help you reduce it.
 
 #### Resize Images
-Images usually contributes to the majority of your Egress bill, by keeping their total size as small as possible you'll get the advantage to reduce the bytes you are transferring, therefore reducing your Egress.
-You can use our [Image Transformation](/guides/storage/serving/image-transformations) to optimise any image on fly.
 
+Images usually contribute to the majority of your egress. By keeping their size as small as possible, you can reduce your egress and increase the performance of your application at the same time.
+You can use our [Image Transformation](/docs/guides/storage/serving/image-transformations) to optimise any image on the fly.
 
-#### Browser Cache
-Utilising the browser cache will help reducing your egress as the asset will be stored on the user local cache after the first download.
-When possible set a high `cache-control` value when uploading assets, this value will be the amount of time the asset will be stored on your users local cache.
+#### Set a high cache-control value
+
+Utilising the browser cache will help reduce your egress as the asset will be stored on the user's browser after it is first downloaded. Setting a high `cache-control` value will ensure that the asset is stored on the user's browser for a long time. This will reduce the number of times the asset is downloaded from the server.
 
 #### Limit the upload size
-Limiting the maximum file size that a user can upload, will help you keep the egress cost under control.
-If you don't have any limits, users might upload large images,documents and various files.
-You can limit the max file size by setting this option at the []bucket level](/guides/storage/buckets/creating-buckets)
+
+You can set the maximum upload size for your bucket. This will prevent users from uploading and subsequently downloading large files. You can limit the max file size by setting this option at the [bucket level](/docs/guides/storage/buckets/creating-buckets)
 
 ## Optimize Listing Objects
-When you reach a high number of records you might be noticing that `supabase.storage.list()` method starts getting slow.
+
+When you reach a high number of objects you might be notice that `supabase.storage.list()` method starts getting slow.
 
 This is because the endpoint is very generic and tries to compute folders and objects in a single query.
-It is very useful when building something like the Storage viewer on the Supabase Admin Studio.
+It is very useful when building something like the Storage viewer on the Supabase dashboard.
 
-However, if your application don't need the entire hierarchy computed you can speed up drastically the query execution for listing your objects.
-You can create a custom `rpc` function as following:
+However, if your application don't need the entire hierarchy computed you can speed up drastically the query execution for listing your objects by creating a Postgres function as following:
 
 ```sql
 create or replace function list_objects(
@@ -69,25 +68,27 @@ end;
 $$ language plpgsql stable;
 ```
 
-You can then use the your custom rpc function as following:
+You can then use the your Postgres function as following:
 
 Using SQL:
+
 ```sql
-SELECT * from list_objects('bucket_id', '', 100, 0);
+select * from list_objects('bucket_id', '', 100, 0);
 ```
 
 Using the SDK:
 
 ```js
 const { data, error } = await supabase.rpc('list_objects', {
- bucketid: 'yourbucket',
- prefix: '',
- limit: 100,
- offset: 0
+  bucketid: 'yourbucket',
+  prefix: '',
+  limit: 100,
+  offset: 0,
 })
 ```
 
 ## Optimising RLS
+
 When creating RLS policies against the storage tables you can add indexes to the interested columns to speed up the lookup
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />

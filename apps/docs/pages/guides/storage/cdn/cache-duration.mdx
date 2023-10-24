@@ -21,6 +21,7 @@ Note that CDNs might still evict your object from their cache if it has not been
 The cache status of a particular request is sent in the `cf-cache-status` header. A cache status of `MISS` indicates that the CDN node did not have the object in its cache and had to ping the origin to get it. A cache status of `HIT` indicates that the object was sent directly from the CDN.
 
 ## Cache Eviction
+
 Though assets are cached for as long as possible in the CDN, you have the ability to bust the cache by changing or deleting a file.
 
 Note that it can take **up to 60 seconds** for the CDN cache to be invalidated as the asset metadata propagates across all the data-centers around the globe.
@@ -32,13 +33,15 @@ If your asset is updated frequently, we recommend that you re-upload the new ass
 If you expect your asset to be deleted, we recommend setting a low browser TTL value using the `cacheControl` option. The default is 1 hour which generally is a good default.
 
 ## Bypassing Cache
+
 In the circumstance where you want to force the assets to refresh from origin and bypassing the cache is necessary, you can do so by appending a unique query string to the url.
 
 For example, You can use a URL like `/storage/v1/object/sign/profile-pictures/cat.jpg?version=1` in your applications and set a long cache time of 1 year.
 
 When you want to update the cat picture, you can increment the version query parameter in the URL. The CDN treats `/storage/v1/object/sign/profile-pictures/cat.jpg?version=2` as a new object and pings the origin for the updated version.
 
-
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
-export default Page
+export default Pag
+
+e

@@ -7,22 +7,24 @@ export const meta = {
   sidebar_label: 'Serving',
 }
 
-Assets stored in a non-public bucket are considered private and are not accessible via a Public url like the public buckets.
+Assets stored in a non-public bucket are considered private and are not accessible via a public url like the public buckets.
+
 You can access them only by:
 
 - Signing a time limited URL on the Server, for example with Edge Functions.
 - with a GET request the url `https://[project_id].supabase.co/storage/v1/authenticated/[bucket]/[asset-name]` and the user Authorization header
-
 
 ### Signing URLs
 
 You can sign a time-limited URL that you can share to your users by invoking the `createSignedUrl` method on the SDK.
 
 ```js
-const {data, error} = supabase.storage.from('bucket').createSignedUrl('private-document.pdf', 3600)
+const { data, error } = supabase.storage
+  .from('bucket')
+  .createSignedUrl('private-document.pdf', 3600)
 
 if (data) {
-    console.log(data.signedUrl)
+  console.log(data.signedUrl)
 }
 ```
 

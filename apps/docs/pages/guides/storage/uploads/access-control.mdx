@@ -8,9 +8,11 @@ export const meta = {
   tocVideo: '4ERX__Y908k',
 }
 
-To allow users to start uploading files you will need to setup RLS policies on the `storage.objects` table.
+Supabase Storage is designed to work perfectly with Postgres [Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security) (RLS).
 
-Policies are just SQL, and they're easy once you get the hang of them. For example, here is a Policy that allows public access to any files in a bucket called "my_bucket_id".
+You can use RLS to create Security Access Policies that are incredibly powerful and flexible, allowing you to restrict access based on your business needs.
+
+To allow users to start uploading files you will need to setup RLS policies on the `storage.objects` table. For example, here is a Policy that allows public access to any files in a bucket called "my_bucket_id".
 
 ```sql
 create policy "Public Access"
@@ -25,7 +27,6 @@ using ( bucket_id = 'my_bucket_id' );   -- Identify the bucket
 The only RLS policy required for uploading, is to grant the `INSERT` action to the `storage.objects` table.
 
 If you allow to overwrite files using the `upsert` functionality you will need to additionally grant `SELECT` and `UPDATE`
-
 
 ### RLS examples
 
