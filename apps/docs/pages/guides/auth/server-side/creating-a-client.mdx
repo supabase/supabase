@@ -1,0 +1,420 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  title: 'Creating a Supabase client for SSR',
+  description: 'Configure Supabase client to use Cookies',
+  sidebar_label: 'Creating a client',
+}
+
+### Install Supabase packages
+
+The `ssr` package configures Supabase to use Cookies, which is required for server-side languages and frameworks.
+
+```bash
+npm install @supabase/ssr @supabase/supabase-js
+```
+
+### Set environment variables
+
+Create a `.env.local` file in your project root directory. You can get your `SUPABASE_URL` and `SUPABASE_ANON_KEY` from inside [your Supabase project's dashboard](https://supabase.com/dashboard/project/_/settings/api).
+
+<Tabs scrollable size="small" type="underlined" defaultActiveId="nextjs" queryGroup="framework">
+
+<TabPanel id="nextjs" label="Next.js">
+
+```bash .env.local
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+</TabPanel>
+<TabPanel id="sveltekit" label="SvelteKit">
+
+```bash .env.local
+PUBLIC_SUPABASE_URL=your_supabase_project_url
+PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+</TabPanel>
+</Tabs>
+
+### Creating a client
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="nextjs"
+  queryGroup="framework"
+>
+<TabPanel id="nextjs" label="Next.js">
+
+Creating a Supabase client with the `ssr` package automatically configures it to use Cookies. This means your user's session is available throughout the entire Next.js stack - client, server, App Router, Pages Router. It just works!
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="client-component"
+  queryGroup="environment"
+>
+<TabPanel id="client-component" label="Client Component">
+
+```ts page.tsx
+"use client";
+
+import { createBrowserClient } from '@supabase/ssr'
+
+export default function Page () {
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+
+  return ...
+}
+```
+
+</TabPanel>
+
+<TabPanel id="server-component" label="Server Component">
+
+<Admonition type="note">
+
+Server Components only have read access to cookies. Check the `Middleware` tab for an example of refreshing expired sessions before loading a Server Component route.
+
+</Admonition>
+
+```ts page.tsx
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+
+export const dynamic = 'force-dynamic'
+
+export default async function Page () {
+  const cookieStore = cookies()
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          // Server Components only have read access to cookies.
+          // Make sure you have implemented Middleware correctly
+          // to refresh your user's access token
+        },
+        remove(name: string, options: CookieOptions) {
+          // Server Components only have read access to cookies.
+          // Make sure you have implemented Middleware correctly
+          // to remove your user's access token
+        },
+      },
+    }
+  )
+
+  return ...
+}
+```
+
+</TabPanel>
+
+<TabPanel id="middleware" label="Middleware">
+
+<Admonition type="note">
+
+Server Components only have read access to cookies. This `Middleware` example can be used to refresh expired sessions before loading Server Component routes.
+
+</Admonition>
+
+```ts middleware.ts
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { NextResponse, type NextRequest } from 'next/server'
+
+export async function middleware(request: NextRequest) {
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  })
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return request.cookies.get(name)?.value
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          request.cookies.set({
+            name,
+            value,
+            ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          response.cookies.set({
+            name,
+            value,
+            ...options,
+          })
+        },
+        remove(name: string, options: CookieOptions) {
+          request.cookies.delete({
+            name,
+            ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          response.cookies.delete({
+            name,
+            ...options,
+          })
+        },
+      },
+    }
+  )
+
+  await supabase.auth.getSession()
+
+  return response
+}
+```
+
+</TabPanel>
+
+<TabPanel id="route-handler" label="Route Handler">
+
+```ts route.js
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+
+export const dynamic = 'force-dynamic'
+
+export async function POST(request: Request) {
+  const cookieStore = cookies()
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          cookieStore.set({ name, value, ...options })
+        },
+        remove(name: string, options: CookieOptions) {
+          cookieStore.delete({ name, ...options })
+        },
+      },
+    }
+  )
+
+  return ...
+}
+```
+
+</TabPanel>
+
+<TabPanel id="server-action" label="Server Action">
+
+```ts page.tsx
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+
+export const dynamic = 'force-dynamic'
+
+export default async function Page () {
+  const serverAction = async () => {
+    'use server'
+
+    const cookieStore = cookies()
+
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get(name: string) {
+            return cookieStore.get(name)?.value
+          },
+          set(name: string, value: string, options: CookieOptions) {
+            cookieStore.set({ name, value, ...options })
+          },
+          remove(name: string, options: CookieOptions) {
+            cookieStore.delete({ name, ...options })
+          },
+        },
+      }
+    )
+  }
+
+  return ...
+}
+```
+
+</TabPanel>
+
+<TabPanel id="get-server-side-props" label="getServerSideProps">
+
+Cookies have many edge cases when not using a helper function, therefore, we recommend using the `cookies` package in `getServerSideProps` to provide a similar API to the Next.js `cookies` function in the App Router.
+
+```bash
+npm install cookies
+```
+
+Types can optionally be installed as well.
+
+```bash
+npm install --save-dev @types/cookies
+```
+
+```ts index.tsx
+import { type GetServerSidePropsContext } from 'next'
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import Cookies from 'cookies'
+
+export const getServerSideProps = async (context: GetServerSidePropsContext) => {
+  const cookies = new Cookies(context.req, context.res)
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(key: string) {
+          return cookies.get(key)
+        },
+        set(key: string, value: string, options: CookieOptions) {
+          cookies.set(key, value, options)
+        },
+        remove(key: string, options: CookieOptions) {
+          cookies.set(key, '', options)
+        },
+      },
+    }
+  )
+
+  return {...}
+}
+```
+
+</TabPanel>
+
+<TabPanel id="get-static-props" label="getStaticProps">
+
+The `getStaticProps` function gets executed at build time, rather than per request. At build time,
+there is no user, session or cookies. Therefore, we can use the standard `createClient` function
+from `supabase-js`.
+
+```ts page.tsx
+import { createClient } from '@supabase/supabase-js'
+
+export const getStaticProps = async () => {
+  const cookies = new Cookies(context.req, context.res)
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  )
+
+  return {...}
+}
+```
+
+</TabPanel>
+
+<TabPanel id="api-route" label="API Route">
+
+Cookies have many edge cases when not using a helper function, therefore, we recommend using the `cookies` package in API Routes to provide a similar API to the Next.js `cookies` function in the App Router.
+
+```bash
+npm install cookies
+```
+
+Types can optionally be installed as well.
+
+```bash
+npm install --save-dev @types/cookies
+```
+
+```ts index.tsx
+import { createServerClient, type CookieOptions } from "@supabase/ssr"
+import { type NextApiRequest, type NextApiResponse } from "next"
+import Cookies from "cookies"
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  const cookies = new Cookies(req, res)
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(key: string) {
+          return cookies.get(key)
+        },
+        set(key: string, value: string, options: CookieOptions) {
+          cookies.set(key, value, options)
+        },
+        remove(key: string, options: CookieOptions) {
+          cookies.set(key, "", options)
+        },
+      },
+    }
+  )
+
+  res.send(...)
+}
+```
+
+</TabPanel>
+
+<TabPanel id="pages-component" label="Pages Component">
+
+```ts index.tsx
+export default function Index () {
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+
+  return ...
+}
+```
+
+</TabPanel>
+</Tabs>
+
+</TabPanel>
+<TabPanel id="sveltekit" label="SvelteKit">
+
+HELP ME SUPADREW!
+
+</TabPanel>
+</Tabs>
+
+## Next steps
+
+- Implement [Authentication using Email and Password](/docs/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr)
+- Implement [Authentication using OAuth](/docs/guides/auth/server-side/oauth-with-pkce-flow-for-ssr)
+- [Learn more about SSR](/docs/guides/auth/server-side-rendering)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
