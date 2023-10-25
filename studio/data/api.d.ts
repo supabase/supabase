@@ -4155,7 +4155,9 @@ export interface components {
       id: number
       url: string
       title: string
+      repo: string
       branch: string
+      label: string
       created_at: string
       created_by?: string
     }
@@ -9365,6 +9367,10 @@ export interface operations {
   /** Gets github pull requests for a given repo */
   GitHubPullRequestController_getPullRequests: {
     parameters: {
+      query?: {
+        per_page?: number
+        page?: number
+      }
       path: {
         organization_integration_id: string
         repo_owner: string
