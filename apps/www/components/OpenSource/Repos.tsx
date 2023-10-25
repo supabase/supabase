@@ -32,9 +32,9 @@ const Tab = ({ isActive, label, icon, onClick }: TabProps) => (
           width="16"
           height="16"
           viewBox="0 0 16 16"
-          fill="none"text-foreground-light
+          fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className={cn('text-light shrink-0', isActive && 'text-brand')}
+          className={cn('text-foreground-light shrink-0', isActive && 'text-brand')}
         >
           <path
             d={icon}
@@ -105,13 +105,13 @@ const Repos = ({ tabs }: Props) => {
 
   return (
     <div className="flex flex-col gap-8 xl:gap-10">
-      <div className="fltext-foreground-light items-center gap-6 text-sm sm:gap-8">
+      <div className="flex mx-auto items-center gap-6 text-sm sm:gap-8">
         <Link href="https://github.com/supabase/supabase/blob/master/DEVELOPERS.md">
           <a
             className="text-foreground-lighter hover:underline flex gap-1 items-center"
             target="_blank"
           >
-            <GitHubIcon text-foreground-light
+            <GitHubIcon />
             How to contribute
           </a>
         </Link>
