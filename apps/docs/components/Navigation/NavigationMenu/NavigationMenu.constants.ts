@@ -244,6 +244,7 @@ export const gettingstarted: NavMenuConstant = {
         { name: 'SolidJS', url: '/guides/getting-started/quickstarts/solidjs' },
         { name: 'Vue', url: '/guides/getting-started/quickstarts/vue' },
         { name: 'refine', url: '/guides/getting-started/quickstarts/refine' },
+        { name: 'Astro', url: '/guides/getting-started/quickstarts/astro' }
       ],
     },
     {

@@ -58,6 +58,11 @@ const HomePageCover = (props) => {
       icon: '/docs/img/icons/refine-icon',
       href: '/guides/getting-started/quickstarts/refine',
     },
+    {
+      tooltip: 'Astro',
+      icon: '/docs/img/icons/astro-icon',
+      href: '/guides/getting-started/quickstarts/astro',
+    },
   ]
 
   const GettingStarted = () => (
