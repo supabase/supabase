@@ -60,7 +60,7 @@ const ColumnList = ({
       <div className="flex items-center space-x-2">
         <div className="flex items-center space-x-2">
           <h3 className="mb-1 text-xl text-foreground">Database Tables</h3>
-          <IconChevronRight strokeWidth={1.5} className="text-light" />
+          <IconChevronRight strokeWidth={1.5} className="text-foreground-light" />
           <h3 className="mb-1 text-xl text-foreground">{table.name}</h3>
         </div>
       </div>

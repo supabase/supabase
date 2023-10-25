@@ -98,7 +98,7 @@ const PauseProjectButton = () => {
         onSelectConfirm={requestPauseProject}
       >
         <Modal.Content className="py-4">
-          <p className="text-light text-sm">
+          <p className="text-foreground-light text-sm">
             Are you sure you want to pause this project? It will not be accessible until you unpause
             it.
           </p>

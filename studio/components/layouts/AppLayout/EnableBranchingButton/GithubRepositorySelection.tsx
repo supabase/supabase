@@ -93,7 +93,7 @@ const GithubRepositorySelection = ({
             <p>Git Connection</p>
             <Badge color="amber">Required</Badge>
           </div>
-          <p className="text-sm text-light !mb-4">
+          <p className="text-sm text-foreground-light !mb-4">
             {githubConnection !== undefined
               ? 'Your database preview branches will be based on the branches in the following repository that your project is connected with:'
               : 'Your database preview branches will be based on the branches in the Git repository that your project is connected with.'}
@@ -131,7 +131,10 @@ const GithubRepositorySelection = ({
               </ul>
 
               <div>
-                <label className="block text-sm text-light mb-2" htmlFor="branch-selector">
+                <label
+                  className="block text-sm text-foreground-light mb-2"
+                  htmlFor="branch-selector"
+                >
                   Select your production branch:
                 </label>
                 {isLoadingBranches && <ShimmeringLoader />}
@@ -151,7 +154,7 @@ const GithubRepositorySelection = ({
                         ref={comboBoxRef}
                         className={clsx(
                           'justify-start',
-                          selectedBranch === undefined ? 'text-light' : 'text'
+                          selectedBranch === undefined ? 'text-foreground-light' : 'text'
                         )}
                         iconRight={
                           <span className="grow flex justify-end">

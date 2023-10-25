@@ -181,7 +181,7 @@ const TableList = ({
                     <Table.tr key={snap.selectedSchemaName}>
                       <Table.td colSpan={6}>
                         <p className="text-sm text-foreground">No tables created yet</p>
-                        <p className="text-sm text-light">
+                        <p className="text-sm text-foreground-light">
                           There are no tables found in the schema "{snap.selectedSchemaName}"
                         </p>
                       </Table.td>
@@ -191,7 +191,7 @@ const TableList = ({
                     <Table.tr key={snap.selectedSchemaName}>
                       <Table.td colSpan={6}>
                         <p className="text-sm text-foreground">No results found</p>
-                        <p className="text-sm text-light">
+                        <p className="text-sm text-foreground-light">
                           Your search for "{filterString}" did not return any results
                         </p>
                       </Table.td>

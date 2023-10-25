@@ -48,7 +48,9 @@ const TriggerList = ({
       <Table.tr key={schema}>
         <Table.td colSpan={6}>
           <p className="text-sm text-foreground">No triggers created yet</p>
-          <p className="text-sm text-light">There are no triggers found in the schema "{schema}"</p>
+          <p className="text-sm text-foreground-light">
+            There are no triggers found in the schema "{schema}"
+          </p>
         </Table.td>
       </Table.tr>
     )
@@ -59,7 +61,7 @@ const TriggerList = ({
       <Table.tr key={schema}>
         <Table.td colSpan={5}>
           <p className="text-sm text-foreground">No results found</p>
-          <p className="text-sm text-light">
+          <p className="text-sm text-foreground-light">
             Your search for "{filterString}" did not return any results
           </p>
         </Table.td>

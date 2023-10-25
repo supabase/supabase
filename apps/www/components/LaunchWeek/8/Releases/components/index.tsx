@@ -271,7 +271,7 @@ export const VideoPreviewTrigger = ({
   title?: string
   thumbnail: string
 }) => (
-  <div className="flex items-center h-full gap-3 text-xs group/vid text-light hover:text-foreground transition-colors">
+  <div className="flex items-center h-full gap-3 text-xs group/vid text-foreground-light hover:text-foreground transition-colors">
     <div className="relative h-10 !aspect-video flex items-center justify-center rounded overflow-hidden border border-scale-1000 opacity-80 group-hover/vid:opacity-100 transition-colors">
       <div className="absolute z-10 w-2.5 h-2.5 text-white opacity-100">
         <svg viewBox="0 0 81 91" fill="none" xmlns="http://www.w3.org/2000/svg">

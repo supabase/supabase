@@ -87,7 +87,7 @@ const Panel = ({
     >
       <div
         className={cn(
-          'relative z-10 w-full h-full rounded-xl bg-surface-100 overflow-hidden text-light',
+          'relative z-10 w-full h-full rounded-xl bg-surface-100 overflow-hidden text-foreground-light',
           innerClassName
         )}
       >

@@ -86,7 +86,7 @@ function CustomerStoriesPage(props: any) {
                 animate={{ opacity: 1, y: 0, transition: { duration: 0.5, easing: 'easeOut' } }}
               >
                 <h1 className="text-foreground mb-3 text-3xl">Customer stories</h1>
-                <h2 className="text-light text-xl">
+                <h2 className="text-foreground-light text-xl">
                   Discover case studies on how Supabase is being used around the world to quickly
                   create outstanding products and set new industry standards.
                 </h2>

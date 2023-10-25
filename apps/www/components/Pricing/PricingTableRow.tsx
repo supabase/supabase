@@ -121,7 +121,10 @@ export const PricingTableRowMobile = (props: any) => {
           {category.features.map((feat: any, i: number) => {
             return (
               <tr key={i} className="border-border border-t">
-                <th className="text-light px-4 py-3 text-left text-sm font-normal" scope="row">
+                <th
+                  className="text-foreground-light px-4 py-3 text-left text-sm font-normal"
+                  scope="row"
+                >
                   <span>
                     <p>{feat.title}</p>
                   </span>

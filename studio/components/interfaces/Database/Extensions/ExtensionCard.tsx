@@ -84,7 +84,7 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
               >
                 {extension.name}
               </h3>
-              <p className="text-sm text-light">
+              <p className="text-sm text-foreground-light">
                 {extension?.installed_version ?? extension.default_version}
               </p>
             </div>

@@ -151,7 +151,7 @@ function Database() {
 
                     <div>
                       <h3 className="text-foreground text-lg">{item.title}</h3>
-                      <p className="text-light text-sm">{item.description}</p>
+                      <p className="text-foreground-light text-sm">{item.description}</p>
                     </div>
                   </div>
                 )
@@ -186,7 +186,9 @@ function Database() {
                         <div
                           className={cn(
                             'transition-colors ',
-                            active ? ' text-foreground' : ' text-light group-hover:text-foreground'
+                            active
+                              ? ' text-foreground'
+                              : ' text-foreground-light group-hover:text-foreground'
                           )}
                         >
                           {feat.title}
@@ -194,7 +196,9 @@ function Database() {
                         <div
                           className={cn(
                             'text-sm transition-colors ',
-                            active ? ' text-light' : ' text-light group-hover:text-light '
+                            active
+                              ? ' text-foreground-light'
+                              : ' text-foreground-light group-hover:text-foreground-light '
                           )}
                         >
                           {feat.description}
@@ -269,7 +273,7 @@ serve(async (req) => {
               <div className="grid grid-cols-12" key={0}>
                 <div className="col-span-12 mt-0 flex lg:col-span-6 xl:col-span-12 xl:mb-8">
                   <p>
-                    <p className="text-light m-0">Libraries coming soon:</p>
+                    <p className="text-foreground-light m-0">Libraries coming soon:</p>
                   </p>
                   <div className="ml-1 space-x-1">
                     <Badge dot={false}>Python</Badge>

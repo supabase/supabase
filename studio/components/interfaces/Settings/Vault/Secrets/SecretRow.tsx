@@ -155,7 +155,7 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
                   onClick={() => onSelectRemove(secret)}
                 >
                   <IconTrash stroke="red" size="tiny" />
-                  <p className="text-light">Delete</p>
+                  <p className="text-foreground-light">Delete</p>
                 </DropdownMenuItem>
               </Tooltip.Trigger>
               {!canManageSecrets && (

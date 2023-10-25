@@ -20,7 +20,7 @@ const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }
   <button
     onClick={onClick}
     className={`text-left text-lg flex flex-col group gap-1 transition-all ${
-      isActive ? 'flex-[2] text-foreground' : 'flex-[1] text-light'
+      isActive ? 'flex-[2] text-foreground' : 'flex-[1] text-foreground-light'
     }`}
     aria-selected={isActive}
     role="tab"

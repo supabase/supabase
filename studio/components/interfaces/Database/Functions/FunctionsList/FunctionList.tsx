@@ -57,7 +57,7 @@ const FunctionList = ({
       <Table.tr key={schema}>
         <Table.td colSpan={5}>
           <p className="text-sm text-foreground">No functions created yet</p>
-          <p className="text-sm text-light">
+          <p className="text-sm text-foreground-light">
             There are no functions found in the schema "{schema}"
           </p>
         </Table.td>
@@ -70,7 +70,7 @@ const FunctionList = ({
       <Table.tr key={schema}>
         <Table.td colSpan={5}>
           <p className="text-sm text-foreground">No results found</p>
-          <p className="text-sm text-light">
+          <p className="text-sm text-foreground-light">
             Your search for "{filterString}" did not return any results
           </p>
         </Table.td>

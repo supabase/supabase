@@ -30,7 +30,7 @@ export const LaunchSection = (props: WeekDayProps) => {
       ></div>
       {/* END timeline dot */}
       <div className="flex items-center gap-3">
-        <span className="text-light text-sm">{props.date}</span>
+        <span className="text-foreground-light text-sm">{props.date}</span>
         {props.shipped ? (
           <Badge>
             <div className="flex items-center gap-2">
@@ -48,7 +48,7 @@ export const LaunchSection = (props: WeekDayProps) => {
         {props.shipped ? props.title : props.dd + ' 08:00 PT | 11:00 ET'}
       </h4>
 
-      {props.shipped && <p className="text-light text-base">{props.description}</p>}
+      {props.shipped && <p className="text-foreground-light text-base">{props.description}</p>}
     </div>
   )
 
@@ -179,7 +179,7 @@ export const LaunchSection = (props: WeekDayProps) => {
                       <div className="bg-scale-300 dark:bg-scale-400 h-px w-full"></div>
 
                       <div className="flex flex-col gap-6 p-6 px-10 pb-10">
-                        <h3 className="text-light text-sm">New releases</h3>
+                        <h3 className="text-foreground-light text-sm">New releases</h3>
                         {article.products &&
                           article.products.map((product: Product, index) => (
                             <ProductButtonListItem key={product.url + index} {...product} />

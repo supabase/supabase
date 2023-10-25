@@ -181,10 +181,10 @@ export const Grid = memo(
                         style={{ height: `calc(100% - 35px)` }}
                         className="flex flex-col items-center justify-center"
                       >
-                        <p className="text-sm text-light">This table is empty</p>
+                        <p className="text-sm text-foreground-light">This table is empty</p>
                         {onAddRow !== undefined && onImportData !== undefined && (
                           <>
-                            <p className="text-sm text-light mt-1">
+                            <p className="text-sm text-foreground-light mt-1">
                               Add rows to your table to get started.
                             </p>
                             <div className="flex items-center space-x-2 mt-4">
@@ -204,7 +204,7 @@ export const Grid = memo(
                         style={{ height: `calc(100% - 35px)` }}
                         className="flex flex-col items-center justify-center"
                       >
-                        <p className="text-sm text-light">
+                        <p className="text-sm text-foreground-light">
                           The filters applied has returned no results from this table
                         </p>
                         <div className="flex items-center space-x-2 mt-4">
