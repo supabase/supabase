@@ -13,15 +13,13 @@ import {
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
-import { useFlag, useIsFeatureEnabled } from 'hooks'
+import { useFlag } from 'hooks'
 import { Alert, Badge, Button, IconPackage, Input } from 'ui'
 import ProjectUpgradeAlert from '../General/Infrastructure/ProjectUpgradeAlert'
 
 const InfrastructureInfo = () => {
   const { ref } = useParams()
   const { project } = useProjectContext()
-
-  const authEnabled = useIsFeatureEnabled('project_auth:all')
 
   const {
     data,
@@ -79,14 +77,12 @@ const InfrastructureInfo = () => {
             )}
             {isSuccessUpgradeEligibility && (
               <>
-                {authEnabled && (
-                  <Input
-                    readOnly
-                    disabled
-                    label="GoTrue version"
-                    value={project?.serviceVersions?.gotrue ?? ''}
-                  />
-                )}
+                <Input
+                  readOnly
+                  disabled
+                  label="GoTrue version"
+                  value={project?.serviceVersions?.gotrue ?? ''}
+                />
                 <Input
                   readOnly
                   disabled
@@ -142,6 +138,36 @@ const InfrastructureInfo = () => {
                       <a target="_blank" rel="noreferrer">
                         <Button size="tiny" type="default">
                           Contact support
+                        </Button>
+                      </a>
+                    </Link>
+                  </Alert>
+                )}
+                {showDbUpgrades && !data?.eligible && (data?.extension_dependent_objects || []).length > 0 && (
+                  <Alert
+                    icon={<IconPackage className="text-foreground-light" strokeWidth={1.5} />}
+                    variant="warning"
+                    title="A new version of Postgres is available for your project"
+                  >
+                    <p className="mb-3">
+                      This project cannot be upgraded due to the following extension
+                      dependent objects:
+                    </p>
+
+                    <ul className="mb-3">
+                      {(data?.extension_dependent_objects || []).map((obj) => (
+                        <li className="list-disc" key={obj}>{obj}</li>
+                      ))}
+                    </ul>
+
+                    <p className="mb-3">
+                      Once the above objects are exported and removed, you can proceed to upgrade
+                      your project, and re-import the objects after the upgrade operation is complete.
+                    </p>
+                    <Link href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats">
+                      <a target="_blank" rel="noreferrer">
+                        <Button size="tiny" type="default">
+                          Visit our documentation to learn more about this 
                         </Button>
                       </a>
                     </Link>

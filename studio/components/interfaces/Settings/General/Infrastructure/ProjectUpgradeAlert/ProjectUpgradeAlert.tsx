@@ -87,38 +87,9 @@ const ProjectUpgradeAlert = () => {
                         All services, including Auth, Rest, and Extensions will be upgraded. This
                         action cannot be undone.
                       </p>
-                      {(data?.potential_breaking_changes ?? []).length > 0 && (
-                        <InformationBox
-                          icon={<IconAlertCircle strokeWidth={2} />}
-                          title="There will be breaking changes involved with the upgrade"
-                          description={
-                            <ul className="list-disc pl-4">
-                              {data?.potential_breaking_changes.map((reason) => {
-                                const change = (BREAKING_CHANGES as any)[reason]
-                                if (change !== undefined)
-                                  return (
-                                    <li key={reason}>
-                                      <p className="text-foreground">{change.title}</p>
-                                      <p className="flex items-center space-x-1">
-                                        <span>This update has breaking changes. Read more </span>
-                                        <Link href={change.url}>
-                                          <a className="text-brand opacity-90 flex items-center space-x-1">
-                                            <span>here</span>
-                                            <IconExternalLink size="tiny" strokeWidth={2} />
-                                          </a>
-                                        </Link>
-                                      </p>
-                                    </li>
-                                  )
-                                else return null
-                              })}
-                            </ul>
-                          }
-                        />
-                      )}
                       <Alert
                         withIcon
-                        variant="warning"
+                        variant="info"
                         title="Your project will be offline while the upgrade is in progress"
                       >
                         <p>
@@ -133,26 +104,45 @@ const ProjectUpgradeAlert = () => {
                           your application.
                         </p>
                       </Alert>
+                      {(data?.potential_breaking_changes ?? []).length > 0 && (
+                        <Alert
+                          withIcon
+                          variant="danger"
+                          title="Breaking changes"
+                          >
+                            <p className="mb-3">
+                              Your project will be upgraded across major versions of Postgres. This
+                              may involve breaking changes.
+                            </p>
+
+                            <Link href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats">
+                              <a target="_blank" rel="noreferrer">
+                                <Button size="tiny" type="default">
+                                  Visit our documentation to learn more about breaking changes 
+                                </Button>
+                              </a>
+                            </Link>
+                          </Alert>
+                      )}
                       {legacyAuthCustomRoles.length > 0 && (
                         <Alert
                           withIcon
                           variant="warning"
                           title="Custom Postgres roles using md5 authentication have been detected"
                         >
-                          <p>
+                          <p className="mb-3">
                             New Postgres versions use scram-sha-256 authentication by default and do
                             not support md5, as it has been deprecated.
                           </p>
-                          <p>
-                            After upgrading your database to the latest version you will not be able
-                            to use the existing custom roles until you update them to use
-                            scram-sha-256 authentication.
+                          <p className="mb-3">
+                            After upgrading you will not be able to connect using the existing custom 
+                            roles until they've been updated to use the new authentication method.
                           </p>
-                          <p>You can do so by running the following commands after the upgrade:</p>
-                          <div className="flex items-baseline gap-2">
+                          <p className="mb-1">You can do so by running the following commands after the upgrade:</p>
+                          <div className="flex items-baseline gap-2 mb-3">
                             <code className="text-xs">
                               {legacyAuthCustomRoles.map((role) => (
-                                <div key={role}>
+                                <div key={role} className="pb-1">
                                   ALTER ROLE <span className="text-green-900">{role}</span> WITH
                                   ENCRYPTED PASSWORD '
                                   <span className="text-green-900">newpassword</span>';
@@ -160,29 +150,13 @@ const ProjectUpgradeAlert = () => {
                               ))}
                             </code>
                           </div>
-                        </Alert>
-                      )}
-                      {extensionDependentObjects.length > 0 && (
-                        <Alert
-                          withIcon
-                          variant="warning"
-                          title="Objects dependent on extensions have been detected"
-                        >
-                          <p>
-                            A small numbers of extensions are toggled off and on during the upgrade
-                            process, which may cause objects dependent on them to be dropped:
-                          </p>
-                          <div className="flex items-baseline gap-2">
-                            <code className="text-xs">
-                              {extensionDependentObjects.map((object) => (
-                                <div key={object}>{object}</div>
-                              ))}
-                            </code>
-                          </div>
-                          <p>
-                            We are taking additional steps to preserve these objects, but we
-                            recommend that you export their definitions before upgrading.
-                          </p>
+                          <Link href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats">
+                              <a target="_blank" rel="noreferrer">
+                                <Button size="tiny" type="default">
+                                  Visit our documentation to learn more about this 
+                                </Button>
+                              </a>
+                            </Link>
                         </Alert>
                       )}
                       <Listbox
