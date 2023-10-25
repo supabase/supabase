@@ -105,24 +105,20 @@ const ProjectUpgradeAlert = () => {
                         </p>
                       </Alert>
                       {(data?.potential_breaking_changes ?? []).length > 0 && (
-                        <Alert
-                          withIcon
-                          variant="danger"
-                          title="Breaking changes"
-                          >
-                            <p className="mb-3">
-                              Your project will be upgraded across major versions of Postgres. This
-                              may involve breaking changes.
-                            </p>
+                        <Alert withIcon variant="danger" title="Breaking changes">
+                          <p className="mb-3">
+                            Your project will be upgraded across major versions of Postgres. This
+                            may involve breaking changes.
+                          </p>
 
-                            <Link href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats">
-                              <a target="_blank" rel="noreferrer">
-                                <Button size="tiny" type="default">
-                                  Visit our documentation to learn more about breaking changes 
-                                </Button>
-                              </a>
-                            </Link>
-                          </Alert>
+                          <Link href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats">
+                            <a target="_blank" rel="noreferrer">
+                              <Button size="tiny" type="default">
+                                Visit our documentation to learn more about breaking changes
+                              </Button>
+                            </a>
+                          </Link>
+                        </Alert>
                       )}
                       {legacyAuthCustomRoles.length > 0 && (
                         <Alert
@@ -135,10 +131,13 @@ const ProjectUpgradeAlert = () => {
                             not support md5, as it has been deprecated.
                           </p>
                           <p className="mb-3">
-                            After upgrading you will not be able to connect using the existing custom 
-                            roles until they've been updated to use the new authentication method.
+                            After upgrading you will not be able to connect using the existing
+                            custom roles until they've been updated to use the new authentication
+                            method.
                           </p>
-                          <p className="mb-1">You can do so by running the following commands after the upgrade:</p>
+                          <p className="mb-1">
+                            You can do so by running the following commands after the upgrade:
+                          </p>
                           <div className="flex items-baseline gap-2 mb-3">
                             <code className="text-xs">
                               {legacyAuthCustomRoles.map((role) => (
@@ -151,12 +150,12 @@ const ProjectUpgradeAlert = () => {
                             </code>
                           </div>
                           <Link href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats">
-                              <a target="_blank" rel="noreferrer">
-                                <Button size="tiny" type="default">
-                                  Visit our documentation to learn more about this 
-                                </Button>
-                              </a>
-                            </Link>
+                            <a target="_blank" rel="noreferrer">
+                              <Button size="tiny" type="default">
+                                Visit our documentation to learn more about this
+                              </Button>
+                            </a>
+                          </Link>
                         </Alert>
                       )}
                       <Listbox
