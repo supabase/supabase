@@ -1,0 +1,80 @@
+---
+name: GoodTape
+title: 'Scaling securely: one million users in 7 months with Supabase Auth'
+# Use meta_title to add a custom meta title. Otherwise it defaults to '{name} | Supabase Customer Stories':
+meta_title: 'Scaling securely: one million users in 7 months with Supabase Auth'
+description: Learn how Pebblely, an AI image generation company, used Supabase Auth to handle Single Sign On for their rapidly growing user base.
+# Use meta_description to add a custom meta description. Otherwise it defaults to {description}:
+meta_description: Learn how Pebblely, an AI image generation company, used Supabase Auth to handle Single Sign On for their rapidly growing user base.
+author: paul_copplestone
+author_title: CEO and Cofounder
+author_url: https://github.com/kiwicopple
+author_image_url: https://avatars2.githubusercontent.com/u/10214025?s=400&u=c6775be2ae667e2acae3ccd347fed62bb3f5b3e7&v=4
+authorURL: https://github.com/kiwicopple
+logo: /images/customers/logos/pebblely.png
+logo_inverse: /images/customers/logos/light/pebblely.png
+og_image: /images/customers/og/pebblely.jpg
+tags:
+  - supabase
+date: '2023-09-29'
+company_url: 'https://pebblely.com'
+stats: []
+misc:
+  [
+    { label: 'Use case', text: 'Generative AI, Image generation' },
+    { label: 'Solutions', text: 'Supabase Database, Supabase Auth, Supabase Realtime' },
+  ]
+about: 'Pebblely is an AI tool that turns boring product images into beautiful marketing assets in just seconds. The AI creates backgrounds based on the uploaded images and adds shadows or reflections accordingly.'
+---
+
+## Introduction
+
+GoodTape started as a hackathon project by Jakob Steinn. The initial idea was to help journalists at Zetland, the news agency where he worked, transcribe their stories from audio to text. In the past, they had done this by hand since existing tools didn't support smaller language areas like Danish. Steinn leveraged Zetland's existing dataset of transcribed audio to train OpenAI's Whisper model to build a better transcription service.
+
+That was one year ago. The initial hackathon product transformed into GoodTape, which allows users to upload their audio files and instantly get them transcribed by AI. 
+
+## The challenge: Accommodating hyper-growth
+
+Today, GoodTape generates 63,600 Euros every month and is still growing 15% month on month. Built with security and privacy in mind, GoodTape has helped journalists in areas like Taiwan, Denmark, and Sweden. The product saves them hours of manual transcription work and allows for new use cases like categorization and classification of previously inaccessible data. But this hyper-growth also came with its own challenges. 
+
+One such challenge was authentication. GoodTape started off with Auth0. When they scaled beyond hobbyist levels, the cost to support auth exploded. From Steinn, “their pricing is wild.”
+
+More importantly, because of their limited developer resources, GoodTape needed a database solution that didn't put the burden of database debugging and support on their small team. At first, they went with a Postgres Fly database, which was “not a managed solution but gave all the tools to feel like it was managed.” But as they scaled, they started noticing limitations with reliability and performance.
+
+The critical moment for GoodTape came when their primary database went down, and in attempting to manage the situation themselves, one of their read replicas was promoted to be primary when not ready. That caused the cluster to go into an irreparable state that they could not boot up again.
+
+<Quote img="jakob-steinn-goodtape.jpeg" caption="Jakob Steinn - Lead Developer at GoodTape">
+  As we wanted more reliability, I have had to learn a lot more about databases. And that's knowledge that I wish I didn't have to know.
+</Quote>
+
+## Why Supabase?
+
+That prompted Steinn to look for a new solution that would allow them to build without having to look over their shoulder at their database. In particular, Supabase's managed database came up as the answer to his database problems of support and uptime. In migrating, Steinn was pleasantly surprised by the support from Supabase both pre- and post-sales. 
+
+For the migration, Steinn was helped by [Kevin, our head of Customer Success](https://www.linkedin.com/in/kevin-brolly-92a0202a/), and the migration process went so smoothly that he later said, “Wow… I wish I could give [Kevin] a hug.”
+
+Post migration, Steinn appreciated the communication and safety that Supabase offered. Complex database issues that had previously taken them long engineering hours to fix were now managed and handled by Supabase, like automatically adding more disk space, so Steinn and the GoodTape team could focus on their core product. 
+
+Further, while implementing Supabase, he was impressed with “the sheer amount of educational content and incredible documentation. It was amazing. So really, really, really great.” Beyond just the developer resources, once finished with the migration, Steinn ran a small POC with [Supabase Auth](https://supabase.com/docs/guides/auth). It was then that he found that Supabase could solve their authentication cost issues and also add extra benefits that were impossible if he was working with multiple vendors“.  The main thing was having our authentication together with our database and seeing the benefits of having those two at the same place. One example is [row-level security](https://supabase.com/docs/guides/auth/row-level-security)… that just sells me immediately.”
+
+<Quote img="jakob-steinn-goodtape.jpeg" caption="Jakob Steinn - Lead Developer at GoodTape">
+  My biggest regret is not having gone with Supabase from the beginning.
+</Quote>
+
+## The Results
+
+GoodTape migrated both their Postgres Fly database and Auth0 workloads to Supabase in a single month.
+
+Prior to Supabase, Steinn had spent three months of his time doing nothing but server infrastructure and incident response. With Supabase, he's been able to be entirely hands-off with the database. Moving to Supabase has had the quantitative effect of adding a full-time engineer to the GoodTape team and also the qualitative effect of freeing Steinn to focus on what he loves: building and improving the product.
+
+That includes initiatives like the GoodTape archive, where users can upload any type of file they want, including 4k Dolby Atmos videos, and GoodTape will use Supabase Edge Functions as the translation layer to turn each audio file into the right format, such as Opus or MP3. Another feature that Steinn is excited about is the new search capability built on top of pgvector. Supabase has not only enabled GoodTape to save backend engineering time, but it has also broadened the ambitions of the team. 
+
+In terms of costs, GoodTape has seen a remarkable reduction in backend expenses. Before migrating to Supabase's comprehensive backend solution, they were paying nearly $1,500 per month for authentication through Auth0, and their database-related expenses exceeded $2,600 per month with Fly. With the transition to Supabase, they not only lowered their costs to $1,600, resulting in a 60% reduction in expenses, but they also saved valuable engineering time that allowed them to focus on their core product.
+
+The best part about Supabase for Steinn has been the peace of mind with Supabase's managed services. Where in the past, his vacations had always been interrupted - “every time I was in an airport, our database would go down” - with Supabase managing the database, Steinn now can visit friends and family in Iceland without any concerns.
+
+<Quote img="jakob-steinn-goodtape.jpeg" caption="Jakob Steinn - Lead Developer at GoodTape">
+  Moving to Supabase has saved the company. We wouldn't have worked if we hadn't made the right [backend] decision… So Supabase helped us stay in production and not become an internal tool. 
+</Quote>
+
+> To learn more about how Supabase can help you manage and scale your database, **[reach out to us](https://forms.supabase.com/enterprise)**.
