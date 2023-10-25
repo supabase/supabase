@@ -56,17 +56,8 @@ export default (isMobile?: boolean) => ({
       },
       {
         title: 'Secure and Scalable',
-        paragraph: (
-          <>
-            Supabase is{' '}
-            <Link href="https://forms.supabase.com/soc2">
-              <a className="text-light hover:underline" target="_blank">
-                SOC2 type 2
-              </a>
-            </Link>{' '}
-            compliant, and comes with an advanced permissions system.
-          </>
-        ),
+        paragraph:
+          'Supabase is SOC2 type 2 compliant, and comes with an advanced permissions system.',
         image: SecureAndScalableImg,
       },
       {
