@@ -163,11 +163,13 @@ const General = () => {
                       </p>
                     </div>
                   </div>
-                  <Button asChild type="default">
-                    <Link href={`/org/${organization.slug}/usage?projectRef=${project?.ref}`}>
-                      View project usage
-                    </Link>
-                  </Button>
+                  <div>
+                    <Button asChild type="default">
+                      <Link href={`/org/${organization.slug}/usage?projectRef=${project?.ref}`}>
+                        View project usage
+                      </Link>
+                    </Button>
+                  </div>
                 </div>
               </Panel.Content>
             </Panel>

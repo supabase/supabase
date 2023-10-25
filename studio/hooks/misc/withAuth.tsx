@@ -1,6 +1,6 @@
-import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { ComponentType, PropsWithChildren, useEffect } from 'react'
+import Script from 'next/script'
+import { ComponentType, useEffect } from 'react'
 
 import { useParams } from 'common/hooks'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
@@ -100,19 +100,22 @@ export function withAuth<T>(
 
     return (
       <>
-        <Head>
-          {/* This script will quickly (before the main JS loads) redirect the user
+        {/* This script will quickly (before the main JS loads) redirect the user
           to the login page if they are guaranteed (no token at all) to not be logged in. */}
-          {IS_PLATFORM && (
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `window._getReturnToPath = ${getReturnToPath.toString()};if (!localStorage.getItem('${STORAGE_KEY}') && !location.hash) {const searchParams = new URLSearchParams(location.search);searchParams.set('returnTo', location.pathname);location.replace('${
-                  basePath ?? ''
-                }/sign-in' + '?' + searchParams.toString())}`,
-              }}
-            />
-          )}
-        </Head>
+        {IS_PLATFORM && (
+          <Script
+            id="redirect-if-not-logged-in"
+            dangerouslySetInnerHTML={{
+              __html: `
+              window._getReturnToPath = ${getReturnToPath.toString()};
+              if (!localStorage.getItem('${STORAGE_KEY}') && !location.hash) {
+                const searchParams = new URLSearchParams(location.search);
+                searchParams.set('returnTo', location.pathname);
+                location.replace('${basePath ?? ''}/sign-in' + '?' + searchParams.toString())
+              }`,
+            }}
+          />
+        )}
         <InnerComponent {...props} />
       </>
     )

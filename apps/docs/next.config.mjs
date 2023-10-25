@@ -67,15 +67,7 @@ const nextConfig = {
       transform: 'lodash/{{member}}',
     },
   },
-  transpilePackages: [
-    'ui',
-    'common',
-    '@supabase/auth-helpers-nextjs',
-    'mermaid',
-    'mdx-mermaid',
-    'dayjs',
-    'shared-data',
-  ],
+  transpilePackages: ['ui', 'common', 'mermaid', 'mdx-mermaid', 'dayjs', 'shared-data'],
   async headers() {
     return [
       {

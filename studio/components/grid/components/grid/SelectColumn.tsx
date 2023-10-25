@@ -3,6 +3,7 @@ import {
   CalculatedColumn,
   RenderCellProps,
   RenderGroupCellProps,
+  RenderHeaderCellProps,
   useRowSelection,
 } from 'react-data-grid'
 import { Button, IconMaximize2 } from 'ui'
@@ -10,7 +11,6 @@ import { Button, IconMaximize2 } from 'ui'
 import { SELECT_COLUMN_KEY } from '../../constants'
 import { useTrackedState } from '../../store'
 import { SupaRow } from '../../types'
-import { useFocusRef } from '../../utils'
 
 export const SelectColumn: CalculatedColumn<any, any> = {
   key: SELECT_COLUMN_KEY,
@@ -22,14 +22,17 @@ export const SelectColumn: CalculatedColumn<any, any> = {
   sortable: false,
   frozen: true,
   isLastFrozenColumn: false,
-  // rowGroup: false,
-  renderHeaderCell: (props) => {
+  renderHeaderCell: (props: RenderHeaderCellProps<unknown>) => {
+    // [Joshen] formatter is actually a valid React component, so we can use hooks here
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const [isRowSelected, onRowSelectionChange] = useRowSelection()
+
     return (
       <SelectCellHeader
         aria-label="Select All"
-        // [Next 18 refactor] Need to fix
-        value={false}
-        onChange={() => {}}
+        tabIndex={props.tabIndex}
+        value={isRowSelected}
+        onChange={(checked) => onRowSelectionChange({ type: 'HEADER', checked })}
       />
     )
   },
@@ -40,10 +43,7 @@ export const SelectColumn: CalculatedColumn<any, any> = {
     return (
       <SelectCellFormatter
         aria-label="Select"
-        tabIndex={-1}
-        // [Next 18 refactor] Need to fix
-        isCellSelected={false}
-        // isCellSelected={props.isCellSelected}
+        tabIndex={props.tabIndex}
         value={isRowSelected}
         row={props.row}
         onChange={(checked, isShiftClick) => {
@@ -61,10 +61,7 @@ export const SelectColumn: CalculatedColumn<any, any> = {
     return (
       <SelectCellFormatter
         aria-label="Select Group"
-        tabIndex={-1}
-        // [Next 18 refactor] Need to fix
-        isCellSelected={false}
-        // isCellSelected={props.isCellSelected}
+        tabIndex={props.tabIndex}
         value={isRowSelected}
         onChange={(checked) => {
           onRowSelectionChange({
@@ -97,7 +94,6 @@ type SharedInputProps = Pick<
 >
 
 interface SelectCellFormatterProps extends SharedInputProps {
-  isCellSelected: boolean
   value: boolean
   row?: SupaRow
   onChange: (value: boolean, isShiftClick: boolean) => void
@@ -107,7 +103,6 @@ function SelectCellFormatter({
   row,
   value,
   tabIndex,
-  isCellSelected,
   disabled,
   onClick,
   onChange,
@@ -116,7 +111,6 @@ function SelectCellFormatter({
 }: SelectCellFormatterProps) {
   const state = useTrackedState()
   const { onEditRow } = state
-  const inputRef = useFocusRef<HTMLInputElement>(isCellSelected)
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     onChange(e.target.checked, (e.nativeEvent as MouseEvent).shiftKey)
@@ -135,7 +129,6 @@ function SelectCellFormatter({
         aria-label={ariaLabel}
         aria-labelledby={ariaLabelledBy}
         tabIndex={tabIndex}
-        ref={inputRef}
         type="checkbox"
         className="rdg-row__select-column__select-action"
         disabled={disabled}
