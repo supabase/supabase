@@ -14,7 +14,7 @@
     "@supabase/auth-helpers-react": "^0.3.1",
     "@supabase/auth-ui-react": "^0.2.7",
     "@supabase/supabase-js": "^2.7.1",
-    "next": "^13.1.6",
+    "next": "^13.5.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
