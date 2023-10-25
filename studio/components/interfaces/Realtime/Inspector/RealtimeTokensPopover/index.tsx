@@ -22,6 +22,7 @@ interface RealtimeTokensPopoverProps {
 
 export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokensPopoverProps) => {
   const [open, setOpen] = useState(false)
+  const [bearerEnabled, setBearerEnabled] = useState(false)
   const [tempConfig, setTempConfig] = useState(config)
 
   const { data: settings } = useProjectSettingsQuery({ projectRef: config.projectRef })
@@ -91,7 +92,17 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
         </div>
         <div className="border-b border-overlay p-4 flex flex-row gap-4">
           <div className="pt-0.5">
-            <Toggle size="small" />
+            <Toggle
+              size="small"
+              checked={bearerEnabled}
+              onChange={() => {
+                const flag = !bearerEnabled
+                if (flag === false) {
+                  setTempConfig({ ...tempConfig, bearer: '' })
+                }
+                setBearerEnabled(flag)
+              }}
+            />
           </div>
           <div className="flex flex-col gap-y-1 flex-grow">
             <p className="text-sm">Impersonate User</p>
@@ -103,8 +114,9 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
               icon={<IconKey />}
               size="small"
               className="flex-grow"
-              value={tempConfig.filter}
-              onChange={(v) => setTempConfig({ ...tempConfig, filter: v.target.value })}
+              disabled={!bearerEnabled}
+              defaultValue={tempConfig.bearer || ''}
+              onChange={(v) => setTempConfig({ ...tempConfig, bearer: v.target.value })}
             />
           </div>
         </div>
