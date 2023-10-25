@@ -470,6 +470,8 @@ export default {
       text-scale-1200
       border
       focus:shadow-md
+      dark:bg-[#292929]
+      focus:ring-[#292929]
       ${defaults.focus}
       focus:border-scale-900
       focus:ring-scale-400

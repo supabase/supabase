@@ -43,6 +43,7 @@ const SchemaSelector = ({
   const [open, setOpen] = useState(false)
 
   const { project } = useProjectContext()
+ 
   const {
     data,
     isLoading: isSchemasLoading,
