@@ -1,5 +1,5 @@
 import { PlusCircle } from 'lucide-react'
-import { Dispatch, SetStateAction, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import {
   Button,
   IconKey,
@@ -12,6 +12,8 @@ import {
 } from 'ui'
 
 import { RealtimeConfig } from '../useRealtimeEvents'
+import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
 
 interface RealtimeTokensPopoverProps {
   config: RealtimeConfig
@@ -21,6 +23,20 @@ interface RealtimeTokensPopoverProps {
 export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokensPopoverProps) => {
   const [open, setOpen] = useState(false)
   const [tempConfig, setTempConfig] = useState(config)
+
+  const { data: settings } = useProjectSettingsQuery({ projectRef: config.projectRef })
+
+  const apiService = (settings?.services ?? []).find(
+    (x) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID
+  )
+  const apiKeys = apiService?.service_api_keys ?? []
+
+  useEffect(() => {
+    const anonKey = apiKeys.find((k) => k.tags === 'anon')
+    if (anonKey) {
+      onChangeConfig({ ...config, token: anonKey.api_key })
+    }
+  }, [apiKeys])
 
   const onOpen = (v: boolean) => {
     // when opening, copy the outside config into the intermediate one
@@ -54,17 +70,18 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
           <div className="flex-grow flex flex-col gap-y-1">
             <Listbox
               type="select"
-              value="service_role"
+              value={tempConfig.token}
               size="tiny"
               className="w-full"
               onChange={(v) => setTempConfig({ ...config, token: v })}
             >
-              <Listbox.Option key="service_role" label="service_role" value="service_role">
-                <span className="text-foreground">service_role</span>
-              </Listbox.Option>
-              <Listbox.Option key="anon" label="anon" value="anon">
-                <span className="text-foreground">anon</span>
-              </Listbox.Option>
+              {apiKeys.map((key) => {
+                return (
+                  <Listbox.Option key={key.tags} label={key.tags} value={key.api_key}>
+                    <span className="text-foreground">{key.tags}</span>
+                  </Listbox.Option>
+                )
+              })}
             </Listbox>
             <span className="text-sm text-foreground-light">
               The type of token used. Using <code>service_role</code> will bypass RLS policies. If
