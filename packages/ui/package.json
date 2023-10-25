@@ -115,6 +115,6 @@
     "typescript": "^5.0.4",
     "ts-jest": "^29.1.1",
     "jest-environment-jsdom": "^29.7.0",
-    "next": "^12.3.2"
+    "next": "^13.5.0"
   }
 }

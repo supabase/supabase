@@ -69,7 +69,7 @@
     "mobx": "^6.3.2",
     "mobx-react-lite": "^3.2.0",
     "monaco-editor": "0.33.0",
-    "next": "^12.3.2",
+    "next": "^13.5.0",
     "next-transpile-modules": "^9.0.0",
     "openai": "^3.3.0",
     "openapi-fetch": "^0.6.1",
