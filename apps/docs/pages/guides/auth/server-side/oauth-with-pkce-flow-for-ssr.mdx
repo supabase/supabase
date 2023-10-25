@@ -109,9 +109,7 @@ export const handle: Handle = async ({ event, resolve }) => {
     supabaseUrl: PUBLIC_SUPABASE_URL,
     supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
     event,
-    cookieOptions: {
-      secure: !dev
-    },
+    cookieOptions: { secure: !dev },
   })
 
   event.locals.getSession = async () => {
