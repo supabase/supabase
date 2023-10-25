@@ -4,23 +4,23 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
   Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Button,
   Form,
   IconAlertCircle,
-  IconExternalLink,
   IconPackage,
   Listbox,
   Modal,
 } from 'ui'
 
 import { useParams } from 'common/hooks'
-import InformationBox from 'components/ui/InformationBox'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
 import { useProjectUpgradeMutation } from 'data/projects/project-upgrade-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useStore } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
-import { BREAKING_CHANGES } from './ProjectUpgradeAlert.constants'
 
 const ProjectUpgradeAlert = () => {
   const router = useRouter()
@@ -87,76 +87,88 @@ const ProjectUpgradeAlert = () => {
                         All services, including Auth, Rest, and Extensions will be upgraded. This
                         action cannot be undone.
                       </p>
-                      <Alert
-                        withIcon
-                        variant="info"
-                        title="Your project will be offline while the upgrade is in progress"
-                      >
-                        <p>
-                          Based on your current database's size it is estimated the upgrade will
-                          take up to:
-                        </p>
-                        <p className="text-sm text-green-900">
-                          {durationEstimateHours} hour{durationEstimateHours === 1 ? '' : 's'}
-                        </p>
-                        <p>
-                          It is advised to upgrade at a time when there will be minimal impact for
-                          your application.
-                        </p>
-                      </Alert>
-                      {(data?.potential_breaking_changes ?? []).length > 0 && (
-                        <Alert withIcon variant="danger" title="Breaking changes">
-                          <p className="mb-3">
-                            Your project will be upgraded across major versions of Postgres. This
-                            may involve breaking changes.
+                      <Alert_Shadcn_ title="Your project will be offline while the upgrade is in progress">
+                        <IconAlertCircle className="h-4 w-4" strokeWidth={2} />
+                        <AlertTitle_Shadcn_>
+                          Your project will be offline while the upgrade is in progress
+                        </AlertTitle_Shadcn_>
+                        <AlertDescription_Shadcn_>
+                          <p>
+                            Based on your current database's size it is estimated the upgrade will
+                            take up to:{' '}
+                            <span className="text-green-900">
+                              {durationEstimateHours} hour{durationEstimateHours === 1 ? '' : 's'}.
+                            </span>
+                            <br />
+                            It is advised to upgrade at a time when there will be minimal impact for
+                            your application.
                           </p>
+                        </AlertDescription_Shadcn_>
+                      </Alert_Shadcn_>
+                      {(data?.potential_breaking_changes ?? []).length > 0 && (
+                        <Alert_Shadcn_ variant="destructive" title="Breaking changes">
+                          <IconAlertCircle className="h-4 w-4" strokeWidth={2} />
+                          <AlertTitle_Shadcn_>Breaking changes</AlertTitle_Shadcn_>
+                          <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                            <p>
+                              Your project will be upgraded across major versions of Postgres. This
+                              may involve breaking changes.
+                            </p>
 
-                          <Link href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats">
-                            <a target="_blank" rel="noreferrer">
-                              <Button size="tiny" type="default">
-                                Visit our documentation to learn more about breaking changes
-                              </Button>
-                            </a>
-                          </Link>
-                        </Alert>
+                            <Link href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats">
+                              <a target="_blank" rel="noreferrer">
+                                <Button size="tiny" type="default">
+                                  Visit our documentation to learn more about breaking changes
+                                </Button>
+                              </a>
+                            </Link>
+                          </AlertDescription_Shadcn_>
+                        </Alert_Shadcn_>
                       )}
                       {legacyAuthCustomRoles.length > 0 && (
-                        <Alert
-                          withIcon
+                        <Alert_Shadcn_
                           variant="warning"
                           title="Custom Postgres roles using md5 authentication have been detected"
                         >
-                          <p className="mb-3">
-                            New Postgres versions use scram-sha-256 authentication by default and do
-                            not support md5, as it has been deprecated.
-                          </p>
-                          <p className="mb-3">
-                            After upgrading you will not be able to connect using the existing
-                            custom roles until they've been updated to use the new authentication
-                            method.
-                          </p>
-                          <p className="mb-1">
-                            You can do so by running the following commands after the upgrade:
-                          </p>
-                          <div className="flex items-baseline gap-2 mb-3">
-                            <code className="text-xs">
-                              {legacyAuthCustomRoles.map((role) => (
-                                <div key={role} className="pb-1">
-                                  ALTER ROLE <span className="text-green-900">{role}</span> WITH
-                                  ENCRYPTED PASSWORD '
-                                  <span className="text-green-900">newpassword</span>';
-                                </div>
-                              ))}
-                            </code>
-                          </div>
-                          <Link href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats">
-                            <a target="_blank" rel="noreferrer">
-                              <Button size="tiny" type="default">
-                                Visit our documentation to learn more about this
-                              </Button>
-                            </a>
-                          </Link>
-                        </Alert>
+                          <IconAlertCircle className="h-4 w-4" strokeWidth={2} />
+                          <AlertTitle_Shadcn_>
+                            Custom Postgres roles using md5 authentication have been detected
+                          </AlertTitle_Shadcn_>
+                          <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                            <p>
+                              New Postgres versions use scram-sha-256 authentication by default and
+                              do not support md5, as it has been deprecated.
+                            </p>
+                            <p>
+                              After upgrading you will not be able to connect using the existing
+                              custom roles until they've been updated to use the new authentication
+                              method.
+                            </p>
+                            <div>
+                              <p className="mb-1">
+                                You can do so by running the following commands after the upgrade:
+                              </p>
+                              <div className="flex items-baseline gap-2">
+                                <code className="text-xs">
+                                  {legacyAuthCustomRoles.map((role) => (
+                                    <div key={role} className="pb-1">
+                                      ALTER ROLE <span className="text-green-900">{role}</span> WITH
+                                      ENCRYPTED PASSWORD '
+                                      <span className="text-green-900">newpassword</span>';
+                                    </div>
+                                  ))}
+                                </code>
+                              </div>
+                            </div>
+                            <Link href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats">
+                              <a target="_blank" rel="noreferrer">
+                                <Button size="tiny" type="default">
+                                  Visit our documentation to learn more about this
+                                </Button>
+                              </a>
+                            </Link>
+                          </AlertDescription_Shadcn_>
+                        </Alert_Shadcn_>
                       )}
                       <Listbox
                         id="version"
