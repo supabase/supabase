@@ -1,5 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import clsx from 'clsx'
+import Link from 'next/link'
+
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import SparkBar from 'components/ui/SparkBar'
@@ -10,8 +12,8 @@ import {
   UsageMetric,
   useProjectUsageQuery,
 } from 'data/usage/project-usage-query'
+import { useIsFeatureEnabled } from 'hooks'
 import { formatBytes } from 'lib/helpers'
-import Link from 'next/link'
 import { Button, IconAlertTriangle, IconBarChart2 } from 'ui'
 import { USAGE_APPROACHING_THRESHOLD } from '../Billing.constants'
 import SectionContent from './SectionContent'
@@ -263,12 +265,14 @@ const UsageSection = ({
                           </p>
                         </div>
                       </div>
+
                       <Link
                         href={`/project/${projectRef}/settings/billing/subscription?panel=subscriptionPlan`}
+                        passHref
                       >
-                        <a>
-                          <Button type="primary">Upgrade plan</Button>
-                        </a>
+                        <Button type="primary" asChild>
+                          <a>Upgrade plan</a>
+                        </Button>
                       </Link>
                     </div>
                   </Panel.Content>

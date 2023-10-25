@@ -7,12 +7,14 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuItem,
   DropdownMenuTrigger,
   IconChevronLeft,
   IconChevronRight,
   IconChevronsDown,
   IconChevronsUp,
+  IconCode,
   IconColumns,
   IconEdit2,
   IconFolderPlus,
@@ -23,12 +25,36 @@ import {
   IconUpload,
   IconX,
   Input,
+  IconCheck,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuRadioItem,
 } from 'ui'
 
 import { useCheckPermissions } from 'hooks'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useAppStateSnapshot } from 'state/app-state'
+
+const VIEW_OPTIONS = [
+  { key: STORAGE_VIEWS.COLUMNS, name: 'As columns' },
+  { key: STORAGE_VIEWS.LIST, name: 'As list' },
+]
+
+const SORT_BY_OPTIONS = [
+  { key: STORAGE_SORT_BY.NAME, name: 'Name' },
+  { key: STORAGE_SORT_BY.CREATED_AT, name: 'Time created' },
+  { key: STORAGE_SORT_BY.UPDATED_AT, name: 'Time modified' },
+  { key: STORAGE_SORT_BY.LAST_ACCESSED_AT, name: 'Time last accessed' },
+]
+
+const SORT_ORDER_OPTIONS = [
+  { key: STORAGE_SORT_BY_ORDER.ASC, name: 'Ascending' },
+  { key: STORAGE_SORT_BY_ORDER.DESC, name: 'Descending' },
+]
 
 const HeaderPathEdit = ({ loading, isSearching, breadcrumbs, togglePathEdit }: any) => {
   return (
@@ -114,7 +140,9 @@ const FileExplorerHeader = ({
   onFilesUpload = noop,
 }: FileExplorerHeader) => {
   const debounceDuration = 300
+  const appSnap = useAppStateSnapshot()
   const snap = useStorageExplorerStateSnapshot()
+  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
 
   const [pathString, setPathString] = useState('')
   const [searchString, setSearchString] = useState('')
@@ -144,6 +172,7 @@ const FileExplorerHeader = ({
     addNewFolderPlaceholder,
     clearOpenedFolders,
     closeFilePreview,
+    selectedBucket,
   } = storageExplorerStore
 
   const breadcrumbs = columns.map((column: any) => column.name)
@@ -249,9 +278,9 @@ const FileExplorerHeader = ({
   return (
     <div
       className="
-    flex h-[40px]
+    flex h-[40px] pl-2
     items-center justify-between
-    rounded-t-md border-b border-panel-border-light bg-panel-header-light px-2 dark:border-panel-border-dark dark:bg-panel-header-dark"
+    rounded-t-md border-b border-panel-border-light bg-panel-header-light dark:border-panel-border-dark dark:bg-panel-header-dark"
     >
       {/* Navigation */}
       <div className={`flex items-center ${isEditingPath ? 'w-1/2' : ''}`}>
@@ -260,7 +289,7 @@ const FileExplorerHeader = ({
             icon={<IconChevronLeft size={16} strokeWidth={2} />}
             size="tiny"
             type="text"
-            className={breadcrumbs.length > 1 ? 'opacity-100' : 'opacity-25'}
+            className={`${breadcrumbs.length > 1 ? 'opacity-100' : 'opacity-25'} px-1`}
             disabled={backDisabled}
             onClick={() => {
               setIsEditingPath(false)
@@ -268,7 +297,6 @@ const FileExplorerHeader = ({
             }}
           />
         )}
-        {!snap.isSearching && <></>}
         {isEditingPath ? (
           <form className="ml-2 flex-grow">
             <Input
@@ -317,10 +345,9 @@ const FileExplorerHeader = ({
       </div>
 
       {/* Actions */}
-      <div className="flex items-center space-x-4">
-        <div className="flex items-center space-x-1">
+      <div className="flex items-center">
+        <div className="flex items-center space-x-1 px-2">
           <Button
-            className="mr-2"
             size="tiny"
             icon={<IconRefreshCw />}
             type="text"
@@ -329,93 +356,163 @@ const FileExplorerHeader = ({
           >
             Reload
           </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <Button
-                asChild
-                icon={
-                  view === 'LIST' ? (
-                    <IconList size={16} strokeWidth={2} />
-                  ) : (
-                    <IconColumns size={16} strokeWidth={2} />
-                  )
-                }
-                type="text"
-                disabled={breadcrumbs.length === 0}
-                onChange={setView}
-              >
-                <span>View as</span>
-              </Button>
-            </DropdownMenuTrigger>
 
-            <DropdownMenuContent>
-              <DropdownMenuRadioGroup key="viewOptions" value={view} onValueChange={setView}>
-                <DropdownMenuRadioItem value={STORAGE_VIEWS.COLUMNS}>Columns</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value={STORAGE_VIEWS.LIST}>List</DropdownMenuRadioItem>
-              </DropdownMenuRadioGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <Button
-                asChild
-                icon={<IconChevronsDown size={16} strokeWidth={2} />}
-                type="text"
-                disabled={breadcrumbs.length === 0}
-              >
-                <span>Sort by</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuRadioGroup key="sortOptions" value={sortBy} onValueChange={setSortBy}>
-                <DropdownMenuRadioItem value={STORAGE_SORT_BY.NAME}>Name</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value={STORAGE_SORT_BY.CREATED_AT}>
-                  Time created
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value={STORAGE_SORT_BY.UPDATED_AT}>
-                  Time modified
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value={STORAGE_SORT_BY.LAST_ACCESSED_AT}>
-                  Time last accessed
-                </DropdownMenuRadioItem>
-              </DropdownMenuRadioGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <Button
-                asChild
-                icon={
-                  sortByOrder === STORAGE_SORT_BY_ORDER.DESC ? (
-                    <IconChevronsDown size={16} strokeWidth={2} />
-                  ) : (
-                    <IconChevronsUp size={16} strokeWidth={2} />
-                  )
-                }
-                type="text"
-                disabled={breadcrumbs.length === 0}
-              >
-                <span>Sort Order</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuRadioGroup
-                key="sortOrderOptions"
-                value={sortByOrder}
-                onValueChange={setSortByOrder}
-              >
-                <DropdownMenuRadioItem value={STORAGE_SORT_BY_ORDER.ASC}>
-                  Ascending
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value={STORAGE_SORT_BY_ORDER.DESC}>
-                  Descending
-                </DropdownMenuRadioItem>
-              </DropdownMenuRadioGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {isNewAPIDocsEnabled ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="text"
+                  icon={
+                    view === 'LIST' ? (
+                      <IconList size={16} strokeWidth={2} />
+                    ) : (
+                      <IconColumns size={16} strokeWidth={2} />
+                    )
+                  }
+                >
+                  View
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-40 min-w-0">
+                {VIEW_OPTIONS.map((option) => (
+                  <DropdownMenuItem key={option.key} onClick={() => setView(option.key)}>
+                    <div className="flex items-center justify-between w-full">
+                      <p>{option.name}</p>
+                      {view === option.key && <IconCheck className="text-brand" strokeWidth={2} />}
+                    </div>
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuSeparator />
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>Sort by</DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent className="w-44">
+                    {SORT_BY_OPTIONS.map((option) => (
+                      <DropdownMenuItem key={option.key} onClick={() => setSortBy(option.key)}>
+                        <div className="flex items-center justify-between w-full">
+                          <p>{option.name}</p>
+                          {sortBy === option.key && (
+                            <IconCheck className="text-brand" strokeWidth={2} />
+                          )}
+                        </div>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>Sort order</DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
+                    {SORT_ORDER_OPTIONS.map((option) => (
+                      <DropdownMenuItem key={option.key} onClick={() => setSortByOrder(option.key)}>
+                        <div className="flex items-center justify-between w-full">
+                          <p>{option.name}</p>
+                          {sortByOrder === option.key && (
+                            <IconCheck className="text-brand" strokeWidth={2} />
+                          )}
+                        </div>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <>
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <Button
+                    asChild
+                    icon={
+                      view === 'LIST' ? (
+                        <IconList size={16} strokeWidth={2} />
+                      ) : (
+                        <IconColumns size={16} strokeWidth={2} />
+                      )
+                    }
+                    type="text"
+                    disabled={breadcrumbs.length === 0}
+                    onChange={setView}
+                  >
+                    <span>View as</span>
+                  </Button>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent>
+                  <DropdownMenuRadioGroup key="viewOptions" value={view} onValueChange={setView}>
+                    <DropdownMenuRadioItem value={STORAGE_VIEWS.COLUMNS}>
+                      Columns
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value={STORAGE_VIEWS.LIST}>List</DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <Button
+                    asChild
+                    icon={<IconChevronsDown size={16} strokeWidth={2} />}
+                    type="text"
+                    disabled={breadcrumbs.length === 0}
+                  >
+                    <span>Sort by</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuRadioGroup
+                    key="sortOptions"
+                    value={sortBy}
+                    onValueChange={setSortBy}
+                  >
+                    <DropdownMenuRadioItem value={STORAGE_SORT_BY.NAME}>Name</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value={STORAGE_SORT_BY.CREATED_AT}>
+                      Time created
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value={STORAGE_SORT_BY.UPDATED_AT}>
+                      Time modified
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value={STORAGE_SORT_BY.LAST_ACCESSED_AT}>
+                      Time last accessed
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <Button
+                    asChild
+                    icon={
+                      sortByOrder === STORAGE_SORT_BY_ORDER.DESC ? (
+                        <IconChevronsDown size={16} strokeWidth={2} />
+                      ) : (
+                        <IconChevronsUp size={16} strokeWidth={2} />
+                      )
+                    }
+                    type="text"
+                    disabled={breadcrumbs.length === 0}
+                  >
+                    <span>Sort Order</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuRadioGroup
+                    key="sortOrderOptions"
+                    value={sortByOrder}
+                    onValueChange={setSortByOrder}
+                  >
+                    <DropdownMenuRadioItem value={STORAGE_SORT_BY_ORDER.ASC}>
+                      Ascending
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value={STORAGE_SORT_BY_ORDER.DESC}>
+                      Descending
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          )}
         </div>
-        <div className="h-6 border-r border-panel-border-light dark:border-panel-border-dark" />
-        <div className="flex items-center space-x-1">
+
+        <div className="h-6 border-r border-scale-600" />
+        <div className="flex items-center space-x-1 px-2">
           <div className="hidden">
             {/* @ts-ignore */}
             <input ref={uploadButtonRef} type="file" multiple onChange={onFilesUpload} />
@@ -481,7 +578,7 @@ const FileExplorerHeader = ({
         </div>
 
         <div className="h-6 border-r border-scale-600" />
-        <div className="flex items-center pr-1.5">
+        <div className="flex items-center px-2">
           {snap.isSearching ? (
             <Input
               size="tiny"
@@ -512,6 +609,24 @@ const FileExplorerHeader = ({
             />
           )}
         </div>
+
+        {isNewAPIDocsEnabled && (
+          <>
+            <div className="h-6 border-r border-scale-600" />
+            <Button
+              size="tiny"
+              className="mx-2"
+              type="default"
+              icon={<IconCode size={14} strokeWidth={2} />}
+              onClick={() => {
+                appSnap.setActiveDocsSection(['storage', selectedBucket.name])
+                appSnap.setShowProjectApiDocs(true)
+              }}
+            >
+              API
+            </Button>
+          </>
+        )}
       </div>
     </div>
   )

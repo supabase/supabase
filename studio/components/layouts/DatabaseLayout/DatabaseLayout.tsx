@@ -6,6 +6,7 @@ import ProductMenu from 'components/ui/ProductMenu'
 import { useSelectedProject, useStore, withAuth } from 'hooks'
 import ProjectLayout from '../'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 export interface DatabaseLayoutProps {
   title?: string
@@ -21,6 +22,7 @@ const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) =>
   const vaultExtension = meta.extensions.byId('supabase_vault')
   const isVaultEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
   const pgNetExtensionExists = meta.extensions.byId('pg_net') !== undefined
+  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
 
   useEffect(() => {
     if (ui.selectedProjectRef) {
@@ -41,7 +43,10 @@ const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) =>
     <ProjectLayout
       product="Database"
       productMenu={
-        <ProductMenu page={page} menu={generateDatabaseMenu(project, { pgNetExtensionExists })} />
+        <ProductMenu
+          page={page}
+          menu={generateDatabaseMenu(project, { pgNetExtensionExists, isNewAPIDocsEnabled })}
+        />
       }
     >
       <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">

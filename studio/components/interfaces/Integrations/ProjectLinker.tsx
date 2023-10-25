@@ -1,7 +1,8 @@
-import { ReactNode, useRef, useState } from 'react'
+import { ReactNode, useEffect, useRef, useState } from 'react'
 import { toast } from 'react-hot-toast'
 import {
   Button,
+  cn,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
@@ -12,7 +13,6 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
-  cn,
 } from 'ui'
 
 import ShimmerLine from 'components/ui/ShimmerLine'
@@ -79,9 +79,18 @@ const ProjectLinker = ({
   const [supabaseProjectRef, setSupabaseProjectRef] = useState<string | undefined>(
     defaultSupabaseProjectRef
   )
+  useEffect(() => {
+    if (defaultSupabaseProjectRef !== undefined && supabaseProjectRef === undefined)
+      setSupabaseProjectRef(defaultSupabaseProjectRef)
+  }, [defaultSupabaseProjectRef, supabaseProjectRef])
+
   const [foreignProjectId, setForeignProjectId] = useState<string | undefined>(
     defaultForeignProjectId
   )
+  useEffect(() => {
+    if (defaultForeignProjectId !== undefined && foreignProjectId === undefined)
+      setForeignProjectId(defaultForeignProjectId)
+  }, [defaultForeignProjectId, foreignProjectId])
 
   // create a flat array of foreign project ids. ie, ["prj_MlkO6AiLG5ofS9ojKrkS3PhhlY3f", ..]
   const flatInstalledConnectionsIds = new Set(installedConnections.map((x) => x.foreign_project_id))
@@ -150,12 +159,12 @@ const ProjectLinker = ({
 
         {loadingForeignProjects || loadingSupabaseProjects ? (
           <div className="w-1/2 mx-auto space-y-2 py-4">
-            <p className="text text-center">Loading projects</p>
+            <p className="text-foreground text-center">Loading projects</p>
             <ShimmerLine active />
           </div>
         ) : noSupabaseProjects || noForeignProjects ? (
           <div className="text-center">
-            <h5 className="text">No {missingEntity} Projects found</h5>
+            <h5 className="text-foreground">No {missingEntity} Projects found</h5>
             <p className="text-light text-sm">
               You will need to create a {missingEntity} Project to link to a {oppositeMissingEntity}{' '}
               Project.

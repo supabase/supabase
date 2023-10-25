@@ -6,8 +6,7 @@ import {
   UseQueryOptions,
 } from '@tanstack/react-query'
 import md5 from 'blueimp-md5'
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { post as newPost } from 'data/fetchers'
 import { useCallback } from 'react'
 import { sqlKeys } from './keys'
 
@@ -34,33 +33,28 @@ export async function executeSql(
   >,
   signal?: AbortSignal
 ) {
-  if (!projectRef) {
-    throw new Error('projectRef is required')
-  }
+  if (!projectRef) throw new Error('projectRef is required')
 
   let headers = new Headers()
+  if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
-  if (connectionString) {
-    headers.set('x-connection-encrypted', connectionString)
+  const { data, error } = await newPost('/platform/pg-meta/{ref}/query', {
+    signal,
+    params: {
+      header: { 'x-connection-encrypted': connectionString ?? '' },
+      path: { ref: projectRef },
+      // @ts-ignore: This is just a client side thing to identify queries better
+      query: { key: queryKey?.filter((seg) => typeof seg === 'string').join('-') ?? '' },
+    },
+    body: { query: sql },
+    headers: Object.fromEntries(headers),
+  })
+
+  if (error) {
+    if (handleError !== undefined) return handleError(error)
+    else throw error
   }
-
-  const response = await post(
-    `${API_URL}/pg-meta/${projectRef}/query${
-      queryKey ? `?key=${queryKey.filter((seg) => typeof seg === 'string').join('-')}` : ''
-    }`,
-    { query: sql },
-    { headers: Object.fromEntries(headers), signal }
-  )
-
-  if (response.error) {
-    if (handleError !== undefined) {
-      return handleError(response.error)
-    } else {
-      throw response.error
-    }
-  }
-
-  return { result: response }
+  return { result: data }
 }
 
 export type ExecuteSqlData = Awaited<ReturnType<typeof executeSql>>

@@ -1,27 +1,33 @@
 import Link from 'next/link'
-import IntegrationsImage from '~/components/Products/VectorAI/IntegrationsImage'
 import OpenAIImage from '~/components/Products/VectorAI/OpenAIImage'
 import SecureAndScalableImg from '~/components/Products/VectorAI/SecureAndScalableImg'
 import PGvectorImg from '~/components/Products/VectorAI/PGvectorImg'
 import DeployGlobally from '~/components/Products/VectorAI/DeployGlobally'
+import IntegrationsImage from '~/components/Products/VectorAI/IntegrationsImage'
 
-export default {
+export default (isMobile?: boolean) => ({
   metaTitle: '',
   metaDescription: '',
   heroSection: {
+    announcement: {
+      url: 'https://youtu.be/qw4PrtyvJI0?t=10584',
+      badge: 'AI Engineer Summit',
+      announcement: "Watch our CEO's talk",
+      target: '_blank',
+      hasArrow: !isMobile,
+    },
     title: 'Supabase Vector',
     h1: (
       <span key={'vector-h1'} className="heading-gradient">
-        The Postgres Vector database <br />
+        The Postgres Vector database <br className="hidden md:block" />
         and AI Toolkit
       </span>
     ),
     subheader: (
       <>
         An open source Vector database for developing AI applications.
-        <br className="hidden md:block" />
-        Use pgvector to store, index, and access embeddings, and our AI toolkit to build AI
-        applications with Hugging Face and OpenAI.
+        <br className="hidden md:block" /> Use pgvector to store, index, and access embeddings, and
+        our AI toolkit to build AI applications with Hugging Face and OpenAI.
       </>
     ),
     image: '/images/product/vector/vector-hero.svg',
@@ -50,17 +56,8 @@ export default {
       },
       {
         title: 'Secure and Scalable',
-        paragraph: (
-          <>
-            Supabase is{' '}
-            <Link href="https://forms.supabase.com/soc2">
-              <a className="text-scale-1100 hover:underline" target="_blank">
-                SOC2 type 2
-              </a>
-            </Link>{' '}
-            compliant, and comes with an advanced permissions system.
-          </>
-        ),
+        paragraph:
+          'Supabase is SOC2 type 2 compliant, and comes with an advanced permissions system.',
         image: SecureAndScalableImg,
       },
       {
@@ -73,7 +70,7 @@ export default {
   },
   integrations: {
     title: 'Leverage the tools you love',
-    image: <IntegrationsImage />,
+    image: IntegrationsImage,
   },
   useCasesSection: {
     title: (
@@ -331,4 +328,4 @@ docs.query(
       },
     ],
   },
-}
+})
