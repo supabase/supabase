@@ -5,6 +5,7 @@ import { LogData } from 'components/interfaces/Settings/Logs'
 import { uuidv4 } from 'lib/helpers'
 import { EMPTY_ARR } from 'lib/void'
 import { useCallback, useEffect, useReducer, useState } from 'react'
+import { useProjectApiQuery } from 'data/config/project-api-query'
 
 function reducer(
   state: LogData[],
@@ -63,7 +64,17 @@ export const useRealtimeEvents = ({
   enableDbChanges,
   enableBroadcast,
 }: RealtimeConfig) => {
-  const host = `https://${projectRef}.supabase.co`
+  // the default host is prod until the correct one comes through an API call.
+  const [host, setHost] = useState(`https://${projectRef}.supabase.co`)
+  useProjectApiQuery(
+    { projectRef: projectRef },
+    {
+      onSuccess: (data) => {
+        setHost(`${data.autoApiService.protocol}://${data.autoApiService.endpoint}`)
+      },
+    }
+  )
+
   const [logData, dispatch] = useReducer(reducer, [] as LogData[])
   const pushEvent = (eventType: string, metadata: any) => {
     dispatch({ type: 'add', payload: { eventType, metadata } })
