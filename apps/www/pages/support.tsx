@@ -69,14 +69,14 @@ const Index = () => {
                   rounded"
               >
                 <div className="flex items-center flex-1 space-x-2">
-                  <IconSearch className="text-light" size={18} strokeWidth={2} />
+                  <IconSearch className="text-foreground-light" size={18} strokeWidth={2} />
                   <p
                     ref={typerRef}
-                    className="text-lighter text-sm group-hover:text-light transition"
+                    className="text-foreground-lighter text-sm group-hover:text-foreground-light transition"
                   />
                 </div>
                 <div className="flex items-center h-full space-x-1">
-                  <div className="hidden text-lighter md:flex items-center justify-center h-5 w-10 border rounded bg-surface-300 border-foreground-lighter/30 gap-1">
+                  <div className="hidden text-foreground-lighter md:flex items-center justify-center h-5 w-10 border rounded bg-surface-300 border-foreground-lighter/30 gap-1">
                     <IconCommand size={12} strokeWidth={1.5} />
                     <span className="text-[12px]">K</span>
                   </div>
@@ -95,7 +95,7 @@ const Index = () => {
               <div className="mb-4 lg:mb-8 flex-1">
                 <h2 className="text text-lg font-medium">{card.title}</h2>
                 <div className="my-2 block">
-                  <p className="text-light">{card.paragraph}</p>
+                  <p className="text-foreground-light">{card.paragraph}</p>
                 </div>
               </div>
               <div className="flex gap-2">

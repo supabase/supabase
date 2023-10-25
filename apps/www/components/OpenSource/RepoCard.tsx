@@ -38,8 +38,8 @@ const RepoCard = ({ repo, activeTab, index }: { repo: any; activeTab: number; in
               {repo.name}
             </p>
           </div>
-          <p className="text-sm flex-1 text-lighter">{repo.description}</p>
-          <div className="text-sm w-full flex justify-between text-lighter mt-8">
+          <p className="text-sm flex-1 text-foreground-lighter">{repo.description}</p>
+          <div className="text-sm w-full flex justify-between text-foreground-lightround-lighter mt-8">
             <p className="">{repo.full_name}</p>
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-1">

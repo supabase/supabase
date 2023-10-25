@@ -134,7 +134,9 @@ const LayoutComparison = ({ components, props }: Props) => {
               <MDXRemote {...content} components={components} />
             </div>
             <div className="py-16">
-              <div className="text-muted dark:text-lighter text-sm">Share this article</div>
+              <div className="text-muted dark:text-foreground-lighter text-sm">
+                Share this article
+              </div>
               <div className="mt-4 flex items-center space-x-4">
                 <Link
                   passHref

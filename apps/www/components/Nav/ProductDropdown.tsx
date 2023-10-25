@@ -35,7 +35,7 @@ const ProductDropdown = () => {
       <div className="bg-overlay border-t xl:border-t-0 xl:border-l py-8 px-10 gap-8 grid grid-cols-5 xl:flex xl:flex-col w-full xl:w-[500px]">
         <div className="col-span-3 xl:w-auto">
           <Link href="/customers">
-            <a className="group flex items-center gap-1 text-lighter hover:text-foreground text-xs uppercase tracking-widest font-mono mb-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm focus-visible:text-foreground">
+            <a className="group flex items-center gap-1 text-foreground-lighter hover:text-foreground text-xs uppercase tracking-widest font-mono mb-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm focus-visible:text-foreground">
               Customer Stories
               <IconChevronRight className="h-3 w-3 transition-transform will-change-transform -translate-x-1 group-hover:translate-x-0" />
             </a>
@@ -55,7 +55,7 @@ const ProductDropdown = () => {
                       />
                     </div>
                     <div className="flex flex-col">
-                      <h4 className="text-light group-hover:text-foreground group-focus-visible:text-foreground text-normal mb-0 text-sm">
+                      <h4 className="text-foreground-light group-hover:text-foreground group-focus-visible:text-foreground text-normal mb-0 text-sm">
                         {customer.title}
                       </h4>
                     </div>
@@ -66,7 +66,7 @@ const ProductDropdown = () => {
           </ul>
         </div>
         <div className="col-span-2">
-          <p className="text-lighter text-xs uppercase tracking-widest font-mono mb-6">
+          <p className="text-foreground-lightround-lighter text-xs uppercase tracking-widest font-mono mb-6">
             {ComparisonsData.label}
           </p>
           <ul className="flex flex-col gap-2">

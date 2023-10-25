@@ -129,7 +129,7 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
           align === 'Left' ? 'text-center xl:text-left' : 'text-center'
         )}
       >
-        <p className="text-lighter text-base max-w-[420px]">
+        <p className="text-foreground-lighter text-base max-w-[420px]">
           Register to get your ticket and stay tuned all week for daily announcements
         </p>
       </div>

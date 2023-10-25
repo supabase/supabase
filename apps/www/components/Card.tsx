@@ -57,7 +57,7 @@ const Card = (props: Props) => {
       className="relative flex transform flex-col overflow-hidden rounded-md shadow-lg transition hover:-translate-y-1 hover:shadow-2xl"
     >
       <div className="flex-shrink-0">
-        <img className="h-64 w-full text-light object-cover" src={imgUrl} alt={title} />
+        <img className="h-64 w-full text-foreground-light object-cover" src={imgUrl} alt={title} />
       </div>
       <div className="bg-surface-100 flex flex-1 flex-col justify-between p-8">
         <div className="flex-1">
@@ -66,11 +66,11 @@ const Card = (props: Props) => {
               {iconMarkup}
             </div>
           )} */}
-          <p className="font-base text-lighter text-sm capitalize">{type}</p>
+          <p className="font-base text-foreground-lighter text-sm capitalize">{type}</p>
           <div className="mt-2 flex h-32 flex-col justify-between">
             {/* {logoUrl && <img src={logoUrl} className="h-9 my-4" />} */}
             {title && <p className="text-xl text-foreground">{title}</p>}
-            <p className="text-lighter mt-3 text-base">
+            <p className="text-foreground-lighter mt-3 text-base">
               {type !== 'Project Example' ? postMeta.publishDate : description}
             </p>
           </div>
@@ -83,7 +83,7 @@ const Card = (props: Props) => {
             </div>
             <div className="ml-3">
               <p className="text-sm font-medium text-foreground">{postMeta.name}</p>
-              <div className="text-lighter flex space-x-1 text-sm">
+              <div className="text-foreground-lighter flex space-x-1 text-sm">
                 <time dateTime="2020-03-16">{postMeta.publishDate}</time>
                 <span aria-hidden="true">&middot;</span>
                 <span>{postMeta.readLength} min read</span>

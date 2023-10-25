@@ -219,7 +219,7 @@ const SideBarContent = observer(() => {
                     </div>
                   ) : (
                     <div className="text-foreground text-sm h-32 border border-dashed flex flex-col gap-3 items-center justify-center px-3 mx-3 rounded">
-                      <span className="text-lighter">No queries found</span>
+                      <span className="text-foreground-lighter">No queries found</span>
                     </div>
                   )}
                 </div>
@@ -288,7 +288,7 @@ const SideBarContent = observer(() => {
                     </div>
                   ) : (
                     <div className="text-foreground text-sm h-32 border border-dashed flex flex-col gap-3 items-center justify-center px-3 mx-3 rounded">
-                      <span className="text-lighter">No queries found</span>
+                      <span className="text-foreground-lighter">No queries found</span>
                     </div>
                   )}
                 </div>
@@ -355,7 +355,7 @@ const SideBarContent = observer(() => {
                 ) : (
                   <div className="text-foreground text-sm h-32 border border-dashed flex flex-col gap-3 items-center justify-center px-3 mx-3 rounded">
                     {filteredFavoriteSnippets.length === 0 && (
-                      <span className="text-lighter">No queries found</span>
+                      <span className="text-foreground-lighter">No queries found</span>
                     )}
                     <Button type="default" onClick={() => handleNewQuery()}>
                       New Query

@@ -86,7 +86,7 @@ const TopNavBar: FC = () => {
               border
               transition
               border-scale-500 pl-1.5 md:pl-3 pr-1.5 w-full h-[32px] rounded
-              text-lighter
+              text-foreground-lighter
               "
             >
               <div className="flex items-center space-x-2">

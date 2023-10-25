@@ -102,7 +102,7 @@ const Partners = () => {
               <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-.5px]">
                 Explore our marketplace
               </h2>
-              <p className="text-lighter text-xs sm:text-sm lg:text-base py-3 lg:max-w-md">
+              <p className="text-foreground-lighter text-xs sm:text-sm lg:text-base py-3 lg:max-w-md">
                 Discover how technology and consulting partners are already working with Supabase.
               </p>
               <TextLink

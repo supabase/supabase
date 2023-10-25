@@ -118,7 +118,7 @@ const BranchManagement = () => {
   if (!hasBranchEnabled) {
     return (
       <ProductEmptyState title="Database Branching">
-        <p className="text-sm text-light">
+        <p className="text-sm text-foreground-light">
           {hasAccessToBranching
             ? 'Create preview branches to experiment changes to your database schema in a safe, non-destructible environment.'
             : "Register for early access and you'll be contacted by email when your organization is enrolled in database branching."}
@@ -232,7 +232,7 @@ const BranchManagement = () => {
               <li className="flex gap-3">
                 <div>
                   <strong className="text-sm">Before you disable branching, consider:</strong>
-                  <ul className="space-y-2 mt-2 text-sm text-light">
+                  <ul className="space-y-2 mt-2 text-sm text-foreground-light">
                     <li className="list-disc ml-6">
                       Your project no longer requires database previews.
                     </li>

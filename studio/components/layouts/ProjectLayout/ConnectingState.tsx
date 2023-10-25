@@ -70,7 +70,7 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
 
               <div className="space-y-1">
                 <p className="text-center">Connecting to {project.name}</p>
-                <p className="text-center text-sm text-light">
+                <p className="text-center text-sm text-foreground-light">
                   If you are unable to connect after a few minutes, check your project's health to
                   verify if it's running into any resource constraints.
                 </p>

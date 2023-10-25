@@ -70,7 +70,7 @@ const ProductCard = ({
           </div>
           <h2 className="text-xl">{title}</h2>
           <div className="flex-1 flex flex-col justify-between gap-2">
-            <p className="text-sm text-lighter">{subtitle}</p>
+            <p className="text-sm text-foreground-lighter">{subtitle}</p>
             {highlights && <span className="hidden lg:block">{highlights}</span>}
           </div>
         </div>

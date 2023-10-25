@@ -104,10 +104,10 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
               </Badge>
             </div>
             <div className="flex flex-col gap-0">
-              <span className="text-lighter text-xs">
+              <span className="text-foreground-lighter text-xs">
                 Created {dayjs(integration.inserted_at).fromNow()}
               </span>
-              <span className="text-lighter text-xs">
+              <span className="text-foreground-lighter text-xs">
                 Added by {integration?.added_by?.primary_email}
               </span>
             </div>
@@ -228,7 +228,7 @@ const IntegrationConnectionOption = React.forwardRef<HTMLLIElement, IntegrationC
             <span className="text-sm">{connection.metadata.name}</span>
           </div>
 
-          <span className="text-lighter text-xs">
+          <span className="text-foreground-lighter text-xs">
             Connected {dayjs(connection.inserted_at).fromNow()}
           </span>
         </div>

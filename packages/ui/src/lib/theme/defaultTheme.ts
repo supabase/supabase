@@ -187,7 +187,7 @@ export default {
     justified: `justify-between`,
     chevron: {
       base: `
-        text-lighter
+        text-foreground-lighter
         rotate-0
         group-state-open:rotate-180
         group-data-[state=open]:rotate-180
@@ -219,7 +219,7 @@ export default {
     color: {
       brand: 'bg-brand-500 text-brand-600 border border-brand-400',
       brandAlt: 'bg-brand bg-opacity-100 text-background border border-brand',
-      scale: 'bg-background text-light border border-strong',
+      scale: 'bg-background text-foreground-light border border-strong',
       tomato: `bg-tomato-200 text-tomato-1100 border border-tomato-700`,
       red: `bg-red-200 text-red-1100 border border-red-700`,
       crimson: `bg-crimson-200 text-crimson-1100 border border-crimson-700`,
@@ -266,9 +266,9 @@ export default {
       },
       info: {
         base: `bg-alternative border-alternative`,
-        icon: `text-lighter`,
+        icon: `text-foreground-lighter`,
         header: `text-foreground`,
-        description: `text-light`,
+        description: `text-foreground-light`,
       },
       success: {
         base: `bg-brand-300 dark:bg-brand-100 border-brand-400`,
@@ -280,7 +280,7 @@ export default {
         base: `bg-surface-100 border-border`,
         icon: `text-muted`,
         header: `text-foreground`,
-        description: `text-light`,
+        description: `text-foreground-light`,
       },
     },
     close: `
@@ -328,7 +328,7 @@ export default {
       base: `
         relative
         cursor-pointer
-        text-lighter
+        text-foreground-lighter
         flex
         items-center
         space-x-2
@@ -498,7 +498,7 @@ export default {
     disabled: 'opacity-50',
     actions_container: 'absolute inset-y-0 right-0 pl-3 pr-1 mr-5 flex items-center',
     chevron_container: 'absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none',
-    chevron: 'h-5 w-5 text-lighter',
+    chevron: 'h-5 w-5 text-foreground-lighter',
   },
 
   /*
@@ -586,7 +586,7 @@ export default {
     },
     disabled: 'opacity-50',
     label: {
-      base: `text-light cursor-pointer`,
+      base: `text-foreground-light cursor-pointer`,
       ...defaults.size.text,
     },
     label_before: {
@@ -598,7 +598,7 @@ export default {
       ...defaults.size.text,
     },
     description: {
-      base: `text-lighter`,
+      base: `text-foreground-lighter`,
       ...defaults.size.text,
     },
     group: `space-y-3`,
@@ -824,7 +824,7 @@ export default {
       },
     },
     label: {
-      base: `text-light cursor-pointer`,
+      base: `text-foreground-light cursor-pointer`,
       ...defaults.size.text,
     },
     label_before: {
@@ -836,11 +836,11 @@ export default {
       ...defaults.size.text,
     },
     description: {
-      base: `text-lighter`,
+      base: `text-foreground-lighter`,
       ...defaults.size.text,
     },
     optionalLabel: {
-      base: `text-lighter`,
+      base: `text-foreground-lighter`,
       ...defaults.size.text,
     },
     disabled: `opacity-50 cursor-auto border-dashed`,
@@ -1008,31 +1008,31 @@ export default {
     data_input_vertical_layout__align_right: 'text-right',
 
     label: {
-      base: 'block text-light',
+      base: 'block text-foreground-light',
       size: {
         ...defaults.size.text,
       },
     },
     label_optional: {
-      base: 'text-lighter',
+      base: 'text-foreground-lighter',
       size: {
         ...defaults.size.text,
       },
     },
     description: {
-      base: 'mt-2 text-lighter leading-normal',
+      base: 'mt-2 text-foreground-lighter leading-normal',
       size: {
         ...defaults.size.text,
       },
     },
     label_before: {
-      base: 'text-lighter ',
+      base: 'text-foreground-lighter ',
       size: {
         ...defaults.size.text,
       },
     },
     label_after: {
-      base: 'text-lighter',
+      base: 'text-foreground-lighter',
       size: {
         ...defaults.size.text,
       },
@@ -1109,7 +1109,7 @@ export default {
     `,
     close: `
       transition
-      text-lighter
+      text-foreground-lighter
     `,
     separator: `
       w-full
@@ -1134,12 +1134,12 @@ export default {
       `,
       content: {
         base: `transition truncate text-sm w-full`,
-        normal: `text-light group-hover:text-foreground`,
+        normal: `text-foreground-light group-hover:text-foreground`,
         active: `text-foreground font-semibold`,
       },
       icon: {
         base: `transition truncate text-sm`,
-        normal: `text-lighter group-hover:text-light`,
+        normal: `text-foreground-lighter group-hover:text-foreground-light`,
         active: `text-foreground`,
       },
       variants: {
@@ -1189,7 +1189,7 @@ export default {
           active: `
             font-semibold
             bg-surface-200
-            text-lighter
+            text-foreground-lighter
             z-10
 
             rounded-md
@@ -1203,8 +1203,8 @@ export default {
         mb-2
         font-normal
       `,
-      icon: `text-lighter`,
-      content: `text-sm text-lighter w-full`,
+      icon: `text-foreground-lighter`,
+      content: `text-sm text-foreground-lighter w-full`,
       variants: {
         text: ``,
         pills: `px-3`,
@@ -1385,7 +1385,7 @@ export default {
     absolute inset-y-0
     left-0 pl-3 flex
     items-center pointer-events-none
-    text-light
+    text-foreground-light
     `,
   },
 

@@ -165,7 +165,7 @@ const GridHeaderActions = ({ table, openAPIDocsPanel, refreshDocs }: GridHeaderA
           icon={
             <MousePointer2
               size={14}
-              className={isRealtimeEnabled ? 'text-brand' : 'text-lighter'}
+              className={isRealtimeEnabled ? 'text-brand' : 'text-foreground-lighter'}
             />
           }
           onClick={() => setShowEnableRealtime(true)}

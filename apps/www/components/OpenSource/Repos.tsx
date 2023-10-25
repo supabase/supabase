@@ -19,7 +19,9 @@ const Tab = ({ isActive, label, icon, onClick }: TabProps) => (
   <button
     onClick={onClick}
     className={`rounded-full px-4 md:px-3 py-2 md:py-1 nowrap flex group gap-1 transition-all ${
-      isActive ? 'text-strong bg-surface-300' : 'text-lighter bg-surface-200 hover:bg-overlay-hover'
+      isActive
+        ? 'text-strong bg-surface-300'
+        : 'text-foreground-lighter bg-surface-200 hover:bg-overlay-hover'
     }`}
     aria-selected={isActive}
     role="tab"
@@ -30,7 +32,7 @@ const Tab = ({ isActive, label, icon, onClick }: TabProps) => (
           width="16"
           height="16"
           viewBox="0 0 16 16"
-          fill="none"
+          fill="none"text-foreground-light
           xmlns="http://www.w3.org/2000/svg"
           className={cn('text-light shrink-0', isActive && 'text-brand')}
         >
@@ -103,15 +105,21 @@ const Repos = ({ tabs }: Props) => {
 
   return (
     <div className="flex flex-col gap-8 xl:gap-10">
-      <div className="flex mx-auto items-center gap-6 text-sm sm:gap-8">
+      <div className="fltext-foreground-light items-center gap-6 text-sm sm:gap-8">
         <Link href="https://github.com/supabase/supabase/blob/master/DEVELOPERS.md">
-          <a className="text-lighter hover:underline flex gap-1 items-center" target="_blank">
-            <GitHubIcon />
+          <a
+            className="text-foreground-lighter hover:underline flex gap-1 items-center"
+            target="_blank"
+          >
+            <GitHubIcon text-foreground-light
             How to contribute
           </a>
         </Link>
         <Link href="https://github.com/supabase/.github/blob/main/CODE_OF_CONDUCT.md">
-          <a className="text-lighter hover:underline flex gap-1 items-center" target="_blank">
+          <a
+            className="text-foreground-lighter hover:underline flex gap-1 items-center"
+            target="_blank"
+          >
             <GitHubIcon />
             Code of Conduct
           </a>

@@ -188,7 +188,7 @@ You can change the scope of the access for Supabase by configuring
             </div>
           )}
           {VercelContentSectionBottom && (
-            <Markdown content={VercelContentSectionBottom} className="text-lighter" />
+            <Markdown content={VercelContentSectionBottom} className="text-foreground-lighter" />
           )}
         </ScaffoldSectionContent>
       </ScaffoldSection>

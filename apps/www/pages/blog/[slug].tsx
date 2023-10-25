@@ -142,7 +142,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
           <div className="border-scale-500 hover:bg-scale-100 dark:hover:bg-scale-300 cursor-pointer rounded border p-6 transition">
             <div className="space-y-4">
               <div>
-                <p className="text-lighter text-sm">{label}</p>
+                <p className="text-foreground-lighter text-sm">{label}</p>
               </div>
               <div>
                 <h4 className="text-foreground text-lg">{post.title}</h4>
@@ -242,7 +242,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
               <p>
                 <a
                   href={'/blog'}
-                  className="text-lighter hover:text-foreground flex cursor-pointer items-center text-sm transition"
+                  className="text-foreground-lightround-lighter hover:text-foreground flex cursor-pointer items-center text-sm transition"
                 >
                   <IconChevronLeft style={{ padding: 0 }} />
                   Back
@@ -255,7 +255,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                 <div className="space-y-4">
                   <p className="text-brand">Blog post</p>
                   <h1 className="h1">{props.blog.title}</h1>
-                  <div className="text-light flex space-x-3 text-sm">
+                  <div className="text-foreground-light flex space-x-3 text-sm">
                     <p>{props.blog.date}</p>
                     <p>•</p>
                     <p>{generateReadingTime(props.blog.source)}</p>
@@ -284,7 +284,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                                     <span className="text-foreground mb-0 text-sm">
                                       {author.author}
                                     </span>
-                                    <span className="text-lighter mb-0 text-xs">
+                                    <span className="text-foreground-lightround-lighter mb-0 text-xs">
                                       {author.position}
                                     </span>
                                   </div>
@@ -331,7 +331,9 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                   </article>
                   {isLaunchWeek7 && <BlogLinks />}
                   <div className="block lg:hidden py-8">
-                    <div className="text-lighter dark:text-lighter text-sm">Share this article</div>
+                    <div className="text-foreground-lightround-litext-foreground-light:text-foreground-lighter text-sm">
+                      Share this article
+                    </div>
                     <ShareArticleActions title={props.blog.title} slug={props.blog.slug} />
                   </div>
                   <div className="grid gap-8 py-8 lg:grid-cols-1">
@@ -357,10 +359,10 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                         {props.relatedPosts.map((post) => (
                           <Link href={`${post.path}`} as={`${post.path}`} key={post.slug}>
                             <div>
-                              <p className="cursor-pointer">
+                              <p className="cursor-poitext-foreground-light
                                 <div className="flex gap-2">
-                                  {/* <div className="text-lighter">
-                                    <IconFile size={'small'} style={{ minWidth: '1.2rem' }} />
+                                  {/* <div className="text-foreground-lighter">
+                                    <IconFile size=text-foreground-lightstyle={{ minWidth: '1.2rem' }} />
                                   </div> */}
                                   <span className="text-light hover:text-gray-1200 text-sm">
                                     {post.title}
@@ -371,7 +373,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                             </div>
                           </Link>
                         ))}
-                        <div className="mt-2">
+                        <div className="mttext-foreground-light
                           <Link href={`/blog`} passHref>
                             <a className="text-light hover:text-foreground cursor-pointer text-xs">
                               View all posts

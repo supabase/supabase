@@ -34,7 +34,7 @@ const IntegrationWindowLayout = ({
             <a
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 text-xs text-light hover:text"
+              className="flex items-center gap-2 text-xs text-foreground-light hover:text"
             >
               <IconBook size={16} /> Docs
             </a>
@@ -44,7 +44,7 @@ const IntegrationWindowLayout = ({
           <a
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 text-xs text-light hover:text"
+            className="flex items-center gap-2 text-xs text-foreground-light hover:text"
           >
             <IconLifeBuoy size={16} /> Support
           </a>

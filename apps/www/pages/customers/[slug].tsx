@@ -110,7 +110,7 @@ function CaseStudyPage(props: any) {
               <p>
                 <a
                   href={'/customers'}
-                  className="text-lighter hover:text-foreground flex cursor-pointer items-center text-sm transition"
+                  className="text-foreground-lighter hover:text-foreground flex cursor-pointer items-center text-sm transition"
                 >
                   <IconChevronLeft style={{ padding: 0 }} />
                   Back
@@ -161,12 +161,12 @@ function CaseStudyPage(props: any) {
                         </div>
 
                         <div className="flex flex-col space-y-2">
-                          <span className="text-lighter">About</span>
+                          <span className="text-foreground-lightround-lighter">About</span>
                           <p>{props.blog.about}</p>
                           <span className="not-prose ">
                             <a
                               href={props.blog.company_url}
-                              className="flex cursor-pointer items-center space-x-1 transition-opacity text-lighter hover:text-light"
+                              className="flex cursor-pointer items-center space-x-1 transition-opacity text-foreground-lightround-ligtext-foreground-light:text-foreground-light"
                               target="_blank"
                             >
                               <span>{props.blog.company_url}</span>
@@ -178,8 +178,8 @@ function CaseStudyPage(props: any) {
                         {props.blog.misc.map((x: any) => {
                           return (
                             <div className="flex flex-col gap-0">
-                              <span className="text-lighter">{x.label}</span>
-                              <span className="text-light">{x.text}</span>
+                              <span className="text-foreground-lightround-lighter">{x.label}</span>
+                              <span className="text-foreground-light">{x.text}</span>
                             </div>
                           )
                         })}

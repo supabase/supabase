@@ -45,7 +45,7 @@ function ExampleCard(props: any) {
         >
           <Link href={props.repo_url} as={props.repo_url} passHref>
             <a
-              className="text-light hover:text-foreground flex flex-row items-center text-sm"
+              className="text-foreground-light hover:text-foreground flex flex-row items-center text-sm"
               target="_blank"
             >
               <span>{props.repo_name}</span>

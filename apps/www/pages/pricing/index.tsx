@@ -117,7 +117,7 @@ export default function IndexPage() {
               {price}
             </span>
           ) : (
-            <span className="text-light">{price}</span>
+            <span className="text-foreground-light">{price}</span>
           )}
 
           <p className="p">{priceDescription}</p>
@@ -223,7 +223,7 @@ export default function IndexPage() {
                           )}
                         </div>
                       </div>
-                      <p className="text-light my-4 text-sm border-b border-border pb-4 2xl:pr-4">
+                      <p className="text-foreground-light my-4 text-sm border-b border-border pb-4 2xl:pr-4">
                         {plan.description}
                       </p>
 
@@ -242,7 +242,7 @@ export default function IndexPage() {
                           <div className="flex items-end gap-2">
                             <div>
                               {plan.priceLabel && (
-                                <p className="text-lighter ml-1 text-[13px] leading-4 font-normal">
+                                <p className="text-foreground-lightround-lighter ml-1 text-[13px] leading-4 font-normal">
                                   {plan.priceLabel}
                                 </p>
                               )}
@@ -256,7 +256,7 @@ export default function IndexPage() {
                                   {plan.name !== 'Enterprise' ? '$' : ''}
                                   {plan.priceMonthly}
                                 </p>
-                                <p className="text-lighter mb-1.5 ml-1 text-[13px] leading-4">
+                                <p className="text-foreground-lightround-lighter mb-1.5 ml-1 text-[13px] leading-4">
                                   {plan.costUnitOrg}
                                 </p>
                               </div>
@@ -280,10 +280,10 @@ export default function IndexPage() {
                       ].join(' ')}
                     >
                       {plan.preface && (
-                        <p className="text-light text-[13px] mt-2 mb-4">{plan.preface}</p>
+                        <p className="text-foreground-light text-[13px] mt-2 mb-4">{plan.preface}</p>
                       )}
-                      {/* <p className="text-lighter text-sm">Included with plan:</p> */}
-                      <ul role="list" className="text-[13px] text-lighter">
+                      {/* <p className="text-foreground-lightround-lighter text-sm">Included with plan:</p> */}
+                      <ul role="list" className="text-[13px] text-foreground-lightround-lighter">
                         {plan.features.map((feature) => (
                           <li key={feature} className="flex items-center py-2 first:mt-0">
                             <IconCheck
@@ -333,7 +333,7 @@ export default function IndexPage() {
         <div>
           <div className="text-center">
             <h2 className="text-foreground text-3xl">Easily customizable add-ons</h2>
-            <p className="text-light mt-4 mb-8 lg:mb-16 text-lg">
+            <p className="text-foreground-light mt-4 mb-8 lg:mb-16 text-lg">
               Level up your Supabase experience with add-ons.
             </p>
           </div>
@@ -352,7 +352,7 @@ export default function IndexPage() {
                   />
                 </div>
                 <div className="px-8 -mt-1">
-                  <p className="text-[13px] text-lighter">{addon.price}</p>
+                  <p className="text-[13px] text-foreground-lightround-lighter">{addon.price}</p>
                   <div className="flex items-center gap-2 mt-2">
                     <Image
                       src={`${basePath}/images/pricing/${addon.icon}${
@@ -365,7 +365,7 @@ export default function IndexPage() {
                     />
                     <span className="text-sm text-foreground">{addon.name}</span>
                   </div>
-                  <p className="mt-2 text-lighter text-[13px] min-h-[40px] lg:min-h-[50px] lg:max-w-[290px]">
+                  <p className="mt-2 text-foreground-lightround-lighter text-[13px] min-h-[40px] lg:min-h-[50px] lg:max-w-[290px]">
                     {addon.description}
                   </p>
                   <div className="flex items-center justify-between mt-4 mb-4 lg:mb-8">
@@ -441,7 +441,7 @@ export default function IndexPage() {
             <h2 className="text-foreground text-3xl scroll-m-20" id="compare-plans">
               Compare Plans
             </h2>
-            <p className="text-light mt-4 mb-8 lg:mb-16 text-lg">
+            <p className="text-foreground-light mt-4 mb-8 lg:mb-16 text-lg">
               Start with a hobby project, collaborate with a team, and scale to millions of users.
             </p>
           </div>
@@ -453,7 +453,7 @@ export default function IndexPage() {
               {/* Free - Mobile  */}
               <div className="bg-slate-200 p-2 sticky top-14 z-10 pt-4">
                 <div className="bg-slate-300 rounded-lg border border-slate-500 py-2 px-4 flex justify-between items-center">
-                  <label className="text-lighter">Change plan</label>
+                  <label className="text-foreground-lightround-lighter">Change plan</label>
                   <Select
                     id="change-plan"
                     name="Change plan"
@@ -744,7 +744,7 @@ export default function IndexPage() {
                 <tbody className="border-border divide-border divide-y">
                   <tr>
                     <th
-                      className="text-light px-6 py-8 text-left align-top text-sm font-medium"
+                      className="text-foreground-light px-6 py-8 text-left align-top text-sm font-medium"
                       scope="row"
                     ></th>
 
@@ -905,7 +905,7 @@ export default function IndexPage() {
                   chevronAlign="right"
                   justified
                   size="medium"
-                  className="text-light"
+                  className="text-foreground-light"
                 >
                   {pricingFaq.map((faq, i) => {
                     return (
@@ -914,7 +914,9 @@ export default function IndexPage() {
                           header={<span className="text-foreground">{faq.question}</span>}
                           id={`faq--${i.toString()}`}
                         >
-                          <ReactMarkdown className="text-lighter prose">{faq.answer}</ReactMarkdown>
+                          <ReactMarkdown className="text-foreground-lightround-lighter prose">
+                            {faq.answer}
+                          </ReactMarkdown>
                         </Accordion.Item>
                       </div>
                     )

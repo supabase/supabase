@@ -93,7 +93,7 @@ function Partner({
           <div className="col-span-12 mx-auto mb-2 max-w-5xl space-y-10 lg:col-span-2">
             {/* Back button */}
             <Link href="/partners/integrations">
-              <a className="text-foreground hover:text-lighter flex cursor-pointer items-center transition-colors">
+              <a className="text-foreground hover:text-foreground-lighter flex cursor-pointer items-center transition-colors">
                 <IconChevronLeft style={{ padding: 0 }} />
                 Back
               </a>
@@ -209,13 +209,13 @@ function Partner({
                   <div className="text-foreground divide-y">
                     {partner.type === 'technology' && (
                       <div className="flex items-center justify-between py-2">
-                        <span className="text-lighter">Developer</span>
+                        <span className="text-foreground-lighter">Developer</span>
                         <span className="text-foreground">{partner.developer}</span>
                       </div>
                     )}
 
                     <div className="flex items-center justify-between py-2">
-                      <span className="text-lighter">Category</span>
+                      <span className="text-foreground-lighter">Category</span>
                       <Link href={`/partners/integrations#${partner.category.toLowerCase()}`}>
                         <a className="text-brand hover:text-brand-300 transition-colors">
                           {partner.category}
@@ -224,7 +224,7 @@ function Partner({
                     </div>
 
                     <div className="flex items-center justify-between py-2">
-                      <span className="text-lighter">Website</span>
+                      <span className="text-foreground-lighter">Website</span>
                       <a
                         href={partner.website}
                         target="_blank"
@@ -237,7 +237,7 @@ function Partner({
 
                     {partner.type === 'technology' && partner.docs && (
                       <div className="flex items-center justify-between py-2">
-                        <span className="text-lighter">Documentation</span>
+                        <span className="text-foreground-lighter">Documentation</span>
                         <a
                           href={partner.docs}
                           target="_blank"

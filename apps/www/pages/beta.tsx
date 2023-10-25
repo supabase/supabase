@@ -179,7 +179,7 @@ const Introduction = () => {
       </div>
 
       <div className="col-span-12 mb-10 text-base">
-        <p className="pb-2 border-b-2 border-dark-200 text-light dark:border-dark-400 w-60">
+        <p className="pb-2 border-b-2 border-dark-200 text-foreground-light dark:border-dark-400 w-60">
           Alpha Program in Numbers
         </p>
       </div>
@@ -207,7 +207,7 @@ const Introduction = () => {
               </p>
             </div>
             <div className="col-span-12 col-start-0 sm:col-span-9 sm:col-start-5 md:col-span-10 md:col-start-4 xl:col-start-3">
-              <p className="text-xs text-lighter lg:text-base">{stat.name}</p>
+              <p className="text-xs text-foreground-lighter lg:text-base">{stat.name}</p>
             </div>
           </div>
         ))}

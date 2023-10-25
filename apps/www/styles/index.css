@@ -143,12 +143,12 @@ h6:not(.overwrite) {
 }
 
 .p:not(.prose *):not(.overwrite) {
-  @apply text-light;
+  @apply text-foreground-light;
   margin-bottom: 16px;
 }
 
 .small:not(.prose *):not(.overwrite) {
-  @apply text-lighter text-xs;
+  @apply text-foreground-lighter text-xs;
 }
 
 .sbui-border-fix select {

@@ -61,7 +61,7 @@ const MainBranchPanel = ({
                 <Button
                   type="text"
                   size="small"
-                  className="text-light hover:text py-1 px-1.5"
+                  className="text-foreground-light hover:text py-1 px-1.5"
                   iconRight={<IconExternalLink size={14} strokeWidth={1.5} />}
                 >
                   {repo}
@@ -163,7 +163,7 @@ const BranchPanel = ({
         <IconGitBranch size={16} strokeWidth={2} />
         <p>{branch?.name}</p>
         {isActive && <Badge color="green">Selected</Badge>}
-        <p className="text-light">
+        <p className="text-foreground-light">
           {daysFromNow > 1 ? `Created on ${formattedCreatedAt}` : `Created ${formattedTimeFromNow}`}
         </p>
       </div>
@@ -235,7 +235,7 @@ const PullRequestPanel = ({
             <div className="flex items-center space-x-4">
               <IconGitBranch className="text-brand-900" size={16} strokeWidth={2} />
               <p>{pr.branch}</p>
-              <p className="text-light">
+              <p className="text-foreground-light">
                 {daysFromNow > 1
                   ? `Created on ${formattedCreatedAt}`
                   : `Created ${formattedTimeFromNow}`}

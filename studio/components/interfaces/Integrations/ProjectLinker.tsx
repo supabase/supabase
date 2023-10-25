@@ -165,7 +165,7 @@ const ProjectLinker = ({
         ) : noSupabaseProjects || noForeignProjects ? (
           <div className="text-center">
             <h5 className="text-foreground">No {missingEntity} Projects found</h5>
-            <p className="text-light text-sm">
+            <p className="text-foreground-light text-sm">
               You will need to create a {missingEntity} Project to link to a {oppositeMissingEntity}{' '}
               Project.
               <br />

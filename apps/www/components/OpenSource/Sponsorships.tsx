@@ -11,7 +11,7 @@ const Sponsorships = ({ sponsorships }: { sponsorships: any[] }) => {
         <h2 className="text-3xl xl:text-4xl max-w-[280px] sm:max-w-xs xl:max-w-[360px] tracking-[-1px]">
           Sponsored Projects
         </h2>
-        <p className="text-lighter mb-4 max-w-sm">
+        <p className="text-foreground-lighter mb-4 max-w-sm">
           We don't just live and breath open-source, we also sponsor projects we love.
         </p>
       </div>
@@ -50,8 +50,8 @@ const Sponsorships = ({ sponsorships }: { sponsorships: any[] }) => {
                     {link.name}
                   </p>
                 </div>
-                <p className="text-sm flex-1 text-lighter">{link.description}</p>
-                <div className="text-sm w-full flex justify-between text-lighter mt-2">
+                <p className="text-sm flex-1 text-foreground-lightround-lighter">{link.description}</p>
+                <div className="text-sm w-full flex justify-between text-foreground-lightround-lighter mt-2">
                   <IconArrowUpRight className="w-4 stroke-[1.5px]" />
                 </div>
               </Panel>

@@ -67,7 +67,7 @@ const SchemaSelector = ({
         >
           <div>
             <div className="w-full flex space-x-3 py-0.5">
-              <p className="text-xs text-light">Loading schemas...</p>
+              <p className="text-xs text-foreground-light">Loading schemas...</p>
             </div>
           </div>
         </Button>
@@ -99,7 +99,7 @@ const SchemaSelector = ({
               }
             >
               <div className="w-full flex space-x-3 py-0.5">
-                <p className="text-xs text-light">schema</p>
+                <p className="text-xs text-foreground-light">schema</p>
                 <p className="text-xs">{selectedSchemaName}</p>
               </div>
             </Button>
