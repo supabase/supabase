@@ -150,7 +150,7 @@ const Layout: FC<Props> = (props) => {
             <div
               className={[
                 'col-span-3',
-                'border-scale-400 dark:bg-scale-200 table-of-contents-height',
+                'border-overlay bg-background table-of-contents-height',
                 'thin-scrollbar overflow-y-auto sticky hidden md:block md:col-span-3 px-2',
                 'transition-all ease-out',
                 'duration-100',
