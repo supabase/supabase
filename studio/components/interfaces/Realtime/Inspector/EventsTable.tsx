@@ -15,6 +15,7 @@ export const isErrorLog = (l: LogData) => {
 interface Props {
   enabled: boolean
   data?: LogData[]
+  showSendEvent: () => void
 }
 
 const renderNoResultAlert = () => (
@@ -51,7 +52,7 @@ const RowRenderer = (props: RowRendererProps<any>) => {
   return <Row {...props} isRowSelected={false} selectedCellIdx={undefined} />
 }
 
-const EventsTable = ({ enabled, data = [] }: Props) => {
+const EventsTable = ({ enabled, data = [], showSendEvent }: Props) => {
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const stringData = JSON.stringify(data)
 
@@ -84,7 +85,11 @@ const EventsTable = ({ enabled, data = [] }: Props) => {
                       : `No event found yet...`}
                   </div>
                 </div>
-                <Button type="primary" className="!bg-brand-400 !border-brand-500">
+                <Button
+                  type="primary"
+                  className="!bg-brand-400 !border-brand-500"
+                  onClick={showSendEvent}
+                >
                   Send test event
                 </Button>
               </div>
