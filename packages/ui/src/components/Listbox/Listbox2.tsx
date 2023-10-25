@@ -1,17 +1,18 @@
 /* This example requires Tailwind CSS v2.0+ */
-import React, { useEffect, useRef, useState } from 'react'
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
+import React, { useEffect, useRef, useState } from 'react'
 import { FormLayout } from '../../lib/Layout/FormLayout'
 
-import InputIconContainer from '../../lib/Layout/InputIconContainer'
 import InputErrorIcon from '../../lib/Layout/InputErrorIcon'
+import InputIconContainer from '../../lib/Layout/InputIconContainer'
 import { IconCheck } from '../Icon/icons/IconCheck'
 
-import { useFormContext } from '../Form/FormContext'
 import { flatten } from 'lodash'
+import { useFormContext } from '../Form/FormContext'
 
 import { SelectContext } from './SelectContext'
 
+import { cn } from '@ui/lib/utils'
 import styleHandler from '../../lib/theme/styleHandler'
 
 function classNames(...classes: any) {
@@ -20,6 +21,7 @@ function classNames(...classes: any) {
 
 export interface Props extends Omit<React.InputHTMLAttributes<HTMLButtonElement>, 'size'> {
   className?: string
+  buttonClassName?: string
   children: React.ReactNode
   descriptionText?: string | React.ReactNode
   error?: string
@@ -34,7 +36,6 @@ export interface Props extends Omit<React.InputHTMLAttributes<HTMLButtonElement>
   actions?: React.ReactNode
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
   defaultValue?: any
-  borderless?: boolean
   validation?: (x: any) => void
   optionsWidth?: number
   // override the button prop for onchange we only return a single value
@@ -45,6 +46,7 @@ export interface Props extends Omit<React.InputHTMLAttributes<HTMLButtonElement>
 function Listbox({
   children,
   className,
+  buttonClassName,
   descriptionText,
   error,
   icon,
@@ -60,7 +62,6 @@ function Listbox({
   style,
   size = 'medium',
   defaultValue,
-  borderless = false,
   validation,
   disabled,
   optionsWidth,
@@ -187,7 +188,7 @@ function Listbox({
     if (validation) fieldLevelValidation(id, validation(value))
   }
 
-  let selectClasses = [__styles.container, __styles.base]
+  let selectClasses = [__styles.container, __styles.base, buttonClassName]
   if (error) selectClasses.push(__styles.variants.error)
   if (!error) selectClasses.push(__styles.variants.standard)
   // if (icon) selectClasses.push(SelectStyles['sbui-listbox--with-icon'])
@@ -213,7 +214,7 @@ function Listbox({
         <DropdownMenuPrimitive.Trigger asChild disabled={disabled}>
           <button
             ref={triggerRef}
-            className={selectClasses.join(' ')}
+            className={cn(selectClasses)}
             onBlur={handleBlurEvent}
             onFocus={onFocus}
             name={name}
@@ -302,7 +303,7 @@ function SelectOption({
               __styles.option,
               active ? __styles.option_active : ' ',
               disabled ? __styles.option_disabled : ' '
-            )} ${className}`}
+            )} ${className} hello`}
             onSelect={() => (!disabled ? onChange(value) : {})}
           >
             <div className={__styles.option_inner}>

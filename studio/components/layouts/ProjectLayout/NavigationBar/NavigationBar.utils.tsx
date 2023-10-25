@@ -1,3 +1,4 @@
+import { MousePointer2 } from 'lucide-react'
 import SVG from 'react-inlinesvg'
 import { products } from 'shared-data'
 import { IconBarChart, IconFileText, IconList, IconSettings } from 'ui'
@@ -51,7 +52,7 @@ export const generateToolRoutes = (
 export const generateProductRoutes = (
   ref?: string,
   project?: ProjectBase,
-  features?: { auth?: boolean; edgeFunctions?: boolean; storage?: boolean }
+  features?: { auth?: boolean; edgeFunctions?: boolean; storage?: boolean; realtime?: boolean }
 ): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}/building`
@@ -59,6 +60,7 @@ export const generateProductRoutes = (
   const authEnabled = features?.auth ?? true
   const edgeFunctionsEnabled = features?.edgeFunctions ?? true
   const storageEnabled = features?.storage ?? true
+  const realtimeEnabled = features?.realtime ?? true
 
   return [
     {
@@ -162,6 +164,16 @@ export const generateProductRoutes = (
               </svg>
             ),
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/functions`),
+          },
+        ]
+      : []),
+    ...(IS_PLATFORM && realtimeEnabled
+      ? [
+          {
+            key: 'realtime',
+            label: 'Realtime',
+            icon: <MousePointer2 />,
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/realtime`),
           },
         ]
       : []),

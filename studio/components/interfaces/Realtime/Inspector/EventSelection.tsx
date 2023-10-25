@@ -1,0 +1,86 @@
+import { useMemo } from 'react'
+import { Button, IconX, cn } from 'ui'
+
+import CopyButton from 'components/ui/CopyButton'
+import { LogData } from './Events.types'
+import { SelectedRealtimeEventPanel } from './SelectedRealtimeEventPanel'
+
+export interface LogSelectionProps {
+  log: LogData
+  onClose: () => void
+}
+
+const LogSelection = ({ log, onClose }: LogSelectionProps) => {
+  const selectionText = useMemo(() => {
+    return JSON.stringify(log, null, 2)
+  }, [log])
+
+  return (
+    <div
+      className={cn([
+        'relative flex h-full flex-grow flex-col border border-l',
+        'border-panel-border-light dark:border-panel-border-dark',
+        'overflow-y-scroll bg-gray-200',
+      ])}
+    >
+      <div
+        className={cn([
+          'absolute flex',
+          'h-full w-full flex-col items-center justify-center gap-2 overflow-y-scroll bg-scale-200 text-center opacity-0 transition-all',
+          log ? 'z-0 opacity-0' : 'z-10 opacity-100',
+        ])}
+      >
+        <div className="flex w-full max-w-sm scale-95 flex-col items-center justify-center gap-6 text-center opacity-0 transition-all delay-300 duration-500 mt-0">
+          <div className="relative flex h-4 w-32 items-center rounded border border-scale-600 px-2 dark:border-scale-400">
+            <div className="h-0.5 w-2/3 rounded-full bg-scale-600 dark:bg-scale-500"></div>
+            <div className="absolute right-1 -bottom-4">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="1"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"
+                />
+              </svg>
+            </div>
+          </div>
+          <div className="flex flex-col gap-1">
+            <h3 className="text-sm text-scale-1200">Select an Event</h3>
+            <p className="text-xs text-scale-900">
+              Select an Event to view the code snippet (pretty view) or complete JSON payload (raw
+              view).
+            </p>
+          </div>
+        </div>
+      </div>
+      <div className="relative h-px flex-grow bg-scale-300">
+        <div className="pt-4 px-4 flex flex-col gap-4">
+          <div className="flex flex-row justify-between items-center">
+            <div className="transition">
+              <CopyButton text={selectionText} type="default" title="Copy log to clipboard" />
+            </div>
+            <Button
+              type="text"
+              className="cursor-pointer transition hover:text-scale-1200 h-8 w-8 px-0 py-0 flex items-center justify-center"
+              onClick={onClose}
+            >
+              <IconX size={14} strokeWidth={2} className="text-scale-900" />
+            </Button>
+          </div>
+          <div className="h-px w-full bg-scale-600 rounded" />
+        </div>
+        <div className="flex flex-col space-y-6 bg-scale-300 py-4">
+          <SelectedRealtimeEventPanel log={log} />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default LogSelection
