@@ -5,7 +5,7 @@ import NavigationMenu from '~/components/Navigation/NavigationMenu/NavigationMen
 import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
 
 import Head from 'next/head'
-import { PropsWithChildren, memo } from 'react'
+import { PropsWithChildren, memo, useEffect } from 'react'
 import Footer from '~/components/Navigation/Footer'
 import { menuState, useMenuLevelId, useMenuMobileOpen } from '~/hooks/useMenuState'
 
@@ -202,6 +202,19 @@ const MobileHeader = memo(function MobileHeader() {
 
 const MobileMenuBackdrop = memo(function MobileMenuBackdrop() {
   const mobileMenuOpen = useMenuMobileOpen()
+
+  useEffect(() => {
+    window.addEventListener('resize', (e: UIEvent) => {
+      const w = e.target as Window
+      if (mobileMenuOpen && w.innerWidth >= 1024) {
+        menuState.setMenuMobileOpen(!mobileMenuOpen)
+      }
+    })
+    return () => {
+      window.removeEventListener('resize', () => {})
+    }
+  }, [mobileMenuOpen])
+
   return (
     <div
       className={[
