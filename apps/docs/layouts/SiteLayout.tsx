@@ -186,7 +186,7 @@ const MobileHeader = memo(function MobileHeader() {
       <span
         className={[
           'transition-all duration-200',
-          'text-scale-1200',
+          'text-foreground',
           mobileMenuOpen ? 'text-xs' : 'text-sm',
         ].join(' ')}
       >

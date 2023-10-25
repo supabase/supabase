@@ -278,7 +278,7 @@ export default {
       },
       neutral: {
         base: `bg-surface-100 border-border`,
-        icon: `text-muted`,
+        icon: `text-foreground-muted`,
         header: `text-foreground`,
         description: `text-foreground-light`,
       },
@@ -287,7 +287,7 @@ export default {
       absolute
       right-6 top-4
       p-0 m-0
-      text-muted
+      text-foreground-muted
       cursor-pointer transition ease-in-out
       bg-transparent border-transparent focus:outline-none
       opacity-50 hover:opacity-100`,
@@ -368,7 +368,7 @@ export default {
       inactive: `
         bg-background
         border-strong hover:border-foreground-muted
-        text-muted hover:text-foreground
+        text-foreground-muted hover:text-foreground
       `,
       active: `
         bg-selection
@@ -1169,7 +1169,7 @@ export default {
           active: `
             font-semibold
 
-            text-muted
+            text-foreground-muted
             z-10
 
             border-l
@@ -1343,11 +1343,11 @@ export default {
     disabled: `opacity-50`,
     actions_container: 'absolute inset-y-0 right-0 pl-3 pr-1 flex space-x-1 items-center',
     chevron_container: 'absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none',
-    chevron: 'h-5 w-5 text-muted',
+    chevron: 'h-5 w-5 text-foreground-muted',
     option: `
       w-listbox
       transition cursor-pointer select-none relative py-2 pl-3 pr-9
-      text-muted
+      text-foreground-muted
       text-sm
       hover:bg-border-overlay
       focus:bg-border-overlay

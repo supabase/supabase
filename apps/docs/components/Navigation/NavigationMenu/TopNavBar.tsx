@@ -85,7 +85,7 @@ const TopNavBar: FC = () => {
               hover:bg-opacity-100
               border
               transition
-              border-scale-500 pl-1.5 md:pl-3 pr-1.5 w-full h-[32px] rounded
+              pl-1.5 md:pl-3 pr-1.5 w-full h-[32px] rounded
               text-foreground-lighter
               "
             >
@@ -119,7 +119,10 @@ const TopNavBar: FC = () => {
             rel="noreferrer noopener"
           >
             <a className="px-2.5 py-1" target="_blank">
-              <IconGitHub size={16} className="text-scale-1100 hover:text-scale-1200 transition" />
+              <IconGitHub
+                size={16}
+                className="text-foreground-light hover:text-foreground transition"
+              />
             </a>
           </Link>
           <ThemeToggle />

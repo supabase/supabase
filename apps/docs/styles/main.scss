@@ -76,7 +76,7 @@ article h1 {
 }
 
 .p:not(.prose *):not(.overwrite) {
-  @apply text-scale-1100;
+  @apply text-foreground-light;
   margin-bottom: 16px;
 }
 
