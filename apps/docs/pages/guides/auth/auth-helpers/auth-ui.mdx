@@ -310,7 +310,7 @@ const App = () => (
 
 ### Custom labels [#custom-labels]
 
-You can use custom labels with `localization.variables`. See the [list of labels](https://github.com/supabase/auth-ui/blob/main/packages/shared/src/localization/en.json) that can be overwritten.
+You can use custom labels with `localization.variables` like so:
 
 ```js mark=10:15 /src/index.js
 import { createClient } from '@supabase/supabase-js'
@@ -333,7 +333,106 @@ const App = () => (
 )
 ```
 
+A full list of the available variables is below:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sign-up"
+>
+<TabPanel id="sign-up" label="Sign Up">
+
+| Label Tag                    | Default Label                              |
+| ---------------------------- | ------------------------------------------ |
+| `email_label`                | Email address                              |
+| `password_label`             | Create a Password                          |
+| `email_input_placeholder`    | Your email address                         |
+| `password_input_placeholder` | Your password                              |
+| `button_label`               | Sign up                                    |
+| `loading_button_label`       | Signing up ...                             |
+| `social_provider_text`       | Sign in with `{{provider}}`                |
+| `link_text`                  | Don't have an account? Sign up             |
+| `confirmation_text`          | Check your email for the confirmation link |
+
+</TabPanel>
+
+<TabPanel id="sign-in" label="Sign In">
+
+| Label Tag                    | Default Label                    |
+| ---------------------------- | -------------------------------- |
+| `email_label`                | Email address                    |
+| `password_label`             | Your Password                    |
+| `email_input_placeholder`    | Your email address               |
+| `password_input_placeholder` | Your password                    |
+| `button_label`               | Sign in                          |
+| `loading_button_label`       | Signing in ...                   |
+| `social_provider_text`       | Sign in with `{{provider}}`      |
+| `link_text`                  | Already have an account? Sign in |
+
+</TabPanel>
+
+<TabPanel id="magic_link" label="Magic Link">
+
+| Label Tag                 | Default Label                       |
+| ------------------------- | ----------------------------------- |
+| `email_input_label`       | Email address                       |
+| `email_input_placeholder` | Your email address                  |
+| `button_label`            | Sign in                             |
+| `loading_button_label`    | Signing in ...                      |
+| `link_text`               | Already have an account? Sign in    |
+| `confirmation_text`       | Check your email for the magic link |
+
+</TabPanel>
+
+<TabPanel id="forgotten-password" label="Forgotten Password">
+
+| Label Tag                 | Default Label                                |
+| ------------------------- | -------------------------------------------- |
+| `email_label`             | Email address                                |
+| `password_label`          | Your Password                                |
+| `email_input_placeholder` | Your email address                           |
+| `button_label`            | Send reset password instructions             |
+| `loading_button_label`    | Sending reset instructions ...               |
+| `link_text`               | Forgot your password?                        |
+| `confirmation_text`       | Check your email for the password reset link |
+
+</TabPanel>
+
+<TabPanel id="update-password" label="Update Password">
+
+| Label Tag                    | Default Label                  |
+| ---------------------------- | ------------------------------ |
+| `password_label`             | New Password                   |
+| `password_input_placeholder` | Your new password              |
+| `button_label`               | Update password                |
+| `loading_button_label`       | Updating password ...          |
+| `confirmation_text`          | Your password has been updated |
+
+</TabPanel>
+
+<TabPanel id="verify-otp" label="Verify OTP">
+
+| Label Tag                 | Default Label      |
+| ------------------------- | ------------------ |
+| `email_input_label`       | Email address      |
+| `email_input_placeholder` | Your email address |
+| `phone_input_label`       | Phone number       |
+| `phone_input_placeholder` | Your phone number  |
+| `token_input_label`       | Token              |
+| `token_input_placeholder` | Your Otp token     |
+| `button_label`            | Verify token       |
+| `loading_button_label`    | Signing in ...     |
+
+</TabPanel>
+
+</Tabs>
+
+<Admonition type="warning">
+
 Currently, translating error messages (e.g. "Invalid credentials") is not supported. Check [related issue.](https://github.com/supabase/auth-ui/issues/86)
+
+</Admonition>
 
 ### Hiding links [#hiding-links]
 
