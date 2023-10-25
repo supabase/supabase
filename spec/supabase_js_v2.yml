@@ -4803,7 +4803,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: list-buckets
         name: List buckets
@@ -4822,7 +4822,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: get-bucket
         name: Get bucket
@@ -4841,7 +4841,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: `insert`
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: create-bucket
         name: Create bucket
@@ -4864,7 +4864,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
         - `objects` table permissions: `select` and `delete`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: empty-bucket
         name: Empty bucket
@@ -4882,7 +4882,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: `select` and `update`
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: update-bucket
         name: Update bucket
@@ -4905,7 +4905,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: `select` and `delete`
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: delete-bucket
         name: Delete bucket
@@ -4924,7 +4924,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: only `insert` when you are uploading new files and `select`, `insert` and `update` when you are upserting files
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
       - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Upload file using `ArrayBuffer` from base64 file data instead, see example below.
     examples:
       - id: upload-file
@@ -4962,7 +4962,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `update` and `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
       - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Update file using `ArrayBuffer` from base64 file data instead, see example below.
     examples:
       - id: update-file
@@ -5000,7 +5000,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `update` and `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: move-file
         name: Move file
@@ -5020,7 +5020,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `insert` and `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: copy-file
         name: Copy file
@@ -5040,7 +5040,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: create-signed-url
         name: Create Signed URL
@@ -5087,7 +5087,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: create-signed-urls
         name: Create Signed URLs
@@ -5107,7 +5107,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `insert`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: create-signed-upload-url
         name: Create Signed Upload URL
@@ -5127,7 +5127,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: upload-to-signed-url
         name: Upload to a signed URL
@@ -5148,7 +5148,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: returns-the-url-for-an-asset-in-a-public-bucket
         name: Returns the URL for an asset in a public bucket
@@ -5195,7 +5195,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: download-file
         name: Download file
@@ -5231,7 +5231,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `delete` and `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: delete-file
         name: Delete file
@@ -5251,7 +5251,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: list-files-in-a-bucket
         name: List files in a bucket

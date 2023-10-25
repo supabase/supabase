@@ -44,7 +44,7 @@ You can enable RLS for any table using the `enable row level security` clause:
 alter table "table_name" enable row level security;
 ```
 
-Once you have enabled RLS, no data will be accessible until you create policies.
+Once you have enabled RLS, no data will be accessible via the [API](/docs/guides/api) when using the public `anon` key, until you create policies.
 
 ## Creating Policies
 
