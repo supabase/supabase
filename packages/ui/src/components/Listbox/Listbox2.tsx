@@ -1,23 +1,15 @@
-/* This example requires Tailwind CSS v2.0+ */
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
-import React, { useEffect, useRef, useState } from 'react'
-import { FormLayout } from '../../lib/Layout/FormLayout'
-
-import InputErrorIcon from '../../lib/Layout/InputErrorIcon'
-import InputIconContainer from '../../lib/Layout/InputIconContainer'
-import { IconCheck } from '../Icon/icons/IconCheck'
-
 import { flatten } from 'lodash'
-import { useFormContext } from '../Form/FormContext'
-
-import { SelectContext } from './SelectContext'
+import React, { useEffect, useRef, useState } from 'react'
 
 import { cn } from '@ui/lib/utils'
+import { FormLayout } from '../../lib/Layout/FormLayout'
+import InputErrorIcon from '../../lib/Layout/InputErrorIcon'
+import InputIconContainer from '../../lib/Layout/InputIconContainer'
 import styleHandler from '../../lib/theme/styleHandler'
-
-function classNames(...classes: any) {
-  return classes.filter(Boolean).join(' ')
-}
+import { useFormContext } from '../Form/FormContext'
+import { IconCheck } from '../Icon/icons/IconCheck'
+import { SelectContext } from './SelectContext'
 
 export interface Props extends Omit<React.InputHTMLAttributes<HTMLButtonElement>, 'size'> {
   className?: string
@@ -299,11 +291,12 @@ function SelectOption({
         return (
           <DropdownMenuPrimitive.Item
             key={id}
-            className={`${classNames(
+            className={cn(
               __styles.option,
               active ? __styles.option_active : ' ',
-              disabled ? __styles.option_disabled : ' '
-            )} ${className} hello`}
+              disabled ? __styles.option_disabled : ' ',
+              className
+            )}
             onSelect={() => (!disabled ? onChange(value) : {})}
           >
             <div className={__styles.option_inner}>
@@ -315,10 +308,7 @@ function SelectOption({
 
             {active ? (
               <span
-                className={classNames(
-                  __styles.option_check,
-                  active ? __styles.option_check_active : ''
-                )}
+                className={cn(__styles.option_check, active ? __styles.option_check_active : '')}
               >
                 <IconCheck className={__styles.option_check_icon} aria-hidden="true" />
               </span>
