@@ -37,28 +37,18 @@ export async function getStaticProps() {
 }
 
 function ChangelogPage(props: any) {
+  const TITLE = 'Changelog'
+  const DESCRIPTION = 'New updates and improvements to Supabase'
+
   return (
     <>
       <NextSeo
-        title={'Changelog'}
+        title={TITLE}
         openGraph={{
-          title: 'Changelog',
-          description: 'props.blog.description',
+          title: TITLE,
+          description: DESCRIPTION,
           url: `https://supabase.com/changelog`,
           type: 'article',
-          article: {
-            //
-            // to do: add expiration and modified dates
-            // https://github.com/garmeeh/next-seo#article
-            // publishedTime: props.blog.date,
-          },
-          // images: [
-          //   {
-          //     url: `https://supabase.com${basePath}/images/blog/${
-          //       props.blog.image ? props.blog.image : props.blog.thumb
-          //     }`,
-          //   },
-          // ],
         }}
       />
       <DefaultLayout>
@@ -66,7 +56,7 @@ function ChangelogPage(props: any) {
           className="
             container mx-auto flex flex-col
             gap-20
-            px-8 py-10 sm:px-16
+            px-4 py-10 sm:px-16
             xl:px-20
           "
         >
@@ -81,16 +71,13 @@ function ChangelogPage(props: any) {
             {props.changelog.map((changelog: any, i: number) => {
               const date = changelog.published_at.split('T')
               return (
-                <div
-                  key={i}
-                  className="border-scale-400 grid border-l pb-10 lg:grid-cols-12 lg:gap-8"
-                >
+                <div key={i} className="border-border grid border-l pb-10 lg:grid-cols-12 lg:gap-8">
                   <div
                     className="col-span-12 mb-8 self-start lg:sticky lg:top-0 lg:col-span-4 lg:-mt-32 lg:pt-32
                 "
                   >
                     <div className="flex w-full items-baseline gap-6">
-                      <div className="bg-scale-100 dark:bg-scale-500 border-scale-400 dark:border-scale-600 text-muted -ml-2.5 flex h-5 w-5 items-center justify-center rounded border drop-shadow-sm">
+                      <div className="bg-surface-300 border-control text-lighter -ml-2.5 flex h-5 w-5 items-center justify-center rounded border drop-shadow-sm">
                         <IconGitCommit size={14} strokeWidth={1.5} />
                       </div>
                       <div className="flex w-full flex-col gap-1">
@@ -101,7 +88,7 @@ function ChangelogPage(props: any) {
                       </div>
                     </div>
                   </div>
-                  <div className="col-span-8 ml-8 lg:ml-0">
+                  <div className="col-span-8 ml-8 lg:ml-0 max-w-[calc(100vw-80px)]">
                     <article className="prose prose-docs max-w-none">
                       <MDXRemote {...changelog.source} components={mdxComponents('blog')} />
                     </article>
