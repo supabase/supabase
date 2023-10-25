@@ -191,7 +191,7 @@ function StoragePage() {
                     className="mt-4"
                     icon={<IconArrowUpRight />}
                   >
-                    <Link href="/docs/guides/storage/cdn">Explore docs</Link>
+                    <Link href="/docs/guides/storage/cdn/fundamentals">Explore docs</Link>
                   </Button>
                 </div>
                 <div className="col-span-6 lg:col-span-12 xl:col-span-4">
@@ -207,7 +207,9 @@ function StoragePage() {
                     className="mt-4"
                     icon={<IconArrowUpRight />}
                   >
-                    <Link href="/docs/guides/storage/image-transformations">Explore docs</Link>
+                    <Link href="/docs/guides/storage/serving/image-transformations">
+                      Explore docs
+                    </Link>
                   </Button>
                 </div>
               </div>,
