@@ -75,7 +75,7 @@ const footerData = [
       },
       {
         text: 'SOC2',
-        url: 'https://forms.supabase.com/soc2',
+        url: '/security',
       },
       {
         text: 'HIPAA',
