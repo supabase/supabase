@@ -14,7 +14,16 @@ import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
 import { useFlag, useIsFeatureEnabled } from 'hooks'
-import { Alert, Badge, Button, IconPackage, Input } from 'ui'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Badge,
+  Button,
+  IconPackage,
+  Input,
+} from 'ui'
 import ProjectUpgradeAlert from '../General/Infrastructure/ProjectUpgradeAlert'
 
 const InfrastructureInfo = () => {
@@ -150,37 +159,43 @@ const InfrastructureInfo = () => {
                 {showDbUpgrades &&
                   !data?.eligible &&
                   (data?.extension_dependent_objects || []).length > 0 && (
-                    <Alert
-                      icon={<IconPackage className="text-foreground-light" strokeWidth={1.5} />}
+                    <Alert_Shadcn_
                       variant="warning"
                       title="A new version of Postgres is available for your project"
                     >
-                      <p className="mb-3">
-                        This project cannot be upgraded due to the following extension dependent
-                        objects:
-                      </p>
+                      <IconPackage className="text-foreground-light" strokeWidth={1.5} />
+                      <AlertTitle_Shadcn_>
+                        A new version of Postgres is available for your project
+                      </AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                        <div>
+                          <p className="mb-1">
+                            This project cannot be upgraded due to the following extension dependent
+                            objects:
+                          </p>
 
-                      <ul className="mb-3">
-                        {(data?.extension_dependent_objects || []).map((obj) => (
-                          <li className="list-disc" key={obj}>
-                            {obj}
-                          </li>
-                        ))}
-                      </ul>
-
-                      <p className="mb-3">
-                        Once the above objects are exported and removed, you can proceed to upgrade
-                        your project, and re-import the objects after the upgrade operation is
-                        complete.
-                      </p>
-                      <Link href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats">
-                        <a target="_blank" rel="noreferrer">
-                          <Button size="tiny" type="default">
-                            Visit our documentation to learn more about this
-                          </Button>
-                        </a>
-                      </Link>
-                    </Alert>
+                          <ul className="pl-4">
+                            {(data?.extension_dependent_objects || ['prv', 'vtor']).map((obj) => (
+                              <li className="list-disc" key={obj}>
+                                {obj}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        <p>
+                          Once the above objects are exported and removed, you can proceed to
+                          upgrade your project, and re-import the objects after the upgrade
+                          operation is complete.
+                        </p>
+                        <Link href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats">
+                          <a target="_blank" rel="noreferrer">
+                            <Button size="tiny" type="default">
+                              Visit our documentation to learn more about this
+                            </Button>
+                          </a>
+                        </Link>
+                      </AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
                   )}
               </>
             )}
