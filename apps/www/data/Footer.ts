@@ -79,7 +79,7 @@ const footerData = [
       },
       {
         text: 'HIPAA',
-        url: 'https://forms.supabase.com/hipaa',
+        url: 'https://forms.supabase.com/hipaa2',
       },
     ],
   },
