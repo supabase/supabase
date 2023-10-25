@@ -1,6 +1,23 @@
 export const data = [
   {
     type: 'Customer Story',
+    title: 'How Next Door Lending leveraged Supabase to become a top 10 mortgage broker',
+    description: '',
+    imgUrl: 'images/customers/logos/next-door-lending.png',
+    logoUrl: 'images/customers/logos/next-door-lending.png',
+    organization: 'Next Door Lending',
+    url: '/customers/next-door-lending',
+    path: '/customers/next-door-lending',
+    postMeta: {
+      name: 'Paul Copplestone',
+      avatarUrl: 'https://avatars0.githubusercontent.com/u/10214025?v=4',
+      publishDate: 'Oct 25, 2023',
+      readLength: 4,
+    },
+    ctaText: 'View story',
+  },
+  {
+    type: 'Customer Story',
     title: 'Scaling securely: one million users in 7 months protected with Supabase Auth',
     description:
       'Learn how Pebblely, an AI image generation company, used Supabase Auth for rapid growth and adaptable security solutions.',
