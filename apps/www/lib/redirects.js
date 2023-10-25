@@ -2313,4 +2313,9 @@ module.exports = [
     source: '/docs/guides/ai/managing-indexes',
     destination: '/docs/guides/ai/vector-indexes',
   },
+  {
+    permanent: true,
+    source: '/blog/supabase-ai-content-storm',
+    destination: 'https://dev.to/supabase/ai-ignites-the-rain-content-storm-is-back-kdl',
+  },
 ]
