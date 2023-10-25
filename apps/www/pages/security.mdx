@@ -52,7 +52,9 @@ export const Section = ({ children, icon, img }) => (
 
 ### SOC 2
 
-Supabase is SOC2 Type 2 compliant. Enterprise and Teams customers can request a copy of our SOC2 report [here](https://forms.supabase.com/soc2).
+Supabase is SOC2 Type 2 compliant. This is an important security policy when handling sensitive customer data.
+
+Enterprise and Teams customers can access our SOC2 report [on the dashboard](/dashboard/org/_/documents).
 
 <div className="w-32">
   <img src="/images/security/soc2-type2.svg" />
@@ -63,7 +65,9 @@ Supabase is SOC2 Type 2 compliant. Enterprise and Teams customers can request a 
 
 ### HIPAA
 
-Supabase is HIPAA compliant. Enterprise and Teams customers can request to sign our BAA [here](https://forms.supabase.com/hipaa).
+Supabase is HIPAA compliant. You can store Protected Health Information (PHI) on our hosted platform once you enter into a Business Associate Agreement (BAA) with us and fulfill your HIPAA obligations under our [shared responsibility model](/docs/guides/platform/shared-responsibility-model#managing-healthcare-data).
+
+Enterprise and Teams customers can request to sign our BAA [on the dashboard](/dashboard/org/_/documents).
 
 <div className="w-32">
   <img src="/images/security/HIPAA.svg" />
@@ -128,40 +132,6 @@ In addition to internal security reviews, we use various tools to scan our code 
 
 </div>
 
-</div>
-
----
-
-<div className="container mx-auto pb-24 pt-1 px-8 sm:px-16 xl:px-20">
-  <div className="max-w-xl">
-
-<h3 className="text-3xl">Documents Center</h3>
-
-As a database company, being SOC2 compliant is important when handling sensitive customer data. Access Supabase’s security policies by requesting for our latest SOC2 report.
-
-    <div className="not-prose">
-      <Link passHref href="https://forms.supabase.com/soc2">
-        <a target="_blank">
-          <Button size="medium" type="default">
-            Request SOC2 report
-          </Button>
-        </a>
-      </Link>
-    </div>
-
-You can build healthcare apps on our hosted platform once you enter into a Business Associate Agreement (BAA) with us and fulfill your HIPAA obligations under our [shared responsibility model](/docs/guides/platform/shared-responsibility-model#managing-healthcare-data).
-
-    <div className="not-prose">
-      <Link passHref href="https://forms.supabase.com/hipaa">
-        <a target="_blank">
-          <Button size="medium" type="default">
-            Request BAA
-          </Button>
-        </a>
-      </Link>
-    </div>
-
-  </div>
 </div>
 
 export default (context) => <Layout meta={meta} children={context.children} context={context} />
