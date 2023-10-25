@@ -1,5 +1,6 @@
 /* eslint-disable react/display-name */
 
+import 'react-data-grid/lib/styles.css'
 import DataGrid, { DataGridHandle, RowsChangeData } from 'react-data-grid'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { forwardRef } from 'react'
@@ -96,12 +97,10 @@ export const Grid = memo(
         })
       }
 
-      // function onSelectedCellChange(position: { idx: number; rowIdx: number }) {
-      // [Next 18 Refactor] Needs to be fixed
       function onSelectedCellChange(args: { rowIdx: number; row: any; column: any }) {
         dispatch({
           type: 'SELECTED_CELL_CHANGE',
-          payload: { position: { idx: 0, rowIdx: args.rowIdx } },
+          payload: { position: { idx: args.column.idx, rowIdx: args.rowIdx } },
         })
       }
 
@@ -146,11 +145,13 @@ export const Grid = memo(
 
       return (
         <div
-          className={containerClass}
+          className={`${containerClass} flex flex-col`}
           style={{ width: width || '100%', height: height || '50vh' }}
         >
           <DataGrid
             ref={ref}
+            className={`${gridClass} flex-grow`}
+            rowClass={rowClass}
             columns={state.gridColumns}
             rows={rows ?? []}
             renderers={{
@@ -158,12 +159,12 @@ export const Grid = memo(
               noRowsFallback: (
                 <>
                   {isLoading && (
-                    <div className="p-2">
+                    <div className="p-2 col-span-full">
                       <GenericSkeletonLoader />
                     </div>
                   )}
                   {isError && (
-                    <div className="p-2">
+                    <div className="p-2 col-span-full">
                       <AlertError error={error} subject="Failed to retrieve rows from table" />
                     </div>
                   )}
@@ -172,7 +173,7 @@ export const Grid = memo(
                       {(filters ?? []).length === 0 ? (
                         <div
                           style={{ height: `calc(100% - 35px)` }}
-                          className="flex flex-col items-center justify-center"
+                          className="flex flex-col items-center justify-center col-span-full"
                         >
                           <p className="text-sm text-light">This table is empty</p>
                           {onAddRow !== undefined && onImportData !== undefined && (
@@ -195,7 +196,7 @@ export const Grid = memo(
                       ) : (
                         <div
                           style={{ height: `calc(100% - 35px)` }}
-                          className="flex flex-col items-center justify-center"
+                          className="flex flex-col items-center justify-center col-span-full"
                         >
                           <p className="text-sm text-light">
                             The filters applied has returned no results from this table
@@ -218,11 +219,7 @@ export const Grid = memo(
             onRowsChange={onRowsChange}
             onSelectedCellChange={onSelectedCellChange}
             onSelectedRowsChange={onSelectedRowsChange}
-            // [Next 18 Refactor] Double check if this is correct, props has been removed
-            // onRowDoubleClick={onRowDoubleClick}
-            className={gridClass}
-            rowClass={rowClass}
-            style={{ height: '100%' }}
+            onCellDoubleClick={(props) => onRowDoubleClick(props.row, props.column)}
           />
         </div>
       )

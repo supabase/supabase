@@ -1,60 +1,27 @@
-import { useCallback, useState } from 'react'
 import { Item, ItemParams, Menu, PredicateParams, Separator } from 'react-contexify'
+import { IconClipboard, IconEdit, IconTrash } from 'ui'
 
-import { SupaRow, SupaTable } from 'components/grid/types'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
-import { IconClipboard, IconEdit, IconTrash, Modal } from 'ui'
-import { useDispatch, useTrackedState } from '../../store'
+import { SupaRow } from 'components/grid/types'
+import { useCallback } from 'react'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { useTrackedState } from '../../store'
 import { copyToClipboard, formatClipboardValue } from '../../utils'
 
 export const ROW_CONTEXT_MENU_ID = 'row-context-menu-id'
 
 export type RowContextMenuProps = {
-  table: SupaTable
   rows: SupaRow[]
 }
 
-const RowContextMenu = ({ table, rows }: RowContextMenuProps) => {
+const RowContextMenu = ({ rows }: RowContextMenuProps) => {
   const state = useTrackedState()
-  const dispatch = useDispatch()
-
-  const [deletingRow, setDeletingRow] = useState<SupaRow | null>(null)
-
-  const { project } = useProjectContext()
-  const { mutate: deleteRows } = useTableRowDeleteMutation({
-    onSuccess: (res, variables) => {
-      dispatch({ type: 'REMOVE_ROWS', payload: { rowIdxs: [variables.rows[0].idx] } })
-      dispatch({
-        type: 'SELECTED_ROWS_CHANGE',
-        payload: { selectedRows: new Set() },
-      })
-      setDeletingRow(null)
-    },
-    onError: (error) => {
-      if (state.onError) state.onError(error)
-    },
-  })
+  const snap = useTableEditorStateSnapshot()
 
   function onDeleteRow(p: ItemParams) {
     const { props } = p
     const { rowIdx } = props
     const row = rows[rowIdx]
-    if (!row) return
-
-    setDeletingRow(row)
-  }
-
-  function onConfirmDeleteRow() {
-    if (!deletingRow || !project) return
-
-    deleteRows({
-      projectRef: project.ref,
-      connectionString: project.connectionString,
-      table,
-      rows: [deletingRow],
-    })
+    if (row) snap.onDeleteRows([row])
   }
 
   function onEditRowClick(p: ItemParams) {
@@ -108,22 +75,6 @@ const RowContextMenu = ({ table, rows }: RowContextMenuProps) => {
           <span className="ml-2 text-xs">Delete row</span>
         </Item>
       </Menu>
-
-      <ConfirmationModal
-        visible={deletingRow !== null}
-        header="Confirm to delete"
-        buttonLabel="Confirm"
-        onSelectCancel={() => setDeletingRow(null)}
-        onSelectConfirm={() => {
-          onConfirmDeleteRow()
-        }}
-      >
-        <Modal.Content>
-          <p className="py-4 text-sm text-foreground-light">
-            Are you sure you want to delete this row? This action cannot be undone.
-          </p>
-        </Modal.Content>
-      </ConfirmationModal>
     </>
   )
 }
