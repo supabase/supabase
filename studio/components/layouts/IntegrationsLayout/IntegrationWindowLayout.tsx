@@ -28,7 +28,7 @@ const IntegrationWindowLayout = ({
       <Header title={title} integrationIcon={integrationIcon} />
       <LoadingLine loading={loading} />
       <main className="overflow-auto flex flex-col h-full bg">{children}</main>
-      <ScaffoldContainer className="bg-body flex flex-row gap-6 py-6 border-t">
+      <ScaffoldContainer className="bg-background flex flex-row gap-6 py-6 border-t">
         {docsHref && (
           <Link href={docsHref} passHref>
             <a

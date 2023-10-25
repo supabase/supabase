@@ -72,7 +72,7 @@ const NavigationBar = () => {
     <div
       className={[
         'flex w-14 flex-col justify-between overflow-y-hidden p-2',
-        'border-r bg-body border-scale-500',
+        'border-r bg-background border-border',
       ].join(' ')}
     >
       <ul className="flex flex-col space-y-2">
@@ -96,7 +96,7 @@ const NavigationBar = () => {
             link: `/project/${projectRef}`,
           }}
         />
-        <div className="bg-scale-500 h-px w-full" />
+        <div className="bg-border h-px w-full" />
         {toolRoutes.map((route) => (
           <NavigationIconButton
             key={route.key}
@@ -104,7 +104,7 @@ const NavigationBar = () => {
             isActive={activeRoute === route.key}
           />
         ))}
-        <div className="bg-scale-500 h-px w-full"></div>
+        <div className="bg-border h-px w-full"></div>
 
         {productRoutes.map((route) => (
           <NavigationIconButton
@@ -113,7 +113,7 @@ const NavigationBar = () => {
             isActive={activeRoute === route.key}
           />
         ))}
-        <div className="h-px w-full bg-scale-500"></div>
+        <div className="h-px w-full bg-border"></div>
         {otherRoutes.map((route) => (
           <NavigationIconButton
             key={route.key}
@@ -144,7 +144,7 @@ const NavigationBar = () => {
                   <div
                     className={[
                       'rounded py-1 px-2 leading-none shadow text-xs',
-                      'border border-scale-200 flex items-center space-x-1',
+                      'border border-background flex items-center space-x-1',
                     ].join(' ')}
                   >
                     Project API Docs
@@ -173,7 +173,7 @@ const NavigationBar = () => {
                   <div
                     className={[
                       'rounded  py-1 px-2 leading-none shadow',
-                      'border border-scale-200 flex items-center space-x-1',
+                      'border border-background flex items-center space-x-1',
                     ].join(' ')}
                   >
                     {os === 'macos' ? (

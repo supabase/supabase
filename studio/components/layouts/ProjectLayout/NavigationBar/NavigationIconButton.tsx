@@ -25,9 +25,9 @@ const NavigationIconButton = ({ route, isActive = false }: NavigationIconButtonP
             className={[
               'transition-colors duration-200',
               'flex items-center justify-center h-10 w-10 rounded', // Layout
-              'bg-scale-200 hover:bg-scale-500', // Light mode
+              'bg-background hover:bg-overlay-hover', // Light mode
               'text-foreground-lighter hover:text-foreground ', // Dark mode
-              `${isActive ? 'bg-scale-500 shadow-sm text-foreground' : ''}`,
+              `${isActive ? 'bg-selection shadow-sm text-foreground' : ''}`,
             ].join(' ')}
           >
             {route.icon}
@@ -40,8 +40,8 @@ const NavigationIconButton = ({ route, isActive = false }: NavigationIconButtonP
 
           <div
             className={[
-              'bg-scale-100 shadow-lg shadow-scale-700 dark:shadow-scale-300	py-1.5 px-3 rounded leading-none', // background
-              'border border-scale-500 ', //border
+              'bg-alternative shadow-lg shadow-background-control	py-1.5 px-3 rounded leading-none', // background
+              'border border-border', //border
             ].join(' ')}
           >
             <span className="text-foreground text-xs">{route.label}</span>
