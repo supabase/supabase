@@ -1,7 +1,7 @@
 import { ListTree } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 
 import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -41,22 +41,24 @@ const BranchLink = ({
     sanitizedRoute?.replace('[ref]', branch.project_ref) ?? `/project/${branch.project_ref}`
 
   return (
-    <CommandItem_Shadcn_
-      value={branch.name}
-      className="cursor-pointer w-full"
-      onSelect={() => {
-        setOpen(false)
-        router.push(href)
-      }}
-      onClick={() => {
-        setOpen(false)
-      }}
-    >
-      <Link href={href} className="w-full flex items-center justify-between">
-        {branch.name}
+    <Link passHref href={href}>
+      <CommandItem_Shadcn_
+        value={branch.name}
+        className="cursor-pointer w-full flex items-center justify-between"
+        onSelect={() => {
+          setOpen(false)
+          router.push(href)
+        }}
+        onClick={() => {
+          setOpen(false)
+        }}
+      >
+        <p className="truncate w-60" title={branch.name}>
+          {branch.name}
+        </p>
         {isSelected && <IconCheck />}
-      </Link>
-    </CommandItem_Shadcn_>
+      </CommandItem_Shadcn_>
+    </Link>
   )
 }
 
@@ -68,7 +70,6 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const projectDetails = useSelectedProject()
-  const branchNameRef = useRef<HTMLAnchorElement>(null)
 
   const isBranch = projectDetails?.parent_project_ref !== undefined
   const projectRef =
@@ -76,7 +77,6 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
   const { data: branches, isLoading, isError, isSuccess } = useBranchesQuery({ projectRef })
 
   const [open, setOpen] = useState(false)
-  const popoverOffset = (branchNameRef.current?.offsetWidth ?? 0) + 12
   const selectedBranch = branches?.find((branch) => branch.project_ref === ref)
 
   return (
@@ -91,7 +91,7 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
       )}
 
       {isSuccess && branches.length > 0 && (
-        <div className="flex items-center space-x-2 px-2">
+        <div className="flex items-center px-2">
           <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
             <PopoverTrigger_Shadcn_ asChild>
               <Button
@@ -111,18 +111,13 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
                 </div>
               </Button>
             </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_
-              className="p-0"
-              side="bottom"
-              align="start"
-              style={{ marginLeft: `-${popoverOffset}px` }}
-            >
+            <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
               <Command_Shadcn_>
                 <CommandInput_Shadcn_ placeholder="Find branch..." />
                 <CommandList_Shadcn_>
                   <CommandEmpty_Shadcn_>No branches found</CommandEmpty_Shadcn_>
                   <CommandGroup_Shadcn_>
-                    <ScrollArea className={(branches || []).length > 7 ? 'h-[210px]' : ''}>
+                    <ScrollArea className="max-h-[210px] overflow-y-auto">
                       {branches?.map((branch) => (
                         <BranchLink
                           key={branch.id}
