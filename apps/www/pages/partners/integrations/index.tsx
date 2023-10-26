@@ -102,7 +102,7 @@ function IntegrationPartnersPage(props: Props) {
           ],
         }}
       />
-      <DefaultLayout className="bg-scale-400 dark:bg-scale-100">
+      <DefaultLayout className="bg-alternative">
         <SectionContainer className="space-y-16">
           <div>
             <h1 className="h1">{meta_title}</h1>

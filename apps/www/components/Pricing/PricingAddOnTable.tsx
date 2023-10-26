@@ -42,7 +42,7 @@ const PricingAddOnTable = ({ icon, pricing }: PricingAddOnTableProps) => {
           >
             <div className="flex w-full flex-1 flex-col items-start lg:w-auto lg:flex-row lg:items-center">
               <div className="dark:bg-scale-300 relative flex w-full items-center space-x-3 self-stretch bg-white py-8 pl-4 lg:w-[420px] lg:py-0">
-                <span className="bg-scale-1200 text-scale-100 rounded-md p-2 shadow-sm transition-transform duration-500 group-hover:scale-105 group-hover:shadow">
+                <span className="bg-foreground text-background rounded-md p-2 shadow-sm transition-transform duration-500 group-hover:scale-105 group-hover:shadow">
                   {icon}
                 </span>
                 <span className="flex-shrink-0">

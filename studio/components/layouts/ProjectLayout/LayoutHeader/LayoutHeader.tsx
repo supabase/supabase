@@ -89,7 +89,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
 
             {projectRef && (
               <>
-                <span className="text-scale-800 dark:text-scale-700">
+                <span className="text-border-stronger dark:text-border-strong">
                   <svg
                     viewBox="0 0 24 24"
                     width="16"
@@ -127,7 +127,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
 
             {selectedProject && enableBranchManagement && (
               <>
-                <span className="text-scale-800 dark:text-scale-700">
+                <span className="text-border-stronger dark:text-border-strong">
                   <svg
                     viewBox="0 0 24 24"
                     width="16"

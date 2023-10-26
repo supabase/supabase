@@ -207,7 +207,7 @@ const TableList = ({
                           {x.comment !== null ? (
                             <p title={x.comment}>{x.comment}</p>
                           ) : (
-                            <p className="text-scale-800">No description</p>
+                            <p className="text-border-stronger">No description</p>
                           )}
                         </Table.td>
                         <Table.td className="hidden text-right xl:table-cell">

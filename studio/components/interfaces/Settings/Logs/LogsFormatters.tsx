@@ -60,7 +60,7 @@ export const ResponseCodeFormatter = ({ value }: any) => {
   if (!value) {
     return (
       <div>
-        <label className="text-xs text-scale-800">No data</label>
+        <label className="text-xs text-border-stronger">No data</label>
       </div>
     )
   }
@@ -150,7 +150,7 @@ export const SeverityFormatter = ({
   if (!value) {
     return (
       <div>
-        <label className="text-xs text-scale-800">No data</label>
+        <label className="text-xs text-border-stronger">No data</label>
       </div>
     )
   }

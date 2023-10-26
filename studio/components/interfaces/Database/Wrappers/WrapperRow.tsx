@@ -54,7 +54,7 @@ const WrapperRow = ({
           >
             <div className="flex items-center gap-3">
               <IconChevronUp
-                className="transition text-scale-800 data-open-parent:rotate-0 data-closed-parent:rotate-180"
+                className="transition text-border-stronger data-open-parent:rotate-0 data-closed-parent:rotate-180"
                 strokeWidth={2}
                 width={14}
               />

@@ -42,7 +42,7 @@
 }
 
 .react-datepicker__current-month {
-  @apply ml-2.5 text-lg font-semibold text-scale-800;
+  @apply ml-2.5 text-lg font-semibold text-border-stronger;
 }
 
 .react-datepicker__week {
@@ -81,7 +81,7 @@
 }
 
 .react-datepicker__day--outside-month {
-  @apply text-scale-800;
+  @apply text-border-stronger;
 }
 
 .react-datepicker__day--in-range {
@@ -105,9 +105,9 @@
 }
 
 .react-datepicker__day--range-start {
-  @apply bg-brand text-white hover:text-scale-700 hover:bg-white;
+  @apply bg-brand text-white hover:text-border-strong hover:bg-white;
 }
 
 .react-datepicker__day--range-end {
-  @apply bg-brand text-white hover:text-scale-700 hover:bg-white;
+  @apply bg-brand text-white hover:text-border-strong hover:bg-white;
 }

@@ -390,7 +390,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                   (benefits: { icon: string; title: string; text: string }, i: number) => {
                     return (
                       <div
-                        className="h-full bg-white dark:bg-scale-300 drop-shadow-sm border-scale-400 border-[1px] p-6 rounded-lg flex items-start space-x-6 w-full"
+                        className="h-full bg-alternative drop-shadow-sm border-muted border-[1px] p-6 rounded-lg flex items-start space-x-6 w-full"
                         key={i}
                       >
                         <div className="w-12 h-12 sm:w-10 sm:h-10 lg:w-12 lg:h-12 aspect-square rounded-lg flex items-center">
@@ -489,7 +489,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                     return (
                       <div className="cursor-pointer md:cursor-default" key={i}>
                         <Link href={job.absolute_url}>
-                          <div className="bg-white border-scale-300 drop-shadow-sm dark:bg-scale-300 border dark:border-scale-400 p-4 px-7 rounded-md sm:flex sm:items-center transition ease-out hover:bg-alternative dark:hover:bg-scale-400 hover:drop-shadow-md hover:cursor-pointer">
+                          <div className="bg-alternative border-muted drop-shadow-sm border p-4 px-7 rounded-md sm:flex sm:items-center transition ease-out hover:bg-alternative dark:hover:bg-surface-100 hover:drop-shadow-md hover:cursor-pointer">
                             <h2 className="text-base min-w-[240px] lg:min-w-[316px] truncate mr-6">
                               {job.title}
                             </h2>

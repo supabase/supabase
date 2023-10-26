@@ -54,7 +54,7 @@ function Partner({
                 layout="fixed"
                 width={56}
                 height={56}
-                className="bg-scale-400 flex-shrink-f0 h-14 w-14 rounded-full"
+                className="bg-surface2100 flex-shrink-f0 h-14 w-14 rounded-full"
                 src={partner.logo}
                 alt={partner.title}
               />
@@ -64,7 +64,7 @@ function Partner({
             </div>
 
             <div
-              className="bg-scale-300 py-6"
+              className="bg-surface-100 py-6"
               style={{ marginLeft: 'calc(50% - 50vw)', marginRight: 'calc(50% - 50vw)' }}
             >
               <Swiper
@@ -122,7 +122,7 @@ function Partner({
 
                 {partner.video && (
                   <div
-                    className="bg-scale-1000 relative w-full rounded-md shadow-lg"
+                    className="bg-foreground-lighter relative w-full rounded-md shadow-lg"
                     style={{ padding: '56.25% 0 0 0', marginBottom: '1rem' }}
                   >
                     <iframe

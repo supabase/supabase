@@ -107,7 +107,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
         >
           <div className="flex items-center gap-3">
             <IconChevronUp
-              className="text-scale-800 transition data-open-parent:rotate-0 data-closed-parent:rotate-180"
+              className="text-border-stronger transition data-open-parent:rotate-0 data-closed-parent:rotate-180"
               strokeWidth={2}
               width={14}
             />

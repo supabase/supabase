@@ -100,7 +100,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                 <div className="flex items-start space-x-3">
                   <IconChevronUp
                     id="collapsible-trigger"
-                    className="text-scale-800 transition data-open-parent:rotate-0 data-closed-parent:rotate-180"
+                    className="text-border-stronger transition data-open-parent:rotate-0 data-closed-parent:rotate-180"
                     strokeWidth={2}
                     width={14}
                   />
