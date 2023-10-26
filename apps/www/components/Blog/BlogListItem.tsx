@@ -28,11 +28,9 @@ const BlogListItem = ({ post }: Props) => {
       <Link href={post.path} className="group inline-block min-w-full">
         <div className="flex flex-col space-y-6">
           <div className="flex flex-col space-y-3">
-            <div
-              className={`border-scale-300 relative mb-4 h-60 w-full overflow-auto rounded-lg border shadow-sm`}
-            >
+            <div className="border-scale-300 relative mb-4 h-60 w-full overflow-hidden rounded-lg border shadow-sm">
               <Image
-                layout="fill"
+                fill
                 src={
                   !post.thumb
                     ? `/images/blog/blog-placeholder.png`
@@ -40,9 +38,8 @@ const BlogListItem = ({ post }: Props) => {
                     ? post.thumb
                     : `/images/blog/${post.thumb}`
                 }
-                objectFit="cover"
-                className="scale-100 transform duration-100 ease-in group-hover:scale-105"
-                alt="case study thumbnail"
+                className="object-cover scale-100 transform duration-100 ease-in group-hover:scale-105"
+                alt={post.title}
               />
             </div>
 

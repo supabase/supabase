@@ -185,9 +185,9 @@ function FeaturedThumb(blog: PostTypes) {
         </div>
         <div className="flex flex-col space-y-2">
           <div className="text-muted flex space-x-2 text-sm">
-            <p>{blog.date}</p>
-            <p>•</p>
-            <p>{blog.readingTime}</p>
+            <span>{blog.date}</span>
+            <span>•</span>
+            <span>{blog.readingTime}</span>
           </div>
 
           <div>

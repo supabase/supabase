@@ -140,23 +140,22 @@ function CaseStudyPage(props: any) {
                     <div className="col-span-12 lg:col-span-4 lg:block xl:col-span-4">
                       <div className="space-y-8 lg:sticky lg:top-24 lg:mb-24">
                         {/* Logo */}
-                        <div className={`relative h-16 w-32`}>
-                          <p className="flex flex-row ">
-                            <Image
-                              layout="fill"
-                              src={`${props.blog.logo}`}
-                              alt={`${props.blog.title} logo`}
-                              objectFit="scale-down"
-                              objectPosition="left"
-                              className="
-                      bg-no-repeat
+                        <div className="relative h-16 w-32 lg:mt-5">
+                          <Image
+                            fill
+                            src={`${props.blog.logo}`}
+                            alt={`${props.blog.title} logo`}
+                            className="
+                                bg-no-repeat
+                                object-left
+                                object-contain
+                                m-0
 
-                      dark:brightness-200
-                      dark:contrast-0
-                      dark:filter
-                    "
-                            />
-                          </p>
+                                dark:brightness-200
+                                dark:contrast-0
+                                dark:filter
+                              "
+                          />
                         </div>
 
                         <div className="flex flex-col space-y-2">
