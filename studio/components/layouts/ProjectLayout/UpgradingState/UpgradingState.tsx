@@ -178,8 +178,8 @@ const UpgradingState = () => {
                                 />
                               </div>
                             ) : isCompleted ? (
-                              <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-brand-600 dark:bg-brand-300 border-brand-400">
-                                <IconCheck size={12} className="text-white" strokeWidth={2} />
+                              <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-brand border-brand">
+                                <IconCheck size={12} className="text-white" strokeWidth={3} />
                               </div>
                             ) : (
                               <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-scale-600" />
