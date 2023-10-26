@@ -94,8 +94,9 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
                       to check if your DNS has been propagated successfully before clicking verify.
                     </p>
                     <p>
-                    Some registrars will require you to remove the domain name when creating DNS records.
-                    As an example, to create a record for `foo.app.example.com`, you would need to create an entry for `foo.app`.
+                      Some registrars will require you to remove the domain name when creating DNS
+                      records. As an example, to create a record for `foo.app.example.com`, you
+                      would need to create an entry for `foo.app`.
                     </p>
                   </div>
                 ) : (
