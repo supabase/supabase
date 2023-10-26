@@ -44,12 +44,12 @@ const HighlightCard = ({ highlight, index }: { highlight: Highlight; index: numb
       onMouseLeave={() => setIsHovered(false)}
       animate={isInView ? animate : initial}
     >
-      <Panel hasShimmer innerClassName="flex flex-col !bg-scale-100">
+      <Panel hasShimmer innerClassName="flex flex-col !bg-alternative">
         <div className="relative w-full aspect-[1.35/1] mb-4">
           <div
             className="absolute inset-0 w-full h-full z-10"
             style={{
-              background: `radial-gradient(100% 50% at 50% 50%, transparent, var(--colors-scale1))`,
+              background: `radial-gradient(100% 50% at 50% 50%, transparent, hsl(var(--background-alternative)))`,
             }}
           />
           {highlight.image && <Img isHovered={isHovered} />}
