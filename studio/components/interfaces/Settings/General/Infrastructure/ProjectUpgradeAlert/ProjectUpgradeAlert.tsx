@@ -35,7 +35,6 @@ const ProjectUpgradeAlert = () => {
 
   const durationEstimateHours = data?.duration_estimate_hours || 1
   const legacyAuthCustomRoles = data?.legacy_auth_custom_roles || []
-  const extensionDependentObjects = data?.extension_dependent_objects || []
 
   const initialValues = { version: data?.target_upgrade_versions?.[0]?.postgres_version ?? 0 }
   const { mutate: upgradeProject, isLoading: isUpgrading } = useProjectUpgradeMutation({
@@ -84,8 +83,10 @@ const ProjectUpgradeAlert = () => {
                   <Modal.Content>
                     <div className="space-y-4">
                       <p className="text-sm">
-                        All services, including Auth, Rest, and Extensions will be upgraded. This
-                        action cannot be undone.
+                        All services are going offline.
+                      </p>
+                      <p className="text-sm">
+                        You will not be able to downgrade back to Postgres {currentPgVersion}.
                       </p>
                       <Alert_Shadcn_ title="Your project will be offline while the upgrade is in progress">
                         <IconAlertCircle className="h-4 w-4" strokeWidth={2} />
