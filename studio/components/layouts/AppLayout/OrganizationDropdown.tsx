@@ -85,14 +85,14 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
                       <CommandItem_Shadcn_
                         key={org.slug}
                         value={`${org.name} - ${org.slug}`}
-                        className="cursor-pointer w-full flex items-center justify-between"
+                        className="cursor-pointer w-full"
                         onSelect={() => {
                           setOpen(false)
                           router.push(href)
                         }}
                         onClick={() => setOpen(false)}
                       >
-                        <Link href={href}>
+                        <Link href={href} className="w-full flex items-center justify-between">
                           {org.name}
                           {org.slug === slug && <IconCheck />}
                         </Link>
@@ -104,14 +104,14 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
               {organizationCreationEnabled && (
                 <CommandGroup_Shadcn_ className="border-t">
                   <CommandItem_Shadcn_
-                    className="cursor-pointer flex items-center space-x-2 w-full"
+                    className="cursor-pointer w-full"
                     onSelect={(e) => {
                       setOpen(false)
                       router.push(`/new`)
                     }}
                     onClick={() => setOpen(false)}
                   >
-                    <Link href="/new">
+                    <Link href="/new" className="flex items-center gap-2 w-full">
                       <IconPlus size={14} strokeWidth={1.5} />
                       <p>New organization</p>
                     </Link>

@@ -43,7 +43,7 @@ const BranchLink = ({
   return (
     <CommandItem_Shadcn_
       value={branch.name}
-      className="cursor-pointer w-full flex items-center justify-between"
+      className="cursor-pointer w-full"
       onSelect={() => {
         setOpen(false)
         router.push(href)
@@ -52,7 +52,7 @@ const BranchLink = ({
         setOpen(false)
       }}
     >
-      <Link href={href}>
+      <Link href={href} className="w-full flex items-center justify-between">
         {branch.name}
         {isSelected && <IconCheck />}
       </Link>
@@ -135,14 +135,17 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
                   </CommandGroup_Shadcn_>
                   <CommandGroup_Shadcn_ className="border-t">
                     <CommandItem_Shadcn_
-                      className="cursor-pointer flex items-center space-x-2 w-full"
+                      className="cursor-pointer w-full"
                       onSelect={(e) => {
                         setOpen(false)
                         router.push(`/project/${ref}/branches`)
                       }}
                       onClick={() => setOpen(false)}
                     >
-                      <Link href={`/project/${ref}/branches`}>
+                      <Link
+                        href={`/project/${ref}/branches`}
+                        className="w-full flex items-center gap-2"
+                      >
                         <ListTree size={14} strokeWidth={1.5} />
                         <p>Manage branches</p>
                       </Link>
