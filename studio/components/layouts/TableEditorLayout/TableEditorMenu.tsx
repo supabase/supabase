@@ -20,8 +20,10 @@ import {
   IconSearch,
   IconX,
   Input,
-  Menu,
+  Menu
 } from 'ui'
+
+import {PlusCircle} from 'lucide-react'
 
 import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import InfiniteList from 'components/ui/InfiniteList'
@@ -40,10 +42,15 @@ const TableEditorMenu = () => {
 
   const [showModal, setShowModal] = useState(false)
   const [searchText, setSearchText] = useState<string>('')
+  const [isSearchExpanded, setSearchExpanded] = useState(false);
   const [sort, setSort] = useLocalStorage<'alphabetical' | 'grouped-alphabetical'>(
     'table-editor-sort',
     'alphabetical'
   )
+
+  const toggleSearchExpansion = () => {
+    setSearchExpanded(!isSearchExpanded);
+  };
 
   const { project } = useProjectContext()
   const {
@@ -107,22 +114,18 @@ const TableEditorMenu = () => {
           }}
           onSelectCreateSchema={() => snap.onAddSchema()}
         />
-
+          
         <div className="space-y-1 mx-4">
           {!isLocked ? (
             <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger className="w-full">
+              <Tooltip.Trigger className="w-full ">
                 <Button
                   asChild
                   block
                   disabled={!canCreateTables}
                   size="tiny"
-                  icon={
-                    <div className="text-foreground-lighter">
-                      <IconEdit size={14} strokeWidth={1.5} />
-                    </div>
-                  }
-                  type="default"
+                  icon={<PlusCircle className="mr-2 h-4 w-4 text-foreground-light" />}
+                  type="outline"
                   style={{ justifyContent: 'start' }}
                   onClick={snap.onAddTable}
                 >
@@ -163,34 +166,7 @@ const TableEditorMenu = () => {
             </Alert_Shadcn_>
           )}
 
-          {/* Table search input */}
-          <div className="mb-2 block">
-            <Input
-              className="table-editor-search border-none"
-              icon={
-                isSearching ? (
-                  <IconLoader
-                    className="animate-spin text-foreground-lighter"
-                    size={12}
-                    strokeWidth={1.5}
-                  />
-                ) : (
-                  <IconSearch className="text-foreground-lighter" size={12} strokeWidth={1.5} />
-                )
-              }
-              placeholder="Search tables"
-              onChange={(e) => setSearchText(e.target.value.trim())}
-              value={searchText}
-              size="tiny"
-              actions={
-                searchText && (
-                  <Button size="tiny" type="text" onClick={() => setSearchText('')}>
-                    <IconX size={12} strokeWidth={2} />
-                  </Button>
-                )
-              }
-            />
-          </div>
+
         </div>
 
         {isLoading ? (
@@ -224,11 +200,35 @@ const TableEditorMenu = () => {
                 <>
                   <div className="flex w-full items-center justify-between">
                     <div className="flex items-center space-x-1">
-                      <p>Tables</p>
-                      {totalCount !== undefined && (
-                        <p style={{ fontVariantNumeric: 'tabular-nums' }}>({totalCount})</p>
-                      )}
+                      {/* Table search input */}
+                      <div className="mb-2 block relative">
+                        <div className={`relative table-editor-search border-none'}`}>
+                          {isSearchExpanded ? (
+                            <div className="flex items-center">
+                              <Input
+                                onBlur={toggleSearchExpansion}
+                                onChange={(e) => setSearchText(e.target.value.trim())}
+                                value={searchText}
+                                size="tiny"
+                              />
+                              
+                              <IconX size={18} strokeWidth={1} 
+                              type="text"
+                              onClick={() => {
+                                setSearchText('');
+                                toggleSearchExpansion();
+                              }} />
+                        
+                            </div>
+                          ) : (
+                            <div className="flex items-center" onClick={toggleSearchExpansion}>
+                              <IconSearch className="text-foreground-lighter" size={18} strokeWidth={1.5} />
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </div>
+                    
 
                     <div className="flex gap-3 items-center">
                       <DropdownMenu>
@@ -272,12 +272,13 @@ const TableEditorMenu = () => {
                         </DropdownMenuContent>
                       </DropdownMenu>
 
-                      <button
+                              
+                      {/* <button
                         className="cursor-pointer text-foreground-lighter transition-colors hover:text-foreground"
                         onClick={refreshTables}
                       >
                         <IconRefreshCw className={isRefetching ? 'animate-spin' : ''} size={14} />
-                      </button>
+                      </button> */}
                     </div>
                   </div>
                 </>
