@@ -55,7 +55,9 @@ const BranchLink = ({
         }}
       >
         <a>
-          {branch.name}
+          <p className="truncate w-60" title={branch.name}>
+            {branch.name}
+          </p>
           {isSelected && <IconCheck />}
         </a>
       </CommandItem_Shadcn_>
@@ -71,7 +73,6 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const projectDetails = useSelectedProject()
-  const branchNameRef = useRef<HTMLAnchorElement>(null)
 
   const isBranch = projectDetails?.parent_project_ref !== undefined
   const projectRef =
@@ -79,7 +80,6 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
   const { data: branches, isLoading, isError, isSuccess } = useBranchesQuery({ projectRef })
 
   const [open, setOpen] = useState(false)
-  const popoverOffset = (branchNameRef.current?.offsetWidth ?? 0) + 12
   const selectedBranch = branches?.find((branch) => branch.project_ref === ref)
 
   return (
@@ -94,7 +94,7 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
       )}
 
       {isSuccess && branches.length > 0 && (
-        <div className="flex items-center space-x-2 px-2">
+        <div className="flex items-center px-2">
           <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
             <PopoverTrigger_Shadcn_ asChild>
               <Button
@@ -114,18 +114,13 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
                 </div>
               </Button>
             </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_
-              className="p-0"
-              side="bottom"
-              align="start"
-              style={{ marginLeft: `-${popoverOffset}px` }}
-            >
+            <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
               <Command_Shadcn_>
                 <CommandInput_Shadcn_ placeholder="Find branch..." />
                 <CommandList_Shadcn_>
                   <CommandEmpty_Shadcn_>No branches found</CommandEmpty_Shadcn_>
                   <CommandGroup_Shadcn_>
-                    <ScrollArea className={(branches || []).length > 7 ? 'h-[210px]' : ''}>
+                    <ScrollArea className="max-h-[210px] overflow-y-auto">
                       {branches?.map((branch) => (
                         <BranchLink
                           key={branch.id}
