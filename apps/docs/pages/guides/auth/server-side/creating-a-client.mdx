@@ -16,11 +16,11 @@ npm install @supabase/ssr @supabase/supabase-js
 
 ### Set environment variables
 
-Create a `.env.local` file in your project root directory. You can get your `SUPABASE_URL` and `SUPABASE_ANON_KEY` from inside [your Supabase project's dashboard](https://supabase.com/dashboard/project/_/settings/api).
-
 <Tabs scrollable size="small" type="underlined" defaultActiveId="nextjs" queryGroup="framework">
 
 <TabPanel id="nextjs" label="Next.js">
+
+Create a `.env.local` file in your project root directory. You can get your `SUPABASE_URL` and `SUPABASE_ANON_KEY` from inside [your Supabase project's dashboard](https://supabase.com/dashboard/project/_/settings/api).
 
 ```bash .env.local
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
@@ -30,9 +30,31 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 </TabPanel>
 <TabPanel id="sveltekit" label="SvelteKit">
 
+Create a `.env.local` file in your project root directory. You can get your `SUPABASE_URL` and `SUPABASE_ANON_KEY` from inside [your Supabase project's dashboard](https://supabase.com/dashboard/project/_/settings/api).
+
 ```bash .env.local
 PUBLIC_SUPABASE_URL=your_supabase_project_url
 PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+</TabPanel>
+<TabPanel id="astro" label="Astro">
+
+Create a `.env` file in your project root directory. You can get your `SUPABASE_URL` and `SUPABASE_ANON_KEY` from inside [your Supabase project's dashboard](https://supabase.com/dashboard/project/_/settings/api).
+
+```bash .env
+PUBLIC_SUPABASE_URL=your_supabase_project_url
+PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+</TabPanel>
+<TabPanel id="remix" label="Remix">
+
+Create a `.env` file in your project root directory. You can get your `SUPABASE_URL` and `SUPABASE_ANON_KEY` from inside [your Supabase project's dashboard](https://supabase.com/dashboard/project/_/settings/api).
+
+```bash .env
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
 </TabPanel>
@@ -405,6 +427,159 @@ export default function Index () {
 <TabPanel id="sveltekit" label="SvelteKit">
 
 HELP ME SUPADREW!
+
+</TabPanel>
+<TabPanel id="astro" label="Astro">
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="astro-server"
+  queryGroup="environment"
+>
+<TabPanel id="astro-server" label="Server">
+
+```ts index.astro
+---
+import { createServerClient, type CookieOptions } from "@suapbase/ssr";
+
+const supabase = createServerClient(
+  import.meta.env.PUBLIC_SUPABASE_URL,
+  import.meta.env.PUBLIC_SUPABASE_ANON_KEY,
+  {
+    cookies: {
+      get(key: string) {
+        return Astro.cookies.get(key)?.value;
+      },
+      set(key: string, value: string, options: CookieOptions) {
+        Astro.cookies.set(key, value, options);
+      },
+      remove(key: string, options) {
+        Astro.cookies.delete(key, options);
+      },
+    },
+  }
+);
+---
+```
+
+</TabPanel>
+
+<TabPanel id="astro-browser" label="Browser">
+
+```html index.astro
+<script>
+  const supabase = createBrowserClient(
+    import.meta.env.PUBLIC_SUPABASE_URL,
+    import.meta.env.PUBLIC_SUPABASE_ANON_KEY
+  );
+</script>
+```
+
+</TabPanel>
+</Tabs>
+
+</TabPanel>
+<TabPanel id="remix" label="Remix">
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="remix-loader"
+  queryGroup="environment"
+>
+<TabPanel id="remix-loader" label="Loader">
+
+```ts _index.tsx
+import { type LoaderFunctionArgs } from '@remix-run/node'
+import { createServerClient, parse, serialize } from '@supabase/ssr'
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  const cookies = parse(request.headers.get('Cookie') ?? '')
+  const headers = new Headers()
+
+  const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
+    cookies: {
+      get(key) {
+        return cookies[key]
+      },
+      set(key, value, options) {
+        headers.append('Set-Cookie', serialize(key, value, options))
+      },
+      remove(key, options) {
+        headers.append('Set-Cookie', serialize(key, '', options))
+      },
+    },
+  })
+
+  return new Response('...', {
+    headers,
+  })
+}
+```
+
+</TabPanel>
+
+<TabPanel id="remix-action" label="Action">
+
+```ts _index.tsx
+import { type ActionFunctionArgs } from '@remix-run/node'
+import { createServerClient, parse, serialize } from '@supabase/ssr'
+
+export async function action({ request }: ActionFunctionArgs) {
+  const cookies = parse(request.headers.get('Cookie') ?? '')
+  const headers = new Headers()
+
+  const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
+    cookies: {
+      get(key) {
+        return cookies[key]
+      },
+      set(key, value, options) {
+        headers.append('Set-Cookie', serialize(key, value, options))
+      },
+      remove(key, options) {
+        headers.append('Set-Cookie', serialize(key, '', options))
+      },
+    },
+  })
+
+  return new Response('...', {
+    headers,
+  })
+}
+```
+
+</TabPanel>
+
+<TabPanel id="remix-component" label="Component">
+
+```ts _index.tsx
+import { type LoaderFunctionArgs } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
+import { createBrowserClient } from "@supabase/ssr";
+
+export async function loader({}: LoaderFunctionArgs) {
+  return {
+    env: {
+      SUPABASE_URL: process.env.SUPABASE_URL!,
+      SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
+    },
+  };
+}
+
+export default function Index() {
+  const { env } = useLoaderData<typeof loader>();
+
+  const supabase = createBrowserClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
+
+  return ...
+```
+
+</TabPanel>
+</Tabs>
 
 </TabPanel>
 </Tabs>
