@@ -159,46 +159,46 @@ const InfrastructureInfo = () => {
                 {showDbUpgrades &&
                   !data?.eligible &&
                   (data?.extension_dependent_objects || []).length > 0 && (
-                  <Alert_Shadcn_
-                    variant="warning"
-                    title="A new version of Postgres is available for your project"
-                  >
-                    <AlertTitle_Shadcn_>New version of Postgres available</AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_ className="flex flex-col gap-3">
-                      <div>
-                        <p className="mb-1">
-                          This project cannot be upgraded due to the following extension dependent
-                          objects:
-                        </p>
+                    <Alert_Shadcn_
+                      variant="warning"
+                      title="A new version of Postgres is available for your project"
+                    >
+                      <AlertTitle_Shadcn_>New version of Postgres available</AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                        <div>
+                          <p className="mb-1">
+                            This project cannot be upgraded due to the following extension dependent
+                            objects:
+                          </p>
 
-                        <ul className="pl-4">
-                          {(data?.extension_dependent_objects || []).map((obj) => (
-                            <li className="list-disc" key={obj}>
-                              {obj}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                      <p>
-                        Once the above objects are exported and removed, you can proceed to upgrade
-                        your project, and re-import the objects after the upgrade operation is
-                        complete.
-                      </p>
-                      <div>
-                        <Link
-                          href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats"
-                          passHref
-                        >
-                          <Button size="tiny" type="default" asChild>
-                            <a target="_blank" rel="noreferrer">
-                              View docs
-                            </a>
-                          </Button>
-                        </Link>
-                      </div>
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
-                )}
+                          <ul className="pl-4">
+                            {(data?.extension_dependent_objects || []).map((obj) => (
+                              <li className="list-disc" key={obj}>
+                                {obj}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        <p>
+                          Once the above objects are exported and removed, you can proceed to
+                          upgrade your project, and re-import the objects after the upgrade
+                          operation is complete.
+                        </p>
+                        <div>
+                          <Link
+                            href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats"
+                            passHref
+                          >
+                            <Button size="tiny" type="default" asChild>
+                              <a target="_blank" rel="noreferrer">
+                                View docs
+                              </a>
+                            </Button>
+                          </Link>
+                        </div>
+                      </AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
+                  )}
               </>
             )}
           </ScaffoldSectionContent>

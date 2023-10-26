@@ -82,9 +82,7 @@ const ProjectUpgradeAlert = () => {
                 <div className="py-6">
                   <Modal.Content>
                     <div className="space-y-4">
-                      <p className="text-sm">
-                        All services are going offline.
-                      </p>
+                      <p className="text-sm">All services are going offline.</p>
                       <p className="text-sm">
                         You will not be able to downgrade back to Postgres {currentPgVersion}.
                       </p>
