@@ -55,7 +55,9 @@ const BranchLink = ({
         }}
       >
         <a>
-          {branch.name}
+          <p className="truncate w-60" title={branch.name}>
+            {branch.name}
+          </p>
           {isSelected && <IconCheck />}
         </a>
       </CommandItem_Shadcn_>
