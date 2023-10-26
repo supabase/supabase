@@ -9307,6 +9307,10 @@ export interface operations {
   /** Gets github repos for the given organization */
   GitHubRepoController_getRepos: {
     parameters: {
+      query?: {
+        per_page?: number
+        page?: number
+      }
       path: {
         organization_integration_id: string
       }
