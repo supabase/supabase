@@ -1,15 +1,19 @@
 import { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { Button, IconExternalLink, IconSearch, Input } from 'ui'
 
-import { useParams } from 'common/hooks'
 import { Policies } from 'components/interfaces/Auth/Policies'
+import RLSTestSidePanel from 'components/interfaces/Auth/Policies/RLSTestSidePanel/RLSTestSidePanel'
 import { AuthLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
+import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
@@ -17,7 +21,6 @@ import { useCheckPermissions, useStore } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { NextPageWithLayout } from 'types'
-import { Button, IconExternalLink, IconLock, IconSearch, Input, Listbox } from 'ui'
 
 /**
  * Filter tables by table name and policy name
@@ -59,23 +62,18 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const snap = useTableEditorStateSnapshot()
   const { meta } = useStore()
   const { search } = useParams()
+  const [showRlsTester, setShowRlsTester] = useState(false)
   const [searchString, setSearchString] = useState<string>('')
 
   useEffect(() => {
     if (search) setSearchString(search)
   }, [search])
 
-  const {
-    data: schemas,
-    isLoading: isLoadingSchemas,
-    isSuccess: isSuccessSchemas,
-    isError: isErrorSchemas,
-    error: errorSchemas,
-  } = useSchemasQuery({
+  const { data: schemas } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const [protectedSchemas, openSchemas] = partition(schemas, (schema) =>
+  const [protectedSchemas] = partition(schemas, (schema) =>
     EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
   )
   const schema = schemas?.find((schema) => schema.name === snap.selectedSchemaName)
@@ -96,7 +94,6 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   })
 
   const filteredTables = onFilterTables(tables ?? [], policies, searchString)
-
   const canReadPolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'policies')
 
   if (!canReadPolicies) {
@@ -107,65 +104,14 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
     <div className="flex flex-col h-full">
       <div className="mb-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="w-[230px]">
-              {isLoadingSchemas && (
-                <div className="h-[34px] w-full bg-scale-1000 rounded shimmering-loader" />
-              )}
-
-              {isErrorSchemas && (
-                <AlertError error={errorSchemas} subject="Failed to retrieve schemas" />
-              )}
-
-              {isSuccessSchemas && (
-                <Listbox
-                  size="small"
-                  value={snap.selectedSchemaName}
-                  onChange={(schema: string) => {
-                    snap.setSelectedSchemaName(schema)
-                    setSearchString('')
-                  }}
-                  icon={isLocked && <IconLock size={14} strokeWidth={2} />}
-                >
-                  <Listbox.Option
-                    disabled
-                    key="normal-schemas"
-                    value="normal-schemas"
-                    label="Schemas"
-                  >
-                    <p className="text-sm">Schemas</p>
-                  </Listbox.Option>
-                  {openSchemas.map((schema) => (
-                    <Listbox.Option
-                      key={schema.id}
-                      value={schema.name}
-                      label={schema.name}
-                      addOnBefore={() => <span className="text-foreground-lighter">schema</span>}
-                    >
-                      <span className="text-foreground text-sm">{schema.name}</span>
-                    </Listbox.Option>
-                  ))}
-                  <Listbox.Option
-                    disabled
-                    key="protected-schemas"
-                    value="protected-schemas"
-                    label="Protected schemas"
-                  >
-                    <p className="text-sm">Protected schemas</p>
-                  </Listbox.Option>
-                  {protectedSchemas.map((schema) => (
-                    <Listbox.Option
-                      key={schema.id}
-                      value={schema.name}
-                      label={schema.name}
-                      addOnBefore={() => <span className="text-foreground-lighter">schema</span>}
-                    >
-                      <span className="text-foreground text-sm">{schema.name}</span>
-                    </Listbox.Option>
-                  ))}
-                </Listbox>
-              )}
-            </div>
+          <div className="flex items-center space-x-2">
+            <SchemaSelector
+              className="w-[260px]"
+              size="small"
+              showError={false}
+              selectedSchemaName={snap.selectedSchemaName}
+              onSelectSchema={snap.setSelectedSchemaName}
+            />
             <Input
               size="small"
               placeholder="Filter tables and policies"
@@ -175,22 +121,36 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
               icon={<IconSearch size="tiny" />}
             />
           </div>
-          <a
-            target="_blank"
-            rel="noreferrer"
-            href="https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security"
-          >
-            <Button type="link" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
-              What is RLS?
+
+          <div className="flex items-center gap-2">
+            <Button type="default" onClick={() => setShowRlsTester(true)}>
+              Test RLS policies
             </Button>
-          </a>
+            <Link
+              passHref
+              href="https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security"
+            >
+              <Button
+                asChild
+                type="default"
+                icon={<IconExternalLink size={14} strokeWidth={1.5} />}
+              >
+                <a target="_blank" rel="noreferrer">
+                  What is RLS?
+                </a>
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
+
       {isLoading && <GenericSkeletonLoader />}
       {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
       {isSuccess && (
         <Policies tables={filteredTables} hasTables={tables.length > 0} isLocked={isLocked} />
       )}
+
+      <RLSTestSidePanel visible={showRlsTester} onClose={() => setShowRlsTester(false)} />
     </div>
   )
 }
