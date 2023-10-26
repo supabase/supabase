@@ -67,7 +67,7 @@ const WrappersDisabledState = () => {
   return (
     <div>
       <div
-        className="w-full px-12 py-12 bg-white bg-no-repeat border rounded dark:bg-scale-200 border-border"
+        className="w-full px-12 py-12 bg-no-repeat border rounded bg-background border-border"
         style={{
           backgroundSize: '45%',
           backgroundPosition: '105% 40%',

@@ -396,8 +396,8 @@ const AiCommand = () => {
                 <div key={index} className="flex gap-6 mx-4 [overflow-anchor:none] mb-6">
                   <div
                     className="
-                  w-7 h-7 bg-scale-200 rounded-full border border-scale-400 flex items-center justify-center text-foreground-lighter first-letter:
-                  ring-scale-200
+                  w-7 h-7 bg-background rounded-full border border-muted flex items-center justify-center text-foreground-lighter first-letter:
+                  ring-background
                   ring-1
                   shadow-sm
               "
@@ -419,7 +419,7 @@ const AiCommand = () => {
                     />
                     <>
                       {message.status === MessageStatus.Pending ? (
-                        <div className="bg-scale-700 h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
+                        <div className="bg-border-strong h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
                       ) : (
                         <ReactMarkdown
                           remarkPlugins={[remarkGfm]}
