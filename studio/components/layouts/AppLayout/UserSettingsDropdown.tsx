@@ -56,20 +56,14 @@ const UserSettingsDropdown = () => {
 
           <DropdownMenuSeparator />
           <DropdownMenuItem className="cursor-pointer" onClick={() => setOpen(false)} asChild>
-            <Link passHref href="/account/me">
-              Preferences
-            </Link>
+            <Link href="/account/me">Preferences</Link>
           </DropdownMenuItem>
           <DropdownMenuItem className="cursor-pointer" onClick={() => setOpen(false)} asChild>
-            <Link passHref href="/account/tokens">
-              Access tokens
-            </Link>
+            <Link href="/account/tokens">Access tokens</Link>
           </DropdownMenuItem>
           {showAuditLogs ? (
             <DropdownMenuItem className="cursor-pointer" onClick={() => setOpen(false)} asChild>
-              <Link passHref href="/account/audit">
-                Audit logs
-              </Link>
+              <Link href="/account/audit">Audit logs</Link>
             </DropdownMenuItem>
           ) : null}
           <DropdownMenuSeparator />

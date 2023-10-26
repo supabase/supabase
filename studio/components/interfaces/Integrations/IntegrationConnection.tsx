@@ -85,7 +85,6 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
                     {router.pathname !== projectIntegrationUrl && (
                       <DropdownMenuItem disabled={isSyncEnvLoading} asChild>
                         <Link
-                          passHref
                           href={projectIntegrationUrl.replace(
                             '[ref]',
                             props.connection.supabase_project_ref
