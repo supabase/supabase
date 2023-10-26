@@ -35,7 +35,7 @@ IVF [indexes](https://supabase.com/docs/guides/ai/vector-indexes/ivf-indexes#how
 
 98% of our customers are generating text embeddings using OpenAI's `text-embedding-ada-002` model. At an initial glance, there's good reason for this - these embeddings perform quite well for information retrieval and are economical to produce. `text-embedding-ada-002` produces vectors with 1536 dimensions which is among the largest in the industry. IVF indexes help address some scaling challenges, but there are still some pitfalls.
 
-First, vectors are large. A 1536 dimensional vector is ~12.3 kilobytes. Scaling that up to 1M vectors, the raw data tops 11 gigabytes. Experienced SQL users know that for best performance, indexes should fit within system memory. Moreover, unlike traditional workloads, there is a significant compute component when performing vector similarity queries.
+First, vectors are large. A 1536 dimensional vector is ~6.15 kilobytes. Scaling that up to 1M vectors, the raw data tops 6 gigabytes. Experienced SQL users know that for best performance, indexes should fit within system memory. Moreover, unlike traditional workloads, there is a significant compute component when performing vector similarity queries.
 
 In the real-world it's common for an index to reduce the number of distance computations needed to estimate nearest neighbors from 100% of the dataset to 5-20%. At 1M records, that's still 50k-200k distance calculations being performed for a single query. Given how different the [resource requirements](https://supabase.com/docs/guides/ai/choosing-compute-addon) are to support heavy vector workloads, it's not surprising that one of the most common issues we see is significant under provisioning of hardware.
 
