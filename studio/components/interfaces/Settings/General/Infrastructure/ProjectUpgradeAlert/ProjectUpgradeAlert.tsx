@@ -3,14 +3,13 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
-  Alert,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
   Form,
   IconAlertCircle,
-  IconPackage,
+  IconAlertTriangle,
   Listbox,
   Modal,
 } from 'ui'
@@ -54,18 +53,19 @@ const ProjectUpgradeAlert = () => {
 
   return (
     <>
-      <Alert
-        icon={<IconPackage className="text-brand" strokeWidth={1.5} />}
-        variant="success"
-        title="Your project can be upgraded to the latest version of Postgres"
-      >
-        <p className="mb-3">
-          The latest version of Postgres ({latestPgVersion}) is available for your project.
-        </p>
-        <Button size="tiny" type="primary" onClick={() => setShowUpgradeModal(true)}>
-          Upgrade project
-        </Button>
-      </Alert>
+      <Alert_Shadcn_ title="Your project can be upgraded to the latest version of Postgres">
+        <AlertTitle_Shadcn_>
+          Your project can be upgraded to the latest version of Postgres
+        </AlertTitle_Shadcn_>
+        <AlertDescription_Shadcn_>
+          <p className="mb-3">
+            The latest version of Postgres ({latestPgVersion}) is available for your project.
+          </p>
+          <Button size="tiny" type="primary" onClick={() => setShowUpgradeModal(true)}>
+            Upgrade project
+          </Button>
+        </AlertDescription_Shadcn_>
+      </Alert_Shadcn_>
       <Modal
         hideFooter
         visible={showUpgradeModal}
@@ -90,11 +90,13 @@ const ProjectUpgradeAlert = () => {
                       <Alert_Shadcn_ title="Your project will be offline while the upgrade is in progress">
                         <IconAlertCircle className="h-4 w-4" strokeWidth={2} />
                         <AlertTitle_Shadcn_>
-                          Your project will be offline for up to {durationEstimateHours} hour{durationEstimateHours === 1 ? '' : 's'}
+                          Your project will be offline for up to {durationEstimateHours} hour
+                          {durationEstimateHours === 1 ? '' : 's'}
                         </AlertTitle_Shadcn_>
                         <AlertDescription_Shadcn_>
                           <p>
-                            It is advised to upgrade at a time when there will be minimal impact for your application.
+                            It is advised to upgrade at a time when there will be minimal impact for
+                            your application.
                           </p>
                         </AlertDescription_Shadcn_>
                       </Alert_Shadcn_>
@@ -108,13 +110,18 @@ const ProjectUpgradeAlert = () => {
                               may involve breaking changes.
                             </p>
 
-                            <Link href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats">
-                              <a target="_blank" rel="noreferrer">
-                                <Button size="tiny" type="default">
-                                  View docs
+                            <div>
+                              <Link
+                                href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats"
+                                passHref
+                              >
+                                <Button size="tiny" type="default" asChild>
+                                  <a target="_blank" rel="noreferrer">
+                                    View docs
+                                  </a>
                                 </Button>
-                              </a>
-                            </Link>
+                              </Link>
+                            </div>
                           </AlertDescription_Shadcn_>
                         </Alert_Shadcn_>
                       )}
@@ -123,41 +130,42 @@ const ProjectUpgradeAlert = () => {
                           variant="warning"
                           title="Custom Postgres roles using md5 authentication have been detected"
                         >
-                          <IconAlertCircle className="h-4 w-4" strokeWidth={2} />
+                          <IconAlertTriangle className="h-4 w-4" strokeWidth={2} />
                           <AlertTitle_Shadcn_>
                             Custom Postgres roles will not work automatically after upgrade
                           </AlertTitle_Shadcn_>
                           <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                            <p>You must run a series of commands after upgrading.</p>
                             <p>
-                             You must run a series of commands after upgrading.
-                            </p>
-                            <p>
-                              This is because new Postgres versions use scram-sha-256 authentication by default and
-                              do not support md5, as it has been deprecated.
+                              This is because new Postgres versions use scram-sha-256 authentication
+                              by default and do not support md5, as it has been deprecated.
                             </p>
                             <div>
-                              <p className="mb-1">
-                                Run the following commands after the upgrade:
-                              </p>
+                              <p className="mb-1">Run the following commands after the upgrade:</p>
                               <div className="flex items-baseline gap-2">
                                 <code className="text-xs">
                                   {legacyAuthCustomRoles.map((role) => (
                                     <div key={role} className="pb-1">
-                                      ALTER ROLE <span className="text-green-900">{role}</span> WITH
+                                      ALTER ROLE <span className="text-brand">{role}</span> WITH
                                       ENCRYPTED PASSWORD '
-                                      <span className="text-green-900">newpassword</span>';
+                                      <span className="text-brand">newpassword</span>';
                                     </div>
                                   ))}
                                 </code>
                               </div>
                             </div>
-                            <Link href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats">
-                              <a target="_blank" rel="noreferrer">
-                                <Button size="tiny" type="default">
-                                  View docs
+                            <div>
+                              <Link
+                                href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats"
+                                passHref
+                              >
+                                <Button size="tiny" type="default" asChild>
+                                  <a target="_blank" rel="noreferrer">
+                                    View docs
+                                  </a>
                                 </Button>
-                              </a>
-                            </Link>
+                              </Link>
+                            </div>
                           </AlertDescription_Shadcn_>
                         </Alert_Shadcn_>
                       )}
