@@ -559,6 +559,10 @@ export const auth = {
           url: '/guides/auth/server-side/oauth-with-pkce-flow-for-ssr',
         },
         { name: 'Server-side Rendering', url: '/guides/auth/server-side-rendering' },
+        {
+          name: 'Migrating from Auth Helpers',
+          url: '/guides/auth/server-side/migrating-to-ssr-from-auth-helpers',
+        },
       ],
     },
     {
