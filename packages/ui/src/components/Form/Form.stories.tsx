@@ -400,8 +400,8 @@ export const CardForm = () => {
           <Panel
             header={
               <>
-                <h3 className="text-scale-1200 text-xl font-semibold">Custom Options</h3>
-                <p className="text-scale-900">
+                <h3 className="text-foreground text-xl font-semibold">Custom Options</h3>
+                <p className="text-foreground-muted">
                   These settings apply to payment pages you create using Stripe Checkout and Payment
                   Links.
                 </p>
@@ -424,7 +424,7 @@ export const CardForm = () => {
             {/* <p>{isSubmitting ? 'submitting' : 'not submitting'}</p> */}
             {/* <div className="border-t border-scale-400"></div> */}
             <Section
-              header={<label className="text-sm text-scale-1200 col-span-4">Faster checkout</label>}
+              header={<label className="text-sm text-foreground col-span-4">Faster checkout</label>}
             >
               <Toggle
                 className="col-span-8"
@@ -436,7 +436,7 @@ export const CardForm = () => {
             </Section>
             <div className="border-t border-scale-400"></div>
             <Section
-              header={<label className="text-sm text-scale-1200 col-span-4">Faster checkout</label>}
+              header={<label className="text-sm text-foreground col-span-4">Faster checkout</label>}
             >
               <Radio.Group
                 className="col-span-8"
@@ -463,7 +463,7 @@ export const CardForm = () => {
             </Section>
             <div className="border-t border-scale-400"></div>
             <Section
-              header={<label className="text-sm text-scale-1200 col-span-4">Faster checkout</label>}
+              header={<label className="text-sm text-foreground col-span-4">Faster checkout</label>}
             >
               <div className="col-span-8 space-y-4">
                 <Input name="app_id" label="Application ID in Stripe" />

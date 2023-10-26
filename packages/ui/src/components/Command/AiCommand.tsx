@@ -396,7 +396,7 @@ const AiCommand = () => {
                 <div key={index} className="flex gap-6 mx-4 [overflow-anchor:none] mb-6">
                   <div
                     className="
-                  w-7 h-7 bg-scale-200 rounded-full border border-scale-400 flex items-center justify-center text-scale-1000 first-letter:
+                  w-7 h-7 bg-scale-200 rounded-full border border-scale-400 flex items-center justify-center text-foreground-lighter first-letter:
                   ring-scale-200
                   ring-1
                   shadow-sm
@@ -404,7 +404,7 @@ const AiCommand = () => {
                   >
                     <IconUser strokeWidth={1.5} size={16} />
                   </div>
-                  <div className="prose text-scale-1000">{message.content}</div>
+                  <div className="prose text-foreground-lighter">{message.content}</div>
                 </div>
               )
             case MessageRole.Assistant:
@@ -472,10 +472,10 @@ const AiCommand = () => {
         {hasError && (
           <div className="p-6 flex flex-col items-center gap-6 mt-4">
             <IconAlertTriangle className="text-amber-900" strokeWidth={1.5} size={21} />
-            <p className="text-lg text-scale-1200 text-center">
+            <p className="text-lg text-foreground text-center">
               Sorry, looks like Clippy is having a hard time!
             </p>
-            <p className="text-sm text-scale-900 text-center">Please try again in a bit.</p>
+            <p className="text-sm text-foreground-muted text-center">Please try again in a bit.</p>
             <Button size="tiny" type="secondary" onClick={handleReset}>
               Try again?
             </Button>
@@ -502,8 +502,8 @@ const AiCommand = () => {
                     search ? 'opacity-100' : 'opacity-0'
                   }`}
                 >
-                  <span className="text-scale-1100">Submit message</span>
-                  <div className="hidden text-scale-1100 md:flex items-center justify-center h-6 w-6 rounded bg-scale-500">
+                  <span className="text-foreground-light">Submit message</span>
+                  <div className="hidden text-foreground-light md:flex items-center justify-center h-6 w-6 rounded bg-scale-500">
                     <IconCornerDownLeft size={12} strokeWidth={1.5} />
                   </div>
                 </div>

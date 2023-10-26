@@ -103,13 +103,13 @@ const GenerateSQL = () => {
                 <div className="flex gap-6 mx-4 [overflow-anchor:none] mb-6">
                   <div
                     className="
-                      w-7 h-7 bg-scale-200 rounded-full border border-scale-400 flex items-center justify-center text-scale-1000 first-letter:
+                      w-7 h-7 bg-scale-200 rounded-full border border-scale-400 flex items-center justify-center text-foreground-lighter first-letter:
                       ring-scale-200 ring-1 shadow-sm
                     "
                   >
                     <IconUser strokeWidth={1.5} size={16} />
                   </div>
-                  <div className="flex items-center prose text-scale-1100 text-sm">
+                  <div className="flex items-center prose text-foreground-light text-sm">
                     {message.content}
                   </div>
                 </div>
@@ -149,7 +149,7 @@ const GenerateSQL = () => {
                             strokeWidth={1.5}
                             size={21}
                           />
-                          <p className="text-lg text-scale-1200 text-center">
+                          <p className="text-lg text-foreground text-center">
                             Sorry, I don't know how to help with that.
                           </p>
                           <Button size="tiny" type="secondary" onClick={handleReset}>
@@ -186,11 +186,11 @@ const GenerateSQL = () => {
         {messages.length === 0 && !hasError && (
           <div>
             <div className="px-4">
-              <h3 className="text-base text-scale-1100">
+              <h3 className="text-base text-foreground-light">
                 Describe what you need and Supabase AI will try to generate the relevant SQL
                 statements
               </h3>
-              <p className="text-sm mt-1 text-scale-1100">
+              <p className="text-sm mt-1 text-foreground-light">
                 Here are some example prompts to try out:
               </p>
             </div>
@@ -244,10 +244,10 @@ const GenerateSQL = () => {
         {hasError && (
           <div className="p-6 flex flex-col items-center gap-6 mt-4">
             <IconAlertTriangle className="text-amber-900" strokeWidth={1.5} size={21} />
-            <p className="text-lg text-scale-1200 text-center">
+            <p className="text-lg text-foreground text-center">
               Sorry, looks like Clippy is having a hard time!
             </p>
-            <p className="text-sm text-scale-900 text-center">Please try again in a bit.</p>
+            <p className="text-sm text-foreground-muted text-center">Please try again in a bit.</p>
             <Button size="tiny" type="secondary" onClick={handleReset}>
               Try again?
             </Button>
@@ -267,7 +267,7 @@ const GenerateSQL = () => {
                     Include table names, column names and their corresponding data types in
                     conversation
                   </p>
-                  <p className="text-sm text-scale-1100">
+                  <p className="text-sm text-foreground-light">
                     This will generate answers that are more relevant to your project during the
                     current conversation
                   </p>
@@ -303,8 +303,8 @@ const GenerateSQL = () => {
                     search ? 'opacity-100' : 'opacity-0'
                   }`}
                 >
-                  <span className="text-scale-1100">Submit message</span>
-                  <div className="hidden text-scale-1100 md:flex items-center justify-center h-6 w-6 rounded bg-scale-500">
+                  <span className="text-foreground-light">Submit message</span>
+                  <div className="hidden text-foreground-light md:flex items-center justify-center h-6 w-6 rounded bg-scale-500">
                     <IconCornerDownLeft size={12} strokeWidth={1.5} />
                   </div>
                 </div>

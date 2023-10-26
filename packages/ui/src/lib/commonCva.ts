@@ -10,7 +10,7 @@ const defaults = {
   text: {
     brand: 'text-purple-600',
     body: 'text-scale-600 dark:text-scaleDark-200',
-    title: 'text-scale-700 dark:text-scaleDark-100',
+    title: 'text-border-strong dark:text-scaleDark-100',
   },
   border: {
     brand: 'border-brand-600',
@@ -18,7 +18,7 @@ const defaults = {
     secondary: 'border-scale-400',
     alternative: 'border-scale-600 dark:border-scaleDark-200',
   },
-  placeholder: 'placeholder-scale-800',
+  placeholder: 'placeholder-border-stronger',
   focus: `
     outline-none
     focus:ring-current focus:ring-2
@@ -49,7 +49,7 @@ const defaults = {
     },
   },
   overlay: {
-    base: `absolute inset-0 bg-scale-200 opacity-50`,
+    base: `absolute inset-0 bg-background opacity-50`,
     container: `fixed inset-0 transition-opacity`,
   },
 }

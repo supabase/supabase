@@ -47,8 +47,8 @@ const DocsButton = () => {
           /> */}
       </div>
       <div className="grow">
-        <h3 className="text-scale-1200">Use authentication as the backbone of your app</h3>
-        <p className="text-scale-900 text-xs">
+        <h3 className="text-foreground">Use authentication as the backbone of your app</h3>
+        <p className="text-foreground-muted text-xs">
           Learn how to use Supabase Auth with Auth Policies to pick and choose what users see what.
         </p>
         <p className="text-brand mt-2 flex items-center gap-1 text-xs">
@@ -58,7 +58,7 @@ const DocsButton = () => {
           </span>
         </p>
       </div>
-      <div className="text-scale-900">
+      <div className="text-foreground-muted">
         <IconX />
       </div>
     </button>
@@ -154,7 +154,7 @@ const CardForm = () => {
             }
           >
             <Section
-              header={<label className="text-scale-1200 col-span-4 text-sm">User Signups</label>}
+              header={<label className="text-foreground col-span-4 text-sm">User Signups</label>}
             >
               <Toggle
                 id="enable_signups"
@@ -166,7 +166,7 @@ const CardForm = () => {
             </Section>
             <div className="border-scale-400 border-t"></div>
             <Section
-              header={<label className="text-scale-1200 col-span-4 text-sm">User Sessions</label>}
+              header={<label className="text-foreground col-span-4 text-sm">User Sessions</label>}
             >
               <InputNumber
                 className="col-span-8"
@@ -317,13 +317,13 @@ const AuthForm = () => {
             type="button"
             className="
               
-              text-scale-1200 group 
+              text-foreground group 
               flex 
               w-full items-center justify-between rounded p-3 px-6"
           >
             <div className="flex items-center gap-3">
               <IconChevronUp
-                className="text-scale-800 data-open-parent:rotate-0 data-closed-parent:rotate-180 transition"
+                className="text-border-stronger data-open-parent:rotate-0 data-closed-parent:rotate-180 transition"
                 strokeWidth={2}
               />
 
@@ -345,7 +345,7 @@ const AuthForm = () => {
                   <span className="px-1">Enabled</span>
                 </div>
               ) : (
-                <div className="bg-scale-100 dark:bg-scale-300 border-scale-500 dark:border-scale-700 text-scale-900 rounded-md border py-1 px-3 text-xs">
+                <div className="bg-scale-100 dark:bg-scale-300 border-scale-500 dark:border-scale-700 text-foreground-muted rounded-md border py-1 px-3 text-xs">
                   Disabled
                 </div>
               )}
@@ -404,7 +404,7 @@ const AuthForm = () => {
               <div
                 className="
                   bg-scale-100 dark:bg-scale-300
-                  text-scale-1200 border-scale-500 group border-t py-6 px-6
+                  text-foreground border-scale-500 group border-t py-6 px-6
                 "
               >
                 <div className="mx-auto max-w-md space-y-6">
@@ -550,11 +550,11 @@ const DomainsForm = () => {
       <>
         <div className="my-6 flex items-center justify-between">
           <div>
-            <h3 className="text-scale-1200 mb-2 text-2xl">Authorised domains</h3>
-            <p className="text-scale-900 text-sm">
+            <h3 className="text-foreground mb-2 text-2xl">Authorised domains</h3>
+            <p className="text-foreground-muted text-sm">
               Turn payment methods on and off in one click – no engineering time required.
             </p>
-            <p className="text-scale-900 text-sm">
+            <p className="text-foreground-muted text-sm">
               Use our guide to check which payment methods are compatible with your integration.
             </p>
           </div>
@@ -564,7 +564,7 @@ const DomainsForm = () => {
             visible={open}
             onCancel={() => setOpen(!open)}
             header={
-              <div className="text-scale-1200 flex items-center gap-2">
+              <div className="text-foreground flex items-center gap-2">
                 <div className="flex items-baseline gap-2">
                   <h3 className="text-sm">Add a new domain</h3>
                 </div>
@@ -607,7 +607,7 @@ const DomainsForm = () => {
                 return (
                   <div className="mb-4 space-y-4 pt-4">
                     <div className="px-5">
-                      <p className="text-scale-1100 text-sm">
+                      <p className="text-foreground-light text-sm">
                         This will add a domain to a list of allowed domains that can interact with
                         your Authentication services for this project.
                       </p>
@@ -653,7 +653,7 @@ const DomainsForm = () => {
           return (
             <>
               <div
-                className="bg-scale-300 border-scale-500 text-scale-1200 flex items-center 
+                className="bg-scale-300 border-scale-500 text-foreground flex items-center 
               justify-between gap-2
               border px-6 
               py-4 text-sm
@@ -661,7 +661,7 @@ const DomainsForm = () => {
             "
               >
                 <div className="flex items-center gap-2 font-mono">
-                  <span className="text-scale-900">
+                  <span className="text-foreground-muted">
                     <IconGlobe strokeWidth={2} size={14} />
                   </span>
                   {domain}
@@ -686,7 +686,7 @@ const DomainsForm = () => {
         visible={deleteOpen}
         onCancel={() => setDeleteOpen(!open)}
         header={
-          <div className="text-scale-1200 flex items-center gap-2">
+          <div className="text-foreground flex items-center gap-2">
             <div className="flex items-baseline gap-2">
               <h3 className="text-sm">Remove domain</h3>
             </div>
@@ -697,11 +697,11 @@ const DomainsForm = () => {
       >
         <div className="mb-4 space-y-4 pt-4">
           <div className="px-5">
-            <p className="text-scale-1100 mb-2 text-sm">
+            <p className="text-foreground-light mb-2 text-sm">
               Are you sure you want to remove{' '}
-              <span className="text-scale-1200">{selectedDomain}</span>?
+              <span className="text-foreground">{selectedDomain}</span>?
             </p>
-            <p className="text-scale-900 text-sm">
+            <p className="text-foreground-muted text-sm">
               This domain will no longer work with your Authentication configuration.
             </p>
           </div>
@@ -840,7 +840,7 @@ const SmtpForm = () => {
           >
             {/* <Section
               header={
-                <label className="text-sm text-scale-1200 col-span-4">
+                <label className="text-sm text-foreground col-span-4">
                   Enable SMTP
                 </label>
               }
@@ -859,8 +859,8 @@ const SmtpForm = () => {
             <Section
               header={
                 <div className="w-full">
-                  <label className="text-scale-1100 text-sm">SMTP details</label>
-                  <p className="text-scale-900 text-sm">
+                  <label className="text-foreground-light text-sm">SMTP details</label>
+                  <p className="text-foreground-muted text-sm">
                     These settings can be found in your SMTP provider config
                   </p>
                 </div>
@@ -1001,7 +1001,7 @@ const TemplatesForm = () => {
             >
               {/* <Section
               header={
-                <label className="text-sm text-scale-1200 col-span-4">
+                <label className="text-sm text-foreground col-span-4">
                   Enable SMTP
                 </label>
               }
@@ -1020,8 +1020,8 @@ const TemplatesForm = () => {
               <Section
                 header={
                   <div className="w-full">
-                    <h3 className="text-scale-1200 mb-4 text-base">Confirm Signup</h3>
-                    <p className="text-scale-900 text-sm">
+                    <h3 className="text-foreground mb-4 text-base">Confirm Signup</h3>
+                    <p className="text-foreground-muted text-sm">
                       When a user signs up using an email address and password, you can send them a
                       confirmation email to verify their registered email address. Learn more
                     </p>
@@ -1065,25 +1065,25 @@ export function WholeForm() {
         <Tabs.Panel id="one" label="Sign-in method">
           <div className="animate-fade-in space-y-12 py-12">
             <div>
-              <h1 className="text-scale-1200 text-3xl">Sign-in method</h1>
+              <h1 className="text-foreground text-3xl">Sign-in method</h1>
             </div>
             <div className="border-scale-400 border-t"></div>
             <div>
-              <h3 className="text-scale-1200 mb-2 text-2xl">General settings</h3>
-              <p className="text-scale-900 text-sm">
+              <h3 className="text-foreground mb-2 text-2xl">General settings</h3>
+              <p className="text-foreground-muted text-sm">
                 Turn payment methods on and off in one click – no engineering time required.
               </p>
-              <p className="text-scale-900 text-sm">
+              <p className="text-foreground-muted text-sm">
                 Use our guide to check which payment methods are compatible with your integration.
               </p>
               <CardForm />
             </div>
             <div>
-              <h3 className="text-scale-1200 mb-2 text-2xl">Providers</h3>
-              <p className="text-scale-900 text-sm">
+              <h3 className="text-foreground mb-2 text-2xl">Providers</h3>
+              <p className="text-foreground-muted text-sm">
                 Turn payment methods on and off in one click – no engineering time required.
               </p>
-              <p className="text-scale-900 text-sm">
+              <p className="text-foreground-muted text-sm">
                 Use our guide to check which payment methods are compatible with your integration.
               </p>
               <AuthForm />
@@ -1095,7 +1095,7 @@ export function WholeForm() {
         <Tabs.Panel id="two" label="Emails">
           <div className="animate-fade-in space-y-12 py-12">
             <div>
-              <h1 className="text-scale-1200 text-3xl">Emails</h1>
+              <h1 className="text-foreground text-3xl">Emails</h1>
             </div>
             <button
               className="
@@ -1121,8 +1121,8 @@ export function WholeForm() {
           /> */}
               </div>
               <div className="grow">
-                <h3 className="text-scale-1200">Use authentication as the backbone of your app</h3>
-                <p className="text-scale-900 text-xs">
+                <h3 className="text-foreground">Use authentication as the backbone of your app</h3>
+                <p className="text-foreground-muted text-xs">
                   Learn how to use Supabase Auth with Auth Policies to pick and choose what users
                   see what.
                 </p>
@@ -1133,21 +1133,21 @@ export function WholeForm() {
                   </span>
                 </p>
               </div>
-              <div className="text-scale-900">
+              <div className="text-foreground-muted">
                 <IconX />
               </div>
             </button>
             <div className="border-scale-400 border-t"></div>
             <div>
-              <h3 className="text-scale-1200 mb-2 text-2xl">Custom SMTP</h3>
-              <p className="text-scale-900 text-sm">
+              <h3 className="text-foreground mb-2 text-2xl">Custom SMTP</h3>
+              <p className="text-foreground-muted text-sm">
                 You can use your own SMTP server instead of the built-in email service.
               </p>
               <SmtpForm />
             </div>
             <div>
-              <h3 className="text-scale-1200 mb-2 text-2xl">Templates</h3>
-              <p className="text-scale-900 text-sm">
+              <h3 className="text-foreground mb-2 text-2xl">Templates</h3>
+              <p className="text-foreground-muted text-sm">
                 You can use your own SMTP server instead of the built-in email service.
               </p>
               <TemplatesForm />
