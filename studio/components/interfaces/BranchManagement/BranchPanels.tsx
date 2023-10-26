@@ -234,7 +234,7 @@ const PullRequestPanel = ({
           <div>
             <div className="flex items-center space-x-4">
               <IconGitBranch className="text-brand-900" size={16} strokeWidth={2} />
-              <p>{pr.branch}</p>
+              <p>{pr.label}</p>
               <p className="text-light">
                 {daysFromNow > 1
                   ? `Created on ${formattedCreatedAt}`
