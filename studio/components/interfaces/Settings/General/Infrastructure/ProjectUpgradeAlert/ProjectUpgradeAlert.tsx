@@ -3,24 +3,23 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
-  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Button,
   Form,
   IconAlertCircle,
-  IconExternalLink,
-  IconPackage,
+  IconAlertTriangle,
   Listbox,
   Modal,
 } from 'ui'
 
 import { useParams } from 'common/hooks'
-import InformationBox from 'components/ui/InformationBox'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
 import { useProjectUpgradeMutation } from 'data/projects/project-upgrade-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useStore } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
-import { BREAKING_CHANGES } from './ProjectUpgradeAlert.constants'
 
 const ProjectUpgradeAlert = () => {
   const router = useRouter()
@@ -33,6 +32,9 @@ const ProjectUpgradeAlert = () => {
   const { data } = useProjectUpgradeEligibilityQuery({ projectRef: ref })
   const currentPgVersion = (data?.current_app_version ?? '').split('supabase-postgres-')[1]
   const latestPgVersion = (data?.latest_app_version ?? '').split('supabase-postgres-')[1]
+
+  const durationEstimateHours = data?.duration_estimate_hours || 1
+  const legacyAuthCustomRoles = data?.legacy_auth_custom_roles || []
 
   const initialValues = { version: data?.target_upgrade_versions?.[0]?.postgres_version ?? 0 }
   const { mutate: upgradeProject, isLoading: isUpgrading } = useProjectUpgradeMutation({
@@ -50,18 +52,19 @@ const ProjectUpgradeAlert = () => {
 
   return (
     <>
-      <Alert
-        icon={<IconPackage className="text-brand" strokeWidth={1.5} />}
-        variant="success"
-        title="Your project can be upgraded to the latest version of Postgres"
-      >
-        <p className="mb-3">
-          The latest version of Postgres ({latestPgVersion}) is available for your project.
-        </p>
-        <Button size="tiny" type="primary" onClick={() => setShowUpgradeModal(true)}>
-          Upgrade project
-        </Button>
-      </Alert>
+      <Alert_Shadcn_ title="Your project can be upgraded to the latest version of Postgres">
+        <AlertTitle_Shadcn_>
+          Your project can be upgraded to the latest version of Postgres
+        </AlertTitle_Shadcn_>
+        <AlertDescription_Shadcn_>
+          <p className="mb-3">
+            The latest version of Postgres ({latestPgVersion}) is available for your project.
+          </p>
+          <Button size="tiny" type="primary" onClick={() => setShowUpgradeModal(true)}>
+            Upgrade project
+          </Button>
+        </AlertDescription_Shadcn_>
+      </Alert_Shadcn_>
       <Modal
         hideFooter
         visible={showUpgradeModal}
@@ -79,48 +82,92 @@ const ProjectUpgradeAlert = () => {
                 <div className="py-6">
                   <Modal.Content>
                     <div className="space-y-4">
+                      <p className="text-sm">All services are going offline.</p>
                       <p className="text-sm">
-                        All services, including Auth, Rest, and Extensions will be upgraded. This
-                        action cannot be undone.
+                        You will not be able to downgrade back to Postgres {currentPgVersion}.
                       </p>
+                      <Alert_Shadcn_ title="Your project will be offline while the upgrade is in progress">
+                        <IconAlertCircle className="h-4 w-4" strokeWidth={2} />
+                        <AlertTitle_Shadcn_>
+                          Your project will be offline for up to {durationEstimateHours} hour
+                          {durationEstimateHours === 1 ? '' : 's'}
+                        </AlertTitle_Shadcn_>
+                        <AlertDescription_Shadcn_>
+                          <p>
+                            It is advised to upgrade at a time when there will be minimal impact for
+                            your application.
+                          </p>
+                        </AlertDescription_Shadcn_>
+                      </Alert_Shadcn_>
                       {(data?.potential_breaking_changes ?? []).length > 0 && (
-                        <InformationBox
-                          icon={<IconAlertCircle strokeWidth={2} />}
-                          title="There will be breaking changes involved with the upgrade"
-                          description={
-                            <ul className="list-disc pl-4">
-                              {data?.potential_breaking_changes.map((reason) => {
-                                const change = (BREAKING_CHANGES as any)[reason]
-                                if (change !== undefined)
-                                  return (
-                                    <li key={reason}>
-                                      <p className="text-foreground">{change.title}</p>
-                                      <p className="flex items-center space-x-1">
-                                        <span>This update has breaking changes. Read more </span>
-                                        <Link href={change.url}>
-                                          <a className="text-brand opacity-90 flex items-center space-x-1">
-                                            <span>here</span>
-                                            <IconExternalLink size="tiny" strokeWidth={2} />
-                                          </a>
-                                        </Link>
-                                      </p>
-                                    </li>
-                                  )
-                                else return null
-                              })}
-                            </ul>
-                          }
-                        />
+                        <Alert_Shadcn_ variant="destructive" title="Breaking changes">
+                          <IconAlertCircle className="h-4 w-4" strokeWidth={2} />
+                          <AlertTitle_Shadcn_>Breaking changes</AlertTitle_Shadcn_>
+                          <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                            <p>
+                              Your project will be upgraded across major versions of Postgres. This
+                              may involve breaking changes.
+                            </p>
+
+                            <div>
+                              <Link
+                                href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats"
+                                passHref
+                              >
+                                <Button size="tiny" type="default" asChild>
+                                  <a target="_blank" rel="noreferrer">
+                                    View docs
+                                  </a>
+                                </Button>
+                              </Link>
+                            </div>
+                          </AlertDescription_Shadcn_>
+                        </Alert_Shadcn_>
                       )}
-                      <Alert
-                        withIcon
-                        variant="warning"
-                        title="Your project will be offline while the upgrade is in progress"
-                      >
-                        Upgrades will take a few minutes depending on the size of your database. It
-                        is advised to upgrade at a time when there will be minimal impact for your
-                        application
-                      </Alert>
+                      {legacyAuthCustomRoles.length > 0 && (
+                        <Alert_Shadcn_
+                          variant="warning"
+                          title="Custom Postgres roles using md5 authentication have been detected"
+                        >
+                          <IconAlertTriangle className="h-4 w-4" strokeWidth={2} />
+                          <AlertTitle_Shadcn_>
+                            Custom Postgres roles will not work automatically after upgrade
+                          </AlertTitle_Shadcn_>
+                          <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                            <p>You must run a series of commands after upgrading.</p>
+                            <p>
+                              This is because new Postgres versions use scram-sha-256 authentication
+                              by default and do not support md5, as it has been deprecated.
+                            </p>
+                            <div>
+                              <p className="mb-1">Run the following commands after the upgrade:</p>
+                              <div className="flex items-baseline gap-2">
+                                <code className="text-xs">
+                                  {legacyAuthCustomRoles.map((role) => (
+                                    <div key={role} className="pb-1">
+                                      ALTER ROLE <span className="text-brand">{role}</span> WITH
+                                      ENCRYPTED PASSWORD '
+                                      <span className="text-brand">newpassword</span>';
+                                    </div>
+                                  ))}
+                                </code>
+                              </div>
+                            </div>
+                            <div>
+                              <Link
+                                href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats"
+                                passHref
+                              >
+                                <Button size="tiny" type="default" asChild>
+                                  <a target="_blank" rel="noreferrer">
+                                    View docs
+                                  </a>
+                                </Button>
+                              </Link>
+                            </div>
+                          </AlertDescription_Shadcn_>
+                        </Alert_Shadcn_>
+                      )}
                       <Listbox
                         id="version"
                         name="version"

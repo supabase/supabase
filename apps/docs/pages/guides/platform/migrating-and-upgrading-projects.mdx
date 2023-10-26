@@ -62,6 +62,55 @@ Breaking changes are generally only present in major version upgrades of Postgre
 
 If you are upgrading from a significantly older version, you will need to consider the release notes for any intermediary releases as well.
 
+#### Objects dependent on Postgres extensions
+
+pg_upgrade does not support upgrading of databases containing reg\* data types referencing system OIDs.
+If you have created any objects that depend on the following extensions, you will need to recreate them after the upgrade.
+
+Extensions registering system OID-specific reg\* data types:
+
+- `plv8`
+- `plcoffee`
+- `plls`
+
+As these extensions offer support to create functions in different languages, you will only need to check for functions using the languages enabled by the above extensions.
+Any objects depending on the detected objects (e.g. triggers, views, tables, etc.) will need to be modified to exclude references to them.
+
+The following query returns the function name and their definitions, to help in recreating them post-upgrade.
+
+```sql
+SELECT
+  pn.nspname || '.' || objid::regproc AS function_name,
+  pg_get_functiondef(objid) || ';' AS function_definition
+FROM pg_depend d
+  JOIN pg_language l on (d.refobjid = l.oid)
+  JOIN pg_proc pp on (d.objid = pp.oid)
+  JOIN pg_namespace pn on (pp.pronamespace = pn.oid)
+WHERE l.lanname in ('plls', 'plcoffee', 'plv8')
+  AND pn.nspname <> 'pg_catalog';
+```
+
+#### Authentication method changes - deprecating md5 in favor of scram-sha-256
+
+The md5 hashing method has [known weaknesses](https://en.wikipedia.org/wiki/MD5#Security) that make it unsuitable for cryptography.
+As such, we are deprecating md5 in favor of [scram-sha-256](https://www.postgresql.org/docs/current/auth-password.html), which is the default and most secure authentication method used in the latest Postgres versions.
+
+We automatically migrate Supabase-managed roles' passwords to scram-sha-256 during the upgrade process, but you will need to manually migrate the passwords of any custom roles you have created, else you won't be able to connect using them after the upgrade.
+
+To identify roles using the md5 hashing method and migrate their passwords, you can use the following SQL statements after the upgrade:
+
+```sql
+-- List roles using md5 hashing method
+SELECT
+  rolname
+FROM pg_authid
+WHERE rolcanlogin = true
+  AND rolpassword LIKE 'md5%';
+
+-- Migrate a role's password to scram-sha-256
+ALTER ROLE <role_name> WITH PASSWORD '<password>';
+```
+
 #### Post-upgrade validation
 
 Supabase performs extensive pre- and post-upgrade validations to ensure that the database has been correctly upgraded. However, you should plan for your own application-level validations, as there might be changes you might not have anticipated, and this should be budgeted for when planning your downtime window.

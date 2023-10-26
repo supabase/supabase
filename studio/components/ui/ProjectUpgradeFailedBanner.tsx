@@ -22,7 +22,8 @@ const ProjectUpgradeFailedBanner = () => {
   const [showMessage, setShowMessage] = useState(!isAcknowledged)
 
   const isFailed = status === DatabaseUpgradeStatus.Failed
-  const initiatedAtUTC = dayjs(initiated_at ?? 0)
+  const initiatedAtUTC = dayjs
+    .utc(initiated_at ?? 0)
     .utc()
     .format('DD MMM YYYY HH:mm:ss')
 

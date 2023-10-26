@@ -14,6 +14,9 @@ export type ProjectUpgradeEligibilityResponse = {
   target_upgrade_versions: { postgres_version: number; app_version: string }[]
   requires_manual_intervention: string | null
   potential_breaking_changes: string[]
+  duration_estimate_hours: number
+  legacy_auth_custom_roles: string[]
+  extension_dependent_objects: string[]
 }
 
 export async function getProjectUpgradeEligibility(
