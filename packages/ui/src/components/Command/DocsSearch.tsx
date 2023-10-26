@@ -142,11 +142,11 @@ const DocsSearch = () => {
       className="
         transition
         w-6 h-6
-        bg-scale-100
+        bg-alternative
         group-aria-selected:scale-[105%]
-        group-aria-selected:bg-scale-1200
+        group-aria-selected:bg-foreground
         text-foreground
-        group-aria-selected:text-scale-100
+        group-aria-selected:text-background
         rounded flex
         items-center
         justify-center
@@ -196,7 +196,7 @@ const DocsSearch = () => {
                 <ChevronArrow />
               </CommandItem>
               {pageSections.length > 0 && (
-                <div className="border-l border-scale-500 ml-3 pt-3">
+                <div className="border-l border-border ml-3 pt-3">
                   {pageSections.map((section, i) => (
                     <CommandItem
                       forceMount
@@ -213,7 +213,7 @@ const DocsSearch = () => {
                         <div className="flex flex-col gap-2">
                           <cite>
                             <TextHighlighter
-                              className="not-italic text-xs rounded-full px-2 py-1 bg-scale-500 text-foreground"
+                              className="not-italic text-xs rounded-full px-2 py-1 bg-overlay-hover text-foreground"
                               text={page.meta.title}
                               query={search}
                             />

@@ -47,7 +47,7 @@ const SidebarItem = ({
       <a className="block" target={isExternal ? '_blank' : '_self'}>
         <button
           className={[
-            'group border-scale-500 ring-scale-1200 group-hover:border-scale-900',
+            'group border-border ring-scale-1200 group-hover:border-scale-900',
             'flex max-w-full cursor-pointer items-center space-x-2 py-1 font-normal',
             'outline-none focus-visible:z-10 focus-visible:ring-1',
           ].join(' ')}

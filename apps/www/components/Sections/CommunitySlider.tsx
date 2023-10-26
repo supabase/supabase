@@ -136,7 +136,7 @@ const CommunitySlider = () => {
   )
 
   return (
-    <div className="py-16 sm:py-18 md:py-24 bg-scale-100">
+    <div className="py-16 sm:py-18 md:py-24 bg-alternative">
       <div className="relative h-[300px] w-screen mx-auto md:w-full -mb-32 z-0">
         <Image
           src="/images/product/vector/community/vector-community.svg"

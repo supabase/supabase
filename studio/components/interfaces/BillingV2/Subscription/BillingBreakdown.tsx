@@ -149,7 +149,7 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                   <div
                     key={metric.key}
                     className={clsx(
-                      'col-span-12 md:col-span-6 space-y-4 py-4 border-scale-400',
+                      'col-span-12 md:col-span-6 space-y-4 py-4 border-overlay',
                       i % 2 === 0 ? 'md:border-r md:pr-4' : 'md:pl-4',
                       i < BILLING_BREAKDOWN_METRICS.length - 2 && 'border-b'
                     )}
@@ -185,8 +185,8 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                               <Tooltip.Arrow className="radix-tooltip-arrow" />
                               <div
                                 className={[
-                                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                  'border border-scale-200',
+                                  'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                  'border border-background',
                                 ].join(' ')}
                               >
                                 <div className="text-xs text-foreground">
@@ -256,8 +256,8 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                                 <Tooltip.Arrow className="radix-tooltip-arrow" />
                                 <div
                                   className={[
-                                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                    'border border-scale-200',
+                                    'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                    'border border-background',
                                   ].join(' ')}
                                 >
                                   <p className="text-xs text-foreground">
@@ -285,12 +285,12 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                           value={usageMeta.usage ?? 0}
                           barClass={
                             !hasLimit && usageMeta.usage > 0
-                              ? 'bg-scale-1100'
+                              ? 'bg-foreground-light'
                               : isExceededLimit && !isUsageBillingEnabled
                               ? 'bg-red-900'
                               : isApproachingLimit && !isUsageBillingEnabled
                               ? 'bg-amber-900'
-                              : 'bg-scale-1100'
+                              : 'bg-foreground-light'
                           }
                           bgClass="bg-gray-300 dark:bg-gray-600"
                           labelBottom={usageLabel}

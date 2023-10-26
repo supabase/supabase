@@ -484,10 +484,10 @@ const AiCommand = () => {
 
         <div className="[overflow-anchor:auto] h-px w-full"></div>
       </div>
-      <div className="absolute bottom-0 w-full bg-scale-200 py-3">
+      <div className="absolute bottom-0 w-full bg-background py-3">
         {messages.length > 0 && !hasError && <AiWarning className="mb-3 mx-3" />}
         <Input
-          className="bg-scale-100 rounded mx-3 [&_input]:pr-32 md:[&_input]:pr-40"
+          className="bg-alternative rounded mx-3 [&_input]:pr-32 md:[&_input]:pr-40"
           inputRef={inputRef}
           autoFocus
           placeholder={
@@ -503,7 +503,7 @@ const AiCommand = () => {
                   }`}
                 >
                   <span className="text-foreground-light">Submit message</span>
-                  <div className="hidden text-foreground-light md:flex items-center justify-center h-6 w-6 rounded bg-scale-500">
+                  <div className="hidden text-foreground-light md:flex items-center justify-center h-6 w-6 rounded bg-overlay-hover">
                     <IconCornerDownLeft size={12} strokeWidth={1.5} />
                   </div>
                 </div>

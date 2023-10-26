@@ -78,7 +78,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
   return (
     <div
       className={`flex h-12 max-h-12 items-center justify-between py-2 px-5 ${
-        headerBorder ? 'border-b border-scale-500' : ''
+        headerBorder ? 'border-b border-border' : ''
       }`}
     >
       <div className="-ml-2 flex items-center text-sm">

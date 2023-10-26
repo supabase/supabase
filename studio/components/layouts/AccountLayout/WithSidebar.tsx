@@ -76,7 +76,7 @@ const WithSidebar = ({
                     subitemsParentKey={subitemsParentKey}
                   />
                 ) : (
-                  <div className="border-b py-5 px-6 border-muted" key={section.key}>
+                  <div className="border-b py-5 px-6 border-border" key={section.key}>
                     <SidebarItem
                       links={section.links}
                       subitems={subitems}

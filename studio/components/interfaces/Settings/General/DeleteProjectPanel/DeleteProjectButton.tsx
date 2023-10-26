@@ -104,8 +104,8 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
               <Tooltip.Arrow className="radix-tooltip-arrow" />
               <div
                 className={[
-                  'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                  'border border-scale-200 ', //border
+                  'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                  'border border-background', //border
                 ].join(' ')}
               >
                 <span className="text-xs text-foreground">
@@ -164,7 +164,7 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
                         `${
                           active
                             ? ` bg-foreground text-background opacity-100 hover:bg-opacity-75`
-                            : ` bg-scale-700 text-foreground opacity-25 hover:opacity-50`
+                            : ` bg-border-strong text-foreground opacity-25 hover:opacity-50`
                         }`,
                       ].join(' ')}
                     >

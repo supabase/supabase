@@ -356,12 +356,8 @@ export const CardForm = () => {
     header?: React.ReactNode
     footer?: React.ReactNode
   }) => (
-    <div className="bg-scale-300 border border-scale-400 rounded-md w-3/4 mx-auto my-8 shadow overflow-hidden">
-      {header && (
-        <div className="bg-scale-100 dark:bg-scale-200 px-8 py-4 border-b border-scale-400">
-          {header}
-        </div>
-      )}
+    <div className="bg-surface-100 border border-overlay rounded-md w-3/4 mx-auto my-8 shadow overflow-hidden">
+      {header && <div className="bg-surface-100 px-8 py-4 border-b border-overlay">{header}</div>}
       <div className="space-y-6 py-6">{children}</div>
       {footer}
     </div>

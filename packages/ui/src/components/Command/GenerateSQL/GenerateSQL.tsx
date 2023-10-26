@@ -103,8 +103,8 @@ const GenerateSQL = () => {
                 <div className="flex gap-6 mx-4 [overflow-anchor:none] mb-6">
                   <div
                     className="
-                      w-7 h-7 bg-scale-200 rounded-full border border-scale-400 flex items-center justify-center text-foreground-lighter first-letter:
-                      ring-scale-200 ring-1 shadow-sm
+                      w-7 h-7 bg-background rounded-full border border-muted flex items-center justify-center text-foreground-lighter first-letter:
+                      ring-background ring-1 shadow-sm
                     "
                   >
                     <IconUser strokeWidth={1.5} size={16} />
@@ -141,7 +141,7 @@ const GenerateSQL = () => {
                     </div>
                     <>
                       {message.status === MessageStatus.Pending ? (
-                        <div className="bg-scale-700 h-[21px] w-[13px] mt-1 animate-bounce"></div>
+                        <div className="bg-border-strong h-[21px] w-[13px] mt-1 animate-bounce"></div>
                       ) : cantHelp ? (
                         <div className="p-6 flex flex-col flex-grow items-center gap-6 mt-4">
                           <IconAlertTriangle
@@ -163,14 +163,14 @@ const GenerateSQL = () => {
                               hideCopy
                               language="sql"
                               className="
-                                relative prose dark:prose-dark bg-scale-300 max-w-none !mb-0
+                                relative prose dark:prose-dark bg-surface-100 max-w-none !mb-0
                                 !rounded-b-none
                                 
                               "
                             >
                               {answer}
                             </CodeBlock>
-                            <AiWarning className="!rounded-t-none border-scale-400" />
+                            <AiWarning className="!rounded-t-none border-muted" />
                           </div>
                           {message.status === MessageStatus.Complete && (
                             <SQLOutputActions answer={answer} messages={messages.slice(0, i + 1)} />
@@ -256,7 +256,7 @@ const GenerateSQL = () => {
         <div className="[overflow-anchor:auto] h-px w-full"></div>
       </div>
 
-      <div className="absolute bottom-0 w-full bg-scale-200 pt-4">
+      <div className="absolute bottom-0 w-full bg-background pt-4">
         {/* {messages.length > 0 && !hasError && <AiWarning className="mb-4 mx-4" />} */}
         {allowSendingSchemaMetadata && (
           <div className="mb-4">
@@ -287,7 +287,7 @@ const GenerateSQL = () => {
         )}
         <Input
           inputRef={inputRef}
-          className="bg-scale-100 rounded mx-3 mb-4 [&_input]:pr-32 md:[&_input]:pr-40"
+          className="bg-alternative rounded mx-3 mb-4 [&_input]:pr-32 md:[&_input]:pr-40"
           autoFocus
           placeholder={
             isLoading || isResponding
@@ -304,7 +304,7 @@ const GenerateSQL = () => {
                   }`}
                 >
                   <span className="text-foreground-light">Submit message</span>
-                  <div className="hidden text-foreground-light md:flex items-center justify-center h-6 w-6 rounded bg-scale-500">
+                  <div className="hidden text-foreground-light md:flex items-center justify-center h-6 w-6 rounded bg-overlay-hover">
                     <IconCornerDownLeft size={12} strokeWidth={1.5} />
                   </div>
                 </div>

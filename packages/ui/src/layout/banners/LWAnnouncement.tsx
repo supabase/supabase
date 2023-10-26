@@ -13,13 +13,13 @@ const Card = ({
 }) => (
   <div
     className={[
-      'group relative p-[1px] bg-gradient-to-b from-scale-100/90 to-scale-100/60 rounded-xl overflow-hidden shadow-sm',
+      'group relative p-[1px] bg-gradient-to-b from-background-alternative/90 to-background-alternative/60 rounded-xl overflow-hidden shadow-sm',
       className,
     ].join(' ')}
   >
     <div
       className={[
-        'bg-scale-100 text-sm text-foreground-light p-2 flex flex-row justify-between items-center backdrop-blur-md h-full',
+        'bg-alternative text-sm text-foreground-light p-2 flex flex-row justify-between items-center backdrop-blur-md h-full',
         innerClassName,
       ].join(' ')}
     >

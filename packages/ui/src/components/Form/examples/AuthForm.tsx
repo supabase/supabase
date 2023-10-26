@@ -25,12 +25,10 @@ const DocsButton = () => {
   return (
     <button
       className="
-                bg-scale-300
-                dark:bg-scale-100
-                border-scale-500  
-                hover:border-scale-700  
-                dark:border-scale-300 
-                dark:hover:border-scale-500 group
+                bg-surface-100
+                border-border  
+                hover:border-strong  
+                group
                 my-6 flex
                 w-full items-center 
                 gap-6 
@@ -78,16 +76,10 @@ const CardForm = () => {
   }) => (
     <div
       className="
-      bg-scale-100 
-      dark:bg-scale-300 
-      
-      border-scale-400 my-8 overflow-hidden rounded-md border shadow"
+      bg-surface-100 
+      border-muted my-8 overflow-hidden rounded-md border shadow"
     >
-      {header && (
-        <div className="bg-scale-100 dark:bg-scale-200 border-scale-400 border-b px-8 py-4">
-          {header}
-        </div>
-      )}
+      {header && <div className="bg-background border-muted border-b px-8 py-4">{header}</div>}
       <div className="space-y-6 py-6">{children}</div>
       {footer}
     </div>
@@ -136,7 +128,7 @@ const CardForm = () => {
           <Panel
             footer={
               <>
-                <div className="border-scale-400 border-t"></div>
+                <div className="border-muted border-t"></div>
                 <div className="flex justify-end gap-2 py-3 px-6">
                   <Button type="default" htmlType="reset" onClick={() => handleReset()}>
                     Cancel
@@ -164,7 +156,7 @@ const CardForm = () => {
                 descriptionText="If this is disabled, new users will not be able to sign up to your application."
               />
             </Section>
-            <div className="border-scale-400 border-t"></div>
+            <div className="border-muted border-t"></div>
             <Section
               header={<label className="text-foreground col-span-4 text-sm">User Sessions</label>}
             >
@@ -219,12 +211,8 @@ const AuthForm = () => {
     header?: React.ReactNode
     footer?: React.ReactNode
   }) => (
-    <div className="bg-scale-300 border-scale-400 mx-auto my-8 w-3/4 overflow-hidden rounded-md border shadow">
-      {header && (
-        <div className="bg-scale-100 dark:bg-scale-200 border-scale-400 border-b px-8 py-4">
-          {header}
-        </div>
-      )}
+    <div className="bg-surface-100 border-overlay mx-auto my-8 w-3/4 overflow-hidden rounded-md border shadow">
+      {header && <div className="bg-background border-overlay border-b px-8 py-4">{header}</div>}
       <div className="space-y-6 py-6">{children}</div>
       {footer}
     </div>
@@ -253,7 +241,7 @@ const AuthForm = () => {
     return (
       <div
         className="
-          bg-scale-400 border-scale-500 hover:border-scale-700 hover:bg-scale-500 mx-auto overflow-hidden
+          bg-surface-200 border-border hover:border-strong hover:bg-overlay-hover mx-auto overflow-hidden
           border shadow
           transition first:rounded-tr  
           first:rounded-tl
@@ -293,12 +281,11 @@ const AuthForm = () => {
         open={open}
         onOpenChange={setOpen}
         className="
-            bg-scale-100 dark:bg-scale-300 
-            hover:bg-scale-200 dark:hover:bg-scale-500
-            data-open:bg-scale-200 dark:data-open:bg-scale-500 
-            border-scale-300 
-            dark:border-scale-500 hover:border-scale-500 
-            dark:hover:border-scale-700 data-open:border-scale-700
+            bg-surface-100 
+            hover:bg-overlay-hover
+            data-open:bg-selection
+            border-border 
+            hover:border-strong data-open:border-strong
 
             data-open:pb-px col-span-12 mx-auto
             -space-y-px overflow-hidden
@@ -345,7 +332,7 @@ const AuthForm = () => {
                   <span className="px-1">Enabled</span>
                 </div>
               ) : (
-                <div className="bg-scale-100 dark:bg-scale-300 border-scale-500 dark:border-scale-700 text-foreground-muted rounded-md border py-1 px-3 text-xs">
+                <div className="bg-surface-100 border-strong text-foreground-muted rounded-md border py-1 px-3 text-xs">
                   Disabled
                 </div>
               )}
@@ -403,8 +390,8 @@ const AuthForm = () => {
             <Collapsible.Content>
               <div
                 className="
-                  bg-scale-100 dark:bg-scale-300
-                  text-foreground border-scale-500 group border-t py-6 px-6
+                  bg-surface-100
+                  text-foreground border-border group border-t py-6 px-6
                 "
               >
                 <div className="mx-auto max-w-md space-y-6">
@@ -414,7 +401,7 @@ const AuthForm = () => {
                     label={`Enable ${provider.name} Provider`}
                     layout="flex"
                   />
-                  <div className="border-scale-400 border-t"></div>
+                  <div className="border-muted border-t"></div>
                   {provider.form.map((x) => {
                     return (
                       <Input
@@ -427,7 +414,7 @@ const AuthForm = () => {
                       />
                     )
                   })}
-                  <div className="border-scale-400 border-t"></div>
+                  <div className="border-muted border-t"></div>
                   <div className="flex items-center justify-end gap-3">
                     <Button
                       htmlType="reset"
@@ -653,7 +640,7 @@ const DomainsForm = () => {
           return (
             <>
               <div
-                className="bg-scale-300 border-scale-500 text-foreground flex items-center 
+                className="bg-surface-100 border-border text-foreground flex items-center 
               justify-between gap-2
               border px-6 
               py-4 text-sm
@@ -758,16 +745,11 @@ const SmtpForm = () => {
   }) => (
     <div
       className="
-      bg-scale-100 
-      dark:bg-scale-300 
+      bg-surface-100
       
-      border-scale-400 my-8 overflow-hidden rounded-md border shadow"
+      border-muted my-8 overflow-hidden rounded-md border shadow"
     >
-      {header && (
-        <div className="bg-scale-100 dark:bg-scale-200 border-scale-400 border-b px-8 py-4">
-          {header}
-        </div>
-      )}
+      {header && <div className="bg-background border-muted border-b px-8 py-4">{header}</div>}
       <div className="space-y-6 py-6">{children}</div>
       {footer}
     </div>
@@ -816,7 +798,7 @@ const SmtpForm = () => {
           <Panel
             footer={
               <>
-                <div className="border-scale-400 border-t"></div>
+                <div className="border-muted border-t"></div>
                 <div className="flex justify-end gap-2 py-3 px-6">
                   <Button
                     loading={isSubmitting}
@@ -855,7 +837,7 @@ const SmtpForm = () => {
               descriptionText="If this is disabled, new users will not be able to sign up to your application."
             />
             {/* </Section> */}
-            <div className="border-scale-400 border-t"></div>
+            <div className="border-muted border-t"></div>
             <Section
               header={
                 <div className="w-full">
@@ -905,15 +887,10 @@ const TemplatesForm = () => {
   }) => (
     <div
       className="
-      bg-scale-100 
-      dark:bg-scale-300 
-      border-scale-400 mb-8 overflow-hidden rounded-md border shadow"
+      bg-surface-100 
+      border-muted mb-8 overflow-hidden rounded-md border shadow"
     >
-      {header && (
-        <div className="bg-scale-100 dark:bg-scale-200 border-scale-400 border-b px-8 py-4">
-          {header}
-        </div>
-      )}
+      {header && <div className="bg-background border-muted border-b px-8 py-4">{header}</div>}
       <div className="space-y-6 py-6">{children}</div>
       {footer}
     </div>
@@ -977,7 +954,7 @@ const TemplatesForm = () => {
             <Panel
               footer={
                 <>
-                  <div className="border-scale-400 border-t"></div>
+                  <div className="border-muted border-t"></div>
                   <div className="flex justify-end gap-2 py-3 px-6">
                     <Button
                       loading={isSubmitting}
@@ -1016,7 +993,7 @@ const TemplatesForm = () => {
               descriptionText="If this is disabled, new users will not be able to sign up to your application."
             /> */}
               {/* </Section> */}
-              {/* <div className="border-t border-scale-400"></div> */}
+              {/* <div className="border-t border-muted"></div> */}
               <Section
                 header={
                   <div className="w-full">
@@ -1067,7 +1044,7 @@ export function WholeForm() {
             <div>
               <h1 className="text-foreground text-3xl">Sign-in method</h1>
             </div>
-            <div className="border-scale-400 border-t"></div>
+            <div className="border-muted border-t"></div>
             <div>
               <h3 className="text-foreground mb-2 text-2xl">General settings</h3>
               <p className="text-foreground-muted text-sm">
@@ -1099,12 +1076,10 @@ export function WholeForm() {
             </div>
             <button
               className="
-                bg-scale-300
-                dark:bg-scale-100
-                border-scale-500  
-                hover:border-scale-700  
-                dark:border-scale-300 
-                dark:hover:border-scale-500 group
+                bg-surface-300
+                border-border  
+                hover:border-strong
+                group
                 my-6 flex
                 w-full items-center 
                 gap-6 
@@ -1137,7 +1112,7 @@ export function WholeForm() {
                 <IconX />
               </div>
             </button>
-            <div className="border-scale-400 border-t"></div>
+            <div className="border-muted border-t"></div>
             <div>
               <h3 className="text-foreground mb-2 text-2xl">Custom SMTP</h3>
               <p className="text-foreground-muted text-sm">

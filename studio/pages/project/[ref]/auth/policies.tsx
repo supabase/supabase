@@ -110,7 +110,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
           <div className="flex items-center space-x-4">
             <div className="w-[230px]">
               {isLoadingSchemas && (
-                <div className="h-[34px] w-full bg-scale-1000 rounded shimmering-loader" />
+                <div className="h-[34px] w-full bg-foreground-lighter rounded shimmering-loader" />
               )}
 
               {isErrorSchemas && (

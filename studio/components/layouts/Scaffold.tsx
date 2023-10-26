@@ -31,7 +31,7 @@ const ScaffoldContainer = React.forwardRef<HTMLDivElement, React.HTMLAttributes<
 
 const ScaffoldDivider = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => {
-    return <div ref={ref} {...props} className={cn('w-full h-px bg-muted', className)} />
+    return <div ref={ref} {...props} className={cn('w-full h-px bg-border', className)} />
   }
 )
 

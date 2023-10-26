@@ -250,8 +250,8 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
               <Tooltip.Arrow className="radix-tooltip-arrow" />
               <div
                 className={[
-                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                  'border border-scale-200 flex items-center space-x-1',
+                  'rounded bg-alternative py-1 px-2 leading-none shadow',
+                  'border border-background flex items-center space-x-1',
                 ].join(' ')}
               >
                 <span className="text-xs text-foreground">Notifications</span>

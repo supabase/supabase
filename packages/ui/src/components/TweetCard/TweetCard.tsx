@@ -10,7 +10,7 @@ function TweetCard(props: TweetCard) {
   return (
     <div
       className="
-      bg-surface-100 border-muted
+      bg-surface-100 border-overlay
       rounded-2xl border p-6
       drop-shadow-sm
     "

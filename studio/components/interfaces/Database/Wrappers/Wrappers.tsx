@@ -61,7 +61,7 @@ const Wrappers = () => {
         </div>
 
         {isLoadingExtensions || isLoading ? (
-          <div className="p-12 space-y-2 border rounded border-scale-500">
+          <div className="p-12 space-y-2 border rounded border-border">
             <GenericSkeletonLoader />
           </div>
         ) : isWrappersEnabled ? (
@@ -69,7 +69,7 @@ const Wrappers = () => {
             {wrappers.length === 0 ? (
               <div
                 className={[
-                  'border rounded border-scale-500 px-20 py-16',
+                  'border rounded border-border px-20 py-16',
                   'flex flex-col items-center justify-center space-y-4',
                 ].join(' ')}
               >

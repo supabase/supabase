@@ -38,7 +38,7 @@ const LayoutComparison = ({ components, props }: Props) => {
     return (
       <Link href={`${post.url}`} as={`${post.url}`}>
         <div className={className}>
-          <div className="border-scale-500 hover:bg-scale-100 dark:hover:bg-scale-300 cursor-pointer rounded border p-6 transition">
+          <div className="border-border hover:bg-surface-100 cursor-pointer rounded border p-6 transition">
             <div className="space-y-4">
               <div>
                 <p className="text-muted text-sm">{label}</p>
