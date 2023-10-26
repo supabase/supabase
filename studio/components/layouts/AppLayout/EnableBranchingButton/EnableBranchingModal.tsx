@@ -1,19 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  Form_Shadcn_,
-  IconAlertCircle,
-  IconFileText,
-  IconGitBranch,
-  Modal,
-} from 'ui'
+import { Button, Form_Shadcn_, IconFileText, IconGitBranch, Modal } from 'ui'
 import * as z from 'zod'
 
 import SidePanelGitHubRepoLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
@@ -36,7 +25,6 @@ const EnableBranchingModal = () => {
   // but calling form.formState.isValid somehow removes the onBlur check,
   // and makes the validation run onChange instead. This is a workaround
   const [isValid, setIsValid] = useState(false)
-  const isOrgBilling = !!selectedOrg?.subscription_id
 
   const {
     data: integrations,
@@ -136,124 +124,83 @@ const EnableBranchingModal = () => {
               </div>
             </Modal.Content>
 
-            {!isOrgBilling ? (
+            {isLoadingIntegrations && (
               <>
-                <Modal.Content className="px-3 border-y bg-alternative">
-                  <Alert_Shadcn_ variant="default" className="rounded-none border-0">
-                    <IconAlertCircle strokeWidth={2} />
-                    <AlertTitle_Shadcn_>
-                      Organization-based billing migration required
-                    </AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_>
-                      <p className="!leading-normal">
-                        Your organization will first need to be migrated to use our new
-                        organization-based billing before you can enable Branching.
-                      </p>
-                      <p className="!leading-normal mt-1">
-                        You may do so under the billing settings of your organization.
-                      </p>
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
-                </Modal.Content>
-                <Modal.Content className="px-4 pt-3">
-                  <div className="flex items-center justify-end space-x-2 py-2 pb-4">
-                    <Button
-                      disabled={isCreating}
-                      type="default"
-                      onClick={() => snap.setShowEnableBranchingModal(false)}
-                    >
-                      Understood
-                    </Button>
-                    <Button asChild>
-                      <Link href={`/org/${selectedOrg?.slug}/billing`}>Organization settings</Link>
-                    </Button>
-                  </div>
-                </Modal.Content>
-              </>
-            ) : (
-              <>
-                {isLoadingIntegrations && (
-                  <>
-                    <Modal.Separator />
-                    <Modal.Content className="px-7 py-6">
-                      <GenericSkeletonLoader />
-                    </Modal.Content>
-                    <Modal.Separator />
-                  </>
-                )}
-
-                {isErrorIntegrations && (
-                  <>
-                    <Modal.Separator />
-                    <Modal.Content className="px-7 py-6">
-                      <AlertError
-                        error={integrationsError}
-                        subject="Failed to retrieve integrations"
-                      />
-                    </Modal.Content>
-                    <Modal.Separator />
-                  </>
-                )}
-
-                {isSuccessIntegrations && (
-                  <GithubRepositorySelection
-                    form={form}
-                    isChecking={isChecking}
-                    isValid={canSubmit}
-                    integration={githubIntegration}
-                    hasGithubIntegrationInstalled={hasGithubIntegrationInstalled}
-                  />
-                )}
-
-                <Modal.Content className="px-7 py-6 flex flex-col gap-3">
-                  <p className="text-sm text-light">Please keep in mind the following:</p>
-                  <div className="flex flex-row gap-4">
-                    <div>
-                      <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-300 flex items-center justify-center">
-                        <IconFileText className="text-amber-900" size={20} strokeWidth={2} />
-                      </figure>
-                    </div>
-                    <div>
-                      <p className="text-sm text-foreground">
-                        You will not be able to use the dashboard to make changes to the database
-                      </p>
-                      <p className="text-sm text-light">
-                        Schema changes for database preview branches must be done via Git. We are
-                        nonetheless working on allowing the dashboard to make schema changes for
-                        preview branches.
-                      </p>
-                    </div>
-                  </div>
-                </Modal.Content>
-
                 <Modal.Separator />
-
-                <Modal.Content className="px-7">
-                  <div className="flex items-center space-x-2 py-2 pb-4">
-                    <Button
-                      size="medium"
-                      block
-                      disabled={isCreating}
-                      type="default"
-                      onClick={() => snap.setShowEnableBranchingModal(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      block
-                      size="medium"
-                      form={formId}
-                      disabled={isCreating || !canSubmit}
-                      loading={isCreating}
-                      type="primary"
-                      htmlType="submit"
-                    >
-                      I understand, enable branching
-                    </Button>
-                  </div>
+                <Modal.Content className="px-7 py-6">
+                  <GenericSkeletonLoader />
                 </Modal.Content>
+                <Modal.Separator />
               </>
             )}
+
+            {isErrorIntegrations && (
+              <>
+                <Modal.Separator />
+                <Modal.Content className="px-7 py-6">
+                  <AlertError error={integrationsError} subject="Failed to retrieve integrations" />
+                </Modal.Content>
+                <Modal.Separator />
+              </>
+            )}
+
+            {isSuccessIntegrations && (
+              <GithubRepositorySelection
+                form={form}
+                isChecking={isChecking}
+                isValid={canSubmit}
+                integration={githubIntegration}
+                hasGithubIntegrationInstalled={hasGithubIntegrationInstalled}
+              />
+            )}
+
+            <Modal.Content className="px-7 py-6 flex flex-col gap-3">
+              <p className="text-sm text-light">Please keep in mind the following:</p>
+              <div className="flex flex-row gap-4">
+                <div>
+                  <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-300 flex items-center justify-center">
+                    <IconFileText className="text-amber-900" size={20} strokeWidth={2} />
+                  </figure>
+                </div>
+                <div>
+                  <p className="text-sm text-foreground">
+                    You will not be able to use the dashboard to make changes to the database
+                  </p>
+                  <p className="text-sm text-light">
+                    Schema changes for database preview branches must be done via Git. We are
+                    nonetheless working on allowing the dashboard to make schema changes for preview
+                    branches.
+                  </p>
+                </div>
+              </div>
+            </Modal.Content>
+
+            <Modal.Separator />
+
+            <Modal.Content className="px-7">
+              <div className="flex items-center space-x-2 py-2 pb-4">
+                <Button
+                  size="medium"
+                  block
+                  disabled={isCreating}
+                  type="default"
+                  onClick={() => snap.setShowEnableBranchingModal(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  block
+                  size="medium"
+                  form={formId}
+                  disabled={isCreating || !canSubmit}
+                  loading={isCreating}
+                  type="primary"
+                  htmlType="submit"
+                >
+                  I understand, enable branching
+                </Button>
+              </div>
+            </Modal.Content>
           </form>
         </Form_Shadcn_>
       </Modal>

@@ -1,5 +1,5 @@
 import BillingSettings from './BillingSettings/BillingSettings'
-import BillingSettingsV2 from './BillingSettingsV2/BillingSettings'
+import BillingSettingsV2 from './BillingSettings/BillingSettings'
 import GeneralSettings from './GeneralSettings/GeneralSettings'
 import IntegrationSettings from './IntegrationSettings/IntegrationSettings'
 import InvoicesSettings from './InvoicesSettings/InvoicesSettings'
