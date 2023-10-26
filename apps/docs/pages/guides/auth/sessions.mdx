@@ -1,0 +1,103 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'sessions',
+  title: 'User Sessions',
+  description: 'Control and manage user sessions.',
+}
+
+Supabase Auth provides fine-grained control over your user's sessions.
+
+A session is created when a user signs in. It is represented by the Supabase Auth access token in the form of a JWT, and a refresh token which is a unique string.
+
+Access tokens are designed to be short lived, usually between 5 minutes and 1 hour. You can exchange a refresh token only once to get a new access and refresh token pair.
+
+This process is called **refreshing the session.** 
+
+By default, there's no limit to the number of sessions a user can have on Supabase Auth. This behavior can be controlled in the following ways.
+
+- By restricting the number of sessions a user can have.
+- By controlling the lifetime of a session.
+
+A session can terminate, depending on configuration, when:
+
+- The user clicks sign out.
+- The user changes their password or performs a security sensitive action.
+- It times out due to inactivity.
+- It reaches its maximum lifetime.
+- A new session for the same user was started.
+
+## Controlling the lifetime of a session
+
+<Admonition type="note">
+
+This feature is only available on Pro plans and up.
+
+</Admonition>
+
+Supabase Auth can be configured to limit the lifetime of a user's session. By default, all sessions are active until the user clicks log out or performs some other action that terminates a session.
+
+In some applications, it's useful or required from a security point of view to ensure that users authenticate often, or that sessions are not left active on devices for too long.
+
+There are two ways in which you can limit the lifetime of a session:
+
+- By enabling timeboxed sessions which terminate after a fixed amount of time.
+- By enabling inactivity timeout, such that if a session remains unrefreshed for too long it will be terminated.
+
+To make sure that users are required to re-authenticate periodically, you can select the _Enforce timeboxed sessions_ option in the Auth configuration screen for your project.
+
+To make sure that sessions expire after a period of inactivity, you can select and configure the _Terminate inactive sessions_ option.
+
+Sessions are not proactively terminated when you change these settings, but rather the check is enforced whenever a session is refreshed next.
+
+## Restricting the number of sessions per user
+
+<Admonition type="note">
+
+This feature is only available on Pro plans and up.
+
+</Admonition>
+
+Supabase Auth can be configured to restrict the number of sessions per user.
+
+When your application's requirements demand that a user does not have more than one active session at once, you can enforce this by selecting the _Single session per user_ option in the Auth configuration page for your project.
+
+Sessions are not proactively removed when you toggle this setting. Instead, on the next session refresh the remaining of the user's sessions will be terminated.
+
+Enforcing only a single session per user can sometimes be too strict, especially if you're building an app for multiple devices. In those cases it's often necessary to enforce a single session per device per user -- one session on iOS, one on Android, one on web, etc.
+
+Supabase Auth lets you do this by assigning a **tag** to a session on sign in.
+
+You can configure the allowed tags in the Auth configuration page for your project. You can choose as many or as few tags as you want depending on your use case.
+
+For example, if you're building an app for iOS, Android, Desktop and Web, natural choices for tags could be: `ios`, `android`, `desktop` and `web`.
+
+Finally, you can configure the session tag when creating the client library. This example shows how you can do this with the `web` tag. If you do not specify the tag in the client, the first tag in the list will generally be used.
+
+```typescript
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    sessionTag: 'web',
+  },
+})
+```
+
+In React Native you can use the [Platform API](https://reactnative.dev/docs/platform) to identify the OS:
+
+```typescript
+import { createClient } from '@supabase/supabase-js'
+import { Platform } from 'react-native'
+
+const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    sessionTag: Platform.OS, // 'ios' or 'android'
+    // other options for React Native
+  },
+})
+```
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
