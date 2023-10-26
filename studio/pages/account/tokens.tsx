@@ -47,7 +47,7 @@ const UserAccessTokens: NextPageWithLayout = () => {
       <div className="flex items-center justify-between">
         <Alert
           withIcon
-          className="mb-6 mr-6 w-full"
+          className="mb-6 w-full"
           variant="warning"
           title="Personal access tokens can be used to control your whole account and use features added in the future. Be careful when sharing them!"
         />
