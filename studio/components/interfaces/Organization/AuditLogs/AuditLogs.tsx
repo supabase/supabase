@@ -233,9 +233,11 @@ const AuditLogs = () => {
                   </div>
 
                   <div className="flex items-center">
-                    <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
-                      <Button type="primary">Upgrade subscription</Button>
-                    </Link>
+                    <Button type="primary" asChild>
+                      <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
+                        Upgrade subscription
+                      </Link>
+                    </Button>
                   </div>
                 </div>
               </Alert_Shadcn_>
@@ -273,7 +275,7 @@ const AuditLogs = () => {
                         <p>Date</p>
 
                         <Tooltip.Root delayDuration={0}>
-                          <Tooltip.Trigger>
+                          <Tooltip.Trigger asChild>
                             <Button
                               type="text"
                               className="px-1"
@@ -288,21 +290,19 @@ const AuditLogs = () => {
                             />
                           </Tooltip.Trigger>
                           <Tooltip.Portal>
-                            <Tooltip.Portal>
-                              <Tooltip.Content side="right">
-                                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                <div
-                                  className={[
-                                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                    'border border-scale-200',
-                                  ].join(' ')}
-                                >
-                                  <span className="text-xs text-foreground">
-                                    {dateSortDesc ? 'Sort latest first' : 'Sort earliest first'}
-                                  </span>
-                                </div>
-                              </Tooltip.Content>
-                            </Tooltip.Portal>
+                            <Tooltip.Content side="right">
+                              <Tooltip.Arrow className="radix-tooltip-arrow" />
+                              <div
+                                className={[
+                                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                  'border border-scale-200',
+                                ].join(' ')}
+                              >
+                                <span className="text-xs text-foreground">
+                                  {dateSortDesc ? 'Sort latest first' : 'Sort earliest first'}
+                                </span>
+                              </div>
+                            </Tooltip.Content>
                           </Tooltip.Portal>
                         </Tooltip.Root>
                       </div>
