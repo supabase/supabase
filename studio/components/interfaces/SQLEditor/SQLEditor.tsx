@@ -1,3 +1,4 @@
+import { Monaco } from '@monaco-editor/react'
 import { useParams, useTelemetryProps } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import dynamic from 'next/dynamic'
@@ -8,7 +9,6 @@ import { format } from 'sql-formatter'
 import {
   AiIconAnimation,
   Button,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -20,6 +20,7 @@ import {
   IconSettings,
   IconX,
   Input_Shadcn_,
+  cn,
 } from 'ui'
 
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
@@ -63,7 +64,6 @@ import {
   getDiffTypeDropdownLabel,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
-import { Monaco } from '@monaco-editor/react'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -516,8 +516,9 @@ const SQLEditor = () => {
       <ConfirmModal
         visible={isConfirmModalOpen}
         title="Destructive operation"
+        danger
         description="We've detected a potentially destructive operation in the query. Please confirm that you would like to execute this query."
-        buttonLabel="Execute query"
+        buttonLabel="Run destructive query"
         onSelectCancel={() => {
           setIsConfirmModalOpen(false)
         }}
