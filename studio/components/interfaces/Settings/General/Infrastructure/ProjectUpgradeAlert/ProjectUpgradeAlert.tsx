@@ -90,18 +90,11 @@ const ProjectUpgradeAlert = () => {
                       <Alert_Shadcn_ title="Your project will be offline while the upgrade is in progress">
                         <IconAlertCircle className="h-4 w-4" strokeWidth={2} />
                         <AlertTitle_Shadcn_>
-                          Your project will be offline while the upgrade is in progress
+                          Your project will be offline for up to {durationEstimateHours} hour{durationEstimateHours === 1 ? '' : 's'}
                         </AlertTitle_Shadcn_>
                         <AlertDescription_Shadcn_>
                           <p>
-                            Based on your current database's size it is estimated the upgrade will
-                            take up to:{' '}
-                            <span className="text-green-900">
-                              {durationEstimateHours} hour{durationEstimateHours === 1 ? '' : 's'}.
-                            </span>
-                            <br />
-                            It is advised to upgrade at a time when there will be minimal impact for
-                            your application.
+                            It is advised to upgrade at a time when there will be minimal impact for your application.
                           </p>
                         </AlertDescription_Shadcn_>
                       </Alert_Shadcn_>
@@ -118,7 +111,7 @@ const ProjectUpgradeAlert = () => {
                             <Link href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats">
                               <a target="_blank" rel="noreferrer">
                                 <Button size="tiny" type="default">
-                                  Visit our documentation to learn more about breaking changes
+                                  View docs
                                 </Button>
                               </a>
                             </Link>
@@ -132,21 +125,19 @@ const ProjectUpgradeAlert = () => {
                         >
                           <IconAlertCircle className="h-4 w-4" strokeWidth={2} />
                           <AlertTitle_Shadcn_>
-                            Custom Postgres roles using md5 authentication have been detected
+                            Custom Postgres roles will not work automatically after upgrade
                           </AlertTitle_Shadcn_>
                           <AlertDescription_Shadcn_ className="flex flex-col gap-3">
                             <p>
-                              New Postgres versions use scram-sha-256 authentication by default and
-                              do not support md5, as it has been deprecated.
+                             You must run a series of commands after upgrading.
                             </p>
                             <p>
-                              After upgrading you will not be able to connect using the existing
-                              custom roles until they've been updated to use the new authentication
-                              method.
+                              This is because new Postgres versions use scram-sha-256 authentication by default and
+                              do not support md5, as it has been deprecated.
                             </p>
                             <div>
                               <p className="mb-1">
-                                You can do so by running the following commands after the upgrade:
+                                Run the following commands after the upgrade:
                               </p>
                               <div className="flex items-baseline gap-2">
                                 <code className="text-xs">
@@ -163,7 +154,7 @@ const ProjectUpgradeAlert = () => {
                             <Link href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats">
                               <a target="_blank" rel="noreferrer">
                                 <Button size="tiny" type="default">
-                                  Visit our documentation to learn more about this
+                                  View docs
                                 </Button>
                               </a>
                             </Link>

@@ -165,7 +165,7 @@ const InfrastructureInfo = () => {
                     >
                       <IconPackage className="text-foreground-light" strokeWidth={1.5} />
                       <AlertTitle_Shadcn_>
-                        A new version of Postgres is available for your project
+                        New version of Postgres available
                       </AlertTitle_Shadcn_>
                       <AlertDescription_Shadcn_ className="flex flex-col gap-3">
                         <div>
@@ -190,7 +190,9 @@ const InfrastructureInfo = () => {
                         <Link href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats">
                           <a target="_blank" rel="noreferrer">
                             <Button size="tiny" type="default">
-                              Visit our documentation to learn more about this
+                            <Button size="tiny" type="default">
+                              View docs
+                            </Button>
                             </Button>
                           </a>
                         </Link>
