@@ -136,8 +136,6 @@ Server Components only have read access to cookies. Check the `Middleware` tab f
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
-export const dynamic = 'force-dynamic'
-
 export default async function Page () {
   const cookieStore = cookies()
 
@@ -148,16 +146,6 @@ export default async function Page () {
       cookies: {
         get(name: string) {
           return cookieStore.get(name)?.value
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          // Server Components only have read access to cookies.
-          // Make sure you have implemented Middleware correctly
-          // to refresh your user's access token
-        },
-        remove(name: string, options: CookieOptions) {
-          // Server Components only have read access to cookies.
-          // Make sure you have implemented Middleware correctly
-          // to remove your user's access token
         },
       },
     }
@@ -214,8 +202,9 @@ export async function middleware(request: NextRequest) {
           })
         },
         remove(name: string, options: CookieOptions) {
-          request.cookies.delete({
+          request.cookies.set({
             name,
+            value: '',
             ...options,
           })
           response = NextResponse.next({
@@ -223,8 +212,9 @@ export async function middleware(request: NextRequest) {
               headers: request.headers,
             },
           })
-          response.cookies.delete({
+          response.cookies.set({
             name,
+            value: '',
             ...options,
           })
         },
@@ -246,8 +236,6 @@ export async function middleware(request: NextRequest) {
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
-export const dynamic = 'force-dynamic'
-
 export async function POST(request: Request) {
   const cookieStore = cookies()
 
@@ -263,7 +251,7 @@ export async function POST(request: Request) {
           cookieStore.set({ name, value, ...options })
         },
         remove(name: string, options: CookieOptions) {
-          cookieStore.delete({ name, ...options })
+          cookieStore.set({ name, value: '', ...options })
         },
       },
     }
@@ -280,8 +268,6 @@ export async function POST(request: Request) {
 ```ts page.tsx
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-
-export const dynamic = 'force-dynamic'
 
 export default async function Page () {
   const serverAction = async () => {
@@ -301,7 +287,7 @@ export default async function Page () {
             cookieStore.set({ name, value, ...options })
           },
           remove(name: string, options: CookieOptions) {
-            cookieStore.delete({ name, ...options })
+            cookieStore.set({ name, value: '', ...options })
           },
         },
       }
@@ -341,14 +327,14 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(key: string) {
-          return cookies.get(key)
+        get(name: string) {
+          return cookies.get(name)
         },
-        set(key: string, value: string, options: CookieOptions) {
-          cookies.set(key, value, options)
+        set(name: string, value: string, options: CookieOptions) {
+          cookies.set(name, value, options)
         },
-        remove(key: string, options: CookieOptions) {
-          cookies.set(key, '', options)
+        remove(name: string, options: CookieOptions) {
+          cookies.set(name, '', options)
         },
       },
     }
@@ -413,14 +399,14 @@ export default async function handler(
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(key: string) {
-          return cookies.get(key)
+        get(name: string) {
+          return cookies.get(name)
         },
-        set(key: string, value: string, options: CookieOptions) {
-          cookies.set(key, value, options)
+        set(name: string, value: string, options: CookieOptions) {
+          cookies.set(name, value, options)
         },
-        remove(key: string, options: CookieOptions) {
-          cookies.set(key, "", options)
+        remove(name: string, options: CookieOptions) {
+          cookies.set(name, "", options)
         },
       },
     }
@@ -435,6 +421,8 @@ export default async function handler(
 <TabPanel id="pages-component" label="Pages Component">
 
 ```ts index.tsx
+import { createBrowserClient } from "@supabase/ssr"
+
 export default function Index () {
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
