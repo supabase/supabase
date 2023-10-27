@@ -50,6 +50,7 @@
     "common-tags": "^1.8.2",
     "config": "*",
     "configcat-js": "^7.0.0",
+    "dat.gui": "^0.7.9",
     "dayjs": "^1.11.7",
     "eslint-config-next": "^13.3.0",
     "file-saver": "^2.0.5",

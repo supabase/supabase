@@ -51,6 +51,7 @@ import PageTelemetry from 'components/ui/PageTelemetry'
 import { useRootQueryClient } from 'data/query-client'
 import { StoreProvider } from 'hooks'
 import useAutoAuthRedirect from 'hooks/misc/useAutoAuthRedirect'
+import useThemeSandbox from 'hooks/misc/useThemeSandbox'
 import { AuthProvider } from 'lib/auth'
 import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { dart } from 'lib/constants/prism'
@@ -151,6 +152,8 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useThemeSandbox()
 
   return (
     <QueryClientProvider client={queryClient}>
