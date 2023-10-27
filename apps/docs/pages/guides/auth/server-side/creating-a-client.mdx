@@ -439,7 +439,7 @@ Creating a Supabase client with the `ssr` package automatically configures it to
 
 <Admonition type="note">
 
-API routes, server layout load and form actions can now access the supabase client from the `event` object.
+API routes, server layout load and form actions can now access the supabase client from the `event` object due to this hook.
 
 </Admonition>
 
@@ -484,6 +484,12 @@ export const handle: Handle = async ({ event, resolve }) => {
 </TabPanel>
 
 <TabPanel id="layout" label="Layout Load">
+
+<Admonition type="note">
+
+Page components can get access to the supabase client from the `data` object due to this load function.
+
+</Admonition>
 
 ```ts +layout.ts
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
