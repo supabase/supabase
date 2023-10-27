@@ -6,17 +6,11 @@ export const meta = {
   description: 'Use Supabase to Authenticate and Authorize your users using email.',
 }
 
-## Overview
+Set up Email Logins for your Supabase application.
 
-Setting up Email logins for your Supabase application.
-
-- Add Email authenticator to your [Supabase Project](https://supabase.com/dashboard)
-- Add the login code to your application - [JavaScript](https://github.com/supabase/supabase-js) | [Flutter](https://github.com/supabase/supabase-flutter)
-
-## Configure email settings
-
-1. For [Site URL](https://supabase.com/dashboard/project/_/auth/url-configuration), enter the final (hosted) URL of your app.
-1. For [Auth Providers](https://supabase.com/dashboard/project/_/auth/providers), **enable email provider**.
+- Enable the email provider in your [Supabase Project](/dashboard/project/_/auth/providers)
+- Configure the Site URL and any additional redirect URLs in the [authentication management tab](/dashboard/project/_/auth/url-configuration).
+- The Site URL represents the default URL that the user will be redirected to after clicking on the email signup confirmation link.
 
 <Admonition type="info" label="Self hosting">
 
@@ -26,8 +20,7 @@ See the [self-hosting docs](/docs/guides/hosting/overview#configuration) for det
 
 </Admonition>
 
-## Add login code to your client app
-
+## Sign up the user 
 <Tabs
   scrollable
   size="small"
@@ -37,13 +30,16 @@ See the [self-hosting docs](/docs/guides/hosting/overview#configuration) for det
 >
 <TabPanel id="js" label="JavaScript">
 
-When your user signs in, call [signInWithPassword()](/docs/reference/javascript/auth-signinwithpassword) with their email address and password:
+To sign up the user, call [signUp()](/docs/reference/javascript/auth-signup) with their email address and password:
 
 ```js
-async function signInWithEmail() {
-  const { data, error } = await supabase.auth.signInWithPassword({
+async function signUpNewUser() {
+  const { data, error } = await supabase.auth.signUp({
     email: 'example@email.com',
     password: 'example-password',
+    options: {
+      redirectTo: 'https//example.com/welcome'
+    }
   })
 }
 ```
@@ -51,11 +47,11 @@ async function signInWithEmail() {
 </TabPanel>
 <TabPanel id="dart" label="Dart">
 
-When your user signs in, call [signInWithPassword()](/docs/reference/dart/auth-signinwithpassword) with their email address and password:
+To sign up the user, call [signUp()](/docs/reference/dart/auth-signup) with their email address and password:
 
 ```dart
-Future<void> signInWithEmail() async {
-  final AuthResponse res = await supabase.auth.signInWithPassword(
+Future<void> signUpNewUser() async {
+  final AuthResponse res = await supabase.auth.signUp(
     email: 'example@email.com',
     password: 'example-password'
   );
@@ -65,11 +61,11 @@ Future<void> signInWithEmail() async {
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
-When your user signs in, call [loginWith(Email)](/docs/reference/kotlin/auth-signinwithpassword) with their email address and password:
+To sign up the user, call [signUpWith(Email)](/docs/reference/kotlin/auth-signup) with their email address and password:
 
 ```kotlin
-suspend fun signInWithEmail() {
-	supabase.gotrue.loginWith(Email) {
+suspend fun signUpNewUser() {
+	supabase.gotrue.signUpWith(Email) {
 		email = "example@email.com"
 		password = "example-password"
 	}
@@ -121,11 +117,113 @@ suspend fun logout() {
 </TabPanel>
 </Tabs>
 
+## Sign in the user
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+When your user signs in, call [signInWithPassword()](/docs/reference/javascript/auth-signinwithpassword) with their email address and password:
+
+```js
+async function signInWithEmail() {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: 'example@email.com',
+    password: 'example-password',
+    options: {
+      redirectTo: 'https//example.com/welcome'
+    }
+  })
+}
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+When your user signs in, call [signInWithPassword()](/docs/reference/dart/auth-signinwithpassword) with their email address and password:
+
+```dart
+Future<void> signInWithEmail() async {
+  final AuthResponse res = await supabase.auth.signInWithPassword(
+    email: 'example@email.com',
+    password: 'example-password'
+  );
+}
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+When your user signs in, call [loginWith(Email)](/docs/reference/kotlin/auth-signinwithpassword) with their email address and password:
+
+```kotlin
+suspend fun signInWithEmail() {
+	supabase.gotrue.loginWith(Email) {
+		email = "example@email.com"
+		password = "example-password"
+	}
+}
+```
+
+</TabPanel>
+</Tabs>
+
+## Sign out the user
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```js
+async function signOut() {
+  const { error } = await supabase.auth.signOut()
+}
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+When your user signs out, call [signOut()](/docs/reference/dart/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```dart
+Future<void> signOut() async {
+   await supabase.auth.signOut();
+}
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+
+When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```kotlin
+suspend fun logout() {
+	supabase.gotrue.logout()
+}
+```
+
+</TabPanel>
+</Tabs>
+
 ## Resources
 
 - [Supabase Account - Free Plan OK](https://supabase.com)
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
 - [Supabase Flutter Client](https://github.com/supabase/supabase-flutter)
+- [Supabase Kotlin Client](https://github.com/supabase-community/supabase-kt)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
