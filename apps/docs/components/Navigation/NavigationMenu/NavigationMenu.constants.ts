@@ -548,21 +548,20 @@ export const auth = {
       name: 'Server-side Auth',
       url: undefined,
       items: [
-        { name: 'Overview', url: '/guides/auth/auth-helpers' },
+        { name: 'Overview', url: '/guides/auth/server-side/overview' },
+        { name: 'Creating a client', url: '/guides/auth/server-side/creating-a-client' },
         {
-          name: 'Next.js',
-          url: '/guides/auth/auth-helpers/nextjs',
-        },
-        { name: 'Remix', url: '/guides/auth/auth-helpers/remix' },
-        { name: 'SvelteKit', url: '/guides/auth/auth-helpers/sveltekit' },
-        { name: 'Server-side Rendering', url: '/guides/auth/server-side-rendering' },
-        {
-          name: 'Email Auth with PKCE flow for SSR',
+          name: 'Email Auth with PKCE flow',
           url: '/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr',
         },
         {
-          name: 'OAuth with PKCE flow for SSR',
+          name: 'OAuth with PKCE flow',
           url: '/guides/auth/server-side/oauth-with-pkce-flow-for-ssr',
+        },
+        { name: 'Server-side Rendering', url: '/guides/auth/server-side-rendering' },
+        {
+          name: 'Migrating from Auth Helpers',
+          url: '/guides/auth/server-side/migrating-to-ssr-from-auth-helpers',
         },
       ],
     },
