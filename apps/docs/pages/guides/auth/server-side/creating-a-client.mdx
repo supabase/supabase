@@ -474,35 +474,35 @@ import { createServerClient } from '@supabase/ssr'
 import type { Handle } from '@sveltejs/kit'
 
 export const handle: Handle = async ({ event, resolve }) => {
-	event.locals.supabase = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
-		cookies: {
-			get: (key) => event.cookies.get(key),
-			set: (key, value, options) => {
-				event.cookies.set(key, value, options)
-			},
-			remove: (key, options) => {
-				event.cookies.delete(key, options)
-			},
-		}
-	})
+  event.locals.supabase = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
+    cookies: {
+      get: (key) => event.cookies.get(key),
+      set: (key, value, options) => {
+        event.cookies.set(key, value, options)
+      },
+      remove: (key, options) => {
+        event.cookies.delete(key, options)
+      },
+    },
+  })
 
-	/**
-	 * a little helper that is written for convenience so that instead
-	 * of calling `const { data: { session } } = await supabase.auth.getSession()`
-	 * you just call this `await getSession()`
-	 */
-	event.locals.getSession = async () => {
-		const {
-			data: { session }
-		} = await event.locals.supabase.auth.getSession()
-		return session
-	}
+  /**
+   * a little helper that is written for convenience so that instead
+   * of calling `const { data: { session } } = await supabase.auth.getSession()`
+   * you just call this `await getSession()`
+   */
+  event.locals.getSession = async () => {
+    const {
+      data: { session },
+    } = await event.locals.supabase.auth.getSession()
+    return session
+  }
 
-	return resolve(event, {
-		filterSerializedResponseHeaders(name) {
-			return name === 'content-range'
-		}
-	})
+  return resolve(event, {
+    filterSerializedResponseHeaders(name) {
+      return name === 'content-range'
+    },
+  })
 }
 ```
 
@@ -522,30 +522,30 @@ import type { LayoutLoad } from './$types'
 import { createBrowserClient, isBrowser, parse } from '@supabase/ssr'
 
 export const load: LayoutLoad = async ({ fetch, data, depends }) => {
-	depends('supabase:auth')
+  depends('supabase:auth')
 
-	const supabase = createBrowserClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
-		global: {
-			fetch,
-		},
-		cookies: {
-			get(key) {
-				if (!isBrowser()) {
-					return JSON.stringify(data.session)
-				}
+  const supabase = createBrowserClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
+    global: {
+      fetch,
+    },
+    cookies: {
+      get(key) {
+        if (!isBrowser()) {
+          return JSON.stringify(data.session)
+        }
 
-				const cookie = parse(document.cookie)
-				return cookie[key]
-			},
-		}
-	})
+        const cookie = parse(document.cookie)
+        return cookie[key]
+      },
+    },
+  })
 
-	const {
-		data: { session }
-	} = await supabase.auth.getSession()
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
 
-	return { supabase, session }
-};
+  return { supabase, session }
+}
 ```
 
 </TabPanel>
@@ -766,31 +766,31 @@ export default function Index() {
 <TabPanel id="server-client" label="Server Client">
 
 ```ts lib/supabase.js
-const { createServerClient } = require("@supabase/ssr");
+const { createServerClient } = require('@supabase/ssr')
 
 exports.createClient = (context) => {
   return createServerClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY, {
     cookies: {
       get: (key) => {
-        const cookies = context.req.cookies;
-        const cookie = cookies[key] ?? "";
-        return decodeURIComponent(cookie);
+        const cookies = context.req.cookies
+        const cookie = cookies[key] ?? ''
+        return decodeURIComponent(cookie)
       },
       set: (key, value, options) => {
-        if (!context.res) return;
+        if (!context.res) return
         context.res.cookie(key, encodeURIComponent(value), {
           ...options,
-          sameSite: "Lax",
-          httpOnly: true
-        });
+          sameSite: 'Lax',
+          httpOnly: true,
+        })
       },
       remove: (key, options) => {
-        if (!context.res) return;
-        context.res.cookie(key, "", { ...options, httpOnly: true });
-      }
-    }
+        if (!context.res) return
+        context.res.cookie(key, '', { ...options, httpOnly: true })
+      },
+    },
   })
-};
+}
 ```
 
 </TabPanel>
