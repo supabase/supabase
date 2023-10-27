@@ -1,0 +1,53 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'index',
+  title: 'Server-Side Auth Overview',
+  description: 'Configure Supabase Auth to use Cookies',
+  sidebar_label: 'Overview',
+}
+
+When using Supabase with server-side languages and frameworks - such as Next.js, SvelteKit and Remix - it is important to configure your Supabase client to use cookies for storing user sessions. We have developed an `@supabase/ssr` package to make this process as simple as possible. This package is currently in `beta`, and is likely to have breaking changes in the future.
+
+## Framework Quickstarts
+
+<div className="grid lg:grid-cols-12 gap-6 not-prose">
+  {quickstarts.map((item) => {
+    return (
+      <Link href={`${item.href}`} key={item.title} passHref>
+        <a className={'col-span-4'}>
+          <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
+            {item.description}
+          </GlassPanel>
+        </a>
+      </Link>
+    )
+  })}
+</div>
+
+<Admonition type="note">
+
+If you're currently using the [Auth Helpers package](https://github.com/supabase/auth-helpers), the [docs are still available](/docs/guides/auth/auth-helpers), however we recommend migrating to the new `@supabase/ssr` package as this will be the recommended path moving forward.
+
+</Admonition>
+
+## Next steps
+
+- [Create a Supabase client for SSR](/docs/guides/auth/server-side/creating-a-client)
+- [Email Auth with PKCE flow for SSR](/docs/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr)
+- [OAuth with PKCE flow for SSR](/docs/guides/auth/server-side/oauth-with-pkce-flow-for-ssr)
+- [Learn more about SSR](/docs/guides/auth/server-side-rendering)
+
+export const quickstarts = [
+  {
+    title: 'Next.js',
+    href: '/guides/auth/quickstarts/nextjs',
+    description:
+      'Automatically configure Supabase to use cookies, making your user and their session available on the client and server.',
+    icon: '/docs/img/icons/nextjs-icon',
+  },
+]
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

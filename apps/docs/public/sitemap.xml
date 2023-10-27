@@ -980,6 +980,22 @@
 
   <url>
     <loc
+      >https://supabase.com/docs/guides/auth/server-side/overview</loc
+    >
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc
+      >https://supabase.com/docs/guides/auth/server-side/creating-a-client</loc
+    >
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc
       >https://supabase.com/docs/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr</loc
     >
     <changefreq>weekly</changefreq>
@@ -988,6 +1004,14 @@
 
   <url>
     <loc>https://supabase.com/docs/guides/auth/server-side/oauth-with-pkce-flow-for-ssr</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc
+      >https://supabase.com/docs/guides/auth/server-side/migrating-to-ssr-from-auth-helpers</loc
+    >
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
