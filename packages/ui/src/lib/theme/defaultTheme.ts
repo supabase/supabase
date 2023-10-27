@@ -428,7 +428,7 @@ export default {
       border
       focus-visible:shadow-md
       ${defaults.focus}
-      focus-visible:border-foreground-lighter
+      focus-visible:border-foreground-muted
       focus-visible:ring-background-control
       ${defaults.placeholder}
     `,
@@ -471,7 +471,7 @@ export default {
       border
       focus-visible:shadow-md
       ${defaults.focus}
-      focus-visible:border-foreground-lighter
+      focus-visible:border-foreground-muted
       focus-visible:ring-background-control
       ${defaults.placeholder}
 
@@ -517,7 +517,7 @@ export default {
       border
       focus-visible:shadow-md
       ${defaults.focus}
-      focus-visible:border-foreground-lighter
+      focus-visible:border-foreground-muted
       focus-visible:ring-background-control
       ${defaults.placeholder}
 
@@ -1129,7 +1129,7 @@ export default {
         cursor-pointer
         flex space-x-3 items-center
         outline-none
-        focus-visible:ring-1 ring-foreground focus-visible:z-10
+        focus-visible:ring-1 ring-foreground-muted focus-visible:z-10
         group
       `,
       content: {
@@ -1289,7 +1289,7 @@ export default {
       border
       focus-visible:shadow-md
       ${defaults.focus}
-      focus-visible:border-foreground-lighter
+      focus-visible:border-foreground-muted
       focus-visible:ring-background-control
       ${defaults.placeholder}
       indent-px

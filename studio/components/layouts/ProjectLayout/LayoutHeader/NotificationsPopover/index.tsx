@@ -157,7 +157,7 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
         onOpenChange={onOpenChange}
         overlay={
           <div className="w-[400px] lg:w-[700px]">
-            <div className="flex items-center justify-between border-b border-gray-500 bg-gray-400 px-4 py-2">
+            <div className="flex items-center justify-between border-b border-border bg-surface-200 px-4 py-2">
               <p className="text-sm">Notifications</p>
               {/* Area for improvement: Paginate notifications and show in a side panel */}
               {/* <p className="text-foreground-light hover:text-foreground cursor-pointer text-sm transition">

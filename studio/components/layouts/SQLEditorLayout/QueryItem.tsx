@@ -63,7 +63,7 @@ const QueryItem = ({ tabInfo }: QueryItemProps) => {
       key={id}
       className={clsx(
         'flex items-center justify-between rounded-md group',
-        isActive && 'text-foreground bg-scale-400 dark:bg-scale-600 -active'
+        isActive && 'text-foreground bg-surface-300 -active'
       )}
       ref={isActive ? (activeItemRef as React.RefObject<HTMLDivElement>) : null}
     >

@@ -163,12 +163,7 @@ export const LaunchSection = (props: WeekDayProps) => {
           <div className="flex flex-col gap-12">
             {props.articles &&
               props.articles.map((article: Article, index) => (
-                <div
-                  key={article.url + index}
-                  className="
-                dark:bg-scale-300 rounded border bg-white
-                "
-                >
+                <div key={article.url + index} className="bg-surface-100 rounded border">
                   <div className="p-6 px-10">
                     <ArticleButtonListItem {...article} />
                   </div>
@@ -176,7 +171,7 @@ export const LaunchSection = (props: WeekDayProps) => {
                   {article.products && (
                     <>
                       {/* border */}
-                      <div className="bg-scale-300 dark:bg-scale-400 h-px w-full"></div>
+                      <div className="bg-surface-200 h-px w-full"></div>
 
                       <div className="flex flex-col gap-6 p-6 px-10 pb-10">
                         <h3 className="text-foreground-light text-sm">New releases</h3>

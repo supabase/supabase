@@ -13,7 +13,7 @@ export function ScheduleInfo() {
           The first launch will be on Monday 08:00 PT | 11:00 ET.
         </p>
       </div>
-      <div className="dark:bg-scale-300 flex flex-col gap-4 overflow-hidden rounded-md border bg-white shadow-sm md:max-w-lg">
+      <div className="flex flex-col gap-4 overflow-hidden rounded-md border bg-white shadow-sm md:max-w-lg">
         <div className="flex flex-col gap-3 p-10 pb-0">
           <h3 className="text-foreground text-lg">You can still win a lucky gold ticket</h3>
           <p className="text-foreground-light text-sm">

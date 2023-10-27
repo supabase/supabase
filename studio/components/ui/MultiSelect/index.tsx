@@ -211,7 +211,7 @@ export default function MultiSelect({
                       className={[
                         'text-typography-body-light dark:text-typography-body-dark',
                         'group flex cursor-pointer items-center justify-between transition',
-                        'space-x-1 rounded bg-transparent p-2 px-4 text-sm hover:bg-gray-600',
+                        'space-x-1 rounded bg-transparent p-2 px-4 text-sm hover:bg-overlay-hover',
                         `${active ? ' dark:bg-green-600 dark:bg-opacity-25' : ''}`,
                       ].join(' ')}
                     >

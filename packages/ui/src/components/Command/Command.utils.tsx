@@ -172,7 +172,7 @@ export const CommandSeparator = React.forwardRef<
     className={cn(
       `h-px
     w-full
-    bg-scale-50
+    bg-alternative
     `,
       className
     )}
@@ -236,7 +236,7 @@ export const CommandItem = React.forwardRef<CommandPrimitiveItemElement, Command
         data-[disabled]:pointer-events-none data-[disabled]:opacity-50`
           : `
         px-2
-        aria-selected:bg-scale-300
+        aria-selected:bg-surface-100
         dark:aria-selected:bg-[#323232]/80
         aria-selected:backdrop-filter
         aria-selected:backdrop-blur-md
@@ -262,7 +262,7 @@ export const CommandItemStale = React.forwardRef<CommandPrimitiveItemElement, Co
     <CommandPrimitive.Item
       ref={ref}
       className={cn(
-        'text-foreground-light relative flex cursor-default select-none items-center rounded-md py-1.5 px-2 text-sm outline-none aria-selected:bg-scale-500 data-[disabled]:pointer-events-none data-[disabled]:opacity-50 dark:aria-selected:bg-scale-500',
+        'text-foreground-light relative flex cursor-default select-none items-center rounded-md py-1.5 px-2 text-sm outline-none aria-selected:bg-overlay-selection data-[disabled]:pointer-events-none data-[disabled]:opacity-50 dark:aria-selected:bg-overlay-selection',
         className
       )}
       {...props}
@@ -293,7 +293,7 @@ export const CommandShortcut = ({
         'justify-end',
         type === 'breadcrumb'
           ? 'text-foreground-muted'
-          : 'bg-scale-500 text-foreground-muted [&:not(:last-child)]:hover:bg-scale-600 last:bg-scale-600 last:text-foreground-muted',
+          : 'bg-overlay-hover text-foreground-muted [&:not(:last-child)]:hover:bg-selection last:bg-selection last:text-foreground-muted',
         className
       )}
     >
