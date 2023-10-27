@@ -9,14 +9,16 @@ export type EnumeratedTypeDeleteVariables = {
   projectRef: string
   connectionString: string
   name: string
+  schema: string
 }
 
 export async function deleteEnumeratedType({
   projectRef,
   connectionString,
   name,
+  schema
 }: EnumeratedTypeDeleteVariables) {
-  const sql = `drop type if exists ${name}`
+  const sql = `drop type if exists ${schema}.${name}`
   const { result } = await executeSql({ projectRef, connectionString, sql })
   return result
 }
@@ -42,6 +44,7 @@ export const useEnumeratedTypeDeleteMutation = ({
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
+        console.log("data err", data)
         if (onError === undefined) {
           toast.error(`Failed to create enumerated type: ${data.message}`)
         } else {
