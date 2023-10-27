@@ -189,6 +189,26 @@ export async function loader({ request }: LoaderFunctionArgs) {
 ```
 
 </TabPanel>
+<TabPanel id="express" label="Express">
+
+Create a new route in your express app and populate with the following:
+
+```js app.js
+...
+app.get("/auth/callback", async function (req, res) {
+  const code = req.query.code
+  const next = req.query.next ?? "/"
+
+  if (code) {
+    const supabase = createClient({ req, res })
+    await supabase.auth.exchangeCodeForSession(code)
+  }
+
+  res.redirect(303, `/${next.slice(1)}`)
+})
+```
+
+</TabPanel>
 </Tabs>
 
 Let's point our `.signInWithOAuth` method's redirect to the callback route we create above:

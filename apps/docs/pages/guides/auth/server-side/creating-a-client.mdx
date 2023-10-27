@@ -58,6 +58,31 @@ SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
 </TabPanel>
+<TabPanel id="express" label="Express">
+
+Create a `.env` file in your project root directory. You can get your `SUPABASE_URL` and `SUPABASE_ANON_KEY` from inside [your Supabase project's dashboard](https://supabase.com/dashboard/project/_/settings/api).
+
+```bash .env
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+Install [dotenv](https://www.npmjs.com/package/dotenv)
+
+```bash
+npm i dotenv
+```
+
+and initialise it
+
+```js app.js
+const express = require("express")
+const dotenv = require("dotenv")
+dotenv.config()
+...
+```
+
+</TabPanel>
 </Tabs>
 
 ### Creating a client
@@ -721,6 +746,70 @@ export default function Index() {
   const supabase = createBrowserClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
 
   return ...
+}
+```
+
+</TabPanel>
+</Tabs>
+
+</TabPanel>
+
+<TabPanel id="express" label="Express">
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="server-client"
+  queryGroup="environment"
+>
+<TabPanel id="server-client" label="Server Client">
+
+```ts lib/supabase.js
+const { createServerClient } = require("@supabase/ssr");
+
+exports.createClient = (context) => {
+  return createServerClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY, {
+    cookies: {
+      get: (key) => {
+        const cookies = context.req.cookies;
+        const cookie = cookies[key] ?? "";
+        return decodeURIComponent(cookie);
+      },
+      set: (key, value, options) => {
+        if (!context.res) return;
+        context.res.cookie(key, encodeURIComponent(value), {
+          ...options,
+          sameSite: "Lax",
+          httpOnly: true
+        });
+      },
+      remove: (key, options) => {
+        if (!context.res) return;
+        context.res.cookie(key, "", { ...options, httpOnly: true });
+      }
+    }
+  })
+};
+```
+
+</TabPanel>
+<TabPanel id="express-route" label="Route">
+
+```ts app.js
+const express = require("express")
+const dotenv = require("dotenv")
+
+const { createClient } = require("./lib/supabase")
+
+const app = express()
+
+app.post("/hello-world", async function (req, res, next) {
+  const { email, emailConfirm } = req.body
+  ...
+
+  const supabase = createClient({ req, res })
+})
 ```
 
 </TabPanel>
