@@ -111,6 +111,14 @@ const nextConfig = {
         basePath: false,
         permanent: false,
       },
+
+      // Redirect blog links in dev/preview envs
+      {
+        source: '/blog/:path*',
+        destination: 'https://supabase.com/blog/:path*',
+        basePath: false,
+        permanent: false,
+      },
     ]
   },
 }
