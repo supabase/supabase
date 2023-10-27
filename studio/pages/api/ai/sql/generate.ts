@@ -2,7 +2,7 @@ import { SchemaBuilder } from '@serafin/schema-builder'
 import { codeBlock, stripIndent } from 'common-tags'
 import { isError } from 'data/utils/error-check'
 import { jsonrepair } from 'jsonrepair'
-import apiWrapper from 'lib/api/apiWrapper'
+import apiWrapperTest from 'lib/api/apiWrapperTest'
 import { NextApiRequest, NextApiResponse } from 'next'
 import type {
   ChatCompletionRequestMessage,
@@ -173,6 +173,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-const wrapper = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
+const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
+  apiWrapperTest(req, res, handler, '/api/ai/sql/generate')
 
 export default wrapper
