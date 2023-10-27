@@ -306,7 +306,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         links: [
           {
             name: 'Documentation',
-            url: 'https://supabase.com/docs/guides/storage/image-transformations',
+            url: 'https://supabase.com/docs/guides/storage/serving/image-transformations',
           },
         ],
       },

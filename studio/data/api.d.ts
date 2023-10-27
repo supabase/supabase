@@ -229,12 +229,16 @@ export interface paths {
   '/platform/organizations/{slug}/billing/subscription': {
     /** Gets the current subscription */
     get: operations['SubscriptionController_getSubscription']
-    /** Previews subscription change */
+    /** Updates subscription */
     put: operations['SubscriptionController_updateSubscription']
   }
   '/platform/organizations/{slug}/billing/subscription/preview': {
-    /** Updates subscription */
+    /** Preview subscription changes */
     post: operations['SubscriptionController_previewSubscriptionChange']
+  }
+  '/platform/organizations/{slug}/billing/subscription/schedule': {
+    /** Deletes any upcoming subscription schedule */
+    delete: operations['SubscriptionController_deleteSubscriptionSchedule']
   }
   '/platform/organizations/{slug}/billing/plans': {
     /** Gets subscription plans */
@@ -783,6 +787,10 @@ export interface paths {
   '/platform/integrations/github/branches/{organization_integration_id}/{repo_owner}/{repo_name}': {
     /** Gets github branches for a given repo */
     get: operations['GitHubBranchController_getBranches']
+  }
+  '/platform/integrations/github/branches/{organization_integration_id}/{repo_owner}/{repo_name}/{branch_name}': {
+    /** Gets a specific github branch for a given repo */
+    get: operations['GitHubBranchController_getBranchByName']
   }
   '/platform/integrations/github/pull-requests/{organization_integration_id}/{repo_owner}/{repo_name}/{target}': {
     /** Gets github pull requests for a given repo */
@@ -2255,6 +2263,7 @@ export interface components {
       address: string
       balance: number
       invoice_settings: Record<string, never>
+      billing_via_partner: boolean
     }
     CustomerUpdateResponse: {
       id: string
@@ -2687,6 +2696,12 @@ export interface components {
       expiry_month: number
       expiry_year: number
     }
+    ScheduledPlanChange: {
+      /** Format: date-time */
+      at: string
+      target_plan: Record<string, never>
+      usage_billing_enabled: boolean
+    }
     GetSubscriptionResponse: {
       billing_cycle_anchor: number
       current_period_end: number
@@ -2700,6 +2715,11 @@ export interface components {
       payment_method_type: string
       payment_method_id?: string
       payment_method_card_details?: components['schemas']['PaymentMethodCardDetails']
+      billing_via_partner: boolean
+      /** @enum {string} */
+      billing_partner: 'fly'
+      scheduled_plan_change: components['schemas']['ScheduledPlanChange'] | null
+      customer_balance: number
     }
     UpdateSubscriptionBody: {
       payment_method?: string
@@ -3268,9 +3288,10 @@ export interface components {
         | 'project_edge_function:all'
         | 'profile:update'
         | 'billing:all'
+        | 'billing:account_data'
+        | 'billing:credits'
         | 'billing:invoices'
         | 'billing:payment_methods'
-        | 'billing:account_data'
       )[]
     }
     UpdateProfileBody: {
@@ -4134,7 +4155,9 @@ export interface components {
       id: number
       url: string
       title: string
+      repo: string
       branch: string
+      label: string
       created_at: string
       created_by?: string
     }
@@ -4641,6 +4664,48 @@ export interface components {
         | 'RESTORING'
         | 'UPGRADING'
         | 'PAUSING'
+    }
+    ResourceBillingItem: {
+      /**
+       * @description Non-Unique identifier of the item
+       * @example usage_egress
+       */
+      itemIdentifier: string
+      /**
+       * @description Descriptive name of the billing item
+       * @example Pro Plan
+       */
+      itemName: string
+      /** @enum {string} */
+      type: 'usage' | 'plan' | 'addon' | 'proration'
+      /**
+       * @description In case of a usage item, the free usage included in the customers plan
+       * @example 100
+       */
+      freeUnitsInPlan?: number
+      /**
+       * @description In case of a usage item, the total usage
+       * @example 100
+       */
+      usageTotal?: number
+      /**
+       * @description In case of a usage item, the billable usage amount, free usage has been deducted
+       * @example 100
+       */
+      usageBillable?: number
+      /**
+       * @description Costs of the item in cents
+       * @example 100
+       */
+      costs: number
+    }
+    ResourceBillingResponse: {
+      /** @description Whether the user is exceeding the included quotas in the plan - only relevant for users on usage-capped plans. */
+      exceedsPlanLimits: boolean
+      /** @description Whether the user is can have over-usage, which will be billed - this will be false on usage-capped plans. */
+      overusageAllowed: boolean
+      extensionId: string
+      items: components['schemas']['ResourceBillingItem'][]
     }
     ResourceProvisioningBody: {
       /** @description A UNIX epoch timestamp value */
@@ -5927,7 +5992,7 @@ export interface operations {
       500: never
     }
   }
-  /** Updates subscription */
+  /** Preview subscription changes */
   SubscriptionController_previewSubscriptionChange: {
     parameters: {
       path: {
@@ -5943,7 +6008,22 @@ export interface operations {
     responses: {
       201: never
       403: never
-      /** @description Failed to update subscription */
+      /** @description Failed to preview subscription changes */
+      500: never
+    }
+  }
+  /** Deletes any upcoming subscription schedule */
+  SubscriptionController_deleteSubscriptionSchedule: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    responses: {
+      200: never
+      403: never
+      /** @description Failed to update subscription change */
       500: never
     }
   }
@@ -9227,6 +9307,10 @@ export interface operations {
   /** Gets github repos for the given organization */
   GitHubRepoController_getRepos: {
     parameters: {
+      query?: {
+        per_page?: number
+        page?: number
+      }
       path: {
         organization_integration_id: string
       }
@@ -9264,9 +9348,33 @@ export interface operations {
       500: never
     }
   }
+  /** Gets a specific github branch for a given repo */
+  GitHubBranchController_getBranchByName: {
+    parameters: {
+      path: {
+        organization_integration_id: string
+        repo_owner: string
+        repo_name: string
+        branch_name: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['GetGithubBranch']
+        }
+      }
+      /** @description Failed to get github branch for a given repo */
+      500: never
+    }
+  }
   /** Gets github pull requests for a given repo */
   GitHubPullRequestController_getPullRequests: {
     parameters: {
+      query?: {
+        per_page?: number
+        page?: number
+      }
       path: {
         organization_integration_id: string
         repo_owner: string
@@ -10971,7 +11079,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': Record<string, never>
+          'application/json': components['schemas']['ResourceBillingResponse']
         }
       }
     }

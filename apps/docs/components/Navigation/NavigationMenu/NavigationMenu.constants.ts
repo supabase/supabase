@@ -548,21 +548,20 @@ export const auth = {
       name: 'Server-side Auth',
       url: undefined,
       items: [
-        { name: 'Overview', url: '/guides/auth/auth-helpers' },
+        { name: 'Overview', url: '/guides/auth/server-side/overview' },
+        { name: 'Creating a client', url: '/guides/auth/server-side/creating-a-client' },
         {
-          name: 'Next.js',
-          url: '/guides/auth/auth-helpers/nextjs',
-        },
-        { name: 'Remix', url: '/guides/auth/auth-helpers/remix' },
-        { name: 'SvelteKit', url: '/guides/auth/auth-helpers/sveltekit' },
-        { name: 'Server-side Rendering', url: '/guides/auth/server-side-rendering' },
-        {
-          name: 'Email Auth with PKCE flow for SSR',
+          name: 'Email Auth with PKCE flow',
           url: '/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr',
         },
         {
-          name: 'OAuth with PKCE flow for SSR',
+          name: 'OAuth with PKCE flow',
           url: '/guides/auth/server-side/oauth-with-pkce-flow-for-ssr',
+        },
+        { name: 'Server-side Rendering', url: '/guides/auth/server-side-rendering' },
+        {
+          name: 'Migrating from Auth Helpers',
+          url: '/guides/auth/server-side/migrating-to-ssr-from-auth-helpers',
         },
       ],
     },
@@ -709,10 +708,6 @@ export const database: NavMenuConstant = {
         {
           name: 'pg_stat_statements: SQL Planning and Execution Statistics',
           url: '/guides/database/extensions/pg_stat_statements',
-        },
-        {
-          name: 'pg_repack: Storage Optimization',
-          url: '/guides/database/extensions/pgrepack',
         },
         {
           name: 'PostGIS: Geo queries',
@@ -975,18 +970,64 @@ export const storage: NavMenuConstant = {
     { name: 'Overview', url: '/guides/storage' },
     { name: 'Quickstart', url: '/guides/storage/quickstart' },
     {
-      name: 'Fundamentals',
+      name: 'Buckets',
       url: undefined,
       items: [
-        { name: 'Uploading files to Storage', url: '/guides/storage/uploads' },
-        { name: 'Image Transformations', url: '/guides/storage/image-transformations' },
-        { name: 'How caching works', url: '/guides/storage/cdn' },
+        { name: 'Fundamentals', url: '/guides/storage/buckets/fundamentals' },
+        { name: 'Creating Buckets', url: '/guides/storage/buckets/creating-buckets' },
       ],
     },
     {
-      name: 'Access and security',
+      name: 'Security',
       url: undefined,
-      items: [{ name: 'Access Control', url: '/guides/storage/access-control' }],
+      items: [{ name: 'Access Control', url: '/guides/storage/security/access-control' }],
+    },
+    {
+      name: 'Uploads',
+      url: undefined,
+      items: [
+        { name: 'Standard Uploads', url: '/guides/storage/uploads/standard-uploads' },
+        { name: 'Resumable Uploads', url: '/guides/storage/uploads/resumable-uploads' },
+        { name: 'Limits', url: '/guides/storage/uploads/file-limits' },
+      ],
+    },
+    {
+      name: 'Serving',
+      url: undefined,
+      items: [
+        { name: 'Serving assets', url: '/guides/storage/serving/downloads' },
+        { name: 'Image Transformations', url: '/guides/storage/serving/image-transformations' },
+      ],
+    },
+    {
+      name: 'CDN',
+      url: undefined,
+      items: [
+        { name: 'Fundamentals', url: '/guides/storage/cdn/fundamentals' },
+        { name: 'Smart CDN', url: '/guides/storage/cdn/smart-cdn' },
+        { name: 'Metrics', url: '/guides/storage/cdn/metrics' },
+      ],
+    },
+    {
+      name: 'Debugging',
+      url: undefined,
+      items: [
+        { name: 'Logs', url: '/guides/storage/debugging/logs' },
+        { name: 'Error Codes', url: '/guides/storage/debugging/error-codes' },
+      ],
+    },
+    {
+      name: 'Schema',
+      url: undefined,
+      items: [
+        { name: 'Database Design', url: '/guides/storage/schema/design' },
+        { name: 'Helper Functions', url: '/guides/storage/schema/helper-functions' },
+      ],
+    },
+    {
+      name: 'Going to production',
+      url: undefined,
+      items: [{ name: 'Scaling', url: '/guides/storage/production/scaling' }],
     },
   ],
 }
