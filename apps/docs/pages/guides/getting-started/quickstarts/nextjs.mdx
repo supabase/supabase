@@ -4,20 +4,20 @@ import StepHikeCompact from '~/components/StepHikeCompact'
 export const meta = {
   title: 'Use Supabase with Next.js',
   subtitle:
-    'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Next.js app.',
+    'Learn how to create a Supabase project, add some sample data, and query from a Next.js app.',
   breadcrumb: 'Framework Quickstarts',
 }
 
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
-    <StepHikeCompact.Details title="Set up a Supabase project with sample data">
+    <StepHikeCompact.Details title="Set up a Supabase project">
 
-    [Create a new project](https://supabase.com/dashboard) in the Supabase Dashboard.
+    Head over to [database.new](https://database.new) and create a new Supabase project.
 
-    After your project is ready, create a table in your Supabase database using the [SQL Editor](https://supabase.com/dashboard/project/_/sql) in the Dashboard.
+    When your project is up and running, navigate to the [Table Editor](https://supabase.com/dashboard/project/_/editor), create a new table and insert some data.
 
-    Use the following SQL statement to create a `countries` table with some sample data.
+    Alternatively, you can run the following snippet in your project's [SQL Editor](https://supabase.com/dashboard/project/_/sql/new). This will create a `notes` table with some sample data.
 
     </StepHikeCompact.Details>
 
@@ -25,15 +25,17 @@ export const meta = {
 
      ```sql SQL_EDITOR
       -- Create the table
-      create table countries (
+      create table notes (
         id serial primary key,
-        name text not null
+        title text
       );
 
-      -- Insert some sample data into the table
-      insert into countries (name) values ('United States');
-      insert into countries (name) values ('Canada');
-      insert into countries (name) values ('Mexico');
+      -- Insert some sample data
+      insert into notes (title)
+      values
+        ('Today I created a Supabase project.'),
+        ('I added some data and queried it from Next.js.'),
+        ('It was awesome!');
       ````
 
     </StepHikeCompact.Code>
@@ -45,7 +47,7 @@ export const meta = {
     <StepHikeCompact.Details title="Create a Next.js app">
 
     Use the `create-next-app` command and the `with-supabase` template, to create a Next.js app pre-configured with:
-    - [Supabase Auth](https://supabase.com/docs/guides/auth/auth-helpers/nextjs)
+    - [Cookie-based Auth](https://supabase.com/docs/guides/auth/auth-helpers/nextjs)
     - [TypeScript](https://www.typescriptlang.org/)
     - [Tailwind CSS](https://tailwindcss.com/)
 
@@ -54,7 +56,7 @@ export const meta = {
     <StepHikeCompact.Code>
 
       ```bash Terminal
-      npx create-next-app -e with-supabase my-app && cd my-app
+      npx create-next-app -e with-supabase
       ```
 
     </StepHikeCompact.Code>
@@ -82,31 +84,24 @@ export const meta = {
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Query Supabase data from Next.js">
 
-    Create a new file at `app/countries/page.tsx` and populate with the following.
+    Create a new file at `app/notes/page.tsx` and populate with the following.
 
-    This will select all the rows from the `countries` table in Supabase and render them on the page.
+    This will select all the rows from the `notes` table in Supabase and render them on the page.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```ts app/countries/page.tsx
-        import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-        import { cookies } from "next/headers";
+      ```ts app/notes/page.tsx
+        import { createClient } from '@/utils/supabase/server';
 
-        export default async function Index() {
-          const cookieStore = cookies()
-          const supabase = createServerComponentClient({ cookies: () => cookieStore })
+        export const dynamic = "force-dynamic";
 
-          const { data: countries } = await supabase.from("countries").select();
+        export default async function Notes() {
+          const supabase = createClient();
+          const { data: notes } = await supabase.from("notes").select();
 
-          return (
-            <ul className="my-auto text-foreground">
-              {countries?.map((country) => (
-                <li key={country.id}>{country.name}</li>
-              ))}
-            </ul>
-          );
+          return <pre>{JSON.stringify(notes, null, 2)}</pre>
         }
       ```
 
@@ -117,7 +112,7 @@ export const meta = {
   <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Start the app">
 
-    Run the development server, go to http://localhost:3000/countries in a browser and you should see the list of countries.
+    Run the development server, go to http://localhost:3000/notes in a browser and you should see the list of notes.
 
     </StepHikeCompact.Details>
 
