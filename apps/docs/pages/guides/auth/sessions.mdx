@@ -10,7 +10,7 @@ Supabase Auth provides fine-grained control over your user's sessions.
 
 A session is created when a user signs in. It is represented by the Supabase Auth access token in the form of a JWT, and a refresh token which is a unique string.
 
-Access tokens are designed to be short lived, usually between 5 minutes and 1 hour. You can exchange a refresh token only once to get a new access and refresh token pair.
+Access tokens are designed to be short lived, usually between 5 minutes and 1 hour. Refresh tokens only can be used once and never expire. You can exchange a refresh token to get a new access and refresh token pair.
 
 This process is called **refreshing the session.** 
 
@@ -19,10 +19,10 @@ By default, there's no limit to the number of sessions a user can have on Supaba
 - By restricting the number of sessions a user can have.
 - By controlling the lifetime of a session.
 
-A session can terminate, depending on configuration, when:
+A session can be revoked, depending on configuration, when:
 
 - The user clicks sign out.
-- The user changes their password or performs a security sensitive action.
+- The user changes their password or performs a security sensitive action such as enabling multi-factor authentication (MFA).
 - It times out due to inactivity.
 - It reaches its maximum lifetime.
 - A new session for the same user was started.
@@ -35,20 +35,20 @@ This feature is only available on Pro plans and up.
 
 </Admonition>
 
-Supabase Auth can be configured to limit the lifetime of a user's session. By default, all sessions are active until the user clicks log out or performs some other action that terminates a session.
+Supabase Auth can be configured to limit the lifetime of a user's session. By default, all sessions are active until the user signs out or performs some other action that revokes a session.
 
-In some applications, it's useful or required from a security point of view to ensure that users authenticate often, or that sessions are not left active on devices for too long.
+This is useful for more security sensitive applications to ensure that users are re-authenticated often so that sessions are not left active on devices for too long.
 
 There are two ways in which you can limit the lifetime of a session:
 
-- By enabling timeboxed sessions which terminate after a fixed amount of time.
-- By enabling inactivity timeout, such that if a session remains unrefreshed for too long it will be terminated.
+- By enabling time-boxed sessions which are revoked after a fixed amount of time.
+- By enabling timeout after inactivity, such that a session will be revoked if no user activity has been detected.
 
 To make sure that users are required to re-authenticate periodically, you can select the _Enforce timeboxed sessions_ option in the Auth configuration screen for your project.
 
-To make sure that sessions expire after a period of inactivity, you can select and configure the _Terminate inactive sessions_ option.
+To make sure that sessions expire after a period of inactivity, you can select and configure the _Revoke inactive sessions_ option.
 
-Sessions are not proactively terminated when you change these settings, but rather the check is enforced whenever a session is refreshed next.
+Sessions are not proactively revoked when you change these settings, but rather the check is enforced whenever a session is refreshed next.
 
 ## Restricting the number of sessions per user
 
