@@ -43,14 +43,11 @@ const completionFunctions = {
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  console.log('inside handler')
   if (!openAiKey) {
     return res.status(500).json({
       error: 'No OPENAI_KEY set. Create this environment variable to use AI features.',
     })
   }
-
-  console.log({ method: req.method })
 
   const { method } = req
 

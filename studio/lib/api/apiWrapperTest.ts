@@ -31,8 +31,6 @@ export default async function apiWrapper(
       }
     }
 
-    console.log({ method: req.method })
-
     const func = wrapApiHandlerWithSentry(handler as any, path)
     // @ts-ignore
     return await func(req, res)
