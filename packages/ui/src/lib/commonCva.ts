@@ -9,14 +9,14 @@ const defaults = {
   },
   text: {
     brand: 'text-purple-600',
-    body: 'text-scale-600 dark:text-scaleDark-200',
-    title: 'text-border-strong dark:text-scaleDark-100',
+    body: 'text-background',
+    title: 'text-alternative',
   },
   border: {
     brand: 'border-brand-600',
-    primary: 'border-scale-700',
-    secondary: 'border-scale-400',
-    alternative: 'border-scale-600 dark:border-scaleDark-200',
+    primary: 'border-strong',
+    secondary: 'border-secondary',
+    alternative: 'border-alternative',
   },
   placeholder: 'placeholder-border-stronger',
   focus: `

@@ -197,7 +197,7 @@ const TransferProjectButton = () => {
             {organizations && (
               <div className="mt-8 mx-4 border-t pt-4 space-y-2">
                 {organizations.length === 0 ? (
-                  <div className="flex items-center gap-2 bg-scale-400 p-3 text-sm">
+                  <div className="flex items-center gap-2 bg-surface-200 p-3 text-sm">
                     <IconAlertCircle /> You do not have any organizations with an organization-based
                     subscription.
                   </div>
@@ -248,7 +248,7 @@ const TransferProjectButton = () => {
             <Modal.Content>
               <div className="px-4">
                 {transferPreviewData && transferPreviewData.valid && (
-                  <div className="text-sm text-foreground-light p-4 bg-scale-400">
+                  <div className="text-sm text-foreground-light p-4 bg-surface-200">
                     {transferPreviewData.source_subscription_plan !==
                     transferPreviewData.target_subscription_plan ? (
                       <div>

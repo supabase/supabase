@@ -52,7 +52,7 @@ const MainBranchPanel = ({
       <div className="bg-surface-200 shadow-sm flex justify-between items-center pl-8 pr-6 py-3 rounded-t-lg text-sm">
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center space-x-4">
-            <div className="w-8 h-8 bg-scale-200 rounded-md flex items-center justify-center">
+            <div className="w-8 h-8 bg-background rounded-md flex items-center justify-center">
               <IconGitHub size={18} strokeWidth={2} />
             </div>
             <p>Github branch workflow</p>
@@ -128,8 +128,8 @@ const MainBranchPanel = ({
 
 const BranchContainer = ({ className, children }: PropsWithChildren<{ className?: string }>) => {
   return (
-    <div className="list-none ml-6 pl-8 pb-4 border-l border-scale-600 dark:border-scale-400 relative last:!border-transparent">
-      <div className="absolute w-[33px] rounded-bl-full border-b border-l border-scale-600 dark:border-scale-400 h-10 -left-px" />
+    <div className="list-none ml-6 pl-8 pb-4 border-l border-overlay relative last:!border-transparent">
+      <div className="absolute w-[33px] rounded-bl-full border-b border-l border-overlay h-10 -left-px" />
       <div
         className={clsx(
           'border shadow-sm flex justify-between items-center pl-8 pr-6 py-4 rounded-lg text-sm',
@@ -204,10 +204,7 @@ const BranchHeader = forwardRef<HTMLDivElement, BranchHeader>(
       <div
         {...props}
         ref={ref}
-        className={cn(
-          'border-l border-scale-600 dark:border-scale-400 ml-6 pl-8 pt-6 pb-3',
-          className
-        )}
+        className={cn('border-l border-overlay ml-6 pl-8 pt-6 pb-3', className)}
       >
         <Markdown content={markdown} className="" />
       </div>

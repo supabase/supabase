@@ -50,7 +50,7 @@ const LWAnnouncement = ({
       ].join(' ')}
     >
       <Card
-        className={['border hover:border-scale-800 transition-colors', cardClassName].join(' ')}
+        className={['border hover:border-stronger transition-colors', cardClassName].join(' ')}
         innerClassName={['!bg-opacity-70', cardInnerClassName].join(' ')}
       >
         <Link href={LW_SITE_URL}>

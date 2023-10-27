@@ -154,14 +154,14 @@ const UsageSection = ({
                         barClass={clsx(
                           usageRatio >= 1
                             ? usageBasedBilling
-                              ? 'bg-scale-1100'
+                              ? 'bg-foreground-light'
                               : 'bg-red-900'
                             : usageBasedBilling === false &&
                               usageRatio >= USAGE_APPROACHING_THRESHOLD
                             ? 'bg-amber-900'
-                            : 'bg-scale-1100'
+                            : 'bg-foreground-light'
                         )}
-                        bgClass="bg-gray-300 dark:bg-gray-600"
+                        bgClass="bg-surface-300"
                         value={usageMeta?.usage ?? 0}
                         max={usageMeta?.limit || 1}
                       />

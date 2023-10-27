@@ -41,7 +41,7 @@ const Footer = (props: Props) => {
             </li>
             <li className="flex items-center gap-2 whitespace-nowrap flex-nowrap">
               <CheckIcon className="w-4 h-4" /> HIPAA{' '}
-              <span className="text-foreground-lightround-lighter hidden sm:inline">Compliant</span>
+              <span className="text-foreground-lighter hidden sm:inline">Compliant</span>
             </li>
           </ul>
         </SectionContainer>

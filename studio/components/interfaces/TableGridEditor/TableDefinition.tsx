@@ -102,7 +102,7 @@ const TableDefinition = ({ id }: TableDefinitionProps) => {
   }
 
   return (
-    <div className="flex-grow overflow-y-auto border-t border-scale-400 relative">
+    <div className="flex-grow overflow-y-auto border-t border-muted relative">
       <Link
         passHref
         href={`/project/${ref}/sql/new?content=${encodeURIComponent(formattedDefinition ?? '')}`}

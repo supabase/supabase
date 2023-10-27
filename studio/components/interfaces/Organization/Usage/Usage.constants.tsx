@@ -5,7 +5,7 @@ import { OrgUsageResponse } from 'data/usage/org-usage-query'
 import { Alert } from 'ui'
 
 export const COLOR_MAP = {
-  white: { bar: 'fill-scale-1200', marker: 'bg-scale-1200' },
+  white: { bar: 'fill-foreground', marker: 'bg-foreground' },
   green: { bar: 'fill-green-1000', marker: 'bg-green-1000' },
   blue: { bar: 'fill-blue-1000', marker: 'bg-blue-1000' },
   yellow: { bar: 'fill-amber-1000', marker: 'bg-amber-1000' },

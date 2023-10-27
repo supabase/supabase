@@ -45,7 +45,11 @@ const UsageBarChart = ({
     <div className="w-full h-[200px]">
       <ResponsiveContainer width="100%" height={200}>
         <ComposedChart data={data} margin={{ top: 0, right: 0, left: yLeftMargin, bottom: 0 }}>
-          <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-scale-800" />
+          <CartesianGrid
+            vertical={false}
+            strokeDasharray="3 3"
+            className="stroke-border-stronger"
+          />
           <XAxis dataKey="periodStartFormatted" />
           <YAxis
             width={40}

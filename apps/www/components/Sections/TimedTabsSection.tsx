@@ -25,7 +25,7 @@ const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }
     aria-selected={isActive}
     role="tab"
   >
-    <div className="relative w-full h-[2px] bg-scale-700 opacity-80 group-hover:opacity-100 rounded-full overflow-hidden">
+    <div className="relative w-full h-[2px] bg-border-strong opacity-80 group-hover:opacity-100 rounded-full overflow-hidden">
       {isActive && (
         <motion.div
           className={[

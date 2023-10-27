@@ -13,11 +13,11 @@
 /* !!!! THIS IS A COPY OF THE styles/date-picker.scss !! */
 
 .react-datepicker__input-container input {
-  @apply block w-full text-base md:text-sm bg-white border border-scale-300 rounded shadow-sm;
+  @apply block w-full text-base md:text-sm bg-white border border-muted rounded shadow-sm;
 }
 
 .react-datepicker-popper {
-  @apply z-40 w-72 text-sm bg-surface-100 shadow px-3 py-2 border-2 border-scale-200 rounded;
+  @apply z-40 w-72 text-sm bg-surface-100 shadow px-3 py-2 border-2 border-background rounded;
 }
 
 .react-datepicker-left {
@@ -29,7 +29,7 @@
 }
 
 .react-datepicker__portal {
-  @apply absolute z-10 w-72 text-sm transform-none bg-white shadow px-3 py-2 top-12 right-0 border-2 border-scale-200 rounded;
+  @apply absolute z-10 w-72 text-sm transform-none bg-white shadow px-3 py-2 top-12 right-0 border-2 border-background rounded;
 }
 
 .react-datepicker__month-container {

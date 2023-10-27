@@ -110,7 +110,7 @@ export const CodeBlock = ({
             lineProps={(lineNumber) => {
               if (linesToHighlight.includes(lineNumber)) {
                 return {
-                  style: { display: 'block', backgroundColor: 'var(--colors-scale6)' },
+                  style: { display: 'block', backgroundColor: 'hsl(var(--background-selection))' },
                 }
               }
               return {}

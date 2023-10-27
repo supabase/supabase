@@ -8,7 +8,7 @@ const LW8CalloutsSection = () => {
   return (
     <SectionContainer className="!py-0 w-full !px-0 !max-w-none">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 scroll-mt-[105px]" id="hackathon">
-        <SmallCard className="hover:from-scale-900 hover:to-scale-900">
+        <SmallCard className="hover:from-foreground-muted hover:to-foreground-muted">
           <Link href="https://twitter.com/supabase/status/1688544202643111936">
             <a
               target="_blank"
@@ -31,7 +31,7 @@ const LW8CalloutsSection = () => {
             </a>
           </Link>
         </SmallCard>
-        <SmallCard className="hover:from-scale-900 hover:to-scale-900">
+        <SmallCard className="hover:from-foreground-muted hover:to-foreground-muted">
           <Link href="/blog/supabase-lw8-hackathon">
             <a className="flex flex-row justify-between items-center w-full h-full gap-2">
               <div className="relative flex-shrink flex items-center p-2 w-2/3 lg:w-1/2 md:w-auto">

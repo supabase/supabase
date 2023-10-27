@@ -46,7 +46,7 @@ function FunctionsUsecases(props: Props) {
                 key={`featureHighlighted-${i}`}
                 className={
                   'bg-background hover:bg-surface-100 hover:border group rounded-md border px-6 py-4 text-left transition-all' +
-                  (active ? ' dark:bg-scale-400 border-foreground-lighter bg-white' : '')
+                  (active ? ' bg-surface-200 border-foreground-lighter' : '')
                 }
                 // onClick={() => setCurrentSelection(feat.highlightLines)}
                 onClick={() => handleApiSwiperNavChange(i)}

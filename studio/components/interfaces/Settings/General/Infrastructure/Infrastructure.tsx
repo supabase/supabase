@@ -63,7 +63,7 @@ const Infrastructure = ({}: InfrastructureProps) => {
 
             {isFreeProject && (
               <>
-                <div className="border-t border-scale-400" />
+                <div className="border-t border-muted" />
                 <div className="flex w-full items-center justify-between px-8 py-4">
                   <div>
                     <p className="text-sm">Pause project</p>

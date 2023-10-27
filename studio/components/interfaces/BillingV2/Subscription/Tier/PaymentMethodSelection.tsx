@@ -141,7 +141,7 @@ const PaymentMethodSelection = ({
               )
             })}
             <div
-              className="flex items-center px-3 py-2 space-x-2 transition cursor-pointer group hover:bg-scale-500"
+              className="flex items-center px-3 py-2 space-x-2 transition cursor-pointer group hover:bg-surface-300"
               onClick={() => setShowAddNewPaymentMethodModal(true)}
             >
               <IconPlus size={16} />

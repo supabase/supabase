@@ -367,7 +367,7 @@ const AuditLogs = () => {
                           <Table.td className="max-w-[250px]">
                             <div className="flex items-center space-x-2">
                               {hasStatusCode && (
-                                <p className="bg-scale-400 rounded px-1 flex items-center justify-center text-xs font-mono border">
+                                <p className="bg-surface-200 rounded px-1 flex items-center justify-center text-xs font-mono border">
                                   {log.action.metadata[0].status}
                                 </p>
                               )}

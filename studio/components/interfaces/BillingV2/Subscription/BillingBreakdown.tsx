@@ -292,7 +292,7 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                               ? 'bg-amber-900'
                               : 'bg-foreground-light'
                           }
-                          bgClass="bg-gray-300 dark:bg-gray-600"
+                          bgClass="bg-surface-300"
                           labelBottom={usageLabel}
                           labelBottomClass="!text-foreground-light"
                           labelTop={hasLimit ? percentageLabel : undefined}

@@ -143,7 +143,7 @@ const Usage = () => {
         </div>
       </div>
       <div>
-        <div className="sticky top-0 z-10 overflow-hidden bg-scale-200 border-b">
+        <div className="sticky top-0 z-10 overflow-hidden bg-background border-b">
           <div className="1xl:px-28 mx-auto px-5 lg:px-16 2xl:px-32 flex flex-col gap-2">
             <div className="flex items-center mt-4 justify-between">
               <div className="flex items-center space-x-4">
@@ -197,7 +197,7 @@ const Usage = () => {
                     className={cn(
                       'flex items-center space-x-2 py-3 hover:opacity-100 transition cursor-pointer',
                       activeTab === category.key
-                        ? 'border-b border-scale-1200 text-foreground'
+                        ? 'border-b border-foreground text-foreground'
                         : 'opacity-50'
                     )}
                   >

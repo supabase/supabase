@@ -165,7 +165,7 @@ const AutoSchemaForm = observer(() => {
                   />
                 </FormSectionContent>
               </FormSection>
-              <div className="border-t border-scale-400"></div>
+              <div className="border-t border-muted"></div>
               <FormSection header={<FormSectionLabel>User Sessions</FormSectionLabel>}>
                 <FormSectionContent loading={isLoading}>
                   {/* Permitted redirects for anything on that domain */}

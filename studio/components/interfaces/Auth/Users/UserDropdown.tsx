@@ -169,7 +169,7 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'rounded bg-scalealternative py-1 px-2 leading-none shadow',
+                      'rounded bg-alternative py-1 px-2 leading-none shadow',
                       'border border-background',
                     ].join(' ')}
                   >

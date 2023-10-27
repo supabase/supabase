@@ -88,8 +88,8 @@ const TicketCustomizationForm = ({ supabase, user }: Props) => {
             strokeWidth={2}
             className={[
               'w-3',
-              IS_SAVING && 'text-scale-300',
-              !!formData.role ? 'text-brand' : 'text-scale-300',
+              IS_SAVING && 'text-background-surface-300',
+              !!formData.role ? 'text-brand' : 'text-background-surface-300',
             ].join(' ')}
           />
         }
@@ -110,8 +110,8 @@ const TicketCustomizationForm = ({ supabase, user }: Props) => {
             strokeWidth={2}
             className={[
               'w-3',
-              IS_SAVING && 'text-scale-300',
-              !!formData.company ? 'text-brand' : 'text-scale-300',
+              IS_SAVING && 'text-background-surface-300',
+              !!formData.company ? 'text-brand' : 'text-background-surface-300',
             ].join(' ')}
           />
         }
@@ -132,8 +132,8 @@ const TicketCustomizationForm = ({ supabase, user }: Props) => {
             strokeWidth={2}
             className={[
               'w-3 flex spin',
-              IS_SAVING && 'text-scale-300',
-              !!formData.location ? 'text-brand' : 'text-scale-300',
+              IS_SAVING && 'text-background-surface-300',
+              !!formData.location ? 'text-brand' : 'text-background-surface-300',
             ].join(' ')}
           />
         }

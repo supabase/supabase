@@ -405,7 +405,7 @@ export const CardForm = () => {
             }
             footer={
               <>
-                <div className="border-t border-scale-400"></div>
+                <div className="border-t border-muted"></div>
                 <div className="py-3 px-6 flex gap-2 justify-end">
                   <Button loading={isSubmitting} type="secondary" htmlType="submit">
                     Cancel
@@ -418,7 +418,7 @@ export const CardForm = () => {
             }
           >
             {/* <p>{isSubmitting ? 'submitting' : 'not submitting'}</p> */}
-            {/* <div className="border-t border-scale-400"></div> */}
+            {/* <div className="border-t border-muted"></div> */}
             <Section
               header={<label className="text-sm text-foreground col-span-4">Faster checkout</label>}
             >
@@ -430,7 +430,7 @@ export const CardForm = () => {
                 descriptionText="Go to Payment methods settings to configure Apple Pay and Google Pay."
               />
             </Section>
-            <div className="border-t border-scale-400"></div>
+            <div className="border-t border-muted"></div>
             <Section
               header={<label className="text-sm text-foreground col-span-4">Faster checkout</label>}
             >
@@ -457,7 +457,7 @@ export const CardForm = () => {
                 />
               </Radio.Group>
             </Section>
-            <div className="border-t border-scale-400"></div>
+            <div className="border-t border-muted"></div>
             <Section
               header={<label className="text-sm text-foreground col-span-4">Faster checkout</label>}
             >

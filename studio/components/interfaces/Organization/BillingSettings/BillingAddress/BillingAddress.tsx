@@ -162,7 +162,7 @@ const BillingAddress = () => {
                         />
                       </div>
                     </Panel.Content>
-                    <div className="border-t border-scale-400" />
+                    <div className="border-t border-muted" />
                     <Panel.Content className="flex justify-between">
                       {!canUpdateBillingAddress ? (
                         <p className="text-sm text-foreground-light">

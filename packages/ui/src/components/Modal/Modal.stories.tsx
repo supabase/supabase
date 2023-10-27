@@ -59,7 +59,7 @@ export const withUseState = () => {
           onCancel={() => setVisible(!visible)}
           header={
             <div className="flex items-center gap-2 text-foreground">
-              {/* <div className="text-scale-600">
+              {/* <div className="text-border-control">
               <IconTrash strokeWidth={2} />
             </div> */}
               <div className="flex items-baseline gap-2">
@@ -111,7 +111,7 @@ export const withUseState = () => {
                       <span className="text-foreground font-regular">MyProject</span>.
                     </p>
                   </div>
-                  <div className="border-t border-scale-300 dark:border-border"></div>
+                  <div className="border-t border-muted dark:border-border"></div>
                   <div className="px-5">
                     <Input
                       id="name"
@@ -120,7 +120,7 @@ export const withUseState = () => {
                       label="Please type MyProject to confirm."
                     />
                   </div>
-                  <div className="border-t border-scale-300 dark:border-border"></div>
+                  <div className="border-t border-muted dark:border-border"></div>
                   <div className="px-5">
                     <Button
                       type="danger"

@@ -46,7 +46,7 @@ const MigrationsEmptyState = () => {
   ]
 
   return (
-    <div className="w-full px-12 py-12 bg-white bg-no-repeat border rounded dark:bg-scale-200 border-border">
+    <div className="w-full px-12 py-12 bg-no-repeat border rounded bg-background border-border">
       <div className="space-y-8">
         <div className="space-y-2 w-4/5">
           <h4 className="text-lg">Database migrations</h4>
