@@ -304,7 +304,7 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
     </Collapsible.Trigger>
     <Collapsible.Content className="pt-2">
       {datum.search ? (
-        <pre className={`syntax-highlight overflow-auto rounded bg-scale-300 p-2 !text-xs`}>
+        <pre className={`syntax-highlight overflow-auto rounded bg-surface-100 p-2 !text-xs`}>
           <div
             className="text-wrap"
             dangerouslySetInnerHTML={{

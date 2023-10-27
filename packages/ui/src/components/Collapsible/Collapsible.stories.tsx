@@ -14,7 +14,7 @@ export const Default = (args: any) => {
         <Collapsible.Trigger asChild>
           <button
             type="button"
-            className="group text-foreground flex justify-between items-center w-full bg-scale-300 rounded border border-border p-3"
+            className="group text-foreground flex justify-between items-center w-full bg-surface-100 rounded border border-border p-3"
           >
             <div className="flex gap-2 items-center">
               <IconChevronUp className="transition data-open-parent:rotate-0 data-closed-parent:rotate-180" />
@@ -29,7 +29,7 @@ export const Default = (args: any) => {
           </button>
         </Collapsible.Trigger>
         <Collapsible.Content>
-          <div className="group text-foreground flex justify-between items-center w-full bg-scale-300 rounded border border-border p-3">
+          <div className="group text-foreground flex justify-between items-center w-full bg-surface-100 rounded border border-border p-3">
             <h3 className="text-tomato-900">I am content</h3>
             <h3 className="text-tomato-900">I am content</h3>
             <h3 className="text-tomato-900">I am content</h3>

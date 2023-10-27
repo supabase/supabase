@@ -210,8 +210,8 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
               className={clsx(
                 'rounded p-1',
                 isActive
-                  ? 'text-foreground-light hover:bg-scale-800'
-                  : 'text-scale-300 dark:text-scale-200 hover:bg-scale-500 group-hover:text-foreground-light'
+                  ? 'text-foreground-light hover:bg-border-stronger'
+                  : 'text-background hover:bg-overlay-hover group-hover:text-foreground-light'
               )}
             >
               <IconChevronDown size="tiny" strokeWidth={2} />

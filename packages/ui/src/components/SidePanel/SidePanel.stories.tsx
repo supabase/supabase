@@ -80,7 +80,7 @@ export const nestedSidepanels = (args: any) => {
       <div
         className="
           p-3 px-5 
-          bg-scale-300 border border-scale-600 rounded flex gap-4 
+          bg-surface-100 border border-control rounded flex gap-4 
           justify-between
           items-center
           

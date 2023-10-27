@@ -183,7 +183,7 @@ const StorageConfig = ({ config, projectRef }: any) => {
                       />
                     </div>
                   )}
-                  <div className="border-t border-scale-400" />
+                  <div className="border-t border-overlay" />
                   <div className="flex justify-between px-8 py-4">
                     <div className="flex items-center justify-between w-full gap-2">
                       {!canUpdateStorageSettings ? (

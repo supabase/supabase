@@ -235,8 +235,8 @@ const LogTable = ({
   const renderNoResultAlert = () => (
     <div className="mt-16 flex scale-100 flex-col items-center justify-center gap-6 text-center opacity-100">
       <div className="flex flex-col gap-1">
-        <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-scale-600 px-2 dark:border-scale-900"></div>
-        <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-scale-600 px-2 dark:border-scale-900">
+        <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2"></div>
+        <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2">
           <div className="absolute right-1 -bottom-4 text-foreground-light">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -300,8 +300,8 @@ const LogTable = ({
               [
                 'font-mono tracking-tight',
                 isEqual(row, focusedLog)
-                  ? '!bg-scale-800 rdg-row--focused'
-                  : ' !bg-scale-200 hover:!bg-scale-300 cursor-pointer',
+                  ? '!bg-border-stronger rdg-row--focused'
+                  : ' !bg-background hover:!bg-surface-100 cursor-pointer',
               ].join(' ')
             }
             rows={logDataRows}

@@ -63,7 +63,7 @@ const UsageBarChart = ({
                 return (
                   <div
                     className={clsx(
-                      'border bg-scale-300 rounded-md px-2 py-2',
+                      'border bg-surface-100 rounded-md px-2 py-2',
                       attributes.length > 1 && !isAfterToday ? 'w-[250px]' : 'w-[170px]'
                     )}
                   >

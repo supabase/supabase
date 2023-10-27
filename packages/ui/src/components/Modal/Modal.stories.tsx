@@ -28,7 +28,7 @@ export const withUseState = () => {
       <div
         className="
           py-4 px-8
-          bg-scale-300 
+          bg-surface-100 
           border 
           border-border 
           rounded flex gap-4 
