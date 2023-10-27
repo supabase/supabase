@@ -140,7 +140,7 @@ const GridHeaderActions = ({ table, openAPIDocsPanel, refreshDocs }: GridHeaderA
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger className="w-full">
             {(table.rls_enabled || showRLSWarning) && (
-              <Link href={`/project/${projectRef}/auth/policies?search=${table.id}`}>
+              <Link passHref href={`/project/${projectRef}/auth/policies?search=${table.id}`}>
                 <a>
                   <Button
                     type={table.rls_enabled ? 'link' : 'warning'}

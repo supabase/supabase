@@ -14,17 +14,14 @@ export interface FooterProps {
 }
 
 const Footer = ({ isLoading, isRefetching }: FooterProps) => {
-  const { id: _id, ref: projectRef } = useParams()
+  const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
-  const { data: selectedTable, isLoading: isTableLoading } = useTable(id)
+  const { data: selectedTable } = useTable(id)
 
   const entityType = useEntityType(selectedTable?.id)
   const isTableSelected = entityType?.type === ENTITY_TYPE.TABLE
   const isViewSelected =
     entityType?.type === ENTITY_TYPE.VIEW || entityType?.type === ENTITY_TYPE.MATERIALIZED_VIEW
-
-  const isLocked = EXCLUDED_SCHEMAS.includes(entityType?.schema ?? '')
-  const canEditViaTableEditor = isTableSelected && !isLocked
 
   const [{ view: selectedView = 'data' }, setUrlState] = useUrlState()
 
@@ -42,21 +39,16 @@ const Footer = ({ isLoading, isRefetching }: FooterProps) => {
         {selectedView === 'data' && <Pagination isLoading={isLoading} />}
 
         {(isTableSelected || isViewSelected) && (
-          <>
-            {/* {canEditViaTableEditor && (
-              <div className="h-[20px] w-px border-r border-scale-600"></div>
-            )} */}
-            <div className="ml-auto flex items-center gap-4">
-              {selectedTable && <RefreshButton table={selectedTable} isRefetching={isRefetching} />}
-              <TwoOptionToggle
-                width={75}
-                options={['definition', 'data']}
-                activeOption={selectedView}
-                borderOverride="border-gray-500"
-                onClickOption={setSelectedView}
-              />
-            </div>
-          </>
+          <div className="ml-auto flex items-center gap-4">
+            {selectedTable && <RefreshButton table={selectedTable} isRefetching={isRefetching} />}
+            <TwoOptionToggle
+              width={75}
+              options={['definition', 'data']}
+              activeOption={selectedView}
+              borderOverride="border-gray-500"
+              onClickOption={setSelectedView}
+            />
+          </div>
         )}
       </div>
     </div>

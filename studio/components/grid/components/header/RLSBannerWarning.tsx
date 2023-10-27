@@ -50,7 +50,7 @@ export default function RLSBannerWarning() {
             <IconAlertCircle size={16} strokeWidth={2} />
             <span className="font-bold mx-2">Table is public</span> You are allowing anonymous
             access to your data.{' '}
-            <Link href={`/project/${projectRef}/auth/policies?search=${tableID}`}>
+            <Link passHref href={`/project/${projectRef}/auth/policies?search=${tableID}`}>
               <a className="underline ml-2 opacity-80 hover:opacity-100 transition">
                 Enable Row Level Security
               </a>
