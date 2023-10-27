@@ -1,21 +1,20 @@
-import DataGrid, { Row, RenderRowProps } from 'react-data-grid'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Alert, Button, IconClipboard, IconEye, IconEyeOff } from 'ui'
 import { isEqual } from 'lodash'
+import { Key, ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
+import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
+import { Alert, Button, IconClipboard, IconEye, IconEyeOff } from 'ui'
 
 import CSVButton from 'components/ui/CSVButton'
 import { useStore } from 'hooks'
 import { copyToClipboard } from 'lib/helpers'
-import { LogQueryError } from '.'
+import { LogQueryError, isDefaultLogPreviewFormat } from '.'
 import AuthColumnRenderer from './LogColumnRenderers/AuthColumnRenderer'
 import DatabaseApiColumnRender from './LogColumnRenderers/DatabaseApiColumnRender'
 import DatabasePostgresColumnRender from './LogColumnRenderers/DatabasePostgresColumnRender'
 import DefaultPreviewColumnRenderer from './LogColumnRenderers/DefaultPreviewColumnRenderer'
 import FunctionsEdgeColumnRender from './LogColumnRenderers/FunctionsEdgeColumnRender'
 import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnRender'
-import { LogData, QueryType } from './Logs.types'
-import { isDefaultLogPreviewFormat } from './Logs.utils'
 import LogSelection, { LogSelectionProps } from './LogSelection'
+import { LogData, QueryType } from './Logs.types'
 import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
 
@@ -32,24 +31,6 @@ interface Props {
   params: LogSelectionProps['params']
 }
 type LogMap = { [id: string]: LogData }
-
-interface FormatterArg {
-  column: {
-    key: string
-    name: string
-    resizable: boolean
-    header: string
-    minWidth: number
-    idx: number
-    frozen: boolean
-    isLastFrozenColumn: boolean
-    rowGroup: boolean
-    sortable: boolean
-  }
-  isCellSelected: boolean
-  onRowChange: Function
-  row: any
-}
 
 /**
  * Logs table view with focus side panel
@@ -73,32 +54,32 @@ const LogTable = ({
   const hasId = columnNames.includes('id')
   const hasTimestamp = columnNames.includes('timestamp')
 
-  const DEFAULT_COLUMNS = columnNames.map((v, idx: number) => {
-    let formatter = undefined
-
-    formatter = (received: FormatterArg) => {
-      const value = received.row?.[v]
-      if (value && typeof value === 'object') {
-        return JSON.stringify(value)
-      } else if (value === null) {
-        return 'NULL'
-      } else {
-        return String(value)
-      }
-    }
-    return {
+  const DEFAULT_COLUMNS = columnNames.map((v: keyof LogData, idx) => {
+    const result: Column<LogData> = {
       key: `logs-column-${idx}`,
-      name: v,
+      name: v as string,
       resizable: true,
-      formatter,
-      header: v,
+      renderCell: (props) => {
+        const value = props.row?.[v]
+        if (value && typeof value === 'object') {
+          return JSON.stringify(value)
+        } else if (value === null) {
+          return 'NULL'
+        } else {
+          return String(value)
+        }
+      },
+      renderHeaderCell: (props) => {
+        return v
+      },
       minWidth: 128,
     }
+    return result
   })
 
-  let columns
+  let columns = DEFAULT_COLUMNS
   if (!queryType) {
-    columns = DEFAULT_COLUMNS
+    columns
   } else {
     switch (queryType) {
       case 'api':
@@ -166,10 +147,10 @@ const LogTable = ({
     }
   }, [stringData])
 
-  const RowRenderer = useCallback(
-    (props: RenderRowProps<any>) => (
-      <Row {...props} isRowSelected={false} selectedCellIdx={undefined} />
-    ),
+  const RowRenderer = useCallback<(key: Key, props: RenderRowProps<LogData, unknown>) => ReactNode>(
+    (key, props) => {
+      return <Row {...props} isRowSelected={false} selectedCellIdx={undefined} />
+    },
     []
   )
 
@@ -287,7 +268,7 @@ const LogTable = ({
               setFocusedLog(data[rowIdx] as LogData)
             }}
             selectedRows={new Set([])}
-            columns={columns as any}
+            columns={columns}
             rowClass={(row: LogData) =>
               [
                 'font-mono tracking-tight',
@@ -305,7 +286,7 @@ const LogTable = ({
             // [Next 18 refactor] need to fix
             // onRowClick={setFocusedLog}
             renderers={{
-              renderRow: RowRenderer as any,
+              renderRow: RowRenderer,
               noRowsFallback: !isLoading ? (
                 <div className="mx-auto flex h-full w-full items-center justify-center space-y-12 py-4 transition-all delay-200 duration-500">
                   {!error && renderNoResultAlert()}

@@ -1,3 +1,5 @@
+import { Column } from 'react-data-grid'
+import { LogData } from '../Logs.types'
 import {
   ResponseCodeFormatter,
   RowLayout,
@@ -6,20 +8,24 @@ import {
 } from '../LogsFormatters'
 import DefaultPreviewColumnRenderer from './DefaultPreviewColumnRenderer'
 
-export default [
+const columns: Column<LogData>[] = [
   {
-    formatter: (data: any) => {
-      if (!data.row.status_code && !data.row.method && !data.row.path) {
-        return DefaultPreviewColumnRenderer[0].formatter(data)
+    name: 'database-api-first-column',
+    key: 'database-api-first-column',
+    renderCell: (props) => {
+      if (!props.row.status_code && !props.row.method && !props.row.path) {
+        return DefaultPreviewColumnRenderer[0].formatter(props)
       }
       return (
         <RowLayout>
-          <TimestampLocalFormatter value={data.row.timestamp!} />
-          <ResponseCodeFormatter row={data} value={data.row.status_code} />
-          <TextFormatter className="w-20" value={data.row.method} />
-          <TextFormatter className="w-full" value={data.row.path} />
+          <TimestampLocalFormatter value={props.row.timestamp!} />
+          <ResponseCodeFormatter row={props} value={props.row.status_code} />
+          <TextFormatter className="w-20" value={props.row.method as string} />
+          <TextFormatter className="w-full" value={props.row.path as string} />
         </RowLayout>
       )
     },
   },
 ]
+
+export default columns

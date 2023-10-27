@@ -1,13 +1,18 @@
-import { PreviewLogData } from '..'
+import { Column } from 'react-data-grid'
+import { LogData } from '..'
 import { RowLayout, TextFormatter, TimestampLocalFormatter } from '../LogsFormatters'
 
-export default [
+const columns: Column<LogData>[] = [
   {
-    formatter: (data: { row: PreviewLogData }) => (
+    name: 'default-preview-first-column',
+    key: 'default-preview-first-column',
+    renderCell: (props) => (
       <RowLayout>
-        <TimestampLocalFormatter value={data.row.timestamp!} />
-        <TextFormatter className="w-full" value={data.row.event_message} />
+        <TimestampLocalFormatter value={props.row.timestamp!} />
+        <TextFormatter className="w-full" value={props.row.event_message} />
       </RowLayout>
     ),
   },
 ]
+
+export default columns
