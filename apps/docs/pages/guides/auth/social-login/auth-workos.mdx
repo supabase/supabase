@@ -71,7 +71,7 @@ async function signInWithWorkOS() {
       queryParams: {
         connection: '<your_connection>',
         organization: '<your_organization',
-        provider: '<your_provider>',
+        workos_provider: '<your_provider>',
       },
     },
   })
@@ -90,7 +90,7 @@ suspend fun signInWithWorkOS() {
 	supabase.gotrue.loginWith(WorkOS) {
 		queryParams["connection"] = "<your_connection>"
 		queryParams["organization"] = "<your_organization>"
-		queryParams["provider"] = "<your_provider>"
+		queryParams["workos_provider"] = "<your_provider>"
 	}
 }
 ```
