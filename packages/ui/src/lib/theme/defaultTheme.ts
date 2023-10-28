@@ -418,6 +418,7 @@ export default {
 
   input: {
     base: `
+      pr-[2.3rem]
       block
       box-border
       w-full
@@ -1341,14 +1342,14 @@ export default {
     `,
     with_icon: 'pl-10',
     addOnBefore: `
-    w-full flex flex-row items-center space-x-3
+    w-full flex flex-row items-center space-x-1
     `,
     size: {
       ...default__padding_and_text,
     },
     disabled: `opacity-50`,
     actions_container: 'absolute inset-y-0 right-0 pl-3 pr-1 flex space-x-1 items-center',
-    chevron_container: 'absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none',
+    chevron_container: 'absolute inset-y-0 right-1 flex items-center pointer-events-none',
     chevron: 'h-5 w-5 text-scale-600',
     option: `
       w-listbox
