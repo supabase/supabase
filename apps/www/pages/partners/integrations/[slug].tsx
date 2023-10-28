@@ -17,7 +17,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import supabase from '~/lib/supabaseMisc'
 import { Partner } from '~/types/partners'
-import Error404 from '../../404'
+// import Error404 from '../../404'
 
 /**
  * Returns custom components so that the markdown converts to a nice looking html.
@@ -48,8 +48,7 @@ function Partner({
 }) {
   const [focusedImage, setFocusedImage] = useState<string | null>(null)
 
-  console.log('partner', partner)
-  if (!partner) return <Error404 />
+  // if (!partner) return <Error404 />
 
   const videoThumbnail = partner.video
     ? `http://img.youtube.com/vi/${partner.video}/0.jpg`

@@ -11,7 +11,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import supabase from '~/lib/supabaseMisc'
 import { Partner } from '~/types/partners'
-import Error404 from '../../404'
+// import Error404 from '../../404'
 
 function Partner({
   partner,
@@ -20,7 +20,7 @@ function Partner({
   partner: Partner
   overview: MDXRemoteSerializeResult<Record<string, unknown>, Record<string, unknown>>
 }) {
-  if (!partner) return <Error404 />
+  // if (!partner) return <Error404 />
   return (
     <>
       <NextSeo
