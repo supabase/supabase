@@ -104,14 +104,17 @@ const Indexes = () => {
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <Link href="https://supabase.com/docs/guides/database/query-optimization">
+            <Link passHref href="https://supabase.com/docs/guides/database/query-optimization">
               <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                 <a target="_blank" rel="noreferrer">
                   Documentation
                 </a>
               </Button>
             </Link>
-            <Link href="https://supabase.com/docs/guides/database/extensions/index_advisor">
+            <Link
+              passHref
+              href="https://supabase.com/docs/guides/database/extensions/index_advisor"
+            >
               <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                 <a target="_blank" rel="noreferrer">
                   Optimization with index_advisor
