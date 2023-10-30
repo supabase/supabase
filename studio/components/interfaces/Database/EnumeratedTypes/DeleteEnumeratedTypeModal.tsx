@@ -40,7 +40,7 @@ const DeleteEnumeratedTypeModal = ({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       name: selectedEnumeratedType.name,
-      schema: selectedEnumeratedType.schema
+      schema: selectedEnumeratedType.schema,
     })
   }
 

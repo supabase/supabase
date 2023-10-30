@@ -51,7 +51,6 @@ export async function executeSql(
   })
 
   if (error) {
-    console.log("err", error)
     if (handleError !== undefined) return handleError(error)
     else throw error
   }
