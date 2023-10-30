@@ -8,8 +8,7 @@ export const meta = {
   description: 'Logging in with social accounts',
 }
 
-Social Login (OAuth) is an open standard for authentication that allows users to log in to one website or application using their credentials from another website or application.
-It is a way for users to grant third-party applications access to their online accounts without sharing their passwords.
+Social Login (OAuth) is an open standard for authentication that allows users to log in to one website or application using their credentials from another website or application. OAuth allows users to grant third-party applications access to their online accounts without sharing their passwords.
 OAuth is commonly used for things like logging in to a social media account from a third-party app. It is a secure and convenient way to authenticate users and share information between applications.
 
 ## Benefits
@@ -47,9 +46,13 @@ Supabase supports a suite of social providers. Follow these guides to configure 
   
 ## Provider Tokens
   
-Once the OAuth flow completes, Supabase Auth will sign your user in. You will receive a copy of the provider token used in the OAuth flow in case you need to use it further. For example, you can use the Google provider token to access Google APIs on behalf of your user.
+You can use the provider token and provider refresh token returned to make API calls to the OAuth provider. For example, you can use the Google provider token to access Google APIs on behalf of your user. 
+
+Supabase Auth does not manage refreshing the provider token for the user. Your application will need to use the provider refresh token to obtain a new provider token. If no provider refresh token is returned, then it could mean one of the following:
+- The OAuth provider does not return a refresh token
+- Additional scopes need to be specified in order for the OAuth provider to return a refresh token.
   
-Provider tokens are intentionally not stored in your project's database, however. This is because provider tokens give access to potentially sensitive user data in third-party systems. Different applications have different needs, and one application's OAuth scopes may be significantly more permissive than another. If you do want to use the provider token outside of the browser that completed the OAuth flow, you will have to send it manually to a secure server under your control.
+Provider tokens are intentionally not stored in your project's database. This is because provider tokens give access to potentially sensitive user data in third-party systems. Different applications have different needs, and one application's OAuth scopes may be significantly more permissive than another. If you want to use the provider token outside of the browser that completed the OAuth flow, it is recommended to send it to a trusted and secure server you control.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
