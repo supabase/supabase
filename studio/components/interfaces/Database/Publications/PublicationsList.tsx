@@ -10,6 +10,11 @@ import NoSearchResults from 'components/ui/NoSearchResults'
 import { useCheckPermissions, useStore } from 'hooks'
 import { Button, IconAlertCircle, IconSearch, Input, Modal, Toggle } from 'ui'
 
+interface PublicationEvent {
+  event: string
+  key: string
+}
+
 interface PublicationsListProps {
   onSelectPublication: (id: number) => void
 }
@@ -23,7 +28,7 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
     'publications'
   )
 
-  const publicationEvents = [
+  const publicationEvents: PublicationEvent[] = [
     { event: 'Insert', key: 'publish_insert' },
     { event: 'Update', key: 'publish_update' },
     { event: 'Delete', key: 'publish_delete' },
@@ -36,7 +41,7 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
 
   const [toggleListenEventValue, setToggleListenEventValue] = useState<{
     publication: any
-    event: any
+    event: PublicationEvent
     currentStatus: any
   } | null>(null)
 
@@ -47,7 +52,7 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
 
     try {
       let payload: any = { id: publication.id }
-      payload[`publish_${event}`] = !currentStatus
+      payload[`publish_${event.event.toLowerCase()}`] = !currentStatus
       const { data, error }: any = await meta.publications.update(publication.id, payload)
       if (error) {
         throw error
@@ -105,7 +110,7 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
                 Source
               </Table.th>,
             ]}
-            body={publications.map((x: any, i: number) => (
+            body={publications.map((x, i) => (
               <Table.tr className="border-t " key={x.name}>
                 <Table.td className="px-4 py-3" style={{ width: '25%' }}>
                   {x.name}
@@ -162,7 +167,7 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
         <Modal.Content>
           <p className="py-4 text-sm text-foreground-light">
             Are you sure you want to {toggleListenEventValue?.currentStatus ? 'stop' : 'start'}{' '}
-            sending {toggleListenEventValue?.event} events for{' '}
+            sending {toggleListenEventValue?.event.event.toLowerCase()} events for{' '}
             {toggleListenEventValue?.publication.name}?
           </p>
         </Modal.Content>
