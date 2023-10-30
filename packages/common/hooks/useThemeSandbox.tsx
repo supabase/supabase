@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 import { IS_PROD } from '../constants'
 
-let defaultConfig: { [name: string]: string } = {
-  // Dark
+const defaultDark: { [name: string]: string } = {
   '--brand-accent': '160deg 100% 50%',
   '--brand-default': '159.9deg 100% 38.6%',
   '--brand-600': '176deg 59.5% 70%',
@@ -32,35 +31,37 @@ let defaultConfig: { [name: string]: string } = {
   '--foreground-lighter': '210deg 8% 55%',
   '--foreground-light': '210deg 5% 69%',
   '--foreground-default': '210deg 0% 93%',
-  // Light
-  // "--brand-accent": "152.9deg 60% 52.9%",
-  // "--brand-default": "152.9deg 60% 52.9%",
-  // "--brand-600": "153.2deg 49.7% 33.5%",
-  // "--brand-500": "148.7deg 42.7% 69.2%",
-  // "--brand-400": "149.1deg 59.3% 88.4%",
-  // "--brand-300": "148.6deg 77.8% 94.7%",
-  // "--brand-200": "156deg 71.4% 98.6%",
-  // "--background-muted": "0deg 0% 100%",
-  // "--background-alternative": "0deg 0% 100%",
-  // "--border-stronger": "var(--colors-gray-light-800)",
-  // "--border-strong": "var(--colors-gray-light-700)",
-  // "--border-alternative": "var(--colors-slate-light-500)",
-  // "--border-control": "var(--colors-slate-light-600)",
-  // "--border-overlay": "var(--colors-slate-light-500)",
-  // "--border-muted": "var(--colors-gray-dark-400)",
-  // "--border-default": "var(--colors-slate-light-500)",
-  // "--background-overlay-hover": "var(--colors-slate-light-300)",
-  // "--background-overlay-default": "var(--colors-slate-light-100)",
-  // "--background-surface-300": "var(--colors-slate-light-400)",
-  // "--background-surface-200": "var(--colors-slate-light-300)",
-  // "--background-surface-100": "var(--colors-slate-light-100)",
-  // "--background-control": "var(--colors-slate-light-300)",
-  // "--background-selection": "var(--colors-gray-light-400)",
-  // "--background-default": "var(--colors-slate-light-200)",
-  // "--foreground-muted": "var(--colors-slate-light-800)",
-  // "--foreground-lighter": "var(--colors-slate-light-1000)",
-  // "--foreground-light": "var(--colors-slate-light-1100)",
-  // "--foreground-default": "var(--colors-slate-light-1200)",
+}
+const defaultLight: { [name: string]: string } = {
+  '--brand-accent': '152.9deg 60% 52.9%',
+  '--brand-default': '152.9deg 60% 52.9%',
+  '--brand-600': '153.2deg 49.7% 33.5%',
+  '--brand-500': '148.7deg 42.7% 69.2%',
+  '--brand-400': '149.1deg 59.3% 88.4%',
+  '--brand-300': '148.6deg 77.8% 94.7%',
+  '--brand-200': '156deg 71.4% 98.6%',
+  '--border-stronger': '205deg 10.7% 78%',
+  '--border-strong': '210deg 11.1% 85.9%',
+  '--border-secondary': '210deg 11.8% 93.3%',
+  '--border-alternative': '216deg 11.1% 91.2%',
+  '--border-control': '205.7deg 12.3% 88.8%',
+  '--border-overlay': '216deg 11.1% 91.2%',
+  '--border-muted': '210deg 11.8% 93.3%',
+  '--border-default': '216deg 11.1% 91.2%',
+  '--background-overlay-hover': '210deg 16.7% 95.3%',
+  '--background-overlay-default': '210deg 33.3% 98.8%',
+  '--background-surface-300': '210deg 11.8% 93.3%',
+  '--background-surface-200': '210deg 16.7% 95.3%',
+  '--background-surface-100': '210deg 33.3% 98.8%',
+  '--background-control': '210deg 16.7% 95.3%',
+  '--background-selection': '210deg 11.8% 93.3%',
+  '--background-muted': '210deg 10% 93%',
+  '--background-alternative': '210deg 10% 100%',
+  '--background-default': '210deg 16.7% 97.6%',
+  '--foreground-muted': '205.7deg 6.3% 56.1%',
+  '--foreground-lighter': '205.7deg 5.7% 52.2%',
+  '--foreground-light': '205.7deg 6.3% 43.5%',
+  '--foreground-default': '201.8deg 24.4% 8.8%',
 }
 
 /**
@@ -76,6 +77,8 @@ export const useThemeSandbox = (): any => {
   const isWindowUndefined = typeof window === 'undefined'
   if (isWindowUndefined || IS_PROD) return null
   const hash = window.location.hash
+  const defaultConfig = defaultDark // use dark default tokens
+  // const defaultConfig = defaultLight // use light default tokens
   const localPreset = localStorage.getItem('theme-sandbox')
   const isSandbox = hash.includes('#theme-sandbox') || localPreset !== null
   const [themeConfig, setThemeConfig] = useState(
@@ -101,6 +104,7 @@ export const useThemeSandbox = (): any => {
     gui.width = 500
 
     Object.entries(defaultConfig).map(([key, _value]) => {
+      if (!themeConfig[key]) return localStorage.removeItem('theme-sandbox')
       const folderName = key.split('-')[2]
       const folder = gui.__folders[folderName] ?? gui.addFolder(folderName)
 
