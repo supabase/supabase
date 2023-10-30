@@ -51,7 +51,7 @@ export interface PageResult {
 
 function removeDoubleQuotes(inputString: string): string {
   // Use the replace method with a regular expression to remove double quotes
-  return inputString.replace(/"/g, '');
+  return inputString.replace(/"/g, '')
 }
 
 const getDocsUrl = () => {
@@ -210,7 +210,9 @@ const DocsSearch = () => {
                         openLink(page.type, formatSectionUrl(page, section))
                       }}
                       key={`${page.meta.title}__${section.heading}-item-index-${i}`}
-                      value={`${removeDoubleQuotes(page.meta.title)}__${section.heading ? removeDoubleQuotes(section.heading) : ""}-item-index-${i}`}
+                      value={`${removeDoubleQuotes(page.meta.title)}__${
+                        section.heading ? removeDoubleQuotes(section.heading) : ''
+                      }-item-index-${i}`}
                       type="block-link"
                     >
                       <div className="grow flex gap-3 items-center">
