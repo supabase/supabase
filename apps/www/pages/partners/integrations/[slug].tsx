@@ -217,7 +217,7 @@ function Partner({
                     <div className="flex items-center justify-between py-2">
                       <span className="text-lighter">Category</span>
                       <Link href={`/partners/integrations#${partner.category.toLowerCase()}`}>
-                        <a className="text-brand hover:text-brand-300 transition-colors">
+                        <a className="text-brand hover:underline transition-colors">
                           {partner.category}
                         </a>
                       </Link>
@@ -229,7 +229,7 @@ function Partner({
                         href={partner.website}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-brand hover:text-brand-300 transition-colors"
+                        className="text-brand hover:underline transition-colors"
                       >
                         {new URL(partner.website).host}
                       </a>
@@ -242,7 +242,7 @@ function Partner({
                           href={partner.docs}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-brand hover:text-brand-300 transition-colors"
+                          className="text-brand hover:underline transition-colors"
                         >
                           <span className="flex items-center space-x-1">
                             <span>Learn</span>
