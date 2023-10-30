@@ -24,6 +24,20 @@ create type mood as enum (
 
 In this example, we've created an Enum called "mood" with four possible values.
 
+## When to use Enums
+
+There is a lot of overlap between Enums and foreign keys. Both can be used to define a set of values for a column. However, there are some advantages to using Enums:
+
+- Performance: You can query a single table instead of finding the value from a lookup table.
+- Simplicity: Generally the SQL is easier to read and write.
+
+There are also some disadvantages to using Enums:
+
+- Limited Flexibility: Adding and removing values requires modifying the database schema (i.e.: using migrations) rather than adding data to a table.
+- Maintenance Overhead: Enum types require ongoing maintenance. If your application's requirements change frequently, maintaining enums can become burdensome.
+
+In general you should only use Enums when the list of values is small, fixed, and unlikely to change often. Things like "a list of continents" or "a list of departments" are good candidates for Enums.
+
 ## Using Enums in tables
 
 To use the Enum in a table, you can define a column with the Enum type. For example:
@@ -90,12 +104,15 @@ alter type mood add value 'content';
 
 ### Removing Enum Values
 
-You can remove values from an existing Enum using the `ALTER TYPE` statement:
+Even though it is possible, it is unsafe to remove enum values once they have been created. It's better to leave the enum value in place.
 
-{/* prettier-ignore */}
-```sql
-alter type mood add value 'content';
-```
+<Admonition type="warning">
+
+Read the [Postgres mailing list](https://www.postgresql.org/message-id/21012.1459434338%40sss.pgh.pa.us) for more information:
+
+There is no `ALTER TYPE DELETE VALUE` in Postgres. Even if you delete every occurrence of an Enum value within a table (and vacuumed away those rows), the target value could still exist in upper index pages. If you delete the `pg_enum` entry you'll break the index.
+
+</Admonition>
 
 ### Getting a list of Enum Values
 
