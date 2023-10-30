@@ -6,7 +6,7 @@ import {
   TextFormatter,
   TimestampLocalFormatter,
 } from '../LogsFormatters'
-import DefaultPreviewColumnRenderer from './DefaultPreviewColumnRenderer'
+import { defaultRenderCell } from './DefaultPreviewColumnRenderer'
 
 const columns: Column<LogData>[] = [
   {
@@ -14,7 +14,7 @@ const columns: Column<LogData>[] = [
     key: 'database-postgres-first-column',
     renderCell: (props) => {
       if (!props.row.error_severity) {
-        return DefaultPreviewColumnRenderer[0].formatter(props)
+        return defaultRenderCell(props)
       }
       return (
         <RowLayout>
