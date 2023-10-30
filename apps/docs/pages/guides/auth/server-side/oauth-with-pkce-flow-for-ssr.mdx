@@ -8,127 +8,9 @@ export const meta = {
     'Learn how to configure OAuth authentication in your server-side rendering (SSR) application to work with the PKCE flow.',
 }
 
-### Install Supabase Auth Helpers
+### Setting up SSR client
 
-The Auth Helpers assist with user authentication within server-side rendering (SSR) frameworks.
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="nextjs"
-  queryGroup="framework"
->
-<TabPanel id="nextjs" label="NextJS">
-
-```bash
-npm install @supabase/auth-helpers-nextjs @supabase/supabase-js
-```
-
-</TabPanel>
-<TabPanel id="sveltekit" label="SvelteKit">
-
-```bash
-npm install @supabase/auth-helpers-sveltekit @supabase/supabase-js
-```
-
-</TabPanel>
-</Tabs>
-
-### Set environment variables
-
-Create an `.env.local` file in your project root directory. You can get your `SITE_URL` and `ANON_KEY` from inside of the [dashboard](https://supabase.com/dashboard/project/_/settings/api).
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="nextjs"
-  queryGroup="framework"
->
-<TabPanel id="nextjs" label="NextJS">
-
-```bash .env.local
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
-
-</TabPanel>
-<TabPanel id="sveltekit" label="SvelteKit">
-
-```bash .env.local
-PUBLIC_SUPABASE_URL=your_supabase_project_url
-PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
-
-</TabPanel>
-</Tabs>
-
-### Setting up the Auth Helpers
-
-For SSR, the Supabase client requires extra steps to ensure the user's auth session remains active. Since the user's session is tracked in a cookie, we need to read this cookie and update it if necessary.
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="nextjs"
-  queryGroup="framework"
->
-<TabPanel id="nextjs" label="NextJS">
-Next.js Server Components allow you to read a cookie but not write back to it. Middleware on the other hand allow you to both read and write to cookies.
-
-Next.js [Middleware](https://nextjs.org/docs/app/building-your-application/routing/middleware) runs immediately before each route is rendered. We'll use Middleware to refresh the user's session before loading Server Component routes.
-
-Create a new `middleware.js` file in the root of your project and populate with the following:
-
-```js middleware.js
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
-import { NextResponse } from 'next/server'
-
-export async function middleware(req) {
-  const res = NextResponse.next()
-  const supabase = createMiddlewareClient({ req, res })
-  await supabase.auth.getSession()
-  return res
-}
-```
-
-</TabPanel>
-<TabPanel id="sveltekit" label="SvelteKit">
-Create a new `hooks.server.js` file in the root of your project and populate with the following:
-
-```ts src/hooks.server.js
-import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
-import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit'
-import type { Handle } from '@sveltejs/kit'
-import { dev } from '$app/environment'
-
-export const handle: Handle = async ({ event, resolve }) => {
-  event.locals.supabase = createSupabaseServerClient({
-    supabaseUrl: PUBLIC_SUPABASE_URL,
-    supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
-    event,
-    cookieOptions: { secure: !dev },
-  })
-
-  event.locals.getSession = async () => {
-    const {
-      data: { session },
-    } = await event.locals.supabase.auth.getSession()
-    return session
-  }
-
-  return resolve(event, {
-    filterSerializedResponseHeaders(name) {
-      return name === 'content-range'
-    },
-  })
-}
-```
-
-</TabPanel>
-</Tabs>
+Check out our [guide for creating a client](/docs/guides/auth/server-side/creating-a-client) to learn how to install the necessary packages, declare environment variables, and create a Supabase client configured for SSR in your framework.
 
 ### Create API endpoint for handling the `code` exchange
 
@@ -141,35 +23,55 @@ In order to use OAuth we will need to setup a endpoint for the `code` exchange, 
   defaultActiveId="nextjs"
   queryGroup="framework"
 >
-<TabPanel id="nextjs" label="NextJS">
-Create a new file at `app/auth/callback/route.js` and populate with the following:
+<TabPanel id="nextjs" label="Next.js">
 
-```js app/auth/callback/route.js
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+Create a new file at `app/auth/callback/route.ts` and populate with the following:
+
+```ts app/auth/callback/route.ts
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
-export async function GET(req) {
-  const { searchParams } = new URL(req.url)
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url)
   const code = searchParams.get('code')
   const next = searchParams.get('next') ?? '/'
 
   if (code) {
     const cookieStore = cookies()
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get(name: string) {
+            return cookieStore.get(name)?.value
+          },
+          set(name: string, value: string, options: CookieOptions) {
+            cookieStore.set({ name, value, ...options })
+          },
+          remove(name: string, options: CookieOptions) {
+            cookieStore.delete({ name, ...options })
+          },
+        },
+      }
+    )
+
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      return NextResponse.redirect(new URL(`/${next.slice(1)}`, req.url))
+      return NextResponse.redirect(new URL(`/${next.slice(1)}`, request.url))
     }
   }
 
   // return the user to an error page with instructions
-  return NextResponse.redirect(new URL('/auth/auth-code-error', req.url))
+  return NextResponse.redirect(new URL('/auth/auth-code-error', request.url))
 }
 ```
 
 </TabPanel>
 <TabPanel id="sveltekit" label="SvelteKit">
+
 Create a new file at `src/routes/auth/callback/+server.js` and populate with the following:
 
 ```js src/routes/auth/callback/+server.js
@@ -193,6 +95,117 @@ export const GET = async (event) => {
   // return the user to an error page with instructions
   throw redirect(303, '/auth/auth-code-error');
 };
+```
+
+</TabPanel>
+
+<TabPanel id="astro" label="Astro">
+
+Create a new file at `src/pages/auth/callback.ts` and populate with the following:
+
+```ts src/pages/auth/callback.ts
+import { createServerClient } from '@supabase/ssr'
+import { type APIRoute } from 'astro'
+
+export const GET: APIRoute = async ({ request, cookies, redirect }) => {
+  const requestUrl = new URL(request.url)
+  const code = requestUrl.searchParams.get('code')
+  const next = requestUrl.searchParams.get('next') || '/'
+
+  if (code) {
+    const supabase = createServerClient(
+      import.meta.env.PUBLIC_SUPABASE_URL,
+      import.meta.env.PUBLIC_SUPABASE_ANON_KEY,
+      {
+        cookies: {
+          get(key) {
+            return cookies.get(key)?.value
+          },
+          set(key, value, options) {
+            cookies.set(key, value, options)
+          },
+          remove(key, options) {
+            cookies.delete(key, options)
+          },
+        },
+      }
+    )
+
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+
+    if (!error) {
+      return redirect(`/${next.slice(1)}`)
+    }
+  }
+
+  // return the user to an error page with instructions
+  return redirect('/auth/auth-code-error')
+}
+```
+
+</TabPanel>
+
+<TabPanel id="remix" label="Remix">
+
+Create a new file at `app/routes/auth.callback.tsx` and populate with the following:
+
+```ts app/routes/auth.callback.tsx
+import { redirect, type LoaderFunctionArgs } from '@remix-run/node'
+import { createServerClient, parse, serialize } from '@supabase/ssr'
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  const requestUrl = new URL(request.url)
+  const code = requestUrl.searchParams.get('code')
+  const next = requestUrl.searchParams.get('next') || '/'
+
+  if (code) {
+    const cookies = parse(request.headers.get('Cookie') ?? '')
+    const headers = new Headers()
+
+    const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
+      cookies: {
+        get(key) {
+          return cookies[key]
+        },
+        set(key, value, options) {
+          headers.append('Set-Cookie', serialize(key, value, options))
+        },
+        remove(key, options) {
+          headers.append('Set-Cookie', serialize(key, '', options))
+        },
+      },
+    })
+
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+
+    if (!error) {
+      return redirect(`/${next.slice(1)}`)
+    }
+  }
+
+  // return the user to an error page with instructions
+  return redirect('/auth/auth-code-error')
+}
+```
+
+</TabPanel>
+<TabPanel id="express" label="Express">
+
+Create a new route in your express app and populate with the following:
+
+```js app.js
+...
+app.get("/auth/callback", async function (req, res) {
+  const code = req.query.code
+  const next = req.query.next ?? "/"
+
+  if (code) {
+    const supabase = createClient({ req, res })
+    await supabase.auth.exchangeCodeForSession(code)
+  }
+
+  res.redirect(303, `/${next.slice(1)}`)
+})
 ```
 
 </TabPanel>
