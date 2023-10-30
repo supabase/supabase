@@ -205,7 +205,7 @@ const Addons = () => {
                         onClick={() => snap.setPanelKey('computeInstance')}
                         disabled={isBranch || !isProjectActive || projectUpdateDisabled}
                       >
-                        Change optimized compute
+                        Change compute size
                       </Button>
                     </ProjectUpdateDisabledTooltip>
 

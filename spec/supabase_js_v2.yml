@@ -620,6 +620,7 @@ functions:
       - Passwordless sign-ins can be resent by calling the `signInWithOtp()` method again.
       - Password recovery emails can be resent by calling the `resetPassswordForEmail()` method again.
       - This method will only resend an email or phone OTP to the user if there was an initial signup, email change or phone change request being made.
+      - You can specify a redirect url when you resend an email link using the `emailRedirectTo` option.
     examples:
       - id: resend-email-signup-confirmation
         name: Resend an email signup confirmation
@@ -630,6 +631,9 @@ functions:
           const { data, error } = await supabase.auth.resend({
             type: 'signup',
             email: 'email@example.com'
+            options: {
+              emailRedirectTo: 'https://example.com/welcome'
+            }
           })
           ```
       - id: resend-phone-signup-confirmation
@@ -708,9 +712,9 @@ functions:
     title: 'onAuthStateChange()'
     $ref: '@supabase/gotrue-js.GoTrueClient.onAuthStateChange'
     notes: |
-      - Types of auth events: `SIGNED_IN`, `SIGNED_OUT`, `TOKEN_REFRESHED`, `USER_UPDATED`, `PASSWORD_RECOVERY`
-      - Currently, `onAuthStateChange()` does not work across tabs.
-      For instance, in the case of a password reset flow, the original tab which requested for the password reset link will not receive the `SIGNED_IN` and `PASSWORD_RECOVERY` event when the user clicks on the link.
+      - Types of auth events: `INITIAL_SESSION`, `SIGNED_IN`, `SIGNED_OUT`, `TOKEN_REFRESHED`, `USER_UPDATED`, `PASSWORD_RECOVERY`
+      - The `INITIAL_SESSION` can be used to allow you to invoke the callback function when `onAuthStateChange` is first called.
+      - Currently, `onAuthStateChange()` does not work across tabs. For instance, in the case of a password reset flow, the original tab which requested for the password reset link will not receive the `SIGNED_IN` and `PASSWORD_RECOVERY` event when the user clicks on the link.
 
     examples:
       - id: listen-to-auth-changes
