@@ -14,7 +14,7 @@ const HomePageCover = (props) => {
       href: '/guides/getting-started/quickstarts/reactjs',
     },
     {
-      tooltip: 'NextJS',
+      tooltip: 'Next.js',
       icon: '/docs/img/icons/nextjs-icon',
       href: '/guides/getting-started/quickstarts/nextjs',
     },

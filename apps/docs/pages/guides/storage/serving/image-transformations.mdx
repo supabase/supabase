@@ -186,11 +186,11 @@ supabase.storage["bucket"].downloadAuthenticatedTo("image.jpg", file) {
 </TabPanel>
 </Tabs>
 
-## NextJS Loader
+## Next.js Loader
 
-You can use Supabase Image Transformation to optimize your NextJS images using a custom [Loader](https://nextjs.org/docs/api-reference/next/image#loader-configuration).
+You can use Supabase Image Transformation to optimize your Next.js images using a custom [Loader](https://nextjs.org/docs/api-reference/next/image#loader-configuration).
 
-To get started, create a `supabase-image-loader.js` file in your NextJS project which exports a default function:
+To get started, create a `supabase-image-loader.js` file in your Next.js project which exports a default function:
 
 ```ts
 const projectId = '' // your supabase project id
@@ -202,7 +202,7 @@ export default function supabaseLoader({ src, width, quality }) {
 }
 ```
 
-In your `nextjs.config.js` file add the following configuration to instruct NextJS to use our custom loader
+In your `nextjs.config.js` file add the following configuration to instruct Next.js to use our custom loader
 
 ```js
 module.exports = {
@@ -213,7 +213,7 @@ module.exports = {
 }
 ```
 
-At this point you are ready to use the `Image` component provided by NextJS
+At this point you are ready to use the `Image` component provided by Next.js
 
 ```tsx
 import Image from 'next/image'
