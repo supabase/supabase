@@ -23,12 +23,6 @@ const UserAccessTokens: NextPageWithLayout = () => {
             title="Access Tokens"
             description="Personal access tokens can be used with our Management API or CLI."
           />
-          <Alert
-            withIcon
-            className="mb-6 mr-6"
-            variant="warning"
-            title="Personal access tokens can be used to control your whole account and use features added in the future. Be careful when sharing them!"
-          />
         </div>
         <div className="flex items-center space-x-4 mb-6">
           <div className="flex items-center space-x-2">
@@ -49,6 +43,14 @@ const UserAccessTokens: NextPageWithLayout = () => {
           </div>
           <NewAccessTokenButton onCreateToken={setNewToken} />
         </div>
+      </div>
+      <div className="flex items-center justify-between">
+        <Alert
+          withIcon
+          className="mb-6 w-full"
+          variant="warning"
+          title="Personal access tokens can be used to control your whole account and use features added in the future. Be careful when sharing them!"
+        />
       </div>
       <div className="space-y-4">
         {newToken && <NewTokenBanner token={newToken} />}
