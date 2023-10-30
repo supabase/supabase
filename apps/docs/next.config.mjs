@@ -14,13 +14,6 @@ const withBundleAnalyzer = configureBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 })
 
-/**
- * Rewrites and redirects are handled by
- * apps/www nextjs config
- *
- * Do not add them in this config
- */
-
 const withMDX = nextMdx({
   extension: /\.mdx?$/,
   options: {
@@ -91,11 +84,38 @@ const nextConfig = {
       },
     ]
   },
+
+  /**
+   * Doc rewrites and redirects are
+   * handled by the `www` nextjs config:
+   *
+   * ./apps/www/lib/redirects.js
+   *
+   * Only add dev/preview specific redirects
+   * in this config.
+   */
   async redirects() {
     return [
+      // Redirect root to docs base path in dev/preview envs
       {
         source: '/',
         destination: '/docs',
+        basePath: false,
+        permanent: false,
+      },
+
+      // Redirect dashboard links in dev/preview envs
+      {
+        source: '/dashboard/:path*',
+        destination: 'https://supabase.com/dashboard/:path*',
+        basePath: false,
+        permanent: false,
+      },
+
+      // Redirect blog links in dev/preview envs
+      {
+        source: '/blog/:path*',
+        destination: 'https://supabase.com/blog/:path*',
         basePath: false,
         permanent: false,
       },
