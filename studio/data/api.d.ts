@@ -1655,6 +1655,8 @@ export interface paths {
   '/partners/flyio/extensions/{extension_id}': {
     /** Gets database status */
     get: operations['ExtensionController_getResourceStatus']
+    /** Deletes a database */
+    delete: operations['ExtensionController_deleteResource']
   }
   '/partners/flyio/extensions/{extension_id}/sso': {
     /** Starts Flyio single sign on */
@@ -4151,15 +4153,21 @@ export interface components {
     GetGithubBranch: {
       name: string
     }
+    GitRef: {
+      repo: string
+      branch: string
+      label: string
+    }
     GetGithubPullRequest: {
       id: number
       url: string
       title: string
+      target: components['schemas']['GitRef']
+      created_at: string
+      created_by?: string
       repo: string
       branch: string
       label: string
-      created_at: string
-      created_by?: string
     }
     FunctionResponse: {
       id: string
@@ -4236,6 +4244,7 @@ export interface components {
       tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
       custom_usage_fees?: components['schemas']['BillingUsageBasedPrice'][]
       tier_price_id?: string
+      compute_credits?: number
       payment_method_id?: string
       existing_org_subscription_id?: string
       dryRun?: boolean
@@ -4397,6 +4406,9 @@ export interface components {
       target_upgrade_versions: components['schemas']['ProjectVersion'][]
       requires_manual_intervention: string | null
       potential_breaking_changes: string[]
+      duration_estimate_hours: number
+      legacy_auth_custom_roles: string[]
+      extension_dependent_objects: string[]
     }
     DatabaseUpgradeStatus: {
       initiated_at: string
@@ -4448,7 +4460,7 @@ export interface components {
         | components['schemas']['AuthHealthResponse']
         | components['schemas']['RealtimeHealthResponse']
       /** @enum {string} */
-      name: 'auth' | 'realtime' | 'rest' | 'storage'
+      name: 'auth' | 'db' | 'realtime' | 'rest' | 'storage'
       healthy: boolean
       error?: string
     }
@@ -9307,6 +9319,10 @@ export interface operations {
   /** Gets github repos for the given organization */
   GitHubRepoController_getRepos: {
     parameters: {
+      query?: {
+        per_page?: number
+        page?: number
+      }
       path: {
         organization_integration_id: string
       }
@@ -10549,7 +10565,7 @@ export interface operations {
     parameters: {
       query: {
         timeout_ms?: number
-        services: ('auth' | 'realtime' | 'rest' | 'storage')[]
+        services: ('auth' | 'db' | 'realtime' | 'rest' | 'storage')[]
       }
       path: {
         /** @description Project ref */
@@ -11052,6 +11068,17 @@ export interface operations {
           'application/json': components['schemas']['ResourceStatusResponse']
         }
       }
+    }
+  }
+  /** Deletes a database */
+  ExtensionController_deleteResource: {
+    parameters: {
+      path: {
+        extension_id: string
+      }
+    }
+    responses: {
+      200: never
     }
   }
   /** Starts Flyio single sign on */

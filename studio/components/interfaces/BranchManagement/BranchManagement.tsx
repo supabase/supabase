@@ -292,6 +292,7 @@ const BranchManagement = () => {
                           return (
                             <BranchRow
                               key={branch.id}
+                              repo={repo}
                               branch={branch}
                               generateCreatePullRequestURL={generateCreatePullRequestURL}
                             />

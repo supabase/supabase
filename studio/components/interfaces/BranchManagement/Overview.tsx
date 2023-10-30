@@ -37,7 +37,9 @@ const Overview = ({
     <>
       <BranchManagementSection header="Production branch">
         {isLoading && <BranchRowLoader />}
-        {isSuccess && <BranchRow isMain branch={mainBranch} repo={repo} />}
+        {isSuccess && mainBranch !== undefined && (
+          <BranchRow isMain branch={mainBranch} repo={repo} />
+        )}
       </BranchManagementSection>
 
       <BranchManagementSection
@@ -68,6 +70,7 @@ const Overview = ({
             return (
               <BranchRow
                 key={branch.id}
+                repo={repo}
                 branch={branch}
                 pullRequest={pullRequest}
                 generateCreatePullRequestURL={generateCreatePullRequestURL}

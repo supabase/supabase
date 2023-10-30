@@ -70,9 +70,9 @@ export const BranchLoader = () => {
 }
 
 interface BranchRowProps {
+  repo: string
   branch: Branch
   isMain?: boolean
-  repo?: string
   pullRequest?: GitHubPullRequest
   generateCreatePullRequestURL?: (branchName?: string) => string
   onSelectDeleteBranch?: () => void
@@ -120,8 +120,14 @@ export const BranchRow = ({
               <p className="text-xs">Open</p>
             </div>
             <IconArrowRight className="mx-1 text-foreground-light" strokeWidth={1.5} size={16} />
-            {/* [Joshen TODO] Need API to return the target */}
-            <Button type="default">main</Button>
+            <Link
+              passHref
+              href={`http://github.com/${pullRequest.target.repo}/tree/${pullRequest.target.branch}`}
+            >
+              <Button asChild type="default">
+                <a>{pullRequest.target.branch}</a>
+              </Button>
+            </Link>
           </div>
         )}
         {isMain ? (
