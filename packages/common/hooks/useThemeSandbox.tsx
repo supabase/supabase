@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { IS_PLATFORM } from '../../lib/constants'
+import { IS_PROD } from '../constants'
 
 let defaultConfig: { [name: string]: string } = {
   // Dark
@@ -19,10 +19,8 @@ let defaultConfig: { [name: string]: string } = {
   '--border-muted': '210deg 14.9% 9.2%',
   '--border-default': '210deg 10% 11%',
   '--background-muted': '210deg 9.1% 10.8%',
-  '--background-secondary': '0deg 0% 100%',
   '--background-overlay-hover': '210deg 10.7% 11%',
   '--background-overlay-default': '210deg 14.3% 6.9%',
-  '--background-surface-contrast-300': '210deg 10.5% 14.9%',
   '--background-surface-300': '210deg 20% 10%',
   '--background-surface-200': '210deg 20% 7%',
   '--background-surface-100': '210deg 20% 6%',
@@ -30,11 +28,9 @@ let defaultConfig: { [name: string]: string } = {
   '--background-selection': '210deg 9.8% 10%',
   '--background-alternative': '210deg 20% 2.9%',
   '--background-default': '210deg 20% 4%',
-  '--foreground-contrast': '210deg 16.9% 12.7%',
   '--foreground-muted': '210deg 10% 35%',
   '--foreground-lighter': '210deg 8% 55%',
   '--foreground-light': '210deg 5% 69%',
-  '--foreground-strong': '210deg 0% 93%',
   '--foreground-default': '210deg 0% 93%',
   // Light
   // "--brand-accent": "152.9deg 60% 52.9%",
@@ -45,20 +41,16 @@ let defaultConfig: { [name: string]: string } = {
   // "--brand-300": "148.6deg 77.8% 94.7%",
   // "--brand-200": "156deg 71.4% 98.6%",
   // "--background-muted": "0deg 0% 100%",
-  // "--background-secondary": "0deg 0% 100%",
   // "--background-alternative": "0deg 0% 100%",
-  // "--foreground-contrast": "210deg 25% 98.4%",
   // "--border-stronger": "var(--colors-gray-light-800)",
   // "--border-strong": "var(--colors-gray-light-700)",
   // "--border-alternative": "var(--colors-slate-light-500)",
   // "--border-control": "var(--colors-slate-light-600)",
   // "--border-overlay": "var(--colors-slate-light-500)",
-  // "--border-secondary": "var(--colors-gray-dark-400)",
   // "--border-muted": "var(--colors-gray-dark-400)",
   // "--border-default": "var(--colors-slate-light-500)",
   // "--background-overlay-hover": "var(--colors-slate-light-300)",
   // "--background-overlay-default": "var(--colors-slate-light-100)",
-  // "--background-surface-contrast-300": "var(--colors-slate-light-400)",
   // "--background-surface-300": "var(--colors-slate-light-400)",
   // "--background-surface-200": "var(--colors-slate-light-300)",
   // "--background-surface-100": "var(--colors-slate-light-100)",
@@ -68,13 +60,21 @@ let defaultConfig: { [name: string]: string } = {
   // "--foreground-muted": "var(--colors-slate-light-800)",
   // "--foreground-lighter": "var(--colors-slate-light-1000)",
   // "--foreground-light": "var(--colors-slate-light-1100)",
-  // "--foreground-strong": "var(--colors-slate-light-1200)",
   // "--foreground-default": "var(--colors-slate-light-1200)",
 }
 
-const useThemeSandbox = (): any => {
+/**
+ * Shows a GUI to test color themes in dev and preview env.
+ *
+ * To access sandbox mode:
+ * - switch theme to dark mode
+ * - append "#theme-sandbox" to the url
+ * - select "Apply Theme" to apply preset (localStorage will keep track of changes so you don't lose new values)
+ * - select "Reset localStorage" and refresh page to restart
+ */
+export const useThemeSandbox = (): any => {
   const isWindowUndefined = typeof window === 'undefined'
-  if (isWindowUndefined || !IS_PLATFORM) return null
+  if (isWindowUndefined || IS_PROD) return null
   const hash = window.location.hash
   const localPreset = localStorage.getItem('theme-sandbox')
   const isSandbox = hash.includes('#theme-sandbox') || localPreset !== null

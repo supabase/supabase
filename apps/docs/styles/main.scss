@@ -282,3 +282,9 @@ div[role='tablist'] {
   position: relative !important;
   height: unset !important;
 }
+
+/* dat.GUI */
+
+.dg.ac {
+  z-index: 9999 !important;
+}

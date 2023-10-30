@@ -8,7 +8,7 @@ import '../styles/prism-okaidia.scss'
 
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
-import { AuthProvider, ThemeProvider, useConsent, useTelemetryProps } from 'common'
+import { AuthProvider, ThemeProvider, useConsent, useTelemetryProps, useThemeSandbox } from 'common'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import { AppPropsWithLayout } from 'types'
@@ -24,6 +24,8 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
   const { consentValue, hasAcceptedConsent } = useConsent()
+
+  useThemeSandbox()
 
   const [supabase] = useState(() =>
     IS_PLATFORM || LOCAL_SUPABASE ? createBrowserSupabaseClient() : undefined

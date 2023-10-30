@@ -14,7 +14,7 @@ import { post } from '~/lib/fetchWrapper'
 import supabase from '~/lib/supabase'
 import { CommandMenuProvider } from 'ui'
 import PortalToast from 'ui/src/layout/PortalToast'
-import { AuthProvider, ThemeProvider, useConsent, useTelemetryProps } from 'common'
+import { AuthProvider, ThemeProvider, useConsent, useTelemetryProps, useThemeSandbox } from 'common'
 
 import Meta from '~/components/Favicons'
 
@@ -22,6 +22,8 @@ export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
   const { consentValue, hasAcceptedConsent } = useConsent()
+
+  useThemeSandbox()
 
   function handlePageTelemetry(route: string) {
     return post(`${API_URL}/telemetry/page`, {
