@@ -1,4 +1,4 @@
-import { Badge, IconCode, IconFastForward, IconGlobe, IconRefreshCcw } from 'ui'
+import { Badge, IconCode, IconFastForward, IconGlobe, IconRefreshCcw, cn } from 'ui'
 import UseCaseExamples from 'data/products/functions/usecase-examples'
 import Solutions from 'data/Solutions'
 import { NextSeo } from 'next-seo'
@@ -142,16 +142,16 @@ function Database() {
               {featureBlocks.map((item, i) => {
                 return (
                   <div
-                    className="bg-scale-100 dark:bg-scale-300 group flex flex-col gap-4 rounded border px-8 py-6"
+                    className="bg-background group flex flex-col gap-4 rounded border px-8 py-6"
                     key={i}
                   >
-                    <div className="bg-scale-300 dark:bg-scale-500 text-scale-1200 group-hover:text-brand flex h-12 w-12 items-center justify-center rounded-md border transition-all group-hover:scale-105">
+                    <div className="bg-surface-100 text-foreground group-hover:text-brand flex h-12 w-12 items-center justify-center rounded-md border transition-all group-hover:scale-105">
                       {item.icon ? item.icon : <IconCode strokeWidth={2} />}
                     </div>
 
                     <div>
-                      <h3 className="text-scale-1200 text-lg">{item.title}</h3>
-                      <p className="text-scale-900 text-sm">{item.description}</p>
+                      <h3 className="text-foreground text-lg">{item.title}</h3>
+                      <p className="text-light text-sm">{item.description}</p>
                     </div>
                   </div>
                 )
@@ -177,31 +177,25 @@ function Database() {
                     return (
                       <button
                         key={`featureHighlighted-${i}`}
-                        className={
-                          'bg-scale-200 hover:bg-scale-100 hover:dark:bg-scale-300 group rounded-md border px-6 py-4 text-left transition-all hover:border' +
-                          (active
-                            ? ' dark:bg-scale-400 border-scale-500 bg-white'
-                            : ' border-scale-300')
-                        }
+                        className={cn(
+                          'bg-background hover:bg-surface-100 group rounded-md border px-6 py-4 text-left transition-all hover:border',
+                          active ? '!bg-surface-100 border-foreground-lighter' : ''
+                        )}
                         onClick={() => setCurrentSelection(feat.highlightLines)}
                       >
                         <div
-                          className={
-                            'transition-colors ' +
-                            (active
-                              ? ' text-scale-1200'
-                              : ' text-scale-900 group-hover:text-scale-1200')
-                          }
+                          className={cn(
+                            'transition-colors ',
+                            active ? ' text-foreground' : ' text-light group-hover:text-foreground'
+                          )}
                         >
                           {feat.title}
                         </div>
                         <div
-                          className={
-                            'text-sm transition-colors ' +
-                            (active
-                              ? ' text-scale-1100'
-                              : ' text-scale-800 group-hover:text-scale-1100 ')
-                          }
+                          className={cn(
+                            'text-sm transition-colors ',
+                            active ? ' text-light' : ' text-light group-hover:text-light '
+                          )}
                         >
                           {feat.description}
                         </div>
@@ -275,7 +269,7 @@ serve(async (req) => {
               <div className="grid grid-cols-12" key={0}>
                 <div className="col-span-12 mt-0 flex lg:col-span-6 xl:col-span-12 xl:mb-8">
                   <p>
-                    <p className="text-scale-1100 m-0">Libraries coming soon:</p>
+                    <p className="text-light m-0">Libraries coming soon:</p>
                   </p>
                   <div className="ml-1 space-x-1">
                     <Badge dot={false}>Python</Badge>

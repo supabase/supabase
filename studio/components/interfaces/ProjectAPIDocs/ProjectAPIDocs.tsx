@@ -139,7 +139,7 @@ const ProjectAPIDocs = () => {
           {snap.activeDocsSection[0] === 'storage' && (
             <>
               {snap.activeDocsSection[1] !== undefined ? (
-                <Bucket language={language} />
+                <Bucket language={language} apikey={apikey} endpoint={endpoint} />
               ) : (
                 <Storage language={language} />
               )}

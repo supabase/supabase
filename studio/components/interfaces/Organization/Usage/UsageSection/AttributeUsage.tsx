@@ -21,6 +21,7 @@ import {
 } from '../Usage.utils'
 import UsageBarChart from '../UsageBarChart'
 import { ChartMeta } from './UsageSection'
+import { useIsFeatureEnabled } from 'hooks'
 
 export interface AttributeUsageProps {
   slug: string
@@ -150,14 +151,14 @@ const AttributeUsage = ({
                       </div>
 
                       {showUsageWarning && (
-                        <Link href={upgradeUrl}>
-                          <a className="pb-1">
-                            <Button type="default" size="tiny">
+                        <Link href={upgradeUrl} passHref className="pb-1">
+                          <Button type="default" size="tiny" asChild>
+                            <a className="pb-1">
                               {subscription?.plan?.id === 'free'
                                 ? 'Upgrade plan'
                                 : 'Change spend cap'}
-                            </Button>
-                          </a>
+                            </a>
+                          </Button>
                         </Link>
                       )}
                     </div>
@@ -282,10 +283,11 @@ const AttributeUsage = ({
                         </p>
                       </div>
                     </div>
-                    <Link href={upgradeUrl}>
-                      <a>
-                        <Button type="primary">Upgrade plan</Button>
-                      </a>
+
+                    <Link href={upgradeUrl} passHref>
+                      <Button type="primary" asChild>
+                        <a>Upgrade plan</a>
+                      </Button>
                     </Link>
                   </div>
                 </Panel.Content>

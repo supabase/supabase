@@ -132,6 +132,7 @@ const Nav = [
       { name: 'removeChannel()', url: '/reference/javascript/removechannel', items: [] },
       { name: 'removeAllChannels()', url: '/reference/javascript/removeallchannels', items: [] },
       { name: 'getChannels()', url: '/reference/javascript/getchannels', items: [] },
+      { name: 'broadcastMessage()', url: '/reference/javascript/broadcastmessage', items: [] },
     ],
   },
   {

@@ -1,4 +1,7 @@
-import { parseValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
+import {
+  generateRowObjectFromFields,
+  parseValue,
+} from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
 
 describe('parseValue', () => {
   it('should return null when originalValue is null', () => {
@@ -90,5 +93,57 @@ describe('parseValue', () => {
       throw new Error('Mocked error')
     })
     expect(parseValue(originalValue, format)).toEqual(originalValue)
+  })
+})
+
+describe('generateRowObjectFromFields', () => {
+  it('should not force NULL values', () => {
+    const sampleRowFields = [
+      { id: '1', name: 'id', value: '', comment: '', defaultValue: null, format: 'int8' },
+      {
+        id: '2',
+        name: 'time_not_null',
+        value: '',
+        comment: '',
+        defaultValue: 'now()',
+        format: 'timestamptz',
+        isNullable: false, // [Joshen] technically this method doesnt even check this property
+      },
+      {
+        id: '3',
+        name: 'time_nullable',
+        value: '',
+        comment: '',
+        defaultValue: 'now()',
+        format: 'timestamptz',
+        isNullable: true,
+      },
+    ]
+    const result = generateRowObjectFromFields(sampleRowFields)
+    expect(result).toEqual({})
+  })
+  it('should discern EMPTY values for text', () => {
+    const sampleRowFields = [
+      { id: '1', name: 'id', value: '', comment: '', defaultValue: null, format: 'int8' },
+      { id: '2', name: 'name', value: '', comment: '', defaultValue: null, format: 'text' },
+    ]
+    const result = generateRowObjectFromFields(sampleRowFields)
+    expect(result).toEqual({ name: '' })
+  })
+  it('should discern NULL values for text', () => {
+    const sampleRowFields = [
+      { id: '1', name: 'id', value: '', comment: '', defaultValue: null, format: 'int8' },
+      { id: '2', name: 'name', value: null, comment: '', defaultValue: null, format: 'text' },
+    ]
+    const result = generateRowObjectFromFields(sampleRowFields)
+    expect(result).toEqual({})
+  })
+  it('should discern NULL values for booleans', () => {
+    const sampleRowFields = [
+      { id: '1', name: 'id', value: '', comment: '', defaultValue: null, format: 'int8' },
+      { id: '2', name: 'bool-test', value: null, comment: '', defaultValue: null, format: 'bool' },
+    ]
+    const result = generateRowObjectFromFields(sampleRowFields)
+    expect(result).toEqual({})
   })
 })

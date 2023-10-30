@@ -44,7 +44,6 @@ const FunctionList = ({
     includes(x.name.toLowerCase(), filterString.toLowerCase())
   )
   const _functions = filteredFunctions.filter((x) => x.schema == schema)
-  const isApiDocumentAvailable = schema == 'public'
   const projectRef = selectedProject?.ref
 
   const canUpdateFunctions = useCheckPermissions(
@@ -55,7 +54,7 @@ const FunctionList = ({
   if (_functions.length === 0 && filterString.length === 0) {
     return (
       <Table.tr key={schema}>
-        <Table.td colSpan={4}>
+        <Table.td colSpan={5}>
           <p className="text-sm text-foreground">No functions created yet</p>
           <p className="text-sm text-light">
             There are no functions found in the schema "{schema}"
@@ -68,7 +67,7 @@ const FunctionList = ({
   if (_functions.length === 0 && filterString.length > 0) {
     return (
       <Table.tr key={schema}>
-        <Table.td colSpan={4}>
+        <Table.td colSpan={5}>
           <p className="text-sm text-foreground">No results found</p>
           <p className="text-sm text-light">
             Your search for "{filterString}" did not return any results
@@ -81,6 +80,8 @@ const FunctionList = ({
   return (
     <>
       {_functions.map((x) => {
+        const isApiDocumentAvailable = schema == 'public' && x.return_type !== 'trigger'
+
         return (
           <Table.tr key={x.id}>
             <Table.td className="truncate">

@@ -5,12 +5,23 @@ import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 export const generateSettingsMenu = (
   ref?: string,
   project?: ProjectBase,
-  organization?: Organization
+  organization?: Organization,
+  features?: {
+    auth?: boolean
+    edgeFunctions?: boolean
+    storage?: boolean
+    invoices?: boolean
+  }
 ): ProductMenuGroup[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}/building`
 
   const isOrgBilling = !!organization?.subscription_id
+
+  const authEnabled = features?.auth ?? true
+  const edgeFunctionsEnabled = features?.edgeFunctions ?? true
+  const storageEnabled = features?.storage ?? true
+  const invoicesEnabled = features?.invoices ?? true
 
   if (isOrgBilling) {
     return [
@@ -39,12 +50,14 @@ export const generateSettingsMenu = (
                 },
               ]
             : []),
-          {
-            name: 'Add Ons',
-            key: 'addons',
-            url: `/project/${ref}/settings/addons`,
-            items: [],
-          },
+          ...[
+            {
+              name: 'Add Ons',
+              key: 'addons',
+              url: `/project/${ref}/settings/addons`,
+              items: [],
+            },
+          ],
           {
             name: 'Vault',
             key: 'vault',
@@ -69,7 +82,7 @@ export const generateSettingsMenu = (
             url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
             items: [],
           },
-          ...(IS_PLATFORM
+          ...(IS_PLATFORM && authEnabled
             ? [
                 {
                   name: 'Authentication',
@@ -79,7 +92,7 @@ export const generateSettingsMenu = (
                 },
               ]
             : []),
-          ...(IS_PLATFORM
+          ...(IS_PLATFORM && storageEnabled
             ? [
                 {
                   name: 'Storage',
@@ -89,7 +102,7 @@ export const generateSettingsMenu = (
                 },
               ]
             : []),
-          ...(IS_PLATFORM
+          ...(IS_PLATFORM && edgeFunctionsEnabled
             ? [
                 {
                   name: 'Edge Functions',
@@ -111,6 +124,7 @@ export const generateSettingsMenu = (
             url: `/org/${organization?.slug}/billing`,
             items: [],
           },
+
           {
             name: 'Usage',
             key: 'usage',
@@ -153,7 +167,7 @@ export const generateSettingsMenu = (
                 },
               ]
             : []),
-          ...(IS_PLATFORM
+          ...(IS_PLATFORM && authEnabled
             ? [
                 {
                   name: 'Auth',
@@ -163,7 +177,7 @@ export const generateSettingsMenu = (
                 },
               ]
             : []),
-          ...(IS_PLATFORM
+          ...(IS_PLATFORM && storageEnabled
             ? [
                 {
                   name: 'Storage',
@@ -195,20 +209,25 @@ export const generateSettingsMenu = (
                     : `/project/${ref}/settings/billing/subscription`,
                   items: [],
                 },
+
                 {
                   name: 'Usage',
                   key: 'usage',
                   url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/billing/usage`,
                   items: [],
                 },
-                {
-                  name: 'Invoices',
-                  key: 'invoices',
-                  url: isProjectBuilding
-                    ? buildingUrl
-                    : `/project/${ref}/settings/billing/invoices`,
-                  items: [],
-                },
+                ...(invoicesEnabled
+                  ? [
+                      {
+                        name: 'Invoices',
+                        key: 'invoices',
+                        url: isProjectBuilding
+                          ? buildingUrl
+                          : `/project/${ref}/settings/billing/invoices`,
+                        items: [],
+                      },
+                    ]
+                  : []),
               ],
             },
           ]
