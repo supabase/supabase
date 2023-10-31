@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { BillingSettingsV2 } from 'components/interfaces/Organization'
+import { BillingSettings } from 'components/interfaces/Organization'
 import { OrganizationLayout } from 'components/layouts'
 import Loading from 'components/ui/Loading'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
@@ -31,7 +31,7 @@ const OrgBillingSettings: NextPageWithLayout = () => {
       {selectedOrganization === undefined && isLoadingPermissions ? (
         <Loading />
       ) : (
-        <BillingSettingsV2 />
+        <BillingSettings />
       )}
     </>
   )
