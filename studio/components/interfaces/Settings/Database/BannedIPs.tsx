@@ -64,8 +64,8 @@ const BannedIPs = () => {
     <div id="banned-ips">
       <div className="flex items-center justify-between">
         <FormHeader
-          title="Banned IPs"
-          description="We monitor unsuccessful logins and block IPs for security"
+          title="Network Bans"
+          description="List of IP addresses that are temporarily blocked if their traffic pattern looks abusive"
         />
         <div className="flex items-center space-x-2 mb-6">
           <Link href="https://supabase.com/docs/reference/cli/supabase-network-bans">

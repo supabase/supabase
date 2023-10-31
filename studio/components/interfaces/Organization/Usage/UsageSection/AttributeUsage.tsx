@@ -55,8 +55,6 @@ const AttributeUsage = ({
   isSuccess,
   currentBillingCycleSelected,
 }: AttributeUsageProps) => {
-  const billingEnabled = useIsFeatureEnabled('billing:all')
-
   const upgradeUrl = getUpgradeUrl(slug ?? '', subscription)
   const usageRatio = (usageMeta?.usage ?? 0) / (usageMeta?.pricing_free_units ?? 0)
   const usageExcess = (usageMeta?.usage ?? 0) - (usageMeta?.pricing_free_units ?? 0)
@@ -152,15 +150,15 @@ const AttributeUsage = ({
                         )}
                       </div>
 
-                      {billingEnabled && showUsageWarning && (
-                        <Link href={upgradeUrl}>
-                          <a className="pb-1">
-                            <Button type="default" size="tiny">
+                      {showUsageWarning && (
+                        <Link href={upgradeUrl} passHref className="pb-1">
+                          <Button type="default" size="tiny" asChild>
+                            <a className="pb-1">
                               {subscription?.plan?.id === 'free'
                                 ? 'Upgrade plan'
                                 : 'Change spend cap'}
-                            </Button>
-                          </a>
+                            </a>
+                          </Button>
                         </Link>
                       )}
                     </div>
@@ -285,13 +283,12 @@ const AttributeUsage = ({
                         </p>
                       </div>
                     </div>
-                    {billingEnabled && (
-                      <Link href={upgradeUrl}>
-                        <a>
-                          <Button type="primary">Upgrade plan</Button>
-                        </a>
-                      </Link>
-                    )}
+
+                    <Link href={upgradeUrl} passHref>
+                      <Button type="primary" asChild>
+                        <a>Upgrade plan</a>
+                      </Button>
+                    </Link>
                   </div>
                 </Panel.Content>
               </Panel>

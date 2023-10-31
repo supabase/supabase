@@ -37,28 +37,18 @@ export async function getStaticProps() {
 }
 
 function ChangelogPage(props: any) {
+  const TITLE = 'Changelog'
+  const DESCRIPTION = 'New updates and improvements to Supabase'
+
   return (
     <>
       <NextSeo
-        title={'Changelog'}
+        title={TITLE}
         openGraph={{
-          title: 'Changelog',
-          description: 'props.blog.description',
+          title: TITLE,
+          description: DESCRIPTION,
           url: `https://supabase.com/changelog`,
           type: 'article',
-          article: {
-            //
-            // to do: add expiration and modified dates
-            // https://github.com/garmeeh/next-seo#article
-            // publishedTime: props.blog.date,
-          },
-          // images: [
-          //   {
-          //     url: `https://supabase.com${basePath}/images/blog/${
-          //       props.blog.image ? props.blog.image : props.blog.thumb
-          //     }`,
-          //   },
-          // ],
         }}
       />
       <DefaultLayout>
@@ -66,7 +56,7 @@ function ChangelogPage(props: any) {
           className="
             container mx-auto flex flex-col
             gap-20
-            px-8 py-10 sm:px-16
+            px-4 py-10 sm:px-16
             xl:px-20
           "
         >
@@ -98,7 +88,7 @@ function ChangelogPage(props: any) {
                       </div>
                     </div>
                   </div>
-                  <div className="col-span-8 ml-8 lg:ml-0">
+                  <div className="col-span-8 ml-8 lg:ml-0 max-w-[calc(100vw-80px)]">
                     <article className="prose prose-docs max-w-none">
                       <MDXRemote {...changelog.source} components={mdxComponents('blog')} />
                     </article>

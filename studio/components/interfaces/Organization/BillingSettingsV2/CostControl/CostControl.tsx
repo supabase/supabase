@@ -13,10 +13,20 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useFlag } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import { Alert, Button, IconExternalLink } from 'ui'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconCalendar,
+  IconExternalLink,
+} from 'ui'
 import ProjectUpdateDisabledTooltip from '../../BillingSettings/ProjectUpdateDisabledTooltip'
 import SpendCapSidePanel from './SpendCapSidePanel'
 import Image from 'next/image'
+import dayjs from 'dayjs'
+import { useOrganizationBillingSubscriptionCancelSchedule } from 'data/subscriptions/org-subscription-cancel-schedule-mutation'
 
 export interface CostControlProps {}
 
@@ -40,6 +50,9 @@ const CostControl = ({}: CostControlProps) => {
   const canChangeTier =
     !projectUpdateDisabled && !['team', 'enterprise'].includes(currentPlan?.id || '')
 
+  const { mutate: cancelSubscriptionSchedule, isLoading: cancelSubscriptionScheduleLoading } =
+    useOrganizationBillingSubscriptionCancelSchedule()
+
   return (
     <>
       <ScaffoldSection>
@@ -52,7 +65,7 @@ const CostControl = ({}: CostControlProps) => {
               </p>
             </div>
             <div className="space-y-2">
-              <p className="text-sm text-foreground-light">More information</p>
+              <p className="text-sm text-foreground-light m-0">More information</p>
               <div>
                 <Link href="https://supabase.com/docs/guides/platform/spend-cap">
                   <a target="_blank" rel="noreferrer">
@@ -109,6 +122,36 @@ const CostControl = ({}: CostControlProps) => {
                   switch off your spend cap to pay for additional usage.
                 </p>
               )}
+
+              {/** Toggled on spend cap, scheduled change for end-of-cycle */}
+              {subscription?.scheduled_plan_change?.target_plan === 'pro' &&
+                subscription?.scheduled_plan_change?.usage_billing_enabled === false &&
+                subscription?.plan.id === 'pro' && (
+                  <Alert_Shadcn_ className="mb-2" title="Scheduled downgrade">
+                    <IconCalendar className="h-4 w-4" />
+                    <AlertTitle_Shadcn_>Scheduled change</AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                      <div>
+                        Your spend cap will be enabled on{' '}
+                        {dayjs(subscription?.scheduled_plan_change?.at).format('MMMM D, YYYY')}. You
+                        will not be charged for any over-usage moving on. If you would like to keep
+                        the spend cap disabled and scale as you go, you may still cancel the
+                        scheduled change.
+                      </div>
+                      <div>
+                        <Button
+                          type="default"
+                          loading={cancelSubscriptionScheduleLoading}
+                          onClick={() => {
+                            return cancelSubscriptionSchedule({ slug: slug! })
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
+                )}
 
               <div className="flex space-x-6">
                 <div>

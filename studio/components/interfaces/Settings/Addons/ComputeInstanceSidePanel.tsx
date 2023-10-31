@@ -18,7 +18,18 @@ import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
 import Telemetry from 'lib/telemetry'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
-import { Alert, Button, IconExternalLink, IconInfo, Modal, Radio, SidePanel } from 'ui'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconAlertTriangle,
+  IconExternalLink,
+  IconInfo,
+  Modal,
+  Radio,
+  SidePanel,
+} from 'ui'
 
 import * as Tooltip from '@radix-ui/react-tooltip'
 import Image from 'next/image'
@@ -227,7 +238,7 @@ const ComputeInstanceSidePanel = () => {
                         )
                       }}
                     >
-                      <Image
+                      <img
                         alt="Compute Instance"
                         className={clsx(
                           'relative rounded-xl transition border bg-no-repeat bg-center bg-cover cursor-pointer w-[160px] h-[96px]',
@@ -430,6 +441,18 @@ const ComputeInstanceSidePanel = () => {
                 <p>You need to disable PITR before downgrading to Micro Compute.</p>
               </Alert>
             )}
+
+            {hasChanges &&
+              subscription?.billing_via_partner &&
+              subscription.scheduled_plan_change?.target_plan !== undefined && (
+                <Alert_Shadcn_ variant={'warning'} className="mb-2">
+                  <IconAlertTriangle className="h-4 w-4" />
+                  <AlertDescription_Shadcn_>
+                    You have a scheduled subscription change that will be canceled if you change
+                    your PITR add on.
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+              )}
           </div>
         </SidePanel.Content>
       </SidePanel>

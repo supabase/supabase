@@ -22,8 +22,6 @@ const UpgradeToPro = ({
   secondaryText,
   addon,
 }: UpgradeToProProps) => {
-  const billingEnabled = useIsFeatureEnabled('billing:all')
-
   const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
   const plan = subscription?.plan?.id
 
@@ -32,8 +30,6 @@ const UpgradeToPro = ({
     'stripe.subscriptions'
   )
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-
-  if (!billingEnabled) return null
 
   return (
     <div

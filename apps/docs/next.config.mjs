@@ -105,15 +105,7 @@ const nextConfig = {
 
 const configExport = () => {
   const plugins = [
-    withTM([
-      'ui',
-      'common',
-      '@supabase/auth-helpers-nextjs',
-      'mermaid',
-      'mdx-mermaid',
-      'dayjs',
-      'shared-data',
-    ]),
+    withTM(['ui', 'common', 'mermaid', 'mdx-mermaid', 'dayjs', 'shared-data']),
     withMDX,
     withYaml,
     withBundleAnalyzer,
