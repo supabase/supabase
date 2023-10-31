@@ -72,7 +72,7 @@ const CustomerQuotesSection = (props: Props) => {
         </div>
 
         <div>
-          <p className="text-foreground-lightround-lighter mt-4">
+          <p className="text-foreground-lighter mt-4">
             {customer.author}, {customer.role}
           </p>
           {customer.url && (

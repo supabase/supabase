@@ -67,7 +67,7 @@ const Footer = (props: Props) => {
             <div className="flex space-x-5">
               <a
                 href="https://twitter.com/supabase"
-                className="text-foreground-lightround-lighter hover:text-foreground transition"
+                className="text-foreground-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">Twitter</span>
                 <IconTwitterX size={22} />
@@ -75,7 +75,7 @@ const Footer = (props: Props) => {
 
               <a
                 href="https://github.com/supabase"
-                className="text-foreground-lightround-lighter hover:text-foreground transition"
+                className="text-foreground-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">GitHub</span>
                 <IconGitHubSolid size={22} />
@@ -83,7 +83,7 @@ const Footer = (props: Props) => {
 
               <a
                 href="https://discord.supabase.com/"
-                className="text-foreground-lightround-lighter hover:text-foreground transition"
+                className="text-foreground-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">Discord</span>
                 <IconDiscord size={22} />
@@ -91,7 +91,7 @@ const Footer = (props: Props) => {
 
               <a
                 href="https://youtube.com/c/supabase"
-                className="text-foreground-lightround-lighter hover:text-foreground transition"
+                className="text-foreground-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">Youtube</span>
                 <IconYoutubeSolid size={22} />
@@ -110,8 +110,8 @@ const Footer = (props: Props) => {
                           <div
                             className={`text-sm transition-colors ${
                               link.url || Component
-                                ? 'text-foreground-lightround-lighter hover:text-foreground'
-                                : 'text-muted hover:text-foreground-lightround-lighter'
+                                ? 'text-foreground-lighter hover:text-foreground'
+                                : 'text-muted hover:text-foreground-lighter'
                             } `}
                           >
                             {link.text}

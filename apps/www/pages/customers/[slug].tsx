@@ -159,7 +159,7 @@ function CaseStudyPage(props: any) {
                         </div>
 
                         <div className="flex flex-col space-y-2">
-                          <span className="text-foreground-lightround-lighter">About</span>
+                          <span className="text-foreground-lighter">About</span>
                           <p>{props.blog.about}</p>
                           <span className="not-prose ">
                             <a
@@ -176,7 +176,7 @@ function CaseStudyPage(props: any) {
                         {props.blog.misc.map((x: any) => {
                           return (
                             <div className="flex flex-col gap-0">
-                              <span className="text-foreground-lightround-lighter">{x.label}</span>
+                              <span className="text-foreground-lighter">{x.label}</span>
                               <span className="text-foreground-light">{x.text}</span>
                             </div>
                           )

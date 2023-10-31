@@ -68,7 +68,7 @@ const ProductDropdown = () => {
           </ul>
         </div>
         <div className="col-span-2">
-          <p className="text-foreground-lightround-lighter text-xs uppercase tracking-widest font-mono mb-6">
+          <p className="text-foreground-lighter text-xs uppercase tracking-widest font-mono mb-6">
             {ComparisonsData.label}
           </p>
           <ul className="flex flex-col gap-2">

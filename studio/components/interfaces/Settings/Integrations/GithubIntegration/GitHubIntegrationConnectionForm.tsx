@@ -220,7 +220,7 @@ const GitHubIntegrationConnectionForm = ({
       <Form_Shadcn_ {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <FormLabel_Shadcn_ className="!text">Supabase directory</FormLabel_Shadcn_>
-          <FormDescription_Shadcn_ className="text-xs text-foreground-lightround-lighter mb-3">
+          <FormDescription_Shadcn_ className="text-xs text-foreground-lighter mb-3">
             Migration and seed SQL files will be run from this directory.
           </FormDescription_Shadcn_>
 
@@ -252,7 +252,7 @@ const GitHubIntegrationConnectionForm = ({
                     />
                     <RotateCcw
                       className={cn(
-                        'text-foreground-lightround-lighter transition hover:text cursor-pointer',
+                        'text-foreground-lighter transition hover:text cursor-pointer',
                         'w-4 h-4 absolute right-3 top-3',
                         'duration-150',
                         isUpdatingGithubConnection ||

@@ -75,7 +75,9 @@ function AuthWidgetSection() {
                     </div>
                     <h1 className="text-foreground text-2xl">Acme Industries</h1>
                   </div>
-                  <p className="text-foreground-light text-auth-widget-test">Sign in today for Supa stuff</p>
+                  <p className="text-foreground-light text-auth-widget-test">
+                    Sign in today for Supa stuff
+                  </p>
                 </div>
                 <Auth.UserContextProvider supabaseClient={supabase}>
                   <AuthContainer supabaseClient={supabase}>
@@ -111,7 +113,7 @@ function AuthWidgetSection() {
             <div className="prose !max-w-md">
               <h3 className="text-2xl">Auth UI</h3>
               <p className="!mb-0">Pre-built auth widgets to get started in minutes.</p>
-              <p className="text-foreground-lightround-lighter mt-0">
+              <p className="text-foreground-lighter mt-0">
                 Customizable authentication UI component with custom themes and extensible styles to
                 match your brand and aesthetic
               </p>

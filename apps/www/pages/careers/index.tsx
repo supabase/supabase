@@ -269,7 +269,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                 <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1.5px]">
                   Human powered
                 </h2>
-                <p className="text-foreground-lightround-lighter text-xs sm:text-sm lg:text-base pt-3 sm:w-3/5 lg:max-w-sm">
+                <p className="text-foreground-lighter text-xs sm:text-sm lg:text-base pt-3 sm:w-3/5 lg:max-w-sm">
                   As a completely remote and asynchronous team, we focus on these five traits to
                   keep our team effective:
                 </p>

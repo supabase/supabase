@@ -238,7 +238,7 @@ export default function IndexPage() {
                           <div className="flex items-end gap-2">
                             <div>
                               {plan.priceLabel && (
-                                <p className="text-foreground-lightround-lighter ml-1 text-[13px] leading-4 font-normal">
+                                <p className="text-foreground-lighter ml-1 text-[13px] leading-4 font-normal">
                                   {plan.priceLabel}
                                 </p>
                               )}
@@ -252,7 +252,7 @@ export default function IndexPage() {
                                   {plan.name !== 'Enterprise' ? '$' : ''}
                                   {plan.priceMonthly}
                                 </p>
-                                <p className="text-foreground-lightround-lighter mb-1.5 ml-1 text-[13px] leading-4">
+                                <p className="text-foreground-lighter mb-1.5 ml-1 text-[13px] leading-4">
                                   {plan.costUnitOrg}
                                 </p>
                               </div>
@@ -276,10 +276,12 @@ export default function IndexPage() {
                       ].join(' ')}
                     >
                       {plan.preface && (
-                        <p className="text-foreground-light text-[13px] mt-2 mb-4">{plan.preface}</p>
+                        <p className="text-foreground-light text-[13px] mt-2 mb-4">
+                          {plan.preface}
+                        </p>
                       )}
-                      {/* <p className="text-foreground-lightround-lighter text-sm">Included with plan:</p> */}
-                      <ul role="list" className="text-[13px] text-foreground-lightround-lighter">
+                      {/* <p className="text-foreground-lighter text-sm">Included with plan:</p> */}
+                      <ul role="list" className="text-[13px] text-foreground-lighter">
                         {plan.features.map((feature) => (
                           <li key={feature} className="flex items-center py-2 first:mt-0">
                             <IconCheck
@@ -349,7 +351,7 @@ export default function IndexPage() {
                   />
                 </div>
                 <div className="px-8 -mt-1">
-                  <p className="text-[13px] text-foreground-lightround-lighter">{addon.price}</p>
+                  <p className="text-[13px] text-foreground-lighter">{addon.price}</p>
                   <div className="flex items-center gap-2 mt-2">
                     <Image
                       src={`${basePath}/images/pricing/${addon.icon}${
@@ -362,7 +364,7 @@ export default function IndexPage() {
                     />
                     <span className="text-sm text-foreground">{addon.name}</span>
                   </div>
-                  <p className="mt-2 text-foreground-lightround-lighter text-[13px] min-h-[40px] lg:min-h-[50px] lg:max-w-[290px]">
+                  <p className="mt-2 text-foreground-lighter text-[13px] min-h-[40px] lg:min-h-[50px] lg:max-w-[290px]">
                     {addon.description}
                   </p>
                   <div className="flex items-center justify-between mt-4 mb-4 lg:mb-8">
@@ -448,7 +450,7 @@ export default function IndexPage() {
               {/* Free - Mobile  */}
               <div className="bg-slate-200 p-2 sticky top-14 z-10 pt-4">
                 <div className="bg-slate-300 rounded-lg border border-slate-500 py-2 px-4 flex justify-between items-center">
-                  <label className="text-foreground-lightround-lighter">Change plan</label>
+                  <label className="text-foreground-lighter">Change plan</label>
                   <Select
                     id="change-plan"
                     name="Change plan"
@@ -896,7 +898,7 @@ export default function IndexPage() {
                           header={<span className="text-foreground">{faq.question}</span>}
                           id={`faq--${i.toString()}`}
                         >
-                          <ReactMarkdown className="text-foreground-lightround-lighter prose">
+                          <ReactMarkdown className="text-foreground-lighter prose">
                             {faq.answer}
                           </ReactMarkdown>
                         </Accordion.Item>
