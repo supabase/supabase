@@ -41,7 +41,7 @@ const SignInFlyTos = () => {
         </nav>
       </div>
       <div className="flex w-[320px] flex-col items-center justify-center space-y-3">
-        <h4 className="text-lg">Fly Single Sign On</h4>
+        <h4 className="text-lg">Continue to Supabase Dashboard</h4>
       </div>
       <div className="flex items-center space-x-4">
         {/* require extension_id */}
