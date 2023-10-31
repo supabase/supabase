@@ -8,8 +8,8 @@ export const data = [
     imgUrl: 'images/customers/logos/goodtape.png',
     logoUrl: 'images/customers/logos/goodtape.png',
     organization: 'GoodTape',
-    url: '/customers/goodtape',
-    path: '/customers/goodtape',
+    url: '/customers/good-tape',
+    path: '/customers/good-tape',
     postMeta: {
       name: 'Paul Copplestone',
       avatarUrl: 'https://avatars0.githubusercontent.com/u/10214025?v=4',
