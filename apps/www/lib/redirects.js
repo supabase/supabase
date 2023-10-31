@@ -2321,6 +2321,6 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/functions/global-deployments',
-    destination: 'docs/guides/functions',
+    destination: 'docs/guides/functions/regional-invocation',
   },
 ]
