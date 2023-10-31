@@ -46,7 +46,7 @@ function VectorPage() {
       />
       <DefaultLayout className="!bg-alternative">
         <ProductHeaderCentered {...pageData.heroSection} />
-        <HighlightCards {...pageData.highlightsSection} />
+        <HighlightCards {...(pageData.highlightsSection as any)} />
         <CenteredTitleImage {...pageData.integrations} />
         <TimedTabsSection {...pageData.APIsection} />
         <div className="bg-alternative">

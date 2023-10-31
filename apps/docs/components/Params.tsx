@@ -1,16 +1,12 @@
-import { FC } from 'react'
-
 type IParamProps = any
 
-const Param: FC<IParamProps> = (paramItem) => {
+const Param = ({ name, isOptional, type, description, children }: IParamProps) => {
   return (
-    <li className="border-t border-b py-5 flex flex-col gap-3">
+    <div className="border-t border-b py-5 flex flex-col gap-3 debugger">
       <div className="flex gap-3 items-center">
-        <span className="text-sm text-foreground font-mono font-medium">
-          {paramItem.name ?? 'no-name'}
-        </span>
+        <span className="text-sm text-foreground font-mono font-medium">{name ?? 'no-name'}</span>
         <span>
-          {paramItem.isOptional ? (
+          {isOptional ? (
             <div className="text-[10px] px-3 tracking-wide font-mono text-foreground-lighter">
               Optional
             </div>
@@ -20,13 +16,11 @@ const Param: FC<IParamProps> = (paramItem) => {
             </div>
           )}
         </span>
-        <span className="text-foreground-muted text-xs">{paramItem.type ?? 'no type'}</span>
+        <span className="text-foreground-muted text-xs">{type ?? 'no type'}</span>
       </div>
-      {paramItem.description && (
-        <p className="text-sm text-foreground-lighter m-0">{paramItem.description} </p>
-      )}
-      {paramItem.children}
-    </li>
+      {description && <p className="text-sm text-foreground-lighter m-0">{description} </p>}
+      {children}
+    </div>
   )
 }
 

@@ -134,15 +134,15 @@ const Infrastructure = ({}: InfrastructureProps) => {
                   Please reach out to us via our support form if you are keen to upgrade your
                   Postgres version to the latest available ({latestPgVersion}).
                 </p>
-                <Link
-                  href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
-                >
-                  <a target="_blank" rel="noreferrer">
-                    <Button size="tiny" type="default">
-                      Contact support
-                    </Button>
-                  </a>
-                </Link>
+                <Button asChild size="tiny" type="default">
+                  <Link
+                    href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Contact support
+                  </Link>
+                </Button>
               </Alert>
             )}
           </FormSectionContent>

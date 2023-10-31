@@ -46,6 +46,7 @@ const ProductHeaderCentered = (props: Types) => (
             layout="fill"
             objectFit="contain"
             objectPosition="top"
+            alt=""
           />
         </div>
       ) : (
@@ -80,25 +81,25 @@ const ProductHeaderCentered = (props: Types) => (
         </div>
         <div className="w-full sm:w-auto flex flex-col items-stretch sm:flex-row pt-2 sm:pt-8 sm:items-center gap-2">
           {props.cta && (
-            <Link href={props.cta.link} as={props.cta.link} passHref>
-              <Button size="medium" className="text-white" asChild>
-                <a>{props.cta.label ?? 'Start for free'}</a>
-              </Button>
-            </Link>
+            <Button size="medium" className="text-white" asChild>
+              <Link href={props.cta.link} as={props.cta.link}>
+                {props.cta.label ?? 'Start for free'}
+              </Link>
+            </Button>
           )}
           {props.video && (
-            <Link href={props.video} as={props.video} passHref>
-              <Button type="default" size="medium" icon={<IconPlayCircle />} asChild>
-                <a>Watch video</a>
-              </Button>
-            </Link>
+            <Button type="default" size="medium" icon={<IconPlayCircle />} asChild>
+              <Link href={props.video} as={props.video}>
+                Watch video
+              </Link>
+            </Button>
           )}
           {props.secondaryCta && (
-            <Link href={props.secondaryCta.link} as={props.secondaryCta.link} passHref>
-              <Button type="default" size="medium" asChild>
-                <a>{props.secondaryCta.label}</a>
-              </Button>
-            </Link>
+            <Button type="default" size="medium" asChild>
+              <Link href={props.secondaryCta.link} as={props.secondaryCta.link}>
+                {props.secondaryCta.label}
+              </Link>
+            </Button>
           )}
         </div>
         {props.footer && <div className="mb-4">{props.footer}</div>}

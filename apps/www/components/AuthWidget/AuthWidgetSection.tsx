@@ -6,15 +6,15 @@ import { useRouter } from 'next/router'
 import Image from 'next/image'
 
 import { ColorSwatchIcon, MenuIcon } from '@heroicons/react/outline'
-import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { useTheme } from 'next-themes'
 
-const supabase = createClient(
-  'https://rsnibhkhsbfnncjmwnkj.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYxNTIxNDE1MywiZXhwIjoxOTMwNzkwMTUzfQ.OQEbAaTfgDdLCCht251P2JRD3QDnui6nsU8N-tZA_Mc'
-)
-
 function AuthWidgetSection() {
+  const supabase = createClient(
+    'https://rsnibhkhsbfnncjmwnkj.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYxNTIxNDE1MywiZXhwIjoxOTMwNzkwMTUzfQ.OQEbAaTfgDdLCCht251P2JRD3QDnui6nsU8N-tZA_Mc'
+  )
   const { resolvedTheme } = useTheme()
   const { basePath } = useRouter()
   const [radius, setRadius] = useState('4px')
@@ -85,9 +85,6 @@ function AuthWidgetSection() {
                       theme={resolvedTheme === 'dark' ? 'dark' : 'default'}
                       providers={['google', 'facebook', 'twitter']}
                       supabaseClient={supabase}
-                      localization={{
-                        lang: 'en',
-                      }}
                       appearance={{
                         theme: ThemeSupa,
                         variables: {
@@ -119,12 +116,12 @@ function AuthWidgetSection() {
                 match your brand and aesthetic
               </p>
               <div className="mb-4 flex items-center space-x-2">
-                <div className="m-0 w-8 flex items-center">
+                <div className="relative m-0 w-8 flex items-center">
                   <Image
                     src={`${basePath}/images/product/auth/react-icon.svg`}
                     alt="react icon"
-                    width="100%"
-                    height="100%"
+                    layout="fill"
+                    className="w-full"
                   />
                 </div>
                 <small>React only. Other frameworks coming soon.</small>
@@ -210,20 +207,20 @@ function AuthWidgetSection() {
                         : '',
                     ].join(' ')}
                   >
-                    <div className="m-0 w-4 items-center hidden text-red-900 dark:flex">
+                    <div className="relative m-0 w-4 items-center hidden text-red-900 dark:flex">
                       <Image
                         src="/images/auth-ui/small--light.svg"
                         alt="react icon"
-                        width="100%"
-                        height="100%"
+                        layout="fill"
+                        className="w-full"
                       />
                     </div>
-                    <div className="m-0 w-4 items-center flex text-red-900 dark:hidden">
+                    <div className="relative m-0 w-4 items-center flex text-red-900 dark:hidden">
                       <Image
                         src="/images/auth-ui/small--dark.svg"
                         alt="react icon"
-                        width="100%"
-                        height="100%"
+                        layout="fill"
+                        className="w-full"
                       />
                     </div>
                   </button>
@@ -236,20 +233,20 @@ function AuthWidgetSection() {
                         : '',
                     ].join(' ')}
                   >
-                    <div className="m-0 w-4 items-center hidden text-red-900 dark:flex">
+                    <div className="relative m-0 w-4 items-center hidden text-red-900 dark:flex">
                       <Image
                         src="/images/auth-ui/medium--light.svg"
                         alt="react icon"
-                        width="100%"
-                        height="100%"
+                        layout="fill"
+                        className="w-full"
                       />
                     </div>
-                    <div className="m-0 w-4 items-center flex text-red-900 dark:hidden">
+                    <div className="relative m-0 w-4 items-center flex text-red-900 dark:hidden">
                       <Image
                         src="/images/auth-ui/medium--dark.svg"
                         alt="react icon"
-                        width="100%"
-                        height="100%"
+                        layout="fill"
+                        className="w-full"
                       />
                     </div>
                   </button>
@@ -262,20 +259,20 @@ function AuthWidgetSection() {
                         : '',
                     ].join(' ')}
                   >
-                    <div className="m-0 w-4 items-center flex text-red-900 dark:hidden">
+                    <div className="relative m-0 w-4 items-center flex text-red-900 dark:hidden">
                       <Image
                         src="/images/auth-ui/large--light.svg"
                         alt="react icon"
-                        width="100%"
-                        height="100%"
+                        layout="fill"
+                        className="w-full"
                       />
                     </div>
-                    <div className="m-0 w-4 items-center hidden text-red-900 dark:flex">
+                    <div className="relative m-0 w-4 items-center hidden text-red-900 dark:flex">
                       <Image
                         src="/images/auth-ui/large--dark.svg"
                         alt="react icon"
-                        width="100%"
-                        height="100%"
+                        layout="fill"
+                        className="w-full"
                       />
                     </div>
                   </button>

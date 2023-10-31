@@ -1,6 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { observer } from 'mobx-react-lite'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import { Fragment, useState } from 'react'
 
 import { useParams } from 'common/hooks'
@@ -210,25 +210,27 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                             </div>
                           ) : role !== undefined ? (
                             <Tooltip.Root delayDuration={0}>
-                              <Tooltip.Trigger className="w-[140px]">
-                                <Listbox
-                                  className={disableRoleEdit ? 'pointer-events-none' : ''}
-                                  disabled={disableRoleEdit}
-                                  value={role.id}
-                                  onChange={validateSelectedRoleToChange}
-                                >
-                                  {roles.map((r: any) => (
-                                    <Listbox.Option
-                                      key={r.id}
-                                      value={r.id}
-                                      label={r.name}
-                                      disabled={disableRoleEdit}
-                                      className="w-36"
-                                    >
-                                      {r.name}
-                                    </Listbox.Option>
-                                  ))}
-                                </Listbox>
+                              <Tooltip.Trigger className="w-[140px]" asChild>
+                                <div>
+                                  <Listbox
+                                    className={disableRoleEdit ? 'pointer-events-none' : ''}
+                                    disabled={disableRoleEdit}
+                                    value={role.id}
+                                    onChange={validateSelectedRoleToChange}
+                                  >
+                                    {roles.map((r: any) => (
+                                      <Listbox.Option
+                                        key={r.id}
+                                        value={r.id}
+                                        label={r.name}
+                                        disabled={disableRoleEdit}
+                                        className="w-36"
+                                      >
+                                        {r.name}
+                                      </Listbox.Option>
+                                    ))}
+                                  </Listbox>
+                                </div>
                               </Tooltip.Trigger>
                               {memberIsPendingInvite ? (
                                 <Tooltip.Portal>

@@ -1,14 +1,10 @@
-import React, { useState } from 'react'
-import { useRouter } from 'next/router'
+import React from 'react'
 import ImageCarousel from '~/components/Carousels/ImageCarousel'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 
 import AdminAccessData from 'data/home/admin-access.json'
 
 const AdminAccess = () => {
-  const { basePath } = useRouter()
-  const [tabId, setTabId] = useState('tabTableEditor')
-
   return (
     <SectionContainer>
       <div className="mb-16">

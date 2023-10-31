@@ -174,7 +174,7 @@ const AuditLogs = () => {
                       <p>Date</p>
 
                       <Tooltip.Root delayDuration={0}>
-                        <Tooltip.Trigger>
+                        <Tooltip.Trigger asChild>
                           <Button
                             type="text"
                             className="px-1"

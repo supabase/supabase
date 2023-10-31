@@ -1,19 +1,16 @@
-// This file configures the initialization of Sentry on the browser.
-// The config you add here will be used whenever a page is visited.
-// https://docs.sentry.io/platforms/javascript/guides/nextjs/
-
 import * as Sentry from '@sentry/nextjs'
 import { match } from 'path-to-regexp'
-import { Integrations } from '@sentry/tracing'
 
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
   tracesSampleRate: 0.01,
-  // Note: if you want to override the automatic release value, do not set a
-  // `release` value here - use the environment variable `SENTRY_RELEASE`, so
-  // that it will also get attached to your source maps
+  debug: false,
   integrations: [
-    new Integrations.BrowserTracing({
+    new Sentry.BrowserTracing({
+      // TODO: update gotrue + api to support Access-Control-Request-Headers: authorization,baggage,sentry-trace,x-client-info
+      // then remove these options
+      traceFetch: false,
+      traceXHR: false,
       beforeNavigate: (context) => {
         return {
           ...context,
@@ -51,25 +48,25 @@ Sentry.init({
 
 // Replace dynamic query param with a template text
 // Support grouping sentry transaction
-function standardiseRouterUrl(url) {
+function standardiseRouterUrl(url: string) {
   let finalUrl = url
 
   const orgMatch = match('/org/:slug/(.*)', { decode: decodeURIComponent })
   const orgMatchResult = orgMatch(finalUrl)
   if (orgMatchResult) {
-    finalUrl = finalUrl.replace(orgMatchResult.params.slug, '[slug]')
+    finalUrl = finalUrl.replace((orgMatchResult.params as any).slug, '[slug]')
   }
 
   const newOrgMatch = match('/new/:slug', { decode: decodeURIComponent })
   const newOrgMatchResult = newOrgMatch(finalUrl)
   if (newOrgMatchResult) {
-    finalUrl = finalUrl.replace(newOrgMatchResult.params.slug, '[slug]')
+    finalUrl = finalUrl.replace((newOrgMatchResult.params as any).slug, '[slug]')
   }
 
   const projectMatch = match('/project/:ref/(.*)', { decode: decodeURIComponent })
   const projectMatchResult = projectMatch(finalUrl)
   if (projectMatchResult) {
-    finalUrl = finalUrl.replace(projectMatchResult.params.ref, '[ref]')
+    finalUrl = finalUrl.replace((projectMatchResult.params as any).ref, '[ref]')
   }
 
   return finalUrl
@@ -77,7 +74,7 @@ function standardiseRouterUrl(url) {
 
 // Ignore dev console errors getting incorrectly thrown to sentry (Chrome specific)
 // https://github.com/getsentry/sentry-javascript/issues/5179#issuecomment-1206343862
-function filterConsoleErrors(event) {
+function filterConsoleErrors(event: any) {
   const originalException = event.exception?.values?.[0]
 
   // Console errors appear to always bubble up to `window.onerror` and to be unhandled. So if,
@@ -117,11 +114,11 @@ function filterConsoleErrors(event) {
   return event
 }
 
-function isSuspiciousError(errorType) {
+function isSuspiciousError(errorType: string) {
   return ['syntaxerror', 'referenceerror', 'typeerror'].includes(errorType)
 }
 
-function hasSuspiciousFrames(stackFrames) {
+function hasSuspiciousFrames(stackFrames: any[]) {
   const allSuspicious = stackFrames.every(isSuspiciousFrame)
 
   // Certain type errors will include the thrown error message as the second stack frame,
@@ -131,7 +128,7 @@ function hasSuspiciousFrames(stackFrames) {
   return allSuspicious || firstSuspicious
 }
 
-function isSuspiciousFrame(frame) {
+function isSuspiciousFrame(frame: any) {
   const url = window.location.href
   return frame.function === '?' && (frame.filename === '<anonymous>' || frame.filename === url)
 }

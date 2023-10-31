@@ -15,11 +15,7 @@ const NavigationIconButton = ({ route, isActive = false }: NavigationIconButtonP
       <Tooltip.Trigger>
         <ConditionalWrap
           condition={route.link !== undefined}
-          wrap={(children) => (
-            <Link href={route.link!}>
-              <a>{children}</a>
-            </Link>
-          )}
+          wrap={(children) => <Link href={route.link!}>{children}</Link>}
         >
           <span
             className={[

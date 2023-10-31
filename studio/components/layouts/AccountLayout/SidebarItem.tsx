@@ -43,29 +43,27 @@ const SidebarItem = ({
   }
 
   return (
-    <Link href={href || ''}>
-      <a className="block" target={isExternal ? '_blank' : '_self'}>
-        <button
-          className={[
+    <Link href={href || ''} className="block" target={isExternal ? '_blank' : '_self'}>
+      <button
+        className={[
             'group border-border ring-foreground group-hover:border-foreground-muted',
             'flex max-w-full cursor-pointer items-center space-x-2 py-1 font-normal',
             'outline-none focus-visible:z-10 focus-visible:ring-1',
           ].join(' ')}
-          onClick={onClick}
-        >
-          {isExternal && (
-            <span className="truncate text-sm text-foreground-lighter transition group-hover:text-foreground-light">
-              <IconArrowUpRight size="tiny" />
-            </span>
-          )}
-          <span
-            title={label}
-            className="w-full truncate text-sm text-foreground-light transition group-hover:text-foreground"
-          >
-            {isSubitem ? <p>{label}</p> : label}
+        onClick={onClick}
+      >
+        {isExternal && (
+          <span className="truncate text-sm text-foreground-lighter transition group-hover:text-foreground-light">
+            <IconArrowUpRight size="tiny" />
           </span>
-        </button>
-      </a>
+        )}
+        <span
+          title={label}
+          className="w-full truncate text-sm text-foreground-light transition group-hover:text-foreground"
+        >
+          {isSubitem ? <p>{label}</p> : label}
+        </span>
+      </button>
     </Link>
   )
 }

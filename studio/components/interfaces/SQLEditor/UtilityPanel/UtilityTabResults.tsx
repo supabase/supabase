@@ -55,6 +55,10 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
   // Customers on HIPAA plans should not have access to Supabase AI
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
+  const isTimeout =
+    result?.error?.message?.includes('canceling statement due to statement timeout') ||
+    result?.error?.message?.includes('upstream request timeout')
+
   if (isUtilityPanelCollapsed) return null
 
   if (isExecuting) {
@@ -64,24 +68,51 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
       </div>
     )
   } else if (result?.error) {
-    const formattedError = (result.error?.formattedError.split('\n') ?? []).filter(
+    const formattedError = (result.error?.formattedError?.split('\n') ?? []).filter(
       (x: string) => x.length > 0
     )
 
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
         <div className="flex flex-row justify-between items-start py-4 px-6">
-          <div>
-            {formattedError.length > 0 ? (
-              formattedError.map((x: string, i: number) => (
-                <pre key={`error-${i}`} className="font-mono text-sm">
-                  {x}
-                </pre>
-              ))
-            ) : (
-              <p className="font-mono text-sm">{result.error.error}</p>
-            )}
-          </div>
+          {isTimeout ? (
+            <div className="flex flex-col gap-y-1">
+              <p className="font-mono text-sm">SQL query ran into an upstream timeout</p>
+              <p className="font-mono text-sm text-foreground-light">
+                You can either{' '}
+                <a
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline transition hover:text-foreground"
+                  href="https://supabase.com/docs/guides/platform/performance#examining-query-performance"
+                >
+                  optimize your query
+                </a>
+                , or{' '}
+                <a
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline transition hover:text-foreground"
+                  href="https://supabase.com/docs/guides/database/timeouts"
+                >
+                  increase the statement timeout
+                </a>
+                .
+              </p>
+            </div>
+          ) : (
+            <div>
+              {formattedError.length > 0 ? (
+                formattedError.map((x: string, i: number) => (
+                  <pre key={`error-${i}`} className="font-mono text-sm">
+                    {x}
+                  </pre>
+                ))
+              ) : (
+                <p className="font-mono text-sm">{result.error.error}</p>
+              )}
+            </div>
+          )}
           {supabaseAIEnabled && !hasHipaaAddon && (
             <Button
               icon={
@@ -125,24 +156,6 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
             </Button>
           )}
         </div>
-        {(result.error.message ?? result.error)?.includes(
-          'canceling statement due to statement timeout'
-        ) && (
-          <p className="m-0 border-0 px-6 py-4 font-mono">
-            You can either{' '}
-            <a
-              className="underline"
-              href="https://supabase.com/docs/guides/platform/performance#examining-query-performance"
-            >
-              optimize your query
-            </a>
-            , or{' '}
-            <a className="underline" href="https://supabase.com/docs/guides/database/timeouts">
-              increase the statement timeout
-            </a>
-            .
-          </p>
-        )}
       </div>
     )
   } else if (!result) {
@@ -156,7 +169,7 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
   }
 
   return (
-    <div className="h-full">
+    <div className="h-full flex flex-col">
       <Results id={id} rows={result.rows} />
     </div>
   )

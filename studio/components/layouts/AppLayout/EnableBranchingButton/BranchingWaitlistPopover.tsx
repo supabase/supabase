@@ -39,11 +39,15 @@ const BranchingWaitlistPopover = ({ isNewNav = false }: BranchingWaitlistPopover
           enrolled in database branching.
         </p>
         <div className="flex items-center space-x-2">
-          <Link passHref href="https://forms.supabase.com/branching-request">
-            <a rel="noreferrer" target="_blank">
-              <Button>Join waitlist</Button>
-            </a>
-          </Link>
+          <Button asChild>
+            <Link
+              href="https://forms.supabase.com/branching-request"
+              rel="noreferrer"
+              target="_blank"
+            >
+              Join waitlist
+            </Link>
+          </Button>
           {/* <Link passHref href={'/'}>
             <a rel="noreferrer" target="_blank">
               <Button type="default">View the docs</Button>

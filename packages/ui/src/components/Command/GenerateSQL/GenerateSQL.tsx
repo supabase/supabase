@@ -225,7 +225,6 @@ const GenerateSQL = () => {
                                 return
                             }
                           }}
-                          forceMount
                           key={query.replace(/\s+/g, '_')}
                         >
                           <div className="flex flex-row gap-2">

@@ -65,7 +65,7 @@ const HomeLayout: FC<Props> = (props: Props) => {
       <LayoutMainContent>
         <div className={['relative transition-all ease-out', 'duration-150 '].join(' ')}>
           <article className="prose dark:prose-dar max-w-none">
-            <MDXProvider components={components} children={props.children} />
+            <MDXProvider components={components}>{props.children}</MDXProvider>
           </article>
         </div>
         {hasTableOfContents && !props.meta?.hide_table_of_contents && (

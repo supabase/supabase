@@ -22,9 +22,9 @@ export function ScheduleInfo() {
           </p>
         </div>
         <div className="px-10">
-          <Link href="/launch-week-register">
-            <Button type="default">Get a ticket</Button>
-          </Link>
+          <Button asChild type="default">
+            <Link href="/launch-week-register">Get a ticket</Link>
+          </Button>
         </div>
         <img src="/images/launchweek/gold-ticket.svg" className="w-full" />
       </div>

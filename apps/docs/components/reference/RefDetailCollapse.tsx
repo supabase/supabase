@@ -2,10 +2,9 @@ import * as Accordion from '@radix-ui/react-accordion'
 import React from 'react'
 import { IconChevronRight } from '~/../../packages/ui'
 
-const RefDetailCollapse: React.FC<{ id: string; label: string; defaultOpen?: boolean }> = ({
-  defaultOpen = true,
-  ...props
-}) => {
+const RefDetailCollapse: React.FC<
+  React.PropsWithChildren<{ id: string; label: string; defaultOpen?: boolean }>
+> = ({ defaultOpen = true, ...props }) => {
   return (
     <Accordion.Root
       className="AccordionRoot"

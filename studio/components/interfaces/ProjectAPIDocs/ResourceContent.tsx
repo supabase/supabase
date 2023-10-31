@@ -25,13 +25,11 @@ const ResourceContent = ({ selectedLanguage, snippet, codeSnippets }: ResourceCo
         <div className="flex items-center justify-between">
           <h2 className="doc-heading">{snippet.title}</h2>
           {snippet.docsUrl !== undefined && (
-            <Link passHref href={snippet.docsUrl}>
-              <Button asChild type="default" icon={<IconExternalLink />}>
-                <a target="_blank" rel="noreferrer">
-                  Documentation
-                </a>
-              </Button>
-            </Link>
+            <Button asChild type="default" icon={<IconExternalLink />}>
+              <Link href={snippet.docsUrl} target="_blank" rel="noreferrer">
+                Documentation
+              </Link>
+            </Button>
           )}
         </div>
         {snippet.description !== undefined && (

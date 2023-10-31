@@ -35,18 +35,15 @@ export default function TicketBrickWall({ users }: Props) {
           {isMobile && <TicketBrickWallSlider users={users.slice(11, 17)} speed={16000} />}
         </div>
         <div className="flex justify-center w-full mx-auto mt-2 lg:mt-4">
-          <Link href="/launch-week/7/tickets">
-            <a>
-              <Button
-                type="outline"
-                size="medium"
-                onClick={() => window.scrollTo(0, 0)}
-                className="text-white"
-              >
-                View all tickets
-              </Button>
-            </a>
-          </Link>
+          <Button
+            asChild
+            type="outline"
+            size="medium"
+            onClick={() => window.scrollTo(0, 0)}
+            className="text-white"
+          >
+            <Link href="/launch-week/7/tickets">View all tickets</Link>
+          </Button>
         </div>
       </div>
     </div>

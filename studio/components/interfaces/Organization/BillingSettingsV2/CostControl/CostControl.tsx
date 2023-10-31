@@ -67,13 +67,15 @@ const CostControl = ({}: CostControlProps) => {
             <div className="space-y-2">
               <p className="text-sm text-foreground-light m-0">More information</p>
               <div>
-                <Link href="https://supabase.com/docs/guides/platform/spend-cap">
-                  <a target="_blank" rel="noreferrer">
-                    <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                      <p className="text-sm m-0">Spend cap</p>
-                      <IconExternalLink size={16} strokeWidth={1.5} />
-                    </div>
-                  </a>
+                <Link
+                  href="https://supabase.com/docs/guides/platform/spend-cap"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
+                    <p className="text-sm m-0">Spend cap</p>
+                    <IconExternalLink size={16} strokeWidth={1.5} />
+                  </div>
                 </Link>
               </div>
             </div>
@@ -102,10 +104,11 @@ const CostControl = ({}: CostControlProps) => {
                 >
                   {currentPlan?.name || ''} plan requires you to have spend cap off at all times.
                   Your projects will never become unresponsive. Only when your{' '}
-                  <Link href="#breakdown">
-                    <a className="text-green-900 transition hover:text-green-1000">
-                      included usage
-                    </a>
+                  <Link
+                    href="#breakdown"
+                    className="text-green-900 transition hover:text-green-1000"
+                  >
+                    included usage
                   </Link>{' '}
                   is exceeded will you be charged for any additional usage.
                 </Alert>
@@ -113,10 +116,11 @@ const CostControl = ({}: CostControlProps) => {
                 <p className="text-sm text-foreground-light">
                   You can control whether your organization is charged for additional usage beyond
                   the{' '}
-                  <Link href="#breakdown">
-                    <a className="text-green-900 transition hover:text-green-1000">
-                      included quota
-                    </a>
+                  <Link
+                    href="#breakdown"
+                    className="text-green-900 transition hover:text-green-1000"
+                  >
+                    included quota
                   </Link>{' '}
                   of your subscription plan. If you need to go beyond the included quota, simply
                   switch off your spend cap to pay for additional usage.

@@ -128,13 +128,15 @@ const SpendCapSidePanel = () => {
       header={
         <div className="flex items-center justify-between">
           <h4>Spend cap</h4>
-          <Link href="https://supabase.com/docs/guides/platform/spend-cap">
-            <a target="_blank" rel="noreferrer">
-              <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                About spend cap
-              </Button>
-            </a>
-          </Link>
+          <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+            <Link
+              href="https://supabase.com/docs/guides/platform/spend-cap"
+              target="_blank"
+              rel="noreferrer"
+            >
+              About spend cap
+            </Link>
+          </Button>
         </div>
       }
       tooltip={!canUpdateSpendCap ? 'You do not have permission to update spend cap' : undefined}

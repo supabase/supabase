@@ -32,7 +32,7 @@ const IconPanel = ({
 }: Props) => {
   const { theme } = useTheme()
 
-  const IconContainer: React.FC = (props) => {
+  const IconContainer: React.FC<React.PropsWithChildren> = (props) => {
     return (
       <div
         className={[

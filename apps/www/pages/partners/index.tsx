@@ -138,13 +138,11 @@ const Partners = () => {
                   <p className="text-muted text-sm">Find an expert to help build your next idea.</p>
                 </div>
 
-                <Link href="/partners/experts">
-                  <a className="absolute inset-0" />
-                </Link>
+                <Link href="/partners/experts" className="absolute inset-0" />
               </Panel>
               <Panel
-                hasShimmer
-                hasActiveOnHover
+                hasInnerShimmer={false}
+                hasActiveOnHover={true}
                 innerClassName="px-8 py-6 group flex flex-col gap-4"
               >
                 <div className="bg-surface-200 text-foreground flex h-12 w-12 items-center justify-center rounded-md border transition-all group-hover:scale-105">
@@ -168,9 +166,7 @@ const Partners = () => {
                   <h3 className="text-foreground text-lg">Integrations</h3>
                   <p className="text-muted text-sm">Use your favorite tools with Supabase.</p>
                 </div>
-                <Link href="/partners/integrations">
-                  <a className="absolute inset-0" />
-                </Link>
+                <Link href="/partners/integrations" className="absolute inset-0" />
               </Panel>
             </div>
           </div>
@@ -237,11 +233,11 @@ const Partners = () => {
               Reach out to partner with Supabase
             </h2>
             <div className="w-full mt-4 flex items-center justify-center text-center gap-4">
-              <Link href="https://forms.supabase.com/partner">
-                <a tabIndex={-1}>
-                  <Button size="medium">Become a Partner</Button>
-                </a>
-              </Link>
+              <Button asChild size="medium">
+                <Link href="https://forms.supabase.com/partner" tabIndex={-1}>
+                  Become a Partner
+                </Link>
+              </Button>
             </div>
           </div>
         </SectionContainer>

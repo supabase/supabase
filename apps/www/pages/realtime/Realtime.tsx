@@ -138,11 +138,9 @@ function RealtimePage() {
                 Listen to changes in the Database inserts, updates, and deletes and other changes.
               </p>
               <div className="not-prose mt-3">
-                <Link passHref href="/docs/guides/realtime/postgres-changes">
-                  <a>
-                    <Button type="default">View docs</Button>
-                  </a>
-                </Link>
+                <Button asChild type="default">
+                  <Link href="/docs/guides/realtime/postgres-changes">View docs</Link>
+                </Button>
               </div>
             </div>
             <div className="prose col-span-12 mb-10 lg:col-span-3 lg:col-start-5 lg:mb-0">
@@ -156,11 +154,9 @@ function RealtimePage() {
               <h3>Presence</h3>
               <p>Store and synchronize online user state consistently across clients.</p>
               <div className="not-prose mt-3">
-                <Link passHref href="/docs/guides/realtime/presence">
-                  <a>
-                    <Button type="default">View docs</Button>
-                  </a>
-                </Link>
+                <Button asChild type="default">
+                  <Link href="/docs/guides/realtime/presence">View docs</Link>
+                </Button>
               </div>
             </div>
             <div className="prose col-span-12 lg:col-span-3 lg:col-start-9">
@@ -174,11 +170,9 @@ function RealtimePage() {
               <h3>Broadcast</h3>
               <p>Send any data to any client subscribed to the same Channel.</p>
               <div className="not-prose mt-3">
-                <Link passHref href="/docs/guides/realtime/broadcast">
-                  <a>
-                    <Button type="default">View docs</Button>
-                  </a>
-                </Link>
+                <Button asChild type="default">
+                  <Link href="/docs/guides/realtime/broadcast">View docs</Link>
+                </Button>
               </div>
             </div>
           </div>

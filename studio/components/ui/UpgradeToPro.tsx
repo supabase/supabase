@@ -55,7 +55,7 @@ const UpgradeToPro = ({
                     plan === 'free' ? 'subscriptionPlan' : addon || 'subscriptionPlan'
                   }`}
                 >
-                  <a>{plan === 'free' ? 'Upgrade to Pro' : 'Enable Addon'}</a>
+                  {plan === 'free' ? 'Upgrade to Pro' : 'Enable Addon'}
                 </Link>
               </Button>
             </Tooltip.Trigger>

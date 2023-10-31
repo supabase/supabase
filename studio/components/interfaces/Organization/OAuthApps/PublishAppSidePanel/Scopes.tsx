@@ -73,7 +73,7 @@ const Scope = ({
         <span className="text-foreground-light text-xs">{description}</span>
       </div>
       <DropdownMenu>
-        <DropdownMenuTrigger>
+        <DropdownMenuTrigger asChild>
           <Button type="default" iconRight={<IconChevronDown />}>
             <p>{accessDescription}</p>
           </Button>

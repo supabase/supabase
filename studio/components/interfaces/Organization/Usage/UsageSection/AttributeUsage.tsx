@@ -151,15 +151,13 @@ const AttributeUsage = ({
                       </div>
 
                       {showUsageWarning && (
-                        <Link href={upgradeUrl} passHref className="pb-1">
-                          <Button type="default" size="tiny" asChild>
-                            <a className="pb-1">
-                              {subscription?.plan?.id === 'free'
-                                ? 'Upgrade plan'
-                                : 'Change spend cap'}
-                            </a>
-                          </Button>
-                        </Link>
+                        <Button type="default" size="tiny" asChild>
+                          <Link href={upgradeUrl} className="pb-1">
+                            {subscription?.plan?.id === 'free'
+                              ? 'Upgrade plan'
+                              : 'Change spend cap'}
+                          </Link>
+                        </Button>
                       )}
                     </div>
 
@@ -284,11 +282,9 @@ const AttributeUsage = ({
                       </div>
                     </div>
 
-                    <Link href={upgradeUrl} passHref>
-                      <Button type="primary" asChild>
-                        <a>Upgrade plan</a>
-                      </Button>
-                    </Link>
+                    <Button type="primary" asChild>
+                      <Link href={upgradeUrl}>Upgrade plan</Link>
+                    </Button>
                   </div>
                 </Panel.Content>
               </Panel>

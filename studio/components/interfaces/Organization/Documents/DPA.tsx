@@ -12,7 +12,8 @@ const DPA = () => {
         <p className="text-base m-0">Data Processing Addendum (DPA)</p>
         <div className="space-y-2 text-sm text-foreground-light m-0">
           <p>
-            Sign and return the signed DPA document to{' '}
+            All organizations can access and use our DPA as part of their GDPR compliance. Sign and
+            return the signed DPA document to{' '}
             <a
               href="mailto:privacy@supabase.com"
               target="_blank"
