@@ -1,4 +1,4 @@
-import DataGrid, { Column } from 'react-data-grid'
+import DataGrid, { CalculatedColumn, Column, Row } from 'react-data-grid'
 import { useKeyboardShortcuts } from 'hooks'
 import { copyToClipboard } from 'lib/helpers'
 import { useState } from 'react'
@@ -54,13 +54,25 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
   const columnRender = (name: string) => {
     return <div className="flex h-full items-center justify-center font-mono">{name}</div>
   }
-  const columns: Column<any, unknown>[] = Object.keys(rows?.[0] ?? []).map((key) => ({
+  const columns: CalculatedColumn<any>[] = Object.keys(rows?.[0] ?? []).map((key, idx) => ({
+    idx,
     key,
     name: key,
-    formatter: ({ row }: any) => formatter(key, row),
-    headerRenderer: () => columnRender(key),
+
     resizable: true,
     width: 120,
+
+    // [Next 18 Refactor] Double check if this is correct
+    parent: undefined,
+    level: 0,
+    minWidth: 120,
+    maxWidth: undefined,
+    draggable: false,
+    frozen: false,
+    sortable: false,
+    isLastFrozenColumn: false,
+    renderCell: ({ row }: any) => formatter(key, row),
+    renderHeaderCell: () => columnRender(key),
   }))
 
   function onSelectedCellChange(position: any) {
@@ -81,6 +93,7 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
         columns={columns}
         rows={rows}
         style={{ height: '100%' }}
+        rowClass={() => '[&>.rdg-cell]:items-center'}
         onSelectedCellChange={onSelectedCellChange}
       />
       {typeof window !== 'undefined' &&
