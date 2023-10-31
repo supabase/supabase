@@ -295,7 +295,7 @@ const AuditLogs = () => {
                               <div
                                 className={[
                                   'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                    'border border-background',
+                                  'border border-background',
                                 ].join(' ')}
                               >
                                 <span className="text-xs text-foreground">

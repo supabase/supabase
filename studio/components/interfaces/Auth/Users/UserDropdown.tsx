@@ -181,7 +181,7 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
                     <div
                       className={[
                         'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background',
+                        'border border-background',
                       ].join(' ')}
                     >
                       <span className="text-xs text-foreground">
@@ -212,7 +212,7 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
                     <div
                       className={cn([
                         'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background',
+                        'border border-background',
                       ])}
                     >
                       <span className="text-xs text-foreground">
