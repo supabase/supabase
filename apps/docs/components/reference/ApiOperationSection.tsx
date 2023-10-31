@@ -96,7 +96,7 @@ const ApiOperationSection = (props) => {
           >
             {operation.responseList.map((response: any) => (
               <Tabs.Panel id={response.responseCode} label={response.responseCode}>
-                <p className="text-background0">{response.description}</p>
+                <p className="text-background">{response.description}</p>
                 {response?.content && response?.content['application/json'] && (
                   <div className="mt-8">
                     <CodeBlock language="bash" className="relative">
