@@ -180,11 +180,11 @@ You can change the scope of the access for Supabase by configuring
               })
           ) : (
             <div>
-              <Link href="https://vercel.com/integrations/supabase-v2" passHref>
-                <Button type="default" iconRight={<IconExternalLink />} asChild>
-                  <a target="_blank">Install Vercel Integration</a>
-                </Button>
-              </Link>
+              <Button asChild type="default" iconRight={<IconExternalLink />}>
+                <Link href="https://vercel.com/integrations/supabase-v2" target="_blank">
+                  Install Vercel Integration
+                </Link>
+              </Button>
             </div>
           )}
           {VercelContentSectionBottom && (

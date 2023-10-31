@@ -211,16 +211,22 @@ const MigrateOrganizationBillingButton = observer(() => {
               <p>
                 With organization-based billing, you'll have a single subscription for your entire
                 organization. For a detailed breakdown of changes, see{' '}
-                <Link href="https://supabase.com/docs/guides/platform/org-based-billing">
-                  <a target="_blank" rel="noreferrer" className="underline">
-                    Billing Migration Docs
-                  </a>
+                <Link
+                  href="https://supabase.com/docs/guides/platform/org-based-billing"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline"
+                >
+                  Billing Migration Docs
                 </Link>
                 . To transfer projects to a different organization, visit{' '}
-                <Link href="/project/_/settings/general">
-                  <a target="_blank" rel="noreferrer" className="underline">
-                    general project settings
-                  </a>
+                <Link
+                  href="/project/_/settings/general"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline"
+                >
+                  general project settings
                 </Link>
                 .
               </p>
@@ -267,10 +273,13 @@ const MigrateOrganizationBillingButton = observer(() => {
                 <p className="text-sm text-foreground-light">
                   Paid plans come with one compute instance included. Additional projects will at
                   least cost the compute instance hours used (min $10/month). See{' '}
-                  <Link href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute">
-                    <a target="_blank" rel="noreferrer" className="underline">
-                      Compute Instance Usage Billing
-                    </a>
+                  <Link
+                    href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline"
+                  >
+                    Compute Instance Usage Billing
                   </Link>{' '}
                   for more details.
                 </p>

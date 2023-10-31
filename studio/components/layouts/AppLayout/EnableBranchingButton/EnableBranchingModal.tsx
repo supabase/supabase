@@ -125,7 +125,6 @@ const EnableBranchingModal = () => {
         <Form_Shadcn_ {...form}>
           <form
             id={formId}
-            className="space-y-4"
             onSubmit={form.handleSubmit(onSubmit)}
             onChange={() => setIsValid(false)}
           >
@@ -165,11 +164,9 @@ const EnableBranchingModal = () => {
                     >
                       Understood
                     </Button>
-                    <Link passHref href={`/org/${selectedOrg?.slug}/billing`}>
-                      <Button asChild>
-                        <a>Organization settings</a>
-                      </Button>
-                    </Link>
+                    <Button asChild>
+                      <Link href={`/org/${selectedOrg?.slug}/billing`}>Organization settings</Link>
+                    </Button>
                   </div>
                 </Modal.Content>
               </>
@@ -199,15 +196,13 @@ const EnableBranchingModal = () => {
                 )}
 
                 {isSuccessIntegrations && (
-                  <>
-                    <GithubRepositorySelection
-                      form={form}
-                      isChecking={isChecking}
-                      isValid={canSubmit}
-                      integration={githubIntegration}
-                      hasGithubIntegrationInstalled={hasGithubIntegrationInstalled}
-                    />
-                  </>
+                  <GithubRepositorySelection
+                    form={form}
+                    isChecking={isChecking}
+                    isValid={canSubmit}
+                    integration={githubIntegration}
+                    hasGithubIntegrationInstalled={hasGithubIntegrationInstalled}
+                  />
                 )}
 
                 <Modal.Content className="px-7 py-6 flex flex-col gap-3">

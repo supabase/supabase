@@ -41,23 +41,22 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
             <p className="text-base">Subscription plan</p>
             <div className="text-sm text-foreground-light">
               To manage your billing address, emails or Tax ID, head to your{' '}
-              <Link href={`/org/${orgSlug}/billing`}>
-                <a className="text-sm text-green-900 transition hover:text-green-1000">
-                  organization settings
-                </a>
+              <Link
+                href={`/org/${orgSlug}/billing`}
+                className="text-sm text-green-900 transition hover:text-green-1000"
+              >
+                organization settings
               </Link>
               .
             </div>
             <div className="space-y-2">
               <p className="text-sm text-foreground-light">More information</p>
               <div>
-                <Link href="https://supabase.com/pricing">
-                  <a target="_blank" rel="noreferrer">
-                    <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                      <p className="text-sm">Pricing</p>
-                      <IconExternalLink size={16} strokeWidth={1.5} />
-                    </div>
-                  </a>
+                <Link href="https://supabase.com/pricing" target="_blank" rel="noreferrer">
+                  <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
+                    <p className="text-sm">Pricing</p>
+                    <IconExternalLink size={16} strokeWidth={1.5} />
+                  </div>
                 </Link>
               </div>
             </div>
@@ -103,9 +102,7 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
                       <Link
                         href={`/support/new?ref=${projectRef}&category=sales&subject=Change%20plan%20away%20from%20${tierName}`}
                       >
-                        <a>
-                          <Button type="default">Contact support</Button>
-                        </a>
+                        <Button type="default">Contact support</Button>
                       </Link>
                     </div>,
                   ]}
@@ -132,10 +129,11 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
               >
                 <p className="text-sm text-foreground-light">
                   When this project exceeds its{' '}
-                  <Link href="#breakdown">
-                    <a className="text-sm text-green-900 transition hover:text-green-1000">
-                      included usage quotas
-                    </a>
+                  <Link
+                    href="#breakdown"
+                    className="text-sm text-green-900 transition hover:text-green-1000"
+                  >
+                    included usage quotas
                   </Link>
                   , it may become unresponsive.{' '}
                   {currentPlan?.id === 'free' ? (

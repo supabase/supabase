@@ -101,10 +101,13 @@ const CustomerQuotesSection = (props: Props) => {
             className="relative mx-auto max-w-7xl grid grid-cols-1 lg:grid-cols-3 gap-4 xl:gap-8 pt-16 pb-0"
           >
             {props.customers.map((customer, i: number) => (
-              <Link href={`${basePath}${customer.url}`} key={customer.customer}>
-                <a className="h-full flex" target={customer.target ?? '_self'}>
-                  <Card customer={customer} index={i} />
-                </a>
+              <Link
+                href={`${basePath}${customer.url}`}
+                key={customer.customer}
+                className="h-full flex"
+                target={customer.target ?? '_self'}
+              >
+                <Card customer={customer} index={i} />
               </Link>
             ))}
           </div>

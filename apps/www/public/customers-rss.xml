@@ -38,6 +38,7 @@
 <item>
   <guid>https://supabase.com/customers/berriai</guid>
   <title>Berri AI boosts productivity by migrating from AWS RDS to Supabase Vector</title>
+  
   <link>https://supabase.com/customers/berriai</link>
   <description>Learn how Berri AI overcame challenges with self-hosting their vector database on AWS RDS and successfully migrated to Supabase.</description>
   <pubDate>Mon, 05 Jun 2023 22:00:00 GMT</pubDate>

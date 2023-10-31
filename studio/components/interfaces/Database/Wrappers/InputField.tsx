@@ -27,14 +27,12 @@ const InputField = ({ option, loading, error }: InputFieldProps) => {
             <div className="flex items-center space-x-2">
               <p>{option.label}</p>
               {option.urlHelper !== undefined && (
-                <Link href={option.urlHelper}>
-                  <a target="_blank" rel="noreferrer">
-                    <IconHelpCircle
-                      strokeWidth={2}
-                      size={14}
-                      className="text-foreground-light hover:text-foreground cursor-pointer transition"
-                    />
-                  </a>
+                <Link href={option.urlHelper} target="_blank" rel="noreferrer">
+                  <IconHelpCircle
+                    strokeWidth={2}
+                    size={14}
+                    className="text-foreground-light hover:text-foreground cursor-pointer transition"
+                  />
                 </Link>
               )}
             </div>
@@ -55,14 +53,12 @@ const InputField = ({ option, loading, error }: InputFieldProps) => {
           <div className="flex items-center space-x-2">
             <p>{option.label}</p>
             {option.urlHelper !== undefined && (
-              <Link href={option.urlHelper}>
-                <a target="_blank" rel="noreferrer">
-                  <IconHelpCircle
-                    strokeWidth={2}
-                    size={14}
-                    className="text-foreground-light hover:text-foreground cursor-pointer transition"
-                  />
-                </a>
+              <Link href={option.urlHelper} target="_blank" rel="noreferrer">
+                <IconHelpCircle
+                  strokeWidth={2}
+                  size={14}
+                  className="text-foreground-light hover:text-foreground cursor-pointer transition"
+                />
               </Link>
             )}
           </div>
