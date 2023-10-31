@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.106.1
+  version: 1.110.1
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -199,6 +199,86 @@ commands:
     usage: supabase test db
     subcommands: []
     flags: []
+  - id: supabase-storage
+    title: supabase storage
+    summary: Manage Supabase Storage objects
+    tags:
+      - management-api
+    links: []
+    subcommands:
+      - supabase-storage-cp
+      - supabase-storage-ls
+      - supabase-storage-mv
+      - supabase-storage-rm
+    flags: []
+  - id: supabase-storage-rm
+    title: supabase storage rm
+    summary: Remove objects by file path
+    tags: []
+    links: []
+    usage: supabase storage rm <file> ... [flags]
+    subcommands: []
+    flags:
+      - id: recursive
+        name: -r, --recursive
+        description: Recursively move a directory.
+        default_value: 'false'
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
+        default_value: 'false'
+  - id: supabase-storage-mv
+    title: supabase storage mv
+    summary: Move objects from src to dst path
+    tags: []
+    links: []
+    usage: supabase storage mv <src> <dst> [flags]
+    subcommands: []
+    flags:
+      - id: recursive
+        name: -r, --recursive
+        description: Recursively remove a directory.
+        default_value: 'false'
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
+        default_value: 'false'
+  - id: supabase-storage-ls
+    title: supabase storage ls
+    summary: List objects by path prefix
+    tags: []
+    links: []
+    usage: supabase storage ls [path] [flags]
+    subcommands: []
+    flags:
+      - id: recursive
+        name: -r, --recursive
+        description: Recursively list a directory.
+        default_value: 'false'
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
+        default_value: 'false'
+  - id: supabase-storage-cp
+    title: supabase storage cp
+    summary: Copy objects from src to dst path
+    tags: []
+    links: []
+    usage: supabase storage cp <src> <dst> [flags]
+    subcommands: []
+    flags:
+      - id: recursive
+        name: -r, --recursive
+        description: Recursively copy a directory.
+        default_value: 'false'
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
+        default_value: 'false'
   - id: supabase-stop
     title: supabase stop
     summary: Stop all local Supabase containers
@@ -249,11 +329,11 @@ commands:
         response: |
           supabase local development setup is running.
 
-                   API URL: http://localhost:54321
-               GraphQL URL: http://localhost:54321/graphql/v1
-                    DB URL: postgresql://postgres:postgres@localhost:54322/postgres
-                Studio URL: http://localhost:54323
-              Inbucket URL: http://localhost:54324
+                   API URL: http://127.0.0.1:54321
+               GraphQL URL: http://127.0.0.1:54321/graphql/v1
+                    DB URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+                Studio URL: http://127.0.0.1:54323
+              Inbucket URL: http://127.0.0.1:54324
                 JWT secret: super-secret-jwt-token-with-at-least-32-characters-long
                   anon key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
           service_role key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU
@@ -262,21 +342,21 @@ commands:
         code: supabase status -o env
         response: |
           ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0"
-          API_URL="http://localhost:54321"
-          DB_URL="postgresql://postgres:postgres@localhost:54322/postgres"
-          GRAPHQL_URL="http://localhost:54321/graphql/v1"
-          INBUCKET_URL="http://localhost:54324"
+          API_URL="http://127.0.0.1:54321"
+          DB_URL="postgresql://postgres:postgres@127.0.0.1:54322/postgres"
+          GRAPHQL_URL="http://127.0.0.1:54321/graphql/v1"
+          INBUCKET_URL="http://127.0.0.1:54324"
           JWT_SECRET="super-secret-jwt-token-with-at-least-32-characters-long"
           SERVICE_ROLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU"
-          STUDIO_URL="http://localhost:54323"
+          STUDIO_URL="http://127.0.0.1:54323"
       - id: output-custom-name
         name: Customize the names of exported variables
         code: supabase status -o env --override-name auth.anon_key=SUPABASE_ANON_KEY --override-name auth.service_role_key=SUPABASE_SERVICE_KEY
         response: |
           Stopped services: [supabase_inbucket_cli supabase_rest_cli supabase_studio_cli]
           SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0"
-          DB_URL="postgresql://postgres:postgres@localhost:54322/postgres"
-          GRAPHQL_URL="http://localhost:54321/graphql/v1"
+          DB_URL="postgresql://postgres:postgres@127.0.0.1:54322/postgres"
+          GRAPHQL_URL="http://127.0.0.1:54321/graphql/v1"
           JWT_SECRET="super-secret-jwt-token-with-at-least-32-characters-long"
           SUPABASE_SERVICE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU"
     tags:
@@ -1370,7 +1450,7 @@ commands:
             20230222032233 │                │ 2023-02-22 03:22:33
       - id: with-db-url
         name: Connect to self-hosted database
-        code: supabase migration list --db-url 'postgres://postgres[:percent_encoded_password]@localhost[:port]/postgres'
+        code: supabase migration list --db-url 'postgres://postgres[:percent_encoded_password]@127.0.0.1[:port]/postgres'
         response: |2
                 LOCAL      │     REMOTE     │     TIME (UTC)
           ─────────────────┼────────────────┼──────────────────────
@@ -2623,7 +2703,7 @@ commands:
           Linked project is up to date.
       - id: self-hosted
         name: Self hosted
-        code: supabase db push --db-url "postgres://user:pass@localhost:5432/postgres"
+        code: supabase db push --db-url "postgres://user:pass@127.0.0.1:5432/postgres"
         response: |
           Pushing migration 20230410135622_create_employees_table.sql...
           Finished supabase db push.
@@ -2688,7 +2768,7 @@ commands:
       If no entries exist in the migration history table, `pg_dump` will be used to capture all contents of the remote schemas you have created. Otherwise, this command will only diff schema changes against the remote database, similar to running `db diff --linked`.
     tags: []
     links: []
-    usage: supabase db pull [flags]
+    usage: supabase db pull [migration name] [flags]
     subcommands: []
     flags:
       - id: db-url
