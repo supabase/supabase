@@ -10,7 +10,7 @@ services:
 
   studio:
     container_name: supabase-studio
-    image: supabase/studio:20230921-d657f29
+    image: supabase/studio:20231023-7e2cd92
     restart: unless-stopped
     healthcheck:
       test:
@@ -272,7 +272,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.20.2
+    image: supabase/edge-runtime:v1.22.3
     restart: unless-stopped
     depends_on:
       analytics:
