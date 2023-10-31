@@ -114,6 +114,12 @@ Note: for "Twilio Message Service SID" you can use the Sender Phone Number gener
 
 Now the backend should be setup, we can proceed to add our client-side code!
 
+<Admonition type="info">
+  The `Twilio Content SID` field is specific to Twilio Programmable Messaging (WhatsApp) senders.
+  Disregard this field if you are only sending SMS messages. Refer to the section on WhatsApp OTP
+  Logins for further details.
+</Admonition>
+
 #### SMS custom template
 
 The SMS message sent to a phone containing an OTP code can be customized. This is useful if you need to mention a brand name or display a website address.
@@ -400,11 +406,16 @@ Twilio Verify can be used with WhatsApp OTPs with no additional configuration.
 Complete the following steps to use WhatsApp OTP with Twilio Programmable Messaging:
 
 1. Go through the [Twilio self sign up guide for WhatsApp](https://www.twilio.com/docs/whatsapp/self-sign-up).
-2. Follow the [Twilio Guide for Submitting Templates](https://www.twilio.com/docs/whatsapp/tutorial/send-whatsapp-notification-messages-templates#creating-message-templates-and-submitting-them-for-approval) and submit a Basic Authentication Message for approval (e.g. Your Code is 123456).
+2. Follow the [Twilio Guide for Submitting Templates](https://www.twilio.com/docs/whatsapp/tutorial/send-whatsapp-notification-messages-templates#creating-message-templates-and-submitting-them-for-approval) and submit a Basic Authentication Message for approval.
+
+Alternatively, you can register a Twilio Content SID which corresponds to a message template.
+![Twilio Content SID Image](/docs/img/guides/auth-twilio/twilio_content_sid.png)
+
+Note that you may only use one Twilio Content SID at a time. Use Twilio Verify or the Basic Authentication Message if you require internationalization for your message template.
 
 <Admonition type="caution">
 
-Twilio Programmable Messaging can only be used with the Basic Authentication Message. For advanced customization options, please use Twilio Verify.
+Twilio Programmable Messaging (WhatsApp) can only be used with the Basic Authentication Message. For advanced customization options, please use Twilio Verify.
 
 </Admonition>
 
