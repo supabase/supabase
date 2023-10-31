@@ -90,13 +90,11 @@ const FeaturePreviewModal = () => {
             <p>{selectedFeature?.name}</p>
             <div className="flex items-center space-x-2">
               {selectedFeature?.discussionsUrl !== undefined && (
-                <Link passHref href={selectedFeature.discussionsUrl}>
-                  <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                    <a target="_blank" rel="noreferrer">
-                      Give feedback
-                    </a>
-                  </Button>
-                </Link>
+                <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                  <Link href={selectedFeature.discussionsUrl} target="_blank" rel="noreferrer">
+                    Give feedback
+                  </Link>
+                </Button>
               )}
               <Button type="default" onClick={() => toggleFeature()}>
                 {isSelectedFeatureEnabled ? 'Disable' : 'Enable'} feature

@@ -139,26 +139,25 @@ const GridHeaderActions = ({ table, openAPIDocsPanel, refreshDocs }: GridHeaderA
         )}
 
         {(table.rls_enabled || showRLSWarning) && (
-          <Link href={`/project/${projectRef}/auth/policies?search=${table.id}`}>
-            <a>
-              <Button
-                type={table.rls_enabled ? 'link' : 'warning'}
-                icon={
-                  table.rls_enabled ? (
-                    <IconLock strokeWidth={2} size={14} />
-                  ) : (
-                    <IconAlertCircle strokeWidth={2} size={14} />
-                  )
-                }
-              >
-                {!table.rls_enabled
-                  ? 'RLS is not enabled'
-                  : `${policies.length == 0 ? 'No' : policies.length} active RLS polic${
-                      policies.length > 1 || policies.length == 0 ? 'ies' : 'y'
-                    }`}
-              </Button>
-            </a>
-          </Link>
+          <Button
+            asChild
+            type={table.rls_enabled ? 'link' : 'warning'}
+            icon={
+              table.rls_enabled ? (
+                <IconLock strokeWidth={2} size={14} />
+              ) : (
+                <IconAlertCircle strokeWidth={2} size={14} />
+              )
+            }
+          >
+            <Link href={`/project/${projectRef}/auth/policies?search=${table.id}`}>
+              {!table.rls_enabled
+                ? 'RLS is not enabled'
+                : `${policies.length == 0 ? 'No' : policies.length} active RLS polic${
+                    policies.length > 1 || policies.length == 0 ? 'ies' : 'y'
+                  }`}
+            </Link>
+          </Button>
         )}
         <Button
           type="default"
@@ -197,8 +196,8 @@ const GridHeaderActions = ({ table, openAPIDocsPanel, refreshDocs }: GridHeaderA
           {!isRealtimeEnabled && (
             <p className="text-sm">
               You may also select which events to broadcast to subscribers on the{' '}
-              <Link href={`/project/${ref}/database/replication`}>
-                <a className="text-brand">database replication</a>
+              <Link href={`/project/${ref}/database/replication`} className="text-brand">
+                database replication
               </Link>{' '}
               settings.
             </p>

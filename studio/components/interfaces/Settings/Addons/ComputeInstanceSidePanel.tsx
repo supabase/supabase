@@ -195,13 +195,15 @@ const ComputeInstanceSidePanel = () => {
         header={
           <div className="flex items-center justify-between">
             <h4>Change project compute size</h4>
-            <Link href="https://supabase.com/docs/guides/platform/compute-add-ons">
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                  About compute sizes
-                </Button>
-              </a>
-            </Link>
+            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+              <Link
+                href="https://supabase.com/docs/guides/platform/compute-add-ons"
+                target="_blank"
+                rel="noreferrer"
+              >
+                About compute sizes
+              </Link>
+            </Button>
           </div>
         }
       >
@@ -275,11 +277,11 @@ const ComputeInstanceSidePanel = () => {
                     title="Changing your compute size is only available on the Pro plan"
                     actions={
                       isOrgBilling ? (
-                        <Link href={`/org/${organization.slug}/billing?panel=subscriptionPlan`}>
-                          <a>
-                            <Button type="default">View available plans</Button>
-                          </a>
-                        </Link>
+                        <Button asChild type="default">
+                          <Link href={`/org/${organization.slug}/billing?panel=subscriptionPlan`}>
+                            View available plans
+                          </Link>
+                        </Button>
                       ) : (
                         <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
                           View available plans
@@ -400,10 +402,13 @@ const ComputeInstanceSidePanel = () => {
                   There are no immediate charges when changing compute. Compute Hours are a
                   usage-based item and you're billed at the end of your billing cycle based on your
                   compute usage. Read more about{' '}
-                  <Link href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute">
-                    <a target="_blank" rel="noreferrer" className="underline">
-                      Compute Billing
-                    </a>
+                  <Link
+                    href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline"
+                  >
+                    Compute Billing
                   </Link>
                   .
                 </p>

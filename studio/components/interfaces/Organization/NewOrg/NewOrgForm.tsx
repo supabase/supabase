@@ -379,13 +379,15 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
                     subscriptions per project.{' '}
                   </p>
                   <div>
-                    <Link href="https://supabase.com/docs/guides/platform/org-based-billing">
-                      <a target="_blank" rel="noreferrer">
-                        <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                          Documentation
-                        </Button>
-                      </a>
-                    </Link>
+                    <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                      <Link
+                        href="https://supabase.com/docs/guides/platform/org-based-billing"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Documentation
+                      </Link>
+                    </Button>
                   </div>
                 </div>
               }

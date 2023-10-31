@@ -1,24 +1,30 @@
+import { Column } from 'react-data-grid'
+import { LogData } from '../Logs.types'
 import {
   RowLayout,
   SeverityFormatter,
   TextFormatter,
   TimestampLocalFormatter,
 } from '../LogsFormatters'
-import DefaultPreviewColumnRenderer from './DefaultPreviewColumnRenderer'
+import { defaultRenderCell } from './DefaultPreviewColumnRenderer'
 
-export default [
+const columns: Column<LogData>[] = [
   {
-    formatter: (data: any) => {
-      if (!data.row.error_severity) {
-        return DefaultPreviewColumnRenderer[0].formatter(data)
+    name: 'database-postgres-first-column',
+    key: 'database-postgres-first-column',
+    renderCell: (props) => {
+      if (!props.row.error_severity) {
+        return defaultRenderCell(props)
       }
       return (
         <RowLayout>
-          <TimestampLocalFormatter value={data.row.timestamp!} />
-          <SeverityFormatter value={data.row.error_severity} />
-          <TextFormatter className="w-full" value={data.row.event_message} />
+          <TimestampLocalFormatter value={props.row.timestamp!} />
+          <SeverityFormatter value={props.row.error_severity as string} />
+          <TextFormatter className="w-full" value={props.row.event_message} />
         </RowLayout>
       )
     },
   },
 ]
+
+export default columns
