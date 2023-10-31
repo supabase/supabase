@@ -156,7 +156,7 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
   }
 
   return (
-    <div className="h-full">
+    <div className="h-full flex flex-col">
       <Results id={id} rows={result.rows} />
     </div>
   )
