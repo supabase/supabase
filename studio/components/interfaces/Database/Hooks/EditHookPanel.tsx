@@ -53,6 +53,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { mutate: createDatabaseTrigger } = useDatabaseTriggerCreateMutation({
     onSuccess: (res) => {
+      console.log('This is the response in new hook', res)
       ui.setNotification({
         category: 'success',
         message: `Successfully created new webhook "${res.name}"`,
@@ -71,11 +72,12 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
   })
   const { mutate: updateDatabaseTrigger } = useDatabaseTriggerUpdateMutation({
     onSuccess: (res) => {
-      setIsSubmitting(false)
+      console.log( res)
       ui.setNotification({
         category: 'success',
         message: `Successfully updated webhook "${res.name}"`,
       })
+      setIsSubmitting(false)
       onClose()
     },
     onError: (error) => {

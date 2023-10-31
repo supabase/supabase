@@ -41,7 +41,7 @@ export async function updateDatabaseTrigger({
 }: DatabaseTriggerUpdateVariables) {
   const sql = getDatabaseTriggerUpdateSQL({ originalTrigger, updatedTrigger })
   const { result } = await executeSql({ projectRef, connectionString, sql })
-  return result
+  return updatedTrigger
 }
 
 type DatabaseTriggerUpdateTxnData = Awaited<ReturnType<typeof updateDatabaseTrigger>>
