@@ -1795,16 +1795,54 @@ functions:
         name: Basic invocation
         description:
         code: |
+          ```python
+          resp = supabase.functions.invoke(
+            "hello-world",
+            invoke_options={
+              "body": { "foo": "bar" }
+            },
+          )
           ```
-          func = supabase.functions()
-          @asyncio.coroutine
-          async def test_func(loop):
-            resp = await func.invoke("hello-world",invoke_options={'body':{}})
-            return resp
+      - id: error-handling
+        name: Error handling
+        description: |
+          A `FunctionsHttpError` error is returned if your function throws an error, `FunctionsRelayError` if the Supabase Relay has an error processing your function.
+        isSpotlight: true
+        code: |
+          ```python
+          from supafunc.errors import FunctionsRelayError, FunctionsHttpError
 
-          loop = asyncio.get_event_loop()
-          resp = loop.run_until_complete(test_func(loop))
-          loop.close()
+          try:
+            resp = supabase.functions.invoke(
+                "hello-world",
+                invoke_options={
+                    "body": {"foo": "bar"},
+                    "headers": {"my-custom-header": "my-custom-header-value"},
+                },
+            )
+          except FunctionsHttpError as exception:
+            err = exception.to_dict()
+            print(f"Function returned an error {err.get("message")}")
+          except FunctionsRelayError as exception:
+            err = exception.to_dict()
+            print(f"Relay error: {err.get("message")}")
+          ```
+      - id: passing-custom-headers
+        name: Passing custom headers
+        description: |
+          You can pass custom headers to your function. Note: supabase-py automatically passes the `Authorization` header with the signed in user's JWT.
+        isSpotlight: true
+        code: |
+          ```python
+          resp = supabase.functions.invoke(
+            "hello-world", 
+            invoke_options={
+              "headers": {
+                "my-custom-header": "my-custom-header-value"
+              },
+              "body": { "foo": "bar" }
+            }
+          )
           ```
 
   - id: list-buckets
