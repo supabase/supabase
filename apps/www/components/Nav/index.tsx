@@ -72,26 +72,29 @@ const Nav = () => {
             <div className="flex items-center px-6 lg:px-0 flex-1 sm:items-stretch justify-between">
               <div className="flex items-center">
                 <div className="flex items-center flex-shrink-0">
-                  <Link href="/" as="/">
-                    <a className="block w-auto h-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm">
-                      <Image
-                        src={
-                          isLaunchWeekPage || resolvedTheme === 'dark' || isHomePage
-                            ? supabaseLogoWordmarkDark
-                            : supabaseLogoWordmarkLight
-                        }
-                        width={124}
-                        height={24}
-                        alt="Supabase Logo"
-                      />
-                    </a>
+                  <Link
+                    href="/"
+                    className="block w-auto h-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm"
+                  >
+                    <Image
+                      src={
+                        isLaunchWeekPage || resolvedTheme === 'dark' || isHomePage
+                          ? supabaseLogoWordmarkDark
+                          : supabaseLogoWordmarkLight
+                      }
+                      width={124}
+                      height={24}
+                      alt="Supabase Logo"
+                    />
                   </Link>
 
                   {isLaunchWeekPage && (
-                    <Link href="/launch-week" as="/launch-week">
-                      <a className="hidden ml-2 xl:block font-mono text-sm uppercase leading-4 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm">
-                        Launch Week
-                      </a>
+                    <Link
+                      href="/launch-week"
+                      as="/launch-week"
+                      className="hidden ml-2 xl:block font-mono text-sm uppercase leading-4 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm"
+                    >
+                      Launch Week
                     </Link>
                   )}
                 </div>
@@ -133,23 +136,17 @@ const Nav = () => {
                 {!isUserLoading && (
                   <>
                     {isLoggedIn ? (
-                      <Link href="/dashboard/projects" passHref>
-                        <Button className="hidden text-white lg:block" asChild>
-                          <a type={undefined}>Dashboard</a>
-                        </Button>
-                      </Link>
+                      <Button className="hidden text-white lg:block" asChild>
+                        <Link href="/dashboard/projects">Dashboard</Link>
+                      </Button>
                     ) : (
                       <>
-                        <Link href="https://supabase.com/dashboard" passHref>
-                          <Button type="default" className="hidden lg:block" asChild>
-                            <a type={undefined}>Sign in</a>
-                          </Button>
-                        </Link>
-                        <Link href="https://supabase.com/dashboard" passHref>
-                          <Button className="hidden text-white lg:block" asChild>
-                            <a type={undefined}>Start your project</a>
-                          </Button>
-                        </Link>
+                        <Button type="default" className="hidden lg:block" asChild>
+                          <Link href="https://supabase.com/dashboard">Sign in</Link>
+                        </Button>
+                        <Button className="hidden text-white lg:block" asChild>
+                          <Link href="https://supabase.com/dashboard">Start your project</Link>
+                        </Button>
                       </>
                     )}
                   </>

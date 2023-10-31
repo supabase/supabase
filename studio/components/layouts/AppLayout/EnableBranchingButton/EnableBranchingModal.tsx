@@ -164,11 +164,9 @@ const EnableBranchingModal = () => {
                     >
                       Understood
                     </Button>
-                    <Link passHref href={`/org/${selectedOrg?.slug}/billing`}>
-                      <Button asChild>
-                        <a>Organization settings</a>
-                      </Button>
-                    </Link>
+                    <Button asChild>
+                      <Link href={`/org/${selectedOrg?.slug}/billing`}>Organization settings</Link>
+                    </Button>
                   </div>
                 </Modal.Content>
               </>

@@ -184,13 +184,11 @@ const ColumnType = ({
             unless you have a very specific use case.
           </p>
           <div className="flex items-center space-x-2 mt-3">
-            <Link href={recommendation.reference}>
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" icon={<IconExternalLink />}>
-                  Read more
-                </Button>
-              </a>
-            </Link>
+            <Button asChild type="default" icon={<IconExternalLink />}>
+              <Link href={recommendation.reference} target="_blank" rel="noreferrer">
+                Read more
+              </Link>
+            </Button>
             <Button type="primary" onClick={() => onOptionSelect(recommendation.alternative)}>
               Use {recommendation.alternative}
             </Button>

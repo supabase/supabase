@@ -1,5 +1,5 @@
-import Head from 'next/head'
 import { useRouter } from 'next/router'
+import Script from 'next/script'
 import { ComponentType, useEffect } from 'react'
 
 import { useParams } from 'common/hooks'
@@ -8,8 +8,8 @@ import { useAuthenticatorAssuranceLevelQuery } from 'data/profile/mfa-authentica
 import { useSelectedProject, useStore } from 'hooks'
 import { useAuth } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
-import { getReturnToPath, STORAGE_KEY } from 'lib/gotrue'
-import { isNextPageWithLayout, NextPageWithLayout } from 'types'
+import { STORAGE_KEY, getReturnToPath } from 'lib/gotrue'
+import { NextPageWithLayout, isNextPageWithLayout } from 'types'
 import Error500 from '../../pages/500'
 
 const PLATFORM_ONLY_PAGES = [
@@ -96,22 +96,27 @@ export function withAuth<T>(
       return <Error500 />
     }
 
+    const InnerComponent = WrappedComponent as any
+
     return (
       <>
-        <Head>
-          {/* This script will quickly (before the main JS loads) redirect the user
+        {/* This script will quickly (before the main JS loads) redirect the user
           to the login page if they are guaranteed (no token at all) to not be logged in. */}
-          {IS_PLATFORM && (
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `window._getReturnToPath = ${getReturnToPath.toString()};if (!localStorage.getItem('${STORAGE_KEY}') && !location.hash) {const searchParams = new URLSearchParams(location.search);searchParams.set('returnTo', location.pathname);location.replace('${
-                  basePath ?? ''
-                }/sign-in' + '?' + searchParams.toString())}`,
-              }}
-            />
-          )}
-        </Head>
-        <WrappedComponent {...props} />
+        {IS_PLATFORM && (
+          <Script
+            id="redirect-if-not-logged-in"
+            dangerouslySetInnerHTML={{
+              __html: `
+              window._getReturnToPath = ${getReturnToPath.toString()};
+              if (!localStorage.getItem('${STORAGE_KEY}') && !location.hash) {
+                const searchParams = new URLSearchParams(location.search);
+                searchParams.set('returnTo', location.pathname);
+                location.replace('${basePath ?? ''}/sign-in' + '?' + searchParams.toString())
+              }`,
+            }}
+          />
+        )}
+        <InnerComponent {...props} />
       </>
     )
   }

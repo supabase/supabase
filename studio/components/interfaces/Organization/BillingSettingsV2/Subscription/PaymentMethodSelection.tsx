@@ -86,7 +86,7 @@ const PaymentMethodSelection = ({
             </div>
 
             <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
+              <Tooltip.Trigger asChild>
                 <Button
                   type="default"
                   disabled={!canUpdatePaymentMethods}

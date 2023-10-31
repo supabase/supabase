@@ -1,28 +1,34 @@
+import { Column } from 'react-data-grid'
+import { LogData } from '../Logs.types'
 import {
   RowLayout,
   SeverityFormatter,
   TextFormatter,
   TimestampLocalFormatter,
 } from '../LogsFormatters'
-import DefaultPreviewColumnRenderer from './DefaultPreviewColumnRenderer'
+import { defaultRenderCell } from './DefaultPreviewColumnRenderer'
 
-export default [
+const columns: Column<LogData>[] = [
   {
-    formatter: (data: any) => {
-      if (!data.row.event_type && !data.row.level) {
-        return DefaultPreviewColumnRenderer[0].formatter(data)
+    name: 'functions-logs-first-column',
+    key: 'functions-logs-first-column',
+    renderCell: (props) => {
+      if (!props.row.event_type && !props.row.level) {
+        return defaultRenderCell(props)
       }
       return (
         <RowLayout>
-          <TimestampLocalFormatter value={data.row.timestamp!} />
-          {data.row.event_type === 'uncaughtException' ? (
-            <SeverityFormatter value={data.row.event_type} uppercase={false} />
+          <TimestampLocalFormatter value={props.row.timestamp!} />
+          {props.row.event_type === 'uncaughtException' ? (
+            <SeverityFormatter value={props.row.event_type} uppercase={false} />
           ) : (
-            <SeverityFormatter value={data.row.level} />
+            <SeverityFormatter value={props.row.level as string} />
           )}
-          <TextFormatter className="w-full" value={data.row.event_message} />
+          <TextFormatter className="w-full" value={props.row.event_message} />
         </RowLayout>
       )
     },
   },
 ]
+
+export default columns

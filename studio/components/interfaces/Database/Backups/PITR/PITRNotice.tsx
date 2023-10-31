@@ -28,15 +28,12 @@ const PITRNotice = ({}) => {
             You can also increase your recovery retention period updating your PITR add-on
           </span>
           <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
-              <Link
-                href={`/project/${projectRef}/settings/billing/subscription?panel=pitr`}
-                passHref
-              >
-                <Button disabled={canUpdateSubscription} type="default" asChild>
-                  <a>Increase retention period</a>
-                </Button>
-              </Link>
+            <Tooltip.Trigger asChild>
+              <Button asChild disabled={canUpdateSubscription} type="default">
+                <Link href={`/project/${projectRef}/settings/billing/subscription?panel=pitr`}>
+                  Increase retention period
+                </Link>
+              </Button>
             </Tooltip.Trigger>
             {!canUpdateSubscription && (
               <Tooltip.Portal>

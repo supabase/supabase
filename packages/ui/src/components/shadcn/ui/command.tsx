@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { DialogProps } from '@radix-ui/react-dialog'
-import { Command as CommandPrimitive } from 'cmdk-supabase'
+import { Command as CommandPrimitive } from 'cmdk'
 import { Search } from 'lucide-react'
 
 import { cn } from '@ui/lib/utils'

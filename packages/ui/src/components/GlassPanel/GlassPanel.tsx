@@ -33,7 +33,7 @@ const GlassPanel = ({
   const showLogoInverse = logoInverse && resolvedTheme === 'dark'
   const showLogo = !showLogoInverse && logo
 
-  const IconBackground: React.FC = (props) => (
+  const IconBackground: React.FC<React.PropsWithChildren> = (props) => (
     <div
       className={[
         'shrink-0',
