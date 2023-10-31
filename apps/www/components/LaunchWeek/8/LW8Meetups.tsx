@@ -59,41 +59,38 @@ const LW8Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
           meets
             ?.sort((a, b) => (new Date(a.start_at) > new Date(b.start_at) ? 1 : -1))
             .map(({ display_info, link, isLive, title }: Meetup) => (
-              <Link href={link ?? '#'}>
-                <a
-                  target="_blank"
-                  className={[
-                    'w-full group py-0 flex items-center gap-2 md:gap-4 text-lg sm:text-2xl xl:text-4xl border-b border-[#111718]',
-                    'hover:text-foreground',
-                    isLive ? 'text-light' : 'text-[#56646B]',
-                    !link && 'pointer-events-none',
-                  ].join(' ')}
-                >
-                  <div className="flex items-center gap-2 md:gap-4 py-2 md:py-0">
-                    <span>{title}</span>
-                    {isLive && <Badge>Live now</Badge>}
-                    <span className="hidden md:inline opacity-0 -translate-x-2 transition-all md:group-hover:opacity-100 group-hover:translate-x-0">
-                      <svg
-                        width="47"
-                        height="47"
-                        viewBox="0 0 47 47"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M33.0387 16.2422L40.6691 23.8727M40.6691 23.8727L33.0387 31.5031M40.6691 23.8727L6.33203 23.8727"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </span>
-                  </div>
-                  {display_info && (
-                    <span className="text-sm text-right flex-1">{display_info}</span>
-                  )}
-                </a>
+              <Link
+                href={link ?? '#'}
+                target="_blank"
+                className={[
+                  'w-full group py-0 flex items-center gap-2 md:gap-4 text-lg sm:text-2xl xl:text-4xl border-b border-[#111718]',
+                  'hover:text-foreground',
+                  isLive ? 'text-light' : 'text-[#56646B]',
+                  !link && 'pointer-events-none',
+                ].join(' ')}
+              >
+                <div className="flex items-center gap-2 md:gap-4 py-2 md:py-0">
+                  <span>{title}</span>
+                  {isLive && <Badge>Live now</Badge>}
+                  <span className="hidden md:inline opacity-0 -translate-x-2 transition-all md:group-hover:opacity-100 group-hover:translate-x-0">
+                    <svg
+                      width="47"
+                      height="47"
+                      viewBox="0 0 47 47"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M33.0387 16.2422L40.6691 23.8727M40.6691 23.8727L33.0387 31.5031M40.6691 23.8727L6.33203 23.8727"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </span>
+                </div>
+                {display_info && <span className="text-sm text-right flex-1">{display_info}</span>}
               </Link>
             ))}
       </div>

@@ -32,18 +32,16 @@ Supabase supports Phone Login with several communications platforms. Follow the 
 
 <div className="grid grid-cols-12 gap-10 not-prose py-8">
   {PhoneLoginsItems.map((item) => (
-    <Link href={`${item.url}`} key={item.name} passHref>
-      <a className="col-span-4">
-        <IconPanel
-          title={item.name}
-          span="col-span-6"
-          icon={item.icon}
-          isDarkMode={item.isDarkMode}
-          hasLightIcon={item.hasLightIcon}
-        >
-          {item.linkDescription}
-        </IconPanel>
-      </a>
+    <Link href={`${item.url}`} key={item.name} passHref className="col-span-4">
+      <IconPanel
+        title={item.name}
+        span="col-span-6"
+        icon={item.icon}
+        isDarkMode={item.isDarkMode}
+        hasLightIcon={item.hasLightIcon}
+      >
+        {item.linkDescription}
+      </IconPanel>
     </Link>
 ))}
 

@@ -2,13 +2,14 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useParams } from 'common/hooks'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
 import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
 import { useOrganizationMemberInviteDeleteMutation } from 'data/organizations/organization-member-invite-delete-mutation'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useCheckPermissions, useIsFeatureEnabled, useSelectedOrganization, useStore } from 'hooks'
 import { observer } from 'mobx-react-lite'
+import { useState } from 'react'
 import { Member, Role } from 'types'
 import {
   Button,
@@ -19,6 +20,7 @@ import {
   DropdownMenuTrigger,
   IconMoreHorizontal,
   IconTrash,
+  Modal,
 } from 'ui'
 import { isInviteExpired } from '../Organization.utils'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
@@ -54,6 +56,8 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
     resource: { role_id: roleId },
   })
 
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+
   const { mutate: deleteOrganizationMember, isLoading: isDeletingMember } =
     useOrganizationMemberDeleteMutation({
       onSuccess: () => {
@@ -61,6 +65,7 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
           category: 'success',
           message: `Successfully removed ${member.primary_email}`,
         })
+        setIsDeleteModalOpen(false)
       },
     })
 
@@ -81,15 +86,9 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
     useOrganizationMemberInviteDeleteMutation()
 
   const handleMemberDelete = async () => {
-    confirmAlert({
-      title: 'Confirm to remove',
-      message: `This is permanent! Are you sure you want to remove ${member.primary_email}`,
-      onAsyncConfirm: async () => {
-        if (!slug) return console.error('slug is required')
-        if (!member.gotrue_id) return console.error('gotrue_id is required')
-        deleteOrganizationMember({ slug, gotrueId: member.gotrue_id })
-      },
-    })
+    if (!slug) return console.error('slug is required')
+    if (!member.gotrue_id) return console.error('gotrue_id is required')
+    deleteOrganizationMember({ slug, gotrueId: member.gotrue_id })
   }
 
   const handleResendInvite = async (member: Member) => {
@@ -150,56 +149,79 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
   const isLoading = isDeletingMember || isDeletingInvite || isCreatingInvite
 
   return (
-    <div className="flex items-center justify-end">
-      <DropdownMenu>
-        <DropdownMenuTrigger>
-          <Button
-            asChild
-            type="text"
-            disabled={isLoading}
-            loading={isLoading}
-            icon={<IconMoreHorizontal />}
-          >
-            <span></span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent side="bottom" align="end">
-          <>
-            {isPendingInviteAcceptance ? (
-              <>
-                {canRevokeInvite && (
-                  <DropdownMenuItem onClick={() => handleRevokeInvitation(member)}>
-                    <div className="flex flex-col">
-                      <p>Cancel invitation</p>
-                      <p className="block opacity-50">Revoke this invitation.</p>
-                    </div>
-                  </DropdownMenuItem>
-                )}
-                {/* canResendInvite && isExpired */}
-                {true && (
-                  <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => handleResendInvite(member)}>
+    <>
+      <div className="flex items-center justify-end">
+        <DropdownMenu>
+          <DropdownMenuTrigger>
+            <Button
+              asChild
+              type="text"
+              disabled={isLoading}
+              loading={isLoading}
+              icon={<IconMoreHorizontal />}
+            >
+              <span></span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="bottom" align="end">
+            <>
+              {isPendingInviteAcceptance ? (
+                <>
+                  {canRevokeInvite && (
+                    <DropdownMenuItem onClick={() => handleRevokeInvitation(member)}>
                       <div className="flex flex-col">
-                        <p>Resend invitation</p>
-                        <p className="block opacity-50">Invites expire after 24hrs.</p>
+                        <p>Cancel invitation</p>
+                        <p className="block opacity-50">Revoke this invitation.</p>
                       </div>
                     </DropdownMenuItem>
-                  </>
-                )}
-              </>
-            ) : (
-              organizationMembersDeletionEnabled && (
-                <DropdownMenuItem className="space-x-2" onClick={handleMemberDelete}>
-                  <IconTrash size={16} />
-                  <p>Remove member</p>
-                </DropdownMenuItem>
-              )
-            )}
-          </>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+                  )}
+                  {/* canResendInvite && isExpired */}
+                  {true && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => handleResendInvite(member)}>
+                        <div className="flex flex-col">
+                          <p>Resend invitation</p>
+                          <p className="block opacity-50">Invites expire after 24hrs.</p>
+                        </div>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </>
+              ) : (
+                organizationMembersDeletionEnabled && (
+                  <DropdownMenuItem
+                    className="space-x-2"
+                    onClick={() => {
+                      setIsDeleteModalOpen(true)
+                    }}
+                  >
+                    <IconTrash size={16} />
+                    <p>Remove member</p>
+                  </DropdownMenuItem>
+                )
+              )}
+            </>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      <ConfirmationModal
+        visible={isDeleteModalOpen}
+        header="Confirm to remove"
+        buttonLabel="Remove"
+        onSelectCancel={() => setIsDeleteModalOpen(false)}
+        onSelectConfirm={() => {
+          handleMemberDelete()
+        }}
+      >
+        <Modal.Content>
+          <p className="py-4 text-sm text-foreground-light">
+            This is permanent! Are you sure you want to remove {member.primary_email}
+          </p>
+        </Modal.Content>
+      </ConfirmationModal>
+    </>
   )
 }
 

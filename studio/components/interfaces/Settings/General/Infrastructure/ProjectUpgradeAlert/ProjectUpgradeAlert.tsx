@@ -110,16 +110,15 @@ const ProjectUpgradeAlert = () => {
                             </p>
 
                             <div>
-                              <Link
-                                href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats"
-                                passHref
-                              >
-                                <Button size="tiny" type="default" asChild>
-                                  <a target="_blank" rel="noreferrer">
-                                    View docs
-                                  </a>
-                                </Button>
-                              </Link>
+                              <Button size="tiny" type="default" asChild>
+                                <Link
+                                  href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats"
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  View docs
+                                </Link>
+                              </Button>
                             </div>
                           </AlertDescription_Shadcn_>
                         </Alert_Shadcn_>
@@ -146,24 +145,22 @@ const ProjectUpgradeAlert = () => {
                                   {legacyAuthCustomRoles.map((role) => (
                                     <div key={role} className="pb-1">
                                       ALTER ROLE <span className="text-brand">{role}</span> WITH
-                                      ENCRYPTED PASSWORD '
-                                      <span className="text-brand">newpassword</span>';
+                                      PASSWORD '<span className="text-brand">newpassword</span>';
                                     </div>
                                   ))}
                                 </code>
                               </div>
                             </div>
                             <div>
-                              <Link
-                                href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats"
-                                passHref
-                              >
-                                <Button size="tiny" type="default" asChild>
-                                  <a target="_blank" rel="noreferrer">
-                                    View docs
-                                  </a>
-                                </Button>
-                              </Link>
+                              <Button size="tiny" type="default" asChild>
+                                <Link
+                                  href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats"
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  View docs
+                                </Link>
+                              </Button>
                             </div>
                           </AlertDescription_Shadcn_>
                         </Alert_Shadcn_>

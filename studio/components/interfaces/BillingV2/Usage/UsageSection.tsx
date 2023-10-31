@@ -135,15 +135,13 @@ const UsageSection = ({
                       {currentBillingCycleSelected &&
                         !usageBasedBilling &&
                         usageRatio >= USAGE_APPROACHING_THRESHOLD && (
-                          <Link href={upgradeUrl}>
-                            <a className="pb-1">
-                              <Button type="default" size="tiny">
-                                {subscription?.plan?.id === 'free'
-                                  ? 'Upgrade plan'
-                                  : 'Change spend cap'}
-                              </Button>
-                            </a>
-                          </Link>
+                          <Button asChild type="default" size="tiny">
+                            <Link href={upgradeUrl} className="pb-1">
+                              {subscription?.plan?.id === 'free'
+                                ? 'Upgrade plan'
+                                : 'Change spend cap'}
+                            </Link>
+                          </Button>
                         )}
                     </div>
                     {currentBillingCycleSelected && usageMeta?.limit > 0 && (
@@ -266,14 +264,13 @@ const UsageSection = ({
                         </div>
                       </div>
 
-                      <Link
-                        href={`/project/${projectRef}/settings/billing/subscription?panel=subscriptionPlan`}
-                        passHref
-                      >
-                        <Button type="primary" asChild>
-                          <a>Upgrade plan</a>
-                        </Button>
-                      </Link>
+                      <Button type="primary" asChild>
+                        <Link
+                          href={`/project/${projectRef}/settings/billing/subscription?panel=subscriptionPlan`}
+                        >
+                          Upgrade plan
+                        </Link>
+                      </Button>
                     </div>
                   </Panel.Content>
                 </Panel>

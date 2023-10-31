@@ -120,11 +120,9 @@ const OrganizationProjects = ({
 
         {!!overdueInvoices.length && (
           <div>
-            <Link href={`/org/${slug}/invoices`}>
-              <a>
-                <Button type="danger">Outstanding Invoices</Button>
-              </a>
-            </Link>
+            <Button asChild type="danger">
+              <Link href={`/org/${slug}/invoices`}>Outstanding Invoices</Link>
+            </Button>
           </div>
         )}
 
@@ -195,10 +193,11 @@ const OrganizationProjects = ({
               The organization "{name}" still uses the legacy project-based billing. We've recently
               made some big improvements to our billing system and require your action. To migrate
               to the new organization-based billing, head over to your{' '}
-              <Link href={`/org/${slug}/billing`} passHref>
-                <a className="text-sm text-green-900 transition hover:text-green-1000">
-                  organization billing settings
-                </a>
+              <Link
+                href={`/org/${slug}/billing`}
+                className="text-sm text-green-900 transition hover:text-green-1000"
+              >
+                organization billing settings
               </Link>
               .
             </p>
@@ -209,20 +208,24 @@ const OrganizationProjects = ({
             </p>
 
             <div className="space-x-3">
-              <Link href="https://supabase.com/blog/organization-based-billing" passHref>
-                <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                  <a target="_blank" rel="noreferrer">
-                    Announcement
-                  </a>
-                </Button>
-              </Link>
-              <Link href="https://supabase.com/docs/guides/platform/org-based-billing" passHref>
-                <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                  <a target="_blank" rel="noreferrer">
-                    Documentation
-                  </a>
-                </Button>
-              </Link>
+              <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                <Link
+                  href="https://supabase.com/blog/organization-based-billing"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Announcement
+                </Link>
+              </Button>
+              <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                <Link
+                  href="https://supabase.com/docs/guides/platform/org-based-billing"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Documentation
+                </Link>
+              </Button>
             </div>
           </div>
         </Modal.Content>
@@ -239,11 +242,9 @@ const NoProjectsState = ({ slug }: { slug: string }) => {
         <p className="text-sm text-foreground-light">Get started by creating a new project.</p>
       </div>
       <div>
-        <Link href={`/new/${slug}`}>
-          <a>
-            <Button icon={<IconPlus />}>New Project</Button>
-          </a>
-        </Link>
+        <Button asChild icon={<IconPlus />}>
+          <Link href={`/new/${slug}`}>New Project</Link>
+        </Button>
       </div>
     </div>
   )
