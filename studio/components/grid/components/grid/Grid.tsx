@@ -157,7 +157,10 @@ export const Grid = memo(
             renderers={{
               renderRow: RowRenderer,
               noRowsFallback: (
-                <>
+                // [Joshen] Temp fix with magic numbers till we find a better solution
+                // RDG used to use flex, but with v7 they've moved to CSS grid and the
+                // in built no rows fallback only takes the width of the CSS grid itself
+                <div style={{ width: `calc(100vw - 255px - 55px)` }}>
                   {isLoading && (
                     <div className="p-2 col-span-full">
                       <GenericSkeletonLoader />
@@ -210,7 +213,7 @@ export const Grid = memo(
                       )}
                     </>
                   )}
-                </>
+                </div>
               ),
             }}
             rowKeyGetter={rowKeyGetter}
