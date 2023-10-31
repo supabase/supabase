@@ -1,4 +1,4 @@
-import { Badge, Button, Checkbox, Modal } from 'ui'
+import { Badge, Button, Checkbox, IconExternalLink, Modal } from 'ui'
 
 import { PolicyName, PolicyRoles } from 'components/interfaces/Auth/Policies/PolicyEditor'
 import SqlEditor from 'components/ui/SqlEditor'
@@ -83,12 +83,23 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
 
 const PolicyEditorFooter = ({ onViewTemplates = () => {}, onReviewPolicy = () => {} }) => (
   <div className="flex w-full items-center justify-end space-x-4 border-t px-6 py-3 dark:border-dark">
-    <Button type="default" onClick={onViewTemplates}>
-      View templates
+    <Button asChild type="link" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
+      <a
+        href="https://supabase.com/docs/guides/storage/access-control"
+        target="_blank"
+        rel="noreferrer"
+      >
+        Documentation
+      </a>
     </Button>
-    <Button type="primary" onClick={onReviewPolicy}>
-      Review
-    </Button>
+    <div className="flex w-full items-center justify-end gap-2">
+      <Button type="default" onClick={onViewTemplates}>
+        View templates
+      </Button>
+      <Button type="primary" onClick={onReviewPolicy}>
+        Review
+      </Button>
+    </div>
   </div>
 )
 
