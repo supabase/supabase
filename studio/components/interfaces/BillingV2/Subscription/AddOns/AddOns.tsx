@@ -78,43 +78,51 @@ const AddOns = () => {
               <div className="space-y-2">
                 <p className="text-sm text-foreground-light">More information</p>
                 <div>
-                  <Link href="https://supabase.com/docs/guides/platform/compute-add-ons">
-                    <a target="_blank" rel="noreferrer">
-                      <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                        <p className="text-sm">Compute add-ons</p>
-                        <IconExternalLink size={16} strokeWidth={1.5} />
-                      </div>
-                    </a>
+                  <Link
+                    href="https://supabase.com/docs/guides/platform/compute-add-ons"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
+                      <p className="text-sm">Compute add-ons</p>
+                      <IconExternalLink size={16} strokeWidth={1.5} />
+                    </div>
                   </Link>
                 </div>
                 <div>
-                  <Link href="https://supabase.com/docs/guides/platform/backups#point-in-time-recovery">
-                    <a target="_blank" rel="noreferrer">
-                      <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                        <p className="text-sm">PITR backups</p>
-                        <IconExternalLink size={16} strokeWidth={1.5} />
-                      </div>
-                    </a>
+                  <Link
+                    href="https://supabase.com/docs/guides/platform/backups#point-in-time-recovery"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
+                      <p className="text-sm">PITR backups</p>
+                      <IconExternalLink size={16} strokeWidth={1.5} />
+                    </div>
                   </Link>
                 </div>
                 <div>
-                  <Link href="https://supabase.com/docs/guides/platform/custom-domains">
-                    <a target="_blank" rel="noreferrer">
-                      <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                        <p className="text-sm">Custom domains</p>
-                        <IconExternalLink size={16} strokeWidth={1.5} />
-                      </div>
-                    </a>
+                  <Link
+                    href="https://supabase.com/docs/guides/platform/custom-domains"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
+                      <p className="text-sm">Custom domains</p>
+                      <IconExternalLink size={16} strokeWidth={1.5} />
+                    </div>
                   </Link>
                 </div>
                 <div>
-                  <Link href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler">
-                    <a target="_blank" rel="noreferrer">
-                      <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                        <p className="text-sm">Connection Pooler</p>
-                        <IconExternalLink size={16} strokeWidth={1.5} />
-                      </div>
-                    </a>
+                  <Link
+                    href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
+                      <p className="text-sm">Connection Pooler</p>
+                      <IconExternalLink size={16} strokeWidth={1.5} />
+                    </div>
                   </Link>
                 </div>
               </div>
@@ -208,35 +216,31 @@ const AddOns = () => {
 
                   <div className="mt-2 w-full flex items-center justify-between border-b py-2">
                     <Link href={`/project/${projectRef}/settings/billing/usage#ram`}>
-                      <a>
-                        <div className="group flex items-center space-x-2">
-                          <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
-                            Memory
-                          </p>
-                          <IconChevronRight
-                            strokeWidth={1.5}
-                            size={16}
-                            className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
-                          />
-                        </div>
-                      </a>
+                      <div className="group flex items-center space-x-2">
+                        <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
+                          Memory
+                        </p>
+                        <IconChevronRight
+                          strokeWidth={1.5}
+                          size={16}
+                          className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
+                        />
+                      </div>
                     </Link>
                     <p className="text-sm">{computeInstance?.variant?.meta?.memory_gb ?? 1} GB</p>
                   </div>
                   <div className="w-full flex items-center justify-between border-b py-2">
                     <Link href={`/project/${projectRef}/settings/billing/usage#cpu`}>
-                      <a>
-                        <div className="group flex items-center space-x-2">
-                          <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
-                            CPU
-                          </p>
-                          <IconChevronRight
-                            strokeWidth={1.5}
-                            size={16}
-                            className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
-                          />
-                        </div>
-                      </a>
+                      <div className="group flex items-center space-x-2">
+                        <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
+                          CPU
+                        </p>
+                        <IconChevronRight
+                          strokeWidth={1.5}
+                          size={16}
+                          className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
+                        />
+                      </div>
                     </Link>
                     <p className="text-sm">
                       {computeInstance?.variant?.meta?.cpu_cores ?? 2}-core {cpuArchitecture}{' '}
@@ -257,18 +261,16 @@ const AddOns = () => {
                   </div>
                   <div className="w-full flex items-center justify-between border-b py-2">
                     <Link href={`/project/${projectRef}/settings/billing/usage#disk_io`}>
-                      <a>
-                        <div className="group flex items-center space-x-2">
-                          <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
-                            Max Disk Throughput
-                          </p>
-                          <IconChevronRight
-                            strokeWidth={1.5}
-                            size={16}
-                            className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
-                          />
-                        </div>
-                      </a>
+                      <div className="group flex items-center space-x-2">
+                        <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
+                          Max Disk Throughput
+                        </p>
+                        <IconChevronRight
+                          strokeWidth={1.5}
+                          size={16}
+                          className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
+                        />
+                      </div>
                     </Link>
                     <p className="text-sm">
                       {computeInstance?.variant?.meta?.max_disk_io_mbs?.toLocaleString() ?? '2,085'}{' '}
@@ -277,18 +279,16 @@ const AddOns = () => {
                   </div>
                   <div className="w-full flex items-center justify-between py-2">
                     <Link href={`/project/${projectRef}/settings/billing/usage#disk_io`}>
-                      <a>
-                        <div className="group flex items-center space-x-2">
-                          <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
-                            Baseline Disk Throughput
-                          </p>
-                          <IconChevronRight
-                            strokeWidth={1.5}
-                            size={16}
-                            className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
-                          />
-                        </div>
-                      </a>
+                      <div className="group flex items-center space-x-2">
+                        <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
+                          Baseline Disk Throughput
+                        </p>
+                        <IconChevronRight
+                          strokeWidth={1.5}
+                          size={16}
+                          className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
+                        />
+                      </div>
                     </Link>
                     <p className="text-sm">
                       {computeInstance?.variant?.meta?.baseline_disk_io_mbs?.toLocaleString() ?? 87}{' '}
@@ -334,14 +334,13 @@ const AddOns = () => {
                         <p className="text-sm leading-normal mb-2">
                           Reach out to us via support if you're interested
                         </p>
-                        <Link
-                          passHref
-                          href={`/support/new?ref=${projectRef}&category=sales&subject=Project%20too%20old%20old%20for%20PITR`}
-                        >
-                          <Button asChild type="default">
-                            <a>Contact support</a>
-                          </Button>
-                        </Link>
+                        <Button asChild type="default">
+                          <Link
+                            href={`/support/new?ref=${projectRef}&category=sales&subject=Project%20too%20old%20old%20for%20PITR`}
+                          >
+                            Contact support
+                          </Link>
+                        </Button>
                       </AlertDescription_Shadcn_>
                     </Alert_Shadcn_>
                   ) : (

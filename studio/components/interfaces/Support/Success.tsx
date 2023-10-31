@@ -47,20 +47,21 @@ const Success = ({ sentCategory = '' }: SuccessProps) => {
               onChange={(e) => setSearchValue(e.target.value)}
               icon={<IconSearch size={16} strokeWidth={1.5} />}
               actions={[
-                <Link
+                <Button
                   key="search"
-                  href={`https://github.com/supabase/supabase/discussions?discussions_q=${searchValue}`}
+                  asChild
+                  className="mr-1"
+                  type="default"
+                  icon={<IconExternalLink size={16} strokeWidth={1.5} />}
                 >
-                  <a target="_blank" rel="noreferrer">
-                    <Button
-                      className="mr-1"
-                      type="default"
-                      icon={<IconExternalLink size={16} strokeWidth={1.5} />}
-                    >
-                      Search on Github discussions
-                    </Button>
-                  </a>
-                </Link>,
+                  <Link
+                    href={`https://github.com/supabase/supabase/discussions?discussions_q=${searchValue}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Search on Github discussions
+                  </Link>
+                </Button>,
               ]}
             />
           </div>
@@ -71,9 +72,7 @@ const Success = ({ sentCategory = '' }: SuccessProps) => {
       </div>
       <div className="w-full pb-4 px-4 flex items-center justify-end">
         <Link href="/">
-          <a>
-            <Button>Go back</Button>
-          </a>
+          <Button>Go back</Button>
         </Link>
       </div>
     </div>

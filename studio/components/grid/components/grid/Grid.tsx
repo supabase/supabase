@@ -1,6 +1,7 @@
 /* eslint-disable react/display-name */
 
-import DataGrid, { DataGridHandle, RowsChangeData } from '@supabase/react-data-grid'
+import 'react-data-grid/lib/styles.css'
+import DataGrid, { DataGridHandle, RowsChangeData } from 'react-data-grid'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { forwardRef } from 'react'
 import { memo } from 'react-tracked'
@@ -96,10 +97,10 @@ export const Grid = memo(
         })
       }
 
-      function onSelectedCellChange(position: { idx: number; rowIdx: number }) {
+      function onSelectedCellChange(args: { rowIdx: number; row: any; column: any }) {
         dispatch({
           type: 'SELECTED_CELL_CHANGE',
-          payload: { position },
+          payload: { position: { idx: args.column.idx, rowIdx: args.rowIdx } },
         })
       }
 
@@ -117,7 +118,7 @@ export const Grid = memo(
           table?.columns.find((x) => x.name == columnName)?.foreignKey ?? {}
 
         return data?.find(
-          (key) =>
+          (key: any) =>
             key.target_schema == targetTableSchema &&
             key.target_table == targetTableName &&
             key.target_columns == targetColumnName
@@ -144,80 +145,84 @@ export const Grid = memo(
 
       return (
         <div
-          className={containerClass}
+          className={`${containerClass} flex flex-col`}
           style={{ width: width || '100%', height: height || '50vh' }}
         >
           <DataGrid
             ref={ref}
+            className={`${gridClass} flex-grow`}
+            rowClass={rowClass}
             columns={state.gridColumns}
             rows={rows ?? []}
-            rowRenderer={RowRenderer}
+            renderers={{
+              renderRow: RowRenderer,
+              noRowsFallback: (
+                // [Joshen] Temp fix with magic numbers till we find a better solution
+                // RDG used to use flex, but with v7 they've moved to CSS grid and the
+                // in built no rows fallback only takes the width of the CSS grid itself
+                <div style={{ width: `calc(100vw - 255px - 55px)` }}>
+                  {isLoading && (
+                    <div className="p-2 col-span-full">
+                      <GenericSkeletonLoader />
+                    </div>
+                  )}
+                  {isError && (
+                    <div className="p-2 col-span-full">
+                      <AlertError error={error} subject="Failed to retrieve rows from table" />
+                    </div>
+                  )}
+                  {isSuccess && (
+                    <>
+                      {(filters ?? []).length === 0 ? (
+                        <div
+                          style={{ height: `calc(100% - 35px)` }}
+                          className="flex flex-col items-center justify-center col-span-full"
+                        >
+                          <p className="text-sm text-light">This table is empty</p>
+                          {onAddRow !== undefined && onImportData !== undefined && (
+                            <>
+                              <p className="text-sm text-light mt-1">
+                                Add rows to your table to get started.
+                              </p>
+                              <div className="flex items-center space-x-2 mt-4">
+                                {/* [Joshen] Leaving this as a placeholder */}
+                                {/* <Button type="outline">Generate random data</Button> */}
+                                {onAddRow !== undefined && onImportData !== undefined && (
+                                  <Button type="default" onClick={onImportData}>
+                                    Import data via CSV
+                                  </Button>
+                                )}
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      ) : (
+                        <div
+                          style={{ height: `calc(100% - 35px)` }}
+                          className="flex flex-col items-center justify-center col-span-full"
+                        >
+                          <p className="text-sm text-light">
+                            The filters applied has returned no results from this table
+                          </p>
+                          <div className="flex items-center space-x-2 mt-4">
+                            <Button type="default" onClick={() => removeAllFilters()}>
+                              Remove all filters
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              ),
+            }}
             rowKeyGetter={rowKeyGetter}
             selectedRows={state.selectedRows}
             onColumnResize={onColumnResize}
             onRowsChange={onRowsChange}
             onSelectedCellChange={onSelectedCellChange}
             onSelectedRowsChange={onSelectedRowsChange}
-            onRowDoubleClick={onRowDoubleClick}
-            className={gridClass}
-            rowClass={rowClass}
-            style={{ height: '100%' }}
-            noRowsFallback={
-              <>
-                {isLoading && (
-                  <div className="p-2">
-                    <GenericSkeletonLoader />
-                  </div>
-                )}
-                {isError && (
-                  <div className="p-2">
-                    <AlertError error={error} subject="Failed to retrieve rows from table" />
-                  </div>
-                )}
-                {isSuccess && (
-                  <>
-                    {(filters ?? []).length === 0 ? (
-                      <div
-                        style={{ height: `calc(100% - 35px)` }}
-                        className="flex flex-col items-center justify-center"
-                      >
-                        <p className="text-sm text-light">This table is empty</p>
-                        {onAddRow !== undefined && onImportData !== undefined && (
-                          <>
-                            <p className="text-sm text-light mt-1">
-                              Add rows to your table to get started.
-                            </p>
-                            <div className="flex items-center space-x-2 mt-4">
-                              {/* [Joshen] Leaving this as a placeholder */}
-                              {/* <Button type="outline">Generate random data</Button> */}
-                              {onAddRow !== undefined && onImportData !== undefined && (
-                                <Button type="default" onClick={onImportData}>
-                                  Import data via CSV
-                                </Button>
-                              )}
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    ) : (
-                      <div
-                        style={{ height: `calc(100% - 35px)` }}
-                        className="flex flex-col items-center justify-center"
-                      >
-                        <p className="text-sm text-light">
-                          The filters applied has returned no results from this table
-                        </p>
-                        <div className="flex items-center space-x-2 mt-4">
-                          <Button type="default" onClick={() => removeAllFilters()}>
-                            Remove all filters
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-                  </>
-                )}
-              </>
-            }
+            onCellDoubleClick={(props) => onRowDoubleClick(props.row, props.column)}
           />
         </div>
       )

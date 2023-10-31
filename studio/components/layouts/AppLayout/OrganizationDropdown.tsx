@@ -82,45 +82,40 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
                       ? `/org/${org.slug}`
                       : `/org/${org.slug}/general`
                     return (
-                      <Link passHref href={href} key={org.slug}>
-                        <CommandItem_Shadcn_
-                          asChild
-                          value={`${org.name} - ${org.slug}`}
-                          className="cursor-pointer w-full flex items-center justify-between"
-                          onSelect={() => {
-                            setOpen(false)
-                            router.push(href)
-                          }}
-                          onClick={() => setOpen(false)}
-                        >
-                          <a>
-                            {org.name}
-                            {org.slug === slug && <IconCheck />}
-                          </a>
-                        </CommandItem_Shadcn_>
-                      </Link>
+                      <CommandItem_Shadcn_
+                        key={org.slug}
+                        value={`${org.name} - ${org.slug}`}
+                        className="cursor-pointer w-full"
+                        onSelect={() => {
+                          setOpen(false)
+                          router.push(href)
+                        }}
+                        onClick={() => setOpen(false)}
+                      >
+                        <Link href={href} className="w-full flex items-center justify-between">
+                          {org.name}
+                          {org.slug === slug && <IconCheck />}
+                        </Link>
+                      </CommandItem_Shadcn_>
                     )
                   })}
                 </ScrollArea>
               </CommandGroup_Shadcn_>
               {organizationCreationEnabled && (
                 <CommandGroup_Shadcn_ className="border-t">
-                  <Link passHref href="/new">
-                    <CommandItem_Shadcn_
-                      asChild
-                      className="cursor-pointer flex items-center space-x-2 w-full"
-                      onSelect={(e) => {
-                        setOpen(false)
-                        router.push(`/new`)
-                      }}
-                      onClick={() => setOpen(false)}
-                    >
-                      <a>
-                        <IconPlus size={14} strokeWidth={1.5} />
-                        <p>New organization</p>
-                      </a>
-                    </CommandItem_Shadcn_>
-                  </Link>
+                  <CommandItem_Shadcn_
+                    className="cursor-pointer w-full"
+                    onSelect={(e) => {
+                      setOpen(false)
+                      router.push(`/new`)
+                    }}
+                    onClick={() => setOpen(false)}
+                  >
+                    <Link href="/new" className="flex items-center gap-2 w-full">
+                      <IconPlus size={14} strokeWidth={1.5} />
+                      <p>New organization</p>
+                    </Link>
+                  </CommandItem_Shadcn_>
                 </CommandGroup_Shadcn_>
               )}
             </CommandList_Shadcn_>
