@@ -836,7 +836,6 @@ export const functions: NavMenuConstant = {
         { name: 'TypeScript Support', url: '/guides/functions/typescript-support' },
         { name: 'Debugging Edge Functions', url: '/guides/functions/debugging' },
         { name: 'Managing packages using Import Maps', url: '/guides/functions/import-maps' },
-        { name: 'Globally Distributed Deployments', url: '/guides/functions/global-deployments' },
       ],
     },
     {
@@ -858,6 +857,7 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/connect-to-postgres',
         },
         { name: 'Testing your Edge Functions', url: '/guides/functions/unit-test' },
+        { name: 'Regional Invocation', url: '/guides/functions/regional-invocation' },
         { name: 'Troubleshooting', url: '/guides/functions/troubleshooting' },
       ],
     },
