@@ -1,8 +1,8 @@
-import DataGrid, { CalculatedColumn, Column, Row } from 'react-data-grid'
 import { useKeyboardShortcuts } from 'hooks'
 import { copyToClipboard } from 'lib/helpers'
 import { useState } from 'react'
 import { Item, Menu, useContextMenu } from 'react-contexify'
+import DataGrid, { CalculatedColumn } from 'react-data-grid'
 import { createPortal } from 'react-dom'
 import { IconClipboard } from 'ui'
 
@@ -58,13 +58,10 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
     idx,
     key,
     name: key,
-
     resizable: true,
-    width: 120,
-
-    // [Next 18 Refactor] Double check if this is correct
     parent: undefined,
     level: 0,
+    width: 120,
     minWidth: 120,
     maxWidth: undefined,
     draggable: false,
