@@ -6,7 +6,7 @@ import { LogData } from './Events.types'
 import { SelectedRealtimeEventPanel } from './SelectedRealtimeEventPanel'
 
 export interface LogSelectionProps {
-  log: LogData
+  log: LogData | null
   onClose: () => void
 }
 
@@ -17,20 +17,24 @@ const LogSelection = ({ log, onClose }: LogSelectionProps) => {
 
   return (
     <div
-      className={cn([
+      className={cn(
         'relative flex h-full flex-grow flex-col border border-l',
         'border-panel-border-light dark:border-panel-border-dark',
-        'overflow-y-scroll bg-gray-200',
-      ])}
+        'overflow-y-scroll bg-gray-200'
+      )}
     >
       <div
-        className={cn([
-          'absolute flex',
-          'h-full w-full flex-col items-center justify-center gap-2 overflow-y-scroll bg-scale-200 text-center opacity-0 transition-all',
-          log ? 'z-0 opacity-0' : 'z-10 opacity-100',
-        ])}
+        className={cn(
+          'absolute flex h-full w-full flex-col items-center justify-center gap-2 bg-scale-200 text-center opacity-0 transition-all',
+          log ? 'z-0 opacity-0' : 'z-10 opacity-100'
+        )}
       >
-        <div className="flex w-full max-w-sm scale-95 flex-col items-center justify-center gap-6 text-center opacity-0 transition-all delay-300 duration-500 mt-0">
+        <div
+          className={cn(
+            'flex w-full max-w-sm scale-95 flex-col items-center justify-center gap-6 text-center opacity-0 transition-all delay-300 duration-500',
+            log ? 'mt-0 scale-95 opacity-0' : 'mt-8 scale-100 opacity-100'
+          )}
+        >
           <div className="relative flex h-4 w-32 items-center rounded border border-scale-600 px-2 dark:border-scale-400">
             <div className="h-0.5 w-2/3 rounded-full bg-scale-600 dark:bg-scale-500"></div>
             <div className="absolute right-1 -bottom-4">
@@ -51,10 +55,9 @@ const LogSelection = ({ log, onClose }: LogSelectionProps) => {
             </div>
           </div>
           <div className="flex flex-col gap-1">
-            <h3 className="text-sm text-scale-1200">Select an Event</h3>
-            <p className="text-xs text-scale-900">
-              Select an Event to view the code snippet (pretty view) or complete JSON payload (raw
-              view).
+            <h3 className="text-sm text-foreground">Select an Event</h3>
+            <p className="text-xs text-foreground-lighter">
+              Click on an event on the left to view details of event.
             </p>
           </div>
         </div>
@@ -76,7 +79,7 @@ const LogSelection = ({ log, onClose }: LogSelectionProps) => {
           <div className="h-px w-full bg-scale-600 rounded" />
         </div>
         <div className="flex flex-col space-y-6 bg-scale-300 py-4">
-          <SelectedRealtimeEventPanel log={log} />
+          {log && <SelectedRealtimeEventPanel log={log} />}
         </div>
       </div>
     </div>

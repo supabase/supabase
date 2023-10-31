@@ -48,8 +48,8 @@ const renderNoResultAlert = () => (
   </div>
 )
 
-const RowRenderer = (props: RowRendererProps<any>) => {
-  return <Row {...props} isRowSelected={false} selectedCellIdx={undefined} />
+const RowRenderer = (key: Key, props: RenderRowProps<LogData, unknown>) => {
+  return <Row key={key} {...props} isRowSelected={false} selectedCellIdx={undefined} />
 }
 
 const EventsTable = ({ enabled, data = [], showSendEvent }: Props) => {
@@ -100,14 +100,9 @@ const EventsTable = ({ enabled, data = [], showSendEvent }: Props) => {
               rowHeight={40}
               headerRowHeight={0}
               onSelectedCellChange={({ rowIdx }) => {
-                setFocusedLog(data[rowIdx] as LogData)
+                setFocusedLog(data[rowIdx])
               }}
               selectedRows={new Set([])}
-              noRowsFallback={
-                <div className="mx-auto flex h-full w-full items-center justify-center space-y-12 py-4 transition-all delay-200 duration-500">
-                  {renderNoResultAlert()}
-                </div>
-              }
               columns={ColumnRenderer}
               rowClass={(row) => {
                 return cn([
@@ -120,15 +115,19 @@ const EventsTable = ({ enabled, data = [], showSendEvent }: Props) => {
               }}
               rows={data}
               rowKeyGetter={(row) => row.id}
-              onRowClick={setFocusedLog}
-              rowRenderer={RowRenderer}
+              renderers={{
+                renderRow: RowRenderer,
+                noRowsFallback: (
+                  <div className="mx-auto flex h-full w-full items-center justify-center space-y-12 py-4 transition-all delay-200 duration-500">
+                    <NoResultAlert enabled={enabled} />
+                  </div>
+                ),
+              }}
             />
           </div>
-          {(enabled || data.length > 0) && focusedLog ? (
-            <div className="flex w-1/2 flex-col">
-              <LogSelection onClose={() => setFocusedLog(null)} log={focusedLog} />
-            </div>
-          ) : null}
+          <div className="flex w-1/2 flex-col">
+            <LogSelection onClose={() => setFocusedLog(null)} log={focusedLog} />
+          </div>
         </div>
       </section>
     </>

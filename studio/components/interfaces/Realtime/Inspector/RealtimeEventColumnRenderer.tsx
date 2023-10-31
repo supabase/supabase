@@ -1,4 +1,4 @@
-import { Column } from '@supabase/react-data-grid'
+import { Column } from 'react-data-grid'
 import { IconAlertCircle, IconBroadcast, IconDatabaseChanges, IconPresence } from 'ui'
 
 import { LogData, PreviewLogData } from './Events.types'
@@ -16,7 +16,7 @@ export const ColumnRenderer: Column<LogData, unknown>[] = [
   {
     name: 'timestamp-with-truncated-text',
     key: 'main-column',
-    formatter: (data: { row: PreviewLogData }) => {
+    renderCell: (data: { row: PreviewLogData }) => {
       const isError = isErrorLog(data.row)
       const type = data.row.event_message as keyof typeof ICONS
 
