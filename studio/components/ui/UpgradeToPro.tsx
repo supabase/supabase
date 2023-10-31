@@ -5,7 +5,7 @@ import { ReactNode } from 'react'
 import { Button } from 'ui'
 
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { useCheckPermissions, useFlag } from 'hooks'
+import { useCheckPermissions, useFlag, useIsFeatureEnabled } from 'hooks'
 
 interface UpgradeToProProps {
   icon?: ReactNode

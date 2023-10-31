@@ -6,12 +6,12 @@ import { useFlag, useSelectedOrganization, useSelectedProject } from 'hooks'
 import FeedbackDropdown from '../ProjectLayout/LayoutHeader/FeedbackDropdown'
 import HelpPopover from '../ProjectLayout/LayoutHeader/HelpPopover'
 import NotificationsPopover from '../ProjectLayout/LayoutHeader/NotificationsPopover'
+import BranchDropdown from './BranchDropdown'
+import EnableBranchingButton from './EnableBranchingButton/EnableBranchingButton'
 import OrganizationDropdown from './OrganizationDropdown'
 import ProjectDropdown from './ProjectDropdown'
 import SettingsButton from './SettingsButton'
 import UserSettingsDropdown from './UserSettingsDropdown'
-import BranchDropdown from './BranchDropdown'
-import EnableBranchingButton from './EnableBranchingButton/EnableBranchingButton'
 
 const AppHeader = () => {
   const router = useRouter()

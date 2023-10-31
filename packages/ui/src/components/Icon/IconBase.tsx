@@ -1,35 +1,19 @@
 import React from 'react'
 import styleHandler from '../../lib/theme/styleHandler'
 import { IconContext } from './IconContext'
+import { cn } from '../../lib/utils'
 // @ts-ignore
 // import IconStyles from './Icon.module.css'
 
 interface Props {
   className?: string
-  size?:
-    | 'tiny'
-    | 'small'
-    | 'medium'
-    | 'large'
-    | 'xlarge'
-    | 'xxlarge'
-    | 'xxxlarge'
-    | number
+  size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge' | 'xxlarge' | 'xxxlarge' | number
   type?: string
   color?: string
   strokeWidth?: number
   fill?: string
   stroke?: string
-  background?:
-    | 'brand'
-    | 'gray'
-    | 'red'
-    | 'yellow'
-    | 'green'
-    | 'blue'
-    | 'indigo'
-    | 'purple'
-    | 'pink'
+  background?: 'brand' | 'gray' | 'red' | 'yellow' | 'green' | 'blue' | 'indigo' | 'purple' | 'pink'
   src?: React.ReactNode
   icon?: any
 }
@@ -85,11 +69,7 @@ function IconBase({
 
         // use size prop of this component if one exists
         if (size) {
-          iconSize = size
-            ? typeof size === 'string'
-              ? defaultSizes[size]
-              : size
-            : defaultSize
+          iconSize = size ? (typeof size === 'string' ? defaultSizes[size] : size) : defaultSize
         }
 
         // confitional used for Icons with no color settings
@@ -105,7 +85,7 @@ function IconBase({
           <FeatherIcon
             color={!noColor ? color : 'currentColor'}
             stroke={!noColor ? stroke : 'currentColor'}
-            className={classes.join(' ')}
+            className={cn(classes)}
             strokeWidth={strokeWidth}
             size={iconSize}
             fill={!noColor ? (fill ? fill : 'none') : 'none'}
@@ -115,27 +95,29 @@ function IconBase({
 
         const Icon = src ? (
           // custom SVG file
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            color={!noColor ? color : 'currentColor'}
-            fill={!noColor ? (fill ? fill : 'none') : 'none'}
-            stroke={!noColor ? stroke : 'currentColor'}
-            className={classes.join(' ')}
-            width={iconSize}
-            height={iconSize}
-          >
-            {src}
-          </svg>
+          <div className="relative" style={{ width: iconSize + 'px', height: iconSize + 'px' }}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 16 16"
+              color={!noColor ? color : 'currentColor'}
+              fill={!noColor ? (fill ? fill : 'none') : 'none'}
+              stroke={!noColor ? stroke : 'currentColor'}
+              className={cn(classes)}
+              width="100%"
+              height="100%"
+              strokeWidth={strokeWidth ?? undefined}
+              {...props}
+            >
+              {/* Import custom icon path from svg with 16x16px viewport */}
+              {src}
+            </svg>
+          </div>
         ) : (
           // feather icon
           <IconComponent />
         )
 
-        return background ? (
-          <div className={__styles.container}>{Icon}</div>
-        ) : (
-          Icon
-        )
+        return background ? <div className={__styles.container}>{Icon}</div> : Icon
       }}
     </IconContext.Consumer>
   )

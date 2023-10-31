@@ -12,7 +12,16 @@ import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscr
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import Telemetry from 'lib/telemetry'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
-import { Alert, Button, IconExternalLink, Radio, SidePanel } from 'ui'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconAlertTriangle,
+  IconExternalLink,
+  Radio,
+  SidePanel,
+} from 'ui'
 
 const CustomDomainSidePanel = () => {
   const { ui } = useStore()
@@ -242,6 +251,17 @@ const CustomDomainSidePanel = () => {
                   of a downgrade, you get credits for the remaining time.
                 </p>
               )}
+
+              {subscription?.billing_via_partner &&
+                subscription.scheduled_plan_change?.target_plan !== undefined && (
+                  <Alert_Shadcn_ variant={'warning'} className="mb-2">
+                    <IconAlertTriangle className="h-4 w-4" />
+                    <AlertDescription_Shadcn_>
+                      You have a scheduled subscription change that will be canceled if you change
+                      your custom domain add on.
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
+                )}
             </>
           )}
 

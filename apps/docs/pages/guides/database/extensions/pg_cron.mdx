@@ -33,13 +33,8 @@ The `pg_cron` extension is a simple cron-based job scheduler for PostgreSQL that
 -- Example: enable the "pg_cron" extension
 create extension pg_cron with schema extensions;
 
--- If you're planning to use a non-superuser role to schedule jobs,
--- ensure that they are granted access to the cron schema and its underlying objects beforehand.
--- Failure to do so would result in jobs by these roles to not run at all.
-
-grant usage on schema cron to {{DB user}};
-grant all privileges on all tables in schema cron to {{DB user}};
-
+grant usage on schema cron to postgres;
+grant all privileges on all tables in schema cron to postgres;
 
 -- Example: disable the "pg_cron" extension
 drop extension if exists pg_cron;

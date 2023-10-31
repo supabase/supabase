@@ -1,7 +1,7 @@
+import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
 
-import { useParams } from 'common'
 import { ColumnList, TableList } from 'components/interfaces/Database'
 import { SidePanelEditor } from 'components/interfaces/TableGridEditor'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
@@ -13,19 +13,21 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { NextPageWithLayout } from 'types'
 
 const DatabaseTables: NextPageWithLayout = () => {
-  const snap = useTableEditorStateSnapshot()
   const { ui, meta } = useStore()
-
   const { ref: projectRef } = useParams()
+
+  const snap = useTableEditorStateSnapshot()
+  const [selectedTable, setSelectedTable] = useState<Table>()
+
+  // [Joshen] Separate state required to handle edit/delete table
+  // since selectedTable above handles the state for ColumnList
+  const [selectedTableToEdit, setSelectedTableToEdit] = useState<Table>()
 
   useEffect(() => {
     if (ui.selectedProjectRef) {
       meta.types.load()
     }
   }, [ui.selectedProjectRef])
-
-  const [selectedTable, setSelectedTable] = useState<Table | undefined>(undefined)
-  const [selectedTableToEdit, setSelectedTableToEdit] = useState<Table | undefined>(undefined)
 
   return (
     <>
@@ -47,7 +49,7 @@ const DatabaseTables: NextPageWithLayout = () => {
               />
             ) : (
               <ColumnList
-                selectedTable={selectedTable}
+                table={selectedTable}
                 onAddColumn={snap.onAddColumn}
                 onEditColumn={snap.onEditColumn}
                 onDeleteColumn={snap.onDeleteColumn}
