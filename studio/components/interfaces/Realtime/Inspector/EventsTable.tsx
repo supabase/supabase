@@ -1,11 +1,13 @@
-import DataGrid, { Row, RowRendererProps } from '@supabase/react-data-grid'
 import { isEqual } from 'lodash'
 import { Loader2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { Button, cn } from 'ui'
+import { Key, useEffect, useState } from 'react'
+import DataGrid, { RenderRowProps, Row } from 'react-data-grid'
+import { Button, IconBroadcast, IconDatabaseChanges, IconExternalLink, IconPresence, cn } from 'ui'
 
-import { LogData } from './Events.types'
+import { useParams } from 'common'
+import { useRouter } from 'next/router'
 import LogSelection from './EventSelection'
+import { LogData } from './Events.types'
 import { ColumnRenderer } from './RealtimeEventColumnRenderer'
 
 export const isErrorLog = (l: LogData) => {
@@ -18,35 +20,65 @@ interface Props {
   showSendEvent: () => void
 }
 
-const renderNoResultAlert = () => (
-  <div className="mt-16 flex scale-100 flex-col items-center justify-center gap-6 text-center opacity-100">
-    <div className="flex flex-col gap-1">
-      <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-scale-600 px-2 dark:border-scale-900"></div>
-      <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-scale-600 px-2 dark:border-scale-900">
-        <div className="absolute right-1 -bottom-4 text-scale-1100">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
+const NoResultAlert = ({ enabled }: { enabled: boolean }) => {
+  const router = useRouter()
+  const { ref } = useParams()
+
+  return (
+    <div className="w-full max-w-md flex items-center flex-col">
+      {enabled ? <div>No Realtime events found</div> : null}
+      <div className="text-foreground-lighter">Realtime event logs will be shown here</div>
+      <div className="mt-4 border bg-surface-100 border-border rounded-md justify-start items-center flex flex-col w-full">
+        <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">
+          <IconBroadcast size="xlarge" className="bg-brand-400 rounded w-6" />
+          <div className="grow flex-col flex">
+            <div className="text-foreground">Create a Broadcast event</div>
+            <div className="text-foreground-lighter text-xs">Start developing in preview</div>
+          </div>
+          <Button type="default">
+            <span>Send a test event</span>
+          </Button>
+        </div>
+        <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">
+          <IconPresence size="xlarge" className="bg-brand-400 rounded" />
+          <div className="grow flex-col flex">
+            <div className="text-foreground">Join from another browser tab</div>
+            <div className="text-foreground-lighter text-xs">Start developing in preview</div>
+          </div>
+          <Button type="default" iconRight={<IconExternalLink />}>
+            <a href={`${router.basePath}${router.asPath}`} target="_blank">
+              <span>Open inspector</span>
+            </a>
+          </Button>
+        </div>
+
+        <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">
+          <IconDatabaseChanges size="xlarge" className="bg-brand-400 rounded w-6" />
+          <div className="grow flex-col flex">
+            <div className="text-foreground">Listen to a table for changes</div>
+            <div className="text-foreground-lighter text-xs">Start developing in preview</div>
+          </div>
+          <Button type="default" iconRight={<IconExternalLink />}>
+            <a href={`${router.basePath}/project/${ref}/database/replication`} target="_blank">
+              <span>Replication settings</span>
+            </a>
+          </Button>
+        </div>
+        <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b bg-background">
+          <div className="grow flex-col flex">
+            <div className="text-foreground">Not sure what to do?</div>
+            <div className="text-foreground-lighter text-xs">Browse our documentation</div>
+          </div>
+          <Button type="default" iconRight={<IconExternalLink />}>
+            <a href="https://supabase.com/docs/guides/realtime" target="_blank">
+              <span>Docs</span>
+            </a>
+          </Button>
         </div>
       </div>
     </div>
-    <div className="flex flex-col gap-1 px-5">
-      <h3 className="text-lg text-scale-1200">No results</h3>
-      <p className="text-sm text-scale-900">Try another search, or adjusting the filters</p>
-    </div>
-  </div>
-)
+  )
+}
 
 const RowRenderer = (key: Key, props: RenderRowProps<LogData, unknown>) => {
   return <Row key={key} {...props} isRowSelected={false} selectedCellIdx={undefined} />
