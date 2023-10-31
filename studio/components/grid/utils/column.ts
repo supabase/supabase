@@ -6,9 +6,10 @@ import { deepClone } from './common'
 export function cloneColumn(column: CalculatedColumn<any, any>) {
   const cloned = deepClone(column)
   // these properties can't be cloned. Need to manual re-set again
-  cloned.editor = column.renderEditCell
-  cloned.headerRenderer = column.renderHeaderCell
-  cloned.formatter = column.renderCell
+  cloned.renderEditCell = column.renderEditCell
+  cloned.renderHeaderCell = column.renderHeaderCell
+  cloned.renderCell = column.renderCell
+  cloned.renderGroupCell = column.renderGroupCell
   return cloned
 }
 
