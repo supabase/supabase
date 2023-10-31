@@ -1,15 +1,16 @@
 import * as React from 'react'
 import {
   CalculatedColumn,
-  FormatterProps,
-  GroupFormatterProps,
+  RenderCellProps,
+  RenderGroupCellProps,
+  RenderHeaderCellProps,
   useRowSelection,
-} from '@supabase/react-data-grid'
+} from 'react-data-grid'
 import { Button, IconMaximize2 } from 'ui'
-import { SupaRow } from '../../types'
+
 import { SELECT_COLUMN_KEY } from '../../constants'
-import { useFocusRef } from '../../utils'
 import { useTrackedState } from '../../store'
+import { SupaRow } from '../../types'
 
 export const SelectColumn: CalculatedColumn<any, any> = {
   key: SELECT_COLUMN_KEY,
@@ -21,47 +22,50 @@ export const SelectColumn: CalculatedColumn<any, any> = {
   sortable: false,
   frozen: true,
   isLastFrozenColumn: false,
-  rowGroup: false,
-  headerRenderer: (props) => {
+  renderHeaderCell: (props: RenderHeaderCellProps<unknown>) => {
+    // [Joshen] formatter is actually a valid React component, so we can use hooks here
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const [isRowSelected, onRowSelectionChange] = useRowSelection()
+
     return (
       <SelectCellHeader
         aria-label="Select All"
-        value={props.allRowsSelected}
-        onChange={props.onAllRowsSelectionChange}
+        tabIndex={props.tabIndex}
+        value={isRowSelected}
+        onChange={(checked) => onRowSelectionChange({ type: 'HEADER', checked })}
       />
     )
   },
-  formatter: (props: FormatterProps<SupaRow>) => {
+  renderCell: (props: RenderCellProps<SupaRow>) => {
     // [Alaister] formatter is actually a valid React component, so we can use hooks here
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const [isRowSelected, onRowSelectionChange] = useRowSelection()
     return (
       <SelectCellFormatter
         aria-label="Select"
-        tabIndex={-1}
-        isCellSelected={props.isCellSelected}
+        tabIndex={props.tabIndex}
         value={isRowSelected}
         row={props.row}
         onChange={(checked, isShiftClick) => {
-          onRowSelectionChange({ row: props.row, checked, isShiftClick })
+          onRowSelectionChange({ type: 'ROW', row: props.row, checked, isShiftClick })
         }}
         // Stop propagation to prevent row selection
         onClick={stopPropagation}
       />
     )
   },
-  groupFormatter: (props: GroupFormatterProps<SupaRow>) => {
+  renderGroupCell: (props: RenderGroupCellProps<SupaRow>) => {
     // [Alaister] groupFormatter is actually a valid React component, so we can use hooks here
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const [isRowSelected, onRowSelectionChange] = useRowSelection()
     return (
       <SelectCellFormatter
         aria-label="Select Group"
-        tabIndex={-1}
-        isCellSelected={props.isCellSelected}
+        tabIndex={props.tabIndex}
         value={isRowSelected}
         onChange={(checked) => {
           onRowSelectionChange({
+            type: 'ROW',
             row: props.row,
             checked,
             isShiftClick: false,
@@ -72,6 +76,12 @@ export const SelectColumn: CalculatedColumn<any, any> = {
       />
     )
   },
+
+  // [Next 18 Refactor] Double check if this is correct
+  parent: undefined,
+  level: 0,
+  minWidth: 0,
+  draggable: false,
 }
 
 function stopPropagation(event: React.SyntheticEvent) {
@@ -84,7 +94,6 @@ type SharedInputProps = Pick<
 >
 
 interface SelectCellFormatterProps extends SharedInputProps {
-  isCellSelected: boolean
   value: boolean
   row?: SupaRow
   onChange: (value: boolean, isShiftClick: boolean) => void
@@ -94,7 +103,6 @@ function SelectCellFormatter({
   row,
   value,
   tabIndex,
-  isCellSelected,
   disabled,
   onClick,
   onChange,
@@ -103,7 +111,6 @@ function SelectCellFormatter({
 }: SelectCellFormatterProps) {
   const state = useTrackedState()
   const { onEditRow } = state
-  const inputRef = useFocusRef<HTMLInputElement>(isCellSelected)
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     onChange(e.target.checked, (e.nativeEvent as MouseEvent).shiftKey)
@@ -122,7 +129,6 @@ function SelectCellFormatter({
         aria-label={ariaLabel}
         aria-labelledby={ariaLabelledBy}
         tabIndex={tabIndex}
-        ref={inputRef}
         type="checkbox"
         className="rdg-row__select-column__select-action"
         disabled={disabled}

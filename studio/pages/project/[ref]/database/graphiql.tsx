@@ -2,6 +2,7 @@ import { createGraphiQLFetcher, Fetcher } from '@graphiql/toolkit'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useMemo } from 'react'
 
+import '@graphiql/react/dist/style.css'
 import { useParams } from 'common/hooks'
 import ExtensionCard from 'components/interfaces/Database/Extensions/ExtensionCard'
 import GraphiQL from 'components/interfaces/GraphQL/GraphiQL'

@@ -1,5 +1,5 @@
 //import { Step } from 'next-seo/lib/types'
-import { FC } from 'react'
+import { FC, PropsWithChildren } from 'react'
 import { cn } from 'ui'
 
 interface IStep {
@@ -23,14 +23,14 @@ interface IStepHikeCompact {
   title: string
 }
 
-const StepHikeCompact: FC<IStepHikeCompact> & IStepHikeCompactSubcomponents = ({
+const StepHikeCompact: FC<PropsWithChildren<IStepHikeCompact>> & IStepHikeCompactSubcomponents = ({
   children,
   title,
 }) => {
   return <div className="py-8">{children}</div>
 }
 
-const Step: FC<IStep> = ({ children, title, step }) => {
+const Step: FC<PropsWithChildren<IStep>> = ({ children, title, step }) => {
   return (
     <div className="relative pb-8 [&_div]:[&_div]:last:bg-transparent">
       <div
@@ -77,7 +77,7 @@ const Step: FC<IStep> = ({ children, title, step }) => {
   )
 }
 
-const Details: FC<IDetails> = ({ children, title, fullWidth = false }) => {
+const Details: FC<PropsWithChildren<IDetails>> = ({ children, title, fullWidth = false }) => {
   return (
     <div className={cn(fullWidth ? 'col-span-12' : 'col-span-5', 'ml-12', 'lg:ml-0')}>
       <h3 className="mt-0 text-scale-1200 text-base">{title}</h3>
@@ -86,7 +86,7 @@ const Details: FC<IDetails> = ({ children, title, fullWidth = false }) => {
   )
 }
 
-const Code: FC<ICode> = ({ children }) => {
+const Code: FC<PropsWithChildren<ICode>> = ({ children }) => {
   return <div className="col-span-7 not-prose">{children}</div>
 }
 

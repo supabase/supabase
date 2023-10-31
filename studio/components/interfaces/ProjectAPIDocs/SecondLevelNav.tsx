@@ -153,19 +153,17 @@ const SecondLevelNav = () => {
             <p className="text-xs !leading-normal">
               Head over to our docs site for the full API documentation.
             </p>
-            <Link passHref href={content[section].docsUrl}>
-              <Button
-                asChild
-                className="!mt-2"
-                size="tiny"
-                type="default"
-                icon={<IconExternalLink strokeWidth={1.5} />}
-              >
-                <a target="_blank" rel="noreferrer">
-                  Documentation
-                </a>
-              </Button>
-            </Link>
+            <Button
+              asChild
+              className="!mt-2"
+              size="tiny"
+              type="default"
+              icon={<IconExternalLink strokeWidth={1.5} />}
+            >
+              <Link href={content[section].docsUrl} target="_blank" rel="noreferrer">
+                Documentation
+              </Link>
+            </Button>
           </AlertDescription_Shadcn_>
         </Alert_Shadcn_>
       </div>

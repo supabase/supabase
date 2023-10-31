@@ -1,7 +1,7 @@
 import { PropsWithChildren, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Modal, Toggle } from 'ui'
-import { useConsentValue, LOCAL_STORAGE_KEYS } from 'common'
+import { Modal, Toggle, useConsentValue } from 'ui'
+import { LOCAL_STORAGE_KEYS } from 'common'
 
 const PrivacySettings = ({ children, ...props }: PropsWithChildren<{ className?: string }>) => {
   const [isOpen, setIsOpen] = useState(false)
@@ -56,8 +56,11 @@ const PrivacySettings = ({ children, ...props }: PropsWithChildren<{ className?:
               descriptionText={
                 <>
                   These cookies are necessary for Supabase to function.{' '}
-                  <Link href="https://supabase.com/privacy#8-cookies-and-similar-technologies-used-on-our-european-services">
-                    <a className="underline">Learn more</a>
+                  <Link
+                    href="https://supabase.com/privacy#8-cookies-and-similar-technologies-used-on-our-european-services"
+                    className="underline"
+                  >
+                    Learn more
                   </Link>
                 </>
               }
@@ -73,8 +76,11 @@ const PrivacySettings = ({ children, ...props }: PropsWithChildren<{ className?:
                 <>
                   By opting in to sending telemetry data, Supabase can improve the overall user
                   experience.{' '}
-                  <Link href="https://supabase.com/privacy#cookieless-analytics">
-                    <a className="underline">Learn more</a>
+                  <Link
+                    href="https://supabase.com/privacy#cookieless-analytics"
+                    className="underline"
+                  >
+                    Learn more
                   </Link>
                 </>
               }

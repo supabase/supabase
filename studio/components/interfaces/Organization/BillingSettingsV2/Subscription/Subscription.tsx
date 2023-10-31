@@ -60,13 +60,11 @@ const Subscription = () => {
             <div className="space-y-2">
               <p className="text-sm text-foreground-light m-0">More information</p>
               <div>
-                <Link href="https://supabase.com/pricing">
-                  <a target="_blank" rel="noreferrer">
-                    <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                      <p className="text-sm m-0">Pricing</p>
-                      <IconExternalLink size={16} strokeWidth={1.5} />
-                    </div>
-                  </a>
+                <Link href="https://supabase.com/pricing" target="_blank" rel="noreferrer">
+                  <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
+                    <p className="text-sm m-0">Pricing</p>
+                    <IconExternalLink size={16} strokeWidth={1.5} />
+                  </div>
                 </Link>
               </div>
             </div>
@@ -152,13 +150,13 @@ const Subscription = () => {
                       title={`Unable to update plan from ${planName}`}
                       actions={[
                         <div key="contact-support">
-                          <Link
-                            href={`/support/new?category=sales&subject=Change%20plan%20away%20from%20${planName}`}
-                          >
-                            <a>
-                              <Button type="default">Contact support</Button>
-                            </a>
-                          </Link>
+                          <Button asChild type="default">
+                            <Link
+                              href={`/support/new?category=sales&subject=Change%20plan%20away%20from%20${planName}`}
+                            >
+                              Contact support
+                            </Link>
+                          </Button>
                         </div>,
                       ]}
                     >
@@ -186,10 +184,11 @@ const Subscription = () => {
                 >
                   <div className="text-sm text-foreground-light mr-2">
                     When this organization exceeds its{' '}
-                    <Link href="#breakdown">
-                      <a className="text-sm text-green-900 transition hover:text-green-1000">
-                        included usage quotas
-                      </a>
+                    <Link
+                      href="#breakdown"
+                      className="text-sm text-green-900 transition hover:text-green-1000"
+                    >
+                      included usage quotas
                     </Link>
                     , its projects may become unresponsive.{' '}
                     {currentPlan?.id === 'free' ? (

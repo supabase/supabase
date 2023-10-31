@@ -1,17 +1,19 @@
-import { FormatterProps } from '@supabase/react-data-grid'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
+import { RenderCellProps } from 'react-data-grid'
+import { Button, IconArrowRight } from 'ui'
 
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { useParams } from 'common/hooks'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableQuery } from 'data/tables/table-query'
-import { Button, IconArrowRight } from 'ui'
+import { useTablesQuery } from 'data/tables/tables-query'
 import { SupaRow } from '../../types'
 import { NullValue } from '../common'
-import { useTablesQuery } from 'data/tables/tables-query'
 
-export const ForeignKeyFormatter = (props: PropsWithChildren<FormatterProps<SupaRow, unknown>>) => {
+export const ForeignKeyFormatter = (
+  props: PropsWithChildren<RenderCellProps<SupaRow, unknown>>
+) => {
   const { project } = useProjectContext()
   const { ref: projectRef, id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
@@ -53,16 +55,14 @@ export const ForeignKeyFormatter = (props: PropsWithChildren<FormatterProps<Supa
             <Link
               href={`/project/${projectRef}/editor/${targetTable?.id}?filter=${relationship?.target_column_name}%3Aeq%3A${value}`}
             >
-              <a>
-                <Button
-                  type="default"
-                  size="tiny"
-                  className="translate-y-[2px]"
-                  onClick={() => {}}
-                  icon={<IconArrowRight size="tiny" />}
-                  style={{ padding: '3px' }}
-                />
-              </a>
+              <Button
+                type="default"
+                size="tiny"
+                className="translate-y-[2px]"
+                onClick={() => {}}
+                icon={<IconArrowRight size="tiny" />}
+                style={{ padding: '3px' }}
+              />
             </Link>
           </Tooltip.Trigger>
           <Tooltip.Portal>

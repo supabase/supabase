@@ -78,24 +78,21 @@ const ProjectLink = ({
   }
 
   return (
-    <Link passHref href={href}>
-      <CommandItem_Shadcn_
-        asChild
-        key={project.ref}
-        value={`${project.name}-${project.ref}`}
-        className="cursor-pointer w-full flex items-center justify-between"
-        onSelect={() => {
-          router.push(href)
-          setOpen(false)
-        }}
-        onClick={() => setOpen(false)}
-      >
-        <a>
-          {project.name}
-          {project.ref === ref && <IconCheck />}
-        </a>
-      </CommandItem_Shadcn_>
-    </Link>
+    <CommandItem_Shadcn_
+      key={project.ref}
+      value={`${project.name}-${project.ref}`}
+      className="cursor-pointer w-full"
+      onSelect={() => {
+        router.push(href)
+        setOpen(false)
+      }}
+      onClick={() => setOpen(false)}
+    >
+      <Link href={href} className="w-full flex items-center justify-between">
+        {project.name}
+        {project.ref === ref && <IconCheck />}
+      </Link>
+    </CommandItem_Shadcn_>
   )
 }
 
@@ -169,28 +166,25 @@ const ProjectDropdown = ({ isNewNav = false }: ProjectDropdownProps) => {
               </CommandGroup_Shadcn_>
               {projectCreationEnabled && (
                 <CommandGroup_Shadcn_ className="border-t">
-                  <Link
-                    passHref
-                    href={`/new/${selectedOrganization?.slug}`}
-                    onClick={() => {
+                  <CommandItem_Shadcn_
+                    className="cursor-pointer w-full"
+                    onSelect={() => {
                       setOpen(false)
+                      router.push(`/new/${selectedOrganization?.slug}`)
                     }}
+                    onClick={() => setOpen(false)}
                   >
-                    <CommandItem_Shadcn_
-                      asChild
-                      className="cursor-pointer flex items-center space-x-2 w-full"
-                      onSelect={() => {
+                    <Link
+                      href={`/new/${selectedOrganization?.slug}`}
+                      onClick={() => {
                         setOpen(false)
-                        router.push(`/new/${selectedOrganization?.slug}`)
                       }}
-                      onClick={() => setOpen(false)}
+                      className="w-full flex items-center gap-2"
                     >
-                      <a>
-                        <IconPlus size={14} strokeWidth={1.5} />
-                        <p>New project</p>
-                      </a>
-                    </CommandItem_Shadcn_>
-                  </Link>
+                      <IconPlus size={14} strokeWidth={1.5} />
+                      <p>New project</p>
+                    </Link>
+                  </CommandItem_Shadcn_>
                 </CommandGroup_Shadcn_>
               )}
             </CommandList_Shadcn_>

@@ -46,21 +46,17 @@ const ProductMenuItem = ({
   if (url) {
     if (isExternal) {
       return (
-        <Link href={url}>
-          <a target="_blank" rel="noreferrer">
-            <Button block className="!justify-start" type="text" size="small" icon={icon}>
-              {name}
-            </Button>
-          </a>
-        </Link>
+        <Button asChild block className="!justify-start" type="text" size="small" icon={icon}>
+          <Link href={url} target="_blank" rel="noreferrer">
+            {name}
+          </Link>
+        </Button>
       )
     }
 
     return (
-      <Link href={url} passHref>
-        <a className="block" target={target}>
-          {menuItem}
-        </a>
+      <Link href={url} className="block" target={target}>
+        {menuItem}
       </Link>
     )
   }

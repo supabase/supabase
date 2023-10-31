@@ -31,20 +31,20 @@ function TwitterSocialProof() {
             Supported by a network of early advocates, contributors, and champions.
           </p>
           <div className="my-8 flex justify-center gap-2">
-            <Link href={'https://github.com/supabase/supabase/discussions'} passHref>
-              <a target="_blank" tabIndex={-1}>
-                <Button size="small" iconRight={<IconMessageCircle size={14} />} type="default">
-                  GitHub discussions
-                </Button>
-              </a>
-            </Link>
-            <Link href={'https://discord.supabase.com/'} passHref>
-              <a target="_blank" tabIndex={-1}>
-                <Button type="default" size="small" iconRight={<IconMessageCircle size={14} />}>
-                  Discord
-                </Button>
-              </a>
-            </Link>
+            <Button asChild size="small" iconRight={<IconMessageCircle size={14} />} type="default">
+              <Link
+                href={'https://github.com/supabase/supabase/discussions'}
+                target="_blank"
+                tabIndex={-1}
+              >
+                GitHub discussions
+              </Link>
+            </Button>
+            <Button asChild type="default" size="small" iconRight={<IconMessageCircle size={14} />}>
+              <Link href={'https://discord.supabase.com/'} target="_blank" tabIndex={-1}>
+                Discord
+              </Link>
+            </Button>
           </div>
         </div>
       </div>
@@ -59,14 +59,12 @@ function TwitterSocialProof() {
           )}
           {tweets.map((tweet: any, i: number) => (
             <div className="mb-4 z-0 break-inside-avoid-column" key={i}>
-              <Link href={tweet.url}>
-                <a target="_blank">
-                  <TweetCard
-                    handle={`@${tweet.handle}`}
-                    quote={tweet.text}
-                    img_url={`${basePath}${tweet.img_url}`}
-                  />
-                </a>
+              <Link href={tweet.url} target="_blank">
+                <TweetCard
+                  handle={`@${tweet.handle}`}
+                  quote={tweet.text}
+                  img_url={`${basePath}${tweet.img_url}`}
+                />
               </Link>
             </div>
           ))}

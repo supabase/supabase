@@ -16,11 +16,9 @@ const EnterpriseCta = () => {
           and managing embeddings at scale.
         </p>
         <div className="w-full mt-4 flex items-center justify-center text-center gap-4">
-          <Link href="https://forms.supabase.com/enterprise">
-            <a>
-              <Button size="medium">Fill out Enterprise Form</Button>
-            </a>
-          </Link>
+          <Button asChild size="medium">
+            <Link href="https://forms.supabase.com/enterprise">Fill out Enterprise Form</Link>
+          </Button>
         </div>
       </div>
     </SectionContainer>

@@ -55,22 +55,16 @@ const UserSettingsDropdown = () => {
           </div>
 
           <DropdownMenuSeparator />
-          <Link passHref href="/account/me">
-            <DropdownMenuItem className="cursor-pointer" onClick={() => setOpen(false)} asChild>
-              <a>Preferences</a>
-            </DropdownMenuItem>
-          </Link>
-          <Link passHref href="/account/tokens">
-            <DropdownMenuItem className="cursor-pointer" onClick={() => setOpen(false)} asChild>
-              <a>Access tokens</a>
-            </DropdownMenuItem>
-          </Link>
+          <DropdownMenuItem className="cursor-pointer" onClick={() => setOpen(false)} asChild>
+            <Link href="/account/me">Preferences</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer" onClick={() => setOpen(false)} asChild>
+            <Link href="/account/tokens">Access tokens</Link>
+          </DropdownMenuItem>
           {showAuditLogs ? (
-            <Link passHref href="/account/audit">
-              <DropdownMenuItem className="cursor-pointer" onClick={() => setOpen(false)} asChild>
-                <a>Audit logs</a>
-              </DropdownMenuItem>
-            </Link>
+            <DropdownMenuItem className="cursor-pointer" onClick={() => setOpen(false)} asChild>
+              <Link href="/account/audit">Audit logs</Link>
+            </DropdownMenuItem>
           ) : null}
           <DropdownMenuSeparator />
           <DropdownMenuItem

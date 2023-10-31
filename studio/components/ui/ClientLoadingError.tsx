@@ -22,11 +22,11 @@ const ClientLoadingError = ({
           </p>
         </div>
       </div>
-      <Link href={`/support/new?ref=${projectRef}`}>
-        <a target="_blank" rel="noreferrer">
-          <Button>Contact support</Button>
-        </a>
-      </Link>
+      <Button asChild>
+        <Link href={`/support/new?ref=${projectRef}`} target="_blank" rel="noreferrer">
+          Contact support
+        </Link>
+      </Button>
     </div>
   )
 }

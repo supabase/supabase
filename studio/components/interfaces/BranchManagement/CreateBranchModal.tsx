@@ -164,10 +164,12 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
                 </p>
                 <div className="flex items-center space-x-2">
                   <p>{githubConnection?.metadata.name}</p>
-                  <Link passHref href={`https://github.com/${repoOwner}/${repoName}`}>
-                    <a target="_blank" rel="noreferrer">
-                      <IconExternalLink size={14} strokeWidth={1.5} />
-                    </a>
+                  <Link
+                    href={`https://github.com/${repoOwner}/${repoName}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <IconExternalLink size={14} strokeWidth={1.5} />
                   </Link>
                 </div>
               </div>

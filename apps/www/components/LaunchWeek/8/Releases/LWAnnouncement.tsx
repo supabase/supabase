@@ -68,10 +68,11 @@ const LWAnnouncement = ({
             }
           />
         ) : ( */}
-        <Link href="/launch-week">
-          <a className="flex flex-row justify-between items-center w-full h-full gap-2 text-left">
-            {announcement}
-          </a>
+        <Link
+          href="/launch-week"
+          className="flex flex-row justify-between items-center w-full h-full gap-2 text-left"
+        >
+          {announcement}
         </Link>
         {/* )} */}
       </SmallCard>

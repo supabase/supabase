@@ -1,7 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { Button, Collapsible, IconChevronUp, IconEdit, IconExternalLink, IconTrash } from 'ui'
 
@@ -104,11 +104,10 @@ const WrapperRow = ({
                         <p className="text-foreground-light">{metadata.label}:</p>
                         <Link
                           href={`/project/${ref}/settings/vault/secrets?search=${wrapper.name}_${metadata.name}`}
+                          className="transition text-foreground-light hover:text-foreground flex items-center space-x-2"
                         >
-                          <a className="transition text-foreground-light hover:text-foreground flex items-center space-x-2">
-                            <span>Encrypted in Vault</span>
-                            <IconExternalLink size={14} strokeWidth={1.5} />
-                          </a>
+                          <span>Encrypted in Vault</span>
+                          <IconExternalLink size={14} strokeWidth={1.5} />
                         </Link>
                       </div>
                     ))}
@@ -120,14 +119,9 @@ const WrapperRow = ({
                         {wrapper.tables ? (
                           wrapper.tables.map((table: any) => (
                             <Link key={table.id} href={`/project/${ref}/editor/${table.id}`}>
-                              <a>
-                                <div
-                                  key={table.id}
-                                  className="text-sm border rounded px-2 py-1 transition bg-scale-400 hover:bg-scale-500"
-                                >
-                                  {table.name}
-                                </div>
-                              </a>
+                              <div className="text-sm border rounded px-2 py-1 transition bg-scale-400 hover:bg-scale-500">
+                                {table.name}
+                              </div>
                             </Link>
                           ))
                         ) : (
@@ -139,13 +133,11 @@ const WrapperRow = ({
                   <div className="flex items-center space-x-2">
                     {canManageWrappers ? (
                       <Link href={`/project/${ref}/database/wrappers/${wrapper.id}`}>
-                        <a>
-                          <Button
-                            type="default"
-                            icon={<IconEdit strokeWidth={1.5} />}
-                            className="py-2"
-                          />
-                        </a>
+                        <Button
+                          type="default"
+                          icon={<IconEdit strokeWidth={1.5} />}
+                          className="py-2"
+                        />
                       </Link>
                     ) : (
                       <Tooltip.Root delayDuration={0}>

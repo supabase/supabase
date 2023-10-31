@@ -83,19 +83,16 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
                 {props.type === 'Vercel' && (
                   <>
                     {router.pathname !== projectIntegrationUrl && (
-                      <Link
-                        passHref
-                        href={projectIntegrationUrl.replace(
-                          '[ref]',
-                          props.connection.supabase_project_ref
-                        )}
-                      >
-                        <a>
-                          <DropdownMenuItem disabled={isSyncEnvLoading}>
-                            View project configuration
-                          </DropdownMenuItem>
-                        </a>
-                      </Link>
+                      <DropdownMenuItem disabled={isSyncEnvLoading} asChild>
+                        <Link
+                          href={projectIntegrationUrl.replace(
+                            '[ref]',
+                            props.connection.supabase_project_ref
+                          )}
+                        >
+                          View project configuration
+                        </Link>
+                      </DropdownMenuItem>
                     )}
                     <DropdownMenuItem
                       className="space-x-2"

@@ -1,10 +1,10 @@
-import * as React from 'react'
+import { Key } from 'react'
 import { TriggerEvent, useContextMenu } from 'react-contexify'
-import { Row, RowRendererProps } from '@supabase/react-data-grid'
+import { Row, RenderRowProps } from 'react-data-grid'
 import { MENU_IDS } from '../menu'
 import { SupaRow } from '../../types'
 
-export default function RowRenderer(props: RowRendererProps<SupaRow>) {
+export default function RowRenderer(key: Key, props: RenderRowProps<SupaRow>) {
   const { show: showContextMenu } = useContextMenu()
 
   function displayMenu(e: TriggerEvent) {

@@ -351,16 +351,15 @@ const PublishAppSidePanel = ({
                             of its projects.
                           </span>
                         </div>
-                        <Link
-                          passHref
-                          href="https://supabase.com/docs/guides/platform/oauth-apps/oauth-scopes"
-                        >
-                          <Button asChild type="default" icon={<IconExternalLink />}>
-                            <a target="_blank" rel="noreferrer">
-                              Documentation
-                            </a>
-                          </Button>
-                        </Link>
+                        <Button asChild type="default" icon={<IconExternalLink />}>
+                          <Link
+                            href="https://supabase.com/docs/guides/platform/oauth-apps/oauth-scopes"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Documentation
+                          </Link>
+                        </Button>
                       </div>
 
                       <ScopesPanel scopes={scopes} setScopes={setScopes} />

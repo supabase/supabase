@@ -123,13 +123,9 @@ export default function IndexPage() {
           <p className="p">{priceDescription}</p>
         </div>
         <p className="p">{description}</p>
-        <Link href="https://supabase.com/dashboard/new" passHref>
-          <a>
-            <Button size="medium" block>
-              Get started
-            </Button>
-          </a>
-        </Link>
+        <Button asChild size="medium" block>
+          <Link href="https://supabase.com/dashboard/new">Get started</Link>
+        </Button>
       </div>
     )
   }
@@ -349,6 +345,7 @@ export default function IndexPage() {
                     src={`${basePath}/images/pricing/${addon.heroImg}${
                       resolvedTheme === 'dark' ? '' : '-light'
                     }.png`}
+                    alt=""
                   />
                 </div>
                 <div className="px-8 -mt-1">
@@ -369,13 +366,11 @@ export default function IndexPage() {
                     {addon.description}
                   </p>
                   <div className="flex items-center justify-between mt-4 mb-4 lg:mb-8">
-                    <Link href={addon.leftCtaLink} as={addon.leftCtaLink}>
-                      <a>
-                        <Button size="tiny" type="default">
-                          {addon.leftCtaText}
-                        </Button>
-                      </a>
-                    </Link>
+                    <Button asChild size="tiny" type="default">
+                      <Link href={addon.leftCtaLink} as={addon.leftCtaLink}>
+                        {addon.leftCtaText}
+                      </Link>
+                    </Button>
                     {addon.name === 'Optimized Compute' ? (
                       <button
                         className="text-brand-600 text-[13px] leading-4 hover:underline "
@@ -393,16 +388,15 @@ export default function IndexPage() {
           </div>
           <div className="flex flex-col md:flex-row items-center gap-4 justify-center text-center">
             <span className="prose">Got something you'd like to see here?</span>
-            <Link
-              href="https://github.com/supabase/supabase/discussions/categories/feature-requests"
-              as="https://github.com/supabase/supabase/discussions/categories/feature-requests"
-            >
-              <a target="_blank">
-                <Button size="tiny" type="default">
-                  Request a feature
-                </Button>
-              </a>
-            </Link>
+            <Button asChild size="tiny" type="default">
+              <Link
+                href="https://github.com/supabase/supabase/discussions/categories/feature-requests"
+                as="https://github.com/supabase/supabase/discussions/categories/feature-requests"
+                target="_blank"
+              >
+                Request a feature
+              </Link>
+            </Button>
           </div>
         </div>
 
@@ -430,6 +424,7 @@ export default function IndexPage() {
               src={`${basePath}/images/pricing/spend-cap${
                 resolvedTheme === 'dark' ? '' : '-light'
               }.png`}
+              alt=""
             />
           </div>
         </div>
@@ -778,17 +773,16 @@ export default function IndexPage() {
                             )}
 
                             <div className={plan.name === 'Enterprise' ? 'mt-auto' : 'mt-8'}>
-                              <Link href={plan.href} as={plan.href}>
-                                <a>
-                                  <Button
-                                    size="tiny"
-                                    type={plan.name === 'Enterprise' ? 'default' : 'primary'}
-                                    block
-                                  >
-                                    {plan.cta}
-                                  </Button>
-                                </a>
-                              </Link>
+                              <Button
+                                asChild
+                                size="tiny"
+                                type={plan.name === 'Enterprise' ? 'default' : 'primary'}
+                                block
+                              >
+                                <Link href={plan.href} as={plan.href}>
+                                  {plan.cta}
+                                </Link>
+                              </Button>
                             </div>
                           </div>
                         </div>
@@ -844,49 +838,37 @@ export default function IndexPage() {
                     </th>
 
                     <td className="px-6 pt-5">
-                      <Link
-                        href="https://supabase.com/dashboard/new?plan=free"
-                        as="https://supabase.com/dashboard/new?plan=free"
-                      >
-                        <a>
-                          <Button size="tiny" type="primary" block>
-                            Get Started
-                          </Button>
-                        </a>
-                      </Link>
+                      <Button asChild size="tiny" type="primary" block>
+                        <Link
+                          href="https://supabase.com/dashboard/new?plan=free"
+                          as="https://supabase.com/dashboard/new?plan=free"
+                        >
+                          Get Started
+                        </Link>
+                      </Button>
                     </td>
 
                     <td className="px-6 pt-5">
-                      <Link
-                        href="https://supabase.com/dashboard/new?plan=pro"
-                        as="https://supabase.com/dashboard/new?plan=pro"
-                      >
-                        <a>
-                          <Button size="tiny" type="primary" block>
-                            Get Started
-                          </Button>
-                        </a>
-                      </Link>
+                      <Button asChild size="tiny" type="primary" block>
+                        <Link
+                          href="https://supabase.com/dashboard/new?plan=pro"
+                          as="https://supabase.com/dashboard/new?plan=pro"
+                        >
+                          Get Started
+                        </Link>
+                      </Button>
                     </td>
 
                     <td className="px-6 pt-5">
-                      <Link href="https://supabase.com/dashboard/new?plan=team">
-                        <a>
-                          <Button size="tiny" type="primary" block>
-                            Get Started
-                          </Button>
-                        </a>
-                      </Link>
+                      <Button asChild size="tiny" type="primary" block>
+                        <Link href="https://supabase.com/dashboard/new?plan=team">Get Started</Link>
+                      </Button>
                     </td>
 
                     <td className="px-6 pt-5">
-                      <Link href="https://forms.supabase.com/enterprise">
-                        <a>
-                          <Button size="tiny" type="default" block>
-                            Contact Us
-                          </Button>
-                        </a>
-                      </Link>
+                      <Button asChild size="tiny" type="default" block>
+                        <Link href="https://forms.supabase.com/enterprise">Contact Us</Link>
+                      </Button>
                     </td>
                   </tr>
                 </tfoot>

@@ -104,13 +104,15 @@ const UpgradingState = () => {
                   </p>
                 </div>
                 <div className="flex items-center mx-auto space-x-2">
-                  <Link
-                    href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
-                  >
-                    <a target="_blank" rel="noreferrer">
-                      <Button type="default">Contact support</Button>
-                    </a>
-                  </Link>
+                  <Button asChild type="default">
+                    <Link
+                      href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Contact support
+                    </Link>
+                  </Button>
                   <Button loading={loading} disabled={loading} onClick={refetchProjectDetails}>
                     Return to project
                   </Button>

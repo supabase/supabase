@@ -1,4 +1,4 @@
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import LinkCard from '~/components/LinkCard'
 import LinkCardsWrapper from '~/components/LinkCardsWrapper'
 
@@ -23,10 +23,12 @@ function getComponents(type: any) {
                 ' '
               )}
               layout="fill"
+              alt=""
             />
           </div>
         )
       }
+      // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
       return <img {...props} />
     },
   }

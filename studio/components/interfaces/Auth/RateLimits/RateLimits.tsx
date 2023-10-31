@@ -190,22 +190,19 @@ const RateLimits = () => {
                                 {!isSmtpEnabled(authConfig) &&
                                   'The built-in email service has a fixed rate limit. You will need to set up your own custom SMTP provider to update your email rate limit'}
                               </p>
-                              <Link
-                                passHref
-                                href={
-                                  !authConfig.EXTERNAL_EMAIL_ENABLED
-                                    ? `/project/${projectRef}/auth/providers`
-                                    : `/project/${projectRef}/settings/auth`
-                                }
-                              >
-                                <Button asChild type="default" className="mt-2">
-                                  <a>
-                                    {!authConfig.EXTERNAL_EMAIL_ENABLED
-                                      ? 'View providers configuration'
-                                      : 'View SMTP settings'}
-                                  </a>
-                                </Button>
-                              </Link>
+                              <Button asChild type="default" className="mt-2">
+                                <Link
+                                  href={
+                                    !authConfig.EXTERNAL_EMAIL_ENABLED
+                                      ? `/project/${projectRef}/auth/providers`
+                                      : `/project/${projectRef}/settings/auth`
+                                  }
+                                >
+                                  {!authConfig.EXTERNAL_EMAIL_ENABLED
+                                    ? 'View providers configuration'
+                                    : 'View SMTP settings'}
+                                </Link>
+                              </Button>
                             </AlertDescription_Shadcn_>
                           </Alert_Shadcn_>
                         )}
@@ -254,11 +251,11 @@ const RateLimits = () => {
                                 Head over to the providers page to enable phone provider and phone
                                 confirmations before updating your rate limit
                               </p>
-                              <Link passHref href={`/project/${projectRef}/auth/providers`}>
-                                <Button asChild type="default" className="mt-2">
-                                  <a>View providers configuration</a>
-                                </Button>
-                              </Link>
+                              <Button asChild type="default" className="mt-2">
+                                <Link href={`/project/${projectRef}/auth/providers`}>
+                                  View providers configuration
+                                </Link>
+                              </Button>
                             </AlertDescription_Shadcn_>
                           </Alert_Shadcn_>
                         )}

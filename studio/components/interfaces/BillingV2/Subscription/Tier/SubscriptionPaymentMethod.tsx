@@ -201,10 +201,12 @@ const SubscriptionPaymentMethod = ({
             </p>
             <p className="text-sm text-foreground-light">
               To remove unused or expired payment methods, head to your{' '}
-              <Link href={`/org/${currentOrgSlug || '_'}/billing`} passHref>
-                <a target="_blank" className="text-green-900 transition hover:text-green-1000">
-                  organization's billing settings
-                </a>
+              <Link
+                href={`/org/${currentOrgSlug || '_'}/billing`}
+                target="_blank"
+                className="text-green-900 transition hover:text-green-1000"
+              >
+                organization's billing settings
               </Link>
               .
             </p>

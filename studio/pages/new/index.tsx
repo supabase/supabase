@@ -29,7 +29,7 @@ const Wizard: NextPageWithLayout = () => {
 
   const { mutate: setupIntent } = useSetupIntent({ onSuccess: (res) => setIntent(res) })
 
-  const captchaRefCallback = useCallback((node) => {
+  const captchaRefCallback = useCallback((node: any) => {
     setCaptchaRef(node)
   }, [])
 

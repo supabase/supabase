@@ -116,9 +116,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
                           : `/project/${projectRef}/settings/billing/usage`
                       }
                     >
-                      <a>
-                        <Badge color="red">Exceeding usage limits</Badge>
-                      </a>
+                      <Badge color="red">Exceeding usage limits</Badge>
                     </Link>
                   </div>
                 )}

@@ -131,13 +131,9 @@ export default function TicketsPage({ users }: Props) {
                 </h2>
                 <p className="radial-gradient-text-scale-500">Submissions are closed.</p>
                 <div className="mt-1">
-                  <Link href="/launch-week/7">
-                    <a>
-                      <Button type="outline" size="medium">
-                        Go to Launch Week 7
-                      </Button>
-                    </a>
-                  </Link>
+                  <Button asChild type="outline" size="medium">
+                    <Link href="/launch-week/7">Go to Launch Week 7</Link>
+                  </Button>
                 </div>
               </motion.div>
             </div>

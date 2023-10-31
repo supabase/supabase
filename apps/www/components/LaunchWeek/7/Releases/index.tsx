@@ -332,6 +332,7 @@ export default function LW7Releases() {
                                 layout="fill"
                                 objectPosition={i === 2 && isTablet ? '50% 60%' : '80% 50%'}
                                 objectFit={i === 2 && isTablet ? 'contain' : 'cover'}
+                                alt=""
                               />
                             </motion.div>
                           )
@@ -383,6 +384,7 @@ export default function LW7Releases() {
                                 layout="fill"
                                 objectPosition="50% 50%"
                                 objectFit="cover"
+                                alt=""
                               />
                             </motion.div>
                           )
@@ -470,6 +472,7 @@ export default function LW7Releases() {
                                 }
                                 objectFit="cover"
                                 quality={100}
+                                alt=""
                               />
                             </motion.div>
                           )
@@ -557,6 +560,7 @@ export default function LW7Releases() {
                                 }
                                 objectFit="cover"
                                 quality={100}
+                                alt=""
                               />
                             </motion.div>
                           )
@@ -644,6 +648,7 @@ export default function LW7Releases() {
                                 }
                                 objectFit={!!layer.mobileImg && isTablet ? 'contain' : 'cover'}
                                 quality={100}
+                                alt=""
                               />
                             </motion.div>
                           )
@@ -729,6 +734,7 @@ export default function LW7Releases() {
                                 }
                                 objectFit="cover"
                                 quality={100}
+                                alt=""
                               />
                             </motion.div>
                           )

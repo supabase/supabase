@@ -1,10 +1,10 @@
 import { useInView } from 'react-intersection-observer'
-import { FC } from 'react'
+import { FC, PropsWithChildren } from 'react'
 import { highlightSelectedNavItem } from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
 import { useRouter } from 'next/router'
 import { useNavigationMenuContext } from '~/components/Navigation/NavigationMenu/NavigationMenu.Context'
 import { menuState } from '~/hooks/useMenuState'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 
 interface ISectionContainer {
   id: string
@@ -17,9 +17,9 @@ interface ISectionContainer {
 }
 
 type RefSubLayoutSubComponents = {
-  Section: FC<ISectionContainer>
-  EducationSection: FC<IEducationSection>
-  EducationRow: FC<IEducationRow>
+  Section: FC<PropsWithChildren<ISectionContainer>>
+  EducationSection: FC<PropsWithChildren<IEducationSection>>
+  EducationRow: FC<PropsWithChildren<IEducationRow>>
   Details: FC<ISectionDetails>
   Examples: FC<ISectionExamples>
 }
@@ -50,7 +50,9 @@ interface IEducationSection {
 interface ISectionDetails {}
 interface ISectionExamples {}
 
-const RefSubLayout: FC<RefSubLayoutType> & RefSubLayoutSubComponents = (props) => {
+const RefSubLayout: FC<PropsWithChildren<RefSubLayoutType>> & RefSubLayoutSubComponents = (
+  props
+) => {
   return (
     <div className="flex flex-col w-full divide-y px-5 max-w-7xl mx-auto py-16">
       {props.children}
@@ -58,7 +60,7 @@ const RefSubLayout: FC<RefSubLayoutType> & RefSubLayoutSubComponents = (props) =
   )
 }
 
-const Section: FC<ISectionContainer> = (props) => {
+const Section: FC<PropsWithChildren<ISectionContainer>> = (props) => {
   return (
     <article
       key={props.id + 'section'}
@@ -131,11 +133,11 @@ const StickyHeader: FC<StickyHeader> = ({ icon, ...props }) => {
   )
 }
 
-const Details: FC<ISectionDetails> = (props) => {
+const Details: FC<PropsWithChildren<ISectionDetails>> = (props) => {
   return <div className="relative w-full">{props.children}</div>
 }
 
-const Examples: FC<ISectionExamples> = (props) => {
+const Examples: FC<PropsWithChildren<ISectionExamples>> = (props) => {
   return (
     <div className="w-full">
       <div className="sticky top-24">{props.children}</div>
@@ -143,7 +145,7 @@ const Examples: FC<ISectionExamples> = (props) => {
   )
 }
 
-const EducationRow: FC<IEducationRow> = (props) => {
+const EducationRow: FC<PropsWithChildren<IEducationRow>> = (props) => {
   return (
     <div className={['grid lg:grid-cols-2 gap-8 lg:gap-16', props.className].join(' ')}>
       {props.children}
@@ -151,7 +153,11 @@ const EducationRow: FC<IEducationRow> = (props) => {
   )
 }
 
-const EducationSection: FC<IEducationSection> = ({ icon, hideTitle = false, ...props }) => {
+const EducationSection: FC<PropsWithChildren<IEducationSection>> = ({
+  icon,
+  hideTitle = false,
+  ...props
+}) => {
   return (
     <article
       key={props.id + 'education'}

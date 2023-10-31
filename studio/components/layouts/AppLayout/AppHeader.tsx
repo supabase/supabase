@@ -26,14 +26,15 @@ const AppHeader = () => {
   return (
     <div className="flex items-center justify-between px-4 py-1 bg-scale-200 border-b">
       <div className="flex items-center space-x-1">
-        <Link href={organization !== undefined ? `/org/${organization?.slug}` : '/'}>
-          <a className="block mr-3">
-            <img
-              src={`${router.basePath}/img/supabase-logo.svg`}
-              alt="Supabase"
-              className="mx-auto h-[40px] w-6 cursor-pointer rounded"
-            />
-          </a>
+        <Link
+          href={organization !== undefined ? `/org/${organization?.slug}` : '/'}
+          className="block mr-3"
+        >
+          <img
+            src={`${router.basePath}/img/supabase-logo.svg`}
+            alt="Supabase"
+            className="mx-auto h-[40px] w-6 cursor-pointer rounded"
+          />
         </Link>
         <OrganizationDropdown isNewNav />
         {ref !== undefined && <ProjectDropdown isNewNav />}

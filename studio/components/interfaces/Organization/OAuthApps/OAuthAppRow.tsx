@@ -70,7 +70,7 @@ const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) =>
       <Table.td>{dayjs(app.created_at).format('DD/MM/YYYY, HH:mm:ss')}</Table.td>
       <Table.td align="right">
         <DropdownMenu>
-          <DropdownMenuTrigger>
+          <DropdownMenuTrigger asChild>
             <Button type="default" icon={<IconMoreVertical />} className="px-1" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" side="bottom">

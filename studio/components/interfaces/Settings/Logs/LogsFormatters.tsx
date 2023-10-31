@@ -10,7 +10,7 @@ import React from 'react'
 import { IconAlertCircle, IconInfo } from 'ui'
 import { isUnixMicro, unixMicroToIsoTimestamp } from '.'
 
-export const RowLayout: React.FC = ({ children }) => (
+export const RowLayout: React.FC<React.PropsWithChildren> = ({ children }) => (
   <div className="flex h-full w-full items-center gap-4">{children}</div>
 )
 // renders a timestamp (either unix microsecond or iso timestamp)
@@ -157,9 +157,10 @@ export const SeverityFormatter = ({
 
   const uppercasedValue = value.toUpperCase()
   const text = uppercase ? uppercasedValue : value
-  const Layout: React.FC<{ className?: string }> = ({ className, children }) => (
-    <div className={`w-24 flex items-center h-full ${className}`}>{children}</div>
-  )
+  const Layout: React.FC<React.PropsWithChildren<{ className?: string }>> = ({
+    className,
+    children,
+  }) => <div className={`w-24 flex items-center h-full ${className}`}>{children}</div>
 
   switch (uppercasedValue) {
     case 'UNCAUGHTEXCEPTION':

@@ -102,13 +102,15 @@ const SecretsManagement = () => {
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <Link href="https://supabase.com/docs/guides/database/vault">
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                  Vault Documentation
-                </Button>
-              </a>
-            </Link>
+            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+              <Link
+                href="https://supabase.com/docs/guides/database/vault"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Vault Documentation
+              </Link>
+            </Button>
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger>
                 <Button

@@ -111,6 +111,7 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
                     objectPosition="top"
                     priority
                     draggable={false}
+                    alt="Launch Week 8 gradient background"
                   />
                 </div>
               </div>

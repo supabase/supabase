@@ -1,9 +1,10 @@
 import { Select } from 'ui'
-import { EditorProps } from '@supabase/react-data-grid'
+import { RenderEditCellProps } from 'react-data-grid'
 
 import { useTrackedState } from 'components/grid/store'
 
-interface SelectEditorProps<TRow, TSummaryRow = unknown> extends EditorProps<TRow, TSummaryRow> {
+interface SelectEditorProps<TRow, TSummaryRow = unknown>
+  extends RenderEditCellProps<TRow, TSummaryRow> {
   options: { label: string; _value: string }[]
 }
 

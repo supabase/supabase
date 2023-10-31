@@ -84,13 +84,11 @@ const SSLConfiguration = () => {
       <div className="flex items-center justify-between">
         <FormHeader title="SSL Configuration" description="" />
         <div className="flex items-center space-x-2 mb-6">
-          <Link href="https://supabase.com/docs/guides/platform/ssl-enforcement">
-            <a target="_blank">
-              <Button type="default" icon={<IconExternalLink />}>
-                Documentation
-              </Button>
-            </a>
-          </Link>
+          <Button asChild type="default" icon={<IconExternalLink />}>
+            <Link href="https://supabase.com/docs/guides/platform/ssl-enforcement" target="_blank">
+              Documentation
+            </Link>
+          </Button>
         </div>
       </div>
       <FormPanel>
@@ -110,10 +108,13 @@ const SSLConfiguration = () => {
                       title="SSL enforcement was not updated successfully"
                     >
                       Please try updating again, or contact{' '}
-                      <Link href="/support/new">
-                        <a target="_blank" rel="noreferrer" className="underline">
-                          support
-                        </a>
+                      <Link
+                        href="/support/new"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="underline"
+                      >
+                        support
                       </Link>{' '}
                       if this error persists
                     </Alert>

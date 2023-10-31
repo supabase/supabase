@@ -138,8 +138,11 @@ const APIKeys = () => {
                   This key is safe to use in a browser if you have enabled Row Level Security (RLS)
                   for your tables and configured policies. You may also use the service key which
                   can be found{' '}
-                  <Link href={`/project/${projectRef}/settings/api`}>
-                    <a className="transition text-brand hover:text-brand-600">here</a>
+                  <Link
+                    href={`/project/${projectRef}/settings/api`}
+                    className="transition text-brand hover:text-brand-600"
+                  >
+                    here
                   </Link>{' '}
                   to bypass RLS.
                 </p>

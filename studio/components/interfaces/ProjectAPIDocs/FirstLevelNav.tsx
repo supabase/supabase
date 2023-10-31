@@ -141,42 +141,49 @@ const FirstLevelNav = () => {
         })}
       </div>
       <div className="px-2 py-4">
-        <Link passHref href="https://supabase.com/docs">
-          <Button block asChild type="text" size="small" icon={<IconBook />}>
-            <a target="_blank" rel="noreferrer" className="!justify-start">
-              Documentation
-            </a>
-          </Button>
-        </Link>
-        <Link passHref href="https://supabase.com/docs/guides/api">
-          <Button block asChild type="text" size="small" icon={<IconBookOpen />}>
-            <a target="_blank" rel="noreferrer" className="!justify-start">
-              REST guide
-            </a>
-          </Button>
-        </Link>
-        <Link passHref href="https://supabase.com/docs/guides/graphql">
-          <Button
-            block
-            asChild
-            type="text"
-            size="small"
-            icon={
-              <SVG
-                src={`${BASE_PATH}/img/graphql.svg`}
-                style={{ width: `${16}px`, height: `${16}px` }}
-                className="text-foreground"
-                preProcessor={(code) =>
-                  code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
-                }
-              />
-            }
+        <Button block asChild type="text" size="small" icon={<IconBook />}>
+          <Link
+            href="https://supabase.com/docs"
+            target="_blank"
+            rel="noreferrer"
+            className="!justify-start"
           >
-            <a target="_blank" rel="noreferrer" className="!justify-start">
-              GraphQL guide
-            </a>
-          </Button>
-        </Link>
+            Documentation
+          </Link>
+        </Button>
+        <Button block asChild type="text" size="small" icon={<IconBookOpen />}>
+          <Link
+            href="https://supabase.com/docs/guides/api"
+            target="_blank"
+            rel="noreferrer"
+            className="!justify-start"
+          >
+            REST guide
+          </Link>
+        </Button>
+        <Button
+          block
+          asChild
+          type="text"
+          size="small"
+          icon={
+            <SVG
+              src={`${BASE_PATH}/img/graphql.svg`}
+              style={{ width: `${16}px`, height: `${16}px` }}
+              className="text-foreground"
+              preProcessor={(code) => code.replace(/svg/, 'svg class="m-auto text-color-inherit"')}
+            />
+          }
+        >
+          <Link
+            href="https://supabase.com/docs/guides/graphql"
+            target="_blank"
+            rel="noreferrer"
+            className="!justify-start"
+          >
+            GraphQL guide
+          </Link>
+        </Button>
       </div>
     </>
   )

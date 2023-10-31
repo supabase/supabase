@@ -67,8 +67,11 @@ const General = () => {
           <AlertDescription_Shadcn_>
             Certain settings are not available while you're on a preview branch. To adjust your
             project settings, you may return to your{' '}
-            <Link passHref href={`/project/${parentProject.ref}/settings/general`}>
-              <a className="text-brand-900">main branch</a>
+            <Link
+              href={`/project/${parentProject.ref}/settings/general`}
+              className="text-brand-900"
+            >
+              main branch
             </Link>
             .
           </AlertDescription_Shadcn_>
@@ -160,11 +163,13 @@ const General = () => {
                       </p>
                     </div>
                   </div>
-                  <Link href={`/org/${organization.slug}/usage?projectRef=${project?.ref}`}>
-                    <a>
-                      <Button type="default">View project usage</Button>
-                    </a>
-                  </Link>
+                  <div>
+                    <Button asChild type="default">
+                      <Link href={`/org/${organization.slug}/usage?projectRef=${project?.ref}`}>
+                        View project usage
+                      </Link>
+                    </Button>
+                  </div>
                 </div>
               </Panel.Content>
             </Panel>

@@ -49,8 +49,8 @@ const CustomDomainConfig = () => {
               <IconAlertCircle size={16} strokeWidth={1.5} />
               <p className="text-sm text-foreground-light">
                 Failed to retrieve custom domain configuration. Please try again later or{' '}
-                <Link href={`/support/new?ref=${ref}&category=sales`}>
-                  <a className="underline">contact support</a>
+                <Link href={`/support/new?ref=${ref}&category=sales`} className="underline">
+                  contact support
                 </Link>
                 .
               </p>

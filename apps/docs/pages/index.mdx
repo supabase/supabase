@@ -28,12 +28,10 @@ export const meta = {
     <div className="grid grid-cols-12 gap-6 not-prose [&_svg]:text-brand-600 [&_svg]dark:text-brand">
       {products.map((product) => {
         return (
-          <Link href={product.href} key={product.title} passHref>
-            <a className={product.span ?? 'col-span-12 md:col-span-4'}>
-              <GlassPanel {...product} icon={<HomeMenuIconPicker icon={product.icon} width={18} height={18} />} background={true} showIconBg={true} showLink={false}>
-                {product.description}
-              </GlassPanel>
-            </a>
+          <Link href={product.href} key={product.title} passHref className={product.span ?? 'col-span-12 md:col-span-4'}>
+            <GlassPanel {...product} icon={<HomeMenuIconPicker icon={product.icon} width={18} height={18} />} background={true} showIconBg={true} showLink={false}>
+              {product.description}
+            </GlassPanel>
           </Link>
         )
       })}
@@ -57,18 +55,16 @@ export const meta = {
       <div className="grid col-span-8 grid-cols-12 gap-6 not-prose">
         {clientLibraries.map((product) => {
           return (
-            <Link href={product.href} key={product.title} passHref>
-              <a className={product.span ?? 'col-span-6 md:col-span-4'}>
-                <IconPanel
-                  {...product}
-                  icon={<HomeMenuIconPicker icon={product.icon} width={18} height={18} />}
-                  background={true}
-                  showIconBg={true}
-                  showLink={false}
-                >
-                  {product.description}
-                </IconPanel>
-              </a>
+            <Link href={product.href} key={product.title} passHref  className={product.span ?? 'col-span-6 md:col-span-4'}>
+              <IconPanel
+                {...product}
+                icon={<HomeMenuIconPicker icon={product.icon} width={18} height={18} />}
+                background={true}
+                showIconBg={true}
+                showLink={false}
+              >
+                {product.description}
+              </IconPanel>
             </Link>
           )
         })}
@@ -82,9 +78,7 @@ export const meta = {
 
         ## Migrate to Supabase
 
-        <p className="text-scale-1100 text-sm p-0 m-0">
-          Bring your existing data, auth and storage to Supabase following our migration guides.
-        </p>
+        <p className="text-scale-1100 text-sm p-0 m-0">Bring your existing data, auth and storage to Supabase following our migration guides.</p>
 
         <TextLink
           label="Explore more resources"
@@ -99,13 +93,12 @@ export const meta = {
             <Link
               href={product.href}
               key={product.title}
+              className={product.span ?? 'col-span-6 md:col-span-4'}
               passHref
             >
-              <a className={product.span ?? 'col-span-6 md:col-span-4'}>
-                <IconPanel {...product} background={true} showIconBg={true} showLink={false}>
-                  {product.description}
-                </IconPanel>
-              </a>
+              <IconPanel {...product} background={true} showIconBg={true} showLink={false}>
+                {product.description}
+              </IconPanel>
             </Link>
           )
         })}
@@ -129,13 +122,13 @@ export const meta = {
           <Link
             href={product.href}
             key={product.title}
+            className={product.span ?? 'col-span-12 md:col-span-6 lg:col-span-3'}
             passHref
           >
-            <a className={product.span ?? 'col-span-12 md:col-span-6 lg:col-span-3'}>
-              <GlassPanel {...product} icon={<HomeMenuIconPicker icon={product.icon} width={18} height={18} />} background={false}>
-                {product.description}
-              </GlassPanel>
-            </a>
+            <GlassPanel {...product} icon={<HomeMenuIconPicker icon={product.icon} width={18} height={18} />} background={false}>
+              {product.description}
+            </GlassPanel>
+
           </Link>
         )
       })}
@@ -154,9 +147,7 @@ export const meta = {
           </IconBackground>
           ### Self-Hosting
         </div>
-        <p className="text-scale-1100 text-sm">
-          Get started with self-hosting Supabase.
-        </p>
+        <p className="text-scale-1100 text-sm">Get started with self-hosting Supabase.</p>
         <TextLink
           label="More on Self-Hosting"
           url="/guides/self-hosting"
@@ -173,13 +164,12 @@ export const meta = {
             <Link
               href={product.href}
               key={product.title}
+              className={product.span ?? 'col-span-6'}
               passHref
             >
-              <a className={product.span ?? 'col-span-6'}>
-                <IconPanel {...product} icon={<HomeMenuIconPicker icon={product.icon} width={18} height={18} />} background={true} showIconBg={true} showLink={false}>
-                  {product.description}
-                </IconPanel>
-              </a>
+              <IconPanel {...product} icon={<HomeMenuIconPicker icon={product.icon} width={18} height={18} />} background={true} showIconBg={true} showLink={false}>
+                {product.description}
+              </IconPanel>
             </Link>
           )
         })}

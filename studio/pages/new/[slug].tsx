@@ -5,18 +5,7 @@ import { debounce, isUndefined } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useRef, useState } from 'react'
-import {
-  Alert,
-  Button,
-  IconExternalLink,
-  IconHelpCircle,
-  IconInfo,
-  IconUsers,
-  Input,
-  Listbox,
-  Toggle,
-} from 'ui'
+import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 
 import { SpendCapModal } from 'components/interfaces/BillingV2'
 import {
@@ -54,6 +43,17 @@ import {
 } from 'lib/constants'
 import { passwordStrength, pluckObjectFields } from 'lib/helpers'
 import { NextPageWithLayout } from 'types'
+import {
+  Alert,
+  Button,
+  IconExternalLink,
+  IconHelpCircle,
+  IconInfo,
+  IconUsers,
+  Input,
+  Listbox,
+  Toggle,
+} from 'ui'
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
@@ -499,31 +499,32 @@ const Wizard: NextPageWithLayout = () => {
                       )}
 
                       <div className="space-x-3">
-                        <Link href="https://supabase.com/blog/organization-based-billing" passHref>
-                          <Button
-                            asChild
-                            type="default"
-                            icon={<IconExternalLink strokeWidth={1.5} />}
-                          >
-                            <a target="_blank" rel="noreferrer">
-                              Announcement
-                            </a>
-                          </Button>
-                        </Link>
-                        <Link
-                          href="https://supabase.com/docs/guides/platform/org-based-billing"
-                          passHref
+                        <Button
+                          asChild
+                          type="default"
+                          icon={<IconExternalLink strokeWidth={1.5} />}
                         >
-                          <Button
-                            asChild
-                            type="default"
-                            icon={<IconExternalLink strokeWidth={1.5} />}
+                          <Link
+                            href="https://supabase.com/blog/organization-based-billing"
+                            target="_blank"
+                            rel="noreferrer"
                           >
-                            <a target="_blank" rel="noreferrer">
-                              Documentation
-                            </a>
-                          </Button>
-                        </Link>
+                            Announcement
+                          </Link>
+                        </Button>
+                        <Button
+                          asChild
+                          type="default"
+                          icon={<IconExternalLink strokeWidth={1.5} />}
+                        >
+                          <Link
+                            href="https://supabase.com/docs/guides/platform/org-based-billing"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Documentation
+                          </Link>
+                        </Button>
                       </div>
                     </div>
                   }
@@ -606,40 +607,42 @@ const Wizard: NextPageWithLayout = () => {
                         This organization uses the legacy project-based billing. We’ve recently made
                         some big improvements to our billing system. To migrate to the new
                         organization-based billing, head over to your{' '}
-                        <Link href={`/org/${slug}/billing`}>
-                          <a className="text-sm text-green-900 transition hover:text-green-1000">
-                            organization billing settings
-                          </a>
+                        <Link
+                          href={`/org/${slug}/billing`}
+                          className="text-sm text-green-900 transition hover:text-green-1000"
+                        >
+                          organization billing settings
                         </Link>
                         .
                       </p>
 
                       <div className="space-x-3">
-                        <Link href="https://supabase.com/blog/organization-based-billing" passHref>
-                          <Button
-                            asChild
-                            type="default"
-                            icon={<IconExternalLink strokeWidth={1.5} />}
-                          >
-                            <a target="_blank" rel="noreferrer">
-                              Announcement
-                            </a>
-                          </Button>
-                        </Link>
-                        <Link
-                          href="https://supabase.com/docs/guides/platform/org-based-billing"
-                          passHref
+                        <Button
+                          asChild
+                          type="default"
+                          icon={<IconExternalLink strokeWidth={1.5} />}
                         >
-                          <Button
-                            asChild
-                            type="default"
-                            icon={<IconExternalLink strokeWidth={1.5} />}
+                          <Link
+                            href="https://supabase.com/blog/organization-based-billing"
+                            target="_blank"
+                            rel="noreferrer"
                           >
-                            <a target="_blank" rel="noreferrer">
-                              Documentation
-                            </a>
-                          </Button>
-                        </Link>
+                            Announcement
+                          </Link>
+                        </Button>
+                        <Button
+                          asChild
+                          type="default"
+                          icon={<IconExternalLink strokeWidth={1.5} />}
+                        >
+                          <Link
+                            href="https://supabase.com/docs/guides/platform/org-based-billing"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Documentation
+                          </Link>
+                        </Button>
                       </div>
                     </div>
                   }
@@ -693,7 +696,7 @@ const Wizard: NextPageWithLayout = () => {
   )
 }
 
-const PageLayout = withAuth(({ children }) => {
+const PageLayout = withAuth(({ children }: PropsWithChildren) => {
   const { slug } = useParams()
 
   const { data: organizations } = useOrganizationsQuery()

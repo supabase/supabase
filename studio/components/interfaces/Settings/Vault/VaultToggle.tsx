@@ -90,34 +90,32 @@ const VaultToggle = () => {
                   </p>
                 </div>
                 <div>
-                  <Link
-                    href={`/support/new?ref=${ref}&category=sales&subject=Request%20for%20access%20to%20vault`}
-                  >
-                    <a target="_blank" rel="noreferrer">
-                      <Button type="primary">Contact us</Button>
-                    </a>
-                  </Link>
+                  <Button asChild type="primary">
+                    <Link
+                      href={`/support/new?ref=${ref}&category=sales&subject=Request%20for%20access%20to%20vault`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Contact us
+                    </Link>
+                  </Button>
                 </div>
               </div>
               <div className="flex items-center space-x-2 my-1 ml-[1px]">
-                <Link href="https://github.com/supabase/vault">
-                  <a target="_blank" rel="noreferrer">
-                    <Button type="default" icon={<IconExternalLink />}>
-                      About Vault
-                    </Button>
-                  </a>
-                </Link>
+                <Button asChild type="default" icon={<IconExternalLink />}>
+                  <Link href="https://github.com/supabase/vault" target="_blank" rel="noreferrer">
+                    About Vault
+                  </Link>
+                </Button>
               </div>
             </div>
           ) : (
             <div className="flex items-center space-x-2">
-              <Link href="https://github.com/supabase/vault">
-                <a target="_blank" rel="noreferrer">
-                  <Button type="default" icon={<IconExternalLink />}>
-                    About Vault
-                  </Button>
-                </a>
-              </Link>
+              <Button asChild type="default" icon={<IconExternalLink />}>
+                <Link href="https://github.com/supabase/vault" target="_blank" rel="noreferrer">
+                  About Vault
+                </Link>
+              </Button>
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger>
                   <Button

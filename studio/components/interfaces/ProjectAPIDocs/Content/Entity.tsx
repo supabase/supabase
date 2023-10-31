@@ -6,6 +6,7 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
 import ResourceContent from '../ResourceContent'
 import { ContentProps } from './Content.types'
+import { tempRemovePostgrestText } from './Content.utils'
 
 function getColumnType(type: string, format: string) {
   // json and jsonb both have type=undefined, so check format instead
@@ -71,7 +72,9 @@ const Entity = ({ language, apikey = '', endpoint = '' }: ContentProps) => {
                   <p className="truncate">{column.format}</p>
                 </Table.td>
                 <Table.td title={formattedColumnType}>{formattedColumnType}</Table.td>
-                <Table.td title={column.description}>{column.description ?? ''}</Table.td>
+                <Table.td title={column.description}>
+                  {tempRemovePostgrestText(column.description ?? '').trim()}
+                </Table.td>
               </Table.tr>
             )
           })}

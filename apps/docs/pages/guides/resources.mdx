@@ -17,13 +17,12 @@ export const meta = {
         <Link
           href={`${resource.href}`}
           key={resource.title}
+          className={'col-span-12 md:col-span-4'}
           passHref
         >
-          <a className={'col-span-12 md:col-span-4'}>
-            <GlassPanel {...resource} background={false} showIconBg={true}>
-              {resource.description}
-            </GlassPanel>
-          </a>
+          <GlassPanel {...resource} background={false} showIconBg={true}>
+            {resource.description}
+          </GlassPanel>
         </Link>
       )
 
@@ -46,13 +45,12 @@ export const meta = {
         <Link
           href={`${product.href}`}
           key={product.title}
+          className={product.span ?? 'col-span-6 md:col-span-3'}
           passHref
         >
-          <a className={product.span ?? 'col-span-6 md:col-span-3'}>
-            <IconPanel {...product} background={true} showIconBg={true} showLink={true}>
-              {product.description}
-            </IconPanel>
-          </a>
+          <IconPanel {...product} background={true} showIconBg={true} showLink={true}>
+            {product.description}
+          </IconPanel>
         </Link>
       )
 
@@ -75,13 +73,12 @@ export const meta = {
         <Link
           href={`${resource.href}`}
           key={resource.title}
+          className={'col-span-12 md:col-span-4'}
           passHref
         >
-          <a className={'col-span-12 md:col-span-4'}>
-            <GlassPanel {...resource} background={false} showIconBg={true}>
-              {resource.description}
-            </GlassPanel>
-          </a>
+          <GlassPanel {...resource} background={false} showIconBg={true}>
+            {resource.description}
+          </GlassPanel>
         </Link>
       )
 

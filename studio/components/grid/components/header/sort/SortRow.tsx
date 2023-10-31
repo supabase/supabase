@@ -37,11 +37,11 @@ const SortRow = ({ table, index, columnName, sort, onDelete, onToggle, onDrag }:
         handlerId: monitor.getHandlerId(),
       }
     },
-    hover(item: DragItem, monitor: DropTargetMonitor) {
+    hover(item, monitor) {
       if (!ref.current) {
         return
       }
-      const dragIndex = item.index
+      const dragIndex = (item as DragItem).index
       const hoverIndex = index
 
       // Don't replace items with themselves
@@ -82,7 +82,7 @@ const SortRow = ({ table, index, columnName, sort, onDelete, onToggle, onDrag }:
       // Generally it's better to avoid mutations,
       // but it's good here for the sake of performance
       // to avoid expensive index searches.
-      item.index = hoverIndex
+      ;(item as DragItem).index = hoverIndex
     },
   })
 

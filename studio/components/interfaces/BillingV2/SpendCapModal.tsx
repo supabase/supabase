@@ -157,10 +157,13 @@ const SpendCapModal = ({ visible, onHide }: SpendCapModalProps) => {
 
             <p className="text-sm">
               See{' '}
-              <Link href="https://supabase.com/pricing" passHref>
-                <a className="text-brand" target="_blank" rel="noreferrer">
-                  <span>pricing page</span>
-                </a>
+              <Link
+                href="https://supabase.com/pricing"
+                className="text-brand"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span>pricing page</span>
               </Link>{' '}
               for a full overview.
             </p>

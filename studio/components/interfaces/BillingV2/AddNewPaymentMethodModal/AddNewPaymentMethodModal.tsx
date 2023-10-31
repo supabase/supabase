@@ -48,7 +48,7 @@ const AddNewPaymentMethodModal = ({
     },
   })
 
-  const captchaRefCallback = useCallback((node) => {
+  const captchaRefCallback = useCallback((node: any) => {
     setCaptchaRef(node)
   }, [])
 

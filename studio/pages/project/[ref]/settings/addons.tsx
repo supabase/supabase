@@ -20,8 +20,8 @@ const ProjectAddons: NextPageWithLayout = () => {
           title="This page is only available for projects under an organization subscription"
         >
           You might be looking for the{' '}
-          <Link href={`/project/${ref}/settings/billing/subscription`}>
-            <a className="text-brand">project's subscription</a>
+          <Link href={`/project/${ref}/settings/billing/subscription`} className="text-brand">
+            project's subscription
           </Link>{' '}
           page instead.
         </Alert>

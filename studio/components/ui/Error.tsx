@@ -17,16 +17,12 @@ export default function EmptyPageState({ error }: any) {
         </p>
       </div>
       <div className="flex items-center space-x-4">
-        <Link href="/projects">
-          <a>
-            <Button>Head back</Button>
-          </a>
-        </Link>
-        <Link href="/support/new">
-          <a>
-            <Button type="secondary">Submit a support request</Button>
-          </a>
-        </Link>
+        <Button asChild>
+          <Link href="/projects">Head back</Link>
+        </Button>
+        <Button asChild type="secondary">
+          <Link href="/support/new">Submit a support request</Link>
+        </Button>
       </div>
       <p className="text-sm text-foreground-light">
         Error: [{error?.code}] {error?.message}

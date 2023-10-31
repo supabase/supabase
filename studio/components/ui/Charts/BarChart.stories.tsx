@@ -51,6 +51,6 @@ export const BarChart = () => (
   </div>
 )
 
-const ExampleName: React.FC = ({ children }) => (
+const ExampleName: React.FC<React.PropsWithChildren> = ({ children }) => (
   <h1 className="font-bold text-foreground-light">{children}</h1>
 )

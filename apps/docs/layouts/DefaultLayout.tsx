@@ -2,7 +2,7 @@ import { MDXProvider } from '@mdx-js/react'
 import { NextSeo } from 'next-seo'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { FC } from 'react'
+import { FC, PropsWithChildren } from 'react'
 import components from '~/components'
 import TableOfContents from '~/components/TableOfContents'
 
@@ -64,7 +64,7 @@ const Layout: FC<Props> = (props: Props) => {
         <div className={['relative transition-all ease-out', 'duration-150 '].join(' ')}>
           <article className="prose dark:prose-dar max-w-none">
             <h1>{props.meta.title}</h1>
-            <MDXProvider components={components} children={props.children} />
+            <MDXProvider components={components}>{props.children}</MDXProvider>
           </article>
         </div>
         {hasTableOfContents && !props.meta?.hide_table_of_contents && (
@@ -82,8 +82,9 @@ const Layout: FC<Props> = (props: Props) => {
   )
 }
 
-export const LayoutMainContent: FC<{ className?: string }> = ({ className, children }) => (
-  <div className={['max-w-7xl px-5 mx-auto py-16', className].join(' ')}>{children}</div>
-)
+export const LayoutMainContent: FC<PropsWithChildren<{ className?: string }>> = ({
+  className,
+  children,
+}) => <div className={['max-w-7xl px-5 mx-auto py-16', className].join(' ')}>{children}</div>
 
 export default Layout

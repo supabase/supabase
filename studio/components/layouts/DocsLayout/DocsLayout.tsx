@@ -14,7 +14,6 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
   const { ui, meta } = useStore()
   const { data, isLoading, error } = meta.openApi
   const selectedProject = useSelectedProject()
-
   const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
 
   const getPage = () => {
@@ -29,7 +28,7 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
     if (ui.selectedProjectRef && !isPaused) {
       meta.openApi.load()
     }
-  }, [ui.selectedProjectRef])
+  }, [ui.selectedProjectRef, isPaused])
 
   if (error) {
     return (

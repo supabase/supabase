@@ -215,10 +215,11 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                             <div className="col-span-12">
                               <p className="text-foreground-light text-sm">
                                 Note: The{' '}
-                                <Link href={`/project/${ref}/settings/storage`}>
-                                  <a className="text-brand opacity-80 hover:opacity-100 transition">
-                                    global upload limit
-                                  </a>
+                                <Link
+                                  href={`/project/${ref}/settings/storage`}
+                                  className="text-brand opacity-80 hover:opacity-100 transition"
+                                >
+                                  global upload limit
                                 </Link>{' '}
                                 takes precedence over this value ({formattedGlobalUploadLimit})
                               </p>

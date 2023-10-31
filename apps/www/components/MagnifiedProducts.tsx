@@ -79,24 +79,23 @@ function Product({
       initial={initial}
       animate={isInView ? animate : initial}
     >
-      <Link href={product.url}>
-        <a className="flex w-full flex-col items-center text-center">
-          <motion.div
-            style={isMobile ? (undefined as any) : { width, willChange: 'width' }}
-            className="relative w-[50px] aspect-square will-change-transform"
-          >
-            <Image
-              src={product.icon}
-              priority
-              layout="fill"
-              objectFit="contain"
-              lazyBoundary="100px"
-            />
-          </motion.div>
-          <div className="text-brand-600 dark:text-brand flex justify-center relative opacity-70 md:absolute md:bottom-0 md:opacity-0 group-hover:opacity-100 transition-opacity md:translate-y-8 md:-left-20 md:md:-right-20 font-mono uppercase text-center text-xs mt-2">
-            <span>{product.name}</span>
-          </div>
-        </a>
+      <Link href={product.url} className="flex w-full flex-col items-center text-center">
+        <motion.div
+          style={isMobile ? (undefined as any) : { width, willChange: 'width' }}
+          className="relative w-[50px] aspect-square will-change-transform"
+        >
+          <Image
+            src={product.icon}
+            priority
+            layout="fill"
+            objectFit="contain"
+            lazyBoundary="100px"
+            alt=""
+          />
+        </motion.div>
+        <div className="text-brand-600 dark:text-brand flex justify-center relative opacity-70 md:absolute md:bottom-0 md:opacity-0 group-hover:opacity-100 transition-opacity md:translate-y-8 md:-left-20 md:md:-right-20 font-mono uppercase text-center text-xs mt-2">
+          <span>{product.name}</span>
+        </div>
       </Link>
     </motion.div>
   )

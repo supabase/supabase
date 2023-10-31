@@ -129,19 +129,17 @@ const TimedTabsSection = ({
   return (
     <SectionContainer className="flex flex-col gap-8">
       <div className="flex flex-col lg:flex-row gap-8 xl:gap-10 justify-between">
-        <div className="w-full lg:w-1/2 gap-2 flex flex-col">
+        <div className="w-full lg:w-1/2 gap-2 flex flex-col items-start">
           <h2 className="text-3xl xl:text-4xl max-w-[280px] sm:max-w-xs xl:max-w-[360px] tracking-[-1px]">
             {title}
           </h2>
           <p className="text-muted mb-4 max-w-sm">{paragraph}</p>
           {cta && (
-            <Link href={cta.link}>
-              <a className="">
-                <Button type="default" size="small" icon={<IconArrowUpRight />}>
-                  {cta.label ?? 'Explore more'}
-                </Button>
-              </a>
-            </Link>
+            <Button asChild type="default" size="small" icon={<IconArrowUpRight />}>
+              <Link href={cta.link} className="">
+                {cta.label ?? 'Explore more'}
+              </Link>
+            </Button>
           )}
         </div>
         <div className="relative w-full lg:w-1/2 min-h-[300px]">
@@ -206,23 +204,22 @@ const TimedTabsSection = ({
 }
 
 const OpenInColab = ({ colabUrl, className }: { colabUrl: string; className?: string }) => (
-  <Link href={colabUrl}>
-    <a
-      target="_blank"
-      className={[
-        'flex items-center z-10 h-10 bg-[#fff] hover:bg-[#fff] dark:bg-scale-300 dark:hover:bg-scale-400 hover:text-muted text-sm text-muted shadow-lg hover:shadow-md rounded-full py-1 px-3 gap-2',
-        className,
-      ].join(' ')}
-    >
-      <Image
-        className="opacity-100 hover:opacity-80 transition-opacity invert dark:filter-none"
-        src="/images/logos/google-colaboratory.svg"
-        alt="Google Colaboratory logo"
-        width={30}
-        height={30}
-      />
-      <span>Open in Colab</span>
-    </a>
+  <Link
+    href={colabUrl}
+    target="_blank"
+    className={[
+      'flex items-center z-10 h-10 bg-[#fff] hover:bg-[#fff] dark:bg-scale-300 dark:hover:bg-scale-400 hover:text-muted text-sm text-muted shadow-lg hover:shadow-md rounded-full py-1 px-3 gap-2',
+      className,
+    ].join(' ')}
+  >
+    <Image
+      className="opacity-100 hover:opacity-80 transition-opacity invert dark:filter-none"
+      src="/images/logos/google-colaboratory.svg"
+      alt="Google Colaboratory logo"
+      width={30}
+      height={30}
+    />
+    <span>Open in Colab</span>
   </Link>
 )
 

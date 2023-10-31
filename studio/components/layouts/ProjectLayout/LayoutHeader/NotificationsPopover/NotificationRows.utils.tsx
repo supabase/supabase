@@ -108,14 +108,12 @@ export const formatNotificationText = (project: Project, notification: Notificat
                 <p className="text-sm">{upgrade.version_to}</p>
                 {upgrade.changelog_link && (
                   <div className="!ml-4">
-                    <Link href={upgrade.changelog_link}>
-                      <a target="_blank" rel="noreferrer">
-                        <IconExternalLink
-                          className="cursor-pointer text-foreground-light hover:text-foreground transition"
-                          size={12}
-                          strokeWidth={2}
-                        />
-                      </a>
+                    <Link href={upgrade.changelog_link} target="_blank" rel="noreferrer">
+                      <IconExternalLink
+                        className="cursor-pointer text-foreground-light hover:text-foreground transition"
+                        size={12}
+                        strokeWidth={2}
+                      />
                     </Link>
                   </div>
                 )}

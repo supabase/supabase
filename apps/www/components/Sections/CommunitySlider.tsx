@@ -204,9 +204,7 @@ const CommunitySlider = () => {
                 />
               ) : (
                 <Link href={`${basePath}${card.url}`}>
-                  <a>
-                    <Card {...card} />
-                  </a>
+                  <Card {...card} />
                 </Link>
               )}
             </SwiperSlide>

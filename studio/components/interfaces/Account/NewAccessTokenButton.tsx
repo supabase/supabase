@@ -119,13 +119,15 @@ const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonPr
                       such, be very careful when using this API.
                     </p>
                     <div className="mt-4">
-                      <Link href="https://api.supabase.com/api/v0">
-                        <a target="_blank" rel="noreferrer">
-                          <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                            Experimental API documentation
-                          </Button>
-                        </a>
-                      </Link>
+                      <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                        <Link
+                          href="https://api.supabase.com/api/v0"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Experimental API documentation
+                        </Link>
+                      </Button>
                     </div>
                   </Alert>
                 </Modal.Content>

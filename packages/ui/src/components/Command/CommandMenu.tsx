@@ -103,11 +103,10 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
         <CommandList className={['my-2', showCommandInput && 'max-h-[300px]'].join(' ')}>
           {!currentPage && (
             <>
-              <CommandGroup heading="Documentation" forceMount>
+              <CommandGroup heading="Documentation">
                 <CommandItem
                   type="command"
                   onSelect={() => setPages([...pages, COMMAND_ROUTES.DOCS_SEARCH])}
-                  forceMount
                 >
                   <IconBook className="" />
 
@@ -129,7 +128,6 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                   onSelect={() => {
                     setPages([...pages, COMMAND_ROUTES.AI])
                   }}
-                  forceMount
                 >
                   <AiIconAnimation />
                   <span className="text-brand">
@@ -188,7 +186,6 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
               {site === 'studio' && (
                 <CommandGroup heading="Experimental">
                   <CommandItem
-                    forceMount
                     type="command"
                     badge={<BadgeExperimental />}
                     onSelect={() => setPages([...pages, COMMAND_ROUTES.GENERATE_SQL])}
@@ -202,7 +199,6 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
               {site === 'studio' && projectRef !== undefined && (
                 <CommandGroup heading="Project tools">
                   <CommandItem
-                    forceMount
                     type="command"
                     onSelect={() => {
                       setSearch('')

@@ -184,18 +184,15 @@ function StoragePage() {
                     title="CDN"
                     text="Serve from over 285 cities globally to reduce latency."
                   />
-                  <Link href="/docs/guides/storage/cdn/fundamentals" passHref>
-                    <a>
-                      <Button
-                        size="small"
-                        type="default"
-                        className="mt-4"
-                        icon={<IconArrowUpRight />}
-                      >
-                        Explore docs
-                      </Button>
-                    </a>
-                  </Link>
+                  <Button
+                    asChild
+                    size="small"
+                    type="default"
+                    className="mt-4"
+                    icon={<IconArrowUpRight />}
+                  >
+                    <Link href="/docs/guides/storage/cdn/fundamentals">Explore docs</Link>
+                  </Button>
                 </div>
                 <div className="col-span-6 lg:col-span-12 xl:col-span-4">
                   <FeatureColumn
@@ -203,18 +200,17 @@ function StoragePage() {
                     title="Image Optimizations and Transformations"
                     text="Resize and compress your media files on the fly."
                   />
-                  <Link href="/docs/guides/storage/serving/image-transformations" passHref>
-                    <a>
-                      <Button
-                        size="small"
-                        type="default"
-                        className="mt-4"
-                        icon={<IconArrowUpRight />}
-                      >
-                        Explore docs
-                      </Button>
-                    </a>
-                  </Link>
+                  <Button
+                    asChild
+                    size="small"
+                    type="default"
+                    className="mt-4"
+                    icon={<IconArrowUpRight />}
+                  >
+                    <Link href="/docs/guides/storage/serving/image-transformations">
+                      Explore docs
+                    </Link>
+                  </Button>
                 </div>
               </div>,
             ]}
@@ -250,18 +246,17 @@ function StoragePage() {
                         policies.
                       </p>
 
-                      <Link href="/docs/reference/javascript/storage-createbucket" passHref>
-                        <a>
-                          <Button
-                            size="small"
-                            type="default"
-                            className="mt-4"
-                            icon={<IconArrowUpRight />}
-                          >
-                            Explore documentation
-                          </Button>
-                        </a>
-                      </Link>
+                      <Button
+                        asChild
+                        size="small"
+                        type="default"
+                        className="mt-4"
+                        icon={<IconArrowUpRight />}
+                      >
+                        <Link href="/docs/reference/javascript/storage-createbucket">
+                          Explore documentation
+                        </Link>
+                      </Button>
                     </div>
                     <div className="col-span-12 lg:col-span-6 lg:col-start-7">
                       <SplitCodeBlockCarousel

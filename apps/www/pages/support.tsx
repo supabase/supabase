@@ -101,16 +101,16 @@ const Index = () => {
               </div>
               <div className="flex gap-2">
                 {card.links.map((link) => (
-                  <Link href={link.link} as={link.link} passHref>
-                    <Button
-                      size="small"
-                      type={(link.type as ButtonProps['type']) ?? 'default'}
-                      iconRight={link.icon}
-                      asChild
-                    >
-                      <a target={link.target}>{link.label}</a>
-                    </Button>
-                  </Link>
+                  <Button
+                    size="small"
+                    type={(link.type as ButtonProps['type']) ?? 'default'}
+                    iconRight={link.icon}
+                    asChild
+                  >
+                    <Link href={link.link} as={link.link} target={link.target}>
+                      {link.label}
+                    </Link>
+                  </Button>
                 ))}
               </div>
             </InteractiveShimmerCard>
@@ -126,18 +126,21 @@ const Index = () => {
                 <div className="flex flex-col">{data.banner.paragraph}</div>
                 <div className="flex gap-2">
                   {data.banner.links.map((link) => (
-                    <Link href={link.link} as={link.link} passHref>
-                      <Button
-                        size="tiny"
-                        type={(link.type as ButtonProps['type']) ?? 'default'}
-                        iconRight={link.icon}
-                        asChild
+                    <Button
+                      size="tiny"
+                      type={(link.type as ButtonProps['type']) ?? 'default'}
+                      iconRight={link.icon}
+                      asChild
+                    >
+                      <Link
+                        href={link.link}
+                        as={link.link}
+                        target={link.target}
+                        className={cn(link.className)}
                       >
-                        <a target={link.target} className={cn(link.className)}>
-                          {link.label}
-                        </a>
-                      </Button>
-                    </Link>
+                        {link.label}
+                      </Link>
+                    </Button>
                   ))}
                 </div>
               </div>

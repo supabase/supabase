@@ -59,6 +59,7 @@ export default function LaunchWeekPrizeCard({
             layout="fill"
             objectFit="cover"
             objectPosition={imgObjectPosition}
+            alt=""
           />
         </div>
         <div className="p-4">{content && content}</div>

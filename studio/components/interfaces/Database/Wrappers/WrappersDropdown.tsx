@@ -1,7 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { observer } from 'mobx-react-lite'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { Fragment } from 'react'
 import {
@@ -64,19 +64,19 @@ const WrapperDropdown = ({ buttonText = 'Add wrapper', align = 'end' }: WrapperD
       <DropdownMenuContent side="bottom" align={align}>
         {WRAPPERS.map((wrapper, idx) => (
           <Fragment key={idx}>
-            <Link href={`/project/${ref}/database/wrappers/new?type=${wrapper.name.toLowerCase()}`}>
-              <a>
-                <DropdownMenuItem key={wrapper.name} className="space-x-2">
-                  <Image
-                    src={wrapper.icon}
-                    width={20}
-                    height={20}
-                    alt={`${wrapper.name} wrapper icon`}
-                  />
-                  <p>{wrapper.label}</p>
-                </DropdownMenuItem>
-              </a>
-            </Link>
+            <DropdownMenuItem key={wrapper.name} className="space-x-2" asChild>
+              <Link
+                href={`/project/${ref}/database/wrappers/new?type=${wrapper.name.toLowerCase()}`}
+              >
+                <Image
+                  src={wrapper.icon}
+                  width={20}
+                  height={20}
+                  alt={`${wrapper.name} wrapper icon`}
+                />
+                <p>{wrapper.label}</p>
+              </Link>
+            </DropdownMenuItem>
             {idx !== WRAPPERS.length - 1 && <DropdownMenuSeparator />}
           </Fragment>
         ))}

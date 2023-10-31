@@ -67,24 +67,23 @@ const HeroFrameworks = ({ className }: { className?: string }) => {
       <small className="small !text-light">Works seamlessly with 20+ frameworks</small>
       <div className="w-full sm:max-w-lg mt-4 md:mt-3 lg:ml-0 flex flex-wrap items-center justify-center gap-1 xs:gap-2 sm:flex-nowrap">
         {frameworks.map((framework) => (
-          <Link href={framework.docs} key={framework.name}>
-            <a
-              key={framework.name}
-              className="block focus:outline-none focus:border-none focus:ring-brand-600 focus:ring-2 focus:rounded-lg"
-              data-tip={framework.name}
-              aria-label={framework.name}
-              onClick={() => sendTelemetryEvent(framework.gaEvent)}
+          <Link
+            href={framework.docs}
+            key={framework.name}
+            className="block focus:outline-none focus:border-none focus:ring-brand-600 focus:ring-2 focus:rounded-lg"
+            data-tip={framework.name}
+            aria-label={framework.name}
+            onClick={() => sendTelemetryEvent(framework.gaEvent)}
+          >
+            <svg
+              width={isXs ? 35 : 45}
+              height={isXs ? 35 : 45}
+              viewBox="0 0 61 61"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
             >
-              <svg
-                width={isXs ? 35 : 45}
-                height={isXs ? 35 : 45}
-                viewBox="0 0 61 61"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path d={framework.icon} fill="#7E7E7E" />
-              </svg>
-            </a>
+              <path d={framework.icon} fill="#7E7E7E" />
+            </svg>
           </Link>
         ))}
         <ReactTooltip

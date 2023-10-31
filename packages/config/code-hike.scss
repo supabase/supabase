@@ -70,6 +70,9 @@
   //   font-family: Ubuntu, Droid Sans, -apple-system, BlinkMacSystemFont, Segoe WPC, Segoe UI,
   // sans-serif;
 }
+.ch-code-wrapper {
+  background-color: var(--ch-16) !important;
+}
 .ch-terminal-container .ch-frame-content {
   background-color: inherit;
 }
@@ -213,7 +216,6 @@
   top: 0.8em;
 }
 .ch-editor-tab {
-  border-right: 1px solid #252526;
   min-width: -webkit-fit-content;
   min-width: -moz-fit-content;
   min-width: fit-content;
@@ -226,7 +228,7 @@
   box-sizing: border-box;
   padding-left: 15px;
   padding-right: 15px;
-  background-color: #2d2d2d;
+  background-color: var(--ch-24) !important;
   color: hsla(0, 0%, 100%, 0.5);
   min-width: 0;
   border-bottom: 1px solid;
@@ -254,12 +256,13 @@
     sans-serif;
   -moz-column-break-inside: avoid;
   break-inside: avoid;
-  --ch-title-bar-height: 40px;
+  --ch-title-bar-height: 32px;
   height: 100%;
   //   border: 1px solid red;
 }
 .ch-editor-frame .ch-frame-title-bar {
-  background: none;
+  background-color: var(--ch-t-background) !important;
+  background: var(--ch-t-background) !important;
 }
 .ch-editor-terminal {
   position: absolute;
@@ -618,6 +621,7 @@
   margin-top: 1.25em;
   margin-bottom: 1.25em;
   border: 1px solid var(--colors-scale5); // @mildtomato
+  box-shadow: none;
 }
 .ch-inline-code > code {
   padding: 0.2em 0.15em;
@@ -636,6 +640,9 @@
 }
 .ch-section-link[data-active='true'] {
   background-color: rgba(186, 230, 253, 0.4);
+}
+.ch-editor-tab[data-active='true'] {
+  background-color: var(--ch-24);
 }
 .ch-section-link[data-active='true'],
 .ch-section-link[data-active='true'] * {

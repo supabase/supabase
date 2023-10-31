@@ -99,13 +99,15 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
 
         <Panel.Content className="w-full">
           <div className="flex items-center justify-between">
-            <Link href="https://supabase.com/docs/guides/platform/custom-domains">
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" icon={<IconExternalLink />}>
-                  Documentation
-                </Button>
-              </a>
-            </Link>
+            <Button asChild type="default" icon={<IconExternalLink />}>
+              <Link
+                href="https://supabase.com/docs/guides/platform/custom-domains"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Documentation
+              </Link>
+            </Button>
             <div className="flex items-center space-x-2">
               <Button
                 type="default"

@@ -153,13 +153,15 @@ const PITRSidePanel = () => {
       header={
         <div className="flex items-center justify-between">
           <h4>Point in Time Recovery</h4>
-          <Link href="https://supabase.com/docs/guides/platform/backups#point-in-time-recovery">
-            <a target="_blank" rel="noreferrer">
-              <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                About point in time recovery
-              </Button>
-            </a>
-          </Link>
+          <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+            <Link
+              href="https://supabase.com/docs/guides/platform/backups#point-in-time-recovery"
+              target="_blank"
+              rel="noreferrer"
+            >
+              About point in time recovery
+            </Link>
+          </Button>
         </div>
       }
     >
@@ -234,11 +236,11 @@ const PITRSidePanel = () => {
                   title="Changing your Point-In-Time-Recovery is only available on the Pro plan"
                   actions={
                     isOrgBilling ? (
-                      <Link href={`/org/${organization.slug}/billing?panel=subscriptionPlan`}>
-                        <a>
-                          <Button type="default">View available plans</Button>
-                        </a>
-                      </Link>
+                      <Button asChild type="default">
+                        <Link href={`/org/${organization.slug}/billing?panel=subscriptionPlan`}>
+                          View available plans
+                        </Link>
+                      </Button>
                     ) : (
                       <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
                         View available plans

@@ -159,9 +159,11 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
           variant="info"
           title={'Disk size configuration is not available for projects on the Free plan'}
           actions={
-            <Link href={`/project/${projectRef}/settings/billing/subscription`}>
-              <Button type="default">Upgrade subscription</Button>
-            </Link>
+            <Button asChild type="default">
+              <Link href={`/project/${projectRef}/settings/billing/subscription`}>
+                Upgrade subscription
+              </Link>
+            </Button>
           }
         >
           <div>

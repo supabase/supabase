@@ -269,7 +269,7 @@ interface OptionProps {
   value: any
   label: string
   disabled?: boolean
-  children?: React.ReactNode
+  children?: React.ReactNode | (({ active, selected }: any) => React.ReactNode)
   className?: string
   addOnBefore?: ({ active, selected }: any) => React.ReactNode
 }

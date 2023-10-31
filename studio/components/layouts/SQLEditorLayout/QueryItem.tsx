@@ -67,15 +67,13 @@ const QueryItem = ({ tabInfo }: QueryItemProps) => {
       )}
       ref={isActive ? (activeItemRef as React.RefObject<HTMLDivElement>) : null}
     >
-      <Link href={`/project/${ref}/sql/${id}`}>
-        <a className="py-1 px-3 w-full overflow-hidden">
-          <p
-            title={description || name}
-            className="text-sm text-foreground-light group-hover:text-foreground transition overflow-hidden text-ellipsis"
-          >
-            {name}
-          </p>
-        </a>
+      <Link href={`/project/${ref}/sql/${id}`} className="py-1 px-3 w-full overflow-hidden">
+        <p
+          title={description || name}
+          className="text-sm text-foreground-light group-hover:text-foreground transition overflow-hidden text-ellipsis"
+        >
+          {name}
+        </p>
       </Link>
       <div className="pr-1">{<QueryItemActions tabInfo={tabInfo} activeId={activeId} />}</div>
     </div>

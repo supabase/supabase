@@ -82,16 +82,22 @@ const FilterPopover = ({
         </>
       }
     >
-      <Button type={activeOptions.length > 0 ? 'default' : 'dashed'} onClick={() => setOpen(false)}>
-        <span>{name}</span>
-        {activeOptions.length > 0 && <span className="mr-1">:</span>}
-        {activeOptions.length >= 3 ? (
-          <span>
-            {formattedOptions[0]} and {activeOptions.length - 1} others
-          </span>
-        ) : activeOptions.length > 0 ? (
-          <span>{formattedOptions.join(', ')}</span>
-        ) : null}
+      <Button
+        asChild
+        type={activeOptions.length > 0 ? 'default' : 'dashed'}
+        onClick={() => setOpen(false)}
+      >
+        <div>
+          <span>{name}</span>
+          {activeOptions.length > 0 && <span className="mr-1">:</span>}
+          {activeOptions.length >= 3 ? (
+            <span>
+              {formattedOptions[0]} and {activeOptions.length - 1} others
+            </span>
+          ) : activeOptions.length > 0 ? (
+            <span>{formattedOptions.join(', ')}</span>
+          ) : null}
+        </div>
       </Button>
     </Popover>
   )

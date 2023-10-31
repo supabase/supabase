@@ -108,6 +108,7 @@ export default function TicketVisual({
               placeholder="blur"
               blurDataURL="/images/blur.png"
               className="absolute inset-[1px] z-[1]"
+              alt=""
             />
           )}
           <Image
@@ -122,6 +123,7 @@ export default function TicketVisual({
               imageIsLoading ? 'grayscale blur-xl scale-110' : 'scale-100 grayscale-0 blur-0',
             ].join(' ')}
             onLoadingComplete={() => setImageIsLoading(false)}
+            alt=""
           />
         </div>
       </div>

@@ -16,10 +16,11 @@ const BillingLayout = ({ children }: PropsWithChildren<BillingLayoutProps>) => {
       <div className="flex h-full w-full flex-col">
         {/* Header */}
         <div className="flex items-center space-x-4 border-b py-4 px-5 dark:border-dark">
-          <Link href={`/project/${selectedProject?.ref}/settings/billing/subscription`} passHref>
-            <a className="text-foreground-lighter transition-colors hover:text-foreground">
-              <IconX size={16} strokeWidth={1.5} />
-            </a>
+          <Link
+            href={`/project/${selectedProject?.ref}/settings/billing/subscription`}
+            className="text-foreground-lighter transition-colors hover:text-foreground"
+          >
+            <IconX size={16} strokeWidth={1.5} />
           </Link>
           <div className="flex items-center space-x-6">
             <h1 className="text-sm text-foreground">Customize your plan</h1>

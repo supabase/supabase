@@ -101,7 +101,7 @@ const SidePanelVercelProjectLinker = () => {
     })
 
   const onCreateConnections = useCallback(
-    (vars) => {
+    (vars: any) => {
       createConnections({
         ...vars,
         connection: {

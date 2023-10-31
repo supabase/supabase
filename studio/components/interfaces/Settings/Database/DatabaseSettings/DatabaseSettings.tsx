@@ -210,16 +210,15 @@ const DatabaseSettings = () => {
                 <Button type="default" onClick={() => setShowConfirmationModal(true)}>
                   Disable read-only mode
                 </Button>
-                <Link
-                  passHref
-                  href="https://supabase.com/docs/guides/platform/database-size#disabling-read-only-mode"
-                >
-                  <a target="_blank" rel="noreferrer">
-                    <Button type="default" icon={<IconExternalLink />}>
-                      Learn more
-                    </Button>
-                  </a>
-                </Link>
+                <Button asChild type="default" icon={<IconExternalLink />}>
+                  <Link
+                    href="https://supabase.com/docs/guides/platform/database-size#disabling-read-only-mode"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Learn more
+                  </Link>
+                </Button>
               </div>
             </Alert_Shadcn_>
           )}

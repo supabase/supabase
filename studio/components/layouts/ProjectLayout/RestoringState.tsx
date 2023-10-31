@@ -91,13 +91,13 @@ const RestoringState = () => {
             </div>
             {isFailed && (
               <div className="border-t border-scale-400 flex items-center justify-end py-4 px-8">
-                <Link
-                  href={`/support/new?category=Database_unresponsive&ref=${project?.ref}&subject=Restoration%20failed%20for%20project`}
-                >
-                  <a>
-                    <Button type="default">Contact support</Button>
-                  </a>
-                </Link>
+                <Button asChild type="default">
+                  <Link
+                    href={`/support/new?category=Database_unresponsive&ref=${project?.ref}&subject=Restoration%20failed%20for%20project`}
+                  >
+                    Contact support
+                  </Link>
+                </Button>
               </div>
             )}
           </div>

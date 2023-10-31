@@ -143,16 +143,15 @@ const InfrastructureInfo = () => {
                         Please reach out to us via our support form if you are keen to upgrade your
                         Postgres version to the latest available ({latestPgVersion}).
                       </p>
-                      <Link
-                        href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
-                        passHref
-                      >
-                        <Button size="tiny" type="default" asChild>
-                          <a target="_blank" rel="noreferrer">
-                            Contact support
-                          </a>
-                        </Button>
-                      </Link>
+                      <Button size="tiny" type="default" asChild>
+                        <Link
+                          href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Contact support
+                        </Link>
+                      </Button>
                     </AlertDescription_Shadcn_>
                   </Alert_Shadcn_>
                 )}
@@ -185,16 +184,15 @@ const InfrastructureInfo = () => {
                           operation is complete.
                         </p>
                         <div>
-                          <Link
-                            href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats"
-                            passHref
-                          >
-                            <Button size="tiny" type="default" asChild>
-                              <a target="_blank" rel="noreferrer">
-                                View docs
-                              </a>
-                            </Button>
-                          </Link>
+                          <Button size="tiny" type="default" asChild>
+                            <Link
+                              href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats"
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              View docs
+                            </Link>
+                          </Button>
                         </div>
                       </AlertDescription_Shadcn_>
                     </Alert_Shadcn_>

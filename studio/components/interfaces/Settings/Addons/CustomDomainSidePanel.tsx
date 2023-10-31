@@ -138,13 +138,15 @@ const CustomDomainSidePanel = () => {
       header={
         <div className="flex items-center justify-between">
           <h4>Custom domains</h4>
-          <Link href="https://supabase.com/docs/guides/platform/custom-domains">
-            <a target="_blank" rel="noreferrer">
-              <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                About custom domains
-              </Button>
-            </a>
-          </Link>
+          <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+            <Link
+              href="https://supabase.com/docs/guides/platform/custom-domains"
+              target="_blank"
+              rel="noreferrer"
+            >
+              About custom domains
+            </Link>
+          </Button>
         </div>
       }
     >
@@ -153,8 +155,8 @@ const CustomDomainSidePanel = () => {
           <p className="text-sm">
             Custom domains allow you to present a branded experience to your users. You may set up
             your custom domain in the{' '}
-            <Link href={`/project/${projectRef}/settings/general`}>
-              <a className="text-brand">General Settings</a>
+            <Link href={`/project/${projectRef}/settings/general`} className="text-brand">
+              General Settings
             </Link>{' '}
             page after enabling the add-on.
           </p>
@@ -272,11 +274,11 @@ const CustomDomainSidePanel = () => {
               title="Custom domains are unavailable on the free plan"
               actions={
                 isOrgBilling ? (
-                  <Link href={`/org/${organization.slug}/billing?panel=subscriptionPlan`}>
-                    <a>
-                      <Button type="default">View available plans</Button>
-                    </a>
-                  </Link>
+                  <Button asChild type="default">
+                    <Link href={`/org/${organization.slug}/billing?panel=subscriptionPlan`}>
+                      View available plans
+                    </Link>
+                  </Button>
                 ) : (
                   <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
                     View available plans

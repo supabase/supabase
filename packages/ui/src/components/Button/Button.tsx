@@ -115,7 +115,7 @@ const buttonVariants = cva(
         container: `fixed inset-0 transition-opacity`,
       },
       disabled: {
-        true: 'opacity-50 cursor-not-allowed pointer-events-none',
+        true: 'opacity-50 cursor-default',
       },
       defaultVariants: {
         //   variant: 'default',

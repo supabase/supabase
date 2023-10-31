@@ -3,9 +3,6 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 })
 
-// this is required to use shared packages in the packages directory
-const withTM = require('next-transpile-modules')(['ui', 'common', 'shared-data'])
-
 // Required for nextjs standalone build
 const path = require('path')
 
@@ -232,10 +229,7 @@ const nextConfig = {
       'vercel.com',
     ],
   },
-  // Ref: https://nextjs.org/docs/advanced-features/output-file-tracing#caveats
-  experimental: {
-    outputFileTracingRoot: path.join(__dirname, '../../'),
-  },
+  transpilePackages: ['ui', 'common', 'shared-data'],
   webpack(config) {
     config.module?.rules
       .find((rule) => rule.oneOf)
@@ -251,25 +245,34 @@ const nextConfig = {
   },
 }
 
-// Export all config
-const moduleExports = withTM(withBundleAnalyzer(nextConfig))
-
-const sentryWebpackPluginOptions = {
-  // Additional config options for the Sentry Webpack plugin. Keep in mind that
-  // the following options are set automatically, and overriding them is not
-  // recommended:
-  //   release, url, org, project, authToken, configFile, stripPrefix,
-  //   urlPrefix, include, ignore
-
-  silent: true, // Suppresses all logs
-
-  // For all available options, see:
-  // https://github.com/getsentry/sentry-webpack-plugin#options.
-}
-
+// module.exports = withBundleAnalyzer(nextConfig)
 // Make sure adding Sentry options is the last code to run before exporting, to
 // ensure that your source maps include changes from all other Webpack plugins
 module.exports =
   process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
-    ? withSentryConfig(moduleExports, sentryWebpackPluginOptions)
-    : withTM(nextConfig)
+    ? withSentryConfig(
+        withBundleAnalyzer(nextConfig),
+        {
+          silent: true,
+        },
+        {
+          // For all available options, see:
+          // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+
+          // Upload a larger set of source maps for prettier stack traces (increases build time)
+          widenClientFileUpload: true,
+
+          // Transpiles SDK to be compatible with IE11 (increases bundle size)
+          transpileClientSDK: false,
+
+          // Routes browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers (increases server load)
+          tunnelRoute: '/monitoring',
+
+          // Hides source maps from generated client bundles
+          hideSourceMaps: true,
+
+          // Automatically tree-shake Sentry logger statements to reduce bundle size
+          disableLogger: true,
+        }
+      )
+    : nextConfig

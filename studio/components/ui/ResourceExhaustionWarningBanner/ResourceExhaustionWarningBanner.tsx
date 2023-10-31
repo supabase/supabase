@@ -116,20 +116,14 @@ const ResourceExhaustionWarningBanner = () => {
       <AlertDescription_Shadcn_>{description}</AlertDescription_Shadcn_>
       <div className="absolute top-5 right-5 flex items-center space-x-2">
         {learnMoreUrl !== undefined && (
-          <Link passHref href={learnMoreUrl}>
-            <a>
-              <Button type="default" icon={<IconExternalLink />}>
-                Learn more
-              </Button>
-            </a>
-          </Link>
+          <Button asChild type="default" icon={<IconExternalLink />}>
+            <Link href={learnMoreUrl}>Learn more</Link>
+          </Button>
         )}
         {correctionUrl !== undefined && (
-          <Link passHref href={correctionUrl}>
-            <a>
-              <Button type="default">{buttonText ?? 'Check'}</Button>
-            </a>
-          </Link>
+          <Button asChild type="default">
+            <Link href={correctionUrl}>{buttonText ?? 'Check'}</Link>
+          </Button>
         )}
       </div>
     </Alert_Shadcn_>

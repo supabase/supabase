@@ -111,11 +111,9 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
                     )}
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Link href={`/project/${ref}/settings/functions`}>
-                      <a>
-                        <Button type="default">Manage secrets</Button>
-                      </a>
-                    </Link>
+                    <Button asChild type="default">
+                      <Link href={`/project/${ref}/settings/functions`}>Manage secrets</Link>
+                    </Button>
                     {isNewAPIDocsEnabled && (
                       <Button
                         size="tiny"
@@ -134,17 +132,16 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
                         API
                       </Button>
                     )}
-                    <Link href="https://supabase.com/docs/guides/functions">
-                      <a target="_link">
-                        <Button
-                          type="default"
-                          className="translate-y-[1px]"
-                          icon={<IconExternalLink size={14} strokeWidth={1.5} />}
-                        >
-                          Documentation
-                        </Button>
-                      </a>
-                    </Link>
+                    <Button
+                      asChild
+                      type="default"
+                      className="translate-y-[1px]"
+                      icon={<IconExternalLink size={14} strokeWidth={1.5} />}
+                    >
+                      <Link href="https://supabase.com/docs/guides/functions" target="_link">
+                        Documentation
+                      </Link>
+                    </Button>
                   </div>
                 </div>
               </div>

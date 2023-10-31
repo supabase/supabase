@@ -20,18 +20,14 @@ const CPUWarnings = ({ isFreePlan, upgradeUrl, severity }: CPUWarningsProps) => 
           upgrading to a larger compute add-on.
         </AlertDescription_Shadcn_>
         <div className="mt-3 flex items-center space-x-2">
-          <Link href="https://supabase.com/docs/guides/platform/exhaust-cpu">
-            <a>
-              <Button type="default">Learn more</Button>
-            </a>
-          </Link>
-          <Link href={upgradeUrl}>
-            <a>
-              <Button type="warning">
-                {isFreePlan ? 'Upgrade project' : 'Change compute add-on'}
-              </Button>
-            </a>
-          </Link>
+          <Button asChild type="default">
+            <Link href="https://supabase.com/docs/guides/platform/exhaust-cpu">Learn more</Link>
+          </Button>
+          <Button asChild type="warning">
+            <Link href={upgradeUrl}>
+              {isFreePlan ? 'Upgrade project' : 'Change compute add-on'}
+            </Link>
+          </Button>
         </div>
       </Alert_Shadcn_>
     )
@@ -48,18 +44,14 @@ const CPUWarnings = ({ isFreePlan, upgradeUrl, severity }: CPUWarningsProps) => 
           upgrading to a larger compute add-on.
         </AlertDescription_Shadcn_>
         <div className="mt-3 flex items-center space-x-2">
-          <Link href="https://supabase.com/docs/guides/platform/exhaust-cpu">
-            <a>
-              <Button type="default">Learn more</Button>
-            </a>
-          </Link>
-          <Link href={upgradeUrl}>
-            <a>
-              <Button type="danger">
-                {isFreePlan ? 'Upgrade project' : 'Change compute add-on'}
-              </Button>
-            </a>
-          </Link>
+          <Button asChild type="default">
+            <Link href="https://supabase.com/docs/guides/platform/exhaust-cpu">Learn more</Link>
+          </Button>
+          <Button asChild type="danger">
+            <Link href={upgradeUrl}>
+              {isFreePlan ? 'Upgrade project' : 'Change compute add-on'}
+            </Link>
+          </Button>
         </div>
       </Alert_Shadcn_>
     )

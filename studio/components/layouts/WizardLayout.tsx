@@ -47,14 +47,12 @@ const Header = ({ organization, project }: WizardLayoutProps) => {
           <div className="flex items-center text-sm">
             <div className="flex items-center space-x-2">
               <Link href="/projects">
-                <a>
-                  <img
-                    src={`${BASE_PATH}/img/supabase-logo.svg`}
-                    alt="Supabase"
-                    className="rounded border p-1 hover:border-white dark:border-dark"
-                    style={{ height: 24 }}
-                  />
-                </a>
+                <img
+                  src={`${BASE_PATH}/img/supabase-logo.svg`}
+                  alt="Supabase"
+                  className="rounded border p-1 hover:border-white dark:border-dark"
+                  style={{ height: 24 }}
+                />
               </Link>
               <IconChevronRight size="small" className="text-foreground-light" />
               <p className="text-sm">

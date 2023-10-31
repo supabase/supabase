@@ -18,13 +18,12 @@ export const meta = {
         <Link
           href={`${resource.href}`}
           key={resource.title}
+          className={'col-span-12 md:col-span-4'}
           passHref
         >
-          <a className={'col-span-12 md:col-span-4'}>
-            <GlassPanel {...resource} background={false} showIconBg={true}>
-              {resource.description}
-            </GlassPanel>
-          </a>
+          <GlassPanel {...resource} background={false} showIconBg={true}>
+            {resource.description}
+          </GlassPanel>
         </Link>
       )
 
@@ -41,18 +40,16 @@ export const meta = {
 <div className="grid lg:grid-cols-12 gap-6 not-prose">
   {useCases.map((item) => {
     return (
-      <Link href={`${item.href}`} key={item.title} passHref>
-        <a className={'col-span-4'}>
-          <GlassPanel
-            title={item.title}
-            span="col-span-6"
-            background={false}
-            icon={item.icon}
-            hasLightIcon={item.hasLightIcon}
-          >
-            {item.description}
-          </GlassPanel>
-        </a>
+      <Link href={`${item.href}`} key={item.title} passHref className={'col-span-4'}>
+        <GlassPanel
+          title={item.title}
+          span="col-span-6"
+          background={false}
+          icon={item.icon}
+          hasLightIcon={item.hasLightIcon}
+        >
+          {item.description}
+        </GlassPanel>
       </Link>
     )
   })}
@@ -63,12 +60,10 @@ export const meta = {
 <div className="grid lg:grid-cols-12 gap-6 not-prose">
   {quickstarts.map((item) => {
     return (
-      <Link href={`${item.href}`} key={item.title} passHref>
-        <a className={'col-span-4'}>
-          <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
-            {item.description}
-          </GlassPanel>
-        </a>
+      <Link href={`${item.href}`} key={item.title} passHref className={'col-span-4'}>
+        <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
+          {item.description}
+        </GlassPanel>
       </Link>
     )
   })}
@@ -79,15 +74,16 @@ export const meta = {
 <div className="grid lg:grid-cols-12 gap-6 not-prose">
   {webapps.map((item) => {
     return (
-      <Link href={`${item.href}`} key={item.title} passHref>
-        <a className={'col-span-4'}>
-          <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
-            {item.description}
-          </GlassPanel>
-        </a>
+      <Link href={`${item.href}`} key={item.title} passHref className={'col-span-4'}>
+        <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
+          {item.description}
+        </GlassPanel>
+
       </Link>
     )
-  })}
+
+})}
+
 </div>
 
 ### Mobile Tutorials
@@ -95,15 +91,15 @@ export const meta = {
 <div className="grid lg:grid-cols-12 gap-6 not-prose">
   {mobile.map((item) => {
     return (
-      <Link href={`${item.href}`} key={item.title} passHref>
-        <a className={'col-span-4'}>
-          <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
-            {item.description}
-          </GlassPanel>
-        </a>
+      <Link href={`${item.href}`} key={item.title} passHref className={'col-span-4'}>
+        <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
+          {item.description}
+        </GlassPanel>
       </Link>
     )
-  })}
+
+})}
+
 </div>
 
 export const useCases = [

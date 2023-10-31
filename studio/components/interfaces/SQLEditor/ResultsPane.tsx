@@ -1,4 +1,4 @@
-import DataGrid, { Row } from '@supabase/react-data-grid'
+import DataGrid, { Row } from 'react-data-grid'
 
 interface ResultsPaneProps {
   results: any
@@ -48,7 +48,7 @@ const ResultsPane = ({ results }: ResultsPaneProps) => {
       <DataGrid
         columns={columns}
         rows={results}
-        rowRenderer={rowRenderer}
+        renderers={{ renderRow: rowRenderer }}
         style={{ height: '100%' }}
       />
     </div>

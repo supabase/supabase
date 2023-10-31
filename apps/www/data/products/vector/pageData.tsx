@@ -57,7 +57,7 @@ export default (isMobile?: boolean) => ({
       {
         title: 'Secure and Scalable',
         paragraph:
-          'Supabase is SOC2 type 2 compliant, and comes with an advanced permissions system.',
+          'Supabase is SOC2 Type 2 compliant, and comes with an advanced permissions system.',
         image: SecureAndScalableImg,
       },
       {

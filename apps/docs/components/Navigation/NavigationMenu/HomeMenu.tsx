@@ -35,22 +35,20 @@ const NavigationMenuHome = () => {
                     } else {
                       return (
                         <Link href={link.href} passHref key={link.label}>
-                          <a>
-                            <li
-                              className={[
-                                'group flex items-center gap-2',
-                                'text-sm transition-all duration-150 text-scale-1100 hover:text-scale-1200  hover:cursor-pointer ',
-                              ].join(' ')}
-                            >
-                              {link?.icon && <HomeMenuIconPicker icon={link.icon} />}
-                              {link.label}
-                              {link.community && (
-                                <Badge size="small" color="scale">
-                                  Community
-                                </Badge>
-                              )}
-                            </li>
-                          </a>
+                          <li
+                            className={[
+                              'group flex items-center gap-2',
+                              'text-sm transition-all duration-150 text-scale-1100 hover:text-scale-1200  hover:cursor-pointer ',
+                            ].join(' ')}
+                          >
+                            {link?.icon && <HomeMenuIconPicker icon={link.icon} />}
+                            {link.label}
+                            {link.community && (
+                              <Badge size="small" color="scale">
+                                Community
+                              </Badge>
+                            )}
+                          </li>
                         </Link>
                       )
                     }

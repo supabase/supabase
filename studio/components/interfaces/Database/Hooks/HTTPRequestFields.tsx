@@ -94,11 +94,9 @@ const HTTPRequestFields = ({
               <p className="text-sm text-foreground-light">Select which edge function to trigger</p>
               <div className="px-4 py-4 border rounded bg-scale-500 border-scale-700 flex items-center justify-between space-x-4">
                 <p className="text-sm">No edge functions created yet</p>
-                <Link href={`/project/${ref}/functions`}>
-                  <a>
-                    <Button>Create an edge function</Button>
-                  </a>
-                </Link>
+                <Button asChild>
+                  <Link href={`/project/${ref}/functions`}>Create an edge function</Link>
+                </Button>
               </div>
               {errors.http_url && <p className="text-sm text-red-900">{errors.http_url}</p>}
             </div>

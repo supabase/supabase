@@ -28,10 +28,13 @@ const Footer = () => (
             )}
             {Icon && <Icon width={16} height={16} />}
             <p>{text}</p>
-            <Link href={url} passHref>
-              <a className="text-brand hover:underline" target="_blank" rel="noreferrer noopener">
-                {ctaLabel}
-              </a>
+            <Link
+              href={url}
+              className="text-brand hover:underline"
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              {ctaLabel}
             </Link>
           </li>
         ))}
@@ -40,14 +43,14 @@ const Footer = () => (
     <hr className="border-border my-6"></hr>
     <div className="flex gap-4 items-center justify-between">
       <div className="flex flex-col lg:flex-row gap-3 ">
-        <Link href="https://supabase.com/">
-          <a className="text-xs text-lighter">&copy; Supabase Inc</a>
+        <Link href="https://supabase.com/" className="text-xs text-lighter">
+          &copy; Supabase Inc
         </Link>
         <span className="text-xs text-lighter">—</span>
         {secondaryLinks.map(({ component: Component, ...item }) =>
           item.url ? (
-            <Link href={item.url} key={item.url}>
-              <a className="text-xs text-lighter hover:underline">{item.title}</a>
+            <Link href={item.url} key={item.url} className="text-xs text-lighter hover:underline">
+              {item.title}
             </Link>
           ) : (
             Component && (

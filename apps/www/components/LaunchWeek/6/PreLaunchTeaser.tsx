@@ -61,8 +61,9 @@ export function PreLaunchTeaser() {
                     key={author.author_id + ' profile image'}
                     src={author.author_image_url}
                     className="dark:border-dark rounded-lg border"
-                    width="54px"
-                    height="54px"
+                    width={54}
+                    height={54}
+                    alt="Author profile image"
                   />
                 )
               })}
@@ -87,9 +88,9 @@ export function PreLaunchTeaser() {
               </p>
             </div>
             <div>
-              <Link href="/blog/supabase-series-b">
-                <Button type="default">Read more</Button>
-              </Link>
+              <Button asChild type="default">
+                <Link href="/blog/supabase-series-b">Read more</Link>
+              </Button>
             </div>
           </div>
         </div>

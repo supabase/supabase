@@ -53,9 +53,7 @@ const Authentication = ({ autoApiService, selectedLang, showApiKey }: Authentica
           <p>
             We have provided you a Client Key to get started. You will soon be able to add as many
             keys as you like. You can find the <code>anon</code> key in the{' '}
-            <Link href={`/project/${autoApiService.project.ref}/settings/api`}>
-              <a>API Settings</a>
-            </Link>{' '}
+            <Link href={`/project/${autoApiService.project.ref}/settings/api`}>API Settings</Link>{' '}
             page.
           </p>
         </article>
@@ -87,9 +85,7 @@ const Authentication = ({ autoApiService, selectedLang, showApiKey }: Authentica
           <p>
             We have provided you with a Service Key to get started. Soon you will be able to add as
             many keys as you like. You can find the <code>service_role</code> in the{' '}
-            <Link href={`/project/${autoApiService.project.ref}/settings/api`}>
-              <a>API Settings</a>
-            </Link>{' '}
+            <Link href={`/project/${autoApiService.project.ref}/settings/api`}>API Settings</Link>{' '}
             page.
           </p>
         </article>

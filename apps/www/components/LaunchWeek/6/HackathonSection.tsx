@@ -17,16 +17,14 @@ export default function LaunchHero() {
           </div>
 
           <div className="flex gap-3">
-            <Link href="https://www.madewithsupabase.com/tag/Launch%20Week%205">
-              <Button type="primary" size="small" className="text-white">
+            <Button asChild type="primary" size="small" className="text-white">
+              <Link href="https://www.madewithsupabase.com/tag/Launch%20Week%205">
                 view projects
-              </Button>
-            </Link>
-            <Link href="/blog/launch-week-5-hackathon">
-              <Button type="default" size="small">
-                Learn more
-              </Button>
-            </Link>
+              </Link>
+            </Button>
+            <Button asChild type="default" size="small">
+              <Link href="/blog/launch-week-5-hackathon">Learn more</Link>
+            </Button>
           </div>
         </div>
 

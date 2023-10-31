@@ -22,11 +22,12 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
   }) => {
     return (
       <li key={id} className="function-link-item text-scale-1000 leading-3">
-        <Link href={`#${id}`} passHref>
-          <a className="cursor-pointer transition text-scale-1000 text-sm hover:text-brand flex gap-3">
-            {icon && <img className="w-3" src={`${router.basePath}${icon}`} />}
-            {title}
-          </a>
+        <Link
+          href={`#${id}`}
+          className="cursor-pointer transition text-scale-1000 text-sm hover:text-brand flex gap-3"
+        >
+          {icon && <img className="w-3" src={`${router.basePath}${icon}`} />}
+          {title}
         </Link>
       </li>
     )
@@ -96,20 +97,19 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
       ].join(' ')}
     >
       <div className={'w-full flex flex-col gap-0 sticky top-8'}>
-        <Link href={`${menu.parent ?? '/'}`} passHref>
-          <a
-            className={[
-              'flex items-center gap-1 text-xs group mb-3',
-              'text-base transition-all duration-200 text-brand hover:text-brand-600 hover:cursor-pointer ',
-            ].join(' ')}
-          >
-            <div className="relative w-2">
-              <div className="transition-all ease-out ml-0 group-hover:-ml-1">
-                <IconChevronLeft size={10} strokeWidth={3} />
-              </div>
+        <Link
+          href={`${menu.parent ?? '/'}`}
+          className={[
+            'flex items-center gap-1 text-xs group mb-3',
+            'text-base transition-all duration-200 text-brand hover:text-brand-600 hover:cursor-pointer ',
+          ].join(' ')}
+        >
+          <div className="relative w-2">
+            <div className="transition-all ease-out ml-0 group-hover:-ml-1">
+              <IconChevronLeft size={10} strokeWidth={3} />
             </div>
-            <span>Back to menu</span>
-          </a>
+          </div>
+          <span>Back to menu</span>
         </Link>
         <div className="flex items-center gap-3 my-3">
           <img
