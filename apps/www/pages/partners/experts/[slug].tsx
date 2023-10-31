@@ -162,7 +162,7 @@ function Partner({
                     <span className="text-lighter">Category</span>
                     <Link
                       href={`/partners/experts#${partner.category.toLowerCase()}`}
-                      className="text-brand hover:text-brand-300 transition-colors"
+                      className="text-brand hover:underline transition-colors"
                     >
                       {partner.category}
                     </Link>
@@ -174,7 +174,7 @@ function Partner({
                       href={partner.website}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-brand hover:text-brand-300 transition-colors"
+                      className="text-brand hover:underline transition-colors"
                     >
                       {new URL(partner.website).host}
                     </a>
@@ -187,7 +187,7 @@ function Partner({
                         href={partner.docs}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-brand hover:text-brand-300 transition-colors"
+                        className="text-brand hover:underline transition-colors"
                       >
                         <span className="flex items-center space-x-1">
                           <span>Learn</span>
