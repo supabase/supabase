@@ -19,7 +19,7 @@ If you prefer to do this, you can specify the region when invoking the function.
 
 ### How to set the region via HTTP headers
 
-You can pass the region via `x-region` HTTP header, when calling a function.
+Use the `x-region` HTTP header when calling an Edge Function to determine where the Function should be executed.
 
 ```bash
 curl --request POST 'https://<project_ref>.supabase.co/functions/v1/hello-world' \
