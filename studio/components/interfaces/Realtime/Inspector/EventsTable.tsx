@@ -101,11 +101,11 @@ const EventsTable = ({ enabled, data = [], showSendEvent }: Props) => {
   return (
     <>
       <section className="flex w-full flex-col" style={{ maxHeight: 'calc(100vh - 42px - 3rem)' }}>
-        <div className="flex h-full flex-row">
+        <div className={cn('flex h-full flex-row border-t-4', enabled ? 'border-brand-400' : null)}>
           <div className="flex flex-grow flex-col">
             {enabled && (
-              <div className="w-full h-12 px-4 bg-brand-400 border-b border-zinc-800 items-center inline-flex justify-between">
-                <div className="inline-flex gap-2.5 text-brand-600 text-xs">
+              <div className="w-full h-8 px-4 bg-surface-100 border-b items-center inline-flex justify-between text-foreground-light">
+                <div className="inline-flex gap-2.5 text-xs">
                   <Loader2 size="16" className="animate-spin" />
                   <div>Listening</div>
                   <div>•</div>
@@ -117,12 +117,10 @@ const EventsTable = ({ enabled, data = [], showSendEvent }: Props) => {
                       : `No event found yet...`}
                   </div>
                 </div>
-                <Button
-                  type="primary"
-                  className="!bg-brand-400 !border-brand-500"
-                  onClick={showSendEvent}
-                >
-                  Send test event
+                <Button type="link" onClick={showSendEvent}>
+                  <span className="underline text-foreground-light hover:text-brand-600">
+                    Send test event
+                  </span>
                 </Button>
               </div>
             )}
