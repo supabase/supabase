@@ -14,13 +14,19 @@ export const isErrorLog = (l: LogData) => {
   return l.event_message === 'SYSTEM' && l.metadata?.status === 'error'
 }
 
-interface Props {
+interface EventsTableProps {
   enabled: boolean
   data?: LogData[]
   showSendEvent: () => void
 }
 
-const NoResultAlert = ({ enabled }: { enabled: boolean }) => {
+const NoResultAlert = ({
+  enabled,
+  showSendEvent,
+}: {
+  enabled: boolean
+  showSendEvent: () => void
+}) => {
   const router = useRouter()
   const { ref } = useParams()
 
@@ -35,15 +41,17 @@ const NoResultAlert = ({ enabled }: { enabled: boolean }) => {
             <div className="text-foreground">Create a Broadcast event</div>
             <div className="text-foreground-lighter text-xs">Start developing in preview</div>
           </div>
-          <Button type="default">
+          <Button type="default" onClick={showSendEvent}>
             <span>Send a test event</span>
           </Button>
         </div>
         <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">
-          <IconPresence size="xlarge" className="bg-brand-400 rounded" />
+          <IconPresence size="xlarge" className="bg-brand-400 rounded w-6" />
           <div className="grow flex-col flex">
             <div className="text-foreground">Join from another browser tab</div>
-            <div className="text-foreground-lighter text-xs">Start developing in preview</div>
+            <div className="text-foreground-lighter text-xs">
+              Experiment with presence events between multiple clients
+            </div>
           </div>
           <Button type="default" iconRight={<IconExternalLink />}>
             <a href={`${router.basePath}${router.asPath}`} target="_blank">
@@ -84,7 +92,7 @@ const RowRenderer = (key: Key, props: RenderRowProps<LogData, unknown>) => {
   return <Row key={key} {...props} isRowSelected={false} selectedCellIdx={undefined} />
 }
 
-const EventsTable = ({ enabled, data = [], showSendEvent }: Props) => {
+const EventsTable = ({ enabled, data = [], showSendEvent }: EventsTableProps) => {
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const stringData = JSON.stringify(data)
 
@@ -149,7 +157,7 @@ const EventsTable = ({ enabled, data = [], showSendEvent }: Props) => {
                 renderRow: RowRenderer,
                 noRowsFallback: (
                   <div className="mx-auto flex h-full w-full items-center justify-center space-y-12 py-4 transition-all delay-200 duration-500">
-                    <NoResultAlert enabled={enabled} />
+                    <NoResultAlert enabled={enabled} showSendEvent={showSendEvent} />
                   </div>
                 ),
               }}
