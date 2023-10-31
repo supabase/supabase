@@ -83,7 +83,7 @@
     "tailwindcss-animate": "^1.0.6",
     "tailwindcss-radix": "^2.0.0",
     "yup": "^0.32.11",
-    "zod": "^3.21.4"
+    "zod": "^3.22.3"
   },
   "devDependencies": {
     "@babel/plugin-syntax-flow": "^7.21.4",
