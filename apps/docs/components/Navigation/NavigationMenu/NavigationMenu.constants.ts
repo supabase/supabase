@@ -858,6 +858,7 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/connect-to-postgres',
         },
         { name: 'Testing your Edge Functions', url: '/guides/functions/unit-test' },
+        { name: 'Regional Invocation', url: '/guides/functions/regional-invocation' },
         { name: 'Troubleshooting', url: '/guides/functions/troubleshooting' },
       ],
     },
