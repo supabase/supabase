@@ -6,7 +6,7 @@ import {
   UseQueryOptions,
 } from '@tanstack/react-query'
 import md5 from 'blueimp-md5'
-import { post as newPost } from 'data/fetchers'
+import { post } from 'data/fetchers'
 import { useCallback } from 'react'
 import { sqlKeys } from './keys'
 
@@ -38,7 +38,7 @@ export async function executeSql(
   let headers = new Headers()
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
-  const { data, error } = await newPost('/platform/pg-meta/{ref}/query', {
+  const { data, error } = await post('/platform/pg-meta/{ref}/query', {
     signal,
     params: {
       header: { 'x-connection-encrypted': connectionString ?? '' },
