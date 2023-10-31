@@ -125,7 +125,6 @@ const EnableBranchingModal = () => {
         <Form_Shadcn_ {...form}>
           <form
             id={formId}
-            className="space-y-4"
             onSubmit={form.handleSubmit(onSubmit)}
             onChange={() => setIsValid(false)}
           >
@@ -165,11 +164,9 @@ const EnableBranchingModal = () => {
                     >
                       Understood
                     </Button>
-                    <Link passHref href={`/org/${selectedOrg?.slug}/billing`}>
-                      <Button asChild>
-                        <a>Organization settings</a>
-                      </Button>
-                    </Link>
+                    <Button asChild>
+                      <Link href={`/org/${selectedOrg?.slug}/billing`}>Organization settings</Link>
+                    </Button>
                   </div>
                 </Modal.Content>
               </>
@@ -199,19 +196,19 @@ const EnableBranchingModal = () => {
                 )}
 
                 {isSuccessIntegrations && (
-                  <>
-                    <GithubRepositorySelection
-                      form={form}
-                      isChecking={isChecking}
-                      isValid={canSubmit}
-                      integration={githubIntegration}
-                      hasGithubIntegrationInstalled={hasGithubIntegrationInstalled}
-                    />
-                  </>
+                  <GithubRepositorySelection
+                    form={form}
+                    isChecking={isChecking}
+                    isValid={canSubmit}
+                    integration={githubIntegration}
+                    hasGithubIntegrationInstalled={hasGithubIntegrationInstalled}
+                  />
                 )}
 
                 <Modal.Content className="px-7 py-6 flex flex-col gap-3">
-                  <p className="text-sm text-light">Please keep in mind the following:</p>
+                  <p className="text-sm text-foreground-light">
+                    Please keep in mind the following:
+                  </p>
                   <div className="flex flex-row gap-4">
                     <div>
                       <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-300 flex items-center justify-center">
@@ -222,7 +219,7 @@ const EnableBranchingModal = () => {
                       <p className="text-sm text-foreground">
                         You will not be able to use the dashboard to make changes to the database
                       </p>
-                      <p className="text-sm text-light">
+                      <p className="text-sm text-foreground-light">
                         Schema changes for database preview branches must be done via Git. We are
                         nonetheless working on allowing the dashboard to make schema changes for
                         preview branches.
@@ -259,60 +256,8 @@ const EnableBranchingModal = () => {
                 </Modal.Content>
               </>
             )}
-<<<<<<< HEAD
-
-            <Modal.Content className="px-7 py-6 flex flex-col gap-3">
-              <p className="text-sm text-foreground-light">Please keep in mind the following:</p>
-              <div className="flex flex-row gap-4">
-                <div>
-                  <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-300 flex items-center justify-center">
-                    <IconFileText className="text-amber-900" size={20} strokeWidth={2} />
-                  </figure>
-                </div>
-                <div>
-                  <p className="text-sm text-foreground">
-                    You will not be able to use the dashboard to make changes to the database
-                  </p>
-                  <p className="text-sm text-foreground-light">
-                    Schema changes for database preview branches must be done via Git. We are
-                    nonetheless working on allowing the dashboard to make schema changes for preview
-                    branches.
-                  </p>
-                </div>
-              </div>
-            </Modal.Content>
-
-            <Modal.Separator />
-
-            <Modal.Content className="px-7">
-              <div className="flex items-center space-x-2 py-2 pb-4">
-                <Button
-                  size="medium"
-                  block
-                  disabled={isCreating}
-                  type="default"
-                  onClick={() => snap.setShowEnableBranchingModal(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  size="medium"
-                  block
-                  disabled={selectedBranch === undefined || isCreating}
-                  loading={isCreating}
-                  type="primary"
-                  onClick={() => onEnableBranching()}
-                >
-                  I understand, enable branching
-                </Button>
-              </div>
-            </Modal.Content>
-          </>
-        )}
-=======
           </form>
         </Form_Shadcn_>
->>>>>>> master
       </Modal>
 
       <SidePanelGitHubRepoLinker projectRef={ref} />
