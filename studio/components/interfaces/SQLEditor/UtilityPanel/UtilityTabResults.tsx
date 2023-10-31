@@ -56,8 +56,8 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
   const isTimeout =
-    result?.error.message?.includes('canceling statement due to statement timeout') ||
-    result?.error.message?.includes('upstream request timeout')
+    result?.error?.message?.includes('canceling statement due to statement timeout') ||
+    result?.error?.message?.includes('upstream request timeout')
 
   if (isUtilityPanelCollapsed) return null
 
