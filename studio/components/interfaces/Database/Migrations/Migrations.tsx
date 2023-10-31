@@ -38,13 +38,15 @@ const Migrations = () => {
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <Link href="https://supabase.com/docs/guides/getting-started/local-development#database-migrations">
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                  Documentation
-                </Button>
-              </a>
-            </Link>
+            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+              <Link
+                href="https://supabase.com/docs/guides/getting-started/local-development#database-migrations"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Documentation
+              </Link>
+            </Button>
           </div>
         </div>
 
@@ -63,16 +65,13 @@ const Migrations = () => {
               variant="warning"
               title="Failed to retrieve migration history for database"
               actions={[
-                <Link
-                  key="contact-support"
-                  href={`/support/new?ref=${project?.ref}&category=dashboard_bug&subject=Unable%20to%20view%20database%20migrations`}
-                >
-                  <a>
-                    <Button type="default" className="ml-4">
-                      Contact support
-                    </Button>
-                  </a>
-                </Link>,
+                <Button key="contact-support" asChild type="default" className="ml-4">
+                  <Link
+                    href={`/support/new?ref=${project?.ref}&category=dashboard_bug&subject=Unable%20to%20view%20database%20migrations`}
+                  >
+                    Contact support
+                  </Link>
+                </Button>,
               ]}
             >
               <p className="mb-1">

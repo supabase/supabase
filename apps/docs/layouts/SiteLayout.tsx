@@ -1,5 +1,5 @@
 import { useTheme } from 'next-themes'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import Link from 'next/link'
 import NavigationMenu from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
@@ -235,22 +235,20 @@ const MobileMenuBackdrop = memo(function MobileMenuBackdrop() {
 const HeaderLogo = memo(function HeaderLogo() {
   const { resolvedTheme } = useTheme()
   return (
-    <Link href="/">
-      <a className="px-10 flex items-center gap-2">
-        <Image
-          className="cursor-pointer"
-          src={resolvedTheme === 'dark' ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'}
-          width={96}
-          height={24}
-          alt="Supabase Logo"
-        />
-        <span className="font-mono text-sm font-medium text-brand">DOCS</span>
-      </a>
+    <Link href="/" className="px-10 flex items-center gap-2">
+      <Image
+        className="cursor-pointer"
+        src={resolvedTheme === 'dark' ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'}
+        width={96}
+        height={24}
+        alt="Supabase Logo"
+      />
+      <span className="font-mono text-sm font-medium text-brand">DOCS</span>
     </Link>
   )
 })
 
-const Container = memo(function Container(props) {
+const Container = memo(function Container(props: PropsWithChildren) {
   const mobileMenuOpen = useMenuMobileOpen()
 
   return (

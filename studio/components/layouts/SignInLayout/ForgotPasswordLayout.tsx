@@ -1,7 +1,7 @@
 import { useTheme } from 'next-themes'
 import { BASE_PATH } from 'lib/constants'
 import { observer } from 'mobx-react-lite'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 
@@ -28,18 +28,16 @@ const ForgotPasswordLayout = ({
           <div className="flex flex-shrink-0 flex-grow items-center lg:flex-grow-0">
             <div className="flex w-full items-center justify-between md:w-auto">
               <Link href={logoLinkToMarketingSite ? 'https://supabase.com' : '/projects'}>
-                <a>
-                  <Image
-                    src={
-                      resolvedTheme === 'dark'
-                        ? `${BASE_PATH}/img/supabase-dark.svg`
-                        : `${BASE_PATH}/img/supabase-light.svg`
-                    }
-                    alt=""
-                    height={24}
-                    width={120}
-                  />
-                </a>
+                <Image
+                  src={
+                    resolvedTheme === 'dark'
+                      ? `${BASE_PATH}/img/supabase-dark.svg`
+                      : `${BASE_PATH}/img/supabase-light.svg`
+                  }
+                  alt=""
+                  height={24}
+                  width={120}
+                />
               </Link>
             </div>
           </div>

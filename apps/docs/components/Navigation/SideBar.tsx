@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import { useRouter } from 'next/router'
 import { IconChevronRight, IconArrowLeft } from '~/../../packages/ui'
 import { REFERENCES } from './NavigationMenu/NavigationMenu.constants'
@@ -49,12 +49,10 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
       {isInReferencePages && (
         <>
           <Link href="/reference">
-            <a>
-              <div className="flex items-center space-x-4 opacity-75 hover:opacity-100 transition">
-                <IconArrowLeft size={16} strokeWidth={2} className="text-scale-1200" />
-                <span className="text-sm text-scale-1200">All Reference Docs</span>
-              </div>
-            </a>
+            <div className="flex items-center space-x-4 opacity-75 hover:opacity-100 transition">
+              <IconArrowLeft size={16} strokeWidth={2} className="text-scale-1200" />
+              <span className="text-sm text-scale-1200">All Reference Docs</span>
+            </div>
           </Link>
           {referenceMeta !== undefined && (
             <div className="my-5 flex items-center space-x-4">
@@ -76,21 +74,19 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
         <div className="my-2">
           {menuItems[0].items.map((item) => (
             <Link key={item.name} href={item.url}>
-              <a>
-                <div
-                  key={item.name}
-                  className={[
-                    'py-1.5 px-5 rounded text-sm transition',
-                    `${
-                      item.url === asPath
-                        ? 'bg-scale-200 text-brand'
-                        : 'text-scale-1100 hover:text-scale-1200'
-                    }`,
-                  ].join(' ')}
-                >
-                  {item.name}
-                </div>
-              </a>
+              <div
+                key={item.name}
+                className={[
+                  'py-1.5 px-5 rounded text-sm transition',
+                  `${
+                    item.url === asPath
+                      ? 'bg-scale-200 text-brand'
+                      : 'text-scale-1100 hover:text-scale-1200'
+                  }`,
+                ].join(' ')}
+              >
+                {item.name}
+              </div>
             </Link>
           ))}
         </div>
@@ -118,20 +114,18 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                   if (section.items.length === 0) {
                     return (
                       <Link href={section.url} key={section.name}>
-                        <a>
-                          <div
-                            className={[
-                              'py-1.5 px-5 rounded text-sm transition',
-                              `${
-                                section.url === asPath
-                                  ? 'bg-scale-200 text-brand'
-                                  : 'text-scale-1100 hover:text-scale-1200'
-                              }`,
-                            ].join(' ')}
-                          >
-                            {section.name}
-                          </div>
-                        </a>
+                        <div
+                          className={[
+                            'py-1.5 px-5 rounded text-sm transition',
+                            `${
+                              section.url === asPath
+                                ? 'bg-scale-200 text-brand'
+                                : 'text-scale-1100 hover:text-scale-1200'
+                            }`,
+                          ].join(' ')}
+                        >
+                          {section.name}
+                        </div>
                       </Link>
                     )
                   } else {
@@ -157,21 +151,19 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                           <Accordion.Content className="my-2 data-open:animate-slide-down data-closed:animate-slide-up">
                             {section.items.map((item: NavMenuSection) => (
                               <Link key={item.name} href={item.url}>
-                                <a>
-                                  <div
-                                    key={item.name}
-                                    className={[
-                                      'py-1.5 ml-4 px-5 rounded text-sm transition',
-                                      `${
-                                        item.url === asPath
-                                          ? 'bg-scale-200 text-brand'
-                                          : 'text-scale-1100 hover:text-scale-1200'
-                                      }`,
-                                    ].join(' ')}
-                                  >
-                                    {item.name}
-                                  </div>
-                                </a>
+                                <div
+                                  key={item.name}
+                                  className={[
+                                    'py-1.5 ml-4 px-5 rounded text-sm transition',
+                                    `${
+                                      item.url === asPath
+                                        ? 'bg-scale-200 text-brand'
+                                        : 'text-scale-1100 hover:text-scale-1200'
+                                    }`,
+                                  ].join(' ')}
+                                >
+                                  {item.name}
+                                </div>
                               </Link>
                             ))}
                           </Accordion.Content>

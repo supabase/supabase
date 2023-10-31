@@ -42,11 +42,12 @@ function Partner({
         <SectionContainer>
           <div className="col-span-12 mx-auto mb-2 max-w-5xl space-y-12 lg:col-span-2">
             {/* Back button */}
-            <Link href="/partners/experts">
-              <a className="text-foreground hover:text-lighter flex cursor-pointer items-center transition-colors">
-                <IconChevronLeft style={{ padding: 0 }} />
-                Back
-              </a>
+            <Link
+              href="/partners/experts"
+              className="text-foreground hover:text-lighter flex cursor-pointer items-center transition-colors"
+            >
+              <IconChevronLeft style={{ padding: 0 }} />
+              Back
             </Link>
 
             <div className="flex items-center space-x-4">
@@ -159,10 +160,11 @@ function Partner({
 
                   <div className="flex items-center justify-between py-2">
                     <span className="text-lighter">Category</span>
-                    <Link href={`/partners/experts#${partner.category.toLowerCase()}`}>
-                      <a className="text-brand hover:underline transition-colors">
-                        {partner.category}
-                      </a>
+                    <Link
+                      href={`/partners/experts#${partner.category.toLowerCase()}`}
+                      className="text-brand hover:underline transition-colors"
+                    >
+                      {partner.category}
                     </Link>
                   </div>
 

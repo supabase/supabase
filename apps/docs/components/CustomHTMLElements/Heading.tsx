@@ -28,7 +28,7 @@ interface Props {
  * need to parse the <a> and generate anchors. Custom anchors are used in tsx files.
  * (see: /pages/guides/cli/config.tsx)
  */
-const Heading: React.FC<Props> = ({ tag, customAnchor, children }) => {
+const Heading: React.FC<React.PropsWithChildren<Props>> = ({ tag, customAnchor, children }) => {
   const HeadingTag = `${tag}` as any
   const anchor = customAnchor ? customAnchor : getAnchor(children)
   const link = `#${anchor}`

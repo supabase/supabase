@@ -72,13 +72,11 @@ const NotificationActions = ({
         )
       })}
       {changelogLink && (
-        <Link href={changelogLink} passHref>
-          <Button asChild type="default" icon={<IconExternalLink size={12} strokeWidth={2} />}>
-            <a target="_blank" rel="noreferrer">
-              More info
-            </a>
-          </Button>
-        </Link>
+        <Button asChild type="default" icon={<IconExternalLink size={12} strokeWidth={2} />}>
+          <Link href={changelogLink} target="_blank" rel="noreferrer">
+            More info
+          </Link>
+        </Button>
       )}
     </div>
   )

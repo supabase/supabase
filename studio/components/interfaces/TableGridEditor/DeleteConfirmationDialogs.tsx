@@ -1,17 +1,23 @@
 import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
+import toast from 'react-hot-toast'
+import { Alert, Button, Checkbox, IconExternalLink, Modal } from 'ui'
 
+import { SupaRow } from 'components/grid'
+import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { sqlKeys } from 'data/sql/keys'
+import { useTableRowDeleteAllMutation } from 'data/table-rows/table-row-delete-all-mutation'
+import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
+import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-mutation'
 import { tableKeys } from 'data/tables/keys'
 import { useGetTables } from 'data/tables/tables-query'
 import { useStore, useUrlState } from 'hooks'
 import { TableLike } from 'hooks/misc/useTable'
 import { noop } from 'lib/void'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { Alert, Button, Checkbox, IconExternalLink, Modal } from 'ui'
 
 export type DeleteConfirmationDialogsProps = {
   projectRef?: string
@@ -24,19 +30,69 @@ const DeleteConfirmationDialogs = ({
   selectedTable,
   onAfterDeleteTable = noop,
 }: DeleteConfirmationDialogsProps) => {
+  const { meta, ui } = useStore()
+  const queryClient = useQueryClient()
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
 
-  const [, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
-
-  const queryClient = useQueryClient()
-
-  const { meta, ui } = useStore()
+  const [{ filter }, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
+  const filters = formatFilterURLParams(filter as string[])
 
   const getTables = useGetTables({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+
+  const { mutate: deleteRows } = useTableRowDeleteMutation({
+    onSuccess: () => {
+      if (snap.confirmationDialog?.type === 'row') {
+        snap.confirmationDialog.callback?.()
+      }
+      toast.success(`Successfully deleted selected row(s)`)
+      snap.closeConfirmationDialog()
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete row: ${error.message}`)
+      snap.closeConfirmationDialog()
+    },
+  })
+
+  const { mutateAsync: deleteAllRows } = useTableRowDeleteAllMutation({
+    onSuccess: () => {
+      if (snap.confirmationDialog?.type === 'row') {
+        snap.confirmationDialog.callback?.()
+      }
+      toast.success(`Successfully deleted selected rows`)
+      snap.closeConfirmationDialog()
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete rows: ${error.message}`)
+      snap.closeConfirmationDialog()
+    },
+  })
+
+  const { mutateAsync: truncateRows } = useTableRowTruncateMutation({
+    onSuccess: () => {
+      if (snap.confirmationDialog?.type === 'row') {
+        snap.confirmationDialog.callback?.()
+      }
+      toast.success(`Successfully deleted all rows from table`)
+      snap.closeConfirmationDialog()
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete rows: ${error.message}`)
+      snap.closeConfirmationDialog()
+    },
+  })
+
+  const isAllRowsSelected =
+    snap.confirmationDialog?.type === 'row' ? snap.confirmationDialog.allRowsSelected : false
+  const numRows =
+    snap.confirmationDialog?.type === 'row'
+      ? snap.confirmationDialog.allRowsSelected
+        ? snap.confirmationDialog.numRows ?? 0
+        : snap.confirmationDialog.rows.length
+      : 0
 
   const removeDeletedColumnFromFiltersAndSorts = (columnName: string) => {
     setParams((prevParams) => {
@@ -57,7 +113,8 @@ const DeleteConfirmationDialogs = ({
     })
   }
 
-  const isDeleteWithCascade = snap.confirmationDialog?.isDeleteWithCascade ?? false
+  const isDeleteWithCascade =
+    snap.confirmationDialog?.type === 'column' ? snap.confirmationDialog.isDeleteWithCascade : false
 
   const onConfirmDeleteColumn = async () => {
     if (!(snap.confirmationDialog?.type === 'column')) return
@@ -136,6 +193,37 @@ const DeleteConfirmationDialogs = ({
     }
   }
 
+  const onConfirmDeleteRow = async () => {
+    if (!project) return console.error('Project ref is required')
+    if (!selectedTable) return console.error('Selected table required')
+    if (snap.confirmationDialog?.type !== 'row') return
+    const selectedRowsToDelete = snap.confirmationDialog.rows
+
+    if (snap.confirmationDialog.allRowsSelected) {
+      if (filters.length === 0) {
+        truncateRows({
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+          table: selectedTable as any,
+        })
+      } else {
+        deleteAllRows({
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+          table: selectedTable as any,
+          filters,
+        })
+      }
+    } else {
+      deleteRows({
+        projectRef: project.ref,
+        connectionString: project.connectionString,
+        table: selectedTable as any,
+        rows: selectedRowsToDelete as SupaRow[],
+      })
+    }
+  }
+
   return (
     <>
       <ConfirmationModal
@@ -173,18 +261,21 @@ const DeleteConfirmationDialogs = ({
                   All dependent objects will be removed, as will any objects that depend on them,
                   recursively.
                 </p>
-                <Link href="https://www.postgresql.org/docs/current/ddl-depend.html">
-                  <a target="_blank" rel="noreferrer">
-                    <Button size="tiny" type="default" icon={<IconExternalLink />}>
-                      About dependency tracking
-                    </Button>
-                  </a>
-                </Link>
+                <Button asChild size="tiny" type="default" icon={<IconExternalLink />}>
+                  <Link
+                    href="https://www.postgresql.org/docs/current/ddl-depend.html"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    About dependency tracking
+                  </Link>
+                </Button>
               </Alert>
             )}
           </div>
         </Modal.Content>
       </ConfirmationModal>
+
       <ConfirmationModal
         danger
         size="small"
@@ -220,15 +311,42 @@ const DeleteConfirmationDialogs = ({
                   All dependent objects will be removed, as will any objects that depend on them,
                   recursively.
                 </p>
-                <Link href="https://www.postgresql.org/docs/current/ddl-depend.html">
-                  <a target="_blank" rel="noreferrer">
-                    <Button size="tiny" type="default" icon={<IconExternalLink />}>
-                      About dependency tracking
-                    </Button>
-                  </a>
-                </Link>
+                <Button asChild size="tiny" type="default" icon={<IconExternalLink />}>
+                  <Link
+                    href="https://www.postgresql.org/docs/current/ddl-depend.html"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    About dependency tracking
+                  </Link>
+                </Button>
               </Alert>
             )}
+          </div>
+        </Modal.Content>
+      </ConfirmationModal>
+
+      <ConfirmationModal
+        danger
+        size="small"
+        visible={snap.confirmationDialog?.type === 'row'}
+        header={
+          <span className="break-words">
+            Confirm to delete the selected row{numRows > 1 && 's'}
+          </span>
+        }
+        buttonLabel="Delete"
+        buttonLoadingLabel="Deleting"
+        onSelectCancel={() => snap.closeConfirmationDialog()}
+        onSelectConfirm={() => onConfirmDeleteRow()}
+      >
+        <Modal.Content>
+          <div className="py-4 space-y-4">
+            <p className="text-sm text-foreground-light">
+              Are you sure you want to delete {isAllRowsSelected ? 'all' : 'the selected'}{' '}
+              {numRows > 1 && `${numRows} `}row
+              {numRows > 1 && 's'}? This action cannot be undone.
+            </p>
           </div>
         </Modal.Content>
       </ConfirmationModal>
