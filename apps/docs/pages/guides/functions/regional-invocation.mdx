@@ -1,0 +1,74 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'function-regional-invocation',
+  title: 'Regional Invocation',
+  description: 'How to execute an Edge Functions in a particular region.',
+}
+
+By default, Edge Functions are executed in the region closest to the user making the request. This helps to reduce network latency and provide faster responses to the user.
+
+However, if your function does lot of database or storage operations, invoking the function in the same region as your DB may provide better performance.
+
+Some situations where this might be helpful include:
+
+- Bulk adding and editing records in your database
+- Uploading files
+
+If you prefer to do this, you can specify the region when invoking the function.
+
+### How to set the region via HTTP headers
+
+Use the `x-region` HTTP header when calling an Edge Function to determine where the Function should be executed.
+
+```bash
+curl --request POST 'https://<project_ref>.supabase.co/functions/v1/hello-world' \
+  --header 'Authorization: Bearer ANON_KEY' \
+  --header 'Content-Type: application/json' \
+  --header 'x-region: eu-west-3' \
+  --data '{ "name":"Functions" }'
+```
+
+You can also specify the region using the [client libraries](/docs#reference-documentation), such as [supabase-js](/docs/reference/javascript/functions-invoke):
+
+```js
+// https://supabase.com/docs/reference/javascript/installing
+import { createClient } from '@supabase/supabase-js'
+
+// Create a single supabase client for interacting with your database
+const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+
+const { data, error } = await supabase.functions.invoke('hello-world', {
+  body: { name: 'Functions' },
+  headers: { 'x-region': 'eu-west-3' },
+})
+```
+
+You can verify the region the function was executed by looking at the `x-sb-edge-region` HTTP header in the response. You can also find it as metadata in [Edge Function Logs](/docs/guides/functions/debugging)
+
+### Supported regions
+
+These are the currently supported region values you can provide for `x-region` header.
+
+- `ap-northeast-1`
+- `ap-northeast-2`
+- `ap-south-1`
+- `ap-southeast-1`
+- `ap-southeast-2`
+- `ca-central-1`
+- `eu-central-1`
+- `eu-west-1`
+- `eu-west-2`
+- `eu-west-3`
+- `sa-east-1`
+- `us-east-1`
+- `us-west-1`
+- `us-west-2`
+
+### What happens if the region has an outage?
+
+If you explicitly specify the region via `x-region` header, the **request won't be automatically re-routed** to another region.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
