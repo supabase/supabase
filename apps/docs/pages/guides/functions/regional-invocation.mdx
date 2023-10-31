@@ -8,7 +8,13 @@ export const meta = {
 
 By default, Edge Functions are executed in the region closest to the user making the request. In most cases, this helps to reduce network latency and provide faster responses to the user.
 
-However, if your function does lot of DB operations (eg: adding a bunch of records) or storage operations (eg: uploading files), invoking the function in the same region as your DB may provide better performance.
+However, if your function does lot of database or storage operations, invoking the function in the same region as your DB may provide better performance.
+
+Some situations where this might be helpful include:
+
+- Bulk adding and editing records in your database
+- Uploading files
+
 If you prefer to do this, you can specify the region when invoking the function.
 
 ### How to set the region via HTTP headers
