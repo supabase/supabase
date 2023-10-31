@@ -1,15 +1,10 @@
 import { useState } from 'react'
 
+import { useParams } from 'common'
 import EventsTable from './EventsTable'
 import { Header } from './Header'
-import { RealtimeConfig, useRealtimeEvents } from './useRealtimeEvents'
-import { useCheckPermissions } from 'hooks'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
-import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
-import { useParams } from 'common'
-import { useProjectApiQuery } from 'data/config/project-api-query'
 import { SendEventModal } from './SendEventModal'
+import { RealtimeConfig, useRealtimeEvents } from './useRealtimeEvents'
 
 /**
  * Acts as a container component for the entire log display
@@ -26,7 +21,6 @@ export const RealtimeInspector = () => {
     token: '', // will be filled out by RealtimeTokensPopover
     schema: 'public',
     table: '*',
-    tableId: undefined,
     filter: undefined,
     bearer: null,
     enablePresence: true,

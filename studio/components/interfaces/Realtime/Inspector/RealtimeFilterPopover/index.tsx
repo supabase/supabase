@@ -59,15 +59,13 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
           <div className="flex border-b border-overlay p-4 gap-y-2 flex-col">
             <FilterSchema
               value={tempConfig.schema}
-              onChange={(v) =>
-                setTempConfig({ ...tempConfig, schema: v, table: '*', tableId: undefined })
-              }
+              onChange={(v) => setTempConfig({ ...tempConfig, schema: v, table: '*' })}
             />
 
             <TableSchema
               value={tempConfig.table}
               schema={tempConfig.schema}
-              onChange={(table, tableId) => setTempConfig({ ...tempConfig, table, tableId })}
+              onChange={(table) => setTempConfig({ ...tempConfig, table })}
             />
           </div>
           <div className="border-b border-overlay p-4">

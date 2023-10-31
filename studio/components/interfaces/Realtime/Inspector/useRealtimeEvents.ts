@@ -2,10 +2,10 @@ import { createClient, RealtimeChannel, SupabaseClient } from '@supabase/supabas
 import { sortBy, take } from 'lodash'
 
 import { LogData } from 'components/interfaces/Settings/Logs'
+import { useProjectApiQuery } from 'data/config/project-api-query'
 import { uuidv4 } from 'lib/helpers'
 import { EMPTY_ARR } from 'lib/void'
 import { useCallback, useEffect, useReducer, useState } from 'react'
-import { useProjectApiQuery } from 'data/config/project-api-query'
 
 function reducer(
   state: LogData[],
@@ -42,7 +42,6 @@ export interface RealtimeConfig {
   token: string
   schema: string
   table: string
-  tableId: number | undefined
   filter: string | undefined
   bearer: string | null
   enableBroadcast: boolean
@@ -203,7 +202,7 @@ export const useRealtimeEvents = ({
   ])
 
   const sendEvent = useCallback(
-    (event, payload) => {
+    (event: string, payload: any) => {
       channel?.send({
         type: 'broadcast',
         event,
