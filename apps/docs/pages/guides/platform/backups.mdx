@@ -38,6 +38,16 @@ For security purposes, passwords for custom roles are not stored in daily backup
 
 </Admonition>
 
+<Admonition type="note">
+
+Databases larger than 100GB[^1], if they're on a recent build of the Supabase platform, get automatically transitioned to use daily physical backups. Physical backups are a more performant backup mechanism that lowers the overhead and impact on the database being backed up, and also avoids holding locks on objects in your database for a long period of time. While restores are unaffected, the backups created using this method cannot be downloaded from the Backups section of the dashboard.
+
+This class of physical backups only allows for recovery to a fixed time each day, similar to daily backups. You can use [PITR](#point-in-time-recovery) for access to more granular recovery options.
+
+[^1]: The threshold for transitioning might be lowered in the future.
+
+</Admonition>
+
 ### Backup Process [#daily-backups-process]
 
 The PostgreSQL utility [pg_dumpall](https://www.postgresql.org/docs/current/app-pg-dumpall.html) is used to perform daily backups. An SQL file is generated, zipped up, and sent to our storage servers for safe keeping.
