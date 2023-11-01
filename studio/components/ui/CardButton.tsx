@@ -34,7 +34,7 @@ const CardButton = ({
   loading = false,
 }: PropsWithChildren<CardButtonProps>) => {
   const LinkContainer = ({ children }: { children: React.ReactNode }) => (
-    <Link href={linkHref} onMouseEnter={onHover}>
+    <Link href={linkHref} onClick={onClick} onMouseEnter={onHover}>
       {children}
     </Link>
   )
@@ -121,10 +121,10 @@ const CardButton = ({
     </div>
   )
 
-  if (onClick) {
-    return <ButtonContainer>{contents}</ButtonContainer>
-  } else if (linkHref) {
+  if (linkHref) {
     return <LinkContainer>{contents}</LinkContainer>
+  } else if (onClick) {
+    return <ButtonContainer>{contents}</ButtonContainer>
   } else if (url) {
     return <UrlContainer>{contents}</UrlContainer>
   } else {

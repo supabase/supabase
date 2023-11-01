@@ -1,6 +1,9 @@
 import CardButton from 'components/ui/CardButton'
 import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { usePrefetchProjectDetail } from 'data/projects/project-detail-query'
+import {
+  getCachedProjectDetail,
+  usePrefetchProjectDetail,
+} from 'data/projects/project-detail-query'
 import { usePrefetchProjectUsage } from 'data/usage/project-usage-query'
 import { ResourceWarning } from 'data/usage/resource-warnings-query'
 import { BASE_PATH } from 'lib/constants'
@@ -8,6 +11,8 @@ import { GitBranch, Github } from 'lucide-react'
 import { Project } from 'types'
 import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
+import { useQueryClient } from '@tanstack/react-query'
+import { usePrefetchEntityTypes } from 'data/entity-types/entity-types-infinite-query'
 
 export interface ProjectCardProps {
   project: Project
@@ -33,8 +38,10 @@ const ProjectCard = ({
   const githubRepository = githubIntegration?.metadata.name ?? undefined
   const projectStatus = inferProjectStatus(project)
 
+  const queryClient = useQueryClient()
   const prefetchProjectDetail = usePrefetchProjectDetail()
   const prefetchProjectUsage = usePrefetchProjectUsage()
+  const prefetchEntityTypes = usePrefetchEntityTypes()
 
   return (
     <li className="list-none">
@@ -77,6 +84,24 @@ const ProjectCard = ({
         onHover={() => {
           prefetchProjectDetail(projectRef)
           prefetchProjectUsage(projectRef)
+        }}
+        onClick={() => {
+          prefetchProjectDetail(projectRef)
+            .then(() => {
+              return getCachedProjectDetail(queryClient, projectRef)
+            })
+            .then((projectDetail) => {
+              if (projectDetail !== undefined) {
+                console.log('running')
+                prefetchEntityTypes({
+                  projectRef: projectDetail?.ref,
+                  connectionString: projectDetail?.connectionString,
+                  schema: 'public',
+                  search: undefined,
+                  sort: 'alphabetical',
+                })
+              }
+            })
         }}
       />
     </li>

@@ -16,6 +16,7 @@ export function getQueryClient() {
     new QueryClient({
       defaultOptions: {
         queries: {
+          staleTime: 60 * 1000, // 1 minute
           retry: (failureCount, error) => {
             // Don't retry on 404s
             if (

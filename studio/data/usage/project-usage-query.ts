@@ -82,13 +82,10 @@ export const useProjectUsageQuery = <TData = ProjectUsageData>(
     }
   )
 
-export async function prefetchProjectUsage(client: QueryClient, projectRef: string | undefined) {
-  return await client.prefetchQuery<ProjectUsageData, ProjectUsageError>(
-    usageKeys.usage(projectRef),
-    {
-      queryFn: ({ signal }) => getProjectUsage({ projectRef }, signal),
-    }
-  )
+export function prefetchProjectUsage(client: QueryClient, projectRef: string | undefined) {
+  return client.prefetchQuery<ProjectUsageData, ProjectUsageError>(usageKeys.usage(projectRef), {
+    queryFn: ({ signal }) => getProjectUsage({ projectRef }, signal),
+  })
 }
 
 export function usePrefetchProjectUsage() {

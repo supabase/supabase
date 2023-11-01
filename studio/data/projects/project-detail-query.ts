@@ -50,13 +50,10 @@ export async function getCachedProjectDetail(
   return await client.fetchQuery<ProjectDetailData, ProjectDetailError>(projectKeys.detail(ref))
 }
 
-export async function prefetchProjectDetail(client: QueryClient, ref: string | undefined) {
-  return await client.prefetchQuery<ProjectDetailData, ProjectDetailError>(
-    projectKeys.detail(ref),
-    {
-      queryFn: ({ signal }) => getProjectDetail({ ref }, signal),
-    }
-  )
+export function prefetchProjectDetail(client: QueryClient, ref: string | undefined) {
+  return client.prefetchQuery<ProjectDetailData, ProjectDetailError>(projectKeys.detail(ref), {
+    queryFn: ({ signal }) => getProjectDetail({ ref }, signal),
+  })
 }
 
 export function usePrefetchProjectDetail() {
