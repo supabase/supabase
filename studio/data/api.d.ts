@@ -10160,6 +10160,7 @@ export interface operations {
       /** @description Failed to get github pull requests for a given repo */
       500: {
         content: never
+      }
     }
   }
   /** Create CLI login session */

@@ -9,13 +9,15 @@ export async function createCliLoginSession(
     throw new Error('sessionId is required')
   }
 
-  const { data } = await post(`/platform/cli/login`, {
+  const { data, error } = await post(`/platform/cli/login`, {
     body: {
       session_id: sessionId,
       public_key: publicKey,
       token_name: tokenName,
     },
   })
+
+  if (error) throw error
 
   return data
 }
