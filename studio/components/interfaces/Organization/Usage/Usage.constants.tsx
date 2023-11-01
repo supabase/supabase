@@ -1,4 +1,4 @@
-import { USAGE_APPROACHING_THRESHOLD } from 'components/interfaces/BillingV2/Billing.constants'
+import { USAGE_APPROACHING_THRESHOLD } from 'components/interfaces/Billing/Billing.constants'
 import { EgressType, PricingMetric } from 'data/analytics/org-daily-stats-query'
 import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
 import { OrgUsageResponse } from 'data/usage/org-usage-query'

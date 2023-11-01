@@ -24,8 +24,6 @@ const ResourceExhaustionWarningBanner = () => {
     (warning) => warning.project === ref
   )
 
-  const isOrgBilling = !!organization?.subscription_id
-
   // [Joshen] Read only takes higher precedence over multiple resource warnings
   const activeWarnings =
     projectResourceWarnings !== undefined
@@ -87,7 +85,7 @@ const ResourceExhaustionWarningBanner = () => {
       : `/project/[ref]/settings/[infra-path]#${metric}`
   )
     ?.replace('[ref]', ref ?? 'default')
-    ?.replace('[infra-path]', isOrgBilling ? 'infrastructure' : 'billing/usage')
+    ?.replace('[infra-path]', 'infrastructure')
 
   const buttonText =
     activeWarnings.length > 1
