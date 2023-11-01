@@ -4,13 +4,14 @@ import Link from 'next/link'
 import { ReactNode } from 'react'
 import { Button } from 'ui'
 
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { useCheckPermissions, useFlag, useIsFeatureEnabled } from 'hooks'
+import { useCheckPermissions, useFlag } from 'hooks'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 interface UpgradeToProProps {
   icon?: ReactNode
   primaryText: string
   projectRef: string
+  organizationSlug: string
   secondaryText: string
   addon?: 'pitr' | 'customDomain' | 'computeInstance'
 }
@@ -19,10 +20,11 @@ const UpgradeToPro = ({
   icon,
   primaryText,
   projectRef,
+  organizationSlug,
   secondaryText,
   addon,
 }: UpgradeToProProps) => {
-  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organizationSlug })
   const plan = subscription?.plan?.id
 
   const canUpdateSubscription = useCheckPermissions(
@@ -52,9 +54,11 @@ const UpgradeToPro = ({
             <Tooltip.Trigger>
               <Button type="primary" disabled={!canUpdateSubscription || projectUpdateDisabled}>
                 <Link
-                  href={`/project/${projectRef}/settings/billing/subscription?panel=${
-                    plan === 'free' ? 'subscriptionPlan' : addon || 'subscriptionPlan'
-                  }`}
+                  href={
+                    plan === 'free'
+                      ? `/org/${organizationSlug}/billing?panel=subscriptionPlan`
+                      : `/project/${projectRef}/settings/addons?panel=${addon}`
+                  }
                 >
                   {plan === 'free' ? 'Upgrade to Pro' : 'Enable Addon'}
                 </Link>

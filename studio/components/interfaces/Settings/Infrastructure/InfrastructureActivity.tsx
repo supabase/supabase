@@ -4,12 +4,12 @@ import Link from 'next/link'
 import { Fragment, useMemo, useState } from 'react'
 import { IconBarChart2, IconExternalLink } from 'ui'
 
-import { getAddons } from 'components/interfaces/BillingV2/Subscription/Subscription.utils'
+import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import {
   CPUWarnings,
   DiskIOBandwidthWarnings,
   RAMWarnings,
-} from 'components/interfaces/BillingV2/Usage/UsageWarningAlerts'
+} from 'components/interfaces/Billing/Usage/UsageWarningAlerts'
 import UsageBarChart from 'components/interfaces/Organization/Usage/UsageBarChart'
 import {
   ScaffoldContainer,
@@ -33,7 +33,6 @@ import { INFRA_ACTIVITY_METRICS } from './Infrastructure.constants'
 const InfrastructureActivity = () => {
   const { ref: projectRef } = useParams()
   const organization = useSelectedOrganization()
-  const isOrgBilling = !!organization?.subscription_id
   const [dateRange, setDateRange] = useState<any>()
 
   const { data: subscription, isLoading: isLoadingSubscription } = useOrgSubscriptionQuery({
@@ -169,8 +168,6 @@ const InfrastructureActivity = () => {
       data: ioBudgetData?.data ?? [],
     },
   }
-
-  if (!isOrgBilling) return null
 
   return (
     <>
