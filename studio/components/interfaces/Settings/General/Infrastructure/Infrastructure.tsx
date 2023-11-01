@@ -13,18 +13,20 @@ import {
   FormSectionLabel,
 } from 'components/ui/Forms'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { useFlag } from 'hooks'
+import { useFlag, useSelectedOrganization } from 'hooks'
 import PauseProjectButton from './PauseProjectButton'
 import ProjectUpgradeAlert from './ProjectUpgradeAlert'
 import RestartServerButton from './RestartServerButton'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 interface InfrastructureProps {}
 
 const Infrastructure = ({}: InfrastructureProps) => {
   const { ref } = useParams()
   const { project } = useProjectContext()
-  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef: ref })
+  const organization = useSelectedOrganization()
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+
   const isFreeProject = subscription?.plan?.id === 'free'
 
   const {

@@ -21,7 +21,6 @@ import {
 } from '../Usage.utils'
 import UsageBarChart from '../UsageBarChart'
 import { ChartMeta } from './UsageSection'
-import { useIsFeatureEnabled } from 'hooks'
 
 export interface AttributeUsageProps {
   slug: string
