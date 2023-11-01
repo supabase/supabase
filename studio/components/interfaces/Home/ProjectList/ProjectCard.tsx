@@ -92,7 +92,6 @@ const ProjectCard = ({
             })
             .then((projectDetail) => {
               if (projectDetail !== undefined) {
-                console.log('running')
                 prefetchEntityTypes({
                   projectRef: projectDetail?.ref,
                   connectionString: projectDetail?.connectionString,
