@@ -12,7 +12,6 @@ import { setProjectStatus } from 'data/projects/projects-query'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
@@ -32,7 +31,7 @@ import {
 } from 'ui'
 
 import * as Tooltip from '@radix-ui/react-tooltip'
-import Image from 'next/image'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 const COMPUTE_CATEGORY_OPTIONS: {
   id: 'micro' | 'optimized'
@@ -62,7 +61,6 @@ const ComputeInstanceSidePanel = () => {
   const { resolvedTheme } = useTheme()
   const { project: selectedProject } = useProjectContext()
   const organization = useSelectedOrganization()
-  const isOrgBilling = !!organization?.subscription_id
 
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<'micro' | 'optimized'>('micro')
@@ -78,7 +76,7 @@ const ComputeInstanceSidePanel = () => {
   const onClose = () => snap.setPanelKey(undefined)
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
-  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
       ui.setNotification({
@@ -276,17 +274,11 @@ const ComputeInstanceSidePanel = () => {
                     variant="info"
                     title="Changing your compute size is only available on the Pro plan"
                     actions={
-                      isOrgBilling ? (
-                        <Button asChild type="default">
-                          <Link href={`/org/${organization.slug}/billing?panel=subscriptionPlan`}>
-                            View available plans
-                          </Link>
-                        </Button>
-                      ) : (
-                        <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
+                      <Button asChild type="default">
+                        <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
                           View available plans
-                        </Button>
-                      )
+                        </Link>
+                      </Button>
                     }
                   >
                     Upgrade your plan to change the compute size of your project
@@ -379,12 +371,7 @@ const ComputeInstanceSidePanel = () => {
             )}
 
             {hasChanges &&
-              (selectedCategory === 'micro' && !isOrgBilling ? (
-                <p className="text-sm text-foreground-light">
-                  Upon clicking confirm, the amount of that's unused during the current billing
-                  cycle will be returned as credits that can be used for subsequent billing cycles
-                </p>
-              ) : selectedCategory !== 'micro' && selectedCompute?.price_interval === 'monthly' ? (
+              (selectedCategory !== 'micro' && selectedCompute?.price_interval === 'monthly' ? (
                 // Monthly payment with project-level subscription
                 <p className="text-sm text-foreground-light">
                   Upon clicking confirm, the amount of{' '}

@@ -24,12 +24,12 @@ import LoadingOpacity from 'components/ui/LoadingOpacity'
 import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useContentInsertMutation } from 'data/content/content-insert-mutation'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { useLocalStorage, useStore } from 'hooks'
+import { useLocalStorage, useSelectedOrganization, useStore } from 'hooks'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { uuidv4 } from 'lib/helpers'
 import { LogSqlSnippets, NextPageWithLayout } from 'types'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 const PLACEHOLDER_QUERY =
   'select\n  cast(timestamp as datetime) as timestamp,\n  event_message, metadata \nfrom edge_logs \nlimit 5'
@@ -38,11 +38,12 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const { ui } = useStore()
   const router = useRouter()
   const { ref: projectRef, q, ite, its } = useParams()
+  const organization = useSelectedOrganization()
   const [editorId, setEditorId] = useState<string>(uuidv4())
   const [editorValue, setEditorValue] = useState<string>(PLACEHOLDER_QUERY)
   const [saveModalOpen, setSaveModalOpen] = useState<boolean>(false)
   const [warnings, setWarnings] = useState<LogsWarning[]>([])
-  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { params, logData, error, isLoading, changeQuery, runQuery, setParams } = useLogsQuery(
     projectRef as string,
     {

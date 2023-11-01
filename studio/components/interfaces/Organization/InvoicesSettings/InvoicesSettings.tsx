@@ -2,8 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
-import { InvoiceStatusBadge } from 'components/interfaces/BillingV2'
-import { InvoiceStatus } from 'components/interfaces/BillingV2/Invoices.types'
+import { InvoiceStatus } from 'components/interfaces/Billing/Invoices.types'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
@@ -14,6 +13,7 @@ import { useInvoicesCountQuery } from 'data/invoices/invoices-count-query'
 import { useInvoicesQuery } from 'data/invoices/invoices-query'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { Button, IconChevronLeft, IconChevronRight, IconDownload, IconFileText } from 'ui'
+import InvoiceStatusBadge from 'components/interfaces/Billing/InvoiceStatusBadge'
 
 const PAGE_LIMIT = 10
 
