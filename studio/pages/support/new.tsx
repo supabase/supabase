@@ -33,37 +33,38 @@ const SupportPage = () => {
               <h1 className="m-0 text-lg">Supabase support</h1>
             </div>
             <div className="flex items-center space-x-3">
-              <Link passHref href="https://supabase.com/docs/guides/platform/troubleshooting">
-                <a target="_blank" rel="noreferrer">
-                  <Button type="default" icon={<IconTool />}>
-                    Troubleshooting
-                  </Button>
-                </a>
-              </Link>
+              <Button asChild type="default" icon={<IconTool />}>
+                <Link
+                  href="https://supabase.com/docs/guides/platform/troubleshooting"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Troubleshooting
+                </Link>
+              </Button>
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger>
-                  <Link href="https://status.supabase.com/">
-                    <a target="_blank" rel="noreferrer">
-                      <Button
-                        type="default"
-                        icon={
-                          isLoading ? (
-                            <IconLoader className="animate-spin" />
-                          ) : isHealthy ? (
-                            <div className="h-2 w-2 bg-brand rounded-full" />
-                          ) : (
-                            <div className="h-2 w-2 bg-yellow-900 rounded-full" />
-                          )
-                        }
-                      >
-                        {isLoading
-                          ? 'Checking status'
-                          : isHealthy
-                          ? 'All systems operational'
-                          : 'Active incident ongoing'}
-                      </Button>
-                    </a>
-                  </Link>
+                  <Button
+                    asChild
+                    type="default"
+                    icon={
+                      isLoading ? (
+                        <IconLoader className="animate-spin" />
+                      ) : isHealthy ? (
+                        <div className="h-2 w-2 bg-brand rounded-full" />
+                      ) : (
+                        <div className="h-2 w-2 bg-yellow-900 rounded-full" />
+                      )
+                    }
+                  >
+                    <Link href="https://status.supabase.com/" target="_blank" rel="noreferrer">
+                      {isLoading
+                        ? 'Checking status'
+                        : isHealthy
+                        ? 'All systems operational'
+                        : 'Active incident ongoing'}
+                    </Link>
+                  </Button>
                 </Tooltip.Trigger>
                 <Tooltip.Portal>
                   <Tooltip.Content side="bottom">

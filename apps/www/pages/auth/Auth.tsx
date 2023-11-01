@@ -218,13 +218,15 @@ function AuthPage() {
               </p>
               <p className="p">Policies can be written in SQL or using the dashboard online.</p>
 
-              <Link href="/docs/guides/auth#policy-examples">
-                <a>
-                  <Button size="small" type="default" className="mt-4" icon={<IconArrowUpRight />}>
-                    Explore documentation
-                  </Button>
-                </a>
-              </Link>
+              <Button
+                asChild
+                size="small"
+                type="default"
+                className="mt-4"
+                icon={<IconArrowUpRight />}
+              >
+                <Link href="/docs/guides/auth#policy-examples">Explore documentation</Link>
+              </Button>
             </div>
             <div className="col-span-12 lg:col-span-6 lg:col-start-7">
               <SplitCodeBlockCarousel

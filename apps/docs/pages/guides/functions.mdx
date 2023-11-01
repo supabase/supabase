@@ -30,11 +30,9 @@ Check out the [Edge Function Examples](https://github.com/supabase/supabase/tree
   {examples.map((x) => (
     <div className="col-span-4" key={x.href}>
       <Link href={x.href} passHref>
-        <a>
-          <GlassPanel icon={'/docs/img/icons/github-icon'} hasLightIcon={true} title={x.name}>
-            {x.description}
-          </GlassPanel>
-        </a>
+        <GlassPanel icon={'/docs/img/icons/github-icon'} hasLightIcon={true} title={x.name}>
+          {x.description}
+        </GlassPanel>
       </Link>
     </div>
   ))}

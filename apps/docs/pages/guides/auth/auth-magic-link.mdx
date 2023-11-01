@@ -3,28 +3,23 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'auth-magic-link',
   title: 'Login With Magic Link',
-  description: 'Use Supabase to authenticate and authorize your users using magic links.',
+  description: 'Use Supabase to authenticate your users using magic links.',
 }
 
-Magic links are a form of passwordless logins where users click on a link sent to their email address to log in to their accounts.
-Magic links only work with email addresses. By default, a user can only request a magic link once every 60 seconds.
+Magic links are a form of passwordless logins where users click on a link sent to their email address to log in to their accounts. Magic links only work with email addresses and are one-time use only. By default, a user can only request a magic link once every 60 seconds and they expire after 24 hours.
 
-## Overview
+Set up Magic Link logins for your Supabase application.
 
-Setting up Magic Link logins for your Supabase application.
+- Enable the email provider in your [Supabase Project](/dashboard/project/_/auth/providers)
+- Configure the Site URL and any additional redirect URLs in the [authentication management tab](/dashboard/project/_/auth/url-configuration).
+- The Site URL represents the default URL that the user will be redirected to after clicking on the email signup confirmation link.
+- If a user has not signed up yet, signing in with a magic link will automatically sign up the user. To prevent users from signing up through magic links, you can set the `shouldCreateUser` option to `false`.
 
-- Add the login code to your application - [JavaScript](/docs/reference/javascript/introduction) | [Flutter](/docs/reference/dart/installing)
-
-## Add Magic Link into your Supabase Project
-
-1. For [Site URL](https://supabase.com/dashboard/project/_/auth/url-configuration), enter the final (hosted) URL of your app.
-1. For [Auth Providers](https://supabase.com/dashboard/project/_/auth/providers), **enable email provider**.
-
-## Add login code to your client app
+## Sign in with magic link
 
 <Admonition type="caution">
 
-When making use of Magic Links with [the PKCE Flow](https://supabase.com/blog/supabase-auth-sso-pkce#introducing-pkce) do bear in mind that links can only be used in the same browser that they are sent from. Consequently, a magic link sent from Chrome on Desktop will be invalid if used on a Mobile Device.
+When using Magic Links in [the PKCE Flow](/blog/supabase-auth-sso-pkce#introducing-pkce), keep in mind that links can only be opened from the same browser that they are sent from (as defined in the PKCE spec). Consequently, a magic link sent from Chrome on Desktop will be invalid if used on a Mobile Device.
 
 </Admonition>
 
@@ -43,6 +38,8 @@ async function signInWithEmail() {
   const { data, error } = await supabase.auth.signInWithOtp({
     email: 'example@email.com',
     options: {
+      // set this to false if you do not want the user to be automatically signed up
+      shouldCreateUser: false,
       emailRedirectTo: 'https://example.com/welcome',
     },
   })

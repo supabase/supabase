@@ -39,11 +39,9 @@ const AlertError = ({ ref, subject, error, className }: AlertErrorProps) => {
           </p>
         </div>
         <div>
-          <Link key="contact-support" href={href} passHref>
-            <Button type="warning" asChild>
-              <a>Contact support</a>
-            </Button>
-          </Link>
+          <Button asChild type="warning">
+            <Link href={href}>Contact support</Link>
+          </Button>
         </div>
       </AlertDescription_Shadcn_>
     </Alert_Shadcn_>

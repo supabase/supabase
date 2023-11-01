@@ -88,7 +88,7 @@ const PROVIDER_PHONE = {
     // Twilio
     SMS_TWILIO_ACCOUNT_SID: {
       type: 'string',
-      title: 'Twilio Account Sid',
+      title: 'Twilio Account SID',
       show: {
         key: 'SMS_PROVIDER',
         matches: ['twilio'],
@@ -105,7 +105,15 @@ const PROVIDER_PHONE = {
     },
     SMS_TWILIO_MESSAGE_SERVICE_SID: {
       type: 'string',
-      title: 'Twilio Message Service Sid',
+      title: 'Twilio Message Service SID',
+      show: {
+        key: 'SMS_PROVIDER',
+        matches: ['twilio'],
+      },
+    },
+    SMS_TWILIO_CONTENT_SID: {
+      type: 'string',
+      title: 'Twilio Content SID (Optional, For WhatsApp Only)',
       show: {
         key: 'SMS_PROVIDER',
         matches: ['twilio'],
@@ -115,7 +123,7 @@ const PROVIDER_PHONE = {
     // Twilio Verify
     SMS_TWILIO_VERIFY_ACCOUNT_SID: {
       type: 'string',
-      title: 'Twilio Account Sid',
+      title: 'Twilio Account SID',
       show: {
         key: 'SMS_PROVIDER',
         matches: ['twilio_verify'],
@@ -132,7 +140,7 @@ const PROVIDER_PHONE = {
     },
     SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: {
       type: 'string',
-      title: 'Twilio Verify Service Sid',
+      title: 'Twilio Verify Service SID',
       show: {
         key: 'SMS_PROVIDER',
         matches: ['twilio_verify'],
