@@ -1,5 +1,7 @@
 import CardButton from 'components/ui/CardButton'
 import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import { usePrefetchProjectDetail } from 'data/projects/project-detail-query'
+import { usePrefetchProjectUsage } from 'data/usage/project-usage-query'
 import { ResourceWarning } from 'data/usage/resource-warnings-query'
 import { BASE_PATH } from 'lib/constants'
 import { GitBranch, Github } from 'lucide-react'
@@ -30,6 +32,9 @@ const ProjectCard = ({
   const isVercelIntegrated = vercelIntegration !== undefined
   const githubRepository = githubIntegration?.metadata.name ?? undefined
   const projectStatus = inferProjectStatus(project)
+
+  const prefetchProjectDetail = usePrefetchProjectDetail()
+  const prefetchProjectUsage = usePrefetchProjectUsage()
 
   return (
     <li className="list-none">
@@ -69,6 +74,10 @@ const ProjectCard = ({
         footer={
           <ProjectCardStatus projectStatus={projectStatus} resourceWarnings={resourceWarnings} />
         }
+        onHover={() => {
+          prefetchProjectDetail(projectRef)
+          prefetchProjectUsage(projectRef)
+        }}
       />
     </li>
   )

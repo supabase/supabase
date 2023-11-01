@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { QueryClient, useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
@@ -81,3 +81,23 @@ export const useProjectUsageQuery = <TData = ProjectUsageData>(
       ...options,
     }
   )
+
+export async function prefetchProjectUsage(client: QueryClient, projectRef: string | undefined) {
+  return await client.prefetchQuery<ProjectUsageData, ProjectUsageError>(
+    usageKeys.usage(projectRef),
+    {
+      queryFn: ({ signal }) => getProjectUsage({ projectRef }, signal),
+    }
+  )
+}
+
+export function usePrefetchProjectUsage() {
+  const client = useQueryClient()
+
+  return useCallback(
+    (projectRef: string | undefined) => {
+      return prefetchProjectUsage(client, projectRef)
+    },
+    [client]
+  )
+}

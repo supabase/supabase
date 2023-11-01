@@ -1,3 +1,4 @@
+import { noop } from 'lib/void'
 import Link from 'next/link'
 import React, { PropsWithChildren } from 'react'
 import { IconChevronRight, IconLoader } from 'ui'
@@ -11,6 +12,7 @@ interface CardButtonProps {
   imgUrl?: string
   imgAlt?: string
   onClick?: () => void
+  onHover?: () => void
   icon?: React.ReactNode
   loading?: boolean
   className?: string
@@ -26,17 +28,28 @@ const CardButton = ({
   imgUrl,
   imgAlt,
   onClick,
+  onHover = noop,
   icon,
   className,
   loading = false,
 }: PropsWithChildren<CardButtonProps>) => {
   const LinkContainer = ({ children }: { children: React.ReactNode }) => (
-    <Link href={linkHref}>{children}</Link>
+    <Link href={linkHref} onMouseEnter={onHover}>
+      {children}
+    </Link>
   )
-  const UrlContainer = ({ children }: { children: React.ReactNode }) => <a href={url}>{children}</a>
-  const NonLinkContainer = ({ children }: { children: React.ReactNode }) => <div>{children}</div>
+  const UrlContainer = ({ children }: { children: React.ReactNode }) => (
+    <a href={url} onMouseEnter={onHover}>
+      {children}
+    </a>
+  )
+  const NonLinkContainer = ({ children }: { children: React.ReactNode }) => (
+    <div onMouseEnter={onHover}>{children}</div>
+  )
   const ButtonContainer = ({ children }: { children: React.ReactNode }) => (
-    <button onClick={onClick}>{children}</button>
+    <button onClick={onClick} onMouseEnter={onHover}>
+      {children}
+    </button>
   )
 
   const isLink = url || linkHref || onClick

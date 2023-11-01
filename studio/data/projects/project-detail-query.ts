@@ -1,9 +1,10 @@
-import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { QueryClient, useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
 
 import { get, isResponseOk } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { Project, ResponseError } from 'types'
 import { projectKeys } from './keys'
+import { useCallback } from 'react'
 
 export type ProjectDetailVariables = { ref?: string }
 
@@ -47,4 +48,24 @@ export async function getCachedProjectDetail(
   if (cached) return cached
 
   return await client.fetchQuery<ProjectDetailData, ProjectDetailError>(projectKeys.detail(ref))
+}
+
+export async function prefetchProjectDetail(client: QueryClient, ref: string | undefined) {
+  return await client.prefetchQuery<ProjectDetailData, ProjectDetailError>(
+    projectKeys.detail(ref),
+    {
+      queryFn: ({ signal }) => getProjectDetail({ ref }, signal),
+    }
+  )
+}
+
+export function usePrefetchProjectDetail() {
+  const client = useQueryClient()
+
+  return useCallback(
+    (ref: string | undefined) => {
+      return prefetchProjectDetail(client, ref)
+    },
+    [client]
+  )
 }
