@@ -1,6 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { AutoSchemaForm, SmtpForm } from 'components/interfaces/Auth'
+import {
+  SmtpForm,
+  BasicAuthSettingsForm,
+  AdvancedAuthSettingsForm,
+} from 'components/interfaces/Auth'
 import { SettingsLayout } from 'components/layouts'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions } from 'hooks'
@@ -14,8 +18,9 @@ const PageLayout: NextPageWithLayout = () => {
   } else {
     return (
       <div className="1xl:px-28 mx-auto flex flex-col gap-8 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32">
-        <AutoSchemaForm />
+        <BasicAuthSettingsForm />
         <SmtpForm />
+        <AdvancedAuthSettingsForm />
       </div>
     )
   }
