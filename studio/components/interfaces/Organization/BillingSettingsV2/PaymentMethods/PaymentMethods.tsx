@@ -99,14 +99,16 @@ const PaymentMethods = () => {
                       variant="info"
                       title="Payment is currently by invoice"
                       actions={[
-                        <Link
-                          key="payment-method-support"
-                          href={`/support/new?category=billing&subject=Request%20to%20change%20payment%20method`}
-                        >
-                          <a target="_blank" rel="noreferrer" className="ml-3">
-                            <Button type="default">Contact support</Button>
-                          </a>
-                        </Link>,
+                        <Button key="payment-method-support" asChild type="default">
+                          <Link
+                            href={`/support/new?category=billing&subject=Request%20to%20change%20payment%20method`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="ml-3"
+                          >
+                            Contact support
+                          </Link>
+                        </Button>,
                       ]}
                     >
                       You get a monthly invoice and payment link via email. To change your payment

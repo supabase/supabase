@@ -2,7 +2,7 @@ import Divider from 'components/ui/Divider'
 import { BASE_PATH } from 'lib/constants'
 import { useTheme } from 'next-themes'
 import Head from 'next/head'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import { PropsWithChildren } from 'react'
 
 export interface APIAuthorizationLayoutProps {}

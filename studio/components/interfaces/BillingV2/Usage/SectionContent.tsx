@@ -41,13 +41,11 @@ const SectionContent = ({
                   </p>
                   {links.map((link) => (
                     <div key={link.url}>
-                      <Link href={link.url}>
-                        <a target="_blank" rel="noreferrer">
-                          <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                            <p className="text-sm">{link.name}</p>
-                            <IconExternalLink size={16} strokeWidth={1.5} />
-                          </div>
-                        </a>
+                      <Link href={link.url} target="_blank" rel="noreferrer">
+                        <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
+                          <p className="text-sm">{link.name}</p>
+                          <IconExternalLink size={16} strokeWidth={1.5} />
+                        </div>
                       </Link>
                     </div>
                   ))}

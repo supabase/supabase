@@ -1,10 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import clsx from 'clsx'
 import saveAs from 'file-saver'
 import Papa from 'papaparse'
 import { ReactNode, useState } from 'react'
 import {
   Button,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -15,22 +15,19 @@ import {
   IconFileText,
   IconTrash,
   IconX,
+  cn,
 } from 'ui'
 
-import clsx from 'clsx'
 import { useDispatch, useTrackedState } from 'components/grid/store'
 import { Filter, Sort, SupaTable } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import { useTableRowDeleteAllMutation } from 'data/table-rows/table-row-delete-all-mutation'
-import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
-import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-mutation'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useCheckPermissions, useStore, useUrlState } from 'hooks'
-import FilterDropdown from './filter'
-import RefreshButton from './RefreshButton'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 import RLSBannerWarning from './RLSBannerWarning'
+import RefreshButton from './RefreshButton'
+import FilterDropdown from './filter'
 import SortPopover from './sort'
 
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
@@ -235,45 +232,9 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   const dispatch = useDispatch()
 
   const { project } = useProjectContext()
-  // [Joshen] Passing blank error handlers here as the errors are handled via the
-  // error handler in tracked state within catch block
-  const { mutateAsync: deleteRows } = useTableRowDeleteMutation({
-    onSuccess: (res, variables) => {
-      const rowIdxs = variables.rows.map((x) => x.idx)
-      dispatch({ type: 'REMOVE_ROWS', payload: { rowIdxs } })
-      dispatch({
-        type: 'SELECTED_ROWS_CHANGE',
-        payload: { selectedRows: new Set() },
-      })
-    },
-    onError: (error) => {
-      if (state.onError) state.onError(error)
-    },
-  })
-  const { mutateAsync: deleteAllRows } = useTableRowDeleteAllMutation({
-    onSuccess: () => {
-      dispatch({ type: 'REMOVE_ALL_ROWS' })
-      dispatch({
-        type: 'SELECTED_ROWS_CHANGE',
-        payload: { selectedRows: new Set() },
-      })
-    },
-    onError: (error) => {
-      if (state.onError) state.onError(error)
-    },
-  })
-  const { mutateAsync: truncateRows } = useTableRowTruncateMutation({
-    onSuccess: () => {
-      dispatch({ type: 'REMOVE_ALL_ROWS' })
-      dispatch({
-        type: 'SELECTED_ROWS_CHANGE',
-        payload: { selectedRows: new Set() },
-      })
-    },
-    onError: (error) => {
-      if (state.onError) state.onError(error)
-    },
-  })
+  const snap = useTableEditorStateSnapshot()
+
+  const [isExporting, setIsExporting] = useState(false)
 
   const { data } = useTableRowsQuery({
     queryKey: [table.schema, table.name],
@@ -286,8 +247,6 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
     limit: state.rowsPerPage,
   })
 
-  const allRows = data?.rows ?? []
-
   const { data: countData } = useTableRowsCountQuery(
     {
       queryKey: [table?.schema, table?.name, 'count'],
@@ -299,10 +258,6 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
     { keepPreviousData: true }
   )
 
-  const totalRows = countData?.count ?? 0
-
-  const { selectedRows, editable, allRowsSelected } = state
-
   const onSelectAllRows = () => {
     dispatch({
       type: 'SELECT_ALL_ROWS',
@@ -312,50 +267,21 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
 
   const onRowsDelete = () => {
     const numRows = allRowsSelected ? totalRows : selectedRows.size
-    confirmAlert({
-      title: 'Confirm to delete',
-      message: `Are you sure you want to delete the selected ${numRows} row${
-        numRows > 1 ? 's' : ''
-      }? This action cannot be undone.`,
-      confirmText: `Delete ${numRows} rows`,
-      onAsyncConfirm: async () => {
-        if (!project) return
+    const rowIdxs = Array.from(selectedRows) as number[]
+    const rows = allRows.filter((x) => rowIdxs.includes(x.idx))
 
-        if (allRowsSelected) {
-          try {
-            if (filters.length === 0) {
-              await truncateRows({
-                projectRef: project.ref,
-                connectionString: project.connectionString,
-                table,
-              })
-            } else {
-              await deleteAllRows({
-                projectRef: project.ref,
-                connectionString: project.connectionString,
-                table,
-                filters,
-              })
-            }
-          } catch (error) {}
-        } else {
-          const rowIdxs = Array.from(selectedRows) as number[]
-          const rows = allRows.filter((x) => rowIdxs.includes(x.idx))
-
-          try {
-            await deleteRows({
-              projectRef: project?.ref,
-              connectionString: project?.connectionString,
-              table,
-              rows,
-            })
-          } catch (error) {}
-        }
+    snap.onDeleteRows(rows, {
+      allRowsSelected,
+      numRows,
+      callback: () => {
+        dispatch({ type: 'REMOVE_ROWS', payload: { rowIdxs } })
+        dispatch({
+          type: 'SELECTED_ROWS_CHANGE',
+          payload: { selectedRows: new Set() },
+        })
       },
     })
   }
-
-  const [isExporting, setIsExporting] = useState(false)
 
   async function onRowsExportCSV() {
     setIsExporting(true)
@@ -394,6 +320,10 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
       payload: { selectedRows: new Set() },
     })
   }
+
+  const allRows = data?.rows ?? []
+  const totalRows = countData?.count ?? 0
+  const { selectedRows, editable, allRowsSelected } = state
 
   return (
     <div className="flex items-center gap-6">

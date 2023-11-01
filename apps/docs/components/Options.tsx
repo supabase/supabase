@@ -1,4 +1,4 @@
-import { FC, useState } from 'react'
+import { FC, PropsWithChildren, useState } from 'react'
 import { IconXCircle } from '~/../../packages/ui'
 
 interface IOptions {
@@ -11,7 +11,7 @@ type OptionsSubComponents = {
   Option: IOption
 }
 
-const Options: FC<IOptions> & OptionsSubComponents = (props) => {
+const Options: FC<PropsWithChildren<IOptions>> & OptionsSubComponents = (props) => {
   const [open, setOpen] = useState(false)
   return (
     <div className="mt-0">

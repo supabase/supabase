@@ -82,7 +82,7 @@ export const useChartSize = (
   }
 ) => {
   const minHeight = sizeMap[size]
-  const Container: React.FC = useMemo(
+  const Container: React.FC<React.PropsWithChildren> = useMemo(
     () =>
       ({ children }) =>
         (

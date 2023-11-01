@@ -61,7 +61,7 @@ const DatabaseTables: NextPageWithLayout = () => {
       </ScaffoldContainer>
 
       <DeleteConfirmationDialogs projectRef={projectRef} selectedTable={selectedTableToEdit} />
-      <SidePanelEditor selectedTable={selectedTableToEdit} />
+      <SidePanelEditor selectedTable={selectedTable || selectedTableToEdit} />
     </>
   )
 }

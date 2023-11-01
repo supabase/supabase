@@ -1,5 +1,5 @@
 import { PostgresColumn } from '@supabase/postgres-meta'
-import { Dictionary } from 'components/grid'
+import { Dictionary, SupaRow } from 'components/grid'
 import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
 import { JsonEditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import { PropsWithChildren, createContext, useContext, useRef } from 'react'
@@ -26,6 +26,16 @@ export type SidePanel =
 export type ConfirmationDialog =
   | { type: 'table'; isDeleteWithCascade: boolean }
   | { type: 'column'; column: PostgresColumn; isDeleteWithCascade: boolean }
+  // [Joshen] Just FYI callback, numRows, allRowsSelected is a temp workaround so that
+  // DeleteConfirmationDialog can trigger dispatch methods after the successful deletion of rows.
+  // Once we deprecate react tracked and move things to valtio, we can remove this.
+  | {
+      type: 'row'
+      rows: SupaRow[]
+      numRows?: number
+      allRowsSelected?: boolean
+      callback?: () => void
+    }
 
 export type UIState =
   | {
@@ -128,6 +138,20 @@ export const createTableEditorState = () => {
         sidePanel: { type: 'row', row },
       }
     },
+    onDeleteRows: (
+      rows: SupaRow[],
+      meta: { numRows?: number; allRowsSelected: boolean; callback?: () => void } = {
+        numRows: 0,
+        allRowsSelected: false,
+        callback: () => {},
+      }
+    ) => {
+      const { numRows, allRowsSelected, callback } = meta
+      state.ui = {
+        open: 'confirmation-dialog',
+        confirmationDialog: { type: 'row', rows, numRows, allRowsSelected, callback },
+      }
+    },
 
     /* Misc */
     onExpandJSONEditor: (jsonValue: JsonEditValue) => {
@@ -151,7 +175,10 @@ export const createTableEditorState = () => {
 
     /* Utils */
     toggleConfirmationIsWithCascade: (overrideIsDeleteWithCascade?: boolean) => {
-      if (state.ui.open === 'confirmation-dialog') {
+      if (
+        state.ui.open === 'confirmation-dialog' &&
+        state.ui.confirmationDialog.type === 'column'
+      ) {
         state.ui.confirmationDialog.isDeleteWithCascade =
           overrideIsDeleteWithCascade ?? !state.ui.confirmationDialog.isDeleteWithCascade
       }

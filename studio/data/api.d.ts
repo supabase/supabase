@@ -1798,6 +1798,7 @@ export interface components {
       SMS_TEXTLOCAL_API_KEY: string
       SMS_TEXTLOCAL_SENDER: string
       SMS_TWILIO_ACCOUNT_SID: string
+      SMS_TWILIO_CONTENT_SID: string
       SMS_TWILIO_AUTH_TOKEN: string
       SMS_TWILIO_MESSAGE_SERVICE_SID: string
       SMS_TWILIO_VERIFY_ACCOUNT_SID: string
@@ -1929,6 +1930,7 @@ export interface components {
       SMS_TEST_OTP_VALID_UNTIL?: string
       SMS_TEXTLOCAL_API_KEY?: string
       SMS_TEXTLOCAL_SENDER?: string
+      SMS_TWILIO_CONTENT_SID?: string
       SMS_TWILIO_ACCOUNT_SID?: string
       SMS_TWILIO_AUTH_TOKEN?: string
       SMS_TWILIO_CONTENT_SID?: string
@@ -2058,6 +2060,7 @@ export interface components {
       SMS_MESSAGEBIRD_ORIGINATOR: string
       SMS_TEXTLOCAL_API_KEY: string
       SMS_TEXTLOCAL_SENDER: string
+      SMS_TWILIO_CONTENT_SID: string
       SMS_TWILIO_ACCOUNT_SID: string
       SMS_TWILIO_AUTH_TOKEN: string
       SMS_TWILIO_MESSAGE_SERVICE_SID: string

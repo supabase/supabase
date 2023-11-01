@@ -9,10 +9,13 @@ export default function AuthProviders({ type }: { type: string }) {
     <>
       <div className="grid grid-cols-12 gap-10 not-prose py-8">
         {filterProviders.map((x) => (
-          <Link href={`${x.href}`} key={x.name} passHref>
-            <a className="col-span-6 lg:col-span-4 xl:col-span-3">
-              <IconPanel title={x.name} icon={x.logo} hasLightIcon={x.hasLightIcon} />
-            </a>
+          <Link
+            href={`${x.href}`}
+            key={x.name}
+            passHref
+            className="col-span-6 lg:col-span-4 xl:col-span-3"
+          >
+            <IconPanel title={x.name} icon={x.logo} hasLightIcon={x.hasLightIcon} />
           </Link>
         ))}
       </div>

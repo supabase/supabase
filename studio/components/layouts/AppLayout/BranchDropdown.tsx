@@ -1,7 +1,7 @@
 import { ListTree } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 
 import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -43,7 +43,6 @@ const BranchLink = ({
   return (
     <Link passHref href={href}>
       <CommandItem_Shadcn_
-        asChild
         value={branch.name}
         className="cursor-pointer w-full flex items-center justify-between"
         onSelect={() => {
@@ -54,12 +53,10 @@ const BranchLink = ({
           setOpen(false)
         }}
       >
-        <a>
-          <p className="truncate w-60" title={branch.name}>
-            {branch.name}
-          </p>
-          {isSelected && <IconCheck />}
-        </a>
+        <p className="truncate w-60" title={branch.name}>
+          {branch.name}
+        </p>
+        {isSelected && <IconCheck />}
       </CommandItem_Shadcn_>
     </Link>
   )
@@ -132,22 +129,22 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
                     </ScrollArea>
                   </CommandGroup_Shadcn_>
                   <CommandGroup_Shadcn_ className="border-t">
-                    <Link passHref href={`/project/${ref}/branches`}>
-                      <CommandItem_Shadcn_
-                        asChild
-                        className="cursor-pointer flex items-center space-x-2 w-full"
-                        onSelect={(e) => {
-                          setOpen(false)
-                          router.push(`/project/${ref}/branches`)
-                        }}
-                        onClick={() => setOpen(false)}
+                    <CommandItem_Shadcn_
+                      className="cursor-pointer w-full"
+                      onSelect={(e) => {
+                        setOpen(false)
+                        router.push(`/project/${ref}/branches`)
+                      }}
+                      onClick={() => setOpen(false)}
+                    >
+                      <Link
+                        href={`/project/${ref}/branches`}
+                        className="w-full flex items-center gap-2"
                       >
-                        <a>
-                          <ListTree size={14} strokeWidth={1.5} />
-                          <p>Manage branches</p>
-                        </a>
-                      </CommandItem_Shadcn_>
-                    </Link>
+                        <ListTree size={14} strokeWidth={1.5} />
+                        <p>Manage branches</p>
+                      </Link>
+                    </CommandItem_Shadcn_>
                   </CommandGroup_Shadcn_>
                 </CommandList_Shadcn_>
               </Command_Shadcn_>

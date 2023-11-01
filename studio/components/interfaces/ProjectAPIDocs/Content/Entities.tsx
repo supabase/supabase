@@ -47,13 +47,15 @@ const Entities = ({ language }: ContentProps) => {
       <div>
         <ContentSnippet selectedLanguage={language} snippet={DOCS_CONTENT.generatingTypes} />
         <div className="flex items-center space-x-2 px-4 mt-3">
-          <Link passHref href="https://supabase.com/docs/guides/database/api/generating-types">
-            <Button asChild type="default" icon={<IconExternalLink />}>
-              <a target="_blank" rel="noreferrer">
-                Documentation
-              </a>
-            </Button>
-          </Link>
+          <Button asChild type="default" icon={<IconExternalLink />}>
+            <Link
+              href="https://supabase.com/docs/guides/database/api/generating-types"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Documentation
+            </Link>
+          </Button>
           <Button
             type="default"
             disabled={isGeneratingTypes}
