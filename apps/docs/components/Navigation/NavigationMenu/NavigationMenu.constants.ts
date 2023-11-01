@@ -836,7 +836,6 @@ export const functions: NavMenuConstant = {
         { name: 'TypeScript Support', url: '/guides/functions/typescript-support' },
         { name: 'Debugging Edge Functions', url: '/guides/functions/debugging' },
         { name: 'Managing packages using Import Maps', url: '/guides/functions/import-maps' },
-        { name: 'Globally Distributed Deployments', url: '/guides/functions/global-deployments' },
       ],
     },
     {

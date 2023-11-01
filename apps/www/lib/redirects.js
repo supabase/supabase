@@ -2318,4 +2318,9 @@ module.exports = [
     source: '/blog/supabase-ai-content-storm',
     destination: 'https://dev.to/supabase/ai-ignites-the-rain-content-storm-is-back-kdl',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/functions/global-deployments',
+    destination: '/docs/guides/functions/regional-invocation',
+  },
 ]
