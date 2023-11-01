@@ -31,13 +31,16 @@ export const BranchingEmptyState = () => {
         </div>
       ) : (
         <div className="flex items-center space-x-2 !mt-4">
-          <Link passHref href="https://forms.supabase.com/branching-request">
-            <Button asChild>
-              <a rel="noreferrer" target="_blank">
-                Join waitlist
-              </a>
-            </Button>
-          </Link>
+          <Button asChild>
+            <Link
+              passHref
+              rel="noreferrer"
+              target="_blank"
+              href="https://forms.supabase.com/branching-request"
+            >
+              Join waitlist
+            </Link>
+          </Button>
         </div>
       )}
     </ProductEmptyState>
@@ -64,13 +67,11 @@ export const PullRequestsEmptyState = ({
               <IconGitPullRequest strokeWidth={2} className="text-foreground-light" />
               <p>Create a pull request</p>
             </div>
-            <Link passHref href={url}>
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" iconRight={<IconExternalLink />}>
-                  Github
-                </Button>
-              </a>
-            </Link>
+            <Button asChild type="default" iconRight={<IconExternalLink />}>
+              <Link passHref target="_blank" rel="noreferrer" href={url}>
+                Github
+              </Link>
+            </Button>
           </div>
           <div className="px-5 py-3 border-t flex items-center justify-between">
             <div>

@@ -69,6 +69,8 @@ const BranchManagement = () => {
     isSuccess: isSuccessBranches,
   } = useBranchesQuery({ projectRef })
   const [[mainBranch], previewBranches] = partition(branches, (branch) => branch.is_default)
+  const branchesWithPRs = previewBranches.filter((branch) => branch.pr_number !== undefined)
+
   const githubIntegration = integrations?.find(
     (integration) =>
       integration.integration.name === 'GitHub' &&
@@ -92,6 +94,7 @@ const BranchManagement = () => {
     repoName,
     target: mainBranch?.git_branch,
   })
+  const pullRequests = allPullRequests ?? []
 
   const isError = isErrorIntegrations || isErrorBranches
   const isLoading = isLoadingIntegrations || isLoadingBranches
@@ -250,7 +253,7 @@ const BranchManagement = () => {
                       repo={repo}
                       mainBranch={mainBranch}
                       previewBranches={previewBranches}
-                      pullRequests={allPullRequests ?? []}
+                      pullRequests={pullRequests}
                       onViewAllBranches={() => setView('branches')}
                       onSelectCreateBranch={() => setShowCreateBranch(true)}
                       onSelectDeleteBranch={setSelectedBranchToDelete}
@@ -258,7 +261,9 @@ const BranchManagement = () => {
                     />
                   )}
                   {view === 'prs' && (
-                    <BranchManagementSection header="xxx pull requests found">
+                    <BranchManagementSection
+                      header={`${branchesWithPRs.length} branches with pull requests found`}
+                    >
                       {isLoadingPullRequests && <BranchLoader />}
                       {isErrorPullRequests && (
                         <AlertError
@@ -267,10 +272,29 @@ const BranchManagement = () => {
                         />
                       )}
                       {isSuccessPullRequests && (
-                        <PullRequestsEmptyState
-                          url={generateCreatePullRequestURL()}
-                          hasBranches={previewBranches.length > 0}
-                        />
+                        <>
+                          {branchesWithPRs.length > 0 ? (
+                            branchesWithPRs.map((branch) => {
+                              const pullRequest = pullRequests?.find(
+                                (pr) => pr.branch === branch.git_branch && pr.repo === repo
+                              )
+                              return (
+                                <BranchRow
+                                  key={branch.id}
+                                  repo={repo}
+                                  branch={branch}
+                                  pullRequest={pullRequest}
+                                  generateCreatePullRequestURL={generateCreatePullRequestURL}
+                                />
+                              )
+                            })
+                          ) : (
+                            <PullRequestsEmptyState
+                              url={generateCreatePullRequestURL()}
+                              hasBranches={previewBranches.length > 0}
+                            />
+                          )}
+                        </>
                       )}
                     </BranchManagementSection>
                   )}
@@ -290,11 +314,15 @@ const BranchManagement = () => {
                       )}
                       {isSuccessBranches &&
                         previewBranches.map((branch) => {
+                          const pullRequest = pullRequests?.find(
+                            (pr) => pr.branch === branch.git_branch && pr.repo === repo
+                          )
                           return (
                             <BranchRow
                               key={branch.id}
                               repo={repo}
                               branch={branch}
+                              pullRequest={pullRequest}
                               generateCreatePullRequestURL={generateCreatePullRequestURL}
                             />
                           )
