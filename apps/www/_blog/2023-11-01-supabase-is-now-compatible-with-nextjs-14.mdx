@@ -113,7 +113,7 @@ So why does it require work on the Supabase side to make it compatible with Next
 
 ## Configuring Supabase to use Cookies
 
-This works well for client-side apps, but will fail when you try to use [`supabase-js`](https://supabase.com/docs/reference/javascript/introduction) in a Server Component, as there is no concept of 'localStorage' on the server.
+By default, [`supabase-js`](https://supabase.com/docs/reference/javascript/introduction) uses `localStorage` to store the user's session. This works well for client-side apps, but will fail when you try to use [`supabase-js`](https://supabase.com/docs/reference/javascript/introduction) in a Server Component, as there is no concept of 'localStorage' on the server.
 
 To do this, we need to configure `supabase-js` to use cookies instead of `localStorage` when running on the server. But this code is a little verbose to ask people to duplicate across every app they build with Supabase:
 
