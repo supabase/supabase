@@ -9,27 +9,29 @@ tags:
   - intgrations
 date: '2023-11-01'
 toc_depth: 3
-image: todo
-thumb: todo
+image: 2023-11-01-supabase-is-now-compatible-with-nextjs-14/nextjs-compatible.png
+thumb: 2023-11-01-supabase-is-now-compatible-with-nextjs-14/nextjs-compatible.png
 ---
 
-As part of [Next.js Conf 2023](https://nextjs.org/conf), the team at Vercel released [Next.js 14](https://nextjs.org/blog/next-14). The huge headling feature was...
+As part of [Next.js Conf 2023](https://nextjs.org/conf), the team at Vercel released [Next.js 14](https://nextjs.org/blog/next-14). The huge headline feature was...
 
-<img
-  className="dark:hidden !m-0"
-  alt="Tweet from Lee Robinson about Next.js 14 containing no new APIs - light mode version"
-  src="/images/blog/2023-11-01-supabase-is-now-compatible-with-nextjs-14/lee-tweet-light.png"
-/>
+<a href="https://x.com/leeerob/status/1717596944623649198?s=20" target="_blank">
+  <img
+    className="dark:hidden !m-0"
+    alt="Tweet from Lee Robinson about Next.js 14 containing no new APIs - light mode version"
+    src="/images/blog/2023-11-01-supabase-is-now-compatible-with-nextjs-14/lee-tweet-light.png"
+  />
 
-<img
-  className="hidden dark:block !m-0"
-  alt="Tweet from Lee Robinson about Next.js 14 containing no new APIs - dark mode version"
-  src="/images/blog/2023-11-01-supabase-is-now-compatible-with-nextjs-14/lee-tweet-dark.png"
-/>
+  <img
+    className="hidden dark:block !m-0"
+    alt="Tweet from Lee Robinson about Next.js 14 containing no new APIs - dark mode version"
+    src="/images/blog/2023-11-01-supabase-is-now-compatible-with-nextjs-14/lee-tweet-dark.png"
+  />
+</a>
 
 That's right, the headline feature is no new features!
 
-This may sound underwhelming at first, but is incredibly good news for the stability of Next.js. This release comes with a huge number of performance and stability improvements - such as [Server Actions](https://nextjs.org/docs/app/api-reference/functions/server-actions) being marked as stable. This means we can finally start promoting this fantastically simple way of authenticating users—entirely server-side!
+This may sound underwhelming at first, but is incredibly good news for the stability of Next.js. This release comes with a huge number of performance and stability improvements — such as [Server Actions](https://nextjs.org/docs/app/api-reference/functions/server-actions) being marked as stable. This means we can finally start promoting this fantastically simple way of authenticating users — entirely server-side!
 
 ```tsx
 export default async function Page() {
@@ -55,7 +57,7 @@ export default async function Page() {
 }
 ```
 
-Now with Server Actions, mutation logic can be co-located with the Server Components that fetch data and render the page:
+With Server Actions, you can now place mutation logic alongside the Server Components responsible for fetching data and rendering the page:
 
 ```tsx
 export default async function Page() {
@@ -76,19 +78,21 @@ export default async function Page() {
 
 Yes, it is! So much so that [Guillermo Rauch](https://twitter.com/rauchg) shouted us out in the keynote!
 
-<img
-  className="dark:hidden !m-0"
-  alt="Tweet from Guillermo Rauch showing Supabase as one of the companies compatible with the Next.js App Router - light mode version"
-  src="/images/blog/2023-11-01-supabase-is-now-compatible-with-nextjs-14/guillermo-tweet-light.png"
-/>
+<a href="https://x.com/supabase/status/1717658742743761239?s=20" target="_blank">
+  <img
+    className="dark:hidden !m-0"
+    alt="Tweet showing Guillermo Rauch mentioning Supabase as one of the companies compatible with the Next.js App Router - light mode version"
+    src="/images/blog/2023-11-01-supabase-is-now-compatible-with-nextjs-14/guillermo-tweet-light.png"
+  />
 
-<img
-  className="hidden dark:block !m-0"
-  alt="Tweet from Guillermo Rauch showing Supabase as one of the companies compatible with the Next.js App Router - dark mode version"
-  src="/images/blog/2023-11-01-supabase-is-now-compatible-with-nextjs-14/guillermo-tweet-dark.png"
-/>
+  <img
+    className="hidden dark:block !m-0"
+    alt="Tweet showing Guillermo Rauch mentioning Supabase as one of the companies compatible with the Next.js App Router - dark mode version"
+    src="/images/blog/2023-11-01-supabase-is-now-compatible-with-nextjs-14/guillermo-tweet-dark.png"
+  />
+</a>
 
-Since the release of the [App Router](https://nextjs.org/docs/app)—launched as beta with Next.js 13—we have been working closely with the team at Vercel to ensure that Supabase is fully compatible with every part of Next.js.
+Since the release of the [App Router](https://nextjs.org/docs/app) — launched as beta with Next.js 13 — we have been working closely with the team at Vercel to ensure that Supabase is fully compatible with every part of Next.js.
 
 So for the [App Router](https://nextjs.org/docs/app), that's:
 
@@ -105,11 +109,13 @@ And for the [Pages Router](https://nextjs.org/docs/pages):
 - [API Routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes)
 - [Page Components](https://nextjs.org/docs/pages/building-your-application/data-fetching/client-side)
 
-## What problem needed to be solved?
+So why does it require work on the Supabase side to make it compatible with Next.js?
 
-By default, [`supabase-js`](https://supabase.com/docs/reference/javascript/introduction) uses `localStorage` to store the user's session. This is great for client-side apps, but it means that when you try to use `supabase-js` in any of the Next.js server bits, it will fail as there is no concept of `localStorage` on the server.
+## Configuring Supabase to use Cookies
 
-Therefore, we need to configure `supabase-js` to use cookies instead of `localStorage` when running on the server. But this code is a little verbose to ask people to duplicate across every app they build with Supabase:
+This works well for client-side apps, but will fail when you try to use [`supabase-js`](https://supabase.com/docs/reference/javascript/introduction) in a Server Component, as there is no concept of 'localStorage' on the server.
+
+To do this, we need to configure `supabase-js` to use cookies instead of `localStorage` when running on the server. But this code is a little verbose to ask people to duplicate across every app they build with Supabase:
 
 ```tsx
 const supabase = createClient(supabaseUrl, supabaseAnonKey, {
@@ -179,14 +185,16 @@ Build ~~in a weekend~~ on a Friday night! Scale to millions!
 
 No Supabase blog is complete without a meme signing off. This one is of the least controversial command coming out of Next.js Conf:
 
-<img
-  className="dark:hidden !m-0"
-  alt="Tweet from Terry Sutton running the `with-supabase` command - light mode version"
-  src="/images/blog/2023-11-01-supabase-is-now-compatible-with-nextjs-14/terry-tweet-light.png"
-/>
+<a href="https://x.com/saltcod/status/1718959967955275843?s=20" target="_blank">
+  <img
+    className="dark:hidden !m-0"
+    alt="Tweet from Terry Sutton running the `with-supabase` command - light mode version"
+    src="/images/blog/2023-11-01-supabase-is-now-compatible-with-nextjs-14/terry-tweet-light.png"
+  />
 
-<img
-  className="hidden dark:block !m-0"
-  alt="Tweet from Terry Sutton running the `with-supabase` commands - dark mode version"
-  src="/images/blog/2023-11-01-supabase-is-now-compatible-with-nextjs-14/terry-tweet-dark.png"
-/>
+  <img
+    className="hidden dark:block !m-0"
+    alt="Tweet from Terry Sutton running the `with-supabase` commands - dark mode version"
+    src="/images/blog/2023-11-01-supabase-is-now-compatible-with-nextjs-14/terry-tweet-dark.png"
+  />
+</a>
