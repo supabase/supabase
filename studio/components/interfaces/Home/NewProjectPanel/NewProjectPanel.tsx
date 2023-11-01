@@ -46,53 +46,53 @@ const NewProjectPanel = () => {
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                <Link href={`/project/${ref}/editor`}>
-                  <a>
-                    <Button
-                      type="default"
-                      icon={
-                        <SVG
-                          src={`${router.basePath}/img/table-editor.svg`}
-                          style={{ width: `${14}px`, height: `${14}px` }}
-                          preProcessor={(code) =>
-                            code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
-                          }
-                        />
+                <Button
+                  asChild
+                  type="default"
+                  icon={
+                    <SVG
+                      src={`${router.basePath}/img/table-editor.svg`}
+                      style={{ width: `${14}px`, height: `${14}px` }}
+                      preProcessor={(code) =>
+                        code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
                       }
-                    >
-                      Table Editor
-                    </Button>
-                  </a>
-                </Link>
-                <Link
-                  href={
-                    supabaseAIEnabled ? `/project/${ref}/sql/new` : `/project/${ref}/sql/templates`
+                    />
                   }
                 >
-                  <a>
-                    <Button
-                      type="default"
-                      icon={
-                        <SVG
-                          src={`${router.basePath}/img/sql-editor.svg`}
-                          style={{ width: `${14}px`, height: `${14}px` }}
-                          preProcessor={(code) =>
-                            code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
-                          }
-                        />
+                  <Link href={`/project/${ref}/editor`}>Table Editor</Link>
+                </Button>
+                <Button
+                  asChild
+                  type="default"
+                  icon={
+                    <SVG
+                      src={`${router.basePath}/img/sql-editor.svg`}
+                      style={{ width: `${14}px`, height: `${14}px` }}
+                      preProcessor={(code) =>
+                        code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
                       }
-                    >
-                      SQL editor
-                    </Button>
-                  </a>
-                </Link>
-                <Link href="https://supabase.com/docs/guides/database">
-                  <a target="_blank" rel="noreferrer">
-                    <Button type="default" icon={<IconExternalLink size={14} />}>
-                      About Database
-                    </Button>
-                  </a>
-                </Link>
+                    />
+                  }
+                >
+                  <Link
+                    href={
+                      supabaseAIEnabled
+                        ? `/project/${ref}/sql/new`
+                        : `/project/${ref}/sql/templates`
+                    }
+                  >
+                    SQL editor
+                  </Link>
+                </Button>
+                <Button asChild type="default" icon={<IconExternalLink size={14} />}>
+                  <Link
+                    href="https://supabase.com/docs/guides/database"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    About Database
+                  </Link>
+                </Button>
               </div>
             </div>
             <div className="col-span-12 lg:col-span-5">
@@ -124,22 +124,24 @@ const NewProjectPanel = () => {
                       </p>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Link href={`/project/${ref}/auth/users`}>
-                        <a>
-                          <Button type="default">Explore Auth</Button>
-                        </a>
-                      </Link>
-                      <Link href="https://supabase.com/docs/guides/auth">
-                        <a target="_blank" rel="noreferrer">
-                          <Button
-                            className="translate-y-[1px]"
-                            icon={<IconExternalLink size={14} />}
-                            type="default"
-                          >
-                            About Auth
-                          </Button>
-                        </a>
-                      </Link>
+                      <Button type="default" asChild>
+                        <Link href={`/project/${ref}/auth/users`}>Explore Auth</Link>
+                      </Button>
+
+                      <Button
+                        className="translate-y-[1px]"
+                        icon={<IconExternalLink size={14} />}
+                        type="default"
+                        asChild
+                      >
+                        <Link
+                          href="https://supabase.com/docs/guides/auth"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          About Auth
+                        </Link>
+                      </Button>
                     </div>
                   </Panel.Content>
                 </Panel>
@@ -158,22 +160,24 @@ const NewProjectPanel = () => {
                       </p>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Link href={`/project/${ref}/storage/buckets`}>
-                        <a>
-                          <Button type="default">Explore Storage</Button>
-                        </a>
-                      </Link>
-                      <Link href="https://supabase.com/docs/guides/storage">
-                        <a target="_blank" rel="noreferrer">
-                          <Button
-                            className="translate-y-[1px]"
-                            icon={<IconExternalLink size={14} />}
-                            type="default"
-                          >
-                            About Storage
-                          </Button>
-                        </a>
-                      </Link>
+                      <Button type="default" asChild>
+                        <Link href={`/project/${ref}/storage/buckets`}>Explore Storage</Link>
+                      </Button>
+
+                      <Button
+                        className="translate-y-[1px]"
+                        icon={<IconExternalLink size={14} />}
+                        type="default"
+                        asChild
+                      >
+                        <Link
+                          href="https://supabase.com/docs/guides/storage"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          About Storage
+                        </Link>
+                      </Button>
                     </div>
                   </Panel.Content>
                 </Panel>
@@ -193,22 +197,23 @@ const NewProjectPanel = () => {
                       </p>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Link href={`/project/${ref}/functions`}>
-                        <a>
-                          <Button type="default">Explore Functions</Button>
-                        </a>
-                      </Link>
-                      <Link href="https://supabase.com/docs/guides/functions">
-                        <a target="_blank" rel="noreferrer">
-                          <Button
-                            className="translate-y-[1px]"
-                            icon={<IconExternalLink size={14} />}
-                            type="default"
-                          >
-                            About Functions
-                          </Button>
-                        </a>
-                      </Link>
+                      <Button type="default" asChild>
+                        <Link href={`/project/${ref}/functions`}>Explore Functions</Link>
+                      </Button>
+                      <Button
+                        className="translate-y-[1px]"
+                        icon={<IconExternalLink size={14} />}
+                        type="default"
+                        asChild
+                      >
+                        <Link
+                          href="https://supabase.com/docs/guides/functions"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          About Functions
+                        </Link>
+                      </Button>
                     </div>
                   </Panel.Content>
                 </Panel>
@@ -226,17 +231,20 @@ const NewProjectPanel = () => {
                       </p>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Link href="https://supabase.com/docs/guides/realtime">
-                        <a target="_blank" rel="noreferrer">
-                          <Button
-                            className="translate-y-[1px]"
-                            icon={<IconExternalLink size={14} />}
-                            type="default"
-                          >
-                            About Realtime
-                          </Button>
-                        </a>
-                      </Link>
+                      <Button
+                        className="translate-y-[1px]"
+                        icon={<IconExternalLink size={14} />}
+                        type="default"
+                        asChild
+                      >
+                        <Link
+                          href="https://supabase.com/docs/guides/realtime"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          About Realtime
+                        </Link>
+                      </Button>
                     </div>
                   </Panel.Content>
                 </Panel>
@@ -252,8 +260,8 @@ const NewProjectPanel = () => {
             <h3 className="text-xl text-foreground">Connecting to your new project</h3>
             <p className="text-base text-foreground-light lg:max-w-sm">
               Interact with your database through the{' '}
-              <Link href="https://supabase.com/docs/reference">
-                <a className="text-brand">Supabase client libraries</a>
+              <Link href="https://supabase.com/docs/reference" className="text-brand">
+                Supabase client libraries
               </Link>{' '}
               with your API keys.
             </p>
@@ -263,18 +271,23 @@ const NewProjectPanel = () => {
             </p>
           </div>
           <div className="flex items-center space-x-2">
-            <Link href={`/project/${ref}/settings/api`}>
-              <a>
-                <Button type="default">View API settings</Button>
-              </a>
-            </Link>
-            <Link href="https://supabase.com/docs/guides/database/api">
-              <a target="_blank" rel="noreferrer">
-                <Button className="translate-y-[1px]" type="default" icon={<IconExternalLink />}>
-                  About APIs
-                </Button>
-              </a>
-            </Link>
+            <Button asChild type="default">
+              <Link href={`/project/${ref}/settings/api`}>View API settings</Link>
+            </Button>
+            <Button
+              asChild
+              className="translate-y-[1px]"
+              type="default"
+              icon={<IconExternalLink />}
+            >
+              <Link
+                href="https://supabase.com/docs/guides/database/api"
+                target="_blank"
+                rel="noreferrer"
+              >
+                About APIs
+              </Link>
+            </Button>
           </div>
         </div>
       </div>

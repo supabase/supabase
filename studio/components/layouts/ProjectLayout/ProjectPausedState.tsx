@@ -104,10 +104,13 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                   <p className="text-sm text-foreground-light text-center">
                     Unpaused projects count towards compute usage. For every hour your instance is
                     active, we'll bill you based on the instance size of your project. See{' '}
-                    <Link href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute">
-                      <a target="_blank" rel="noreferrer" className="underline">
-                        Compute Instance Usage Billing
-                      </a>
+                    <Link
+                      href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="underline"
+                    >
+                      Compute Instance Usage Billing
                     </Link>{' '}
                     for more details.
                   </p>
@@ -145,23 +148,21 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                   )}
                 </Tooltip.Root>
                 {isFreePlan ? (
-                  <Link
-                    href={
-                      billedViaOrg
-                        ? `/org/${orgSlug}/billing?panel=subscriptionPlan`
-                        : `/project/${ref}/settings/billing/subscription?panel=subscriptionPlan`
-                    }
-                  >
-                    <a>
-                      <Button type="default">Upgrade to Pro</Button>
-                    </a>
-                  </Link>
+                  <Button asChild type="default">
+                    <Link
+                      href={
+                        billedViaOrg
+                          ? `/org/${orgSlug}/billing?panel=subscriptionPlan`
+                          : `/project/${ref}/settings/billing/subscription?panel=subscriptionPlan`
+                      }
+                    >
+                      Upgrade to Pro
+                    </Link>
+                  </Button>
                 ) : (
-                  <Link href={`/project/${ref}/settings/general`}>
-                    <a>
-                      <Button type="default">View project settings</Button>
-                    </a>
-                  </Link>
+                  <Button asChild type="default">
+                    <Link href={`/project/${ref}/settings/general`}>View project settings</Link>
+                  </Button>
                 )}
               </div>
             </div>

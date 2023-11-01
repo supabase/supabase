@@ -197,13 +197,19 @@ const EdgeFunctionDetails = () => {
                           explicit import URLs
                         </p>
                         <div className="!mt-4">
-                          <Link href="https://supabase.com/docs/guides/functions/import-maps">
-                            <a target="_blank" rel="noreferrer">
-                              <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                                More about import maps
-                              </Button>
-                            </a>
-                          </Link>
+                          <Button
+                            asChild
+                            type="default"
+                            icon={<IconExternalLink strokeWidth={1.5} />}
+                          >
+                            <Link
+                              href="https://supabase.com/docs/guides/functions/import-maps"
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              More about import maps
+                            </Link>
+                          </Button>
                         </div>
                       </div>
                     </FormSectionContent>
