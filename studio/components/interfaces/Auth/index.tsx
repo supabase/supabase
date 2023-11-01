@@ -1,8 +1,16 @@
 import AuthProvidersForm from './AuthProvidersForm/AuthProvidersForm'
-import AutoSchemaForm from './AutoSchemaForm'
 import EmailTemplates from './EmailTemplates/EmailTemplates'
 import SmtpForm from './SmtpForm/SmtpForm'
+import BasicAuthSettingsForm from './BasicAuthSettingsForm/BasicAuthSettingsForm'
+import AdvancedAuthSettingsForm from './AdvancedAuthSettingsForm/AdvancedAuthSettingsForm'
 
 import Users from './Users'
 
-export { Users, AuthProvidersForm, AutoSchemaForm, EmailTemplates, SmtpForm }
+export {
+  Users,
+  AuthProvidersForm,
+  EmailTemplates,
+  SmtpForm,
+  BasicAuthSettingsForm,
+  AdvancedAuthSettingsForm,
+}

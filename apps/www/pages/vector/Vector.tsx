@@ -46,7 +46,7 @@ function VectorPage() {
       />
       <DefaultLayout className="!bg-scale-300 dark:!bg-scale-100">
         <ProductHeaderCentered {...pageData.heroSection} />
-        <HighlightCards {...pageData.highlightsSection} />
+        <HighlightCards {...(pageData.highlightsSection as any)} />
         <CenteredTitleImage {...pageData.integrations} />
         <TimedTabsSection {...pageData.APIsection} />
         <div className="bg-white dark:bg-[#121212]">

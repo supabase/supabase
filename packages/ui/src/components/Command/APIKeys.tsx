@@ -1,4 +1,4 @@
-import { CommandGroup } from 'cmdk-supabase'
+import { CommandGroup } from 'cmdk'
 import { useCommandMenu } from './CommandMenuProvider'
 import { Badge } from '../Badge'
 import { CommandItem, copyToClipboard } from './Command.utils'

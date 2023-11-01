@@ -521,6 +521,42 @@
   },
   {
     "type": "category",
+    "title": "Storage",
+    "items": [
+      {
+        "id": "supabase-storage",
+        "title": "Manage Storage objects",
+        "slug": "supabase-storage",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-storage-ls",
+        "title": "Lists all Storage objects",
+        "slug": "supabase-storage-ls",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-storage-cp",
+        "title": "Upload and download from Storage",
+        "slug": "supabase-storage-cp",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-storage-mv",
+        "title": "Move objects within a bucket",
+        "slug": "supabase-storage-mv",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-storage-cp",
+        "title": "Delete objects from Storage",
+        "slug": "supabase-storage-cp",
+        "type": "cli-command"
+      }
+    ]
+  },
+  {
+    "type": "category",
     "title": "Encryption",
     "items": [
       {

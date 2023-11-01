@@ -204,16 +204,15 @@ const DatabaseUsage = observer(() => {
                         are inactive.
                       </p>
 
-                      <Link
-                        href="https://supabase.com/docs/guides/platform/database-size#database-space-management"
-                        passHref
-                      >
-                        <Button asChild type="default" icon={<IconExternalLink />}>
-                          <a target="_blank" rel="noreferrer">
-                            Read about database space
-                          </a>
-                        </Button>
-                      </Link>
+                      <Button asChild type="default" icon={<IconExternalLink />}>
+                        <Link
+                          href="https://supabase.com/docs/guides/platform/database-size#database-space-management"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Read about database space
+                        </Link>
+                      </Button>
                     </div>
                   </AlertDescription_Shadcn_>
                 </Alert_Shadcn_>
