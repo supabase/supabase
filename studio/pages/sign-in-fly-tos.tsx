@@ -8,6 +8,7 @@ import { API_URL } from 'lib/constants'
 const SignInFlyTos = () => {
   const router = useRouter()
   const {
+    isReady,
     query: { extension_id, organization_id },
   } = router
   const { resolvedTheme } = useTheme()
@@ -25,7 +26,7 @@ const SignInFlyTos = () => {
           <div className="flex flex-shrink-0 flex-grow items-center lg:flex-grow-0">
             <div className="flex w-full items-center justify-between md:w-auto">
               <Link href="/projects">
-                <a>
+                <div>
                   <Image
                     src={
                       resolvedTheme === 'dark'
@@ -36,7 +37,7 @@ const SignInFlyTos = () => {
                     height={24}
                     width={120}
                   />
-                </a>
+                </div>
               </Link>
             </div>
           </div>
@@ -45,21 +46,28 @@ const SignInFlyTos = () => {
       <div className="flex w-[320px] flex-col items-center justify-center space-y-3">
         <h4 className="text-lg">Continue to Supabase Dashboard</h4>
       </div>
-      <div className="flex items-center space-x-4">
-        {/* require extension_id */}
+      <div className="flex flex-col items-center space-x-4 space-y-4">
         <Button onClick={onSignInWithFly} disabled={!extension_id && !organization_id}>
           Login with Fly.io
         </Button>
+        {isReady && !extension_id && !organization_id && (
+          <p className="text-red-900 text-sm">
+            An extension ID or organization ID is required to login
+          </p>
+        )}
       </div>
       <div className="sm:text-center">
         <p className="text-xs text-foreground-lighter sm:mx-auto sm:max-w-sm">
           By continuing, you agree to Supabase's{' '}
-          <Link href="https://supabase.com/terms">
-            <a className="underline hover:text-foreground-light">Terms of Service</a>
+          <Link href="https://supabase.com/terms" className="underline hover:text-foreground-light">
+            Terms of Service
           </Link>{' '}
           and{' '}
-          <Link href="https://supabase.com/privacy">
-            <a className="underline hover:text-foreground-light">Privacy Policy</a>
+          <Link
+            href="https://supabase.com/privacy"
+            className="underline hover:text-foreground-light"
+          >
+            Privacy Policy
           </Link>
           , and to receive periodic emails with updates.
         </p>
