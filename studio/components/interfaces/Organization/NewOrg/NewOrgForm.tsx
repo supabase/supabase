@@ -16,7 +16,7 @@ import {
 } from 'ui'
 
 import { useParams } from 'common'
-import { SpendCapModal } from 'components/interfaces/BillingV2'
+import SpendCapModal from 'components/interfaces/Billing/SpendCapModal'
 import InformationBox from 'components/ui/InformationBox'
 import Panel from 'components/ui/Panel'
 import { useOrganizationCreateMutation } from 'data/organizations/organization-create-mutation'

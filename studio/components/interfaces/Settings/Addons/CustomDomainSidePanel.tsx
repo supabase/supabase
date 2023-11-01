@@ -8,7 +8,6 @@ import { useParams } from 'common'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import Telemetry from 'lib/telemetry'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
@@ -22,13 +21,13 @@ import {
   Radio,
   SidePanel,
 } from 'ui'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 const CustomDomainSidePanel = () => {
   const { ui } = useStore()
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const organization = useSelectedOrganization()
-  const isOrgBilling = !!organization?.subscription_id
 
   const [selectedOption, setSelectedOption] = useState<string>('cd_none')
 
@@ -42,7 +41,7 @@ const CustomDomainSidePanel = () => {
   const onClose = () => snap.setPanelKey(undefined)
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
-  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
       ui.setNotification({
@@ -273,17 +272,11 @@ const CustomDomainSidePanel = () => {
               variant="info"
               title="Custom domains are unavailable on the free plan"
               actions={
-                isOrgBilling ? (
-                  <Button asChild type="default">
-                    <Link href={`/org/${organization.slug}/billing?panel=subscriptionPlan`}>
-                      View available plans
-                    </Link>
-                  </Button>
-                ) : (
-                  <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
+                <Button asChild type="default">
+                  <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
                     View available plans
-                  </Button>
-                )
+                  </Link>
+                </Button>
               }
             >
               Upgrade your plan to add a custom domain to your project
