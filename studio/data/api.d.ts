@@ -892,6 +892,12 @@ export interface paths {
     /** Gets usage stats */
     get: operations['OrgUsageSystemController_getDailyStats']
   }
+  '/system/organizations/{slug}/billing/subscription': {
+    /** Gets the current subscription */
+    get: operations['OrgSubscriptionSystemController_getSubscription']
+    /** Updates subscription */
+    put: operations['OrgSubscriptionSystemController_updateSubscription']
+  }
   '/system/integrations/vercel/webhooks': {
     /** Processes Vercel event */
     post: operations['VercelWebhooksController_processEvent']
@@ -1655,6 +1661,8 @@ export interface paths {
   '/partners/flyio/extensions/{extension_id}': {
     /** Gets database status */
     get: operations['ExtensionController_getResourceStatus']
+    /** Deletes a database */
+    delete: operations['ExtensionController_deleteResource']
   }
   '/partners/flyio/extensions/{extension_id}/sso': {
     /** Starts Flyio single sign on */
@@ -1798,7 +1806,6 @@ export interface components {
       SMS_TEXTLOCAL_API_KEY: string
       SMS_TEXTLOCAL_SENDER: string
       SMS_TWILIO_ACCOUNT_SID: string
-      SMS_TWILIO_CONTENT_SID: string
       SMS_TWILIO_AUTH_TOKEN: string
       SMS_TWILIO_MESSAGE_SERVICE_SID: string
       SMS_TWILIO_VERIFY_ACCOUNT_SID: string
@@ -1930,7 +1937,6 @@ export interface components {
       SMS_TEST_OTP_VALID_UNTIL?: string
       SMS_TEXTLOCAL_API_KEY?: string
       SMS_TEXTLOCAL_SENDER?: string
-      SMS_TWILIO_CONTENT_SID?: string
       SMS_TWILIO_ACCOUNT_SID?: string
       SMS_TWILIO_AUTH_TOKEN?: string
       SMS_TWILIO_CONTENT_SID?: string
@@ -2060,7 +2066,6 @@ export interface components {
       SMS_MESSAGEBIRD_ORIGINATOR: string
       SMS_TEXTLOCAL_API_KEY: string
       SMS_TEXTLOCAL_SENDER: string
-      SMS_TWILIO_CONTENT_SID: string
       SMS_TWILIO_ACCOUNT_SID: string
       SMS_TWILIO_AUTH_TOKEN: string
       SMS_TWILIO_MESSAGE_SERVICE_SID: string
@@ -3314,6 +3319,7 @@ export interface components {
       is_readonly_mode_enabled?: boolean
       is_branch_enabled: boolean
       preview_branch_refs: string[]
+      disk_volume_size_gb?: number
     }
     AmiSearchOptions: {
       search_tags?: Record<string, never>
@@ -3370,6 +3376,7 @@ export interface components {
       is_readonly_mode_enabled?: boolean
       is_branch_enabled: boolean
       preview_branch_refs: string[]
+      disk_volume_size_gb?: number
       endpoint: string
       anon_key: string
       service_key: string
@@ -4154,15 +4161,21 @@ export interface components {
     GetGithubBranch: {
       name: string
     }
+    GitRef: {
+      repo: string
+      branch: string
+      label: string
+    }
     GetGithubPullRequest: {
       id: number
       url: string
       title: string
+      target: components['schemas']['GitRef']
+      created_at: string
+      created_by?: string
       repo: string
       branch: string
       label: string
-      created_at: string
-      created_by?: string
     }
     FunctionResponse: {
       id: string
@@ -4239,6 +4252,7 @@ export interface components {
       tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
       custom_usage_fees?: components['schemas']['BillingUsageBasedPrice'][]
       tier_price_id?: string
+      compute_credits?: number
       payment_method_id?: string
       existing_org_subscription_id?: string
       dryRun?: boolean
@@ -4304,6 +4318,7 @@ export interface components {
       parent_project_ref: string
       is_default: boolean
       git_branch?: string
+      pr_number?: number
       created_at: string
       updated_at: string
     }
@@ -4400,6 +4415,9 @@ export interface components {
       target_upgrade_versions: components['schemas']['ProjectVersion'][]
       requires_manual_intervention: string | null
       potential_breaking_changes: string[]
+      duration_estimate_hours: number
+      legacy_auth_custom_roles: string[]
+      extension_dependent_objects: string[]
     }
     DatabaseUpgradeStatus: {
       initiated_at: string
@@ -4451,7 +4469,7 @@ export interface components {
         | components['schemas']['AuthHealthResponse']
         | components['schemas']['RealtimeHealthResponse']
       /** @enum {string} */
-      name: 'auth' | 'realtime' | 'rest' | 'storage'
+      name: 'auth' | 'db' | 'realtime' | 'rest' | 'storage'
       healthy: boolean
       error?: string
     }
@@ -4489,7 +4507,7 @@ export interface components {
     }
     AttributeMapping: {
       keys: {
-        [key: string]: components['schemas']['AttributeValue'] | undefined
+        [key: string]: components['schemas']['AttributeValue']
       }
     }
     CreateProviderBody: {
@@ -4775,13 +4793,17 @@ export interface components {
   pathItems: never
 }
 
+export type $defs = Record<string, never>
+
 export type external = Record<string, never>
 
 export interface operations {
   /** Redirects to dashboard homepage */
   LoginController_redirectToDashboardHomepage: {
     responses: {
-      200: never
+      200: {
+        content: never
+      }
     }
   }
   /** Get notifications */
@@ -4800,7 +4822,9 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve notifications */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Delete notifications */
@@ -4817,7 +4841,9 @@ export interface operations {
         }
       }
       /** @description Failed to delete notifications */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Update notifications */
@@ -4834,7 +4860,9 @@ export interface operations {
         }
       }
       /** @description Failed to update notifications */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Reset password for email */
@@ -4845,7 +4873,9 @@ export interface operations {
       }
     }
     responses: {
-      201: never
+      201: {
+        content: never
+      }
     }
   }
   /** Send feedback */
@@ -4862,7 +4892,9 @@ export interface operations {
         }
       }
       /** @description Failed to send feedback */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Send exit survey to HubSpot */
@@ -4879,7 +4911,9 @@ export interface operations {
         }
       }
       /** @description Failed to send exit survey */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Sign up with email and password */
@@ -4890,7 +4924,9 @@ export interface operations {
       }
     }
     responses: {
-      201: never
+      201: {
+        content: never
+      }
     }
   }
   /** Gets project's status */
@@ -4902,9 +4938,13 @@ export interface operations {
       }
     }
     responses: {
-      200: never
+      200: {
+        content: never
+      }
       /** @description Failed to get project's status */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /**
@@ -4935,7 +4975,9 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve GoTrue config */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates GoTrue config */
@@ -4958,7 +5000,9 @@ export interface operations {
         }
       }
       /** @description Failed to update GoTrue config */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Sends an invite to the given email */
@@ -4980,9 +5024,13 @@ export interface operations {
           'application/json': Record<string, never>
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to send an invite to the given email */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Sends a magic link to the given email */
@@ -5004,9 +5052,13 @@ export interface operations {
           'application/json': Record<string, never>
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to send a magic link to the given email */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Sends an OTP to the given phone number */
@@ -5028,9 +5080,13 @@ export interface operations {
           'application/json': Record<string, never>
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to send an OTP to the given phone number */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Sends a recovery email to the given email */
@@ -5052,9 +5108,13 @@ export interface operations {
           'application/json': Record<string, never>
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to send a recovery email to the given email */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets GoTrue template */
@@ -5072,7 +5132,9 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve GoTrue template */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets users */
@@ -5095,9 +5157,13 @@ export interface operations {
           'application/json': components['schemas']['UsersResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to retrieve users */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Delete user with given ID */
@@ -5119,9 +5185,13 @@ export interface operations {
           'application/json': Record<string, never>
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to delete user */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Delete all factors associated to a user */
@@ -5139,9 +5209,13 @@ export interface operations {
           'application/json': Record<string, never>
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to delete factors */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets project backups */
@@ -5159,7 +5233,9 @@ export interface operations {
         }
       }
       /** @description Failed to get project backups */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Download project backup */
@@ -5182,7 +5258,9 @@ export interface operations {
         }
       }
       /** @description Failed to download project backup */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Restore project backup */
@@ -5199,9 +5277,13 @@ export interface operations {
       }
     }
     responses: {
-      201: never
+      201: {
+        content: never
+      }
       /** @description Failed to restore project backup */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Restore project with a physical backup */
@@ -5218,9 +5300,13 @@ export interface operations {
       }
     }
     responses: {
-      201: never
+      201: {
+        content: never
+      }
       /** @description Failed to restore project with physical backup */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Restore project to a previous point in time */
@@ -5237,9 +5323,13 @@ export interface operations {
       }
     }
     responses: {
-      201: never
+      201: {
+        content: never
+      }
       /** @description Failed to restore project to a previous point in time */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets hook logs with the given ID */
@@ -5264,9 +5354,13 @@ export interface operations {
           'application/json': Record<string, never>
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to get hook logs with the given ID */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Enables Database Webhooks on the project */
@@ -5278,10 +5372,16 @@ export interface operations {
       }
     }
     responses: {
-      201: never
-      403: never
+      201: {
+        content: never
+      }
+      403: {
+        content: never
+      }
       /** @description Failed to enable Database Webhooks on the project */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets the status of owner reassignment */
@@ -5299,7 +5399,9 @@ export interface operations {
         }
       }
       /** @description Failed to get status of owner reassignment */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Reassigns object owner from supabase_admin to temp */
@@ -5319,9 +5421,13 @@ export interface operations {
           'application/json': components['schemas']['OwnerResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to reassign owner on the project */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Rollback object owner from temp to supabase_admin */
@@ -5341,9 +5447,13 @@ export interface operations {
           'application/json': components['schemas']['OwnerResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to rollback owner on the project */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Reassigns object owner from temp to postgres */
@@ -5363,9 +5473,13 @@ export interface operations {
           'application/json': components['schemas']['OwnerResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to reassign owner on the project */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /**
@@ -5380,7 +5494,9 @@ export interface operations {
         }
       }
       /** @description Unexpected error listing organizations */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Creates an organization (v2) */
@@ -5397,7 +5513,9 @@ export interface operations {
         }
       }
       /** @description Unexpected error creating an organization */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Deletes organization */
@@ -5409,10 +5527,16 @@ export interface operations {
       }
     }
     responses: {
-      200: never
-      403: never
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
       /** @description Failed to delete organization */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates organization */
@@ -5435,7 +5559,9 @@ export interface operations {
         }
       }
       /** @description Failed to update organization */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets the Stripe customer */
@@ -5453,7 +5579,9 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve the Stripe customer */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates the Stripe customer */
@@ -5470,9 +5598,13 @@ export interface operations {
           'application/json': components['schemas']['CustomerUpdateResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to update the Stripe customer */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets the given organization's roles */
@@ -5490,7 +5622,9 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve the organization's roles */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets the given organization's tax IDs */
@@ -5507,9 +5641,13 @@ export interface operations {
           'application/json': components['schemas']['TaxIdResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to retrieve the organization's tax IDs */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Creates a tax ID for the given organization */
@@ -5531,9 +5669,13 @@ export interface operations {
           'application/json': components['schemas']['CreateTaxIdResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to create the tax ID */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Delete the tax ID with the given ID */
@@ -5555,9 +5697,13 @@ export interface operations {
           'application/json': components['schemas']['DeleteTaxIdResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to delete the tax ID */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Transfers the organization to the given member */
@@ -5568,9 +5714,13 @@ export interface operations {
       }
     }
     responses: {
-      201: never
+      201: {
+        content: never
+      }
       /** @description Failed to update owner */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets daily organization stats */
@@ -5618,7 +5768,9 @@ export interface operations {
         }
       }
       /** @description Failed to get daily organization stats */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets usage stats */
@@ -5636,7 +5788,9 @@ export interface operations {
         }
       }
       /** @description Failed to get usage stats */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Get standard security questionnaire URL */
@@ -5692,7 +5846,9 @@ export interface operations {
         }
       }
       /** @description Failed to get an organization's audit logs */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets invited users */
@@ -5710,7 +5866,9 @@ export interface operations {
         }
       }
       /** @description Failed to get invited users */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Invites user */
@@ -5733,7 +5891,9 @@ export interface operations {
         }
       }
       /** @description Failed to invite user */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Delete invited user */
@@ -5748,9 +5908,13 @@ export interface operations {
       }
     }
     responses: {
-      200: never
+      200: {
+        content: never
+      }
       /** @description Failed to delete invited user */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets invite */
@@ -5771,7 +5935,9 @@ export interface operations {
         }
       }
       /** @description Failed to get invite */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Joins organization */
@@ -5792,7 +5958,9 @@ export interface operations {
         }
       }
       /** @description Failed to join organization */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Leaves the given organization */
@@ -5810,7 +5978,9 @@ export interface operations {
         }
       }
       /** @description Failed to leave organization */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Leaves the given organization */
@@ -5833,7 +6003,9 @@ export interface operations {
         }
       }
       /** @description Failed to leave organization */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets organization's members */
@@ -5851,7 +6023,9 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve organization's members */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Removes organization member */
@@ -5864,9 +6038,13 @@ export interface operations {
       }
     }
     responses: {
-      200: never
+      200: {
+        content: never
+      }
       /** @description Failed to remove organization member */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates organization member */
@@ -5884,9 +6062,13 @@ export interface operations {
       }
     }
     responses: {
-      200: never
+      200: {
+        content: never
+      }
       /** @description Failed to update organization member */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets organization members who have reached their free project limit */
@@ -5904,7 +6086,9 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve organization members who have reached their free project limit */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets Stripe payment methods for the given organization */
@@ -5921,9 +6105,13 @@ export interface operations {
           'application/json': components['schemas']['PaymentsResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to get Stripe payment methods */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Detach Stripe payment method with the given card ID */
@@ -5939,9 +6127,13 @@ export interface operations {
           'application/json': components['schemas']['DetachPaymentResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to detach Stripe payment method */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Sets up a payment method */
@@ -5953,7 +6145,9 @@ export interface operations {
         }
       }
       /** @description Failed to set up a payment method */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets the current subscription */
@@ -5970,9 +6164,13 @@ export interface operations {
           'application/json': components['schemas']['GetSubscriptionResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to retrieve subscription */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates subscription */
@@ -5989,10 +6187,16 @@ export interface operations {
       }
     }
     responses: {
-      200: never
-      403: never
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
       /** @description Failed to update subscription */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Preview subscription changes */
@@ -6009,10 +6213,16 @@ export interface operations {
       }
     }
     responses: {
-      201: never
-      403: never
+      201: {
+        content: never
+      }
+      403: {
+        content: never
+      }
       /** @description Failed to preview subscription changes */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Deletes any upcoming subscription schedule */
@@ -6024,10 +6234,16 @@ export interface operations {
       }
     }
     responses: {
-      200: never
-      403: never
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
       /** @description Failed to update subscription change */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets subscription plans */
@@ -6044,9 +6260,13 @@ export interface operations {
           'application/json': Record<string, never>
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to get subscription plans */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets the upcoming invoice */
@@ -6063,9 +6283,13 @@ export interface operations {
           'application/json': Record<string, never>
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to retrieve upcoming invoice */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Retrieve column privileges */
@@ -6085,9 +6309,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresColumnPrivileges'][]
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to retrieve column privileges */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Grant column privileges */
@@ -6112,9 +6340,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresColumnPrivileges'][]
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to grant column privileges */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Revoke column privileges */
@@ -6139,9 +6371,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresColumnPrivileges'][]
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to revoke column privileges */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets project pg.columns */
@@ -6165,9 +6401,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresColumn'][]
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to get pg.columns */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Creates project pg.column */
@@ -6192,9 +6432,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresColumn']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to create pg.column */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Deletes project pg.column with the given ID */
@@ -6219,9 +6463,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresColumn']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to delete pg.column with the given ID */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates project pg.column with the given ID */
@@ -6250,9 +6498,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresColumn']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to update pg.column with the given ID */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets project pg.extensions */
@@ -6272,9 +6524,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresExtension'][]
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to get pg.extensions */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Creates project pg.extension */
@@ -6299,9 +6555,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresExtension']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to create pg.extension */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Deletes project pg.extension with the given ID */
@@ -6325,9 +6585,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresExtension']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to delete pg.extension with the given ID */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Retrieve database foreign tables */
@@ -6353,9 +6617,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresForeignTable'][]
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to retrieve database foreign tables */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /**
@@ -6375,9 +6643,13 @@ export interface operations {
           'application/json': components['schemas']['FunctionResponse'][]
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to retrieve project's functions */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /**
@@ -6411,9 +6683,13 @@ export interface operations {
           'application/json': components['schemas']['FunctionResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to create project's function */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Deletes project pg.function with the given ID */
@@ -6437,9 +6713,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresFunction']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to delete pg.function with the given ID */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates project pg.function with the given ID */
@@ -6468,9 +6748,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresFunction']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to update pg.function with the given ID */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Retrieve database materialized views */
@@ -6498,9 +6782,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresMaterializedView'][]
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to retrieve database materialized views */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets project pg.policies */
@@ -6524,9 +6812,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresPolicy'][]
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to get pg.policies */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Creates project pg.policy */
@@ -6551,9 +6843,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresPolicy']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to create pg.policy */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Deletes project pg.policy with the given ID */
@@ -6577,9 +6873,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresPolicy']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to delete pg.policy with the given ID */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates project pg.policy with the given ID */
@@ -6608,9 +6908,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresPolicy']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to update pg.policy with the given ID */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets project pg.publications */
@@ -6630,9 +6934,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresPublication'][]
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to get pg.publications */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets project pg.publications */
@@ -6657,9 +6965,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresPublication']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to create pg.publication */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Deletes project pg.publication with the given ID */
@@ -6683,9 +6995,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresPublication']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to delete pg.publication with the given ID */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates project pg.publication with the given ID */
@@ -6714,9 +7030,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresPublication']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to update pg.publication with the given ID */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Run sql query */
@@ -6741,9 +7061,13 @@ export interface operations {
           'application/json': Record<string, never>
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to run sql query */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Format sql query */
@@ -6766,7 +7090,9 @@ export interface operations {
         }
       }
       /** @description Failed to format sql query */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Validate sql query */
@@ -6789,7 +7115,9 @@ export interface operations {
         }
       }
       /** @description Failed to validate sql query */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets project pg.roles */
@@ -6809,9 +7137,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresRole'][]
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to get pg.roles */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Creates project pg.role */
@@ -6836,9 +7168,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresRole']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to create pg.role */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Deletes project pg.role with the given ID */
@@ -6862,9 +7198,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresRole']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to delete pg.role with the given ID */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates project pg.role with the given ID */
@@ -6893,9 +7233,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresRole']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to update pg.role with the given ID */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets project pg.schemas */
@@ -6915,9 +7259,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresSchema'][]
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to get pg.schemas */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Creates project pg.schema */
@@ -6942,9 +7290,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresSchema']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to create pg.schema */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Deletes project pg.schema with the given ID */
@@ -6968,9 +7320,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresSchema']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to delete pg.schema with the given ID */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates project pg.schema with the given ID */
@@ -6999,9 +7355,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresSchema']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to update pg.schema with the given ID */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Searches project pg.tables. Return maximum 50 results. */
@@ -7026,9 +7386,13 @@ export interface operations {
           'application/json': components['schemas']['Table'][]
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to search pg.tables */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Searches project pg.columns. Return maximum 50 results. */
@@ -7053,9 +7417,13 @@ export interface operations {
           'application/json': components['schemas']['Column'][]
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to search pg.columns */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Retrieve table privileges */
@@ -7075,9 +7443,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresTablePrivileges'][]
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to retrieve table privileges */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Grant table privileges */
@@ -7102,9 +7474,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresTablePrivileges'][]
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to grant table privileges */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Revoke table privileges */
@@ -7129,9 +7505,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresTablePrivileges'][]
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to revoke table privileges */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets project pg.tables or pg.table with the given ID */
@@ -7161,9 +7541,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresTable'][]
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to get pg.tables or pg.table with the given ID */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Creates project pg.table */
@@ -7188,9 +7572,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresTable']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to create pg.table */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Deletes project pg.table with the given ID */
@@ -7215,9 +7603,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresTable']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to delete pg.table with the given ID */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates project pg.table with the given ID */
@@ -7246,9 +7638,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresTable']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to update pg.table with the given ID */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets project pg.triggers */
@@ -7272,9 +7668,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresTrigger'][]
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to get pg.triggers */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Creates project pg.trigger */
@@ -7299,9 +7699,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresTrigger']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to create pg.trigger */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Deletes project pg.trigger with the given ID */
@@ -7325,9 +7729,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresTrigger']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to delete pg.trigger with the given ID */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates project pg.trigger with the given ID */
@@ -7356,9 +7764,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresTrigger']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to update pg.trigger with the given ID */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets project pg.types */
@@ -7382,9 +7794,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresType'][]
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to get pg.types */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Retrieve database views */
@@ -7413,9 +7829,13 @@ export interface operations {
           'application/json': components['schemas']['PostgresView'][]
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to retrieve database views */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets the user's access tokens */
@@ -7427,7 +7847,9 @@ export interface operations {
         }
       }
       /** @description Failed to get user's access tokens */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Creates a new access token */
@@ -7444,7 +7866,9 @@ export interface operations {
         }
       }
       /** @description Failed to create access token */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets the access token with the given ID */
@@ -7462,7 +7886,9 @@ export interface operations {
         }
       }
       /** @description Failed to get access token */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Deletes the access token with the given ID */
@@ -7480,7 +7906,9 @@ export interface operations {
         }
       }
       /** @description Failed to delete access token */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets a user's audit logs */
@@ -7500,7 +7928,9 @@ export interface operations {
         }
       }
       /** @description Failed to get a user's audit logs */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Search profiles by username, email with the given keywords */
@@ -7517,7 +7947,9 @@ export interface operations {
         }
       }
       /** @description Failed to search profiles with the given keywords */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets the user's subscription statistics */
@@ -7529,7 +7961,9 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve user's subscription statistics */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Check password strength */
@@ -7546,7 +7980,9 @@ export interface operations {
         }
       }
       /** @description Failed to check password strength */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets all the user's permissions */
@@ -7558,7 +7994,9 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve permissions */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets the user's profile */
@@ -7570,7 +8008,9 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve user's profile */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Creates user's profile */
@@ -7582,17 +8022,25 @@ export interface operations {
         }
       }
       /** @description Failed to create user's profile */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Deletes user's profile */
   ProfileController_deleteProfile: {
     responses: {
-      200: never
+      200: {
+        content: never
+      }
       /** @description Forbidden action */
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to delete user's profile */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates user's profile */
@@ -7609,7 +8057,9 @@ export interface operations {
         }
       }
       /** @description Failed to update user's profile */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /**
@@ -7660,7 +8110,9 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve project's content */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates project's content */
@@ -7683,7 +8135,9 @@ export interface operations {
         }
       }
       /** @description Failed to update project's content */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Creates project's content */
@@ -7706,7 +8160,9 @@ export interface operations {
         }
       }
       /** @description Failed to create project's content */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Deletes project's content */
@@ -7723,7 +8179,9 @@ export interface operations {
         }
       }
       /** @description Failed to delete project's content */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates project's content */
@@ -7745,7 +8203,9 @@ export interface operations {
         }
       }
       /** @description Failed to update project's content */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets daily project stats */
@@ -7769,7 +8229,9 @@ export interface operations {
         }
       }
       /** @description Failed to get daily project stats */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates the database password */
@@ -7786,10 +8248,16 @@ export interface operations {
       }
     }
     responses: {
-      200: never
-      403: never
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
       /** @description Failed to update database password */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets project health check */
@@ -7801,10 +8269,16 @@ export interface operations {
       }
     }
     responses: {
-      200: never
-      403: never
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
       /** @description Failed to get project health check */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets project OpenApi */
@@ -7821,9 +8295,13 @@ export interface operations {
           'application/json': Record<string, never>
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to get project OpenApi */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Queries project Graphql */
@@ -7848,9 +8326,13 @@ export interface operations {
           'application/json': Record<string, never>
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to query project Graphql */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets project's usage metrics */
@@ -7881,7 +8363,9 @@ export interface operations {
         }
       }
       /** @description Failed to get project's usage metrics */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets project's invoices */
@@ -7903,7 +8387,9 @@ export interface operations {
         }
       }
       /** @description Failed to get project's invoices */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets project's invoice count */
@@ -7915,9 +8401,13 @@ export interface operations {
       }
     }
     responses: {
-      200: never
+      200: {
+        content: never
+      }
       /** @description Failed to get project's invoice count */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Pauses the project */
@@ -7929,9 +8419,13 @@ export interface operations {
       }
     }
     responses: {
-      201: never
+      201: {
+        content: never
+      }
       /** @description Failed to pause the project */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Resize database disk */
@@ -7948,9 +8442,13 @@ export interface operations {
       }
     }
     responses: {
-      201: never
+      201: {
+        content: never
+      }
       /** @description Failed to resize database disk */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Restarts project */
@@ -7962,10 +8460,16 @@ export interface operations {
       }
     }
     responses: {
-      201: never
-      403: never
+      201: {
+        content: never
+      }
+      403: {
+        content: never
+      }
       /** @description Failed to restart project */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets a specific project that belongs to the authenticated user */
@@ -7998,7 +8502,9 @@ export interface operations {
           'application/json': components['schemas']['ProjectRefResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
     }
   }
   /** Updates the given project */
@@ -8020,9 +8526,13 @@ export interface operations {
           'application/json': components['schemas']['ProjectRefResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to update project */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Restores project */
@@ -8040,7 +8550,9 @@ export interface operations {
         }
       }
       /** @description Failed to restore project */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Restarts given services */
@@ -8057,9 +8569,13 @@ export interface operations {
       }
     }
     responses: {
-      201: never
+      201: {
+        content: never
+      }
       /** @description Failed to restart given services */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets project's settings */
@@ -8077,7 +8593,9 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve project's settings */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /**
@@ -8098,10 +8616,16 @@ export interface operations {
       }
     }
     responses: {
-      201: never
-      403: never
+      201: {
+        content: never
+      }
+      403: {
+        content: never
+      }
       /** @description Failed to update project */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets project's usage */
@@ -8119,7 +8643,9 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve project's usage */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Previews transfering a project to a different organizations, shows eligibility and impact. */
@@ -8141,7 +8667,9 @@ export interface operations {
           'application/json': components['schemas']['PreviewProjectTransferResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
     }
   }
   /** Transfers a project to a different organization. */
@@ -8158,8 +8686,12 @@ export interface operations {
       }
     }
     responses: {
-      201: never
-      403: never
+      201: {
+        content: never
+      }
+      403: {
+        content: never
+      }
     }
   }
   /** Gets a project's function invocation statistics */
@@ -8180,9 +8712,13 @@ export interface operations {
           'application/json': components['schemas']['AnalyticsResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to get project's function invocation statistics */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets project's logs */
@@ -8207,9 +8743,13 @@ export interface operations {
           'application/json': components['schemas']['AnalyticsResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to get project's logs */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets project's usage api counts */
@@ -8229,9 +8769,13 @@ export interface operations {
           'application/json': components['schemas']['AnalyticsResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to get project's usage api counts */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets project's pgbouncer config */
@@ -8249,7 +8793,9 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve project's pgbouncer config */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates project's pgbouncer config */
@@ -8271,9 +8817,13 @@ export interface operations {
           'application/json': components['schemas']['UpdatePoolingConfigResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to update project's pgbouncer config */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets project's postgrest config */
@@ -8290,9 +8840,13 @@ export interface operations {
           'application/json': components['schemas']['PostgrestConfigWithJWTSecretResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to retrieve project's postgrest config */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates project's postgrest config */
@@ -8314,9 +8868,13 @@ export interface operations {
           'application/json': components['schemas']['PostgrestConfigResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to update project's postgrest config */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets project's Postgres config */
@@ -8334,7 +8892,9 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve project's Postgres config */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates project's Postgres config */
@@ -8357,7 +8917,9 @@ export interface operations {
         }
       }
       /** @description Failed to update project's Postgres config */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates project's secrets config */
@@ -8380,7 +8942,9 @@ export interface operations {
         }
       }
       /** @description Failed to update project's secrets config */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets project's storage config */
@@ -8397,9 +8961,13 @@ export interface operations {
           'application/json': components['schemas']['StorageConfigResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to retrieve project's storage config */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates project's storage config */
@@ -8421,9 +8989,13 @@ export interface operations {
           'application/json': components['schemas']['UpdateStorageConfigResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to update project's storage config */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets project addons */
@@ -8440,9 +9012,13 @@ export interface operations {
           'application/json': components['schemas']['ProjectAddonsResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to get project addons */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates project addon */
@@ -8459,10 +9035,16 @@ export interface operations {
       }
     }
     responses: {
-      201: never
-      403: never
+      201: {
+        content: never
+      }
+      403: {
+        content: never
+      }
       /** @description Failed to update project addon */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Removes project addon */
@@ -8475,10 +9057,16 @@ export interface operations {
       }
     }
     responses: {
-      200: never
-      403: never
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
       /** @description Failed to remove project addon */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets subscription plans */
@@ -8495,9 +9083,13 @@ export interface operations {
           'application/json': Record<string, never>
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to get subscription plans */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets the upcoming invoice */
@@ -8514,9 +9106,13 @@ export interface operations {
           'application/json': Record<string, never>
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to retrieve upcoming invoice */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /**
@@ -8537,7 +9133,9 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve project's api info */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets the last JWT secret update status */
@@ -8555,7 +9153,9 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve JWT secret update status */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets bucket */
@@ -8574,9 +9174,13 @@ export interface operations {
           'application/json': components['schemas']['StorageBucket']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to get bucket */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Deletes bucket */
@@ -8590,10 +9194,16 @@ export interface operations {
       }
     }
     responses: {
-      200: never
-      403: never
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
       /** @description Failed to delete bucket */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates bucket */
@@ -8612,10 +9222,16 @@ export interface operations {
       }
     }
     responses: {
-      200: never
-      403: never
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
       /** @description Failed to update bucket */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Removes all objects inside a single bucket. */
@@ -8629,10 +9245,16 @@ export interface operations {
       }
     }
     responses: {
-      201: never
-      403: never
+      201: {
+        content: never
+      }
+      403: {
+        content: never
+      }
       /** @description Failed to empty bucket */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets list of buckets */
@@ -8649,9 +9271,13 @@ export interface operations {
           'application/json': components['schemas']['StorageBucket'][]
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to get list of buckets */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Create bucket */
@@ -8673,9 +9299,13 @@ export interface operations {
           'application/json': string
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to create bucket */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets list of objects with the given bucket */
@@ -8699,9 +9329,13 @@ export interface operations {
           'application/json': components['schemas']['StorageObject'][]
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to get list of objects with the given bucket */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Creates URL for an asset in a public bucket */
@@ -8725,9 +9359,13 @@ export interface operations {
           'application/json': components['schemas']['PublicUrlResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to create public URL */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Downloads a file from a private bucket */
@@ -8746,10 +9384,16 @@ export interface operations {
       }
     }
     responses: {
-      201: never
-      403: never
+      201: {
+        content: never
+      }
+      403: {
+        content: never
+      }
       /** @description Failed to download the file */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Creates a signed URL */
@@ -8773,9 +9417,13 @@ export interface operations {
           'application/json': components['schemas']['SignedUrlResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to create a signed URL */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets multiple signed URLs */
@@ -8799,9 +9447,13 @@ export interface operations {
           'application/json': components['schemas']['SignedUrlsResponse'][]
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to get multiple signed URLs */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Copys object */
@@ -8825,9 +9477,13 @@ export interface operations {
           'application/json': components['schemas']['CopyObjectResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to copy object */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Move object */
@@ -8846,10 +9502,16 @@ export interface operations {
       }
     }
     responses: {
-      201: never
-      403: never
+      201: {
+        content: never
+      }
+      403: {
+        content: never
+      }
       /** @description Failed to move object */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Deletes objects */
@@ -8868,10 +9530,16 @@ export interface operations {
       }
     }
     responses: {
-      200: never
-      403: never
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
       /** @description Failed to delete objects */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets the total count of invoices for the given customer */
@@ -8883,9 +9551,17 @@ export interface operations {
       }
     }
     responses: {
-      200: never
+      200: {
+        headers: {
+          /** @description total count value */
+          'X-Total-Count'?: unknown
+        }
+        content: never
+      }
       /** @description Failed to retrieve the total count of invoices */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets information about overdue invoices that relate to the authenticated user */
@@ -8912,7 +9588,9 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve invoice */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Sends analytics server event */
@@ -8923,9 +9601,13 @@ export interface operations {
       }
     }
     responses: {
-      201: never
+      201: {
+        content: never
+      }
       /** @description Failed to send analytics server event */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Send analytics identify event */
@@ -8936,9 +9618,13 @@ export interface operations {
       }
     }
     responses: {
-      201: never
+      201: {
+        content: never
+      }
       /** @description Failed to send analytics identify event */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Send server page event */
@@ -8949,9 +9635,13 @@ export interface operations {
       }
     }
     responses: {
-      201: never
+      201: {
+        content: never
+      }
       /** @description Failed to send server page event */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Sends mixpanel server activity */
@@ -8962,9 +9652,13 @@ export interface operations {
       }
     }
     responses: {
-      201: never
+      201: {
+        content: never
+      }
       /** @description Failed to send mixpanel server activity */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Send mixpanel page event */
@@ -8975,9 +9669,13 @@ export interface operations {
       }
     }
     responses: {
-      201: never
+      201: {
+        content: never
+      }
       /** @description Failed to send mixpanel page event */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets the Vercel access token for the given code */
@@ -8988,9 +9686,13 @@ export interface operations {
       }
     }
     responses: {
-      200: never
+      200: {
+        content: never
+      }
       /** @description Failed to get Vercel access token */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets the project with the given ID if provided, otherwise gets the list of projects */
@@ -9011,7 +9713,9 @@ export interface operations {
         }
       }
       /** @description Failed to get project(s) */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets the environment variables for the given project ID on behalf of the given team ID */
@@ -9032,7 +9736,9 @@ export interface operations {
         }
       }
       /** @description Failed to get Vercel environment variables */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Creates the environment variable for the given project ID on behalf of the given team ID */
@@ -9058,7 +9764,9 @@ export interface operations {
         }
       }
       /** @description Failed to get the environment variables */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets user's integrations */
@@ -9076,7 +9784,9 @@ export interface operations {
         }
       }
       /** @description Failed to get user's integrations */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets integration with the given organization slug */
@@ -9093,7 +9803,9 @@ export interface operations {
         }
       }
       /** @description Failed to get integration with the given organization slug */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /**
@@ -9107,9 +9819,13 @@ export interface operations {
       }
     }
     responses: {
-      201: never
+      201: {
+        content: never
+      }
       /** @description Failed to create vercel integration */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Removes Vercel organization integration with the given id */
@@ -9120,9 +9836,13 @@ export interface operations {
       }
     }
     responses: {
-      200: never
+      200: {
+        content: never
+      }
       /** @description Failed to remove Vercel organization integration with the given id */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets vercel projects with the given organization integration id */
@@ -9144,7 +9864,9 @@ export interface operations {
         }
       }
       /** @description Failed to get vercel projects with the given organization integration id */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets installed vercel project connections for the given organization integration */
@@ -9161,7 +9883,9 @@ export interface operations {
         }
       }
       /** @description Failed to get installed vercel connections for the given organization integration */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Connects a Vercel project to a supabase project */
@@ -9178,7 +9902,9 @@ export interface operations {
         }
       }
       /** @description Failed to create project connection */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Syncs supabase project envs with given connection id */
@@ -9189,9 +9915,13 @@ export interface operations {
       }
     }
     responses: {
-      201: never
+      201: {
+        content: never
+      }
       /** @description Failed to sync supabase project envs with given connection id */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Deletes vercel project connection */
@@ -9208,7 +9938,9 @@ export interface operations {
         }
       }
       /** @description Failed to delete vercel integration project connection */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates a Vercel connection for a supabase project */
@@ -9224,9 +9956,13 @@ export interface operations {
       }
     }
     responses: {
-      200: never
+      200: {
+        content: never
+      }
       /** @description Failed to update Vercel connection */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Create github integration */
@@ -9243,7 +9979,9 @@ export interface operations {
         }
       }
       /** @description Failed to create github integration */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets installed github project connections for the given organization integration */
@@ -9260,7 +9998,9 @@ export interface operations {
         }
       }
       /** @description Failed to get installed github connections for the given organization integration */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Connects a GitHub project to a supabase project */
@@ -9271,9 +10011,13 @@ export interface operations {
       }
     }
     responses: {
-      201: never
+      201: {
+        content: never
+      }
       /** @description Failed to create project connections */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Deletes github project connection */
@@ -9284,9 +10028,13 @@ export interface operations {
       }
     }
     responses: {
-      200: never
+      200: {
+        content: never
+      }
       /** @description Failed to delete github integration project connection */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates a GitHub connection for a supabase project */
@@ -9302,9 +10050,13 @@ export interface operations {
       }
     }
     responses: {
-      200: never
+      200: {
+        content: never
+      }
       /** @description Failed to update GitHub connection */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets github repos for the given organization */
@@ -9325,7 +10077,9 @@ export interface operations {
         }
       }
       /** @description Failed to get github repos for the given organization */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets github branches for a given repo */
@@ -9348,7 +10102,9 @@ export interface operations {
         }
       }
       /** @description Failed to get github branches for a given repo */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets a specific github branch for a given repo */
@@ -9368,7 +10124,9 @@ export interface operations {
         }
       }
       /** @description Failed to get github branch for a given repo */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets github pull requests for a given repo */
@@ -9392,7 +10150,9 @@ export interface operations {
         }
       }
       /** @description Failed to get github pull requests for a given repo */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets GoTrue template */
@@ -9410,7 +10170,9 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve GoTrue template */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets the status of owner reassignment */
@@ -9428,7 +10190,9 @@ export interface operations {
         }
       }
       /** @description Failed to get status of owner reassignment */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Reassigns object owner from supabase_admin to temp */
@@ -9448,9 +10212,13 @@ export interface operations {
           'application/json': components['schemas']['OwnerResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to reassign owner on the project */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Rollback object owner from temp to supabase_admin */
@@ -9470,9 +10238,13 @@ export interface operations {
           'application/json': components['schemas']['OwnerResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to rollback owner on the project */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Reassigns object owner from temp to postgres */
@@ -9492,9 +10264,13 @@ export interface operations {
           'application/json': components['schemas']['OwnerResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to reassign owner on the project */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Reset JWT if leaked keys found by GitHub secret scanning */
@@ -9511,9 +10287,13 @@ export interface operations {
       }
     }
     responses: {
-      200: never
+      200: {
+        content: never
+      }
       /** @description Failed to reset JWT */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /**
@@ -9533,9 +10313,13 @@ export interface operations {
           'application/json': components['schemas']['FunctionResponse'][]
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to retrieve project's functions */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Deletes all Edge Functions from a project */
@@ -9547,7 +10331,9 @@ export interface operations {
       }
     }
     responses: {
-      200: never
+      200: {
+        content: never
+      }
     }
   }
   /**
@@ -9567,9 +10353,13 @@ export interface operations {
           'application/json': components['schemas']['SecretResponse'][]
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to retrieve project's secrets */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /**
@@ -9589,10 +10379,16 @@ export interface operations {
       }
     }
     responses: {
-      201: never
-      403: never
+      201: {
+        content: never
+      }
+      403: {
+        content: never
+      }
       /** @description Failed to create project's secrets */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /**
@@ -9617,9 +10413,13 @@ export interface operations {
           'application/json': Record<string, never>
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to delete secrets with given names */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Refreshes secrets */
@@ -9631,9 +10431,13 @@ export interface operations {
       }
     }
     responses: {
-      201: never
+      201: {
+        content: never
+      }
       /** @description Failed to refresh secrets */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates a project's health status. */
@@ -9650,9 +10454,13 @@ export interface operations {
       }
     }
     responses: {
-      200: never
+      200: {
+        content: never
+      }
       /** @description Failed to update health status. */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Records an HA event */
@@ -9669,9 +10477,13 @@ export interface operations {
       }
     }
     responses: {
-      200: never
+      200: {
+        content: never
+      }
       /** @description Failed to record HA event. */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Allows a project to obtain temporary credentials. */
@@ -9694,7 +10506,9 @@ export interface operations {
         }
       }
       /** @description Failed to obtain temporary credentials. */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates project addon */
@@ -9711,9 +10525,13 @@ export interface operations {
       }
     }
     responses: {
-      201: never
+      201: {
+        content: never
+      }
       /** @description Failed to update project addon */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Removes project addon */
@@ -9726,9 +10544,13 @@ export interface operations {
       }
     }
     responses: {
-      200: never
+      200: {
+        content: never
+      }
       /** @description Failed to remove project addon */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Migrates org to org-level billing. */
@@ -9739,9 +10561,13 @@ export interface operations {
       }
     }
     responses: {
-      201: never
+      201: {
+        content: never
+      }
       /** @description Failed to migrate org. */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Previews the migration of the organization to the new org level billing. */
@@ -9752,9 +10578,13 @@ export interface operations {
       }
     }
     responses: {
-      201: never
+      201: {
+        content: never
+      }
       /** @description Failed to preview org billing organization */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Attaches subscription id to org and projects. */
@@ -9765,9 +10595,13 @@ export interface operations {
       }
     }
     responses: {
-      200: never
+      200: {
+        content: never
+      }
       /** @description Failed to preview org billing organization */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Handle update project jwt on completion */
@@ -9779,7 +10613,9 @@ export interface operations {
       }
     }
     responses: {
-      201: never
+      201: {
+        content: never
+      }
     }
   }
   /** Gets usage stats */
@@ -9797,7 +10633,50 @@ export interface operations {
         }
       }
       /** @description Failed to get usage stats */
-      500: never
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets the current subscription */
+  OrgSubscriptionSystemController_getSubscription: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to retrieve subscription */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Updates subscription */
+  OrgSubscriptionSystemController_updateSubscription: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateSubscriptionV2AdminBody']
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to update subscription */
+      500: {
+        content: never
+      }
     }
   }
   /** Processes Vercel event */
@@ -9813,9 +10692,13 @@ export interface operations {
       }
     }
     responses: {
-      201: never
+      201: {
+        content: never
+      }
       /** @description Failed to process Vercel event */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Processes GitHub event */
@@ -9832,9 +10715,13 @@ export interface operations {
       }
     }
     responses: {
-      201: never
+      201: {
+        content: never
+      }
       /** @description Failed to process GitHub event */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Processes Stripe event */
@@ -9850,9 +10737,13 @@ export interface operations {
       }
     }
     responses: {
-      200: never
+      200: {
+        content: never
+      }
       /** @description Failed to process Stripe event */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /**
@@ -9892,7 +10783,9 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve database branch */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /**
@@ -9907,9 +10800,13 @@ export interface operations {
       }
     }
     responses: {
-      200: never
+      200: {
+        content: never
+      }
       /** @description Failed to delete database branch */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /**
@@ -9935,7 +10832,9 @@ export interface operations {
         }
       }
       /** @description Failed to update database branch */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   ApiKeysController_getProjectApiKeys: {
@@ -9951,7 +10850,9 @@ export interface operations {
           'application/json': components['schemas']['ApiKeyResponse'][]
         }
       }
-      403: never
+      403: {
+        content: never
+      }
     }
   }
   /**
@@ -9972,7 +10873,9 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve database branches */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /**
@@ -9998,7 +10901,9 @@ export interface operations {
         }
       }
       /** @description Failed to create database branch */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /**
@@ -10013,9 +10918,13 @@ export interface operations {
       }
     }
     responses: {
-      200: never
+      200: {
+        content: never
+      }
       /** @description Failed to disable preview branching */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets project's custom hostname config */
@@ -10032,9 +10941,13 @@ export interface operations {
           'application/json': components['schemas']['UpdateCustomHostnameResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to retrieve project's custom hostname config */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Deletes a project's custom hostname configuration */
@@ -10046,10 +10959,16 @@ export interface operations {
       }
     }
     responses: {
-      200: never
-      403: never
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
       /** @description Failed to delete project custom hostname configuration */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates project's custom hostname configuration */
@@ -10071,9 +10990,13 @@ export interface operations {
           'application/json': components['schemas']['UpdateCustomHostnameResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to update project custom hostname configuration */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Attempts to verify the DNS configuration for project's custom hostname configuration */
@@ -10090,9 +11013,13 @@ export interface operations {
           'application/json': components['schemas']['UpdateCustomHostnameResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to verify project custom hostname configuration */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Activates a custom hostname for a project. */
@@ -10109,9 +11036,13 @@ export interface operations {
           'application/json': components['schemas']['UpdateCustomHostnameResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to activate project custom hostname configuration */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets project's network bans */
@@ -10128,9 +11059,13 @@ export interface operations {
           'application/json': components['schemas']['NetworkBanResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to retrieve project's network bans */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Remove network bans. */
@@ -10147,10 +11082,16 @@ export interface operations {
       }
     }
     responses: {
-      200: never
-      403: never
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
       /** @description Failed to remove network bans. */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets project's network restrictions */
@@ -10167,9 +11108,13 @@ export interface operations {
           'application/json': components['schemas']['NetworkRestrictionsResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to retrieve project's network restrictions */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates project's network restrictions */
@@ -10191,9 +11136,13 @@ export interface operations {
           'application/json': components['schemas']['NetworkRestrictionsResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to update project network restrictions */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets project's pgsodium config */
@@ -10210,9 +11159,13 @@ export interface operations {
           'application/json': components['schemas']['PgsodiumConfigResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to retrieve project's pgsodium config */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible. */
@@ -10234,9 +11187,13 @@ export interface operations {
           'application/json': components['schemas']['PgsodiumConfigResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to update project's pgsodium config */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /**
@@ -10256,9 +11213,13 @@ export interface operations {
           'application/json': components['schemas']['SecretResponse'][]
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to retrieve project's secrets */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /**
@@ -10278,10 +11239,16 @@ export interface operations {
       }
     }
     responses: {
-      201: never
-      403: never
+      201: {
+        content: never
+      }
+      403: {
+        content: never
+      }
       /** @description Failed to create project's secrets */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /**
@@ -10306,9 +11273,13 @@ export interface operations {
           'application/json': Record<string, never>
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to delete secrets with given names */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Get project's SSL enforcement configuration. */
@@ -10325,9 +11296,13 @@ export interface operations {
           'application/json': components['schemas']['SslEnforcementResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to retrieve project's SSL enforcement config */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Update project's SSL enforcement configuration. */
@@ -10349,9 +11324,13 @@ export interface operations {
           'application/json': components['schemas']['SslEnforcementResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to update project's SSL enforcement configuration. */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /**
@@ -10374,9 +11353,13 @@ export interface operations {
           'application/json': components['schemas']['TypescriptResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to generate TypeScript types */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets current vanity subdomain config */
@@ -10393,9 +11376,13 @@ export interface operations {
           'application/json': components['schemas']['VanitySubdomainConfigResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to get project vanity subdomain configuration */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Deletes a project's vanity subdomain configuration */
@@ -10407,10 +11394,16 @@ export interface operations {
       }
     }
     responses: {
-      200: never
-      403: never
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
       /** @description Failed to delete project vanity subdomain configuration */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Checks vanity subdomain availability */
@@ -10432,9 +11425,13 @@ export interface operations {
           'application/json': components['schemas']['SubdomainAvailabilityResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to check project vanity subdomain configuration */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Activates a vanity subdomain for a project. */
@@ -10456,9 +11453,13 @@ export interface operations {
           'application/json': components['schemas']['ActivateVanitySubdomainResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to activate project vanity subdomain configuration */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Upgrades the project's Postgres version */
@@ -10475,10 +11476,16 @@ export interface operations {
       }
     }
     responses: {
-      201: never
-      403: never
+      201: {
+        content: never
+      }
+      403: {
+        content: never
+      }
       /** @description Failed to initiate project upgrade */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Returns the project's eligibility for upgrades */
@@ -10495,9 +11502,13 @@ export interface operations {
           'application/json': components['schemas']['ProjectUpgradeEligibilityResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to determine project upgrade eligibility */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets the latest status of the project's upgrade */
@@ -10514,9 +11525,13 @@ export interface operations {
           'application/json': components['schemas']['DatabaseUpgradeStatusResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to retrieve project upgrade status */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Returns project's readonly mode status */
@@ -10534,7 +11549,9 @@ export interface operations {
         }
       }
       /** @description Failed to get project readonly mode status */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Disables project's readonly mode for the next 15 minutes */
@@ -10546,9 +11563,13 @@ export interface operations {
       }
     }
     responses: {
-      201: never
+      201: {
+        content: never
+      }
       /** @description Failed to disable project's readonly mode */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets project's service health status */
@@ -10556,7 +11577,7 @@ export interface operations {
     parameters: {
       query: {
         timeout_ms?: number
-        services: ('auth' | 'realtime' | 'rest' | 'storage')[]
+        services: ('auth' | 'db' | 'realtime' | 'rest' | 'storage')[]
       }
       path: {
         /** @description Project ref */
@@ -10570,7 +11591,9 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve project's service health status */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets project's Postgres config */
@@ -10588,7 +11611,9 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve project's Postgres config */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates project's Postgres config */
@@ -10611,7 +11636,9 @@ export interface operations {
         }
       }
       /** @description Failed to update project's Postgres config */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Get project's pgbouncer config */
@@ -10629,7 +11656,9 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve project's pgbouncer config */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets project's auth config */
@@ -10646,9 +11675,13 @@ export interface operations {
           'application/json': components['schemas']['AuthConfigResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to retrieve project's auth config */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Updates a project's auth config */
@@ -10670,9 +11703,13 @@ export interface operations {
           'application/json': components['schemas']['AuthConfigResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to update project's auth config */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Lists all SSO providers */
@@ -10689,9 +11726,13 @@ export interface operations {
           'application/json': components['schemas']['ListProvidersResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description SAML 2.0 support is not enabled for this project */
-      404: never
+      404: {
+        content: never
+      }
     }
   }
   /** Creates a new SSO provider */
@@ -10713,9 +11754,13 @@ export interface operations {
           'application/json': components['schemas']['CreateProviderResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description SAML 2.0 support is not enabled for this project */
-      404: never
+      404: {
+        content: never
+      }
     }
   }
   /** Gets a SSO provider by its UUID */
@@ -10733,9 +11778,13 @@ export interface operations {
           'application/json': components['schemas']['GetProviderResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Either SAML 2.0 was not enabled for this project, or the provider does not exist */
-      404: never
+      404: {
+        content: never
+      }
     }
   }
   /** Updates a SSO provider by its UUID */
@@ -10758,9 +11807,13 @@ export interface operations {
           'application/json': components['schemas']['UpdateProviderResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Either SAML 2.0 was not enabled for this project, or the provider does not exist */
-      404: never
+      404: {
+        content: never
+      }
     }
   }
   /** Removes a SSO provider by its UUID */
@@ -10778,9 +11831,13 @@ export interface operations {
           'application/json': components['schemas']['DeleteProviderResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Either SAML 2.0 was not enabled for this project, or the provider does not exist */
-      404: never
+      404: {
+        content: never
+      }
     }
   }
   /** Run sql query */
@@ -10802,9 +11859,13 @@ export interface operations {
           'application/json': Record<string, never>
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to run sql query */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Enables Database Webhooks on the project */
@@ -10816,10 +11877,16 @@ export interface operations {
       }
     }
     responses: {
-      201: never
-      403: never
+      201: {
+        content: never
+      }
+      403: {
+        content: never
+      }
       /** @description Failed to enable Database Webhooks on the project */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Restores a PITR backup for a database */
@@ -10836,7 +11903,9 @@ export interface operations {
       }
     }
     responses: {
-      201: never
+      201: {
+        content: never
+      }
     }
   }
   /**
@@ -10858,9 +11927,13 @@ export interface operations {
           'application/json': components['schemas']['FunctionSlugResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to retrieve function with given slug */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /**
@@ -10877,10 +11950,16 @@ export interface operations {
       }
     }
     responses: {
-      200: never
-      403: never
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
       /** @description Failed to delete function with given slug */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /**
@@ -10916,9 +11995,13 @@ export interface operations {
           'application/json': components['schemas']['FunctionResponse']
         }
       }
-      403: never
+      403: {
+        content: never
+      }
       /** @description Failed to update function with given slug */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /**
@@ -10935,10 +12018,16 @@ export interface operations {
       }
     }
     responses: {
-      200: never
-      403: never
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
       /** @description Failed to retrieve function body with given slug */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Create an organization */
@@ -10955,7 +12044,9 @@ export interface operations {
         }
       }
       /** @description Unexpected error creating an organization */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** List members of an organization */
@@ -10988,7 +12079,9 @@ export interface operations {
       }
     }
     responses: {
-      303: never
+      303: {
+        content: never
+      }
     }
   }
   /** Exchange auth code for user's access and refresh token */
@@ -11020,7 +12113,9 @@ export interface operations {
         }
       }
       /** @description Failed to list user's SQL snippets */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Gets a specific SQL snippet */
@@ -11037,13 +12132,17 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve SQL snippet */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Redirects to Supabase dashboard after Fly sso with Gotrue */
   CallbackController_redirectToDashboardFlyioExtensionScreen: {
     responses: {
-      200: never
+      200: {
+        content: never
+      }
     }
   }
   /** Gets database status */
@@ -11061,6 +12160,19 @@ export interface operations {
       }
     }
   }
+  /** Deletes a database */
+  ExtensionController_deleteResource: {
+    parameters: {
+      path: {
+        extension_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+    }
+  }
   /** Starts Flyio single sign on */
   ExtensionController_startFlyioSSO: {
     parameters: {
@@ -11069,7 +12181,9 @@ export interface operations {
       }
     }
     responses: {
-      200: never
+      200: {
+        content: never
+      }
     }
   }
   /** Gets resource billing */
