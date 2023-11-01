@@ -2323,4 +2323,16 @@ module.exports = [
     source: '/docs/guides/functions/global-deployments',
     destination: '/docs/guides/functions/regional-invocation',
   },
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/select',
+    has: [
+      {
+        type: 'query',
+        key: 'example',
+        value: 'query-foreign-tables',
+      },
+    ],
+    destination: '/docs/reference/javascript/select?query-referenced-tables',
+  },
 ]
