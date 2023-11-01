@@ -210,25 +210,26 @@ const BranchManagement = () => {
                       <IconGitHub size={18} strokeWidth={2} />
                     </div>
                     <p className="text-sm">GitHub branch workflow</p>
-                    <Link passHref href={`/project/${ref}/settings/integrations`}>
-                      <a>
-                        <Button type="default" iconRight={<IconExternalLink />}>
-                          Settings
-                        </Button>
-                      </a>
-                    </Link>
-                    <Link passHref href={`https://github.com/${repo}`}>
-                      <a target="_blank" rel="noreferrer">
-                        <Button
-                          type="text"
-                          size="small"
-                          className="text-light hover:text py-1 px-1.5"
-                          iconRight={<IconExternalLink size={14} strokeWidth={1.5} />}
-                        >
-                          {repo}
-                        </Button>
-                      </a>
-                    </Link>
+                    <Button asChild type="default" iconRight={<IconExternalLink />}>
+                      <Link passHref href={`/project/${ref}/settings/integrations`}>
+                        Settings
+                      </Link>
+                    </Button>
+                    <Button
+                      type="text"
+                      size="small"
+                      className="text-light hover:text py-1 px-1.5"
+                      iconRight={<IconExternalLink size={14} strokeWidth={1.5} />}
+                    >
+                      <Link
+                        passHref
+                        target="_blank"
+                        rel="noreferrer"
+                        href={`https://github.com/${repo}`}
+                      >
+                        {repo}
+                      </Link>
+                    </Button>
                   </div>
                   <Button type="default" onClick={() => setShowDisableBranching(true)}>
                     Disable branching

@@ -93,7 +93,6 @@ export const BranchRow = ({
   const formattedTimeFromNow = dayjs(branch.created_at).fromNow()
   const formattedCreatedAt = dayjs(branch.created_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
 
-  const pullRequestNumber = pullRequest?.url.split('/').slice(-1)[0]
   const createPullRequestURL =
     generateCreatePullRequestURL?.(branch.git_branch) ?? 'https://github.com'
 
@@ -101,10 +100,11 @@ export const BranchRow = ({
     <div className="w-full flex items-center justify-between px-6 py-2.5">
       <div className="flex items-center gap-x-4">
         <Button
+          asChild
           type="default"
           icon={isMain && <IconShield strokeWidth={2} className="text-amber-900" />}
         >
-          {branch.name}
+          <Link href={`/project/${branch.project_ref}/branches`}>{branch.name}</Link>
         </Button>
         {isActive && <Badge color="slate">Current</Badge>}
         <p className="text-xs text-foreground-lighter">
@@ -114,31 +114,38 @@ export const BranchRow = ({
       <div className="flex items-center gap-x-8">
         {pullRequest !== undefined && (
           <div className="flex items-center">
-            <p className="text-xs text-foreground-lighter mr-4">#{pullRequestNumber}</p>
+            <Link
+              href={pullRequest.url}
+              target="_blank"
+              rel="noreferrer"
+              className="text-xs transition text-foreground-lighter mr-4 hover:text-foreground"
+            >
+              #{branch.pr_number}
+            </Link>
             <div className="flex items-center gap-x-2 bg-brand-500 px-3 py-1 rounded-full">
               <GitPullRequest size={14} />
               <p className="text-xs">Open</p>
             </div>
             <IconArrowRight className="mx-1 text-foreground-light" strokeWidth={1.5} size={16} />
-            <Link
-              passHref
-              href={`http://github.com/${pullRequest.target.repo}/tree/${pullRequest.target.branch}`}
-            >
-              <Button asChild type="default">
-                <a>{pullRequest.target.branch}</a>
-              </Button>
-            </Link>
+            <Button asChild type="default">
+              <Link
+                passHref
+                target="_blank"
+                rel="noreferer"
+                href={`http://github.com/${pullRequest.target.repo}/tree/${pullRequest.target.branch}`}
+              >
+                {pullRequest.target.branch}
+              </Link>
+            </Button>
           </div>
         )}
         {isMain ? (
           <div className="flex items-center gap-x-2">
-            <Link passHref href={`https://github.com/${repo}`}>
-              <Button asChild type="default" iconRight={<IconExternalLink />}>
-                <a target="_blank" rel="noreferrer">
-                  View Repository
-                </a>
-              </Button>
-            </Link>
+            <Button asChild type="default" iconRight={<IconExternalLink />}>
+              <Link target="_blank" rel="noreferrer" passHref href={`https://github.com/${repo}`}>
+                View Repository
+              </Link>
+            </Button>
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <Button type="text" icon={<IconMoreVertical />} className="px-1" />
@@ -154,13 +161,16 @@ export const BranchRow = ({
           </div>
         ) : (
           <div className="flex items-center gap-x-2">
-            <Link passHref href={pullRequest?.url ?? createPullRequestURL}>
-              <Button asChild type="default" iconRight={<IconExternalLink />}>
-                <a target="_blank" rel="noreferrer">
-                  {pullRequest !== undefined ? 'View Pull Request' : 'Create Pull Request'}
-                </a>
-              </Button>
-            </Link>
+            <Button asChild type="default" iconRight={<IconExternalLink />}>
+              <Link
+                passHref
+                target="_blank"
+                rel="noreferrer"
+                href={pullRequest?.url ?? createPullRequestURL}
+              >
+                {branch.pr_number !== undefined ? 'View Pull Request' : 'Create Pull Request'}
+              </Link>
+            </Button>
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <Button type="text" icon={<IconMoreVertical />} className="px-1" />
