@@ -47,6 +47,26 @@ async function signInWithEmail() {
 ```
 
 </TabPanel>
+<TabPanel id="react-native" label="Expo React Native">
+Follow the [Expo Quickstart Guide](/docs/guides/getting-started/tutorials/with-expo-react-native#initialize-a-react-native-app) to corectly initialize `supabase-js` for usage with React Native.
+
+When your user signs in, call [signInWithOtp()](/docs/reference/javascript/auth-signinwithotp) with their email address:
+
+```ts
+import { makeRedirectUri } from "expo-auth-session";
+
+const redirectTo = makeRedirectUri();
+
+const { error } = await supabase.auth.signInWithOtp({
+  email: "example@email.com",
+  options: {
+    emailRedirectTo: redirectTo,
+  },
+});
+```
+
+For magic links you will need to handle deep linking into your application. Read the [docs](/docs/guides/auth/native-mobile-deep-linking).
+</TabPanel>
 <TabPanel id="dart" label="Dart">
 
 When your user signs in, call [signIn()](/docs/reference/dart/auth-signinwithotp) with their email address:
