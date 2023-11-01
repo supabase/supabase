@@ -8,12 +8,14 @@ import { API_URL } from 'lib/constants'
 const SignInFlyTos = () => {
   const router = useRouter()
   const {
-    query: { extension_id },
+    query: { extension_id, organization_id },
   } = router
   const { resolvedTheme } = useTheme()
 
   const onSignInWithFly = async () => {
-    window.location.href = `${API_URL}/tos/fly?extension_id=${extension_id}`
+    window.location.href = extension_id
+      ? `${API_URL}/tos/fly?extension_id=${extension_id}`
+      : `${API_URL}/tos/fly?organization_id=${organization_id}`
   }
 
   return (
@@ -45,7 +47,7 @@ const SignInFlyTos = () => {
       </div>
       <div className="flex items-center space-x-4">
         {/* require extension_id */}
-        <Button onClick={onSignInWithFly} disabled={!extension_id}>
+        <Button onClick={onSignInWithFly} disabled={!extension_id && !organization_id}>
           Login with Fly.io
         </Button>
       </div>
