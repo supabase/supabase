@@ -6,19 +6,20 @@ author_title: Supabase
 author_url: https://github.com/dragarcia
 author_image_url: https://avatars0.githubusercontent.com/u/26374889?s=400&u=f5e35e9b47a50fa2b4d8c4bb96babd921071bcf1&v=4
 authorURL: https://github.com/dragarcia
+categories:
+  - postgres
 tags:
   - postgres
+  - planetpg
 date: '07-09-2020'
 ---
 
 Whenever you create a new database in Postgres, you are actually [basing it off an already present database](https://www.postgresql.org/docs/current/manage-ag-templatedbs.html) in your cluster.
 
-<!--truncate-->
-
 This database, `template1`, and another, called `template0`, are standard system databases that exist in every newly created database cluster. Don't believe me? Why not quickly [spin up a database](/docs/postgres/server/about) and see it for yourself with this query:
 
 ```sql
-SELECT * FROM pg_database;
+select * from pg_database;
 ```
 
 In this post, we'll explore these template databases and see how we can make full use of their potential. We'll even look into creating a template database of our own.
@@ -87,3 +88,12 @@ CREATE DATABASE new_db_name ENCODING 'SQL_ASCII';
 ## Conclusion
 
 To quickly sum things up, we found out that new databases are, by default, created from a template database called `template1`. `template1` can be modified in any way we please and the changes would be present in any database created afterward. We can also create custom template databases and base new databases from them instead. If things go awry, `template0` is always there to help.
+
+## More Postgres resources
+
+- [Implementing "seen by" functionality with Postgres](https://supabase.com/blog/seen-by-in-postgresql)
+- [Partial data dumps using Postgres Row Level Security](https://supabase.com/blog/partial-postgresql-data-dumps-with-rls)
+- [Postgres Views](https://supabase.com/blog/postgresql-views)
+- [Postgres Auditing in 150 lines of SQL](https://supabase.com/blog/audit)
+- [Cracking PostgreSQL Interview Questions](https://supabase.com/blog/cracking-postgres-interview)
+- [Realtime Postgres RLS on Supabase](https://supabase.com/blog/realtime-row-level-security-in-postgresql)

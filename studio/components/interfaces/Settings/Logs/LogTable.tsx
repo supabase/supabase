@@ -1,46 +1,36 @@
-import dayjs from 'dayjs'
-import { useEffect, useState, useMemo } from 'react'
-import { Alert, Button, IconEye, IconEyeOff, Input } from '@supabase/ui'
-import DataGrid from '@supabase/react-data-grid'
+import { isEqual } from 'lodash'
+import { Key, ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
+import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
+import { Alert, Button, IconClipboard, IconEye, IconEyeOff } from 'ui'
 
-import LogSelection from './LogSelection'
-import { LogData, QueryType } from './Logs.types'
-import { SeverityFormatter, ResponseCodeFormatter, HeaderFormmater } from './LogsFormatters'
-import { isDefaultLogPreviewFormat } from './Logs.utils'
-// column renders
+import CSVButton from 'components/ui/CSVButton'
+import { useStore } from 'hooks'
+import { copyToClipboard } from 'lib/helpers'
+import { LogQueryError, isDefaultLogPreviewFormat } from '.'
+import AuthColumnRenderer from './LogColumnRenderers/AuthColumnRenderer'
 import DatabaseApiColumnRender from './LogColumnRenderers/DatabaseApiColumnRender'
 import DatabasePostgresColumnRender from './LogColumnRenderers/DatabasePostgresColumnRender'
-import CSVButton from 'components/ui/CSVButton'
 import DefaultPreviewColumnRenderer from './LogColumnRenderers/DefaultPreviewColumnRenderer'
+import FunctionsEdgeColumnRender from './LogColumnRenderers/FunctionsEdgeColumnRender'
+import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnRender'
+import LogSelection, { LogSelectionProps } from './LogSelection'
+import { LogData, QueryType } from './Logs.types'
+import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
+import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
 
 interface Props {
   data?: Array<LogData | Object>
-  queryType?: QueryType
   onHistogramToggle?: () => void
   isHistogramShowing?: boolean
   isLoading?: boolean
-  error?: any
+  error?: LogQueryError | null
   showDownload?: boolean
+  // TODO: move all common params to a context to avoid prop drilling
+  queryType?: QueryType
+  projectRef: string
+  params: LogSelectionProps['params']
 }
 type LogMap = { [id: string]: LogData }
-
-interface FormatterArg {
-  column: {
-    key: string
-    name: string
-    resizable: boolean
-    header: string
-    minWidth: number
-    idx: number
-    frozen: boolean
-    isLastFrozenColumn: boolean
-    rowGroup: boolean
-    sortable: boolean
-  }
-  isCellSelected: boolean
-  onRowChange: Function
-  row: any
-}
 
 /**
  * Logs table view with focus side panel
@@ -53,34 +43,43 @@ const LogTable = ({
   onHistogramToggle,
   isHistogramShowing,
   isLoading,
-  showDownload,
   error,
+  projectRef,
+  params,
 }: Props) => {
+  const { ui } = useStore()
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const firstRow: LogData | undefined = data?.[0] as LogData
   const columnNames = Object.keys(data[0] || {})
   const hasId = columnNames.includes('id')
   const hasTimestamp = columnNames.includes('timestamp')
 
-  const DEFAULT_COLUMNS = columnNames.map((v) => {
-    let formatter = undefined
-
-    formatter = (received: FormatterArg) => {
-      const value = received.row?.[v]
-      if (value && typeof value === 'object') {
-        return `[Object]`
-      } else if (value === null) {
-        return 'NULL'
-      } else {
-        return String(value)
-      }
+  const DEFAULT_COLUMNS = columnNames.map((v: keyof LogData, idx) => {
+    const result: Column<LogData> = {
+      key: `logs-column-${idx}`,
+      name: v as string,
+      resizable: true,
+      renderCell: (props) => {
+        const value = props.row?.[v]
+        if (value && typeof value === 'object') {
+          return JSON.stringify(value)
+        } else if (value === null) {
+          return 'NULL'
+        } else {
+          return String(value)
+        }
+      },
+      renderHeaderCell: (props) => {
+        return v
+      },
+      minWidth: 128,
     }
-    return { key: v, name: v, resizable: true, formatter, header: v, minWidth: 128 }
+    return result
   })
 
-  let columns
+  let columns = DEFAULT_COLUMNS
   if (!queryType) {
-    columns = DEFAULT_COLUMNS
+    columns
   } else {
     switch (queryType) {
       case 'api':
@@ -92,88 +91,14 @@ const LogTable = ({
         break
 
       case 'fn_edge':
-        columns = [
-          {
-            key: 'timestamp',
-            headerRenderer: () => (
-              <div className="flex w-full justify-end h-full">
-                <HeaderFormmater value={'timestamp'} />
-              </div>
-            ),
-            name: 'timestamp',
-            formatter: (data: any) => (
-              <span className="flex w-full h-full items-center gap-1">
-                <span className="text-xs">
-                  {dayjs(data?.row?.timestamp / 1000).format('DD MMM')}
-                </span>
-                <span className="text-xs">
-                  {dayjs(data?.row?.timestamp / 1000).format('HH:mm:ss')}
-                </span>
-              </span>
-            ),
-            width: 128,
-          },
-          {
-            key: 'status_code',
-            headerRenderer: () => <HeaderFormmater value={'Status'} />,
-            name: 'status_code',
-            formatter: (data: any) => (
-              <ResponseCodeFormatter row={data} value={data.row.status_code} />
-            ),
-            width: 0,
-            resizable: true,
-          },
-          {
-            key: 'method',
-            headerRenderer: () => <HeaderFormmater value={'method'} />,
-            width: 0,
-            resizable: true,
-          },
-          {
-            key: 'id',
-            headerRenderer: () => <HeaderFormmater value={'id'} />,
-            name: 'id',
-            resizable: true,
-          },
-        ]
+        columns = FunctionsEdgeColumnRender
         break
       case 'functions':
-        columns = [
-          {
-            key: 'timestamp',
-            headerRenderer: () => (
-              <div className="flex w-full justify-end h-full">
-                <HeaderFormmater value={'timestamp'} />
-              </div>
-            ),
-            name: 'timestamp',
-            formatter: (data: any) => (
-              <span className="flex w-full h-full items-center gap-1">
-                <span className="text-xs !text-scale-1100">
-                  {dayjs(data?.row?.timestamp / 1000).format('DD MMM')}
-                </span>
-                <span className="text-xs !text-scale-1100">
-                  {dayjs(data?.row?.timestamp / 1000).format('HH:mm:ss')}
-                </span>
-              </span>
-            ),
-            width: 128,
-            resizable: true,
-          },
-          {
-            key: 'level',
-            headerRenderer: () => <HeaderFormmater value={'Level'} />,
-            name: 'level',
-            formatter: (data: any) => <SeverityFormatter value={data.row.level} />,
-            width: 24,
-            resizable: true,
-          },
-          {
-            key: 'event_message',
-            headerRenderer: () => <HeaderFormmater value={'Event message'} />,
-            resizable: true,
-          },
-        ]
+        columns = FunctionsLogsColumnRender
+        break
+
+      case 'auth':
+        columns = AuthColumnRenderer
         break
 
       default:
@@ -203,13 +128,13 @@ const LogTable = ({
   }, [stringData])
 
   useEffect(() => {
-    if (!hasId || data === null) return
-    if (focusedLog && !(focusedLog.id in logMap)) {
+    if (!data) return
+    const found = data.find((datum) => isEqual(datum, focusedLog))
+    if (!found) {
+      // close selection panel if not found in dataset
       setFocusedLog(null)
     }
   }, [stringData])
-
-  if (!data) return null
 
   // [Joshen] Hmm quite hacky now, but will do
   const maxHeight = !queryType ? 'calc(100vh - 42px - 10rem)' : 'calc(100vh - 42px - 3rem)'
@@ -222,178 +147,170 @@ const LogTable = ({
     }
   }, [stringData])
 
+  const RowRenderer = useCallback<(key: Key, props: RenderRowProps<LogData, unknown>) => ReactNode>(
+    (key, props) => {
+      return <Row {...props} isRowSelected={false} selectedCellIdx={undefined} />
+    },
+    []
+  )
+
+  const copyResultsToClipboard = () => {
+    copyToClipboard(stringData, () => {
+      ui.setNotification({ category: 'success', message: 'Results copied to clipboard.' })
+    })
+  }
+
+  const LogsExplorerTableHeader = () => (
+    <div className="flex w-full items-center justify-between rounded-tl rounded-tr border-t border-l border-r bg-scale-100 px-5 py-2 dark:bg-scale-300">
+      <div className="flex items-center gap-2">
+        {data && data.length ? (
+          <>
+            <span className="text-sm text-foreground">Query results</span>
+            <span className="text-sm text-foreground-light">{data && data.length}</span>
+          </>
+        ) : (
+          <span className="text-xs text-foreground">Results will be shown below</span>
+        )}
+      </div>
+      <div className="flex items-center gap-2">
+        {onHistogramToggle && (
+          <Button
+            type="default"
+            icon={isHistogramShowing ? <IconEye /> : <IconEyeOff />}
+            onClick={onHistogramToggle}
+          >
+            Histogram
+          </Button>
+        )}
+        <Button type="default" icon={<IconClipboard />} onClick={copyResultsToClipboard}>
+          Copy to clipboard
+        </Button>
+        <CSVButton data={data}>Download</CSVButton>
+      </div>
+    </div>
+  )
+
+  const renderErrorAlert = () => {
+    if (!error) return null
+    const childProps = {
+      isCustomQuery: queryType ? false : true,
+      error: error!,
+    }
+    let Renderer = DefaultErrorRenderer
+    if (
+      typeof error === 'object' &&
+      error.error?.errors.find((err) => err.reason === 'resourcesExceeded')
+    ) {
+      Renderer = ResourcesExceededErrorRenderer
+    }
+
+    return (
+      <div className="flex w-1/2 justify-center px-5">
+        <Alert variant="danger" title="Sorry! An error occurred when fetching data." withIcon>
+          <Renderer {...childProps} />
+        </Alert>
+      </div>
+    )
+  }
+
+  const renderNoResultAlert = () => (
+    <div className="mt-16 flex scale-100 flex-col items-center justify-center gap-6 text-center opacity-100">
+      <div className="flex flex-col gap-1">
+        <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-scale-600 px-2 dark:border-scale-900"></div>
+        <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-scale-600 px-2 dark:border-scale-900">
+          <div className="absolute right-1 -bottom-4 text-foreground-light">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div className="flex flex-col gap-1 px-5">
+        <h3 className="text-lg text-foreground">No results</h3>
+        <p className="text-sm text-foreground-lighter">
+          Try another search, or adjusting the filters
+        </p>
+      </div>
+    </div>
+  )
+
+  if (!data) return null
+
   return (
     <>
       <section
-        className={'flex flex-col w-full ' + (!queryType ? 'shadow-lg' : '')}
+        className={'flex w-full flex-col ' + (!queryType ? 'shadow-lg' : '')}
         style={{ maxHeight }}
       >
-        {!queryType && (
-          <div>
-            <div
-              className="
-            w-full bg-scale-100 dark:bg-scale-300 
-            rounded-tl rounded-tr
-            border-t
-            border-l
-            border-r
-            flex items-center justify-between
-            px-5 py-2
-      "
-            >
-              <div className="flex items-center gap-2">
-                {data && data.length ? (
-                  <>
-                    <span className="text-sm text-scale-1200">Query results</span>
-                    <span className="text-sm text-scale-1100">{data && data.length}</span>
-                  </>
-                ) : (
-                  <span className="text-xs text-scale-1200">Results will be shown below</span>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                {onHistogramToggle && (
-                  <Button
-                    type="default"
-                    icon={isHistogramShowing ? <IconEye /> : <IconEyeOff />}
-                    onClick={onHistogramToggle}
-                  >
-                    Histogram
-                  </Button>
-                )}
-                {showDownload && <CSVButton data={data}>Download</CSVButton>}
-              </div>
-            </div>
-          </div>
-        )}
-        <div className={`flex flex-row h-full ${!queryType ? 'border-l border-r' : ''}`}>
+        {!queryType && <LogsExplorerTableHeader />}
+        <div className={`flex h-full flex-row ${!queryType ? 'border-l border-r' : ''}`}>
           <DataGrid
             style={{ height: '100%' }}
             className={`
-            flex-grow flex-1
-            ${!queryType ? 'data-grid--logs-explorer' : ' data-grid--simple-logs'} 
+            flex-1 flex-grow
+            ${!queryType ? 'data-grid--logs-explorer' : ' data-grid--simple-logs'}
           `}
             rowHeight={40}
             headerRowHeight={queryType ? 0 : 28}
-            onSelectedCellChange={({ idx, rowIdx }) => {
+            onSelectedCellChange={({ rowIdx }) => {
               if (!hasId) return
               setFocusedLog(data[rowIdx] as LogData)
             }}
-            noRowsFallback={
-              !isLoading ? (
-                <>
-                  <div className="py-4 w-full h-full flex-col space-y-12">
-                    {!error && (
-                      <div
-                        className={`transition-all
-                      duration-500
-                      delay-200
-                      
-                      flex
-                      flex-col
-                      items-center
-                  
-                      gap-6
-                      text-center
-                      mt-16
-                      opacity-100 
-                      scale-100
-                      
-                      justify-center
-                    `}
-                      >
-                        <>
-                          <div className="flex flex-col gap-1">
-                            <div className="relative border border-scale-600 border-dashed dark:border-scale-400 w-32 h-4 rounded px-2 flex items-center"></div>
-                            <div className="relative border border-scale-600 border-dashed dark:border-scale-400 w-32 h-4 rounded px-2 flex items-center">
-                              <div className="absolute right-1 -bottom-4">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-6 w-6"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                  />
-                                </svg>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex flex-col gap-1 px-5">
-                            <h3 className="text-lg text-scale-1200">No results</h3>
-                            <p className="text-sm text-scale-900">
-                              Try another search, or adjusting the filters
-                            </p>
-                          </div>
-                        </>
-                      </div>
-                    )}
-                    {error && (
-                      <div className="flex justify-center px-5">
-                        <Alert
-                          variant="danger"
-                          title="Sorry! An error occured when fetching data."
-                          withIcon
-                          className="w-1/2"
-                        >
-                          <Input.TextArea
-                            size="tiny"
-                            value={
-                              typeof error === 'string' ? error : JSON.stringify(error, null, 2)
-                            }
-                            borderless
-                            className="font-mono w-full mt-4"
-                            copy
-                            rows={12}
-                          />
-                        </Alert>
-                      </div>
-                    )}
-                  </div>
-                </>
-              ) : null
+            selectedRows={new Set([])}
+            columns={columns}
+            rowClass={(row: LogData) =>
+              [
+                'font-mono tracking-tight',
+                isEqual(row, focusedLog)
+                  ? '!bg-scale-800 rdg-row--focused'
+                  : ' !bg-scale-200 hover:!bg-scale-300 cursor-pointer',
+              ].join(' ')
             }
-            columns={columns as any}
-            rowClass={(r) => {
-              const row = r as LogData
-
-              let classes = []
-              classes.push(
-                `${
-                  row.id === focusedLog?.id ? '!bg-scale-400 rdg-row--focussed' : 'cursor-pointer'
-                }`
-              )
-
-              return classes.join(' ')
-            }}
             rows={logDataRows}
             rowKeyGetter={(r) => {
-              if (!hasId) return Object.keys(r)[0]
+              if (!hasId) return JSON.stringify(r)
               const row = r as LogData
               return row.id
             }}
-            onRowClick={(r) => setFocusedLog(r)}
+            // [Next 18 refactor] need to fix
+            // onRowClick={setFocusedLog}
+            renderers={{
+              renderRow: RowRenderer,
+              noRowsFallback: !isLoading ? (
+                <div className="mx-auto flex h-full w-full items-center justify-center space-y-12 py-4 transition-all delay-200 duration-500">
+                  {!error && renderNoResultAlert()}
+                  {error && renderErrorAlert()}
+                </div>
+              ) : null,
+            }}
           />
           {logDataRows.length > 0 ? (
             <div
               className={
                 queryType
-                  ? 'w-1/2 flex flex-col'
+                  ? 'flex w-1/2 flex-col'
                   : focusedLog
-                  ? 'w-1/2 flex flex-col'
-                  : 'w-0 hidden'
+                  ? 'flex w-1/2 flex-col'
+                  : 'hidden w-0'
               }
             >
               <LogSelection
-                isLoading={isLoading}
+                projectRef={projectRef}
                 onClose={() => setFocusedLog(null)}
                 log={focusedLog}
                 queryType={queryType}
+                params={params}
               />
             </div>
           ) : null}

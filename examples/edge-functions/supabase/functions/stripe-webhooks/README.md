@@ -9,7 +9,7 @@ Also check out our full Stripe Payments examples for [React Native (Expo)](https
 ## Test locally
 
 - Terminal 1:
-  - `supabase functions serve --no-verify-jwt stripe-webhooks --env-file ./supabase/.env.local`
+  - `supabase functions serve --no-verify-jwt --env-file ./supabase/.env.local`
 - Terminal 2:
   - `stripe listen --forward-to localhost:54321/functions/v1/`
 - Terminal 3 (optional):

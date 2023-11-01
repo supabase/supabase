@@ -1,23 +1,30 @@
-import dayjs from 'dayjs'
-import { SeverityFormatter } from '../LogsFormatters'
+import { Column } from 'react-data-grid'
+import { LogData } from '../Logs.types'
+import {
+  RowLayout,
+  SeverityFormatter,
+  TextFormatter,
+  TimestampLocalFormatter,
+} from '../LogsFormatters'
+import { defaultRenderCell } from './DefaultPreviewColumnRenderer'
 
-export default [
+const columns: Column<LogData>[] = [
   {
-    formatter: (data: any) => (
-      <div className="flex w-full items-center gap-2 h-full">
-        <div className="flex items-center gap-2 h-full">
-          <span className="w-24 flex items-center gap-1">
-            <span className="text-xs">{dayjs(data?.row?.timestamp / 1000).format('DD MMM')}</span>
-            <span className="text-xs">{dayjs(data?.row?.timestamp / 1000).format('HH:mm:ss')}</span>
-          </span>
-          <div className="w-16 flex items-center">
-            <SeverityFormatter value={data?.row?.metadata[0].parsed[0].error_severity} />
-          </div>
-        </div>
-        <div className="flex truncate">
-          <span className="font-mono text-xs truncate">{data.row.event_message}</span>
-        </div>
-      </div>
-    ),
+    name: 'database-postgres-first-column',
+    key: 'database-postgres-first-column',
+    renderCell: (props) => {
+      if (!props.row.error_severity) {
+        return defaultRenderCell(props)
+      }
+      return (
+        <RowLayout>
+          <TimestampLocalFormatter value={props.row.timestamp!} />
+          <SeverityFormatter value={props.row.error_severity as string} />
+          <TextFormatter className="w-full" value={props.row.event_message} />
+        </RowLayout>
+      )
+    },
   },
 ]
+
+export default columns

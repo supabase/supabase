@@ -18,7 +18,12 @@ export const CONFIRMATION: FormSchema = {
       descriptionOptional: 'HTML body of your email',
       type: 'code',
       description: ` 
-- \`{{ .ConfirmationURL }}\` : URL to confirm the message
+- \`{{ .ConfirmationURL }}\` : URL to confirm the e-mail address for the new account
+- \`{{ .Token }}\` : The 6-digit numeric email OTP 
+- \`{{ .TokenHash }}\` : The hashed token used in the URL
+- \`{{ .SiteURL }}\` : The URL of the site
+- \`{{ .Email }}\` : The user's email address
+- \`{{ .Data }}\` : The user's \`user_metadata\`
 `,
     },
   },
@@ -28,7 +33,7 @@ export const CONFIRMATION: FormSchema = {
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/auth-apple#configure-your-services-id)`,
+            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 
@@ -47,7 +52,12 @@ export const INVITE: FormSchema = {
       descriptionOptional: 'HTML body of your email',
       type: 'code',
       description: ` 
-- \`{{ .ConfirmationURL }}\` : URL to confirm the message
+- \`{{ .ConfirmationURL }}\` : URL to accept the invitation to create an account
+- \`{{ .Token }}\` : The 6-digit numeric email OTP 
+- \`{{ .TokenHash }}\` : The hashed token used in the URL
+- \`{{ .SiteURL }}\` : The URL of the site
+- \`{{ .Email }}\` : The user's email address
+- \`{{ .Data }}\` : The user's \`user_metadata\`
 `,
     },
   },
@@ -57,7 +67,7 @@ export const INVITE: FormSchema = {
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/auth-apple#configure-your-services-id)`,
+            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 
@@ -76,7 +86,12 @@ export const MAGIC_LINK: FormSchema = {
       descriptionOptional: 'HTML body of your email',
       type: 'code',
       description: ` 
-- \`{{ .ConfirmationURL }}\` : URL to confirm the message
+- \`{{ .ConfirmationURL }}\` : URL for a one-time login to the user's account
+- \`{{ .Token }}\` : The 6-digit numeric email OTP 
+- \`{{ .TokenHash }}\` : The hashed token used in the URL
+- \`{{ .SiteURL }}\` : The URL of the site
+- \`{{ .Email }}\` : The user's email address
+- \`{{ .Data }}\` : The user's \`user_metadata\`
 `,
     },
   },
@@ -86,7 +101,7 @@ export const MAGIC_LINK: FormSchema = {
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/auth-apple#configure-your-services-id)`,
+            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 
@@ -106,6 +121,12 @@ export const EMAIL_CHANGE: FormSchema = {
       type: 'code',
       description: ` 
 - \`{{ .ConfirmationURL }}\` : URL to confirm the email change
+- \`{{ .Token }}\` : The 6-digit numeric email OTP 
+- \`{{ .TokenHash }}\` : The hashed token used in the URL
+- \`{{ .SiteURL }}\` : The URL of the site
+- \`{{ .Email }}\` : The original user's email address
+- \`{{ .NewEmail }}\` : The user's new email address
+- \`{{ .Data }}\` : The user's \`user_metadata\`
 `,
     },
   },
@@ -115,7 +136,7 @@ export const EMAIL_CHANGE: FormSchema = {
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/auth-apple#configure-your-services-id)`,
+            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 
@@ -135,6 +156,11 @@ export const RECOVERY: FormSchema = {
       type: 'code',
       description: ` 
 - \`{{ .ConfirmationURL }}\` : URL to confirm the password reset
+- \`{{ .Token }}\` : The 6-digit numeric email OTP 
+- \`{{ .TokenHash }}\` : The hashed token used in the URL
+- \`{{ .SiteURL }}\` : The URL of the site
+- \`{{ .Email }}\` : The user's email address
+- \`{{ .Data }}\` : The user's \`user_metadata\`
 `,
     },
   },
@@ -144,7 +170,7 @@ export const RECOVERY: FormSchema = {
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/auth-apple#configure-your-services-id)`,
+            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 

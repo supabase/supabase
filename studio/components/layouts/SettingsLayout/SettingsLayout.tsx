@@ -1,37 +1,30 @@
-import { FC, ReactNode } from 'react'
-import { observer } from 'mobx-react-lite'
+import { PropsWithChildren } from 'react'
+import AppLayout from '../AppLayout/AppLayout'
+import { useParams } from 'common'
+import OrganizationSettingsMenu from './OrganizationSettingsMenu'
+import AccountSettingsMenu from './AccountSettingsMenu'
 import { useRouter } from 'next/router'
-import { useStore, withAuth } from 'hooks'
-import { generateSettingsMenu } from './SettingsMenu.utils'
 
-import BaseLayout from '../'
-import ProductMenu from 'components/ui/ProductMenu'
-
-interface Props {
-  title?: string
-  children: ReactNode
-}
-
-const SettingsLayout: FC<Props> = ({ title, children }) => {
-  const { ui } = useStore()
-  const projectRef = ui.selectedProjectRef as string
-  const projectBaseInfo = ui.selectedProjectBaseInfo
-
+const SettingsLayout = ({ children }: PropsWithChildren<{}>) => {
   const router = useRouter()
-  const page = router.pathname.split('/')[4]
-  const menuRoutes = generateSettingsMenu(projectRef, projectBaseInfo)
+  const { ref, slug } = useParams()
 
   return (
-    <BaseLayout
-      title={title || 'Settings'}
-      product="Settings"
-      productMenu={<ProductMenu page={page} menu={menuRoutes} />}
-    >
-      <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
-        {children}
-      </main>
-    </BaseLayout>
+    <AppLayout>
+      <div className="flex h-full">
+        {router.pathname !== '/projects' && (
+          <div className="h-full overflow-y-auto min-w-[280px] border-r px-8 py-8">
+            {slug === undefined && ref === undefined ? (
+              <AccountSettingsMenu />
+            ) : (
+              <OrganizationSettingsMenu />
+            )}
+          </div>
+        )}
+        <div className="h-full overflow-y-auto flex-grow">{children}</div>
+      </div>
+    </AppLayout>
   )
 }
 
-export default withAuth(observer(SettingsLayout))
+export default SettingsLayout

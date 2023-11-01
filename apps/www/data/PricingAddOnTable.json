@@ -1,0 +1,360 @@
+{
+  "database": {
+    "title": "Optimized Compute",
+    "features": [
+      "For projects that need dedicated compute",
+      "For scaling number of connections",
+      "Additional CPU & RAM options",
+      "Additional Disk Bandwidth"
+    ],
+    "rows": [
+      {
+        "columns": [
+          { "key": "plan", "title": "Plan", "value": "Starter" },
+          { "key": "pricing", "title": "Price USD", "value": "$10" },
+          { "key": "cpu", "title": "CPU", "value": "2-core ARM" },
+          { "key": "dedicated", "title": "Dedicated", "value": false },
+          { "key": "memory", "title": "Memory", "value": "1 GB" },
+          { "key": "maxDiskIO", "title": "Max Disk Bandwidth", "value": "2,085 Mbps" },
+          {
+            "key": "baseDiskIO",
+            "title": "Baseline Disk Bandwidth",
+            "value": "87 Mbps"
+          },
+          {
+            "key": "directConnections",
+            "title": "Connections: Direct",
+            "value": "60"
+          },
+          {
+            "key": "poolerConnections",
+            "title": "Connections: Pooler",
+            "value": "200"
+          }
+        ]
+      },
+      {
+        "columns": [
+          { "key": "plan", "title": "Plan", "value": "Small" },
+          { "key": "pricing", "title": "Price USD", "value": "$15" },
+          { "key": "cpu", "title": "CPU", "value": "2-core ARM" },
+          { "key": "dedicated", "title": "Dedicated", "value": false },
+          { "key": "memory", "title": "Memory", "value": "2 GB" },
+          { "key": "maxDiskIO", "title": "Max Disk Bandwidth", "value": "2,085 Mbps" },
+          {
+            "key": "baseDiskIO",
+            "title": "Baseline Disk Bandwidth",
+            "value": "174 Mbps"
+          },
+          {
+            "key": "directConnections",
+            "title": "Connections: Direct (recommended)",
+            "value": "90"
+          },
+          {
+            "key": "poolerConnections",
+            "title": "Connections: Pooler (recommended)",
+            "value": "200"
+          }
+        ]
+      },
+      {
+        "columns": [
+          { "key": "plan", "title": "Plan", "value": "Medium" },
+          { "key": "pricing", "title": "Price USD", "value": "$60" },
+          { "key": "cpu", "title": "CPU", "value": "2-core ARM" },
+          { "key": "dedicated", "title": "Dedicated", "value": false },
+          { "key": "memory", "title": "Memory", "value": "4 GB" },
+          { "key": "maxDiskIO", "title": "Max Disk Bandwidth", "value": "2,085 Mbps" },
+          {
+            "key": "baseDiskIO",
+            "title": "Baseline Disk Bandwidth",
+            "value": "347 Mbps"
+          },
+          {
+            "key": "directConnections",
+            "title": "Connections: Direct (recommended)",
+            "value": "120"
+          },
+          {
+            "key": "poolerConnections",
+            "title": "Connections: Pooler (recommended)",
+            "value": "200"
+          }
+        ]
+      },
+      {
+        "columns": [
+          { "key": "plan", "title": "Plan", "value": "Large" },
+          { "key": "pricing", "title": "Price USD", "value": "$110" },
+          { "key": "cpu", "title": "CPU", "value": "2-core ARM" },
+          { "key": "dedicated", "title": "Dedicated", "value": true },
+          { "key": "memory", "title": "Memory", "value": "8 GB" },
+          { "key": "maxDiskIO", "title": "Max Disk Bandwidth", "value": "4,750 Mbps" },
+          {
+            "key": "baseDiskIO",
+            "title": "Baseline Disk Bandwidth",
+            "value": "630 Mbps"
+          },
+          {
+            "key": "directConnections",
+            "title": "Connections: Direct (recommended)",
+            "value": "160"
+          },
+          {
+            "key": "poolerConnections",
+            "title": "Connections: Pooler (recommended)",
+            "value": "300"
+          }
+        ]
+      },
+      {
+        "columns": [
+          { "key": "plan", "title": "Plan", "value": "XL" },
+          { "key": "pricing", "title": "Price USD", "value": "$210" },
+          { "key": "cpu", "title": "CPU", "value": "4-core ARM" },
+          { "key": "dedicated", "title": "Dedicated", "value": true },
+          { "key": "memory", "title": "Memory", "value": "16 GB" },
+          { "key": "maxDiskIO", "title": "Max Disk Bandwidth", "value": "4,750 Mbps" },
+          {
+            "key": "baseDiskIO",
+            "title": "Baseline Disk Bandwidth",
+            "value": "1,188 Mbps"
+          },
+          {
+            "key": "directConnections",
+            "title": "Connections: Direct (recommended)",
+            "value": "240"
+          },
+          {
+            "key": "poolerConnections",
+            "title": "Connections: Pooler (recommended)",
+            "value": "700"
+          }
+        ]
+      },
+      {
+        "columns": [
+          { "key": "plan", "title": "Plan", "value": "2XL" },
+          { "key": "pricing", "title": "Price USD", "value": "$410" },
+          { "key": "cpu", "title": "CPU", "value": "8-core ARM" },
+          { "key": "dedicated", "title": "Dedicated", "value": true },
+          { "key": "memory", "title": "Memory", "value": "32 GB" },
+          { "key": "maxDiskIO", "title": "Max Disk Bandwidth", "value": "4,750 Mbps" },
+          {
+            "key": "baseDiskIO",
+            "title": "Baseline Disk Bandwidth",
+            "value": "2,375 Mbps"
+          },
+          {
+            "key": "directConnections",
+            "title": "Connections: Direct (recommended)",
+            "value": "380"
+          },
+          {
+            "key": "poolerConnections",
+            "title": "Connections: Pooler (recommended)",
+            "value": "1500"
+          }
+        ]
+      },
+      {
+        "columns": [
+          { "key": "plan", "title": "Plan", "value": "4XL" },
+          { "key": "pricing", "title": "Price USD", "value": "$960" },
+          { "key": "cpu", "title": "CPU", "value": "16-core ARM" },
+          { "key": "dedicated", "title": "Dedicated", "value": true },
+          { "key": "memory", "title": "Memory", "value": "64 GB" },
+          { "key": "maxDiskIO", "title": "Max Disk Bandwidth", "value": "4,750 Mbps" },
+          {
+            "key": "baseDiskIO",
+            "title": "Baseline Disk Bandwidth",
+            "value": "4,750 Mbps"
+          },
+          {
+            "key": "directConnections",
+            "title": "Connections: Direct (recommended)",
+            "value": "480"
+          },
+          {
+            "key": "poolerConnections",
+            "title": "Connections: Pooler (recommended)",
+            "value": "3000"
+          }
+        ]
+      },
+      {
+        "columns": [
+          { "key": "plan", "title": "Plan", "value": "8XL" },
+          { "key": "pricing", "title": "Price USD", "value": "$1,870" },
+          { "key": "cpu", "title": "CPU", "value": "32-core ARM" },
+          { "key": "dedicated", "title": "Dedicated", "value": true },
+          { "key": "memory", "title": "Memory", "value": "128 GB" },
+          { "key": "maxDiskIO", "title": "Max Disk Bandwidth", "value": "9,500 Mbps" },
+          {
+            "key": "baseDiskIO",
+            "title": "Baseline Disk Bandwidth",
+            "value": "9,500 Mbps"
+          },
+          {
+            "key": "directConnections",
+            "title": "Connections: Direct (recommended)",
+            "value": "490"
+          },
+          {
+            "key": "poolerConnections",
+            "title": "Connections: Pooler (recommended)",
+            "value": "6000"
+          }
+        ]
+      },
+      {
+        "columns": [
+          { "key": "plan", "title": "Plan", "value": "12XL" },
+          { "key": "pricing", "title": "Price USD", "value": "$2,800" },
+          { "key": "cpu", "title": "CPU", "value": "48-core ARM" },
+          { "key": "dedicated", "title": "Dedicated", "value": true },
+          { "key": "memory", "title": "Memory", "value": "192 GB" },
+          {
+            "key": "maxDiskIO",
+            "title": "Max Disk Bandwidth",
+            "value": "14,250 Mbps"
+          },
+          {
+            "key": "baseDiskIO",
+            "title": "Baseline Disk Bandwidth",
+            "value": "14,250 Mbps"
+          },
+          {
+            "key": "directConnections",
+            "title": "Connections: Direct (recommended)",
+            "value": "500"
+          },
+          {
+            "key": "poolerConnections",
+            "title": "Connections: Pooler (recommended)",
+            "value": "9000"
+          }
+        ]
+      },
+      {
+        "columns": [
+          { "key": "plan", "title": "Plan", "value": "16XL" },
+          { "key": "pricing", "title": "Price USD", "value": "$3,730" },
+          { "key": "cpu", "title": "CPU", "value": "64-core ARM" },
+          { "key": "dedicated", "title": "Dedicated", "value": true },
+          { "key": "memory", "title": "Memory", "value": "256 GB" },
+          {
+            "key": "maxDiskIO",
+            "title": "Max Disk Bandwidth",
+            "value": "19,000 Mbps"
+          },
+          {
+            "key": "baseDiskIO",
+            "title": "Baseline Disk Bandwidth",
+            "value": "19,000 Mbps"
+          },
+          {
+            "key": "directConnections",
+            "title": "Connections: Direct (recommended)",
+            "value": "500"
+          },
+          {
+            "key": "poolerConnections",
+            "title": "Connections: Pooler (recommended)",
+            "value": "12,000"
+          }
+        ]
+      }
+    ]
+  },
+  "support": {
+    "title": "Support",
+    "features": [
+      "Guaranteed Response Times",
+      "SLAs",
+      "Designated Support",
+      "Advanced Support Scope"
+    ],
+    "rows": [
+      {
+        "columns": [
+          { "key": "plan", "title": "Plan", "value": "Standard" },
+          { "key": "pricing", "title": "Pricing", "value": "Contact Us" },
+          {
+            "key": "severityLevelUrgent",
+            "title": "1. Severity Level: Urgent",
+            "value": "1 business hour (24/7x365)"
+          },
+          {
+            "key": "severityLevelHigh",
+            "title": "2. Severity Level: High",
+            "value": "4 business hours (Monday - Friday)"
+          },
+          {
+            "key": "severityLevelNormal",
+            "title": "3. Severity Level: Normal",
+            "value": "1 business day (Monday - Friday)"
+          },
+          {
+            "key": "severityLevelLow",
+            "title": "4. Severity Level: Low",
+            "value": "2 business days (Monday - Friday)"
+          }
+        ]
+      },
+      {
+        "columns": [
+          { "key": "plan", "title": "Plan", "value": "Priority" },
+          { "key": "pricing", "title": "Pricing", "value": "Contact Us" },
+          {
+            "key": "severityLevelUrgent",
+            "title": "1. Severity Level: Urgent",
+            "value": "1 business hour (24/7x365)"
+          },
+          {
+            "key": "severityLevelHigh",
+            "title": "2. Severity Level: High",
+            "value": "2 business hours (Monday - Friday)"
+          },
+          {
+            "key": "severityLevelNormal",
+            "title": "3. Severity Level: Normal",
+            "value": "1 business day (Monday - Friday)"
+          },
+          {
+            "key": "severityLevelLow",
+            "title": "4. Severity Level: Low",
+            "value": "2 business days (Monday - Friday)"
+          }
+        ]
+      },
+      {
+        "columns": [
+          { "key": "plan", "title": "Plan", "value": "Priority Plus" },
+          { "key": "pricing", "title": "Pricing", "value": "Contact Us" },
+          {
+            "key": "severityLevelUrgent",
+            "title": "1. Severity Level: Urgent",
+            "value": "1 business hour (24/7x365)"
+          },
+          {
+            "key": "severityLevelHigh",
+            "title": "2. Severity Level: High",
+            "value": "2 business hours (24/7x365)"
+          },
+          {
+            "key": "severityLevelNormal",
+            "title": "3. Severity Level: Normal",
+            "value": "12 business hours (Monday - Friday)"
+          },
+          {
+            "key": "severityLevelLow",
+            "title": "4. Severity Level: Low",
+            "value": "1 business days (Monday - Friday)"
+          }
+        ]
+      }
+    ]
+  }
+}

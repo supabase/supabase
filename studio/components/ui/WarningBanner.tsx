@@ -1,4 +1,4 @@
-import { IconAlertCircle } from '@supabase/ui'
+import { IconAlertCircle } from 'ui'
 
 const WarningBanner = ({ title, description }: { title: string; description?: string }) => {
   return (
@@ -7,8 +7,8 @@ const WarningBanner = ({ title, description }: { title: string; description?: st
         <div className="mt-1 text-yellow-1100 dark:text-yellow-800">
           <IconAlertCircle size={14} strokeWidth={2} />
         </div>
-        <div className="flex flex-col xl:flex-row gap-x-3 items-start xl:items-center">
-          <h2 className="text-sm text-scale-1200 dark:text-scale-100">{title}</h2>
+        <div className="flex flex-col items-start gap-x-3 xl:flex-row xl:items-center">
+          <h2 className="text-sm text-foreground dark:text-scale-100">{title}</h2>
           {description && (
             <p className="text-xs text-yellow-1200 dark:text-yellow-800">{description}</p>
           )}

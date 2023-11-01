@@ -33,7 +33,7 @@
 
 // TO DO: REMOVE
 .form-group label {
-  @apply inline-block text-scale-1100 text-sm py-2;
+  @apply inline-block text-foreground-light text-sm py-2;
   width: 33%;
   align-self: top;
 }
@@ -54,7 +54,7 @@
 
 .Form .form-text,
 .Form .form-error {
-  @apply block text-sm text-scale-900 my-1;
+  @apply block text-sm text-foreground-lighter my-1;
   display: block;
   margin-left: calc(33% + 0.5rem);
   width: 100%;
@@ -118,7 +118,7 @@
 }
 
 .table-container thead th {
-  @apply text-scale-900 font-normal text-sm;
+  @apply text-foreground-light font-normal text-sm;
   @apply bg-table-header-light dark:bg-table-header-dark;
   @apply border-t border-b border-table-border-light dark:border-table-border-dark;
 }
@@ -192,20 +192,12 @@
 /* Docs */
 .Docs {
   &--inner-wrapper {
-    background: linear-gradient(
-      90deg,
-      var(--colors-scale1) 50%,
-      var(--colors-scale3) 50%
-    ); /* bg-white bg-coolGray-100 */
+    background: linear-gradient(90deg, var(--colors-scale1) 50%, var(--colors-scale3) 50%);
     width: 100%;
   }
 
   .dark &--inner-wrapper {
-    background: linear-gradient(
-      90deg,
-      var(--colors-scale3) 50%,
-      var(--colors-scale2) 50%
-    ); /* bg-gray-700 bg-gray-600 */
+    background: linear-gradient(90deg, var(--colors-scale3) 50%, var(--colors-scale2) 50%);
   }
 
   // h1,
@@ -224,11 +216,41 @@
     @apply border-b flex border-scale-500;
   }
 
+  &.Docs--table-editor .doc-section--introduction {
+    .text {
+      width: 85%;
+    }
+  }
+
+  &.Docs--table-editor .doc-section--introduction {
+    .text {
+      width: 85%;
+    }
+  }
+
+  &.Docs--table-editor .doc-section--client-libraries {
+    flex-direction: column;
+    margin-bottom: 40px;
+
+    .text,
+    .code {
+      width: 100%;
+      max-width: none;
+    }
+    .code {
+      margin-bottom: 20px;
+    }
+  }
+
   .doc-section article:first-child {
     @apply prose prose-docs prose-sm max-w-none;
   }
 
-  .text {
+  &.Docs--table-editor .doc-section__table-name {
+    @apply mt-4;
+  }
+
+  .code-column {
     @apply p-4 px-6 w-1/2;
     max-width: 50%;
 
@@ -236,8 +258,12 @@
     //   @apply text-green-500;
     // }
 
+    a {
+      @apply transition;
+    }
+
     a:hover {
-      @apply text-green-600;
+      @apply text-brand-600;
     }
 
     p:last-child {
@@ -250,7 +276,7 @@
     max-width: 50%;
 
     h4 {
-      @apply uppercase font-normal m-1 p-0 text-sm text-scale-1100;
+      @apply uppercase font-normal m-1 p-0 text-sm text-foreground-light;
     }
 
     h4:not(:first-child) {
@@ -263,14 +289,17 @@
     }
 
     .is-highlighted {
-      @apply text-brand-900;
+      @apply text-brand;
     }
+  }
+  .codeblock-container + .codeblock-container {
+    @apply mt-12;
   }
 }
 
 ::-moz-selection {
   /* Code for Firefox */
-  @apply bg-brand-900;
+  @apply bg-brand;
   color: #333 !important;
 }
 
@@ -324,5 +353,91 @@
   polygon {
     @apply fill-scale-100 dark:fill-scale-100;
     // fill: #eeeeee;
+  }
+}
+
+.pitr-listbox {
+  @apply md:gap-x-2;
+}
+
+.roles-toggle {
+  label {
+    @apply mt-1;
+  }
+}
+
+.thin-scrollbars {
+  scrollbar-width: thin;
+  scrollbar-color: var(--colors-slate9) var(--colors-slate1);
+
+  .dark & {
+    scrollbar-color: var(--colors-slate10) var(--colors-slate3o);
+  }
+
+  ::-webkit-scrollbar {
+    background: var(--colors-slate2);
+    height: 3px;
+    width: 0px;
+    border-radius: 0;
+
+    .dark & {
+      background: var(--colors-slate6);
+    }
+  }
+
+  ::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px var(--colors-slate6);
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+
+    .dark & {
+      -webkit-box-shadow: inset 0 0 6px var(--colors-slate8);
+    }
+  }
+
+  ::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    background: var(--colors-slate9);
+
+    .dark & {
+      -webkit-box-shadow: inset 0 0 6px var(--colors-slate12);
+    }
+  }
+}
+
+.form-field-markdown {
+  a {
+    @apply text-brand transition opacity-75 hover:opacity-100 underline;
+  }
+}
+
+.view-icon {
+  rect {
+    @apply fill-blue-500 stroke-blue-500;
+  }
+  path,
+  circle {
+    @apply stroke-blue-900 fill-blue-500;
+  }
+}
+
+.table-icon {
+  rect {
+    @apply fill-green-1000 stroke-green-500;
+  }
+  line {
+    @apply stroke-green-500;
+  }
+}
+
+.recharts-cartesian-axis-tick {
+  text {
+    @apply text-xs;
+  }
+}
+.recharts-reference-line {
+  line {
+    @apply stroke-scale-1000;
   }
 }

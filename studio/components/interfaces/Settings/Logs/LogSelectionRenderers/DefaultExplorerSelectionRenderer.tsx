@@ -1,30 +1,7 @@
 import { LOGS_TAILWIND_CLASSES } from '../Logs.constants'
-import { jsonSyntaxHighlight } from '../LogsFormatters'
+import { jsonSyntaxHighlight, SelectionDetailedRow } from '../LogsFormatters'
 
 const DefaultExplorerSelectionRenderer = ({ log }: any) => {
-  const DetailedRow = ({
-    label,
-    value,
-    code,
-  }: {
-    label: string
-    value: string | React.ReactNode
-    code?: boolean
-  }) => {
-    return (
-      <div className="grid grid-cols-12">
-        <span className="text-scale-900 text-sm col-span-4 whitespace-prep-wrap">{label}</span>
-        <span
-          className={`text-scale-1200 text-sm col-span-8 whitespace-prep-wrap ${
-            code && 'text-xs font-mono'
-          }`}
-        >
-          {value}
-        </span>
-      </div>
-    )
-  }
-
   const DetailedJsonRow = ({
     label,
     value,
@@ -36,9 +13,9 @@ const DefaultExplorerSelectionRenderer = ({ log }: any) => {
   }) => {
     return (
       <div className="grid grid-cols-12">
-        <span className="text-scale-900 text-sm col-span-4">{label}</span>
+        <span className="text-foreground-lighter text-sm col-span-4">{label}</span>
         <span
-          className={`text-scale-1200 text-sm col-span-8 overflow-x-auto ${
+          className={`text-foreground text-sm col-span-8 overflow-x-auto ${
             code && 'text-xs font-mono'
           }`}
         >
@@ -63,7 +40,7 @@ const DefaultExplorerSelectionRenderer = ({ log }: any) => {
             {value && typeof value === 'object' ? (
               <DetailedJsonRow label={key} value={value} />
             ) : (
-              <DetailedRow label={key} value={value === null ? 'NULL ' : String(value)} />
+              <SelectionDetailedRow label={key} value={value === null ? 'NULL ' : String(value)} />
             )}
           </div>
         )

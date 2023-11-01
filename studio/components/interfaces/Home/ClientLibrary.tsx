@@ -1,42 +1,46 @@
-import { FC } from 'react'
-import { Typography, IconBookOpen, IconGitHub, Button, Badge } from '@supabase/ui'
+import { Badge, Button, IconBookOpen, IconGitHub } from 'ui'
 
-interface Props {
+import { BASE_PATH } from 'lib/constants'
+
+interface ClientLibraryProps {
   language: string
   officialSupport?: boolean
-  releaseState?: string
   docsUrl?: string
   gitUrl: string
+  altIconName?: string
 }
 
-const ClientLibrary: FC<Props> = ({ language, releaseState, officialSupport, docsUrl, gitUrl }) => {
+const ClientLibrary = ({
+  language,
+  officialSupport,
+  docsUrl,
+  gitUrl,
+  altIconName,
+}: ClientLibraryProps) => {
   return (
-    <div className="flex space-x-6 items-start">
+    <div className="flex items-start space-x-6">
       <img
-        src={`/img/libraries/${language.toLowerCase()}-icon.svg`}
+        src={`${BASE_PATH}/img/libraries/${
+          altIconName ? `${altIconName}-icon.svg` : `${language.toLowerCase()}-icon.svg`
+        }`}
         alt={`${language} logo`}
         width="21"
       />
       <div className="space-y-4">
         <div>
-          <h5 className="text-scale-1200 text-base flex items-center gap-2">
-            {language} {releaseState && <Badge color="yellow">{`Public ${releaseState}`}</Badge>}
+          <h5 className="flex items-center gap-2 text-base text-foreground">
+            {language} {!officialSupport && <Badge color="green">Community</Badge>}
           </h5>
-          <p className="text-scale-1000 text-sm">
-            {officialSupport
-              ? 'This library is officially supported'
-              : 'This library is community supported'}
-          </p>
         </div>
-        <div className="space-x-1">
+        <div className="flex gap-2">
           {docsUrl && (
-            <a href={docsUrl} target="_blank">
+            <a href={docsUrl} target="_blank" rel="noreferrer">
               <Button icon={<IconBookOpen />} type="default">
                 Docs
               </Button>
             </a>
           )}
-          <a href={gitUrl} target="_blank">
+          <a href={gitUrl} target="_blank" rel="noreferrer">
             <Button icon={<IconGitHub />} type="default">
               See GitHub
             </Button>

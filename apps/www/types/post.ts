@@ -17,8 +17,10 @@ type PostTypes = {
   readingTime?: string
   description: string
   url: string
+  path: string
   tags?: []
   logo?: string
+  logo_inverse?: string
   hideAuthor?: boolean
 }
 

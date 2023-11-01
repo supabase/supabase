@@ -1,6 +1,6 @@
+import { useState } from 'react'
+import { Button } from 'ui'
 import SchemaForm from './SchemaForm'
-import React, { useState } from 'react'
-import { Button, Typography } from '@supabase/ui'
 
 export default function SchemaFormPanel({
   schema,
@@ -10,12 +10,17 @@ export default function SchemaFormPanel({
   onChangeModel = (model) => {},
   onReset = () => {},
   onSubmit,
+  loading,
   submitLabel = 'Save',
   cancelLabel = 'Cancel',
+  message = '',
+  disabled = false,
+  disabledMessage = '',
 }) {
   let formRef
   const [submitButtonLoading, setSubmitButtonLoading] = useState(false)
   const [hasChanged, setHasChanged] = useState(false)
+  const isLoading = loading !== undefined ? loading : submitButtonLoading
 
   function onClickCancel() {
     formRef.reset()
@@ -31,7 +36,7 @@ export default function SchemaFormPanel({
         setSubmitButtonLoading(true)
       })
       .catch((error) => {
-        console.log('Error on submitting', error)
+        console.error('Error on submitting', error)
       })
   }
 
@@ -39,36 +44,42 @@ export default function SchemaFormPanel({
     <section className="section-block mb-8">
       <div
         className="
-          px-6 h-12
-          bg-panel-header-light dark:bg-panel-header-dark
-          border-b border-panel-border-light dark:border-panel-border-dark
-          flex overflow-hidden items-center"
+          flex h-12
+          items-center overflow-hidden
+          border-b border-panel-border-light bg-panel-header-light
+          px-6 dark:border-panel-border-dark dark:bg-panel-header-dark"
       >
         <div className="flex-1 text-left">
-          <Typography.Title level={6}>{title || ''}</Typography.Title>
+          <h6>{title || ''}</h6>
         </div>
-        <div
-          className={`flex transition duration-150 ${
-            hasChanged ? 'opacity-100' : 'opacity-0 cursor-default'
-          }`}
-        >
-          <Button onClick={onClickCancel} type="default" disabled={!hasChanged}>
-            {cancelLabel || 'Cancel'}
-          </Button>
-          <Button
-            onClick={onClickSubmit}
-            loading={submitButtonLoading}
-            disabled={!hasChanged}
-            type="primary"
-            className="ml-2 hover:border-green-500"
+        {disabled && disabledMessage ? (
+          <p className="text-sm text-foreground-light">{disabledMessage}</p>
+        ) : (
+          <div
+            className={`flex transition duration-150 ${
+              hasChanged ? 'opacity-100' : 'cursor-default opacity-0'
+            }`}
           >
-            {submitLabel || 'Save'}
-          </Button>
-        </div>
+            <Button onClick={onClickCancel} type="default" disabled={!hasChanged || isLoading}>
+              {cancelLabel || 'Cancel'}
+            </Button>
+            <Button
+              onClick={onClickSubmit}
+              loading={isLoading}
+              disabled={disabled || !hasChanged || isLoading}
+              type="primary"
+              className="ml-2 hover:border-green-500"
+            >
+              {submitLabel || 'Save'}
+            </Button>
+          </div>
+        )}
+        <span className="text-sm text-foreground-lighter">{message}</span>
       </div>
 
       <div className="Form section-block--body px-6 py-3">
         <SchemaForm
+          disabled={disabled}
           onChangeModel={(model) => {
             setHasChanged(true)
             if (onChangeModel) onChangeModel(model)
@@ -76,7 +87,6 @@ export default function SchemaFormPanel({
           formRef={(ref) => (formRef = ref)}
           schema={schema}
           model={model}
-          children={children}
           onSubmit={async (args) => {
             onSubmit(args)
               .then(() => {
@@ -85,7 +95,9 @@ export default function SchemaFormPanel({
               })
               .catch(() => setSubmitButtonLoading(false))
           }}
-        />
+        >
+          {children}
+        </SchemaForm>
       </div>
     </section>
   )

@@ -2,8 +2,6 @@
 title: Supabase vs Firebase
 description: Supabase is an Open Source Firebase Alternative with a SQL based Database, Auth, and Cloud Functions
 author: ant_wilson
-image: partner-gallery/partner-showcase-thumb.png
-thumb: partner-gallery/partner-showcase-thumb.png
 tags:
   - comparison
 date: '2022-05-26'
@@ -30,7 +28,7 @@ Supabase is an open source firebase alternative, but instead of being built arou
 
 At Supabase we’ve always been huge fans of Firebase - so we started adding a few things on top of PostgreSQL in an attempt to reach feature parity, including:
 
-- Auto-generated API - [query your data straight from the client](https://supabase.com/docs/guides/api#rest-api-2).
+- Auto-generated API - [query your data straight from the client](https://supabase.com/docs/guides/api#rest-api-overview).
 - Realtime - [changes in your data will be streamed directly to your application](https://supabase.com/docs/reference/dart/subscribe).
 - Auth - [a simple to integrate auth system and SQL based rules engine](https://supabase.com/auth).
 - Functions - [javascript and typescript functions that deploy out globally](https://supabase.com/edge-functions).
@@ -44,7 +42,7 @@ Both Firebase and Supabase have invested heavily in client side libraries so you
 
 ## How are they different?
 
-Firebase and Supabase differ in several ways. The main one being that Firebase is a document store, whereas Supabase is based on PostgreSQL - a relational, SQL-based database management system. 
+Firebase and Supabase differ in several ways. The main one being that Firebase is a document store, whereas Supabase is based on PostgreSQL - a relational, SQL-based database management system.
 
 There are some other important differences.
 
@@ -62,10 +60,10 @@ We created a benchmarking repo where you can compare the performance of both ser
 
 ## How do I migrate from Firebase to Supabase?
 
-Since Firebase is document based, migrating into a relational database requires you to map your data structure across into a SQL schema. Luckily we’ve built a [handy conversion tool to do it for you](https://github.com/supabase-community/firebase-to-supabase/tree/main/firestore).
+Since Firebase is document based, migrating into a relational database requires you to map your data structure across into a SQL schema. Luckily we’ve built a [handy conversion tool to do it for you](https://supabase.com/docs/guides/migrations/firestore-data).
 
-We also have a tool for [migrating Firebase Auth to Supabase Auth](https://github.com/supabase-community/firebase-to-supabase/tree/main/auth). And one for [migrating Firebase Storage files to Supabase Storage](https://github.com/supabase-community/firebase-to-supabase/tree/main/storage).
+We also have guides and tools for [migrating Firebase Auth to Supabase Auth](https://supabase.com/docs/guides/migrations/firebase-auth) for [migrating Firebase Storage files to Supabase Storage](https://supabase.com/docs/guides/migrations/firebase-storage).
 
 These are by far the most complete Firebase to Postgres migration tools available anywhere on the web.
 
-You can [try Supabase for free](https://app.supabase.io). If you require Enterprise level support with your project or migration, please get in touch using our [Enterprise contact form](https://supabase.com/contact/enterprise).
+You can [try Supabase for free](https://supabase.com/dashboard). If you require Enterprise level support with your project or migration, please get in touch using our [Enterprise contact form](https://forms.supabase.com/enterprise).

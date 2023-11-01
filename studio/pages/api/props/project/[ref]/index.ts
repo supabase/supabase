@@ -1,5 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
+
 import apiWrapper from 'lib/api/apiWrapper'
+import { DEFAULT_PROJECT } from 'pages/api/constants'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -19,12 +21,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   // Platform specific endpoint
   const response = {
     project: {
-      id: 1,
-      ref: 'default',
-      name: 'Default Project',
-      status: 'ACTIVE_HEALTHY',
-      organization_id: 1,
-      inserted_at: '2021-08-02T06:40:40.646362',
+      ...DEFAULT_PROJECT,
       services: [],
     },
   }

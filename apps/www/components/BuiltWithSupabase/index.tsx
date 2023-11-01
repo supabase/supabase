@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { Button, IconGitHub } from '@supabase/ui'
+import { Button, IconGitHub } from 'ui'
 import SectionContainer from '../Layouts/SectionContainer'
 import ExampleCard from '../ExampleCard'
 
@@ -12,23 +12,22 @@ const BuiltExamples = () => {
   return (
     <SectionContainer className="xl:pt-32">
       <div className="text-center">
-        <h3 className="h2">What can you build with supabase?</h3>
-        <p className="p">There are many example apps and starter projects to get going</p>
+        <h3 className="h2">What can you build with Supabase?</h3>
+        <p className="p">There are many example apps and starter projects to get you started.</p>
         <div className="flex justify-center gap-2 py-4">
-          <Link href="/docs/guides/examples" as="/docs/guides/examples" passHref>
-            <Button as="a" type="default" size="small">
+          <Button asChild type="default" size="small" className="h-full">
+            <Link href="/docs/guides/examples" as="/docs/guides/examples">
               View all examples
-            </Button>
-          </Link>
-          <Link
-            href="https://github.com/supabase/supabase/tree/master/examples"
-            as="https://github.com/supabase/supabase/tree/master/examples"
-            passHref
-          >
-            <Button as="a" type="default" icon={<IconGitHub />} size="small">
-              Official github library
-            </Button>
-          </Link>
+            </Link>
+          </Button>
+          <Button asChild type="default" icon={<IconGitHub />} size="small">
+            <Link
+              href="https://github.com/supabase/supabase/tree/master/examples"
+              as="https://github.com/supabase/supabase/tree/master/examples"
+            >
+              Official GitHub library
+            </Link>
+          </Button>
         </div>
       </div>
       <div className="mt-16 grid grid-cols-12 gap-5">

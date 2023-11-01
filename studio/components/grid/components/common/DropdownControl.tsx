@@ -1,7 +1,7 @@
-import * as React from 'react'
-import { Dropdown, Typography } from '@supabase/ui'
+import { PropsWithChildren } from 'react'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
 
-type DropdownControlProps = {
+interface DropdownControlProps {
   options: {
     value: string | number
     label: string
@@ -9,44 +9,36 @@ type DropdownControlProps = {
     preLabel?: string
   }[]
   onSelect: (value: string | number) => void
-  className?: string
   side?: 'bottom' | 'left' | 'top' | 'right' | undefined
   align?: 'start' | 'center' | 'end' | undefined
-  isNested?: boolean
 }
 
-export const DropdownControl: React.FC<DropdownControlProps> = (p) => {
-  const { className, children, side, align, isNested } = p
+export const DropdownControl = ({
+  children,
+  side,
+  align,
+  options,
+  onSelect,
+}: PropsWithChildren<DropdownControlProps>) => {
   return (
-    <Dropdown
-      className={className}
-      side={side}
-      align={align}
-      overlay={<DropdownItems {...p} />}
-      isNested={isNested}
-    >
-      {children}
-    </Dropdown>
-  )
-}
-
-const DropdownItems: React.FC<DropdownControlProps> = ({ options, onSelect }) => {
-  return (
-    <div className="dropdown-control" style={{ maxHeight: '30vh' }}>
-      {options.length == 0 && (
-        <Typography.Text className="dropdown-control__empty-text">No more items</Typography.Text>
-      )}
-      {options.map((x) => {
-        return (
-          <Dropdown.Item key={x.value} onClick={() => onSelect(x.value)}>
-            <div className="flex items-center gap-2">
-              {x.preLabel && <span className="text-xs text-scale-900 grow">{x.preLabel}</span>}
-              <span>{x.label}</span>
-              {x.postLabel && <span className="text-xs text-scale-900">{x.postLabel}</span>}
-            </div>
-          </Dropdown.Item>
-        )
-      })}
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger>{children}</DropdownMenuTrigger>
+      <DropdownMenuContent side={side} align={align}>
+        <div className="dropdown-control" style={{ maxHeight: '30vh' }}>
+          {options.length === 0 && <p className="dropdown-control__empty-text">No more items</p>}
+          {options.map((x) => {
+            return (
+              <DropdownMenuItem key={x.value} onClick={() => onSelect(x.value)}>
+                <div className="flex items-center gap-2">
+                  {x.preLabel && <span className="grow text-foreground-lighter">{x.preLabel}</span>}
+                  <span>{x.label}</span>
+                  {x.postLabel && <span className="text-foreground-lighter">{x.postLabel}</span>}
+                </div>
+              </DropdownMenuItem>
+            )
+          })}
+        </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }

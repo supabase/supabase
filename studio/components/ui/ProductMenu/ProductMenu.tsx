@@ -1,32 +1,34 @@
-import { FC } from 'react'
-import { Badge, Menu } from '@supabase/ui'
-import ProductMenuItem from './ProductMenuItem'
-import { ProductMenuGroupItem, ProductMenuGroup } from './ProductMenu.types'
+import { Badge, Menu } from 'ui'
 
-interface Props {
+import { ProductMenuGroup } from './ProductMenu.types'
+import ProductMenuItem from './ProductMenuItem'
+
+interface ProductMenuProps {
   page?: string
   menu: ProductMenuGroup[]
 }
 
-const ProductMenu: FC<Props> = ({ page, menu }) => {
+const ProductMenu = ({ page, menu }: ProductMenuProps) => {
   return (
     <div className="flex flex-col space-y-8 overflow-y-auto">
       <Menu type="pills">
-        {menu.map((group: ProductMenuGroup, idx: number) => (
+        {menu.map((group, idx) => (
           <div key={group.title}>
             <div className="my-6 space-y-8">
               <div className="mx-3">
                 <Menu.Group
                   //@ts-ignore
                   title={
-                    <div className="flex flex-col space-y-2">
-                      <span>{group.title}</span>
-                      {group.isPreview && <Badge color="amber">Not production ready</Badge>}
-                    </div>
+                    group.title ? (
+                      <div className="flex flex-col space-y-2">
+                        <span>{group.title}</span>
+                        {group.isPreview && <Badge color="amber">Not production ready</Badge>}
+                      </div>
+                    ) : null
                   }
                 />
                 <div>
-                  {group.items.map((item: ProductMenuGroupItem) => (
+                  {group.items.map((item) => (
                     <ProductMenuItem
                       key={item.key}
                       url={item.url}
@@ -35,12 +37,13 @@ const ProductMenu: FC<Props> = ({ page, menu }) => {
                       isActive={page === item.key}
                       isExternal={item.isExternal}
                       target={item.isExternal ? '_blank' : '_self'}
+                      label={item.label}
                     />
                   ))}
                 </div>
               </div>
             </div>
-            {idx !== menu.length - 1 && <div className="bg-scale-500 h-px w-full"></div>}
+            {idx !== menu.length - 1 && <div className="h-px w-full bg-scale-500"></div>}
           </div>
         ))}
       </Menu>

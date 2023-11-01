@@ -1,39 +1,83 @@
-import { FC } from 'react'
+import { Action, ActionReason, ActionType } from '@supabase/shared-types/out/notifications'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Button } from '@supabase/ui'
+import { Fragment } from 'react'
+import { Button, IconExternalLink } from 'ui'
 
 import { Project } from 'types'
 
-interface Props {
+interface NotificationActionsProps {
   project: Project
-  availableActions: any[]
+  changelogLink?: string
+  availableActions: Action[]
   onSelectRestartProject: () => void
+  onSelectApplyMigration: () => void
+  onSelectRollbackMigration: () => void
 }
 
-const NotificationActions: FC<Props> = ({ project, availableActions, onSelectRestartProject }) => {
+const NotificationActions = ({
+  project,
+  changelogLink,
+  availableActions,
+  onSelectRestartProject,
+  onSelectApplyMigration,
+  onSelectRollbackMigration,
+}: NotificationActionsProps) => {
   const router = useRouter()
 
   const onSelectUpgradeProject = () => {
-    return router.push(`/project/${project.ref}/settings/billing/update/pro`)
+    return router.push(
+      `/project/${project.ref}/settings/billing/subscription?panel=subscriptionPlan`
+    )
   }
 
-  return (
-    <div className="space-y-2">
-      {availableActions.map((action: any) => {
-        if (action.action_type === 'project.upgrade') {
+  const renderActionButton = (action: Action) => {
+    switch (action.action_type) {
+      case ActionType.UpgradeProjectToPro:
+        return (
+          <Button type="default" onClick={onSelectUpgradeProject}>
+            Upgrade project
+          </Button>
+        )
+      case ActionType.SchedulePostgresRestart:
+        return (
+          <Button type="default" onClick={onSelectRestartProject}>
+            Restart project
+          </Button>
+        )
+      case ActionType.MigratePostgresSchema:
+        if (action.reason === ActionReason.Rollback) {
           return (
-            <Button key={action.action_type} type="default" onClick={onSelectUpgradeProject}>
-              Upgrade project
+            <Button type="default" onClick={onSelectRollbackMigration}>
+              Rollback
             </Button>
           )
-        } else if (action.action_type === 'postgresql.restart') {
+        } else {
           return (
-            <Button key={action.action_type} type="default" onClick={onSelectRestartProject}>
-              Restart project
+            <Button type="default" onClick={onSelectApplyMigration}>
+              Apply now
             </Button>
           )
         }
+    }
+  }
+
+  return (
+    <div className="flex items-center space-x-2">
+      {availableActions.map((action) => {
+        return (
+          <Fragment key={`${action.action_type}_${action.reason}`}>
+            {renderActionButton(action)}
+          </Fragment>
+        )
       })}
+      {changelogLink && (
+        <Button asChild type="default" icon={<IconExternalLink size={12} strokeWidth={2} />}>
+          <Link href={changelogLink} target="_blank" rel="noreferrer">
+            More info
+          </Link>
+        </Button>
+      )}
     </div>
   )
 }

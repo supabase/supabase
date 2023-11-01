@@ -1,6 +1,6 @@
+import { Button, IconCornerRightUp, Tabs } from 'ui'
 import { useRouter } from 'next/router'
-import { Tabs, Button, IconCornerRightUp, IconArrowUpRight } from '@supabase/ui'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react'
@@ -8,19 +8,19 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 // Import Swiper styles
 import 'swiper/swiper.min.css'
 
-import ImageCarouselStyles from './ImageCarousel.module.css'
-import Link from 'next/link'
 import Image from 'next/image'
 import TextLink from '../TextLink'
+import ImageCarouselStyles from './ImageCarousel.module.css'
+import { useInView } from 'framer-motion'
 
 interface Content {
   title: string
   label?: string
   img_url?: string
-  video_url?: string
   text?: string
   cta?: string
   url?: string
+  youtube_id?: string
 }
 
 interface ImageCarouselProps {
@@ -30,6 +30,8 @@ interface ImageCarouselProps {
 }
 
 function ImageCarousel(props: ImageCarouselProps) {
+  const sectionRef = useRef<any>(null)
+  const isInView = useInView(sectionRef, { margin: '75%', once: true })
   // base path for images
   const { basePath } = useRouter()
 
@@ -67,7 +69,7 @@ function ImageCarousel(props: ImageCarouselProps) {
   )
 
   return (
-    <div className="grid grid-cols-12">
+    <div className="grid grid-cols-12" ref={sectionRef}>
       <div className="col-span-12 w-full lg:col-span-6">
         <div className="sbui-tabs--alt col-span-12 lg:col-span-7">
           <div className={props.altTabView ? 'hidden' : 'block'}>
@@ -111,21 +113,24 @@ function ImageCarousel(props: ImageCarouselProps) {
                     {content.img_url && (
                       <Image
                         src={`${basePath}${content.img_url}`}
+                        alt={content.title}
                         layout="responsive"
                         width="1460"
                         height="960"
                       />
                     )}
-                    {content.video_url && (
-                      <video
-                        src={`${basePath}/${content.video_url}`}
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                      >
-                        Your browser does not support the video tag
-                      </video>
+                    {isInView && content.youtube_id && (
+                      <div className="relative w-full" style={{ padding: '56.25% 0 0 0' }}>
+                        <iframe
+                          title="Demo video showcasing Supabase"
+                          className="absolute h-full w-full rounded-b-md"
+                          src={`https://www.youtube-nocookie.com/embed/${content.youtube_id}?playlist=${content.youtube_id}&autoplay=1&loop=1&controls=0&modestbranding=1&rel=0&disablekb=1&mute=1&muted=1`}
+                          style={{ top: 0, left: 0 }}
+                          frameBorder="0"
+                          allow="autoplay; modestbranding; encrypted-media"
+                          loading="lazy"
+                        />
+                      </div>
                     )}
                   </SwiperSlide>
                 )
@@ -165,7 +170,7 @@ function ImageCarousel(props: ImageCarouselProps) {
           {props.content.map((content, i) => {
             return (
               <SwiperSlide key={i} className="py-4">
-                <h4 className="text-scale-1200 mb-4 text-xl">{content.title}</h4>
+                <h4 className="text-foreground mb-4 text-xl">{content.title}</h4>
                 <p className="p text-base">{content.text}</p>
                 <TextLink
                   label={content.cta ? content.cta : 'View documentation'}

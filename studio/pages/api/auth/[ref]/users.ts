@@ -25,15 +25,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   const headers = constructHeaders(req.headers)
-  const { keywords, limit, offset } = req.query
+  const { keywords, limit, offset, verified } = req.query
   const limitInt = tryParseInt(limit as string) || 10
   const offsetInt = tryParseInt(offset as string) || 0
   const hasValidKeywords = keywords && keywords != ''
+  const hasVerifiedValue = verified && verified != ''
 
   let queryCount = ''
   let queryUsers = ''
 
-  if (hasValidKeywords) {
+  if (hasValidKeywords && !hasVerifiedValue) {
     queryCount = SqlString.format('SELECT count(*) from auth.users WHERE email ilike ?;', [
       `%${keywords}%`,
     ])
@@ -41,7 +42,53 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
       'SELECT * from auth.users WHERE email ilike ? ORDER BY created_at DESC LIMIT ? OFFSET ?;',
       [`%${keywords}%`, limitInt, offsetInt]
     )
-  } else {
+  }
+
+  if (!hasValidKeywords && hasVerifiedValue) {
+    if (verified === 'verified') {
+      queryCount = SqlString.format(
+        'SELECT count(*) from auth.users WHERE (email_confirmed_at IS NOT NULL or phone_confirmed_at IS NOT NULL);'
+      )
+      queryUsers = SqlString.format(
+        'SELECT * from auth.users WHERE (email_confirmed_at IS NOT NULL or phone_confirmed_at IS NOT NULL) ORDER BY created_at DESC LIMIT ? OFFSET ?;',
+        [limitInt, offsetInt]
+      )
+    }
+    if (verified === 'unverified') {
+      queryCount = SqlString.format(
+        'SELECT count(*) from auth.users WHERE (email_confirmed_at IS NULL AND phone_confirmed_at IS NULL);'
+      )
+      queryUsers = SqlString.format(
+        'SELECT * from auth.users WHERE (email_confirmed_at IS NULL AND phone_confirmed_at IS NULL) ORDER BY created_at DESC LIMIT ? OFFSET ?;',
+        [limitInt, offsetInt]
+      )
+    }
+  }
+
+  if (hasValidKeywords && hasVerifiedValue) {
+    if (verified === 'verified') {
+      queryCount = SqlString.format(
+        'SELECT count(*)  from auth.users WHERE (email_confirmed_at IS NOT NULL or phone_confirmed_at IS NOT NULL) AND email ilike ?;',
+        [`%${keywords}%`]
+      )
+      queryUsers = SqlString.format(
+        'SELECT * from auth.users WHERE (email_confirmed_at IS NOT NULL or phone_confirmed_at IS NOT NULL) AND email ilike ? ORDER BY created_at DESC LIMIT ? OFFSET ?;',
+        [`%${keywords}%`, limitInt, offsetInt]
+      )
+    }
+    if (verified === 'unverified') {
+      queryCount = SqlString.format(
+        'SELECT count(*)  from auth.users WHERE (email_confirmed_at IS NULL AND phone_confirmed_at IS NULL) AND email ilike ?;',
+        [`%${keywords}%`]
+      )
+      queryUsers = SqlString.format(
+        'SELECT * from auth.users WHERE (email_confirmed_at IS NULL AND phone_confirmed_at IS NULL) AND email ilike ? ORDER BY created_at DESC LIMIT ? OFFSET ?;',
+        [`%${keywords}%`, limitInt, offsetInt]
+      )
+    }
+  }
+
+  if (!hasValidKeywords && !hasVerifiedValue) {
     queryCount = 'SELECT count(*) from auth.users;'
     queryUsers = SqlString.format(
       'SELECT * from auth.users ORDER BY created_at DESC LIMIT ? OFFSET ?;',
@@ -68,6 +115,12 @@ const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
   const payload = req.body
   const query = { query: `DELETE from auth.users where id='${payload.id}';` }
 
-  const response = post(`${PG_META_URL}/query`, query, { headers })
+  const response = await post(`${PG_META_URL}/query`, query, { headers })
+
+  if (response.error) {
+    console.error('Delete Users POST:', response.error)
+    return res.status(400).json({ error: response.error })
+  }
+
   return res.status(200).json(response)
 }

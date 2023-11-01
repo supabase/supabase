@@ -1,35 +1,31 @@
-import { useEffect, useState } from 'react'
-import { observer } from 'mobx-react-lite'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 
-import { API_URL } from 'lib/constants'
-import { useStore, withAuth } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { PROJECT_STATUS } from 'lib/constants'
-import { ProjectLayoutWithAuth } from 'components/layouts'
-import Loading from 'components/ui/Loading'
+import { useParams } from 'common/hooks'
+import { ReportsLayout } from 'components/layouts'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-
-import { useProjectContentStore } from 'stores/projectContentStore'
 import { createReport } from 'components/to-be-cleaned/Reports/Reports.utils'
+import Loading from 'components/ui/Loading'
+import { useCheckPermissions, useStore } from 'hooks'
+import { useProfile } from 'lib/profile'
+import { useProjectContentStore } from 'stores/projectContentStore'
 import { NextPageWithLayout } from 'types'
 
-const PageLayout: NextPageWithLayout = () => {
+export const UserReportPage: NextPageWithLayout = () => {
   const [loading, setLoading] = useState(true)
 
   const router = useRouter()
-  const { ref } = router.query
+  const { ref } = useParams()
 
+  const { profile } = useProfile()
   const { ui } = useStore()
-  const project = ui.selectedProject
 
   const contentStore = useProjectContentStore(ref)
-
-  useEffect(() => {
-    if (project && project.status === PROJECT_STATUS.INACTIVE) {
-      post(`${API_URL}/projects/${ref}/restore`, {})
-    }
-  }, [project])
+  const canCreateReport = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
+    resource: { type: 'report', owner_id: profile?.id },
+    subject: { id: profile?.id },
+  })
 
   async function loadReports() {
     await contentStore.load()
@@ -47,15 +43,13 @@ const PageLayout: NextPageWithLayout = () => {
   }, [ref])
 
   return (
-    <div className="mx-auto my-16 w-full max-w-7xl flex-grow space-y-16">
+    <div className="mx-auto my-32 w-full max-w-7xl flex-grow space-y-16">
       {loading ? (
         <Loading />
       ) : (
         <ProductEmptyState
           title="Reports"
           ctaButtonLabel="Create report"
-          // infoButtonLabel="About reports"
-          // infoButtonUrl="https://supabase.com/docs/guides/storage"
           onClickCta={() => {
             try {
               createReport({ router })
@@ -66,9 +60,11 @@ const PageLayout: NextPageWithLayout = () => {
               })
             }
           }}
+          disabled={!canCreateReport}
+          disabledMessage="You need additional permissions to create a report"
         >
-          <p className="text-scale-1100 text-sm">Create custom reports for your projects.</p>
-          <p className="text-scale-1100 text-sm">
+          <p className="text-foreground-light text-sm">Create custom reports for your projects.</p>
+          <p className="text-foreground-light text-sm">
             Get a high level overview of your network traffic, user actions, and infrastructure
             health.
           </p>
@@ -78,6 +74,6 @@ const PageLayout: NextPageWithLayout = () => {
   )
 }
 
-PageLayout.getLayout = (page) => <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
+UserReportPage.getLayout = (page) => <ReportsLayout>{page}</ReportsLayout>
 
-export default observer(PageLayout)
+export default UserReportPage

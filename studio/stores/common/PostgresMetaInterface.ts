@@ -1,8 +1,8 @@
 import { action, computed, makeObservable, observable } from 'mobx'
-import { get, patch, post, delete_ } from 'lib/common/fetch'
+import { get, patch, post, delete_, isResponseOk } from 'lib/common/fetch'
 import { keyBy } from 'lodash'
 import { IRootStore } from '../RootStore'
-import { ResponseError } from 'types'
+import { ResponseError, SupaResponse } from 'types'
 
 type DataKeys = number | string
 
@@ -15,13 +15,17 @@ export interface IPostgresMetaInterface<T> {
   isInitialized: boolean
 
   load: () => void
-  create: (payload: any) => Promise<T | { error: ResponseError }>
-  update: (id: number | string, updates: any) => Promise<T | { error: ResponseError }>
-  del: (id: number | string) => Promise<boolean | { error: ResponseError }>
+  loadBySchema: (schema: string) => Promise<SupaResponse<T[]>>
+  create: (payload: any) => Promise<SupaResponse<T>>
+  update: (id: number | string, updates: any) => Promise<SupaResponse<T>>
+  del: (id: number | string, cascade?: boolean) => Promise<SupaResponse<boolean>>
   list: (filter?: any) => T[]
   find: (filter?: any) => T | undefined
   byId: (id: number | string) => T | undefined
   initialDataArray: (value: T[]) => void
+
+  setUrl: (url: string) => void
+  setHeaders: (headers: { [prop: string]: any }) => void
 }
 
 // [TODO] Need to refactor the logic for 'isInitialized'
@@ -43,6 +47,7 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
   state = this.STATES.INITIAL
   data: { [key in DataKeys]: T } = {}
   headers: any = {}
+  isInitialized: boolean = false
 
   constructor(
     rootStore: IRootStore,
@@ -64,6 +69,7 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
       count: computed,
       hasError: computed,
       isLoading: computed,
+      isInitialized: observable,
       load: action,
       create: action,
       update: action,
@@ -86,14 +92,12 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
     return this.state === this.STATES.INITIAL || this.state === this.STATES.LOADING
   }
 
-  get isInitialized() {
-    return this.state === this.STATES.LOADED || this.state === this.STATES.ERROR
-  }
-
   async fetchData() {
     const headers = { 'Content-Type': 'application/json', ...this.headers }
     const response = await get<T[]>(this.url, { headers })
-    if (response.error) throw response.error
+    if (!isResponseOk(response)) {
+      throw response.error
+    }
 
     this.setDataArray(response)
     return response
@@ -110,12 +114,49 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
       console.error('Load error message', e.message)
       this.setError(e)
       this.setState(ERROR)
+    } finally {
+      if (!this.isInitialized) this.isInitialized = true
+    }
+  }
+
+  // [Joshen] Only used for tables and views for now
+  async loadBySchema(schema: string) {
+    let { LOADING, ERROR, LOADED } = this.STATES
+    try {
+      this.setError(null)
+      this.setState(LOADING)
+
+      const url = this.url.includes('?')
+        ? `${this.url}&included_schemas=${schema}`
+        : `${this.url}?included_schemas=${schema}`
+      const response = await get(url, { headers: this.headers })
+      if (response.error) throw response.error
+
+      const data = response as T[]
+      const formattedData = keyBy(data, this.identifier)
+
+      // Purge existing data that belongs to given schema, otherwise
+      // stale data will persist
+      const purgedData = Object.keys(this.data)
+        .map((identifier: any) => this.data[identifier])
+        .filter((item: any) => item.schema !== schema)
+      const formattedPurgedData = keyBy(purgedData, this.identifier)
+
+      this.data = { ...formattedPurgedData, ...formattedData } as any
+      this.setState(LOADED)
+
+      return data
+    } catch (error: any) {
+      console.error('Error in loadBySchema:', error.message)
+      this.setError(error)
+      this.setState(ERROR)
+      return { error }
     }
   }
 
   initialDataArray(value: T[]) {
     if (this.state === this.STATES.INITIAL) {
-      this.data = keyBy(value, this.identifier)
+      this.data = keyBy(value, this.identifier) as any
       this.state = this.STATES.LOADED
     }
   }
@@ -125,7 +166,7 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
   }
 
   setDataArray(value: T[]) {
-    this.data = keyBy(value, this.identifier)
+    this.data = keyBy(value, this.identifier) as any
   }
 
   setError(value: any) {
@@ -161,21 +202,22 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
       if (response.error) throw response.error
 
       const data = response as T
-      const indentity = response[this.identifier]
-      this.data[indentity] = data
+      const identity = response[this.identifier]
+      this.data[identity] = data
       return data
     } catch (error: any) {
       return { data: null, error }
     }
   }
 
-  async update(id: number | string, updates: any) {
+  async update(id: number | string, payload: any) {
     try {
       const headers = { 'Content-Type': 'application/json', ...this.headers }
-      let payload = { ...updates, id }
       const url = `${this.url}?id=${id}`
       const response = await patch<T>(url, payload, { headers })
-      if (response.error) throw response.error
+      if (!isResponseOk(response)) {
+        throw response.error
+      }
 
       this.data[id] = response
       return response
@@ -184,17 +226,32 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
     }
   }
 
-  async del(id: number | string) {
+  async del(id: number | string, cascade: boolean = false) {
     try {
       const headers = { 'Content-Type': 'application/json', ...this.headers }
-      const url = `${this.url}?id=${id}`
+      const url = cascade ? `${this.url}?id=${id}&cascade=${cascade}` : `${this.url}?id=${id}`
       const response = await delete_<T>(url, {}, { headers })
-      if (response.error) throw response.error
+      if (!isResponseOk(response)) {
+        throw response.error
+      }
 
       delete this.data[id]
       return true
     } catch (error: any) {
       return { error }
     }
+  }
+
+  setUrl(url: string) {
+    this.url = url
+
+    // if the url changes, we need to reset the state
+    this.state = this.STATES.INITIAL
+    this.data = {}
+    this.error = null
+  }
+
+  setHeaders(headers: { [prop: string]: any }) {
+    this.headers = headers
   }
 }

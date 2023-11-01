@@ -7,28 +7,29 @@ author_url: https://github.com/kiwicopple
 author_image_url: https://github.com/kiwicopple.png
 authorURL: https://github.com/kiwicopple
 image: /images/blog/release-feb-2021.jpg
+categories:
+  - product
 tags:
   - release-notes
 date: '03-02-2021'
+video: https://www.youtube.com/v/h-ses99G45g
 ---
 
 Supabase is an open source Firebase alternative. We've now been building for one year. Here's what we released last month.
-
-<!--truncate-->
 
 ### Quick demo
 
 Watch a full demo:
 
-<iframe
-  className="video-with-border w-full"
-  width="640"
-  height="385"
-  src="https://www.youtube-nocookie.com/embed/h-ses99G45g"
-  frameBorder="1"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-  allowFullScreen
-></iframe>
+<div className="video-container">
+  <iframe
+    className="video-with-border w-full"
+    src="https://www.youtube-nocookie.com/embed/h-ses99G45g"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
 
 ### Dashboard Sidebars
 
@@ -40,13 +41,13 @@ We've improved the UX of our Dashboard with sidebars in every section, including
 
 Writing SQL just got 10x easier. We added autocomplete to the SQL editor, including table & column suggestions.
 
-<video width="99%" autoPlay="autoplay" muted playsInline controls={true}>
-  <source src="/images/blog/feb/autocomplete.mp4" type="video/mp4" muted playsInline />
+<video width="99%" autoPlay muted playsInline controls={true}>
+  <source src="/images/blog/feb/autocomplete.mp4" type="video/mp4" />
 </video>
 
 ### Auth Redirects
 
-Redirect your users to specific route within your site on [`signIn()`](/docs/reference/javascript/auth-signin#sign-in-with-redirect) and [`signUp()`](/docs/reference/javascript/auth-signup#sign-up-with-redirect).
+Redirect your users to specific route within your site on [`signIn()`](/docs/reference/javascript/v1/auth-signin#sign-in-with-redirect) and [`signUp()`](/docs/reference/javascript/auth-signup#sign-up-with-redirect).
 
 ![Redirect your users after sign up](/images/blog/feb/auth-redirect.png)
 
@@ -78,9 +79,9 @@ Launch your database in South Africa.
 
 ### Community
 
-One of the community, [@ftonato](https://github.com/ftonato), has built an amazing [example](https://github.com/supabase/supabase/tree/master/examples/with-stencil) that shows how to use Supabase with [Stencil](https://stenciljs.com/) (a Web Component compiler built by they [Ionic](https://ionicframework.com/) team.)
+One of the community, [@ftonato](https://github.com/ftonato), has built an amazing [example](https://github.com/supabase/examples/tree/main/supabase-js-v1/with-stencil) that shows how to use Supabase with [Stencil](https://stenciljs.com/) (a Web Component compiler built by they [Ionic](https://ionicframework.com/) team.)
 
-[Check it out!](https://github.com/supabase/supabase/tree/master/examples/with-stencil)
+[Check it out!](https://github.com/supabase/examples/tree/main/supabase-js-v1/with-stencil)
 
 ![Supabase with Stencil](/images/blog/feb/supabase-stencil.png)
 
@@ -104,7 +105,7 @@ Waiting for Supabase Storage? Here's a sneak peek for the upcoming Launch Week a
 
 ### Get started
 
-- Start using Supabase today: [app.supabase.com](https://app.supabase.com/)
+- Start using Supabase today: [supabase.com/dashboard](https://supabase.com/dashboard/)
 - Make sure to [star us on GitHub](https://github.com/supabase/supabase)
 - Follow us [on Twitter](https://twitter.com/supabase)
 - Subscribe to our [YouTube channel](https://www.youtube.com/c/supabase)

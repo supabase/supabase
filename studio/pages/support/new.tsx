@@ -1,279 +1,24 @@
-import { useEffect, useReducer, useState } from 'react'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { observer } from 'mobx-react-lite'
-import {
-  Button,
-  IconArrowLeft,
-  IconCheck,
-  IconMail,
-  Input,
-  Listbox,
-  Typography,
-} from '@supabase/ui'
-import Divider from 'components/ui/Divider'
-
-import SVG from 'react-inlinesvg'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { useState } from 'react'
+import SVG from 'react-inlinesvg'
+import { Button, IconLoader, IconTool } from 'ui'
 
-import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
-import { useStore, withAuth, useFlag } from 'hooks'
-import { post, get } from 'lib/common/fetch'
-import { Project } from 'types'
-import { isUndefined } from 'lodash'
-import Connecting from 'components/ui/Loading/Loading'
+import Success from 'components/interfaces/Support/Success'
+import SupportForm from 'components/interfaces/Support/SupportForm'
+import { usePlatformStatusQuery } from 'data/platform/platform-status-query'
+import { useFlag, withAuth } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
 
-const DEFAULT = {
-  category: {
-    value: 'Problem',
-    error: '',
-  },
-  severity: {
-    value: 'Low',
-    error: '',
-  },
-  project: {
-    value: '',
-    error: '',
-  },
-  subject: {
-    value: '',
-    error: '',
-  },
-  body: {
-    value: '',
-    error: '',
-  },
-}
-
-/*
- * Move this to schema files
- */
-const categoryOptions = [
-  {
-    value: 'Problem',
-    label: 'Issue with project / API / Client library / REST API',
-    description: 'Issues with project API, client libraries',
-  },
-  {
-    value: 'Sales',
-    label: 'Sales enquiry',
-    description: 'Questions about pricing, paid plans and Enterprise plans',
-  },
-  {
-    value: 'Billing',
-    label: 'Billing',
-    description: 'Issues with credit card charges | invoices | overcharing',
-  },
-  {
-    value: 'Abuse',
-    label: 'Abuse report',
-    description: 'Report abuse of a Supabase project or Supabase brand',
-  },
-  {
-    value: 'Refund',
-    label: 'Refund enquiry',
-    description: 'Formal enquiry form for requesting refunds',
-  },
-]
-
-const severityOptions = [
-  {
-    value: 'Low',
-    label: 'Low',
-    description: 'General guidance',
-  },
-  {
-    value: 'Normal',
-    label: 'Normal',
-    description: 'System impaired',
-  },
-  {
-    value: 'High',
-    label: 'High',
-    description: 'Production system impaired',
-  },
-  {
-    value: 'Urgent',
-    label: 'Urgent',
-    description: 'Production system down',
-  },
-  {
-    value: 'Critical',
-    label: 'Critical',
-    description: 'Business-critical system down (Unavailable for free projects)',
-  },
-]
-
-function formReducer(state: any, action: any) {
-  return {
-    ...state,
-    [action.name]: {
-      value: action.value,
-      error: action.error,
-    },
-  }
-}
-
-const SupportNew = () => {
-  const { ui, app } = useStore()
-  const router = useRouter()
-  const projectRef = router.query.ref
-  const category = router.query.category
-
-  const [formState, formDispatch] = useReducer(formReducer, DEFAULT)
-  const [errors, setErrors] = useState<any>([])
-  const [loading, setLoading] = useState<boolean>(false)
-  const [sent, setSent] = useState<boolean>(false)
+const SupportPage = () => {
+  const [sentCategory, setSentCategory] = useState<string>()
 
   const ongoingIncident = useFlag('ongoingIncident')
   const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
 
-  /*
-   * Get all orgs and projects from global store
-   */
-  const sortedOrganizations = app.organizations.list()
-  const sortedProjects = app.projects.list()
-
-  const projectDefaults: Partial<Project>[] = [
-    {
-      ref: 'no-project',
-      name: 'No specific project',
-    },
-  ]
-
-  const isInitialized = app.projects.isInitialized
-  const projects = [...sortedProjects, ...projectDefaults]
-
-  useEffect(() => {
-    if (isInitialized) {
-      // set project default
-      if (sortedProjects.length > 1) {
-        const selectedProject = sortedProjects.find(
-          (project: Project) => project.ref === projectRef
-        )
-        if (!isUndefined(selectedProject)) {
-          handleOnChange({ name: 'project', value: selectedProject.ref })
-        } else {
-          handleOnChange({ name: 'project', value: sortedProjects[0].ref })
-        }
-      } else {
-        // set as 'No specific project'
-        handleOnChange({ name: 'project', value: projectDefaults[0].ref })
-      }
-
-      // Set category based on query param
-      if (category) {
-        const selectedCategory = categoryOptions.find((option) => {
-          if (option.value.toLowerCase() === category) return option
-        })
-        if (selectedCategory) handleOnChange({ name: 'category', value: selectedCategory.value })
-      }
-    }
-  }, [isInitialized])
-
-  function handleOnChange(x: any) {
-    formDispatch({
-      name: x.name,
-      value: x.value,
-      error: x.error,
-    })
-    // Reset severity value when changing project to prevent selection of Critical
-    if (x.name === 'project') {
-      const selectedProject = projects.find((project: any) => project.ref === x.value)
-      if (
-        (selectedProject?.subscription_tier ?? PRICING_TIER_PRODUCT_IDS.FREE) ===
-          PRICING_TIER_PRODUCT_IDS.FREE &&
-        formState.severity.value === 'Critical'
-      ) {
-        formDispatch({
-          name: 'severity',
-          value: 'Low',
-          error: '',
-        })
-      }
-    }
-  }
-
-  async function handleSubmit(e: any) {
-    e.preventDefault()
-
-    let errors: any = []
-
-    if (!formState.subject.value) {
-      const message = 'Please add a subject heading'
-      handleOnChange({ name: 'subject', error: message })
-      errors.push([...errors, message])
-    }
-
-    if (!formState.body.value) {
-      const message = 'Please type in a message'
-      handleOnChange({ name: 'body', error: message })
-      errors.push([...errors, message])
-    }
-
-    setErrors([...errors])
-
-    if (errors.length === 0) {
-      const projectRef = formState.project.value
-      const payload = {
-        projectRef,
-        message: formState.body.value,
-        category: formState.category.value,
-        verified: true,
-        tags: ['dashboard-support-form'],
-        subject: formState.subject.value,
-        severity: formState.severity.value,
-        siteUrl: '',
-        additionalRedirectUrls: '',
-      }
-
-      if (projectRef !== 'no-project') {
-        const URL = `${API_URL}/auth/${projectRef}/config`
-        const authConfig = await get(URL)
-        if (!authConfig.error) {
-          payload.siteUrl = authConfig.SITE_URL
-          payload.additionalRedirectUrls = authConfig.URI_ALLOW_LIST
-        }
-      }
-
-      setLoading(true)
-      const response = await post(`${API_URL}/feedback/send`, payload)
-      setLoading(false)
-
-      if (response.error) {
-        ui.setNotification({
-          category: 'error',
-          message: `Failed to submit support ticket: ${response.error.message}`,
-        })
-      } else {
-        ui.setNotification({ category: 'success', message: 'Support request sent. Thank you!' })
-        setSent(true)
-      }
-    }
-  }
-
-  const Success = () => {
-    return (
-      <div className="w-100 space-y-4 px-6">
-        <div className="relative flex">
-          <IconCheck size={24} background={'brand'} />
-        </div>
-        <div>
-          <Typography.Title className="block" level={5}>
-            Support request successfully sent
-          </Typography.Title>
-          <Typography.Text type="secondary" className="opacity-50">
-            We will email you back using your GitHub email address
-          </Typography.Text>
-        </div>
-        <Link href="/">
-          <Button>Go back to dashboard</Button>
-        </Link>
-      </div>
-    )
-  }
-
-  if (!isInitialized) return <Connecting />
+  const { data, isLoading } = usePlatformStatusQuery()
+  const isHealthy = data?.isHealthy
 
   return (
     <div
@@ -281,166 +26,73 @@ const SupportNew = () => {
       style={{ height: maxHeight, maxHeight }}
     >
       <div className="mx-auto my-8 max-w-2xl px-4 lg:px-6">
-        <Button
-          type="text"
-          className="opacity-50 hover:opacity-100"
-          style={{ background: 'none', padding: 0 }}
-          onClick={function goBack() {
-            window.history.back()
-          }}
-          icon={<IconArrowLeft />}
-        >
-          Go back
-        </Button>
         <div className="space-y-12 py-8">
-          <div className="flex items-center space-x-3">
-            <SVG src={`/img/supabase-logo.svg`} className="h-4 w-4" />
-            <Typography.Title level={4} className="m-0">
-              Supabase support
-            </Typography.Title>
+          <div className="flex justify-between items-center">
+            <div className="flex items-center space-x-3">
+              <SVG src={`${BASE_PATH}/img/supabase-logo.svg`} className="h-4 w-4" />
+              <h1 className="m-0 text-lg">Supabase support</h1>
+            </div>
+            <div className="flex items-center space-x-3">
+              <Button asChild type="default" icon={<IconTool />}>
+                <Link
+                  href="https://supabase.com/docs/guides/platform/troubleshooting"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Troubleshooting
+                </Link>
+              </Button>
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger>
+                  <Button
+                    asChild
+                    type="default"
+                    icon={
+                      isLoading ? (
+                        <IconLoader className="animate-spin" />
+                      ) : isHealthy ? (
+                        <div className="h-2 w-2 bg-brand rounded-full" />
+                      ) : (
+                        <div className="h-2 w-2 bg-yellow-900 rounded-full" />
+                      )
+                    }
+                  >
+                    <Link href="https://status.supabase.com/" target="_blank" rel="noreferrer">
+                      {isLoading
+                        ? 'Checking status'
+                        : isHealthy
+                        ? 'All systems operational'
+                        : 'Active incident ongoing'}
+                    </Link>
+                  </Button>
+                </Tooltip.Trigger>
+                <Tooltip.Portal>
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                        'border border-scale-200',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-foreground">Check Supabase status page</span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              </Tooltip.Root>
+            </div>
           </div>
-          <div className="bg-panel-body-light dark:bg-panel-body-dark dark:border-dark min-w-full space-y-12 rounded border py-8 shadow-md">
-            {sent ? (
-              <Success />
+          <div
+            className={[
+              'min-w-full space-y-12 rounded border bg-panel-body-light shadow-md',
+              `${sentCategory === undefined ? 'py-8' : 'pt-8'}`,
+              'dark:border-dark dark:bg-panel-body-dark',
+            ].join(' ')}
+          >
+            {sentCategory !== undefined ? (
+              <Success sentCategory={sentCategory} />
             ) : (
-              <form onSubmit={(e) => handleSubmit(e)} className="space-y-8">
-                <div className="px-6">
-                  <Typography.Title level={4}>What problem are you facing?</Typography.Title>
-                </div>
-
-                <div className="space-y-6">
-                  <div className="px-6">
-                    <Listbox
-                      value={formState.category.value}
-                      label="Category"
-                      layout="horizontal"
-                      onChange={(value) => handleOnChange({ name: 'category', value })}
-                    >
-                      {categoryOptions.map((option, i) => {
-                        return (
-                          <Listbox.Option
-                            key={`option-${option.value}`}
-                            label={option.label}
-                            value={option.value}
-                            children={({ active, selected }: any) => {
-                              return (
-                                <>
-                                  <span>{option.label}</span>
-                                  <span className="block text-xs opacity-50">
-                                    {option.description}
-                                  </span>
-                                </>
-                              )
-                            }}
-                          />
-                        )
-                      })}
-                    </Listbox>
-                  </div>
-                  <div className="px-6">
-                    <Listbox
-                      value={formState.project.value}
-                      label="Project"
-                      layout="horizontal"
-                      descriptionText="The project that is experiencing the problem"
-                      onChange={(value) => handleOnChange({ name: 'project', value })}
-                    >
-                      {projects.map((option) => {
-                        return (
-                          <Listbox.Option
-                            key={`option-${option.ref}`}
-                            label={option.name || ''}
-                            value={option.ref}
-                            children={({ active, selected }: any) => {
-                              const organization = sortedOrganizations.find(
-                                (x) => x.id === option.organization_id
-                              )
-                              return (
-                                <div>
-                                  <span>{option.name}</span>
-                                  <span className="block text-xs opacity-50">
-                                    {organization?.name}
-                                  </span>
-                                </div>
-                              )
-                            }}
-                          />
-                        )
-                      })}
-                    </Listbox>
-                  </div>
-
-                  <div className="px-6">
-                    <Listbox
-                      value={formState.severity.value}
-                      label="Severity"
-                      layout="horizontal"
-                      onChange={(value) => handleOnChange({ name: 'severity', value })}
-                    >
-                      {severityOptions.map((option: any) => {
-                        const selectedProject = projects.find(
-                          (project: any) => project.ref === formState.project.value
-                        )
-                        const isAllowedCritical =
-                          (selectedProject?.subscription_tier ?? PRICING_TIER_PRODUCT_IDS.FREE) !==
-                          PRICING_TIER_PRODUCT_IDS.FREE
-                        return (
-                          <Listbox.Option
-                            key={`option-${option.value}`}
-                            label={option.label}
-                            value={option.value}
-                            disabled={option.value === 'Critical' && !isAllowedCritical}
-                            children={({ active, selected }: any) => {
-                              return (
-                                <>
-                                  <span>{option.label}</span>
-                                  <span className="block text-xs opacity-50">
-                                    {option.description}
-                                  </span>
-                                </>
-                              )
-                            }}
-                          />
-                        )
-                      })}
-                    </Listbox>
-                  </div>
-
-                  <Divider light />
-
-                  <div className="px-6">
-                    <Input
-                      label="Subject"
-                      placeholder="Summary of the problem you have"
-                      onChange={(e) => handleOnChange({ name: 'subject', value: e.target.value })}
-                      value={formState.subject.value}
-                      error={formState.subject.error}
-                    />
-                  </div>
-
-                  <div className="px-6">
-                    <Input.TextArea
-                      label="Message"
-                      descriptionText="Describe the issue your facing, with any relevant information we may need"
-                      limit={500}
-                      labelOptional="500 character limit"
-                      onChange={(e) => handleOnChange({ name: 'body', value: e.target.value })}
-                      value={formState.body.value}
-                      error={formState.body.error}
-                    />
-                  </div>
-                </div>
-                {errors.length >= 1 && (
-                  <Typography.Text type="danger">There are errors here</Typography.Text>
-                )}
-                <div className="px-6">
-                  <div className="flex justify-end">
-                    <Button icon={<IconMail />} size="medium" loading={loading}>
-                      Send support request
-                    </Button>
-                  </div>
-                </div>
-              </form>
+              <SupportForm setSentCategory={setSentCategory} />
             )}
           </div>
         </div>
@@ -449,4 +101,4 @@ const SupportNew = () => {
   )
 }
 
-export default withAuth(observer(SupportNew))
+export default withAuth(observer(SupportPage), { useHighestAAL: false })

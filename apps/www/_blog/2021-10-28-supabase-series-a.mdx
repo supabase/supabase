@@ -4,6 +4,8 @@ description: Supabase just raised $30M, bringing our total funding to $36M.
 author: paul_copplestone
 image: series-a/supabase-series-a.png
 thumb: series-a/supabase-series-a.png
+categories:
+  - company
 tags:
   - supabase
 date: '2021-10-28'
@@ -29,8 +31,8 @@ because we don't add telemetry. Active databases are growing 35% per month.
 
 As of September, over 40,000 developers have signed up to Supabase from some of the world's leading companies.
 Because of the versatility of Postgres, they're building everything from
-[counter-fraud systems for Fintech](/blog/2020/12/02/case-study-xendit) to
-[digital platforms powering 200,000 users](/blog/2021/07/28/mobbin-supabase-200000-users).
+[counter-fraud systems for Fintech](/blog/case-study-xendit) to
+[digital platforms powering 200,000 users](/blog/mobbin-supabase-200000-users).
 
 <ImageGrid
   smCols={3}
@@ -152,7 +154,7 @@ Building an alternative is a bit like launching five different startups at once.
 
 That said, our approach has been clear from the start: we don't want to re-invent the wheel.
 We want to leverage existing open source products wherever we can, improving them by up-streaming changes and employing maintainers
-([PostgREST](/blog/2020/06/15/supabase-steve-chavez),
+([PostgREST](/blog/supabase-steve-chavez),
 [PostgreSQL](https://www.postgresql.org/message-id/CABwTF4UZzYoHcaEGe2cESVn-e9dc3wzg%3Dmvx7Tz8qbKJ7p3UKA%40mail.gmail.com)).
 This model is the real promise of open source, and we've been lucky to have investors who have backed our approach
 since the start - Y Combinator, Mozilla, and our lead investor, Coatue.
@@ -217,7 +219,7 @@ User-facing applications usually require tools beyond just a database and fronte
 - **File Storage:** for large images and media.
 
 Supabase makes all of this easy. Beyond the database we offer [Auth](/docs/guides/auth),
-RESTful and Realtime [APIs](/docs/guides/api), a [Storage](/docs/guides/storage)
+RESTful and Realtime [APIs](/docs/guides/database/api), a [Storage](/docs/guides/storage)
 system for large files, and a bunch of other tools - all wrapped up into a simple-to-use Dashboard.
 
 ![Supabase Dashboard](/images/blog/series-a/dashboard.png)
@@ -227,7 +229,7 @@ existing functionality.
 
 - **Row Level Security:** restrict user access to data and files using Postgres Policies.
 - **Realtime data streams:** subscribe to database changes using the logical replication stream.
-- **Function Hooks:** trigger external systems using Postgres triggers and our [async request extension](https://github.com/supabase/pg_net/).
+- **Database Webhooks (previously called "Function Hooks"):** trigger external systems using Postgres triggers and our [async request extension](https://github.com/supabase/pg_net/).
 - **RESTful APIs:** query your database [tables](/docs/reference/javascript/select) and [functions](/docs/reference/javascript/rpc) over HTTP, using [PostgREST](https://postgrest.org).
 
 ### Phase 3: Cloud-native PostgreSQL
@@ -254,7 +256,7 @@ We're building a cloud-native Postgres platform.
 ## Join us
 
 We have a track record of hiring open source maintainers, PostgREST is maintained by a
-[Supabase developer](/blog/2020/06/15/supabase-steve-chavez), one of our first hires over a year ago.
+[Supabase developer](/blog/supabase-steve-chavez), one of our first hires over a year ago.
 We've recently added [another developer](https://www.postgresql.org/message-id/CABwTF4UZzYoHcaEGe2cESVn-e9dc3wzg%3Dmvx7Tz8qbKJ7p3UKA%40mail.gmail.com)
 with the explicit goal of working within the PostgreSQL community.
 
@@ -263,7 +265,7 @@ If you want to help us build the future of cloud-native Postgres, join us:
 
 ## Get started
 
-- Start using Supabase today: **[app.supabase.com](https://app.supabase.com/)**
+- Start using Supabase today: **[supabase.com/dashboard](https://supabase.com/dashboard/)**
 - Make sure to **[star us on GitHub](https://github.com/supabase/supabase)**
 - Follow us **[on Twitter](https://twitter.com/supabase)**
 - Subscribe to our **[YouTube channel](https://www.youtube.com/c/supabase)**

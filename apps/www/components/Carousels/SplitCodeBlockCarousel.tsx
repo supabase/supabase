@@ -2,12 +2,12 @@ import { useState } from 'react'
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react'
 
-import { Tabs, Button, Space } from '@supabase/ui'
+import { Tabs, Button, Space } from 'ui'
 import CodeBlock from '../CodeBlock/CodeBlock'
 
 // Import Swiper styles
 import 'swiper/swiper.min.css'
-import { Badge } from '@supabase/ui'
+import { Badge } from 'ui'
 import Link from 'next/link'
 
 interface Content {
@@ -117,20 +117,18 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
             return (
               <SwiperSlide key={i}>
                 <p>
-                  <span className="text-scale-1200 mb-4 block text-lg dark:text-white">
+                  <span className="text-foreground mb-4 block text-lg dark:text-white">
                     {extension.detail_title}
                   </span>
                 </p>
                 <p className="p mb-6 block">{extension.detail_text}</p>
                 <Space className="justify-between">
                   {extension.url && (
-                    <Link href={extension.url} as={extension.url}>
-                      <a className="ml-px">
-                        <Button as="a" type="default">
-                          View documentation
-                        </Button>
-                      </a>
-                    </Link>
+                    <Button asChild type="default">
+                      <Link href={extension.url} as={extension.url} className="ml-px">
+                        View documentation
+                      </Link>
+                    </Button>
                   )}
                   <div>
                     <p className="p mr-4">{extension.badges_label}</p>

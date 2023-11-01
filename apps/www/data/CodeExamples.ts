@@ -23,7 +23,7 @@ export const createUserExample: ExampleProps = {
   const supabase = createClient(supabaseUrl, supabaseKey)
   
   // Create a new user
-  const { user, error } = await supabase.auth.signUp({
+  const { user, error } = await supabase.auth.signUpWithPassword({
     email: 'example@email.com',
     password: 'example-password',
   })

@@ -1,5 +1,4 @@
-import SQLEditor from './SQLEditor'
 import SQLTemplates from './SQLTemplates/SQLTemplates'
+import SQLQuickstarts from './SQLTemplates/SQLQuickstarts'
 
-export { SQLTemplates }
-export default SQLEditor
+export { SQLTemplates, SQLQuickstarts }

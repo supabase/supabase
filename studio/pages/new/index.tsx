@@ -1,101 +1,107 @@
-import { useState } from 'react'
+import HCaptcha from '@hcaptcha/react-hcaptcha'
+import { Elements } from '@stripe/react-stripe-js'
+import { loadStripe } from '@stripe/stripe-js'
+import { useParams } from 'common'
+import { useTheme } from 'next-themes'
 import { observer } from 'mobx-react-lite'
-import { Button, Input } from '@supabase/ui'
-import { useRouter } from 'next/router'
+import { useCallback, useEffect, useState } from 'react'
 
-import { API_URL } from 'lib/constants'
-import { useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
+import { NewOrgForm } from 'components/interfaces/Organization'
 import { WizardLayout } from 'components/layouts'
-import Panel from 'components/ui/Panel'
+import { useSetupIntent } from 'data/stripe/setup-intent-mutation'
+import { STRIPE_PUBLIC_KEY } from 'lib/constants'
+import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
 import { NextPageWithLayout } from 'types'
+
+const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
 /**
  * No org selected yet, create a new one
  */
 const Wizard: NextPageWithLayout = () => {
-  const { ui, app } = useStore()
-  const router = useRouter()
+  const { resolvedTheme } = useTheme()
 
-  const [orgName, setOrgName] = useState('')
-  const [newOrgLoading, setNewOrgLoading] = useState(false)
+  const [intent, setIntent] = useState<any>()
+  const captchaLoaded = useIsHCaptchaLoaded()
 
-  function validateOrgName(name: any) {
-    const value = name ? name.trim() : ''
-    return value.length >= 1
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
+
+  const { mutate: setupIntent } = useSetupIntent({ onSuccess: (res) => setIntent(res) })
+
+  const captchaRefCallback = useCallback((node: any) => {
+    setCaptchaRef(node)
+  }, [])
+
+  const initSetupIntent = async (hcaptchaToken: string | undefined) => {
+    if (!hcaptchaToken) return console.error('Hcaptcha token is required')
+
+    // Force a reload of Elements, necessary for Stripe
+    setIntent(undefined)
+    setupIntent({ hcaptchaToken })
   }
 
-  function onOrgNameChange(e: any) {
-    setOrgName(e.target.value)
+  const options = {
+    clientSecret: intent ? intent.client_secret : '',
+    appearance: { theme: resolvedTheme === 'dark' ? 'night' : 'flat', labels: 'floating' },
+  } as any
+
+  const loadPaymentForm = async () => {
+    if (captchaRef && captchaLoaded) {
+      let token = captchaToken
+
+      try {
+        if (!token) {
+          const captchaResponse = await captchaRef.execute({ async: true })
+          token = captchaResponse?.response ?? null
+        }
+      } catch (error) {
+        return
+      }
+
+      await initSetupIntent(token ?? undefined)
+      resetCaptcha()
+    }
   }
 
-  async function onClickSubmit(e: any) {
-    e.preventDefault()
-    const isOrgNameValid = validateOrgName(orgName)
-    if (!isOrgNameValid) {
-      ui.setNotification({ category: 'error', message: 'Organization name is empty' })
-      return
-    }
+  useEffect(() => {
+    loadPaymentForm()
+  }, [captchaRef, captchaLoaded])
 
-    setNewOrgLoading(true)
-    const response = await post(`${API_URL}/organizations`, {
-      name: orgName,
-    })
+  const resetSetupIntent = () => {
+    return loadPaymentForm()
+  }
 
-    if (response.error) {
-      setNewOrgLoading(false)
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to create organization: ${response.error?.message ?? response.error}`,
-      })
-    } else {
-      const org = response
-      app.onOrgAdded(org)
-      router.push(`/new/${org.slug}`)
-    }
+  const onLocalCancel = () => {
+    setIntent(undefined)
+  }
+
+  const resetCaptcha = () => {
+    setCaptchaToken(null)
+    captchaRef?.resetCaptcha()
   }
 
   return (
-    <Panel
-      hideHeaderStyling
-      title={
-        <div key="panel-title">
-          <h4>Create a new organization</h4>
-        </div>
-      }
-      footer={
-        <div key="panel-footer" className="flex w-full items-center justify-between">
-          <Button type="default" onClick={() => router.push('/')}>
-            Cancel
-          </Button>
-          <div className="flex items-center space-x-3">
-            <p className="text-scale-900 text-xs">You can rename your organization later</p>
-            <Button onClick={onClickSubmit} loading={newOrgLoading} disabled={newOrgLoading}>
-              Create organization
-            </Button>
-          </div>
-        </div>
-      }
-    >
-      <Panel.Content className="pt-0">
-        <p className="text-sm">This is your organization's name within Supabase.</p>
-        <p className="text-scale-1100 text-sm">
-          For example, you can use the name of your company or department
-        </p>
-      </Panel.Content>
-      <Panel.Content className="Form section-block--body has-inputs-centered">
-        <Input
-          autoFocus
-          label="Name"
-          type="text"
-          layout="horizontal"
-          placeholder="Organization name"
-          descriptionText="What's the name of your company or team?"
-          value={orgName}
-          onChange={onOrgNameChange}
-        />
-      </Panel.Content>
-    </Panel>
+    <>
+      <HCaptcha
+        ref={captchaRefCallback}
+        sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+        size="invisible"
+        onVerify={(token) => {
+          setCaptchaToken(token)
+        }}
+        onClose={onLocalCancel}
+        onExpire={() => {
+          setCaptchaToken(null)
+        }}
+      />
+
+      {intent && (
+        <Elements stripe={stripePromise} options={options}>
+          <NewOrgForm onPaymentMethodReset={() => resetSetupIntent()} />
+        </Elements>
+      )}
+    </>
   )
 }
 

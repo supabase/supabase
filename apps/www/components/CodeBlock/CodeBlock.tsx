@@ -1,4 +1,4 @@
-import { Button, IconCheck, IconCopy, IconFile, IconTerminal } from '@supabase/ui'
+import { Button, IconCheck, IconCopy, IconFile, IconTerminal } from 'ui'
 import { useState } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
@@ -6,16 +6,18 @@ import bash from 'react-syntax-highlighter/dist/cjs/languages/hljs/bash'
 import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
 import py from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
 import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
+import kotlin from 'react-syntax-highlighter/dist/cjs/languages/hljs/kotlin'
 import monokaiCustomTheme from './CodeBlock.utils'
 
 export interface CodeBlockProps {
-  lang: 'js' | 'sql' | 'py' | 'bash' | 'ts' | 'tsx'
+  lang: 'js' | 'sql' | 'py' | 'bash' | 'ts' | 'tsx' | 'kotlin'
   startingLineNumber?: number
   hideCopy?: boolean
   showLineNumbers?: boolean
   className?: string
   children?: string
   size?: 'small' | 'medium' | 'large'
+  background?: string
 }
 
 function CodeBlock(props: CodeBlockProps) {
@@ -51,6 +53,7 @@ function CodeBlock(props: CodeBlockProps) {
   SyntaxHighlighter.registerLanguage('py', py)
   SyntaxHighlighter.registerLanguage('sql', sql)
   SyntaxHighlighter.registerLanguage('bash', bash)
+  SyntaxHighlighter.registerLanguage('kotlin', kotlin)
 
   // const large = props.size === 'large' ? true : false
   const large = false
@@ -60,21 +63,21 @@ function CodeBlock(props: CodeBlockProps) {
       {filename && (
         <div
           className="
-            bg-scale-200
-            text-scale-900
-            flex 
-            h-8 w-full 
+            bg-background
+            text-muted
+            flex
+            h-8 w-full
             items-center
-            
-            gap-1
-            rounded-tr  
-            rounded-tl 
-            
-            border-t 
 
-            border-r 
-            border-l 
-            px-4 
+            gap-1
+            rounded-tr
+            rounded-tl
+
+            border-t
+
+            border-r
+            border-l
+            px-4
             font-sans
             "
         >
@@ -87,6 +90,7 @@ function CodeBlock(props: CodeBlockProps) {
         </div>
       )}
       <div className="relative">
+        {/* @ts-ignore */}
         <SyntaxHighlighter
           language={lang}
           style={monokaiCustomTheme}
@@ -95,7 +99,7 @@ function CodeBlock(props: CodeBlockProps) {
             padding: '21px 24px',
             fontSize: large ? 18 : '0.875rem',
             lineHeight: large ? 1.6 : 1.4,
-            background: '#181818',
+            background: props.background ?? '#1A1A1A',
           }}
           showLineNumbers={props.showLineNumbers}
           lineNumberStyle={{
@@ -115,7 +119,7 @@ function CodeBlock(props: CodeBlockProps) {
                 type="text"
                 icon={
                   copied ? (
-                    <span className="text-brand-900">
+                    <span className="text-brand">
                       <IconCheck strokeWidth={3} />
                     </span>
                   ) : (
@@ -123,6 +127,7 @@ function CodeBlock(props: CodeBlockProps) {
                   )
                 }
                 onClick={() => handleCopy()}
+                aria-label="Copy"
               >
                 {/* {copied ? 'Copied' : 'Copy'} */}
               </Button>

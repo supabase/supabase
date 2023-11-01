@@ -1,8 +1,11 @@
-import * as React from 'react'
-import { EditorProps } from '@supabase/react-data-grid'
+import { Select } from 'ui'
+import { RenderEditCellProps } from 'react-data-grid'
 
-interface SelectEditorProps<TRow, TSummaryRow = unknown> extends EditorProps<TRow, TSummaryRow> {
-  options: { label: string; value: string }[]
+import { useTrackedState } from 'components/grid/store'
+
+interface SelectEditorProps<TRow, TSummaryRow = unknown>
+  extends RenderEditCellProps<TRow, TSummaryRow> {
+  options: { label: string; _value: string }[]
 }
 
 export function SelectEditor<TRow, TSummaryRow = unknown>({
@@ -12,14 +15,17 @@ export function SelectEditor<TRow, TSummaryRow = unknown>({
   onClose,
   options,
 }: SelectEditorProps<TRow, TSummaryRow>) {
+  const state = useTrackedState()
+  const gridColumn = state.gridColumns.find((x) => x.name == column.key)
+
   const value = row[column.key as keyof TRow] as unknown as string
 
-  function onChange(event: React.ChangeEvent<HTMLSelectElement>) {
-    const value = event.target.value
-    if (!value || value == '') {
+  function onChange(event: any) {
+    debugger
+    if (!event.target.value || event.target.value == '') {
       onRowChange({ ...row, [column.key]: null }, true)
     } else {
-      onRowChange({ ...row, [column.key]: value }, true)
+      onRowChange({ ...row, [column.key]: event.target.value }, true)
     }
   }
 
@@ -28,19 +34,24 @@ export function SelectEditor<TRow, TSummaryRow = unknown>({
   }
 
   return (
-    <select
-      className="sb-grid-select-editor bg-scale-400 text-grid p-0 px-3"
-      value={value ?? ''}
+    <Select
+      autoFocus
+      id="select-editor"
+      name="select-editor"
+      size="small"
+      defaultValue={value ?? ''}
+      className="sb-grid-select-editor !gap-2"
+      style={{ width: `${gridColumn?.width || column.width}px` }}
+      // @ts-ignore
       onChange={onChange}
       onBlur={onBlur}
-      autoFocus
     >
-      <option value={''}>[null]</option>
-      {options.map(({ label, value }) => (
-        <option key={value} value={value}>
+      <Select.Option value="">NULL</Select.Option>
+      {options.map(({ label, _value }) => (
+        <Select.Option key={_value} value={_value} selected={_value === value}>
           {label}
-        </option>
+        </Select.Option>
       ))}
-    </select>
+    </Select>
   )
 }

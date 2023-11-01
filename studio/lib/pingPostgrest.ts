@@ -1,5 +1,8 @@
 import semver from 'semver'
 import { headWithTimeout, getWithTimeout } from './common/fetch'
+import { API_URL } from './constants'
+
+const DEFAULT_TIMEOUT_MILLISECONDS = 2000
 
 /**
  * Ping Postgrest for health check. Default timeout in 2s.
@@ -14,13 +17,14 @@ import { headWithTimeout, getWithTimeout } from './common/fetch'
  * @return true if ping is successful else false
  */
 async function pingPostgrest(
-  restUrl: string,
-  apikey: string,
+  projectRef: string,
   options?: {
     kpsVersion?: string
     timeout?: number
   }
 ) {
+  if (projectRef === undefined) return false
+
   const { kpsVersion, timeout } = options ?? {}
   const healthCheckApiEnable = semver.gte(
     // @ts-ignore
@@ -28,26 +32,21 @@ async function pingPostgrest(
     semver.coerce('kps-v3.8.6')
   )
   if (healthCheckApiEnable) {
-    const healthCheckUrl = `${restUrl.replace('/rest/', '/rest-admin/')}live`
-    return pingHealthCheckApi(healthCheckUrl, apikey, timeout)
+    return pingHealthCheckApi(projectRef, timeout)
+  } else {
+    return pingOpenApi(projectRef, timeout)
   }
-
-  return pingOpenApi(restUrl, apikey, timeout)
 }
-export default pingPostgrest
 
-const DEFAULT_TIMEOUT_MILLISECONDS = 2000
+export default pingPostgrest
 
 /**
  * Send a HEAD request to postgrest OpenAPI.
  *
  * @return true if there's no error else false
  */
-async function pingOpenApi(url: string, apikey: string, timeout?: number) {
-  const headers = { apikey, Authorization: `Bearer ${apikey}` }
-  const { error } = await headWithTimeout(url, [], {
-    headers,
-    credentials: 'omit',
+async function pingOpenApi(ref: string, timeout?: number) {
+  const { error } = await headWithTimeout(`${API_URL}/projects/${ref}/api/rest`, [], {
     timeout: timeout ?? DEFAULT_TIMEOUT_MILLISECONDS,
   })
   return error === undefined
@@ -58,11 +57,8 @@ async function pingOpenApi(url: string, apikey: string, timeout?: number) {
  *
  * @return true if there's no error else false
  */
-async function pingHealthCheckApi(url: string, apikey: string, timeout?: number) {
-  const headers = { apikey }
-  const { error } = await getWithTimeout(url, {
-    headers,
-    credentials: 'omit',
+async function pingHealthCheckApi(ref: string, timeout?: number) {
+  const { error } = await getWithTimeout(`${API_URL}/projects/${ref}/live`, {
     timeout: timeout ?? DEFAULT_TIMEOUT_MILLISECONDS,
   })
   return error === undefined

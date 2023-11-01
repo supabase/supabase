@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@supabase/supabase-js": "^1.33.3",
-    "@supabase/ui": "^0.36.4",
+    "@supabase/auth-ui-react": "^0.2.1",
+    "@supabase/supabase-js": "^2.0.0",
     "@testing-library/jest-dom": "^5.16.3",
     "@testing-library/react": "^12.1.4",
     "@testing-library/user-event": "^13.5.0",

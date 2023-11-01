@@ -4,46 +4,49 @@ import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
   return [
     {
-      title: 'General',
+      title: 'Manage',
+      items: [{ name: 'Users', key: 'users', url: `/project/${ref}/auth/users`, items: [] }],
+    },
+
+    {
+      title: 'Configuration',
       items: [
-        { name: 'Users', key: 'users', url: `/project/${ref}/auth/users`, items: [] },
-        { name: 'Policies', key: 'policies', url: `/project/${ref}/auth/policies`, items: [] },
+        {
+          name: 'Policies',
+          key: 'policies',
+          url: `/project/${ref}/auth/policies`,
+          items: [],
+        },
         ...(IS_PLATFORM
           ? [
               {
-                name: 'Logs',
-                key: 'auth-logs',
-                url: `/project/${ref}/auth/auth-logs`,
+                name: 'Providers',
+                key: 'providers',
+                url: `/project/${ref}/auth/providers`,
+                items: [],
+              },
+              {
+                name: 'Rate Limits',
+                key: 'rate-limits',
+                url: `/project/${ref}/auth/rate-limits`,
+                items: [],
+              },
+              {
+                name: 'Email Templates',
+                key: 'templates',
+                url: `/project/${ref}/auth/templates`,
+                items: [],
+              },
+
+              {
+                name: 'URL Configuration',
+                key: 'url-configuration',
+                url: `/project/${ref}/auth/url-configuration`,
                 items: [],
               },
             ]
           : []),
       ],
     },
-    ...(IS_PLATFORM
-      ? [
-          {
-            title: 'Configuration',
-            items: [
-              ...(IS_PLATFORM
-                ? [
-                    {
-                      name: 'Settings',
-                      key: 'settings',
-                      url: `/project/${ref}/auth/settings`,
-                      items: [],
-                    },
-                  ]
-                : []),
-              {
-                name: 'Templates',
-                key: 'templates',
-                url: `/project/${ref}/auth/templates`,
-                items: [],
-              },
-            ],
-          },
-        ]
-      : []),
   ]
 }

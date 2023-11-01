@@ -1,7 +1,6 @@
-import { FC } from 'react'
-import { IconX } from '@supabase/ui'
+import { IconX } from 'ui'
 
-export const BadgeDisabled: FC<{ name: string }> = ({ name }) => (
+export const BadgeDisabled = ({ name }: { name: string }) => (
   <div
     className={[
       'text-typography-body-light dark:text-typography-body-dark',
@@ -13,9 +12,12 @@ export const BadgeDisabled: FC<{ name: string }> = ({ name }) => (
   </div>
 )
 
-export const BadgeSelected: FC<{ name: string; handleRemove: () => void }> = ({
+export const BadgeSelected = ({
   name,
   handleRemove,
+}: {
+  name: string
+  handleRemove: () => void
 }) => (
   <div
     className={[
@@ -23,6 +25,7 @@ export const BadgeSelected: FC<{ name: string; handleRemove: () => void }> = ({
       'flex items-center space-x-2 rounded bg-gray-500',
       'py-0.5 px-2 text-sm',
     ].join(' ')}
+    onClick={(e: any) => e.preventDefault()}
   >
     <span>{name}</span>
     <IconX
@@ -30,6 +33,7 @@ export const BadgeSelected: FC<{ name: string; handleRemove: () => void }> = ({
       className="cursor-pointer opacity-50 transition hover:opacity-100"
       onClick={(e: any) => {
         e.preventDefault()
+        e.stopPropagation()
         handleRemove()
       }}
     />

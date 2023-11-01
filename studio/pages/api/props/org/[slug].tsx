@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import apiWrapper from 'lib/api/apiWrapper'
-import { Member } from 'types'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -17,27 +16,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
-  const owner: Member = {
-    id: 1,
-    is_owner: true,
-    profile: {
-      id: 1,
-      primary_email: 'jonny@supabase.io',
-      username: 'mildtomato',
-    },
-  }
-  const member: Member = {
-    id: 2,
-    is_owner: false,
-    profile: {
-      id: 2,
-      primary_email: 'joshen@supabase.io',
-      username: 'joshen',
-    },
-  }
   // Platform specific endpoint
   const response = {
-    members: [owner, member],
+    members: [],
     products: [],
     customer: {
       customer: {},
@@ -45,6 +26,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
       total_paid_projects: 0,
       total_free_projects: 0,
       total_pro_projects: 0,
+      total_team_projects: 0,
       total_payg_projects: 0,
     },
   }

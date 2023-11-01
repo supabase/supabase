@@ -1,6 +1,10 @@
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import {
   Count,
+  EventChart,
+  EventChartData,
   Filters,
+  genChartQuery,
   genCountQuery,
   genDefaultQuery,
   genQueryParams,
@@ -11,24 +15,23 @@ import {
   LogsTableName,
   PREVIEWER_DATEPICKER_HELPERS,
 } from 'components/interfaces/Settings/Logs'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import useSWR from 'swr'
-import useSWRInfinite, { SWRInfiniteKeyLoader } from 'swr/infinite'
+import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react'
 import { API_URL } from 'lib/constants'
-import { get } from 'lib/common/fetch'
+import { get, isResponseOk } from 'lib/common/fetch'
 import dayjs from 'dayjs'
+import useFillTimeseriesSorted from './useFillTimeseriesSorted'
+import useTimeseriesUnixToIso from './useTimeseriesUnixToIso'
 
-interface Data {
+interface LogsPreviewHook {
   logData: LogData[]
   error: string | Object | null
   newCount: number
   isLoading: boolean
-  pageSize: number
+  isLoadingOlder: boolean
   filters: Filters
   params: LogsEndpointParams
   oldestTimestamp?: string
-}
-interface Handlers {
+  eventChartData: EventChartData[]
   loadOlder: () => void
   refresh: () => void
   setFilters: (filters: Filters | ((previous: Filters) => Filters)) => void
@@ -38,130 +41,178 @@ function useLogsPreview(
   projectRef: string,
   table: LogsTableName,
   filterOverride?: Filters
-): [Data, Handlers] {
+): LogsPreviewHook {
   const defaultHelper = getDefaultHelper(PREVIEWER_DATEPICKER_HELPERS)
   const [latestRefresh, setLatestRefresh] = useState<string>(new Date().toISOString())
 
   const [filters, setFilters] = useState<Filters>({ ...filterOverride })
+  const isFirstRender = useRef<boolean>(true)
 
   const [params, setParams] = useState<LogsEndpointParams>({
     project: projectRef,
-    sql: '',
+    sql: genDefaultQuery(table, filters),
     iso_timestamp_start: defaultHelper.calcFrom(),
     iso_timestamp_end: defaultHelper.calcTo(),
   })
 
   useEffect(() => {
-    if (filters !== {}) {
-      refresh()
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
     }
+    refresh()
   }, [JSON.stringify(filters)])
 
-  // handle url generation for log pagination
-  const getKeyLogs: SWRInfiniteKeyLoader = (_pageIndex: number, prevPageData: Logs) => {
-    let queryParams
-
-    // cancel request if no sql provided
-    if (!params.sql) {
-      // return null to restrict unnecessary requests to api
-      // https://swr.vercel.app/docs/conditional-fetching#conditional
-      return null
-    }
-
-    // if prev page data is 100 items, could possibly have more records that are not yet fetched within this interval
-    if (prevPageData === null) {
-      // reduce interval window limit by using the timestamp of the last log
-      queryParams = genQueryParams(params as any)
-    } else if ((prevPageData.result ?? []).length === 0) {
-      // no rows returned, indicates that no more data to retrieve and append.
-      return null
-    } else {
-      const len = prevPageData.result.length
-      const { timestamp: tsLimit }: LogData = prevPageData.result[len - 1]
-      const isoTsLimit = dayjs.utc(Number(tsLimit / 1000)).toISOString()
-      // create new key from params
-      queryParams = genQueryParams({ ...params, iso_timestamp_end: isoTsLimit } as any)
-    }
-    return `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${queryParams}`
-  }
+  const queryParamsKey = genQueryParams(params as any)
 
   const {
-    data = [],
-    error: swrError,
-    isValidating,
-    size,
-    setSize,
-  } = useSWRInfinite<Logs>(getKeyLogs, get, { revalidateOnFocus: false, dedupingInterval: 3000 })
-  let logData: LogData[] = []
+    data,
+    isLoading,
+    isRefetching,
+    error: rqError,
+    fetchNextPage,
+    isFetchingNextPage,
+    refetch,
+  } = useInfiniteQuery(
+    ['projects', projectRef, 'logs', queryParamsKey],
+    ({ signal, pageParam }) => {
+      const uri = `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams({
+        ...params,
+        // don't overwrite unless user has already clicked on load older
+        iso_timestamp_end: pageParam || params.iso_timestamp_end,
+      } as any)}`
+      return get<Logs>(uri, { signal })
+    },
+    {
+      refetchOnWindowFocus: false,
+      getNextPageParam(lastPage) {
+        if (!isResponseOk(lastPage) || (lastPage.result?.length ?? 0) === 0) {
+          return undefined
+        }
+        const len = lastPage.result.length
+        const { timestamp: tsLimit }: LogData = lastPage.result[len - 1]
+        const isoTsLimit = dayjs.utc(Number(tsLimit / 1000)).toISOString()
+        return isoTsLimit
+      },
+    }
+  )
+
+  // memoize all this calculations stuff
+  const { logData, error, oldestTimestamp } = useMemo(() => {
+    let logData: LogData[] = []
+
+    let error: null | string | object = rqError ? (rqError as any).message : null
+    data?.pages.forEach((response) => {
+      if (isResponseOk(response) && response.result) {
+        logData = [...logData, ...response.result]
+      }
+      if (!error && response && response.error) {
+        error = response.error
+      }
+    })
+
+    const oldestTimestamp = logData[logData.length - 1]?.timestamp
+
+    return { logData, error, oldestTimestamp }
+  }, [data?.pages])
 
   const countUrl = () => {
-    // cancel request if no sql provided
-    if (!params.sql) {
-      // return null to restrict unnecessary requests to api
-      // https://swr.vercel.app/docs/conditional-fetching#conditional
-      return null
-    }
-
     return `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams({
       ...params,
-      sql: genCountQuery(table),
+      sql: genCountQuery(table, filters),
       iso_timestamp_start: latestRefresh,
     } as any)}`
   }
 
-  const { data: countData } = useSWR<Count>(countUrl, get, {
-    revalidateOnFocus: false,
-    dedupingInterval: 5000,
-    refreshInterval: 5000,
-  })
-  const newCount = countData?.result?.[0]?.count ?? 0
+  const { data: countData } = useQuery(
+    [
+      'projects',
+      projectRef,
+      'logs-count',
+      { ...params, sql: genCountQuery(table, filters), iso_timestamp_start: latestRefresh },
+    ],
+    ({ signal }) => get<Count>(countUrl(), { signal }),
+    {
+      refetchOnWindowFocus: false,
+      // refresh each minute only
+      refetchInterval: 60000,
+      // only enable if no errors are found and data has already been loaded
+      enabled: !error && data && data.pages.length > 0 ? true : false,
+    }
+  )
+
+  const newCount = isResponseOk(countData) ? countData.result?.[0]?.count ?? 0 : 0
+
+  // chart data
+
+  const chartQuery = useMemo(() => genChartQuery(table, params, filters), [params, filters])
+  const chartUrl = useMemo(() => {
+    return `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams({
+      iso_timestamp_end: params.iso_timestamp_end,
+      project: params.project,
+      sql: chartQuery,
+    } as any)}`
+  }, [params, chartQuery])
+
+  const { data: eventChartResponse, refetch: refreshEventChart } = useQuery(
+    [
+      'projects',
+      projectRef,
+      'logs-chart',
+      { iso_timestamp_end: params.iso_timestamp_end, project: params.project, sql: chartQuery },
+    ],
+    ({ signal }) => get<EventChart>(chartUrl, { signal }),
+    { refetchOnWindowFocus: false }
+  )
 
   const refresh = async () => {
     const generatedSql = genDefaultQuery(table, filters)
     setParams((prev) => ({ ...prev, sql: generatedSql }))
     setLatestRefresh(new Date().toISOString())
-    setSize(1)
+    refreshEventChart()
+    refetch()
   }
 
-  let error: null | string | object = swrError ? swrError.message : null
-  data.forEach((response) => {
-    if (!error && response?.result) {
-      logData = [...logData, ...response.result]
-    }
-    if (!error && response && response.error) {
-      error = response.error
-    }
-  })
-
-  const oldestTimestamp = logData[logData.length - 1]?.timestamp
-
-  const handleSetFilters: Handlers['setFilters'] = (newFilters) => {
+  const handleSetFilters: LogsPreviewHook['setFilters'] = (newFilters) => {
     if (typeof newFilters === 'function') {
       setFilters((prev) => {
         const resolved = newFilters(prev)
         return { ...resolved, ...filterOverride }
       })
     } else {
-      setFilters((prev) => ({ ...prev, ...newFilters, ...filterOverride }))
+      setFilters({ ...newFilters, ...filterOverride })
     }
   }
-  return [
-    {
-      newCount,
-      logData,
-      isLoading: isValidating,
-      pageSize: size,
-      error,
-      filters,
-      params,
-      oldestTimestamp: oldestTimestamp ? String(oldestTimestamp) : undefined,
-    },
-    {
-      setFilters: handleSetFilters,
-      refresh,
-      loadOlder: () => setSize((prev) => prev + 1),
-      setParams,
-    },
-  ]
+
+  const normalizedEventChartData = useTimeseriesUnixToIso(
+    (isResponseOk(eventChartResponse) && eventChartResponse.result) || [],
+    'timestamp'
+  )
+
+  const eventChartData = useFillTimeseriesSorted(
+    normalizedEventChartData,
+    'timestamp',
+    'count',
+    0,
+    params.iso_timestamp_start,
+    // default to current time if not set
+    params.iso_timestamp_end || new Date().toISOString()
+  )
+
+  return {
+    newCount,
+    logData,
+    isLoading: isLoading || isRefetching,
+    isLoadingOlder: isFetchingNextPage,
+    error,
+    filters,
+    params,
+    oldestTimestamp: oldestTimestamp ? String(oldestTimestamp) : undefined,
+    eventChartData,
+    setFilters: handleSetFilters,
+    refresh,
+    loadOlder: () => fetchNextPage(),
+    setParams,
+  }
 }
 export default useLogsPreview

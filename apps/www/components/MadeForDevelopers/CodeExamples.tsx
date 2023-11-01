@@ -11,7 +11,7 @@ import {
   ExampleProps,
 } from 'data/CodeExamples'
 import monokaiCustomTheme from 'data/CodeEditorTheme'
-import { Button, IconCopy, Space, Tabs } from '@supabase/ui'
+import { Button, IconCopy, Space, Tabs } from 'ui'
 
 SyntaxHighlighter.registerLanguage('javascript', js)
 
@@ -117,9 +117,9 @@ const CodeExamples = () => {
       activeId={example}
       type="underlined"
     >
-      {Object.values(exampleList).map((x) => {
+      {Object.values(exampleList).map((x, i) => {
         return (
-          <Tabs.Panel id={x.id} label={x.name}>
+          <Tabs.Panel id={x.id} label={x.name} key={i}>
             <span></span>
           </Tabs.Panel>
         )
@@ -150,6 +150,7 @@ const CodeExamples = () => {
             </div>
             <SyntaxHighlighter
               language="javascript"
+              // @ts-ignore
               style={monokaiCustomTheme}
               className="rounded-b-lg"
               customStyle={{

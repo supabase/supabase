@@ -1,33 +1,38 @@
-import Link from 'next/link'
 import dayjs from 'dayjs'
-import { FC, useEffect } from 'react'
-import { IconChevronRight, IconLoader } from '@supabase/ui'
+import Link from 'next/link'
+import { useEffect } from 'react'
+import { IconChevronRight, IconLoader } from 'ui'
 
-import { useProjectSubscription, useStore } from 'hooks'
 import Panel from 'components/ui/Panel'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { useStore } from 'hooks'
 
 interface ProjectSummaryProps {
   project: any
 }
 
-const ProjectSummary: FC<ProjectSummaryProps> = ({ project }) => {
+const ProjectSummary = ({ project }: ProjectSummaryProps) => {
   const { ui } = useStore()
-  const { subscription, isLoading: loading, error } = useProjectSubscription(project.ref)
+  const {
+    data: subscription,
+    isLoading: loading,
+    error,
+  } = useProjectSubscriptionV2Query({ projectRef: project.ref })
 
-  const currentPeriodStart = subscription?.billing?.current_period_start ?? 0
-  const currentPeriodEnd = subscription?.billing?.current_period_end ?? 0
+  const currentPeriodStart = subscription?.current_period_start ?? 0
+  const currentPeriodEnd = subscription?.current_period_end ?? 0
 
   useEffect(() => {
     if (error) {
       ui.setNotification({
         category: 'error',
-        message: `Failed to get project subscription: ${error?.message ?? 'unknown'}`,
+        message: `Failed to get project subscription: ${(error as any)?.message ?? 'unknown'}`,
       })
     }
   }, [error])
 
   return (
-    <div className="flex w-full items-center px-6 py-3">
+    <div className="flex items-center w-full px-6 py-3">
       <div className="w-[25%]">
         <p className="text-sm">{project.name}</p>
       </div>
@@ -38,7 +43,7 @@ const ProjectSummary: FC<ProjectSummaryProps> = ({ project }) => {
       ) : (
         <>
           <div className="w-[20%]">
-            <p className="text-sm">{subscription?.tier.name ?? ''}</p>
+            <p className="text-sm">{subscription?.plan.name ?? ''}</p>
           </div>
           <div className="flex w-[40%] items-center space-x-2">
             <p className="text-sm">{dayjs.unix(currentPeriodStart).utc().format('MMM D, YYYY')}</p>
@@ -46,11 +51,12 @@ const ProjectSummary: FC<ProjectSummaryProps> = ({ project }) => {
             <p className="text-sm">{dayjs.unix(currentPeriodEnd).utc().format('MMM D, YYYY')}</p>
           </div>
           <div className="flex w-[15%] items-center justify-end">
-            <Link href={`/project/${project.ref}/settings/billing`}>
-              <a className="group flex items-center space-x-2">
-                <p className="text-sm opacity-0 transition group-hover:opacity-100">View details</p>
-                <IconChevronRight />
-              </a>
+            <Link
+              href={`/project/${project.ref}/settings/billing/subscription`}
+              className="flex items-center space-x-2 group"
+            >
+              <p className="text-xs transition opacity-0 group-hover:opacity-100">View details</p>
+              <IconChevronRight strokeWidth={1.5} />
             </Link>
           </div>
         </>
@@ -63,13 +69,13 @@ interface ProjectsSummaryProps {
   projects: any
 }
 
-const ProjectsSummary: FC<ProjectsSummaryProps> = ({ projects }) => {
+const ProjectsSummary = ({ projects }: ProjectsSummaryProps) => {
   return (
     <div className="space-y-2">
       <h4>Projects at a glance</h4>
       <Panel
         title={
-          <div className="flex w-full items-center">
+          <div className="flex items-center w-full">
             <div className="w-[25%]">
               <p className="text-sm opacity-50">Name</p>
             </div>
@@ -88,7 +94,7 @@ const ProjectsSummary: FC<ProjectsSummaryProps> = ({ projects }) => {
         ))}
         {projects.length === 0 && (
           <Panel.Content>
-            <p className="text-scale-1100 text-sm">No projects created yet</p>
+            <p className="text-sm text-foreground-light">No projects created yet</p>
           </Panel.Content>
         )}
       </Panel>

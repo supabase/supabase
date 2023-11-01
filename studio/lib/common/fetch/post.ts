@@ -9,15 +9,15 @@ export async function post<T = any>(
 ): Promise<SupaResponse<T>> {
   const requestId = uuidv4()
   try {
-    const { headers: optionHeaders, ...otherOptions } = options ?? {}
-    const headers = constructHeaders(requestId, optionHeaders)
+    const { headers: optionHeaders, abortSignal, ...otherOptions } = options ?? {}
+    const headers = await constructHeaders(requestId, optionHeaders)
     const response = await fetch(url, {
       method: 'POST',
       body: JSON.stringify(data),
-      credentials: 'include',
       referrerPolicy: 'no-referrer-when-downgrade',
       headers,
       ...otherOptions,
+      signal: abortSignal,
     })
     if (!response.ok) return handleResponseError(response, requestId)
     return handleResponse(response, requestId)

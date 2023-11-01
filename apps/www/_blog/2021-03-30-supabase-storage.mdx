@@ -4,13 +4,24 @@ description: Launching Supabase Storage and how you can use it in your apps
 author: inian
 image: storage/ph-1.png
 thumb: storage/ph-1.png
+categories:
+  - product
 tags:
   - supabase
   - storage
 date: '03-30-2021'
 ---
 
-Today, we are launching one of most requested features - Storage! When you sign up for Supabase, you get a Postgres database with realtime subscriptions, user management, auto-generated APIs and now a scalable object store. These services integrate very well with each other and you don't need to sign up for yet another service just for your storage requirements.
+<div className="bg-gray-300 rounded-lg px-6 py-2 italic">
+
+🆕 Storage has undergone significant enhancements with two major releases since its initial launch. Here is what is new:
+
+- [Supabase Storage v2: Image resizing and Smart CDN](https://supabase.com/blog/storage-image-resizing-smart-cdn)
+- [Supabase Storage v3: Resumable Uploads with support for 50GB files](https://supabase.com/blog/storage-v3-resumable-uploads)
+
+</div>
+
+Today, we are launching one of most requested features - [Storage!](https://supabase.com/storage) When you sign up for Supabase, you get a Postgres database with realtime subscriptions, user management, auto-generated APIs and now a scalable object store. These services integrate very well with each other and you don't need to sign up for yet another service just for your storage requirements.
 
 As with anything that we build in Supabase, Storage is fast, secure and scalable. You can use it to store terabytes of Machine Learning training data, your e-commerce product gallery or just your growing collection of JPEGs featuring cats playing synths in space.
 
@@ -24,13 +35,13 @@ There are three key components to Supabase Storage:
 - Middleware (access and permissions). This consists of an API Server and Postgres.
 - Frontend (a nice UI).
 
-![Storage Infrastructure](/images/blog/storage/infra.png)
-
 The Storage API server sits behind Kong, an API Gateway. It talks to different storage backends like S3, Backblaze, etc to retrieve and store objects.
 
 Object metadata and security rules are stored in your Postgres database.
 
 We have built a powerful file explorer right into the dashboard, and using our Client libraries you can integrate Storage into your applications.
+
+![Storage Infrastructure](/images/blog/storage/infra.png)
 
 ## Frontend
 
@@ -54,7 +65,7 @@ And if you already know the location of a file but want to save a few clicks, yo
 
 We focused on performance, security and interoperability with the rest of the Supabase ecosystem.
 
-### **Integration with the Supabase ecosystem**
+### Integration with the Supabase ecosystem
 
 Supabase is a [collection of open source tools](/docs#how-it-works) which integrate very well with each other. We evaluated open source object storage servers like [Ceph](https://ceph.io/), [Swift](https://www.openstack.org/software/releases/ocata/components/swift), [Minio](https://min.io/) and [Zenko](https://github.com/scality/Zenko) but none of these tools were a good fit for our existing ecosystem.
 
@@ -155,9 +166,9 @@ You may be itching to get started tinkering around with our new Supabase storage
 ## What's next
 
 - We currently support S3 and will be adding more storage backends. Vote for the storage backends you would like to see us implement [here](https://github.com/supabase/supabase/discussions/982).
-- We will integrate our storage service with a Content Delivery Network. With a CDN, objects are cached on a global network. This leads to faster access times for your users around the world.
-- We are working on transformations like resizing of images and automatic optimization of different media types. This makes it easy to embed Supabase objects directly in your websites and mobile applications without additional processing.
+- We will integrate our storage service with a Content Delivery Network. With a CDN, objects are cached on a global network. This leads to faster access times for your users around the world. \*\*SHIPPED: [Supabase Storage v2: Image resizing and Smart CDN](https://supabase.com/blog/storage-image-resizing-smart-cdn#smart-cdn)
+- We are working on transformations like resizing of images and automatic optimization of different media types. This makes it easy to embed Supabase objects directly in your websites and mobile applications without additional processing. \*\*SHIPPED: [Supabase Storage v2: Image resizing and Smart CDN](https://supabase.com/blog/storage-image-resizing-smart-cdn#image-resizing)
 - A better editor to make authoring policies easier and less error prone.
 - Reach out to us if you would like to help out with adding storage support in one of the [community maintained client libraries](/docs/reference/javascript/installing).
 
-Take it for a spin on our [dashboard](https://app.supabase.com/) and let us know what you think!
+Take it for a spin on our [dashboard](https://supabase.com/dashboard/) and let us know what you think!

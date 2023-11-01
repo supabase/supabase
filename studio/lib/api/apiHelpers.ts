@@ -1,6 +1,4 @@
 import { camelCase, snakeCase } from 'lodash'
-import AES from 'crypto-js/aes'
-import Utf8 from 'crypto-js/enc-utf8'
 import { IS_PLATFORM } from 'lib/constants'
 
 /**
@@ -102,59 +100,6 @@ export const toCamelCase = (object, whitelist = []) => {
   } else {
     return object
   }
-}
-
-/**
- * Decrypts any string using the supabase encryption key
- */
-const decryptString = (stringToDecrypt: string) => {
-  const key = process.env.SUPABASE_ENCRYPTION_KEY
-  if (key) {
-    return AES.decrypt(stringToDecrypt, key).toString(Utf8)
-  } else {
-    return stringToDecrypt
-  }
-}
-
-/**
- * Encrypts any string using the supabase encryption key
- */
-const encryptString = (stringToEncrypt: string) => {
-  const key = process.env.SUPABASE_ENCRYPTION_KEY
-  if (key) {
-    return AES.encrypt(stringToEncrypt, key).toString()
-  } else {
-    return stringToEncrypt
-  }
-}
-
-/**
- * Creates a Postgres connection string using the Supabase master login.
- * Expects the passwords to be encrypted (straight from the DB)
- */
-export const createEncryptedDbConnectionString = ({
-  db_user_supabase,
-  db_pass_supabase,
-  db_dns_name,
-  db_host,
-  db_port,
-  db_name,
-  db_ssl,
-}: {
-  db_user_supabase: string
-  db_host: string
-  db_pass_supabase: string
-  db_dns_name?: String
-  db_port: number
-  db_name: string
-  db_ssl: boolean
-}) => {
-  const host = !db_dns_name ? db_host : db_dns_name // check IP already assigned
-  const unencrypted = decryptString(db_pass_supabase)
-  const value = `postgres://${db_user_supabase}:${unencrypted}@${host}:${db_port}/${db_name}?sslmode=${
-    db_ssl ? 'require' : 'disable'
-  }`
-  return encryptString(value)
 }
 
 /**

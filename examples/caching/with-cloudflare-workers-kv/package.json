@@ -1,0 +1,17 @@
+{
+  "name": "supabase-at-the-edge",
+  "version": "0.0.0",
+  "devDependencies": {
+    "wrangler": "2.20.1"
+  },
+  "private": true,
+  "scripts": {
+    "start": "wrangler dev",
+    "deploy": "wrangler publish"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^1.35.4",
+    "itty-router": "^2.6.1",
+    "itty-router-extras": "^0.4.2"
+  }
+}

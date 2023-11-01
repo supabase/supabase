@@ -32,8 +32,13 @@ const defaultTextBasedValues: Suggestion[] = [
 export const typeExpressionSuggestions: Dictionary<Suggestion[]> = {
   uuid: [
     {
-      name: 'uuid_generate_v4()',
-      value: 'uuid_generate_v4()',
+      name: 'auth.uid()',
+      value: 'auth.uid()',
+      description: "Returns the user's ID when rows are added or updated through the API",
+    },
+    {
+      name: 'gen_random_uuid()',
+      value: 'gen_random_uuid()',
       description: 'Generates a version 4 UUID',
     },
   ],

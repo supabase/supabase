@@ -1,18 +1,15 @@
-import { FC } from 'react'
-import { Typography } from '@supabase/ui'
-
-interface Props {
+interface HeaderTitleProps {
   isNewRecord: boolean
   tableName?: string
 }
 
-const HeaderTitle: FC<Props> = ({ isNewRecord, tableName }) => {
+const HeaderTitle = ({ isNewRecord, tableName }: HeaderTitleProps) => {
   let header = `${isNewRecord ? 'Add new' : 'Update'} row ${isNewRecord ? 'to' : 'from'} `
 
   return (
     <>
       {header}
-      {tableName && <span className="text-code">{tableName}</span>}
+      {tableName && <span className="text-code font-mono">{tableName}</span>}
     </>
   )
 }

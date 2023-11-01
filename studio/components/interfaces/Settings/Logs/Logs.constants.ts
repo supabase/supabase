@@ -1,6 +1,9 @@
 import dayjs from 'dayjs'
 import { DatetimeHelper, FilterTableSet, LogTemplate } from '.'
 
+export const LOGS_EXPLORER_DOCS_URL =
+  'https://supabase.com/docs/guides/platform/logs#querying-with-the-logs-explorer'
+
 export const LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD = 4
 
 export const TEMPLATES: LogTemplate[] = [
@@ -21,7 +24,7 @@ export const TEMPLATES: LogTemplate[] = [
     description: 'Count of commits made by users on the database',
     mode: 'custom',
     searchString: `select
-  p.user_name, 
+  p.user_name,
   count(*) as count
 from postgres_logs
   left join unnest(metadata) as m on true
@@ -38,7 +41,7 @@ group by
     description: 'List all IP addresses that used the Supabase API',
     mode: 'custom',
     searchString: `select
-  cast(timestamp as datetime) as timestamp, 
+  cast(timestamp as datetime) as timestamp,
   h.x_real_ip
 from edge_logs
   left join unnest(metadata) as m on true
@@ -52,8 +55,8 @@ where h.x_real_ip is not null
     label: 'Requests by Country',
     description: 'List all ISO 3166-1 alpha-2 country codes that used the Supabase API',
     mode: 'custom',
-    searchString: `select 
-  cf.country, 
+    searchString: `select
+  cf.country,
   count(*) as count
 from edge_logs
   left join unnest(metadata) as m on true
@@ -71,11 +74,11 @@ order by
     mode: 'custom',
     description: 'List all Supabase API requests that are slow',
     searchString: `select
-  cast(timestamp as datetime) as timestamp, 
+  cast(timestamp as datetime) as timestamp,
   event_message,
   r.origin_time
 from edge_logs
-  cross join unnest(metadata) as m 
+  cross join unnest(metadata) as m
   cross join unnest(m.response) as r
 where
   r.origin_time > 1000
@@ -90,11 +93,11 @@ limit 100
     description: 'List all Supabase API requests that responded witha 5XX status code',
     mode: 'custom',
     searchString: `select
-  cast(timestamp as datetime) as timestamp, 
+  cast(timestamp as datetime) as timestamp,
   event_message,
   r.status_code
 from edge_logs
-  cross join unnest(metadata) as m 
+  cross join unnest(metadata) as m
   cross join unnest(m.response) as r
 where
   r.status_code >= 500
@@ -113,11 +116,11 @@ limit 100
   r.search as params,
   count(timestamp) as c
 from edge_logs
-  cross join unnest(metadata) as m 
+  cross join unnest(metadata) as m
   cross join unnest(m.request) as r
-group by 
+group by
   path,
-  params 
+  params
 order by
   c desc
 limit 100
@@ -132,7 +135,7 @@ limit 100
   cast(timestamp as datetime) as timestamp,
   event_message
 from edge_logs
-  cross join unnest(metadata) as m 
+  cross join unnest(metadata) as m
   cross join unnest(m.request) as r
 where
   path like '%rest/v1%'
@@ -163,6 +166,7 @@ limit 100
   },
   {
     label: 'Error Count by User',
+    description: 'Count of errors by users',
     mode: 'custom',
     searchString: `select
   count(t.timestamp) as count,
@@ -182,6 +186,65 @@ limit 100
 `,
     for: ['database'],
   },
+  {
+    label: 'Auth Endpoint Events',
+    description: 'Endpoint events filtered by path',
+    mode: 'custom',
+    searchString: `select
+  t.timestamp,
+  event_message
+from auth_logs as t
+where
+  regexp_contains(event_message,"level.{3}(info|warning||error|fatal)")
+  -- and regexp_contains(event_message,"path.{3}(/token|/recover|/signup|/otp)")
+limit 100
+`,
+    for: ['database'],
+  },
+  {
+    label: 'Storage Object Requests',
+    description: 'Number of requests done on Storage Objects',
+    mode: 'custom',
+    searchString: `select
+  r.method as http_verb,
+  r.path as filepath,
+  count(*) as num_requests
+from edge_logs
+  cross join unnest(metadata) as m
+  cross join unnest(m.request) AS r
+  cross join unnest(r.headers) AS h
+where
+  path like '%rest/v1/object%'
+group by 
+  r.path, r.method
+order by
+  num_requests desc
+limit 100
+`,
+    for: ['api'],
+  },
+  {
+    label: 'Storage Top Cache Misses',
+    description: 'The top Storage requests that miss caching',
+    mode: 'custom',
+    searchString: `select
+  r.path as path,
+  r.search as search,
+  count(id) as count
+from edge_logs f
+  cross join unnest(f.metadata) as m
+  cross join unnest(m.request) as r
+  cross join unnest(m.response) as res
+  cross join unnest(res.headers) as h
+where starts_with(r.path, '/storage/v1/object') 
+  and r.method = 'GET'
+  and h.cf_cache_status in ('MISS', 'NONE/UNKNOWN', 'EXPIRED', 'BYPASS', 'DYNAMIC')
+group by path, search
+order by count desc
+limit 100
+`,
+    for: ['api'],
+  },
 ]
 
 export const LOG_TYPE_LABEL_MAPPING: { [k: string]: string } = {
@@ -197,9 +260,9 @@ const _SQL_FILTER_COMMON = {
 export const SQL_FILTER_TEMPLATES: any = {
   postgres_logs: {
     ..._SQL_FILTER_COMMON,
-    'severity.error': `metadataParsed.error_severity in ('ERROR', 'FATAL', 'PANIC')`,
-    'severity.noError': `metadataParsed.error_severity not in ('ERROR', 'FATAL', 'PANIC')`,
-    'severity.log': `metadataParsed.error_severity = 'LOG'`,
+    'severity.error': `parsed.error_severity in ('ERROR', 'FATAL', 'PANIC')`,
+    'severity.noError': `parsed.error_severity not in ('ERROR', 'FATAL', 'PANIC')`,
+    'severity.log': `parsed.error_severity = 'LOG'`,
   },
   edge_logs: {
     ..._SQL_FILTER_COMMON,
@@ -214,7 +277,9 @@ export const SQL_FILTER_TEMPLATES: any = {
 
     'method.get': `request.method = 'GET'`,
     'method.post': `request.method = 'POST'`,
-    'method.del': `request.method = 'DEL'`,
+    'method.put': `request.method = 'PUT'`,
+    'method.patch': `request.method = 'PATCH'`,
+    'method.delete': `request.method = 'DELETE'`,
     'method.options': `request.method = 'OPTIONS'`,
   },
   function_edge_logs: {
@@ -230,8 +295,37 @@ export const SQL_FILTER_TEMPLATES: any = {
     'severity.log': `metadata.level = 'log'`,
     'severity.info': `metadata.level = 'info'`,
     'severity.debug': `metadata.level = 'debug'`,
+    'severity.warn': `metadata.level = 'warn'`,
   },
   auth_logs: {
+    ..._SQL_FILTER_COMMON,
+    'severity.error': `metadata.level = 'error' or metadata.level = 'fatal'`,
+    'severity.warning': `metadata.level = 'warning'`,
+    'severity.info': `metadata.level = 'info'`,
+    'status_code.server_error': `metadata.status between 500 and 599`,
+    'status_code.client_error': `metadata.status between 400 and 499`,
+    'status_code.redirection': `metadata.status between 300 and 399`,
+    'status_code.success': `metadata.status between 200 and 299`,
+    'endpoints.admin': `REGEXP_CONTAINS(metadata.path, "/admin")`,
+    'endpoints.signup': `REGEXP_CONTAINS(metadata.path, "/signup|/invite|/verify")`,
+    'endpoints.authentication': `REGEXP_CONTAINS(metadata.path, "/token|/authorize|/callback|/otp|/magiclink")`,
+    'endpoints.recover': `REGEXP_CONTAINS(metadata.path, "/recover")`,
+    'endpoints.user': `REGEXP_CONTAINS(metadata.path, "/user")`,
+    'endpoints.logout': `REGEXP_CONTAINS(metadata.path, "/logout")`,
+  },
+  realtime_logs: {
+    ..._SQL_FILTER_COMMON,
+  },
+  storage_logs: {
+    ..._SQL_FILTER_COMMON,
+  },
+  postgrest_logs: {
+    ..._SQL_FILTER_COMMON,
+  },
+  pgbouncer_logs: {
+    ..._SQL_FILTER_COMMON,
+  },
+  supavisor_logs: {
     ..._SQL_FILTER_COMMON,
   },
 }
@@ -242,6 +336,11 @@ export enum LogsTableName {
   FUNCTIONS = 'function_logs',
   FN_EDGE = 'function_edge_logs',
   AUTH = 'auth_logs',
+  REALTIME = 'realtime_logs',
+  STORAGE = 'storage_logs',
+  PGBOUNCER = 'pgbouncer_logs',
+  POSTGREST = 'postgrest_logs',
+  SUPAVISOR = 'supavisor_logs',
 }
 
 export const LOGS_TABLES = {
@@ -250,17 +349,25 @@ export const LOGS_TABLES = {
   functions: LogsTableName.FUNCTIONS,
   fn_edge: LogsTableName.FN_EDGE,
   auth: LogsTableName.AUTH,
+  realtime: LogsTableName.REALTIME,
+  storage: LogsTableName.STORAGE,
+  postgrest: LogsTableName.POSTGREST,
+  pgbouncer: LogsTableName.PGBOUNCER,
+  supavisor: LogsTableName.SUPAVISOR,
 }
 
 export const LOGS_SOURCE_DESCRIPTION = {
-  [LogsTableName.EDGE]: 'Logs obtained from the network edge, containing all API requests.',
-  [LogsTableName.POSTGRES]: 'Database logs obtained directly from Postgres.',
-  [LogsTableName.FUNCTIONS]: 'Function logs generated from runtime execution.',
-  [LogsTableName.FN_EDGE]: 'Function call logs, containing the request and response.',
+  [LogsTableName.EDGE]: 'Logs obtained from the network edge, containing all API requests',
+  [LogsTableName.POSTGRES]: 'Database logs obtained directly from Postgres',
+  [LogsTableName.FUNCTIONS]: 'Function logs generated from runtime execution',
+  [LogsTableName.FN_EDGE]: 'Function call logs, containing the request and response',
   [LogsTableName.AUTH]: 'Authentication logs from GoTrue',
+  [LogsTableName.REALTIME]: 'Realtime server for Postgres logical replication broadcasting',
+  [LogsTableName.STORAGE]: 'Object storage logs',
+  [LogsTableName.PGBOUNCER]: 'Postgres connection pooler logs',
+  [LogsTableName.POSTGREST]: 'RESTful API web server logs',
+  [LogsTableName.SUPAVISOR]: 'Cloud-native Postgres connection pooler logs',
 }
-
-export const genCountQuery = (table: string): string => `SELECT count(*) as count FROM ${table}`
 
 export const genQueryParams = (params: { [k: string]: string }) => {
   // remove keys which are empty strings, null, or undefined
@@ -363,8 +470,23 @@ export const FILTER_OPTIONS: FilterTableSet = {
           description: '',
         },
         {
+          key: 'put',
+          label: 'PUT',
+          description: '',
+        },
+        {
           key: 'post',
           label: 'POST',
+          description: '',
+        },
+        {
+          key: 'patch',
+          label: 'PATCH',
+          description: '',
+        },
+        {
+          key: 'delete',
+          label: 'DELETE',
           description: '',
         },
       ],
@@ -403,22 +525,114 @@ export const FILTER_OPTIONS: FilterTableSet = {
         {
           key: 'error',
           label: 'Error',
-          description: 'Show all events that have error severity',
+          description: 'Show all events that are "error" severity',
+        },
+        {
+          key: 'warn',
+          label: 'Warning',
+          description: 'Show all events that are "warn" severity',
+        },
+        {
+          key: 'info',
+          label: 'Info',
+          description: 'Show all events that are "info" severity',
+        },
+        {
+          key: 'debug',
+          label: 'Debug',
+          description: 'Show all events that are "debug" severity',
+        },
+        {
+          key: 'log',
+          label: 'Log',
+          description: 'Show all events that are "log" severity',
+        },
+      ],
+    },
+  },
+
+  // auth logs
+  auth_logs: {
+    severity: {
+      label: 'Severity',
+      key: 'severity',
+      options: [
+        {
+          key: 'error',
+          label: 'Error',
+          description: 'Show all events that have error or fatal severity',
+        },
+        {
+          key: 'warning',
+          label: 'Warning',
+          description: 'Show all events that have warning severity',
         },
         {
           key: 'info',
           label: 'Info',
           description: 'Show all events that have error severity',
         },
+      ],
+    },
+    status_code: {
+      label: 'Status Code',
+      key: 'status_code',
+      options: [
         {
-          key: 'debug',
-          label: 'Debug',
-          description: 'Show all events that have error severity',
+          key: 'server_error',
+          label: 'Server Error',
+          description: 'Show all requests with 5XX status code',
         },
         {
-          key: 'log',
-          label: 'Log',
-          description: 'Show all events that are log severity',
+          key: 'client_error',
+          label: 'Client Error',
+          description: 'Show all requests with 4XX status code',
+        },
+        {
+          key: 'redirection',
+          label: 'Redirection',
+          description: 'Show all requests that have 3XX status code',
+        },
+        {
+          key: 'success',
+          label: 'Success',
+          description: 'Show all requests that have 2XX status code',
+        },
+      ],
+    },
+    endpoints: {
+      label: 'Endpoints',
+      key: 'endpoints',
+      options: [
+        {
+          key: 'admin',
+          label: 'Admin',
+          description: 'Show all admin requests',
+        },
+        {
+          key: 'signup',
+          label: 'Sign up',
+          description: 'Show all signup and authorization requests',
+        },
+        {
+          key: 'recover',
+          label: 'Password Recovery',
+          description: 'Show all password recovery requests',
+        },
+        {
+          key: 'authentication',
+          label: 'Authentication',
+          description: 'Show all authentication flow requests (login, otp, and Oauth2)',
+        },
+        {
+          key: 'user',
+          label: 'User',
+          description: 'Show all user data requests',
+        },
+        {
+          key: 'logout',
+          label: 'Logout',
+          description: 'Show all logout requests',
         },
       ],
     },
@@ -435,6 +649,7 @@ export const PREVIEWER_DATEPICKER_HELPERS: DatetimeHelper[] = [
     text: 'Last hour',
     calcFrom: () => dayjs().subtract(1, 'hour').startOf('hour').toISOString(),
     calcTo: () => '',
+    default: true,
   },
   {
     text: 'Last 3 hours',
@@ -442,15 +657,14 @@ export const PREVIEWER_DATEPICKER_HELPERS: DatetimeHelper[] = [
     calcTo: () => '',
   },
   {
-    text: 'Last day',
+    text: 'Last 24 hours',
     calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
     calcTo: () => '',
-    default: true,
   },
 ]
 export const EXPLORER_DATEPICKER_HELPERS: DatetimeHelper[] = [
   {
-    text: 'Last day',
+    text: 'Last 24 hours',
     calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
     calcTo: () => '',
     default: true,
@@ -471,10 +685,11 @@ export const getDefaultHelper = (helpers: DatetimeHelper[]) =>
   helpers.find((helper) => helper.default) || helpers[0]
 
 export const TIER_QUERY_LIMITS: {
-  [x: string]: { text: string; value: 1 | 7 | 90; unit: 'day', promptUpgrade: boolean }
+  [x: string]: { text: string; value: 1 | 7 | 28 | 90; unit: 'day'; promptUpgrade: boolean }
 } = {
   FREE: { text: '1 day', value: 1, unit: 'day', promptUpgrade: true },
   PRO: { text: '7 days', value: 7, unit: 'day', promptUpgrade: true },
-  PAYG: { text: '90 days', value: 90, unit: 'day', promptUpgrade: false },
+  PAYG: { text: '7 days', value: 7, unit: 'day', promptUpgrade: true },
+  TEAM: { text: '28 days', value: 28, unit: 'day', promptUpgrade: true },
   ENTERPRISE: { text: '90 days', value: 90, unit: 'day', promptUpgrade: false },
 }

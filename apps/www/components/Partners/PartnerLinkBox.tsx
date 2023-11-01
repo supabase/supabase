@@ -19,7 +19,7 @@ const PartnerLinkBox = ({
       'bg-amber-400 dark:bg-scale-100 group-hover:bg-amber-500 dark:group-hover:bg-amber-300 text-amber-900',
     blue: 'bg-blue-400 dark:bg-scale-100 group-hover:bg-blue-500 dark:group-hover:bg-blue-300 text-blue-900',
     brand:
-      'bg-brand-400 dark:bg-scale-100 group-hover:bg-brand-500 dark:group-hover:bg-brand-300 text-brand-900',
+      'bg-brand-400 dark:bg-scale-100 group-hover:bg-brand-300 dark:group-hover:bg-brand-300 text-brand',
   }
 
   const content = (
@@ -44,7 +44,7 @@ const PartnerLinkBox = ({
           {icon}
         </div>
         <div>
-          <h5 className="text-scale-1200 mb-2 text-base">{title}</h5>
+          <h5 className="text-foreground mb-2 text-base">{title}</h5>
           <p className="p text-sm">{description}</p>
         </div>
       </div>

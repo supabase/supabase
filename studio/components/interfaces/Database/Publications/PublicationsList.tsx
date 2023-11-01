@@ -1,49 +1,72 @@
-import { FC, useState } from 'react'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { noop } from 'lodash'
 import { observer } from 'mobx-react-lite'
-import { Button, Input, Toggle, IconSearch } from '@supabase/ui'
+import { useState } from 'react'
 
-import { useStore } from 'hooks'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import Table from 'components/to-be-cleaned/Table'
-import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
+import InformationBox from 'components/ui/InformationBox'
+import NoSearchResults from 'components/ui/NoSearchResults'
+import { useCheckPermissions, useStore } from 'hooks'
+import { Button, IconAlertCircle, IconSearch, Input, Modal, Toggle } from 'ui'
 
-interface Props {
+interface PublicationEvent {
+  event: string
+  key: string
+}
+
+interface PublicationsListProps {
   onSelectPublication: (id: number) => void
 }
 
-const PublicationsList: FC<Props> = ({ onSelectPublication = () => {} }) => {
+const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps) => {
   const { ui, meta } = useStore()
   const [filterString, setFilterString] = useState<string>('')
 
+  const canUpdatePublications = useCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'publications'
+  )
+
+  const publicationEvents: PublicationEvent[] = [
+    { event: 'Insert', key: 'publish_insert' },
+    { event: 'Update', key: 'publish_update' },
+    { event: 'Delete', key: 'publish_delete' },
+    { event: 'Truncate', key: 'publish_truncate' },
+  ]
   const publications =
     filterString.length === 0
       ? meta.publications.list()
       : meta.publications.list((publication: any) => publication.name.includes(filterString))
 
-  const toggleListenEvent = async (publication: any, event: any, currentStatus: any) => {
-    const startStop = currentStatus ? 'stop' : 'start'
-    confirmAlert({
-      title: 'Confirm',
-      message: `Are you sure you want to ${startStop} sending ${event} events for ${publication.name}?`,
-      onAsyncConfirm: async () => {
-        try {
-          let payload: any = { id: publication.id }
-          payload[`publish_${event}`] = !currentStatus
-          const { data, error }: any = await meta.publications.update(publication.id, payload)
-          if (error) {
-            throw error
-          } else {
-            return data
-          }
-        } catch (error: any) {
-          ui.setNotification({
-            category: 'error',
-            message: `Failed to toggle for ${publication.name}: ${error.message}`,
-          })
-          return false
-        }
-      },
-    })
+  const [toggleListenEventValue, setToggleListenEventValue] = useState<{
+    publication: any
+    event: PublicationEvent
+    currentStatus: any
+  } | null>(null)
+
+  const toggleListenEvent = async () => {
+    if (!toggleListenEventValue) return
+
+    const { publication, event, currentStatus } = toggleListenEventValue
+
+    try {
+      let payload: any = { id: publication.id }
+      payload[`publish_${event.event.toLowerCase()}`] = !currentStatus
+      const { data, error }: any = await meta.publications.update(publication.id, payload)
+      if (error) {
+        throw error
+      } else {
+        setToggleListenEventValue(null)
+        return data
+      }
+    } catch (error: any) {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to toggle for ${publication.name}: ${error.message}`,
+      })
+      return false
+    }
   }
 
   return (
@@ -51,21 +74,26 @@ const PublicationsList: FC<Props> = ({ onSelectPublication = () => {} }) => {
       <div className="mb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <div>
-              <Input
-                size="small"
-                icon={<IconSearch size="tiny" />}
-                placeholder={'Filter'}
-                value={filterString}
-                onChange={(e) => setFilterString(e.target.value)}
+            <Input
+              size="small"
+              icon={<IconSearch size="tiny" />}
+              placeholder={'Filter'}
+              value={filterString}
+              onChange={(e) => setFilterString(e.target.value)}
+            />
+          </div>
+          {!canUpdatePublications && (
+            <div className="w-[500px]">
+              <InformationBox
+                icon={<IconAlertCircle className="text-foreground-light" strokeWidth={2} />}
+                title="You need additional permissions to update database replications"
               />
             </div>
-          </div>
-          <div className=""></div>
+          )}
         </div>
       </div>
       {publications.length === 0 ? (
-        <NoSearchResults />
+        <NoSearchResults searchString={filterString} onResetFilter={() => setFilterString('')} />
       ) : (
         <div className="overflow-hidden rounded">
           <Table
@@ -74,23 +102,15 @@ const PublicationsList: FC<Props> = ({ onSelectPublication = () => {} }) => {
               <Table.th key="header.id" className="hidden lg:table-cell">
                 System ID
               </Table.th>,
-              <Table.th key="header.insert" className="text-center">
-                Insert
-              </Table.th>,
-              <Table.th key="header.update" className="text-center">
-                Update
-              </Table.th>,
-              <Table.th key="header.delete" className="text-center">
-                Delete
-              </Table.th>,
-              <Table.th key="header.truncate" className="text-center">
-                Truncate
-              </Table.th>,
+              <Table.th key="header.insert">Insert</Table.th>,
+              <Table.th key="header.update">Update</Table.th>,
+              <Table.th key="header.delete">Delete</Table.th>,
+              <Table.th key="header.truncate">Truncate</Table.th>,
               <Table.th key="header.source" className="text-right">
                 Source
               </Table.th>,
             ]}
-            body={publications.map((x: any, i: number) => (
+            body={publications.map((x, i) => (
               <Table.tr className="border-t " key={x.name}>
                 <Table.td className="px-4 py-3" style={{ width: '25%' }}>
                   {x.name}
@@ -98,42 +118,22 @@ const PublicationsList: FC<Props> = ({ onSelectPublication = () => {} }) => {
                 <Table.td className="hidden lg:table-cell" style={{ width: '25%' }}>
                   {x.id}
                 </Table.td>
-                <Table.td>
-                  <div className="flex justify-center">
+                {publicationEvents.map((event) => (
+                  <Table.td key={event.key}>
                     <Toggle
                       size="tiny"
-                      checked={x.publish_insert}
-                      onChange={() => toggleListenEvent(x, 'insert', x.publish_insert)}
+                      checked={x[event.key]}
+                      disabled={!canUpdatePublications}
+                      onChange={() => {
+                        setToggleListenEventValue({
+                          publication: x,
+                          event,
+                          currentStatus: x[event.key],
+                        })
+                      }}
                     />
-                  </div>
-                </Table.td>
-                <Table.td>
-                  <div className="flex justify-center">
-                    <Toggle
-                      size="tiny"
-                      checked={x.publish_update}
-                      onChange={() => toggleListenEvent(x, 'update', x.publish_update)}
-                    />
-                  </div>
-                </Table.td>
-                <Table.td>
-                  <div className="flex justify-center">
-                    <Toggle
-                      size="tiny"
-                      checked={x.publish_delete}
-                      onChange={() => toggleListenEvent(x, 'delete', x.publish_delete)}
-                    />
-                  </div>
-                </Table.td>
-                <Table.td>
-                  <div className="flex justify-center">
-                    <Toggle
-                      size="tiny"
-                      checked={x.publish_truncate}
-                      onChange={() => toggleListenEvent(x, 'truncate', x.publish_truncate)}
-                    />
-                  </div>
-                </Table.td>
+                  </Table.td>
+                ))}
                 <Table.td className="px-4 py-3 pr-2">
                   <div className="flex justify-end gap-2">
                     <Button
@@ -154,6 +154,24 @@ const PublicationsList: FC<Props> = ({ onSelectPublication = () => {} }) => {
           />
         </div>
       )}
+
+      <ConfirmationModal
+        visible={toggleListenEventValue !== null}
+        header="Confirm"
+        buttonLabel="Confirm"
+        onSelectCancel={() => setToggleListenEventValue(null)}
+        onSelectConfirm={() => {
+          toggleListenEvent()
+        }}
+      >
+        <Modal.Content>
+          <p className="py-4 text-sm text-foreground-light">
+            Are you sure you want to {toggleListenEventValue?.currentStatus ? 'stop' : 'start'}{' '}
+            sending {toggleListenEventValue?.event.event.toLowerCase()} events for{' '}
+            {toggleListenEventValue?.publication.name}?
+          </p>
+        </Modal.Content>
+      </ConfirmationModal>
     </>
   )
 }

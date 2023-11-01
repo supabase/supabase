@@ -1,27 +1,23 @@
-import { FC } from 'react'
-import Link from 'next/link'
-import { NextPage } from 'next'
-import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
+import { NextPage } from 'next'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 
-import { withAuth } from 'hooks'
 import ProjectList from 'components/interfaces/Home/ProjectList'
+import { withAuth } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
 
-interface Props {}
-
-const Header: FC<Props> = () => {
+const Header = () => {
   return (
     <div className="dark:border-dark border-b p-3">
       <div className="flex items-center space-x-2">
-        <Link href="/">
-          <a>
-            <img
-              src="/img/supabase-logo.svg"
-              alt="Supabase"
-              className="dark:border-dark rounded border p-1 hover:border-white"
-              style={{ height: 24 }}
-            />
-          </a>
+        <Link href="/projects">
+          <img
+            src={`${BASE_PATH}/img/supabase-logo.svg`}
+            alt="Supabase"
+            className="dark:border-dark rounded border p-1 hover:border-white"
+            style={{ height: 24 }}
+          />
         </Link>
       </div>
     </div>
@@ -34,29 +30,38 @@ const Header: FC<Props> = () => {
 
 const GenericProjectPage: NextPage = () => {
   const router = useRouter()
-  const { routeSlug } = router.query
+  const { routeSlug, ...queryParams } = router.query
+
+  const query = Object.keys(queryParams).length
+    ? `?${new URLSearchParams(queryParams as Record<string, string>)}`
+    : undefined
 
   const urlRewriterFactory = (slug: string | string[] | undefined) => {
     return (projectRef: string) => {
+      const hash = location.hash ? `#${location.hash}` : undefined
+
       if (!Array.isArray(slug)) {
-        return `/project/${projectRef}`
+        return [`/project/${projectRef}`, query, hash].filter(Boolean).join('')
       }
 
-      const slugPath = slug.reduce((a: string, b: string) => `${a}/${b}`, '').slice(1)
-      return `/project/${projectRef}/${slugPath}`
+      const slugPath = slug.reduce((a, b) => `${a}/${b}`, '').slice(1)
+      return [`/project/${projectRef}/${slugPath}`, query, hash].filter(Boolean).join('')
     }
   }
 
   return (
-    <div>
+    <>
       <Header />
-      <div className="mx-auto w-full max-w-5xl py-8">
-        <h3 className="text-2xl">Select a project to continue</h3>
-        <div className="my-6 space-y-8">
+      <div className="flex flex-col mx-auto w-full max-w-5xl">
+        <h1 className="mt-8 text-2xl">Select a project to continue</h1>
+        <div
+          className="flex-grow py-6 space-y-8 overflow-y-auto"
+          style={{ maxHeight: 'calc(100vh - 49px - 64px)' }}
+        >
           <ProjectList rewriteHref={urlRewriterFactory(routeSlug)} />
         </div>
       </div>
-    </div>
+    </>
   )
 }
 

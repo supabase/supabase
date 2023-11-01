@@ -14,7 +14,11 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "baseUrl": ".",
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "incremental": true,
+    "paths": {
+      "@ui/*": ["./../packages/ui/src/*"] // handle ui package paths
+    }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
   "exclude": ["node_modules"]

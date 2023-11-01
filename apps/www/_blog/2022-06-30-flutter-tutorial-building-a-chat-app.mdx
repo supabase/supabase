@@ -1,9 +1,11 @@
 ---
 title: 'Flutter Tutorial: building a Flutter chat app'
-description: How to create a real time chat app using Flutter.
+description: Learn how to build a Flutter chat app with open source and scalable backend (inc. auth, realtime, database, and more).
 author: tyler_shukert
 image: flutter-chat/flutter-chat-app.png
 thumb: flutter-chat/flutter-chat-app.png
+categories:
+  - engineering
 tags:
   - flutter
   - realtime
@@ -15,6 +17,8 @@ toc_depth: 3
 This is the first of a series of Flutter Tutorials. During the series, you will learn how to build cross-platform apps without worrying about the backend.
 
 In the first part, I will show you how to build a chat application, where users can sign up and talk to other users in a single chat room. The exchange of messages will happen in real time, meaning that you do not have to refresh the page to load new messages.
+
+In the second part, I will show you how to implement [Authentication and Authorization (with RLS)](https://supabase.com/blog/flutter-authentication-and-authorization-with-rls) to the chat app.
 
 In order to build this chat app, we will need a database to store all of the chat information. We will be using [Supabase](https://supabase.com/) to store the chat information. Supabase is a back end as a service that provides auth, database, storage and functions to easily create a scalable application. Supabase is a suitable backend for this app, because it provides a nice set of APIs on Postgres database that we can easily call by using the SDK. It is also perfect for chat apps like the one we are about to create, because we can subscribe to real time changes on the database.
 
@@ -58,7 +62,7 @@ You should be able to now see the default counter app that every Flutter project
 Open pubspec.yaml file and let's install a few dependencies of this app.
 
 ```yaml
-supabase_flutter: ^0.2.12
+supabase_flutter: ^1.0.0
 timeago: ^3.1.0
 ```
 
@@ -68,13 +72,13 @@ Run `flutter pub get` to install the packages. Note that you will have to termin
 
 ### Creating a new Supabase project
 
-If you do not have a Supabase account yet, do not worry, you can [get started for free](https://app.supabase.com/).
+If you do not have a Supabase account yet, do not worry, you can [get started for free](https://supabase.com/dashboard/).
 
 You will be prompted to sign in using your Github account with a big green button, so let's go ahead and press it. Proceed with the sign up process and once you are done, you will be taken to a list of projects. You can go ahead and create a new project by pressing the “New Project” button at the top.
 
 ![Create new Supabase project](/images/blog/flutter-chat/create-new-supabase-project.png)
 
-You will be entering a few things here like the name of the project. You can call it “chat” for now. For the database password, go ahead and hit the “Generate a password” button to generate a random password. We won't use this password in this app, but if you ever need it, you can always override it later to whatever you want it to be. You can leave the pricing plan for free as Supabase has a very generous free tier that will be way more than enough for our chat app. Once you have entered everything, you can press the “Create new Project” button. Spinning up a brand new Supabase project could take a few minutes.
+You will be entering a few things here like the name of the project. You can call it “chat” for now. For the database password, go ahead and hit the “Generate a password” button to generate a random password. We won't use this password in this app, but if you ever need it, you can always override it later to whatever you want it to be. You can leave the pricing plan for free as Supabase has a very generous free plan that will be way more than enough for our chat app. Once you have entered everything, you can press the “Create new Project” button. Spinning up a brand new Supabase project could take a few minutes.
 
 Once your project is ready, we can dive into setting up our project!
 
@@ -107,7 +111,7 @@ create table if not exists public.profiles (
 comment on table public.profiles is 'Holds all of users profile information';
 
 create table if not exists public.messages (
-    id uuid not null primary key default uuid_generate_v4(),
+    id uuid not null primary key default gen_random_uuid(),
     profile_id uuid default auth.uid() references public.profiles(id) on delete cascade not null,
     content varchar(500) not null,
     created_at timestamp with time zone default timezone('utc' :: text, now()) not null
@@ -151,6 +155,9 @@ const formSpacer = SizedBox(width: 16, height: 16);
 /// Some padding for all the forms to use
 const formPadding = EdgeInsets.symmetric(vertical: 20, horizontal: 16);
 
+/// Error message to display the user when unexpected error occurs.
+const unexpectedErrorMessage = 'Unexpected error occurred.';
+
 /// Basic theme to change the look and feel of the app
 final appTheme = ThemeData.light().copyWith(
   primaryColorDark: Colors.orange,
@@ -166,13 +173,13 @@ final appTheme = ThemeData.light().copyWith(
   primaryColor: Colors.orange,
   textButtonTheme: TextButtonThemeData(
     style: TextButton.styleFrom(
-      primary: Colors.orange,
+      foregroundColor: Colors.orange,
     ),
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
-      onPrimary: Colors.white,
-      primary: Colors.orange,
+      foregroundColor: Colors.white,
+      backgroundColor: Colors.orange,
     ),
   ),
   inputDecorationTheme: InputDecorationTheme(
@@ -259,14 +266,15 @@ class MyApp extends StatelessWidget {
 
 ### Step 3: Redirect users depending on auth state using splash page
 
-When the user launches the app, we want to redirect those who have already signed in to the Chat page and those who have not signed in yet to the register page. In order to achieve this, we will create a splash page, which is just a page with a preloader at the middle from the user, but takes care of fetching auth state and redirects users accordingly behind the scenes. We are using the `onAuthenticated` and `onUnauthenticated` to redirect the user to the proper pages. 
+When a user launches the app, we want to redirect those who have already signed in to the Chat page and those who have not signed in yet to the register page.
+In order to achieve this, we will create a splash page, which is just a page with a preloader at the middle from the user, but takes care of fetching auth state and redirects users accordingly behind the scenes.
+Within the `_redirect()` method, we are fetching the auth state and navigating the user accordingly.
 
 ```dart title="lib/pages/splash_page.dart"
 import 'package:flutter/material.dart';
 import 'package:my_chat_app/pages/chat_page.dart';
 import 'package:my_chat_app/pages/register_page.dart';
 import 'package:my_chat_app/utils/constants.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Page to redirect users to the appropriate page depending on the initial auth state
 class SplashPage extends StatefulWidget {
@@ -276,34 +284,31 @@ class SplashPage extends StatefulWidget {
   SplashPageState createState() => SplashPageState();
 }
 
-class SplashPageState extends SupabaseAuthState<SplashPage> {
+class SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
-    recoverSupabaseSession();
+    _redirect();
+  }
+
+  Future<void> _redirect() async {
+    // await for for the widget to mount
+    await Future.delayed(Duration.zero);
+
+    final session = supabase.auth.currentSession;
+    if (session == null) {
+      Navigator.of(context)
+          .pushAndRemoveUntil(RegisterPage.route(), (route) => false);
+    } else {
+      Navigator.of(context)
+          .pushAndRemoveUntil(ChatPage.route(), (route) => false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return const Scaffold(body: preloader);
   }
-
-  @override
-  void onAuthenticated(Session session) {
-    Navigator.of(context).pushAndRemoveUntil(ChatPage.route(), (_) => false);
-  }
-
-  @override
-  void onUnauthenticated() {
-    Navigator.of(context)
-        .pushAndRemoveUntil(RegisterPage.route(), (_) => false);
-  }
-
-  @override
-  void onErrorAuthenticating(String message) {}
-
-  @override
-  void onPasswordRecovery(Session session) {}
 }
 ```
 
@@ -373,13 +378,18 @@ class Message {
 
 ### Step 5: Create register page with email, password and username
 
-Now that we have defined a few handy constants, it is time to dive into creating pages. The first page we will create is the register page. This page will take an email address, password, and username within a form widget. The username will be the primary identifier when users search for other users within the app. Once a user performs registration, they will be taken to the chat page. Let's create a `lib/pages/register_page.dart` file and paste the following code.
+Now that we have defined a few handy constants, it is time to dive into creating pages.
+The first page we will create is the register page.
+This page will take an email address, password, and username within a form widget.
+The username will be the primary identifier when users search for other users within the app.
+Once a user performs registration, they will be taken to the chat page. Let's create a `lib/pages/register_page.dart` file and paste the following code.
 
 ```dart title="lib/pages/register.dart"
 import 'package:flutter/material.dart';
 import 'package:my_chat_app/pages/chat_page.dart';
 import 'package:my_chat_app/pages/login_page.dart';
 import 'package:my_chat_app/utils/constants.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key, required this.isRegistering}) : super(key: key);
@@ -413,15 +423,16 @@ class _RegisterPageState extends State<RegisterPage> {
     final email = _emailController.text;
     final password = _passwordController.text;
     final username = _usernameController.text;
-    final res = await supabase.auth
-        .signUp(email, password, userMetadata: {'username': username});
-    final error = res.error;
-    if (error != null) {
+    try {
+      await supabase.auth.signUp(
+          email: email, password: password, data: {'username': username});
+      Navigator.of(context)
+          .pushAndRemoveUntil(ChatPage.route(), (route) => false);
+    } on AuthException catch (error) {
       context.showErrorSnackBar(message: error.message);
-      return;
+    } catch (error) {
+      context.showErrorSnackBar(message: unexpectedErrorMessage);
     }
-    Navigator.of(context)
-        .pushAndRemoveUntil(ChatPage.route(), (route) => false);
   }
 
   @override
@@ -504,7 +515,12 @@ class _RegisterPageState extends State<RegisterPage> {
 
 If you look at the validator function of the username field, you notice that we are enforcing the same regular expression check as what we defined in our table definition of profiles.
 
-If you take a closer look at the `_signup()` method, you notice that the username is passed as a userMetadata. We will need to copy this username into our profiles table so that other users can find you. In order to do this, we will utilize a [Postgres function](https://supabase.com/docs/guides/database/functions) and Postgres trigger. Run the following SQL to create a Postgres function that will automatically run when a new user signs up to our application. Since we have set a unique constraint on the username column of our profiles table, the sign up will fail if a user chooses a username that is already taken.
+If you take a closer look at the `_signup()` method, you notice that the username is passed as a `data`.
+By passing `data` to your sign up method, you can populate the meta data field of your authenticated users.
+We will need to copy this username into our profiles table so that other users can find you.
+In order to do this, we will utilize a [Postgres function](https://supabase.com/docs/guides/database/functions) and Postgres trigger.
+Run the following SQL to create a Postgres function that will automatically run when a new user signs up to our application.
+Since we have set a unique constraint on the username column of our profiles table, the sign up will fail if a user chooses a username that is already taken.
 
 ```sql
 -- Function to create a new row in profiles table upon signup
@@ -525,18 +541,23 @@ create trigger on_auth_user_created
     execute function handle_new_user();
 ```
 
-Also, Supabase has email confirmation turned on by default, meaning that every time someone signs up, they have to click the confirmation link they receive in their email. This is ideal for a production app, but for our sample app, we can turn it off since we want to get up and running with building a functioning chat app. We will cover secure authentications using Supabase in later articles. Go to authentication → settings and turn off the switch of `Enable email confirmations`.
+Also, Supabase has email confirmation turned on by default, meaning that every time someone signs up, they have to click the confirmation link they receive in their email.
+This is ideal for a production app, but for our sample app, we can turn it off since we want to get up and running with building a functioning chat app.
+We will cover secure authentications using Supabase in later articles.
+Go to authentication → settings and turn off the switch of `Enable email confirmations`.
 
 ![turn off email confirmation](/images/blog/flutter-chat/turn-off-email-confirmation.png)
 
 ### Step 6: Create login page
 
-Login page will also be a simple page with an email and password field. Once they have signed in, the user will be taken to the rooms page.
+Login page will also be a simple page with an email and password field.
+Once they have signed in, the user will be taken to the rooms page.
 
 ```dart title="lib/pages/login_page.dart"
 import 'package:flutter/material.dart';
 import 'package:my_chat_app/pages/chat_page.dart';
 import 'package:my_chat_app/utils/constants.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -558,16 +579,23 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       _isLoading = true;
     });
-    final response = await supabase.auth.signIn(
-      email: _emailController.text,
-      password: _passwordController.text,
-    );
-    final error = response.error;
-    if (error != null) {
+    try {
+      await supabase.auth.signInWithPassword(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+      Navigator.of(context)
+          .pushAndRemoveUntil(ChatPage.route(), (route) => false);
+    } on AuthException catch (error) {
       context.showErrorSnackBar(message: error.message);
+    } catch (_) {
+      context.showErrorSnackBar(message: unexpectedErrorMessage);
     }
-    Navigator.of(context)
-        .pushAndRemoveUntil(ChatPage.route(), (route) => false);
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+      });
+    }
   }
 
   @override
@@ -609,7 +637,12 @@ class _LoginPageState extends State<LoginPage> {
 
 ### Step 7: Create a chat page to receive and send real time messages
 
-Last, we create the Chat page. This page will load the messages in real time and display them to the users. Users will also be able to send messages to everyone else using the app. We are using the [stream()](https://supabase.com/docs/reference/dart/stream) method on Supabase SDK to load the messages in realtime. As those messages come in, we are lazily loading the profiles of each message’s sender. We will display the user icon as soon as their profile data is available.
+Last, we create the Chat page.
+This page will load the messages in real time and display them to the users.
+Users will also be able to send messages to everyone else using the app.
+We are using the [stream()](https://supabase.com/docs/reference/dart/stream) method on Supabase SDK to load the messages in realtime.
+As those messages come in, we are lazily loading the profiles of each message’s sender.
+We will display the user icon as soon as their profile data is available.
 
 ```dart title="lib/pages/chat_page.dart"
 import 'dart:async';
@@ -619,6 +652,7 @@ import 'package:flutter/material.dart';
 import 'package:my_chat_app/models/message.dart';
 import 'package:my_chat_app/models/profile.dart';
 import 'package:my_chat_app/utils/constants.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timeago/timeago.dart';
 
 /// Page to chat with someone.
@@ -646,9 +680,8 @@ class _ChatPageState extends State<ChatPage> {
     final myUserId = supabase.auth.currentUser!.id;
     _messagesStream = supabase
         .from('messages')
-        .stream(['id'])
+        .stream(primaryKey: ['id'])
         .order('created_at')
-        .execute()
         .map((maps) => maps
             .map((map) => Message.fromMap(map: map, myUserId: myUserId))
             .toList());
@@ -659,19 +692,12 @@ class _ChatPageState extends State<ChatPage> {
     if (_profileCache[profileId] != null) {
       return;
     }
-    final res = await supabase
-        .from('profiles')
-        .select()
-        .match({'id': profileId})
-        .single()
-        .execute();
-    final data = res.data;
-    if (data != null) {
-      final profile = Profile.fromMap(data);
-      setState(() {
-        _profileCache[profileId] = profile;
-      });
-    }
+    final data =
+        await supabase.from('profiles').select().eq('id', profileId).single();
+    final profile = Profile.fromMap(data);
+    setState(() {
+      _profileCache[profileId] = profile;
+    });
   }
 
   @override
@@ -786,14 +812,15 @@ class _MessageBarState extends State<_MessageBar> {
       return;
     }
     _textController.clear();
-
-    final res = await supabase.from('messages').insert({
-      'profile_id': myUserId,
-      'content': text,
-    }).execute();
-    final error = res.error;
-    if (error != null) {
+    try {
+      await supabase.from('messages').insert({
+        'profile_id': myUserId,
+        'content': text,
+      });
+    } on PostgrestException catch (error) {
       context.showErrorSnackBar(message: error.message);
+    } catch (_) {
+      context.showErrorSnackBar(message: unexpectedErrorMessage);
     }
   }
 }
@@ -862,7 +889,9 @@ If you have any questions please reach out via [Twitter](https://twitter.com/dsh
 
 ## More Flutter Resources
 
+- [Part 2: Flutter Authentication and Authorization with RLS](https://supabase.com/blog/flutter-authentication-and-authorization-with-rls)
 - [Flutter Supabase Quick Starter Guide](https://supabase.com/docs/guides/with-flutter)
-- [Quickly prototype your app using DartPad](https://dartpad.dev/)
+- [supabase-flutter v1.0 released](https://supabase.com/blog/supabase-flutter-sdk-v1-released)
+- [How to build a real-time multiplayer game with Flutter Flame](https://supabase.com/blog/flutter-real-time-multiplayer-game)
 - [Open source map based Flutter app with CI/CD and scalable statemanagement example](https://github.com/dshukertjr/spot)
 - [Build a Flutter app with Very Good CLI and Supabase](https://verygood.ventures/blog/flutter-app-very-good-cli-supabase)

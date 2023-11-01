@@ -1,39 +1,47 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_quickstart/pages/account_page.dart';
+import 'package:supabase_quickstart/pages/login_page.dart';
+import 'package:supabase_quickstart/pages/splash_page.dart';
 
-import 'configure_nonweb.dart' if (dart.library.html) 'configure_web.dart';
-import 'screens/profile_screen.dart';
-import 'screens/signin_screen.dart';
-import 'screens/splash_screen.dart';
-import 'screens/web_home_screen.dart';
-
-Future main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await configureApp();
+Future<void> main() async {
+  await Supabase.initialize(
+    // TODO: Replace credentials with your own
+    url: 'YOUR_SUPABASE_URL',
+    anonKey: 'YOUR_SUPABASE_ANON_KEY',
+    authFlowType: AuthFlowType.pkce,
+  );
   runApp(MyApp());
 }
 
+final supabase = Supabase.instance.client;
+
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Supabase Demo',
-      theme: ThemeData.dark(),
+      title: 'Supabase Flutter',
+      theme: ThemeData.dark().copyWith(
+        primaryColor: Colors.green,
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.green,
+          ),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.green,
+          ),
+        ),
+      ),
       initialRoute: '/',
       routes: <String, WidgetBuilder>{
-        '/signIn': (_) => SignInScreen(),
-        '/profile': (_) => ProfileScreen(),
+        // Splash page is needed to ensure that authentication and page loading works correctly
+        '/': (_) => const SplashPage(),
+        '/login': (_) => const LoginPage(),
+        '/account': (_) => const AccountPage(),
       },
-      onGenerateRoute: generateRoute,
     );
-  }
-}
-
-Route<dynamic> generateRoute(RouteSettings settings) {
-  switch (settings.name) {
-    default:
-      return MaterialPageRoute(
-          builder: (_) => kIsWeb ? WebHomeScreen() : SplashScreen());
   }
 }

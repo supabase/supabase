@@ -1,10 +1,10 @@
-import { PostgresRelationship } from '@supabase/postgres-meta'
+import type { PostgresRelationship } from '@supabase/postgres-meta'
 
 export interface CreateColumnPayload {
   tableId: number
   name: string
   type: string
-  check?: string
+  check?: string | null
   comment?: string
   defaultValue?: any
   defaultValueFormat?: 'expression' | 'literal'
@@ -19,12 +19,14 @@ export interface UpdateColumnPayload {
   name?: string
   comment?: string | null
   type?: string
+  check?: string | null
   dropDefault?: boolean
   defaultValue?: any
   defaultValueFormat?: 'expression' | 'literal'
   isIdentity?: boolean
   isNullable?: boolean
   isUnique?: boolean
+  isPrimaryKey?: boolean
   identityGeneration?: 'BY DEFAULT' | 'ALWAYS'
 }
 
@@ -55,36 +57,36 @@ export interface Field {
   foreignKey?: { table: string; column: string }
 }
 
+export interface ExtendedPostgresRelationship extends PostgresRelationship {
+  deletion_action: string
+  update_action: string
+}
+
 export interface ColumnField {
   id: string
   name: string
+  check: string | null
   comment?: string
   format: string
   defaultValue: string | null
-  foreignKey: PostgresRelationship | undefined
+  foreignKey: ExtendedPostgresRelationship | undefined
   isNullable: boolean
   isUnique: boolean
   isArray: boolean
   isIdentity: boolean
   isPrimaryKey: boolean
   isNewColumn: boolean
-}
 
-// export interface ForeignKey {
-//   table: PostgresTable
-//   column: PostgresColumn
-// }
+  isEncrypted: boolean
+  keyId?: string
+  keyName?: string
+}
 
 export interface PostgresDataTypeOption {
   name: string
   description: string
   type: 'number' | 'text' | 'time' | 'json' | 'bool' | 'others'
 }
-
-// export interface FormattedPostgresColumn extends PostgresColumn {
-//   isPrimaryKey: boolean
-//   foreignKey: ForeignKey
-// }
 
 // Probably belongs to a higher level
 export interface Dictionary<T> {

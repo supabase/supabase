@@ -2,18 +2,28 @@ import { AutoForm } from 'uniforms-bootstrap4'
 import Ajv from 'ajv'
 import { JSONSchemaBridge } from 'uniforms-bridge-json-schema'
 
-const SchemaForm = ({ schema, model, children, formRef, onSubmit, onChangeModel = () => {} }) => {
+const SchemaForm = ({
+  schema,
+  model,
+  disabled = false,
+  children,
+  formRef,
+  onSubmit,
+  onChangeModel = () => {},
+}) => {
   const validatedSchema = new JSONSchemaBridge(schema, createValidator(schema))
   return (
     <AutoForm
+      disabled={disabled}
       onChangeModel={onChangeModel}
       ref={formRef}
       schema={validatedSchema}
       onSubmit={onSubmit}
       submitField={() => <></>}
       model={model}
-      children={children}
-    />
+    >
+      {children}
+    </AutoForm>
   )
 }
 export default SchemaForm

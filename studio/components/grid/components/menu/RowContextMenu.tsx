@@ -1,44 +1,33 @@
-import * as React from 'react'
-import { Menu, Item, ItemParams, PredicateParams } from 'react-contexify'
-import { IconTrash, IconClipboard, IconEdit } from '@supabase/ui'
-import { useDispatch, useTrackedState } from '../../store'
-import { formatClipboardValue, copyToClipboard } from '../../utils'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { Item, ItemParams, Menu, PredicateParams, Separator } from 'react-contexify'
+import { IconClipboard, IconEdit, IconTrash } from 'ui'
+
+import { SupaRow } from 'components/grid/types'
+import { useCallback } from 'react'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { useTrackedState } from '../../store'
+import { copyToClipboard, formatClipboardValue } from '../../utils'
 
 export const ROW_CONTEXT_MENU_ID = 'row-context-menu-id'
 
-type RowContextMenuProps = {}
+export type RowContextMenuProps = {
+  rows: SupaRow[]
+}
 
-const RowContextMenu: React.FC<RowContextMenuProps> = ({}) => {
+const RowContextMenu = ({ rows }: RowContextMenuProps) => {
   const state = useTrackedState()
-  const dispatch = useDispatch()
+  const snap = useTableEditorStateSnapshot()
 
   function onDeleteRow(p: ItemParams) {
-    confirmAlert({
-      title: 'Confirm to delete',
-      message: 'Are you sure you want to delete this row? This action cannot be undone.',
-      onConfirm: async () => {
-        const { props } = p
-        const { rowIdx } = props
-        const row = state.rows[rowIdx]
-        const { error } = state.rowService!.delete([row])
-        if (error) {
-          if (state.onError) state.onError(error)
-        } else {
-          dispatch({ type: 'REMOVE_ROWS', payload: { rowIdxs: [row.idx] } })
-          dispatch({
-            type: 'SELECTED_ROWS_CHANGE',
-            payload: { selectedRows: new Set() },
-          })
-        }
-      },
-    })
+    const { props } = p
+    const { rowIdx } = props
+    const row = rows[rowIdx]
+    if (row) snap.onDeleteRows([row])
   }
 
   function onEditRowClick(p: ItemParams) {
     const { props } = p
     const { rowIdx } = props
-    const row = state.rows[rowIdx]
+    const row = rows[rowIdx]
     if (state.onEditRow) state.onEditRow(row)
   }
 
@@ -48,38 +37,42 @@ const RowContextMenu: React.FC<RowContextMenuProps> = ({}) => {
     return false
   }
 
-  function onCopyCellContent(p: ItemParams) {
-    const { props } = p
+  const onCopyCellContent = useCallback(
+    (p: ItemParams) => {
+      const { props } = p
 
-    if (!state.selectedCellPosition || !props) {
-      return
-    }
+      if (!state.selectedCellPosition || !props) {
+        return
+      }
 
-    const { rowIdx } = props
-    const row = state.rows[rowIdx]
+      const { rowIdx } = props
+      const row = rows[rowIdx]
 
-    const columnKey = state.gridColumns[state.selectedCellPosition?.idx as number].key
+      const columnKey = state.gridColumns[state.selectedCellPosition?.idx as number].key
 
-    const value = row[columnKey]
-    const text = formatClipboardValue(value)
+      const value = row[columnKey]
+      const text = formatClipboardValue(value)
 
-    copyToClipboard(text)
-  }
+      copyToClipboard(text)
+    },
+    [rows, state.gridColumns, state.selectedCellPosition]
+  )
 
   return (
     <>
       <Menu id={ROW_CONTEXT_MENU_ID} animation={false}>
         <Item onClick={onCopyCellContent}>
           <IconClipboard size="tiny" />
-          <span className="sb-grid-context-menu__label">Copy cell content</span>
+          <span className="ml-2 text-xs">Copy cell content</span>
         </Item>
         <Item onClick={onEditRowClick} hidden={isItemHidden} data="edit">
           <IconEdit size="tiny" />
-          <span className="sb-grid-context-menu__label">Edit row</span>
+          <span className="ml-2 text-xs">Edit row</span>
         </Item>
+        {state.editable && <Separator />}
         <Item onClick={onDeleteRow} hidden={isItemHidden} data="delete">
           <IconTrash size="tiny" stroke="red" />
-          <span className="sb-grid-context-menu__label">Delete row</span>
+          <span className="ml-2 text-xs">Delete row</span>
         </Item>
       </Menu>
     </>

@@ -1,5 +1,5 @@
 import { some } from 'lodash'
-import { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 
 import { ImportContent, TableField } from './TableEditor.types'
 import { DEFAULT_COLUMNS } from './TableEditor.constants'
@@ -8,6 +8,7 @@ import {
   generateColumnField,
   generateColumnFieldFromPostgresColumn,
 } from '../ColumnEditor/ColumnEditor.utils'
+import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 
 export const validateFields = (field: TableField) => {
   const errors = {} as any
@@ -29,13 +30,14 @@ export const generateTableField = (): TableField => {
     name: '',
     comment: '',
     columns: DEFAULT_COLUMNS,
-    isRLSEnabled: false,
+    isRLSEnabled: true,
     isRealtimeEnabled: false,
   }
 }
 
 export const generateTableFieldFromPostgresTable = (
   table: PostgresTable,
+  foreignKeys: ForeignKeyConstraint[],
   isDuplicating = false,
   isRealtimeEnabled = false
 ): TableField => {
@@ -45,7 +47,7 @@ export const generateTableFieldFromPostgresTable = (
     comment: isDuplicating ? `This is a duplicate of ${table.name}` : table?.comment ?? '',
     // @ts-ignore
     columns: table.columns.map((column: PostgresColumn) => {
-      return generateColumnFieldFromPostgresColumn(column, table)
+      return generateColumnFieldFromPostgresColumn(column, table, foreignKeys)
     }),
     isRLSEnabled: table.rls_enabled,
     isRealtimeEnabled,
@@ -53,9 +55,12 @@ export const generateTableFieldFromPostgresTable = (
 }
 
 export const formatImportedContentToColumnFields = (importContent: ImportContent) => {
-  const columnFields = importContent.headers.map((header: string) => {
-    const columnType = importContent.columnTypeMap[header]
-    return generateColumnField({ name: header, format: columnType })
-  })
+  const { headers, selectedHeaders, columnTypeMap } = importContent
+  const columnFields = headers
+    .filter((header) => selectedHeaders.includes(header))
+    .map((header) => {
+      const columnType = columnTypeMap[header]
+      return generateColumnField({ name: header, format: columnType })
+    })
   return columnFields
 }

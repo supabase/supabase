@@ -7,8 +7,9 @@ author_image_url: https://github.com/roryw10.png
 authorURL: https://github.com/roryw10
 image: replenysh/og-replenysh.png
 thumb: replenysh/thumb-replenysh.png
+categories:
+  - company
 tags:
-  - case-study
   - auth
 date: '2021-10-19'
 toc_depth: 2
@@ -34,11 +35,11 @@ Brands are adopting Replenysh to demonstrate their commitment to making a positi
 
 ## Refactoring code leads to a better way forward
 
-Historically the team created their own backend infrastructure, setting up APIs and Authentication to run their own OTP system with Twilio and passwords. Postgres is essential to their requirements because Replenysh uses Row Level Security for authorization. Before adopting Supabase, the team used a Haskell server with a different Postgres instance deployed on Heroku.
+Historically the team created their own backend infrastructure, setting up APIs and Authentication to run their own OTP system with Twilio and passwords. Postgres is essential to their requirements because Replenysh uses Row Level Security for authorization. Before adopting Supabase, the team used a Haskell server with a different Postgres instance deployed on [Heroku](https://supabase.com/alternatives/supabase-vs-heroku-postgres).
 
 The team decided to do a large refactor of their codebase and began investigating alternative hosting options to help speed up development time and reduce maintenance.
 
-Firebase seemed appealing due to its ability to get started quickly, but the team didn't want to migrate away from a relational database. Specifically, Postgres and RLS fit their requirements.
+[Firebase](https://supabase.com/alternatives/supabase-vs-firebase) seemed appealing due to its ability to get started quickly, but the team didn't want to migrate away from a relational database. Specifically, Postgres and RLS fit their requirements.
 
 When the team discovered Supabase on Hacker News they felt excitement. Supabase has a reputation for a smooth developer experience, providing Postgres and Row Level Security as a core feature.
 
@@ -74,4 +75,4 @@ Replenysh clients include brands with global recognition and millions of custome
 
 ## Supabase help Replenysh continue to scale
 
-Supabase turbo-charged Replenysh's development time with a seamless end-user mobile login experience. They are ready to help major brands engage with their users through participation in the circular economy. With Supabase, the team knows they have a slick auth experience, reduced DevOps overhead, and can continue to scale with Postgres. You can test out the Supabase developer experience today by [starting a new project on the free tier!.](https://app.supabase.com/)
+Supabase turbo-charged Replenysh's development time with a seamless end-user mobile login experience. They are ready to help major brands engage with their users through participation in the circular economy. With Supabase, the team knows they have a slick auth experience, reduced DevOps overhead, and can continue to scale with Postgres. You can test out the Supabase developer experience today by [starting a new project on the free plan!.](https://supabase.com/dashboard/)

@@ -1,11 +1,10 @@
-import React, { FC } from 'react'
-import { IconChevronRight } from '@supabase/ui'
 import Link from 'next/link'
+import React, { PropsWithChildren } from 'react'
+import { IconChevronRight, IconLoader } from 'ui'
 
-interface Props {
+interface CardButtonProps {
   title: string | React.ReactNode
   description?: string
-  children?: React.ReactNode
   footer?: React.ReactNode
   url?: string
   linkHref?: string
@@ -13,10 +12,11 @@ interface Props {
   imgAlt?: string
   onClick?: () => void
   icon?: React.ReactNode
-  containerHeightClassName?: string
+  loading?: boolean
+  className?: string
 }
 
-const CardButton: FC<Props> = ({
+const CardButton = ({
   title,
   description,
   children,
@@ -27,12 +27,11 @@ const CardButton: FC<Props> = ({
   imgAlt,
   onClick,
   icon,
-  containerHeightClassName = 'h-32',
-}) => {
+  className,
+  loading = false,
+}: PropsWithChildren<CardButtonProps>) => {
   const LinkContainer = ({ children }: { children: React.ReactNode }) => (
-    <Link href={linkHref}>
-      <a>{children}</a>
-    </Link>
+    <Link href={linkHref}>{children}</Link>
   )
   const UrlContainer = ({ children }: { children: React.ReactNode }) => <a href={url}>{children}</a>
   const NonLinkContainer = ({ children }: { children: React.ReactNode }) => <div>{children}</div>
@@ -43,21 +42,20 @@ const CardButton: FC<Props> = ({
   const isLink = url || linkHref || onClick
 
   let containerClasses = [
+    className,
     'group relative text-left',
-    'bg-panel-header-light dark:bg-panel-header-dark',
-    'border border-panel-border-light dark:border-panel-border-dark',
-    'rounded-md py-4 px-6 flex flex-row',
+    'bg-surface-100',
+    'border border-surface',
+    'rounded-md p-5 flex flex-row h-32',
     'transition ease-in-out duration-150',
-    containerHeightClassName,
   ]
 
   if (isLink) {
     containerClasses = [
       ...containerClasses,
       'cursor-pointer',
-      'hover:bg-panel-border-light dark:hover:bg-panel-border-dark',
-      'hover:border-panel-border-hover-light',
-      'dark:hover:border-panel-border-hover-dark hover:border-gray-300',
+      'hover:bg-surface-200',
+      'hover:border-control',
     ]
   }
 
@@ -82,40 +80,42 @@ const CardButton: FC<Props> = ({
       )}
       {icon && <ImageContainer>{icon}</ImageContainer>}
       <div className="flex h-full w-full flex-col space-y-2">
-        <h5 className="text-scale-1200">{title}</h5>
-        <div className="flex w-full flex-1 flex-col">
-          <p className="text-scale-1100 text-sm">{description}</p>
-          <div className="w-full">{children && children}</div>
-        </div>
-        <div className="w-full">{footer && footer}</div>
+        {typeof title === 'string' ? <h5 className="text-foreground">{title}</h5> : title}
+        {(children || description) && (
+          <div className="flex w-full flex-1 flex-col">
+            <p className="text-sm text-foreground-light">{description}</p>
+            <div className="w-full">{children && children}</div>
+          </div>
+        )}
+        {footer && <div className="w-full !mt-auto">{footer}</div>}
       </div>
       {isLink && (
         <div
           className="
-          text-scale-900
-          group-hover:text-scale-1200
           absolute
           right-4
           top-4
+          text-foreground-lighter
           transition-all
           duration-200
           group-hover:right-3
+          group-hover:text-foreground
         "
         >
-          <IconChevronRight />
+          {loading ? <IconLoader className="animate-spin" /> : <IconChevronRight />}
         </div>
       )}
     </div>
   )
 
   if (onClick) {
-    return <ButtonContainer children={contents} />
+    return <ButtonContainer>{contents}</ButtonContainer>
   } else if (linkHref) {
-    return <LinkContainer children={contents} />
+    return <LinkContainer>{contents}</LinkContainer>
   } else if (url) {
-    return <UrlContainer children={contents} />
+    return <UrlContainer>{contents}</UrlContainer>
   } else {
-    return <NonLinkContainer children={contents} />
+    return <NonLinkContainer>{contents}</NonLinkContainer>
   }
 }
 

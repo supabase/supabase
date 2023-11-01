@@ -1,11 +1,11 @@
-import { Button, Typography, Modal } from '@supabase/ui'
-import { useState } from 'react'
 import SqlEditor from 'components/ui/SqlEditor'
+import { useState } from 'react'
+import { Button, Modal } from 'ui'
 
 const ReviewEmptyState = () => {
   return (
-    <div className="flex items-center justify-center my-10 opacity-50 space-x-2">
-      <Typography.Text>There are no changes made to this policy</Typography.Text>
+    <div className="my-10 flex items-center justify-center space-x-2 opacity-50">
+      <p>There are no changes made to this policy</p>
     </div>
   )
 }
@@ -25,9 +25,9 @@ const StoragePoliciesReview = ({
     <>
       <Modal.Content>
         <div className="space-y-6 py-8">
-          <div className="space-y-8 flex items-center justify-between space-x-4">
+          <div className="flex items-center justify-between space-y-8 space-x-4">
             <div className="flex flex-col">
-              <p className="text-sm text-scale-1100">
+              <p className="text-sm text-foreground-light">
                 These are the SQL statements that will be used to create your policies. The suffix
                 appended to the end of your policy name (<code>[hashString]_[number]</code>) just
                 functions as a unique identifier for each of your policies.
@@ -50,7 +50,7 @@ const StoragePoliciesReview = ({
           </div>
         </div>
       </Modal.Content>
-      <div className="px-6 py-4 w-full flex justify-end items-center gap-2 border-t dark:border-dark">
+      <div className="flex w-full items-center justify-end gap-2 border-t px-6 py-4 dark:border-dark">
         <Button type="default" onClick={onSelectBack}>
           Back to edit
         </Button>

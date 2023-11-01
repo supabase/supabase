@@ -1,5 +1,5 @@
 import { makeAutoObservable } from 'mobx'
-import { get } from 'lib/common/fetch'
+import { get, isResponseOk } from 'lib/common/fetch'
 import { IRootStore } from '../RootStore'
 import { OpenAPIV2 } from 'openapi-types'
 
@@ -15,6 +15,9 @@ export interface IOpenApiStore {
   isLoading: boolean
 
   load: () => void
+
+  setUrl: (url: string) => void
+  setHeaders: (headers: { [prop: string]: any }) => void
 }
 export default class OpenApiStore implements IOpenApiStore {
   STATES = {
@@ -49,18 +52,10 @@ export default class OpenApiStore implements IOpenApiStore {
   }
 
   async fetchData() {
-    const headers = { 'Content-Type': 'application/json', ...this.headers }
-    const projectConfig = await get(this.url, { headers })
-    if (projectConfig.error) throw projectConfig.error
-
-    const apiKey = projectConfig.autoApiService?.internalApiKey
-    const restApiUrl = projectConfig.autoApiService?.restUrl
-
-    const response = await get<OpenAPIV2.Document>(`${restApiUrl}?apikey=${apiKey}`, {
-      headers: { ...headers, apiKey: apiKey, Authorization: `Bearer ${apiKey}` },
-      credentials: 'omit',
-    })
-    if (response.error) throw response.error
+    const response = await get<OpenAPIV2.Document>(this.url)
+    if (!isResponseOk(response)) {
+      throw response.error
+    }
 
     const tables = response.definitions
       ? Object.entries(response.definitions).map(([key, table]) => ({
@@ -125,5 +120,18 @@ export default class OpenApiStore implements IOpenApiStore {
 
   setError(value: any) {
     this.error = value
+  }
+
+  setUrl(url: string) {
+    this.url = url
+
+    // if the url changes, we need to reset the state
+    this.state = this.STATES.INITIAL
+    this.data = undefined
+    this.error = null
+  }
+
+  setHeaders(headers: { [prop: string]: any }) {
+    this.headers = headers
   }
 }

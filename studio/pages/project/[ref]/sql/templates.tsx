@@ -1,16 +1,12 @@
-import { NextPage } from 'next'
 import { observer } from 'mobx-react-lite'
-
-import { withAuth } from 'hooks'
+import { NextPageWithLayout } from 'types'
 import { SQLEditorLayout } from 'components/layouts'
 import { SQLTemplates } from 'components/interfaces/SQLEditor'
 
-const SqlTemplates: NextPage = () => {
-  return (
-    <SQLEditorLayout title="SQL">
-      <SQLTemplates />
-    </SQLEditorLayout>
-  )
+const SqlEditorWelcome: NextPageWithLayout = () => {
+  return <SQLTemplates />
 }
 
-export default withAuth(observer(SqlTemplates))
+SqlEditorWelcome.getLayout = (page) => <SQLEditorLayout title="SQL">{page}</SQLEditorLayout>
+
+export default observer(SqlEditorWelcome)

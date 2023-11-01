@@ -1,37 +1,49 @@
-import { FC } from 'react'
+import clsx from 'clsx'
 
-interface Props {
+interface SparkBarProps {
   value: number
   max?: number
-  type?: string
+  type?: 'horizontal' | 'vertical'
   labelTop?: string
+  labelTopClass?: string
   labelBottom?: string
+  labelBottomClass?: string
   barClass?: string
   bgClass?: string
   borderClass?: string
 }
 
-const SparkBar: FC<Props> = ({
+const SparkBar = ({
   max = 100,
   value = 0,
   barClass = '',
   bgClass = '',
-  type = '',
+  type = 'vertical',
   borderClass = '',
   labelBottom = '',
+  labelBottomClass = 'tabular-nums',
   labelTop = '',
-}) => {
-  if (type == 'horizontal') {
-    let width = Number((value / max) * 100)
-    if (width < 3) width = 3
-    let widthCss = `${width}%`
+  labelTopClass = '',
+}: SparkBarProps) => {
+  if (type === 'horizontal') {
+    const width = Number((value / max) * 100)
+    const widthCss = `${width}%`
     const hasLabels = labelBottom || labelTop
+
     return (
       <div className="flex flex-col w-full">
         {hasLabels && (
           <div className="flex align-baseline justify-between pb-1 space-x-8">
-            <span className="text-scale-1200 text-base truncate">{labelBottom}</span>
-            <span className="text-scale-900 text-sm tabular-nums">{labelTop}</span>
+            <p
+              className={clsx(
+                'text-foreground text-sm truncate capitalize-sentence',
+                labelTop.length > 0 && 'max-w-[75%]',
+                labelBottomClass
+              )}
+            >
+              {labelBottom}
+            </p>
+            <p className={clsx('text-foreground-light text-sm', labelTopClass)}>{labelTop}</p>
           </div>
         )}
         <div
@@ -40,7 +52,7 @@ const SparkBar: FC<Props> = ({
           } ${borderClass ? borderClass : 'border-none'}`}
         >
           <div
-            className={`absolute rounded inset-x-0 bottom-0 h-1 ${barClass}`}
+            className={`absolute rounded inset-x-0 bottom-0 h-1 ${barClass} transition-all`}
             style={{ width: widthCss }}
           ></div>
         </div>
@@ -50,6 +62,7 @@ const SparkBar: FC<Props> = ({
     const totalHeight = 35
     let height = Number((value / max) * totalHeight)
     if (height < 2) height = 2
+
     return (
       <div
         className={`relative rounded w-5 overflow-hidden border p-1 ${

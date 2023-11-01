@@ -1,30 +1,29 @@
-import { PostgresTable } from '@supabase/postgres-meta'
-import { Typography } from '@supabase/ui'
+import type { PostgresTable } from '@supabase/postgres-meta'
 
-interface Props {
+interface HeaderTitleProps {
   schema: string
-  table: PostgresTable
+  table?: { name: string }
   isDuplicating: boolean
 }
 
-const HeaderTitle: React.FC<Props> = ({ schema, table, isDuplicating }) => {
+const HeaderTitle = ({ schema, table, isDuplicating }: HeaderTitleProps) => {
   if (!table) {
     return (
       <>
-        Create a new table under <code>{schema}</code>
+        Create a new table under <code className="text-sm">{schema}</code>
       </>
     )
   }
   if (isDuplicating) {
     return (
       <>
-        Duplicate table <Typography.Text code>{table.name}</Typography.Text>
+        Duplicate table <code className="text-sm">{table?.name}</code>
       </>
     )
   }
   return (
     <>
-      Update table <Typography.Text code>{table.name}</Typography.Text>
+      Update table <code className="text-sm">{table?.name}</code>
     </>
   )
 }

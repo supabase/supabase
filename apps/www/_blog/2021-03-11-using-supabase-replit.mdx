@@ -8,11 +8,14 @@ author_image_url: https://github.com/awalias.png
 authorURL: https://github.com/awalias
 image: replit-og.jpg
 thumb: replit-og.jpg
+categories:
+  - engineering
 tags:
   - replit
   - node-js
   - postgres
 date: '03-11-2021'
+video: https://www.youtube.com/v/lQ5iIxaYduI
 ---
 
 [Replit.com](http://replit.com) is an awesome new browser based IDE where you can code alone or collaboratively with friends using their awesome multiplayer features! It's particularly useful for education, and sharing code examples with others.
@@ -21,25 +24,25 @@ They support a ton of different languages and execution environments and even re
 
 As a Replit user, if you want to access larger amounts of data direct from your repl, or if you fancy accessing some super-powerful query tools, at some point you may want to start interacting with a relational database. Supabase is a good fit here; just like Replit, you don't need to worry about servers, and hosting, you can just click a few buttons and get a fully featured relational database which you can start communicating with directly from javacript, using supabase-js.
 
-<iframe
-  className="video-with-border w-full"
-  width="640"
-  height="385"
-  src="https://www.youtube-nocookie.com/embed/lQ5iIxaYduI"
-  frameBorder="1"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-  allowFullScreen
-></iframe>
+<div className="video-container">
+  <iframe
+    className="video-with-border w-full"
+    src="https://www.youtube-nocookie.com/embed/lQ5iIxaYduI"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
 
 Here's how to start a Supabase + Node.js repl:
 
 Sign up for [replit.com](http://replit.com) and hit new repl in the top left
 
-![Untitled-2](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/u3dljulzsyqu58i75epn.png)
+![Untitled-2](/images/blog/2021-march/u3dljulzsyqu58i75epn.png)
 
 Select node.js, give it a name, and click Create repl
 
-![Untitled-1](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/7rcfbb12sfabevto571j.png)
+![Untitled-1](/images/blog/2021-march/7rcfbb12sfabevto571j.png)
 
 Import supabase's createClient method and hit run to install the required libs:
 
@@ -56,11 +59,11 @@ const supabase = createClient(
 )
 ```
 
-![Untitled-3](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/5j5aqyjdh74qm83slmli.png)
+![Untitled-3](/images/blog/2021-march/5j5aqyjdh74qm83slmli.png)
 
 Now that supabase is connected you'll want to add some data to your db, you can grab any SQL dataset on the web, or make your own, but the fasted way to test is to open the SQL tab in the Supabase dashboard and click the Countries sample database and click Run.
 
-![Untitled-4](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/54yykm6h9hqpric87zad.png)
+![Untitled-4](/images/blog/2021-march/54yykm6h9hqpric87zad.png)
 
 From within your repl you can now query your countries table like:
 
@@ -76,7 +79,7 @@ supabase.
 // or...
 // async/await syntax
 const main = async() => {
-  let { data, error } = supabase
+  const { data, error } = supabase
     .from('countries')
     .select('*')
     .limit(5)
@@ -132,4 +135,4 @@ We look forward to showing off some more Supabase + Replit examples.
 
 You can find my example repl here: [https://repl.it/@awalias/supabase-test#index.js](https://repl.it/@awalias/supabase-test#index.js)
 
-Supabase has a free tier, head over to [https://app.supabase.com](https://app.supabase.com) to get started.
+Supabase has a free plan, head over to [https://supabase.com/dashboard](https://supabase.com/dashboard) to get started.

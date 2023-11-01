@@ -1,7 +1,7 @@
 .data-grid--simple-logs {
   .rdg-cell,
   .rdg-cell span {
-    @apply text-scale-1100 font-normal #{!important};
+    @apply text-foreground-light font-normal #{!important};
     border-left: none;
     border-right: none;
   }
@@ -14,14 +14,14 @@
   }
 
   .rdg-row {
-    &.rdg-row--focussed {
-      @apply border-r border-brand-900;
+    &.rdg-row--focused {
+      @apply border-r border-brand;
       border-right-width: 4px;
     }
 
-    &.rdg-row--focussed .rdg-cell,
-    &.rdg-row--focussed .rdg-cell span {
-      @apply text-scale-1200 font-semibold #{!important};
+    &.rdg-row--focused .rdg-cell,
+    &.rdg-row--focused .rdg-cell span {
+      @apply text-foreground font-semibold #{!important};
     }
   }
 }
@@ -31,7 +31,7 @@
 
   .rdg-cell,
   .rdg-cell span {
-    @apply text-scale-1100 font-normal #{!important};
+    @apply text-foreground-light font-normal #{!important};
   }
 
   .rdg-cell:first-child {
@@ -42,14 +42,14 @@
   }
 
   .rdg-row {
-    &.rdg-row--focussed {
-      @apply border-r border-brand-900;
+    &.rdg-row--focused {
+      @apply border-r border-brand;
       border-right-width: 4px;
     }
 
-    &.rdg-row--focussed .rdg-cell,
-    &.rdg-row--focussed .rdg-cell span {
-      @apply text-scale-1200 font-semibold #{!important};
+    &.rdg-row--focused .rdg-cell,
+    &.rdg-row--focused .rdg-cell span {
+      @apply text-foreground-light font-semibold #{!important};
     }
   }
 }
@@ -77,8 +77,8 @@
   background: linear-gradient(
     to right,
     var(--colors-scale2) 0%,
-    var(--colors-brand9) 25%,
-    var(--colors-brand4) 35%,
+    hsl(var(--brand-default)) 25%,
+    hsl(var(--brand-300)) 35%,
     var(--colors-scale2) 45%,
     var(--colors-scale3) 75%
   );

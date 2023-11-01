@@ -1,6 +1,7 @@
 import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilterPanel'
-import { render, waitFor, screen } from '@testing-library/react'
+import { waitFor, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { render } from '../../helpers'
 
 jest.mock('components/ui/Flag/Flag')
 import Flag from 'components/ui/Flag/Flag'
@@ -49,11 +50,11 @@ test('Manual refresh', async () => {
   expect(mockFn).toBeCalled()
 })
 test('Datepicker dropdown', async () => {
-  render(<PreviewFilterPanel />)
-  clickDropdown(await screen.findByText(/Last day/))
+  const fn = jest.fn()
+  render(<PreviewFilterPanel onSearch={fn} />)
+  clickDropdown(await screen.findByText(/Last hour/))
   userEvent.click(await screen.findByText(/Last 3 hours/))
-  await screen.findByText(/Last 3 hours/)
-  await expect(screen.findByText(/Last day/)).rejects.toThrow()
+  expect(fn).toBeCalled()
 })
 
 test.todo('timestamp to/from filter default value')

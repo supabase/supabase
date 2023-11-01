@@ -7,9 +7,12 @@ author_image_url: https://github.com/kiwicopple.png
 authorURL: https://github.com/kiwicopple
 image: april-2021/release-apr-2021.jpg
 thumb: april-2021/release-apr-2021.jpg
+categories:
+  - product
 tags:
   - release-notes
 date: '2021-05-05'
+video: https://www.youtube.com/v/uWJmUTCFdak
 ---
 
 This month was a "gardening" month for Supabase. The team focused on stability, security, and community support.
@@ -19,15 +22,15 @@ Check out what we were working on below, as well as some incredible Community co
 
 Watch a full demo:
 
-<iframe
-  className="video-with-border w-full"
-  width="640"
-  height="385"
-  src="https://www.youtube-nocookie.com/embed/uWJmUTCFdak"
-  frameBorder="1"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-  allowFullScreen
-></iframe>
+<div className="video-container">
+  <iframe
+    className="video-with-border w-full"
+    src="https://www.youtube-nocookie.com/embed/uWJmUTCFdak"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
 
 ## Light Mode
 
@@ -38,10 +41,10 @@ We're a developer tool, which means that Dark Mode is [extremely popular](https:
 While Dark mode is great, for some people it's not an option. Dark Mode is difficult to use for developers with astigmatisms,
 or even just working in brightly-lit environments.
 
-So today we're shipping Light Mode. Access it in the settings of your [Dashboard](https://app.supabase.com).
+So today we're shipping Light Mode. Access it in the settings of your [Dashboard](https://supabase.com/dashboard).
 
-<video width="99%" autoPlay="autoplay" muted playsInline controls={true}>
-  <source src="/images/blog/april-2021/light-mode.mp4" type="video/mp4" muted playsInline />
+<video width="99%" autoPlay muted playsInline controls={true}>
+  <source src="/images/blog/april-2021/light-mode.mp4" type="video/mp4" />
 </video>
 
 ## Translations
@@ -49,7 +52,7 @@ So today we're shipping Light Mode. Access it in the settings of your [Dashboard
 With the help of the community, we [started internationalizing](https://github.com/supabase/supabase/issues/1341) our main repository:
 
 - [Arabic | العربية](https://github.com/supabase/supabase/blob/master/i18n/README.ar.md)
-- [Chinese / 中文](https://github.com/supabase/supabase/blob/master/i18n/README.cn.md)
+- [Chinese / 中文](https://github.com/supabase/supabase/blob/master/i18n/README.zh-cn.md)
 - [Dutch / Nederlands](https://github.com/supabase/supabase/blob/master/i18n/README.nl.md)
 - [English](https://github.com/supabase/supabase)
 - [French / Français](https://github.com/supabase/supabase/blob/master/i18n/README.fr.md)
@@ -88,8 +91,8 @@ which provide a more general solution (but are less "realtime"), and we're openi
 
 One of the most powerful Postgres features is "recursive CTEs" which can be used for nested items (comments, pages, friend-graphs). [@lawrencecchen](https://twitter.com/lawrencecchen) has built a full [Threaded Comments demo](https://github.com/lawrencecchen/threaded-comments) which you can [Deploy with a single click](https://github.com/lawrencecchen/threaded-comments#instant-deploy). Want to add comments to your blog with [Full Text Search](/docs/reference/javascript/textsearch)? Just use Postgres.
 
-<video width="99%" autoPlay="autoplay" muted playsInline controls={true}>
-  <source src="/images/blog/april-2021/threaded-small.mp4" type="video/mp4" muted playsInline />
+<video width="99%" autoPlay muted playsInline controls={true}>
+  <source src="/images/blog/april-2021/threaded-small.mp4" type="video/mp4" />
 </video>
 
 ## Community spotlight: SupaScript
@@ -123,15 +126,15 @@ $$ language plv8;
 
 Fireship reviewed Supabase last week, and despite being a (self-proclaimed) Firebase fan-boy, the review was very impartial.
 
-<iframe
-  className="video-with-border w-full"
-  width="640"
-  height="385"
-  src="https://www.youtube-nocookie.com/embed/WiwfiVdfRIc"
-  frameBorder="1"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-  allowFullScreen
-></iframe>
+<div className="video-container">
+  <iframe
+    className="video-with-border w-full"
+    src="https://www.youtube-nocookie.com/embed/WiwfiVdfRIc"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
 
 ## Community
 
@@ -160,7 +163,7 @@ If you want to keep up to date, make sure you [subscribe to our YouTube channel]
 
 You might have noticed our Dashboard slowly changing (improving), as we migrate the components out to our [open source UI Library](https://github.com/supabase/ui). This progression is an important step towards offering a UI for [Local Development](/docs/guides/local-development) and [Self Hosting](/docs/guides/self-hosting).
 
-We're also working on our [Workflows engine](/blog/2021/04/02/supabase-workflows). This is quite a large task, but we're making progress and aiming to ship sometime in July.
+We're also working on our [Workflows engine](/blog/supabase-workflows). This is quite a large task, but we're making progress and aiming to ship sometime in July.
 
 ## One more thing
 
@@ -170,7 +173,7 @@ We're also working on our [Workflows engine](/blog/2021/04/02/supabase-workflows
 
 ### Get started
 
-- Start using Supabase today: [app.supabase.com](https://app.supabase.com/)
+- Start using Supabase today: [supabase.com/dashboard](https://supabase.com/dashboard/)
 - Make sure to [star us on GitHub](https://github.com/supabase/supabase)
 - Follow us [on Twitter](https://twitter.com/supabase)
 - Subscribe to our [YouTube channel](https://www.youtube.com/c/supabase)

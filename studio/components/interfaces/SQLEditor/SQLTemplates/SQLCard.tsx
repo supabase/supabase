@@ -1,40 +1,27 @@
-import { FC, useState } from 'react'
-import { Typography, IconChevronRight, IconLoader } from '@supabase/ui'
-import { SQLTemplate } from '../SQLEditor.types'
+import CardButton from 'components/ui/CardButton'
+import { useState } from 'react'
 
-interface Props {
-  template: SQLTemplate
+export interface SQLCardProps {
+  title: string
+  description: string
+  sql: string
+  onClick: (sql: string, title: string) => void
 }
 
-const SQLCard: FC<Props> = ({ template }) => {
-  const { title, description } = template
+const SQLCard = ({ title, description, sql, onClick }: SQLCardProps) => {
   const [loading, setLoading] = useState(false)
 
+  function handleOnClick() {
+    setLoading(true)
+    onClick(sql, title)
+  }
   return (
-    <div
-      className="rounded bg-panel-header-light dark:bg-panel-header-dark transition-colors 
-      border border-panel-border-light dark:border-panel-border-dark 
-      hover:border-panel-border-hover-light dark:hover:border-panel-border-hover-dark 
-      cursor-pointer w-full"
-    >
-      <div className="px-6 py-3 border-b dark:border-dark flex items-center justify-between">
-        <Typography.Title level={5} className="m-0">
-          {title}
-        </Typography.Title>
-        {loading ? (
-          <div className="animate-spin">
-            <IconLoader size={16} />
-          </div>
-        ) : (
-          <Typography.Text type="secondary">
-            <IconChevronRight />
-          </Typography.Text>
-        )}
-      </div>
-      <p className="px-6 py-4 capitalize-first">
-        <Typography.Text type="secondary">{description}</Typography.Text>
-      </p>
-    </div>
+    <CardButton
+      title={title}
+      loading={loading}
+      onClick={() => handleOnClick()}
+      footer={<span className="text-foreground-light text-sm">{description}</span>}
+    />
   )
 }
 

@@ -12,7 +12,7 @@
   @apply flex;
   @apply text-grid;
   @apply border-scale-400 dark:border-scale-500 border-r border-b;
-  @apply text-scale-1200;
+  @apply text-foreground;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -32,7 +32,7 @@
   @apply border-scale-400 dark:border-scale-500 border-r-4 shadow-none;
 }
 
-.rdg-cell-selected {
+.rdg-cell[aria-selected='true'] {
   box-shadow: inset 0 0 0 1px #24b47e;
 }
 
@@ -152,7 +152,7 @@
     appearance: none;
     padding: 0;
     -webkit-print-color-adjust: exact;
-    color-adjust: exact;
+    print-color-adjust: exact;
     display: inline-block;
     vertical-align: middle;
     background-origin: border-box;
@@ -174,8 +174,8 @@
   }
 
   [type='checkbox']:checked {
-    @apply dark:bg-brand-900;
-    @apply bg-brand-900;
+    @apply dark:bg-brand;
+    @apply bg-brand;
     border-color: transparent;
     background-size: 100% 100%;
     background-position: center;
@@ -186,7 +186,7 @@
     @apply cursor-pointer rounded border border-solid;
 
     @apply text-brand-600 border-scale-400 transition-all;
-    @apply hover:border-brand-900 focus:ring-brand-500 focus:outline-none;
+    @apply hover:border-brand focus:ring-brand-300 focus:outline-none;
 
     @apply dark:border-scale-500 dark:bg-transparent dark:text-white;
     @apply dark:hover:border-green-900;
@@ -346,6 +346,7 @@
 
 .sb-grid-checkbox-editor__input {
   @apply h-4 w-4;
+  outline: 4px auto -webkit-focus-ring-color;
 }
 
 /*
@@ -385,7 +386,10 @@
 */
 
 .sb-grid-select-editor {
-  @apply h-full w-full;
+  button {
+    @apply border-none rounded-none shadow-none;
+    box-shadow: none !important;
+  }
 }
 
 /*
@@ -473,13 +477,13 @@
 }
 
 .sb-grid-column-header__inner__name {
-  @apply text-scale-1200 overflow-hidden overflow-ellipsis text-xs;
+  @apply text-foreground overflow-hidden overflow-ellipsis text-xs select-text;
 }
 
 .sb-grid-column-header__inner__format {
   @apply text-xs;
   @apply overflow-hidden overflow-ellipsis font-normal;
-  @apply text-scale-1000;
+  @apply text-foreground-light;
 }
 
 .sb-grid-column-header__inner__primary-key {
@@ -487,7 +491,7 @@
 }
 
 .sb-grid-column-header__inner svg {
-  @apply border-brand-900 text-brand-900 dark:border-brand-900 dark:text-brand-900;
+  @apply border-brand text-brand dark:border-brand dark:text-brand;
 }
 
 /*
@@ -519,7 +523,7 @@
 }
 
 .sb-grid-select-cell__header__input {
-  /* @apply focus:ring-brand-500; */
+  /* @apply focus:ring-brand-300; */
   @apply border-scale-300;
 }
 
@@ -568,71 +572,6 @@
 }
 
 /*
-  RowContextMenu
-*/
-
-.sb-grid-context-menu__label {
-  @apply ml-2;
-}
-// }
-
-/*
-  ForeignTableModal
-*/
-
-.foreign-table-modal__content-container {
-  @apply w-full;
-}
-
-/* .foreign-table-modal__content-container__inner {
-@apply px-6;
-} */
-
-.foreign-table-modal__content-container__inner__overflow {
-  @apply w-full overflow-scroll;
-}
-
-.foreign-table-modal__filter {
-  @apply mt-2 flex items-center space-x-2;
-}
-
-.foreign-table-modal__filter__trigger-content {
-  @apply space-x-2;
-}
-
-.foreign-table-modal__filter__trigger-content__label {
-  @apply text-typography-body-light dark:text-typography-body-dark;
-}
-
-.foreign-table-modal__filter__trigger-content__name {
-  @apply text-typography-body-strong-light dark:text-typography-body-strong-dark font-bold;
-}
-
-.foreign-table-modal__filter__search-input {
-  @apply flex-grow;
-}
-
-.foreign-table-modal__menu {
-  @apply flex flex-col space-y-2;
-}
-
-.foreign-table-modal__row-item {
-  @apply border-scale-400 dark:border-scale-500 overflow-hidden rounded border border-solid px-5 py-2 shadow-sm first:mt-2;
-}
-
-.foreign-table-modal__row-item__inner {
-  @apply flex space-x-4;
-}
-
-.foreign-table-modal__row-item__inner__key-item {
-  @apply flex flex-initial flex-col;
-}
-
-.foreign-table-modal__row-item__inner__key-item__key {
-  @apply font-mono;
-}
-
-/*
   header/filter/FilterDropdown
 */
 
@@ -655,10 +594,6 @@ header/filter/FilterRow
 .sb-grid-filter-row {
   @apply flex w-full items-center justify-between space-x-1;
 }
-
-/* .sb-grid-filter-row__inner__close {
-@apply p-0 bg-transparent hover:bg-transparent;
-} */
 
 /*
 header/sort/SortDropdown

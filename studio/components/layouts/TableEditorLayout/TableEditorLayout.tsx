@@ -1,81 +1,47 @@
-import { FC, ReactNode, useState, useEffect } from 'react'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { observer } from 'mobx-react-lite'
-import { PostgresTable } from '@supabase/postgres-meta'
+import { PropsWithChildren, useEffect } from 'react'
 
-import { useStore } from 'hooks'
-import Error from 'components/ui/Error'
-import ProjectLayout from '../ProjectLayout/ProjectLayout'
+import NoPermission from 'components/ui/NoPermission'
+import { useCheckPermissions, useStore } from 'hooks'
+import { ProjectLayoutWithAuth } from '../'
 import TableEditorMenu from './TableEditorMenu'
-import { isUndefined } from 'lodash'
 
-interface Props {
-  selectedSchema?: string
-  onSelectSchema: (schema: string) => void
-  onAddTable: () => void
-  onEditTable: (table: PostgresTable) => void
-  onDeleteTable: (table: PostgresTable) => void
-  onDuplicateTable: (table: PostgresTable) => void
-  children: ReactNode
-}
+const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
+  const { vault, meta, ui } = useStore()
 
-const TableEditorLayout: FC<Props> = ({
-  selectedSchema,
-  onSelectSchema = () => {},
-  onAddTable = () => {},
-  onEditTable = () => {},
-  onDeleteTable = () => {},
-  onDuplicateTable = () => {},
-  children,
-}) => {
-  const { meta, ui } = useStore()
-  const { isInitialized, isLoading, error } = meta.tables
+  const canReadTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'tables')
 
-  const [loaded, setLoaded] = useState<boolean>(isInitialized)
+  const vaultExtension = meta.extensions.byId('supabase_vault')
+  const isVaultEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
 
   useEffect(() => {
-    if (ui.selectedProject) {
-      meta.schemas.load()
-      meta.tables.load()
+    if (ui.selectedProjectRef) {
       meta.types.load()
+      meta.policies.load()
       meta.publications.load()
+      meta.extensions.load()
     }
-  }, [ui.selectedProject])
+  }, [ui.selectedProjectRef])
 
   useEffect(() => {
-    let cancel = false
-    if (!isLoading && !loaded) {
-      if (!cancel) setLoaded(true)
+    if (isVaultEnabled) {
+      vault.load()
     }
-    return () => {
-      cancel = true
-    }
-  }, [isLoading])
+  }, [ui.selectedProjectRef, isVaultEnabled])
 
-  if (error) {
+  if (!canReadTables) {
     return (
-      <ProjectLayout>
-        <Error error={error} />
-      </ProjectLayout>
+      <ProjectLayoutWithAuth>
+        <NoPermission isFullPage resourceText="view tables from this project" />
+      </ProjectLayoutWithAuth>
     )
   }
 
   return (
-    <ProjectLayout
-      isLoading={!loaded || isUndefined(selectedSchema)}
-      product="Table editor"
-      productMenu={
-        <TableEditorMenu
-          selectedSchema={selectedSchema}
-          onSelectSchema={onSelectSchema}
-          onAddTable={onAddTable}
-          onEditTable={onEditTable}
-          onDeleteTable={onDeleteTable}
-          onDuplicateTable={onDuplicateTable}
-        />
-      }
-    >
+    <ProjectLayoutWithAuth product="Table Editor" productMenu={<TableEditorMenu />}>
       {children}
-    </ProjectLayout>
+    </ProjectLayoutWithAuth>
   )
 }
 

@@ -34,9 +34,14 @@ export function isArrayColumn(type: string) {
   return ARRAY_TYPES.indexOf(type.toLowerCase()) > -1
 }
 
-const TEXT_TYPES = ['text', 'character varying']
+const TEXT_TYPES = ['uuid', 'text', 'character varying']
 export function isTextColumn(type: string) {
   return TEXT_TYPES.indexOf(type.toLowerCase()) > -1
+}
+
+const USER_DEFINED_TEXT_TYPES = ['citext']
+export function isCiTextColumn(format: string) {
+  return USER_DEFINED_TEXT_TYPES.indexOf(format.toLowerCase()) > -1
 }
 
 const TIMESTAMP_TYPES = ['timestamp', 'timestamptz']
@@ -65,6 +70,6 @@ export function isEnumColumn(type: string) {
 }
 
 export function isForeignKeyColumn(columnDef: SupaColumn) {
-  const { targetTableSchema, targetTableName, targetColumnName } = columnDef
+  const { targetTableSchema, targetTableName, targetColumnName } = columnDef?.foreignKey ?? {}
   return !!targetTableSchema && !!targetTableName && !!targetColumnName
 }

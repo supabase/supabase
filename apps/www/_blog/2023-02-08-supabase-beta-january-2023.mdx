@@ -1,0 +1,137 @@
+---
+title: Supabase Beta January 2023
+description: New Postgres extensions, pg_graphql updates, changes to Edge Functions, and more!
+author: ant_wilson
+image: 2023-02-08-january-beta-update/supabase-beta-update-january-2023.jpg
+thumb: 2023-02-08-january-beta-update/supabase-beta-update-january-2023.jpg
+categories:
+  - product
+tags:
+  - release-notes
+date: '2023-02-08'
+toc_depth: 3
+---
+
+We have so much good stuff this month that it’s hard to fit in a single blog post 🚢.
+
+We’ve got some new Postgres extensions, GraphQL updates, changes to Edge Functions, and more!
+
+## Storing OpenAI embeddings in Postgres with pgvector
+
+![Storing OpenAI embeddings in Postgres with pgvector](/images/blog/2023-02-08-january-beta-update/pgvector.png)
+
+pgvector is a popular PostgreSQL extension for storing embeddings and performing vector similarity search. It was one of the most requested extensions by the AI/ML community and is now available thanks to [gregnr](https://github.com/gregnr).
+
+[Read the announcement](https://supabase.com/blog/openai-embeddings-postgres-vector)
+
+## Meet Supabase Clippy: ChatGPT for Docs
+
+![Meet Supabase Clippy: ChatGPT for Docs](/images/blog/2023-02-08-january-beta-update/chatgpt-for-supabase-docs.png)
+
+Greg wasted no time and took pgvector for a spin, he combined it with OpenAI to build Supabase Clippy, a next-generation doc search. The first implementation is a 1-week MVP and fully open source, so you can build on top of it.
+
+- [Read the blog post](https://supabase.com/blog/chatgpt-supabase-docs)
+- [Watch the video tutorial](https://www.youtube.com/watch?v=Yhtjd7yGGGA)
+
+## Client library reference: Python and C#
+
+![Client library reference: Python and C#](/images/blog/2023-02-08-january-beta-update/references.png)
+
+We have released extensive reference docs for C# and Python, detailing every object and method. What are you going to build?
+
+- [C# Client Library](https://supabase.com/docs/reference/csharp/)
+- [Python Client Library](https://supabase.com/docs/reference/python/initializing)
+
+## pg_graphql now supports Views, Materialized Views, and Foreign Tables
+
+![pg_graphql now supports Views, Materialized Views, and Foreign Tables](/images/blog/2023-02-08-january-beta-update/pg-graphql.png)
+
+Views, Materialized Views, and Foreign Tables are three database objects that provide a powerful way to access and organize and transform data without duplication.
+
+[Read the docs](https://supabase.github.io/pg_graphql/views/)
+
+## Automatic WebP detection for Image Transformation
+
+![Automatic WebP detection for Image Transformation](/images/blog/2023-02-08-january-beta-update/image-transformation.png)
+
+WebP is a modern image format that provides superior lossless and lossy compression for images on the web. We are enabling format conversion by default for anyone who has Image Transformations. You can opt out by including format: origin in the transformation parameters.
+
+[Read the docs](https://supabase.com/docs/guides/storage/serving/image-transformations#automatic-image-optimisation-webp)
+
+## Quick product updates
+
+-  Postgres Extension: Another powerful and time-tested extension, pg_repack, is added to Supabase. [[PR]](https://github.com/supabase/postgres/pull/492)
+
+- Auth: Multi-tab session support using the new browser BroadcastChannel API. If a user logs out on one tab, they will now be logged out on all tabs. [[PR]](https://github.com/supabase/gotrue-js/pull/566)
+
+- Postgres: Superior speed with lz4 database compression. [[PR]](https://github.com/supabase/postgres/pull/490)
+
+- Postgres: Use ICU locales and collations for text attribute ordering in database queries. [[PR]](https://github.com/supabase/postgres/pull/491)
+
+- Docs: New guide on scheduling functions with pg_cron. [[Guide]](https://supabase.com/docs/guides/functions/schedule-functions)
+
+- Edge Functions: You can now download source codes of deployed edge functions from the CLI. [[Doc]](https://supabase.com/docs/reference/cli/supabase-functions-download)
+
+- Edge Functions: building a Discord Slash Bot. [[Video Tutorial]](https://www.youtube.com/watch?v=J24Bvo_m7DM)
+
+## Deploy Supabase on DigitalOcean
+
+![Deploy Supabase on DigitalOcean](/images/blog/2023-02-08-january-beta-update/self-host-supabase-digital-ocean.png)
+
+We teamed up with DigitalOcean to level up self-hosted Supabase. This guide shows how to host Supabase on DigitalOcean using Sendgrid, Packer, and Terraform. More collaborations coming soon!
+
+[Get started](https://docs.digitalocean.com/developer-center/hosting-supabase-on-digitalocean/).
+
+## 45k Github stars (and counting!)
+
+![45k Github stars (and counting!)](/images/blog/2023-02-08-january-beta-update/github-45k.png)
+
+We hit two big milestones: 45k stars and Supabase is one the top 200 most-popular repos on Github 💥
+
+Massive thanks to the community for all the support 👁️⚡️👁️
+
+[Supabase Repo.](https://github.com/supabase/supabase)
+
+## Made with Supabase
+
+![Made with Supabase](/images/blog/2022-12-07-november-beta-update/madewithsupabase.jpg)
+
+[supermeme.ai](https://www.supermeme.ai/) | Two things that we are fans of are memes and AI. Just describe your thoughts and let AI create original memes for you. Available in 110+ languages!
+
+Discover other great projects: [Made with Supabase](https://www.madewithsupabase.com/).
+
+## Extended Community Highlights
+
+![Community](/images/blog/2022-june/community.jpg)
+
+- JWT Helper for Supabase by Zuplo. [Tool](https://zuplo.com/blog/2023/01/05/supabase-jwt-auth-helper/) <br/>
+
+- ClickHouse and PostgreSQL - a Match Made in Data Heaven - Part 2. [Blog Post](https://clickhouse.com/blog/migrating-data-between-clickhouse-postgres-part-2)
+- Building a Startup from Scratch: My Mistakes as CTO. [Blog Post](https://egor-romanov.medium.com/building-a-startup-from-scratch-my-mistakes-as-cto-b20b463e0058)
+- We are sponsoring TreeHacks, Stanford University's premier hackathon and one of the largest hackathons in the USA. [Hackathon](https://www.treehacks.com)
+- Set up a Svelte to-do list on self-hosted Supabase + authentication. [Tutorial](https://blog.cpbprojects.me/set-up-a-svelte-todo-list-on-self-hosted-supabase-email-sign-up-google-facebook-auth-host-on-github-pages)
+- Vercel wrote a case study about how much we love TurboRepo (and Vercel in general 🖤). [Case Study](https://vercel.com/customers/how-supabase-elevated-their-developer-experience-with-turborepo)
+- A Very Basic Scraper/Aggregator Site in Next.js with Go Cloud Functions and Supabase. [Article](https://chriscoyier.net/2023/01/23/a-very-basic-scraper-aggregator-site-in-next-js-with-go-cloud-functions-and-supabase/)
+- Supabase CDC Webhooks to Memphis REST Gateway. [Article](https://memphis.dev/blog/supabase-cdc-webhooks-to-memphis-rest-gateway/)
+- How I Replaced Revue With a Custom-Built Newsletter Service Using Nuxt 3, Supabase, Serverless, and Amazon SES. [Article](https://mokkapps.de/blog/how-i-replaced-revue-with-a-custom-built-newsletter-service-using-nuxt-3-supabase-serverless-and-amazon-ses/)
+- Nuxt 3, Tailwind, and Supabase Crash Course. [Video Course](https://www.youtube.com/watch?v=A-G6lPHctPs)
+- WhatsApp in React Native. [Part 1](https://dev.to/jacksbridger/whatsapp-ui-in-react-native-part-1-4nbm), [Part 2](https://dev.to/nsmet/chat-backend-with-supabase-socketio-55nn), [Part 3](https://dev.to/jacksbridger/whatsapp-in-react-native-part-3-1gmf)
+- Distributed GraphQL with Hasura and Supabase. [Docs](https://www.section.io/docs/tutorials/distributed-apis/distributed-hasura-supabase/)
+
+## We're Hiring
+
+Come join one of the fastest-growing open source projects ever 🤗
+
+- [Integrations / Marketplace Lead](https://boards.greenhouse.io/supabase/jobs/4775849004) <br/>
+- [Cloud Platform / Site Reliability Engineer](https://boards.greenhouse.io/supabase/jobs/4307459004) <br/>
+- [Social Media and Community Manager](https://boards.greenhouse.io/supabase/jobs/4777008004)
+
+We've redesigned our [Careers page](https://supabase.com/careers) to better reflect our mission, values, and culture.
+
+## Meme Zone
+
+As always, one of our favorite memes from last month. [Follow us on Twitter](https://twitter.com/supabase) for more.
+
+![Best meme from January 2023](/images/blog/2023-02-08-january-beta-update/beta-update-january-meme.jpeg)
+
+See you next month!

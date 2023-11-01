@@ -1,25 +1,18 @@
-import { useState } from 'react'
-import { observer } from 'mobx-react-lite'
-import { isUndefined } from 'lodash'
-
+import { RolesList } from 'components/interfaces/Database'
 import { DatabaseLayout } from 'components/layouts'
-import { RolesList, RolesSettings } from 'components/interfaces/Database'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import { observer } from 'mobx-react-lite'
 import { NextPageWithLayout } from 'types'
 
 const DatabaseRoles: NextPageWithLayout = () => {
-  const [selectedRole, setSelectedRole] = useState<any>()
-
   return (
-    <div className="p-4">
-      {isUndefined(selectedRole) ? (
-        <RolesList onSelectRole={setSelectedRole} />
-      ) : (
-        <RolesSettings
-          selectedRole={selectedRole}
-          onSelectBack={() => setSelectedRole(undefined)}
-        />
-      )}
-    </div>
+    <ScaffoldContainer>
+      <ScaffoldSection>
+        <div className="col-span-12">
+          <RolesList />
+        </div>
+      </ScaffoldSection>
+    </ScaffoldContainer>
   )
 }
 

@@ -1,4 +1,5 @@
 import { withSentry } from '@sentry/nextjs'
+import { isResponseOk } from 'lib/common/fetch'
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
 import { IS_PLATFORM } from '../constants'
 import { apiAuthenticate } from './apiAuthenticate'
@@ -17,7 +18,7 @@ export default async function apiWrapper(
 
     if (IS_PLATFORM && withAuth) {
       const response = await apiAuthenticate(req, res)
-      if (response.error) {
+      if (!isResponseOk(response)) {
         return res.status(401).json({
           error: {
             message: `Unauthorized: ${response.error.message}`,
@@ -29,7 +30,8 @@ export default async function apiWrapper(
       }
     }
 
-    const func = withSentry(handler)
+    const func = withSentry(handler as any)
+    // @ts-ignore
     return await func(req, res)
   } catch (error) {
     return res.status(500).json({ error })

@@ -1,22 +1,29 @@
-import { useEffect, useState } from 'react'
+import { filter, find, get, isEmpty } from 'lodash'
 import { observer } from 'mobx-react-lite'
-import { IconLoader, Typography } from '@supabase/ui'
-import { find, get, isEmpty, filter } from 'lodash'
+import { useEffect, useState } from 'react'
+import { IconLoader } from 'ui'
 
+import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useStore } from 'hooks'
+import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { formatPoliciesForStorage } from '../Storage.utils'
-import StoragePoliciesPlaceholder from './StoragePoliciesPlaceholder'
 import StoragePoliciesBucketRow from './StoragePoliciesBucketRow'
 import StoragePoliciesEditPolicyModal from './StoragePoliciesEditPolicyModal'
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import StoragePoliciesPlaceholder from './StoragePoliciesPlaceholder'
 
-import { PolicyEditorModal } from 'components/interfaces/Authentication/Policies'
+import { useParams } from 'common'
+import { PolicyEditorModal } from 'components/interfaces/Auth/Policies'
+import { useBucketsQuery } from 'data/storage/buckets-query'
 
 const StoragePolicies = () => {
   const { ui, meta } = useStore()
+  const { ref: projectRef } = useParams()
+
   const storageStore = useStorageStore()
-  const { loaded, buckets } = storageStore
+  const { loaded } = storageStore
+
+  const { data } = useBucketsQuery({ projectRef })
+  const buckets = data ?? []
 
   const roles = meta.roles.list((role) => !meta.roles.systemRoles.includes(role.name))
 
@@ -35,7 +42,7 @@ const StoragePolicies = () => {
 
   // Policies under storage.objects
   const storageObjectsPolicies = filter(policies, { table: 'objects' })
-  const formattedStorageObjectPolicies = formatPoliciesForStorage(storageObjectsPolicies)
+  const formattedStorageObjectPolicies = formatPoliciesForStorage(buckets, storageObjectsPolicies)
   const ungroupedPolicies = get(
     find(formattedStorageObjectPolicies, { name: 'Ungrouped' }),
     ['policies'],
@@ -85,7 +92,7 @@ const StoragePolicies = () => {
 
   /*
     Functions that involve the CRUD for policies
-    For each API call within the Promise.all, return true if an error occured, else return false
+    For each API call within the Promise.all, return true if an error occurred, else return false
   */
   const onCreatePolicies = async (payloads) => {
     return await Promise.all(
@@ -143,8 +150,8 @@ const StoragePolicies = () => {
 
   return (
     <div className="flex min-h-full w-full flex-col">
-      <h4 className="text-xl">Storage policies</h4>
-      <p className="text-scale-1100">
+      <h3 className="text-xl">Storage policies</h3>
+      <p className="mt-2 text-sm text-foreground-light">
         Safeguard your files with policies that define the operations allowed for your users at the
         bucket level.
       </p>
@@ -179,10 +186,10 @@ const StoragePolicies = () => {
           })}
 
           <div className="!mb-4 w-full border-b border-gray-600" />
-          <Typography.Text className="opacity-50">
+          <p className="text-sm text-foreground-light">
             You may also write policies for the tables under the storage schema directly for greater
             control
-          </Typography.Text>
+          </p>
 
           {/* Section for policies under storage.objects that are not tied to any buckets */}
           <StoragePoliciesBucketRow

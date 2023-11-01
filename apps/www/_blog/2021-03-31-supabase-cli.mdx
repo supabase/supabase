@@ -4,15 +4,17 @@ description: Local development, database migrations, and self-hosting.
 author: soedirgo
 image: cli/cli-og.jpg
 thumb: cli/cli-og.jpg
+categories:
+  - product
 tags:
   - supabase
   - storage
 date: '03-31-2021'
 ---
 
-**UPDATE:** The Node.js CLI is now obsolete. Follow the latest instructions [here](/docs/guides/local-development).
+**UPDATE 15/08/2022:** [Supabase CLI V1 is Generally Available](/blog/supabase-cli-v1-and-admin-api-beta) and we also released a Management API (in beta).
 
-Today is Day 3 of [Launch Week](/blog/2021/03/25/launch-week), and as promised - we're releasing our CLI.
+Today is Day 3 of [Launch Week](/blog/launch-week), and as promised - we're releasing our CLI.
 
 This is the first step in a long journey of features we plan to deliver:
 
@@ -153,7 +155,7 @@ docker run supabase/pgadmin-schema-diff \
   > diff_demo.sql
 
 Starting schema diff...
-Comparision started......0%
+Comparison started......0%
 Comparing Event Triggers...2%
 Comparing Extensions...4%
 Comparing Languages...8%
@@ -217,11 +219,11 @@ Also check `kong.yml` inside the `kong` directory where you'll see how all the s
 Once you're all set, you can start the stack by running:
 
 ```bash
-docker-compose up
+docker compose up
 ```
 
 Head over to the [Self Hosting Docs](/docs/guides/self-hosting) for a more complete walk through, it also includes several [one-click deploys](/docs/guides/self-hosting#one-click-deploys), so you can easily deploy into your own cloud hosting provider.
 
 If you require any assistance feel free to reach out in our [github discussions](https://github.com/supabase/supabase/discussions) or at support@supabase.io.
 
-Check out what else we've [launched this week](/blog/2021/03/25/launch-week), contribute to the [CLI repo](https://github.com/supabase/cli), or go here for the [hosted version](https://app.supabase.com).
+Check out the CLI VI [launched Monday 15th August, 2022](/blog/supabase-cli-v1-and-admin-api-beta), contribute to the [CLI repo](https://github.com/supabase/cli), or go here for the [hosted version](https://supabase.com/dashboard).

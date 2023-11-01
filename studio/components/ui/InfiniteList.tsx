@@ -1,4 +1,4 @@
-import { CSSProperties, FC, memo } from 'react'
+import { CSSProperties, memo } from 'react'
 import memoize from 'memoize-one'
 import { areEqual, VariableSizeList } from 'react-window'
 import AutoSizer from 'react-virtualized-auto-sizer'
@@ -15,13 +15,13 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 
 const createItemData = memoize((items, itemProps) => ({ items, ...itemProps }))
 
-interface ItemProps {
+export interface ItemProps {
   data: any
   index: number
   style: CSSProperties
 }
 
-const Item: FC<ItemProps> = memo(({ data, index, style }) => {
+const Item = memo(({ data, index, style }: ItemProps) => {
   const { items, itemProps, ItemComponent } = data
   const item = index < items.length ? items[index] : undefined
 
@@ -38,7 +38,17 @@ const Item: FC<ItemProps> = memo(({ data, index, style }) => {
   )
 }, areEqual)
 
-const InfiniteList = ({
+export interface InfiniteListProps<T> {
+  items?: T[]
+  itemProps?: any
+  hasNextPage?: boolean
+  isLoadingNextPage?: boolean
+  getItemSize?: (index: number) => number
+  onLoadNextPage?: () => void
+  ItemComponent?: any
+}
+
+function InfiniteList<T>({
   items = [],
   itemProps = {},
   hasNextPage = false,
@@ -46,7 +56,7 @@ const InfiniteList = ({
   getItemSize = () => 40,
   onLoadNextPage = () => {},
   ItemComponent = () => null,
-}) => {
+}: InfiniteListProps<T>) {
   // Only load 1 page of items at a time
   // Pass an empty callback to InfiniteLoader in case it asks to load more than once
   const loadMoreItems = isLoadingNextPage ? () => {} : onLoadNextPage
@@ -63,7 +73,7 @@ const InfiniteList = ({
     <div className="relative flex flex-col flex-grow">
       <div className="flex-grow">
         <AutoSizer>
-          {({ height, width }) => (
+          {({ height, width }: { height: number; width: number }) => (
             <InfiniteLoader
               itemCount={itemCount}
               isItemLoaded={isItemLoaded}
@@ -72,8 +82,8 @@ const InfiniteList = ({
               {({ onItemsRendered, ref }) => (
                 <VariableSizeList
                   ref={ref}
-                  height={height}
-                  width={width}
+                  height={height ?? 0}
+                  width={width ?? 0}
                   itemCount={itemCount}
                   itemData={itemData}
                   itemSize={getItemSize}

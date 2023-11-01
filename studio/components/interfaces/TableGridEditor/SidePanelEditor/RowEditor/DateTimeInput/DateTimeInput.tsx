@@ -1,13 +1,14 @@
-import { FC } from 'react'
-import { Input } from '@supabase/ui'
-import { getColumnType } from './DateTimeInput.utils'
 import dayjs from 'dayjs'
+import { ReactNode } from 'react'
+import { Input } from 'ui'
 
-interface Props {
+import { getColumnType } from './DateTimeInput.utils'
+
+interface DateTimeInputProps {
   name: string
   format: string
   value: string
-  description: string
+  description: string | ReactNode
   onChange: (value: string) => void
 }
 
@@ -16,13 +17,12 @@ interface Props {
  * e.g Yes: 2022-05-13T14:29:03
  *     No:  2022-05-13T14:29:03+0800
  */
-const DateTimeInput: FC<Props> = ({ value, onChange, name, format, description }) => {
+const DateTimeInput = ({ value, onChange, name, format, description }: DateTimeInputProps) => {
   const inputType = getColumnType(format)
 
   function handleOnChange(e: any) {
     const temp = e.target.value
-    console.log('DateTimeINput', temp)
-    if (temp.length === 0) return
+    if (temp.length === 0 && temp !== '') return
     onChange(temp)
   }
 
@@ -32,11 +32,12 @@ const DateTimeInput: FC<Props> = ({ value, onChange, name, format, description }
       className="w-full"
       label={name}
       descriptionText={
-        description && description.length !== 0
-          ? description
-          : format.includes('tz')
-          ? `Your local timezone will be automatically applied (${dayjs().format('ZZ')})`
-          : undefined
+        <div className="space-y-1">
+          {description}
+          {format.includes('tz') && (
+            <p>Your local timezone will be automatically applied ({dayjs().format('ZZ')})</p>
+          )}
+        </div>
       }
       labelOptional={format}
       size="small"

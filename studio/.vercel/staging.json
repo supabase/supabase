@@ -1,8 +1,0 @@
-{
-  "version": 2,
-  "scope": "supabase",
-  "regions": ["syd1"],
-  "github": {
-    "enabled": false
-  }
-}

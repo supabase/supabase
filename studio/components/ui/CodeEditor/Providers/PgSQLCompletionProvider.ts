@@ -1,8 +1,12 @@
+import { RefObject } from 'react'
 import BackwardIterator from './BackwardIterator'
+import { Schema } from 'data/database/schemas-query'
+import { TableColumn } from 'data/database/table-columns-query'
+import { DatabaseFunction } from 'data/database/functions-query'
 
 // [Joshen] Needs to be fixed
 
-export default function getPgsqlCompletionProvider(monaco: any, sqlEditorStore: any) {
+export default function getPgsqlCompletionProvider(monaco: any, pgInfoRef: RefObject<any>) {
   return {
     triggerCharacters: [' ', '.', '"'],
     provideCompletionItems: function (model: any, position: any, context: any) {
@@ -12,11 +16,11 @@ export default function getPgsqlCompletionProvider(monaco: any, sqlEditorStore: 
         let iterator = new BackwardIterator(model, position.column - 2, position.lineNumber - 1)
 
         if (context.triggerCharacter === '"') {
-          return startingQuoteScenarioSuggestions(monaco, sqlEditorStore, iterator)
+          return startingQuoteScenarioSuggestions(monaco, pgInfoRef, iterator)
         } else if (context.triggerCharacter === '.') {
-          return dotScenarioSuggestions(monaco, sqlEditorStore, iterator)
+          return dotScenarioSuggestions(monaco, pgInfoRef, iterator)
         } else {
-          return defaultScenarioSuggestions(monaco, sqlEditorStore)
+          return defaultScenarioSuggestions(monaco, pgInfoRef)
         }
       } catch (_) {
         // any error, returns empty suggestion
@@ -26,7 +30,7 @@ export default function getPgsqlCompletionProvider(monaco: any, sqlEditorStore: 
   }
 }
 
-function startingQuoteScenarioSuggestions(monaco: any, sqlEditorStore: any, iterator: any) {
+function startingQuoteScenarioSuggestions(monaco: any, pgInfoRef: RefObject<any>, iterator: any) {
   const items: any[] = []
 
   let startingQuotedIdent = iterator.isFowardDQuote()
@@ -41,7 +45,7 @@ function startingQuoteScenarioSuggestions(monaco: any, sqlEditorStore: any, iter
       isQuotedIdent = true
       ident = fixQuotedIdent(ident)
     }
-    let table = sqlEditorStore.tableCache.find((tbl: any) => {
+    let table = pgInfoRef.current.tableColumns.find((tbl: TableColumn) => {
       return (
         (isQuotedIdent && tbl.tablename === ident) ||
         (!isQuotedIdent && tbl.tablename.toLocaleLowerCase() == ident.toLocaleLowerCase())
@@ -59,7 +63,7 @@ function startingQuoteScenarioSuggestions(monaco: any, sqlEditorStore: any, iter
     })
   } else {
     // probably a table - list the tables
-    sqlEditorStore.tableCache.forEach((table: any) => {
+    pgInfoRef.current.tableColumns.forEach((table: TableColumn) => {
       items.push({
         label: table.tablename,
         kind: monaco.languages.CompletionItemKind.Class,
@@ -71,13 +75,13 @@ function startingQuoteScenarioSuggestions(monaco: any, sqlEditorStore: any, iter
   return { suggestions: items }
 }
 
-function dotScenarioSuggestions(monaco: any, sqlEditorStore: any, iterator: any) {
+function dotScenarioSuggestions(monaco: any, pgInfoRef: RefObject<any>, iterator: any) {
   const items: any[] = []
 
   let idents = readIdents(iterator, 3)
   let pos = 0
 
-  let schema = sqlEditorStore.schemaCache.find((sch: any) => {
+  let schema = pgInfoRef.current.schemas.find((sch: Schema) => {
     const _ident = idents && idents.length > pos ? idents[pos] : {}
     return (
       (_ident.isQuoted && sch.name === _ident.name) ||
@@ -86,7 +90,7 @@ function dotScenarioSuggestions(monaco: any, sqlEditorStore: any, iterator: any)
   })
 
   if (!schema) {
-    schema = sqlEditorStore.schemaCache.find((sch: any) => {
+    schema = pgInfoRef.current.schemas.find((sch: Schema) => {
       return sch.name == 'public'
     })
   } else {
@@ -94,7 +98,7 @@ function dotScenarioSuggestions(monaco: any, sqlEditorStore: any, iterator: any)
   }
 
   if (idents.length == pos) {
-    sqlEditorStore.tableCache.forEach((tbl: any) => {
+    pgInfoRef.current.tableColumns.forEach((tbl: TableColumn) => {
       if (tbl.schemaname != schema.name) {
         return
       }
@@ -108,7 +112,7 @@ function dotScenarioSuggestions(monaco: any, sqlEditorStore: any, iterator: any)
     return { suggestions: items }
   }
 
-  let table = sqlEditorStore.tableCache.find((tbl: any) => {
+  let table = pgInfoRef.current.tableColumns.find((tbl: TableColumn) => {
     const _ident = idents && idents.length > pos ? idents[pos] : {}
     return (
       (tbl.schemaname == schema.name && _ident.isQuoted && tbl.tablename === _ident.name) ||
@@ -130,11 +134,11 @@ function dotScenarioSuggestions(monaco: any, sqlEditorStore: any, iterator: any)
   return { suggestions: items }
 }
 
-function defaultScenarioSuggestions(monaco: any, sqlEditorStore: any) {
+function defaultScenarioSuggestions(monaco: any, pgInfoRef: RefObject<any>) {
   const items: any = []
 
-  if (sqlEditorStore.keywordCache?.length > 0) {
-    sqlEditorStore.keywordCache.forEach((x: any) => {
+  if (pgInfoRef.current.keywords?.length > 0) {
+    pgInfoRef.current.keywords.forEach((x: string) => {
       items.push({
         label: x,
         kind: monaco.languages.CompletionItemKind.Keyword,
@@ -143,8 +147,8 @@ function defaultScenarioSuggestions(monaco: any, sqlEditorStore: any) {
     })
   }
 
-  if (sqlEditorStore.schemaCache?.length > 0) {
-    sqlEditorStore.schemaCache.forEach((x: any) => {
+  if (pgInfoRef.current.schemas?.length > 0) {
+    pgInfoRef.current.schemas.forEach((x: Schema) => {
       items.push({
         label: x.name,
         kind: monaco.languages.CompletionItemKind.Keyword,
@@ -153,8 +157,8 @@ function defaultScenarioSuggestions(monaco: any, sqlEditorStore: any) {
     })
   }
 
-  if (sqlEditorStore.tableCache?.length > 0) {
-    sqlEditorStore.tableCache.forEach((x: any) => {
+  if (pgInfoRef.current.tableColumns?.length > 0) {
+    pgInfoRef.current.tableColumns.forEach((x: TableColumn) => {
       const insertText = x.schemaname == 'public' ? x.tablename : x.schemaname + '.' + x.tablename
       items.push({
         label: x.tablename,
@@ -191,8 +195,8 @@ function defaultScenarioSuggestions(monaco: any, sqlEditorStore: any) {
     })
   }
 
-  if (sqlEditorStore.functionCache?.length > 0) {
-    sqlEditorStore.functionCache.forEach((x: any) => {
+  if (pgInfoRef.current.functions?.length > 0) {
+    pgInfoRef.current.functions.forEach((x: DatabaseFunction) => {
       items.push({
         label: x.name,
         kind: monaco.languages.CompletionItemKind.Function,

@@ -1,4 +1,4 @@
-import { IconActivity, IconArchive, IconDatabase, IconKey, IconHeart } from '@supabase/ui'
+import { IconActivity, IconArchive, IconDatabase, IconKey, IconHeart } from 'ui'
 
 export const METRIC_CATEGORIES = {
   API: {
@@ -40,14 +40,26 @@ export const METRIC_CATEGORIES = {
 
 export const METRICS = [
   {
-    key: 'cpu_usage',
-    label: 'CPU % usage',
+    key: 'avg_cpu_usage',
+    label: 'Average CPU % usage',
+    provider: 'infra-monitoring',
+    category: METRIC_CATEGORIES.INSTANCE,
+  },
+  {
+    key: 'max_cpu_usage',
+    label: 'Max CPU % usage',
+    provider: 'infra-monitoring',
+    category: METRIC_CATEGORIES.INSTANCE,
+  },
+  {
+    key: 'disk_io_consumption',
+    label: 'Disk IO % Consumed',
     provider: 'infra-monitoring',
     category: METRIC_CATEGORIES.INSTANCE,
   },
   {
     key: 'disk_io_budget',
-    label: 'Daily Disk IO Budget % Remaining',
+    label: 'Disk IO % Remaining',
     provider: 'infra-monitoring',
     category: METRIC_CATEGORIES.INSTANCE,
   },
@@ -58,13 +70,19 @@ export const METRICS = [
     category: METRIC_CATEGORIES.INSTANCE,
   },
   {
+    key: 'swap_usage',
+    label: 'Swap % usage',
+    provider: 'infra-monitoring',
+    category: METRIC_CATEGORIES.INSTANCE,
+  },
+  {
     key: 'total_realtime_egress',
     label: 'Realtime Connection Egress',
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.API,
   },
   {
-    key: 'total_realtime_get_requests',
+    key: 'total_realtime_requests',
     label: 'Realtime Connection Requests',
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.API_REALTIME,
@@ -81,12 +99,6 @@ export const METRICS = [
   //   provider: 'daily-stats',
   //   category: METRIC_CATEGORIES.API_REALTIME,
   // },
-  {
-    key: 'total_realtime_requests',
-    label: 'Connection Requests',
-    provider: 'daily-stats',
-    category: METRIC_CATEGORIES.API_REALTIME,
-  },
 
   /**
    * API
@@ -150,6 +162,19 @@ export const METRICS = [
   //   provider: 'daily-stats',
   //   category: METRIC_CATEGORIES.API_AUTH,
   // },
+
+  {
+    key: 'total_auth_billing_period_mau',
+    label: 'Auth Monthly Active User',
+    provider: 'daily-stats',
+    category: METRIC_CATEGORIES.API_AUTH,
+  },
+  {
+    key: 'total_auth_billing_period_sso_mau',
+    label: 'Auth Monthly Active SSO User',
+    provider: 'daily-stats',
+    category: METRIC_CATEGORIES.API_AUTH,
+  },
   {
     key: 'total_auth_ingress',
     label: 'Auth Ingress',
@@ -205,6 +230,12 @@ export const METRICS = [
   {
     key: 'total_storage_egress',
     label: 'Storage Egress',
+    provider: 'daily-stats',
+    category: METRIC_CATEGORIES.API_STORAGE,
+  },
+  {
+    key: 'total_storage_image_render_count',
+    label: 'Storage Image Transformations',
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.API_STORAGE,
   },
@@ -397,16 +428,17 @@ export const TIME_PERIODS_INFRA = [
   {
     key: '1h',
     label: 'Last hour',
-    interval: '1m',
   },
   {
     key: '3h',
     label: 'Last 3 hours',
-    interval: '5m',
   },
   {
     key: '1d',
     label: 'Last 24 hours',
-    interval: '30m',
+  },
+  {
+    key: '7d',
+    label: 'Last 7 days',
   },
 ]

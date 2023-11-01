@@ -1,33 +1,58 @@
-import React, { FC } from 'react'
-import { IconCalendar, IconType, IconHash, Listbox, IconToggleRight, Input } from '@supabase/ui'
-import { PostgresType } from '@supabase/postgres-meta'
-import { POSTGRES_DATA_TYPES, POSTGRES_DATA_TYPE_OPTIONS } from '../SidePanelEditor.constants'
-import { PostgresDataTypeOption } from '../SidePanelEditor.types'
+import type { PostgresType } from '@supabase/postgres-meta'
+import { noop } from 'lodash'
+import Link from 'next/link'
+import { ReactNode } from 'react'
+import {
+  Alert,
+  Button,
+  IconCalendar,
+  IconExternalLink,
+  IconHash,
+  IconToggleRight,
+  IconType,
+  Input,
+  Listbox,
+} from 'ui'
 
-interface Props {
+import {
+  POSTGRES_DATA_TYPES,
+  POSTGRES_DATA_TYPE_OPTIONS,
+  RECOMMENDED_ALTERNATIVE_DATA_TYPE,
+} from '../SidePanelEditor.constants'
+import { PostgresDataTypeOption } from '../SidePanelEditor.types'
+import { ListPlus } from 'lucide-react'
+
+interface ColumnTypeProps {
   value: string
   enumTypes: PostgresType[]
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
+  layout?: 'vertical' | 'horizontal'
   className?: string
   error?: any
   disabled?: boolean
   showLabel?: boolean
+  description?: ReactNode
+  showRecommendation?: boolean
   onOptionSelect: (value: string) => void
 }
 
-const ColumnType: FC<Props> = ({
+const ColumnType = ({
   value,
   enumTypes = [],
   className,
   size = 'medium',
+  layout,
   error,
   disabled = false,
   showLabel = true,
-  onOptionSelect = () => {},
-}) => {
+  description,
+  showRecommendation = false,
+  onOptionSelect = noop,
+}: ColumnTypeProps) => {
   // @ts-ignore
   const availableTypes = POSTGRES_DATA_TYPES.concat(enumTypes.map((type) => type.name))
   const isAvailableType = value ? availableTypes.includes(value) : true
+  const recommendation = RECOMMENDED_ALTERNATIVE_DATA_TYPE[value]
 
   if (!isAvailableType) {
     return (
@@ -35,7 +60,9 @@ const ColumnType: FC<Props> = ({
         readOnly
         disabled
         label={showLabel ? 'Type' : ''}
-        layout="horizontal"
+        layout={showLabel ? 'horizontal' : undefined}
+        className="md:gap-x-0"
+        size="small"
         value={value}
         descriptionText={
           showLabel
@@ -49,92 +76,126 @@ const ColumnType: FC<Props> = ({
   const inferIcon = (type: string) => {
     switch (type) {
       case 'number':
-        return <IconHash size={16} className="text-scale-1200" strokeWidth={1.5} />
+        return <IconHash size={16} className="text-foreground" strokeWidth={1.5} />
       case 'time':
-        return <IconCalendar size={16} className="text-scale-1200" strokeWidth={1.5} />
+        return <IconCalendar size={16} className="text-foreground" strokeWidth={1.5} />
       case 'text':
-        return <IconType size={16} className="text-scale-1200" strokeWidth={1.5} />
+        return <IconType size={16} className="text-foreground" strokeWidth={1.5} />
       case 'json':
         return (
-          <div className="text-scale-1200" style={{ padding: '0px 1px' }}>
+          <div className="text-foreground" style={{ padding: '0px 1px' }}>
             {'{ }'}
           </div>
         )
       case 'bool':
-        return <IconToggleRight size={16} className="text-scale-1200" strokeWidth={1.5} />
+        return <IconToggleRight size={16} className="text-foreground" strokeWidth={1.5} />
       default:
         return <div />
     }
   }
 
   return (
-    <Listbox
-      label={showLabel ? 'Type' : ''}
-      layout={showLabel ? 'horizontal' : 'vertical'}
-      value={value}
-      size={size}
-      error={error}
-      disabled={disabled}
-      className={`${className} ${disabled ? 'column-type-disabled' : ''} rounded-md`}
-      onChange={(value: string) => onOptionSelect(value)}
-      optionsWidth={480}
-    >
-      <Listbox.Option key="empty" value="" label="---">
-        ---
-      </Listbox.Option>
-
-      {/*
-        Weird issue with Listbox here 
-        1. Can't do render conditionally (&&) within Listbox hence why using Fragment
-        2. Can't wrap these 2 components within a Fragment conditional (enumTypes.length)
-           as selecting the enumType option will not render it in the Listbox component
-      */}
-      {enumTypes.length > 0 ? (
-        <Listbox.Option disabled key="header-1" value="header-1" label="header-1">
-          User-defined Enumerated Types
-        </Listbox.Option>
-      ) : (
-        <></>
-      )}
-
-      {enumTypes.length > 0 ? (
+    <div className="space-y-2">
+      <Listbox
+        label={showLabel ? 'Type' : ''}
+        layout={layout || (showLabel ? 'horizontal' : 'vertical')}
+        value={value}
+        size={size}
+        error={error}
+        disabled={disabled}
         // @ts-ignore
-        enumTypes.map((enumType: PostgresType) => (
+        descriptionText={description}
+        className={`${className} ${disabled ? 'column-type-disabled' : ''} rounded-md`}
+        onChange={(value: string) => onOptionSelect(value)}
+        optionsWidth={480}
+      >
+        <Listbox.Option key="empty" value="" label="---">
+          ---
+        </Listbox.Option>
+
+        {/*
+          Weird issue with Listbox here
+          1. Can't do render conditionally (&&) within Listbox hence why using Fragment
+          2. Can't wrap these 2 components within a Fragment conditional (enumTypes.length)
+            as selecting the enumType option will not render it in the Listbox component
+        */}
+        {enumTypes.length > 0 ? (
+          <Listbox.Option disabled key="header-1" value="header-1" label="header-1">
+            Enumerated Types
+          </Listbox.Option>
+        ) : (
+          <></>
+        )}
+
+        {enumTypes.length > 0 ? (
+          // @ts-ignore
+          enumTypes.map((enumType: PostgresType) => (
+            <Listbox.Option
+              key={enumType.name}
+              value={enumType.name}
+              label={enumType.name}
+              addOnBefore={() => {
+                return <ListPlus size={16} className="text-foreground" strokeWidth={1.5} />
+              }}
+            >
+              <div className="flex items-center space-x-4">
+                <p className="text-foreground">{enumType.name}</p>
+                {enumType.comment !== undefined && (
+                  <p className="text-foreground-lighter">{enumType.comment}</p>
+                )}
+              </div>
+            </Listbox.Option>
+          ))
+        ) : (
+          <></>
+        )}
+
+        <Listbox.Option disabled value="header-2" label="header-2">
+          PostgreSQL Data Types
+        </Listbox.Option>
+
+        {POSTGRES_DATA_TYPE_OPTIONS.map((option: PostgresDataTypeOption) => (
           <Listbox.Option
-            key={enumType.name}
-            value={enumType.name}
-            label={enumType.name}
-            addOnBefore={() => {
-              return <div className="bg-scale-1200 mx-1 h-2 w-2 rounded-full" />
-            }}
+            key={option.name}
+            value={option.name}
+            label={option.name}
+            addOnBefore={() => inferIcon(option.type)}
           >
             <div className="flex items-center space-x-4">
-              <p>{enumType.name}</p>
+              <span className="text-foreground">{option.name}</span>
+              <span className="text-foreground-lighter">{option.description}</span>
             </div>
           </Listbox.Option>
-        ))
-      ) : (
-        <></>
-      )}
-
-      <Listbox.Option disabled value="header-2" label="header-2">
-        PostgreSQL Data Types
-      </Listbox.Option>
-
-      {POSTGRES_DATA_TYPE_OPTIONS.map((option: PostgresDataTypeOption) => (
-        <Listbox.Option
-          key={option.name}
-          value={option.name}
-          label={option.name}
-          addOnBefore={() => inferIcon(option.type)}
+        ))}
+      </Listbox>
+      {showRecommendation && recommendation !== undefined && (
+        <Alert
+          withIcon
+          variant="warning"
+          title={
+            <>
+              It is recommended to use <code className="text-xs">{recommendation.alternative}</code>{' '}
+              instead
+            </>
+          }
         >
-          <div className="flex items-center space-x-4">
-            <span className="text-scale-1200">{option.name}</span>
-            <span className="text-scale-900">{option.description}</span>
+          <p>
+            Postgres recommends against using the data type <code className="text-xs">{value}</code>{' '}
+            unless you have a very specific use case.
+          </p>
+          <div className="flex items-center space-x-2 mt-3">
+            <Button asChild type="default" icon={<IconExternalLink />}>
+              <Link href={recommendation.reference} target="_blank" rel="noreferrer">
+                Read more
+              </Link>
+            </Button>
+            <Button type="primary" onClick={() => onOptionSelect(recommendation.alternative)}>
+              Use {recommendation.alternative}
+            </Button>
           </div>
-        </Listbox.Option>
-      ))}
-    </Listbox>
+        </Alert>
+      )}
+    </div>
   )
 }
 

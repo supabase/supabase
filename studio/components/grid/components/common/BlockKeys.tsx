@@ -1,9 +1,11 @@
-import * as React from 'react'
+import { useClickedOutside } from 'hooks'
+import { KeyboardEvent, ReactNode, useCallback, useEffect, useRef } from 'react'
 
-type BlockKeysProps = {
+interface BlockKeysProps {
+  value: string | null
+  children: ReactNode
   onEscape?: (value: string | null) => void
   onEnter?: (value: string | null) => void
-  value: string | null
 }
 
 /**
@@ -11,9 +13,12 @@ type BlockKeysProps = {
  * We use this with cell editor to allow editor component to handle keys.
  * Example: press enter to add newline on textEditor
  */
-export const BlockKeys: React.FC<BlockKeysProps> = ({ onEscape, onEnter, value, children }) => {
-  const handleKeyDown = React.useCallback(
-    (ev: React.KeyboardEvent<HTMLDivElement>) => {
+export const BlockKeys = ({ value, children, onEscape, onEnter }: BlockKeysProps) => {
+  const ref = useRef(null)
+  const isClickedOutside = useClickedOutside(ref)
+
+  const handleKeyDown = useCallback(
+    (ev: KeyboardEvent<HTMLDivElement>) => {
       switch (ev.key) {
         case 'Escape':
           ev.stopPropagation()
@@ -21,19 +26,22 @@ export const BlockKeys: React.FC<BlockKeysProps> = ({ onEscape, onEnter, value, 
           break
         case 'Enter':
           ev.stopPropagation()
-          if (onEnter) onEnter(value)
+          if (!ev.shiftKey && onEnter) {
+            ev.preventDefault()
+            onEnter(value)
+          }
           break
       }
     },
     [value]
   )
 
-  function onBlur() {
-    if (onEscape) onEscape(value)
-  }
+  useEffect(() => {
+    if (isClickedOutside && onEnter !== undefined) onEnter(value)
+  }, [isClickedOutside])
 
   return (
-    <div onKeyDown={handleKeyDown} onBlur={onBlur}>
+    <div ref={ref} onKeyDown={handleKeyDown}>
       {children}
     </div>
   )

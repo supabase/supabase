@@ -1,57 +1,97 @@
-import { FC, useEffect, useState } from 'react'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import {
   Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Button,
   Collapsible,
   Form,
+  IconAlertTriangle,
   IconCheck,
   IconChevronUp,
   Input,
-  InputNumber,
-  Listbox,
-  Toggle,
-} from '@supabase/ui'
+} from 'ui'
 
-import { useStore } from 'hooks'
-import { Enum, Provider } from './AuthProvidersForm.types'
+import { useParams } from 'common'
+import { components } from 'data/api'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
+import { useCheckPermissions, useStore } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
 import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
+import { Provider } from './AuthProvidersForm.types'
+import FormField from './FormField'
 
-interface Props {
+export interface ProviderFormProps {
+  config: components['schemas']['GetGoTrueConfigResponse']
   provider: Provider
 }
 
-const ProviderForm: FC<Props> = ({ provider }) => {
+const ProviderForm = ({ config, provider }: ProviderFormProps) => {
   const [open, setOpen] = useState(false)
-  const { authConfig, ui } = useStore()
+  const { ui } = useStore()
+  const { ref: projectRef } = useParams()
+  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
+  const doubleNegativeKeys = ['MAILER_AUTOCONFIRM', 'SMS_AUTOCONFIRM']
+  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
-  const isActive = authConfig.config[`EXTERNAL_${provider?.title?.toUpperCase()}_ENABLED`]
-  const INITIAL_VALUES: { [x: string]: string } = {}
+  const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
 
-  useEffect(() => {
-    /**
-     * Construct values for INITIAL_VALUES
-     * Return empty string `""` rather than `null`
-     * as it breaks form. null is not a valid value.
-     */
+  const generateInitialValues = () => {
+    const initialValues: { [x: string]: string } = {}
+    // the config is already loaded through the parent component
     Object.keys(provider.properties).forEach((key) => {
-      INITIAL_VALUES[key] = authConfig.config[key] ?? ''
-    })
-  }, [provider])
+      // When the key is a 'double negative' key, we must reverse the boolean before adding it to the form
+      const isDoubleNegative = doubleNegativeKeys.includes(key)
 
-  const onSubmit = async (values: any, { setSubmitting }: any) => {
-    try {
-      await authConfig.update(values)
-      setSubmitting(false)
-      setOpen(false)
-      ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
-    } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to update settings:  ${error?.message}`,
-      })
-    }
+      if (provider.title === 'SAML 2.0') {
+        initialValues[key] = (config as any)[key] ?? false
+      } else {
+        initialValues[key] = isDoubleNegative ? !(config as any)[key] : (config as any)[key] ?? ''
+      }
+    })
+    return initialValues
+  }
+
+  const isSAMLEnabled: boolean =
+    provider.title === 'SAML 2.0' && config && (config as any)['SAML_ENABLED']
+  // [Joel] Introduced as the new LinkedIn provider has a corresponding config var of LINKEDIN_OIDC
+  const isLinkedInOIDCEnabled: boolean =
+    provider.title === 'LinkedIn (OIDC)' &&
+    config &&
+    (config as any)['EXTERNAL_LINKEDIN_OIDC_ENABLED']
+  const isExternalProviderAndEnabled: boolean =
+    config && (config as any)[`EXTERNAL_${provider?.title?.toUpperCase()}_ENABLED`]
+
+  // [Joshen] Doing this check as SAML doesn't follow the same naming structure as the other provider options
+  const isActive: boolean = isSAMLEnabled || isExternalProviderAndEnabled || isLinkedInOIDCEnabled
+  const INITIAL_VALUES = generateInitialValues()
+
+  const onSubmit = (values: any, { resetForm }: any) => {
+    const payload = { ...values }
+
+    // Format payload for the following checks:
+    // 1. Convert all empty string values to null
+    // 2. When the key is a 'double negative' key, we must reverse the boolean before the payload can be sent
+    Object.keys(values).map((x: string) => {
+      if (doubleNegativeKeys.includes(x)) payload[x] = !values[x]
+      if (payload[x] === '') payload[x] = null
+    })
+
+    updateAuthConfig(
+      { projectRef: projectRef!, config: payload },
+      {
+        onSuccess: () => {
+          resetForm({ values: { ...values }, initialValues: { ...values } })
+          setOpen(false)
+          ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
+        },
+      }
+    )
   }
 
   return (
@@ -63,7 +103,7 @@ const ProviderForm: FC<Props> = ({ provider }) => {
       <Collapsible.Trigger asChild>
         <button
           type="button"
-          className="group flex w-full items-center justify-between rounded py-3 px-6 text-scale-1200"
+          className="group flex w-full items-center justify-between rounded py-3 px-6 text-foreground"
         >
           <div className="flex items-center gap-3">
             <IconChevronUp
@@ -72,7 +112,7 @@ const ProviderForm: FC<Props> = ({ provider }) => {
               width={14}
             />
             <img
-              src={`/img/icons/${provider.misc.iconKey}.svg`}
+              src={`${BASE_PATH}/img/icons/${provider.misc.iconKey}.svg`}
               width={18}
               alt={`${provider.title} auth icon`}
             />
@@ -80,14 +120,14 @@ const ProviderForm: FC<Props> = ({ provider }) => {
           </div>
           <div className="flex items-center gap-3">
             {isActive ? (
-              <div className="flex items-center gap-1 rounded-full border border-brand-700 bg-brand-200 py-1 px-1 text-xs text-brand-900">
-                <span className="rounded-full bg-brand-900 p-0.5 text-xs text-brand-200">
+              <div className="flex items-center gap-1 rounded-full border border-brand-400 bg-brand-200 py-1 px-1 text-xs text-brand">
+                <span className="rounded-full bg-brand p-0.5 text-xs text-brand-200">
                   <IconCheck strokeWidth={2} size={12} />
                 </span>
                 <span className="px-1">Enabled</span>
               </div>
             ) : (
-              <div className="rounded-md border border-scale-500 bg-scale-100 py-1 px-3 text-xs text-scale-900 dark:border-scale-700 dark:bg-scale-300">
+              <div className="rounded-md border border-scale-500 bg-scale-100 py-1 px-3 text-xs text-foreground-lighter dark:border-scale-700 dark:bg-scale-300">
                 Disabled
               </div>
             )}
@@ -100,121 +140,51 @@ const ProviderForm: FC<Props> = ({ provider }) => {
         validationSchema={provider.validationSchema}
         onSubmit={onSubmit}
       >
-        {({ isSubmitting, handleReset, values }: any) => {
-          const noChanges = JSON.stringify(INITIAL_VALUES) === JSON.stringify(values)
+        {({ handleReset, initialValues, values }: any) => {
+          const noChanges = JSON.stringify(initialValues) === JSON.stringify(values)
           return (
             <Collapsible.Content>
               <div
                 className="
-                  group border-t
-                  border-scale-500 bg-scale-100 py-6 px-6 text-scale-1200 dark:bg-scale-300
-                "
+            group border-t
+            border-scale-500 bg-scale-100 py-6 px-6 text-foreground dark:bg-scale-300
+            "
               >
-                <div className="mx-auto my-6 max-w-md space-y-6">
-                  {Object.keys(provider.properties).map((x: string) => {
-                    const properties = provider.properties[x]
-                    // Conditionally hide properties based on value of key
-                    if (
-                      properties.show &&
-                      values[properties.show.key] !== properties.show.matches
-                    ) {
-                      return null
-                    }
-                    switch (properties.type) {
-                      case 'string':
-                        return (
-                          <Input
-                            size="small"
-                            layout="vertical"
-                            id={x}
-                            key={x}
-                            name={x}
-                            label={properties.title}
-                            descriptionText={
-                              properties.description ? (
-                                <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                                  {properties.description}
-                                </ReactMarkdown>
-                              ) : null
-                            }
-                            labelOptional={
-                              properties.descriptionOptional ? (
-                                <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                                  {properties.descriptionOptional}
-                                </ReactMarkdown>
-                              ) : null
-                            }
-                          />
-                        )
+                <div className="mx-auto my-6 max-w-lg space-y-6">
+                  {provider.title === 'LinkedIn (Deprecated)' && (
+                    <Alert_Shadcn_ variant="warning">
+                      <IconAlertTriangle strokeWidth={2} />
+                      <AlertTitle_Shadcn_>LinkedIn (Deprecated) Provider</AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_>
+                        As of 1st August, LinkedIn has updated their OAuth API scopes. Please use
+                        the new LinkedIn provider below. Developers using this provider should move
+                        over to the new provider. Please refer to our
+                        [docs](/docs/pages/guides/auth/social-login/auth-linkedin) for more details.
+                      </AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
+                  )}
+                  {/* TODO (Joel): Remove after 30th November when we disable the provider */}
+                  {provider.title === 'LinkedIn (Deprecated)' &&
+                    Object.keys(provider.properties).map((x: string) => (
+                      <FormField
+                        key={x}
+                        name={x}
+                        properties={provider.properties[x]}
+                        formValues={values}
+                        disabled={x === 'EXTERNAL_LINKEDIN_ENABLED' ? !canUpdateConfig : true}
+                      />
+                    ))}
 
-                      case 'number':
-                        return (
-                          <InputNumber
-                            size="small"
-                            layout="vertical"
-                            id={x}
-                            key={x}
-                            name={x}
-                            label={properties.title}
-                            descriptionText={
-                              properties.description ? (
-                                <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                                  {properties.description}
-                                </ReactMarkdown>
-                              ) : null
-                            }
-                            labelOptional={
-                              properties.descriptionOptional ? (
-                                <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                                  {properties.descriptionOptional}
-                                </ReactMarkdown>
-                              ) : null
-                            }
-                          />
-                        )
-
-                      case 'boolean':
-                        return (
-                          <Toggle
-                            size="small"
-                            key={x}
-                            name={x}
-                            label={properties.title}
-                            descriptionText={properties.description}
-                          />
-                        )
-
-                      case 'select':
-                        return (
-                          <Listbox
-                            size="small"
-                            key={x}
-                            name={x}
-                            label={properties.title}
-                            descriptionText={properties.description}
-                            defaultValue={properties.enum[0]}
-                          >
-                            {properties.enum.map((option: Enum) => {
-                              return (
-                                <Listbox.Option
-                                  id={option.value}
-                                  label={option.label}
-                                  value={option.value}
-                                  addOnBefore={() => (
-                                    <img className="h-6 w-6" src={`/img/icons/${option.icon}`} />
-                                  )}
-                                >
-                                  {option.label}
-                                </Listbox.Option>
-                              )
-                            })}
-                          </Listbox>
-                        )
-
-                      default:
-                        break
-                    }
-                  })}
+                  {provider.title !== 'LinkedIn (Deprecated)' &&
+                    Object.keys(provider.properties).map((x: string) => (
+                      <FormField
+                        key={x}
+                        name={x}
+                        properties={provider.properties[x]}
+                        formValues={values}
+                        disabled={!canUpdateConfig}
+                      />
+                    ))}
                   {provider?.misc?.alert && (
                     <Alert title={provider.misc.alert.title} variant="warning" withIcon>
                       <ReactMarkdown>{provider.misc.alert.description}</ReactMarkdown>
@@ -222,15 +192,21 @@ const ProviderForm: FC<Props> = ({ provider }) => {
                   )}
                   {provider.misc.requiresRedirect && (
                     <>
-                      <ReactMarkdown className="text-xs text-scale-900">
-                        {provider.misc.helper}
-                      </ReactMarkdown>
                       <Input
                         copy
                         readOnly
                         disabled
-                        label="Redirect URL"
-                        value={`https://${ui.selectedProjectRef}.supabase.co/auth/v1/callback`}
+                        label="Callback URL (for OAuth)"
+                        value={
+                          customDomainData?.customDomain?.status === 'active'
+                            ? `https://${customDomainData.customDomain?.hostname}/auth/v1/callback`
+                            : `https://${projectRef}.supabase.co/auth/v1/callback`
+                        }
+                        descriptionText={
+                          <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                            {provider.misc.helper}
+                          </ReactMarkdown>
+                        }
                       />
                     </>
                   )}
@@ -242,12 +218,38 @@ const ProviderForm: FC<Props> = ({ provider }) => {
                         handleReset()
                         setOpen(false)
                       }}
+                      disabled={isUpdatingConfig}
                     >
                       Cancel
                     </Button>
-                    <Button htmlType="submit" loading={isSubmitting} disabled={noChanges}>
-                      Save
-                    </Button>
+                    <Tooltip.Root delayDuration={0}>
+                      <Tooltip.Trigger type="button">
+                        <Button
+                          htmlType="submit"
+                          loading={isUpdatingConfig}
+                          disabled={isUpdatingConfig || !canUpdateConfig || noChanges}
+                        >
+                          Save
+                        </Button>
+                      </Tooltip.Trigger>
+                      {!canUpdateConfig && (
+                        <Tooltip.Portal>
+                          <Tooltip.Content side="bottom">
+                            <Tooltip.Arrow className="radix-tooltip-arrow" />
+                            <div
+                              className={[
+                                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                'border border-scale-200',
+                              ].join(' ')}
+                            >
+                              <span className="text-xs text-foreground">
+                                You need additional permissions to update provider settings
+                              </span>
+                            </div>
+                          </Tooltip.Content>
+                        </Tooltip.Portal>
+                      )}
+                    </Tooltip.Root>
                   </div>
                 </div>
               </div>

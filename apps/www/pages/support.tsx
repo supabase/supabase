@@ -1,188 +1,153 @@
-import Container from 'components/Container'
-import Layout from '~/components/Layouts/Default'
+import { useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { Button, IconMessageCircle, IconGitHub, Divider, IconMail } from '@supabase/ui'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-
-// Import Swiper styles if swiper used on page
-import 'swiper/swiper.min.css'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
+import Typed from 'typed.js'
+import { Button, ButtonProps, cn, IconCommand, IconSearch, SearchButton } from 'ui'
 
-type Props = {}
+import DefaultLayout from '~/components/Layouts/Default'
+import InteractiveShimmerCard from '~/components/InteractiveShimmerCard'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import { questions } from 'shared-data'
+import data from '~/data/support'
 
-const Index = ({}: Props) => {
+const Index = () => {
   const router = useRouter()
+  const typerRef = useRef(null)
 
-  const meta_title = 'Help & Support | Supabase'
-  const meta_description =
-    'Find help and support for Supabase. Our support agents provide answers on all types of issues, including account information, billing, and refunds.'
+  useEffect(() => {
+    const typed = new Typed(typerRef.current, {
+      strings: questions,
+      typeSpeed: 50,
+      backDelay: 4000,
+      showCursor: false,
+    })
+
+    return () => {
+      // Destroy Typed instance during cleanup to stop animation
+      typed.destroy()
+    }
+  }, [])
 
   return (
     <>
       <NextSeo
-        title={meta_title}
-        description={meta_description}
+        title={data.meta_title}
+        description={data.meta_description}
         openGraph={{
-          title: meta_title,
-          description: meta_description,
+          title: data.meta_title,
+          description: data.meta_description,
           url: `https://supabase.com/${router.pathname}`,
           images: [
             {
-              url: `https://supabase.com/images/og/og-image.jpg`,
+              url: `https://supabase.com/images/og/og-image-v2.jpg`,
             },
           ],
         }}
       />
-      <Layout>
-        <Container>
-          <SectionContainer className="">
-            <div className="text-center">
-              <h1 className="text-scale-1200 text-4xl">Get Support</h1>
-              <p>
-                <p className="text-scale-1100 lg:text-lg">
-                  Need a bit of help? We're here for you. Check out our current issues, GitHub
-                  discussions, or get email support.
-                </p>
-              </p>
-            </div>
-            <div className="text-scale-1200 mt-16 grid gap-5 sm:grid-cols-3 md:grid-cols-12">
-              <div className="col-span-12 lg:col-span-6 xl:col-span-4">
-                <div
-                  className="dark:bg-scale-400 flex h-40 
-                    flex-col justify-between rounded rounded-b-none border-t
-                    border-r
-                    border-l border-gray-100 bg-white
-                    p-5 dark:border-gray-600
-                    "
-                >
-                  <div className="mb-4">
-                    <h5 className="mb-1">GitHub Issues</h5>
-                    <p className="block">
-                      <p>
-                        Have a general issue or bug that you've found? We'd love to hear about it in
-                        our GitHub issues. This can be feature requests too!
-                      </p>
-                      <p>
-                        <span className="font-bold">Use this for:</span> Bugs and other issues
-                      </p>
-                    </p>
-                  </div>
+      <DefaultLayout className="!min-h-fit">
+        <div className="bg-alternative">
+          <SectionContainer className="space-y-2 text-center">
+            <h1 className="text-brand font-mono text-base uppercase tracking-widest">
+              {data.hero.h1}
+            </h1>
+            <p className="h1 tracking-[-1px]">{data.hero.title}</p>
+            <SearchButton className="mx-auto w-full max-w-lg">
+              <div
+                className="
+                  flex
+                  px-3
+                  py-3
+                  group
+                  items-center
+                  justify-between
+                  bg-background
+                  border
+                  border-scale-500
+                  hover:bg-surface-100
+                  hover:border-scale-600
+                  transition 
+                  rounded"
+              >
+                <div className="flex items-center flex-1 space-x-2">
+                  <IconSearch className="text-light" size={18} strokeWidth={2} />
+                  <p
+                    ref={typerRef}
+                    className="text-lighter text-sm group-hover:text-light transition"
+                  />
                 </div>
-                <Divider type="horizontal" light orientation="center" />
-                <div>
-                  <div
-                    className="
-                    dark:bg-scale-400 flex 
-                    flex-col justify-between rounded rounded-t-none border-b
-                    border-r border-l
-                    border-gray-100 bg-white p-5
-                    pt-10 dark:border-gray-600"
-                  >
-                    <Link
-                      href="https://github.com/supabase/supabase/issues"
-                      as="https://github.com/supabase/supabase/issues"
-                    >
-                      <a target="_blank">
-                        <Button size="medium" type="default" iconRight={<IconGitHub />}>
-                          Go To Issues
-                        </Button>
-                      </a>
-                    </Link>
+                <div className="flex items-center h-full space-x-1">
+                  <div className="hidden text-lighter md:flex items-center justify-center h-5 w-10 border rounded bg-scale-500 border-scale-700 gap-1">
+                    <IconCommand size={12} strokeWidth={1.5} />
+                    <span className="text-[12px]">K</span>
                   </div>
                 </div>
               </div>
-              <div className="col-span-12 lg:col-span-6 xl:col-span-4">
-                <div
-                  className="dark:bg-scale-400 flex h-40 
-                    flex-col justify-between rounded rounded-b-none border-t
-                    border-r
-                    border-l border-gray-100 bg-white
-                    p-5 dark:border-gray-600
-                    "
-                >
-                  <div className="mb-4">
-                    <h5 className="mb-1">GitHub Discussions</h5>
-                    <p className="block">
-                      <p>
-                        For help and questions about best practices, join our GitHub discussions.
-                        Browse and ask questions.
-                      </p>
-                      <p>
-                        <span className="font-bold">Use this for:</span> General questions
-                      </p>
-                    </p>
-                  </div>
-                </div>
-                <Divider type="horizontal" light orientation="center" />
-                <div>
-                  <div
-                    className="
-                    dark:bg-scale-400 flex 
-                    flex-col justify-between rounded rounded-t-none border-b
-                    border-r border-l
-                    border-gray-100 bg-white p-5
-                    pt-10 dark:border-gray-600"
-                  >
-                    <Link
-                      href="https://github.com/supabase/supabase/discussions"
-                      as="https://github.com/supabase/supabase/discussions"
-                    >
-                      <a target="_blank">
-                        <Button size="medium" type="default" iconRight={<IconMessageCircle />}>
-                          Join The Discussion
-                        </Button>
-                      </a>
-                    </Link>
-                  </div>
-                </div>
-              </div>
-
-              <div className="col-span-12 lg:col-span-6 xl:col-span-4">
-                <div
-                  className="dark:bg-scale-400 flex h-40 
-                    flex-col justify-between rounded rounded-b-none border-t
-                    border-r
-                    border-l border-gray-100 bg-white
-                    p-5 dark:border-gray-600
-                    "
-                >
-                  <div className="mb-4">
-                    <h5 className="mb-1">Email Support</h5>
-                    <p className="block">
-                      <p>
-                        We offer email based support. If you need SLAs, guaranteed response times,
-                        or have an issue, please contact us here.
-                      </p>
-                      <p>
-                        <span className="font-bold">Use this for:</span> Issues or questions
-                        specific to you
-                      </p>
-                    </p>
-                  </div>
-                </div>
-                <Divider type="horizontal" light orientation="center" />
-                <div>
-                  <div
-                    className="
-                    dark:bg-scale-400 flex 
-                    flex-col justify-between rounded rounded-t-none border-b
-                    border-r border-l
-                    border-gray-100 bg-white p-5
-                    pt-10 dark:border-gray-600"
-                  >
-                    <a href="mailto:support@supabase.io">
-                      <Button size="medium" type="default" iconRight={<IconMail />}>
-                        Email Support
-                      </Button>
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
+            </SearchButton>
           </SectionContainer>
-        </Container>
-      </Layout>
+        </div>
+        <SectionContainer className="text grid gap-5 md:grid-cols-2 xl:grid-cols-3 max-w-7xl !pb-8">
+          {data.cards.map((card) => (
+            <InteractiveShimmerCard
+              key={card.title}
+              outerClassName={cn(card.className)}
+              innerClassName="flex flex-col p-5"
+            >
+              <div className="mb-4 lg:mb-8 flex-1">
+                <h2 className="text text-lg font-medium">{card.title}</h2>
+                <div className="my-2 block">
+                  <p className="text-light">{card.paragraph}</p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                {card.links.map((link) => (
+                  <Button
+                    size="small"
+                    type={(link.type as ButtonProps['type']) ?? 'default'}
+                    iconRight={link.icon}
+                    asChild
+                  >
+                    <Link href={link.link} as={link.link} target={link.target}>
+                      {link.label}
+                    </Link>
+                  </Button>
+                ))}
+              </div>
+            </InteractiveShimmerCard>
+          ))}
+        </SectionContainer>
+        <SectionContainer className="!pt-0 max-w-7xl">
+          <div className="mx-auto bg-alternative border rounded-xl p-6 lg:p-10">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 xl:gap-16 justify-between">
+              <div className="gap-2 flex flex-col">
+                <h2 className="text-xl lg:text-2xl tracking-tight">{data.banner.title}</h2>
+              </div>
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col">{data.banner.paragraph}</div>
+                <div className="flex gap-2">
+                  {data.banner.links.map((link) => (
+                    <Button
+                      size="tiny"
+                      type={(link.type as ButtonProps['type']) ?? 'default'}
+                      iconRight={link.icon}
+                      asChild
+                    >
+                      <Link
+                        href={link.link}
+                        as={link.link}
+                        target={link.target}
+                        className={cn(link.className)}
+                      >
+                        {link.label}
+                      </Link>
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </SectionContainer>
+      </DefaultLayout>
     </>
   )
 }

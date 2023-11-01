@@ -7,14 +7,15 @@ author_url: https://github.com/dragarcia
 author_image_url: https://avatars0.githubusercontent.com/u/26374889?s=400&u=f5e35e9b47a50fa2b4d8c4bb96babd921071bcf1&v=4
 authorURL: https://github.com/dragarcia
 image: postgres-views.png
+categories:
+  - postgres
 tags:
   - postgres
+  - planetpg
 date: '11-18-2020'
 ---
 
 A quick summary of Postgres views, materialized views, and why you should use them.
-
-<!--truncate-->
 
 ### What is a View?
 
@@ -55,13 +56,14 @@ Creating a view consisting of all the three tables will look like this:
 
 ```sql
 create view transcripts as
-    select
-        students.name,
-        students.type,
-        courses.title,
-        courses.code,
-        grades.result
-    from grades
+  select
+    students.name,
+    students.type,
+    courses.title,
+    courses.code,
+    grades.result
+  from
+    grades
     left join students on grades.student_id = students.id
     left join courses on grades.course_id = courses.id;
 ```
@@ -89,14 +91,15 @@ As a query becomes complex it becomes a hassle to call it. Especially when we ru
 
 ```sql
 select
-    students.name,
-    students.type,
-    courses.title,
-    courses.code,
-    grades.result
-from grades
-left join students on grades.student_id = students.id
-left join courses on grades.course_id = courses.id;
+  students.name,
+  students.type,
+  courses.title,
+  courses.code,
+  grades.result
+from
+  grades
+  left join students on grades.student_id = students.id
+  left join courses on grades.course_id = courses.id;
 ```
 
 We can run this instead:
@@ -113,14 +116,15 @@ Views ensure that the likelihood of mistakes decreases when repeatedly executing
 
 ```sql
 select
-    students.name,
-    students.type,
-    courses.title,
-    courses.code,
-    grades.result
-from grades
-    left join students on grades.student_id = students.id
-    left join courses on grades.course_id = courses.id
+  students.name,
+  students.type,
+  courses.title,
+  courses.code,
+  grades.result
+from
+  grades
+  left join students on grades.student_id = students.id
+  left join courses on grades.course_id = courses.id
 where courses.code != 'PG101';
 ```
 
@@ -144,13 +148,14 @@ Using our example above, a materialized view can be created like this:
 
 ```sql
 create materialized view transcripts as
-    select
-        students.name,
-        students.type,
-        courses.title,
-        courses.code,
-        grades.result
-    from grades
+  select
+    students.name,
+    students.type,
+    courses.title,
+    courses.code,
+    grades.result
+  from
+    grades
     left join students on grades.student_id = students.id
     left join courses on grades.course_id = courses.id;
 ```
@@ -182,3 +187,12 @@ Creating a materialized view is not a solution to inefficient queries. You shoul
 ### Conclusion
 
 Postgres views and materialized views are a great way to organize and view results from commonly used queries. Although similar to one another, each has its purpose. Views simplify the process of running queries. Materialized views are usually faster at returning results, with the trade-off of having stale data.
+
+## More Postgres resources
+
+- [Implementing "seen by" functionality with Postgres](https://supabase.com/blog/seen-by-in-postgresql)
+- [Partial data dumps using Postgres Row Level Security](https://supabase.com/blog/partial-postgresql-data-dumps-with-rls)
+- [Postgres Auditing in 150 lines of SQL](https://supabase.com/blog/audit)
+- [Cracking PostgreSQL Interview Questions](https://supabase.com/blog/cracking-postgres-interview)
+- [What are PostgreSQL Templates?](https://supabase.com/blog/postgresql-templates)
+- [Realtime Postgres RLS on Supabase](https://supabase.com/blog/realtime-row-level-security-in-postgresql)

@@ -7,10 +7,13 @@ author_image_url: https://github.com/kiwicopple.png
 authorURL: https://github.com/kiwicopple
 image: 2021-june/release-june-2021.jpg
 thumb: 2021-june/release-june-2021-cover.jpg
+categories:
+  - product
 tags:
   - release-notes
 date: '2021-06-02'
 toc_depth: 3
+video: https://www.youtube.com/v/m3yRPNyYolk
 ---
 
 Supabase is gearing up for another Launch Week on July the 26th. Until then, here's a few new things to try.
@@ -19,15 +22,15 @@ Supabase is gearing up for another Launch Week on July the 26th. Until then, her
 
 Watch a full demo of this month's releases
 
-<iframe
-  className="video-with-border w-full"
-  width="640"
-  height="385"
-  src="https://www.youtube-nocookie.com/embed/m3yRPNyYolk"
-  frameBorder="1"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-  allowFullScreen
-></iframe>
+<div className="video-container">
+  <iframe
+    className="video-with-border w-full"
+    src="https://www.youtube-nocookie.com/embed/m3yRPNyYolk"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
 
 ## Vercel integration
 
@@ -57,13 +60,13 @@ Ever wanted to build a Search Engine? We just released a guide which shows you h
 ### OAuth Guides
 
 We released step-by-step guides to help you set up OAuth with
-[Apple](/docs/guides/auth/auth-apple),
-[Bitbucket](/docs/guides/auth/auth-bitbucket),
-[Facebook](/docs/guides/auth/auth-facebook),
-[GitHub](/docs/guides/auth/auth-github),
-[GitLab](/docs/guides/auth/auth-gitlab),
-[Google](/docs/guides/auth/auth-google), and
-[Twitter](/docs/guides/auth/auth-twitter).
+[Apple](/docs/guides/auth/social-login/auth-apple),
+[Bitbucket](/docs/guides/auth/social-login/auth-bitbucket),
+[Facebook](/docs/guides/auth/social-login/auth-facebook),
+[GitHub](/docs/guides/auth/social-login/auth-github),
+[GitLab](/docs/guides/auth/social-login/auth-gitlab),
+[Google](/docs/guides/auth/social-login/auth-google), and
+[Twitter](/docs/guides/auth/social-login/auth-twitter).
 
 ![Image of Apple's developer Portal](/images/blog/2021-june/apple-developer-portal.png)
 
@@ -79,8 +82,8 @@ Did you know that you can use Javascript inside your Postgres database? Here's h
 Want to share all your favourite memes? Now it's even easier with Public Storage Buckets. Simply mark a bucket as
 "Public" and the content will be accessible without a login.
 
-<video width="99%" autoPlay="autoplay" muted playsInline controls={true}>
-  <source src="/images/blog/2021-june/public-buckets.mp4" type="video/mp4" muted playsInline />
+<video width="99%" autoPlay muted playsInline controls={true}>
+  <source src="/images/blog/2021-june/public-buckets.mp4" type="video/mp4" />
 </video>
 
 ## Storage upserts
@@ -112,15 +115,15 @@ We run a weekly 1-hour live stream where we build in public.
 - [Build in Public 006](https://youtu.be/LHYrqBb4q9I): Supabase Studio
 - [Build in Public 007](https://youtu.be/R4gJhX_JFTo): Supabase Studio - API Docs
 
-<iframe
-  className="video-with-border w-full"
-  width="640"
-  height="385"
-  src="https://www.youtube-nocookie.com/embed/LHYrqBb4q9I"
-  frameBorder="1"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-  allowFullScreen
-></iframe>
+<div className="video-container">
+  <iframe
+    className="video-with-border w-full"
+    src="https://www.youtube-nocookie.com/embed/LHYrqBb4q9I"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
 
 ## Community
 
@@ -155,7 +158,7 @@ If you want to keep up to date, make sure you [subscribe to our YouTube channel]
 
 ## Coming Next
 
-Launch Week!! Remember that time we did a [Launch Week](/blog/2021/03/25/launch-week)? Well we're doing it again at the end of July.
+Launch Week!! Remember that time we did a [Launch Week](/blog/launch-week)? Well we're doing it again at the end of July.
 Strap in, because we're shipping one thing every day for a week.
 
 Let's goooooo.
@@ -164,7 +167,7 @@ Let's goooooo.
 
 ### Get started
 
-- Start using Supabase today: [app.supabase.com](https://app.supabase.com/)
+- Start using Supabase today: [supabase.com/dashboard](https://supabase.com/dashboard/)
 - Make sure to [star us on GitHub](https://github.com/supabase/supabase)
 - Follow us [on Twitter](https://twitter.com/supabase)
 - Subscribe to our [YouTube channel](https://www.youtube.com/c/supabase)

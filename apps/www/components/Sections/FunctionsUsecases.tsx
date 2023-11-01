@@ -1,6 +1,6 @@
 import { useState } from 'react'
 // Import Swiper React components
-import { Button, IconArrowUpRight } from '@supabase/ui'
+import { Button, IconArrowUpRight } from 'ui'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import CodeBlock from '../CodeBlock/CodeBlock'
 import Link from 'next/link'
@@ -45,8 +45,8 @@ function FunctionsUsecases(props: Props) {
               <button
                 key={`featureHighlighted-${i}`}
                 className={
-                  'bg-scale-200 hover:bg-scale-100 hover:dark:bg-scale-300 hover:boder group rounded-md border px-6 py-4 text-left transition-all' +
-                  (active ? ' dark:bg-scale-400 border-scale-500 bg-white' : ' border-scale-300')
+                  'bg-background hover:bg-surface-100 hover:border group rounded-md border px-6 py-4 text-left transition-all' +
+                  (active ? ' dark:bg-scale-400 border-foreground-lighter bg-white' : '')
                 }
                 // onClick={() => setCurrentSelection(feat.highlightLines)}
                 onClick={() => handleApiSwiperNavChange(i)}
@@ -54,7 +54,7 @@ function FunctionsUsecases(props: Props) {
                 <div
                   className={
                     'transition-colors ' +
-                    (active ? ' text-scale-1200' : ' text-scale-900 group-hover:text-scale-1200')
+                    (active ? ' text-foreground' : ' text-light group-hover:text-foreground')
                   }
                 >
                   {feat.title}
@@ -62,10 +62,10 @@ function FunctionsUsecases(props: Props) {
                 <div
                   className={
                     'text-sm transition-colors ' +
-                    (active ? ' text-scale-1100' : ' text-scale-800 group-hover:text-scale-1100 ')
+                    (active ? ' text-light' : ' text-light group-hover:text-light ')
                   }
                 >
-                  {/* 
+                  {/*
                   // @ts-ignore */}
                   {feat.description}
                 </div>
@@ -73,13 +73,17 @@ function FunctionsUsecases(props: Props) {
             )
           })}
           {props.documentation_link && (
-            <Link href={props.documentation_link} as={props.documentation_link}>
-              <a>
-                <Button size="small" className="mt-4" type="default" icon={<IconArrowUpRight />}>
-                  Explore documentation
-                </Button>
-              </a>
-            </Link>
+            <Button
+              asChild
+              size="small"
+              className="mt-4"
+              type="default"
+              icon={<IconArrowUpRight />}
+            >
+              <Link href={props.documentation_link} as={props.documentation_link}>
+                Explore documentation
+              </Link>
+            </Button>
           )}
         </div>
       </div>

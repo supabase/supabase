@@ -1,6 +1,5 @@
-import PortalToast from './PortalToast'
-import GoTrueWrapper from './GoTrueWrapper/GoTrueWrapper'
-import RouteValidationWrapper from './RouteValidationWrapper'
 import AppBannerWrapper from './AppBannerWrapper'
+import CommandMenuWrapper from './CommandMenuWrapper'
+import RouteValidationWrapper from './RouteValidationWrapper'
 
-export { PortalToast, GoTrueWrapper, RouteValidationWrapper, AppBannerWrapper }
+export { AppBannerWrapper, CommandMenuWrapper, RouteValidationWrapper }

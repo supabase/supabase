@@ -1,33 +1,32 @@
 [
   {
     "type": "Announcement",
-    "title": "Works With Supabase - announcing our Partner Gallery",
-    "description": "Introducing our Partner Gallery - open source and made with Supabase.",
-    "imgUrl": "images/blog/partner-gallery/partner-showcase-thumb.png",
-    "logoUrl": "images/blog/partner-gallery/partner-showcase-thumb.png",
+    "title": "Supabase Beta August 2023",
+    "description": "Launch Week 8 review and more things we shipped 🚀",
+    "imgUrl": "/images/blog/2023-09-07-beta-update-august-2023/monthly-update-august-2023.jpg",
+    "logoUrl": "/images/blog/2023-09-07-beta-update-august-2023/monthly-update-august-2023.jpg",
     "organization": "Supabase",
-    "url": "/blog/2022/04/20/partner-gallery-works-with-supabase",
+    "url": "/blog/beta-update-august-2023",
     "postMeta": {
-      "name": "Thor Shcaeff, Alaister Young, Shane Rice",
-      "publishDate": "Apr 20, 2022",
+      "name": "Ant Wilson",
+      "publishDate": "Sep 08, 2023",
       "readLength": 5
     },
-    "ctaText": "Read blog post"
+    "ctaText": "Learn more"
   },
   {
     "type": "Announcement",
-    "title": "Supabase Launch Week IV",
-    "description": "Launch Week IV had something for everybody: Community Day, GraphQL support, Edge Functions, and more.",
-    "imgUrl": "images/blog/launch-week-4/friday-before/launchweek-4-promo-cal.png",
-    "logoUrl": "images/blog/launch-week-4/friday-before/launchweek-4-promo.png",
+    "title": "Launch Week 8 Hackathon Winners",
+    "description": "Announcing the winners of the Launch Week 8 Hackathon!",
+    "imgUrl": "/images/blog/lw8-hackathon-winners/hackathon-winners.png",
+    "logoUrl": "/images/blog/lw8-hackathon-winners/hackathon-winners.png",
     "organization": "Supabase",
-    "url": "/blog/2022/03/25/supabase-launch-week-four",
+    "url": "/blog/launch-week-8-hackathon-winners",
     "postMeta": {
-      "name": "Paul Copplestone",
-      "avatarUrl": "https://avatars0.githubusercontent.com/u/10214025?v=4",
-      "publishDate": "Mar 25, 2022",
-      "readLength": 4
+      "name": "Andrew Smith",
+      "publishDate": "August 28, 2023",
+      "readLength": 3
     },
-    "ctaText": "Read blog post"
+    "ctaText": "See the winners"
   }
 ]

@@ -1,101 +1,168 @@
-import { FC, useState } from 'react'
-import { find, isEmpty, isUndefined } from 'lodash'
-import { Query, Dictionary } from 'components/grid'
-import { Modal } from '@supabase/ui'
-import {
-  PostgresRelationship,
-  PostgresTable,
-  PostgresColumn,
-  PostgresType,
-} from '@supabase/postgres-meta'
+import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
+import { QueryKey, useQueryClient } from '@tanstack/react-query'
+import { isEmpty, isUndefined, noop } from 'lodash'
+import { useState } from 'react'
+import { toast } from 'react-hot-toast'
+import { Modal } from 'ui'
 
-import { useStore } from 'hooks'
-import { RowEditor, ColumnEditor, TableEditor } from '.'
-import { ImportContent } from './TableEditor/TableEditor.types'
-import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
+import { Dictionary } from 'components/grid'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { entityTypeKeys } from 'data/entity-types/keys'
+import { sqlKeys } from 'data/sql/keys'
+import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-mutation'
+import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
+import { tableKeys } from 'data/tables/keys'
+import { useStore, useUrlState } from 'hooks'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { ColumnEditor, RowEditor, SpreadsheetImport, TableEditor } from '.'
+import ForeignRowSelector from './RowEditor/ForeignRowSelector/ForeignRowSelector'
+import JsonEdit from './RowEditor/JsonEditor/JsonEditor'
+import SchemaEditor from './SchemaEditor'
+import {
+  ColumnField,
+  CreateColumnPayload,
+  ExtendedPostgresRelationship,
+  UpdateColumnPayload,
+} from './SidePanelEditor.types'
+import { ImportContent } from './TableEditor/TableEditor.types'
 
-interface Props {
-  selectedSchema: string
+export interface SidePanelEditorProps {
+  editable?: boolean
   selectedTable?: PostgresTable
-  selectedRowToEdit?: Dictionary<any>
-  selectedColumnToEdit?: PostgresColumn
-  selectedTableToEdit?: PostgresTable
-  sidePanelKey?: 'row' | 'column' | 'table'
-  isDuplicating?: boolean
-  closePanel: () => void
   onRowCreated?: (row: Dictionary<any>) => void
   onRowUpdated?: (row: Dictionary<any>, idx: number) => void
 
   // Because the panel is shared between grid editor and database pages
   // Both require different responses upon success of these events
   onTableCreated?: (table: PostgresTable) => void
-  onColumnSaved?: () => void
+  onColumnSaved?: (hasEncryptedColumns?: boolean) => void
 }
 
-const SidePanelEditor: FC<Props> = ({
-  selectedSchema,
+const SidePanelEditor = ({
+  editable = true,
   selectedTable,
-  selectedRowToEdit,
-  selectedColumnToEdit,
-  selectedTableToEdit,
-  sidePanelKey,
-  isDuplicating = false,
-  closePanel,
-  onRowCreated = () => {},
-  onRowUpdated = () => {},
-  onTableCreated = () => {},
-  onColumnSaved = () => {},
-}) => {
+  onRowCreated = noop,
+  onRowUpdated = noop,
+  onTableCreated = noop,
+  onColumnSaved = noop,
+}: SidePanelEditorProps) => {
+  const snap = useTableEditorStateSnapshot()
+  const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
   const { meta, ui } = useStore()
+  const queryClient = useQueryClient()
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
   const [isClosingPanel, setIsClosingPanel] = useState<boolean>(false)
 
-  const tables = meta.tables.list()
-  const enumTypes = meta.types.list(
-    (type: PostgresType) => !meta.excludedSchemas.includes(type.schema)
-  )
+  const enumArrayColumns = (selectedTable?.columns ?? [])
+    .filter((column) => {
+      return (column?.enums ?? []).length > 0 && column.data_type.toLowerCase() === 'array'
+    })
+    .map((column) => column.name)
+
+  const { project } = useProjectContext()
+  const { mutateAsync: createTableRows } = useTableRowCreateMutation()
+  const { mutateAsync: updateTableRow } = useTableRowUpdateMutation({
+    async onMutate({ projectRef, table, configuration, payload }) {
+      snap.closeSidePanel()
+
+      const primaryKeyColumns = new Set(Object.keys(configuration.identifiers))
+      const queryKey = sqlKeys.query(projectRef, [
+        table.schema,
+        table.name,
+        { table: { name: table.name, schema: table.schema } },
+      ])
+
+      await queryClient.cancelQueries(queryKey)
+      const previousRowsQueries = queryClient.getQueriesData<{ result: any[] }>(queryKey)
+      queryClient.setQueriesData<{ result: any[] }>(queryKey, (old) => {
+        return {
+          result:
+            old?.result.map((row) => {
+              // match primary keys
+              if (
+                Object.entries(row)
+                  .filter(([key]) => primaryKeyColumns.has(key))
+                  .every(([key, value]) => value === configuration.identifiers[key])
+              ) {
+                return { ...row, ...payload }
+              }
+
+              return row
+            }) ?? [],
+        }
+      })
+
+      return { previousRowsQueries }
+    },
+    onError(error, _variables, context) {
+      const { previousRowsQueries } = context as {
+        previousRowsQueries: [
+          QueryKey,
+          (
+            | {
+                result: any[]
+              }
+            | undefined
+          )
+        ][]
+      }
+
+      previousRowsQueries.forEach(([queryKey, previousRows]) => {
+        if (previousRows) {
+          queryClient.setQueriesData(queryKey, previousRows)
+        }
+        queryClient.invalidateQueries(queryKey)
+      })
+
+      ui.setNotification({ error, category: 'error', message: error.message })
+    },
+  })
 
   const saveRow = async (
     payload: any,
     isNewRecord: boolean,
     configuration: { identifiers: any; rowIdx: number },
-    onComplete: Function
+    onComplete: (err?: any) => void
   ) => {
-    let saveRowError = false
-    if (isNewRecord) {
-      const insertQuery = new Query()
-        .from(selectedTable!.name, selectedTable!.schema)
-        .insert([payload], { returning: true })
-        .toSql()
+    if (!project || selectedTable === undefined) {
+      return console.error('no project or table selected')
+    }
 
-      const res: any = await meta.query(insertQuery)
-      if (res.error) {
-        saveRowError = true
-        ui.setNotification({ category: 'error', message: res.error?.message })
-      } else {
-        onRowCreated(res[0])
+    let saveRowError: Error | undefined
+    if (isNewRecord) {
+      try {
+        const result = await createTableRows({
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+          table: selectedTable as any,
+          payload,
+          enumArrayColumns,
+        })
+        onRowCreated(result[0])
+      } catch (error: any) {
+        saveRowError = error
       }
     } else {
       const hasChanges = !isEmpty(payload)
       if (hasChanges) {
-        if (selectedTable!.primary_keys.length > 0) {
-          const updateQuery = new Query()
-            .from(selectedTable!.name, selectedTable!.schema)
-            .update(payload, { returning: true })
-            .match(configuration.identifiers)
-            .toSql()
-
-          const res: any = await meta.query(updateQuery)
-          if (res.error) {
-            saveRowError = true
-            ui.setNotification({ category: 'error', message: res.error?.message })
-          } else {
-            onRowUpdated(res[0], configuration.rowIdx)
+        if (selectedTable.primary_keys.length > 0) {
+          try {
+            const result = await updateTableRow({
+              projectRef: project.ref,
+              connectionString: project.connectionString,
+              table: selectedTable as any,
+              configuration,
+              payload,
+              enumArrayColumns,
+            })
+            onRowUpdated(result[0], configuration.rowIdx)
+          } catch (error: any) {
+            saveRowError = error
           }
         } else {
-          saveRowError = true
+          saveRowError = new Error('No primary key')
           ui.setNotification({
             category: 'error',
             message:
@@ -105,24 +172,70 @@ const SidePanelEditor: FC<Props> = ({
       }
     }
 
-    onComplete()
+    onComplete(saveRowError)
     if (!saveRowError) {
       setIsEdited(false)
-      closePanel()
+      snap.closeSidePanel()
     }
+  }
+
+  const onSaveJSON = async (value: string | number | null) => {
+    if (selectedTable === undefined || !(snap.sidePanel?.type === 'json')) return
+    const selectedValueForJsonEdit = snap.sidePanel.jsonValue
+
+    try {
+      const { row, column } = selectedValueForJsonEdit
+      const payload = { [column]: value === null ? null : JSON.parse(value as any) }
+      const identifiers = {} as Dictionary<any>
+      selectedTable.primary_keys.forEach((column) => (identifiers[column.name] = row![column.name]))
+
+      const isNewRecord = false
+      const configuration = { identifiers, rowIdx: row.idx }
+
+      saveRow(payload, isNewRecord, configuration, (error) => {
+        if (error) {
+          toast.error(error?.message ?? 'Something went wrong while trying to save the JSON value')
+        }
+      })
+    } catch (error: any) {}
+  }
+
+  const onSaveForeignRow = async (value: any) => {
+    if (selectedTable === undefined || !(snap.sidePanel?.type === 'foreign-row-selector')) return
+    const selectedForeignKeyToEdit = snap.sidePanel.foreignKey
+
+    try {
+      const { row, column } = selectedForeignKeyToEdit
+      const payload = { [column.name]: value }
+      const identifiers = {} as Dictionary<any>
+      selectedTable.primary_keys.forEach((column) => (identifiers[column.name] = row![column.name]))
+
+      const isNewRecord = false
+      const configuration = { identifiers, rowIdx: row.idx }
+
+      saveRow(payload, isNewRecord, configuration, () => {})
+    } catch (error) {}
   }
 
   const saveColumn = async (
     payload: CreateColumnPayload | UpdateColumnPayload,
-    foreignKey: Partial<PostgresRelationship> | undefined,
+    foreignKey: ExtendedPostgresRelationship | undefined,
     isNewRecord: boolean,
-    configuration: { columnId?: string },
+    configuration: { columnId?: string; isEncrypted: boolean; keyId?: string; keyName?: string },
     resolve: any
   ) => {
+    const selectedColumnToEdit = snap.sidePanel?.type === 'column' && snap.sidePanel.column
+
+    const { columnId, ...securityConfig } = configuration
     const response = isNewRecord
-      ? await meta.createColumn(payload as CreateColumnPayload, foreignKey)
+      ? await meta.createColumn(
+          payload as CreateColumnPayload,
+          selectedTable as PostgresTable,
+          foreignKey,
+          securityConfig
+        )
       : await meta.updateColumn(
-          configuration.columnId as string,
+          columnId as string,
           payload as UpdateColumnPayload,
           selectedTable as PostgresTable,
           foreignKey
@@ -131,13 +244,62 @@ const SidePanelEditor: FC<Props> = ({
     if (response?.error) {
       ui.setNotification({ category: 'error', message: response.error.message })
     } else {
-      await meta.tables.loadById(selectedTable!.id)
-      onColumnSaved()
+      if (
+        !isNewRecord &&
+        payload.name &&
+        selectedColumnToEdit &&
+        selectedColumnToEdit.name !== payload.name
+      ) {
+        reAddRenamedColumnSortAndFilter(selectedColumnToEdit.name, payload.name)
+      }
+
+      await Promise.all([
+        queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints'])),
+        queryClient.invalidateQueries(tableKeys.table(project?.ref, selectedTable!.id)),
+        queryClient.invalidateQueries(
+          sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
+        ),
+        queryClient.invalidateQueries(
+          sqlKeys.query(project?.ref, [
+            'table-definition',
+            selectedTable!.schema,
+            selectedTable!.name,
+          ])
+        ),
+        queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
+      ])
+      onColumnSaved(configuration.isEncrypted)
       setIsEdited(false)
-      closePanel()
+      snap.closeSidePanel()
+    }
+
+    if (configuration.isEncrypted && selectedTable?.schema) {
+      await meta.views.loadBySchema(selectedTable.schema)
     }
 
     resolve()
+  }
+
+  /**
+   * Adds the renamed column's filter and/or sort rules.
+   */
+  const reAddRenamedColumnSortAndFilter = (oldColumnName: string, newColumnName: string) => {
+    setParams((prevParams) => {
+      const existingFilters = (prevParams?.filter ?? []) as string[]
+      const existingSorts = (prevParams?.sort ?? []) as string[]
+
+      return {
+        ...prevParams,
+        filter: existingFilters.map((filter: string) => {
+          const [column] = filter.split(':')
+          return column === oldColumnName ? filter.replace(column, newColumnName) : filter
+        }),
+        sort: existingSorts.map((sort: string) => {
+          const [column] = sort.split(':')
+          return column === oldColumnName ? sort.replace(column, newColumnName) : sort
+        }),
+      }
+    })
   }
 
   const saveTable = async (
@@ -159,23 +321,36 @@ const SidePanelEditor: FC<Props> = ({
       configuration
 
     try {
-      if (isDuplicating) {
-        const duplicateTable = find(tables, { id: tableId }) as PostgresTable
+      if (
+        snap.sidePanel?.type === 'table' &&
+        snap.sidePanel.mode === 'duplicate' &&
+        selectedTable
+      ) {
+        const duplicateTable = selectedTable
+
         toastId = ui.setNotification({
           category: 'loading',
           message: `Duplicating table: ${duplicateTable.name}...`,
         })
+
         const table: any = await meta.duplicateTable(payload, {
           isRLSEnabled,
           isRealtimeEnabled,
           isDuplicateRows,
           duplicateTable,
         })
+
+        await Promise.all([
+          queryClient.invalidateQueries(tableKeys.list(project?.ref, table.schema)),
+          queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
+        ])
+
         ui.setNotification({
           id: toastId,
           category: 'success',
           message: `Table ${duplicateTable.name} has been successfully duplicated into ${table.name}!`,
         })
+
         onTableCreated(table)
       } else if (isNewRecord) {
         toastId = ui.setNotification({
@@ -191,24 +366,33 @@ const SidePanelEditor: FC<Props> = ({
           isRealtimeEnabled,
           importContent
         )
+
+        await Promise.all([
+          queryClient.invalidateQueries(tableKeys.list(project?.ref, table.schema)),
+          queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
+        ])
+
         ui.setNotification({
           id: toastId,
           category: 'success',
           message: `Table ${table.name} is good to go!`,
         })
+
         onTableCreated(table)
-      } else if (selectedTableToEdit) {
+      } else if (selectedTable) {
         toastId = ui.setNotification({
           category: 'loading',
-          message: `Updating table: ${selectedTableToEdit?.name}...`,
+          message: `Updating table: ${selectedTable?.name}...`,
         })
+
         const { table, hasError }: any = await meta.updateTable(
           toastId,
-          selectedTableToEdit,
+          selectedTable,
           payload,
           columns,
           isRealtimeEnabled
         )
+
         if (hasError) {
           ui.setNotification({
             id: toastId,
@@ -216,6 +400,22 @@ const SidePanelEditor: FC<Props> = ({
             message: `Table ${table.name} has been updated, but there were some errors`,
           })
         } else {
+          queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints']))
+          await Promise.all([
+            queryClient.invalidateQueries(
+              sqlKeys.query(project?.ref, [selectedTable.schema, selectedTable.name])
+            ),
+            queryClient.invalidateQueries(
+              sqlKeys.query(project?.ref, [
+                'table-definition',
+                selectedTable.schema,
+                selectedTable.name,
+              ])
+            ),
+            queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
+            queryClient.invalidateQueries(tableKeys.table(project?.ref, table.schema)),
+          ])
+
           ui.setNotification({
             id: toastId,
             category: 'success',
@@ -225,22 +425,99 @@ const SidePanelEditor: FC<Props> = ({
       }
     } catch (error: any) {
       saveTableError = true
-      ui.setNotification({ id: toastId, category: 'error', message: error.message })
+      ui.setNotification({ error, id: toastId, category: 'error', message: error.message })
     }
 
     if (!saveTableError) {
       setIsEdited(false)
-      closePanel()
+      snap.closeSidePanel()
     }
 
     resolve()
+  }
+
+  const onImportData = async (importContent: ImportContent) => {
+    if (!project || selectedTable === undefined) {
+      return console.error('no project or table selected')
+    }
+
+    const { file, rowCount, selectedHeaders, resolve } = importContent
+    const toastId = ui.setNotification({
+      category: 'loading',
+      message: `Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`,
+    })
+
+    if (file && rowCount > 0) {
+      // CSV file upload
+      const { error }: any = await meta.insertRowsViaSpreadsheet(
+        file,
+        selectedTable,
+        selectedHeaders,
+        (progress: number) => {
+          ui.setNotification({
+            id: toastId,
+            progress,
+            category: 'loading',
+            message: `Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`,
+          })
+        }
+      )
+      if (error) {
+        ui.setNotification({
+          error,
+          id: toastId,
+          category: 'error',
+          message: `Failed to import data: ${error.message}`,
+        })
+        return resolve()
+      }
+    } else {
+      // Text paste
+      const { error } = await meta.insertTableRows(
+        selectedTable,
+        importContent.rows,
+        selectedHeaders,
+        (progress: number) => {
+          ui.setNotification({
+            id: toastId,
+            progress,
+            category: 'loading',
+            message: `Adding ${importContent.rows.length.toLocaleString()} rows to ${
+              selectedTable.name
+            }`,
+          })
+        }
+      )
+      if (error) {
+        ui.setNotification({
+          error,
+          id: toastId,
+          category: 'error',
+          message: `Failed to import data: ${error.message}`,
+        })
+        return resolve()
+      }
+    }
+
+    await Promise.all([
+      queryClient.invalidateQueries(
+        sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
+      ),
+    ])
+    ui.setNotification({
+      id: toastId,
+      category: 'success',
+      message: `Successfully imported ${rowCount} rows of data into ${selectedTable.name}`,
+    })
+    resolve()
+    snap.closeSidePanel()
   }
 
   const onClosePanel = () => {
     if (isEdited) {
       setIsClosingPanel(true)
     } else {
-      closePanel()
+      snap.closeSidePanel()
     }
   }
 
@@ -248,9 +525,9 @@ const SidePanelEditor: FC<Props> = ({
     <>
       {!isUndefined(selectedTable) && (
         <RowEditor
-          row={selectedRowToEdit}
+          row={snap.sidePanel?.type === 'row' ? snap.sidePanel.row : undefined}
           selectedTable={selectedTable}
-          visible={sidePanelKey === 'row'}
+          visible={snap.sidePanel?.type === 'row'}
           closePanel={onClosePanel}
           saveChanges={saveRow}
           updateEditorDirty={() => setIsEdited(true)}
@@ -258,44 +535,86 @@ const SidePanelEditor: FC<Props> = ({
       )}
       {!isUndefined(selectedTable) && (
         <ColumnEditor
-          enumTypes={enumTypes}
-          tables={tables}
-          column={selectedColumnToEdit}
+          column={
+            snap.sidePanel?.type === 'column'
+              ? (snap.sidePanel.column as PostgresColumn)
+              : undefined
+          }
           selectedTable={selectedTable}
-          visible={sidePanelKey === 'column'}
+          visible={snap.sidePanel?.type === 'column'}
           closePanel={onClosePanel}
           saveChanges={saveColumn}
           updateEditorDirty={() => setIsEdited(true)}
         />
       )}
       <TableEditor
-        table={selectedTableToEdit}
-        selectedSchema={selectedSchema}
-        isDuplicating={isDuplicating}
-        visible={sidePanelKey === 'table'}
+        table={
+          snap.sidePanel?.type === 'table' &&
+          (snap.sidePanel.mode === 'edit' || snap.sidePanel.mode === 'duplicate')
+            ? selectedTable
+            : undefined
+        }
+        isDuplicating={snap.sidePanel?.type === 'table' && snap.sidePanel.mode === 'duplicate'}
+        visible={snap.sidePanel?.type === 'table'}
         closePanel={onClosePanel}
         saveChanges={saveTable}
         updateEditorDirty={() => setIsEdited(true)}
       />
+      <SchemaEditor
+        visible={snap.sidePanel?.type === 'schema'}
+        closePanel={onClosePanel}
+        saveChanges={() => {}}
+      />
+      <JsonEdit
+        visible={snap.sidePanel?.type === 'json'}
+        column={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.column) || ''}
+        jsonString={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.jsonString) || ''}
+        backButtonLabel="Cancel"
+        applyButtonLabel="Save changes"
+        readOnly={!editable}
+        closePanel={onClosePanel}
+        onSaveJSON={onSaveJSON}
+      />
+      <ForeignRowSelector
+        key={`foreign-row-selector-${
+          (snap.sidePanel?.type === 'foreign-row-selector' &&
+            snap.sidePanel.foreignKey.foreignKey.id) ||
+          'null'
+        }`}
+        visible={snap.sidePanel?.type === 'foreign-row-selector'}
+        foreignKey={
+          snap.sidePanel?.type === 'foreign-row-selector'
+            ? snap.sidePanel.foreignKey.foreignKey
+            : undefined
+        }
+        closePanel={onClosePanel}
+        onSelect={onSaveForeignRow}
+      />
+      <SpreadsheetImport
+        visible={snap.sidePanel?.type === 'csv-import'}
+        selectedTable={selectedTable}
+        saveContent={onImportData}
+        closePanel={onClosePanel}
+        updateEditorDirty={setIsEdited}
+      />
       <ConfirmationModal
         visible={isClosingPanel}
-        header="Confirm to close"
-        buttonLabel="Confirm"
+        header="Discard changes"
+        buttonLabel="Discard"
         onSelectCancel={() => setIsClosingPanel(false)}
         onSelectConfirm={() => {
           setIsClosingPanel(false)
           setIsEdited(false)
-          closePanel()
+          snap.closeSidePanel()
         }}
-        children={
-          <Modal.Content>
-            <p className="text-scale-1100 py-4 text-sm">
-              There are unsaved changes. Are you sure you want to close the panel? Your changes will
-              be lost.
-            </p>
-          </Modal.Content>
-        }
-      />
+      >
+        <Modal.Content>
+          <p className="py-4 text-sm text-foreground-light">
+            There are unsaved changes. Are you sure you want to close the panel? Your changes will
+            be lost.
+          </p>
+        </Modal.Content>
+      </ConfirmationModal>
     </>
   )
 }

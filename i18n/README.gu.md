@@ -1,6 +1,6 @@
 <p align="center">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--light.svg#gh-light-mode-only">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--dark.svg#gh-dark-mode-only">
+<img src="https://user-images.githubusercontent.com/8291514/213727234-cda046d6-28c6-491a-b284-b86c5cede25d.png#gh-light-mode-only">
+<img src="https://user-images.githubusercontent.com/8291514/213727225-56186826-bee8-43b5-9b15-86e839d89393.png#gh-dark-mode-only">
 </p>
 
 ---
@@ -33,13 +33,13 @@
 ## સ્થિતિ
 
 - [x] આલ્ફા: અમે ગ્રાહકોના બંધ સમૂહ સાથે સુપાબેઝનું પરીક્ષણ કરી રહ્યા છીએ
-- [x] જાહેર આલ્ફા: કોઈ પણ [app.supabase.com](https://app.supabase.com) પર જઈને સાઈન-અપ કરી શકે છે. પણ થોડો સંયમ રાખશો, હજુ અમુક સમસ્યાઓ છે
+- [x] જાહેર આલ્ફા: કોઈ પણ [supabase.com/dashboard](https://supabase.com/dashboard) પર જઈને સાઈન-અપ કરી શકે છે. પણ થોડો સંયમ રાખશો, હજુ અમુક સમસ્યાઓ છે
 - [x] જાહેર બીટા: મોટાભાગના નોન-એન્ટરપ્રાઇઝ યુઝ-કેસેટ્સ માટે અનુરૂપ
 - [ ] જાહેર: પ્રોડક્શન માટે તૈયાર
 
 અમે હાલમાં જાહેર બીટામાં છીએ. અગત્યના સુધારાઓ વિશે સૂચિત થવા માટે આ રીપોના "રિલિઝિસ" જુઓ.
 
-<kbd><img src="https://gitcdn.link/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="આ રીપો જુઓ"/></kbd>
+<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="આ રીપો જુઓ"/></kbd>
 
 ---
 
@@ -49,9 +49,9 @@
 
 **વર્તમાન સ્થાપત્ય**
 
-સુપાબેઝ એક [હોસ્ટેડ પ્લેટફોર્મ](https://app.supabase.com) છે. તમે સાઇન અપ કરી શકો છો અને કંઈપણ ઇન્સ્ટોલ કર્યા વગર સુપાબેઝનો ઉપયોગ શરૂ કરી શકો છો. અમે હજી પણ સ્થાનિક ડેવલપમેન્ટ અનુભવ બનાવી રહ્યા છીએ - પ્લેટફોર્મ સ્થિરતાની સાથે હવે આ અમારું મુખ્ય લક્ષ્ય છે.
+સુપાબેઝ એક [હોસ્ટેડ પ્લેટફોર્મ](https://supabase.com/dashboard) છે. તમે સાઇન અપ કરી શકો છો અને કંઈપણ ઇન્સ્ટોલ કર્યા વગર સુપાબેઝનો ઉપયોગ શરૂ કરી શકો છો. અમે હજી પણ સ્થાનિક ડેવલપમેન્ટ અનુભવ બનાવી રહ્યા છીએ - પ્લેટફોર્મ સ્થિરતાની સાથે હવે આ અમારું મુખ્ય લક્ષ્ય છે.
 
-![સ્થાપત્ય](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
+![સ્થાપત્ય](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [PostgreSQL](https://www.postgresql.org/) એક ઓબ્જેક્ટ-રિલેશનલ ડેટાબેઝ સિસ્ટમ છે જેમાં 30 વર્ષથી વધુ સક્રિય વિકાસ છે જેણે તેને વિશ્વસનીયતા, લક્ષણ મજબુતાઇ અને પ્રદર્શન માટે મજબૂત પ્રતિષ્ઠા પ્રાપ્ત કરી છે
 - [Realtime](https://github.com/supabase/realtime) એલિક્સિર સર્વર છે જે તમને વેબસોકેટનો ઉપયોગ કરીને PostgreSQL દાખલ, અપડેટ્સ અને ડીલીટ માટે પરવાનગી આપે છે. સુપાબેઝ Postgresની બિલ્ટ-ઇન પ્રતિકૃતિ વિધેયને સાંભળે છે, પ્રતિકૃતિ બાઇટ પ્રવાહને JSON માં ફેરવે છે, પછી વેબસોકેટ્સ પર JSON પ્રસારિત કરે છે.
@@ -72,7 +72,7 @@
 
 | રીપો                  | ઓફિશ્યિલ                                         | સમુદાય                                                                                                                                                                                                                                                                                                                               |
 | --------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **`supabase-{lang}`** | [`JS`](https://github.com/supabase/supabase-js)  | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Dart`](https://github.com/supabase/supabase-dart) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust` \| [`Ruby`](https://github.com/supabase/supabase-rb) \| `Go`                                                                                             |
+| **`supabase-{lang}`** | [`JS`](https://github.com/supabase/supabase-js)  | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Flutter`](https://github.com/supabase/supabase-flutter) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust` \| [`Ruby`](https://github.com/supabase/supabase-rb) \| `Go`                                                                                       |
 | `postgrest-{lang}`    | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) \| [`Ruby`](https://github.com/supabase/postgrest-rb) \| [`Go`](https://github.com/supabase/postgrest-go) |
 | `realtime-{lang}`     | [`JS`](https://github.com/supabase/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust` \| `Ruby` \| `Go`                                                                                                                                        |
 | `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust` \| `Ruby` \| `Go`                                                                                                                                              |

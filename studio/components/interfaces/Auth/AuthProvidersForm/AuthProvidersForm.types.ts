@@ -12,13 +12,15 @@ export interface Provider {
     [x: string]: {
       title: string
       type: 'boolean' | 'string' | 'select' | 'number'
-      description?: string
-      descriptionOptional?: string
       enum: Enum[]
       show: {
         key: string
         matches: string
       }
+      description?: string
+      descriptionOptional?: string
+      units?: string
+      isSecret?: boolean
     }
   }
   validationSchema: any // todo: use Yup type

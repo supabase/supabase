@@ -1,0 +1,2625 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/v1/branches/{branch_id}": {
+      "get": {
+        "operationId": "getBranchDetails",
+        "summary": "Get database branch config",
+        "description": "Fetches configurations of the specified database branch",
+        "parameters": [
+          {
+            "name": "branch_id",
+            "required": true,
+            "in": "path",
+            "description": "Branch ID",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BranchDetailResponse" }
+              }
+            }
+          },
+          "500": { "description": "Failed to update database branch" }
+        },
+        "tags": ["database branches (beta)"],
+        "security": [{ "bearer": [] }]
+      },
+      "patch": {
+        "operationId": "updateBranch",
+        "summary": "Update database branch config",
+        "description": "Updates the configuration of the specified database branch",
+        "parameters": [
+          {
+            "name": "branch_id",
+            "required": true,
+            "in": "path",
+            "description": "Branch ID",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/UpdateBranchBody" } }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/BranchResponse" } }
+            }
+          },
+          "500": { "description": "Failed to update database branch" }
+        },
+        "tags": ["database branches (beta)"],
+        "security": [{ "bearer": [] }]
+      },
+      "delete": {
+        "operationId": "deleteBranch",
+        "summary": "Delete a database branch",
+        "description": "Deletes the specified database branch",
+        "parameters": [
+          {
+            "name": "branch_id",
+            "required": true,
+            "in": "path",
+            "description": "Branch ID",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "" },
+          "500": { "description": "Failed to delete database branch" }
+        },
+        "tags": ["database branches (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects": {
+      "get": {
+        "operationId": "getProjects",
+        "summary": "List all projects",
+        "description": "Returns a list of all projects you've previously created.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/ProjectResponse" }
+                }
+              }
+            }
+          }
+        },
+        "tags": ["projects"],
+        "security": [{ "bearer": [] }]
+      },
+      "post": {
+        "operationId": "createProject",
+        "summary": "Create a project",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/CreateProjectBody" } }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ProjectResponse" } }
+            }
+          },
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ProjectResponse" } }
+            }
+          }
+        },
+        "tags": ["projects"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/organizations": {
+      "get": {
+        "operationId": "getOrganizations",
+        "summary": "List all organizations",
+        "description": "Returns a list of organizations that you currently belong to.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/OrganizationResponse" }
+                }
+              }
+            }
+          },
+          "500": { "description": "Unexpected error listing organizations" }
+        },
+        "tags": ["organizations"],
+        "security": [{ "bearer": [] }]
+      },
+      "post": {
+        "operationId": "createOrganization",
+        "summary": "Create an organization",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateOrganizationBody" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/OrganizationResponse" }
+              }
+            }
+          },
+          "500": { "description": "Unexpected error creating an organization" }
+        },
+        "tags": ["organizations"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/oauth/authorize": {
+      "get": {
+        "operationId": "authorize",
+        "summary": "Authorize user through oauth",
+        "parameters": [
+          { "name": "client_id", "required": true, "in": "query", "schema": { "type": "string" } },
+          {
+            "name": "response_type",
+            "required": true,
+            "in": "query",
+            "schema": { "enum": ["code", "token", "id_token token"], "type": "string" }
+          },
+          {
+            "name": "redirect_uri",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          { "name": "scope", "required": true, "in": "query", "schema": { "type": "string" } },
+          { "name": "state", "required": false, "in": "query", "schema": { "type": "string" } },
+          {
+            "name": "response_mode",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "code_challenge",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "code_challenge_method",
+            "required": false,
+            "in": "query",
+            "schema": { "enum": ["plain", "sha256", "S256"], "type": "string" }
+          }
+        ],
+        "responses": { "303": { "description": "" } },
+        "tags": ["oauth (beta)"]
+      }
+    },
+    "/v1/oauth/token": {
+      "post": {
+        "operationId": "token",
+        "summary": "Exchange auth code for user's access and refresh token",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": { "$ref": "#/components/schemas/OAuthTokenBody" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/OAuthTokenResponse" }
+              }
+            }
+          }
+        },
+        "tags": ["oauth (beta)"]
+      }
+    },
+    "/v1/projects/{ref}/api-keys": {
+      "get": {
+        "operationId": "getProjectApiKeys",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/ApiKeyResponse" }
+                }
+              }
+            }
+          },
+          "403": { "description": "" }
+        },
+        "tags": ["projects"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/branches": {
+      "get": {
+        "operationId": "getBranches",
+        "summary": "List all database branches",
+        "description": "Returns all database branches of the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/BranchResponse" }
+                }
+              }
+            }
+          },
+          "500": { "description": "Failed to retrieve database branches" }
+        },
+        "tags": ["database branches (beta)"],
+        "security": [{ "bearer": [] }]
+      },
+      "post": {
+        "operationId": "createBranch",
+        "summary": "Create a database branch",
+        "description": "Creates a database branch from the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/CreateBranchBody" } }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/BranchResponse" } }
+            }
+          },
+          "500": { "description": "Failed to create database branch" }
+        },
+        "tags": ["database branches (beta)"],
+        "security": [{ "bearer": [] }]
+      },
+      "delete": {
+        "operationId": "disableBranch",
+        "summary": "Disables preview branching",
+        "description": "Disables preview branching for the specified project",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "" },
+          "500": { "description": "Failed to disable preview branching" }
+        },
+        "tags": ["database branches (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/custom-hostname": {
+      "get": {
+        "operationId": "getCustomHostnameConfig",
+        "summary": "Gets project's custom hostname config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UpdateCustomHostnameResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to retrieve project's custom hostname config" }
+        },
+        "tags": ["custom hostname (beta)"],
+        "security": [{ "bearer": [] }]
+      },
+      "delete": {
+        "operationId": "removeCustomHostnameConfig",
+        "summary": "Deletes a project's custom hostname configuration",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "" },
+          "403": { "description": "" },
+          "500": { "description": "Failed to delete project custom hostname configuration" }
+        },
+        "tags": ["custom hostname (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/custom-hostname/initialize": {
+      "post": {
+        "operationId": "createCustomHostnameConfig",
+        "summary": "Updates project's custom hostname configuration",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateCustomHostnameBody" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UpdateCustomHostnameResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to update project custom hostname configuration" }
+        },
+        "tags": ["custom hostname (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/custom-hostname/reverify": {
+      "post": {
+        "operationId": "reverify",
+        "summary": "Attempts to verify the DNS configuration for project's custom hostname configuration",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UpdateCustomHostnameResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to verify project custom hostname configuration" }
+        },
+        "tags": ["custom hostname (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/custom-hostname/activate": {
+      "post": {
+        "operationId": "activate",
+        "summary": "Activates a custom hostname for a project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UpdateCustomHostnameResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to activate project custom hostname configuration" }
+        },
+        "tags": ["custom hostname (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/network-bans/retrieve": {
+      "post": {
+        "operationId": "getNetworkBans",
+        "summary": "Gets project's network bans",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/NetworkBanResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to retrieve project's network bans" }
+        },
+        "tags": ["network bans (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/network-bans": {
+      "delete": {
+        "operationId": "removeNetworkBan",
+        "summary": "Remove network bans.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/RemoveNetworkBanRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "" },
+          "403": { "description": "" },
+          "500": { "description": "Failed to remove network bans." }
+        },
+        "tags": ["network bans (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/network-restrictions": {
+      "get": {
+        "operationId": "getNetworkRestrictions",
+        "summary": "Gets project's network restrictions",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/NetworkRestrictionsResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to retrieve project's network restrictions" }
+        },
+        "tags": ["network restrictions (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/network-restrictions/apply": {
+      "post": {
+        "operationId": "applyNetworkRestrictions",
+        "summary": "Updates project's network restrictions",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/NetworkRestrictionsRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/NetworkRestrictionsResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to update project network restrictions" }
+        },
+        "tags": ["network restrictions (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/pgsodium": {
+      "get": {
+        "operationId": "getPgsodiumConfig",
+        "summary": "Gets project's pgsodium config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PgsodiumConfigResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to retrieve project's pgsodium config" }
+        },
+        "tags": ["pgsodium (beta)"],
+        "security": [{ "bearer": [] }]
+      },
+      "put": {
+        "operationId": "updatePgsodiumConfig",
+        "summary": "Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdatePgsodiumConfigBody" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PgsodiumConfigResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to update project's pgsodium config" }
+        },
+        "tags": ["pgsodium (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/postgrest": {
+      "get": {
+        "operationId": "getPostgRESTConfig",
+        "summary": "Gets project's postgrest config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PostgrestConfigWithJWTSecretResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to retrieve project's postgrest config" }
+        },
+        "tags": ["services"],
+        "security": [{ "bearer": [] }]
+      },
+      "patch": {
+        "operationId": "updatePostgRESTConfig",
+        "summary": "Updates project's postgrest config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdatePostgrestConfigBody" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PostgrestConfigResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to update project's postgrest config" }
+        },
+        "tags": ["services"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/secrets": {
+      "get": {
+        "operationId": "getSecrets",
+        "summary": "List all secrets",
+        "description": "Returns all secrets you've previously added to the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/SecretResponse" }
+                }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to retrieve project's secrets" }
+        },
+        "tags": ["secrets"],
+        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
+      },
+      "post": {
+        "operationId": "createSecrets",
+        "summary": "Bulk create secrets",
+        "description": "Creates multiple secrets and adds them to the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/CreateSecretBody" }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "" },
+          "403": { "description": "" },
+          "500": { "description": "Failed to create project's secrets" }
+        },
+        "tags": ["secrets"],
+        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
+      },
+      "delete": {
+        "operationId": "deleteSecrets",
+        "summary": "Bulk delete secrets",
+        "description": "Deletes all secrets with the given names from the specified project",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "type": "array", "items": { "type": "string" } } }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to delete secrets with given names" }
+        },
+        "tags": ["secrets"],
+        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/ssl-enforcement": {
+      "get": {
+        "operationId": "getSslEnforcementConfig",
+        "summary": "Get project's SSL enforcement configuration.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SslEnforcementResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to retrieve project's SSL enforcement config" }
+        },
+        "tags": ["ssl enforcement (beta)"],
+        "security": [{ "bearer": [] }]
+      },
+      "put": {
+        "operationId": "updateSslEnforcementConfig",
+        "summary": "Update project's SSL enforcement configuration.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/SslEnforcementRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SslEnforcementResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to update project's SSL enforcement configuration." }
+        },
+        "tags": ["ssl enforcement (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/types/typescript": {
+      "get": {
+        "operationId": "getTypescriptTypes",
+        "summary": "Generate TypeScript types",
+        "description": "Returns the TypeScript types of your schema for use with supabase-js.",
+        "parameters": [
+          {
+            "name": "included_schemas",
+            "required": false,
+            "in": "query",
+            "schema": { "default": "public", "type": "string" }
+          },
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TypescriptResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to generate TypeScript types" }
+        },
+        "tags": ["projects"],
+        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/vanity-subdomain": {
+      "get": {
+        "operationId": "getVanitySubdomainConfig",
+        "summary": "Gets current vanity subdomain config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/VanitySubdomainConfigResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to get project vanity subdomain configuration" }
+        },
+        "tags": ["vanity subdomain (beta)"],
+        "security": [{ "bearer": [] }]
+      },
+      "delete": {
+        "operationId": "removeVanitySubdomainConfig",
+        "summary": "Deletes a project's vanity subdomain configuration",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "" },
+          "403": { "description": "" },
+          "500": { "description": "Failed to delete project vanity subdomain configuration" }
+        },
+        "tags": ["vanity subdomain (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/vanity-subdomain/check-availability": {
+      "post": {
+        "operationId": "checkVanitySubdomainAvailability",
+        "summary": "Checks vanity subdomain availability",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/VanitySubdomainBody" } }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SubdomainAvailabilityResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to check project vanity subdomain configuration" }
+        },
+        "tags": ["vanity subdomain (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/vanity-subdomain/activate": {
+      "post": {
+        "operationId": "activateVanitySubdomainPlease",
+        "summary": "Activates a vanity subdomain for a project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/VanitySubdomainBody" } }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ActivateVanitySubdomainResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to activate project vanity subdomain configuration" }
+        },
+        "tags": ["vanity subdomain (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/upgrade": {
+      "post": {
+        "operationId": "upgradeProject",
+        "summary": "Upgrades the project's Postgres version",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/UpgradeDatabaseBody" } }
+          }
+        },
+        "responses": {
+          "201": { "description": "" },
+          "403": { "description": "" },
+          "500": { "description": "Failed to initiate project upgrade" }
+        },
+        "tags": ["database version upgrade (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/upgrade/eligibility": {
+      "get": {
+        "operationId": "upgradeEligibilityInformation",
+        "summary": "Returns the project's eligibility for upgrades",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProjectUpgradeEligibilityResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to determine project upgrade eligibility" }
+        },
+        "tags": ["database version upgrade (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/upgrade/status": {
+      "get": {
+        "operationId": "getUpgradeStatus",
+        "summary": "Gets the latest status of the project's upgrade",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DatabaseUpgradeStatusResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to retrieve project upgrade status" }
+        },
+        "tags": ["database version upgrade (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/readonly": {
+      "get": {
+        "operationId": "getReadOnlyModeStatus",
+        "summary": "Returns project's readonly mode status",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ReadOnlyStatusResponse" }
+              }
+            }
+          },
+          "500": { "description": "Failed to get project readonly mode status" }
+        },
+        "tags": ["database readonly mode"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/readonly/temporary-disable": {
+      "post": {
+        "operationId": "temporarilyDisableReadonlyMode",
+        "summary": "Disables project's readonly mode for the next 15 minutes",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "201": { "description": "" },
+          "500": { "description": "Failed to disable project's readonly mode" }
+        },
+        "tags": ["database readonly mode"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/config/database/postgres": {
+      "get": {
+        "operationId": "getConfig",
+        "summary": "Gets project's Postgres config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PostgresConfigResponse" }
+              }
+            }
+          },
+          "500": { "description": "Failed to retrieve project's Postgres config" }
+        },
+        "tags": ["projects config"],
+        "security": [{ "bearer": [] }, { "bearer": [] }]
+      },
+      "put": {
+        "operationId": "updateConfig",
+        "summary": "Updates project's Postgres config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdatePostgresConfigBody" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PostgresConfigResponse" }
+              }
+            }
+          },
+          "500": { "description": "Failed to update project's Postgres config" }
+        },
+        "tags": ["projects config"],
+        "security": [{ "bearer": [] }, { "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/config/database/pgbouncer": {
+      "get": {
+        "operationId": "getPgbouncerConfig",
+        "summary": "Gets project's pgbouncer config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProjectPgBouncerConfig" }
+              }
+            }
+          },
+          "500": { "description": "Failed to retrieve project's pgbouncer config" }
+        },
+        "tags": ["projects config"],
+        "security": [{ "bearer": [] }]
+      },
+      "patch": {
+        "operationId": "updatePgbouncerConfig",
+        "summary": "Updates project's pgbouncer config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdatePgbouncerConfigBody" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UpdatePoolingConfigResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to update project's pgbouncer config" }
+        },
+        "tags": ["projects config"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/config/auth": {
+      "get": {
+        "operationId": "getV1AuthConfig",
+        "summary": "Gets project's auth config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AuthConfigResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to retrieve project's auth config" }
+        },
+        "tags": ["projects config"],
+        "security": [{ "bearer": [] }]
+      },
+      "patch": {
+        "operationId": "updateV1AuthConfig",
+        "summary": "Updates a project's auth config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateAuthConfigBody" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AuthConfigResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to update project's auth config" }
+        },
+        "tags": ["projects config"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/database/query": {
+      "post": {
+        "operationId": "v1RunQuery",
+        "summary": "Run sql query",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/RunQueryBody" } }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to run sql query" }
+        },
+        "tags": ["projects (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/database/webhooks/enable": {
+      "post": {
+        "operationId": "v1EnableDatabaseWebhooks",
+        "summary": "Enables Database Webhooks on the project",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "201": { "description": "" },
+          "403": { "description": "" },
+          "500": { "description": "Failed to enable Database Webhooks on the project" }
+        },
+        "tags": ["projects (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/functions": {
+      "post": {
+        "operationId": "createFunction",
+        "summary": "Create a function",
+        "description": "Creates a function and adds it to the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          },
+          {
+            "name": "slug",
+            "required": false,
+            "in": "query",
+            "schema": { "pattern": "/^[A-Za-z0-9_-]+$/", "type": "string" }
+          },
+          { "name": "name", "required": false, "in": "query", "schema": { "type": "string" } },
+          {
+            "name": "verify_jwt",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "boolean" }
+          },
+          {
+            "name": "import_map",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "boolean" }
+          },
+          {
+            "name": "entrypoint_path",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "import_map_path",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/CreateFunctionBody" } },
+            "application/vnd.denoland.eszip": {
+              "schema": { "$ref": "#/components/schemas/CreateFunctionBody" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/FunctionResponse" } }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to create project's function" }
+        },
+        "tags": ["functions"],
+        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
+      },
+      "get": {
+        "operationId": "getFunctions",
+        "summary": "List all functions",
+        "description": "Returns all functions you've previously added to the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/FunctionResponse" }
+                }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to retrieve project's functions" }
+        },
+        "tags": ["functions"],
+        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/functions/{function_slug}": {
+      "get": {
+        "operationId": "getFunction",
+        "summary": "Retrieve a function",
+        "description": "Retrieves a function with the specified slug and project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          },
+          {
+            "name": "function_slug",
+            "required": true,
+            "in": "path",
+            "description": "Function slug",
+            "schema": { "pattern": "/^[A-Za-z0-9_-]+$/", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/FunctionSlugResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to retrieve function with given slug" }
+        },
+        "tags": ["functions"],
+        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
+      },
+      "patch": {
+        "operationId": "updateFunction",
+        "summary": "Update a function",
+        "description": "Updates a function with the specified slug and project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          },
+          {
+            "name": "function_slug",
+            "required": true,
+            "in": "path",
+            "description": "Function slug",
+            "schema": { "pattern": "/^[A-Za-z0-9_-]+$/", "type": "string" }
+          },
+          {
+            "name": "slug",
+            "required": false,
+            "in": "query",
+            "schema": { "pattern": "/^[A-Za-z0-9_-]+$/", "type": "string" }
+          },
+          { "name": "name", "required": false, "in": "query", "schema": { "type": "string" } },
+          {
+            "name": "verify_jwt",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "boolean" }
+          },
+          {
+            "name": "import_map",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "boolean" }
+          },
+          {
+            "name": "entrypoint_path",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "import_map_path",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/UpdateFunctionBody" } },
+            "application/vnd.denoland.eszip": {
+              "schema": { "$ref": "#/components/schemas/UpdateFunctionBody" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/FunctionResponse" } }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to update function with given slug" }
+        },
+        "tags": ["functions"],
+        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
+      },
+      "delete": {
+        "operationId": "deleteFunction",
+        "summary": "Delete a function",
+        "description": "Deletes a function with the specified slug from the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          },
+          {
+            "name": "function_slug",
+            "required": true,
+            "in": "path",
+            "description": "Function slug",
+            "schema": { "pattern": "/^[A-Za-z0-9_-]+$/", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "" },
+          "403": { "description": "" },
+          "500": { "description": "Failed to delete function with given slug" }
+        },
+        "tags": ["functions"],
+        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/functions/{function_slug}/body": {
+      "get": {
+        "operationId": "getFunctionBody",
+        "summary": "Retrieve a function body",
+        "description": "Retrieves a function body for the specified slug and project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          },
+          {
+            "name": "function_slug",
+            "required": true,
+            "in": "path",
+            "description": "Function slug",
+            "schema": { "pattern": "/^[A-Za-z0-9_-]+$/", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "" },
+          "403": { "description": "" },
+          "500": { "description": "Failed to retrieve function body with given slug" }
+        },
+        "tags": ["functions"],
+        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/config/auth/sso/providers": {
+      "post": {
+        "operationId": "createProviderForProject",
+        "summary": "Creates a new SSO provider",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/CreateProviderBody" } }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CreateProviderResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "404": { "description": "SAML 2.0 support is not enabled for this project" }
+        },
+        "tags": ["sso"],
+        "security": [{ "bearer": [] }]
+      },
+      "get": {
+        "operationId": "listAllProviders",
+        "summary": "Lists all SSO providers",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ListProvidersResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "404": { "description": "SAML 2.0 support is not enabled for this project" }
+        },
+        "tags": ["sso"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/config/auth/sso/providers/{provider_id}": {
+      "get": {
+        "operationId": "getProviderById",
+        "summary": "Gets a SSO provider by its UUID",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          },
+          { "name": "provider_id", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GetProviderResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "404": {
+            "description": "Either SAML 2.0 was not enabled for this project, or the provider does not exist"
+          }
+        },
+        "tags": ["sso"],
+        "security": [{ "bearer": [] }]
+      },
+      "put": {
+        "operationId": "updateProviderById",
+        "summary": "Updates a SSO provider by its UUID",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          },
+          { "name": "provider_id", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/UpdateProviderBody" } }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UpdateProviderResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "404": {
+            "description": "Either SAML 2.0 was not enabled for this project, or the provider does not exist"
+          }
+        },
+        "tags": ["sso"],
+        "security": [{ "bearer": [] }]
+      },
+      "delete": {
+        "operationId": "removeProviderById",
+        "summary": "Removes a SSO provider by its UUID",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          },
+          { "name": "provider_id", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DeleteProviderResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "404": {
+            "description": "Either SAML 2.0 was not enabled for this project, or the provider does not exist"
+          }
+        },
+        "tags": ["sso"],
+        "security": [{ "bearer": [] }]
+      }
+    }
+  },
+  "info": { "title": "Supabase API (v1)", "description": "", "version": "1.0.0", "contact": {} },
+  "tags": [
+    { "name": "organizations", "description": "Organization endpoints" },
+    { "name": "projects", "description": "Project endpoints" }
+  ],
+  "servers": [],
+  "components": {
+    "securitySchemes": { "bearer": { "scheme": "bearer", "bearerFormat": "JWT", "type": "http" } },
+    "schemas": {
+      "BranchDetailResponse": {
+        "type": "object",
+        "properties": {
+          "db_port": { "type": "integer" },
+          "ref": { "type": "string" },
+          "postgres_version": { "type": "string" },
+          "status": {
+            "enum": [
+              "ACTIVE_HEALTHY",
+              "ACTIVE_UNHEALTHY",
+              "COMING_UP",
+              "GOING_DOWN",
+              "INACTIVE",
+              "INIT_FAILED",
+              "REMOVED",
+              "RESTORING",
+              "UNKNOWN",
+              "UPGRADING",
+              "PAUSING"
+            ],
+            "type": "string"
+          },
+          "db_host": { "type": "string" },
+          "db_user": { "type": "string" },
+          "db_pass": { "type": "string" },
+          "jwt_secret": { "type": "string" }
+        },
+        "required": ["db_port", "ref", "postgres_version", "status", "db_host"]
+      },
+      "UpdateBranchBody": {
+        "type": "object",
+        "properties": { "branch_name": { "type": "string" }, "git_branch": { "type": "string" } }
+      },
+      "BranchResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "project_ref": { "type": "string" },
+          "parent_project_ref": { "type": "string" },
+          "is_default": { "type": "boolean" },
+          "git_branch": { "type": "string" },
+          "created_at": { "type": "string" },
+          "updated_at": { "type": "string" }
+        },
+        "required": [
+          "id",
+          "name",
+          "project_ref",
+          "parent_project_ref",
+          "is_default",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "DatabaseResponse": {
+        "type": "object",
+        "properties": {
+          "host": { "type": "string", "description": "Database host" },
+          "version": { "type": "string", "description": "Database version" }
+        },
+        "required": ["host", "version"]
+      },
+      "ProjectResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "description": "Id of your project" },
+          "organization_id": { "type": "string", "description": "Slug of your organization" },
+          "name": { "type": "string", "description": "Name of your project" },
+          "region": {
+            "type": "string",
+            "description": "Region of your project",
+            "example": "us-east-1"
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Creation timestamp",
+            "example": "2023-03-29T16:32:59Z"
+          },
+          "database": { "$ref": "#/components/schemas/DatabaseResponse" }
+        },
+        "required": ["id", "organization_id", "name", "region", "created_at"]
+      },
+      "CreateProjectBody": {
+        "type": "object",
+        "properties": {
+          "db_pass": { "type": "string", "description": "Database password" },
+          "name": {
+            "type": "string",
+            "description": "Name of your project, should not contain dots"
+          },
+          "organization_id": { "type": "string", "description": "Slug of your organization" },
+          "plan": {
+            "type": "string",
+            "enum": ["free", "pro"],
+            "description": "Subscription plan",
+            "example": "free"
+          },
+          "region": {
+            "type": "string",
+            "enum": [
+              "us-east-1",
+              "us-west-1",
+              "us-west-2",
+              "ap-southeast-1",
+              "ap-northeast-1",
+              "ap-northeast-2",
+              "ap-southeast-2",
+              "eu-west-1",
+              "eu-west-2",
+              "eu-west-3",
+              "eu-central-1",
+              "ca-central-1",
+              "ap-south-1",
+              "sa-east-1"
+            ],
+            "description": "Region you want your server to reside in",
+            "example": "us-east-1"
+          },
+          "kps_enabled": { "type": "boolean" }
+        },
+        "required": ["db_pass", "name", "organization_id", "plan", "region"]
+      },
+      "OrganizationResponse": {
+        "type": "object",
+        "properties": { "id": { "type": "string" }, "name": { "type": "string" } },
+        "required": ["id", "name"]
+      },
+      "CreateOrganizationBody": {
+        "type": "object",
+        "properties": { "name": { "type": "string" } },
+        "required": ["name"]
+      },
+      "OAuthTokenBody": {
+        "type": "object",
+        "properties": {
+          "grant_type": { "enum": ["authorization_code", "refresh_token"], "type": "string" },
+          "client_id": { "type": "string" },
+          "client_secret": { "type": "string" },
+          "code": { "type": "string" },
+          "code_verifier": { "type": "string" },
+          "redirect_uri": { "type": "string" },
+          "refresh_token": { "type": "string" }
+        },
+        "required": ["grant_type", "client_id", "client_secret"]
+      },
+      "OAuthTokenResponse": {
+        "type": "object",
+        "properties": {
+          "token_type": { "type": "string", "enum": ["Bearer"] },
+          "access_token": { "type": "string" },
+          "refresh_token": { "type": "string" },
+          "expires_in": { "type": "number" }
+        },
+        "required": ["token_type", "access_token", "refresh_token", "expires_in"]
+      },
+      "ApiKeyResponse": {
+        "type": "object",
+        "properties": { "name": { "type": "string" }, "api_key": { "type": "string" } },
+        "required": ["name", "api_key"]
+      },
+      "CreateBranchBody": {
+        "type": "object",
+        "properties": {
+          "branch_name": { "type": "string" },
+          "git_branch": { "type": "string" },
+          "region": { "type": "string" }
+        },
+        "required": ["branch_name"]
+      },
+      "UpdateCustomHostnameResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "enum": [
+              "1_not_started",
+              "2_initiated",
+              "3_challenge_verified",
+              "4_origin_setup_completed",
+              "5_services_reconfigured"
+            ],
+            "type": "string"
+          },
+          "custom_hostname": { "type": "string" },
+          "data": { "type": "object" }
+        },
+        "required": ["status", "custom_hostname", "data"]
+      },
+      "UpdateCustomHostnameBody": {
+        "type": "object",
+        "properties": { "custom_hostname": { "type": "string" } },
+        "required": ["custom_hostname"]
+      },
+      "NetworkBanResponse": {
+        "type": "object",
+        "properties": {
+          "banned_ipv4_addresses": { "type": "array", "items": { "type": "string" } }
+        },
+        "required": ["banned_ipv4_addresses"]
+      },
+      "RemoveNetworkBanRequest": {
+        "type": "object",
+        "properties": { "ipv4_addresses": { "type": "array", "items": { "type": "string" } } },
+        "required": ["ipv4_addresses"]
+      },
+      "NetworkRestrictionsRequest": {
+        "type": "object",
+        "properties": { "dbAllowedCidrs": { "type": "array", "items": { "type": "string" } } },
+        "required": ["dbAllowedCidrs"]
+      },
+      "NetworkRestrictionsResponse": {
+        "type": "object",
+        "properties": {
+          "entitlement": { "enum": ["disallowed", "allowed"], "type": "string" },
+          "config": { "$ref": "#/components/schemas/NetworkRestrictionsRequest" },
+          "old_config": { "$ref": "#/components/schemas/NetworkRestrictionsRequest" },
+          "status": { "enum": ["stored", "applied"], "type": "string" }
+        },
+        "required": ["entitlement", "config", "status"]
+      },
+      "PgsodiumConfigResponse": {
+        "type": "object",
+        "properties": { "root_key": { "type": "string" } },
+        "required": ["root_key"]
+      },
+      "UpdatePgsodiumConfigBody": {
+        "type": "object",
+        "properties": { "root_key": { "type": "string" } },
+        "required": ["root_key"]
+      },
+      "PostgrestConfigWithJWTSecretResponse": {
+        "type": "object",
+        "properties": {
+          "max_rows": { "type": "integer" },
+          "db_schema": { "type": "string" },
+          "db_extra_search_path": { "type": "string" },
+          "jwt_secret": { "type": "string" }
+        },
+        "required": ["max_rows", "db_schema", "db_extra_search_path"]
+      },
+      "UpdatePostgrestConfigBody": {
+        "type": "object",
+        "properties": {
+          "max_rows": { "type": "integer", "minimum": 0, "maximum": 1000000 },
+          "db_extra_search_path": { "type": "string" },
+          "db_schema": { "type": "string" }
+        }
+      },
+      "PostgrestConfigResponse": {
+        "type": "object",
+        "properties": {
+          "max_rows": { "type": "integer" },
+          "db_schema": { "type": "string" },
+          "db_extra_search_path": { "type": "string" }
+        },
+        "required": ["max_rows", "db_schema", "db_extra_search_path"]
+      },
+      "SecretResponse": {
+        "type": "object",
+        "properties": { "name": { "type": "string" }, "value": { "type": "string" } },
+        "required": ["name", "value"]
+      },
+      "CreateSecretBody": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "value": { "type": "string", "pattern": "/^(?!SUPABASE_).*/" }
+        },
+        "required": ["name", "value"]
+      },
+      "SslEnforcements": {
+        "type": "object",
+        "properties": { "database": { "type": "boolean" } },
+        "required": ["database"]
+      },
+      "SslEnforcementResponse": {
+        "type": "object",
+        "properties": {
+          "currentConfig": { "$ref": "#/components/schemas/SslEnforcements" },
+          "appliedSuccessfully": { "type": "boolean" }
+        },
+        "required": ["currentConfig", "appliedSuccessfully"]
+      },
+      "SslEnforcementRequest": {
+        "type": "object",
+        "properties": { "requestedConfig": { "$ref": "#/components/schemas/SslEnforcements" } },
+        "required": ["requestedConfig"]
+      },
+      "TypescriptResponse": {
+        "type": "object",
+        "properties": { "types": { "type": "string" } },
+        "required": ["types"]
+      },
+      "VanitySubdomainConfigResponse": {
+        "type": "object",
+        "properties": {
+          "status": { "enum": ["not-used", "custom-domain-used", "active"], "type": "string" },
+          "custom_domain": { "type": "string" }
+        },
+        "required": ["status"]
+      },
+      "VanitySubdomainBody": {
+        "type": "object",
+        "properties": { "vanity_subdomain": { "type": "string" } },
+        "required": ["vanity_subdomain"]
+      },
+      "SubdomainAvailabilityResponse": {
+        "type": "object",
+        "properties": { "available": { "type": "boolean" } },
+        "required": ["available"]
+      },
+      "ActivateVanitySubdomainResponse": {
+        "type": "object",
+        "properties": { "custom_domain": { "type": "string" } },
+        "required": ["custom_domain"]
+      },
+      "UpgradeDatabaseBody": {
+        "type": "object",
+        "properties": { "target_version": { "type": "number" } },
+        "required": ["target_version"]
+      },
+      "ProjectVersion": {
+        "type": "object",
+        "properties": {
+          "postgres_version": { "type": "number" },
+          "app_version": { "type": "string" }
+        },
+        "required": ["postgres_version", "app_version"]
+      },
+      "ProjectUpgradeEligibilityResponse": {
+        "type": "object",
+        "properties": {
+          "eligible": { "type": "boolean" },
+          "current_app_version": { "type": "string" },
+          "latest_app_version": { "type": "string" },
+          "target_upgrade_versions": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ProjectVersion" }
+          },
+          "requires_manual_intervention": { "type": "string", "nullable": true },
+          "potential_breaking_changes": { "type": "array", "items": { "type": "string" } }
+        },
+        "required": [
+          "eligible",
+          "current_app_version",
+          "latest_app_version",
+          "target_upgrade_versions",
+          "requires_manual_intervention",
+          "potential_breaking_changes"
+        ]
+      },
+      "DatabaseUpgradeStatus": {
+        "type": "object",
+        "properties": {
+          "initiated_at": { "type": "string" },
+          "target_version": { "type": "number" },
+          "error": {
+            "type": "string",
+            "enum": [
+              "1_upgraded_instance_launch_failed",
+              "2_volume_detachchment_from_upgraded_instance_failed",
+              "3_volume_attachment_to_original_instance_failed",
+              "4_data_upgrade_initiation_failed",
+              "5_data_upgrade_completion_failed",
+              "6_volume_detachchment_from_original_instance_failed",
+              "7_volume_attachment_to_upgraded_instance_failed",
+              "8_upgrade_completion_failed"
+            ]
+          },
+          "progress": {
+            "type": "string",
+            "enum": [
+              "1_started",
+              "2_launched_upgraded_instance",
+              "3_detached_volume_from_upgraded_instance",
+              "4_attached_volume_to_original_instance",
+              "5_initiated_data_upgrade",
+              "6_completed_data_upgrade",
+              "7_detached_volume_from_original_instance",
+              "8_attached_volume_to_upgraded_instance",
+              "9_completed_upgrade"
+            ]
+          },
+          "status": { "type": "number", "enum": [0, 1, 2] }
+        },
+        "required": ["initiated_at", "target_version", "status"]
+      },
+      "DatabaseUpgradeStatusResponse": {
+        "type": "object",
+        "properties": {
+          "databaseUpgradeStatus": {
+            "nullable": true,
+            "allOf": [{ "$ref": "#/components/schemas/DatabaseUpgradeStatus" }]
+          }
+        },
+        "required": ["databaseUpgradeStatus"]
+      },
+      "ReadOnlyStatusResponse": {
+        "type": "object",
+        "properties": {
+          "enabled": { "type": "boolean" },
+          "override_enabled": { "type": "boolean" },
+          "override_active_until": { "type": "string" }
+        },
+        "required": ["enabled", "override_enabled", "override_active_until"]
+      },
+      "PostgresConfigResponse": {
+        "type": "object",
+        "properties": {
+          "statement_timeout": { "type": "string" },
+          "effective_cache_size": { "type": "string" },
+          "maintenance_work_mem": { "type": "string" },
+          "max_connections": { "type": "integer", "minimum": 1, "maximum": 262143 },
+          "max_parallel_maintenance_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
+          "max_parallel_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
+          "max_parallel_workers_per_gather": { "type": "integer", "minimum": 0, "maximum": 1024 },
+          "max_worker_processes": { "type": "integer", "minimum": 0, "maximum": 262143 },
+          "shared_buffers": { "type": "string" },
+          "work_mem": { "type": "string" },
+          "session_replication_role": { "enum": ["origin", "replica", "local"], "type": "string" }
+        }
+      },
+      "UpdatePostgresConfigBody": {
+        "type": "object",
+        "properties": {
+          "statement_timeout": { "type": "string" },
+          "effective_cache_size": { "type": "string" },
+          "maintenance_work_mem": { "type": "string" },
+          "max_connections": { "type": "integer", "minimum": 1, "maximum": 262143 },
+          "max_parallel_maintenance_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
+          "max_parallel_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
+          "max_parallel_workers_per_gather": { "type": "integer", "minimum": 0, "maximum": 1024 },
+          "max_worker_processes": { "type": "integer", "minimum": 0, "maximum": 262143 },
+          "shared_buffers": { "type": "string" },
+          "work_mem": { "type": "string" },
+          "session_replication_role": { "enum": ["origin", "replica", "local"], "type": "string" }
+        }
+      },
+      "ProjectPgBouncerConfig": {
+        "type": "object",
+        "properties": {
+          "db_dns_name": { "type": "string" },
+          "db_host": { "type": "string" },
+          "db_name": { "type": "string" },
+          "db_port": { "type": "number" },
+          "db_ssl": { "type": "boolean" },
+          "db_user": { "type": "string" },
+          "default_pool_size": { "type": "number" },
+          "ignore_startup_parameters": { "type": "string" },
+          "inserted_at": { "type": "string" },
+          "pgbouncer_enabled": { "type": "boolean" },
+          "supavisor_enabled": { "type": "boolean" },
+          "pgbouncer_status": {
+            "enum": ["COMING_DOWN", "COMING_UP", "DISABLED", "ENABLED", "RELOADING"],
+            "type": "string"
+          },
+          "pool_mode": { "enum": ["transaction", "session", "statement"], "type": "string" },
+          "max_client_conn": { "type": "number", "nullable": true },
+          "connectionString": { "type": "string" }
+        },
+        "required": [
+          "db_dns_name",
+          "db_host",
+          "db_name",
+          "db_port",
+          "db_ssl",
+          "db_user",
+          "ignore_startup_parameters",
+          "inserted_at",
+          "pgbouncer_enabled",
+          "supavisor_enabled",
+          "pgbouncer_status",
+          "pool_mode",
+          "connectionString"
+        ]
+      },
+      "UpdatePgbouncerConfigBody": {
+        "type": "object",
+        "properties": {
+          "default_pool_size": { "type": "integer", "minimum": 0, "maximum": 1000 },
+          "max_client_conn": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 0,
+            "maximum": 18000
+          },
+          "ignore_startup_parameters": { "type": "string" },
+          "pgbouncer_enabled": { "type": "boolean" },
+          "pool_mode": { "enum": ["transaction", "session", "statement"], "type": "string" }
+        },
+        "required": ["ignore_startup_parameters", "pgbouncer_enabled", "pool_mode"]
+      },
+      "UpdatePoolingConfigResponse": {
+        "type": "object",
+        "properties": {
+          "default_pool_size": { "type": "integer", "minimum": 0, "maximum": 1000 },
+          "max_client_conn": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 0,
+            "maximum": 18000
+          },
+          "ignore_startup_parameters": { "type": "string" },
+          "pgbouncer_enabled": { "type": "boolean" },
+          "pool_mode": { "enum": ["transaction", "session", "statement"], "type": "string" },
+          "pgbouncer_status": {
+            "enum": ["COMING_DOWN", "COMING_UP", "DISABLED", "ENABLED", "RELOADING"],
+            "type": "string"
+          }
+        },
+        "required": [
+          "ignore_startup_parameters",
+          "pgbouncer_enabled",
+          "pool_mode",
+          "pgbouncer_status"
+        ]
+      },
+      "AuthConfigResponse": {
+        "type": "object",
+        "properties": {
+          "smtp_admin_email": { "type": "string" },
+          "smtp_host": { "type": "string" },
+          "smtp_port": { "type": "string" },
+          "smtp_user": { "type": "string" },
+          "smtp_pass": { "type": "string" },
+          "smtp_max_frequency": { "type": "number" },
+          "smtp_sender_name": { "type": "string" },
+          "rate_limit_email_sent": { "type": "number", "minimum": 0, "maximum": 2147483647 }
+        }
+      },
+      "UpdateAuthConfigBody": {
+        "type": "object",
+        "properties": {
+          "smtp_admin_email": { "type": "string" },
+          "smtp_host": { "type": "string" },
+          "smtp_port": { "type": "string" },
+          "smtp_user": { "type": "string" },
+          "smtp_pass": { "type": "string" },
+          "smtp_max_frequency": { "type": "number" },
+          "smtp_sender_name": { "type": "string" },
+          "rate_limit_email_sent": { "type": "number", "minimum": 0, "maximum": 2147483647 }
+        }
+      },
+      "RunQueryBody": {
+        "type": "object",
+        "properties": { "query": { "type": "string" } },
+        "required": ["query"]
+      },
+      "CreateFunctionBody": {
+        "type": "object",
+        "properties": {
+          "slug": { "type": "string", "pattern": "/^[A-Za-z0-9_-]+$/" },
+          "name": { "type": "string" },
+          "body": { "type": "string" },
+          "verify_jwt": { "type": "boolean" }
+        },
+        "required": ["slug", "name", "body"]
+      },
+      "FunctionResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "slug": { "type": "string" },
+          "name": { "type": "string" },
+          "status": { "enum": ["ACTIVE", "REMOVED", "THROTTLED"], "type": "string" },
+          "version": { "type": "number" },
+          "created_at": { "type": "number" },
+          "updated_at": { "type": "number" },
+          "verify_jwt": { "type": "boolean" },
+          "import_map": { "type": "boolean" },
+          "entrypoint_path": { "type": "string" },
+          "import_map_path": { "type": "string" }
+        },
+        "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
+      },
+      "FunctionSlugResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "slug": { "type": "string" },
+          "name": { "type": "string" },
+          "status": { "enum": ["ACTIVE", "REMOVED", "THROTTLED"], "type": "string" },
+          "version": { "type": "number" },
+          "created_at": { "type": "number" },
+          "updated_at": { "type": "number" },
+          "verify_jwt": { "type": "boolean" },
+          "import_map": { "type": "boolean" },
+          "entrypoint_path": { "type": "string" },
+          "import_map_path": { "type": "string" }
+        },
+        "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
+      },
+      "UpdateFunctionBody": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "body": { "type": "string" },
+          "verify_jwt": { "type": "boolean" }
+        }
+      },
+      "AttributeValue": {
+        "type": "object",
+        "properties": {
+          "default": {
+            "oneOf": [
+              { "type": "object" },
+              { "type": "number" },
+              { "type": "string" },
+              { "type": "boolean" }
+            ]
+          },
+          "name": { "type": "string" },
+          "names": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "AttributeMapping": {
+        "type": "object",
+        "properties": {
+          "keys": {
+            "type": "object",
+            "additionalProperties": { "$ref": "#/components/schemas/AttributeValue" }
+          }
+        },
+        "required": ["keys"]
+      },
+      "CreateProviderBody": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["saml"],
+            "description": "What type of provider will be created"
+          },
+          "metadata_xml": { "type": "string" },
+          "metadata_url": { "type": "string" },
+          "domains": { "type": "array", "items": { "type": "string" } },
+          "attribute_mapping": { "$ref": "#/components/schemas/AttributeMapping" }
+        },
+        "required": ["type"]
+      },
+      "SamlDescriptor": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "entity_id": { "type": "string" },
+          "metadata_url": { "type": "string" },
+          "metadata_xml": { "type": "string" },
+          "attribute_mapping": { "$ref": "#/components/schemas/AttributeMapping" }
+        },
+        "required": ["id", "entity_id"]
+      },
+      "Domain": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "domain": { "type": "string" },
+          "created_at": { "type": "string" },
+          "updated_at": { "type": "string" }
+        },
+        "required": ["id"]
+      },
+      "CreateProviderResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "saml": { "$ref": "#/components/schemas/SamlDescriptor" },
+          "domains": { "type": "array", "items": { "$ref": "#/components/schemas/Domain" } },
+          "created_at": { "type": "string" },
+          "updated_at": { "type": "string" }
+        },
+        "required": ["id"]
+      },
+      "Provider": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "saml": { "$ref": "#/components/schemas/SamlDescriptor" },
+          "domains": { "type": "array", "items": { "$ref": "#/components/schemas/Domain" } },
+          "created_at": { "type": "string" },
+          "updated_at": { "type": "string" }
+        },
+        "required": ["id"]
+      },
+      "ListProvidersResponse": {
+        "type": "object",
+        "properties": {
+          "items": { "type": "array", "items": { "$ref": "#/components/schemas/Provider" } }
+        },
+        "required": ["items"]
+      },
+      "GetProviderResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "saml": { "$ref": "#/components/schemas/SamlDescriptor" },
+          "domains": { "type": "array", "items": { "$ref": "#/components/schemas/Domain" } },
+          "created_at": { "type": "string" },
+          "updated_at": { "type": "string" }
+        },
+        "required": ["id"]
+      },
+      "UpdateProviderBody": {
+        "type": "object",
+        "properties": {
+          "metadata_xml": { "type": "string" },
+          "metadata_url": { "type": "string" },
+          "domains": { "type": "array", "items": { "type": "string" } },
+          "attribute_mapping": { "$ref": "#/components/schemas/AttributeMapping" }
+        }
+      },
+      "UpdateProviderResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "saml": { "$ref": "#/components/schemas/SamlDescriptor" },
+          "domains": { "type": "array", "items": { "$ref": "#/components/schemas/Domain" } },
+          "created_at": { "type": "string" },
+          "updated_at": { "type": "string" }
+        },
+        "required": ["id"]
+      },
+      "DeleteProviderResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "saml": { "$ref": "#/components/schemas/SamlDescriptor" },
+          "domains": { "type": "array", "items": { "$ref": "#/components/schemas/Domain" } },
+          "created_at": { "type": "string" },
+          "updated_at": { "type": "string" }
+        },
+        "required": ["id"]
+      }
+    }
+  }
+}

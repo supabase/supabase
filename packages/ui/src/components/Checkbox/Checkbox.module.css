@@ -1,0 +1,127 @@
+/* clear native styling */
+/* .sbui-checkbox[type='checkbox'] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  padding: 0;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+  display: inline-block;
+  vertical-align: middle;
+  background-origin: border-box;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  flex-shrink: 0;
+  height: 1rem;
+  width: 1rem;
+  color: #2563eb;
+  background-color: #fff;
+  border-color: #6b7280;
+  border-width: 1px;
+} */
+
+/* .sbui-checkbox[type='checkbox']:checked {
+  background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+}
+
+.sbui-checkbox[type='checkbox']:checked {
+  @apply dark:bg-brand-400;
+  @apply bg-brand-400;
+  border-color: transparent;
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+} */
+
+/* .sbui-checkbox {
+  @apply border border-solid rounded;
+
+  @apply text-brand-400 border-gray-300 transition-all;
+  @apply hover:border-brand-300 focus:ring-brand-300 focus:outline-none;
+
+  @apply dark:bg-transparent dark:border-dark-400 dark:text-white;
+  @apply dark:hover:border-brand-300;
+
+  margin-top: 2px;
+} */
+/* 
+.sbui-checkbox-container {
+  @apply flex cursor-pointer;
+} */
+
+/* .sbui-checkbox__label-container {
+  @apply leading-none;
+} */
+
+/* .sbui-checkbox__label-container__label {
+  @apply text-gray-700 dark:text-white cursor-pointer mt-0;
+}
+
+.sbui-checkbox__label-container__label__span {
+  @apply font-medium;
+}
+
+.sbui-checkbox__label-container__label__span .sbui-checkbox__label-text-before,
+.sbui-checkbox__label-container__label__span .sbui-checkbox__label-text-after {
+  @apply text-gray-400 dark:text-gray-300;
+}
+
+.sbui-checkbox__label-container__label__p {
+  @apply mt-0 text-gray-400 dark:text-gray-300;
+} */
+
+/*
+  Label sizes
+*/
+
+/* .sbui-checkbox-container--tiny .sbui-checkbox__label-container__label,
+.sbui-checkbox-container--tiny .sbui-checkbox__label-container__label__span,
+.sbui-checkbox-container--tiny .sbui-checkbox__label-container__label__p {
+  @apply text-xs;
+}
+.sbui-checkbox-container--small .sbui-checkbox__label-container__label,
+.sbui-checkbox-container--small .sbui-checkbox__label-container__label__span,
+.sbui-checkbox-container--small .sbui-checkbox__label-container__label__p {
+  @apply text-sm;
+}
+.sbui-checkbox-container--medium .sbui-checkbox__label-container__label,
+.sbui-checkbox-container--medium .sbui-checkbox__label-container__label__span,
+.sbui-checkbox-container--medium .sbui-checkbox__label-container__label__p {
+  @apply text-sm;
+}
+.sbui-checkbox-container--large .sbui-checkbox__label-container__label,
+.sbui-checkbox-container--large .sbui-checkbox__label-container__label__span,
+.sbui-checkbox-container--large .sbui-checkbox__label-container__label__p {
+  @apply text-base;
+}
+.sbui-checkbox-container--xlarge .sbui-checkbox__label-container__label,
+.sbui-checkbox-container--xlarge .sbui-checkbox__label-container__label__span,
+.sbui-checkbox-container--xlarge .sbui-checkbox__label-container__label__p {
+  @apply text-base;
+} */
+
+/*
+  Checkbox sizes
+*/
+
+/* .sbui-checkbox-container--tiny .sbui-checkbox {
+  @apply h-3 w-3 mt-1 mr-3;
+}
+
+.sbui-checkbox-container--small .sbui-checkbox {
+  @apply h-3.5 w-3.5 mt-0.5 mr-3.5;
+}
+
+.sbui-checkbox-container--medium .sbui-checkbox {
+  @apply h-4 w-4 mt-0.5 mr-3.5;
+}
+
+.sbui-checkbox-container--large .sbui-checkbox {
+  @apply h-5 w-5 mt-0.5 mr-4;
+}
+
+.sbui-checkbox-container--xlarge .sbui-checkbox {
+  @apply h-5 w-5 mt-0.5 mr-4;
+} */

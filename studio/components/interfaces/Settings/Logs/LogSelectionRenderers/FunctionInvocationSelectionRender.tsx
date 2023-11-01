@@ -1,53 +1,44 @@
 import dayjs from 'dayjs'
 import { filterFunctionsRequestResponse } from 'lib/logs'
+import { PreviewLogData } from '..'
 import { LOGS_TAILWIND_CLASSES } from '../Logs.constants'
-import { jsonSyntaxHighlight, ResponseCodeFormatter } from '../LogsFormatters'
+import {
+  jsonSyntaxHighlight,
+  ResponseCodeFormatter,
+  SelectionDetailedRow,
+  SelectionDetailedTimestampRow,
+} from '../LogsFormatters'
 
-const FunctionInvocationSelectionRender = ({ log }: any) => {
-  const request = log?.request
-  const response = log?.response
-  const method = log?.method
-  const status = log?.status_code
+const FunctionInvocationSelectionRender = ({ log }: { log: PreviewLogData }) => {
+  const metadata = log.metadata?.[0]
+  const request = metadata?.request?.[0]
+  const response = metadata?.response?.[0]
+  const method = request?.method
+  const status = response?.status_code
   const requestUrl = new URL(request?.url)
-  const executionTimeMs = log?.execution_time_ms
-  const timestamp = dayjs(log.timestamp / 1000)
-
-  const DetailedRow = ({
-    label,
-    value,
-    code,
-  }: {
-    label: string
-    value: string | React.ReactNode
-    code?: boolean
-  }) => {
-    return (
-      <div className="grid grid-cols-12">
-        <span className="text-scale-900 text-sm col-span-4 whitespace-pre-wrap">{label}</span>
-        <span
-          className={`text-scale-1200 text-sm col-span-8 whitespace-pre-wrap ${
-            code && 'text-xs font-mono'
-          }`}
-        >
-          {value}
-        </span>
-      </div>
-    )
-  }
+  const executionTimeMs = metadata.execution_time_ms
+  const deploymentId = metadata.deployment_id
 
   return (
     <>
       <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding} space-y-2`}>
-        <DetailedRow label="Status" value={<ResponseCodeFormatter value={status} />} />
-        <DetailedRow label="Method" value={method} />
-        <DetailedRow label="Timestamp" value={dayjs(timestamp).format('DD MMM, YYYY HH:mm')} />
-        <DetailedRow label="Execution Time" value={`${executionTimeMs}ms`} />
-        <DetailedRow label="Deployment ID" value={log.deployment_id} />
-        <DetailedRow label="Log ID" value={log.id} />
-        <DetailedRow label="Request Path" value={requestUrl.pathname + requestUrl.search} />
+        <SelectionDetailedRow
+          label="Status"
+          value={status}
+          valueRender={<ResponseCodeFormatter value={status} />}
+        />
+        <SelectionDetailedRow label="Method" value={method} />
+        <SelectionDetailedTimestampRow value={log.timestamp} />
+        <SelectionDetailedRow label="Execution Time" value={`${executionTimeMs}ms`} />
+        <SelectionDetailedRow label="Deployment ID" value={deploymentId} />
+        <SelectionDetailedRow label="Log ID" value={log.id} />
+        <SelectionDetailedRow
+          label="Request Path"
+          value={requestUrl.pathname + requestUrl.search}
+        />
       </div>
       <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding}`}>
-        <h3 className="text-lg text-scale-1200 mb-4">Request body</h3>
+        <h3 className="text-lg text-foreground mb-4">Request Metadata</h3>
         <pre className="text-sm syntax-highlight overflow-x-auto">
           <div
             className="text-wrap"
@@ -58,9 +49,7 @@ const FunctionInvocationSelectionRender = ({ log }: any) => {
         </pre>
       </div>
       <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding}`}>
-        <h3 className="text-lg text-scale-1200 mb-4">
-          Response{method ? ` ${method}` : null} body
-        </h3>
+        <h3 className="text-lg text-foreground mb-4">Response Metadata</h3>
         <pre className="text-sm syntax-highlight overflow-x-auto">
           <div
             dangerouslySetInnerHTML={{

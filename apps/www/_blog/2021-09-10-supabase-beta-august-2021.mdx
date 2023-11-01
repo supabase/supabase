@@ -7,10 +7,13 @@ author_image_url: https://github.com/kiwicopple.png
 authorURL: https://github.com/kiwicopple
 image: 2021-august/release-august-2021.jpg
 thumb: 2021-august/release-august-2021-cover.jpg
+categories:
+  - product
 tags:
   - release-notes
 date: '2021-09-10'
 toc_depth: 3
+video: https://www.youtube.com/v/YYpTh2DAvho
 ---
 
 We've raised $30M and shipped a bunch of features. Let's dive into what's been happening at Supabase during the month of August.
@@ -19,15 +22,15 @@ We've raised $30M and shipped a bunch of features. Let's dive into what's been h
 
 Watch a recap of this month's release.
 
-<iframe
-  className="video-with-border w-full"
-  width="640"
-  height="385"
-  src="https://www.youtube-nocookie.com/embed/YYpTh2DAvho"
-  frameBorder="1"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-  allowFullScreen
-></iframe>
+<div className="video-container">
+  <iframe
+    className="video-with-border w-full"
+    src="https://www.youtube-nocookie.com/embed/YYpTh2DAvho"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
 
 ## We raised $30 million
 
@@ -50,7 +53,7 @@ It's not in production yet, but we're making the repo public for comments using 
 
 ## Custom SMS templates
 
-If you're using SMS login in [Auth v2](/blog/2021/07/28/supabase-auth-passwordless-sms-login), you can now customize the SMS which is sent to your users. Read more in the [docs](/docs/guides/auth/auth-twilio#sms-custom-template).
+If you're using SMS login in [Auth v2](/blog/2021/07/28/supabase-auth-passwordless-sms-login), you can now customize the SMS which is sent to your users. Read more in the [docs](/docs/guides/auth/phone-login/twilio#sms-custom-template).
 
 ![Custom SMS templates](/images/blog/2021-august/custom-sms.png)
 
@@ -89,21 +92,21 @@ We now provide a handy copy utility for various database connection strings beca
 RLS can be a bit foreign for developers getting started with Postgres.
 This video by [@\_dijonmusters](https://twitter.com/_dijonmusters) demystifies it. If you find the video a useful medium for learning, consider [subscribing to our channel](https://www.youtube.com/c/supabase).
 
-<iframe
-  className="video-with-border w-full"
-  width="640"
-  height="385"
-  src="https://www.youtube-nocookie.com/embed/Ow_Uzedfohk"
-  frameBorder="1"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-  allowFullScreen
-></iframe>
+<div className="video-container">
+  <iframe
+    className="video-with-border w-full"
+    src="https://www.youtube-nocookie.com/embed/Ow_Uzedfohk"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
 
 ## Community
 
 ### We had a community Hackathon
 
-We held a one-week async Hackathon. Check out [all the winners](/blog/2021/08/09/hackathon-winners) - it was truly impressive what people were able to build in just 7 days.
+We held a one-week async Hackathon. Check out [all the winners](/blog/hackathon-winners) - it was truly impressive what people were able to build in just 7 days.
 
 ![We had a community Hackathon](/images/blog/2021-august/hackathon.png)
 
@@ -145,7 +148,7 @@ If you want to keep up to date, make sure you [subscribe to our YouTube channel]
 - Allow a function with single unnamed parameter to be called with POST<br />
   [https://github.com/PostgREST/postgrest/issues/1735](https://github.com/PostgREST/postgrest/issues/1735)
 
-### pg_net (Function Hooks)
+### pg_net (Database Webhooks)
 
 - Better handling of URL errors<br />
   [https://github.com/supabase/pg_net/issues/39](https://github.com/supabase/pg_net/issues/39)
@@ -158,7 +161,7 @@ By the time we're done, Supabase will be production-ready for all use cases.
 
 ## Get started
 
-- Start using Supabase today: [app.supabase.com](https://app.supabase.com/)
+- Start using Supabase today: [supabase.com/dashboard](https://supabase.com/dashboard/)
 - Make sure to [star us on GitHub](https://github.com/supabase/supabase)
 - Follow us [on Twitter](https://twitter.com/supabase)
 - Subscribe to our [YouTube channel](https://www.youtube.com/c/supabase)

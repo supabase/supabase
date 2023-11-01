@@ -1,44 +1,37 @@
-import { FC, useEffect, useState } from 'react'
-import createConfigCatClient from 'configcat-js'
-import FlagContext from './FlagContext'
-import { IS_PLATFORM } from 'lib/constants'
-import { useStore } from 'hooks'
-import { observer } from 'mobx-react-lite'
-import { User } from 'types'
+import { User } from '@supabase/supabase-js'
+import { PropsWithChildren, useEffect, useState } from 'react'
+import * as configcat from 'configcat-js'
 
-const FlagProvider: FC = ({ children }) => {
-  const [store, setStore] = useState({})
-  const { ui } = useStore()
+import { IS_PLATFORM } from 'lib/constants'
+import FlagContext from './FlagContext'
+import { useUser } from 'lib/auth'
+import { getFlags } from 'lib/configcat'
+
+const FlagProvider = ({ children }: PropsWithChildren<{}>) => {
+  const user = useUser()
+
   const { Provider } = FlagContext
-  const { profile } = ui
+  const [store, setStore] = useState({})
+
+  const processFlags = async (user?: User) => {
+    const flagStore: any = {}
+    const flagValues = await getFlags(user)
+
+    flagValues.forEach((item: any) => {
+      flagStore[item.settingKey] = item.settingValue
+    })
+    setStore(flagStore)
+  }
 
   useEffect(() => {
-    if (IS_PLATFORM) getFlags(profile)
-  }, [profile])
-
-  const getFlags = async (user?: User) => {
-    const setFlagValues = async () => {
-      const flagValues =
-        user !== undefined
-          ? await client.getAllValuesAsync({ identifier: user.primary_email })
-          : await client.getAllValuesAsync()
-      const flagStore: any = {}
-
-      flagValues.forEach((item: any) => {
-        flagStore[item.settingKey] = item.settingValue
-      })
-      setStore(flagStore)
-    }
-
-    const client = createConfigCatClient(process.env.NEXT_PUBLIC_CONFIGCAT_SDK_KEY ?? '', {
-      configChanged: setFlagValues,
-      pollIntervalSeconds: 600,
-    })
-
-    await setFlagValues()
-  }
+    // [Joshen] getFlags get triggered everytime the tab refocuses but this should be okay
+    // as per https://configcat.com/docs/sdk-reference/js/#polling-modes:
+    // The polling downloads the config.json at the set interval and are stored in the internal cache
+    // which subsequently all getValueAsync() calls are served from there
+    if (IS_PLATFORM) processFlags(user ?? undefined)
+  }, [user])
 
   return <Provider value={store}>{children}</Provider>
 }
 
-export default observer(FlagProvider)
+export default FlagProvider

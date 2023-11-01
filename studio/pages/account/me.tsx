@@ -1,13 +1,18 @@
-import React from 'react'
 import { observer } from 'mobx-react-lite'
-import { IconMoon, IconSun, Typography, Input, Listbox } from '@supabase/ui'
 
-import { useProfile, useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import {
+  AccountInformation,
+  AnalyticsSettings,
+  ThemeSettings,
+} from 'components/interfaces/Account/Preferences'
 import { AccountLayout } from 'components/layouts'
-import Panel from 'components/ui/Panel'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
+import AlertError from 'components/ui/AlertError'
+import Panel from 'components/ui/Panel'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useProfileUpdateMutation } from 'data/profile/profile-update-mutation'
+import { useIsFeatureEnabled, useStore } from 'hooks'
+import { useProfile } from 'lib/profile'
 import { NextPageWithLayout } from 'types'
 
 const User: NextPageWithLayout = () => {
@@ -20,7 +25,7 @@ const User: NextPageWithLayout = () => {
 
 User.getLayout = (page) => (
   <AccountLayout
-    title="Supabase"
+    title="Preferences"
     breadcrumbs={[
       {
         key: `supabase-settings`,
@@ -36,126 +41,86 @@ export default User
 
 const ProfileCard = observer(() => {
   const { ui } = useStore()
-  const { mutateProfile } = useProfile()
-  const user = ui.profile
 
-  const updateUser = async (model: any) => {
-    try {
-      const updatedUser = await post(`${API_URL}/profile/update`, model)
-      mutateProfile(updatedUser, false)
-      ui.setProfile(updatedUser)
+  const profileUpdateEnabled = useIsFeatureEnabled('profile:update')
+
+  const { profile, error, isLoading, isError, isSuccess } = useProfile()
+  const { mutateAsync: updateProfile, isLoading: isUpdating } = useProfileUpdateMutation({
+    onSuccess: () => {
       ui.setNotification({ category: 'success', message: 'Successfully saved profile' })
-    } catch (error) {
+    },
+    onError: (error) => {
       ui.setNotification({
         error,
         category: 'error',
         message: "Couldn't update profile. Please try again later.",
       })
+    },
+  })
+
+  const updateUser = async (model: any) => {
+    try {
+      await updateProfile({
+        firstName: model.first_name,
+        lastName: model.last_name,
+      })
+    } finally {
     }
   }
 
   return (
     <article className="max-w-4xl p-4">
-      <section>
-        <GithubProfile />
-      </section>
-      <section className="">
-        {/* @ts-ignore */}
-        <SchemaFormPanel
-          title="Profile"
-          schema={{
-            type: 'object',
-            required: [],
-            properties: {
-              first_name: { type: 'string' },
-              last_name: { type: 'string' },
-            },
-          }}
-          model={{
-            first_name: user?.first_name ?? '',
-            last_name: user?.last_name ?? '',
-          }}
-          onSubmit={updateUser}
-        />
-      </section>
+      {isLoading && (
+        <Panel>
+          <div className="p-4">
+            <GenericSkeletonLoader />
+          </div>
+        </Panel>
+      )}
+      {isError && (
+        <Panel>
+          <div className="p-4">
+            <AlertError error={error} subject="Failed to retrieve account information" />
+          </div>
+        </Panel>
+      )}
+      {isSuccess && (
+        <>
+          <section>
+            <AccountInformation profile={profile} />
+          </section>
+          {profileUpdateEnabled && (
+            <section>
+              {/* @ts-ignore */}
+              <SchemaFormPanel
+                title="Profile"
+                schema={{
+                  type: 'object',
+                  required: [],
+                  properties: {
+                    first_name: { type: 'string' },
+                    last_name: { type: 'string' },
+                  },
+                }}
+                model={{
+                  first_name: profile?.first_name ?? '',
+                  last_name: profile?.last_name ?? '',
+                }}
+                onSubmit={updateUser}
+                loading={isUpdating}
+              />
+            </section>
+          )}
+        </>
+      )}
+
       <section>
         <ThemeSettings />
       </section>
+
+      <section>
+        <AnalyticsSettings />
+      </section>
     </article>
-  )
-})
-
-const GithubProfile = observer(() => {
-  const { ui } = useStore()
-
-  return (
-    <Panel
-      title={
-        <Typography.Title key="panel-title" level={5} className="mb-0">
-          Account Information
-        </Typography.Title>
-      }
-    >
-      <Panel.Content>
-        <div className="space-y-2">
-          <Input
-            readOnly
-            disabled
-            label="Username"
-            layout="horizontal"
-            value={ui.profile?.username ?? ''}
-          />
-          <Input
-            readOnly
-            disabled
-            label="Email"
-            layout="horizontal"
-            value={ui.profile?.primary_email ?? ''}
-          />
-        </div>
-      </Panel.Content>
-    </Panel>
-  )
-})
-
-const ThemeSettings = observer(() => {
-  const { ui } = useStore()
-
-  return (
-    <Panel
-      title={
-        <Typography.Title key="panel-title" level={5}>
-          Theme
-        </Typography.Title>
-      }
-    >
-      <Panel.Content>
-        <Listbox
-          value={ui.themeOption}
-          label="Interface theme"
-          descriptionText="Choose a theme preference"
-          layout="horizontal"
-          style={{ width: '50%' }}
-          icon={
-            ui.themeOption === 'light' ? (
-              <IconSun />
-            ) : ui.themeOption === 'dark' ? (
-              <IconMoon />
-            ) : undefined
-          }
-          onChange={(themeOption: any) => ui.onThemeOptionChange(themeOption)}
-        >
-          <Listbox.Option label="System default" value="system">
-            System default
-          </Listbox.Option>
-          <Listbox.Option label="Dark" value="dark">
-            Dark
-          </Listbox.Option>
-          <Listbox.Option label="Light" value="light">
-            Light
-          </Listbox.Option>
-        </Listbox>
-      </Panel.Content>
-    </Panel>
   )
 })

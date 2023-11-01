@@ -3,11 +3,9 @@ import { Filter, ServiceError, Sort, SupaRow, SupaTable } from '../../types'
 import { ERROR_PRIMARY_KEY_NOTFOUND, SupabaseGridQueue } from '../../constants'
 import Query from '../../query'
 import { isNumericalColumn } from '../../utils'
-import { useDispatch } from 'components/grid/store'
 
 export class SqlRowService implements IRowService {
   protected query = new Query()
-  protected dispatch = useDispatch()
 
   constructor(
     protected table: SupaTable,
@@ -37,11 +35,7 @@ export class SqlRowService implements IRowService {
     }
   }
 
-  async create(row: SupaRow) {
-    return { error: { message: 'not implemented' } }
-  }
-
-  delete(rows: SupaRow[]) {
+  async delete(rows: SupaRow[]) {
     const { primaryKeys, error } = this.getPrimaryKeys()
     if (error) return { error }
 
@@ -53,14 +47,7 @@ export class SqlRowService implements IRowService {
     })
 
     const query = queryChains.toSql()
-    SupabaseGridQueue.add(async () => {
-      const { error } = await this.onSqlQuery(query)
-      if (error) throw error
-    }).catch((error) => {
-      this.onError(error)
-    })
-
-    return {}
+    return await this.onSqlQuery(query)
   }
 
   // For deleting all rows based on a given filter
@@ -89,7 +76,20 @@ export class SqlRowService implements IRowService {
     const pageFromZero = page > 0 ? page - 1 : page
     const from = pageFromZero * rowsPerPage
     const to = (pageFromZero + 1) * rowsPerPage - 1
-    let queryChains = this.query.from(this.table.name, this.table.schema ?? undefined).select()
+
+    const enumArrayColumns = this.table.columns
+      .filter((column) => {
+        return (column?.enum ?? []).length > 0 && column.dataType.toLowerCase() === 'array'
+      })
+      .map((column) => column.name)
+
+    let queryChains =
+      enumArrayColumns.length > 0
+        ? this.query
+            .from(this.table.name, this.table.schema ?? undefined)
+            .select(`*,${enumArrayColumns.map((x) => `"${x}"::text[]`).join(',')}`)
+        : this.query.from(this.table.name, this.table.schema ?? undefined).select()
+
     filters
       .filter((x) => x.value && x.value != '')
       .forEach((x) => {
@@ -105,11 +105,15 @@ export class SqlRowService implements IRowService {
     if (error) {
       this.onError(error)
       return { data: { rows: [] } }
-    } else {
+    } else if (Array.isArray(data)) {
       const rows = data?.map((x: any, index: number) => {
         return { idx: index, ...x } as SupaRow
       })
       return { data: { rows } }
+    } else {
+      console.error('Fetch page:', data)
+      this.onError({ message: 'Data received is not formatted properly' })
+      return { data: { rows: [] } }
     }
   }
 
@@ -157,12 +161,21 @@ export class SqlRowService implements IRowService {
     return rows
   }
 
-  update(row: SupaRow, changedColumn?: string, onRowUpdate?: (value: any) => void) {
+  update(
+    row: SupaRow,
+    originalRow: SupaRow,
+    changedColumn?: string,
+    onRowUpdate?: (value: any) => void
+  ) {
     const { primaryKeys, error } = this.getPrimaryKeys()
     if (error) {
       return { error }
     }
     const { idx, ...value } = row
+
+    // Optimistic rendering
+    if (onRowUpdate) onRowUpdate({ row: value, idx })
+
     const matchValues: any = {}
     primaryKeys!.forEach((key) => {
       matchValues[key] = row[key]
@@ -170,6 +183,11 @@ export class SqlRowService implements IRowService {
       // remove primary key from updated value object
       delete value[key]
     })
+    const enumArrayColumns = this.table.columns
+      .filter((column) => {
+        return (column?.enum ?? []).length > 0 && column.dataType.toLowerCase() === 'array'
+      })
+      .map((column) => column.name)
     const query = this.query
       .from(this.table.name, this.table.schema ?? undefined)
       .update(
@@ -178,7 +196,7 @@ export class SqlRowService implements IRowService {
               [changedColumn]: value[changedColumn],
             }
           : value,
-        { returning: true }
+        { returning: true, enumArrayColumns }
       )
       .match(matchValues)
       .toSql()
@@ -188,6 +206,9 @@ export class SqlRowService implements IRowService {
       if (error) throw error
       if (onRowUpdate) onRowUpdate({ row: data[0], idx })
     }).catch((error) => {
+      const { idx, ...originalRowData } = originalRow
+      // Revert optimistic rendering if any errors
+      if (onRowUpdate) onRowUpdate({ row: originalRowData, idx })
       this.onError(error)
     })
 

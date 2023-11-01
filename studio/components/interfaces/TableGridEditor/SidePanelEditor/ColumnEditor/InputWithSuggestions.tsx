@@ -5,14 +5,26 @@
 // with timeouts and a lot of unnecessary defensive guards - but these can go away when we port
 // the component over to the UI library
 
-import { FC, useEffect, useRef, useState } from 'react'
-import { Button, Dropdown, IconList, Input } from '@supabase/ui'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { noop } from 'lodash'
+import { useEffect, useRef, useState } from 'react'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  IconList,
+  Input,
+} from 'ui'
+
 import { Suggestion } from './ColumnEditor.types'
 
 const MAX_SUGGESTIONS = 3
-const DEFAULT_SUGGESTIONS_WIDTH = 400
 
-interface Props {
+interface InputWithSuggestionsProps {
   label?: string
   description?: string
   placeholder?: string
@@ -21,15 +33,14 @@ interface Props {
   disabled?: boolean
   className?: string
   value: string
-  format?: string
-  suggestionsHeader?: string
-  suggestionsWidth?: number
   suggestions: Suggestion[]
+  suggestionsTooltip?: string
+  suggestionsHeader?: string
   onChange: (event: any) => void
   onSelectSuggestion: (suggestion: Suggestion) => void
 }
 
-const InputWithSuggestions: FC<Props> = ({
+const InputWithSuggestions = ({
   label,
   description,
   placeholder,
@@ -38,11 +49,12 @@ const InputWithSuggestions: FC<Props> = ({
   disabled = false,
   className = '',
   value = '',
-  format,
   suggestions = [],
-  onChange = () => {},
-  onSelectSuggestion = () => {},
-}) => {
+  suggestionsTooltip,
+  suggestionsHeader,
+  onChange = noop,
+  onSelectSuggestion = noop,
+}: InputWithSuggestionsProps) => {
   const ref = useRef(null)
   const [filteredSuggestions, setFilteredSuggestions] = useState<Suggestion[]>(suggestions)
   const showSuggestions = filteredSuggestions.length > 0
@@ -75,34 +87,54 @@ const InputWithSuggestions: FC<Props> = ({
         size={size}
         layout={layout}
         disabled={disabled}
-        className={`${className} ${format?.includes('json') ? 'input-mono' : ''}`}
+        className={className}
         type="text"
         value={value}
         onChange={onInputChange}
         actions={
           showSuggestions && (
-            <Dropdown
-              size={'medium'}
-              align="end"
-              side="bottom"
-              overlay={
-                <>
-                  <Dropdown.Label>Suggestions</Dropdown.Label>
-                  <Dropdown.Seperator />
-                  {filteredSuggestions.map((suggestion: Suggestion) => (
-                    <Dropdown.Item
-                      key={suggestion.name}
-                      onClick={() => onSelectSuggestion(suggestion)}
-                    >
-                      <div className="text-sm">{suggestion.name}</div>
-                      <div className="text-scale-900 text-xs">{suggestion.description}</div>
-                    </Dropdown.Item>
-                  ))}
-                </>
-              }
-            >
-              <Button as="span" type="default" icon={<IconList strokeWidth={1.5} />}></Button>
-            </Dropdown>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Tooltip.Root delayDuration={0}>
+                  <Tooltip.Trigger asChild>
+                    <Button
+                      type="default"
+                      className="!px-1 mr-1"
+                      icon={<IconList strokeWidth={1.5} />}
+                    />
+                  </Tooltip.Trigger>
+                  <Tooltip.Portal>
+                    <Tooltip.Content side="bottom">
+                      <Tooltip.Arrow className="radix-tooltip-arrow" />
+                      <div
+                        className={[
+                          'bg-scale-100 rounded py-1 px-2 leading-none shadow',
+                          'border-scale-200 border',
+                        ].join(' ')}
+                      >
+                        <span className="text-foreground text-xs">
+                          {suggestionsTooltip || 'Suggestions'}
+                        </span>
+                      </div>
+                    </Tooltip.Content>
+                  </Tooltip.Portal>
+                </Tooltip.Root>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" side="bottom">
+                <DropdownMenuLabel>{suggestionsHeader || 'Suggestions'}</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {filteredSuggestions.map((suggestion: Suggestion) => (
+                  <DropdownMenuItem
+                    className="space-x-2"
+                    key={suggestion.name}
+                    onClick={() => onSelectSuggestion(suggestion)}
+                  >
+                    <div>{suggestion.name}</div>
+                    <div className="text-foreground-lighter">{suggestion.description}</div>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           )
         }
       />

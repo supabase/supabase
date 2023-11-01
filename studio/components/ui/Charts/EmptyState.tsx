@@ -1,20 +1,27 @@
-import { FC } from 'react'
-import { Typography, IconBarChart2 } from '@supabase/ui'
+import { IconBarChart2 } from 'ui'
 
-interface Props {}
+interface EmptyStateProps {
+  title?: string
+  message?: string
+}
 
-const EmptyState: FC<Props> = () => (
+const EmptyState = ({
+  title = 'No data to show',
+  message = 'May take 24 hours for data to show',
+}: EmptyStateProps) => (
   <div
     className="
-      h-full w-full py-4
-      border border-dashed dark:border-dark
-      flex flex-col items-center justify-center
+      flex h-full
+      w-full flex-col items-center
+      justify-center space-y-2 space-y-2 border
+      border-dashed border-scale-600 py-4 text-center
     "
   >
-    <Typography.Text className="mb-2">
-      <IconBarChart2 />
-    </Typography.Text>
-    <Typography.Text>No data to show</Typography.Text>
+    <IconBarChart2 className="text-foreground-light" />
+    <div>
+      <p className="text-xs text-foreground-light">{title}</p>
+      <p className="text-xs text-foreground-light">{message}</p>
+    </div>
   </div>
 )
 

@@ -1,28 +1,23 @@
-import { EmailTemplates, SmtpForm } from 'components/interfaces'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+
+import { EmailTemplates } from 'components/interfaces'
 import { AuthLayout } from 'components/layouts'
 import { FormsContainer } from 'components/ui/Forms'
-import { useStore } from 'hooks'
-import { observer } from 'mobx-react-lite'
-import { useEffect } from 'react'
+import NoPermission from 'components/ui/NoPermission'
+import { useCheckPermissions } from 'hooks'
 import { NextPageWithLayout } from 'types'
 
 const PageLayout: NextPageWithLayout = () => {
-  const { ui, authConfig } = useStore()
+  const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
 
-  useEffect(() => {
-    // temporary store loader
-    authConfig.load()
-  }, [ui.selectedProjectRef])
-
-  if (authConfig) {
+  if (!canReadAuthSettings) {
+    return <NoPermission isFullPage resourceText="access your project's email settings" />
+  } else {
     return (
       <FormsContainer>
-        <SmtpForm />
         <EmailTemplates />
       </FormsContainer>
     )
-  } else {
-    return <div />
   }
 }
 
@@ -30,4 +25,4 @@ PageLayout.getLayout = (page) => {
   return <AuthLayout>{page}</AuthLayout>
 }
 
-export default observer(PageLayout)
+export default PageLayout

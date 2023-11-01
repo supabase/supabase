@@ -6,18 +6,19 @@ author_title: Supabase
 author_url: https://github.com/dragarcia
 author_image_url: https://avatars0.githubusercontent.com/u/26374889?s=400&u=f5e35e9b47a50fa2b4d8c4bb96babd921071bcf1&v=4
 authorURL: https://github.com/dragarcia
+categories:
+  - postgres
 tags:
   - postgres
+  - planetpg
 date: '08-02-2020'
 ---
 
 Have you ever wanted to restore your database's state to a particular moment in time? This post explains how, using WAL-G.
 
-<!--truncate-->
-
 ## Introduction
 
-[WAL-G](https://github.com/wal-g/wal-g) is an [open-source continuous archiving tool](https://www.citusdata.com/blog/2017/08/18/introducing-wal-g-faster-restores-for-postgres/) used to easily set up and recover from [physical backups](/blog/2020/07/17/postgresql-physical-logical-backups) in Postgres. It mainly handles the storage and retrieval of physical backups and WAL archives to and from a chosen cloud storage provider. In this post, we will walk you through on how to effortlessly set up WAL-G for your database as well as guide you on what to do if and when disaster strikes.
+[WAL-G](https://github.com/wal-g/wal-g) is an [open-source continuous archiving tool](https://www.citusdata.com/blog/introducing-wal-g-faster-restores-for-postgres/) used to easily set up and recover from [physical backups](/blog/postgresql-physical-logical-backups) in Postgres. It mainly handles the storage and retrieval of physical backups and WAL archives to and from a chosen cloud storage provider. In this post, we will walk you through on how to effortlessly set up WAL-G for your database as well as guide you on what to do if and when disaster strikes.
 
 ## Prerequisites
 
@@ -96,7 +97,7 @@ $ sudo -su postgres envdir /etc/wal-g.d/env /usr/local/bin/wal-g backup-push /va
 
 At this point, if you were to check the S3 path that you provided, the following two newly created and populated directories would be observed:
 
-![Alt Text](https://dev-to-uploads.s3.amazonaws.com/i/lai1mxg62kffyd2khmtm.png)
+![Alt Text](/images/blog/2020/lai1mxg62kffyd2khmtm.png)
 
 From then on, subsequent physical backups would be found in the directory `basebackups_005` and any WAL archives would be sent to the directory `wal_005`.
 
@@ -185,3 +186,13 @@ $ sudo /etc/init.d/postgresql start
 ```
 
 Once Postgres finishes starting up and completes recovery mode, all data or data up to the specified point in time would have been successfully restored on to the new instance. Disaster averted.
+
+## More Postgres resources
+
+- [Implementing "seen by" functionality with Postgres](https://supabase.com/blog/seen-by-in-postgresql)
+- [Partial data dumps using Postgres Row Level Security](https://supabase.com/blog/partial-postgresql-data-dumps-with-rls)
+- [Postgres Auditing in 150 lines of SQL](https://supabase.com/blog/audit)
+- [Postgres Views](https://supabase.com/blog/postgresql-views)
+- [Cracking PostgreSQL Interview Questions](https://supabase.com/blog/cracking-postgres-interview)
+- [What are PostgreSQL Templates?](https://supabase.com/blog/postgresql-templates)
+- [Realtime Postgres RLS on Supabase](https://supabase.com/blog/realtime-row-level-security-in-postgresql)

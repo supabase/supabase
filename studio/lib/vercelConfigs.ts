@@ -6,6 +6,8 @@ export const INTEGRATION_ENVS_ALIAS = {
   ENDPOINT: 'SUPABASE_ENDPOINT',
   ANONKEY: 'SUPABASE_ANON_KEY',
   SERVICEKEY: 'SUPABASE_SERVICE_KEY',
+  DBHOST: 'SUPABASE_DB_HOST',
+  DBPASSWORD: 'SUPABASE_DB_PASSWORD',
 }
 export const VERCEL_DEFAULT_EXTERNAL_ID = 'nextjs-initial-project'
 /*
@@ -63,6 +65,28 @@ export const VERCEL_INTEGRATION_CONFIGS = [
     ],
   },
   {
+    id: 'nextjs-open-ai-doc-search',
+    name: 'Next.js OpenAI Doc Search Starter',
+    template: QuickStart.find((x) => x.title == 'OpenAI Vector Search'),
+    envs: [
+      {
+        key: 'NEXT_PUBLIC_SUPABASE_URL',
+        alias: INTEGRATION_ENVS_ALIAS.ENDPOINT,
+        type: 'encrypted',
+      },
+      {
+        key: 'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+        alias: INTEGRATION_ENVS_ALIAS.ANONKEY,
+        type: 'encrypted',
+      },
+      {
+        key: 'SUPABASE_SERVICE_ROLE_KEY',
+        alias: INTEGRATION_ENVS_ALIAS.SERVICEKEY,
+        type: 'encrypted',
+      },
+    ],
+  },
+  {
     id: 'supabase-todo-list',
     name: 'Todo List Database',
     template: QuickStart.find((x) => x.title == 'Todo List'),
@@ -99,6 +123,16 @@ export const VERCEL_INTEGRATION_CONFIGS = [
       {
         key: 'SUPABASE_SERVICE_ROLE_KEY',
         alias: INTEGRATION_ENVS_ALIAS.SERVICEKEY,
+        type: 'encrypted',
+      },
+      {
+        key: 'SUPABASE_DB_HOST',
+        alias: INTEGRATION_ENVS_ALIAS.DBHOST,
+        type: 'encrypted',
+      },
+      {
+        key: 'SUPABASE_DB_PASSWORD',
+        alias: INTEGRATION_ENVS_ALIAS.DBPASSWORD,
         type: 'encrypted',
       },
     ],

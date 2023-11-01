@@ -1,10 +1,11 @@
-import { v4 as _uuidV4 } from 'uuid'
 import { post } from 'lib/common/fetch'
-import { PASSWORD_STRENGTH, DEFAULT_MINIMUM_PASSWORD_STRENGTH, API_URL } from 'lib/constants'
+import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH, PASSWORD_STRENGTH } from 'lib/constants'
+import { toast } from 'react-hot-toast'
+import { v4 as _uuidV4 } from 'uuid'
 
 export const tryParseJson = (jsonString: any) => {
   try {
-    let parsed = JSON.parse(jsonString)
+    const parsed = JSON.parse(jsonString)
     return parsed
   } catch (error) {
     return undefined
@@ -13,7 +14,15 @@ export const tryParseJson = (jsonString: any) => {
 
 export const minifyJSON = (prettifiedJSON: string) => {
   try {
-    return JSON.stringify(JSON.parse(prettifiedJSON))
+    if (prettifiedJSON.trim() === '') {
+      return null
+    }
+    const res = JSON.stringify(JSON.parse(prettifiedJSON))
+    if (!isNaN(Number(res))) {
+      return Number(res)
+    } else {
+      return res
+    }
   } catch (err) {
     throw err
   }
@@ -47,7 +56,7 @@ export const getURL = () => {
       ? process.env.NEXT_PUBLIC_SITE_URL
       : process?.env?.VERCEL_URL && process.env.VERCEL_URL !== ''
       ? process.env.VERCEL_URL
-      : 'https://app.supabase.com'
+      : 'https://supabase.com/dashboard'
   return url.includes('http') ? url : `https://${url}`
 }
 
@@ -108,7 +117,7 @@ export const filterSensitiveProjectProps = (project: any) => {
 }
 
 /**
- * Returns undefine if the string isn't parse-able
+ * Returns undefined if the string isn't parse-able
  */
 export const tryParseInt = (str: string) => {
   try {
@@ -118,7 +127,7 @@ export const tryParseInt = (str: string) => {
   }
 }
 
-// Used as checker for memoised components
+// Used as checker for memoized components
 export const propsAreEqual = (prevProps: any, nextProps: any) => {
   try {
     Object.keys(prevProps).forEach((key) => {
@@ -134,15 +143,17 @@ export const propsAreEqual = (prevProps: any, nextProps: any) => {
   }
 }
 
-export const formatBytes = (bytes: any, decimals = 2) => {
-  if (bytes === 0 || bytes === undefined) return '0 bytes'
-
-  const k = 1000
+export const formatBytes = (
+  bytes: any,
+  decimals = 2,
+  size?: 'bytes' | 'KB' | 'MB' | 'GB' | 'TB' | 'PB' | 'EB' | 'ZB' | 'YB'
+) => {
+  const k = 1024
   const dm = decimals < 0 ? 0 : decimals
   const sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-
+  if (bytes === 0 || bytes === undefined) return size !== undefined ? `0 ${size}` : '0 bytes'
+  const i = size !== undefined ? sizes.indexOf(size) : Math.floor(Math.log(bytes) / Math.log(k))
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 }
 
@@ -151,38 +162,61 @@ export const snakeToCamel = (str: string) =>
     group.toUpperCase().replace('-', '').replace('_', '')
   )
 
-export const copyToClipboard = (str: string, callback = () => {}) => {
+/**
+ * Copy text content (string or Promise<string>) into Clipboard.
+ * Safari doesn't support write text into clipboard async, so if you need to load
+ * text content async before coping, please use Promise<string> for the 1st arg.
+ */
+export const copyToClipboard = async (str: string | Promise<string>, callback = () => {}) => {
   const focused = window.document.hasFocus()
   if (focused) {
-    window.navigator?.clipboard?.writeText(str).then(callback)
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      const text = await Promise.resolve(str)
+      Promise.resolve(window.navigator?.clipboard?.writeText(text)).then(callback)
+
+      return
+    }
+
+    Promise.resolve(str)
+      .then((text) => window.navigator?.clipboard?.writeText(text))
+      .then(callback)
   } else {
     console.warn('Unable to copy to clipboard')
   }
 }
 
 export async function passwordStrength(value: string) {
-  let message = ''
-  let warning = ''
-  let strength = 0
+  let message: string = ''
+  let warning: string = ''
+  let strength: number = 0
 
   if (value && value !== '') {
-    const response = await post(`${API_URL}/profile/password-check`, { password: value })
-    if (!response.error) {
-      const { result } = response
-      const score = (PASSWORD_STRENGTH as any)[result.score]
-      const suggestions = result.feedback?.suggestions ? result.feedback.suggestions.join(' ') : ''
+    if (value.length > 99) {
+      message = `${PASSWORD_STRENGTH[0]} Maximum length of password exceeded`
+      warning = `Password should be less than 100 characters`
+    } else {
+      // [Joshen] Unable to use RQ atm due to our Jest tests being in JS
+      const response = await post(`${API_URL}/profile/password-check`, { password: value })
+      if (!response.error) {
+        const { result } = response
+        const resultScore = result?.score ?? 0
 
-      // set message :string
-      message = `${score} ${suggestions}`
+        const score = (PASSWORD_STRENGTH as any)[resultScore]
+        const suggestions = result.feedback?.suggestions
+          ? result.feedback.suggestions.join(' ')
+          : ''
 
-      // set strength :number
-      strength = result.score
+        message = `${score} ${suggestions}`
+        strength = resultScore
 
-      // warning message for anything below 4 strength :string
-      if (result.score < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
-        warning = `${
-          result?.feedback?.warning ? result?.feedback?.warning + '.' : ''
-        } You need a stronger password.`
+        // warning message for anything below 4 strength :string
+        if (resultScore < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
+          warning = `${
+            result?.feedback?.warning ? result?.feedback?.warning + '.' : ''
+          } You need a stronger password.`
+        }
+      } else {
+        toast.error(`Failed to check password strength: ${response.error.message}`)
       }
     }
   }
@@ -204,4 +238,65 @@ export const detectBrowser = () => {
   } else if (navigator.userAgent.indexOf('Safari') !== -1) {
     return 'Safari'
   }
+}
+
+export const detectOS = () => {
+  if (typeof navigator === 'undefined' || !navigator) return undefined
+
+  const userAgent = window.navigator.userAgent.toLowerCase()
+  const macosPlatforms = /(macintosh|macintel|macppc|mac68k|macos)/i
+  const windowsPlatforms = /(win32|win64|windows|wince)/i
+
+  if (macosPlatforms.test(userAgent)) {
+    return 'macos'
+  } else if (windowsPlatforms.test(userAgent)) {
+    return 'windows'
+  } else {
+    return undefined
+  }
+}
+
+/**
+ * Pluralize a word based on a count
+ */
+export function pluralize(count: number, singular: string, plural?: string) {
+  return count === 1 ? singular : plural || singular + 's'
+}
+
+export const isValidHttpUrl = (value: string) => {
+  let url: URL
+  try {
+    url = new URL(value)
+  } catch (_) {
+    return false
+  }
+  return url.protocol === 'http:' || url.protocol === 'https:'
+}
+
+/**
+ * Helper function to remove comments from SQL.
+ * Disclaimer: Doesn't work as intended for nested comments.
+ */
+export const removeCommentsFromSql = (sql: string) => {
+  // Removing single-line comments:
+  let cleanedSql = sql.replace(/--.*$/gm, '')
+
+  // Removing multi-line comments:
+  cleanedSql = cleanedSql.replace(/\/\*[\s\S]*?\*\//gm, '')
+
+  return cleanedSql
+}
+
+export const getSemanticVersion = (version: string) => {
+  if (!version) return 0
+
+  // e.g supabase-postgres-14.1.0.88
+  // There's 4 segments instead so we can't use the semver package
+  const segments = version.split('supabase-postgres-')
+  const semver = segments[segments.length - 1]
+
+  // e.g supabase-postgres-14.1.0.99-vault-rc1
+  const formattedSemver = semver.split('-')[0]
+
+  return Number(formattedSemver.split('.').join(''))
 }

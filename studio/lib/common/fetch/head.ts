@@ -10,10 +10,9 @@ export async function head<T = any>(
   const requestId = uuidv4()
   try {
     const { headers: optionHeaders, ...otherOptions } = options ?? {}
-    const headers = constructHeaders(requestId, optionHeaders)
+    const headers = await constructHeaders(requestId, optionHeaders)
     const response = await fetch(url, {
       method: 'HEAD',
-      credentials: 'include',
       referrerPolicy: 'no-referrer-when-downgrade',
       headers,
       ...otherOptions,
@@ -36,10 +35,9 @@ export async function headWithTimeout<T = any>(
     const controller = new AbortController()
     const id = setTimeout(() => controller.abort(), timeout)
     const { headers: optionHeaders, ...otherOptions } = options ?? {}
-    const headers = constructHeaders(requestId, optionHeaders)
+    const headers = await constructHeaders(requestId, optionHeaders)
     const response = await fetch(url, {
       method: 'HEAD',
-      credentials: 'include',
       referrerPolicy: 'no-referrer-when-downgrade',
       headers,
       ...otherOptions,

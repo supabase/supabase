@@ -1,10 +1,75 @@
-# Supabase with Cloudflare Workers
+# Query Supabase from Cloudflare Worker
 
-`supabase-js` uses the `cross-fetch` library to make HTTP requests, which has issues on Cloudflare Workers.
-To solve this we can use Cloudflare Workers' in-built `fetch` method to make HTTP requests using the optional `fetch` parameter in the `supabase-js` client.
+**[📹 Video](https://egghead.io/lessons/cloudflare-query-supabase-from-cloudflare-worker?af=9qsk0a)**
 
-Source: https://supabase.com/docs/reference/javascript/initializing#custom-fetch-implementation
+Supabase JS is an NPM package which provides a simple interface from JavaScript to our Supabase project. It allows us to query and mutate data using its Object Relational Mapping (ORM) syntax, and subscribe to realtime events.
 
-### Credits
+In this video, we install the Supabase JS package and create a new client using our project's URL and Anon Key. These can be found in the Supabase dashboard for our project, under `Settings > API`.
 
-This example was [originally](https://github.com/nascode/cloudflare-workers-supabase-fix) created by [@nascode](https://github.com/nascode).
+We store these values as secrets in our Cloudflare account, and use them to instantiate a new Supabase client.
+
+Additionally, we write a query to select all of our articles from our Supabase instance, and send them back as the response from our Cloudflare Worker.
+
+In order to send a JSON response, we first stringify the object we get back from Supabase, and then set a `Content-Type` header to notify the browser that this will be a type of `application/json`.
+
+## Code Snippets
+
+**Install Supabase JS**
+
+```bash
+npm i @supabase/supabase-js
+```
+
+**Create a Cloudflare secret**
+
+```bash
+npx wrangler secret put NAME
+```
+
+**Add a secret for SUPABASE_URL**
+
+```bash
+npx wrangler secret put SUPABASE_URL
+```
+
+**Run wrangler development server**
+
+```bash
+npx wrangler dev
+```
+
+**Add a secret for SUPABASE_ANON_KEY**
+
+```bash
+npx wrangler secret put SUPABASE_ANON_KEY
+```
+
+**Query data from Supabase**
+
+```javascript
+const { data } = await supabase.from("articles").select("*");
+```
+
+**Send JSON response**
+
+```javascript
+return new Response(JSON.stringify(data), {
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+```
+
+## Resources
+
+- [Selecting data with Supabase JS](https://supabase.com/docs/reference/javascript/select)
+- [Introducing Secrets and Environment Variables to Cloudflare Workers](https://blog.cloudflare.com/workers-secrets-environment/)
+- [Cloudflare docs for sending JSON responses](https://developers.cloudflare.com/workers/examples/return-json/)
+
+---
+
+[👉 Next lesson](/04-proxy-supabase-requests-with-cloudflare-workers-and-itty-router)
+
+---
+
+Enjoying the course? Follow Jon Meyers on [Twitter](https://twitter.com/jonmeyers_io) and subscribe to the [YouTube channel](https://www.youtube.com/c/jonmeyers).

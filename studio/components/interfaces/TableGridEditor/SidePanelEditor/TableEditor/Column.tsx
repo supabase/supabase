@@ -1,23 +1,25 @@
-import { FC } from 'react'
-import { isUndefined } from 'lodash'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import type { PostgresType } from '@supabase/postgres-meta'
 import {
-  Checkbox,
-  Input,
-  Typography,
-  IconX,
-  IconMenu,
-  Popover,
-  IconLink,
-  IconSettings,
   Button,
-} from '@supabase/ui'
-import { PostgresType } from '@supabase/postgres-meta'
+  Checkbox,
+  IconArrowRight,
+  IconLink,
+  IconMenu,
+  IconSettings,
+  IconX,
+  Input,
+  Popover,
+} from 'ui'
 
-import { ColumnField } from '../SidePanelEditor.types'
+import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
+import { noop } from 'lodash'
+import { typeExpressionSuggestions } from '../ColumnEditor/ColumnEditor.constants'
+import { Suggestion } from '../ColumnEditor/ColumnEditor.types'
+import { getForeignKeyCascadeAction } from '../ColumnEditor/ColumnEditor.utils'
 import ColumnType from '../ColumnEditor/ColumnType'
 import InputWithSuggestions from '../ColumnEditor/InputWithSuggestions'
-import { Suggestion } from '../ColumnEditor/ColumnEditor.types'
-import { typeExpressionSuggestions } from '../ColumnEditor/ColumnEditor.constants'
+import { ColumnField } from '../SidePanelEditor.types'
 
 /**
  * [Joshen] For context:
@@ -37,7 +39,7 @@ import { typeExpressionSuggestions } from '../ColumnEditor/ColumnEditor.constant
  * - Cannot be both identity AND array, still checkboxes as they can be toggled off
  */
 
-interface Props {
+interface ColumnProps {
   column: ColumnField
   enumTypes: PostgresType[]
   isNewRecord: boolean
@@ -48,54 +50,94 @@ interface Props {
   onRemoveColumn: () => void
 }
 
-const Column: FC<Props> = ({
+const Column = ({
   column = {} as ColumnField,
   enumTypes = [] as PostgresType[],
   isNewRecord = false,
   hasImportContent = false,
   dragHandleProps = {},
-  onEditRelation = () => {},
-  onUpdateColumn = () => {},
-  onRemoveColumn = () => {},
-}) => {
+  onEditRelation = noop,
+  onUpdateColumn = noop,
+  onRemoveColumn = noop,
+}: ColumnProps) => {
   const suggestions: Suggestion[] = typeExpressionSuggestions?.[column.format] ?? []
 
-  let settingsCount = 0
-
-  column.isNullable ? (settingsCount += 1) : null
-  column.isIdentity ? (settingsCount += 1) : null
-  column.isUnique ? (settingsCount += 1) : null
-  column.isArray ? (settingsCount += 1) : null
+  const settingsCount = [
+    column.isNullable ? 1 : 0,
+    column.isIdentity ? 1 : 0,
+    column.isUnique ? 1 : 0,
+    column.isArray ? 1 : 0,
+  ].reduce((a, b) => a + b, 0)
 
   return (
     <div className="flex w-full items-center">
       <div className={`w-[5%] ${!isNewRecord ? 'hidden' : ''}`}>
         <div className="cursor-drag" {...dragHandleProps}>
-          <Typography>
-            <IconMenu strokeWidth={1} size={15} />
-          </Typography>
+          <IconMenu strokeWidth={1} size={15} />
         </div>
       </div>
-      <div className="w-[25%]">
+      <div className="w-[20%]">
         <div className="flex w-[95%] items-center justify-between">
           <Input
             value={column.name}
             size="small"
+            title={column.name}
             disabled={hasImportContent}
+            placeholder="column_name"
             className={`table-editor-columns-input bg-white dark:bg-transparent lg:gap-0 ${
               hasImportContent ? 'opacity-50' : ''
             } rounded-md`}
-            actions={
-              <Button
-                type={!isUndefined(column.foreignKey) ? 'secondary' : 'default'}
-                onClick={() => onEditRelation(column)}
-              >
-                <IconLink size={14} strokeWidth={!isUndefined(column.foreignKey) ? 2 : 1} />
-              </Button>
-            }
             onChange={(event: any) => onUpdateColumn({ name: event.target.value })}
           />
         </div>
+      </div>
+      <div className="w-[5%] mr-2.5">
+        <Tooltip.Root delayDuration={0}>
+          <Tooltip.Trigger>
+            <Button
+              type={column.foreignKey !== undefined ? 'secondary' : 'default'}
+              onClick={() => onEditRelation(column)}
+              className="px-1 py-2"
+            >
+              <IconLink size={14} strokeWidth={column.foreignKey !== undefined ? 2 : 1} />
+            </Button>
+          </Tooltip.Trigger>
+          <Tooltip.Portal>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                  'border border-scale-200 ', //border
+                ].join(' ')}
+              >
+                {column.foreignKey === undefined ? (
+                  <span className="text-xs text-foreground">Edit foreign key relation</span>
+                ) : (
+                  <div>
+                    <p className="text-xs text-foreground-light">Foreign key relation:</p>
+                    <div className="flex items-center space-x-1">
+                      <p className="text-xs text-foreground">
+                        {column.foreignKey.source_schema}.{column.foreignKey.source_table_name}.
+                        {column.foreignKey.source_column_name}
+                      </p>
+                      <IconArrowRight size="tiny" strokeWidth={1.5} />
+                      <p className="text-xs text-foreground">
+                        {column.foreignKey.target_table_schema}.
+                        {column.foreignKey.target_table_name}.{column.foreignKey.target_column_name}
+                      </p>
+                    </div>
+                    {column.foreignKey.deletion_action !== FOREIGN_KEY_CASCADE_ACTION.NO_ACTION && (
+                      <p className="text-xs text-foreground mt-1">
+                        On delete: {getForeignKeyCascadeAction(column.foreignKey.deletion_action)}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Portal>
+        </Tooltip.Root>
       </div>
       <div className="w-[25%]">
         <div className="w-[95%]">
@@ -105,19 +147,20 @@ const Column: FC<Props> = ({
             size="small"
             showLabel={false}
             className="table-editor-column-type lg:gap-0 "
-            disabled={!isUndefined(column.foreignKey)}
+            disabled={column.foreignKey !== undefined}
             onOptionSelect={(format: string) => {
-              onUpdateColumn({ format, defaultValue: null })
+              const defaultValue = format === 'uuid' ? 'gen_random_uuid()' : null
+              onUpdateColumn({ format, defaultValue })
             }}
           />
         </div>
       </div>
       <div className={`${isNewRecord ? 'w-[25%]' : 'w-[30%]'}`}>
-        <div className="w-[90%]">
+        <div className="w-[95%]">
           <InputWithSuggestions
             placeholder={
               typeof column.defaultValue === 'string' && column.defaultValue.length === 0
-                ? 'Empty string'
+                ? 'EMPTY'
                 : 'NULL'
             }
             size="small"
@@ -128,7 +171,7 @@ const Column: FC<Props> = ({
             }`}
             suggestions={suggestions}
             suggestionsHeader="Suggested expressions"
-            suggestionsWidth={410}
+            suggestionsTooltip="Suggested expressions"
             onChange={(event: any) => onUpdateColumn({ defaultValue: event.target.value })}
             onSelectSuggestion={(suggestion: Suggestion) =>
               onUpdateColumn({ defaultValue: suggestion.value })
@@ -150,9 +193,11 @@ const Column: FC<Props> = ({
             <Popover
               size="xlarge"
               className="pointer-events-auto"
+              align="end"
+              modal={true}
               header={
                 <div className="flex items-center justify-center">
-                  <h5 className="text-scale-1200 text-sm">Extra options</h5>
+                  <h5 className="text-sm text-foreground">Extra options</h5>
                 </div>
               }
               overlay={[
@@ -166,11 +211,11 @@ const Column: FC<Props> = ({
                         className="p-4"
                         onChange={() => onUpdateColumn({ isNullable: !column.isNullable })}
                       />
-                      <Popover.Seperator />
+                      <Popover.Separator />
                     </>
                   )}
 
-                  {isNewRecord && (
+                  {column.isNewColumn && (
                     <>
                       <Checkbox
                         label="Is Unique"
@@ -179,7 +224,7 @@ const Column: FC<Props> = ({
                         className="p-4"
                         onChange={() => onUpdateColumn({ isUnique: !column.isUnique })}
                       />
-                      <Popover.Seperator />
+                      <Popover.Separator />
                     </>
                   )}
                   {column.format.includes('int') && (
@@ -195,7 +240,7 @@ const Column: FC<Props> = ({
                           onUpdateColumn({ isIdentity, isArray })
                         }}
                       />
-                      <Popover.Seperator />
+                      <Popover.Separator />
                     </>
                   )}
 
@@ -217,11 +262,11 @@ const Column: FC<Props> = ({
             >
               <div className="group flex items-center -space-x-1">
                 {settingsCount > 0 && (
-                  <div className="bg-scale-1200 dark:bg-scale-100 text-scale-100 dark:text-scale-1100 rounded-full py-0.5 px-2 text-xs">
+                  <div className="rounded-full bg-scale-1200 py-0.5 px-2 text-xs text-scale-100 dark:bg-scale-100 dark:text-foreground-light">
                     {settingsCount}
                   </div>
                 )}
-                <div className="text-scale-1100 group-hover:text-scale-1200 transition-colors">
+                <div className="text-foreground-light transition-colors group-hover:text-foreground">
                   <IconSettings size={18} strokeWidth={1} />
                 </div>
               </div>
@@ -231,11 +276,9 @@ const Column: FC<Props> = ({
       </div>
       {!hasImportContent && (
         <div className="flex w-[5%] justify-end">
-          <div className="cursor-pointer" onClick={() => onRemoveColumn()}>
-            <Typography>
-              <IconX strokeWidth={1} />
-            </Typography>
-          </div>
+          <button className="cursor-pointer" onClick={() => onRemoveColumn()}>
+            <IconX strokeWidth={1} />
+          </button>
         </div>
       )}
     </div>

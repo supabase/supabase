@@ -1,9 +1,8 @@
-import { Loading } from '@supabase/ui'
-import React, { ReactNode } from 'react'
+import { PropsWithChildren, ReactNode } from 'react'
+import { Loading } from 'ui'
 
-interface Props {
+interface PanelProps {
   bodyClassName?: string
-  children?: ReactNode
   className?: string
   footer?: JSX.Element | false
   hideHeaderStyling?: boolean
@@ -11,8 +10,9 @@ interface Props {
   noMargin?: boolean
   title?: JSX.Element | false
   wrapWithLoading?: boolean
+  noHideOverflow?: boolean
 }
-function Panel(props: Props) {
+function Panel(props: PropsWithChildren<PanelProps>) {
   let headerClasses: string[] = []
 
   if (!props.hideHeaderStyling) {
@@ -31,13 +31,13 @@ function Panel(props: Props) {
   const content = (
     <div
       className={`
-        border border-panel-border-light dark:border-panel-border-dark
-        shadow-sm overflow-hidden
-        rounded-md ${props.noMargin ? '' : 'mb-8'} ${props.className}`}
+        ${props.noHideOverflow ? '' : 'overflow-hidden'} rounded-md border
+        border-panel-border-light shadow-sm
+        dark:border-panel-border-dark ${props.noMargin ? '' : 'mb-8'} ${props.className}`}
     >
       {props.title && (
         <div className={headerClasses.join(' ')}>
-          <div className="px-6 py-4 flex items-center">{props.title}</div>
+          <div className="flex items-center px-6 py-4">{props.title}</div>
         </div>
       )}
       <div className={`bg-panel-body-light dark:bg-panel-body-dark ${props.bodyClassName || ''}`}>
@@ -47,10 +47,10 @@ function Panel(props: Props) {
       {props.footer && (
         <div
           className="
-      bg-panel-footer-light dark:bg-panel-footer-dark
-      border-t border-panel-border-interior-light dark:border-panel-border-interior-dark"
+      border-t border-panel-border-interior-light
+      bg-panel-footer-light dark:border-panel-border-interior-dark dark:bg-panel-footer-dark"
         >
-          <div className="px-6 h-12 flex items-center">{props.footer}</div>
+          <div className="flex h-12 items-center px-6">{props.footer}</div>
         </div>
       )}
     </div>

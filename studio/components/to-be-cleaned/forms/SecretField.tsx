@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { IconEye, IconEyeOff } from '@supabase/ui'
+import { IconEye, IconEyeOff } from 'ui'
 import { connectField, filterDOMProps } from 'uniforms'
 
 const SecretField: React.FC = (props: any) => {
@@ -37,9 +37,9 @@ const SecretField: React.FC = (props: any) => {
           />
           <div className="px-2" onClick={onToggleVisible}>
             {visible ? (
-              <IconEye className="text-scale-900" />
+              <IconEye className="text-foreground-lighter" />
             ) : (
-              <IconEyeOff className="text-scale-900" />
+              <IconEyeOff className="text-foreground-lighter" />
             )}
           </div>
         </div>

@@ -1,29 +1,61 @@
+# To be run in the root of the turbo monorepo
+# NOTE: It's highly recommended to use the new builder, Buildkit. https://docs.docker.com/build/buildkit/
 ## USAGE:
-# Build:        docker build --target production -t supabase/studio:latest .
+# Build:        docker build . -f studio/Dockerfile --target production -t studio:latest
 # Run:          docker run -p 3000:3000 supabase/studio
 # Deploy:       docker push supabase/studio:latest
 # Clean build:
-#    docker build --target production --no-cache -t supabase/studio:latest .
 #    docker builder prune
+#    docker build . -f studio/Dockerfile --target production -t studio:latest --no-cache
 
+FROM node:18-slim as base
 
-FROM node:14-slim as base
-RUN apt-get update && apt-get install -y \
-    python3 \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
-WORKDIR /usr/src/app
-# Do `npm ci` separately so we can cache `node_modules`
-# https://nodejs.org/en/docs/guides/nodejs-docker-webapp/
-COPY package*.json ./
-RUN npm clean-install && npm cache clean --force
+# Fixes issues with Sentry CLI and SSL certificates during build
+RUN apt-get update -qq && \
+    apt-get install -y ca-certificates && \
+    rm -rf /var/lib/apt/lists/* && \
+    update-ca-certificates
+
+WORKDIR /app
+
+# Prune unneeded dependencies with turbo (from apps/ for example)
+FROM base as turbo
 COPY . .
 
-FROM base as dev
-EXPOSE 8082
-CMD ["npm", "run", "dev"]
+RUN npx turbo@1.10.3 prune --scope=studio --docker
 
+# Install dev dependencies (only if needed)
+FROM base as deps
+COPY --from=turbo /app/out/json ./
+COPY --from=turbo /app/out/package-lock.json ./
+# Install additional dependencies for arm64 build (required by bufferutil)
+ARG TARGETARCH
+RUN if [ "$TARGETARCH" = "arm64" ]; then \
+    apt-get update && apt-get install -y --no-install-recommends \
+    python3 \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*; fi
+# No need to clean cache because production uses standalone build
+RUN npm clean-install
+
+# dev contains dependencies and source code not compiled
+FROM deps as dev
+COPY --from=turbo /app/out/full ./
+ENTRYPOINT ["docker-entrypoint.sh"]
+EXPOSE 8082
+CMD ["npm", "run", "dev:studio"]
+
+# Compile Next.js
+FROM dev as builder
+
+RUN npx turbo run build --scope=studio --include-dependencies --no-deps
+
+# Copy only compiled code and dependencies
 FROM base as production
-RUN npm run build && rm -rf .next/cache/webpack && npm prune --production
+COPY --from=builder /app/studio/public ./studio/public
+COPY --from=builder /app/studio/.next/standalone/app ./
+COPY --from=builder /app/studio/.next/static ./studio/.next/static
 EXPOSE 3000
-CMD ["npm", "run", "start"]
+ENTRYPOINT ["docker-entrypoint.sh"]
+HEALTHCHECK --interval=5s --timeout=5s --retries=3 CMD node -e "require('http').get('http://localhost:3000/api/profile', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
+CMD ["node", "studio/server.js"]

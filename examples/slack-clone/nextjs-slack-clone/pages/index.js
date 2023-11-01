@@ -7,9 +7,9 @@ const Home = () => {
 
   const handleLogin = async (type, username, password) => {
     try {
-      const { error, user } =
+      const { error, data: { user } } =
         type === 'LOGIN'
-          ? await supabase.auth.signIn({ email: username, password })
+          ? await supabase.auth.signInWithPassword({ email: username, password })
           : await supabase.auth.signUp({ email: username, password })
       // If the user doesn't exist here and an error hasn't been raised yet,
       // that must mean that a confirmation email has been sent.

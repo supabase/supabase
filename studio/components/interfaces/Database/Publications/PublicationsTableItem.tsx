@@ -1,23 +1,29 @@
-import { FC, useState } from 'react'
+import type { PostgresPublication, PostgresTable } from '@supabase/postgres-meta'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { observer } from 'mobx-react-lite'
-import { Badge, Toggle } from '@supabase/ui'
-import { PostgresPublication, PostgresTable } from '@supabase/postgres-meta'
+import { useState } from 'react'
+import { Badge, Toggle } from 'ui'
 
-import { useStore } from 'hooks'
 import Table from 'components/to-be-cleaned/Table'
+import { useCheckPermissions, useStore } from 'hooks'
 
-interface Props {
+interface PublicationsTableItemProps {
   table: PostgresTable
   selectedPublication: PostgresPublication
 }
 
-const PublicationsTableItem: FC<Props> = ({ table, selectedPublication }) => {
+const PublicationsTableItem = ({ table, selectedPublication }: PublicationsTableItemProps) => {
   const { ui, meta } = useStore()
   const enabledForAllTables = selectedPublication.tables == null
 
   const [loading, setLoading] = useState(false)
   const [checked, setChecked] = useState(
     selectedPublication.tables?.find((x: any) => x.id == table.id) != undefined
+  )
+
+  const canUpdatePublications = useCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'publications'
   )
 
   const toggleReplicationForTable = async (
@@ -72,7 +78,7 @@ const PublicationsTableItem: FC<Props> = ({ table, selectedPublication }) => {
             <Toggle
               size="tiny"
               align="right"
-              disabled={loading}
+              disabled={!canUpdatePublications || loading}
               className="m-0 ml-2 mt-1 -mb-1 p-0"
               checked={checked}
               onChange={() => toggleReplicationForTable(table, selectedPublication)}

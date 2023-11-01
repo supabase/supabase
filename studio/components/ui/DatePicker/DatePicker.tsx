@@ -1,27 +1,37 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import DatePicker from 'react-datepicker'
 import {
   Button,
-  Popover,
-  IconChevronLeft,
-  IconChevronRight,
   IconArrowRight,
   IconCalendar,
-} from '@supabase/ui'
+  IconChevronLeft,
+  IconChevronRight,
+  Popover,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+} from 'ui'
 
-import { format } from 'date-fns'
-import TimeSplitInput from './TimeSplitInput'
-import dayjs from 'dayjs'
-import { ButtonProps } from '@supabase/ui/dist/cjs/components/Button/Button'
 import { DatePickerToFrom } from 'components/interfaces/Settings/Logs'
+import { format } from 'date-fns'
+import dayjs from 'dayjs'
+import { ButtonProps } from 'ui/src/components/Button/Button'
+import TimeSplitInput from './TimeSplitInput'
 
 export interface DatePickerProps {
   onChange?: (args: DatePickerToFrom) => void
-  to?: string
-  from?: string
+  to?: string // ISO string
+  from?: string // ISO string
   triggerButtonType?: ButtonProps['type']
   triggerButtonClassName?: string
+  triggerButtonTitle?: string
+  minDate?: Date
+  maxDate?: Date
+  hideTime?: boolean
+  hideClear?: boolean
+  selectsRange?: boolean
   renderFooter?: (args: DatePickerToFrom) => React.ReactNode | void
+  children?: React.ReactNode | React.ReactNode[] | null
 }
 
 const START_DATE_DEFAULT = new Date()
@@ -36,7 +46,14 @@ function _DatePicker({
   onChange,
   triggerButtonType = 'default',
   triggerButtonClassName = '',
+  triggerButtonTitle,
+  minDate,
+  maxDate,
+  hideTime = false,
+  hideClear = false,
+  selectsRange = true,
   renderFooter = () => null,
+  children,
 }: DatePickerProps) {
   const [open, setOpen] = useState<boolean>(false)
   const [appliedStartDate, setAppliedStartDate] = useState<null | Date>(null)
@@ -50,24 +67,45 @@ function _DatePicker({
     if (!from) {
       setAppliedStartDate(null)
     } else if (from !== appliedStartDate?.toISOString()) {
-      const start = dayjs(from).toDate()
-      setAppliedStartDate(start)
-      setStartDate(start)
+      const start = dayjs(from)
+      const startDate = start.toDate()
+      setAppliedStartDate(startDate)
+      setStartDate(startDate)
+      setStartTime({
+        HH: start.format('HH'),
+        mm: start.format('mm'),
+        ss: start.format('ss'),
+      })
     }
 
     if (!to) {
       setAppliedEndDate(null)
     } else if (to !== appliedEndDate?.toISOString()) {
-      const end = dayjs(to).toDate()
-      setAppliedEndDate(end)
-      setEndDate(end)
+      const end = dayjs(to)
+      const endDate = end.toDate()
+      setAppliedEndDate(endDate)
+      setEndDate(endDate)
+      setEndTime({
+        HH: end.format('HH'),
+        mm: end.format('mm'),
+        ss: end.format('ss'),
+      })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [to, from])
 
-  function handleDatePickerChange(dates: [from: Date | null, to: Date | null]) {
-    const [from, to] = dates
-    setStartDate(from)
-    setEndDate(to)
+  function handleDatePickerChange(dates: Date | [from: Date | null, to: Date | null] | null) {
+    if (!dates) {
+      setStartDate(null)
+      setEndDate(null)
+    } else if (dates instanceof Date) {
+      setStartDate(dates)
+      setEndDate(dates)
+    } else {
+      const [from, to] = dates
+      setStartDate(from)
+      setEndDate(to)
+    }
   }
 
   function handleSubmit() {
@@ -77,17 +115,15 @@ function _DatePicker({
     setAppliedEndDate(endDate)
 
     const payload = {
-      from: dayjs
-        .utc(startDate)
-        .second(startTime.ss)
-        .minute(startTime.mm)
-        .hour(startTime.HH)
+      from: dayjs(startDate)
+        .second(Number(startTime.ss))
+        .minute(Number(startTime.mm))
+        .hour(Number(startTime.HH))
         .toISOString(),
-      to: dayjs
-        .utc(endDate || startDate)
-        .second(endTime.ss)
-        .minute(endTime.mm)
-        .hour(endTime.HH)
+      to: dayjs(endDate || startDate)
+        .second(Number(endTime.ss))
+        .minute(Number(endTime.mm))
+        .hour(Number(endTime.HH))
         .toISOString(),
     }
     if (onChange) onChange(payload)
@@ -103,61 +139,94 @@ function _DatePicker({
 
     setAppliedStartDate(null)
     setAppliedEndDate(null)
+
+    if (onChange) onChange({ from: null, to: null })
   }
+
   return (
-    <Popover
-      open={open}
-      onOpenChange={(e) => setOpen(e)}
-      size="small"
-      align="center"
-      side="bottom"
-      header={
+    <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
+      <PopoverTrigger_Shadcn_ asChild>
+        <Button
+          title={triggerButtonTitle}
+          type={triggerButtonType}
+          icon={<IconCalendar />}
+          className={triggerButtonClassName}
+        >
+          {children !== undefined ? (
+            children
+          ) : (
+            <>
+              {/* Custom */}
+              {selectsRange &&
+              appliedStartDate &&
+              appliedEndDate &&
+              appliedStartDate !== appliedEndDate ? (
+                <>
+                  {format(new Date(appliedStartDate), 'dd MMM')} -{' '}
+                  {format(new Date(appliedEndDate), 'dd MMM')}
+                </>
+              ) : appliedStartDate || appliedEndDate ? (
+                format(new Date((appliedStartDate || appliedEndDate)!), 'dd MMM')
+              ) : (
+                'Custom'
+              )}
+            </>
+          )}
+        </Button>
+      </PopoverTrigger_Shadcn_>
+      <PopoverContent_Shadcn_ align="center" side="bottom" className="p-0">
         <>
-          <div className="flex items-stretch justify-between py-2">
-            <div className="flex grow flex-col gap-1">
-              <TimeSplitInput
-                type="start"
-                startTime={startTime}
-                endTime={endTime}
-                time={startTime}
-                setTime={setStartTime}
-                setStartTime={setStartTime}
-                setEndTime={setEndTime}
-                startDate={startDate}
-                endDate={endDate}
-              />
-            </div>
-            <div
-              className={`
-                      text-scale-900 
+          {hideTime ? null : (
+            <>
+              <div className="flex items-stretch justify-between py-2">
+                {!selectsRange ? null : (
+                  <>
+                    <div className="flex grow flex-col gap-1">
+                      <TimeSplitInput
+                        type="start"
+                        startTime={startTime}
+                        endTime={endTime}
+                        time={startTime}
+                        setTime={setStartTime}
+                        setStartTime={setStartTime}
+                        setEndTime={setEndTime}
+                        startDate={startDate}
+                        endDate={endDate}
+                      />
+                    </div>
+                    <div
+                      className={`
                       flex 
                       w-12 
-                      items-center
+                      items-center 
                       justify-center
+                      text-foreground-lighter
                     `}
-            >
-              <IconArrowRight strokeWidth={1.5} size={14} />
-            </div>
-            <div className="flex grow flex-col gap-1">
-              <TimeSplitInput
-                type="end"
-                startTime={startTime}
-                endTime={endTime}
-                time={endTime}
-                setTime={setEndTime}
-                setStartTime={setStartTime}
-                setEndTime={setEndTime}
-                startDate={startDate}
-                endDate={endDate}
-              />
-            </div>
-          </div>
-        </>
-      }
-      overlay={
-        <>
+                    >
+                      <IconArrowRight strokeWidth={1.5} size={14} />
+                    </div>
+                  </>
+                )}
+                <div className="flex grow flex-col gap-1">
+                  <TimeSplitInput
+                    type="end"
+                    startTime={startTime}
+                    endTime={endTime}
+                    time={endTime}
+                    setTime={setEndTime}
+                    setStartTime={setStartTime}
+                    setEndTime={setEndTime}
+                    startDate={startDate}
+                    endDate={endDate}
+                  />
+                </div>
+              </div>
+            </>
+          )}
           <div className="px-3 py-4">
             <DatePicker
+              inline
+              selectsRange={selectsRange}
               selected={startDate}
               onChange={(dates) => {
                 handleDatePickerChange(dates)
@@ -165,8 +234,8 @@ function _DatePicker({
               dateFormat="MMMM d, yyyy h:mm aa"
               startDate={startDate}
               endDate={endDate}
-              selectsRange
-              inline
+              minDate={minDate}
+              maxDate={maxDate}
               dayClassName={() => 'cursor-pointer'}
               renderCustomHeader={({
                 date,
@@ -183,19 +252,21 @@ function _DatePicker({
                       type="button"
                       className={`
                         ${prevMonthButtonDisabled && 'cursor-not-allowed opacity-50'}
-                        text-scale-1100 hover:text-scale-1200 focus:outline-none
+                        text-foreground-light hover:text-foreground focus:outline-none
                     `}
                     >
                       <IconChevronLeft size={16} strokeWidth={2} />
                     </button>
-                    <span className="text-scale-1100 text-sm">{format(date, 'MMMM yyyy')}</span>
+                    <span className="text-sm text-foreground-light">
+                      {format(date, 'MMMM yyyy')}
+                    </span>
                     <button
                       onClick={increaseMonth}
                       disabled={nextMonthButtonDisabled}
                       type="button"
                       className={`
                         ${nextMonthButtonDisabled && 'cursor-not-allowed opacity-50'}
-                        text-scale-1100 hover:text-scale-1200 focus:outline-none
+                        text-foreground-light hover:text-foreground focus:outline-none
                     `}
                     >
                       <IconChevronRight size={16} strokeWidth={2} />
@@ -209,35 +280,18 @@ function _DatePicker({
             from: startDate?.toISOString() || null,
             to: endDate?.toISOString() || null,
           })}
-          <Popover.Seperator />
+          <Popover.Separator />
           <div className="flex items-center justify-end gap-2 py-2 px-3 pb-4">
-            <Button type="default" onClick={() => handleClear()}>
-              Clear
-            </Button>
+            {!hideClear && (
+              <Button type="default" onClick={() => handleClear()}>
+                Clear
+              </Button>
+            )}
             <Button onClick={() => handleSubmit()}>Apply</Button>
           </div>
         </>
-      }
-    >
-      <Button
-        type={triggerButtonType}
-        as="span"
-        icon={<IconCalendar />}
-        className={triggerButtonClassName}
-      >
-        {/* Custom */}
-        {appliedStartDate && appliedEndDate && appliedStartDate !== appliedEndDate ? (
-          <>
-            {format(new Date(appliedStartDate), 'dd MMM')} -{' '}
-            {format(new Date(appliedEndDate), 'dd MMM')}
-          </>
-        ) : appliedStartDate || appliedEndDate ? (
-          format(new Date((appliedStartDate || appliedEndDate)!), 'dd MMM')
-        ) : (
-          'Custom'
-        )}
-      </Button>
-    </Popover>
+      </PopoverContent_Shadcn_>
+    </Popover_Shadcn_>
   )
 }
 

@@ -1,15 +1,18 @@
+import Panel from 'components/ui/Panel'
+import { isEmpty } from 'lodash'
 import {
   Badge,
   Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   IconArchive,
-  Typography,
-  Dropdown,
   IconEdit,
-  IconTrash,
   IconMoreVertical,
-} from '@supabase/ui'
-import { isEmpty } from 'lodash'
-import Panel from 'components/ui/Panel'
+  IconTrash,
+} from 'ui'
 
 const PolicyRow = ({
   policy,
@@ -21,71 +24,42 @@ const PolicyRow = ({
   const { name, command } = policy
   return (
     <div className="group">
-      <Panel.Content className="flex gap-2 justify-between py-4 border-b border-panel-border-light dark:border-panel-border-dark">
-        <div className="flex flex-col lg:flex-row lg:items-center gap-3">
-          <div className="font-mono text-xs text-scale-900">{command}</div>
-          <div className="flex flex-col lg:flex-row gap-2">
-            <span className="text-sm text-scale-1200 truncate">{name}</span>
+      <Panel.Content className="flex justify-between gap-2 border-b border-panel-border-light py-4 dark:border-panel-border-dark">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+          <div className="font-mono text-xs text-foreground-lighter">{command}</div>
+          <div className="flex flex-col gap-2 lg:flex-row">
+            <span className="truncate text-sm text-foreground">{name}</span>
           </div>
         </div>
-        <Dropdown
-          side="bottom"
-          align="end"
-          size="small"
-          overlay={
-            <>
-              <Dropdown.Item
-                icon={<IconEdit size={14} />}
-                type="outline"
-                className="mx-2"
-                onClick={() => onSelectPolicyEdit(policy, bucketName, table)}
-              >
-                Edit
-              </Dropdown.Item>
-              <Dropdown.Seperator />
-              <Dropdown.Item
-                icon={<IconTrash size={14} />}
-                type="outline"
-                onClick={() => onSelectPolicyDelete(policy)}
-              >
-                Delete
-              </Dropdown.Item>
-            </>
-          }
-        >
-          <Button
-            type="default"
-            style={{ paddingLeft: 4, paddingRight: 4 }}
-            icon={<IconMoreVertical />}
-          />
-        </Dropdown>
+        <DropdownMenu>
+          <DropdownMenuTrigger>
+            <Button
+              type="default"
+              style={{ paddingLeft: 4, paddingRight: 4 }}
+              icon={<IconMoreVertical />}
+            />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="bottom" align="end" size="small">
+            <DropdownMenuItem
+              className="space-x-2"
+              type="outline"
+              onClick={() => onSelectPolicyEdit(policy, bucketName, table)}
+            >
+              <IconEdit size={14} />
+              <p>Edit</p>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              type="outline"
+              className="space-x-2"
+              onClick={() => onSelectPolicyDelete(policy)}
+            >
+              <IconTrash size={14} />
+              <p>Delete</p>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </Panel.Content>
-    </div>
-  )
-  return (
-    <div className="grid grid-cols-10 p-4 px-6 group">
-      <div className="col-span-4">
-        <Typography.Text>{name}</Typography.Text>
-      </div>
-      <div className="col-span-4 flex flex-col">
-        <div>
-          <Badge color="green">{command}</Badge>
-        </div>
-      </div>
-      <div className="col-span-2 flex items-center justify-end opacity-0 transition group-hover:opacity-100">
-        <div name="flex">
-          <Button
-            type="outline"
-            className="mr-2"
-            onClick={() => onSelectPolicyEdit(policy, bucketName, table)}
-          >
-            Edit
-          </Button>
-          <Button type="outline" onClick={() => onSelectPolicyDelete(policy)}>
-            Delete
-          </Button>
-        </div>
-      </div>
     </div>
   )
 }
@@ -112,14 +86,12 @@ const StoragePoliciesBucketRow = ({
   return (
     <Panel
       title={[
-        <div key={label} className="flex items-center justify-between w-full">
+        <div key={label} className="flex w-full items-center justify-between">
           <div className="flex items-center space-x-4">
-            <Typography.Text type="secondary">
-              <IconArchive size="small" />
-            </Typography.Text>
-            <Typography.Title level={4} className="m-0">
+            <IconArchive className="text-foreground-light" size="small" />
+            <h4 className="m-0 text-lg">
               <span>{label}</span>
-            </Typography.Title>
+            </h4>
             {bucket.public && <Badge color="yellow">Public</Badge>}
           </div>
           <Button type="outline" onClick={() => onSelectPolicyAdd(bucket.name, table)}>
@@ -130,7 +102,7 @@ const StoragePoliciesBucketRow = ({
     >
       {policies.length === 0 ? (
         <div className="p-4 px-6">
-          <p className="text-sm text-scale-900">No policies created yet</p>
+          <p className="text-sm text-foreground-lighter">No policies created yet</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 divide-y dark:divide-dark">
@@ -146,7 +118,7 @@ const StoragePoliciesBucketRow = ({
           ))}
           {policies.length !== 0 ? (
             <div className="px-6 py-2">
-              <p className="text-scale-1100 text-sm">{getFooterLabel()}</p>
+              <p className="text-sm text-foreground-light">{getFooterLabel()}</p>
             </div>
           ) : null}
         </div>

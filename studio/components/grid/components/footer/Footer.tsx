@@ -1,15 +1,17 @@
-import * as React from 'react'
 import Pagination from './pagination'
 
-type FooterProps = {}
+export interface FooterProps {
+  isLoading?: boolean
+}
 
-const Footer: React.FC<FooterProps> = () => {
+const Footer = ({ isLoading }: FooterProps) => {
   return (
     <div className="sb-grid-footer">
       <div className="sb-grid-footer__inner">
-        <Pagination />
+        <Pagination isLoading={isLoading} />
       </div>
     </div>
   )
 }
+
 export default Footer

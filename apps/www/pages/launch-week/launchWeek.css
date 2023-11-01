@@ -1,0 +1,68 @@
+.bg-lw7 {
+  background: #9e44ef;
+}
+
+.bg-lw7-black-transition {
+  background: linear-gradient(0.39deg, #161616 53.84%, rgba(28, 28, 28, 0) 88.21%);
+}
+
+.bg-lw7-gradient {
+  background: radial-gradient(80% 65% at 50% 95%, #dbb8bf 0%, transparent 100%);
+}
+
+@media (min-width: 768px) {
+  .bg-lw7-gradient {
+    background: radial-gradient(72.03% 66.03% at 50% 69.72%, #dbb8bf 0%, transparent 100%);
+  }
+}
+
+.opacity-pulse {
+  animation: opacity-pulse 0.6s ease-in-out infinite alternate both;
+}
+
+.opacity-pulse-full {
+  animation: opacity-pulse-full 0.6s ease-in-out infinite alternate both;
+}
+
+.glass-tile-gradient {
+  position: absolute;
+
+  left: calc(50% - 146.58px / 2 - 181.35px);
+  top: calc(50% - 426.82px / 2 - 76.38px);
+
+  background: #579ca1;
+  filter: blur(85.7962px);
+  border-radius: 16.9281px;
+  transform: matrix(0.84, 0.55, -0.55, 0.83, 0, 0);
+}
+
+.bounce-loop {
+  animation: bounce 1s ease-in-out infinite alternate both;
+}
+
+@keyframes bounce {
+  0% {
+    transform: translate3D(0, -5px, 0);
+  }
+  100% {
+    transform: translate3D(0, 5px, 0);
+  }
+}
+
+@keyframes opacity-pulse {
+  0% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes opacity-pulse-full {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}

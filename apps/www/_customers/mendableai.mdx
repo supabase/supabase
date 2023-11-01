@@ -1,0 +1,71 @@
+---
+name: Mendable
+title: Mendable switches from Pinecone to Supabase Vector for PostgreSQL vector embeddings.
+# Use meta_title to add a custom meta title. Otherwise it defaults to '{name} | Supabase Customer Stories':
+meta_title: Mendable switches from Pinecone to Supabase Vector for PostgreSQL vector embeddings.
+description: How Mendable boosts efficiency and accuracy of chat powered search for documentation using Supabase Vector.
+# Use meta_description to add a custom meta description. Otherwise it defaults to {description}:
+meta_description: How Mendable boosts efficiency and accuracy of chat powered search for documentation using Supabase Vector.
+author: paul_copplestone
+author_title: Supabase
+author_url: https://github.com/kiwicopple
+author_image_url: https://avatars2.githubusercontent.com/u/10214025?s=400&u=c6775be2ae667e2acae3ccd347fed62bb3f5b3e7&v=4
+authorURL: https://github.com/kiwicopple
+logo: /images/customers/logos/mendableai.png
+logo_inverse: /images/customers/logos/light/mendableai.png
+og_image: /images/customers/og/mendable.jpg
+tags:
+  - supabase
+date: '2023-05-05'
+company_url: 'https://mendable.ai/'
+stats:
+  [
+    { stat: '00,000', label: Example stat },
+    { stat: '00,000', label: Example stat },
+    { stat: '00,000', label: Example stat },
+  ]
+misc: [{ label: 'Backed by', text: 'Y Combinator' }]
+about: Mendable is Chat Powered Search for Documentation.
+---
+
+[Mendable](http://mendable.ai/) provides a chat-powered search engine for technical documentation. Their AI-powered search tool makes it easier for developers and other technical users to find relevant information in complex documentation. Users can simply ask questions in natural language, and the tool returns the most relevant answers. Mendable's search engine also provides detailed analytics, which helps teams identify knowledge gaps and areas for improvement in their documentation. Mendable has integrated with some of the largest open source projects in the space such as LangChain and LlamaIndex.
+
+## The Challenge
+
+Mendable was experiencing tremendous success, growing Weekly Active Users by nearly 300% since March. They needed a tool to store and search through large amounts of vector data to improve the efficiency and accuracy of their similarity search operations. They tried Faiss, Weaviate, and Pinecone, but found them to be expensive and not very intuitive, especially when it came to storing metadata along with the vectors.
+
+## Why they chose Supabase
+
+Mendable lear that Supabase supports [pgvector](https://supabase.com/docs/guides/database/extensions/pgvector) and found it to be a simple and cost-effective solution. They were impressed with the open source nature of Supabase, as well as its ability to store metadata alongside the vectors. They also appreciated the intuitive interface and ease of use.
+
+<Quote img="caleb-peffer.jpg" caption="Caleb Peffer - CEO, Mendable">
+  We tried other vector databases - we tried Faiss, we tried Weaviate, we tried Pinecone. We found
+  them to be incredibly expensive and not very intuitive. If you’re just doing vector search they’re
+  great, but if you need to store a bunch of metadata that becomes a huge pain.
+</Quote>
+
+## What They Built
+
+Using [Supabase Vector](https://supabase.com/vector), Mendable was able to build a more efficient and accurate search function for their AI chatbot. By storing vector data alongside metadata in Supabase, Mendable was able to quickly and easily search through their customers documentation to find the most relevant responses to queries. They found that Supabase's solution was just as performant as dedicated vector databases, but without the high cost.
+
+![Mendable - build AI chat search applications](/images/customers/mendable/mendable.png)
+
+## The Results
+
+Thanks to Supabase Vector, Mendable was able to significantly improve the efficiency and accuracy of their Chat Powered Search for Documentation. They were able to build faster and more cost-effectively using Supabase’s open source stack.
+
+<Quote img="caleb-peffer.jpg" caption="Caleb Peffer - CEO, Mendable">
+  We looked at the alternatives and chose Supabase because it’s open source, it’s simpler, and, for
+  all the ways we need to use it, Supabase has been just as performant - if not more performant -
+  than the other vector databases.
+</Quote>
+
+To learn more about how Supabase Vector can help you store vector embeddings at scale and build AI apps with ease, [reach out to us](https://forms.supabase.com/enterprise).
+
+## Tech stack
+
+- React
+- Vercel
+- Next.js
+- Express
+- Supabase

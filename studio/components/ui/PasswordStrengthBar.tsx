@@ -1,9 +1,4 @@
-import {
-  DEFAULT_MINIMUM_PASSWORD_STRENGTH,
-  PASSWORD_STRENGTH_COLOR,
-  PASSWORD_STRENGTH_PERCENTAGE,
-} from 'lib/constants'
-import { Typography } from '@supabase/ui'
+import { PASSWORD_STRENGTH_COLOR, PASSWORD_STRENGTH_PERCENTAGE } from 'lib/constants'
 
 interface Props {
   passwordStrengthScore: number
@@ -27,7 +22,7 @@ const PasswordStrengthBar = ({
           aria-valuenow={(PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore]}
           aria-valuetext={(PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore]}
           role="progressbar"
-          className="mb-2 overflow-hidden transition-all border rounded bg-bg-alt-light dark:bg-bg-alt-dark dark:border-dark"
+          className="mb-2 overflow-hidden transition-all border rounded bg-scale-200 dark:bg-scale-200 dark:border-dark"
         >
           <div
             style={{
@@ -39,18 +34,17 @@ const PasswordStrengthBar = ({
           ></div>
         </div>
       )}
-      <Typography.Text
-        className={
-          passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH ? 'text-green-600' : ''
-        }
-      >
+      <p>
         {passwordStrengthMessage
           ? passwordStrengthMessage
-          : 'This is the password to your postgres database, so it must be a strong password and hard to guess.'}{' '}
-        <button className="underline hover:decoration-2" onClick={generateStrongPassword}>
+          : 'This is the password to your postgres database, so it must be strong and hard to guess.'}{' '}
+        <span
+          className="text-brand opacity-50 underline hover:opacity-100 transition cursor-pointer"
+          onClick={generateStrongPassword}
+        >
           Generate a password
-        </button>
-      </Typography.Text>
+        </span>
+      </p>
     </>
   )
 }

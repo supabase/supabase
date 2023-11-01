@@ -1,25 +1,22 @@
-import update from 'immutability-helper'
-import { FC, useRef, memo } from 'react'
-import { Button, IconMenu, Toggle, IconX } from '@supabase/ui'
 import { XYCoord } from 'dnd-core'
-import { useDrag, useDrop, DropTargetMonitor } from 'react-dnd'
+import { memo, useRef } from 'react'
+import { DropTargetMonitor, useDrag, useDrop } from 'react-dnd'
+import { Button, IconMenu, IconX, Toggle } from 'ui'
 
-import { useUrlState } from 'hooks'
-import { DragItem, Sort } from 'components/grid/types'
-import { useTrackedState } from 'components/grid/store'
+import { DragItem, Sort, SupaTable } from 'components/grid/types'
 
-type SortRowProps = {
+export interface SortRowProps {
+  table: SupaTable
   index: number
   columnName: string
   sort: Sort
+  onDelete: (columnName: string) => void
+  onToggle: (columnName: string, ascending: boolean) => void
+  onDrag: (dragIndex: number, hoverIndex: number) => void
 }
 
-const SortRow: FC<SortRowProps> = ({ index, columnName, sort }) => {
-  const state = useTrackedState()
-  const [_, setParams] = useUrlState({ arrayKeys: ['sort'] })
-
-  const column = state?.table?.columns.find((x) => x.name === columnName)
-  if (!column) return null
+const SortRow = ({ table, index, columnName, sort, onDelete, onToggle, onDrag }: SortRowProps) => {
+  const column = table.columns.find((x) => x.name === columnName)
 
   const ref = useRef<HTMLDivElement>(null)
 
@@ -40,11 +37,11 @@ const SortRow: FC<SortRowProps> = ({ index, columnName, sort }) => {
         handlerId: monitor.getHandlerId(),
       }
     },
-    hover(item: DragItem, monitor: DropTargetMonitor) {
+    hover(item, monitor) {
       if (!ref.current) {
         return
       }
-      const dragIndex = item.index
+      const dragIndex = (item as DragItem).index
       const hoverIndex = index
 
       // Don't replace items with themselves
@@ -85,57 +82,19 @@ const SortRow: FC<SortRowProps> = ({ index, columnName, sort }) => {
       // Generally it's better to avoid mutations,
       // but it's good here for the sake of performance
       // to avoid expensive index searches.
-      item.index = hoverIndex
+      ;(item as DragItem).index = hoverIndex
     },
   })
 
-  function onToggle(value: boolean) {
-    setParams((prevParams) => {
-      const existingSorts = (prevParams?.sort ?? []) as string[]
-      const updatedSorts = existingSorts.map((sort: string) => {
-        const [column] = sort.split(':')
-        return column === columnName ? `${columnName}:${value ? 'asc' : 'desc'}` : sort
-      })
-      return {
-        ...prevParams,
-        sort: updatedSorts,
-      }
-    })
-  }
-
-  function onRemoveSort() {
-    setParams((prevParams) => {
-      const existingSorts = (prevParams?.sort ?? []) as string[]
-      const updatedSorts = existingSorts.filter((sort: string) => {
-        const [column] = sort.split(':')
-        if (column !== columnName) return sort
-      })
-      return {
-        ...prevParams,
-        sort: updatedSorts,
-      }
-    })
-  }
-
   const moveSort = (dragIndex: number, hoverIndex: number) => {
     if (dragIndex == hoverIndex) return
-    setParams((prevParams) => {
-      const existingSorts = (prevParams?.sort ?? []) as string[]
-      const updatedSorts = update(existingSorts, {
-        $splice: [
-          [dragIndex, 1],
-          [hoverIndex, 0, existingSorts[dragIndex]],
-        ],
-      })
-      return {
-        ...prevParams,
-        sort: updatedSorts,
-      }
-    })
+    onDrag(dragIndex, hoverIndex)
   }
 
   const opacity = isDragging ? 0 : 1
   drag(drop(ref))
+
+  if (!column) return null
 
   return (
     <div
@@ -144,31 +103,33 @@ const SortRow: FC<SortRowProps> = ({ index, columnName, sort }) => {
       style={{ opacity }}
       data-handler-id={handlerId}
     >
-      <Button
-        icon={<IconX strokeWidth={1.5} size={14} />}
-        size="tiny"
-        type="text"
-        onClick={onRemoveSort}
-      />
+      <span className="transition-color text-foreground-lighter hover:text-foreground-light">
+        <IconMenu strokeWidth={2} size={16} />
+      </span>
       <div className="grow">
-        <span className="text-scale-1200 flex grow items-center gap-1 truncate text-sm">
-          <span className="text-scale-900 text-xs">{index > 0 ? 'then by' : 'sort by'}</span>
+        <span className="flex grow items-center gap-1 truncate text-sm text-foreground">
+          <span className="text-xs text-foreground-lighter">
+            {index > 0 ? 'then by' : 'sort by'}
+          </span>
           {column.name}
         </span>
       </div>
       <div className="flex items-center gap-1">
-        <label className="text-scale-900 text-xs">ascending:</label>
+        <label className="text-xs text-foreground-lighter">ascending:</label>
         <Toggle
           size="tiny"
           layout="flex"
           defaultChecked={sort.ascending}
           // @ts-ignore
-          onChange={(e: boolean) => onToggle(e)}
+          onChange={(e: boolean) => onToggle(columnName, e)}
         />
       </div>
-      <span className="transition-color text-scale-900 hover:text-scale-1100">
-        <IconMenu strokeWidth={2} size={16} />
-      </span>
+      <Button
+        icon={<IconX strokeWidth={1.5} size={14} />}
+        size="tiny"
+        type="text"
+        onClick={() => onDelete(columnName)}
+      />
     </div>
   )
 }

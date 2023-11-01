@@ -1,8 +1,9 @@
+import { RefObject } from 'react'
 import BackwardIterator from './BackwardIterator'
 
 // [Joshen] Needs to be fixed
 
-export default function getPgsqlSignatureHelpProvider(monaco: any, sqlEditorStore: any) {
+export default function getPgsqlSignatureHelpProvider(monaco: any, pgInfoRef: RefObject<any>) {
   return {
     signatureHelpTriggerCharacters: ['(', ','],
     provideSignatureHelp: function (model: any, position: any) {
@@ -16,7 +17,7 @@ export default function getPgsqlSignatureHelpProvider(monaco: any, sqlEditorStor
       let ident = iterator.readIdent()
       if (!ident || ident.match(/^\".*?\"$/)) return null
 
-      let fn = sqlEditorStore.functionCache.find(
+      let fn = pgInfoRef.current.functions.find(
         (f: any) => f.name.toLocaleLowerCase() === ident.toLocaleLowerCase()
       )
       if (!fn) return null

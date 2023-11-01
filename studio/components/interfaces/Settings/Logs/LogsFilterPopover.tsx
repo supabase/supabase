@@ -1,4 +1,4 @@
-import { Button, Checkbox, Form, Popover } from '@supabase/ui'
+import { Button, Checkbox, Form, Popover } from 'ui'
 import React, { useState } from 'react'
 import { Filters, FilterSet } from '.'
 
@@ -49,7 +49,7 @@ const LogsFilterPopover: React.FC<Props> = ({
         >
           {({ isSubmitting }: { isSubmitting: boolean }) => (
             <>
-              <div className="py-6 space-y-4">
+              <div className="space-y-4 py-6">
                 {options.options.map((x, i: number) => (
                   <React.Fragment key={x.key}>
                     <Checkbox
@@ -61,11 +61,11 @@ const LogsFilterPopover: React.FC<Props> = ({
                       size="medium"
                       defaultChecked={(filters?.[options.key] as Filters)?.[x.key] as boolean}
                     />
-                    {i !== options.options.length - 1 && <Popover.Seperator />}
+                    {i !== options.options.length - 1 && <Popover.Separator />}
                   </React.Fragment>
                 ))}
               </div>
-              <div className="flex items-center justify-end gap-2 bg-scale-200 dark:bg-scale-400 py-2 px-3 border-t border-scale-400 dark:border-scale-500 ">
+              <div className="flex items-center justify-end gap-2 border-t border-scale-400 bg-scale-200 py-2 px-3 dark:border-scale-500 dark:bg-scale-400 ">
                 <Button size="tiny" type="default" onClick={handleReset} htmlType="button">
                   Clear
                 </Button>
@@ -77,17 +77,16 @@ const LogsFilterPopover: React.FC<Props> = ({
           )}
         </Form>
       }
-      portalled
       showClose
       side="bottom"
     >
       <Button
-        as="span"
+        asChild
         type={checkIsActive() ? 'secondary' : 'default'}
         onClick={handleToggle}
         className={buttonClassName}
       >
-        {options.label}
+        <span>{options.label}</span>
       </Button>
     </Popover>
   )

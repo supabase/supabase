@@ -1,21 +1,23 @@
-import { FC, ReactNode } from 'react'
-import { Modal, Button, Typography, Input, Alert, Form } from '@supabase/ui'
+import { PropsWithChildren, ReactNode } from 'react'
+import { Alert, Button, Form, Input, Modal } from 'ui'
 
-interface Props {
+interface TextConfirmModalProps {
   loading: boolean
   visible: boolean
   title: string
+  size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge' | 'xxlarge'
   confirmLabel: string
   confirmPlaceholder: string
   confirmString: string
-  alert: string
-  text: string | ReactNode
+  alert?: string
+  text?: string | ReactNode
   onConfirm: () => void
   onCancel: () => void
 }
 
-const TextConfirmModal: FC<Props> = ({
+const TextConfirmModal = ({
   title,
+  size = 'small',
   onConfirm,
   visible,
   onCancel,
@@ -25,7 +27,8 @@ const TextConfirmModal: FC<Props> = ({
   confirmString,
   alert,
   text,
-}) => {
+  children,
+}: PropsWithChildren<TextConfirmModalProps>) => {
   // [Joshen] Have to keep the loading prop here as this component itself doesn't
   // directly trigger any potential async job that follows onConfirm. It only triggers
   // the onConfirm callback function, and hence if anything fails in the callback,
@@ -42,7 +45,7 @@ const TextConfirmModal: FC<Props> = ({
   }
 
   return (
-    <Modal hideFooter closable size="small" visible={visible} header={title} onCancel={onCancel}>
+    <Modal hideFooter closable size={size} visible={visible} header={title} onCancel={onCancel}>
       <Form
         validateOnBlur
         initialValues={{ confirmValue: '' }}
@@ -52,29 +55,36 @@ const TextConfirmModal: FC<Props> = ({
         {() => (
           <div className="w-full py-4">
             <div className="space-y-4">
+              {children && (
+                <>
+                  <Modal.Content>{children}</Modal.Content>
+                  <Modal.Separator />
+                </>
+              )}
               {alert && (
                 <Modal.Content>
                   <Alert variant="warning" withIcon title={alert} />
                 </Modal.Content>
               )}
-              <Modal.Content>
-                <Typography.Text className="block">
-                  <p className="mb-2 text-sm">{text}</p>
-                </Typography.Text>
-              </Modal.Content>
-              <Modal.Seperator />
+              {text !== undefined && (
+                <Modal.Content>
+                  <p className="mb-2 block text-sm break-all">{text}</p>
+                </Modal.Content>
+              )}
+              <Modal.Separator />
               <Modal.Content>
                 <Input
                   id="confirmValue"
                   label={
                     <span>
-                      Type <span className="text-scale-1200">{confirmString}</span> to confirm.
+                      Type <span className="text-foreground break-all">{confirmString}</span> to
+                      confirm.
                     </span>
                   }
                   placeholder={confirmPlaceholder}
                 />
               </Modal.Content>
-              <Modal.Seperator />
+              <Modal.Separator />
               <Modal.Content>
                 <Button
                   block

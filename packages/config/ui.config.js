@@ -3,14 +3,30 @@ const forms = require('@tailwindcss/forms')
 const plugin = require('tailwindcss/plugin')
 const radixUiColors = require('@radix-ui/colors')
 const brandColors = require('./default-colors')
+const svgToDataUri = require('mini-svg-data-uri')
 
 const { default: flattenColorPalette } = require('tailwindcss/lib/util/flattenColorPalette')
 
-// console.log(Object.keys(radixUiColors))
+// exclude these colors from the included set from Radix
+const excludedRadixColors = [
+  'bronze',
+  'brown',
+  'cyan',
+  'grass',
+  'olive',
+  'mauve',
+  'mint',
+  'lime',
+  'plum',
+  'sage',
+  'sand',
+  'sky',
+  'teal',
+]
 
 // generates fixed scales
 // based on the root/light mode version
-const fixedOptions = ['scale', 'scaleA', 'brand']
+const fixedOptions = ['scale', 'scaleA']
 
 function radixColorKeys() {
   let keys = Object.keys(radixUiColors)
@@ -26,12 +42,16 @@ function radixColorKeys() {
 
   keys = filterItems(keys, 'Dark')
 
-  // console.log('radixColorKeys', keys)
+  // remove excluded colors
+  keys = keys.filter(
+    (key) => !excludedRadixColors.some((excludeColor) => key.startsWith(excludeColor))
+  )
+
   return keys
 }
 
 function generateColorClasses() {
-  const brandColors = ['brand', 'scale', 'scaleA']
+  const brandColors = ['scale', 'scaleA']
   const colors = [...radixColorKeys(), ...brandColors]
 
   let mappedColors = {}
@@ -41,11 +61,7 @@ function generateColorClasses() {
     // create empty obj for each color
     mappedColors[x] = {}
     // create empty obj for each fixed color
-    if (
-      fixedOptions.some(function (v) {
-        return x.indexOf(v) >= 0
-      })
-    ) {
+    if (fixedOptions.some((v) => x.indexOf(v) >= 0)) {
       mappedColors[`${x}-fixed`] = {}
     }
   })
@@ -53,14 +69,9 @@ function generateColorClasses() {
   colors.map((x) => {
     for (let index = 0; index < 12; index++) {
       const step = index + 1
-      mappedColors[x][step * 100] = `var(--colors-${x.toLowerCase()}${step})`
+      mappedColors[x][step * 100] = `var(--colors-${x}${step})`
 
-      if (
-        fixedOptions.some(function (v) {
-          return x.indexOf(v) >= 0
-        })
-      ) {
-        // console.log(x)
+      if (fixedOptions.some((v) => x.indexOf(v) >= 0)) {
         mappedColors[`${x}-fixed`][step * 100] = `var(--colors-fixed-${x}${step})`
       }
     }
@@ -71,13 +82,7 @@ function generateColorClasses() {
 
 const colorClasses = generateColorClasses()
 
-/*
- * generateCssVariables()
- *
- * generate the CSS variables for tailwind to use
- *
- */
-
+// generate the CSS variables for tailwind to use
 function generateCssVariables() {
   // potential options
   // { fixedOptions, brandColors }
@@ -85,7 +90,12 @@ function generateCssVariables() {
   let rootColors = {}
   let darkColors = {}
 
-  const radixArray = Object.values(radixUiColors)
+  const radixArray = Object.entries(radixUiColors)
+    .filter(
+      ([key, value]) => !excludedRadixColors.some((excludeColor) => key.startsWith(excludeColor))
+    )
+    .map(([, value]) => value)
+
   const brandArray = Object.values(brandColors)
 
   function generateColors(colors, index, colorSet) {
@@ -122,8 +132,6 @@ function generateCssVariables() {
 }
 
 const variables = generateCssVariables()
-
-// console.log(variables)
 
 const uiConfig = {
   theme: {
@@ -227,10 +235,30 @@ const uiConfig = {
           '0%': { transform: 'translate-x-0', opacity: 1 },
           '100%': { transform: 'translateX(100%)', opacity: 0 },
         },
+        lineLoading: {
+          '0%': {
+            marginLeft: '-10%',
+            width: '80px',
+          },
+          '25%': {
+            width: ' 240px',
+          },
+          '50%': {
+            marginLeft: '100%',
+            width: '80px',
+          },
+          '75%': {
+            width: '240px',
+          },
+          '100%': {
+            marginLeft: '-10%',
+            width: '80px',
+          },
+        },
       },
       animation: {
-        'fade-in': 'fadeIn 300ms',
-        'fade-out': 'fadeOut 300ms',
+        'fade-in': 'fadeIn 300ms both',
+        'fade-out': 'fadeOut 300ms both',
 
         'dropdown-content-show': 'overlayContentShow 100ms cubic-bezier(0.16, 1, 0.3, 1)',
         'dropdown-content-hide': 'overlayContentHide 100ms cubic-bezier(0.16, 1, 0.3, 1)',
@@ -252,6 +280,8 @@ const uiConfig = {
         'panel-slide-right-out': 'panelSlideRightOut 200ms cubic-bezier(0.87, 0, 0.13, 1)',
         'panel-slide-right-in': 'panelSlideRightIn 250ms cubic-bezier(0.87, 0, 0.13, 1)',
 
+        'line-loading': 'lineLoading 1.8s infinite',
+
         // tailwind class for this is `animate-dropdownFadeIn`
         dropdownFadeIn: 'dropdownFadeIn 0.1s ease-out',
         // tailwind class for this is `animate-dropdownFadeOut`
@@ -261,6 +291,10 @@ const uiConfig = {
         ...colorClasses,
         'hi-contrast': `var(--colors-fixed-scale12)`,
         'lo-contrast': `var(--colors-fixed-scale1)`,
+        warning: {
+          default: 'red',
+          100: '#342355',
+        },
       },
     },
   },
@@ -269,13 +303,22 @@ const uiConfig = {
     function ({ addUtilities, addVariant }) {
       // addVariant('data-open', '&:[data-state=open]')
       addUtilities({
+        '.line-loading-bg': {
+          background: 'rgb(0, 0, 0)',
+          background:
+            'linear-gradient(90deg,rgba(0, 0, 0, 0) 0%,rgba(255, 255, 255, 0.65) 50%,rgba(0, 0, 0, 0) 100%)',
+        },
+        '.line-loading-bg-light': {
+          background: 'rgb(0, 0, 0)',
+          background:
+            'linear-gradient(90deg,rgba(0, 0, 0, 0) 0%,rgba(33, 33, 33, 0.65) 50%,rgba(0, 0, 0, 0) 100%)',
+        },
         ".dropdown-content[data-state='open']": {
           animation: 'fadeIn 50ms ease-out',
         },
         ".dropdown-content[data-state='closed']": {
           animation: 'fadeOut 50ms ease-in',
         },
-
         "[data-state='open'] .accordion-content-animation": {
           animation: 'slideDown 200ms ease-out',
         },
@@ -289,6 +332,32 @@ const uiConfig = {
           border: '1px solid hsla(0, 0%, 39.2%, 0.2)',
           borderRadius: '3px',
         },
+        '.no-scrollbar': {
+          /* Hide scrollbar for IE, Edge*/
+          '-ms-overflow-style': 'none',
+
+          /* Firefox */
+          'scrollbar-width': 'none' /* Firefox */,
+
+          /* Hide scrollbar for Chrome, Safari and Opera */
+          '&::-webkit-scrollbar': {
+            display: 'none',
+          },
+        },
+        /* Add fadeout effect */
+        '.mask-fadeout-right': {
+          '-webkit-mask-image': 'linear-gradient(to right, white 98%, transparent 100%)',
+          'mask-image': 'linear-gradient(to right, white 98%, transparent 100%)',
+        },
+        '.mask-fadeout-left': {
+          '-webkit-mask-image': 'linear-gradient(to left, white 98%, transparent 100%)',
+          'mask-image': 'linear-gradient(to left, white 98%, transparent 100%)',
+        },
+        'input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button':
+          {
+            '-webkit-appearance': 'none',
+            margin: '0',
+          },
       })
       addVariant('data-open-parent', '[data-state="open"] &')
       addVariant('data-closed-parent', '[data-state="closed"] &')
@@ -307,39 +376,28 @@ const uiConfig = {
           highlight: (value) => ({ boxShadow: `inset 0 1px 0 0 ${value}` }),
         },
         { values: flattenColorPalette(theme('backgroundColor')), type: 'color' }
-      ),
-        matchUtilities(
-          {
-            subhighlight: (value) => ({
-              boxShadow: `inset 0 -1px 0 0 ${value}`,
-            }),
-          },
-          {
-            values: flattenColorPalette(theme('backgroundColor')),
-            type: 'color',
-          }
-        ),
-        matchUtilities(
-          {
-            bordershadow: (value) => {
-              return {
-                boxShadow: `
-                var(--colors-blacka1) 0px 0px 0px 0px, 
-                var(--colors-blacka1) 0px 0px 0px 0px, 
-                var(--colors-blacka8) 0px 1px 1px 0px, 
-                ${value} 0px 0px 0px 1px, 
-                var(--colors-blacka1) 0px 0px 0px 0px, 
-                var(--colors-blacka1) 0px 0px 0px 0px, 
-                rgb(64 68 82 / 8%) 0px 2px 5px 0px;
-                `,
-              }
-            },
-          },
-          {
-            values: flattenColorPalette(theme('backgroundColor')),
-            type: 'color',
-          }
-        )
+      )
+      matchUtilities(
+        {
+          subhighlight: (value) => ({
+            boxShadow: `inset 0 -1px 0 0 ${value}`,
+          }),
+        },
+        {
+          values: flattenColorPalette(theme('backgroundColor')),
+          type: 'color',
+        }
+      )
+      matchUtilities(
+        {
+          'bg-grid': (value) => ({
+            backgroundImage: `url("${svgToDataUri(
+              `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="${value}"><path d="M0 .5H31.5V32"/></svg>`
+            )}")`,
+          }),
+        },
+        { values: flattenColorPalette(theme('backgroundColor')), type: 'color' }
+      )
     },
     require('tailwindcss-radix')(),
     forms,

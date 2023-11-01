@@ -1,27 +1,31 @@
-import { FC, useEffect, createContext, useContext } from 'react'
+import { has, isEmpty, mapValues, union, without } from 'lodash'
 import { makeAutoObservable } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
-import { isEmpty, mapValues, has, without, union } from 'lodash'
-import {
-  Input,
-  SidePanel,
-  Checkbox,
-  Listbox,
-  Typography,
-  IconPlayCircle,
-  IconPauseCircle,
-  IconTerminal,
-  Badge,
-  Button,
-} from '@supabase/ui'
-import { Dictionary } from 'components/grid'
-import { useRouter } from 'next/router'
+import { createContext, useContext, useEffect, useState } from 'react'
 import SVG from 'react-inlinesvg'
 
-import ChooseFunctionForm from './ChooseFunctionForm'
+import { Dictionary } from 'components/grid'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
 import FormEmptyBox from 'components/ui/FormBoxEmpty'
 import NoTableState from 'components/ui/States/NoTableState'
+import { useTablesQuery } from 'data/tables/tables-query'
 import { useStore } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import {
+  Badge,
+  Button,
+  Checkbox,
+  IconPauseCircle,
+  IconPlayCircle,
+  IconTerminal,
+  Input,
+  Listbox,
+  Modal,
+  SidePanel,
+} from 'ui'
+import ChooseFunctionForm from './ChooseFunctionForm'
 
 class CreateTriggerFormState {
   id: number | undefined
@@ -109,7 +113,7 @@ interface ICreateTriggerStore {
   setChooseFunctionFormVisible: (value: boolean) => void
   setDefaultSelectedTable: () => void
   setLoading: (value: boolean) => void
-  setTables: (value: Dictionary<any>[]) => void
+  setTables: (value: any[]) => void
   setTriggerFunctions: (value: Dictionary<any>[]) => void
   validateForm: () => boolean
 }
@@ -121,6 +125,7 @@ class CreateTriggerStore implements ICreateTriggerStore {
   meta = null
   tables = []
   triggerFunctions = []
+  isDirty = false
 
   constructor() {
     makeAutoObservable(this)
@@ -160,8 +165,14 @@ class CreateTriggerStore implements ICreateTriggerStore {
     this.loading = value
   }
 
-  setTables = (value: Dictionary<any>[]) => {
-    this.tables = value as any
+  setisDirty = (value: boolean) => {
+    this.isDirty = value
+  }
+
+  setTables = (value: any[]) => {
+    this.tables = value
+      .sort((a, b) => a.schema.localeCompare(b.schema))
+      .filter((a) => !EXCLUDED_SCHEMAS.includes(a.schema)) as any
     this.setDefaultSelectedTable()
   }
 
@@ -170,6 +181,7 @@ class CreateTriggerStore implements ICreateTriggerStore {
   }
 
   onFormChange = ({ key, value }: { key: string; value: any }) => {
+    this.isDirty = true
     if (has(this.formState, key)) {
       const temp = (this.formState as any)[key]
       // @ts-ignore
@@ -241,38 +253,44 @@ function hasWhitespace(value: string) {
 
 const CreateTriggerContext = createContext<ICreateTriggerStore | null>(null)
 
-type CreateTriggerProps = {
+interface CreateTriggerProps {
   trigger?: any
   visible: boolean
   setVisible: (value: boolean) => void
-} & any
+}
 
-const CreateTrigger: FC<CreateTriggerProps> = ({ trigger, visible, setVisible }) => {
+const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => {
+  const { project } = useProjectContext()
   const { ui, meta } = useStore()
+  const [isClosingPanel, setIsClosingPanel] = useState(false)
   const _localState = useLocalObservable(() => new CreateTriggerStore())
-  _localState.meta = meta as any
 
-  // for the empty 'no tables' state link
-  const router = useRouter()
-  const { ref } = router.query
+  useTablesQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      onSuccess(tables) {
+        if (_localState.tables.length <= 0) {
+          _localState.setTables(tables)
+        }
+      },
+    }
+  )
 
   useEffect(() => {
-    const fetchTables = async () => {
-      await (_localState!.meta as any)!.tables!.load()
-      const tables = (_localState!.meta as any)!.tables.list()
-      _localState.setTables(tables)
-    }
     const fetchFunctions = async () => {
-      await (_localState.meta as any).functions.load()
-      const triggerFuncs = (_localState!.meta as any)!.functions.listTriggerFunctions()
+      await meta.functions.load()
+      const triggerFuncs = (meta as any)!.functions.listTriggerFunctions()
       _localState.setTriggerFunctions(triggerFuncs)
     }
 
-    fetchTables()
-    fetchFunctions()
-  }, [])
+    if (ui.selectedProjectRef) fetchFunctions()
+  }, [ui.selectedProjectRef])
 
   useEffect(() => {
+    _localState.setisDirty(false)
     if (trigger) {
       _localState.formState.reset(trigger)
     } else {
@@ -288,8 +306,8 @@ const CreateTrigger: FC<CreateTriggerProps> = ({ trigger, visible, setVisible })
 
         const body = _localState.formState.requestBody
         const response: any = _localState.isEditing
-          ? await (_localState.meta as any).triggers.update(body.id, body)
-          : await (_localState.meta as any).triggers.create(body)
+          ? await (meta as any).triggers.update(body.id, body)
+          : await (meta as any).triggers.create(body)
 
         if (response.error) {
           ui.setNotification({
@@ -321,18 +339,22 @@ const CreateTrigger: FC<CreateTriggerProps> = ({ trigger, visible, setVisible })
 
   const hasPublicTables = _localState.tables.length >= 1
 
+  const isClosingSidePanel = () => {
+    _localState.isDirty ? setIsClosingPanel(true) : setVisible(!visible)
+  }
+
   return (
     <>
       <SidePanel
         size="large"
         visible={visible}
-        onCancel={() => setVisible(!visible)}
+        onCancel={isClosingSidePanel}
         header={_localState.title}
         hideFooter={!hasPublicTables}
         className={
           _localState.chooseFunctionFormVisible
-            ? 'hooks-sidepanel transform transition-all duration-300 ease-in-out mr-16'
-            : 'hooks-sidepanel transform transition-all duration-300 ease-in-out mr-0'
+            ? 'hooks-sidepanel mr-16 transform transition-all duration-300 ease-in-out'
+            : 'hooks-sidepanel mr-0 transform transition-all duration-300 ease-in-out'
         }
         loading={_localState.loading}
         onConfirm={handleSubmit}
@@ -340,9 +362,9 @@ const CreateTrigger: FC<CreateTriggerProps> = ({ trigger, visible, setVisible })
         {hasPublicTables ? (
           <div className="">
             <CreateTriggerContext.Provider value={_localState}>
-              <div className="space-y-10 my-6">
+              <div className="my-6 space-y-10">
                 {_localState.isEditing ? (
-                  <div className="px-6 space-y-6">
+                  <div className="space-y-6 px-6">
                     <InputName />
                     <SelectEnabledMode />
                   </div>
@@ -351,15 +373,15 @@ const CreateTrigger: FC<CreateTriggerProps> = ({ trigger, visible, setVisible })
                     <div className="px-6">
                       <InputName />
                     </div>
-                    <SidePanel.Seperator />
-                    <div className="px-6 space-y-12">
-                      <Typography.Title level={5}>Conditions to fire trigger</Typography.Title>
+                    <SidePanel.Separator />
+                    <div className="space-y-12 px-6">
+                      <h5>Conditions to fire trigger</h5>
                       <ListboxTable />
                       <CheckboxEvents />
                       <ListboxActivation />
                       <SelectOrientation />
                     </div>
-                    <SidePanel.Seperator />
+                    <SidePanel.Separator />
                     <FunctionForm />
                   </>
                 )}
@@ -371,6 +393,23 @@ const CreateTrigger: FC<CreateTriggerProps> = ({ trigger, visible, setVisible })
                 onChange={(id: number) => _localState.onSelectFunction(id)}
               />
             </CreateTriggerContext.Provider>
+            <ConfirmationModal
+              visible={isClosingPanel}
+              header="Discard changes"
+              buttonLabel="Discard"
+              onSelectCancel={() => setIsClosingPanel(false)}
+              onSelectConfirm={() => {
+                setIsClosingPanel(false)
+                setVisible(!visible)
+              }}
+            >
+              <Modal.Content>
+                <p className="py-4 text-sm text-foreground-light">
+                  There are unsaved changes. Are you sure you want to close the panel? Your changes
+                  will be lost.
+                </p>
+              </Modal.Content>
+            </ConfirmationModal>
           </div>
         ) : (
           <NoTableState message="You will need to create a table first before you can make a trigger" />
@@ -382,7 +421,7 @@ const CreateTrigger: FC<CreateTriggerProps> = ({ trigger, visible, setVisible })
 
 export default observer(CreateTrigger)
 
-const InputName: FC = observer(({}) => {
+const InputName = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
   return (
     <Input
@@ -404,7 +443,7 @@ const InputName: FC = observer(({}) => {
   )
 })
 
-const SelectEnabledMode: FC = observer(({}) => {
+const SelectEnabledMode = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
   return (
     <Listbox
@@ -424,60 +463,60 @@ const SelectEnabledMode: FC = observer(({}) => {
       <Listbox.Option
         addOnBefore={({ active, selected }: any) => {
           return (
-            <div className="bg-green-900 border border-green-700 shadow-sm w-3 h-3 rounded-full"></div>
+            <div className="h-3 w-3 rounded-full border border-green-700 bg-green-900 shadow-sm"></div>
           )
         }}
         value="ORIGIN"
         label="Origin"
       >
         Origin
-        <span className="text-scale-900 block">This is a default behaviour</span>
+        <span className="block text-foreground-lighter">This is a default behaviour</span>
       </Listbox.Option>
       <Listbox.Option
         addOnBefore={({ active, selected }: any) => {
           return (
-            <div className="bg-green-900 border border-green-700 shadow-sm w-3 h-3 rounded-full"></div>
+            <div className="h-3 w-3 rounded-full border border-green-700 bg-green-900 shadow-sm"></div>
           )
         }}
         value="REPLICA"
         label="Replica"
       >
         Replica
-        <span className="text-scale-900 block">
+        <span className="block text-foreground-lighter">
           Will only fire if the session is in “replica” mode
         </span>
       </Listbox.Option>
       <Listbox.Option
         addOnBefore={({ active, selected }: any) => {
           return (
-            <div className="bg-green-900 border border-green-700 shadow-sm w-3 h-3 rounded-full"></div>
+            <div className="h-3 w-3 rounded-full border border-green-700 bg-green-900 shadow-sm"></div>
           )
         }}
         value="ALWAYS"
         label="Always"
       >
         Always
-        <span className="text-scale-900 block">
+        <span className="block text-foreground-lighter">
           Will fire regardless of the current replication role
         </span>
       </Listbox.Option>
       <Listbox.Option
         addOnBefore={({ active, selected }: any) => {
           return (
-            <div className="bg-red-900 border border-red-700 shadow-sm w-3 h-3 rounded-full"></div>
+            <div className="h-3 w-3 rounded-full border border-red-700 bg-red-900 shadow-sm"></div>
           )
         }}
         value="DISABLED"
         label="Disabled"
       >
         Disabled
-        <span className="text-scale-900 block">Will not fire</span>
+        <span className="block text-foreground-lighter">Will not fire</span>
       </Listbox.Option>
     </Listbox>
   )
 })
 
-const SelectOrientation: FC = observer(({}) => {
+const SelectOrientation = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
   return (
     <Listbox
@@ -496,17 +535,17 @@ const SelectOrientation: FC = observer(({}) => {
     >
       <Listbox.Option value="ROW" label="Row">
         Row
-        <span className="text-scale-900 block">fires once for each processed row</span>
+        <span className="block text-foreground-lighter">fires once for each processed row</span>
       </Listbox.Option>
       <Listbox.Option value="STATEMENT" label="Statement">
         Statement
-        <span className="text-scale-900 block">fires once for each statement</span>
+        <span className="block text-foreground-lighter">fires once for each statement</span>
       </Listbox.Option>
     </Listbox>
   )
 })
 
-const ListboxTable: FC = observer(({}) => {
+const ListboxTable = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
 
   return (
@@ -544,9 +583,9 @@ const ListboxTable: FC = observer(({}) => {
             value={x.id}
             label={x.name}
             addOnBefore={() => (
-              <div className="bg-scale-1200 p-1 flex items-center justify-center rounded text-scale-100 ">
+              <div className="flex items-center justify-center rounded bg-scale-1200 p-1 text-scale-100 ">
                 <SVG
-                  src={'/img/table-editor.svg'}
+                  src={`${BASE_PATH}/img/table-editor.svg`}
                   style={{ width: `16px`, height: `16px`, strokeWidth: '1px' }}
                   preProcessor={(code) =>
                     code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
@@ -556,10 +595,8 @@ const ListboxTable: FC = observer(({}) => {
             )}
           >
             <div className="flex flex-row items-center space-x-1">
-              <Typography.Text>{x.name}</Typography.Text>
-              <Typography.Text type="secondary" className="text-scale-900" small>
-                {x.schema}
-              </Typography.Text>
+              <p className="text-sm text-foreground-light">{x.schema}</p>
+              <p className="text-foreground">{x.name}</p>
             </div>
           </Listbox.Option>
         )
@@ -568,7 +605,7 @@ const ListboxTable: FC = observer(({}) => {
   )
 })
 
-const CheckboxEvents: FC = observer(({}) => {
+const CheckboxEvents = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
   return (
     // @ts-ignore
@@ -614,7 +651,7 @@ const CheckboxEvents: FC = observer(({}) => {
   )
 })
 
-const ListboxActivation: FC = observer(({}) => {
+const ListboxActivation = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
   return (
     <Listbox
@@ -637,14 +674,14 @@ const ListboxActivation: FC = observer(({}) => {
         value={'BEFORE'}
         label={'Before the event'}
         addOnBefore={() => (
-          <div className="bg-scale-1200  p-1 flex items-center justify-center rounded text-scale-100 ">
+          <div className="flex items-center justify-center rounded bg-scale-1200 p-1 text-scale-100 ">
             <IconPauseCircle strokeWidth={2} size="small" />
           </div>
         )}
       >
         <div className="flex flex-col">
           <span>{'before'}</span>
-          <span className="text-scale-900 block">
+          <span className="block text-foreground-lighter">
             Trigger fires before the operation is attempted
           </span>
         </div>
@@ -654,14 +691,14 @@ const ListboxActivation: FC = observer(({}) => {
         value={'AFTER'}
         label={'After the event'}
         addOnBefore={() => (
-          <div className="bg-green-1200  p-1 flex items-center justify-center rounded text-scale-100 ">
+          <div className="flex items-center justify-center rounded bg-green-1200 p-1 text-scale-100 ">
             <IconPlayCircle strokeWidth={2} size="small" />
           </div>
         )}
       >
         <div className="flex flex-col">
           <span>{'after'}</span>
-          <span className="text-scale-900 block">
+          <span className="block text-foreground-lighter">
             Trigger fires after the operation has completed
           </span>
         </div>
@@ -670,13 +707,13 @@ const ListboxActivation: FC = observer(({}) => {
   )
 })
 
-const FunctionForm: FC = observer(({}) => {
+const FunctionForm = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
 
   return (
     <div className="space-y-4">
-      <div className="px-6 space-y-6">
-        <Typography.Title level={5}>Function to trigger</Typography.Title>
+      <div className="space-y-6 px-6">
+        <h5>Function to trigger</h5>
       </div>
       <div className="px-6">
         {isEmpty(_localState!.formState.functionName.value) ? (
@@ -689,24 +726,21 @@ const FunctionForm: FC = observer(({}) => {
   )
 })
 
-const FunctionEmpty: FC = observer(({}) => {
+const FunctionEmpty = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
   return (
     <button
       type="button"
       onClick={() => _localState!.setChooseFunctionFormVisible(true)}
-      className="w-full relative
-        transition-all
-
-        shadow-sm
-                  border bg-scale-200 dark:bg-scale-400
-                  border-scale-600
-                  rounded
-                  hover:border-scale-700
-                  hover:bg-scale-300 dark:hover:bg-scale-500
-                  px-5 py-1
-
-                  "
+      className={[
+        'relative w-full',
+        'rounded',
+        'border border-scale-600',
+        'bg-scale-200 px-5 py-1',
+        'shadow-sm transition-all',
+        'hover:border-scale-700 hover:bg-scale-300',
+        'dark:bg-scale-400 dark:hover:bg-scale-500',
+      ].join(' ')}
     >
       <FormEmptyBox
         icon={<IconTerminal size={14} strokeWidth={2} />}
@@ -716,34 +750,26 @@ const FunctionEmpty: FC = observer(({}) => {
   )
 })
 
-const FunctionWithArguments: FC = observer(({}) => {
+const FunctionWithArguments = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
 
   return (
     <>
       <div
-        className="
-
-
-              w-full
-
-              relative
-              transition-shadow shadow-sm
-              border border-scale-200 dark:border-scale-500
-              rounded
-
-
-              px-5 py-4
-              flex space-x-3 items-center justify-between"
+        className={[
+          'relative w-full',
+          'flex items-center justify-between',
+          'space-x-3 px-5 py-4',
+          'border border-scale-200 dark:border-scale-500',
+          'rounded shadow-sm transition-shadow',
+        ].join(' ')}
       >
         <div className="flex items-center gap-2">
-          <div className="flex rounded w-6 h-6 bg-scale-1200 text-scale-100 focus-within:bg-opacity-10 items-center justify-center">
+          <div className="flex h-6 w-6 items-center justify-center rounded bg-scale-1200 text-scale-100 focus-within:bg-opacity-10">
             <IconTerminal size="small" strokeWidth={2} width={14} />
           </div>
           <div className="flex items-center gap-2">
-            <Typography.Text type="secondary">
-              {_localState!.formState.functionName.value}
-            </Typography.Text>
+            <p className="text-foreground-light">{_localState!.formState.functionName.value}</p>
             <div>
               <Badge>{_localState!.formState.functionSchema.value}</Badge>
             </div>

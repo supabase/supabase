@@ -1,13 +1,14 @@
-import * as React from 'react'
-import { Typography } from '@supabase/ui'
+import { PropsWithChildren } from 'react'
 
-type TableProps = {
+interface TableProps {
   body: JSX.Element | JSX.Element[]
   head?: JSX.Element | JSX.Element[]
   className?: string
   containerClassName?: string
   borderless?: boolean
   headTrClasses?: string
+  bodyClassName?: string
+  style?: React.StyleHTMLAttributes<HTMLTableElement>
 }
 
 function Table({
@@ -17,6 +18,8 @@ function Table({
   containerClassName,
   borderless,
   headTrClasses,
+  bodyClassName,
+  style,
 }: TableProps) {
   let containerClasses = ['table-container']
   if (containerClassName) containerClasses.push(containerClassName)
@@ -27,41 +30,39 @@ function Table({
 
   return (
     <div className={containerClasses.join(' ')}>
-      <table className={classes.join(' ')}>
+      <table className={classes.join(' ')} style={style}>
         <thead>
           <tr className={headTrClasses}>{head}</tr>
         </thead>
-        <tbody>{body}</tbody>
+        <tbody className={bodyClassName}>{body}</tbody>
       </table>
     </div>
   )
 }
 
-type ThProps = {
-  children?: React.ReactNode
+interface ThProps {
   className?: string
   style?: React.CSSProperties
 }
 
-const Th: React.FC<ThProps> = ({ children, className, style }) => {
+const Th = ({ children, className, style }: PropsWithChildren<ThProps>) => {
   const classes = ['p-3 px-4 text-left']
   if (className) classes.push(className)
   return (
     <th className={classes.join(' ')} style={style}>
-      <Typography.Text type="secondary">{children}</Typography.Text>
+      {children}
     </th>
   )
 }
 
-type TrProps = {
-  children: React.ReactNode
+interface TrProps {
   className?: string
   hoverable?: boolean
   style?: React.CSSProperties
   onClick?: () => void
 }
 
-const Tr: React.FC<TrProps> = ({ children, className, onClick, style, hoverable }) => {
+const Tr = ({ children, className, onClick, style, hoverable }: PropsWithChildren<TrProps>) => {
   let classes = [className]
   if (onClick || hoverable) classes.push('tr--link')
   return (
@@ -71,13 +72,14 @@ const Tr: React.FC<TrProps> = ({ children, className, onClick, style, hoverable 
   )
 }
 
-type TdProps = {
-  children: React.ReactNode
+interface TdProps extends React.HTMLProps<HTMLTableCellElement> {
   colSpan?: number
   className?: string
   style?: React.CSSProperties
-} & React.HTMLProps<HTMLTableCellElement>
-const Td: React.FC<TdProps> = ({ children, colSpan, className, style, ...rest }) => {
+  align?: 'left' | 'center' | 'right' | 'justify' | 'char' | undefined
+}
+
+const Td = ({ children, colSpan, className, style, ...rest }: PropsWithChildren<TdProps>) => {
   return (
     <td className={className} colSpan={colSpan} style={style} {...rest}>
       {children}

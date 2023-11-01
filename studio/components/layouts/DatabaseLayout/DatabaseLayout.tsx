@@ -1,69 +1,58 @@
-import { FC, ReactNode, useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
+import { PropsWithChildren, useEffect } from 'react'
 
-import { useStore, withAuth } from 'hooks'
-import BaseLayout from '../'
-import Error from 'components/ui/Error'
 import ProductMenu from 'components/ui/ProductMenu'
+import { useSelectedProject, useStore, withAuth } from 'hooks'
+import ProjectLayout from '../'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
-interface Props {
+export interface DatabaseLayoutProps {
   title?: string
-  children: ReactNode
 }
 
-const DatabaseLayout: FC<Props> = ({ title, children }) => {
-  const { meta, ui, backups } = useStore()
-  const { isInitialized, isLoading, error } = meta.tables
-  const project = ui.selectedProject
+const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) => {
+  const { ui, meta, vault } = useStore()
+  const project = useSelectedProject()
 
   const router = useRouter()
   const page = router.pathname.split('/')[4]
 
-  const [loaded, setLoaded] = useState<boolean>(isInitialized)
+  const vaultExtension = meta.extensions.byId('supabase_vault')
+  const isVaultEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
+  const pgNetExtensionExists = meta.extensions.byId('pg_net') !== undefined
+  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
 
   useEffect(() => {
-    if (ui.selectedProject) {
-      // Eventually should only load the required stores based on the pages
-      meta.schemas.load()
-      meta.tables.load()
-
+    if (ui.selectedProjectRef) {
       meta.roles.load()
       meta.triggers.load()
       meta.extensions.load()
       meta.publications.load()
-
-      backups.load()
     }
-  }, [ui.selectedProject])
+  }, [ui.selectedProjectRef])
 
-  // Optimization required: load logic should be at the page level
-  // e.g backups page is waiting for meta.tables to load finish when it doesnt even need that data
   useEffect(() => {
-    if (!isLoading && !loaded) {
-      setLoaded(true)
+    if (isVaultEnabled) {
+      vault.load()
     }
-  }, [isLoading])
-
-  if (error) {
-    return (
-      <BaseLayout>
-        <Error error={error} />
-      </BaseLayout>
-    )
-  }
+  }, [ui.selectedProjectRef, isVaultEnabled])
 
   return (
-    <BaseLayout
-      isLoading={!loaded}
+    <ProjectLayout
       product="Database"
-      productMenu={<ProductMenu page={page} menu={generateDatabaseMenu(project)} />}
+      productMenu={
+        <ProductMenu
+          page={page}
+          menu={generateDatabaseMenu(project, { pgNetExtensionExists, isNewAPIDocsEnabled })}
+        />
+      }
     >
       <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
         {children}
       </main>
-    </BaseLayout>
+    </ProjectLayout>
   )
 }
 

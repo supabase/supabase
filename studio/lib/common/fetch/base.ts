@@ -1,9 +1,9 @@
-import { tryParseJson } from 'lib/helpers'
+import { getAccessToken } from 'lib/gotrue'
 import { isUndefined } from 'lodash'
 import { SupaResponse } from 'types/base'
 
 export function handleError<T>(e: any, requestId: string): SupaResponse<T> {
-  const message = e?.message ? `An error has occured: ${e.message}` : 'An error has occured'
+  const message = e?.message ? `An error has occurred: ${e.message}` : 'An error has occurred'
   const error = { code: 500, message, requestId }
   return { error } as unknown as SupaResponse<T>
 }
@@ -12,6 +12,9 @@ export async function handleResponse<T>(
   response: Response,
   requestId: string
 ): Promise<SupaResponse<T>> {
+  const contentType = response.headers.get('Content-Type')
+  if (contentType === 'application/octet-stream') return response as any
+
   try {
     const resTxt = await response.text()
     try {
@@ -77,46 +80,13 @@ export async function handleResponseError<T = unknown>(
   } else if (resJson.error && resJson.error.message) {
     return { error: { code: response.status, ...resJson.error } } as unknown as SupaResponse<T>
   } else {
-    const message = resTxt ?? `An error has occured: ${response.status}`
+    const message = resTxt ?? `An error has occurred: ${response.status}`
     const error = { code: response.status, message, requestId }
     return { error } as unknown as SupaResponse<T>
   }
 }
 
-export function getAccessToken() {
-  // ignore if server-side
-  if (typeof window === 'undefined') return ''
-
-  const tokenData = window?.localStorage['supabase.auth.token']
-  if (!tokenData) {
-    // try to get from url fragment
-    const access_token = getParameterByName('access_token')
-    if (access_token) return access_token
-    else return undefined
-  }
-  const tokenObj = tryParseJson(tokenData)
-  if (tokenObj === false) {
-    return ''
-  }
-  return tokenObj.currentSession.access_token
-}
-
-// get param from URL fragment
-export function getParameterByName(name: string, url?: string) {
-  // ignore if server-side
-  if (typeof window === 'undefined') return ''
-
-  if (!url) url = window?.location?.href || ''
-  // eslint-disable-next-line no-useless-escape
-  name = name.replace(/[\[\]]/g, '\\$&')
-  const regex = new RegExp('[?&#]' + name + '(=([^&#]*)|&|#|$)'),
-    results = regex.exec(url)
-  if (!results) return null
-  if (!results[2]) return ''
-  return decodeURIComponent(results[2].replace(/\+/g, ' '))
-}
-
-export function constructHeaders(requestId: string, optionHeaders?: { [prop: string]: any }) {
+export async function constructHeaders(requestId: string, optionHeaders?: { [prop: string]: any }) {
   let headers: { [prop: string]: any } = {
     'Content-Type': 'application/json',
     Accept: 'application/json',
@@ -126,9 +96,17 @@ export function constructHeaders(requestId: string, optionHeaders?: { [prop: str
 
   const hasAuthHeader = !isUndefined(optionHeaders) && 'Authorization' in optionHeaders
   if (!hasAuthHeader) {
-    const accessToken = getAccessToken()
+    const accessToken = await getAccessToken()
     if (accessToken) headers.Authorization = `Bearer ${accessToken}`
   }
 
   return headers
+}
+
+export function isResponseOk<T>(response: SupaResponse<T> | undefined): response is T {
+  return (
+    response !== undefined &&
+    response !== null &&
+    !(typeof response === 'object' && 'error' in response && Boolean(response.error))
+  )
 }

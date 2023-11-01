@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import './index.css'
 import App from './App'
-import { Auth } from '@supabase/ui'
+import { Auth } from '@supabase/auth-ui-react'
 import { supabase } from './utils/supabaseClient'
 
 ReactDOM.render(

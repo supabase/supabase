@@ -1,32 +1,27 @@
-import { FC, ReactNode } from 'react'
-import { Typography } from '@supabase/ui'
-import { useFlag } from 'hooks'
+import { PropsWithChildren } from 'react'
 
-interface Props {
+interface ProductMenuBarProps {
   title: string
-  children: ReactNode
 }
 
-const ProductMenuBar: FC<Props> = ({ title, children }) => {
-  const ongoingIncident = useFlag('ongoingIncident')
-  const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
-
+const ProductMenuBar = ({ title, children }: PropsWithChildren<ProductMenuBarProps>) => {
   return (
     <div
-      style={{ height: maxHeight, maxHeight }}
       className={[
         'hide-scrollbar flex w-64 flex-col border-r', // Layout
-        'bg-sidebar-linkbar-light', // Light mode
-        'dark:bg-sidebar-linkbar-dark dark:border-dark ', // Dark mode
+        'bg-scale-200', // Light mode
+        'dark:border-dark ', // Dark mode
       ].join(' ')}
     >
       <div
         className="dark:border-dark flex max-h-12 items-center border-b px-6"
         style={{ minHeight: '3rem' }}
       >
-        <Typography.Title level={4}>{title}</Typography.Title>
+        <h4 className="text-lg">{title}</h4>
       </div>
-      <div className="flex-grow overflow-y-auto">{children}</div>
+      <div className="flex-grow overflow-y-auto" style={{ maxHeight: 'calc(100vh - 96px)' }}>
+        {children}
+      </div>
     </div>
   )
 }

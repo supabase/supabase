@@ -1,38 +1,31 @@
-import { ChangeEvent, createContext, FC, useContext, useEffect, useState } from 'react'
-import { toast } from 'react-hot-toast'
-import { useRouter } from 'next/router'
-import { observer, useLocalObservable } from 'mobx-react-lite'
-import { makeAutoObservable, runInAction } from 'mobx'
-import {
-  Button,
-  Select,
-  Typography,
-  IconPlusCircle,
-  IconX,
-  IconChevronRight,
-  Listbox,
-} from '@supabase/ui'
 import Divider from 'components/ui/Divider'
+import { makeAutoObservable, runInAction } from 'mobx'
+import { observer, useLocalObservable } from 'mobx-react-lite'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { ChangeEvent, createContext, useContext, useEffect, useState } from 'react'
+import { toast } from 'react-hot-toast'
 
 import { Dictionary } from 'components/grid'
-
-import { useStore, withAuth } from 'hooks'
-import { API_URL } from 'lib/constants'
-import { get } from 'lib/common/fetch'
-import {
-  VERCEL_INTEGRATION_CONFIGS,
-  VERCEL_DEFAULT_EXTERNAL_ID,
-  INTEGRATION_ENVS_ALIAS,
-} from 'lib/vercelConfigs'
+import VercelIntegrationLayout from 'components/layouts/VercelIntegrationLayout'
 import {
   createVercelEnv,
   fetchVercelProjectEnvs,
   fetchVercelProjects,
   prepareVercelEvns,
 } from 'components/to-be-cleaned/Integration/Vercel.utils'
+import { databaseIcon, vercelIcon } from 'components/to-be-cleaned/ListIcons'
 import Loading from 'components/ui/Loading'
-import VercelIntegrationLayout from 'components/layouts/VercelIntegrationLayout'
-import { vercelIcon, databaseIcon } from 'components/to-be-cleaned/ListIcons'
+import { useProjectsQuery } from 'data/projects/projects-query'
+import { withAuth } from 'hooks'
+import { get } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
+import {
+  INTEGRATION_ENVS_ALIAS,
+  VERCEL_DEFAULT_EXTERNAL_ID,
+  VERCEL_INTEGRATION_CONFIGS,
+} from 'lib/vercelConfigs'
+import { Button, IconChevronRight, IconPlusCircle, IconX, Listbox, Select } from 'ui'
 
 interface IVercelIntegrationStore {
   code: string
@@ -156,7 +149,7 @@ class VercelIntegrationStore implements IVercelIntegrationStore {
       await this.getVercelProjects()
       this.loading = false
     } else {
-      toast.error('Retrieve vercel token failed')
+      toast.error(`Failed to retrieve Vercel token: ${response.error.message}`)
       this.loading = false
     }
   }
@@ -180,13 +173,11 @@ class VercelIntegrationStore implements IVercelIntegrationStore {
 }
 const PageContext = createContext<IVercelIntegrationStore>(undefined!)
 
-type VercelIntegrationProps = {} & any
-const VercelIntegration: FC<VercelIntegrationProps> = ({}) => {
+const VercelIntegration = () => {
   // @ts-ignore
   const _store: IVercelIntegrationStore = useLocalObservable(() => new VercelIntegrationStore())
-  const { app } = useStore()
-  const projects = app.projects.list()
-  const isSupabaseProjectListEmpty = projects.length == 0
+  const { data: projects } = useProjectsQuery()
+  const isSupabaseProjectListEmpty = !projects || projects?.length === 0
 
   useEffect(() => {
     _store.loadInitialData()
@@ -215,24 +206,24 @@ const Connecting = () => (
     <div className="flex w-32 items-center justify-center">
       <Loading />
     </div>
-    <Typography.Text>Connecting...</Typography.Text>
+    <p>Connecting...</p>
   </div>
 )
 
 const ProjectLinksEmptyState = () => (
   <div className="flex flex-col space-y-4">
-    <Typography.Text>
+    <p>
       You haven't created a Supabase project yet. Get started by creating a new Supabase project,
       then close this window and retry adding integration.
-    </Typography.Text>
-    <Typography.Link href="https://app.supabase.com">
+    </p>
+    <Link href="https://supabase.com/dashboard" className="text-brand">
       Start a new Supabase project<span aria-hidden="true"> &rarr;</span>
-    </Typography.Link>
+    </Link>
   </div>
 )
 
 const UNDEFINED_SELECT_VALUE = 'undefined'
-const IntegrationProject: FC = observer(() => {
+const IntegrationProject = observer(() => {
   const _store = useContext(PageContext)
   const router = useRouter()
   const [name, setName] = useState<string>('')
@@ -285,23 +276,17 @@ const IntegrationProject: FC = observer(() => {
         </Select>
       </div>
       <div
-        className="bg-panel-header-light dark:bg-panel-header-dark border-border-secondary-light dark:border-border-secondary-dark 
-      w-full rounded-sm border"
+        className="w-full rounded-sm border border-scale-700
+      bg-panel-header-light dark:bg-panel-header-dark"
       >
         <div className="flex items-center justify-between p-6">
-          <Typography.Title level={4} className="my-auto mr-8 capitalize">
-            {name}
-          </Typography.Title>
+          <h4 className="my-auto mr-8 text-lg capitalize">{name}</h4>
           <Button disabled={loading || !!errorMsg} loading={loading} onClick={onClick}>
             Deploy
           </Button>
         </div>
       </div>
-      {errorMsg && (
-        <Typography.Text className="py-4" type="danger">
-          {errorMsg}
-        </Typography.Text>
-      )}
+      {errorMsg && <p className="py-4 text-foreground-light">{errorMsg}</p>}
     </div>
   )
 })
@@ -324,7 +309,7 @@ const defaultVercelEnvs = [
     type: 'encrypted',
   },
 ]
-const ProjectLinks: FC = observer(() => {
+const ProjectLinks = observer(() => {
   const _store = useContext(PageContext)
 
   async function onSubmit() {
@@ -345,22 +330,22 @@ const ProjectLinks: FC = observer(() => {
           vercelToken: _store.token,
         })
         if (fetchEnvsError) {
-          console.log('envsError: ', fetchEnvsError)
+          console.error('envsError: ', fetchEnvsError)
           runInAction(() => {
             item.result = {
               status: 'fail',
-              message: 'Error: validate Vercel project envs fails',
+              message: 'Error: Failed to validate Vercel project envs',
             }
           })
           continue
         }
         const found = existedEnvs.find((x: any) => x.key.includes('SUPABASE'))
         if (!!found) {
-          console.log('Existed Supabase env: ', found)
+          console.error('Existed Supabase env: ', found)
           runInAction(() => {
             item.result = {
               status: 'fail',
-              message: 'Error: this Vercel project already contains Supabase envs',
+              message: 'Error: This Vercel project already contains Supabase envs',
             }
           })
           continue
@@ -368,11 +353,11 @@ const ProjectLinks: FC = observer(() => {
         // If not, pull project detail info
         const projectDetails = await get(`${API_URL}/props/project/${item.supabaseProjectRef}/api`)
         if (projectDetails.error) {
-          console.log('project info error: ', projectDetails.error)
+          console.error('project info error: ', projectDetails.error)
           runInAction(() => {
             item.result = {
               status: 'fail',
-              message: 'Error: fetch Supabase project details fails',
+              message: 'Error: Failed to fetch Supabase project details',
             }
           })
           continue
@@ -380,7 +365,9 @@ const ProjectLinks: FC = observer(() => {
 
         // Then create env for vercel project with supabase project
         const vercelEnvs = prepareVercelEvns(defaultVercelEnvs, {
-          endpoint: `https://${projectDetails.autoApiService.endpoint}`,
+          endpoint: `${projectDetails.autoApiService.protocol ?? 'https'}://${
+            projectDetails.autoApiService.endpoint ?? '-'
+          }`,
           anon_key: projectDetails.autoApiService.defaultApiKey,
           service_key: projectDetails.autoApiService.serviceApiKey,
         })
@@ -451,21 +438,15 @@ const ProjectLinks: FC = observer(() => {
   return (
     <div className="flex w-full flex-col space-y-6">
       <div>
-        <Typography.Title level={4}>Link Vercel to Supabase</Typography.Title>
-        <Typography.Text>
-          Choose which of your Vercel projects to link to your existing Supabase projects.
-        </Typography.Text>
+        <h4 className="text-lg">Link Vercel to Supabase</h4>
+        <p>Choose which of your Vercel projects to link to your existing Supabase projects.</p>
       </div>
       <Divider light />
       <div className="space-y-2">
         <div className="flex justify-between">
-          <Typography.Text className="" type="secondary">
-            Vercel Projects
-          </Typography.Text>
+          <p className="text-foreground-light">Vercel Projects</p>
           <div />
-          <Typography.Text className="" type="secondary">
-            Supabase Projects
-          </Typography.Text>
+          <p className="text-foreground-light">Supabase Projects</p>
         </div>
         <ProjectLinkList />
         <Divider light />
@@ -475,7 +456,7 @@ const ProjectLinks: FC = observer(() => {
   )
 })
 
-const ProjectLinkList: FC = observer(() => {
+const ProjectLinkList = observer(() => {
   const _store = useContext(PageContext)
 
   function addProjectLink() {
@@ -502,9 +483,9 @@ const ProjectLinkList: FC = observer(() => {
       </ul>
       <div className="py-2">
         {_store.projectLinkRemaining == 0 ? (
-          <Typography.Text type="secondary" small>
+          <p className="text-sm text-foreground-light">
             All Vercel projects for selected scope have been added
-          </Typography.Text>
+          </p>
         ) : (
           <div className="flex items-center space-x-2">
             <Button
@@ -515,9 +496,9 @@ const ProjectLinkList: FC = observer(() => {
             >
               {`Add another Vercel Project`}
             </Button>
-            <Typography.Text type="secondary" small>
+            <p className="text-sm text-foreground-light">
               {_store.projectLinkRemaining} project(s) remaining
-            </Typography.Text>
+            </p>
           </div>
         )}
       </div>
@@ -525,20 +506,19 @@ const ProjectLinkList: FC = observer(() => {
   )
 })
 
-type ProjectLinkItemProps = {
+interface ProjectLinkItemProps {
   idx: number
   vercelProjectId?: string
   supabaseProjectRef?: string
   error?: string
   result?: { status: 'waiting' | 'success' | 'fail'; message?: string }
 }
-const ProjectLinkItem: FC<ProjectLinkItemProps> = observer(
-  ({ idx, vercelProjectId, supabaseProjectRef, error, result }) => {
+const ProjectLinkItem = observer(
+  ({ idx, vercelProjectId, supabaseProjectRef, error, result }: ProjectLinkItemProps) => {
     const _store = useContext(PageContext)
     const selectedVercelProject = _store.vercelProjects.find((x) => x.id == vercelProjectId)
 
-    const { app } = useStore()
-    const sortedProjects = app.projects.list()
+    const { data: projects } = useProjectsQuery()
 
     function onVercelProjectChange(e: string) {
       const value = e != UNDEFINED_SELECT_VALUE ? e : undefined
@@ -565,7 +545,6 @@ const ProjectLinkItem: FC<ProjectLinkItemProps> = observer(
 
     return (
       <li className="py-2">
-        {console.log('re-rendered the ProjectLinkItem')}
         <div className="relative flex w-full space-x-2">
           <div className="w-1/2 flex-grow">
             <Listbox
@@ -597,9 +576,7 @@ const ProjectLinkItem: FC<ProjectLinkItemProps> = observer(
             </Listbox>
           </div>
           <div className="flex flex-shrink items-center">
-            <Typography.Text type="secondary">
-              <IconChevronRight />
-            </Typography.Text>
+            <IconChevronRight className="text-foreground-light" />
           </div>
           <div className="w-1/2 flex-grow">
             <Listbox
@@ -609,7 +586,7 @@ const ProjectLinkItem: FC<ProjectLinkItemProps> = observer(
               <Listbox.Option value={UNDEFINED_SELECT_VALUE} label="Choose a project" disabled>
                 Choose a project
               </Listbox.Option>
-              {sortedProjects?.map((x: Dictionary<any>) => (
+              {projects?.map((x: Dictionary<any>) => (
                 <Listbox.Option
                   key={x.id}
                   value={x.ref}
@@ -632,24 +609,19 @@ const ProjectLinkItem: FC<ProjectLinkItemProps> = observer(
             </div>
           )}
         </div>
-        {error && (
-          <Typography.Text type="danger" small>
-            {error}
-          </Typography.Text>
-        )}
+        {error && <p className="text-sm text-foreground-light">{error}</p>}
         {_store.waitingIntegration && result && (
-          <Typography.Text
-            type={
-              result.status == 'waiting'
-                ? 'default'
-                : result.status == 'fail'
-                ? 'danger'
-                : 'success'
-            }
-            small
+          <p
+            className={`text-sm ${
+              result.status === 'waiting'
+                ? 'text-foreground-light'
+                : result.status === 'fail'
+                ? 'text-foreground-light'
+                : 'text-foreground'
+            }`}
           >
             {result?.message ?? 'Processing...'}
-          </Typography.Text>
+          </p>
         )}
       </li>
     )

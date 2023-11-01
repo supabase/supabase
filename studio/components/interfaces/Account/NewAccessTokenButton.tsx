@@ -1,89 +1,155 @@
-import { FC, useState } from 'react'
-import { Input, Button, Modal, Form, Alert } from '@supabase/ui'
-import { useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import { NewAccessToken, useAccessTokens } from 'hooks/queries/useAccessTokens'
 import { observer } from 'mobx-react-lite'
+import Link from 'next/link'
+import { useState } from 'react'
+import {
+  Alert,
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  Form,
+  IconChevronDown,
+  IconExternalLink,
+  Input,
+  Modal,
+} from 'ui'
 
-const NewAccessTokenButton = observer(() => {
-  const { ui } = useStore()
-  const { mutateNewToken } = useAccessTokens()
+import { useAccessTokenCreateMutation } from 'data/access-tokens/access-tokens-create-mutation'
+
+export interface NewAccessTokenButtonProps {
+  onCreateToken: (token: any) => void
+}
+
+const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonProps) => {
   const [isOpen, setIsOpen] = useState(false)
-  const [name, setName] = useState('')
-  const [newToken, setNewToken] = useState<NewAccessToken | undefined>(undefined)
+  const [tokenScope, setTokenScope] = useState<'V0' | undefined>(undefined)
 
-  async function onFormSubmit(values: any, { setSubmitting }: any) {
-    setSubmitting(true)
-    const response = await post(`${API_URL}/profile/access-tokens`, { name })
-    if (response.error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to create token: ${response.error.message}`,
-      })
-      setSubmitting(false)
-    } else {
-      mutateNewToken(response)
-      setNewToken(response)
+  const validate = (values: any) => {
+    const errors: any = {}
+    if (!values.tokenName) errors.tokenName = 'Please enter a name for the token'
+    return errors
+  }
 
-      setSubmitting(false)
+  const { mutate: createAccessToken, isLoading } = useAccessTokenCreateMutation({
+    onSuccess: (res) => {
+      onCreateToken(res)
       setIsOpen(false)
-    }
+    },
+  })
+
+  const onFormSubmit = async (values: any) => {
+    createAccessToken({ name: values.tokenName, scope: tokenScope })
   }
 
   return (
     <>
-      <Button
-        onClick={() => {
-          setName('')
-          setNewToken(undefined)
-          setIsOpen(!isOpen)
-        }}
-      >
-        Generate new token
-      </Button>
-      {newToken && <NewTokenItem data={newToken} />}
+      <div className="container max-w-7xl">
+        <div className="flex justify-between">
+          <div className="flex items-center">
+            <Button
+              className="rounded-r-none px-3"
+              onClick={() => {
+                setTokenScope(undefined)
+                setIsOpen(true)
+              }}
+            >
+              Generate new token
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  asChild
+                  type="primary"
+                  className="rounded-l-none px-[4px] py-[5px]"
+                  icon={<IconChevronDown />}
+                >
+                  <span></span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" side="bottom">
+                <DropdownMenuItem
+                  key="experimental-token"
+                  onClick={() => {
+                    setTokenScope('V0')
+                    setIsOpen(true)
+                  }}
+                >
+                  <div className="space-y-1">
+                    <p className="block text-foreground">Generate token for experimental API</p>
+                  </div>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+      </div>
+
       <Modal
+        closable
+        hideFooter
+        size="medium"
         visible={isOpen}
         onCancel={() => setIsOpen(!isOpen)}
         header={
-          <div className="flex gap-2 items-baseline">
-            <h5 className="text-sm text-scale-1200">Generate New Token</h5>
+          <div className="flex items-baseline gap-2">
+            <h5 className="text-sm text-foreground">
+              {tokenScope === 'V0' ? 'Generate token for experimental API' : 'Generate New Token'}
+            </h5>
           </div>
         }
-        size="small"
-        hideFooter
-        closable
       >
         <Form
-          initialValues={{ tokenName: '' }}
           validateOnBlur
+          initialValues={{ tokenName: '' }}
           onSubmit={onFormSubmit}
-          validate={(values: any) => {
-            const errors: any = {}
-            if (!values.tokenName) {
-              errors.tokenName = 'Enter the name of the token.'
-            }
-            return errors
-          }}
+          validate={validate}
         >
-          {({ isSubmitting }: { isSubmitting: boolean }) => (
-            <div className="space-y-4 py-3">
+          {() => (
+            <div className="py-3 space-y-4">
+              {tokenScope === 'V0' && (
+                <Modal.Content>
+                  <Alert
+                    withIcon
+                    variant="warning"
+                    title="The experimental API provides additional endpoints which allows you to manage your organizations and projects."
+                  >
+                    <p>
+                      These include deleting organizations and projects which cannot be undone. As
+                      such, be very careful when using this API.
+                    </p>
+                    <div className="mt-4">
+                      <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                        <Link
+                          href="https://api.supabase.com/api/v0"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Experimental API documentation
+                        </Link>
+                      </Button>
+                    </div>
+                  </Alert>
+                </Modal.Content>
+              )}
               <Modal.Content>
                 <Input
                   id="tokenName"
                   label="Name"
-                  onChange={(e) => setName(e.target.value)}
-                  value={name}
-                  placeholder="Type in the token name"
+                  placeholder="Provide a name for your token"
                   className="w-full"
                 />
               </Modal.Content>
-              <Modal.Seperator />
+              <Modal.Separator />
               <Modal.Content>
-                <Button htmlType="submit" loading={isSubmitting} size="small" block danger>
-                  Generate Token
-                </Button>
+                <div className="flex items-center space-x-2 justify-end">
+                  <Button type="default" disabled={isLoading} onClick={() => setIsOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button htmlType="submit" loading={isLoading} disabled={isLoading}>
+                    Generate token
+                  </Button>
+                </div>
               </Modal.Content>
             </div>
           )}
@@ -94,28 +160,3 @@ const NewAccessTokenButton = observer(() => {
 })
 
 export default NewAccessTokenButton
-
-interface NewTokenItemProps {
-  data: NewAccessToken
-}
-
-const NewTokenItem: FC<NewTokenItemProps> = observer(({ data }) => {
-  return (
-    <Alert withIcon variant="success" title="Successfully generated a new token!">
-      <div className="w-full space-y-2">
-        <p className="text-sm">
-          Do copy this access token and store it in a secure place - you will not be able to see it
-          again.
-        </p>
-        <Input
-          readOnly
-          size="small"
-          copy={true}
-          className="input-mono max-w-xl"
-          value={data.token}
-          onChange={() => {}}
-        />
-      </div>
-    </Alert>
-  )
-})

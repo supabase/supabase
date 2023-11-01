@@ -1,40 +1,34 @@
-import dayjs from 'dayjs'
-import { HeaderFormmater, SeverityFormatter } from '../LogsFormatters'
+import { Column } from 'react-data-grid'
+import { LogData } from '../Logs.types'
+import {
+  RowLayout,
+  SeverityFormatter,
+  TextFormatter,
+  TimestampLocalFormatter,
+} from '../LogsFormatters'
+import { defaultRenderCell } from './DefaultPreviewColumnRenderer'
 
-export default [
+const columns: Column<LogData>[] = [
   {
-    key: 'timestamp',
-    headerRenderer: () => (
-      <div className="flex w-full justify-end h-full">
-        <HeaderFormmater value={'timestamp'} />
-      </div>
-    ),
-    name: 'timestamp',
-    formatter: (data: any) => (
-      <span className="flex w-full h-full items-center gap-1">
-        <span className="text-xs !text-scale-1100">
-          {dayjs(data?.row?.timestamp / 1000).format('DD MMM')}
-        </span>
-        <span className="text-xs !text-scale-1100">
-          {dayjs(data?.row?.timestamp / 1000).format('HH:mm:ss')}
-        </span>
-        {/* {data?.row?.timestamp} */}
-      </span>
-    ),
-    width: 128,
-    resizable: true,
-  },
-  {
-    key: 'level',
-    headerRenderer: () => <HeaderFormmater value={'Level'} />,
-    name: 'level',
-    formatter: (data: any) => <SeverityFormatter value={data.row.level} />,
-    width: 24,
-    resizable: true,
-  },
-  {
-    key: 'event_message',
-    headerRenderer: () => <HeaderFormmater value={'Event message'} />,
-    resizable: true,
+    name: 'functions-logs-first-column',
+    key: 'functions-logs-first-column',
+    renderCell: (props) => {
+      if (!props.row.event_type && !props.row.level) {
+        return defaultRenderCell(props)
+      }
+      return (
+        <RowLayout>
+          <TimestampLocalFormatter value={props.row.timestamp!} />
+          {props.row.event_type === 'uncaughtException' ? (
+            <SeverityFormatter value={props.row.event_type} uppercase={false} />
+          ) : (
+            <SeverityFormatter value={props.row.level as string} />
+          )}
+          <TextFormatter className="w-full" value={props.row.event_message} />
+        </RowLayout>
+      )
+    },
   },
 ]
+
+export default columns

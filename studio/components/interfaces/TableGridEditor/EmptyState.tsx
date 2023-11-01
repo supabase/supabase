@@ -1,34 +1,64 @@
-import { FC } from 'react'
-import { Button } from '@supabase/ui'
-import { PostgresTable } from '@supabase/postgres-meta'
-import { useStore } from 'hooks'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-interface Props {
-  selectedSchema: string
-  onAddTable: () => void
-}
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
+import { useCheckPermissions, useLocalStorage } from 'hooks'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 
-const EmptyState: FC<Props> = ({ selectedSchema, onAddTable }) => {
-  const { meta } = useStore()
-  const tables = meta.tables.list((table: PostgresTable) => table.schema === selectedSchema)
+export interface EmptyStateProps {}
 
-  const renderNoTablesCTA = () => {
-    return (
-      <div className="flex flex-col items-center justify-center space-y-4">
-        <p className="text-sm">There are no tables available in this schema</p>
-        {selectedSchema === 'public' && <Button onClick={onAddTable}>Create a new table</Button>}
-      </div>
-    )
-  }
+const EmptyState = ({}: EmptyStateProps) => {
+  const snap = useTableEditorStateSnapshot()
+  const isProtectedSchema = EXCLUDED_SCHEMAS.includes(snap.selectedSchemaName)
+  const canCreateTables =
+    useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables') && !isProtectedSchema
+
+  const [sort] = useLocalStorage<'alphabetical' | 'grouped-alphabetical'>(
+    'table-editor-sort',
+    'alphabetical'
+  )
+
+  const { project } = useProjectContext()
+  const { data } = useEntityTypesQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      schema: snap.selectedSchemaName,
+      sort,
+    },
+    {
+      keepPreviousData: true,
+    }
+  )
+
+  const totalCount = data?.pages?.[0].data.count ?? 0
 
   return (
     <div className="w-full h-full flex items-center justify-center">
-      {tables.length === 0 ? (
-        renderNoTablesCTA()
+      {totalCount === 0 ? (
+        <ProductEmptyState
+          title="Table Editor"
+          ctaButtonLabel={canCreateTables ? 'Create a new table' : undefined}
+          onClickCta={canCreateTables ? snap.onAddTable : undefined}
+        >
+          <p className="text-sm text-foreground-light">
+            There are no tables available in this schema.
+          </p>
+        </ProductEmptyState>
       ) : (
         <div className="flex flex-col items-center space-y-4">
-          <p className="text-sm">Select a table or create a new one</p>
-          <Button onClick={onAddTable}>Create a new table</Button>
+          <ProductEmptyState
+            title="Table Editor"
+            ctaButtonLabel={canCreateTables ? 'Create a new table' : undefined}
+            onClickCta={canCreateTables ? snap.onAddTable : undefined}
+          >
+            <p className="text-sm text-foreground-light">
+              Select a table from the navigation panel on the left to view its data
+              {canCreateTables && ', or create a new one.'}
+            </p>
+          </ProductEmptyState>
         </div>
       )}
     </div>

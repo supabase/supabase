@@ -1,230 +1,197 @@
 # Developing Supabase
 
-- [Development Setup](#development-setup)
-  - [Installing Dependencies](#installing-dependencies)
-  - [Forking Supabase on GitHub](#forking-supabase-on-github)
-- [Building Supabase](#building-supabase)
-  - [Choosing Directory](#choosing-directory)
-- [Start a Development Server](#start-a-development-server)
-  - [Supabase Website Development Server](#supabase-website-development-server)
-  - [Supabase Docs Development Server](#supabase-docs-development-server)
-  - [Supabase Studio Development Server](#supabase-studio-development-server)
-- [Monorepo](#monorepo)
-  - [Getting started](#getting-started)
-  - [Shared components](#shared-components)
-  - [Installing packages](#installing-packages)
-  - [Development](#development)
-- [Common Tasks](#common-tasks)
-  - [Adding redirects](#adding-redirects)
-- [Finally](#finally)
-- [Community Channels](#community-channels)
+1. [Getting started](#getting-started)
+   - [Install dependencies](#install-dependencies)
+2. [Local development](#local-development)
+   - [Fork the repository](#fork-the-repository)
+   - [Clone the repo](#clone-the-repo)
+   - [Running turborepo](#running-turborepo)
+     - [Shared components](#shared-components)
+     - [Installing packages](#installing-packages)
+   - [New Supabase docs](#new-supabase-docs)
+3. [Create a pull request](#create-a-pull-request)
 
-## Development Setup
+- [Common tasks](#common-tasks)
+  - [Add a redirect](#add-a-redirect)
+- [Community channels](#community-channels)
 
-First off, thanks for your interest in Supabase and for wanting to contribute! before you begin, read the
-[code of conduct](https://github.com/supabase/.github/blob/main/CODE_OF_CONDUCT.md) and check out the
-[existing issues](https://github.com/supabase/supabase/issues).
-This document describes how to set up your development environment to build and test Supabase.
+## Getting started
 
-### Installing Dependencies
+Thank you for expressing your interest in [Supabase](https://supabase.com) and your willingness to contribute!
 
-Before you can build Supabase, you must install and configure the following dependencies on your
-machine:
+To ensure a positive and inclusive environment, we kindly request you to read our [code of conduct](https://github.com/supabase/.github/blob/main/CODE_OF_CONDUCT.md). Additionally, we encourage you to explore the existing [issues](https://github.com/supabase/supabase/issues) to see how you can make a meaningful impact. This document will guide you through the process of setting up your development environment, enabling you to successfully build and test [Supabase](https://supabase.com).
+
+### Install dependencies
+
+You will need to install and configure the following dependencies on your machine to build [Supabase](https://supabase.com):
 
 - [Git](http://git-scm.com/)
+- [Node.js v18.x (LTS)](http://nodejs.org)
+- [npm](https://www.npmjs.com/) version 9.x.x
 
-- [Node.js v16.x (LTS)](http://nodejs.org)
+## Local development
 
-- [npm](https://www.npmjs.com/) version 7+.
+We are in the process of migrating this repository to monorepo, using [Turborepo](https://turborepo.org/docs).
 
-### Forking Supabase on GitHub
+Eventually, all the apps will be run using [Turborepo](https://turborepo.org/docs), which will significantly improve the developer workflow.
 
-To contribute code to Supabase, you must fork the [Supabase Repository](https://github.com/supabase/supabase). After you fork the repository, you may now begin editing the source code.
+### Fork the repository
 
-## Building Supabase
+To contribute code to [Supabase](https://supabase.com), you must fork the [Supabase Repository](https://github.com/supabase/supabase).
 
-To build Supabase, you clone the source code repository:
+### Clone the repo
 
-2. Clone your GitHub forked repository:
+1. Clone your GitHub forked repository:
 
    ```sh
    git clone https://github.com/<github_username>/supabase.git
    ```
 
-3. Go to the Supabase directory:
+2. Go to the Supabase directory:
    ```sh
    cd supabase
    ```
 
-### Choosing Directory
+### Running turborepo
 
-Before you start a development server, you must choose if you want to work on the [Supabase Website](https://supabase.com), [Supabase Docs](https://supabase.com/docs), or [Supabase Studio](https://app.supabase.com).
+[Supabase](https://supabase.com) uses [Turborepo](https://turborepo.org/docs) to manage and run this monorepo.
 
-1. Go to the [Supabase Website](https://supabase.com) directory
-
-   ```sh
-   cd apps/www
-   ```
-
-   Go to the [Supabase Docs](https://supabase.com/docs) directory
+1. Install the dependencies in the root of the repo.
 
    ```sh
-   cd web
+   npm install # install dependencies
    ```
 
-   Go to the [Supabase Studio](https://app.supabase.com) directory
-
+2. After that you can run the apps simultaneously with the following.
    ```sh
-   cd studio
+   npm run dev # start all the applications
    ```
 
-2. Install npm dependencies:
+Then visit, and edit, any of the following sites:
 
-   npm
+| Site                                                     | Directory    | Scope name | Description                          | Local development server   |
+| -------------------------------------------------------- | ------------ | ---------- | ------------------------------------ | -------------------------- |
+| [supabase.com](https://supabase.com)                     | `/apps/www`  | www        | The main website                     | http://localhost:3000      |
+| [supabase.com/dashboard](https://supabase.com/dashboard) | `/studio`    | studio     | Studio dashboard                     | http://localhost:8082      |
+| [supabase.com/docs](https://supabase.com/docs)           | `/apps/docs` | docs       | Guides and Reference (Next.js based) | http://localhost:3001/docs |
 
-   ```sh
-   npm install
-   ```
+#### Running sites individually
 
-   or with yarn
-
-   ```sh
-   yarn install
-   ```
-
-## Start a Development Server
-
-To debug code, and to see changes in real time, it is often useful to have a local HTTP server. Click one of the three links below to choose which development server you want to start.
-
-- [Supabase Website](#Supabase-Website-Development-Server)
-- [Supabase Docs](#Supabase-Docs-Development-Server)
-- [Supabase Studio](#Supabase-Studio-Development-Server)
-
-### Supabase Website Development Server
-
-The website is moving to a new monorepo setup. See the [Monorepo](#monorepo) section below.
-
-### Supabase Docs Development Server
-
-1. Build development server
-
-   npm
-
-   ```sh
-   npm run build
-   ```
-
-   or with yarn
-
-   ```sh
-   yarn build
-   ```
-
-2. Start development server
-
-   npm
-
-   ```sh
-   npm run start
-   ```
-
-   or with yarn
-
-   ```sh
-   yarn start
-   ```
-
-3. To access the local server, enter the following URL into your web browser:
-
-   ```sh
-   http://localhost:3005/docs
-   ```
-
-### Supabase Studio Development Server
-
-1. Start development server
-
-   npm
-
-   ```sh
-   npm run dev
-   ```
-
-   or with yarn
-
-   ```sh
-   yarn dev
-   ```
-
-2. To access the local server, enter the following URL into your web browser:
-
-   ```sh
-   http://localhost:8082/
-   ```
-
-For more information on Supabase Studio, see the [Supabase Studio readme](./studio/README.md).
-
-## Monorepo
-
-We are in the process of migrating this repository to monorepo, using Turborepo.
-Eventually, the docs and the Studio will be run using Turborepo, which will significantly improve the developer workflow.
-You must be using NPM 7 or higher.
-
-### Getting started
+You can run any of the sites individually by using the scope name. For example:
 
 ```sh
-npm install # install dependencies
-npm run dev # start all the applications
+npm run dev:www
 ```
 
-Then edit and visit any of the following sites:
-
-- `/apps/www`: http://localhost:3000
-  - The main website.
-- `/apps/temp-docs`: http://localhost:3001
-  - We are migrating the docs to a Next.js application.
-- `/apps/temp-community-forum`: http://localhost:3002
-  - pulls all our github discussions into a nextjs site. Temporary/POC
-- `/apps/temp-community-tutorials`: http://localhost:3003
-  - pulls all our DEV articles (which community members can write) into a nextjs site. Temporary/POC
-
-### Shared components
+#### Shared components
 
 The monorepo has a set of shared components under `/packages`:
 
 - `/packages/common`: Common React code, shared between all sites.
 - `/packages/config`: All shared config
+- `/packages/spec`: Generates documentation using spec files.
 - `/packages/tsconfig`: Shared Typescript settings
 
-### Installing packages
+#### Installing packages
 
-Installing a package with NPM workspaces requires you to add the `-w` flag to tell NPM which workspace you want to install into.
+Installing a package with NPM workspaces requires you to add the `-w` flag to tell NPM which workspace you want to install into. Do not install dependencies in their local folder, install them from the route using the `-w` flag.
 
 The format is: `npm install <package name> -w=<workspace to install in>`.
 
 For example:
 
-- `npm install @supabase/ui -w common`: installs into `./packages/common`
-- `npm install @supabase/ui -w www`: installs into `./apps/www`
+- `npm install react -w common`: installs into `./packages/common`
+- `npm install react -w www`: installs into `./apps/www`
+- `npm install react -w studio`: installs into `./studio`
 
 You do not need to install `devDependencies` in each workspace. These can all be installed in the root package.
 
-### Development
+#### New Supabase docs
 
-`npm run dev`
+Following the changes to the [Supabase docs](https://supabase.com/blog/new-supabase-docs-built-with-nextjs) the following is needed to run the new docs locally:
 
-## Common Tasks
+- Inside of `apps/docs` create a `.env.local` file with the following: `NEXT_PUBLIC_NEW_DOCS=true`
 
-### Adding Redirects
+Now when you run a local development docs server you will see the new docs site.
 
-To add a redirect, simple create a new entry in the [`next.config.js`](https://github.com/supabase/supabase/blob/master/apps/www/next.config.js) file in our main site.
+---
 
-## Finally
+## Running Docker
 
-After making your changes to the file(s) you'd like to update, it's time to open a pull request. Once you submit your pull request, others from the Supabase team/community will review it with you.
+To test your changes, you need to run Supabase using Docker. Docker lets you use features of your locally modified Supabase version.
 
-Did you have an issue, like a merge conflict, or don't know how to open a pull request? Check out [GitHub's pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests) tutorial on how to resolve merge conflicts and other issues. Once your PR has been merged, you will be proudly listed as a contributor in the [contributor chart](https://github.com/supabase/supabase/graphs/contributors)
+#### Prerequsites
 
-## Community Channels
+First, make sure you have the Docker application installed on your device. You can download and install it from [here](https://docs.docker.com/get-docker/).
 
-Stuck somewhere? Have any questions? please join the [Discord Community Server](https://discord.supabase.com/) or the [Github Discussions](https://github.com/supabase/supabase/discussions). We are here to help!
+#### Getting Started
+
+1. Navigate to the `docker` directory in your forked repo
+
+   ```sh
+   cd docker
+   ```
+
+2. Copy the example `env` file
+
+   ```sh
+   cp .env.example .env
+   ```
+
+3. Run docker
+
+   ```sh
+   docker-compose up
+   ```
+
+This command initializes the containers specified in the docker-compose.yml file. It might take a few moments to complete, depending on your computer and internet connection.
+
+Once the `docker-compose up` process completes, you should have your local version of Supabase up and running within Docker containers. You can access and test the features you've modified or added.
+
+Remember to keep the Docker application open as long as you're working with your local Supabase instance.
+
+## Create a pull request
+
+After making your changes, open a pull request. Once you submit your pull request, the Supabase team will review it with you.
+
+Once your PR has been merged, you will be proudly listed as a contributor in the [contributor chart](https://github.com/supabase/supabase/graphs/contributors).
+
+---
+
+## Common tasks
+
+### Add a redirect
+
+Create a new entry in the [`redirects.js`](https://github.com/supabase/supabase/blob/master/apps/www/lib/redirects.js) file in our main site.
+
+---
+
+### Federated docs
+
+We support "federating" docs, meaning doc content can come directly from external repos other than [`supabase/supabase`](https://github.com/supabase/supabase).
+
+- It's great for things like client libs who have their own set of docs that we don't want to duplicate on the official Supabase docs (eg. [`supabase/vecs`](https://github.com/supabase/vecs)).
+- No duplication or manual steps required - fetches and generates automatically as part of the docs build pipeline
+- It's flexible - you can "embed" external docs nearly anywhere at any level in Supabase docs, but they will feel native
+- If you are maintaining a repo containing docs that you think could also live in Supabase docs, feel free to create an issue and we can work together to integrate
+
+Federated docs work using Next.js's build pipeline. We use `getStaticProps()` to fetch remote documentation (ie. markdown) at build time which is processed and passed to the respective page within the docs.
+
+See the [Vecs Python source code](https://github.com/supabase/supabase/blob/master/apps/docs/pages/guides/ai/python/%5Bslug%5D.tsx) to see how we do this for [`supabase/vecs`](https://github.com/supabase/vecs). Use this as a starting point for federating other docs.
+
+Some things to consider:
+
+- Links will often need to be transformed. For example if you are bringing in external markdown content, they may contain relative links that may not translate 1-to-1 after rendering in the Supabase docs. Use the [Link Transform](https://github.com/supabase/supabase/blob/master/apps/docs/lib/mdx/plugins/rehypeLinkTransform.ts) rehype plugin to transform links.
+- External markdown may contain syntax extensions that Supabase docs don't understand by default (eg. [mkdocs-material extensions](https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown)). We've built a few remark plugins to support these extensions (eg. [MkDocs Admonition](https://github.com/supabase/supabase/blob/master/apps/docs/lib/mdx/plugins/remarkAdmonition.ts)). If there is a markdown extension that you need that isn't built yet, feel free to open an issue and we can work together to create it.
+
+---
+
+## Community channels
+
+If you are stuck somewhere or have any questions, join our [Discord Community Server](https://discord.supabase.com/) or the [Github Discussions](https://github.com/supabase/supabase/discussions). We are here to help!
+
+## Contributors
+
+<a href="https://github.com/supabase/supabase/graphs/contributors">
+   <img src="https://contributors.deno.dev/supabase/supabase?height=1200&width=1200&count=90" width="1200" height="1200" alt="contributors">
+</a>

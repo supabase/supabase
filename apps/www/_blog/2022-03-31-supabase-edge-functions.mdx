@@ -4,11 +4,14 @@ description: Today we're launching Edge Functions. Edge Functions let you execut
 author: inian
 image: launch-week-4/thursday-functions/functions-thumb.png
 thumb: launch-week-4/thursday-functions/functions-thumb.png
+categories:
+  - product
 tags:
   - launch-week
   - functions
 date: '2022-03-31'
 toc_depth: 3
+video: https://www.youtube.com/v/rzglqRdZUQE
 ---
 
 Today we're launching one of our [most](https://twitter.com/lau_cazanove/status/1506530181946691592) [requested](https://twitter.com/edgarasben/status/1506653203458363393) and [highly-](https://twitter.com/runjep/status/1507462077216088069)[anticipated](https://twitter.com/marcopolotwo/status/1506431782362632195) [features](https://github.com/supabase/supabase/discussions/4269) — Edge Functions. Edge Functions let you execute Typescript code close to your users, no matter where they're located.
@@ -66,7 +69,7 @@ The primary goal of this architecture is to reduce the amount of work done in th
 
 Supabase Edge Functions are deployed to one region - Earth (and we're exploring Mars as an additional region 👽). Edge Functions are deployed to over 30 data centers in a matter of seconds, ensuring fast response times no matter where your users are located.
 
-[Database Functions](https://supabase.com/docs/guides/database/functions) (also served via our [REST and GraphQL APIs](https://supabase.com/docs/guides/api)) are colocated with your Postgres database, making them ideal for DB-intensive operations. These APIs can also be called seamlessly from your Supabase Edge Functions, making for a powerful combination.
+[Database Functions](https://supabase.com/docs/guides/database/functions) (also served via our [REST and GraphQL APIs](https://supabase.com/docs/guides/database/api)) are colocated with your Postgres database, making them ideal for DB-intensive operations. These APIs can also be called seamlessly from your Supabase Edge Functions, making for a powerful combination.
 
 ### Scale to zero
 
@@ -78,22 +81,23 @@ Delivering a phenomenal Developer Experience is something we care about a lot at
 
 We've [extended the Supabase CLI](https://supabase.com/docs/guides/local-development) to optimize the Edge Functions DX along these two dimensions. You get live-reloading, and a local Deno environment that matches the production environment, making for a great local iteration environment.
 
-<video width="99%" autoPlay="autoplay" muted playsInline controls={true}>
+<video width="99%" autoPlay muted playsInline controls={true}>
   <source
-    src="/videos/blog/launch-week-4/functions-hot-reloading.mp4"
+    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/blog/launch-week-4/functions-hot-reloading.mp4"
     type="video/mp4"
-    muted
-    playsInline
   />
 </video>
 
 Once you've tested your Function locally (or gone straight to production cos you live _on the edge_ ... get it?) it takes just seconds to deploy a new function and see the logs streaming in your Dashboard—ensuring a tight iteration loop with your production environment.
 
-<video width="99%" autoPlay="autoplay" muted playsInline controls={true}>
-  <source src="/videos/blog/launch-week-4/logs-polish.mov" type="video/mp4" muted playsInline />
+<video width="99%" autoPlay muted playsInline controls={true}>
+  <source
+    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/blog/launch-week-4/logs-polish.mov"
+    type="video/mp4"
+  />
 </video>
 
-Our observability pipeline has been built [using Logflare](https://supabase.com/blog/2021/12/02/supabase-acquires-logflare). Structured logs from your Edge Functions get sent to Logflare, which also processes them into metrics. Your Supabase Dashboard is able to reach out to Logflare endpoints, and with some of the [(not so) secret sauce](https://supabase.com/blog/2021/11/30/supabase-studio) from our front-end team, you get responsive charts and logs for your Edge Functions.
+Our observability pipeline has been built [using Logflare](https://supabase.com/blog/supabase-acquires-logflare). Structured logs from your Edge Functions get sent to Logflare, which also processes them into metrics. Your Supabase Dashboard is able to reach out to Logflare endpoints, and with some of the [(not so) secret sauce](https://supabase.com/blog/supabase-studio) from our front-end team, you get responsive charts and logs for your Edge Functions.
 
 ![new —> deploy —> invoke —> logs](/images/blog/launch-week-4/thursday-functions/functions-new-deploy-invoke-logs.gif)
 new —> deploy —> invoke —> logs
@@ -102,15 +106,15 @@ To round off the end-to-end experience, `supabase-js` now works in Deno, making 
 
 ## Quickstart
 
-<iframe
-  className="w-full video-with-border"
-  width="640"
-  height="385"
-  src="https://www.youtube-nocookie.com/embed/rzglqRdZUQE"
-  frameBorder="1"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-  allowFullScreen
-></iframe>
+<div className="video-container">
+  <iframe
+    className="video-with-border w-full"
+    src="https://www.youtube-nocookie.com/embed/rzglqRdZUQE"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
 
 Can't wait to get started? Develop, test, and deploy your first Supabase Edge Function in less than 7 minutes with our [Quickstart Video Tutorial](https://youtu.be/rzglqRdZUQE)!
 Check the [Edge Functions Docs](https://supabase.com/docs/guides/functions) for the steps.

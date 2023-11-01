@@ -1,25 +1,24 @@
-import { FC, useEffect, useContext, createContext, FormEvent } from 'react'
-import { isEmpty, mapValues, has, filter, keyBy, isUndefined, partition, isNull } from 'lodash'
-import { observer, useLocalObservable } from 'mobx-react-lite'
-import {
-  Button,
-  Input,
-  Select,
-  SidePanel,
-  Typography,
-  IconTrash,
-  Divider,
-  Radio,
-  IconPlus,
-  Toggle,
-} from '@supabase/ui'
-import { Dictionary } from 'components/grid'
+import { filter, has, isEmpty, isNull, isUndefined, keyBy, mapValues, partition } from 'lodash'
 import { makeAutoObservable } from 'mobx'
+import { observer, useLocalObservable } from 'mobx-react-lite'
+import { createContext, FormEvent, useContext, useEffect, useState } from 'react'
+import { Button, IconPlus, IconTrash, Input, Listbox, Modal, Radio, SidePanel, Toggle } from 'ui'
 
-import { useStore } from 'hooks'
+import { Dictionary } from 'components/grid'
+import { Function } from 'components/interfaces/Functions/Functions.types'
+import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
 import Panel from 'components/ui/Panel'
 import SqlEditor from 'components/ui/SqlEditor'
-import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
+import { useSchemasQuery } from 'data/database/schemas-query'
+import { useStore } from 'hooks'
+import { isResponseOk } from 'lib/common/fetch'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { SupaResponse } from 'types'
+import { convertArgumentTypes, convertConfigParams, hasWhitespace } from './Functions.utils'
+
+// [Refactor] Remove local state, just use the Form component
 
 class CreateFunctionFormState {
   id: number | undefined
@@ -92,42 +91,12 @@ class CreateFunctionFormState {
   }
 }
 
-/**
- * convert argument_types = "a integer, b integer"
- * to args = {value: [{name:'a', type:'integer'}, {name:'b', type:'integer'}]}
- */
-function convertArgumentTypes(value: string) {
-  const items = value?.split(',')
-  if (isEmpty(value) || !items || items?.length == 0) return { value: [] }
-  const temp = items.map((x) => {
-    const str = x.trim()
-    const space = str.indexOf(' ')
-    const name = str.slice(0, space !== 1 ? space : 0)
-    const type = str.slice(space + 1)
-    return { name, type }
-  })
-  return { value: temp }
-}
-
-/**
- * convert config_params =  {search_path: "auth, public"}
- * to {value: [{name: 'search_path', value: 'auth, public'}]}
- */
-function convertConfigParams(value: Dictionary<any>) {
-  const temp = []
-  if (value) {
-    for (var key in value) {
-      temp.push({ name: key, value: value[key] })
-    }
-  }
-  return { value: temp }
-}
-
 interface ICreateFunctionStore {
   loading: boolean
   formState: CreateFunctionFormState
   meta: any
   schemas: Dictionary<any>[]
+  isEditing: boolean
   onFormChange: (value: { key: string; value: any }) => void
   onFormArrayChange: (value: {
     operation: 'add' | 'delete' | 'update'
@@ -145,6 +114,7 @@ class CreateFunctionStore implements ICreateFunctionStore {
   meta = null
   schemas = []
   advancedVisible = false
+  isDirty = false
 
   constructor() {
     makeAutoObservable(this)
@@ -172,7 +142,12 @@ class CreateFunctionStore implements ICreateFunctionStore {
     this.loading = value
   }
 
+  setIsDirty = (value: boolean) => {
+    this.isDirty = value
+  }
+
   onFormChange = ({ key, value }: { key: string; value: any }) => {
+    this.isDirty = true
     if (has(this.formState, key)) {
       const temp = (this.formState as any)[key] as any
       ;(this.formState as any)[key] = { ...temp, value, error: undefined }
@@ -279,35 +254,36 @@ class CreateFunctionStore implements ICreateFunctionStore {
   }
 }
 
-function hasWhitespace(value: string) {
-  return /\s/.test(value)
-}
-
 const CreateFunctionContext = createContext<ICreateFunctionStore | null>(null)
 
-type CreateFunctionProps = {
+interface CreateFunctionProps {
   func: any
   visible: boolean
   setVisible: (value: boolean) => void
-} & any
+}
 
-const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) => {
+const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
   const { ui, meta } = useStore()
+  const { project } = useProjectContext()
   const _localState = useLocalObservable(() => new CreateFunctionStore())
-  _localState.meta = meta as any
 
-  useEffect(() => {
-    const fetchSchemas = async () => {
-      await (_localState!.meta as any).schemas.load()
-      const schemas = (_localState!.meta as any).schemas.list()
-      _localState.setSchemas(schemas)
+  const [isClosingPanel, setIsClosingPanel] = useState<boolean>(false)
+
+  useSchemasQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      onSuccess(schemas) {
+        _localState.setSchemas(schemas)
+      },
     }
-
-    fetchSchemas()
-  }, [])
+  )
 
   useEffect(() => {
     _localState.formState.reset(func)
+    _localState.setIsDirty(false)
   }, [visible, func])
 
   async function handleSubmit() {
@@ -316,15 +292,15 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
         _localState.setLoading(true)
 
         const body = _localState.formState.requestBody
-        const response: any = body.id
-          ? await (_localState!.meta as any).functions.update(body.id, body)
-          : await (_localState!.meta as any).functions.create(body)
+        const response: SupaResponse<Function> = body.id
+          ? await (meta as any).functions.update(body.id, body)
+          : await (meta as any).functions.create(body)
 
-        if (response.error) {
+        if (!isResponseOk(response)) {
           ui.setNotification({
             category: 'error',
             message: `Failed to create function: ${
-              response.error?.message ?? 'Submit request failed'
+              response.error.message ?? 'Submit request failed'
             }`,
           })
           _localState.setLoading(false)
@@ -348,19 +324,23 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
     }
   }
 
+  function isClosingSidePanel() {
+    _localState.isDirty ? setIsClosingPanel(true) : setVisible(!visible)
+  }
+
   return (
     <>
       <SidePanel
         size="large"
         visible={visible}
-        onCancel={() => setVisible(!visible)}
+        onCancel={isClosingSidePanel}
         header={_localState.title}
-        className="hooks-sidepanel transform transition-all duration-300 ease-in-out mr-0"
+        className="hooks-sidepanel mr-0 transform transition-all duration-300 ease-in-out"
         loading={_localState.loading}
         onConfirm={handleSubmit}
       >
         <CreateFunctionContext.Provider value={_localState}>
-          <div className="space-y-10 mt-4">
+          <div className="mt-4 space-y-10">
             {_localState.isEditing ? (
               <>
                 <SidePanel.Content>
@@ -369,11 +349,11 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
                     <SelectSchema />
                   </div>
                 </SidePanel.Content>
-                <SidePanel.Seperator />
+                <SidePanel.Separator />
                 <SidePanel.Content>
                   <InputMultiArguments readonly={true} />
                 </SidePanel.Content>
-                <SidePanel.Seperator />
+                <SidePanel.Separator />
                 <SidePanel.Content>
                   <InputDefinition />
                 </SidePanel.Content>
@@ -383,25 +363,25 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
                 <SidePanel.Content>
                   <InputName />
                 </SidePanel.Content>
-                <SidePanel.Seperator />
+                <SidePanel.Separator />
                 <SidePanel.Content>
                   <div className="space-y-4">
                     <SelectSchema />
                     <SelectReturnType />
                   </div>
                 </SidePanel.Content>
-                <SidePanel.Seperator />
+                <SidePanel.Separator />
                 <SidePanel.Content>
                   <InputMultiArguments />
                 </SidePanel.Content>
-                <SidePanel.Seperator />
+                <SidePanel.Separator />
                 <SidePanel.Content>
                   <InputDefinition />
                 </SidePanel.Content>
-                <SidePanel.Seperator />
+                <SidePanel.Separator />
                 <SidePanel.Content>
                   <Panel>
-                    <div className={`space-y-8 py-4 bg-bg-alt-light dark:bg-bg-alt-dark rounded`}>
+                    <div className={`space-y-8 rounded bg-scale-200 py-4`}>
                       <div className={`px-6`}>
                         <Toggle
                           onChange={() => _localState.toggleAdvancedVisible()}
@@ -422,11 +402,11 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
                         <SelectBehavior />
                       </div>
                     </SidePanel.Content>
-                    <SidePanel.Seperator />
+                    <SidePanel.Separator />
                     <SidePanel.Content>
                       <InputMultiConfigParams />
                     </SidePanel.Content>
-                    <SidePanel.Seperator />
+                    <SidePanel.Separator />
                     <SidePanel.Content>
                       <RadioSecurity />
                     </SidePanel.Content>
@@ -436,6 +416,23 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
             )}
           </div>
         </CreateFunctionContext.Provider>
+        <ConfirmationModal
+          visible={isClosingPanel}
+          header="Discard changes"
+          buttonLabel="Discard"
+          onSelectCancel={() => setIsClosingPanel(false)}
+          onSelectConfirm={() => {
+            setIsClosingPanel(false)
+            setVisible(!visible)
+          }}
+        >
+          <Modal.Content>
+            <p className="py-4 text-sm text-foreground-light">
+              There are unsaved changes. Are you sure you want to close the panel? Your changes will
+              be lost.
+            </p>
+          </Modal.Content>
+        </ConfirmationModal>
       </SidePanel>
     </>
   )
@@ -443,7 +440,7 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
 
 export default observer(CreateFunction)
 
-const InputName: FC = observer(({}) => {
+const InputName = observer(({}) => {
   const _localState = useContext(CreateFunctionContext)
   return (
     <Input
@@ -465,11 +462,11 @@ const InputName: FC = observer(({}) => {
   )
 })
 
-type InputMultiArgumentsProps = {
+interface InputMultiArgumentsProps {
   readonly?: boolean
 }
 
-const InputMultiArguments: FC<InputMultiArgumentsProps> = observer(({ readonly }) => {
+const InputMultiArguments = observer(({ readonly }: InputMultiArgumentsProps) => {
   const _localState = useContext(CreateFunctionContext)
 
   function onAddArgument() {
@@ -483,14 +480,14 @@ const InputMultiArguments: FC<InputMultiArgumentsProps> = observer(({ readonly }
   return (
     <div>
       <div className="flex flex-col">
-        <h5 className="text-base text-scale-1200">Arguments</h5>
-        <p className="text-sm text-scale-1100">
+        <h5 className="text-base text-foreground">Arguments</h5>
+        <p className="text-sm text-foreground-light">
           Arguments can be referenced in the function body using either names or numbers.
         </p>
       </div>
-      <div className="pt-4 space-y-2">
+      <div className="space-y-2 pt-4">
         {readonly && isEmpty(_localState!.formState.args.value) && (
-          <span className="text-scale-900">No argument for this function</span>
+          <span className="text-foreground-lighter">No argument for this function</span>
         )}
         {_localState!.formState.args.value.map(
           (x: { name: string; type: string; error?: string }, idx: number) => (
@@ -516,14 +513,14 @@ const InputMultiArguments: FC<InputMultiArgumentsProps> = observer(({ readonly }
   )
 })
 
-type InputArgumentProps = {
+interface InputArgumentProps {
   idx: number
   name: string
   type: string
   error?: string
   readonly?: boolean
 }
-const InputArgument: FC<InputArgumentProps> = observer(({ idx, name, type, error, readonly }) => {
+const InputArgument = observer(({ idx, name, type, error, readonly }: InputArgumentProps) => {
   const _localState = useContext(CreateFunctionContext)
 
   function onNameChange(e: FormEvent<HTMLInputElement>) {
@@ -536,8 +533,7 @@ const InputArgument: FC<InputArgumentProps> = observer(({ idx, name, type, error
     })
   }
 
-  function onTypeChange(e: FormEvent<HTMLSelectElement>) {
-    const _value = e.currentTarget.value
+  function onTypeChange(_value: string) {
     _localState!.onFormArrayChange({
       key: 'args',
       value: { name, type: _value },
@@ -555,7 +551,7 @@ const InputArgument: FC<InputArgumentProps> = observer(({ idx, name, type, error
   }
 
   return (
-    <div className="flex flex-row space-x-1">
+    <div className="flex flex-row space-x-1 items-center">
       <Input
         id={`name-${idx}`}
         className="flex-1 flex-grow"
@@ -566,37 +562,35 @@ const InputArgument: FC<InputArgumentProps> = observer(({ idx, name, type, error
         error={error}
         disabled={readonly}
       />
-      <Select
-        id={`type-${idx}`}
-        className="flex-1"
-        value={type}
-        onChange={onTypeChange}
-        size="small"
-        disabled={readonly}
-      >
-        <Select.Option value="integer">integer</Select.Option>
-        {POSTGRES_DATA_TYPES.map((x: string) => (
-          <Select.Option key={x} value={x}>
-            {x}
-          </Select.Option>
-        ))}
-      </Select>
+      {readonly ? (
+        <Input disabled readOnly id={`type-${idx}`} size="small" value={type} className="flex-1" />
+      ) : (
+        <Listbox
+          id={`type-${idx}`}
+          className="flex-1"
+          value={type}
+          size="small"
+          onChange={onTypeChange}
+          disabled={readonly}
+        >
+          <Listbox.Option value="integer" label="integer">
+            integer
+          </Listbox.Option>
+          {POSTGRES_DATA_TYPES.map((x: string) => (
+            <Listbox.Option key={x} value={x} label={x}>
+              {x}
+            </Listbox.Option>
+          ))}
+        </Listbox>
+      )}
       {!readonly && (
-        <div>
-          <Button
-            danger
-            type="default"
-            icon={<IconTrash size="tiny" />}
-            onClick={onDelete}
-            size="small"
-          />
-        </div>
+        <Button type="danger" icon={<IconTrash size="tiny" />} onClick={onDelete} size="small" />
       )}
     </div>
   )
 })
 
-const InputMultiConfigParams: FC = observer(({}) => {
+const InputMultiConfigParams = observer(({}) => {
   const _localState = useContext(CreateFunctionContext)
 
   function onAddArgument() {
@@ -609,10 +603,10 @@ const InputMultiConfigParams: FC = observer(({}) => {
 
   return (
     <div>
-      <div className="flex justify-between items-center">
-        <h5 className="text-base text-scale-1200">Config Params</h5>
+      <div className="flex items-center justify-between">
+        <h5 className="text-base text-foreground">Config Params</h5>
       </div>
-      <div className="pt-4 space-y-2">
+      <div className="space-y-2 pt-4">
         {_localState!.formState.configParams.value.map(
           (
             x: { name: string; value: string; error?: { name?: string; value?: string } },
@@ -637,13 +631,13 @@ const InputMultiConfigParams: FC = observer(({}) => {
   )
 })
 
-type InputConfigParamProps = {
+interface InputConfigParamProps {
   idx: number
   name: string
   value: string
   error?: { name?: string; value?: string }
 }
-const InputConfigParam: FC<InputConfigParamProps> = observer(({ idx, name, value, error }) => {
+const InputConfigParam = observer(({ idx, name, value, error }: InputConfigParamProps) => {
   const _localState = useContext(CreateFunctionContext)
 
   function onNameChange(e: FormEvent<HTMLInputElement>) {
@@ -675,7 +669,7 @@ const InputConfigParam: FC<InputConfigParamProps> = observer(({ idx, name, value
   }
 
   return (
-    <div className="flex space-x-1">
+    <div className="flex space-x-1 items-center">
       <Input
         id={`name-${idx}`}
         className="flex-1"
@@ -694,33 +688,27 @@ const InputConfigParam: FC<InputConfigParamProps> = observer(({ idx, name, value
         size="small"
         error={error?.value}
       />
-      <div>
-        <Button
-          danger
-          type="default"
-          icon={<IconTrash size="tiny" />}
-          onClick={onDelete}
-          size="small"
-        />
-      </div>
+      <Button type="danger" icon={<IconTrash size="tiny" />} onClick={onDelete} size="small" />
     </div>
   )
 })
 
-const InputDefinition: FC = observer(({}) => {
+const InputDefinition = observer(({}) => {
   const _localState = useContext(CreateFunctionContext)
   return (
     <div className="space-y-4">
       <div className="flex flex-col">
-        <h5 className="text-base text-scale-1200">Definition</h5>
-        <p className="text-sm text-scale-1100">
+        <h5 className="text-base text-foreground">Definition</h5>
+        <p className="text-sm text-foreground-light">
           The language below should be written in `{_localState!.formState.language.value}`.
         </p>
-        <p className="text-sm text-scale-1100">
-          Change the language in the Advanced Settings below.
-        </p>
+        {!_localState?.isEditing && (
+          <p className="text-sm text-foreground-light">
+            Change the language in the Advanced Settings below.
+          </p>
+        )}
       </div>
-      <div className="h-40 border dark:border-dark">
+      <div className="h-60 resize-y border dark:border-dark">
         <SqlEditor
           defaultValue={_localState!.formState.definition.value}
           onInputChange={(value: string | undefined) => {
@@ -736,35 +724,37 @@ const InputDefinition: FC = observer(({}) => {
   )
 })
 
-const SelectSchema: FC = observer(({}) => {
+const SelectSchema = observer(({}) => {
   const _localState = useContext(CreateFunctionContext)
 
+  const { project } = useProjectContext()
+  const { data } = useSchemasQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const schemas = data?.filter((schema) => !EXCLUDED_SCHEMAS.includes(schema.name)) ?? []
+
   return (
-    <Select
+    <Listbox
       id="schema"
       label="Schema"
-      layout="horizontal"
-      value={_localState!.formState.schema.value}
-      onChange={(e) =>
-        _localState!.onFormChange({
-          key: 'schema',
-          value: e.target.value,
-        })
-      }
-      placeholder="Pick a schema"
       size="small"
+      layout="horizontal"
+      placeholder="Pick a schema"
+      value={_localState!.formState.schema.value}
       descriptionText="Tables made in the table editor will be in 'public'"
+      onChange={(value) => _localState!.onFormChange({ key: 'schema', value })}
     >
-      {_localState!.schemas.map((x) => (
-        <Select.Option key={x.name} value={x.name}>
+      {schemas.map((x) => (
+        <Listbox.Option key={x.name} label={x.name} value={x.name}>
           {x.name}
-        </Select.Option>
+        </Listbox.Option>
       ))}
-    </Select>
+    </Listbox>
   )
 })
 
-const SelectLanguage: FC = observer(({}) => {
+const SelectLanguage = observer(({}) => {
   const { meta } = useStore()
   const _localState = useContext(CreateFunctionContext)
 
@@ -774,98 +764,93 @@ const SelectLanguage: FC = observer(({}) => {
   )
 
   return (
-    <div className="space-y-4">
-      <Select
-        id="language"
-        label="Language"
-        layout="horizontal"
-        value={_localState!.formState.language.value}
-        onChange={(e) =>
-          _localState!.onFormChange({
-            key: 'language',
-            value: e.target.value,
+    <Listbox
+      id="language"
+      size="small"
+      label="Language"
+      layout="horizontal"
+      value={_localState!.formState.language.value}
+      placeholder="Pick a language"
+      onChange={(value) => _localState!.onFormChange({ key: 'language', value })}
+    >
+      <Listbox.Option value="sql" label="sql">
+        sql
+      </Listbox.Option>
+      {
+        //map through all selected extensions that start with pl
+        enabledExtensions
+          .filter((ex: any) => {
+            return ex.name.startsWith('pl')
           })
-        }
-        placeholder="Pick a language"
-        size="small"
-      >
-        <Select.Option value="sql">sql</Select.Option>
-        {
-          //map through all selected extensions that start with pl
-          enabledExtensions
-            .filter((ex: any) => {
-              return ex.name.startsWith('pl')
-            })
-            .map((ex) => (
-              <Select.Option key={ex.name} value={ex.name}>
-                {ex.name}
-              </Select.Option>
-            ))
-        }
-      </Select>
-    </div>
+          .map((ex) => (
+            <Listbox.Option key={ex.name} value={ex.name} label={ex.name}>
+              {ex.name}
+            </Listbox.Option>
+          ))
+      }
+    </Listbox>
   )
 })
 
-const SelectReturnType: FC = observer(({}) => {
+const SelectReturnType = observer(({}) => {
   const _localState = useContext(CreateFunctionContext)
 
   return (
-    <div className="space-y-4">
-      <Select
-        id="returnType"
-        label="Return type"
-        layout="horizontal"
-        value={_localState!.formState.returnType.value}
-        onChange={(e) =>
-          _localState!.onFormChange({
-            key: 'returnType',
-            value: e.target.value,
-          })
-        }
-        size="small"
-      >
-        <Select.Option value="void">void</Select.Option>
-        <Select.Option value="record">record</Select.Option>
-        <Select.Option value="trigger">trigger</Select.Option>
-        <Select.Option value="integer">integer</Select.Option>
-        {POSTGRES_DATA_TYPES.map((x: string) => (
-          <Select.Option key={x} value={x}>
-            {x}
-          </Select.Option>
-        ))}
-      </Select>
-    </div>
+    <Listbox
+      id="returnType"
+      size="small"
+      label="Return type"
+      layout="horizontal"
+      value={_localState!.formState.returnType.value}
+      onChange={(value) => _localState!.onFormChange({ key: 'returnType', value })}
+    >
+      <Listbox.Option value="void" label="void">
+        void
+      </Listbox.Option>
+      <Listbox.Option value="record" label="record">
+        record
+      </Listbox.Option>
+      <Listbox.Option value="trigger" label="trigger">
+        trigger
+      </Listbox.Option>
+      <Listbox.Option value="integer" label="integer">
+        integer
+      </Listbox.Option>
+      {POSTGRES_DATA_TYPES.map((x: string) => (
+        <Listbox.Option key={x} value={x} label={x}>
+          {x}
+        </Listbox.Option>
+      ))}
+    </Listbox>
   )
 })
 
-const SelectBehavior: FC = observer(({}) => {
+const SelectBehavior = observer(({}) => {
   const _localState = useContext(CreateFunctionContext)
 
   return (
-    <div className="space-y-4">
-      <Select
-        id="behavior"
-        label="Behavior"
-        layout="horizontal"
-        value={_localState!.formState.behavior.value}
-        onChange={(e) =>
-          _localState!.onFormChange({
-            key: 'behavior',
-            value: e.target.value,
-          })
-        }
-        size="small"
-      >
-        <Select.Option value="IMMUTABLE">immutable</Select.Option>
-        <Select.Option value="STABLE">stable</Select.Option>
-        <Select.Option value="VOLATILE">volatile</Select.Option>
-      </Select>
-    </div>
+    <Listbox
+      id="behavior"
+      size="small"
+      label="Behavior"
+      layout="horizontal"
+      value={_localState!.formState.behavior.value}
+      onChange={(value) => _localState!.onFormChange({ key: 'behavior', value })}
+    >
+      <Listbox.Option value="IMMUTABLE" label="immutable">
+        immutable
+      </Listbox.Option>
+      <Listbox.Option value="STABLE" label="stable">
+        stable
+      </Listbox.Option>
+      <Listbox.Option value="VOLATILE" label="volatile">
+        volatile
+      </Listbox.Option>
+    </Listbox>
   )
 })
 
-const RadioSecurity: FC = observer(({}) => {
+const RadioSecurity = observer(({}) => {
   const _localState = useContext(CreateFunctionContext)
 
   return (

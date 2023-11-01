@@ -1,43 +1,65 @@
 import { useState } from 'react'
-import { Button, IconMessageCircle, Popover } from '@supabase/ui'
+import {
+  Button,
+  IconMessageCircle,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+} from 'ui'
 import FeedbackWidget from './FeedbackWidget'
 
-const FeedbackDropdown = () => {
+interface FeedbackDropdownProps {
+  alt?: boolean
+}
+
+const FeedbackDropdown = ({ alt = false }: FeedbackDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [feedback, setFeedback] = useState('')
-  const [category, setCategory] = useState('Feedback')
+  const [screenshot, setScreenshot] = useState<string>()
 
   function onOpen() {
     setIsOpen((isOpen) => !isOpen)
   }
 
+  function onClose() {
+    setFeedback('')
+    setScreenshot(undefined)
+    setIsOpen(false)
+  }
+
   return (
-    <Popover
+    <Popover_Shadcn_
+      modal={false}
       open={isOpen}
-      onOpenChange={(e) => setIsOpen(e)}
-      size="content"
-      side="bottom"
-      align="end"
-      overlay={
-        <FeedbackWidget
-          onClose={() => setIsOpen(false)}
-          setFeedback={setFeedback}
-          feedback={feedback}
-          category={category}
-          setCategory={setCategory}
-        />
-      }
+      onOpenChange={(e) => {
+        setIsOpen(e)
+        if (!e) setScreenshot(undefined)
+      }}
     >
-      <Button
-        as="span"
-        onClick={onOpen}
-        type="default"
-        icon={<IconMessageCircle size={16} strokeWidth={1.5} className="text-scale-900" />}
-      >
-        <span className="block md:hidden">Feedback</span>
-        <span className="hidden md:block">Feedback on this page?</span>
-      </Button>
-    </Popover>
+      <PopoverTrigger_Shadcn_ asChild>
+        <Button
+          asChild
+          onClick={onOpen}
+          type="default"
+          icon={
+            alt ? null : (
+              <IconMessageCircle size={16} strokeWidth={1.5} className="text-foreground-lighter" />
+            )
+          }
+        >
+          <span className="hidden md:flex">Feedback</span>
+        </Button>
+      </PopoverTrigger_Shadcn_>
+      <PopoverContent_Shadcn_ side="bottom" align="end" className="w-full p-0">
+        <FeedbackWidget
+          onClose={onClose}
+          feedback={feedback}
+          setFeedback={setFeedback}
+          screenshot={screenshot}
+          setScreenshot={setScreenshot}
+        />
+      </PopoverContent_Shadcn_>
+    </Popover_Shadcn_>
   )
 }
 

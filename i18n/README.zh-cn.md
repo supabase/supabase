@@ -1,6 +1,6 @@
 <p align="center">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--light.svg#gh-light-mode-only">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--dark.svg#gh-dark-mode-only">
+<img src="https://user-images.githubusercontent.com/8291514/213727234-cda046d6-28c6-491a-b284-b86c5cede25d.png#gh-light-mode-only">
+<img src="https://user-images.githubusercontent.com/8291514/213727225-56186826-bee8-43b5-9b15-86e839d89393.png#gh-dark-mode-only">
 </p>
 
 ---
@@ -12,9 +12,9 @@
 - [x] Postgres 数据库托管。[文档](https://supabase.com/docs/guides/database)
 - [x] 身份验证和授权。[文档](https://supabase.com/docs/guides/auth)
 - [x] 自动生成的 API。
-  - [x] REST。[文档](https://supabase.com/docs/guides/api#rest-api)
-  - [x] 实时订阅。[文档](https://supabase.com/docs/guides/api#realtime-api)
-  - [x] GraphQL（测试版）。[文档](https://supabase.com/docs/guides/api#graphql-api)
+  - [x] REST。[文档](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] 实时订阅。[文档](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] GraphQL（测试版）。[文档](https://supabase.com/docs/guides/api#graphql-api-overview)
 - [x] 函数。
   - [x] 数据库函数。[文档](https://supabase.com/docs/guides/database/functions)
   - [x] 边缘函数。[文档](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@
 
 完整的文档，请访问 [supabase.com/docs](https://supabase.com/docs)
 
-了解如何贡献，请访问[入门](./DEVELOPERS.md)
+了解如何贡献，请访问[入门](../DEVELOPERS.md)
 
 ## 社区与支持
 
@@ -39,13 +39,13 @@
 ## 状态
 
 - [x] Alpha：我们正在与一组封闭的客户测试 Supabase
-- [x] Public Alpha：任何人都可以在 [app.supabase.com](https://app.supabase.com)上注册。只是务必手下留情，还有一些纠结的地方。
+- [x] Public Alpha：任何人都可以在 [supabase.com/dashboard](https://supabase.com/dashboard)上注册。只是务必手下留情，还有一些纠结的地方。
 - [x] Public Beta：足够稳定，适合大多数非企业使用场景
 - [ ] Public：生产就绪
 
 我们目前正处于 Public Beta 阶段。关注这个存储库的 "Releases" 以获得关于重大更新的通知。
 
-<kbd><img src="https://gitcdn.link/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="关注这个存储库"/></kbd>
+<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="关注这个存储库"/></kbd>
 
 ---
 
@@ -55,10 +55,10 @@ Supabase 是一个开源工具的组合。我们正在使用企业级的开源�
 
 **当前架构**
 
-Supabase 是一个[托管平台](https://app.supabase.com)。你可以注册并开始使用 Supabase，而无需安装任何软件。
+Supabase 是一个[托管平台](https://supabase.com/dashboard)。你可以注册并开始使用 Supabase，而无需安装任何软件。
 你也可以[自托管](https://supabase.com/docs/guides/hosting/overview)和[本地开发](https://supabase.com/docs/guides/local-development)。
 
-![架构](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
+![架构](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [PostgreSQL](https://www.postgresql.org/) 是一个对象关系型数据库系统，经过 30 多年的积极开发，它在可靠性、功能健壮性和性能方面赢得了很好的声誉。
 - [Realtime](https://github.com/supabase/realtime) 是一个 Elixir 服务器，允许你使用 WebSocket 监听 PostgreSQL 的插入、更新和删除。Supabase 监听 Postgres 的内置复制功能，将复制的字节流转换为 JSON，然后通过 WebSocket 广播 JSON。
@@ -116,8 +116,8 @@ Supabase 是一个[托管平台](https://app.supabase.com)。你可以注册并�
     <td><a href="https://github.com/supabase-community/storage-csharp" target="_blank" rel="noopener noreferrer">storage-csharp</a></td>
   </tr>
   <tr>
-    <td>Dart (Flutter)</td>
-    <td><a href="https://github.com/supabase/supabase-dart" target="_blank" rel="noopener noreferrer">supabase-dart</a></td>
+    <td>Flutter</td>
+    <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-dart</a></td>
     <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
     <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
     <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>
@@ -141,11 +141,11 @@ Supabase 是一个[托管平台](https://app.supabase.com)。你可以注册并�
   </tr>
   <tr>
     <td>Kotlin</td>
-    <td>-</td>
-    <td><a href="https://github.com/supabase-community/postgrest-kt" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
-    <td><a href="https://github.com/supabase-community/gotrue-kt" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
-    <td>-</td>
-    <td>-</td>
+    <td><a href="https://github.com/supabase-community/supabase-kt" target="_blank" rel="noopener noreferrer">supabase-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Postgrest" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/GoTrue" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Realtime" target="_blank" rel="noopener noreferrer">realtime-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Storage" target="_blank" rel="noopener noreferrer">storage-kt</a></td>
   </tr>
   <tr>
     <td>Python</td>
