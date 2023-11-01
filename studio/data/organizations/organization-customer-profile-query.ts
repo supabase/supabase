@@ -4,7 +4,6 @@ import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { organizationKeys } from './keys'
 import { ResponseError } from 'types'
-import { PlanId } from 'data/subscriptions/project-subscription-v2-query'
 
 export type OrganizationCustomerProfileVariables = {
   slug?: string
@@ -59,17 +58,3 @@ export const useOrganizationCustomerProfileQuery = <TData = OrganizationCustomer
       ...options,
     }
   )
-
-export const useOrganizationCustomerProfilePrefetch = ({
-  slug,
-}: OrganizationCustomerProfileVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (slug) {
-      client.prefetchQuery(organizationKeys.customerProfile(slug), ({ signal }) =>
-        getOrganizationCustomerProfile({ slug }, signal)
-      )
-    }
-  }, [slug])
-}

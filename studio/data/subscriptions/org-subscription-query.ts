@@ -1,7 +1,6 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { useCallback } from 'react'
 import { subscriptionKeys } from './keys'
 import { ResponseError } from 'types'
 
@@ -100,16 +99,3 @@ export const useOrgSubscriptionQuery = <TData = OrgSubscriptionData>(
       ...options,
     }
   )
-
-export const useOrgSubscriptionPrefetch = ({ orgSlug }: OrgSubscriptionVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (orgSlug) {
-      client.prefetchQuery(subscriptionKeys.orgSubscription(orgSlug), ({ signal }) =>
-        getOrgSubscription({ orgSlug }, signal)
-      )
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orgSlug])
-}
