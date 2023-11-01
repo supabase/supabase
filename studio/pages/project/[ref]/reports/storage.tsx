@@ -17,14 +17,16 @@ import { DatePickerToFrom, LogsEndpointParams } from 'components/interfaces/Sett
 import { useParams } from 'common'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import DatePickers from 'components/interfaces/Settings/Logs/Logs.DatePickers'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks'
 
 export const StorageReport: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
+  const organization = useSelectedOrganization()
   const report = useStorageReport()
 
-  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const plan = subscription?.plan
 
   const handleDatepickerChange = ({ from, to }: DatePickerToFrom) => {

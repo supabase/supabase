@@ -37,11 +37,7 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
 
   const slug = selectedOrganization?.slug
   const orgName = selectedOrganization?.name
-  const isOrgBilling = !!selectedOrganization?.subscription_id
-  const { data: subscription, isSuccess } = useOrgSubscriptionQuery(
-    { orgSlug: slug },
-    { enabled: isOrgBilling }
-  )
+  const { data: subscription, isSuccess } = useOrgSubscriptionQuery({ orgSlug: slug })
 
   const [open, setOpen] = useState(false)
 

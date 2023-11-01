@@ -6,7 +6,6 @@ import {
   IconChevronRight,
 } from 'ui'
 
-import { useSelectedOrganization } from 'hooks'
 import { Project } from 'types'
 import SettingsMenuItem from './SettingsMenuItem'
 
@@ -16,22 +15,13 @@ interface ProjectSettingsMenuItemProps {
 
 const ProjectSettingsMenuItem = ({ project }: ProjectSettingsMenuItemProps) => {
   const router = useRouter()
-  const organization = useSelectedOrganization()
-  const isOrgBilling = !!organization?.subscription_id
 
   // [Joshen] Links need to be updated once we start implementing these
-  const projectSettings = isOrgBilling
-    ? [
-        { label: 'General', pathname: `/project/[ref]/settings/general` },
-        { label: 'Infrastructure', pathname: `/project/[ref]/settings/infrastructure` },
-        { label: 'Add Ons', pathname: `/project/[ref]/settings/addons` },
-      ]
-    : [
-        { label: 'General', pathname: `/project/[ref]/settings/general` },
-        { label: 'Subscription', pathname: `/project/[ref]/settings/billing/subscription` },
-        { label: 'Usage', pathname: `/project/[ref]/settings/billing/usage` },
-        { label: 'Invoices', pathname: `/project/[ref]/settings/billing/invoices` },
-      ]
+  const projectSettings = [
+    { label: 'General', pathname: `/project/[ref]/settings/general` },
+    { label: 'Infrastructure', pathname: `/project/[ref]/settings/infrastructure` },
+    { label: 'Add Ons', pathname: `/project/[ref]/settings/addons` },
+  ]
 
   return (
     <AccordionItem_Shadcn_ value={project.ref} className="!border-none">

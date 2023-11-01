@@ -6,12 +6,10 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useIsFeatureEnabled, useSelectedOrganization, useSelectedProject } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { Organization, Project } from 'types'
 import {
-  Badge,
   Button,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
@@ -53,7 +51,6 @@ export const sanitizeRoute = (route: string, routerQueries: ParsedUrlQuery) => {
 
 const ProjectLink = ({
   project,
-  organization,
   setOpen,
 }: {
   project: Project
@@ -63,19 +60,9 @@ const ProjectLink = ({
   const router = useRouter()
   const { ref } = useParams()
   const sanitizedRoute = sanitizeRoute(router.route, router.query)
-  const isOrgBilling = !!organization?.subscription_id
 
   // [Joshen] Temp while we're interim between v1 and v2 billing
   let href = sanitizedRoute?.replace('[ref]', project.ref) ?? `/project/${project.ref}`
-  if (href.endsWith('settings/addons') && !isOrgBilling) {
-    href = href.replace('settings/addons', 'settings/billing/subscription')
-  } else if (href.endsWith('settings/billing/subscription') && isOrgBilling) {
-    href = href.replace('settings/billing/subscription', 'settings/addons')
-  } else if (href.endsWith('settings/infrastructure') && !isOrgBilling) {
-    href = href.replace('settings/infrastructure', 'settings/billing/usage')
-  } else if (href.endsWith('settings/billing/usage') && !isOrgBilling) {
-    href = href.replace('settings/billing/usage', 'settings/infrastructure')
-  }
 
   return (
     <CommandItem_Shadcn_
@@ -110,11 +97,7 @@ const ProjectDropdown = ({ isNewNav = false }: ProjectDropdownProps) => {
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
   const isBranch = projectDetails?.parentRef !== projectDetails?.ref
-  const isOrgBilling = !!selectedOrganization?.subscription_id
-  const { data: subscription, isSuccess } = useProjectSubscriptionV2Query(
-    { projectRef: ref },
-    { enabled: !isOrgBilling }
-  )
+
   const projects = isNewNav
     ? allProjects
         ?.filter((x) => x.organization_id === selectedOrganization?.id)
@@ -143,7 +126,6 @@ const ProjectDropdown = ({ isNewNav = false }: ProjectDropdownProps) => {
           >
             <div className="flex items-center space-x-2">
               <p className={isNewNav ? 'text-sm' : 'text-xs'}>{selectedProject?.name}</p>
-              {isSuccess && !isOrgBilling && <Badge color="slate">{subscription?.plan.name}</Badge>}
             </div>
           </Button>
         </PopoverTrigger_Shadcn_>
@@ -155,12 +137,7 @@ const ProjectDropdown = ({ isNewNav = false }: ProjectDropdownProps) => {
               <CommandGroup_Shadcn_>
                 <ScrollArea className={(projects || []).length > 7 ? 'h-[210px]' : ''}>
                   {projects?.map((project) => (
-                    <ProjectLink
-                      key={project.ref}
-                      project={project}
-                      organization={selectedOrganization}
-                      setOpen={setOpen}
-                    />
+                    <ProjectLink key={project.ref} project={project} setOpen={setOpen} />
                   ))}
                 </ScrollArea>
               </CommandGroup_Shadcn_>

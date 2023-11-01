@@ -1,8 +1,5 @@
 import { DataPoint } from 'data/analytics/constants'
-import { ProjectUsageResponse } from 'data/usage/project-usage-query'
-import { USAGE_APPROACHING_THRESHOLD } from 'components/interfaces/BillingV2/Billing.constants'
-import { CategoryAttribute, USAGE_STATUS } from './Usage.constants'
-import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
+import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
 
 // [Joshen] This is just for development to generate some test data for chart rendering
 export const generateUsageData = (attribute: string, days: number): DataPoint[] => {
@@ -16,25 +13,7 @@ export const generateUsageData = (attribute: string, days: number): DataPoint[] 
   })
 }
 
-export const getUsageStatus = (attributes: CategoryAttribute[], usage?: ProjectUsageResponse) => {
-  if (!usage) return USAGE_STATUS.NORMAL
-
-  const attributeStatuses = attributes.map((attribute) => {
-    const usageMeta = usage?.[attribute.key as keyof ProjectUsageResponse]
-    const usageRatio =
-      typeof usageMeta !== 'number' ? (usageMeta?.usage ?? 0) / (usageMeta?.limit ?? 0) : 0
-    if (usageRatio >= 1) return USAGE_STATUS.EXCEEDED
-    else if (usageRatio >= USAGE_APPROACHING_THRESHOLD) return USAGE_STATUS.APPROACHING
-    else return USAGE_STATUS.NORMAL
-  })
-
-  if (attributeStatuses.find((x) => x === USAGE_STATUS.EXCEEDED)) return USAGE_STATUS.EXCEEDED
-  else if (attributeStatuses.find((x) => x === USAGE_STATUS.APPROACHING))
-    return USAGE_STATUS.APPROACHING
-  else return USAGE_STATUS.NORMAL
-}
-
-export const getUpgradeUrl = (slug: string, subscription?: ProjectSubscriptionResponse) => {
+export const getUpgradeUrl = (slug: string, subscription?: OrgSubscription) => {
   if (!subscription) {
     return `/org/${slug}/billing`
   }

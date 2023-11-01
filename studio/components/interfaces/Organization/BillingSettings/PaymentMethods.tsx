@@ -18,7 +18,6 @@ import {
   Modal,
 } from 'ui'
 
-import { AddNewPaymentMethodModal } from 'components/interfaces/BillingV2'
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import Panel from 'components/ui/Panel'
@@ -30,6 +29,7 @@ import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organizat
 import { useCheckPermissions, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { getURL } from 'lib/helpers'
+import AddNewPaymentMethodModal from 'components/interfaces/Billing/Payment/AddNewPaymentMethodModal'
 
 const PaymentMethods = () => {
   const { ui } = useStore()

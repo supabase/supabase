@@ -253,7 +253,7 @@ export default function IndexPage() {
                                   {plan.priceMonthly}
                                 </p>
                                 <p className="text-muted mb-1.5 ml-1 text-[13px] leading-4">
-                                  {plan.costUnitOrg}
+                                  {plan.costUnit}
                                 </p>
                               </div>
 

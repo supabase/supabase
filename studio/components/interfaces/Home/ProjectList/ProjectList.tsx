@@ -1,7 +1,7 @@
 import { groupBy } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
-import { Button, IconExternalLink, IconPlus, Modal } from 'ui'
+import { Button, IconPlus } from 'ui'
 
 import AlertError from 'components/ui/AlertError'
 import {
@@ -14,7 +14,6 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { ResourceWarning, useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { IS_PLATFORM } from 'lib/constants'
 import { makeRandomString } from 'lib/helpers'
-import { useState } from 'react'
 import { Organization, Project, ResponseError } from 'types'
 import ProjectCard from './ProjectCard'
 import ShimmeringCard from './ShimmeringCard'
@@ -111,8 +110,6 @@ const OrganizationProjects = ({
     ?.filter((integration) => integration.integration.name === 'Vercel')
     .flatMap((integration) => integration.connections)
 
-  const [orgBillingMigrationModalVisible, setOrgBillingMigrationModalVisible] = useState(false)
-
   return (
     <div className="space-y-3" key={makeRandomString(5)}>
       <div className="flex space-x-4 items-center">
@@ -122,14 +119,6 @@ const OrganizationProjects = ({
           <div>
             <Button asChild type="danger">
               <Link href={`/org/${slug}/invoices`}>Outstanding Invoices</Link>
-            </Button>
-          </div>
-        )}
-
-        {!subscription_id && (
-          <div>
-            <Button onClick={() => setOrgBillingMigrationModalVisible(true)} type="warning">
-              Action Required
             </Button>
           </div>
         )}
@@ -178,58 +167,6 @@ const OrganizationProjects = ({
           )}
         </ul>
       )}
-
-      <Modal
-        closable
-        hideFooter
-        size="small"
-        visible={orgBillingMigrationModalVisible}
-        onCancel={() => setOrgBillingMigrationModalVisible(false)}
-        header="We're upgrading our billing system"
-      >
-        <Modal.Content className="py-4 space-y-4">
-          <div className="space-y-3">
-            <p className="text-sm leading-normal">
-              The organization "{name}" still uses the legacy project-based billing. We've recently
-              made some big improvements to our billing system and require your action. To migrate
-              to the new organization-based billing, head over to your{' '}
-              <Link
-                href={`/org/${slug}/billing`}
-                className="text-sm text-green-900 transition hover:text-green-1000"
-              >
-                organization billing settings
-              </Link>
-              .
-            </p>
-
-            <p className="text-sm leading-normal">
-              Please do this until the <span className="font-medium">18th of October</span>, as
-              remaining organizations will be migrated.
-            </p>
-
-            <div className="space-x-3">
-              <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                <Link
-                  href="https://supabase.com/blog/organization-based-billing"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Announcement
-                </Link>
-              </Button>
-              <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                <Link
-                  href="https://supabase.com/docs/guides/platform/org-based-billing"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Documentation
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </Modal.Content>
-      </Modal>
     </div>
   )
 }

@@ -26,7 +26,6 @@ import { getProjectAuthConfig } from 'data/auth/auth-config-query'
 import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useFlag, useStore } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
 import { detectBrowser } from 'lib/helpers'
@@ -35,6 +34,7 @@ import { Project } from 'types'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
 import { CATEGORY_OPTIONS, SERVICE_OPTIONS, SEVERITY_OPTIONS } from './Support.constants'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
@@ -110,10 +110,9 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
         })?.slug
       : organizations?.[0]?.slug
 
-  const { data: subscription, isLoading: isLoadingSubscription } = useProjectSubscriptionV2Query(
-    { projectRef: selectedProjectRef },
-    { enabled: selectedProjectRef !== 'no-project' }
-  )
+  const { data: subscription, isLoading: isLoadingSubscription } = useOrgSubscriptionQuery({
+    orgSlug: selectedOrganizationSlug,
+  })
 
   useEffect(() => {
     if (!uploadedFiles) return

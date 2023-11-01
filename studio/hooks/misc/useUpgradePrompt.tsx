@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'common/hooks'
 import { maybeShowUpgradePrompt } from 'components/interfaces/Settings/Logs'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from './useSelectedOrganization'
 
 export const useUpgradePrompt = (from: string) => {
-  const { ref: projectRef } = useParams()
-  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
+  const organization = useSelectedOrganization()
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
 
   const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, subscription?.plan?.id)

@@ -16,26 +16,26 @@ import {
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useSelectedOrganization } from 'hooks'
 import { pluckObjectFields } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
 import ConfirmDisableReadOnlyModeModal from './ConfirmDisableReadOnlyModal'
 import ResetDbPassword from './ResetDbPassword'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 const DatabaseSettings = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const telemetryProps = useTelemetryProps()
+  const organization = useSelectedOrganization()
   const selectedOrganization = useSelectedOrganization()
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 
   const { data, isLoading, isError } = useProjectSettingsQuery({ projectRef })
-  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { data: resourceWarnings } = useResourceWarningsQuery()
 
-  const isOrgBilling = !!selectedOrganization?.subscription_id
   const isReadOnlyMode =
     (resourceWarnings ?? [])?.find((warning) => warning.project === projectRef)
       ?.is_readonly_mode_enabled ?? false
@@ -179,11 +179,7 @@ const DatabaseSettings = () => {
                   {subscription?.plan.id === 'free' ? (
                     <li>
                       <Link
-                        href={
-                          isOrgBilling
-                            ? `/org/${selectedOrganization.slug}/billing?panel=subscriptionPlan`
-                            : `/project/${projectRef}/settings/billing/subscription?panel=subscriptionPlan`
-                        }
+                        href={`/org/${selectedOrganization?.slug}/billing?panel=subscriptionPlan`}
                       >
                         <a className="text underline">Upgrade to the Pro plan</a>
                       </Link>{' '}
@@ -192,11 +188,7 @@ const DatabaseSettings = () => {
                   ) : subscription?.plan.id === 'pro' && subscription?.usage_billing_enabled ? (
                     <li>
                       <Link
-                        href={
-                          isOrgBilling
-                            ? `/org/${selectedOrganization.slug}/billing?panel=subscriptionPlan`
-                            : `/project/${projectRef}/settings/billing/subscription?panel=subscriptionPlan`
-                        }
+                        href={`/org/${selectedOrganization?.slug}/billing?panel=subscriptionPlan`}
                       >
                         <a className="text-foreground underline">Disable your Spend Cap</a>
                       </Link>{' '}

@@ -55,16 +55,3 @@ export const useOrganizationTaxIDsQuery = <TData = OrganizationTaxIDsData>(
       ...options,
     }
   )
-
-export const useOrganizationTaxIDsPrefetch = ({ slug }: OrganizationTaxIDsVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (slug) {
-      client.prefetchQuery(organizationKeys.taxIds(slug), ({ signal }) =>
-        getOrganizationTaxIDs({ slug }, signal)
-      )
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [slug])
-}

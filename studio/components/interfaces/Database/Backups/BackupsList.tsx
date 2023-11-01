@@ -14,7 +14,7 @@ import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useBackupRestoreMutation } from 'data/database/backup-restore-mutation'
 import { DatabaseBackup, useBackupsQuery } from 'data/database/backups-query'
 import { setProjectStatus } from 'data/projects/projects-query'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
 import BackupItem from './BackupItem'
 import BackupsEmpty from './BackupsEmpty'
@@ -23,6 +23,7 @@ const BackupsList = () => {
   const { ui } = useStore()
   const router = useRouter()
   const queryClient = useQueryClient()
+  const organization = useSelectedOrganization()
   const { project: selectedProject } = useProjectContext()
   const projectRef = selectedProject?.ref || 'default'
 
@@ -65,6 +66,7 @@ const BackupsList = () => {
         icon={<IconClock size="large" />}
         primaryText="Free Plan does not include project backups."
         projectRef={projectRef}
+        organizationSlug={organization!.slug}
         secondaryText="Upgrade to the Pro plan for up to 7 days of scheduled backups."
         addon="pitr"
       />

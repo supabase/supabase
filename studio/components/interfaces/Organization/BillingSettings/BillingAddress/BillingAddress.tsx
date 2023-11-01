@@ -1,50 +1,33 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import { isEqual } from 'lodash'
-import { useState } from 'react'
-import { Button, Form, Input, Listbox } from 'ui'
+import { useEffect } from 'react'
 
+import { useParams } from 'common'
+import {
+  ScaffoldSection,
+  ScaffoldSectionContent,
+  ScaffoldSectionDetail,
+} from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import { FormActions, FormPanel, FormSection, FormSectionContent } from 'components/ui/Forms'
 import NoPermission from 'components/ui/NoPermission'
-import Panel from 'components/ui/Panel'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
 import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
 import { useCheckPermissions, useStore } from 'hooks'
+import { Form, Input, Listbox } from 'ui'
 import { COUNTRIES } from './BillingAddress.constants'
 
 const BillingAddress = () => {
   const { ui } = useStore()
   const { slug } = useParams()
+  const { data, error, isLoading, isSuccess, isError } = useOrganizationCustomerProfileQuery({
+    slug,
+  })
+  const { mutateAsync: updateCustomerProfile, isLoading: isUpdating } =
+    useOrganizationCustomerProfileUpdateMutation()
 
-  const {
-    data: customer,
-    error: customerError,
-    isError: isErrorCustomer,
-    isLoading: isLoadingCustomer,
-    isSuccess: isSuccessCustomer,
-  } = useOrganizationCustomerProfileQuery({ slug })
-
-  const { city, country, line1, line2, postal_code, state } = customer?.address ?? {}
-  const [isDirty, setIsDirty] = useState(false)
-  const initialValues = { city, country, line1, line2, postal_code, state }
-
-  const { mutate: updateCustomer, isLoading: isUpdating } =
-    useOrganizationCustomerProfileUpdateMutation({
-      onSuccess: () => {
-        ui.setNotification({
-          category: 'success',
-          message: 'Successfully updated billing address',
-        })
-        setIsDirty(false)
-      },
-      onError: (error) => {
-        ui.setNotification({
-          category: 'error',
-          message: `Failed to update billing address: ${error.message}`,
-        })
-      },
-    })
+  const formId = 'billing-address-form'
+  const { city, country, line1, line2, postal_code, state } = data?.address ?? {}
 
   const canReadBillingAddress = useCheckPermissions(
     PermissionAction.BILLING_READ,
@@ -55,7 +38,9 @@ const BillingAddress = () => {
     'stripe.customer'
   )
 
-  const onValidate = (values: any) => {
+  const initialValues = { city, country, line1, line2, postal_code, state }
+
+  const validate = (values: any) => {
     const errors = {} as any
     if (
       (values.line1 || values.line2 || values.postal_code || values.state || values.city) &&
@@ -63,145 +48,163 @@ const BillingAddress = () => {
     ) {
       errors['country'] = 'Please select a country'
     }
-    if (isEqual(values, initialValues)) {
-      setIsDirty(false)
-    } else {
-      setIsDirty(true)
-    }
     return errors
   }
 
-  const onSubmit = async (values: any) => {
+  const onSubmit = async (values: any, { resetForm }: any) => {
     if (!slug) return console.error('Slug is required')
-    updateCustomer({ slug, address: values })
+
+    try {
+      await updateCustomerProfile({ slug, address: values })
+      ui.setNotification({
+        category: 'success',
+        message: 'Successfully updated billing address',
+      })
+      resetForm({ values, initialValues: values })
+    } catch (error) {}
   }
 
   return (
-    <div className="space-y-2">
-      <div>
-        <h4>Billing address</h4>
-        <p className="text-sm opacity-50">This will be reflected in every invoice</p>
-      </div>
+    <ScaffoldSection>
+      <ScaffoldSectionDetail>
+        <div className="sticky space-y-2 top-12">
+          <p className="text-base m-0">Billing Address</p>
+          <p className="text-sm text-foreground-light m-0">
+            This will be reflected in every upcoming invoice, past invoices are not affected
+          </p>
+        </div>
+      </ScaffoldSectionDetail>
+      <ScaffoldSectionContent>
+        {!canReadBillingAddress ? (
+          <NoPermission resourceText="view this organization's billing address" />
+        ) : (
+          <>
+            {isLoading && (
+              <div className="space-y-2">
+                <ShimmeringLoader />
+                <ShimmeringLoader className="w-3/4" />
+                <ShimmeringLoader className="w-1/2" />
+              </div>
+            )}
 
-      {isLoadingCustomer && <GenericSkeletonLoader />}
+            {isError && (
+              <AlertError
+                subject="Failed to retrieve organization customer profile"
+                error={error as any}
+              />
+            )}
 
-      {isErrorCustomer && (
-        <AlertError error={customerError} subject="Failed to retrieve customer profile" />
-      )}
+            {isSuccess && (
+              <Form
+                validateOnBlur
+                id={formId}
+                initialValues={initialValues}
+                validate={validate}
+                onSubmit={onSubmit}
+              >
+                {({ values, initialValues, handleReset, resetForm }: any) => {
+                  const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
-      {isSuccessCustomer && (
-        <Panel>
-          {!canReadBillingAddress ? (
-            <NoPermission resourceText="view this organization's billing address" />
-          ) : (
-            <Form
-              validateOnBlur
-              initialValues={initialValues}
-              validate={onValidate}
-              onSubmit={onSubmit}
-            >
-              {({ handleReset }: any) => {
-                return (
-                  <>
-                    <Panel.Content className="w-3/5 space-y-2">
-                      <Input
-                        id="line1"
-                        name="line1"
-                        placeholder="Address line 1"
-                        disabled={!canUpdateBillingAddress}
-                      />
-                      <Input
-                        id="line2"
-                        name="line2"
-                        placeholder="Address line 2"
-                        disabled={!canUpdateBillingAddress}
-                      />
-                      <div className="flex space-x-2">
-                        <Listbox
-                          className="w-full"
-                          id="country"
-                          name="country"
-                          placeholder="Country"
-                          disabled={!canUpdateBillingAddress}
-                        >
-                          <Listbox.Option label="---" key="empty" value="">
-                            ---
-                          </Listbox.Option>
-                          {COUNTRIES.map((country) => (
-                            <Listbox.Option
-                              label={country.name}
-                              key={country.code}
-                              value={country.code}
+                  // eslint-disable-next-line react-hooks/rules-of-hooks
+                  useEffect(() => {
+                    if (isSuccess && data !== undefined) {
+                      const { city, country, line1, line2, postal_code, state } =
+                        data?.address ?? {}
+                      const values = { city, country, line1, line2, postal_code, state }
+                      resetForm({ values, initialValues: values })
+                    }
+
+                    // eslint-disable-next-line react-hooks/exhaustive-deps
+                  }, [isSuccess])
+
+                  return (
+                    <FormPanel
+                      footer={
+                        <div className="flex py-4 px-8">
+                          <FormActions
+                            form={formId}
+                            isSubmitting={isUpdating}
+                            hasChanges={hasChanges}
+                            handleReset={handleReset}
+                            helper={
+                              !canUpdateBillingAddress
+                                ? "You need additional permissions to manage this organization's billing address"
+                                : undefined
+                            }
+                          />
+                        </div>
+                      }
+                    >
+                      <FormSection>
+                        <FormSectionContent fullWidth loading={false} className="!gap-2">
+                          <Input
+                            id="line1"
+                            name="line1"
+                            placeholder="Address line 1"
+                            disabled={!canUpdateBillingAddress}
+                          />
+                          <Input
+                            id="line2"
+                            name="line2"
+                            placeholder="Address line 2"
+                            disabled={!canUpdateBillingAddress}
+                          />
+                          <div className="flex space-x-2">
+                            <Listbox
+                              className="w-full"
+                              id="country"
+                              name="country"
+                              placeholder="Country"
+                              disabled={!canUpdateBillingAddress}
                             >
-                              {country.name}
-                            </Listbox.Option>
-                          ))}
-                        </Listbox>
-                        <Input
-                          className="w-full"
-                          id="postal_code"
-                          name="postal_code"
-                          placeholder="Postal code"
-                          disabled={!canUpdateBillingAddress}
-                        />
-                      </div>
-                      <div className="flex space-x-2">
-                        <Input
-                          className="w-full"
-                          id="city"
-                          name="city"
-                          placeholder="City"
-                          disabled={!canUpdateBillingAddress}
-                        />
-                        <Input
-                          className="w-full"
-                          id="state"
-                          name="state"
-                          placeholder="State"
-                          disabled={!canUpdateBillingAddress}
-                        />
-                      </div>
-                    </Panel.Content>
-                    <div className="border-t border-scale-400" />
-                    <Panel.Content className="flex justify-between">
-                      {!canUpdateBillingAddress ? (
-                        <p className="text-sm text-foreground-light">
-                          You need additional permissions to update this organization's billing
-                          address
-                        </p>
-                      ) : (
-                        <div />
-                      )}
-                      <div className="flex items-center space-x-2">
-                        <Button
-                          type="default"
-                          htmlType="reset"
-                          disabled={!isDirty || isUpdating || !canUpdateBillingAddress}
-                          onClick={() => {
-                            handleReset()
-                            setIsDirty(false)
-                          }}
-                        >
-                          Cancel
-                        </Button>
-                        <Button
-                          type="primary"
-                          htmlType="submit"
-                          loading={isUpdating}
-                          disabled={!isDirty || isUpdating || !canUpdateBillingAddress}
-                        >
-                          Save
-                        </Button>
-                      </div>
-                    </Panel.Content>
-                  </>
-                )
-              }}
-            </Form>
-          )}
-        </Panel>
-      )}
-    </div>
+                              <Listbox.Option label="---" key="empty" value="">
+                                ---
+                              </Listbox.Option>
+                              {COUNTRIES.map((country) => (
+                                <Listbox.Option
+                                  label={country.name}
+                                  key={country.code}
+                                  value={country.code}
+                                >
+                                  {country.name}
+                                </Listbox.Option>
+                              ))}
+                            </Listbox>
+                            <Input
+                              className="w-full"
+                              id="postal_code"
+                              name="postal_code"
+                              placeholder="Postal code"
+                              disabled={!canUpdateBillingAddress}
+                            />
+                          </div>
+                          <div className="flex space-x-2">
+                            <Input
+                              className="w-full"
+                              id="city"
+                              name="city"
+                              placeholder="City"
+                              disabled={!canUpdateBillingAddress}
+                            />
+                            <Input
+                              className="w-full"
+                              id="state"
+                              name="state"
+                              placeholder="State"
+                              disabled={!canUpdateBillingAddress}
+                            />
+                          </div>
+                        </FormSectionContent>
+                      </FormSection>
+                    </FormPanel>
+                  )
+                }}
+              </Form>
+            )}
+          </>
+        )}
+      </ScaffoldSectionContent>
+    </ScaffoldSection>
   )
 }
 

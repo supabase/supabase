@@ -11,9 +11,9 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { FormHeader } from 'components/ui/Forms'
 import Panel from 'components/ui/Panel'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 export interface DiskSizeConfigurationProps {
   disabled?: boolean
@@ -22,6 +22,7 @@ export interface DiskSizeConfigurationProps {
 const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps) => {
   const { ui } = useStore()
   const { project } = useProjectContext()
+  const organization = useSelectedOrganization()
   const { ref: projectRef } = useParams()
   const { lastDatabaseResizeAt } = project ?? {}
 
@@ -43,7 +44,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
   })
 
   const { data: projectUsage } = useProjectUsageQuery({ projectRef })
-  const { data: projectSubscriptionData } = useProjectSubscriptionV2Query({ projectRef })
+  const { data: projectSubscriptionData } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { mutate: updateProjectUsage, isLoading: isUpdatingDiskSize } =
     useProjectDiskResizeMutation({
       onSuccess: (res, variables) => {

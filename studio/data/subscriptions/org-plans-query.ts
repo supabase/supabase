@@ -1,7 +1,6 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { useCallback } from 'react'
 import { subscriptionKeys } from './keys'
 
 export type OrgPlansVariables = {
@@ -41,15 +40,3 @@ export const useOrgPlansQuery = <TData = OrgPlansData>(
       ...options,
     }
   )
-
-export const useOrgPlansPrefetch = ({ orgSlug }: OrgPlansVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (orgSlug) {
-      client.prefetchQuery(subscriptionKeys.orgPlans(orgSlug), ({ signal }) =>
-        getOrgPlans({ orgSlug }, signal)
-      )
-    }
-  }, [orgSlug])
-}

@@ -15,11 +15,6 @@ import {
 
 import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
 import {
-  ComputeInstanceSidePanel,
-  CustomDomainSidePanel,
-  PITRSidePanel,
-} from 'components/interfaces/Settings/Addons'
-import {
   useIsProjectActive,
   useProjectContext,
 } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -31,8 +26,11 @@ import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH } from 'lib/constants'
 import { getSemanticVersion } from 'lib/helpers'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
-import { getAddons } from '../Subscription.utils'
 import Image from 'next/image'
+import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import ComputeInstanceSidePanel from 'components/interfaces/Settings/Addons/ComputeInstanceSidePanel'
+import PITRSidePanel from 'components/interfaces/Settings/Addons/PITRSidePanel'
+import CustomDomainSidePanel from 'components/interfaces/Settings/Addons/CustomDomainSidePanel'
 
 const AddOns = () => {
   const { resolvedTheme } = useTheme()

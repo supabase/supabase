@@ -4,13 +4,13 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { Button, Input } from 'ui'
 
-import { CANCELLATION_REASONS } from 'components/interfaces/BillingV2/Billing.constants'
+import { CANCELLATION_REASONS } from 'components/interfaces/Billing/Billing.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send'
 import { useProjectDeleteMutation } from 'data/projects/project-delete-mutation'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 export interface DeleteProjectButtonProps {
   type?: 'danger' | 'default'
@@ -20,9 +20,10 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
   const router = useRouter()
   const { ui } = useStore()
   const { project } = useProjectContext()
+  const organization = useSelectedOrganization()
 
   const projectRef = project?.ref
-  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const projectPlan = subscription?.plan?.id ?? 'free'
   const isFree = projectPlan === 'free'
 

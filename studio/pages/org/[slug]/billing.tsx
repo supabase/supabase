@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { BillingSettings, BillingSettingsV2 } from 'components/interfaces/Organization'
+import { BillingSettings } from 'components/interfaces/Organization'
 import { OrganizationLayout } from 'components/layouts'
 import Loading from 'components/ui/Loading'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
@@ -16,7 +16,6 @@ const OrgBillingSettings: NextPageWithLayout = () => {
   const snap = useOrgSettingsPageStateSnapshot()
   const { isLoading: isLoadingPermissions } = usePermissionsQuery()
   const selectedOrganization = useSelectedOrganization()
-  const isOrgBilling = !!selectedOrganization?.subscription_id
 
   useEffect(() => {
     const allowedValues = ['subscriptionPlan', 'costControl']
@@ -32,15 +31,7 @@ const OrgBillingSettings: NextPageWithLayout = () => {
       {selectedOrganization === undefined && isLoadingPermissions ? (
         <Loading />
       ) : (
-        <>
-          {isOrgBilling ? (
-            <BillingSettingsV2 />
-          ) : (
-            <div className="px-4">
-              <BillingSettings />
-            </div>
-          )}
-        </>
+        <BillingSettings />
       )}
     </>
   )

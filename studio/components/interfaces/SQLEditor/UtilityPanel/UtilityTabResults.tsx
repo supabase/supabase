@@ -1,7 +1,6 @@
-import { subscriptionHasHipaaAddon } from 'components/interfaces/BillingV2/Subscription/Subscription.utils'
+import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { isError } from 'data/utils/error-check'
 import {
   useFlag,
@@ -17,6 +16,7 @@ import { AiIconAnimation, Button } from 'ui'
 import { useSqlEditor } from '../SQLEditor'
 import { sqlAiDisclaimerComment } from '../SQLEditor.constants'
 import Results from './Results'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 export type UtilityTabResultsProps = {
   id: string
@@ -25,6 +25,7 @@ export type UtilityTabResultsProps = {
 
 const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
   const { ui } = useStore()
+  const organization = useSelectedOrganization()
   const snap = useSqlEditorStateSnapshot()
   const { mutateAsync: debugSql, isLoading: isDebugSqlLoading } = useSqlDebugMutation()
   const { setDebugSolution, setAiInput, setSqlDiff, sqlDiff } = useSqlEditor()
@@ -50,7 +51,7 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
   const isUtilityPanelCollapsed = (snippet?.splitSizes?.[1] ?? 0) === 0
   const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
 
-  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef: selectedProject?.ref })
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
   // Customers on HIPAA plans should not have access to Supabase AI
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)

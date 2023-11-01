@@ -1,56 +1,81 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-
-import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
-import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
-import { useCheckPermissions, useFlag, useSelectedOrganization } from 'hooks'
-import OrganizationBillingMigrationPanel from '../GeneralSettings/OrganizationBillingMigrationPanel'
+import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
 import BillingAddress from './BillingAddress/BillingAddress'
 import BillingEmail from './BillingEmail'
+import CostControl from './CostControl/CostControl'
 import CreditBalance from './CreditBalance'
-import PaymentMethods from './PaymentMethods'
-import ProjectsSummary from './ProjectsSummary'
+import PaymentMethods from './PaymentMethods/PaymentMethods'
+import Subscription from './Subscription/Subscription'
 import TaxID from './TaxID/TaxID'
+import BillingBreakdown from './BillingBreakdown/BillingBreakdown'
+import { useIsFeatureEnabled } from 'hooks'
 
 const BillingSettings = () => {
-  const { slug } = useParams()
-
-  const organization = useSelectedOrganization()
-  const { data: allProjects } = useProjectsQuery()
-  const projects =
-    allProjects?.filter((project) => project.organization_id === organization?.id) ?? []
-
-  const { data: customer } = useOrganizationCustomerProfileQuery({ slug })
-
-  const customerBalance = customer && customer.balance ? customer.balance / 100 : 0
-  const isCredit = customerBalance < 0
-  const isDebt = customerBalance > 0
-  const balance =
-    isCredit && customerBalance !== 0
-      ? customerBalance.toString().replace('-', '')
-      : customerBalance
-
-  const orgBillingMigrationEnabled = useFlag('orgBillingMigration')
-  const selectedOrganization = useSelectedOrganization()
-  const { subscription_id } = selectedOrganization ?? {}
+  const {
+    billingAccountData: billingAccountDataEnabled,
+    billingPaymentMethods: billingPaymentMethodsEnabled,
+    billingCredits: billingCreditsEnabled,
+  } = useIsFeatureEnabled(['billing:account_data', 'billing:payment_methods', 'billing:credits'])
 
   return (
-    <ScaffoldContainerLegacy>
-      {orgBillingMigrationEnabled && !subscription_id && <OrganizationBillingMigrationPanel />}
+    <>
+      <ScaffoldContainer id="subscription">
+        <Subscription />
+      </ScaffoldContainer>
 
-      <ProjectsSummary projects={projects} />
+      <ScaffoldDivider />
 
-      <CreditBalance balance={balance} isCredit={isCredit} isDebt={isDebt} />
+      <ScaffoldContainer id="cost-control">
+        <CostControl />
+      </ScaffoldContainer>
 
-      <PaymentMethods />
+      <ScaffoldDivider />
 
-      <BillingEmail />
+      <ScaffoldContainer id="breakdown">
+        <BillingBreakdown />
+      </ScaffoldContainer>
 
-      <BillingAddress />
+      {billingCreditsEnabled && (
+        <>
+          <ScaffoldDivider />
 
-      <TaxID />
-    </ScaffoldContainerLegacy>
+          <ScaffoldContainer id="credits-balance">
+            <CreditBalance />
+          </ScaffoldContainer>
+        </>
+      )}
+
+      {billingPaymentMethodsEnabled && (
+        <>
+          <ScaffoldDivider />
+
+          <ScaffoldContainer id="payment-methods">
+            <PaymentMethods />
+          </ScaffoldContainer>
+        </>
+      )}
+
+      {billingAccountDataEnabled && (
+        <>
+          <ScaffoldDivider />
+
+          <ScaffoldContainer id="email">
+            <BillingEmail />
+          </ScaffoldContainer>
+
+          <ScaffoldDivider />
+
+          <ScaffoldContainer id="address">
+            <BillingAddress />
+          </ScaffoldContainer>
+
+          <ScaffoldDivider />
+
+          <ScaffoldContainer id="taxId">
+            <TaxID />
+          </ScaffoldContainer>
+        </>
+      )}
+    </>
   )
 }
 

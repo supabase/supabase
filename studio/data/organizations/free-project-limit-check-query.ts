@@ -55,15 +55,3 @@ export const useFreeProjectLimitCheckQuery = <TData = FreeProjectLimitCheckData>
       ...options,
     }
   )
-
-export const useFreeProjectLimitCheckPrefetch = ({ slug }: FreeProjectLimitCheckVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (slug) {
-      client.prefetchQuery(organizationKeys.freeProjectLimitCheck(slug), ({ signal }) =>
-        getFreeProjectLimitCheck({ slug }, signal)
-      )
-    }
-  }, [slug])
-}

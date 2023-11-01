@@ -7,7 +7,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 
-import { SpendCapModal } from 'components/interfaces/BillingV2'
 import {
   EmptyPaymentMethodWarning,
   FreeProjectLimitWarning,
@@ -54,6 +53,7 @@ import {
   Listbox,
   Toggle,
 } from 'ui'
+import SpendCapModal from 'components/interfaces/Billing/SpendCapModal'
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()

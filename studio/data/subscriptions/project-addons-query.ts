@@ -1,7 +1,6 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { useCallback } from 'react'
 import { subscriptionKeys } from './keys'
 import { ResponseError } from 'types'
 
@@ -74,15 +73,3 @@ export const useProjectAddonsQuery = <TData = ProjectAddonsData>(
       ...options,
     }
   )
-
-export const useProjectSubscriptionV2Prefetch = ({ projectRef }: ProjectAddonsVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef) {
-      client.prefetchQuery(subscriptionKeys.addons(projectRef), ({ signal }) =>
-        getProjectAddons({ projectRef }, signal)
-      )
-    }
-  }, [projectRef])
-}

@@ -35,7 +35,6 @@ const General = () => {
   const parentProject = useProjectByRef(project?.parent_project_ref)
   const isBranch = parentProject !== undefined
 
-  const isOrgBilling = !!organization?.subscription_id
   const formId = 'project-general-settings'
   const initialValues = { name: project?.name ?? '', ref: project?.ref ?? '' }
   const canUpdateProject = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
@@ -119,7 +118,7 @@ const General = () => {
           }}
         </Form>
       )}
-      {!isBranch && isOrgBilling && (
+      {!isBranch && (
         <>
           <div className="mt-6" id="restart-project">
             <FormPanel>
@@ -165,7 +164,7 @@ const General = () => {
                   </div>
                   <div>
                     <Button asChild type="default">
-                      <Link href={`/org/${organization.slug}/usage?projectRef=${project?.ref}`}>
+                      <Link href={`/org/${organization?.slug}/usage?projectRef=${project?.ref}`}>
                         View project usage
                       </Link>
                     </Button>

@@ -13,9 +13,10 @@ import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
 
 export type StorageSettingsProps = {
   projectRef: string | undefined
+  organizationSlug: string | undefined
 }
 
-const StorageSettings = ({ projectRef }: StorageSettingsProps) => {
+const StorageSettings = ({ projectRef, organizationSlug }: StorageSettingsProps) => {
   const { data, error } = useProjectStorageConfigQuery({ projectRef }, { enabled: IS_PLATFORM })
 
   if (error || data?.error) {
@@ -34,10 +35,10 @@ const StorageSettings = ({ projectRef }: StorageSettingsProps) => {
     )
   }
 
-  return <StorageConfig config={data} projectRef={projectRef} />
+  return <StorageConfig config={data} projectRef={projectRef} organizationSlug={organizationSlug} />
 }
 
-const StorageConfig = ({ config, projectRef }: any) => {
+const StorageConfig = ({ config, projectRef, organizationSlug }: any) => {
   const { fileSizeLimit, isFreeTier } = config
   const { value, unit } = convertFromBytes(fileSizeLimit)
 
@@ -177,6 +178,7 @@ const StorageConfig = ({ config, projectRef }: any) => {
                     <div className="px-6 pb-6">
                       <UpgradeToPro
                         icon={<IconClock size="large" />}
+                        organizationSlug={organizationSlug}
                         primaryText="Free Plan has a fixed upload file size limit of 50 MB."
                         projectRef={projectRef}
                         secondaryText="Upgrade to the Pro plan for a configurable upload file size limit of up to 5 GB."

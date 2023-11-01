@@ -4,7 +4,7 @@ import { useMemo } from 'react'
 
 import { useParams } from 'common'
 import { useTheme } from 'next-themes'
-import { getAddons } from 'components/interfaces/BillingV2/Subscription/Subscription.utils'
+import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
 import {
   useIsProjectActive,
@@ -36,8 +36,10 @@ import {
   IconChevronRight,
   IconExternalLink,
 } from 'ui'
-import { ComputeInstanceSidePanel, CustomDomainSidePanel, PITRSidePanel } from './'
 import Image from 'next/image'
+import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
+import PITRSidePanel from './PITRSidePanel'
+import CustomDomainSidePanel from './CustomDomainSidePanel'
 
 const Addons = () => {
   const { resolvedTheme } = useTheme()

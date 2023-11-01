@@ -18,11 +18,12 @@ import {
 import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilterPanel'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 import ShimmerLine from 'components/ui/ShimmerLine'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import useLogsPreview from 'hooks/analytics/useLogsPreview'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { LOGS_TABLES } from './Logs.constants'
 import UpgradePrompt from './UpgradePrompt'
+import { useSelectedOrganization } from 'hooks'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 /**
  * Acts as a container component for the entire log display
@@ -52,7 +53,8 @@ export const LogsPreviewer = ({
   const router = useRouter()
   const { s, ite, its } = useParams()
   const [showChart, setShowChart] = useState(true)
-  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
+  const organization = useSelectedOrganization()
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
   const table = !tableName ? LOGS_TABLES[queryType] : tableName
 

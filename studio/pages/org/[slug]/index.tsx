@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Button, IconPlus } from 'ui'
 
-import NoProjectsOnPaidOrgInfo from 'components/interfaces/BillingV2/NoProjectsOnPaidOrgInfo'
+import NoProjectsOnPaidOrgInfo from 'components/interfaces/Billing/NoProjectsOnPaidOrgInfo'
 import ProjectCard from 'components/interfaces/Home/ProjectList/ProjectCard'
 import ShimmeringCard from 'components/interfaces/Home/ProjectList/ShimmeringCard'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'

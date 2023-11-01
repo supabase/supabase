@@ -55,16 +55,3 @@ export const useOrgUsageQuery = <TData = OrgUsageData>(
       ...options,
     }
   )
-
-export const useOrgUsagePrefetch = ({ orgSlug }: OrgUsageVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (orgSlug) {
-      client.prefetchQuery(usageKeys.orgUsage(orgSlug), ({ signal }) =>
-        getOrgUsage({ orgSlug }, signal)
-      )
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orgSlug])
-}

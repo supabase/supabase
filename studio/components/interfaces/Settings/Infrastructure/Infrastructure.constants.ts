@@ -1,8 +1,3 @@
-// [Joshen TODO] Please clean up - a lot of repeated code from other files here
-// all of these interfaces, see what can be reused
-
-// [Joshen TODO] Remove any dependency on BillingV2 stuff so that we can deprecate easily
-
 export interface Attribute {
   key: string
   name?: string

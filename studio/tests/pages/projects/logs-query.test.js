@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event'
 import { logDataFixture } from '../../fixtures'
 import { clickDropdown } from 'tests/helpers'
 import dayjs from 'dayjs'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 jest.mock('common/hooks')
 import { useParams } from 'common/hooks'
 
@@ -222,7 +222,7 @@ test('field reference', async () => {
 
 describe.each(['free', 'pro', 'team', 'enterprise'])('upgrade modal for %s', (key) => {
   beforeEach(() => {
-    useProjectSubscriptionV2Query.mockReturnValue({
+    useOrgSubscriptionQuery.mockReturnValue({
       data: {
         plan: {
           id: key,
