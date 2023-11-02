@@ -4,11 +4,14 @@ import { Button, IconAlertCircle, IconExternalLink } from 'ui'
 import InformationBox from 'components/ui/InformationBox'
 
 interface DisabledStateForFreeTierProps {
-  projectRef: string
+  organizationSlug: string
   category: string
 }
 
-const DisabledStateForFreeTier = ({ projectRef, category }: DisabledStateForFreeTierProps) => {
+const DisabledStateForFreeTier = ({
+  organizationSlug,
+  category,
+}: DisabledStateForFreeTierProps) => {
   return (
     <div className="px-6">
       <InformationBox
@@ -21,9 +24,7 @@ const DisabledStateForFreeTier = ({ projectRef, category }: DisabledStateForFree
             <p>Upgrade your project to the Pro plan for support in this area</p>
             <div className="flex items-center space-x-2">
               <Button asChild>
-                <Link
-                  href={`/project/${projectRef}/settings/billing/subscription?panel=subscriptionPlan`}
-                >
+                <Link href={`/org/${organizationSlug}/billing?panel=subscriptionPlan`}>
                   Upgrade project
                 </Link>
               </Button>

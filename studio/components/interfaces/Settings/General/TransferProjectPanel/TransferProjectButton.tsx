@@ -29,10 +29,7 @@ const TransferProjectButton = () => {
   const { data: allOrganizations } = useOrganizationsQuery()
   const disableProjectTransfer = useFlag('disableProjectTransfer')
 
-  const organizations = (allOrganizations || [])
-    .filter((it) => it.id !== projectOrgId)
-    // Only orgs with org-based subscription
-    .filter((it) => it.subscription_id)
+  const organizations = (allOrganizations || []).filter((it) => it.id !== projectOrgId)
 
   const [isOpen, setIsOpen] = useState(false)
   const [selectedOrg, setSelectedOrg] = useState()

@@ -82,13 +82,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
 
                 {showOverUsageBadge && (
                   <div className="ml-2">
-                    <Link
-                      href={
-                        selectedOrganization?.subscription_id
-                          ? `/org/${selectedOrganization.slug}/usage`
-                          : `/project/${projectRef}/settings/billing/usage`
-                      }
-                    >
+                    <Link href={`/org/${selectedOrganization?.slug}/usage`}>
                       <Badge color="red">Exceeding usage limits</Badge>
                     </Link>
                   </div>

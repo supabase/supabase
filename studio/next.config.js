@@ -85,8 +85,56 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: '/project/:ref/settings/billing',
-        destination: '/project/:ref/settings/billing/subscription',
+        source: '/project/:ref/settings/billing/subscription',
+        has: [
+          {
+            type: 'query',
+            key: 'panel',
+            value: 'subscriptionPlan',
+          },
+        ],
+        destination: '/org/_/billing?panel=subscriptionPlan',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/settings/billing/subscription',
+        has: [
+          {
+            type: 'query',
+            key: 'panel',
+            value: 'pitr',
+          },
+        ],
+        destination: '/project/:ref/settings/addons?panel=pitr',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/settings/billing/subscription',
+        has: [
+          {
+            type: 'query',
+            key: 'panel',
+            value: 'computeInstance',
+          },
+        ],
+        destination: '/project/:ref/settings/addons?panel=computeInstance',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/settings/billing/subscription',
+        has: [
+          {
+            type: 'query',
+            key: 'panel',
+            value: 'customDomain',
+          },
+        ],
+        destination: '/project/:ref/settings/addons?panel=customDomain',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/settings/billing/subscription',
+        destination: '/org/_/billing',
         permanent: true,
       },
       {
@@ -146,27 +194,27 @@ const nextConfig = {
       },
       {
         source: '/project/:ref/settings/billing/update',
-        destination: '/project/:ref/settings/billing/subscription',
+        destination: '/org/_/billing',
         permanent: true,
       },
       {
         source: '/project/:ref/settings/billing/update/free',
-        destination: '/project/:ref/settings/billing/subscription',
+        destination: '/org/_/billing',
         permanent: true,
       },
       {
         source: '/project/:ref/settings/billing/update/pro',
-        destination: '/project/:ref/settings/billing/subscription',
+        destination: '/org/_/billing',
         permanent: true,
       },
       {
         source: '/project/:ref/settings/billing/update/team',
-        destination: '/project/:ref/settings/billing/subscription',
+        destination: '/org/_/billing',
         permanent: true,
       },
       {
         source: '/project/:ref/settings/billing/update/enterprise',
-        destination: '/project/:ref/settings/billing/subscription',
+        destination: '/org/_/billing',
         permanent: true,
       },
       {

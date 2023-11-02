@@ -8,6 +8,7 @@ import { useStore } from 'hooks'
 import { Project } from 'types'
 import NotificationActions from './NotificationActions'
 import { formatNotificationCTAText, formatNotificationText } from './NotificationRows.utils'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 
 export interface NotificationRowProps {
   notification: Notification
@@ -24,7 +25,9 @@ const NotificationRow = ({
 }: NotificationRowProps) => {
   const { ui } = useStore()
   const { data: projects } = useProjectsQuery()
+  const { data: organizations } = useOrganizationsQuery()
   const project = projects?.find((project) => project.id === notification.project_id)
+  const organization = organizations?.find((org) => org.id === project?.organization_id)
 
   const insertedAt = dayjs(notification.inserted_at).format('DD MMM YYYY, HH:mma')
   const changelogLink = (notification.data as any).changelog_link
@@ -48,7 +51,7 @@ const NotificationRow = ({
     dismissNotifications({ ids: [notificationId] })
   }
 
-  if (!project) return null
+  if (!project || !organization) return null
 
   return (
     <div className="flex py-2">
@@ -86,6 +89,7 @@ const NotificationRow = ({
           <div className="flex items-center">
             <NotificationActions
               project={project}
+              organization={organization}
               changelogLink={changelogLink}
               availableActions={availableActions}
               onSelectRestartProject={() => onSelectRestartProject(project, notification)}

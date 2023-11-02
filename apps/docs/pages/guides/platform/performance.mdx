@@ -142,7 +142,7 @@ from pg_statio_user_tables;
 
 This shows the ratio of data blocks fetched from the Postgres [shared_buffers](https://www.postgresql.org/docs/15/runtime-config-resource.html#RUNTIME-CONFIG-RESOURCE-MEMORY) cache against the data blocks that were read from disk/OS cache.
 
-If either of your index or table hit rate are < 99% then this can indicate your compute plan is too small for your current workload and you would benefit from more memory. [Upgrading your compute](./compute-add-ons) is easy and can be done from your [project dashboard](https://supabase.com/dashboard/project/_/settings/billing/subscription).
+If either of your index or table hit rate are < 99% then this can indicate your compute plan is too small for your current workload and you would benefit from more memory. [Upgrading your compute](./compute-add-ons) is easy and can be done from your [project dashboard](https://supabase.com/dashboard/project/_/settings/addons?panel=computeInstance).
 
 ### Optimizing poor performing queries
 
@@ -191,7 +191,7 @@ FATAL: remaining connection slots are reserved for non-replication superuser con
 
 In such a scenario, you can consider:
 
-- [upgrading to a larger compute add-on](https://supabase.com/dashboard/project/_/settings/billing)
+- [upgrading to a larger compute add-on](https://supabase.com/dashboard/project/_/settings/addons?panel=computeInstance)
 - configuring your clients to use fewer connections
 - manually configuring the database for a higher number of connections
 
