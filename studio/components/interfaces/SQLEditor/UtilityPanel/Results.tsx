@@ -12,9 +12,9 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
   const [cellPosition, setCellPosition] = useState<any>(undefined)
 
   function onCopyCell() {
-    if (columns && cellPosition) {
-      const { idx, rowIdx } = cellPosition
-      const colKey = columns[idx].key
+    if (cellPosition) {
+      const { rowIdx, column } = cellPosition
+      const colKey = column.key
       const cellValue = rows[rowIdx]?.[colKey] ?? ''
       const value = formatClipboardValue(cellValue)
       copyToClipboard(value)
