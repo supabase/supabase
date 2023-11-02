@@ -24,7 +24,7 @@ const DisabledStateForFreeTier = ({
             <p>Upgrade your project to the Pro plan for support in this area</p>
             <div className="flex items-center space-x-2">
               <Button asChild>
-                <Link href={`/org/${organizationSlug}/subscription?panel=subscriptionPlan`}>
+                <Link href={`/org/${organizationSlug}/billing?panel=subscriptionPlan`}>
                   Upgrade project
                 </Link>
               </Button>

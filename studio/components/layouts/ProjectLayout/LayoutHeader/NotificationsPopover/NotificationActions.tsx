@@ -28,7 +28,7 @@ const NotificationActions = ({
   const router = useRouter()
 
   const onSelectUpgradePlan = () => {
-    return router.push(`/org/${organization.slug}/subscription?panel=subscriptionPlan`)
+    return router.push(`/org/${organization.slug}/billing?panel=subscriptionPlan`)
   }
 
   const renderActionButton = (action: Action) => {

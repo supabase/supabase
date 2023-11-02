@@ -445,7 +445,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                       <div className="flex items-center space-x-2">
                         <Button asChild>
                           <Link
-                            href={`/org/${values.organizationSlug}/subscription?panel=subscriptionPlan`}
+                            href={`/org/${values.organizationSlug}/billing?panel=subscriptionPlan`}
                           >
                             Upgrade project
                           </Link>
