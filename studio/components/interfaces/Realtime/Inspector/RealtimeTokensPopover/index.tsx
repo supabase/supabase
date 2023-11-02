@@ -31,6 +31,7 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
     (x) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID
   )
   const apiKeys = apiService?.service_api_keys ?? []
+  const anonKey = apiKeys.find((key) => key.tags === 'anon')
 
   useEffect(() => {
     const anonKey = apiKeys.find((k) => k.tags === 'anon')
@@ -76,6 +77,7 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
               size="small"
               label="Token type"
               className="w-full"
+              disabled={bearerEnabled && anonKey !== undefined}
               onChange={(v) => setTempConfig({ ...config, token: v })}
             >
               {apiKeys.map((key) => {
@@ -121,6 +123,8 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
               const flag = !bearerEnabled
               if (flag === false) {
                 setTempConfig({ ...tempConfig, bearer: '' })
+              } else {
+                if (anonKey) setTempConfig({ ...tempConfig, token: anonKey.api_key })
               }
               setBearerEnabled(flag)
             }}
