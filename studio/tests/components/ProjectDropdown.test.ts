@@ -6,9 +6,6 @@ test('Should sanitize project routes correctly when switching projects by removi
   expect(sanitizeRoute('/project/[ref]/storage/buckets', { ref: 'abc' })).toBe(
     '/project/[ref]/storage/buckets'
   )
-  expect(sanitizeRoute('/project/[ref]/settings/billing/subscription', { ref: 'abc' })).toBe(
-    '/project/[ref]/settings/billing/subscription'
-  )
 
   expect(sanitizeRoute('/project/[ref]/editor/[tableId]', { ref: 'abc', tableId: '10' })).toBe(
     '/project/[ref]/editor'

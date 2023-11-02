@@ -14,12 +14,10 @@ When using Supabase with server-side languages and frameworks - such as Next.js,
 <div className="grid lg:grid-cols-12 gap-6 not-prose">
   {quickstarts.map((item) => {
     return (
-      <Link href={`${item.href}`} key={item.title} passHref>
-        <a className={'col-span-4'}>
-          <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
-            {item.description}
-          </GlassPanel>
-        </a>
+      <Link href={`${item.href}`} key={item.title} passHref className={'col-span-4'}>
+        <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
+          {item.description}
+        </GlassPanel>
       </Link>
     )
   })}

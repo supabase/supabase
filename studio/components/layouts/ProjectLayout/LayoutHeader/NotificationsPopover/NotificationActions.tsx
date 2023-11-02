@@ -4,10 +4,11 @@ import { useRouter } from 'next/router'
 import { Fragment } from 'react'
 import { Button, IconExternalLink } from 'ui'
 
-import { Project } from 'types'
+import { Organization, Project } from 'types'
 
 interface NotificationActionsProps {
   project: Project
+  organization: Organization
   changelogLink?: string
   availableActions: Action[]
   onSelectRestartProject: () => void
@@ -17,6 +18,7 @@ interface NotificationActionsProps {
 
 const NotificationActions = ({
   project,
+  organization,
   changelogLink,
   availableActions,
   onSelectRestartProject,
@@ -25,18 +27,16 @@ const NotificationActions = ({
 }: NotificationActionsProps) => {
   const router = useRouter()
 
-  const onSelectUpgradeProject = () => {
-    return router.push(
-      `/project/${project.ref}/settings/billing/subscription?panel=subscriptionPlan`
-    )
+  const onSelectUpgradePlan = () => {
+    return router.push(`/org/${organization.slug}/billing?panel=subscriptionPlan`)
   }
 
   const renderActionButton = (action: Action) => {
     switch (action.action_type) {
       case ActionType.UpgradeProjectToPro:
         return (
-          <Button type="default" onClick={onSelectUpgradeProject}>
-            Upgrade project
+          <Button type="default" onClick={onSelectUpgradePlan}>
+            Upgrade plan
           </Button>
         )
       case ActionType.SchedulePostgresRestart:
