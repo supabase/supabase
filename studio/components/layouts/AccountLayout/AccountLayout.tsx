@@ -27,8 +27,6 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
 
   const ongoingIncident = useFlag('ongoingIncident')
   const navLayoutV2 = useFlag('navigationLayoutV2')
-  const mfaSetup = useFlag('mfaSetup')
-  const showAuditLogs = useFlag('auditLogs')
   const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
 
   const signOut = useSignOut()
@@ -91,7 +89,7 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
               },
               // show the MFA page only if the feature flag is set or the user has already MFA setup.
               // He should be able to edit/revoke his MFA even if MFA feature flag is disabled.
-              ...(mfaSetup || (factors?.all || []).length > 0
+              ...((factors?.all || []).length > 0
                 ? [
                     {
                       isActive: router.pathname === `/account/security`,
@@ -102,17 +100,13 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
                     },
                   ]
                 : []),
-              ...(showAuditLogs
-                ? [
-                    {
-                      isActive: router.pathname === `/account/audit`,
-                      icon: `${router.basePath}/img/user.svg`,
-                      label: 'Audit Logs',
-                      href: `/account/audit`,
-                      key: `/account/audit`,
-                    },
-                  ]
-                : []),
+              {
+                isActive: router.pathname === `/account/audit`,
+                icon: `${router.basePath}/img/user.svg`,
+                label: 'Audit Logs',
+                href: `/account/audit`,
+                key: `/account/audit`,
+              },
             ],
           },
         ]
