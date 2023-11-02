@@ -2,13 +2,22 @@ import { isEqual } from 'lodash'
 import { Loader2 } from 'lucide-react'
 import { Key, useEffect, useState } from 'react'
 import DataGrid, { RenderRowProps, Row } from 'react-data-grid'
-import { Button, IconBroadcast, IconDatabaseChanges, IconExternalLink, IconPresence, cn } from 'ui'
+import {
+  Button,
+  IconBroadcast,
+  IconDatabaseChanges,
+  IconExternalLink,
+  IconPresence,
+  LoadingLine,
+  cn,
+} from 'ui'
 
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import LogSelection from './EventSelection'
 import { LogData } from './Events.types'
 import { ColumnRenderer } from './RealtimeEventColumnRenderer'
+import ShimmerLine from 'components/ui/ShimmerLine'
 
 export const isErrorLog = (l: LogData) => {
   return l.event_message === 'SYSTEM' && l.metadata?.status === 'error'
@@ -109,6 +118,7 @@ const EventsTable = ({ enabled, data = [], showSendEvent }: EventsTableProps) =>
   return (
     <>
       <section className="flex w-full flex-col" style={{ maxHeight: 'calc(100vh - 42px - 3rem)' }}>
+        {enabled && <ShimmerLine active />}
         <div className={cn('flex h-full flex-row', enabled ? 'border-brand-400' : null)}>
           <div className="flex flex-grow flex-col">
             {enabled && (
