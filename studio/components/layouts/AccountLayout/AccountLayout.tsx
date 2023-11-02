@@ -3,7 +3,6 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import { useFlag, useSelectedOrganization, withAuth } from 'hooks'
 import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
@@ -23,7 +22,6 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
   const router = useRouter()
   const { data: organizations } = useOrganizationsQuery()
   const selectedOrganization = useSelectedOrganization()
-  const { data: factors } = useMfaListFactorsQuery()
 
   const ongoingIncident = useFlag('ongoingIncident')
   const navLayoutV2 = useFlag('navigationLayoutV2')
