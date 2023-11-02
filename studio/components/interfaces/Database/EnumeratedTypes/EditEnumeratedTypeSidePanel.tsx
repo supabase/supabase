@@ -44,8 +44,8 @@ const EditEnumeratedTypeSidePanel = ({
   const submitRef = useRef<HTMLButtonElement>(null)
   const { project } = useProjectContext()
   const { mutate: updateEnumeratedType, isLoading: isCreating } = useEnumeratedTypeUpdateMutation({
-    onSuccess: () => {
-      toast.success(`Successfully updated type "${name}"`)
+    onSuccess: (_, vars) => {
+      toast.success(`Successfully updated type "${vars.name.updated}"`)
       onClose()
     },
   })
@@ -97,10 +97,12 @@ const EditEnumeratedTypeSidePanel = ({
       return console.error('selectedEnumeratedType required')
 
     const payload: {
+      schema: string
       name: { original: string; updated: string }
       values: { original: string; updated: string; isNew: boolean }[]
       description?: string
     } = {
+      schema: selectedEnumeratedType.schema,
       name: { original: selectedEnumeratedType.name, updated: data.name },
       values: data.values
         .filter((x) => x.updatedValue.length !== 0)

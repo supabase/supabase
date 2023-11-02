@@ -55,25 +55,6 @@ Here, you can also enable external oauth providers, such as Google and GitHub.
 
 ## How to use
 
-### Using `create-next-app`
-
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init) or [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/) to bootstrap the example locally:
-
-```bash
-npx create-next-app --example with-supabase-auth-realtime-db realtime-chat-app
-# or
-yarn create next-app --example with-supabase-auth-realtime-db realtime-chat-app
-```
-
-### Download manually
-
-Download the example:
-
-```bash
-curl https://codeload.github.com/vercel/next.js/tar.gz/canary | tar -xz --strip=2 next.js-canary/examples/with-supabase-auth-realtime-db
-cd with-supabase-auth-realtime-db
-```
-
 ### Using this repo
 
 Simply clone this repo locally and proceed to the next section.
