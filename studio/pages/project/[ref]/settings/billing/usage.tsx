@@ -19,7 +19,7 @@ const ProjectBillingUsage: NextPageWithLayout = () => {
 
     let redirectUrl
 
-    if (['cpu', 'memory', 'disk_io'].includes(hash)) {
+    if (['cpu', 'ram', 'disk_io'].includes(hash)) {
       redirectUrl = `/project/${ref}/settings/infrastructure#${hash}`
     } else {
       redirectUrl = `/org/${organization.slug}/usage?projectRef=${ref}`
