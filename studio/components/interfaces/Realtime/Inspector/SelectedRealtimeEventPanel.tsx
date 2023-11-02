@@ -7,14 +7,14 @@ const LogsDivider = () => {
   )
 }
 
-export const SelectedRealtimeEventPanel = ({ log }: { log: LogData }) => {
+export const SelectedRealtimeMessagePanel = ({ log }: { log: LogData }) => {
   return (
     <>
       <div className="px-8">
-        <span className="col-span-4 text-sm text-scale-900">Event message</span>
+        <span className="col-span-4 text-sm text-scale-900">Message</span>
 
         <div className="text-wrap mt-2 overflow-x-auto whitespace-pre-wrap font-mono text-xs text-scale-1200">
-          {log.event_message}
+          {log.message}
         </div>
       </div>
       <LogsDivider />

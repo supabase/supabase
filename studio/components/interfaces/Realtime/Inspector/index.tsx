@@ -1,17 +1,17 @@
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import EventsTable from './EventsTable'
+import MessagesTable from './EventsTable'
 import { Header } from './Header'
-import { SendEventModal } from './SendEventModal'
-import { RealtimeConfig, useRealtimeEvents } from './useRealtimeEvents'
+import { SendMessageModal } from './SendEventModal'
+import { RealtimeConfig, useRealtimeMessages } from './useRealtimeEvents'
 
 /**
  * Acts as a container component for the entire log display
  */
 export const RealtimeInspector = () => {
   const { ref } = useParams()
-  const [sendEventShown, setSendEventShown] = useState(false)
+  const [sendMessageShown, setSendMessageShown] = useState(false)
 
   const [realtimeConfig, setRealtimeConfig] = useState<RealtimeConfig>({
     enabled: false,
@@ -28,26 +28,26 @@ export const RealtimeInspector = () => {
     enableBroadcast: true,
   })
 
-  const { logData, sendEvent } = useRealtimeEvents(realtimeConfig)
+  const { logData, sendMessage } = useRealtimeMessages(realtimeConfig)
 
   return (
     <div className="flex flex-col flex-grow h-full">
       <Header config={realtimeConfig} onChangeConfig={setRealtimeConfig} />
       <div className="relative flex flex-col flex-grow h-full">
         <div className="flex h-full">
-          <EventsTable
+          <MessagesTable
             enabled={realtimeConfig.enabled}
             data={logData}
-            showSendEvent={() => setSendEventShown(true)}
+            showSendMessage={() => setSendMessageShown(true)}
           />
         </div>
       </div>
-      <SendEventModal
-        visible={sendEventShown}
-        onSelectCancel={() => setSendEventShown(false)}
-        onSelectConfirm={() => {
-          sendEvent('event', {})
-          setSendEventShown(false)
+      <SendMessageModal
+        visible={sendMessageShown}
+        onSelectCancel={() => setSendMessageShown(false)}
+        onSelectConfirm={(v) => {
+          sendMessage(v.message, v.payload)
+          setSendMessageShown(false)
         }}
       />
     </div>

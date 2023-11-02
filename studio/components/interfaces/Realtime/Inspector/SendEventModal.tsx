@@ -1,43 +1,43 @@
 import { Input, Modal } from 'ui'
 
 import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { useStacked } from 'components/ui/Charts/Charts.utils'
 import { useEffect, useState } from 'react'
 
-interface SendEventModalProps {
+interface SendMessageModalProps {
   visible: boolean
   onSelectCancel: () => void
-  onSelectConfirm: () => void
+  onSelectConfirm: (v: { message: string; payload: string }) => void
 }
 
-export const SendEventModal = (props: SendEventModalProps) => {
-  const [values, setValues] = useState({ event: 'test', payload: '{}' })
+export const SendMessageModal = (props: SendMessageModalProps) => {
+  const [values, setValues] = useState({ message: 'test', payload: '{}' })
 
   useEffect(() => {
     if (props.visible) {
-      setValues({ event: 'test', payload: '{}' })
+      setValues({ message: 'test', payload: '{}' })
     }
   }, [props.visible])
 
   return (
     <ConfirmationModal
-      header="Broadcast an event to all clients"
+      header="Broadcast a message to all clients"
       buttonLabel="Send"
       size="medium"
       {...props}
+      onSelectConfirm={() => props.onSelectConfirm(values)}
     >
       <Modal.Content>
         <div className="py-4 flex  flex-col gap-y-4">
           <Input
-            label="Event name"
+            label="Message name"
             size="small"
             className="flex-grow"
-            value={values.event}
-            onChange={(v) => setValues({ ...values, event: v.target.value })}
+            value={values.message}
+            onChange={(v) => setValues({ ...values, message: v.target.value })}
           />
 
           <Input
-            label="Event payload"
+            label="Message payload"
             size="small"
             className="flex-grow"
             value={values.payload}

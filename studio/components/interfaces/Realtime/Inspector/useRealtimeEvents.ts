@@ -1,15 +1,15 @@
 import { createClient, RealtimeChannel, SupabaseClient } from '@supabase/supabase-js'
 import { sortBy, take } from 'lodash'
 
-import { LogData } from 'components/interfaces/Settings/Logs'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { uuidv4 } from 'lib/helpers'
 import { EMPTY_ARR } from 'lib/void'
 import { useCallback, useEffect, useReducer, useState } from 'react'
+import { LogData } from './Messages.types'
 
 function reducer(
   state: LogData[],
-  action: { type: 'add'; payload: { eventType: string; metadata: any } } | { type: 'clear' }
+  action: { type: 'add'; payload: { messageType: string; metadata: any } } | { type: 'clear' }
 ) {
   if (action.type === 'clear') {
     return EMPTY_ARR
@@ -21,7 +21,7 @@ function reducer(
         {
           id: uuidv4(),
           timestamp: new Date().getTime(),
-          event_message: action.payload.eventType,
+          message: action.payload.messageType,
           metadata: action.payload.metadata,
         } as LogData,
         ...state,
@@ -49,7 +49,7 @@ export interface RealtimeConfig {
   enableDbChanges: boolean
 }
 
-export const useRealtimeEvents = ({
+export const useRealtimeMessages = ({
   enabled,
   channelName,
   projectRef,
@@ -75,8 +75,8 @@ export const useRealtimeEvents = ({
   )
 
   const [logData, dispatch] = useReducer(reducer, [] as LogData[])
-  const pushEvent = (eventType: string, metadata: any) => {
-    dispatch({ type: 'add', payload: { eventType, metadata } })
+  const pushMessage = (messageType: string, metadata: any) => {
+    dispatch({ type: 'add', payload: { messageType, metadata } })
   }
 
   // Instantiate our client with the Realtime server and params to connect with
@@ -118,26 +118,25 @@ export const useRealtimeEvents = ({
     // Need to add 'extension' key in the 'payload'
     newChannel.on('system' as any, {} as any, (payload: any) => {
       // if (payload.extension === 'postgres_changes' && payload.status === 'ok') {
-      //   pushEventTo('#conn_info', 'postgres_subscribed', {})
+      //   pushMessageTo('#conn_info', 'postgres_subscribed', {})
       // }
-      pushEvent('SYSTEM', payload)
+      pushMessage('SYSTEM', payload)
     })
 
     if (enableBroadcast) {
-      // Listen for all (`*`) `broadcast` events
-      // The event name can by anything
-      // Match on specific event names to filter for only those types of events and do something with them
-      newChannel.on('broadcast', { event: '*' }, (payload) => pushEvent('BROADCAST', payload))
+      // Listen for all (`*`) `broadcast` messages
+      // The message name can by anything
+      // Match on specific message names to filter for only those types of messages and do something with them
+      newChannel.on('broadcast', { event: '*' }, (payload) => pushMessage('BROADCAST', payload))
     }
 
-    // Listen for all (`*`) `presence` events
+    // Listen for all (`*`) `presence` messages
     if (enablePresence) {
       newChannel.on('presence' as any, { event: '*' }, (payload) => {
-        pushEvent('PRESENCE', payload)
+        pushMessage('PRESENCE', payload)
       })
     }
 
-    // Listen for all (`*`) `postgres_changes` events on tables in the `public` schema
     if (enableDbChanges) {
       let postgres_changes_opts: any = {
         event: '*',
@@ -152,7 +151,7 @@ export const useRealtimeEvents = ({
         let ts = performance.now() + performance.timeOrigin
         let payload_ts = Date.parse(payload.commit_timestamp)
         let latency = ts - payload_ts
-        pushEvent('POSTGRES', { ...payload, latency })
+        pushMessage('POSTGRES', { ...payload, latency })
       })
     }
 
@@ -160,7 +159,7 @@ export const useRealtimeEvents = ({
     newChannel.subscribe(async (status, error) => {
       if (status === 'SUBSCRIBED') {
         // Let LiveView know we connected so we can update the button text
-        // pushEventTo('#conn_info', 'broadcast_subscribed', { host: host })
+        // pushMessageTo('#conn_info', 'broadcast_subscribed', { host: host })
 
         if (enablePresence) {
           const name = 'user_name_' + Math.floor(Math.random() * 100)
@@ -195,15 +194,15 @@ export const useRealtimeEvents = ({
     table,
   ])
 
-  const sendEvent = useCallback(
-    (event: string, payload: any) => {
+  const sendMessage = useCallback(
+    (message: string, payload: any) => {
       channel?.send({
         type: 'broadcast',
-        event,
+        event: message,
         payload,
       })
     },
     [channel]
   )
-  return { logData, sendEvent }
+  return { logData, sendMessage }
 }

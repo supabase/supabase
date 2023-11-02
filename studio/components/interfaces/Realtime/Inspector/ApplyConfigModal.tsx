@@ -11,7 +11,7 @@ interface ApplyConfigModalProps {
 export const ApplyConfigModal = (props: ApplyConfigModalProps) => {
   return (
     <ConfirmationModal
-      header="Previously found events will be lost"
+      header="Previously found messages will be lost"
       danger
       buttonLabel="Confirm"
       size="medium"
@@ -21,8 +21,8 @@ export const ApplyConfigModal = (props: ApplyConfigModalProps) => {
         <div className="py-4">
           <p className="text-sm text-foreground"></p>
           <p className="text-sm text-foreground-light">
-            Realtime inspector will lose currently collected events and start listening for events
-            matching new filtering settings.
+            Realtime inspector will lose currently collected messages and start listening for
+            messages matching new filtering settings.
           </p>
         </div>
       </Modal.Content>

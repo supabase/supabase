@@ -3,14 +3,14 @@ import { Button, IconX, cn } from 'ui'
 
 import CopyButton from 'components/ui/CopyButton'
 import { LogData } from './Events.types'
-import { SelectedRealtimeEventPanel } from './SelectedRealtimeEventPanel'
+import { SelectedRealtimeMessagePanel } from './SelectedRealtimeEventPanel'
 
-export interface LogSelectionProps {
+export interface MessageSelectionProps {
   log: LogData | null
   onClose: () => void
 }
 
-const LogSelection = ({ log, onClose }: LogSelectionProps) => {
+const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
   const selectionText = useMemo(() => {
     return JSON.stringify(log, null, 2)
   }, [log])
@@ -53,9 +53,9 @@ const LogSelection = ({ log, onClose }: LogSelectionProps) => {
             </div>
           </div>
           <div className="flex flex-col gap-1">
-            <h3 className="text-sm text-foreground">Select an event</h3>
+            <h3 className="text-sm text-foreground">Select an message</h3>
             <p className="text-xs text-foreground-lighter">
-              Click on an event on the left to view details of event.
+              Click on a message on the left to view details.
             </p>
           </div>
         </div>
@@ -77,11 +77,11 @@ const LogSelection = ({ log, onClose }: LogSelectionProps) => {
           <div className="h-px w-full bg-scale-600 rounded" />
         </div>
         <div className="flex flex-col space-y-6 bg-scale-300 py-4">
-          {log && <SelectedRealtimeEventPanel log={log} />}
+          {log && <SelectedRealtimeMessagePanel log={log} />}
         </div>
       </div>
     </div>
   )
 }
 
-export default LogSelection
+export default MessageSelection

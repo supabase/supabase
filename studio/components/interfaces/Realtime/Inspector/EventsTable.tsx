@@ -2,56 +2,48 @@ import { isEqual } from 'lodash'
 import { Loader2 } from 'lucide-react'
 import { Key, useEffect, useState } from 'react'
 import DataGrid, { RenderRowProps, Row } from 'react-data-grid'
-import {
-  Button,
-  IconBroadcast,
-  IconDatabaseChanges,
-  IconExternalLink,
-  IconPresence,
-  LoadingLine,
-  cn,
-} from 'ui'
+import { Button, IconBroadcast, IconDatabaseChanges, IconExternalLink, IconPresence, cn } from 'ui'
 
 import { useParams } from 'common'
+import ShimmerLine from 'components/ui/ShimmerLine'
 import { useRouter } from 'next/router'
-import LogSelection from './EventSelection'
+import MessageSelection from './EventSelection'
 import { LogData } from './Events.types'
 import { ColumnRenderer } from './RealtimeEventColumnRenderer'
-import ShimmerLine from 'components/ui/ShimmerLine'
 
 export const isErrorLog = (l: LogData) => {
-  return l.event_message === 'SYSTEM' && l.metadata?.status === 'error'
+  return l.message === 'SYSTEM' && l.metadata?.status === 'error'
 }
 
-interface EventsTableProps {
+interface MessagesTableProps {
   enabled: boolean
   data?: LogData[]
-  showSendEvent: () => void
+  showSendMessage: () => void
 }
 
 const NoResultAlert = ({
   enabled,
-  showSendEvent,
+  showSendMessage,
 }: {
   enabled: boolean
-  showSendEvent: () => void
+  showSendMessage: () => void
 }) => {
   const router = useRouter()
   const { ref } = useParams()
 
   return (
     <div className="w-full max-w-md flex items-center flex-col">
-      {enabled ? <div>No Realtime events found</div> : null}
-      <div className="text-foreground-lighter">Realtime event logs will be shown here</div>
+      {enabled ? <div>No Realtime messages found</div> : null}
+      <div className="text-foreground-lighter">Realtime message logs will be shown here</div>
       <div className="mt-4 border bg-surface-100 border-border rounded-md justify-start items-center flex flex-col w-full">
         <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">
           <IconBroadcast size="xlarge" className="bg-brand-400 rounded w-6" />
           <div className="grow flex-col flex">
-            <div className="text-foreground">Create a Broadcast event</div>
+            <div className="text-foreground">Create a Broadcast message</div>
             <div className="text-foreground-lighter text-xs">Start developing in preview</div>
           </div>
-          <Button type="default" onClick={showSendEvent}>
-            <span>Send a test event</span>
+          <Button type="default" onClick={showSendMessage}>
+            <span>Send a test message</span>
           </Button>
         </div>
         <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">
@@ -59,7 +51,7 @@ const NoResultAlert = ({
           <div className="grow flex-col flex">
             <div className="text-foreground">Join from another browser tab</div>
             <div className="text-foreground-lighter text-xs">
-              Experiment with presence events between multiple clients
+              Experiment with presence messages between multiple clients
             </div>
           </div>
           <Button type="default" iconRight={<IconExternalLink />}>
@@ -101,7 +93,7 @@ const RowRenderer = (key: Key, props: RenderRowProps<LogData, unknown>) => {
   return <Row key={key} {...props} isRowSelected={false} selectedCellIdx={undefined} />
 }
 
-const EventsTable = ({ enabled, data = [], showSendEvent }: EventsTableProps) => {
+const MessagesTable = ({ enabled, data = [], showSendMessage }: MessagesTableProps) => {
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const stringData = JSON.stringify(data)
 
@@ -130,14 +122,14 @@ const EventsTable = ({ enabled, data = [], showSendEvent }: EventsTableProps) =>
                   <div>
                     {data.length > 0
                       ? data.length >= 100
-                        ? `Found a large number of events, showing only the latest 100...`
-                        : `Found ${data.length} events...`
-                      : `No event found yet...`}
+                        ? `Found a large number of messages, showing only the latest 100...`
+                        : `Found ${data.length} messages...`
+                      : `No message found yet...`}
                   </div>
                 </div>
-                <Button type="link" onClick={showSendEvent}>
+                <Button type="link" onClick={showSendMessage}>
                   <span className="underline text-foreground-light hover:text-brand-600">
-                    Send test event
+                    Send test message
                   </span>
                 </Button>
               </div>
@@ -167,18 +159,18 @@ const EventsTable = ({ enabled, data = [], showSendEvent }: EventsTableProps) =>
                 renderRow: RowRenderer,
                 noRowsFallback: (
                   <div className="mx-auto flex h-full w-full items-center justify-center space-y-12 py-4 transition-all delay-200 duration-500">
-                    <NoResultAlert enabled={enabled} showSendEvent={showSendEvent} />
+                    <NoResultAlert enabled={enabled} showSendMessage={showSendMessage} />
                   </div>
                 ),
               }}
             />
           </div>
           <div className="flex w-1/2 flex-col">
-            <LogSelection onClose={() => setFocusedLog(null)} log={focusedLog} />
+            <MessageSelection onClose={() => setFocusedLog(null)} log={focusedLog} />
           </div>
         </div>
       </section>
     </>
   )
 }
-export default EventsTable
+export default MessagesTable

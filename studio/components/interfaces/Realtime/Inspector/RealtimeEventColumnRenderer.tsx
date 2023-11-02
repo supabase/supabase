@@ -17,7 +17,7 @@ export const ColumnRenderer: Column<LogData, unknown>[] = [
     name: 'timestamp-with-truncated-text',
     key: 'main-column',
     renderCell: (data: { row: PreviewLogData }) => {
-      const type = data.row.event_message as keyof typeof ICONS
+      const type = data.row.message as keyof typeof ICONS
 
       return (
         <RowLayout>

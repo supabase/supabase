@@ -11,9 +11,9 @@ import {
   Toggle,
 } from 'ui'
 
-import { RealtimeConfig } from '../useRealtimeEvents'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
+import { RealtimeConfig } from '../useRealtimeEvents'
 
 interface RealtimeTokensPopoverProps {
   config: RealtimeConfig
@@ -90,8 +90,8 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
             </Listbox>
             <span className="text-sm text-foreground-light">
               The type of token used. Using <code className="text-xs">service_role</code> will
-              bypass RLS policies. If you want to test RLS policies with realtime events, you should
-              use <code className="text-xs">anon</code>.
+              bypass RLS policies. If you want to test RLS policies with realtime messages, you
+              should use <code className="text-xs">anon</code>.
             </span>
           </div>
         </div>

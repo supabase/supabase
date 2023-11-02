@@ -98,7 +98,8 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                 </p>
               </div>
               <p className="text-xs text-foreground-lighter mt-2">
-                If you unset this channel, all of the events populated on this page will disappear.
+                If you unset this channel, all of the messages populated on this page will
+                disappear.
               </p>
               <Button
                 type="default"
