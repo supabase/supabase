@@ -155,9 +155,7 @@ const EnableBranchingModal = () => {
             )}
 
             <Modal.Content className="px-7 py-6 flex flex-col gap-3">
-              <p className="text-sm text-foreground-light">
-                    Please keep in mind the following:
-                  </p>
+              <p className="text-sm text-foreground-light">Please keep in mind the following:</p>
               <div className="flex flex-row gap-4">
                 <div>
                   <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-300 flex items-center justify-center">
