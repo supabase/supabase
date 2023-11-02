@@ -11,7 +11,7 @@
   <guid>https://supabase.com/customers/good-tape</guid>
   <title>Good Tape migrates to Supabase managed Postgres and Authentication and achieves database efficiency and a 60% cost reduction.</title>
   <link>https://supabase.com/customers/good-tape</link>
-  <description>Explore how GoodTape achieved remarkable database efficiency and reduced costs by 60% through their successful migration to Supabase&apos;s managed services.</description>
+  <description>Explore how Good Tape achieved remarkable database efficiency and reduced costs by 60% through their successful migration to Supabase&apos;s managed services.</description>
   <pubDate>Mon, 30 Oct 2023 23:00:00 GMT</pubDate>
 </item>
 <item>
@@ -38,7 +38,6 @@
 <item>
   <guid>https://supabase.com/customers/berriai</guid>
   <title>Berri AI boosts productivity by migrating from AWS RDS to Supabase Vector</title>
-  
   <link>https://supabase.com/customers/berriai</link>
   <description>Learn how Berri AI overcame challenges with self-hosting their vector database on AWS RDS and successfully migrated to Supabase.</description>
   <pubDate>Mon, 05 Jun 2023 22:00:00 GMT</pubDate>
