@@ -32,11 +32,13 @@ import EnumeratedTypeValueRow from './EnumeratedTypeValueRow'
 interface CreateEnumeratedTypeSidePanelProps {
   visible: boolean
   onClose: () => void
+  schema: string
 }
 
 const CreateEnumeratedTypeSidePanel = ({
   visible,
   onClose,
+  schema,
 }: CreateEnumeratedTypeSidePanelProps) => {
   const submitRef = useRef<HTMLButtonElement>(null)
   const { project } = useProjectContext()
@@ -80,6 +82,7 @@ const CreateEnumeratedTypeSidePanel = ({
     createEnumeratedType({
       projectRef: project.ref,
       connectionString: project.connectionString,
+      schema,
       name: data.name,
       description: data.description?.replaceAll("'", "''"),
       values: data.values.filter((x) => x.value.length > 0).map((x) => x.value),

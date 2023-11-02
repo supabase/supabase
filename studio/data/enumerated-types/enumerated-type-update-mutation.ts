@@ -9,6 +9,7 @@ import { wrapWithTransaction } from 'data/sql/utils/transaction'
 export type EnumeratedTypeUpdateVariables = {
   projectRef: string
   connectionString: string
+  schema: string
   name: { original: string; updated: string }
   description?: string
   values?: { original: string; updated: string; isNew: boolean }[]
@@ -17,13 +18,14 @@ export type EnumeratedTypeUpdateVariables = {
 export async function updateEnumeratedType({
   projectRef,
   connectionString,
+  schema,
   name,
   description,
   values = [],
 }: EnumeratedTypeUpdateVariables) {
   const statements: string[] = []
   if (name.original !== name.updated) {
-    statements.push(`alter type "${name.original}" rename to "${name.updated}";`)
+    statements.push(`alter type "${schema}"."${name.original}" rename to "${name.updated}";`)
   }
   if (values.length > 0) {
     values.forEach((x, idx) => {
@@ -32,24 +34,24 @@ export async function updateEnumeratedType({
           // Consider if any new enums were added before any existing enums
           const firstExistingEnumValue = values.find((x) => !x.isNew)
           statements.push(
-            `alter type "${name.updated}" add value '${x.updated}' before '${firstExistingEnumValue?.original}';`
+            `alter type "${schema}"."${name.updated}" add value '${x.updated}' before '${firstExistingEnumValue?.original}';`
           )
         } else {
           statements.push(
-            `alter type "${name.updated}" add value '${x.updated}' after '${
+            `alter type "${schema}"."${name.updated}" add value '${x.updated}' after '${
               values[idx - 1].updated
             }';`
           )
         }
       } else if (x.original !== x.updated) {
         statements.push(
-          `alter type "${name.updated}" rename value '${x.original}' to '${x.updated}';`
+          `alter type "${schema}"."${name.updated}" rename value '${x.original}' to '${x.updated}';`
         )
       }
     })
   }
   if (description !== undefined) {
-    statements.push(`comment on type "${name.updated}" is '${description}';`)
+    statements.push(`comment on type "${schema}"."${name.updated}" is '${description}';`)
   }
 
   const sql = wrapWithTransaction(statements.join(' '))
