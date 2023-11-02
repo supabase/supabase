@@ -78,9 +78,11 @@ const EnumeratedTypes = () => {
             icon={<IconSearch size={14} />}
           />
         </div>
-        <Button type="primary" onClick={() => setShowCreateTypePanel(true)}>
-          Create type
-        </Button>
+        {!isLocked && (
+          <Button type="primary" onClick={() => setShowCreateTypePanel(true)}>
+            Create type
+          </Button>
+        )}
       </div>
 
       {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="enumerated types" />}
@@ -173,6 +175,7 @@ const EnumeratedTypes = () => {
       <CreateEnumeratedTypeSidePanel
         visible={showCreateTypePanel}
         onClose={() => setShowCreateTypePanel(false)}
+        schema={selectedSchema}
       />
 
       <EditEnumeratedTypeSidePanel
