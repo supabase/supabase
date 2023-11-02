@@ -75,11 +75,6 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: '/project/:ref/realtime',
-        destination: '/project/:ref/realtime/inspector',
-        permanent: true,
-      },
-      {
         source: '/project/:ref/settings',
         destination: '/project/:ref/settings/general',
         permanent: true,

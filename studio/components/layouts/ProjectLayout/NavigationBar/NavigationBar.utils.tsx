@@ -173,7 +173,7 @@ export const generateProductRoutes = (
             key: 'realtime',
             label: 'Realtime',
             icon: <MousePointer2 />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/realtime`),
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/realtime/inspector`),
           },
         ]
       : []),
