@@ -234,11 +234,11 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
 
     ## Using Native Sign in with Google in Flutter
 
-    Native Google sign in with Supabase is done through [flutter_appauth](https://pub.dev/packages/flutter_appauth) package for iOS and [google_sign_in](https://pub.dev/packages/google_sign_in) package for Android.
+    Native Google sign in with Supabase is done through [google_sign_in](https://pub.dev/packages/google_sign_in) package for iOS and Android.
 
     When the user provides consent, Google issues an identity token (commonly abbreviated as ID token) that is then sent to your project's Supabase Auth server. When valid, a new user session is started by issuing an access and refresh token from Supabase Auth.
 
-    If you are building a Flutter app, you can use the [google_sign_in](https://pub.dev/packages/google_sign_in) package for Android and [flutter_appauth](https://pub.dev/packages/flutter_appauth) package for iOS to sign a user into your Supabase project:
+    Follow the code sample below to implement native Google sign in with Supabase in your Flutter app.
 
     ```dart
     import 'dart:convert';
