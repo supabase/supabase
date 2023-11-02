@@ -19,7 +19,7 @@ export const RealtimeInspector = () => {
     channelName: '',
     logLevel: 'info',
     token: '', // will be filled out by RealtimeTokensPopover
-    schema: 'public',
+    schema: '*',
     table: '*',
     filter: undefined,
     bearer: null,
