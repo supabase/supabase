@@ -39,6 +39,7 @@ const nextConfig = {
           },
         ],
         destination: '/new/new-project',
+        permanent: false,
       },
       {
         source: '/',
