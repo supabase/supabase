@@ -55,7 +55,7 @@ You can use Supabase to store and process Protected Health Information (PHI). Yo
 - Turning on [SSL Enforcement](/docs/guides/platform/ssl-enforcement).
 - Enabling [Network Restrictions](/docs/guides/platform/network-restrictions).
 - Disabling [Supabase AI editor](https://supabase.com/dashboard/org/_/general) in our dashboard.
-- Encrypting PHI in your database. Consider using pgsodium's [Transparent Column Encryption](https://github.com/michelp/pgsodium#transparent-column-encryption) which comes bundled in with every Supabase project.
+- Complying with encryption requirements in the HIPAA Security Rule. Data is encrypted at rest and in transit by Supabase. You can consider encrypting the data at your application layer.
 - Not using [Edge functions](/docs/guides/functions) to process PHI.
 - Not storing PHI in [public Storage buckets](/docs/guides/storage/buckets/fundamentals#public-buckets).
 
