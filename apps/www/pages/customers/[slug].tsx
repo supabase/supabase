@@ -106,15 +106,13 @@ function CaseStudyPage(props: any) {
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-12 mb-2 xl:col-span-2">
               {/* Back button */}
-              <p>
-                <a
-                  href={'/customers'}
-                  className="text-muted hover:text-foreground flex cursor-pointer items-center text-sm transition"
-                >
-                  <IconChevronLeft style={{ padding: 0 }} />
-                  Back
-                </a>
-              </p>
+              <Link
+                href="/customers"
+                className="text-foreground-lighter hover:text-foreground flex cursor-pointer items-center text-sm transition"
+              >
+                <IconChevronLeft style={{ padding: 0 }} />
+                Back
+              </Link>
             </div>
 
             <div
@@ -159,7 +157,7 @@ function CaseStudyPage(props: any) {
                         </div>
 
                         <div className="flex flex-col space-y-2">
-                          <span className="text-muted">About</span>
+                          <span className="text-foreground-lighter">About</span>
                           <p>{props.blog.about}</p>
                           <span className="not-prose ">
                             <a
@@ -176,7 +174,7 @@ function CaseStudyPage(props: any) {
                         {props.blog.misc.map((x: any) => {
                           return (
                             <div className="flex flex-col gap-0">
-                              <span className="text-muted">{x.label}</span>
+                              <span className="text-foreground-lighter">{x.label}</span>
                               <span className="text-light">{x.text}</span>
                             </div>
                           )
