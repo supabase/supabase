@@ -106,15 +106,13 @@ function CaseStudyPage(props: any) {
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-12 mb-2 xl:col-span-2">
               {/* Back button */}
-              <p>
-                <a
-                  href={'/customers'}
-                  className="text-foreground-lighter hover:text-foreground flex cursor-pointer items-center text-sm transition"
-                >
-                  <IconChevronLeft style={{ padding: 0 }} />
-                  Back
-                </a>
-              </p>
+              <Link
+                href="/customers"
+                className="text-foreground-lighter hover:text-foreground flex cursor-pointer items-center text-sm transition"
+              >
+                <IconChevronLeft style={{ padding: 0 }} />
+                Back
+              </Link>
             </div>
 
             <div
