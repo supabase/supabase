@@ -1,7 +1,7 @@
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import { Button } from 'ui'
 import { observer } from 'mobx-react-lite'
 
@@ -26,18 +26,16 @@ const Error500: NextPage = () => {
           <div className="flex flex-shrink-0 flex-grow items-center lg:flex-grow-0">
             <div className="flex w-full items-center justify-between md:w-auto">
               <Link href="/projects">
-                <a>
-                  <Image
-                    src={
-                      resolvedTheme === 'dark'
-                        ? `${router.basePath}/img/supabase-dark.svg`
-                        : `${router.basePath}/img/supabase-light.svg`
-                    }
-                    alt=""
-                    height={24}
-                    width={120}
-                  />
-                </a>
+                <Image
+                  src={
+                    resolvedTheme === 'dark'
+                      ? `${router.basePath}/img/supabase-dark.svg`
+                      : `${router.basePath}/img/supabase-light.svg`
+                  }
+                  alt=""
+                  height={24}
+                  width={120}
+                />
               </Link>
             </div>
           </div>
@@ -52,19 +50,15 @@ const Error500: NextPage = () => {
       </div>
       <div className="flex items-center space-x-4">
         {router.pathname !== '/projects' ? (
-          <Link href="/projects">
-            <a>
-              <Button>Head back</Button>
-            </a>
-          </Link>
+          <Button asChild>
+            <Link href="/projects">Head back</Link>
+          </Button>
         ) : (
           <Button onClick={onClickLogout}>Head back</Button>
         )}
-        <Link href="/support/new">
-          <a>
-            <Button type="secondary">Submit a support request</Button>
-          </a>
-        </Link>
+        <Button type="secondary" asChild>
+          <Link href="/support/new">Submit a support request</Link>
+        </Button>
       </div>
     </div>
   )

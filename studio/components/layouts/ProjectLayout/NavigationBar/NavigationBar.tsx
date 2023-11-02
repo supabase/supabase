@@ -5,6 +5,7 @@ import { FlaskConical } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+
 import {
   Button,
   DropdownMenu,
@@ -26,7 +27,7 @@ import {
 } from 'ui'
 
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useFlag } from 'hooks'
+import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -52,9 +53,19 @@ const NavigationBar = () => {
   const showFeaturePreviews = useFlag('featurePreviews')
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
 
+  const {
+    projectAuthAll: authEnabled,
+    projectEdgeFunctionAll: edgeFunctionsEnabled,
+    projectStorageAll: storageEnabled,
+  } = useIsFeatureEnabled(['project_auth:all', 'project_edge_function:all', 'project_storage:all'])
+
   const activeRoute = router.pathname.split('/')[3]
   const toolRoutes = generateToolRoutes(projectRef, project, supabaseAIEnabled)
-  const productRoutes = generateProductRoutes(projectRef, project)
+  const productRoutes = generateProductRoutes(projectRef, project, {
+    auth: authEnabled,
+    edgeFunctions: edgeFunctionsEnabled,
+    storage: storageEnabled,
+  })
   const otherRoutes = generateOtherRoutes(projectRef, project, isNewAPIDocsEnabled)
 
   return (
@@ -66,14 +77,12 @@ const NavigationBar = () => {
     >
       <ul className="flex flex-col space-y-2">
         {(!navLayoutV2 || !IS_PLATFORM) && (
-          <Link href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}>
-            <a className="block">
-              <img
-                src={`${router.basePath}/img/supabase-logo.svg`}
-                alt="Supabase"
-                className="mx-auto h-[40px] w-6 cursor-pointer rounded"
-              />
-            </a>
+          <Link href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`} className="block">
+            <img
+              src={`${router.basePath}/img/supabase-logo.svg`}
+              alt="Supabase"
+              className="mx-auto h-[40px] w-6 cursor-pointer rounded"
+            />
           </Link>
         )}
         <NavigationIconButton
@@ -187,12 +196,12 @@ const NavigationBar = () => {
             <DropdownMenuContent side="right" align="start">
               {IS_PLATFORM && (
                 <>
-                  <Link href="/account/me">
-                    <DropdownMenuItem key="header" className="space-x-2">
+                  <DropdownMenuItem key="header" className="space-x-2" asChild>
+                    <Link href="/account/me">
                       <IconSettings size={14} strokeWidth={1.5} />
                       <p>Account preferences</p>
-                    </DropdownMenuItem>
-                  </Link>
+                    </Link>
+                  </DropdownMenuItem>
                   {showFeaturePreviews && (
                     <DropdownMenuItem
                       key="header"

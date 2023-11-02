@@ -110,26 +110,22 @@ export default function IndexPage() {
           {plan}
         </h2>
         <div className="flex items-baseline gap-2">
-          {from && <span className="text-scale-1200 text-base">From</span>}
+          {from && <span className="text-foreground text-base">From</span>}
           {showDollarSign ? (
             <span className="h1">
               {plan !== 'Enterprise' ? '$' : ''}
               {price}
             </span>
           ) : (
-            <span className="text-scale-1100">{price}</span>
+            <span className="text-light">{price}</span>
           )}
 
           <p className="p">{priceDescription}</p>
         </div>
         <p className="p">{description}</p>
-        <Link href="https://supabase.com/dashboard/new" passHref>
-          <a>
-            <Button size="medium" block>
-              Get started
-            </Button>
-          </a>
-        </Link>
+        <Button asChild size="medium" block>
+          <Link href="https://supabase.com/dashboard/new">Get started</Link>
+        </Button>
       </div>
     )
   }
@@ -223,13 +219,13 @@ export default function IndexPage() {
                           )}
                         </div>
                       </div>
-                      <p className="text-scale-1100 my-4 text-sm  border-b dark:border-scale-500 pb-4 2xl:pr-4">
+                      <p className="text-light my-4 text-sm  border-b dark:border-scale-500 pb-4 2xl:pr-4">
                         {plan.description}
                       </p>
 
                       <div
                         className={`
-                        text-scale-1200 flex items-baseline
+                        text-foreground flex items-baseline
                         text-5xl
                         font-normal
                         lg:text-4xl
@@ -242,7 +238,7 @@ export default function IndexPage() {
                           <div className="flex items-end gap-2">
                             <div>
                               {plan.priceLabel && (
-                                <p className="text-scale-900 ml-1 text-[13px] leading-4 font-normal">
+                                <p className="text-muted ml-1 text-[13px] leading-4 font-normal">
                                   {plan.priceLabel}
                                 </p>
                               )}
@@ -256,8 +252,8 @@ export default function IndexPage() {
                                   {plan.name !== 'Enterprise' ? '$' : ''}
                                   {plan.priceMonthly}
                                 </p>
-                                <p className="text-scale-900 mb-1.5 ml-1 text-[13px] leading-4">
-                                  {plan.costUnitOrg}
+                                <p className="text-muted mb-1.5 ml-1 text-[13px] leading-4">
+                                  {plan.costUnit}
                                 </p>
                               </div>
 
@@ -280,10 +276,10 @@ export default function IndexPage() {
                       ].join(' ')}
                     >
                       {plan.preface && (
-                        <p className="text-scale-1100 text-[13px] mt-2 mb-4">{plan.preface}</p>
+                        <p className="text-light text-[13px] mt-2 mb-4">{plan.preface}</p>
                       )}
-                      {/* <p className="text-scale-900 text-sm">Included with plan:</p> */}
-                      <ul role="list" className="text-[13px] text-scale-1000">
+                      {/* <p className="text-muted text-sm">Included with plan:</p> */}
+                      <ul role="list" className="text-[13px] text-lighter">
                         {plan.features.map((feature) => (
                           <li key={feature} className="flex items-center py-2 first:mt-0">
                             <IconCheck
@@ -292,7 +288,7 @@ export default function IndexPage() {
                               strokeWidth={3}
                             />
                             {/* </div> */}
-                            <span className="dark:text-scale-1200 mb-0 ml-3 ">{feature}</span>
+                            <span className="dark:text-foreground mb-0 ml-3 ">{feature}</span>
                           </li>
                         ))}
                       </ul>
@@ -332,8 +328,8 @@ export default function IndexPage() {
       >
         <div>
           <div className="text-center">
-            <h2 className="text-scale-1200 text-3xl">Easily customizable add-ons</h2>
-            <p className="text-scale-1100 mt-4 mb-8 lg:mb-16 text-lg">
+            <h2 className="text-foreground text-3xl">Easily customizable add-ons</h2>
+            <p className="text-light mt-4 mb-8 lg:mb-16 text-lg">
               Level up your Supabase experience with add-ons.
             </p>
           </div>
@@ -349,10 +345,11 @@ export default function IndexPage() {
                     src={`${basePath}/images/pricing/${addon.heroImg}${
                       resolvedTheme === 'dark' ? '' : '-light'
                     }.png`}
+                    alt=""
                   />
                 </div>
                 <div className="px-8 -mt-1">
-                  <p className="text-[13px] text-scale-900">{addon.price}</p>
+                  <p className="text-[13px] text-muted">{addon.price}</p>
                   <div className="flex items-center gap-2 mt-2">
                     <Image
                       src={`${basePath}/images/pricing/${addon.icon}${
@@ -363,19 +360,17 @@ export default function IndexPage() {
                       height={14}
                       alt="Compute"
                     />
-                    <span className="text-sm text-scale-1200">{addon.name}</span>
+                    <span className="text-sm text-foreground">{addon.name}</span>
                   </div>
-                  <p className="mt-2 text-scale-900 text-[13px] min-h-[40px] lg:min-h-[50px] lg:max-w-[290px]">
+                  <p className="mt-2 text-muted text-[13px] min-h-[40px] lg:min-h-[50px] lg:max-w-[290px]">
                     {addon.description}
                   </p>
                   <div className="flex items-center justify-between mt-4 mb-4 lg:mb-8">
-                    <Link href={addon.leftCtaLink} as={addon.leftCtaLink}>
-                      <a>
-                        <Button size="tiny" type="default">
-                          {addon.leftCtaText}
-                        </Button>
-                      </a>
-                    </Link>
+                    <Button asChild size="tiny" type="default">
+                      <Link href={addon.leftCtaLink} as={addon.leftCtaLink}>
+                        {addon.leftCtaText}
+                      </Link>
+                    </Button>
                     {addon.name === 'Optimized Compute' ? (
                       <button
                         className="text-brand-600 text-[13px] leading-4 hover:underline "
@@ -393,16 +388,15 @@ export default function IndexPage() {
           </div>
           <div className="flex flex-col md:flex-row items-center gap-4 justify-center text-center">
             <span className="prose">Got something you'd like to see here?</span>
-            <Link
-              href="https://github.com/supabase/supabase/discussions/categories/feature-requests"
-              as="https://github.com/supabase/supabase/discussions/categories/feature-requests"
-            >
-              <a target="_blank">
-                <Button size="tiny" type="default">
-                  Request a feature
-                </Button>
-              </a>
-            </Link>
+            <Button asChild size="tiny" type="default">
+              <Link
+                href="https://github.com/supabase/supabase/discussions/categories/feature-requests"
+                as="https://github.com/supabase/supabase/discussions/categories/feature-requests"
+                target="_blank"
+              >
+                Request a feature
+              </Link>
+            </Button>
           </div>
         </div>
 
@@ -411,10 +405,10 @@ export default function IndexPage() {
           className="grid lg:grid-cols-2 gap-8 items-center mt-12 lg:mt-8 max-w-6xl mx-auto"
         >
           <div className="lg:py-12">
-            <span className="bg-brand-300 text-brand-600 rounded-md bg-opacity-30 inline-block  dark:bg-scale-400 dark:text-scale-1100 py-0.5 px-2 text-[13px] leading-4 mt-2">
+            <span className="bg-brand-300 text-brand-600 rounded-md bg-opacity-30 inline-block  dark:bg-scale-400 dark:text-light py-0.5 px-2 text-[13px] leading-4 mt-2">
               Available for Pro plan
             </span>
-            <h2 className="text-scale-1200 text-4xl mt-4">Cost control with spend caps</h2>
+            <h2 className="text-foreground text-4xl mt-4">Cost control with spend caps</h2>
             <p className="mt-3 prose lg:max-w-lg">
               The Pro plan has a usage quota included and a spend cap turned on by default. If you
               need to go beyond the inclusive limits, simply switch off your spend cap to pay for
@@ -430,6 +424,7 @@ export default function IndexPage() {
               src={`${basePath}/images/pricing/spend-cap${
                 resolvedTheme === 'dark' ? '' : '-light'
               }.png`}
+              alt=""
             />
           </div>
         </div>
@@ -438,10 +433,10 @@ export default function IndexPage() {
       <div className="bg-scale-200">
         <div className="sm:py-18 container relative mx-auto px-4 py-16 md:py-24 lg:px-16 lg:py-24 xl:px-20">
           <div className="text-center">
-            <h2 className="text-scale-1200 text-3xl scroll-m-20" id="compare-plans">
+            <h2 className="text-foreground text-3xl scroll-m-20" id="compare-plans">
               Compare Plans
             </h2>
-            <p className="text-scale-1100 mt-4 mb-8 lg:mb-16 text-lg">
+            <p className="text-light mt-4 mb-8 lg:mb-16 text-lg">
               Start with a hobby project, collaborate with a team, and scale to millions of users.
             </p>
           </div>
@@ -453,7 +448,7 @@ export default function IndexPage() {
               {/* Free - Mobile  */}
               <div className="bg-slate-200 p-2 sticky top-14 z-10 pt-4">
                 <div className="bg-slate-300 rounded-lg border border-slate-500 py-2 px-4 flex justify-between items-center">
-                  <label className="text-scale-1000">Change plan</label>
+                  <label className="text-lighter">Change plan</label>
                   <Select
                     id="change-plan"
                     name="Change plan"
@@ -694,7 +689,7 @@ export default function IndexPage() {
                 <thead className="bg-scale-200 dark:bg-scale-200 sticky top-[62px] z-10">
                   <tr>
                     <th
-                      className="text-scale-1200 w-1/3 px-6 pt-2 pb-2 text-left text-sm font-normal"
+                      className="text-foreground w-1/3 px-6 pt-2 pb-2 text-left text-sm font-normal"
                       scope="col"
                     >
                       <span className="sr-only">Feature by</span>
@@ -706,7 +701,7 @@ export default function IndexPage() {
 
                     {plans.map((plan) => (
                       <th
-                        className="text-scale-1200 w-1/4 px-6 pr-2 pt-2 pb-2 text-left text-sm font-normal"
+                        className="text-foreground w-1/4 px-6 pr-2 pt-2 pb-2 text-left text-sm font-normal"
                         scope="col"
                         key={plan.name}
                       >
@@ -723,13 +718,13 @@ export default function IndexPage() {
                 </thead>
                 <tr className="descriptions">
                   <th
-                    className="text-scale-1200 w-1/3 px-6 pt-2 pb-2 text-left text-sm font-normal"
+                    className="text-foreground w-1/3 px-6 pt-2 pb-2 text-left text-sm font-normal"
                     scope="col"
                   ></th>
 
                   {plans.map((plan) => (
                     <th
-                      className="text-scale-1200 w-1/4 px-6 pt-2 pb-2 text-left text-sm font-normal"
+                      className="text-foreground w-1/4 px-6 pt-2 pb-2 text-left text-sm font-normal"
                       scope="col"
                       key={`th-${plan.name}`}
                     >
@@ -744,7 +739,7 @@ export default function IndexPage() {
                 <tbody className="border-scale-700 dark:border-scale-400 divide-scale-700 dark:divide-scale-400 divide-y">
                   <tr>
                     <th
-                      className="text-scale-900 px-6 py-8 text-left align-top text-sm font-medium dark:text-white"
+                      className="text-muted px-6 py-8 text-left align-top text-sm font-medium dark:text-white"
                       scope="row"
                     ></th>
 
@@ -754,7 +749,7 @@ export default function IndexPage() {
                           <div className="flex flex-col justify-between h-full">
                             <>
                               <span
-                                className={`text-scale-1200 ${
+                                className={`text-foreground ${
                                   plan.name !== 'Enterprise' ? 'text-5xl' : 'text-4xl'
                                 }`}
                               >
@@ -778,17 +773,16 @@ export default function IndexPage() {
                             )}
 
                             <div className={plan.name === 'Enterprise' ? 'mt-auto' : 'mt-8'}>
-                              <Link href={plan.href} as={plan.href}>
-                                <a>
-                                  <Button
-                                    size="tiny"
-                                    type={plan.name === 'Enterprise' ? 'default' : 'primary'}
-                                    block
-                                  >
-                                    {plan.cta}
-                                  </Button>
-                                </a>
-                              </Link>
+                              <Button
+                                asChild
+                                size="tiny"
+                                type={plan.name === 'Enterprise' ? 'default' : 'primary'}
+                                block
+                              >
+                                <Link href={plan.href} as={plan.href}>
+                                  {plan.cta}
+                                </Link>
+                              </Button>
                             </div>
                           </div>
                         </div>
@@ -838,55 +832,43 @@ export default function IndexPage() {
                   />
                 </tbody>
                 <tfoot>
-                  <tr className="border-scale-200 dark:border-scale-600 border-t">
+                  <tr className="border-border border-t">
                     <th className="sr-only" scope="row">
                       Choose your plan
                     </th>
 
                     <td className="px-6 pt-5">
-                      <Link
-                        href="https://supabase.com/dashboard/new?plan=free"
-                        as="https://supabase.com/dashboard/new?plan=free"
-                      >
-                        <a>
-                          <Button size="tiny" type="primary" block>
-                            Get Started
-                          </Button>
-                        </a>
-                      </Link>
+                      <Button asChild size="tiny" type="primary" block>
+                        <Link
+                          href="https://supabase.com/dashboard/new?plan=free"
+                          as="https://supabase.com/dashboard/new?plan=free"
+                        >
+                          Get Started
+                        </Link>
+                      </Button>
                     </td>
 
                     <td className="px-6 pt-5">
-                      <Link
-                        href="https://supabase.com/dashboard/new?plan=pro"
-                        as="https://supabase.com/dashboard/new?plan=pro"
-                      >
-                        <a>
-                          <Button size="tiny" type="primary" block>
-                            Get Started
-                          </Button>
-                        </a>
-                      </Link>
+                      <Button asChild size="tiny" type="primary" block>
+                        <Link
+                          href="https://supabase.com/dashboard/new?plan=pro"
+                          as="https://supabase.com/dashboard/new?plan=pro"
+                        >
+                          Get Started
+                        </Link>
+                      </Button>
                     </td>
 
                     <td className="px-6 pt-5">
-                      <Link href="https://supabase.com/dashboard/new?plan=team">
-                        <a>
-                          <Button size="tiny" type="primary" block>
-                            Get Started
-                          </Button>
-                        </a>
-                      </Link>
+                      <Button asChild size="tiny" type="primary" block>
+                        <Link href="https://supabase.com/dashboard/new?plan=team">Get Started</Link>
+                      </Button>
                     </td>
 
                     <td className="px-6 pt-5">
-                      <Link href="https://forms.supabase.com/enterprise">
-                        <a>
-                          <Button size="tiny" type="default" block>
-                            Contact Us
-                          </Button>
-                        </a>
-                      </Link>
+                      <Button asChild size="tiny" type="default" block>
+                        <Link href="https://forms.supabase.com/enterprise">Contact Us</Link>
+                      </Button>
                     </td>
                   </tr>
                 </tfoot>
@@ -905,18 +887,16 @@ export default function IndexPage() {
                   chevronAlign="right"
                   justified
                   size="medium"
-                  className="text-scale-900 dark:text-white"
+                  className="text-muted dark:text-white"
                 >
                   {pricingFaq.map((faq, i) => {
                     return (
                       <div className="border-b py-2" key={i}>
                         <Accordion.Item
-                          header={<span className="text-scale-1200">{faq.question}</span>}
+                          header={<span className="text-foreground">{faq.question}</span>}
                           id={`faq--${i.toString()}`}
                         >
-                          <ReactMarkdown className="text-scale-900 prose">
-                            {faq.answer}
-                          </ReactMarkdown>
+                          <ReactMarkdown className="text-muted prose">{faq.answer}</ReactMarkdown>
                         </Accordion.Item>
                       </div>
                     )

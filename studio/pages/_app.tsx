@@ -27,7 +27,6 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
-import LogRocket from 'logrocket'
 import Head from 'next/head'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -66,11 +65,6 @@ dayjs.extend(timezone)
 dayjs.extend(relativeTime)
 dart(Prism)
 
-if (IS_PLATFORM && process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging') {
-  // [Joshen] For staff only to debug internal issues
-  LogRocket.init('bffopb/supabase-dashboard-staff')
-}
-
 loader.config({
   // [Joshen] Attempt for offline support/bypass ISP issues is to store the assets required for monaco
   // locally. We're however, only storing the assets which we need (based on what the network tab loads
@@ -90,9 +84,10 @@ loader.config({
 // the dashboard, all other layout components should not be doing that
 
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
-  const consentToastId = useRef<string>()
-  const queryClient = useRootQueryClient()
   const snap = useAppStateSnapshot()
+  const queryClient = useRootQueryClient()
+
+  const consentToastId = useRef<string>()
   const [rootStore] = useState(() => new RootStore())
 
   // [Joshen] Some issues with using createBrowserSupabaseClient
@@ -103,6 +98,24 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
           process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
         )
       : undefined
+  )
+
+  useAutoAuthRedirect(queryClient)
+
+  const getLayout = Component.getLayout ?? ((page) => page)
+
+  const AuthContainer = useMemo(
+    // eslint-disable-next-line react/display-name
+    () => (props: any) => {
+      return IS_PLATFORM ? (
+        <SessionContextProvider supabaseClient={supabase as any}>
+          <AuthProvider>{props.children}</AuthProvider>
+        </SessionContextProvider>
+      ) : (
+        <AuthProvider>{props.children}</AuthProvider>
+      )
+    },
+    [supabase]
   )
 
   useEffect(() => {
@@ -132,24 +145,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  useAutoAuthRedirect(queryClient)
-
-  const getLayout = Component.getLayout ?? ((page) => page)
-
-  const AuthContainer = useMemo(
-    // eslint-disable-next-line react/display-name
-    () => (props: any) => {
-      return IS_PLATFORM ? (
-        <SessionContextProvider supabaseClient={supabase as any}>
-          <AuthProvider>{props.children}</AuthProvider>
-        </SessionContextProvider>
-      ) : (
-        <AuthProvider>{props.children}</AuthProvider>
-      )
-    },
-    [supabase]
-  )
 
   return (
     <QueryClientProvider client={queryClient}>

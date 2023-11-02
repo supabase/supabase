@@ -1,19 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import dayjs from 'dayjs'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import { useEffect, useState } from 'react'
-import {
-  Alert,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertTriangle,
-  IconArrowDown,
-  IconArrowUp,
-  IconRefreshCw,
-  IconUser,
-} from 'ui'
 
 import { useParams } from 'common'
 import { FilterPopover, LogDetailsPanel } from 'components/interfaces/AuditLogs'
@@ -31,6 +19,18 @@ import { useOrganizationRolesQuery } from 'data/organizations/organization-roles
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import Link from 'next/link'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconAlertTriangle,
+  IconArrowDown,
+  IconArrowUp,
+  IconRefreshCw,
+  IconUser,
+} from 'ui'
 
 // [Joshen considerations]
 // - Maybe fix the height of the table to the remaining height of the viewport, so that the search input is always visible
@@ -118,6 +118,8 @@ const AuditLogs = () => {
       }
     })
 
+  const currentOrganization = organizations?.find((o) => o.slug === slug)
+
   return (
     <>
       <ScaffoldContainerLegacy>
@@ -135,7 +137,9 @@ const AuditLogs = () => {
               />
               <FilterPopover
                 name="Projects"
-                options={projects ?? []}
+                options={
+                  projects?.filter((p) => p.organization_id === currentOrganization?.id) ?? []
+                }
                 labelKey="name"
                 valueKey="ref"
                 activeOptions={filters.projects}
@@ -229,9 +233,11 @@ const AuditLogs = () => {
                   </div>
 
                   <div className="flex items-center">
-                    <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
-                      <Button type="primary">Upgrade subscription</Button>
-                    </Link>
+                    <Button type="primary" asChild>
+                      <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
+                        Upgrade subscription
+                      </Link>
+                    </Button>
                   </div>
                 </div>
               </Alert_Shadcn_>
@@ -269,7 +275,7 @@ const AuditLogs = () => {
                         <p>Date</p>
 
                         <Tooltip.Root delayDuration={0}>
-                          <Tooltip.Trigger>
+                          <Tooltip.Trigger asChild>
                             <Button
                               type="text"
                               className="px-1"
@@ -284,21 +290,19 @@ const AuditLogs = () => {
                             />
                           </Tooltip.Trigger>
                           <Tooltip.Portal>
-                            <Tooltip.Portal>
-                              <Tooltip.Content side="right">
-                                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                <div
-                                  className={[
-                                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                    'border border-scale-200',
-                                  ].join(' ')}
-                                >
-                                  <span className="text-xs text-foreground">
-                                    {dateSortDesc ? 'Sort latest first' : 'Sort earliest first'}
-                                  </span>
-                                </div>
-                              </Tooltip.Content>
-                            </Tooltip.Portal>
+                            <Tooltip.Content side="right">
+                              <Tooltip.Arrow className="radix-tooltip-arrow" />
+                              <div
+                                className={[
+                                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                  'border border-scale-200',
+                                ].join(' ')}
+                              >
+                                <span className="text-xs text-foreground">
+                                  {dateSortDesc ? 'Sort latest first' : 'Sort earliest first'}
+                                </span>
+                              </div>
+                            </Tooltip.Content>
                           </Tooltip.Portal>
                         </Tooltip.Root>
                       </div>

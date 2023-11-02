@@ -243,7 +243,7 @@ function Database() {
               <div className="grid grid-cols-12" key={0}>
                 <div className="col-span-12 mt-0 flex lg:col-span-6 xl:col-span-12 xl:mb-8">
                   <p>
-                    <p className="text-scale-1100 m-0">Libraries coming soon:</p>
+                    <p className="text-light m-0">Libraries coming soon:</p>
                   </p>
                   <div className="ml-1 space-x-1">
                     <Badge dot={false}>Python</Badge>
@@ -297,13 +297,9 @@ function Database() {
                 title="40+ preinstalled extensions"
                 text="We only show a few of the extensions supported by Supabase here, but we preinstall many more that you can use right away."
               />
-              <Link href="/docs/guides/database" passHref>
-                <a>
-                  <Button size="small" type="default" icon={<IconArrowUpRight />}>
-                    Explore documentation
-                  </Button>
-                </a>
-              </Link>
+              <Button asChild size="small" type="default" icon={<IconArrowUpRight />}>
+                <Link href="/docs/guides/database">Explore documentation</Link>
+              </Button>
             </div>
             <div className="col-span-12 mt-8 lg:col-span-6 lg:col-start-7 lg:mt-0">
               <SplitCodeBlockCarousel

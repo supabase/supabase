@@ -12,14 +12,12 @@ const Header = () => {
     <div className="dark:border-dark border-b p-3">
       <div className="flex items-center space-x-2">
         <Link href="/projects">
-          <a>
-            <img
-              src={`${BASE_PATH}/img/supabase-logo.svg`}
-              alt="Supabase"
-              className="dark:border-dark rounded border p-1 hover:border-white"
-              style={{ height: 24 }}
-            />
-          </a>
+          <img
+            src={`${BASE_PATH}/img/supabase-logo.svg`}
+            alt="Supabase"
+            className="dark:border-dark rounded border p-1 hover:border-white"
+            style={{ height: 24 }}
+          />
         </Link>
       </div>
     </div>
@@ -33,29 +31,21 @@ const Header = () => {
 const GenericProjectPage: NextPage = () => {
   const router = useRouter()
   const { routeSlug, ...queryParams } = router.query
-  const queryString =
-    Object.keys(queryParams).length > 0
-      ? new URLSearchParams(queryParams as Record<string, string>).toString()
-      : ''
+
+  const query = Object.keys(queryParams).length
+    ? `?${new URLSearchParams(queryParams as Record<string, string>)}`
+    : undefined
 
   const urlRewriterFactory = (slug: string | string[] | undefined) => {
     return (projectRef: string) => {
-      const hash = location.hash
+      const hash = location.hash ? `#${location.hash}` : undefined
 
       if (!Array.isArray(slug)) {
-        return [`/project/${projectRef}`, queryString ?? `?${queryString}`, hash ?? `#${hash}`]
-          .filter(Boolean)
-          .join('')
+        return [`/project/${projectRef}`, query, hash].filter(Boolean).join('')
       }
 
       const slugPath = slug.reduce((a, b) => `${a}/${b}`, '').slice(1)
-      return [
-        `/project/${projectRef}/${slugPath}`,
-        queryString ?? `?${queryString}`,
-        hash ?? `#${hash}`,
-      ]
-        .filter(Boolean)
-        .join('')
+      return [`/project/${projectRef}/${slugPath}`, query, hash].filter(Boolean).join('')
     }
   }
 

@@ -1,5 +1,5 @@
 import { PostgresTable, PostgresTrigger } from '@supabase/postgres-meta'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useParams } from 'common/hooks'
@@ -96,7 +96,8 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
   const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
 
   const isEdgeFunction = (url: string) =>
-    url.includes(`https://${ref}.functions.supabase.${restUrlTld}/`)
+    url.includes(`https://${ref}.functions.supabase.${restUrlTld}/`) ||
+    url.includes(`https://${ref}.supabase.${restUrlTld}/functions/`)
 
   const initialValues = {
     name: selectedHook?.name ?? '',
@@ -397,7 +398,7 @@ const FormContents = ({
       }
     } else if (values.function_type === 'supabase_function') {
       const fnSlug = (functions ?? [])[0]?.slug
-      const defaultFunctionUrl = `https://${projectRef}.functions.supabase.${restUrlTld}/${fnSlug}`
+      const defaultFunctionUrl = `https://${projectRef}.supabase.${restUrlTld}/functions/v1/${fnSlug}`
       const updatedValues = {
         ...values,
         http_url: isEdgeFunction(values.http_url) ? values.http_url : defaultFunctionUrl,

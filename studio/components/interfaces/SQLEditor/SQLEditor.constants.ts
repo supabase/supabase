@@ -1274,6 +1274,27 @@ drop extension if exists "supabase-dbdev";
 create extension "supabase-dbdev";
 `.trim(),
   },
+  {
+    id: 25,
+    type: 'template',
+    title: 'Large objects',
+    description: 'List large objects (tables/indexes) in your database.',
+    sql: `SELECT 
+    SCHEMA_NAME,
+    relname,
+    table_size
+  FROM
+    (SELECT 
+      pg_catalog.pg_namespace.nspname AS SCHEMA_NAME,
+      relname,
+      pg_relation_size(pg_catalog.pg_class.oid) AS table_size
+    FROM pg_catalog.pg_class
+    JOIN pg_catalog.pg_namespace ON relnamespace = pg_catalog.pg_namespace.oid
+    ) t
+  WHERE SCHEMA_NAME NOT LIKE 'pg_%'
+  ORDER BY table_size DESC
+  LIMIT 25`.trim(),
+  },
 ]
 
 export const SQL_SNIPPET_SCHEMA_VERSION = '1.0'

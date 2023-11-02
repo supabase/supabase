@@ -17,6 +17,7 @@ export interface DbQueryHook<T = any> {
   runQuery: () => void
   setParams?: never
   changeQuery?: never
+  resolvedSql: string
 }
 
 const useDbQuery = (
@@ -53,7 +54,14 @@ const useDbQuery = (
   )
 
   const error = rqError || (typeof data === 'object' ? data?.error : '')
-  return { error, data, isLoading: isLoading || isRefetching, params, runQuery: refetch }
+  return {
+    error,
+    data,
+    isLoading: isLoading || isRefetching,
+    params,
+    runQuery: refetch,
+    resolvedSql,
+  }
 }
 
 export default useDbQuery

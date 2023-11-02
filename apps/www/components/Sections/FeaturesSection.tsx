@@ -29,19 +29,15 @@ const FeaturesSection = ({ title, paragraph, cta, features }: Props) => {
     <LazyMotion features={domAnimation}>
       <SectionContainer>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-10 justify-between">
-          <div className="col-span-full lg:col-span-4 gap-2 flex flex-col">
+          <div className="col-span-full lg:col-span-4 gap-2 flex flex-col items-start">
             <h2 className="text-2xl sm:text-3xl xl:text-4xl max-w-[280px] sm:max-w-xs xl:max-w-[360px] tracking-[-1px]">
               {title}
             </h2>
-            <p className="text-scale-900 mb-4">{paragraph}</p>
+            <p className="text-muted mb-4">{paragraph}</p>
             {cta && (
-              <Link href={cta.link}>
-                <a>
-                  <Button type="default" size="small" icon={<IconArrowUpRight />}>
-                    {cta.label ?? 'Explore documentation'}
-                  </Button>
-                </a>
-              </Link>
+              <Button asChild type="default" size="small" icon={<IconArrowUpRight />}>
+                <Link href={cta.link}>{cta.label ?? 'Explore documentation'}</Link>
+              </Button>
             )}
           </div>
           <div
@@ -98,7 +94,7 @@ const Feature = ({
       </div>
       <div className="text-sm lg:text-base">
         <h2 className="text-base">{feature.title}</h2>
-        <ReactMarkdown className="prose pt-1 text-sm text-scale-900">{feature.text}</ReactMarkdown>
+        <ReactMarkdown className="prose pt-1 text-sm text-muted">{feature.text}</ReactMarkdown>
       </div>
     </m.div>
   )

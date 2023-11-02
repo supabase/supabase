@@ -1,7 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { includes, noop } from 'lodash'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 
 import { useParams } from 'common/hooks'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -52,7 +52,8 @@ const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: 
     <>
       {filteredHooks.map((x: any) => {
         const isEdgeFunction = (url: string) =>
-          url.includes(`https://${ref}.functions.supabase.${restUrlTld}/`)
+          url.includes(`https://${ref}.functions.supabase.${restUrlTld}/`) ||
+          url.includes(`https://${ref}.supabase.${restUrlTld}/functions/`)
         const [url, method] = x.function_args
 
         return (

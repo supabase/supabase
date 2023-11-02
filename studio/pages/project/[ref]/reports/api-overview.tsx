@@ -23,13 +23,14 @@ import { useParams } from 'common'
 import { isEqual } from 'lodash'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks'
 
 export const ApiReport: NextPageWithLayout = () => {
-  const { ref: projectRef } = useParams()
+  const organization = useSelectedOrganization()
   const report = useApiReport()
 
-  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const plan = subscription?.plan
 
   const handleDatepickerChange = ({ from, to }: DatePickerToFrom) => {
@@ -67,7 +68,7 @@ export const ApiReport: NextPageWithLayout = () => {
         data={report.data.totalRequests || []}
         renderer={TotalRequestsChartRenderer}
         append={TopApiRoutesRenderer}
-        appendProps={{ data: report.data.topRoutes || [] }}
+        appendProps={{ data: report.data.topRoutes || [], params: report.params.topRoutes }}
       />
       <ReportWidget
         isLoading={report.isLoading}
@@ -76,7 +77,10 @@ export const ApiReport: NextPageWithLayout = () => {
         tooltip="Error responses with 4XX or 5XX status codes"
         data={report.data.errorCounts || []}
         renderer={ErrorCountsChartRenderer}
-        appendProps={{ data: report.data.topErrorRoutes || [] }}
+        appendProps={{
+          data: report.data.topErrorRoutes || [],
+          params: report.params.topErrorRoutes,
+        }}
         append={TopApiRoutesRenderer}
       />
       <ReportWidget
@@ -86,7 +90,7 @@ export const ApiReport: NextPageWithLayout = () => {
         tooltip="Average response speed (in miliseconds) of a request"
         data={report.data.responseSpeed || []}
         renderer={ResponseSpeedChartRenderer}
-        appendProps={{ data: report.data.topSlowRoutes || [] }}
+        appendProps={{ data: report.data.topSlowRoutes || [], params: report.params.topSlowRoutes }}
         append={TopApiRoutesRenderer}
       />
 

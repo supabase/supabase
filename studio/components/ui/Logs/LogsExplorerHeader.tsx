@@ -39,13 +39,9 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
         {subtitle && <span className="text-2xl text-foreground-light">{subtitle}</span>}
       </div>
       <div className="flex flex-row gap-2">
-        <Link href={LOGS_EXPLORER_DOCS_URL}>
-          <a>
-            <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-              Documentation
-            </Button>
-          </a>
-        </Link>
+        <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+          <Link href={LOGS_EXPLORER_DOCS_URL}>Documentation</Link>
+        </Button>
 
         <SidePanel
           size="large"
@@ -80,15 +76,18 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
                 The following table shows all the available paths that can be queried from each
                 respective source. Do note that to access nested keys, you would need to perform the
                 necessary{' '}
-                <Link href="https://supabase.com/docs/guides/platform/logs#unnesting-arrays">
-                  <a target="_blank" rel="noreferrer" className="text-brand">
-                    unnesting joins
-                    <IconExternalLink
-                      size="tiny"
-                      className="ml-1 inline -translate-y-[2px]"
-                      strokeWidth={1.5}
-                    />
-                  </a>
+                <Link
+                  href="https://supabase.com/docs/guides/platform/logs#unnesting-arrays"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-brand"
+                >
+                  unnesting joins
+                  <IconExternalLink
+                    size="tiny"
+                    className="ml-1 inline -translate-y-[2px]"
+                    strokeWidth={1.5}
+                  />
                 </Link>
               </p>
             </div>

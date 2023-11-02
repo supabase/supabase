@@ -8,8 +8,9 @@ export const meta = {
 
 export const mutuallyExclusiveNote = (
   <Admonition type="note">
-    If you enable PITR, Daily Backups will no longer be taken. PITR provides a finer granularity
-    than Daily Backups, so it's unnecessary to run both.
+
+    If you enable PITR, Daily Backups will no longer be taken. PITR provides a finer granularity than Daily Backups, so it's unnecessary to run both.
+
   </Admonition>
 )
 
@@ -42,6 +43,18 @@ For security purposes, passwords for custom roles are not stored in daily backup
 The PostgreSQL utility [pg_dumpall](https://www.postgresql.org/docs/current/app-pg-dumpall.html) is used to perform daily backups. An SQL file is generated, zipped up, and sent to our storage servers for safe keeping.
 
 You can access daily backups in the [Scheduled backups](https://supabase.com/dashboard/project/_/database/backups/scheduled) settings in the Dashboard. Pro plan projects can access the last 7 days' worth of daily backups while Enterprise plan projects can access up to 30 days' worth of daily backups. Users can restore their project to any one of the backups. If you wish to generate a logical backup on your own, you can do so through the [Supabase CLI](/docs/reference/cli/supabase-db-dump).
+
+#### Backup Process for Large Databases
+
+Databases larger than 100GB[^1], if they're on a recent build[^2] of the Supabase platform, get automatically transitioned[^3] to use daily physical backups. Physical backups are a more performant backup mechanism that lowers the overhead and impact on the database being backed up, and also avoids holding locks on objects in your database for a long period of time. While restores are unaffected, the backups created using this method cannot be downloaded from the Backups section of the dashboard.
+
+This class of physical backups only allows for recovery to a fixed time each day, similar to daily backups. You can upgrade to [PITR](#point-in-time-recovery) for access to more granular recovery options.
+
+Once a database is transitioned to using physical backups, it continues to use physical backups, even if the database size falls back below the threshold for the transition.
+
+[^1]: The threshold for transitioning might be lowered in the future.
+[^2]: Projects created or upgraded after the 14th of July 2022 are eligible.
+[^3]: The transition to physical backups does not involve any downtime, and is handled transparently in the background.
 
 ### Restoration Process [#daily-backups-restoration-process]
 
