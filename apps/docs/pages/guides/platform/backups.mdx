@@ -44,6 +44,18 @@ The PostgreSQL utility [pg_dumpall](https://www.postgresql.org/docs/current/app-
 
 You can access daily backups in the [Scheduled backups](https://supabase.com/dashboard/project/_/database/backups/scheduled) settings in the Dashboard. Pro plan projects can access the last 7 days' worth of daily backups while Enterprise plan projects can access up to 30 days' worth of daily backups. Users can restore their project to any one of the backups. If you wish to generate a logical backup on your own, you can do so through the [Supabase CLI](/docs/reference/cli/supabase-db-dump).
 
+#### Backup Process for Large Databases
+
+Databases larger than 100GB[^1], if they're on a recent build[^2] of the Supabase platform, get automatically transitioned[^3] to use daily physical backups. Physical backups are a more performant backup mechanism that lowers the overhead and impact on the database being backed up, and also avoids holding locks on objects in your database for a long period of time. While restores are unaffected, the backups created using this method cannot be downloaded from the Backups section of the dashboard.
+
+This class of physical backups only allows for recovery to a fixed time each day, similar to daily backups. You can upgrade to [PITR](#point-in-time-recovery) for access to more granular recovery options.
+
+Once a database is transitioned to using physical backups, it continues to use physical backups, even if the database size falls back below the threshold for the transition.
+
+[^1]: The threshold for transitioning might be lowered in the future.
+[^2]: Projects created or upgraded after the 14th of July 2022 are eligible.
+[^3]: The transition to physical backups does not involve any downtime, and is handled transparently in the background.
+
 ### Restoration Process [#daily-backups-restoration-process]
 
 When selecting a backup to restore to, select the closest available one made before the desired point in time to restore to. Earlier backups can always be chosen too but do consider the number of days' worth of data that could be lost.
