@@ -37,7 +37,7 @@ const NoResultAlert = ({
       <div className="text-foreground-lighter">Realtime message logs will be shown here</div>
       <div className="mt-4 border bg-surface-100 border-border rounded-md justify-start items-center flex flex-col w-full">
         <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">
-          <IconBroadcast size="xlarge" className="bg-brand-400 rounded w-6" />
+          <IconBroadcast size="xlarge" className="bg-brand-400 rounded w-6 text-brand-600" />
           <div className="grow flex-col flex">
             <div className="text-foreground">Create a Broadcast message</div>
             <div className="text-foreground-lighter text-xs">Start developing in preview</div>
@@ -47,7 +47,7 @@ const NoResultAlert = ({
           </Button>
         </div>
         <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">
-          <IconPresence size="xlarge" className="bg-brand-400 rounded w-6" />
+          <IconPresence size="xlarge" className="bg-brand-400 rounded w-6 text-brand-600" />
           <div className="grow flex-col flex">
             <div className="text-foreground">Join from another browser tab</div>
             <div className="text-foreground-lighter text-xs">
@@ -62,7 +62,7 @@ const NoResultAlert = ({
         </div>
 
         <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">
-          <IconDatabaseChanges size="xlarge" className="bg-brand-400 rounded w-6" />
+          <IconDatabaseChanges size="xlarge" className="bg-brand-400 rounded w-6 text-brand-600" />
           <div className="grow flex-col flex">
             <div className="text-foreground">Listen to a table for changes</div>
             <div className="text-foreground-lighter text-xs">Start developing in preview</div>

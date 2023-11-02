@@ -5,7 +5,7 @@ import IconBase from './../../IconBase'
 const SvgComponent = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width={25} height={24} fill="none">
     <path
-      stroke="#85E0B7"
+      stroke="currentColor"
       strokeLinecap="round"
       strokeLinejoin="bevel"
       strokeMiterlimit={10}
@@ -16,14 +16,14 @@ const SvgComponent = () => (
       cx={17.512}
       cy={6.971}
       r={3.723}
-      fill="#15593B"
-      stroke="#4CC38A"
+      fill="currentColor"
+      stroke="currentColor"
       strokeLinejoin="bevel"
       strokeMiterlimit={10}
     />
     <path
-      fill="#15593B"
-      stroke="#4CC38A"
+      fill="currentColor"
+      stroke="currentColor"
       strokeLinejoin="bevel"
       strokeMiterlimit={10}
       d="m10.11 13.287 2.137 3.703-2.138 3.703H5.833L3.695 16.99l2.138-3.703h4.276Z"

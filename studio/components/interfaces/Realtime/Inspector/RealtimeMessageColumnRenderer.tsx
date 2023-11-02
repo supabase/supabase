@@ -5,10 +5,10 @@ import { LogData, PreviewLogData } from './Messages.types'
 import { RowLayout } from './MessagesFormatters'
 
 const ICONS = {
-  PRESENCE: <IconPresence size="xlarge" className="bg-brand-400 rounded" />,
-  BROADCAST: <IconBroadcast size="xlarge" className="bg-brand-400 rounded" />,
-  POSTGRES: <IconDatabaseChanges size="xlarge" className="bg-brand-400 rounded" />,
-  SYSTEM: <IconDatabaseChanges size="xlarge" className="bg-brand-400 rounded" />,
+  PRESENCE: <IconPresence size="xlarge" className="bg-brand-400 rounded text-brand-600" />,
+  BROADCAST: <IconBroadcast size="xlarge" className="bg-brand-400 rounded text-brand-600" />,
+  POSTGRES: <IconDatabaseChanges size="xlarge" className="bg-brand-400 rounded text-brand-600" />,
+  SYSTEM: <IconDatabaseChanges size="xlarge" className="bg-brand-400 rounded text-brand-600" />,
 }
 
 export const ColumnRenderer: Column<LogData, unknown>[] = [
