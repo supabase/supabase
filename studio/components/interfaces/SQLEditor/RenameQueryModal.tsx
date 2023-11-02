@@ -3,12 +3,13 @@ import { useParams } from 'common'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { isError } from 'data/utils/error-check'
-import { useFlag, useStore } from 'hooks'
+import { useFlag, useSelectedOrganization, useStore } from 'hooks'
 import { useEffect, useState } from 'react'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { AiIconAnimation, Button, Form, Input, Modal } from 'ui'
-import { subscriptionHasHipaaAddon } from '../BillingV2/Subscription/Subscription.utils'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+
 export interface RenameQueryModalProps {
   snippet: SqlSnippet
   visible: boolean
@@ -19,9 +20,10 @@ export interface RenameQueryModalProps {
 const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQueryModalProps) => {
   const { ui } = useStore()
   const { ref } = useParams()
+  const organization = useSelectedOrganization()
   const snap = useSqlEditorStateSnapshot()
   const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
-  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef: ref })
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
   // Customers on HIPAA plans should not have access to Supabase AI
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)

@@ -10,10 +10,10 @@ import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useProjectRestoreMutation } from 'data/projects/project-restore-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useProjectContext } from './ProjectContext'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 export interface ProjectPausedStateProps {
   product?: string
@@ -26,7 +26,8 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const selectedOrganization = useSelectedOrganization()
   const { project } = useProjectContext()
   const orgSlug = selectedOrganization?.slug
-  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef: ref })
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug })
+
   const isFreePlan = subscription?.plan?.id === 'free'
   const billedViaOrg = Boolean(selectedOrganization?.subscription_id)
 

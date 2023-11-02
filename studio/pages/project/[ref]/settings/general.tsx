@@ -2,19 +2,16 @@ import {
   CustomDomainConfig,
   DeleteProjectPanel,
   General,
-  Infrastructure,
   TransferProjectPanel,
 } from 'components/interfaces/Settings/General'
 import { SettingsLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useFlag, useIsFeatureEnabled, useSelectedOrganization } from 'hooks'
+import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { NextPageWithLayout } from 'types'
 
 const ProjectSettings: NextPageWithLayout = () => {
   const { project } = useProjectContext()
-  const organization = useSelectedOrganization()
   const isBranch = !!project?.parent_project_ref
-  const isOrgBilling = !!organization?.subscription_id
   const transferProjectEnabledFlag = useFlag('transferProject')
   const { projectsTransfer: projectTransferEnabled } = useIsFeatureEnabled(['projects:transfer'])
 
@@ -24,7 +21,6 @@ const ProjectSettings: NextPageWithLayout = () => {
       <General />
       {!isBranch ? (
         <>
-          {!isOrgBilling && <Infrastructure />}
           <CustomDomainConfig />
           {projectTransferEnabled && transferProjectEnabledFlag && <TransferProjectPanel />}
           <DeleteProjectPanel />
