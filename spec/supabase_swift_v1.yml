@@ -583,103 +583,633 @@ functions:
     title: "Fetch data: select()"
     notes: |
       - By default, Supabase projects will return a maximum of 1,000 rows. This setting can be changed in Project API Settings. It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
-      - `select()` can be combined with [Modifiers](/docs/reference/javascript/using-modifiers)
-      - `select()` can be combined with [Filters](/docs/reference/javascript/using-filters)
+      - `select()` can be combined with [Modifiers](/docs/reference/swift/using-modifiers)
+      - `select()` can be combined with [Filters](/docs/reference/swift/using-filters)
       - If using the Supabase hosted platform `apikey` is technically a reserved keyword, since the API gateway will pluck it out for authentication. [It should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
-      - The recommended solution for getting data is to use the value property which will return a decoded model. Create a struct codable model of the of your database to get this easily decoded.
+      - The recommended solution for getting data is to use the value property which will return a decoded model. Create a `Codable` to easily decode your database responses.
     examples:
       - id: getting-your-data
         name: Getting your data
         isSpotlight: true
         code: |
           ```swift
-          let cities: [CityModel] = try await client.database
-                      .from("cities")
-                      .execute().value
+          struct Country: Decodable {
+            let id: Int
+            let name: String
+          }
+
+          let countries: [Country] = try await client.database
+            .from("countries")
+            .select()
+            .execute()
+            .value
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Afghanistan"
+              },
+              {
+                "id": 2,
+                "name": "Albania"
+              },
+              {
+                "id": 3,
+                "name": "Algeria"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
           ```
       - id: selecting-specific-columns
         name: Selecting specific columns
-        description: You can select specific fields from your tables.
         code: |
           ```swift
-          let cities: [CityModel] = try await client.database
-                      .from("cities")
-                      .select(columns:"name")
-                      .execute().value
+          struct Country: Decodable {
+            let name: String
+          }
+
+          let countries: [Country] = try await supabase.database
+            .from("countries")
+            .select("name")
+            .execute()
+            .value
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Afghanistan"
+              },
+              {
+                "name": "Albania"
+              },
+              {
+                "name": "Algeria"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
           ```
       - id: query-foreign-tables
         name: Query foreign tables
-        description: If your database has foreign key relationships, you can query related tables too.
+        description: |
+          If your database has foreign key relationships, you can query related tables too.
         code: |
           ```swift
-          let countries: [CountryModel] = try await client.database
-                      .from("countries")
-                      .select(columns:"""
-                                      id,
-                                      name,
-                                      cities: city_id
-                                              (
-                                                id,
-                                                city_name
-                                              )
-                                      """)
-                      .execute().value
+          struct Country: Decodable {
+            let name: String
+            let cities: [City]
+          }
+
+          struct City: Decodable {
+            let name: String
+          }
+
+          let countries: [Country] = try await supabase.database
+            .from("countries")
+            .select(
+              """
+                name,
+                cities (
+                  name
+                )
+              """
+            )
+            .execute()
+            .value
           ```
-        note: |
-          What about join tables
-          If you're in a situation where your tables are **NOT** directly related, but instead are joined by a _join table_,
-          you can still use the `select()` method to query the related data. The PostgREST engine detects the relationship automatically.
-          For more details, [follow the link](https://postgrest.org/en/latest/api.html#embedding-through-join-tables).
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Germany'),
+              (2, 'Indonesia');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 2, 'Bali'),
+              (2, 1, 'Munich');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Germany",
+                "cities": [
+                  {
+                    "name": "Munich"
+                  }
+                ]
+              },
+              {
+                "name": "Indonesia",
+                "cities": [
+                  {
+                    "name": "Bali"
+                  }
+                ]
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+      - id: query-foreign-tables-through-a-join-table
+        name: Query foreign tables through a join table
+        code: |
+          ```swift
+            struct User: Decodable {
+              let name: String
+              let teams: [Team]
+            }
+            
+            struct Team: Decodable {
+              let name: String
+            }
+
+            let users: [User] = try await supabase.database
+              .from("users")
+              .select(
+                """
+                  name,
+                  teams (
+                    name
+                  )
+                """
+              )
+              .execute()
+              .value
+            ```
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 primary key,
+                name text
+              );
+            create table
+              teams (
+                id int8 primary key,
+                name text
+              );
+            -- join table
+            create table
+              users_teams (
+                user_id int8 not null references users,
+                team_id int8 not null references teams,
+                -- both foreign keys must be part of a composite primary key
+                primary key (user_id, team_id)
+              );
+
+            insert into
+              users (id, name)
+            values
+              (1, 'Kiran'),
+              (2, 'Evan');
+            insert into
+              teams (id, name)
+            values
+              (1, 'Green'),
+              (2, 'Blue');
+            insert into
+              users_teams (user_id, team_id)
+            values
+              (1, 1),
+              (1, 2),
+              (2, 2);
+            ```
+        response: |
+          ```json
+            {
+              "data": [
+                {
+                  "name": "Kiran",
+                  "teams": [
+                    {
+                      "name": "Green"
+                    },
+                    {
+                      "name": "Blue"
+                    }
+                  ]
+                },
+                {
+                  "name": "Evan",
+                  "teams": [
+                    {
+                      "name": "Blue"
+                    }
+                  ]
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+        description: |
+          If you're in a situation where your tables are **NOT** directly
+          related, but instead are joined by a _join table_, you can still use
+          the `select()` method to query the related data. The join table needs
+          to have the foreign keys as part of its composite primary key.
+        hideCodeBlock: true
       - id: query-the-same-foreign-table-multiple-times
         name: Query the same foreign table multiple times
-        description: |
-          Sometimes you will need to query the same foreign table twice.
-          In this case, you can use the name of the joined column to identify
-          which join you intend to use. For convenience, you can also give an
-          alias for each column. For example, if we had a shop of products,
-          and we wanted to get the supplier and the purchaser at the same time
-          (both in the users) table
         code: |
           ```swift
-          let messages: [MessageModel] = try await client.database
-                      .from("messages")
-                      .select(columns:"""
-                                      content,
-                                      from: sender_id(name),
-                                      to: receiver_id(name)
-                                      """)
-                      .execute().value
+          struct Message: Decodable {
+            let content: String
+            let from: User
+            let to: User
+          }
+
+          struct User: Decodable {
+            let name: String
+          }
+
+          let messages: [Message] = try await supabase.database
+            .from("messages")
+            .select(
+              """
+                content,
+                from:sender_id(name),
+                to:sended_id(name)
+              """
+            )
+            .execute()
+            .value
           ```
+        data:
+          sql: |
+            ```sql
+             create table
+             users (id int8 primary key, name text);
+
+             create table
+               messages (
+                 sender_id int8 not null references users,
+                 receiver_id int8 not null references users,
+                 content text
+               );
+
+             insert into
+               users (id, name)
+             values
+               (1, 'Kiran'),
+               (2, 'Evan');
+
+             insert into
+               messages (sender_id, receiver_id, content)
+             values
+               (1, 2, '👋');
+             ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "content": "👋",
+                "from": {
+                  "name": "Kiran"
+                },
+                "to": {
+                  "name": "Evan"
+                }
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          If you need to query the same foreign table twice, use the name of the
+          joined column to identify which join to use. You can also give each
+          column an alias.
+        hideCodeBlock: true
+      - id: filtering-through-foreign-tables
+        name: Filtering through foreign tables
+        code: |
+          ```swift
+          struct City: Decodable {
+            let name: String
+            let countries: [Country]?
+          }
+
+          struct Country: Decodable {
+            let name: String
+          }
+
+          let cities: [City] = try await supabase.database
+            .from("cities")
+            .select("name, countries(*)")
+            .eq("countries.name", value: "Estonia")
+            .execute()
+            .value
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Germany'),
+              (2, 'Indonesia');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 2, 'Bali'),
+              (2, 1, 'Munich');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Bali",
+                "countries": null
+              },
+              {
+                "name": "Munich",
+                "countries": null
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          If the filter on a foreign table's column is not satisfied, the foreign
+          table returns `[]` or `null` but the parent table is not filtered out.
+          If you want to filter out the parent table rows, use the `!inner` hint
+        hideCodeBlock: true
+      - id: querying-foreign-table-with-count
+        name: Querying foreign table with count
+        code: |
+          ```swift
+          struct Country: Decodable {
+            let id: UUID
+            let name: String
+            let cities: [City]
+          }
+
+          struct City: Decodable {
+            let count: Int
+          }
+
+          let countries: [Country] = try await supabase.database
+            .from("countries")
+            .select("*, cities(count)")
+            .execute()
+            .value
+          ```
+        data:
+          sql: |
+            ```sql
+            create table countries (
+              "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
+              "name" text
+            );
+
+            create table cities (
+              "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
+              "name" text,
+              "country_id" "uuid" references public.countries on delete cascade
+            );
+
+            with country as (
+              insert into countries (name)
+              values ('united kingdom') returning id
+            )
+            insert into cities (name, country_id) values
+            ('London', (select id from country)),
+            ('Manchester', (select id from country)),
+            ('Liverpool', (select id from country)),
+            ('Bristol', (select id from country));
+            ```
+        response: |
+          ```json
+          [
+            {
+              "id": "693694e7-d993-4360-a6d7-6294e325d9b6",
+              "name": "United Kingdom",
+              "cities": [
+                {
+                  "count": 4
+                }
+              ]
+            }
+          ]
+          ```
+        description: |
+          You can get the number of rows in a related table by using the
+          **count** property.
+        hideCodeBlock: true
       - id: querying-with-count-option
         name: Querying with count option
-        description: |
-          You can get the number of rows by using the count option.
-          Allowed values for count option are [exact](https://postgrest.org/en/stable/api.html#exact-count), [planned](https://postgrest.org/en/stable/api.html#planned-count) and [estimated](https://postgrest.org/en/stable/api.html#estimated-count).
         code: |
           ```swift
-          let count = try await client.database
-                      .from("countries")
-                      .select(columns:"*", head: true, count: .exact)
-                      .execute().count
+          let count = try await supabase.database
+            .from("countries")
+            .select("*", head: true, count: .exact)
+            .execute()
+            .count
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "count": 3,
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          You can get the number of rows by using the
+          [count](/docs/reference/swift/select#parameters) option.
+        hideCodeBlock: true
       - id: querying-json-data
         name: Querying JSON data
-        description: |
-          If you have data inside of a JSONB column, you can apply select
-          and query filters to the data values. Postgres offers a
-          [number of operators](https://www.postgresql.org/docs/current/functions-json.html)
-          for querying JSON data. Also see
-          [PostgREST docs](http://postgrest.org/en/v7.0.0/api.html#json-columns) for more details.
         code: |
           ```swift
-          let users: [UserModel] = try await client.database
-                      .from("users")
-                      .select(columns:"""
-                                      id, name
-                                      address->city
-                                      """)
-                      .execute().value
+          struct User: Decodable {
+            let id: Int
+            let name: String
+            let city: String
+          }
+
+          let users: [User] = try await supabase.database
+            .from("users")
+            .select(
+              """
+                id, name,
+                address->city
+              """
+            )
+            .execute()
+            .value
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 primary key,
+                name text,
+                address jsonb
+              );
+
+            insert into
+              users (id, name, address)
+            values
+              (1, 'Avdotya', '{"city":"Saint Petersburg"}');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Avdotya",
+                "city": "Saint Petersburg"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          You can select and filter data inside of
+          [JSON](/docs/guides/database/json) columns. Postgres offers some
+          [operators](/docs/guides/database/json#query-the-jsonb-data) for
+          querying JSON data.
+        hideCodeBlock: true
+      - id: querying-foreign-table-with-inner-join
+        name: Querying foreign table with inner join
+        code: |
+          ```swift
+          struct City: Decodable {
+            let name: String
+            let countries: [Country]
+          }
+
+          struct Country: Decodable {
+            let name: String
+          }
+
+          let cities: [City] = try await supabase.database
+            .from("cities")
+            .select("name, countries!inner(name)")
+            .eq("countries.name", value: "Indonesia")
+            .execute()
+            .value
+          ```
+        data:
+          sql: |
+            ```sql
+            create table countries (
+              "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
+              "name" text
+            );
+
+            create table cities (
+              "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
+              "name" text,
+              "country_id" "uuid" references public.countries on delete cascade
+            );
+
+            with country as (
+              insert into countries (name)
+              values ('united kingdom') returning id
+            )
+            insert into cities (name, country_id) values
+            ('London', (select id from country)),
+            ('Manchester', (select id from country)),
+            ('Liverpool', (select id from country)),
+            ('Bristol', (select id from country));
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Bali",
+                "countries": {"name": "Indonesia"}
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          If you don't want to return the foreign table contents, you can leave the parenthesis empty.
+          Like `.select('name, countries!inner()')`.
+        hideCodeBlock: true
 
   - id: insert
     title: "Create data: insert()"
