@@ -12,8 +12,8 @@ import {
   Toggle,
 } from 'ui'
 
-import { RealtimeConfig } from '../useRealtimeEvents'
 import Link from 'next/link'
+import { RealtimeConfig } from '../useRealtimeMessages'
 
 interface ChooseChannelPopoverProps {
   config: RealtimeConfig

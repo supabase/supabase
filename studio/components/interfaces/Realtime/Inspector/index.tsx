@@ -1,10 +1,10 @@
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import MessagesTable from './EventsTable'
 import { Header } from './Header'
-import { SendMessageModal } from './SendEventModal'
-import { RealtimeConfig, useRealtimeMessages } from './useRealtimeEvents'
+import MessagesTable from './MessagesTable'
+import { SendMessageModal } from './SendMessageModal'
+import { RealtimeConfig, useRealtimeMessages } from './useRealtimeMessages'
 
 /**
  * Acts as a container component for the entire log display

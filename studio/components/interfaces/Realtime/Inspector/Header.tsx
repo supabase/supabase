@@ -5,7 +5,7 @@ import { Button } from 'ui'
 import { ChooseChannelPopover } from './ChooseChannelPopover'
 import { RealtimeFilterPopover } from './RealtimeFilterPopover'
 import { RealtimeTokensPopover } from './RealtimeTokensPopover'
-import { RealtimeConfig } from './useRealtimeEvents'
+import { RealtimeConfig } from './useRealtimeMessages'
 
 interface HeaderProps {
   config: RealtimeConfig

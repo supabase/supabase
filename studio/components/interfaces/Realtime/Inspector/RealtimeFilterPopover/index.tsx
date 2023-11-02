@@ -10,7 +10,7 @@ import {
 } from 'ui'
 
 import { ApplyConfigModal } from '../ApplyConfigModal'
-import { RealtimeConfig } from '../useRealtimeEvents'
+import { RealtimeConfig } from '../useRealtimeMessages'
 import { FilterSchema } from './FilterSchema'
 import { TableSchema } from './TableSchema'
 

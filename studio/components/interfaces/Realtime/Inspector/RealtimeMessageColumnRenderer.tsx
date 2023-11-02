@@ -1,9 +1,8 @@
 import { Column } from 'react-data-grid'
-import { IconAlertCircle, IconBroadcast, IconDatabaseChanges, IconPresence } from 'ui'
+import { IconBroadcast, IconDatabaseChanges, IconPresence } from 'ui'
 
-import { LogData, PreviewLogData } from './Events.types'
-import { RowLayout } from './EventsFormatters'
-import { isErrorLog } from './EventsTable'
+import { LogData, PreviewLogData } from './Messages.types'
+import { RowLayout } from './MessagesFormatters'
 
 const ICONS = {
   PRESENCE: <IconPresence size="xlarge" className="bg-brand-400 rounded" />,

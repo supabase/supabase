@@ -7,9 +7,9 @@ import { Button, IconBroadcast, IconDatabaseChanges, IconExternalLink, IconPrese
 import { useParams } from 'common'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useRouter } from 'next/router'
-import MessageSelection from './EventSelection'
-import { LogData } from './Events.types'
-import { ColumnRenderer } from './RealtimeEventColumnRenderer'
+import MessageSelection from './MessageSelection'
+import { LogData } from './Messages.types'
+import { ColumnRenderer } from './RealtimeMessageColumnRenderer'
 
 export const isErrorLog = (l: LogData) => {
   return l.message === 'SYSTEM' && l.metadata?.status === 'error'

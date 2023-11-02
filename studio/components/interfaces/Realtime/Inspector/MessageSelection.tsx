@@ -2,8 +2,8 @@ import { useMemo } from 'react'
 import { Button, IconX, cn } from 'ui'
 
 import CopyButton from 'components/ui/CopyButton'
-import { LogData } from './Events.types'
-import { SelectedRealtimeMessagePanel } from './SelectedRealtimeEventPanel'
+import { LogData } from './Messages.types'
+import { SelectedRealtimeMessagePanel } from './SelectedRealtimeMessagePanel'
 
 export interface MessageSelectionProps {
   log: LogData | null

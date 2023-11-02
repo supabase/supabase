@@ -1,6 +1,6 @@
 import CopyButton from 'components/ui/CopyButton'
-import { unixMicroToIsoTimestamp } from './Events.utils'
 import { PropsWithChildren } from 'react'
+import { unixMicroToIsoTimestamp } from './Messages.utils'
 
 export const RowLayout = ({ children }: PropsWithChildren<{}>) => (
   <div className="flex h-full w-full items-center gap-4">{children}</div>

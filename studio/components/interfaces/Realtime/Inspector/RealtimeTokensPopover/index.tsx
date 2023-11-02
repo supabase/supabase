@@ -13,7 +13,7 @@ import {
 
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
-import { RealtimeConfig } from '../useRealtimeEvents'
+import { RealtimeConfig } from '../useRealtimeMessages'
 
 interface RealtimeTokensPopoverProps {
   config: RealtimeConfig
