@@ -6,8 +6,11 @@ import { BASE_PATH } from 'lib/constants'
 export const generateDocsMenu = (
   ref: string,
   tables: string[],
-  functions: string[]
+  functions: string[],
+  features?: { auth?: boolean }
 ): ProductMenuGroup[] => {
+  const authEnabled = features?.auth ?? true
+
   return [
     {
       title: 'Getting Started',
@@ -19,12 +22,16 @@ export const generateDocsMenu = (
           url: `/project/${ref}/api?page=auth`,
           items: [],
         },
-        {
-          name: 'User Management',
-          key: 'users',
-          url: `/project/${ref}/api?page=users`,
-          items: [],
-        },
+        ...(authEnabled
+          ? [
+              {
+                name: 'User Management',
+                key: 'users',
+                url: `/project/${ref}/api?page=users`,
+                items: [],
+              },
+            ]
+          : []),
       ],
     },
     {
