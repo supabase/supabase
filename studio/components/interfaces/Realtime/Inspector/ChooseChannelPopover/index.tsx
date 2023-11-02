@@ -40,26 +40,34 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
           size="tiny"
           iconRight={<IconChevronDown />}
         >
-          <span>Choose Channel</span>
+          <span>
+            {config.channelName.length > 0 ? `Channel: ${config.channelName}` : 'Choose channel'}
+          </span>
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="p-0" align="start">
         <div className="border-b border-overlay p-4 flex flex-col text-sm">
-          <p>Channel for listening</p>
+          {/* [joshen] do we need some validation here? */}
+          <label className="text-foreground text-xs mb-2">Listen for events on a channel</label>
           <div className="flex flex-row">
             <Input
               size="tiny"
               className="w-full"
               inputClassName="rounded-r-none"
+              placeholder="Enter a channel name"
               value={channelName}
               onChange={(e) => {
                 setChannelName(e.target.value)
               }}
             />
             <Button
-              type="primary"
+              type="default"
               className="rounded-l-none"
-              onClick={() => onChangeConfig({ ...config, channelName })}
+              disabled={channelName.length === 0}
+              onClick={() => {
+                setOpen(false)
+                onChangeConfig({ ...config, channelName })
+              }}
             >
               Apply
             </Button>

@@ -11,9 +11,7 @@ export const TableSchema = ({
 }) => {
   return (
     <div className="flex flex-row gap-4">
-      <div className="w-[88px] flex justify-end">
-        <span>AND</span>
-      </div>
+      <p className="w-[88px] flex justify-end text-sm">AND</p>
 
       <div className="flex flex-row">
         <TableSelector

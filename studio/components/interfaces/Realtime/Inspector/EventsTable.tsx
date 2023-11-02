@@ -72,7 +72,7 @@ const NoResultAlert = ({
             </a>
           </Button>
         </div>
-        <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b bg-background">
+        <div className="w-full px-5 py-4 items-center gap-4 inline-flex rounded-b-md bg-background">
           <div className="grow flex-col flex">
             <div className="text-foreground">Not sure what to do?</div>
             <div className="text-foreground-lighter text-xs">Browse our documentation</div>
@@ -109,7 +109,7 @@ const EventsTable = ({ enabled, data = [], showSendEvent }: EventsTableProps) =>
   return (
     <>
       <section className="flex w-full flex-col" style={{ maxHeight: 'calc(100vh - 42px - 3rem)' }}>
-        <div className={cn('flex h-full flex-row border-t-4', enabled ? 'border-brand-400' : null)}>
+        <div className={cn('flex h-full flex-row', enabled ? 'border-brand-400' : null)}>
           <div className="flex flex-grow flex-col">
             {enabled && (
               <div className="w-full h-8 px-4 bg-surface-100 border-b items-center inline-flex justify-between text-foreground-light">

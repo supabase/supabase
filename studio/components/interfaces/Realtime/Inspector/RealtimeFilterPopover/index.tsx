@@ -39,11 +39,11 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
           <Button
             icon={<PlusCircle size="16" />}
             type="primary"
-            className="rounded-[28px] !bg-brand-400 !border-brand-500 !text-brand-600 px-1"
+            className="rounded-full !bg-brand-400 !border-brand-500 !text-brand-600 px-1.5 pr-0.5 !py-0.5"
             size="tiny"
           >
-            <span className="text-brand-600">Filtered by </span>
-            <Badge className="!bg-brand-600 !text-brand-200">schema: {config.schema}</Badge>
+            <span className="text-brand-600 mr-1">Filtered by </span>
+            <Badge className="!bg-brand-600 !text-brand-200 !px-1.5">schema: {config.schema}</Badge>
             {config.table !== '*' ? (
               <>
                 <span className="text-brand-600"> and </span>
@@ -53,7 +53,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
           </Button>
         </PopoverTrigger_Shadcn_>
         <PopoverContent_Shadcn_ className="p-0 w-full" align="start">
-          <div className="border-b border-overlay text-xs p-4 text-foreground-light">
+          <div className="border-b border-overlay text-xs px-4 py-3 text-foreground">
             Filter incoming messages
           </div>
           <div className="flex border-b border-overlay p-4 gap-y-2 flex-col">
@@ -70,9 +70,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
           </div>
           <div className="border-b border-overlay p-4">
             <div className="flex flex-row gap-4">
-              <div className="w-[88px] flex justify-end">
-                <span>AND</span>
-              </div>
+              <p className="w-[88px] flex justify-end text-sm">AND</p>
               <Input
                 size="tiny"
                 className="flex-grow"
@@ -82,7 +80,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
               />
             </div>
           </div>
-          <div className="p-4 gap-2 flex justify-end">
+          <div className="px-4 py-2 gap-2 flex justify-end">
             <Button type="default" onClick={() => setOpen(false)}>
               <span>Cancel</span>
             </Button>

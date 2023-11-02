@@ -58,14 +58,14 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
         <Button
           icon={<PlusCircle size="16" />}
           type="dashed"
-          className="rounded-[28px]"
+          className="rounded-[28px] px-1.5 pr-2 !py-1"
           size="small"
         >
           <span className="text-xs">Test RLS policies</span>
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="w-[650px] p-0" align="start">
-        <div className="border-b border-overlay text-xs p-4 text-foreground-light">Tokens</div>
+        <div className="border-b border-overlay text-xs px-4 py-3 text-foreground">Tokens</div>
         <div className="border-b border-overlay p-4 flex flex-row gap-2">
           <span className="text-sm w-96">Token type</span>
           <div className="flex-grow flex flex-col gap-y-1">

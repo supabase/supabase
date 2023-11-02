@@ -17,22 +17,10 @@ export const ColumnRenderer: Column<LogData, unknown>[] = [
     name: 'timestamp-with-truncated-text',
     key: 'main-column',
     renderCell: (data: { row: PreviewLogData }) => {
-      const isError = isErrorLog(data.row)
       const type = data.row.event_message as keyof typeof ICONS
 
       return (
         <RowLayout>
-          {isError ? (
-            <div>
-              <IconAlertCircle
-                strokeWidth={2}
-                size="xlarge"
-                className="p-1 rounded text-warning-300 bg-warning-600"
-              />
-            </div>
-          ) : (
-            <div className="w-6 flex-shrink-0" />
-          )}
           <div>{ICONS[type]}</div>
           <span className="font-mono">{new Date(data.row.timestamp).toISOString()}</span>
           <span className="truncate font-mono">{JSON.stringify(data.row.metadata)}</span>

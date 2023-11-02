@@ -87,7 +87,6 @@ export const useRealtimeEvents = ({
     if (!enabled) {
       return
     }
-    console.log('connect')
     const opts = {
       realtime: {
         params: {
@@ -102,7 +101,6 @@ export const useRealtimeEvents = ({
 
     setClient(newClient)
     return () => {
-      console.log('disconnect')
       client?.realtime.disconnect()
       setClient(undefined)
     }
@@ -113,7 +111,6 @@ export const useRealtimeEvents = ({
       return
     }
     dispatch({ type: 'clear' })
-    console.log('subscribe')
     const newChannel = client?.channel(channelName, {
       config: { broadcast: { self: true } },
     })
@@ -162,8 +159,6 @@ export const useRealtimeEvents = ({
     // Finally, subscribe to the Channel we just setup
     newChannel.subscribe(async (status, error) => {
       if (status === 'SUBSCRIBED') {
-        console.log(`Realtime Channel status: ${status}`)
-
         // Let LiveView know we connected so we can update the button text
         // pushEventTo('#conn_info', 'broadcast_subscribed', { host: host })
 
@@ -176,16 +171,15 @@ export const useRealtimeEvents = ({
           })
         }
       } else if (status === 'CLOSED') {
-        console.log(`Realtime Channel status: ${status}`)
+        // console.log(`Realtime Channel status: ${status}`)
       } else {
-        console.error(`Realtime Channel error status: ${status}`)
-        console.error(`Realtime Channel error: ${error}`)
+        // console.error(`Realtime Channel error status: ${status}`)
+        // console.error(`Realtime Channel error: ${error}`)
       }
     })
 
     setChannel(newChannel)
     return () => {
-      console.log('unsubscribe')
       newChannel.unsubscribe()
       setChannel(undefined)
     }

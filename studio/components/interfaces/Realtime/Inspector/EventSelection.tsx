@@ -18,9 +18,7 @@ const LogSelection = ({ log, onClose }: LogSelectionProps) => {
   return (
     <div
       className={cn(
-        'relative flex h-full flex-grow flex-col border border-l',
-        'border-panel-border-light dark:border-panel-border-dark',
-        'overflow-y-scroll bg-gray-200'
+        'relative flex h-full flex-grow flex-col border-l border-t-2 overflow-y-scroll bg-gray-200'
       )}
     >
       <div
@@ -55,7 +53,7 @@ const LogSelection = ({ log, onClose }: LogSelectionProps) => {
             </div>
           </div>
           <div className="flex flex-col gap-1">
-            <h3 className="text-sm text-foreground">Select an Event</h3>
+            <h3 className="text-sm text-foreground">Select an event</h3>
             <p className="text-xs text-foreground-lighter">
               Click on an event on the left to view details of event.
             </p>
