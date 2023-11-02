@@ -51,41 +51,63 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="p-0" align="start">
         <div className="border-b border-overlay p-4 flex flex-col text-sm">
-          <label className="text-foreground text-xs mb-2">Channel name</label>
-          <div className="flex flex-row">
-            <Input
-              size="tiny"
-              className="w-full"
-              inputClassName="rounded-r-none"
-              placeholder="Enter a channel name"
-              value={channelName}
-              onChange={(e) => {
-                setChannelName(e.target.value)
-              }}
-            />
-            <Button
-              type="default"
-              className="rounded-l-none"
-              disabled={channelName.length === 0}
-              onClick={() => {
-                setOpen(false)
-                onChangeConfig({ ...config, channelName })
-              }}
-            >
-              Set channel
-            </Button>
-          </div>
-          <p className="text-xs text-foreground-lighter mt-2">
-            The channel you initialize with the Supabase realtime client.{' '}
-            <Link
-              href="https://supabase.com/docs/guides/realtime/concepts#channels"
-              target="_blank"
-              rel="noreferrer"
-              className="underline hover:text-foreground transition"
-            >
-              See documentation.
-            </Link>
-          </p>
+          {config.channelName.length === 0 ? (
+            <>
+              <label className="text-foreground text-xs mb-2">Channel name</label>
+              <div className="flex flex-row">
+                <Input
+                  size="tiny"
+                  className="w-full"
+                  inputClassName="rounded-r-none"
+                  placeholder="Enter a channel name"
+                  value={channelName}
+                  onChange={(e) => {
+                    setChannelName(e.target.value)
+                  }}
+                />
+                <Button
+                  type="default"
+                  className="rounded-l-none"
+                  disabled={channelName.length === 0}
+                  onClick={() => {
+                    setOpen(false)
+                    onChangeConfig({ ...config, channelName })
+                  }}
+                >
+                  Set channel
+                </Button>
+              </div>
+              <p className="text-xs text-foreground-lighter mt-2">
+                The channel you initialize with the Supabase realtime client.{' '}
+                <Link
+                  href="https://supabase.com/docs/guides/realtime/concepts#channels"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline hover:text-foreground transition"
+                >
+                  See documentation.
+                </Link>
+              </p>
+            </>
+          ) : (
+            <div className="space-y-2">
+              <div className="flex items-center gap-x-2">
+                <p className="text-foreground text-xs">Currently using channel</p>
+                <p className="text-xs border border-scale-600  py-0.5 px-1 rounded-md bg-surface-200">
+                  {config.channelName}
+                </p>
+              </div>
+              <p className="text-xs text-foreground-lighter mt-2">
+                If you unset this channel, all of the events populated on this page will disappear.
+              </p>
+              <Button
+                type="default"
+                onClick={() => onChangeConfig({ ...config, channelName: '', enabled: false })}
+              >
+                Unset channel
+              </Button>
+            </div>
+          )}
         </div>
         <div className="border-b border-overlay p-4">
           <div className="flex items-center justify-between gap-2">
