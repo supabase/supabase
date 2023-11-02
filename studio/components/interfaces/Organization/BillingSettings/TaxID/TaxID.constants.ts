@@ -11,14 +11,6 @@ export interface TaxId {
   vatPrefix?: string
 }
 
-export interface StripeTaxId {
-  id: string
-  type: string
-  value: string
-  name: string
-  country?: string
-}
-
 export const TAX_IDS: TaxId[] = [
   {
     name: 'AE TRN',

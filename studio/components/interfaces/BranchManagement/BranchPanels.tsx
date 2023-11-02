@@ -1,270 +1,194 @@
-import clsx from 'clsx'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { noop } from 'lodash'
 import Link from 'next/link'
-import { forwardRef, PropsWithChildren, useState } from 'react'
+import { PropsWithChildren, ReactNode } from 'react'
 import {
   Badge,
   Button,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
+  IconArrowRight,
   IconExternalLink,
-  IconGitBranch,
-  IconGitHub,
   IconMoreVertical,
   IconShield,
   IconTrash,
 } from 'ui'
 
-import { Markdown } from 'components/interfaces/Markdown'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { Branch } from 'data/branches/branches-query'
 import { GitHubPullRequest } from 'data/integrations/integrations-github-pull-requests-query'
+import { GitPullRequest } from 'lucide-react'
 
-interface BranchPanelProps {
-  repo?: string
-  branch?: Branch
-  onSelectUpdate?: () => void
-  onSelectDelete?: () => void
-  onSelectCreateBranch?: () => void
-  onSelectDisableBranching?: () => void
-  generateCreatePullRequestURL?: (branch?: string) => string
+interface BranchManagementSectionProps {
+  header: string
+  footer?: ReactNode
 }
 
-const MainBranchPanel = ({
-  repo,
-  branch,
-  onSelectUpdate = noop,
-  onSelectCreateBranch = noop,
-  onSelectDisableBranching = noop,
-}: BranchPanelProps) => {
-  const { ref } = useParams()
-  const [open, setOpen] = useState(false)
-  const isActive = ref === branch?.project_ref
-
+export const BranchManagementSection = ({
+  header,
+  footer,
+  children,
+}: PropsWithChildren<BranchManagementSectionProps>) => {
   return (
     <div className="border rounded-lg">
-      <div className="bg-surface-200 shadow-sm flex justify-between items-center pl-8 pr-6 py-3 rounded-t-lg text-sm">
-        <div className="flex items-center justify-between w-full">
-          <div className="flex items-center space-x-4">
-            <div className="w-8 h-8 bg-scale-200 rounded-md flex items-center justify-center">
-              <IconGitHub size={18} strokeWidth={2} />
-            </div>
-            <p>Github branch workflow</p>
-            <Button
-              asChild
-              type="text"
-              size="small"
-              className="text-light hover:text py-1 px-1.5"
-              iconRight={<IconExternalLink size={14} strokeWidth={1.5} />}
-            >
-              <Link href={`https://github.com/${repo}`} target="_blank" rel="noreferrer">
-                {repo}
-              </Link>
-            </Button>
-          </div>
-          <Button type="default" onClick={() => onSelectCreateBranch()}>
-            Create preview branch
-          </Button>
-        </div>
+      <div className="bg-surface-100 shadow-sm flex justify-between items-center px-6 py-2 rounded-t-lg text-sm">
+        {header}
       </div>
-      <div className="bg-surface-100 border-t shadow-sm flex justify-between items-center pl-8 pr-6 py-3 rounded-b-lg text-sm">
-        {branch === undefined ? (
-          <ShimmeringLoader className="w-full" />
-        ) : (
-          <>
-            <div className="flex items-center space-x-4">
-              <div className="w-8 h-8 bg-amber-300 rounded-md flex items-center justify-center">
-                <IconShield size={18} strokeWidth={2} className="text-amber-900" />
-              </div>
-              <p>{branch?.name}</p>
-              <Badge color="amber">Production</Badge>
-              {isActive && <Badge color="green">Selected</Badge>}
-            </div>
-            <div className="flex items-center space-x-4">
-              <DropdownMenu open={open} onOpenChange={() => setOpen(!open)} modal={false}>
-                <DropdownMenuTrigger>
-                  <Button
-                    asChild
-                    type="text"
-                    className="px-1"
-                    icon={<IconMoreVertical size={14} />}
-                  >
-                    <span></span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent side="bottom" align="end" className="w-48">
-                  <DropdownMenuItem
-                    asChild
-                    className="flex gap-2"
-                    onSelect={() => onSelectUpdate()}
-                  >
-                    <Link href={`/project/${ref}/settings/integrations`}>
-                      Change production branch
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="flex gap-2"
-                    onSelect={() => onSelectDisableBranching()}
-                  >
-                    Disable branching
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </>
-        )}
-      </div>
+      <div className="bg-surface border-t shadow-sm rounded-b-lg text-sm divide-y">{children}</div>
+      {footer !== undefined && <div className="bg-surface-100 px-6 py-1 border-t">{footer}</div>}
     </div>
   )
 }
 
-const BranchContainer = ({ className, children }: PropsWithChildren<{ className?: string }>) => {
+export const BranchRowLoader = () => {
   return (
-    <div className="list-none ml-6 pl-8 pb-4 border-l border-scale-600 dark:border-scale-400 relative last:!border-transparent">
-      <div className="absolute w-[33px] rounded-bl-full border-b border-l border-scale-600 dark:border-scale-400 h-10 -left-px" />
-      <div
-        className={clsx(
-          'border shadow-sm flex justify-between items-center pl-8 pr-6 py-4 rounded-lg text-sm',
-          className
-        )}
-      >
-        {children}
+    <div className="flex items-center justify-between px-6 py-2.5">
+      <div className="flex items-center gap-x-4">
+        <ShimmeringLoader className="w-52" />
+        <ShimmeringLoader className="w-52" />
+      </div>
+      <div className="flex items-center gap-x-4">
+        <ShimmeringLoader className="w-52" />
+        <ShimmeringLoader className="w-52" />
       </div>
     </div>
   )
 }
 
-const BranchPanel = ({
+export const BranchLoader = () => {
+  return (
+    <>
+      <BranchRowLoader />
+      <BranchRowLoader />
+      <BranchRowLoader />
+      <BranchRowLoader />
+      <BranchRowLoader />
+    </>
+  )
+}
+
+interface BranchRowProps {
+  repo: string
+  branch: Branch
+  isMain?: boolean
+  pullRequest?: GitHubPullRequest
+  generateCreatePullRequestURL?: (branchName?: string) => string
+  onSelectDeleteBranch?: () => void
+}
+
+export const BranchRow = ({
   branch,
+  isMain = false,
+  repo,
+  pullRequest,
   generateCreatePullRequestURL,
-  onSelectDelete = noop,
-}: BranchPanelProps) => {
+  onSelectDeleteBranch,
+}: BranchRowProps) => {
   const { ref } = useParams()
-  const [open, setOpen] = useState(false)
-
   const isActive = ref === branch?.project_ref
-  const daysFromNow = dayjs().diff(dayjs(branch?.created_at), 'day')
-  const formattedTimeFromNow = dayjs(branch?.created_at).fromNow()
-  const formattedCreatedAt = dayjs(branch?.created_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
 
-  const pullRequestURL = generateCreatePullRequestURL?.(branch?.git_branch) ?? 'https://github.com'
+  const daysFromNow = dayjs().diff(dayjs(branch.created_at), 'day')
+  const formattedTimeFromNow = dayjs(branch.created_at).fromNow()
+  const formattedCreatedAt = dayjs(branch.created_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
+
+  const createPullRequestURL =
+    generateCreatePullRequestURL?.(branch.git_branch) ?? 'https://github.com'
 
   return (
-    <BranchContainer className="bg-surface-100">
-      <div className="flex items-center space-x-4">
-        <IconGitBranch size={16} strokeWidth={2} />
-        <p>{branch?.name}</p>
-        {isActive && <Badge color="green">Selected</Badge>}
-        <p className="text-light">
+    <div className="w-full flex items-center justify-between px-6 py-2.5">
+      <div className="flex items-center gap-x-4">
+        <Button
+          asChild
+          type="default"
+          icon={isMain && <IconShield strokeWidth={2} className="text-amber-900" />}
+        >
+          <Link href={`/project/${branch.project_ref}/branches`}>{branch.name}</Link>
+        </Button>
+        {isActive && <Badge color="slate">Current</Badge>}
+        <p className="text-xs text-foreground-lighter">
           {daysFromNow > 1 ? `Created on ${formattedCreatedAt}` : `Created ${formattedTimeFromNow}`}
         </p>
       </div>
-      <div className="flex items-center space-x-4">
-        <Button asChild type="default" icon={<IconExternalLink />}>
-          <Link target="_blank" rel="noreferrer" href={pullRequestURL}>
-            Create pull request
-          </Link>
-        </Button>
-        <DropdownMenu open={open} onOpenChange={() => setOpen(!open)} modal={false}>
-          <DropdownMenuTrigger>
-            <Button asChild type="text" className="px-1" icon={<IconMoreVertical size={14} />}>
-              <span></span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="end">
-            <DropdownMenuItem className="flex gap-2" onSelect={() => onSelectDelete()}>
-              <IconTrash size={14} />
-              Delete branch
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-    </BranchContainer>
-  )
-}
-
-interface BranchHeader extends React.HTMLAttributes<HTMLDivElement> {
-  name?: string
-  markdown?: string
-}
-
-const BranchHeader = forwardRef<HTMLDivElement, BranchHeader>(
-  ({ className, name, markdown = '', ...props }, ref) => {
-    return (
-      <div
-        {...props}
-        ref={ref}
-        className={cn(
-          'border-l border-scale-600 dark:border-scale-400 ml-6 pl-8 pt-6 pb-3',
-          className
-        )}
-      >
-        <Markdown content={markdown} className="" />
-      </div>
-    )
-  }
-)
-
-const PullRequestPanel = ({
-  pr,
-  onSelectDelete = noop,
-}: {
-  pr: GitHubPullRequest
-  onSelectDelete: () => void
-}) => {
-  const [open, setOpen] = useState(false)
-  const daysFromNow = dayjs().diff(dayjs(pr.created_at), 'day')
-  const formattedTimeFromNow = dayjs(pr.created_at).fromNow()
-  const formattedCreatedAt = dayjs(pr.created_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
-
-  return (
-    <BranchContainer className="bg-surface-100">
-      <div className="w-full">
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="flex items-center space-x-4">
-              <IconGitBranch className="text-brand-900" size={16} strokeWidth={2} />
-              <p>{pr.label}</p>
-              <p className="text-light">
-                {daysFromNow > 1
-                  ? `Created on ${formattedCreatedAt}`
-                  : `Created ${formattedTimeFromNow}`}
-              </p>
+      <div className="flex items-center gap-x-8">
+        {pullRequest !== undefined && (
+          <div className="flex items-center">
+            <Link
+              href={pullRequest.url}
+              target="_blank"
+              rel="noreferrer"
+              className="text-xs transition text-foreground-lighter mr-4 hover:text-foreground"
+            >
+              #{branch.pr_number}
+            </Link>
+            <div className="flex items-center gap-x-2 bg-brand-500 px-3 py-1 rounded-full">
+              <GitPullRequest size={14} />
+              <p className="text-xs">Open</p>
             </div>
-            <p className="text-foreground-light ml-8 mt-0.5">{pr.title}</p>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Button asChild type="default" icon={<IconExternalLink />}>
-              <Link href={pr.url} target="_blank" rel="noreferrer">
-                View pull request
+            <IconArrowRight className="mx-1 text-foreground-light" strokeWidth={1.5} size={16} />
+            <Button asChild type="default">
+              <Link
+                passHref
+                target="_blank"
+                rel="noreferer"
+                href={`http://github.com/${pullRequest.target.repo}/tree/${pullRequest.target.branch}`}
+              >
+                {pullRequest.target.branch}
               </Link>
             </Button>
-            <DropdownMenu open={open} onOpenChange={() => setOpen(!open)} modal={false}>
-              <DropdownMenuTrigger>
-                <Button asChild type="text" className="px-1" icon={<IconMoreVertical size={14} />}>
-                  <span></span>
-                </Button>
+          </div>
+        )}
+        {isMain ? (
+          <div className="flex items-center gap-x-2">
+            <Button asChild type="default" iconRight={<IconExternalLink />}>
+              <Link target="_blank" rel="noreferrer" passHref href={`https://github.com/${repo}`}>
+                View Repository
+              </Link>
+            </Button>
+            <DropdownMenu modal={false}>
+              <DropdownMenuTrigger asChild>
+                <Button type="text" icon={<IconMoreVertical />} className="px-1" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent side="bottom" align="end">
-                <DropdownMenuItem className="flex gap-2" onSelect={() => onSelectDelete()}>
-                  <IconTrash size={14} />
-                  Delete branch
+              <DropdownMenuContent className="p-0 w-56" side="bottom" align="end">
+                <Link passHref href={`/project/${ref}/settings/integrations`}>
+                  <DropdownMenuItem asChild className="gap-x-2">
+                    <a>Change production branch</a>
+                  </DropdownMenuItem>
+                </Link>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        ) : (
+          <div className="flex items-center gap-x-2">
+            <Button asChild type="default" iconRight={<IconExternalLink />}>
+              <Link
+                passHref
+                target="_blank"
+                rel="noreferrer"
+                href={pullRequest?.url ?? createPullRequestURL}
+              >
+                {branch.pr_number !== undefined ? 'View Pull Request' : 'Create Pull Request'}
+              </Link>
+            </Button>
+            <DropdownMenu modal={false}>
+              <DropdownMenuTrigger asChild>
+                <Button type="text" icon={<IconMoreVertical />} className="px-1" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="p-0 w-56" side="bottom" align="end">
+                <DropdownMenuItem
+                  className="gap-x-2"
+                  onSelect={() => onSelectDeleteBranch?.()}
+                  onClick={() => onSelectDeleteBranch?.()}
+                >
+                  <IconTrash size="tiny" />
+                  <p>Delete branch</p>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-        </div>
+        )}
       </div>
-    </BranchContainer>
+    </div>
   )
 }
-
-BranchHeader.displayName = 'BranchHeader'
-export { BranchContainer, BranchHeader, BranchPanel, MainBranchPanel, PullRequestPanel }
