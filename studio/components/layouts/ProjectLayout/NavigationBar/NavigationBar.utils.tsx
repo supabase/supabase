@@ -1,7 +1,6 @@
-import { MousePointer2 } from 'lucide-react'
 import SVG from 'react-inlinesvg'
 import { products } from 'shared-data'
-import { IconBarChart, IconFileText, IconList, IconSettings } from 'ui'
+import { IconBarChart, IconFileText, IconList, IconRealtime, IconSettings } from 'ui'
 
 import { Route } from 'components/ui/ui.types'
 import { BASE_PATH, IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
@@ -172,7 +171,7 @@ export const generateProductRoutes = (
           {
             key: 'realtime',
             label: 'Realtime',
-            icon: <MousePointer2 />,
+            icon: <IconRealtime />,
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/realtime/inspector`),
           },
         ]
