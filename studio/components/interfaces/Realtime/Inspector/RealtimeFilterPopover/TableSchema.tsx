@@ -19,6 +19,7 @@ export const TableSchema = ({
           selectedTableName={value}
           onSelectTable={onChange}
           className="w-64"
+          size="small"
         />
       </div>
     </div>

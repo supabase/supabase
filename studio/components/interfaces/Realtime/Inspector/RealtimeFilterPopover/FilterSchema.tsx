@@ -13,6 +13,7 @@ export const FilterSchema = ({
 
       <div className="flex flex-row">
         <SchemaSelector
+          size="small"
           selectedSchemaName={value}
           onSelectSchema={onChange}
           className="rounded-l-none [&>button>span>div]:py-0 w-64"

@@ -72,7 +72,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
             <div className="flex flex-row gap-4">
               <p className="w-[60px] flex justify-end text-sm">AND</p>
               <Input
-                size="tiny"
+                size="small"
                 className="flex-grow"
                 placeholder="body=eq.hey"
                 value={tempConfig.filter}

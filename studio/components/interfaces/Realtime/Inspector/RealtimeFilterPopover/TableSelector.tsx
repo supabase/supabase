@@ -9,14 +9,17 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
+  CommandSeparator_Shadcn_,
   Command_Shadcn_,
   IconCheck,
   IconCode,
   IconLoader,
+  Modal,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   ScrollArea,
+  SidePanel,
 } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -53,17 +56,6 @@ const TableSelector = ({
   const entities = (data?.pages[0].data.entities ? [...data?.pages[0].data.entities] : []).sort(
     (a, b) => (a.name > b.name ? 0 : -1)
   )
-
-  const options = [
-    {
-      name: '*',
-      id: undefined,
-      schema: 'selectedSchemaName',
-      comment: null,
-      type: ENTITY_TYPE.TABLE,
-    },
-    ...entities,
-  ]
 
   return (
     <div className={className}>
@@ -108,7 +100,9 @@ const TableSelector = ({
             >
               <div className="w-full flex space-x-3">
                 <p className="text-xs text-light">table</p>
-                <p className="text-xs">{selectedTableName}</p>
+                <p className="text-xs">
+                  {selectedTableName === '*' ? 'All tables' : selectedTableName}
+                </p>
               </div>
             </Button>
           </PopoverTrigger_Shadcn_>
@@ -118,8 +112,25 @@ const TableSelector = ({
               <CommandList_Shadcn_>
                 <CommandEmpty_Shadcn_>No tables found</CommandEmpty_Shadcn_>
                 <CommandGroup_Shadcn_>
-                  <ScrollArea className={(options || []).length > 7 ? 'h-[210px]' : ''}>
-                    {options?.map((table) => (
+                  <ScrollArea className={(entities || []).length > 7 ? 'h-[210px]' : ''}>
+                    <CommandItem_Shadcn_
+                      key="all-tables"
+                      className="cursor-pointer flex items-center justify-between space-x-2 w-full"
+                      onSelect={() => {
+                        onSelectTable('*', undefined)
+                        setOpen(false)
+                      }}
+                      onClick={() => {
+                        onSelectTable('*', undefined)
+                        setOpen(false)
+                      }}
+                    >
+                      <span>All tables</span>
+                      {selectedSchemaName === '*' && (
+                        <IconCheck className="text-brand" strokeWidth={2} />
+                      )}
+                    </CommandItem_Shadcn_>
+                    {entities?.map((table) => (
                       <CommandItem_Shadcn_
                         key={table.id}
                         className="cursor-pointer flex items-center justify-between space-x-2 w-full"
@@ -133,7 +144,7 @@ const TableSelector = ({
                         }}
                       >
                         <span>{table.name}</span>
-                        {table.name === selectedSchemaName && (
+                        {selectedSchemaName === table.name && (
                           <IconCheck className="text-brand" strokeWidth={2} />
                         )}
                       </CommandItem_Shadcn_>
