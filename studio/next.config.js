@@ -33,7 +33,7 @@ const nextConfig = {
         source: '/',
         has: [
           {
-            type: 'header',
+            type: 'query',
             key: 'next',
             value: 'new-project',
           },
