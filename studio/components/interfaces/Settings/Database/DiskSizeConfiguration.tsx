@@ -11,7 +11,6 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { FormHeader } from 'components/ui/Forms'
 import Panel from 'components/ui/Panel'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
-import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
@@ -43,7 +42,6 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
     },
   })
 
-  const { data: projectUsage } = useProjectUsageQuery({ projectRef })
   const { data: projectSubscriptionData } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { mutate: updateProjectUsage, isLoading: isUpdatingDiskSize } =
     useProjectDiskResizeMutation({
@@ -62,7 +60,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
     updateProjectUsage({ projectRef, volumeSize })
   }
 
-  const currentDiskSize = projectUsage?.disk_volume_size_gb ?? 0
+  const currentDiskSize = project?.volumeSizeGb ?? 0
   // to do, update with max_disk_volume_size_gb
   const maxDiskSize = 200
 
@@ -87,7 +85,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
             <Panel.Content>
               <div className="grid grid-cols-1 items-center lg:grid-cols-3">
                 <div className="col-span-2 space-y-1">
-                  {projectUsage?.disk_volume_size_gb && (
+                  {currentDiskSize && (
                     <span className="text-foreground-light flex gap-2 items-baseline">
                       <span className="text-foreground">Current Disk Storage Size:</span>
                       <span className="text-foreground text-xl">
