@@ -110,7 +110,7 @@ const MessagesTable = ({ enabled, data = [], showSendMessage }: MessagesTablePro
   return (
     <>
       <section className="flex w-full flex-col" style={{ maxHeight: 'calc(100vh - 42px - 3rem)' }}>
-        {enabled && <ShimmerLine active />}
+        <ShimmerLine active={enabled} />
         <div className={cn('flex h-full flex-row', enabled ? 'border-brand-400' : null)}>
           <div className="flex flex-grow flex-col">
             {enabled && (
