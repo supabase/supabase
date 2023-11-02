@@ -31,7 +31,18 @@ const nextConfig = {
     return [
       {
         source: '/',
-        destination: '/sign-in',
+        has: [
+          {
+            type: 'header',
+            key: 'next',
+            value: 'new-project',
+          },
+        ],
+        destination: '/new/new-project',
+      },
+      {
+        source: '/',
+        destination: '/projects',
         permanent: false,
       },
       {
