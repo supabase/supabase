@@ -79,7 +79,7 @@ const NoResultAlert = ({
           </div>
           <Button type="default" iconRight={<IconExternalLink />}>
             <a href="https://supabase.com/docs/guides/realtime" target="_blank">
-              <span>Docs</span>
+              <span>Documentation</span>
             </a>
           </Button>
         </div>

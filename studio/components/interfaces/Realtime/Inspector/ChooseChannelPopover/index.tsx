@@ -13,6 +13,7 @@ import {
 } from 'ui'
 
 import { RealtimeConfig } from '../useRealtimeEvents'
+import Link from 'next/link'
 
 interface ChooseChannelPopoverProps {
   config: RealtimeConfig
@@ -35,20 +36,22 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
     <Popover_Shadcn_ open={open} onOpenChange={onOpen}>
       <PopoverTrigger_Shadcn_ asChild>
         <Button
-          className="rounded-r-none border-r-0"
+          className="rounded-r-none"
           type="default"
           size="tiny"
           iconRight={<IconChevronDown />}
         >
-          <span>
+          <p
+            className="max-w-[120px] truncate"
+            title={config.channelName.length > 0 ? config.channelName : ''}
+          >
             {config.channelName.length > 0 ? `Channel: ${config.channelName}` : 'Choose channel'}
-          </span>
+          </p>
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="p-0" align="start">
         <div className="border-b border-overlay p-4 flex flex-col text-sm">
-          {/* [joshen] do we need some validation here? */}
-          <label className="text-foreground text-xs mb-2">Listen for events on a channel</label>
+          <label className="text-foreground text-xs mb-2">Channel name</label>
           <div className="flex flex-row">
             <Input
               size="tiny"
@@ -69,9 +72,20 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                 onChangeConfig({ ...config, channelName })
               }}
             >
-              Apply
+              Set channel
             </Button>
           </div>
+          <p className="text-xs text-foreground-lighter mt-2">
+            The channel you initialize with the Supabase realtime client.{' '}
+            <Link
+              href="https://supabase.com/docs/guides/realtime/concepts#channels"
+              target="_blank"
+              rel="noreferrer"
+              className="underline hover:text-foreground transition"
+            >
+              See documentation.
+            </Link>
+          </p>
         </div>
         <div className="border-b border-overlay p-4">
           <div className="flex items-center justify-between gap-2">

@@ -18,9 +18,9 @@ export const Header = ({ config, onChangeConfig }: HeaderProps) => {
       <div className="flex flex-row">
         <ChooseChannelPopover config={config} onChangeConfig={onChangeConfig} />
         <Button
-          className="rounded-l-none"
-          type={config.enabled ? 'primary' : 'default'}
           size="tiny"
+          type={config.enabled ? 'warning' : 'primary'}
+          className="rounded-l-none border-l-0"
           disabled={config.channelName.length === 0}
           icon={config.enabled ? <StopCircle size="16" /> : <PlayCircle size="16" />}
           onClick={() => onChangeConfig({ ...config, enabled: !config.enabled })}
