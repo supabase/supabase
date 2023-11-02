@@ -36,6 +36,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/database/column-encryption',
+    destination: '/docs/guides/database/extensions/pgsodium',
+  },
+  {
+    permanent: true,
     source: '/edge-functions/edge-functions',
     destination: '/edge-functions',
   },
