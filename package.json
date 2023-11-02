@@ -6,8 +6,7 @@
   "license": "Apache-2.0",
   "private": true,
   "workspaces": [
-    "apps/www",
-    "apps/docs",
+    "apps/*",
     "studio",
     "tests",
     "packages/*"
