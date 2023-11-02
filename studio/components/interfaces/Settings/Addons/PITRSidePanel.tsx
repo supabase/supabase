@@ -9,13 +9,13 @@ import { useTheme } from 'next-themes'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import Telemetry from 'lib/telemetry'
 
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconExternalLink, Radio, SidePanel } from 'ui'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 const PITR_CATEGORY_OPTIONS: {
   id: 'off' | 'on'
@@ -43,7 +43,6 @@ const PITRSidePanel = () => {
   const { ref: projectRef } = useParams()
   const { resolvedTheme } = useTheme()
   const organization = useSelectedOrganization()
-  const isOrgBilling = !!organization?.subscription_id
 
   const [selectedCategory, setSelectedCategory] = useState<'on' | 'off'>('off')
   const [selectedOption, setSelectedOption] = useState<string>('pitr_0')
@@ -55,7 +54,7 @@ const PITRSidePanel = () => {
   const onClose = () => snap.setPanelKey(undefined)
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
-  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
       ui.setNotification({
@@ -235,17 +234,11 @@ const PITRSidePanel = () => {
                   className="mb-4"
                   title="Changing your Point-In-Time-Recovery is only available on the Pro plan"
                   actions={
-                    isOrgBilling ? (
-                      <Button asChild type="default">
-                        <Link href={`/org/${organization.slug}/billing?panel=subscriptionPlan`}>
-                          View available plans
-                        </Link>
-                      </Button>
-                    ) : (
-                      <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
+                    <Button asChild type="default">
+                      <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
                         View available plans
-                      </Button>
-                    )
+                      </Link>
+                    </Button>
                   }
                 >
                   Upgrade your plan to change PITR for your project
