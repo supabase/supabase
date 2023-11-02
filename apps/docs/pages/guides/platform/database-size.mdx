@@ -6,7 +6,7 @@ export const meta = {
   description: 'Understanding how database size applies to your subscription.',
 }
 
-Database size refers to the _monthly average storage usage_, as reported by Postgres. This metric is reported in your project's [billing usage](https://supabase.com/dashboard/project/_/settings/billing/usage) and is updated daily. As you read this document we will refer to "database size" and "disk size":
+Database size refers to the _monthly average storage usage_, as reported by Postgres. This metric is reported in your organization's [billing usage](https://supabase.com/dashboard/org/_/usage) and is updated daily. As you read this document we will refer to "database size" and "disk size":
 
 - "Database size" is the total size of used storage from your database.
 - "Disk Storage size" describes the size of the underlying available storage.
@@ -77,7 +77,7 @@ The maximum Disk Storage Size for the Pro plan is 16TB. If you need more than th
 
 Free Plan projects enter [read-only](#read-only-mode) mode when you exceed the 500MB limit. Once in read-only mode, you have several options:
 
-- [Upgrade to the Pro plan](https://supabase.com/dashboard/project/_/settings/billing/subscription) to increase the limit to 8GB. [Disable the Spend Cap](https://app.supabase.com/project/_/settings/billing/subscription?panel=costControl) if you want your Pro instance to auto-scale and expand beyond the 8GB database size limit.
+- [Upgrade to the Pro plan](https://supabase.com/dashboard/org/_/billing) to increase the limit to 8GB. [Disable the Spend Cap](https://app.supabase.com/org/_/billing?panel=costControl) if you want your Pro instance to auto-scale and expand beyond the 8GB database size limit.
 - [Disable read-only mode](#disabling-read-only-mode) and reduce your database size.
 
 ### Read-only mode
