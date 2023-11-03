@@ -293,7 +293,7 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
     - For iOS, use the instructions on screen to provide the app Bundle ID, and App Store ID and Team ID if the app is already published on the Apple AppStore.
 
     2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. In particular, make sure you have set up links to your app's privacy policy and terms of service.
-    3. Finally, add the web client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Authorized Client IDs_. No need to add the Android or iOS client ID here. Also turn on the `Skip nonce check` option. This would allow us to perform Google sign in on iOS.
+    3. Finally, add the web client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Authorized Client IDs_. You do not need to add the Android or iOS client ID here. If you need iOS support, enable the `Skip nonce check` option.
 
     Note that you do not have to configure the OAuth flow in the Supabase Dashboard in order to use native sign in.
 
