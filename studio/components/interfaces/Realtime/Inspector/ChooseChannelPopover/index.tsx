@@ -53,7 +53,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
         <div className="border-b border-overlay p-4 flex flex-col text-sm">
           {config.channelName.length === 0 ? (
             <>
-              <label className="text-foreground text-xs mb-2">Channel name</label>
+              <label className="text-foreground text-xs mb-2">Name of channel</label>
               <div className="flex flex-row">
                 <Input
                   size="tiny"
@@ -78,14 +78,14 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                 </Button>
               </div>
               <p className="text-xs text-foreground-lighter mt-2">
-                The channel you initialize with the Supabase realtime client.{' '}
+                The channel you initialize with the Supabase Realtime client. Learn more in{' '}
                 <Link
                   href="https://supabase.com/docs/guides/realtime/concepts#channels"
                   target="_blank"
                   rel="noreferrer"
                   className="underline hover:text-foreground transition"
                 >
-                  See documentation.
+                  our docs
                 </Link>
               </p>
             </>
@@ -98,8 +98,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                 </p>
               </div>
               <p className="text-xs text-foreground-lighter mt-2">
-                If you unset this channel, all of the messages populated on this page will
-                disappear.
+                If you unset this channel, all of the messages populated on this page will disappear
               </p>
               <Button
                 type="default"
@@ -126,7 +125,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
             />
           </div>
           <p className="text-xs text-foreground-light pt-1">
-            Store and synchronize online user state consistently across clients.
+            Store and synchronize user state consistently across clients
           </p>
         </div>
         <div className="border-b border-overlay p-4">
@@ -147,7 +146,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
             />
           </div>
           <p className="text-xs  text-foreground-light pt-1">
-            Send any data to any client subscribed to the same Channel.
+            Send any data to any client subscribed to the same channel
           </p>
         </div>
         <div className="border-b border-overlay p-4">
@@ -168,7 +167,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
             />
           </div>
           <p className="text-xs text-foreground-light pt-1">
-            Listen to changes in the Database inserts, updates, and deletes and other changes.
+            Listen for Database inserts, updates, deletes and more
           </p>
         </div>
       </PopoverContent_Shadcn_>
