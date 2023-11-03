@@ -67,7 +67,6 @@ const ProjectLayout = ({
   const organizationName = selectedOrganization?.name
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
-  const showResourceExhaustionWarnings = useFlag('resourceExhaustionWarnings')
 
   const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
   const ignorePausedState =
@@ -110,7 +109,7 @@ const ProjectLayout = ({
               </div>
             ) : (
               <ContentWrapper isLoading={isLoading}>
-                {showResourceExhaustionWarnings && <ResourceExhaustionWarningBanner />}
+                <ResourceExhaustionWarningBanner />
                 {children}
               </ContentWrapper>
             )}
@@ -230,7 +229,6 @@ export const ProjectLayoutNonBlocking = ({
   const showPausedState = isPaused && !ignorePausedState
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
-  const showResourceExhaustionWarnings = useFlag('resourceExhaustionWarnings')
 
   return (
     <AppLayout>
@@ -259,7 +257,7 @@ export const ProjectLayoutNonBlocking = ({
               </div>
             ) : (
               <>
-                {showResourceExhaustionWarnings && <ResourceExhaustionWarningBanner />}
+                <ResourceExhaustionWarningBanner />
                 {children}
               </>
             )}

@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
-import { useFlag } from 'hooks'
 import { useSignOut } from 'lib/auth'
 import { useProfile } from 'lib/profile'
 import { useTheme } from 'next-themes'
@@ -26,7 +25,6 @@ const UserSettingsDropdown = () => {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const { profile } = useProfile()
-  const showAuditLogs = useFlag('auditLogs')
   const { setIsOpen: setCommandMenuOpen } = useCommandMenu()
   const { theme, setTheme } = useTheme()
 
@@ -61,11 +59,11 @@ const UserSettingsDropdown = () => {
           <DropdownMenuItem className="cursor-pointer" onClick={() => setOpen(false)} asChild>
             <Link href="/account/tokens">Access tokens</Link>
           </DropdownMenuItem>
-          {showAuditLogs ? (
-            <DropdownMenuItem className="cursor-pointer" onClick={() => setOpen(false)} asChild>
-              <Link href="/account/audit">Audit logs</Link>
-            </DropdownMenuItem>
-          ) : null}
+
+          <DropdownMenuItem className="cursor-pointer" onClick={() => setOpen(false)} asChild>
+            <Link href="/account/audit">Audit logs</Link>
+          </DropdownMenuItem>
+
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="cursor-pointer"

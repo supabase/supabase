@@ -15,7 +15,6 @@ export const ProjectCardStatus = ({
   resourceWarnings,
   projectStatus,
 }: ProjectCardWarningsProps) => {
-  //const showResourceExhaustionWarnings = useFlag('resourceExhaustionWarnings')
   const showResourceExhaustionWarnings = false
 
   // [Joshen] Read only takes higher precedence over multiple resource warnings
