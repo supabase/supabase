@@ -26,7 +26,8 @@ const ProjectUsageSection = observer(() => {
     )
   }
 
-  const hasProjectData = usage && usage.result.length > 0 ? usage.result[0].count > 0 : false
+  const hasProjectData =
+    usage?.result && usage.result.length > 0 ? usage.result[0].count > 0 : false
 
   return (
     <>
