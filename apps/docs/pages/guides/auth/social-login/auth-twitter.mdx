@@ -33,18 +33,19 @@ Setting up Twitter logins for your application consists of 3 parts:
   - Enter your project name, click `Next`.
   - Select your use case, click `Next`.
   - Enter a description for your project, click `Next`.
-  - Enter a name for your app, click `Complete`.
+  - Enter a name for your app, click `Next`.
   - Copy and save your `API Key` (this is your `client_id`).
   - Copy and save your `API Secret Key` (this is your `client_secret`).
-- At the bottom, under `Next, setup your App` click the link `enable 3rd party authentication`.
-- Under `App Settings`, click on the gear icon next to your app name to go to `App Settings`.
-- At the bottom, next to `Authentication settings`, click `Edit`.
-- Turn `Enable 3-legged OAuth` ON.
-- Turn `Request email address from users` ON.
-- Enter your `Callback URL`.
-- Enter your `Website URL` (tip: try `http://127.0.0.1:port` or `http://www.localhost:port` during development)
-- Enter your `Terms of service URL`.
-- Enter your `Privacy policy URL`.
+  - Click on `App settings` to proceed to next steps.
+- At the bottom, you will find `User authentication settings`. Click on `Set up`.
+- Under `User authentication settings`, you can configure `App permissions`.
+- Make sure you turn ON `Request email from users`.
+- Select `Web App...` as the `Type of App`.
+- Under `App info` configure the following.
+  - Enter your `Callback URL`. Check the **Find your callback URL** section above to learn how to obtain your callback URL.
+  - Enter your `Website URL` (tip: try `http://127.0.0.1:port` or `http://www.localhost:port` during development)
+  - Enter your `Terms of service URL`.
+  - Enter your `Privacy policy URL`.
 - Click `Save`.
 
 ## Enter your Twitter credentials into your Supabase Project
