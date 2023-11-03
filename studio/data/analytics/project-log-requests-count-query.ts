@@ -1,17 +1,10 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get, isResponseOk } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { get } from 'data/fetchers'
 import { analyticsKeys } from './keys'
+import { ResponseError } from 'types'
 
 export type ProjectLogRequestsCountVariables = {
   projectRef?: string
-}
-
-export type ProjectLogRequestsCountResponse = {
-  result: UsageApiCounts[]
-}
-export interface UsageApiCounts {
-  count: number
 }
 
 export async function getProjectLogRequestsCountStats(
@@ -22,23 +15,29 @@ export async function getProjectLogRequestsCountStats(
     throw new Error('projectRef is required')
   }
 
-  const response = await get<ProjectLogRequestsCountResponse>(
-    `${API_URL}/projects/${projectRef}/analytics/endpoints/usage.api-requests-count`,
+  const { data, error } = await get(
+    '/platform/projects/{ref}/analytics/endpoints/usage.api-requests-count',
     {
+      params: {
+        path: {
+          ref: projectRef,
+        },
+      },
       signal,
     }
   )
-  if (!isResponseOk(response)) {
-    throw response.error
+
+  if (error) {
+    throw error
   }
 
-  return response
+  return data
 }
 
 export type ProjectLogRequestsCountData = Awaited<
   ReturnType<typeof getProjectLogRequestsCountStats>
 >
-export type ProjectLogRequestsCountError = unknown
+export type ProjectLogRequestsCountError = ResponseError
 
 export const useProjectLogRequestsCountQuery = <TData = ProjectLogRequestsCountData>(
   { projectRef }: ProjectLogRequestsCountVariables,
