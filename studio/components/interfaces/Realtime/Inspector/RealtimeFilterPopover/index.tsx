@@ -7,6 +7,7 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
+  cn,
 } from 'ui'
 
 import { ApplyConfigModal } from '../ApplyConfigModal'
@@ -32,18 +33,32 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
     setOpen(v)
   }
 
+  const isFiltered = config.schema !== '*'
+
   return (
     <>
       <Popover_Shadcn_ open={open} onOpenChange={onOpen}>
         <PopoverTrigger_Shadcn_ asChild>
           <Button
             icon={<PlusCircle size="16" />}
-            type="primary"
-            className="rounded-full !bg-brand-400 !border-brand-500 !text-brand-600 px-1.5 pr-0.5 !py-0.5"
+            type="dashed"
+            className={cn(
+              'rounded-full px-1.5 pr-0.5 !py-0.5',
+              isFiltered ? '!bg-brand-400 !border-brand-500 !text-brand-600' : ''
+            )}
             size="tiny"
           >
-            <span className="text-brand-600 mr-1">Filtered by </span>
-            <Badge className="!bg-brand-600 !text-brand-200 !px-1.5">schema: {config.schema}</Badge>
+            {isFiltered ? (
+              <>
+                <span className="text-brand-600 mr-1">Filtered by </span>
+                <Badge className="!bg-brand-600 !text-brand-200 !px-1.5">
+                  schema: {config.schema === '*' ? 'All schemas' : config.schema}
+                </Badge>
+              </>
+            ) : (
+              <span className="mr-1">Filter</span>
+            )}
+
             {config.table !== '*' ? (
               <>
                 <span className="text-brand-600"> and </span>
@@ -72,7 +87,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
             <div className="flex flex-row gap-4">
               <p className="w-[60px] flex justify-end text-sm">AND</p>
               <Input
-                size="small"
+                size="tiny"
                 className="flex-grow"
                 placeholder="body=eq.hey"
                 value={tempConfig.filter}

@@ -58,17 +58,7 @@ const AllSchemasSelector = ({
     connectionString: project?.connectionString,
   })
 
-  const schemas = (
-    data
-      ? [
-          {
-            id: '1',
-            name: '*',
-          },
-          ...data,
-        ]
-      : []
-  ).sort((a, b) => (a.name > b.name ? 0 : -1))
+  const schemas = (data ? [...data] : []).sort((a, b) => (a.name > b.name ? 0 : -1))
 
   return (
     <div className={className}>
@@ -113,7 +103,9 @@ const AllSchemasSelector = ({
             >
               <div className="w-full flex space-x-3 py-0.5">
                 <p className="text-xs text-light">schema</p>
-                <p className="text-xs">{selectedSchemaName}</p>
+                <p className="text-xs">
+                  {selectedSchemaName === '*' ? 'All schemas' : selectedSchemaName}
+                </p>
               </div>
             </Button>
           </PopoverTrigger_Shadcn_>
@@ -124,6 +116,23 @@ const AllSchemasSelector = ({
                 <CommandEmpty_Shadcn_>No schemas found</CommandEmpty_Shadcn_>
                 <CommandGroup_Shadcn_>
                   <ScrollArea className={(schemas || []).length > 7 ? 'h-[210px]' : ''}>
+                    <CommandItem_Shadcn_
+                      key="all-schemas"
+                      className="cursor-pointer flex items-center justify-between space-x-2 w-full"
+                      onSelect={() => {
+                        onSelectSchema('*')
+                        setOpen(false)
+                      }}
+                      onClick={() => {
+                        onSelectSchema('*')
+                        setOpen(false)
+                      }}
+                    >
+                      <span>All schemas</span>
+                      {selectedSchemaName === '*' && (
+                        <IconCheck className="text-brand" strokeWidth={2} />
+                      )}
+                    </CommandItem_Shadcn_>
                     {schemas?.map((schema) => (
                       <CommandItem_Shadcn_
                         key={schema.id}
