@@ -9,7 +9,7 @@ const ICONS = {
   PRESENCE: <IconPresence size="xlarge" />,
   BROADCAST: <IconBroadcast size="xlarge" />,
   POSTGRES: <IconDatabaseChanges size="xlarge" />,
-  SYSTEM: <IconAlertTriangle size="xlarge" />,
+  SYSTEM: <IconAlertTriangle size="large" />,
 }
 
 export const ColumnRenderer: Column<LogData, unknown>[] = [
@@ -21,7 +21,12 @@ export const ColumnRenderer: Column<LogData, unknown>[] = [
 
       return (
         <RowLayout>
-          <div className={isErrorLog(data.row) ? 'text-warning-600' : 'text-green-900'}>
+          <div
+            className={cn(
+              'flex justify-center items-center min-w-[24px]',
+              isErrorLog(data.row) ? 'text-warning-600' : 'text-green-900'
+            )}
+          >
             {ICONS[type]}
           </div>
           <span className={cn('font-mono', isErrorLog(data.row) ? '!text-warning-600' : '')}>
