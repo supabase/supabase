@@ -285,21 +285,7 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
         accessToken: accessToken,
       );
     }
-
-    @override
-    Widget build(BuildContext context) {
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text('Login'),
-        ),
-        body: Center(
-          child: ElevatedButton(
-            onPressed: _googleSignIn,
-            child: const Text('Google login'),
-          ),
-        ),
-      );
-    }
+    ...
     ```
 
     ### Configuration [#flutter-configuration-native-app]
