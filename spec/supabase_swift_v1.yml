@@ -1821,6 +1821,8 @@ functions:
       If a Postgres function returns a table response, you can also apply filters.
 
       Implement `URLQueryRepresentable` protocol in your own types to be able to use them as filter value.
+
+      Supported filtes are: `eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `like`, `ilike`, `is`, `in`, `cs`, `cd`, `sl`, `sr`, `nxl`, `nxr`, `adj`, `ov`, `fts`, `plfts`, `phfts`, `wfts`. Check available operators in [PostgREST](https://postgrest.org/en/stable/references/api/tables_views.html#operators).
     examples:
       - id: applying-filters
         name: Applying Filters
@@ -1981,1049 +1983,22 @@ functions:
           notation.
   - id: or
     title: or()
-    description: |
-      Finds all rows satisfying at least one of the filters.
     notes: |
-      - `.or()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
-
-        ```dart
-        .or('id.in.(6,7),arraycol.cs.{"a","b"}')  // Use Postgres list () and 'in' for in_ filter. Array {} and 'cs' for contains.
-        .or('id.in.(${mylist.join(',')}),arraycol.cs.{${mylistArray.join(',')}}') // You can insert a Dart list for list or array column.
-        .or('id.in.(${mylist.join(',')}),rangecol.cs.(${mylistRange.join(',')}]') // You can insert a Dart list for list or range column.
-        ```
-    examples:
-      - id: with-select
-        name: With `select()`
-        isSpotlight: true
-        code: |
-          ```swift
-          try await client.database
-                .from("countries")
-                .select(columns: "name")
-                .or(filters: "id.eq.2,name.eq.Algeria")
-                .execute()
-          ```
-      - id: use-or-with-and
-        name: Use `or` with `and`
-        code: |
-          ```swift
-          try await client.database
-                .from("countries")
-                .select(columns: "name")
-                .or(filters: "id.gt.3,and(id.eq.1,name.eq.Afghanistan)")
-                .execute()
-          ```
-
-  - id: not
-    title: not()
-    description: |
-      Finds all rows that don't satisfy the filter.
-    notes: |
-      - `.not()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
-
-        ```dart
-        .not('name','eq','Paris')
-        .not('arraycol','cs','{"a","b"}') // Use Postgres array {} for array column and 'cs' for contains.
-        .not('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
-        .not('id','in','(6,7)')  // Use Postgres list () and 'in' for in_ filter.
-        .not('id','in','(${mylist.join(',')})')  // You can insert a Dart list array.
-        ```
-    examples:
-      - id: with-select
-        name: With `select()`
-        isSpotlight: true
-        code: |
-          ```swift
-          try await client.database
-                .from("countries")
-                .select()
-                .not(column: "name", operator: .is, value: "")
-                .execute()
-          ```
-
-  - id: match
-    title: match()
-    description: |
-      Finds all rows whose columns match the specified `query` object.
-    examples:
-      - id: with-select
-        name: With `select()`
-        isSpotlight: true
-        code: |
-          ```swift
-            try await client.database
-                .from("countries")
-                .select(columns: "name")
-                .match(query: ["id" : 2, "name": "Albania"])
-                .execute()
-          ```
-
-  - id: eq
-    title: eq()
-    description: |
-      Finds all rows whose value on the stated `column` exactly matches the specified `value`.
-    examples:
-      - id: with-select
-        name: With `select()`
-        isSpotlight: true
-        code: |
-          ```swift
-          try await client.database
-                .from("cities")
-                .select(columns: "name, country_id")
-                .eq(column: "name", value: "The Shire")
-                .execute()
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```swift
-          let toUpdate = CityModel(name: "Mordor")
-          try await client.database
-                          .from("cities")
-                          .update(columns: toUpdate)
-                          .eq(column: "name", value: "San Francisco")
-                          .execute()
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```swift
-          try await client.database
-                .from("cities")
-                .delete()
-                .eq(column: "name", value: "Mordor")
-                .execute()
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```swift
-          try await client.database
-                .from("cities")
-                .delete()
-                .eq(column: "name", value: "Mordor")
-                .execute()
-          ```
-
-  - id: neq
-    title: neq()
-    description: |
-      Finds all rows whose value on the stated `column` doesn't match the specified `value`.
-    examples:
-      - id: with-select
-        name: With `select()`
-        isSpotlight: true
-        code: |
-          ```swift
-          try await client.database
-                .from("cities")
-                .select(columns: "name, country_id")
-                .neq(column: "name", value: "The Shire")
-                .execute()
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```swift
-          let toUpdate = CityModel(name: "Mordor")
-          try await client.database
-                          .from("cities")
-                          .update(columns: toUpdate)
-                          .neq(column: "name", value: "San Francisco")
-                          .execute()
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```swift
-          try await client.database
-                .from("cities")
-                .delete()
-                .neq(column: "name", value: "Mordor")
-                .execute()
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```swift
-          try await client.database
-                .rpc(fn: "echo_all_cities")
-                .neq(column: "address->postcode", value: 90210)
-                .execute()
-          ```
-
-  - id: gt
-    title: gt()
-    description: |
-      Finds all rows whose value on the stated `column` is greater than the specified `value`.
-    examples:
-      - id: with-select
-        name: With `select()`
-        isSpotlight: true
-        code: |
-          ```swift
-          try await client.database
-                .from("cities")
-                .select(columns: "name, country_id")
-                .gt(column: "country_id", value: 250)
-                .execute()
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```swift
-          let toUpdate = CityModel(name: "Mordor")
-          try await client.database
-                          .from("cities")
-                          .update(columns: toUpdate)
-                          .gt(column: "country_id", value: 250)
-                          .execute()
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```swift
-          try await client.database
-                .from("cities")
-                .delete()
-                .gt(column: "country_id", value: 250)
-                .execute()
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```swift
-          try await client.database
-                .rpc(fn: "echo_all_cities")
-                .gt(column: "country_id", value: 250)
-                .execute()
-          ```
-
-  - id: gte
-    title: gte()
-    description: |
-      Finds all rows whose value on the stated `column` is greater than or equal to the specified `value`.
-    examples:
-      - id: with-select
-        name: With `select()`
-        isSpotlight: true
-        code: |
-          ```swift
-          try await client.database
-                .from("cities")
-                .select(columns: "name, country_id")
-                .gte(column: "country_id", value: 250)
-                .execute()
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```swift
-          let toUpdate = CityModel(name: "Mordor")
-          try await client.database
-                          .from("cities")
-                          .update(columns: toUpdate)
-                          .gte(column: "country_id", value: 250)
-                          .execute()
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```swift
-           try await client.database
-                  .from("cities")
-                  .delete()
-                  .gte(column: "country_id", value: 250)
-                  .execute()
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```swift
-          try await client.database
-                .rpc(fn: "echo_all_cities")
-                .gte(column: "country_id", value: 250)
-                .execute()
-          ```
-
-  - id: lt
-    title: lt()
-    description: |
-      Finds all rows whose value on the stated `column` is less than the specified `value`.
-    examples:
-      - id: with-select
-        name: With `select()`
-        isSpotlight: true
-        code: |
-          ```swift
-          try await client.database
-                .from("cities")
-                .select(columns: "name, country_id")
-                .lt(column: "country_id", value: 250)
-                .execute()
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```swift
-          let toUpdate = CityModel(name: "Mordor")
-          try await client.database
-                          .from("cities")
-                          .update(columns: toUpdate)
-                          .lt(column: "country_id", value: 250)
-                          .execute()
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```swift
-          try await client.database
-                .from("cities")
-                .delete()
-                .lt(column: "country_id", value: 250)
-                .execute()
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```swift
-          try await client.database
-                .rpc(fn: "echo_all_cities")
-                .lt(column: "country_id", value: 250)
-                .execute()
-          ```
-
-  - id: lte
-    title: lte()
-    description: |
-      Finds all rows whose value on the stated `column` is less than or equal to the specified `value`.
-    examples:
-      - id: with-select
-        name: With `select()`
-        isSpotlight: true
-        code: |
-          ```swift
-          try await client.database
-                .from("cities")
-                .select(columns: "name, country_id")
-                .lte(column: "country_id", value: 250)
-                .execute()
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```swift
-          let toUpdate = CityModel(name: "Mordor")
-          try await client.database
-                          .from("cities")
-                          .update(columns: toUpdate)
-                          .lte(column: "country_id", value: 250)
-                          .execute()
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```swift
-          try await client.database
-                .from("cities")
-                .delete()
-                .lte(column: "country_id", value: 250)
-                .execute()
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```swift
-          try await client.database
-                .rpc(fn: "echo_all_cities")
-                .lte(column: "country_id", value: 250)
-                .execute()
-          ```
-
-  - id: like
-    title: like()
-    description: |
-      Finds all rows whose value in the stated `column` matches the supplied `pattern` (case sensitive).
-    examples:
-      - id: with-select
-        name: With `select()`
-        isSpotlight: true
-        code: |
-          ```swift
-          try await client.database
-                .from("cities")
-                .select(columns: "name, country_id")
-                .like(column: "name", value: "%la%")
-                .execute()
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```swift
-          let toUpdate = CityModel(name: "Mordor")
-          try await client.database
-                          .from("cities")
-                          .update(columns: toUpdate)
-                          .like(column: "name", value: "%la%")
-                          .execute()
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```swift
-          try await client.database
-                .from("cities")
-                .delete()
-                .like(column: "name", value: "%la%")
-                .execute()
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```swift
-          try await client.database
-                .rpc(fn: "echo_all_cities")
-                .like(column: "name", value: "%la%")
-                .execute()
-          ```
-
-  - id: ilike
-    title: ilike()
-    description: |
-      Finds all rows whose value in the stated `column` matches the supplied `pattern` (case insensitive).
-    examples:
-      - id: with-select
-        name: With `select()`
-        isSpotlight: true
-        code: |
-          ```swift
-          try await client.database
-                .from("cities")
-                .select(columns: "name, country_id")
-                .ilike(column: "name", value: "%la%")
-                .execute()
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```swift
-          let toUpdate = CityModel(name: "Mordor")
-          try await client.database
-                          .from("cities")
-                          .update(columns: toUpdate)
-                          .ilike(column: "name", value: "%la%")
-                          .execute()
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```swift
-          try await client.database
-                .from("cities")
-                .delete()
-                .ilike(column: "name", value: "%la%")
-                .execute()
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```swift
-          try await client.database
-                .rpc(fn: "echo_all_cities")
-                .ilike(column: "name", value: "%la%")
-                .execute()
-          ```
-
-  - id: is
-    title: is_()
-    description: |
-      A check for exact equality (null, true, false), finds all rows whose value on the stated `column` exactly match the specified `value`.
-
-      `is_` and `in_` filter methods are suffixed with `_` to avoid collisions with reserved keywords.
-    examples:
-      - id: with-select
-        name: With `select()`
-        isSpotlight: true
-        code: |
-          ```swift
-          try await client.database
-                .from("cities")
-                .select(columns: "name, country_id")
-                .is(column: "name", value: "null")
-                .execute()
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```swift
-          let toUpdate = CityModel(name: "Mordor")
-          try await client.database
-                          .from("cities")
-                          .update(columns: toUpdate)
-                          .is(column: "name", value: "null")
-                          .execute()
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```swift
-          try await client.database
-                .from("cities")
-                .delete()
-                .is(column: "name", value: "null")
-                .execute()
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```swift
-          try await client.database
-                .rpc(fn: "echo_all_cities")
-                .is(column: "name", value: "null")
-                .execute()
-          ```
-
-  - id: in
-    title: in_()
-    description: |
-      Finds all rows whose value on the stated `column` is found on the specified `values`.
-    examples:
-      - id: with-select
-        name: With `select()`
-        isSpotlight: true
-        code: |
-          ```swift
-          try await client.database
-                .from("cities")
-                .select(columns: "name, country_id")
-                .in(column: "name", value: ["Rio de Janeiro", "San Francisco"])
-                .execute()
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```swift
-          let toUpdate = CityModel(name: "Mordor")
-          try await client.database
-                          .from("cities")
-                          .update(columns: toUpdate)
-                          .in(column: "name", value: ["Rio de Janeiro", "San Francisco"])
-                          .execute()
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```swift
-          try await client.database
-                .from("cities")
-                .delete()
-                .in(column: "name", value: ["Rio de Janeiro", "San Francisco"])
-                .execute()
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```swift
-          try await client.database
-                .from("cities")
-                .delete()
-                .in(column: "name", value: ["Rio de Janeiro", "San Francisco"])
-                .execute()
-          ```
-
-  - id: contains
-    title: contains()
-    examples:
-      - id: with-select
-        name: With `select()`
-        isSpotlight: true
-        code: |
-          ```swift
-          try await client.database
-                .from("cities")
-                .select(columns: "name, id, main_exports")
-                .contains(column: "main_exports", value: "oil")
-                .execute()
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```swift
-            let toUpdate = CityModel(name: "Mordor")
-            try await client.database
-                            .from("cities")
-                            .update(columns: toUpdate)
-                            .contains(column: "main_exports", value: "oil")
-                            .execute()
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```swift
-          try await client.database
-                .from("cities")
-                .delete()
-                .contains(column: "main_exports", value: "oil")
-                .execute()
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```swift
-          try await client.database
-                .rpc(fn: "echo_all_cities")
-                .contains(column: "main_exports", value: "oil")
-                .execute()
-          ```
-
-  - id: range-lt
-    title: rangeLt()
-    description: |
-      Only relevant for range columns. Match only rows where every element in column is less than any element in range.
-    examples:
-      - id: with-select
-        name: With `select()`
-        isSpotlight: true
-        code: |
-          ```swift
-            try await client.database
-                  .from("reservations")
-                  .select()
-                  .rangeLt(column: "during", value: "[2000-01-02 08:30, 2000-01-02 09:30]")
-                  .execute()
-          ```
-        data:
-          sql: |
-            ```sql
-            create table
-              reservations (
-                id int8 primary key,
-                room_name text,
-                during tsrange
-              );
-
-            insert into
-              reservations (id, room_name, during)
-            values
-              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
-              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
-            ```
-        response: |
-          ```swifton
-          {
-            "data": [
-              {
-                "id": 1,
-                "room_name": "Emerald",
-                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
-              }
-            ],
-            "status": 200,
-            "statusText": "OK"
-          }
-          ```
-        description: |
-          Postgres supports a number of [range
-          types](https://www.postgresql.org/docs/current/rangetypes.html). You
-          can filter on range columns using the string representation of range
-          values.
-        hideCodeBlock: true
-
-  - id: range-gt
-    title: rangeGt()
-    description: |
-      Only relevant for range columns. Match only rows where every element in column is greater than any element in range.
-
-    examples:
-      - id: with-select
-        name: With `select()`
-        isSpotlight: true
-        code: |
-          ```swift
-            try await client.database
-                  .from("reservations")
-                  .select()
-                  .rangeGt(column: "during", value: "[2000-01-02 08:30, 2000-01-02 09:30]")
-                  .execute()
-          ```
-        data:
-          sql: |
-            ```sql
-            create table
-              reservations (
-                id int8 primary key,
-                room_name text,
-                during tsrange
-              );
-
-            insert into
-              reservations (id, room_name, during)
-            values
-              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
-              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
-            ```
-        response: |
-          ```swifton
-            {
-              "data": [
-                {
-                  "id": 2,
-                  "room_name": "Topaz",
-                  "during": "[\"2000-01-02 09:00:00\",\"2000-01-02 10:00:00\")"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-        description: |
-          Postgres supports a number of [range
-          types](https://www.postgresql.org/docs/current/rangetypes.html). You
-          can filter on range columns using the string representation of range
-          values.
-        hideCodeBlock: true
-
-  - id: range-gte
-    title: rangeGte()
-    description: |
-      Only relevant for range columns. Match only rows where every element in column is either contained in range or greater than any element in range.
-    examples:
-      - id: with-select
-        name: With `select()`
-        isSpotlight: true
-        code: |
-          ```swift
-            try await client.database
-                  .from("reservations")
-                  .select()
-                  .rangeGte(column: "during", value: "[2000-01-02 08:30, 2000-01-02 09:30]")
-                  .execute()
-          ```
-        data:
-          sql: |
-            ```sql
-            create table
-              reservations (
-                id int8 primary key,
-                room_name text,
-                during tsrange
-              );
-
-            insert into
-              reservations (id, room_name, during)
-            values
-              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
-              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
-            ```
-        response: |
-          ```swifton
-            {
-              "data": [
-                {
-                  "id": 2,
-                  "room_name": "Topaz",
-                  "during": "[\"2000-01-02 09:00:00\",\"2000-01-02 10:00:00\")"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-        description: |
-          Postgres supports a number of [range
-          types](https://www.postgresql.org/docs/current/rangetypes.html). You
-          can filter on range columns using the string representation of range
-          values.
-        hideCodeBlock: true
-
-  - id: range-lte
-    title: rangeLte()
-    description: |
-      Only relevant for range columns. Match only rows where every element in column is either contained in range or less than any element in range.
-
-    examples:
-      - id: with-select
-        name: With `select()`
-        isSpotlight: true
-        code: |
-          ```swift
-          try await client.database
-                .from("reservations")
-                .select()
-                .rangeLte(column: "during", value: "[2000-01-02 08:30, 2000-01-02 09:30]")
-                .execute()
-          ```
-        data:
-          sql: |
-            ```sql
-            create table
-              reservations (
-                id int8 primary key,
-                room_name text,
-                during tsrange
-              );
-
-            insert into
-              reservations (id, room_name, during)
-            values
-              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
-              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
-            ```
-        response: |
-          ```swifton
-            {
-              "data": [
-                {
-                  "id": 1,
-                  "room_name": "Emerald",
-                  "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-        description: |
-          Postgres supports a number of [range
-          types](https://www.postgresql.org/docs/current/rangetypes.html). You
-          can filter on range columns using the string representation of range
-          values.
-        hideCodeBlock: true
-
-  - id: range-adjacent
-    title: rangeAdjacent()
-    description: |
-      Only relevant for range columns. Match only rows where column is mutually exclusive to range and there can be no element between the two ranges.
-
-    examples:
-      - id: with-select
-        name: With `select()`
-        isSpotlight: true
-        code: |
-          ```swift
-          try await client.database
-                .from("reservations")
-                .select()
-                .rangeAdjacent(column: "during", value: "[2000-01-02 08:30, 2000-01-02 09:30]")
-                .execute()
-          ```
-        data:
-          sql: |
-            ```sql
-            create table
-              reservations (
-                id int8 primary key,
-                room_name text,
-                during tsrange
-              );
-
-            insert into
-              reservations (id, room_name, during)
-            values
-              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
-              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
-            ```
-        response: |
-          ```swifton
-          {
-            "data": [
-              {
-                "id": 1,
-                "room_name": "Emerald",
-                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
-              }
-            ],
-            "status": 200,
-            "statusText": "OK"
-          }
-          ```
-
-        hideCodeBlock: true
-
-  - id: overlaps
-    title: overlaps()
-    description: |
-      Only relevant for array and range columns. Match only rows where column and value have an element in common.
-
-    examples:
-      - id: on-array-columns
-        name: On array columns
-        code: |
-          ```swift
-          try await client.database
-                .from("issues")
-                .select(columns: "title")
-                .overlaps(column: "tags", value: "['is:closed', 'severity:high']")
-                .execute()
-          ```
-        data:
-          sql: |
-            ```sql
-            create table
-              issues (
-                id int8 primary key,
-                title text,
-                tags text[]
-              );
-
-            insert into
-              issues (id, title, tags)
-            values
-              (1, 'Cache invalidation is not working', array['is:open', 'severity:high', 'priority:low']),
-              (2, 'Use better names', array['is:open', 'severity:low', 'priority:medium']);
-            ```
-        response: |
-          ```swifton
-          {
-            "data": [
-              {
-                "title": "Cache invalidation is not working"
-              }
-            ],
-            "status": 200,
-            "statusText": "OK"
-          }
-          ```
-        hideCodeBlock: true
-        isSpotlight: true
-      - id: on-range-columns
-        name: On range columns
-        code: |
-          ```swift
-          try await client.database
-                .from("issues")
-                .select(columns: "title")
-                .overlaps(column: "tags", value: "['is:closed', 'severity:high']")
-                .execute()
-          ```
-        data:
-          sql: |
-            ```sql
-            create table
-              reservations (
-                id int8 primary key,
-                room_name text,
-                during tsrange
-              );
-
-            insert into
-              reservations (id, room_name, during)
-            values
-              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
-              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
-            ```
-        response: |
-          ```swifton
-          {
-            "data": [
-              {
-                "id": 1,
-                "room_name": "Emerald",
-                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
-              }
-            ],
-            "status": 200,
-            "statusText": "OK"
-          }
-          ```
-        description: |
-          Postgres supports a number of [range
-          types](https://www.postgresql.org/docs/current/rangetypes.html). You
-          can filter on range columns using the string representation of range
-          values.
-        hideCodeBlock: true
-
-  - id: text-search
-    title: textSearch()
-    description: |
-      Only relevant for text and tsvector columns. Match only rows where `column`matches the query string in `query`.
-
-      For more information, see [Postgres full text search](https://supabase.com/docs/guides/database/full-text-search).
-    examples:
-      - id: text-search
-        name: Text search
-        code: |
-          ```swift
-          try await client.database
-                .from("quotes")
-                .select(columns: "catchphrase")
-                .textSearch(column: "catchphrase",
-                            query: "'fat' & 'cat'",
-                            config: "english")
-                .execute()
-          ```
-      - id: basic-normalization
-        name: Basic normalization
-        description: Uses PostgreSQL's `plainto_tsquery` function.
-        code: |
-          ```swift
-          try await client.database
-                .from("quotes")
-                .select(columns: "catchphrase")
-                .textSearch(column: "catchphrase",
-                            query: "'fat' & 'cat'",
-                            config: "english",
-                            type: .plain)
-                .execute()
-          ```
-      - id: full-normalization
-        name: Full normalization
-        description: Uses PostgreSQL's `phraseto_tsquery` function.
-        code: |
-          ```swift
-          try await client.database
-                .from("quotes")
-                .select(columns: "catchphrase")
-                .textSearch(column: "catchphrase",
-                            query: "'fat' & 'cat'",
-                            config: "english",
-                            type: .phrase)
-                .execute()
-          ```
-      - id: web-search
-        name: Websearch
-        description: |
-          Uses PostgreSQL's `websearch_to_tsquery` function.
-          This function will never raise syntax errors, which makes it possible to use raw user-supplied input for search, and can be used
-          with advanced operators.
-
-          - `unquoted text`: text not inside quote marks will be converted to terms separated by & operators, as if processed by plainto_tsquery.
-          - `"quoted text"`: text inside quote marks will be converted to terms separated by <-> operators, as if processed by phraseto_tsquery.
-          - `OR`: the word “or” will be converted to the | operator.
-          - `-`: a dash will be converted to the ! operator.
-
-        code: |
-          ```swift
-          try await client.database
-                .from("quotes")
-                .select(columns: "catchphrase")
-                .textSearch(column: "catchphrase",
-                            query: "'fat' & 'cat'",
-                            config: "english",
-                            type: .websearch)
-                .execute()
-          ```
-
-  - id: filter
-    title: filter()
-    notes: |
-      filter() expects you to use the raw PostgREST syntax for the filter values.
+      or() expects you to use the raw PostgREST syntax for the filter names and values.
 
       ```swift
-      .filter('id', 'in', '(5,6,7)')  // Use `()` for `in` filter
-      .filter('arraycol', 'cs', '{"a","b"}')  // Use `cs` for `contains()`, `{}` for array values
+      .or(#"id.in.(5,6,7), arraycol.cs.{"a","b"}")  // Use `()` for `in` filter, `{}` for array values and `cs` for `contains()`.
+      .or(#"id.in.(5,6,7), arraycol.cd.{"a","b"}")  // Use `cd` for `containedBy()`
       ```
     examples:
       - id: with-select
         name: With `select()`
         code: |
           ```swift
-          try await client.database
-                .from("countries")
-                .select()
-                .filter(column: "name", operator: .in, value: "('Algeria','Japan')")
-                .execute()
+          try await supabase.database
+            .from("countries")
+            .select("name")
+            .or("id.eq.2,name.eq.Algeria")
           ```
         data:
           sql: |
@@ -3039,7 +2014,159 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```swifton
+          ```json
+          {
+            "data": [
+              {
+                "name": "Albania"
+              },
+              {
+                "name": "Algeria"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: use-or-with-and
+        name: Use `or` with `and`
+        code: |
+          ```swift
+          try await supabase.database
+            .from("countries")
+            .select("name")
+            .or("id.gt.3,and(id.eq.1,name.eq.Afghanistan)")
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        reponse: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Afghanistan"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        hideCodeBlock: true
+
+  - id: not
+    title: not()
+    description: |
+      Finds all rows that don't satisfy the filter.
+    notes: |
+      - `.not()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
+
+        ```swift
+        .not("name", operator: .eq, value: "Paris")
+        .not("arraycol", operator: .cs, value: #"{"a","b"}") // Use Postgres array {} for array column and 'cs' for contains.
+        .not("rangecol", operator: .cs, value: "(1,2]") // Use Postgres range syntax for range column.
+        .not("id", operator: .in, value: "(6,7)")  // Use Postgres list () and 'in' for in_ filter.
+        .not("id", operator: .in, value: "(\(mylist.join(separator: ",")))")  // You can insert a Swift list array.
+        ```
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```swift
+          try await client.database
+            .from("countries")
+            .select()
+            .not(column: "name", operator: .is, value: "")
+            .execute()
+          ```
+
+  - id: match
+    title: match()
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```ts
+          try await supabase.database
+            .from("countries")
+            .select("name")
+            .match(["id": 2, "name": "Albania"])
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Albania"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+
+  - id: filter
+    title: filter()
+    notes: |
+      filter() expects you to use the raw PostgREST syntax for the filter values.
+
+      ```swift
+      .filter("id", operator: .in, value: "(5,6,7)")  // Use `()` for `in` filter
+      .filter("arraycol", operator: .cs, value: #"{"a","b"}")  // Use `cs` for `contains()`, `{}` for array values
+      ```
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```swift
+          try await supabase.database
+            .from("countries")
+            .select()
+            .filter("name", operator: .in, #"("Algeria","Japan")")
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
           {
             "data": [
               {
@@ -3057,17 +2184,17 @@ functions:
         name: On a foreign table
         code: |
           ```swift
-          try await client.database
-                .from("countries")
-                .select(column:
-                        """
-                        name,
-                        cities!inner (
-                          name
-                        )
-                        """)
-                .filter(column: "cities.name", operator: .eq, value: "Bali")
-                .execute()
+          try await supabase.database
+            .from("countries")
+            .select(
+              """
+                name,
+                cities!inner (
+                  name
+                )
+              """
+            )
+            .filter("cities.name", operator: .eq, value: "Bali")
           ```
         data:
           sql: |
@@ -3093,7 +2220,7 @@ functions:
               (2, 1, 'Munich');
             ```
         response: |
-          ```swifton
+          ```json
           {
             "data": [
               {
@@ -3131,11 +2258,11 @@ functions:
         name: With `upsert()`
         code: |
           ```swift
-            try await client.database
-                .from("countries")
-                .upsert(CountryModel(id: 1, name: "Algeria"))
-                .select()
-                .execute()
+            try await database.database
+              .from("countries")
+              .upsert(CountryModel(id: 1, name: "Algeria"))
+              .select()
+              .execute()
           ```
         data:
           sql: |
@@ -3149,7 +2276,7 @@ functions:
               (1, 'Afghanistan');
             ```
         response: |
-          ```swifton
+          ```json
           {
             "data": [
               {
@@ -3172,11 +2299,11 @@ functions:
         name: With `select()`
         code: |
           ```swift
-          try await client.database
-                .from("countries")
-                .select(column: "id, name")
-                .order(column: "id", ascending: false)
-                .execute()
+          try await supabase.database
+            .from("countries")
+            .select("id, name")
+            .order("id", ascending: false)
+            .execute()
           ```
         data:
           sql: |
@@ -3218,17 +2345,18 @@ functions:
         name: On a foreign table
         code: |
           ```swift
-            try await client.database
-                .from("countries")
-                .select(column:
-                        """
-                        name,
-                        cities (
-                          name
-                        )
-                        """)
-                .order(column: "name", ascending: false, foreignTable: "cities")
-                .execute()
+            try await supabase.database
+              .from("countries")
+              .select(
+                """
+                  name,
+                  cities (
+                    name
+                  )
+                """
+              )
+              .order("name", ascending: false, foreignTable: "cities")
+              .execute()
             ```
         data:
           sql: |
@@ -3291,11 +2419,11 @@ functions:
         name: With `select()`
         code: |
           ```swift
-          try await client.database
-                .from("countries")
-                .select(column: "id, name")
-                .limit(count: 1)
-                .execute()
+          try await supabase.database
+            .from("countries")
+            .select("id, name")
+            .limit(1)
+            .execute()
           ```
         data:
           sql: |
@@ -3311,7 +2439,7 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```swifton
+          ```json
           {
             "data": [
               {
@@ -3329,16 +2457,17 @@ functions:
         code: |
           ```swift
           try await client.database
-                .from("countries")
-                .select(column:
-                        """
-                        name,
-                        cities (
-                          name
-                        )
-                        """)
-                .limit(count: 1, foreignTable: "cities")
-                .execute()
+            .from("countries")
+            .select(
+              """
+              name,
+              cities (
+                name
+              )
+              """
+            )
+            .limit(1, foreignTable: "cities")
+            .execute()
           ```
         data:
           sql: |
@@ -3363,7 +2492,7 @@ functions:
               (2, 1, 'New York City');
             ```
         response: |
-          ```swifton
+          ```json
           {
             "data": [
               {
@@ -3389,17 +2518,18 @@ functions:
         name: With `select()`
         code: |
           ```swift
-          try await client.database
-                .from("countries")
-                .select(column:
-                        """
-                        name,
-                        cities (
-                          name
-                        )
-                        """)
-                .limit(count: 1, foreignTable: "cities")
-                .execute()
+          try await supabase.database
+            .from("countries")
+            .select(
+              """
+                name,
+                cities (
+                  name
+                )
+              """
+            )
+            .range(from: 0, to: 1)
+            .execute()
           ```
         data:
           sql: |
@@ -3431,39 +2561,208 @@ functions:
           ```
         hideCodeBlock: true
         isSpotlight: true
-  - id: invoke
-    title: "invoke()"
+
+  - id: single
+    title: single()
     description: |
-      Invokes a Supabase Function. See the [guide](/docs/guides/functions) for details on writing Functions.
+      By default PostgREST returns all JSON results in an array, even when there is only one item, use `single()` to return the first object unenclosed by an array.
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```swift
+          try await supabase.database
+            .from("countries")
+            .select("name")
+            .limit(1)
+            .single()
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": {
+              "name": "Afghanistan"
+            },
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+  - id: csv
+    title: csv()
+    examples:
+      - id: return-data-as-csv
+        name: Return data as CSV
+        code: |
+          ```swift
+          try await supabase
+            .from("countries")
+            .select()
+            .csv()
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": "id,name\n1,Afghanistan\n2,Albania\n3,Algeria",
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          By default, the data is returned in JSON format, but can also be returned as Comma Separated Values.
+        hideCodeBlock: true
+        isSpotlight: true
+  - id: invoke
+    title: invoke()
+    description: |
+      Invoke a Supabase Edge Function.
     notes: |
       - Requires an Authorization header.
-      - Invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.
+      - When you pass in a body to your function, we automatically attach the Content-Type header for `String`, and `Data`. If it doesn't match any of these types we assume the payload is `json`, serialise it and attach the `Content-Type` header as `application/json`. You can override this behaviour by passing in a `Content-Type` header of your own.
     examples:
-      - id: basic-invocation
-        name: Basic invocation.
+      - id: invocation-with-decodable
+        name: Invocation with `Decodable` response
         isSpotlight: true
         code: |
           ```swift
-          try await supabase.functions.invoke(
-             functionName: "hello",
-             invokeOptions: .init(body: Foo(foo: "baa"))) {
-               data, response in
-             }
-          ```
-      - id: parsing-custom-headers
-        name: Parsing custom headers.
-        description: |
-          Any `headers` will be passed through to the function. A common pattern is to pass a logged-in user's JWT token as an Authorization header.
-        isSpotlight: true
-        code: |
-          ```swift
-          try await supabase.functions.invoke(
-            functionName: "hello",
-            invokeOptions:.init(headers:["Authorization": "Bearer ${supabase.auth.currentSession?.accessToken}"],
-                                body: FooModel(foo: "baa"))
-            { data, response in
+          struct Response: Decodable {
+            // Expected response definition
+          }
 
-            }
+          let response: Response = try await supabase.functions
+            .invoke(
+              "hello", 
+              options: FunctionInvokeOptions(
+                body: ["foo": "bar"]
+              )
+            )
+          ```
+      - id: invocation-with-custom-response
+        name: Invocation with custom response
+        isSpotlight: true
+        code: |
+          ```swift
+          let response = try await supabase.functions
+            .invoke(
+              "hello", 
+              options: FunctionInvokeOptions(
+                body: ["foo": "bar"]
+              ),
+              decode: { data, response in 
+                String(data: data, encoding: .utf8)
+              }
+            )
+
+          print(typeof(response)) // String?
+          ```
+      - id: error-handling
+        name: Error handling
+        description: |
+          A `FunctionsError` error is returned if your function throws an error, `FunctionsRelayError` if the Supabase Relay has an error processing your function and `FunctionsFetchError` if there is a network error in calling your function.
+            - `httpError(code: Int, data: Data)` in case a non-2xx status code is returned by the edge function.
+            - `relayError` in case the Supabase Relay has an error processing your function.
+        isSpotlight: true
+        code: |
+          ```swift
+
+          do {
+            let response = try await supabase.functions
+              .invoke(
+                "hello", 
+                options: FunctionInvokeOptions(
+                  body: ["foo": "bar"]
+                )
+              )
+          } catch FunctionsError.httpError(let code, let data) {
+            print("Function returned code \(code) with response \(String(data: data, encoding: .utf8) ?? "")")
+          } catch FunctionsError.relayError {
+            print("Relay error")
+          } catch {
+            print("Other error: \(error.localizedDescription)")
+          }
+          ```
+      - id: passing-custom-headers
+        name: Passing custom headers
+        description: |
+          You can pass custom headers to your function. Note: supabase-js automatically passes the `Authorization` header with the signed in user's JWT.
+        isSpotlight: true
+        code: |
+          ```swift
+          let response = try await supabase.functions
+            .invoke(
+              "hello", 
+              options: FunctionInvokeOptions(
+                headers: [
+                  "my-custom-header": "my-custom-header-value"
+                ]
+              )
+            )
+          ```
+      - id: calling-with-delete-verb
+        name: Calling with DELETE HTTP verb
+        description: |
+          You can also set the HTTP verb to `DELETE` when calling your Edge Function.
+        isSpotlight: true
+        code: |
+          ```swift
+          let response = try await supabase.functions
+            .invoke(
+              "hello", 
+              options: FunctionInvokeOptions(
+                method: .delete,
+                headers: [
+                  "my-custom-header": "my-custom-header-value"
+                ],
+                body: ["foo": "bar"]
+              )
+            )
+          ```
+      - id: calling-with-get-verb
+        name: Calling with GET HTTP verb
+        description: |
+          You can also set the HTTP verb to `GET` when calling your Edge Function.
+        isSpotlight: true
+        code: |
+          ```swift
+          let response = try await supabase.functions
+            .invoke(
+              "hello", 
+              options: FunctionInvokeOptions(
+                method: .get,
+                headers: [
+                  "my-custom-header": "my-custom-header-value"
+                ]
+              )
+            )
           ```
   - id: subscribe
     description: |
