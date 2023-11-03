@@ -10,7 +10,7 @@ export const TableSchema = ({
   onChange: (v: string, id: number | undefined) => void
 }) => {
   return (
-    <div className="flex flex-row gap-4">
+    <div className="flex flex-row gap-4 items-center">
       <p className="w-[60px] flex justify-end text-sm">AND</p>
 
       <div className="flex flex-row">

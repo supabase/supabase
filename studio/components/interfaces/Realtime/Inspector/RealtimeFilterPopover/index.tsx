@@ -81,7 +81,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
             />
           </div>
           <div className="border-b border-overlay p-4 flex flex-col gap-2">
-            <div className="flex flex-row gap-4">
+            <div className="flex flex-row gap-4 items-center">
               <p className="w-[60px] flex justify-end text-sm">AND</p>
               <Input
                 size="tiny"
@@ -91,7 +91,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
                 onChange={(v) => setTempConfig({ ...tempConfig, filter: v.target.value })}
               />
             </div>
-            <p className="text-xs text-foreground-light pl-7">
+            <p className="text-xs text-foreground-light pl-[80px]">
               Learn more about realtime filtering in{' '}
               <a
                 href="https://supabase.com/docs/guides/realtime/postgres-changes#available-filters"

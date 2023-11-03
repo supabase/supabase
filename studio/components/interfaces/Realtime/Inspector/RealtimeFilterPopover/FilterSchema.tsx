@@ -8,7 +8,7 @@ export const FilterSchema = ({
   onChange: (s: string) => void
 }) => {
   return (
-    <div className="flex flex-row gap-4">
+    <div className="flex flex-row gap-4 items-center">
       <p className="w-[60px] flex justify-end text-sm">WHERE</p>
 
       <div className="flex flex-row">

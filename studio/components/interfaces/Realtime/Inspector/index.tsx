@@ -16,7 +16,7 @@ export const RealtimeInspector = () => {
   const [realtimeConfig, setRealtimeConfig] = useState<RealtimeConfig>({
     enabled: false,
     projectRef: ref!,
-    channelName: '',
+    channelName: 'room_a',
     logLevel: 'info',
     token: '', // will be filled out by RealtimeTokensPopover
     schema: '*',
