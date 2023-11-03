@@ -524,7 +524,7 @@ functions:
     title: "mfa.challengeAndVerify()"
     notes: |
       - An [enrolled factor](/docs/swift/javascript/auth-mfa-enroll) is required before invoking `challengeAndVerify()`.
-      - Executes [`mfa.challenge()`](/docs/reference/swift/auth-mfa-challenge) and [`mfa.verify()`](/docs/reference/javascript/auth-mfa-verify) in a single step.
+      - Executes [`mfa.challenge()`](/docs/reference/swift/auth-mfa-challenge) and [`mfa.verify()`](/docs/reference/swift/auth-mfa-verify) in a single step.
     examples:
       - id: challenge-and-verify
         name: Create and verify a challenge for a factor
@@ -1683,7 +1683,7 @@ functions:
       - id: call-a-postgres-function-without-arguments
         name: Call a Postgres function without arguments
         code: |
-          ```ts
+          ```swift
           let value: String = try await supabase.database
             .rpc("hello_world")
             .execute()
@@ -1807,8 +1807,8 @@ functions:
           ```
         description: |
           Postgres functions that return tables can also be combined with
-          [Filters](/docs/reference/javascript/using-filters) and
-          [Modifiers](/docs/reference/javascript/using-modifiers).
+          [Filters](/docs/reference/swift/using-filters) and
+          [Modifiers](/docs/reference/swift/using-modifiers).
         hideCodeBlock: true
 
   - id: using-filters
@@ -1816,55 +1816,78 @@ functions:
     description: |
       Filters allow you to only return rows that match certain conditions.
 
-      Filters can be used on `select()`, `update()`, and `delete()` queries.
+      Filters can be used on `select()`, `update()`, `upsert()`, and `delete()` queries.
 
-      If a database function returns a table response, you can also apply filters.
+      If a Postgres function returns a table response, you can also apply filters.
+
+      Implement `URLQueryRepresentable` protocol in your own types to be able to use them as filter value.
     examples:
       - id: applying-filters
         name: Applying Filters
         description: |
           Filters must be applied after any of `select()`, `update()`, `upsert()`,
           `delete()`, and `rpc()` and before
-          [modifiers](/docs/reference/dart/using-modifiers).
+          [modifiers](/docs/reference/swift/using-modifiers).
         code: |
           ```swift
-          try await client.database
-                .from("cities")
-                .select(columns: "name, country_id")
-                .eq(column: "name", value: "The Shire")
-                .execute()
+          try await supabase.database
+            .from("cities")
+            .select("name, country_id")
+            .eq("name", value: "The Shire")    // Correct
+
+          try await supabase.database
+            .from("citites")
+            .eq("name", "The Shire")    // Incorrect
+            .select("name, country_id")
           ```
       - id: chaining-filters
-        name: Chaining Filters
+        name: Chaining
         description: |
-          Filters must be applied after any of `select()`, `update()`, `upsert()`,
-          `delete()`, and `rpc()` and before
-          [modifiers](/docs/reference/dart/using-modifiers).
+          Filters can be chained together to produce advanced queries. For example,
+          to query cities with population between 1,000 and 10,000:
         code: |
           ```swift
-          try await client.database
-                .from("cities")
-                .select(columns: "name, country_id")
-                .gte(column: "population", value: 1000)
-                .lt(column: "population", value: 10000)
-                .execute()
+          try await supabase.database
+            .from("cities")
+            .select("name, country_id")
+            .gte("population", value: 1000)
+            .lt("population", value: 10000)
           ```
       - id: conditional-chaining
         name: Conditional Chaining
         description: |
-          Filters can be built up one step at a time and then executed. For example:
+          Filters can be built up one step at a time and then executed.
         code: |
           ```swift
-          try await client.database
-                .from("users")
-                .select()
-                .eq(column: "address->postcode", value: 90210)
-                .execute()
+          let filterByName: String? = nil
+          let filterPopLow = 1000
+          let filterPopHigh = 10000
+
+          var query = supabase.database
+            .from("cities")
+            .select("name, country_id")
+
+          if let filterByName {
+            query = query.eq("name", value: filterByName)
+          }
+          if let filterPopLow {
+            query = query.gte("population", value: filterPopLow)
+          }
+          if let filterPopHigh {
+            query = query.lt("population", value: filterPopHigh)
+          }
+
+          let result: ResponseType = try await query.execute().value
           ```
       - id: filter-by-value-within-json-column
         name: Filter by values within a JSON column
-        description: |
-          Filters can be built up one step at a time and then executed. For example:
+        code: |
+          ```swift
+          try await supabase.database
+            .from("users")
+            .select()
+            .eq("address->postcode", 90210)
+          ```
         data:
           sql: |
             ```sql
@@ -1882,7 +1905,7 @@ functions:
               (2, 'Jane', null);
             ```
         response: |
-          ```swifton
+          ```json
           {
             "data": [
               {
@@ -1897,29 +1920,21 @@ functions:
             "statusText": "OK"
           }
           ```
-        code: |
-          ```swift
-          try await client.database
-                .from("users")
-                .select()
-                .eq(column: "address->postcode", value: 90210)
-                .execute()
-          ```
       - id: filter-foreign-tables
         name: Filter Foreign Tables
         code: |
           ```swift
-          try await client.database
-                .from("countries")
-                .select(columns:
-                        """
-                          name,
-                          cities!inner (
-                            name
-                          )
-                        """)
-                .eq(column: "cities.name", value: "Bali")
-                .execute()
+          try await supabase.database
+            .from("countries")
+            .select(
+              """
+                name,
+                cities!inner (
+                  name
+                )
+              """
+            )
+            .eq("cities.name", value: "Bali")
           ```
         data:
           sql: |
@@ -1945,7 +1960,7 @@ functions:
               (2, 1, 'Munich');
             ```
           response: |
-            ```swifton
+            ```json
             {
               "data": [
                 {
@@ -1961,6 +1976,9 @@ functions:
               "statusText": "OK"
             }
             ```
+        description: |
+          You can filter on foreign tables in your `select()` query using dot
+          notation.
   - id: or
     title: or()
     description: |
@@ -2992,7 +3010,7 @@ functions:
     notes: |
       filter() expects you to use the raw PostgREST syntax for the filter values.
 
-      ```ts
+      ```swift
       .filter('id', 'in', '(5,6,7)')  // Use `()` for `in` filter
       .filter('arraycol', 'cs', '{"a","b"}')  // Use `cs` for `contains()`, `{}` for array values
       ```
@@ -3370,7 +3388,7 @@ functions:
       - id: with-select
         name: With `select()`
         code: |
-          ```ts
+          ```swift
           try await client.database
                 .from("countries")
                 .select(column:
