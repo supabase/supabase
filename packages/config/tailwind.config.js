@@ -24,10 +24,26 @@ function generateTwColorClasses(globalKey, twAttributes) {
   let classes = {}
   Object.values(twAttributes).map((attr, i) => {
     const attrKey = Object.keys(twAttributes)[i]
+
     if (attrKey.includes(globalKey)) {
+      const keySplit = attrKey.split('-').splice(1).join('-')
+
+      let payload = {
+        [keySplit]: `hsl(${attr.cssVariable} / <alpha-value>)`,
+      }
+
+      if (keySplit == 'DEFAULT') {
+        // includes a 'default' duplicate
+        // this allows for classes like `border-default` which is the same as `border`
+        payload = {
+          ...payload,
+          default: `hsl(${attr.cssVariable} / <alpha-value>)`,
+        }
+      }
+
       classes = {
         ...classes,
-        [attrKey.split('-').splice(1).join('-')]: `hsl(${attr.cssVariable} / <alpha-value>)`,
+        ...payload,
       }
     }
   })

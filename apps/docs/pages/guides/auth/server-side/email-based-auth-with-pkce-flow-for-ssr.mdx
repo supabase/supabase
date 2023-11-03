@@ -64,12 +64,12 @@ export async function GET(request: Request) {
       token_hash,
     })
     if (!error) {
-      return NextResponse.redirect(new URL(`/${next.slice(1)}`, request.url))
+      return NextResponse.redirect(next)
     }
   }
 
   // return the user to an error page with some instructions
-  return NextResponse.redirect(new URL('/auth/auth-code-error', request.url))
+  return NextResponse.redirect('/auth/auth-code-error')
 }
 ```
 
@@ -144,7 +144,7 @@ export const GET: APIRoute = async ({ request, cookies, redirect }) => {
     })
 
     if (!error) {
-      return redirect(`/${next.slice(1)}`)
+      return redirect(next)
     }
   }
 
@@ -194,12 +194,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
     })
 
     if (!error) {
-      return redirect(`/${next.slice(1)}`)
+      return redirect(next, { headers })
     }
   }
 
   // return the user to an error page with instructions
-  return redirect('/auth/auth-code-error')
+  return redirect('/auth/auth-code-error', { headers })
 }
 ```
 
@@ -283,7 +283,11 @@ Let's update the URL in our email templates to point to our new confirmation end
 <h2>Confirm Change of Email</h2>
 
 <p>Follow this link to confirm the update of your email from {{ .Email }} to {{ .NewEmail }}:</p>
-<p><a href="{{ .ConfirmationURL }}">Change Email</a></p>
+<p>
+  <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email_change">
+    Change Email
+  </a>
+</p>
 ```
 
 **Reset Password template**
