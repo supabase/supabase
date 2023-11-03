@@ -32,17 +32,19 @@ export interface ProviderFormProps {
 }
 
 const ProviderForm = ({ config, provider }: ProviderFormProps) => {
-  const [open, setOpen] = useState(false)
   const { ui } = useStore()
+  const [open, setOpen] = useState(false)
   const { ref: projectRef } = useParams()
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
+
   const doubleNegativeKeys = ['MAILER_AUTOCONFIRM', 'SMS_AUTOCONFIRM']
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
 
   const generateInitialValues = () => {
-    const initialValues: { [x: string]: string } = {}
+    const initialValues: { [x: string]: string | boolean } = {}
+
     // the config is already loaded through the parent component
     Object.keys(provider.properties).forEach((key) => {
       // When the key is a 'double negative' key, we must reverse the boolean before adding it to the form
@@ -51,9 +53,19 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
       if (provider.title === 'SAML 2.0') {
         initialValues[key] = (config as any)[key] ?? false
       } else {
-        initialValues[key] = isDoubleNegative ? !(config as any)[key] : (config as any)[key] ?? ''
+        if (isDoubleNegative) {
+          initialValues[key] = !(config as any)[key]
+        } else {
+          const configValue = (config as any)[key]
+          initialValues[key] = configValue
+            ? configValue
+            : provider.properties[key].type === 'boolean'
+            ? false
+            : ''
+        }
       }
     })
+
     return initialValues
   }
 
@@ -163,6 +175,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                       </AlertDescription_Shadcn_>
                     </Alert_Shadcn_>
                   )}
+
                   {/* TODO (Joel): Remove after 30th November when we disable the provider */}
                   {provider.title === 'LinkedIn (Deprecated)' &&
                     Object.keys(provider.properties).map((x: string) => (
@@ -185,11 +198,13 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                         disabled={!canUpdateConfig}
                       />
                     ))}
+
                   {provider?.misc?.alert && (
                     <Alert title={provider.misc.alert.title} variant="warning" withIcon>
                       <ReactMarkdown>{provider.misc.alert.description}</ReactMarkdown>
                     </Alert>
                   )}
+
                   {provider.misc.requiresRedirect && (
                     <>
                       <Input
