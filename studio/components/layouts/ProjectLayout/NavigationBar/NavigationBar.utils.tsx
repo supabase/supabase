@@ -1,6 +1,6 @@
 import SVG from 'react-inlinesvg'
 import { products } from 'shared-data'
-import { IconBarChart, IconFileText, IconList, IconRealtime, IconSettings } from 'ui'
+import { IconBarChart, IconFileText, IconList, IconSettings } from 'ui'
 
 import { Route } from 'components/ui/ui.types'
 import { BASE_PATH, IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
@@ -171,7 +171,24 @@ export const generateProductRoutes = (
           {
             key: 'realtime',
             label: 'Realtime',
-            icon: <IconRealtime />,
+            icon: (
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 18 18"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d={products.realtime.icon[18]}
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeMiterlimit="10"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            ),
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/realtime/inspector`),
           },
         ]
