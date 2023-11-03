@@ -60,12 +60,12 @@ export async function GET(request: Request) {
 
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      return NextResponse.redirect(new URL(`/${next.slice(1)}`, request.url))
+      return NextResponse.redirect(next)
     }
   }
 
   // return the user to an error page with instructions
-  return NextResponse.redirect(new URL('/auth/auth-code-error', request.url))
+  return NextResponse.redirect('/auth/auth-code-error'))
 }
 ```
 
@@ -134,7 +134,7 @@ export const GET: APIRoute = async ({ request, cookies, redirect }) => {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!error) {
-      return redirect(`/${next.slice(1)}`)
+      return redirect(next)
     }
   }
 
@@ -179,12 +179,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!error) {
-      return redirect(`/${next.slice(1)}`)
+      return redirect(next, { headers })
     }
   }
 
   // return the user to an error page with instructions
-  return redirect('/auth/auth-code-error')
+  return redirect('/auth/auth-code-error', { headers })
 }
 ```
 
