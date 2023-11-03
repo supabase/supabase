@@ -1,4 +1,4 @@
-import { EditorProps } from '@supabase/react-data-grid'
+import { RenderEditCellProps } from 'react-data-grid'
 import { useCallback, useState } from 'react'
 import { Button, Popover } from 'ui'
 import { useTrackedState } from '../../store'
@@ -10,7 +10,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
   isNullable,
   isEditable,
   onRowChange,
-}: EditorProps<TRow, TSummaryRow> & { isNullable?: boolean; isEditable?: boolean }) => {
+}: RenderEditCellProps<TRow, TSummaryRow> & { isNullable?: boolean; isEditable?: boolean }) => {
   const state = useTrackedState()
   const [isPopoverOpen, setIsPopoverOpen] = useState(true)
   const gridColumn = state.gridColumns.find((x) => x.name == column.key)

@@ -44,8 +44,8 @@ const EditEnumeratedTypeSidePanel = ({
   const submitRef = useRef<HTMLButtonElement>(null)
   const { project } = useProjectContext()
   const { mutate: updateEnumeratedType, isLoading: isCreating } = useEnumeratedTypeUpdateMutation({
-    onSuccess: () => {
-      toast.success(`Successfully updated type "${name}"`)
+    onSuccess: (_, vars) => {
+      toast.success(`Successfully updated type "${vars.name.updated}"`)
       onClose()
     },
   })
@@ -97,10 +97,12 @@ const EditEnumeratedTypeSidePanel = ({
       return console.error('selectedEnumeratedType required')
 
     const payload: {
+      schema: string
       name: { original: string; updated: string }
       values: { original: string; updated: string; isNew: boolean }[]
       description?: string
     } = {
+      schema: selectedEnumeratedType.schema,
       name: { original: selectedEnumeratedType.name, updated: data.name },
       values: data.values
         .filter((x) => x.updatedValue.length !== 0)
@@ -198,21 +200,20 @@ const EditEnumeratedTypeSidePanel = ({
                                     You will need to delete and recreate the enumerated type with
                                     the updated values instead.
                                   </p>
-                                  <Link
-                                    passHref
-                                    href="https://www.postgresql.org/message-id/21012.1459434338%40sss.pgh.pa.us"
+                                  <Button
+                                    asChild
+                                    type="default"
+                                    icon={<IconExternalLink strokeWidth={1.5} />}
+                                    className="mt-2"
                                   >
-                                    <Button
-                                      asChild
-                                      type="default"
-                                      icon={<IconExternalLink strokeWidth={1.5} />}
-                                      className="mt-2"
+                                    <Link
+                                      href="https://www.postgresql.org/message-id/21012.1459434338%40sss.pgh.pa.us"
+                                      target="_blank"
+                                      rel="noreferrer"
                                     >
-                                      <a target="_blank" rel="noreferrer">
-                                        Learn more
-                                      </a>
-                                    </Button>
-                                  </Link>
+                                      Learn more
+                                    </Link>
+                                  </Button>
                                 </AlertDescription_Shadcn_>
                               </Alert_Shadcn_>
                             )}

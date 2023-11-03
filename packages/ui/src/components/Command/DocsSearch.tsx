@@ -171,12 +171,10 @@ const DocsSearch = () => {
           return (
             <CommandGroup
               heading=""
-              forceMount
               key={`${page.meta.title}-group-index-${i}`}
               value={`${page.meta.title}-group-index-${i}`}
             >
               <CommandItem
-                forceMount
                 key={`${page.meta.title}-item-index-${i}`}
                 value={`${removeDoubleQuotes(page.meta.title)}-item-index-${i}`}
                 type="block-link"
@@ -204,7 +202,6 @@ const DocsSearch = () => {
                 <div className="border-l border-scale-500 ml-3 pt-3">
                   {pageSections.map((section, i) => (
                     <CommandItem
-                      forceMount
                       className="ml-3 mb-3"
                       onSelect={() => {
                         openLink(page.type, formatSectionUrl(page, section))
@@ -241,7 +238,7 @@ const DocsSearch = () => {
           )
         })}
       {!results && !hasSearchError && !isLoading && (
-        <CommandGroup forceMount>
+        <CommandGroup>
           {questions.map((question) => {
             const key = question.replace(/\s+/g, '_')
             return (
@@ -254,7 +251,6 @@ const DocsSearch = () => {
                   }
                 }}
                 type="command"
-                forceMount
                 key={key}
               >
                 <IconSearch />

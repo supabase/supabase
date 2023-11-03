@@ -45,7 +45,7 @@ ENTRYPOINT ["docker-entrypoint.sh"]
 EXPOSE 8082
 CMD ["npm", "run", "dev:studio"]
 
-# Compile NextJS
+# Compile Next.js
 FROM dev as builder
 
 RUN npx turbo run build --scope=studio --include-dependencies --no-deps

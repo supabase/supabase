@@ -251,13 +251,15 @@ const TableEditor = ({
                   <p className="mt-3">You can create policies after you create this table.</p>
                 )}
                 <p className="mt-4">
-                  <Link href="https://supabase.com/docs/guides/auth/row-level-security">
-                    <a target="_blank" rel="noreferrer">
-                      <Button type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
-                        RLS Documentation
-                      </Button>
-                    </a>
-                  </Link>
+                  <Button asChild type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
+                    <Link
+                      href="https://supabase.com/docs/guides/auth/row-level-security"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      RLS Documentation
+                    </Link>
+                  </Button>
                 </p>
               </Alert>
             ) : (
@@ -272,13 +274,15 @@ const TableEditor = ({
                   publicly writable and readable
                 </p>
                 <p className="mt-4">
-                  <Link href="https://supabase.com/docs/guides/auth/row-level-security">
-                    <a target="_blank" rel="noreferrer">
-                      <Button type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
-                        RLS Documentation
-                      </Button>
-                    </a>
-                  </Link>
+                  <Button asChild type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
+                    <Link
+                      href="https://supabase.com/docs/guides/auth/row-level-security"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      RLS Documentation
+                    </Link>
+                  </Button>
                 </p>
               </Alert>
             )}
