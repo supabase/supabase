@@ -62,7 +62,7 @@ We are done installing our dependencies. Let’s set up [authentication](https:/
 ## Configure Google sign-in on Supabase Auth
 
 We will obtain client IDs for iOS, Android, and web from the Google Cloud console, and register them to our Supabase project.
-We need the web client ID in order to use the Google sign-in flow on Android.
+The web client ID will be used by the auth server of Supabase to verify the ID token provided by the Google sign-in package.
 
 First, create your Google Cloud project [here](https://cloud.google.com/) if you do not have one yet.
 Within your Google Cloud project, follow the [Get an OAuth client ID for the iOS](https://developers.google.com/identity/sign-in/ios/start-integrating#get_an_oauth_client_id) guide, [Configure a Google API Console project for Android](https://developers.google.com/identity/sign-in/android/start-integrating#configure_a_project) guide, and [Get your backend server's OAuth 2.0 client ID](https://developers.google.com/identity/sign-in/android/start-integrating#configure_a_project) to obtain client IDs for iOS, Android, and web respectively.
