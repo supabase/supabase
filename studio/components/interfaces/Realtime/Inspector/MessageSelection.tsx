@@ -60,7 +60,7 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
           </div>
         </div>
       </div>
-      <div className="relative h-px flex-grow bg-scale-300">
+      <div className="relative h-px flex-grow">
         <div className="pt-4 px-4 flex flex-col gap-4">
           <div className="flex flex-row justify-between items-center">
             <div className="transition">
@@ -76,7 +76,7 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
           </div>
           <div className="h-px w-full bg-scale-600 rounded" />
         </div>
-        <div className="flex flex-col space-y-6 bg-scale-300 py-4">
+        <div className="flex flex-col space-y-6 py-4">
           {log && <SelectedRealtimeMessagePanel log={log} />}
         </div>
       </div>
