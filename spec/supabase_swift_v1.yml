@@ -1213,78 +1213,175 @@ functions:
 
   - id: insert
     title: "Create data: insert()"
-    notes: |
-      - By default, every time you run `insert()`, the client library will make a `select` to return the full record.
-      This is convenient, but it can also cause problems if your policies are not configured to allow the `select` operation.
-      If you are using Row Level Security and you are encountering problems, try setting the `returning` param to `minimal`.
     examples:
       - id: create-a-record
         name: Create a record
-        isSpotlight: true
         code: |
           ```swift
-          let city = CityModel(name:"The Shire", country_id: 554)
-          try await client.database
-                .from("cities")
-                .insert(city)
-                .execute()
+          struct Country: Encodable {
+            let id: Int
+            let name: String
+          }
+
+          let country = Country(id: 1, name: Denmark)
+
+          try await supabase.database
+            .from("countries")
+            .insert(country)
+            .execute()
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            ```
+        response: |
+          ```json
+          {
+            "status": 201,
+            "statusText": "Created"
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: create-a-record-and-return-it
+        name: Create a record and return it
+        code: |
+          ```swift
+          struct Country: Encodable {
+            let id: Int
+            let name: String
+          }
+
+          let country: Country = try await supabase.database
+            .from("countries")
+            // use `returning: .representation` to return the created object.
+            .insert(Country(id: 1, name: Denmark), returning: .representation)
+            // specify you want a single value returned, otherwise it returns a list.
+            .single() 
+            .execute()
+            .value
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Denmark"
+              }
+            ],
+            "status": 201,
+            "statusText": "Created"
+          }
+          ```
+        hideCodeBlock: true
       - id: bulk-create
         name: Bulk create
+        code: |
+          ```swift
+          struct Country: Encodable {
+            let id: Int
+            let name: String
+          }
+
+          let countries = [
+            Country(id: 1, name: "Nepal"),
+            Country(id: 1, name: "Vietnam"),
+          ]
+
+          try await supabase.database
+            .from("countries")
+            .insert(countries)
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            ```
+        response: |
+          ```json
+          {
+            "error": {
+              "code": "23505",
+              "details": "Key (id)=(1) already exists.",
+              "hint": null,
+              "message": "duplicate key value violates unique constraint \"countries_pkey\""
+            },
+            "status": 409,
+            "statusText": "Conflict"
+          }
+          ```
         description: |
-          When running a bulk create, the operation is handled in a single transaction. If any of the inserts fail, all other operations are
-          rolled back.
-        code: |
-          ```swift
-          let theShire = CityModel(name:"The Shire", country_id: 554)
-          let rohan = CityModel(name:"Rohan", country_id: 554)
-          try await client.database
-                          .from("cities")
-                          .insert([theShire, rohan])
-                          .execute()
-          ```
-      - id: fetch-inserted-data
-        name: Fetch inserted record
-        code: |
-          ```swift
-          let theShire = CityModel(name:"The Shire", country_id: 554)
-          let rohan = CityModel(name:"Rohan", country_id: 554)
-          let cities:[CityModel] = try await client.database
-                                  .from("cities")
-                                  .insert([theShire, rohan],
-                                          returning: .representation)
-                                  .select()
-                                  .execute()
-          ```
+          A bulk create operation is handled in a single transaction.
+          If any of the inserts fail, none of the rows are inserted.
+        hideCodeBlock: true
 
   - id: update
     title: "Modify data: update()"
     notes: |
-      - `update()` should always be combined with [Filters](/docs/reference/javascript/using-filters) to target the item(s) you wish to update.
+      - `update()` should always be combined with [Filters](/docs/reference/swift/using-filters) to target the item(s) you wish to update.
     examples:
       - id: updating-your-data
         name: Updating your data
-        isSpotlight: true
         code: |
           ```swift
-          let toUpdate = CountryModel(name: "Australia")
-          try await client.database
-                          .from("countries")
-                          .update(toUpdate)
-                          .eq(column: "id", value: 1)
-                          .execute()
+          try await supabase.database
+            .from("countries")
+            .update(["name": "Australia"])
+            .eq("id", value: 1)
+            .execute()
           ```
+        notes: |
+          Not always you need to create a `Encodable`` struct to define
+          the object being updated, in this example we use a `[String: String]`
+          type directly, since it conforms to `Encodable``.
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Taiwan');
+            ```
+        response: |
+          ```json
+          {
+            "status": 204,
+            "statusText": "No Content"
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
       - id: update-a-record-and-return-it
         name: Update a record and return it
         code: |
           ```swift
-          let toUpdate = CountryModel(name: "Australia")
-          try await client.database
-                          .from("countries")
-                          .update(toUpdate, returning: .representation)
-                          .eq(column: "id", value: 1)
-                          .select()
-                          .execute()
+          struct Country: Decodable {
+            let id: Int
+            let name: String          
+          }
+
+          let country: Country = try await supabase.database
+            .from("countries")
+            .update(["name": "Australia"], returning: .representation)
+            .eq("id", value: 1)
+             // If you know this query should return a single object, append a `single()` modifier to it.
+            .single()
+            .execute()
+            .value
           ```
         data:
           sql: |
@@ -1298,7 +1395,7 @@ functions:
               (1, 'Taiwan');
             ```
         response: |
-          ```swifton
+          ```json
           {
             "data": [
               {
@@ -1313,70 +1410,227 @@ functions:
         hideCodeBlock: true
       - id: updating-json-data
         name: Updating JSON data
-        description: |
-          Postgres offers a
-          [number of operators](https://www.postgresql.org/docs/current/functions-json.html)
-          for working with JSON data. Right now it is only possible to update an entire JSON document,
-          but we are [working on ideas](https://github.com/PostgREST/postgrest/issues/465) for updating individual keys.
         code: |
           ```swift
-          let toUpdate = AddressModel(street: "Melrose Place", postcode: 90210)
-          try await client.database
-                          .from("users")
-                          .update(toUpdate)
-                          .eq(column: "address->postcode", value: 90210)
-                          .select()
-                          .execute()
+          struct User: Decodable {
+            let id: Int
+            let name: String
+            let address: Address
+
+            struct Address: Codable {
+              let street: String
+              let postcode: String
+            }
+          }
+
+          struct UpdateUser: Encodable {
+            let address: User.Address
+          }
+
+          let users: [User] = try await supabase.database
+            .from("users")
+            .update(
+              UpdateUser(
+                address: .init(
+                  street: "Melrose Place",
+                  postcode: "90210"
+                )
+              ),
+              returning: .representation
+            )
+            .eq("address->postcode", "90210")
+            .execute()
+            .value
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 primary key,
+                name text,
+                address jsonb
+              );
+
+            insert into
+              users (id, name, address)
+            values
+              (1, 'Michael', '{ "postcode": "90210" }');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Michael",
+                "address": {
+                  "street": "Melrose Place",
+                  "postcode": "90210"
+                }
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          Postgres offers some
+          [operators](/docs/guides/database/json#query-the-jsonb-data) for
+          working with JSON data. Currently, it is only possible to update the entire JSON document.
+        hideCodeBlock: true
 
   - id: upsert
     title: "Upsert data: upsert()"
     notes: |
-      - Primary keys should be included in the data payload in order for an update to work correctly.
-      - Primary keys  must be natural, not surrogate. There are however, [workarounds](https://github.com/PostgREST/postgrest/issues/1118) for surrogate primary keys.
-      - If you need to insert new data and update existing data at the same time, use [Postgres triggers](https://github.com/supabase/postgrest-js/issues/173#issuecomment-825124550).
+      - Primary keys must be included in `values` to use upsert.
     examples:
       - id: upsert-your-data
         name: Upsert your data
-        isSpotlight: true
         code: |
           ```swift
-          let toUpsert = MessageModel(id:3, message: "foo", username: "supabot")
-          try await client.database
-                          .from("messages")
-                          .upsert(toUpsert)
-                          .execute()
+          try await supabase.database
+            .from("countries")
+            .upsert(["id": 1, "name": "Albania"])
+            .execute()
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Albania"
+              }
+            ],
+            "status": 201,
+            "statusText": "Created"
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: bulk-upsert-your-data
+        name: Bulk Upsert your data
+        code: |
+          ```swift
+          struct Country: Encodable {
+            let id: Int
+            let name: String
+          }
+          try await supabase.database
+            .from("countries")
+            .upsert([
+              Country(id: 1, name: "Albania"),
+              Country(id: 2, name: "Algeria"),
+            ])
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Albania"
+              },
+              {
+                "id": 2,
+                "name": "Algeria"
+              }
+            ],
+            "status": 201,
+            "statusText": "Created"
+          }
+          ```
+        hideCodeBlock: true
       - id: upserting-into-tables-with-constraints
         name: Upserting into tables with constraints
+        code: |
+          ```swift
+          struct User: Encodable {
+            let id: Int
+            let handle: String
+            let displayName: String
+
+            enum CodingKeys: String, CodingKey {
+              case id
+              case handle
+              case displayName = "display_name"
+            }
+          }
+
+          try await supabase.database
+            .from("users")
+            .upsert(
+              User(id: 42, handle: "saoirse", displayName: "Saoirse"),
+              onConflict: "handle"
+            )
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 generated by default as identity primary key,
+                handle text not null unique,
+                display_name text
+              );
+
+            insert into
+              users (id, handle, display_name)
+            values
+              (1, 'saoirse', null);
+            ```
+        response: |
+          ```json
+          {
+            "error": {
+              "code": "23505",
+              "details": "Key (handle)=(saoirse) already exists.",
+              "hint": null,
+              "message": "duplicate key value violates unique constraint \"users_handle_key\""
+            },
+            "status": 409,
+            "statusText": "Conflict"
+          }
+          ```
         description: |
-          Running the following will cause supabase to upsert data into the `users` table.
-          If the username 'supabot' already exists, the `onConflict` argument tells supabase to overwrite that row
-          based on the column passed into `onConflict`.
-        isSpotlight: true
-        code: |
-          ```swift
-          let toUpsert = UserModel(username: "supabot")
-          try await client.database
-                          .from("users")
-                          .upsert(toUpsert, onConflict: "username")
-                          .execute()
-          ```
-      - name: Return the exact number of rows
-        isSpotlight: true
-        code: |
-          ```swift
-          let toUpsert = UserModel(username: "supabot")
-          try await client.database
-                          .from("users")
-                          .upsert(toUpsert, onConflict: "username", count:.exact)
-                          .execute()
-          ```
+          In the following query, `upsert()` implicitly uses the `id`
+          (primary key) column to determine conflicts. If there is no existing
+          row with the same `id`, `upsert()` inserts a new row, which
+          will fail in this case as there is already a row with `handle` `"saoirse"`.
+          Using the `onConflict` option, you can instruct `upsert()` to use
+          another column with a unique constraint to determine conflicts.
+        hideCodeBlock: true
 
   - id: delete
     title: "Delete data: delete()"
+
     notes: |
-      - `delete()` should always be combined with [filters](/docs/reference/javascript/using-filters) to target the item(s) you wish to delete.
+      - `delete()` should always be combined with [filters](/docs/reference/swift/using-filters) to target the item(s) you wish to delete.
       - If you use `delete()` with filters and you have
         [RLS](/docs/learn/auth-deep-dive/auth-row-level-security) enabled, only
         rows visible through `SELECT` policies are deleted. Note that by default
@@ -1385,53 +1639,178 @@ functions:
     examples:
       - id: delete-records
         name: Delete records
-        isSpotlight: true
         code: |
           ```swift
-          try await client.database
-                .from("cities")
-                .delete()
-                .eq(column: "id", value: 666)
-                .execute()
+          try await supabase.database
+            .from("countries")
+            .delete()
+            .eq("id", value: 1)
+            .execute()
           ```
-      - id: fetch-delete-records
-        name: Fetch deleted records
-        code: |
-          ```swift
-          try await client.database
-                .from("cities")
-                .delete()
-                .eq(column: "id", value: 666)
-                .select()
-                .execute()
-          ```
-  - id: rpc
-    title: "Stored Procedures: rpc()"
-    description: |
-      You can call stored procedures as a "Remote Procedure Call".
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
 
-      That's a fancy way of saying that you can put some logic into your database then call it from anywhere.
-      It's especially useful when the logic rarely changes - like password resets and updates.
-    examples:
-      - id: call-a-stored-procedure
-        name: Call a stored procedure
+            insert into
+              countries (id, name)
+            values
+              (1, 'Spain');
+            ```
+        response: |
+          ```json
+          {
+            "status": 204,
+            "statusText": "No Content"
+          }
+          ```
+        hideCodeBlock: true
         isSpotlight: true
-        description: This is an example invoking a stored procedure.
+
+  - id: rpc
+    title: "Postgres functions: rpc()"
+    description: |
+      You can call Postgres functions as _Remote Procedure Calls_, logic in your database that you can execute from anywhere.
+      Functions are useful when the logic rarely changes—like for password resets and updates.
+
+      ```sql
+      create or replace function hello_world() returns text as $$
+        select 'Hello world';
+      $$ language sql;
+      ```
+    examples:
+      - id: call-a-postgres-function-without-arguments
+        name: Call a Postgres function without arguments
+        code: |
+          ```ts
+          let value: String = try await supabase.database
+            .rpc("hello_world")
+            .execute()
+            .value
+          ```
+        data:
+          sql: |
+            ```sql
+            create function hello_world() returns text as $$
+              select 'Hello world';
+            $$ language sql;
+            ```
+        response: |
+          ```json
+          {
+            "data": "Hello world",
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: call-a-postgres-function-with-arguments
+        name: Call a Postgres function with arguments
         code: |
           ```swift
-          try await client.database
-                .rpc(fn: "hello_world")
-                .execute()
+          let response: String = try await supabase.database
+            .rpc("echo", params: ["say": "👋"])
+            .execute()
+            .value
           ```
-      - id: with-parameters
-        name: With Parameters
+        data:
+          sql: |
+            ```sql
+            create function echo(say text) returns text as $$
+              select say;
+            $$ language sql;
+            ```
+        response: |
+          ```json
+            {
+              "data": "👋",
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+        hideCodeBlock: true
+      - id: bulk-processing
+        name: Bulk processing
         code: |
           ```swift
-          let rpcParams = CityModel(name: "The Shire")
-          try await client.database
-                          .rpc(fn: "echo_city", params:rpcParams)
-                          .execute()
+          let response: [Int] = try await supabase.database
+            .rpc("add_one_each", params: ["arr": [1, 2, 3]])
+            .execute()
+            .value
           ```
+        data:
+          sql: |
+            ```sql
+            create function add_one_each(arr int[]) returns int[] as $$
+              select array_agg(n + 1) from unnest(arr) as n;
+            $$ language sql;
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              2,
+              3,
+              4
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          You can process large payloads by passing in an array as an argument.
+        hideCodeBlock: true
+      - id: call-a-postgres-function-with-filters
+        name: Call a Postgres function with filters
+        code: |
+          ```swift
+          struct Country: Decodable {
+            let id: Int
+            let name: String
+          }
+
+          let country: Country = await supabase.database
+            .rpc("list_stored_countries")
+            .eq("id", value: 1)
+            .single()
+            .execute()
+            .value
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'France'),
+              (2, 'United Kingdom');
+
+            create function list_stored_countries() returns setof countries as $$
+              select * from countries;
+            $$ language sql;
+            ```
+        response: |
+          ```json
+          {
+            "data": {
+              "id": 1,
+              "name": "France"
+            },
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          Postgres functions that return tables can also be combined with
+          [Filters](/docs/reference/javascript/using-filters) and
+          [Modifiers](/docs/reference/javascript/using-modifiers).
+        hideCodeBlock: true
+
   - id: using-filters
     title: Using Filters
     description: |
