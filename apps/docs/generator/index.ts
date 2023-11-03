@@ -4,7 +4,7 @@ import ConfigGenerator from './config'
 import SdkGenerator from './sdk'
 import LegacyGenerator from './legacy'
 import { parseArgs } from 'node:util'
-import { strict as assert } from 'node:assert';
+import { strict as assert } from 'node:assert'
 
 const args = parseArgs({
   options: {
