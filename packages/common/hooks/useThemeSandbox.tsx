@@ -23,7 +23,7 @@ const defaultDark: { [name: string]: string } = {
   '--background-surface-300': '200deg 20% 10%',
   '--background-surface-200': '200deg 20% 7%',
   '--background-surface-100': '200deg 20% 6%',
-  '--background-control': '200deg 9% 11%%',
+  '--background-control': '200deg 9% 11%',
   '--background-selection': '200deg 9.8% 10%',
   '--background-alternative': '200deg 20% 2.9%',
   '--background-default': '200deg 20% 4%',
