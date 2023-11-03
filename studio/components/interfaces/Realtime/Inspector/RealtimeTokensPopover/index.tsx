@@ -8,7 +8,6 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
-  Toggle,
 } from 'ui'
 
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
@@ -22,7 +21,6 @@ interface RealtimeTokensPopoverProps {
 
 export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokensPopoverProps) => {
   const [open, setOpen] = useState(false)
-  const [bearerEnabled, setBearerEnabled] = useState(false)
   const [tempConfig, setTempConfig] = useState(config)
 
   const { data: settings } = useProjectSettingsQuery({ projectRef: config.projectRef })
@@ -31,7 +29,8 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
     (x) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID
   )
   const apiKeys = apiService?.service_api_keys ?? []
-  const anonKey = apiKeys.find((key) => key.tags === 'anon')
+  const selectedToken = apiKeys.find((k) => k.api_key === tempConfig.token)
+  const bearerEnabled = selectedToken?.tags === 'anon'
 
   useEffect(() => {
     const anonKey = apiKeys.find((k) => k.tags === 'anon')
@@ -66,70 +65,71 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="w-[500px] p-0" align="start">
-        <div className="border-b border-overlay text-xs px-4 py-3 text-foreground">
-          Test RLS policies
-        </div>
-        <div className="border-b border-overlay p-4 flex flex-row gap-2">
-          <div className="flex-grow flex flex-col gap-y-1">
-            <Listbox
-              type="select"
-              value={tempConfig.token}
-              size="small"
-              label="Token type"
-              className="w-full"
-              disabled={bearerEnabled && anonKey !== undefined}
-              onChange={(v) => setTempConfig({ ...config, token: v })}
-            >
-              {apiKeys.map((key) => {
-                return (
-                  <Listbox.Option key={key.tags} label={key.tags} value={key.api_key}>
-                    <span className="text-foreground">{key.tags}</span>
-                  </Listbox.Option>
-                )
-              })}
-            </Listbox>
-            <span className="text-sm text-foreground-light">
-              The type of token used. Using <code className="text-xs">service_role</code> will
-              bypass RLS policies. If you want to test RLS policies with realtime messages, you
-              should use <code className="text-xs">anon</code>.
-            </span>
-          </div>
-        </div>
-        <div className="border-b border-overlay p-4 flex flex-col gap-4">
-          <Toggle
+        <div className="border-b border-overlay p-4 flex-grow flex flex-col gap-y-3">
+          <p className="text-sm text-foreground">Connection key settings</p>
+          <Listbox
+            type="select"
+            value={tempConfig.token}
             size="small"
-            label="Impersonate a user"
-            descriptionText={
-              <>
-                <p className="text-sm text-foreground-light">
-                  Use a JWT token to test any RLS policies. The token type should be set to{' '}
-                  <code className="text-xs">anon</code>.
-                </p>
-                {bearerEnabled && (
-                  <Input
-                    icon={<IconKey />}
-                    size="small"
-                    className="flex-grow mt-2"
-                    placeholder="Enter a user's JWT"
-                    disabled={!bearerEnabled}
-                    defaultValue={tempConfig.bearer || ''}
-                    onChange={(v) => setTempConfig({ ...tempConfig, bearer: v.target.value })}
-                  />
-                )}
-              </>
-            }
-            checked={bearerEnabled}
-            onChange={() => {
-              const flag = !bearerEnabled
-              if (flag === false) {
-                setTempConfig({ ...tempConfig, bearer: '' })
-              } else {
-                if (anonKey) setTempConfig({ ...tempConfig, token: anonKey.api_key })
+            className="w-full"
+            onChange={(key) => {
+              const selectedToken = apiKeys.find((k) => k.api_key === key)
+              if (selectedToken) {
+                if (selectedToken.tags === 'anon') {
+                  setTempConfig({ ...config, token: key, bearer: '' })
+                } else {
+                  setTempConfig({ ...config, token: key, bearer: '' })
+                }
               }
-              setBearerEnabled(flag)
             }}
-          />
+          >
+            {apiKeys.map((key) => {
+              return (
+                <Listbox.Option key={key.tags} label={key.tags} value={key.api_key}>
+                  <span className="text-foreground">{key.tags}</span>
+                </Listbox.Option>
+              )
+            })}
+          </Listbox>
+          {selectedToken?.tags === 'service_role' ? (
+            <span className="text-sm text-foreground-light">
+              <span className="text-foreground">Service role</span> is a predefined Postgres role
+              with elevated privileges. It will bypass all Row Level Security (RLS) policies.
+            </span>
+          ) : (
+            <span className="text-sm text-foreground-light">
+              <span className="text-foreground">Anon key</span> will respect Row Level Security
+              (RLS) policies.
+            </span>
+          )}
         </div>
+        {bearerEnabled && (
+          <div className="border-b border-overlay p-4 flex-grow flex flex-col gap-y-2">
+            <p className="text-sm text-foreground">Impersonate a User</p>
+            <p className="text-sm text-foreground-light">
+              Select a user or use a JWT token to respect your database's Row-Level Security
+              policies for that particular user.
+            </p>
+            <Input
+              icon={<IconKey />}
+              size="small"
+              className="flex-grow mt-2"
+              placeholder="Enter JWT token of a user"
+              defaultValue={tempConfig.bearer || ''}
+              onChange={(v) => setTempConfig({ ...tempConfig, bearer: v.target.value })}
+            />
+            <p className="text-xs text-foreground-light">
+              Learn more about JWT tokens in{' '}
+              <a
+                href="https://supabase.com/docs/learn/auth-deep-dive/auth-deep-dive-jwts"
+                className="underline"
+                target="_blank"
+              >
+                our docs
+              </a>
+            </p>
+          </div>
+        )}
         <div className="px-4 py-3 gap-2 flex justify-end">
           <Button type="default" onClick={() => setOpen(false)}>
             <span>Cancel</span>
