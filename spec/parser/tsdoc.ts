@@ -1,28 +1,25 @@
 import { writeToDisk } from './helpers'
 import stringify from 'json-stringify-safe'
+import { parseArgs } from 'node:util'
+import fs from 'fs'
+import { strict as assert } from 'node:assert';
 
-const fs = require('fs')
+const args = parseArgs({
+  options: {
+    input: {
+      type: 'string',
+    },
+    output: {
+      type: 'string',
+      short: 'n',
+    },
+  },
+})
 
-const main = (command: string[], options: any) => {
-  handleInput(command[0], options)
-}
+assert(args.values.input, 'input is required')
+assert(args.values.output, 'output is required')
 
-// Run everything
-const argv = require('minimist')(process.argv.slice(2))
-main(argv['_'], argv)
-
-function handleInput(command: string, options: any) {
-  switch (command) {
-    case 'dereference':
-      dereference(options)
-      break
-
-    default:
-      console.log('Unrecognized command:', command)
-      break
-  }
-}
-
+dereference({ input: args.values.input!, output: args.values.output! })
 interface KV {
   [key: string]: any
 }
