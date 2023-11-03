@@ -45,23 +45,20 @@ class _LoginScreenState extends State<LoginScreen> {
     // Google sign in on Android will work without providing the Android
     // Client ID registered on Google Cloud.
 
-    late final String? idToken;
-    late final String? accessToken;
-
     final GoogleSignIn googleSignIn = GoogleSignIn(
       clientId: iosClientId,
       serverClientId: webClientId,
     );
     final googleUser = await googleSignIn.signIn();
     final googleAuth = await googleUser!.authentication;
-    accessToken = googleAuth.accessToken;
-    idToken = googleAuth.idToken;
+    final accessToken = googleAuth.accessToken;
+    final idToken = googleAuth.idToken;
 
-    if (idToken == null) {
-      throw 'No ID Token';
-    }
     if (accessToken == null) {
-      throw 'No Access Token';
+      throw 'No Access Token found.';
+    }
+    if (idToken == null) {
+      throw 'No ID Token found.';
     }
 
     return supabase.auth.signInWithIdToken(
