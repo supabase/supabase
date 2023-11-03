@@ -11,7 +11,9 @@ Ariuna K
 Beng Eu
 Bo Lu
 Bobbie Soedirgo
+Bruno Andrade
 Chandana Anumula
+Charis Lam
 Chase Granberry
 Chris Copplestone
 Chris Gwilliams
@@ -43,8 +45,6 @@ Long Hoang
 Margarita Sandomirskaia
 Marijana Šimag
 Mark Burggraf
-Michel Pelletier
-Mickael Hebert
 Monica El Khoury
 Nikita Kotlyarov
 Oli R
@@ -64,6 +64,7 @@ Stojan Dimitrovski
 Supun Sudaraka Kalidasa
 Terry Sutton
 Thor Schaeff
+Tyler Fontaine
 Tyler Shukert
 TzeYiing L
 Wen Bo Xie

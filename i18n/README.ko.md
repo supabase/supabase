@@ -21,7 +21,7 @@
 - [x] 파일 스토리지. [Docs](https://supabase.com/docs/guides/storage)
 - [x] 대시보드
 
-[슈퍼베이스 대시보드](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
+![슈퍼베이스 대시보드](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## 문서
 

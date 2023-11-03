@@ -19,7 +19,7 @@ export const getTableColumnsQuery = (table?: string, schema?: string) => {
     conditions.push(`schemaname = '${schema}'`)
   }
 
-  const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+  const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
 
   const sql = /* SQL */ `
   
@@ -89,7 +89,7 @@ export type TableColumnsVariables = {
   projectRef?: string
   connectionString?: string
   table?: string
-  schema?: string;
+  schema?: string
 }
 
 export type TableColumnsData = { result: TableColumn[] }
@@ -99,7 +99,6 @@ export const useTableColumnsQuery = <TData extends TableColumnsData = TableColum
   { projectRef, connectionString, table, schema }: TableColumnsVariables,
   options: UseQueryOptions<ExecuteSqlData, TableColumnsError, TData> = {}
 ) => {
-
   return useExecuteSqlQuery(
     {
       projectRef,

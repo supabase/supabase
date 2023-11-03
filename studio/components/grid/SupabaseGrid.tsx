@@ -1,4 +1,4 @@
-import { DataGridHandle } from '@supabase/react-data-grid'
+import { DataGridHandle } from 'react-data-grid'
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
@@ -203,11 +203,7 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>(
           </>
         )}
 
-        {mounted &&
-          createPortal(
-            <RowContextMenu table={props.table} rows={data?.rows ?? []} />,
-            document.body
-          )}
+        {mounted && createPortal(<RowContextMenu rows={data?.rows ?? []} />, document.body)}
       </div>
     )
   }

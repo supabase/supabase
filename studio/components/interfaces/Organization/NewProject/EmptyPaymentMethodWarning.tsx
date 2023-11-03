@@ -1,10 +1,10 @@
 import { useState } from 'react'
 
-import { AddNewPaymentMethodModal } from 'components/interfaces/BillingV2'
 import InformationBox from 'components/ui/InformationBox'
 import { useSelectedOrganization } from 'hooks'
 import { getURL } from 'lib/helpers'
 import { Button, IconAlertCircle } from 'ui'
+import AddNewPaymentMethodModal from 'components/interfaces/Billing/Payment/AddNewPaymentMethodModal'
 
 const EmptyPaymentMethodWarning = ({
   onPaymentMethodAdded,

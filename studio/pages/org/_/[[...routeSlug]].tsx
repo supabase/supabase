@@ -14,14 +14,12 @@ const Header = () => {
     <div className="dark:border-dark border-b p-3">
       <div className="flex items-center space-x-2">
         <Link href="/projects">
-          <a>
-            <img
-              src={`${BASE_PATH}/img/supabase-logo.svg`}
-              alt="Supabase"
-              className="dark:border-dark rounded border p-1 hover:border-white"
-              style={{ height: 24 }}
-            />
-          </a>
+          <img
+            src={`${BASE_PATH}/img/supabase-logo.svg`}
+            alt="Supabase"
+            className="dark:border-dark rounded border p-1 hover:border-white"
+            style={{ height: 24 }}
+          />
         </Link>
       </div>
     </div>
@@ -77,11 +75,9 @@ const GenericOrganizationPage: NextPage = () => {
                 </p>
               </div>
               <div>
-                <Link href="/new">
-                  <a>
-                    <Button icon={<IconPlus />}>New organization</Button>
-                  </a>
-                </Link>
+                <Button asChild icon={<IconPlus />}>
+                  <Link href="/new">New organization</Link>
+                </Button>
               </div>
             </div>
           ) : (

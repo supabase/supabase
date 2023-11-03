@@ -13,18 +13,20 @@ import {
   FormSectionLabel,
 } from 'components/ui/Forms'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { useFlag } from 'hooks'
+import { useFlag, useSelectedOrganization } from 'hooks'
 import PauseProjectButton from './PauseProjectButton'
 import ProjectUpgradeAlert from './ProjectUpgradeAlert'
 import RestartServerButton from './RestartServerButton'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 interface InfrastructureProps {}
 
 const Infrastructure = ({}: InfrastructureProps) => {
   const { ref } = useParams()
   const { project } = useProjectContext()
-  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef: ref })
+  const organization = useSelectedOrganization()
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+
   const isFreeProject = subscription?.plan?.id === 'free'
 
   const {
@@ -134,15 +136,15 @@ const Infrastructure = ({}: InfrastructureProps) => {
                   Please reach out to us via our support form if you are keen to upgrade your
                   Postgres version to the latest available ({latestPgVersion}).
                 </p>
-                <Link
-                  href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
-                >
-                  <a target="_blank" rel="noreferrer">
-                    <Button size="tiny" type="default">
-                      Contact support
-                    </Button>
-                  </a>
-                </Link>
+                <Button asChild size="tiny" type="default">
+                  <Link
+                    href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Contact support
+                  </Link>
+                </Button>
               </Alert>
             )}
           </FormSectionContent>

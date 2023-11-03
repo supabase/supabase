@@ -23,32 +23,38 @@ const UserAccessTokens: NextPageWithLayout = () => {
             title="Access Tokens"
             description="Personal access tokens can be used with our Management API or CLI."
           />
-          <Alert
-            withIcon
-            className="mb-6 mr-6"
-            variant="warning"
-            title="Personal access tokens can be used to control your whole account and use features added in the future. Be careful when sharing them!"
-          />
         </div>
         <div className="flex items-center space-x-4 mb-6">
           <div className="flex items-center space-x-2">
-            <Link href="https://supabase.com/docs/reference/api/introduction">
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                  API Docs
-                </Button>
-              </a>
-            </Link>
-            <Link href="https://supabase.com/docs/reference/cli/start">
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                  CLI docs
-                </Button>
-              </a>
-            </Link>
+            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+              <Link
+                href="https://supabase.com/docs/reference/api/introduction"
+                target="_blank"
+                rel="noreferrer"
+              >
+                API Docs
+              </Link>
+            </Button>
+            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+              <Link
+                href="https://supabase.com/docs/reference/cli/start"
+                target="_blank"
+                rel="noreferrer"
+              >
+                CLI docs
+              </Link>
+            </Button>
           </div>
           <NewAccessTokenButton onCreateToken={setNewToken} />
         </div>
+      </div>
+      <div className="flex items-center justify-between">
+        <Alert
+          withIcon
+          className="mb-6 w-full"
+          variant="warning"
+          title="Personal access tokens can be used to control your whole account and use features added in the future. Be careful when sharing them!"
+        />
       </div>
       <div className="space-y-4">
         {newToken && <NewTokenBanner token={newToken} />}

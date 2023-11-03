@@ -215,7 +215,10 @@ You can change the scope of the access for Supabase by configuring
                       )} Repository connections for Vercel`}
                     />
                   )}
-                  <EmptyIntegrationConnection onClick={() => onAddVercelConnection(integration.id)}>
+                  <EmptyIntegrationConnection
+                    onClick={() => onAddVercelConnection(integration.id)}
+                    orgSlug={org?.slug}
+                  >
                     Add new project connection
                   </EmptyIntegrationConnection>
                 </div>
@@ -223,11 +226,11 @@ You can change the scope of the access for Supabase by configuring
             })
           ) : (
             <div>
-              <Link href={integrationUrl} passHref>
-                <Button type="default" iconRight={<IconExternalLink />} asChild>
-                  <a target="_blank">Install Vercel Integration</a>
-                </Button>
-              </Link>
+              <Button asChild type="default" iconRight={<IconExternalLink />}>
+                <Link href={integrationUrl} target="_blank">
+                  Install Vercel Integration
+                </Link>
+              </Button>
             </div>
           )}
           {VercelContentSectionBottom && (
@@ -303,7 +306,10 @@ These connections will be part of a GitHub workflow that is currently in develop
                       )} Repository connections for GitHub`}
                     />
                   )}
-                  <EmptyIntegrationConnection onClick={() => onAddGitHubConnection(integration.id)}>
+                  <EmptyIntegrationConnection
+                    onClick={() => onAddGitHubConnection(integration.id)}
+                    orgSlug={org?.slug}
+                  >
                     Add new project connection
                   </EmptyIntegrationConnection>
                 </div>

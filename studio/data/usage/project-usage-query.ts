@@ -81,15 +81,3 @@ export const useProjectUsageQuery = <TData = ProjectUsageData>(
       ...options,
     }
   )
-
-export const useProjectUsagePrefetch = ({ projectRef }: ProjectUsageVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef) {
-      client.prefetchQuery(usageKeys.usage(projectRef), ({ signal }) =>
-        getProjectUsage({ projectRef }, signal)
-      )
-    }
-  }, [projectRef])
-}

@@ -21,6 +21,7 @@ export function LaunchWeekLogoHeader() {
               src="/images/launchweek/seven/lw7-seven.svg"
               width={isMobile ? 36 : 40}
               height={isMobile ? 36 : 40}
+              alt="Launch Week 7"
             />
           </span>
         </h1>

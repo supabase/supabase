@@ -16,7 +16,7 @@ const ProductButton = (props: Article) => {
         </div>
         <div className="flex flex-col items-start gap-0">
           <span className="text-base">{props.title}</span>
-          <span className="text-scale-900 text-sm">{props.description}</span>
+          <span className="text-muted text-sm">{props.description}</span>
         </div>
       </button>
     </div>
