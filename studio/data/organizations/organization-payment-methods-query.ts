@@ -61,17 +61,3 @@ export const useOrganizationPaymentMethodsQuery = <TData = OrganizationPaymentMe
     ({ signal }) => getOrganizationPaymentMethods({ slug }, signal),
     { enabled: enabled, ...options }
   )
-
-export const useOrganizationPaymentMethodsPrefetch = ({
-  slug,
-}: OrganizationPaymentMethodsVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(
-    () =>
-      client.prefetchQuery(organizationKeys.paymentMethods(slug), ({ signal }) =>
-        getOrganizationPaymentMethods({ slug }, signal)
-      ),
-    []
-  )
-}

@@ -88,7 +88,7 @@ const PROVIDER_PHONE = {
     // Twilio
     SMS_TWILIO_ACCOUNT_SID: {
       type: 'string',
-      title: 'Twilio Account Sid',
+      title: 'Twilio Account SID',
       show: {
         key: 'SMS_PROVIDER',
         matches: ['twilio'],
@@ -105,7 +105,15 @@ const PROVIDER_PHONE = {
     },
     SMS_TWILIO_MESSAGE_SERVICE_SID: {
       type: 'string',
-      title: 'Twilio Message Service Sid',
+      title: 'Twilio Message Service SID',
+      show: {
+        key: 'SMS_PROVIDER',
+        matches: ['twilio'],
+      },
+    },
+    SMS_TWILIO_CONTENT_SID: {
+      type: 'string',
+      title: 'Twilio Content SID (Optional, For WhatsApp Only)',
       show: {
         key: 'SMS_PROVIDER',
         matches: ['twilio'],
@@ -115,7 +123,7 @@ const PROVIDER_PHONE = {
     // Twilio Verify
     SMS_TWILIO_VERIFY_ACCOUNT_SID: {
       type: 'string',
-      title: 'Twilio Account Sid',
+      title: 'Twilio Account SID',
       show: {
         key: 'SMS_PROVIDER',
         matches: ['twilio_verify'],
@@ -132,7 +140,7 @@ const PROVIDER_PHONE = {
     },
     SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: {
       type: 'string',
-      title: 'Twilio Verify Service Sid',
+      title: 'Twilio Verify Service SID',
       show: {
         key: 'SMS_PROVIDER',
         matches: ['twilio_verify'],
@@ -842,6 +850,12 @@ const EXTERNAL_PROVIDER_GOOGLE = {
         'Comma separated list of client IDs of Android apps, One Tap or Chrome extensions that are allowed to log in to your project.',
       type: 'string',
     },
+    EXTERNAL_GOOGLE_SKIP_NONCE_CHECK: {
+      title: 'Skip nonce checks',
+      description:
+        "Allows ID tokens with any nonce to be accepted, which is less secure. Useful in situations where you don't have access to the nonce used to issue the ID token, such with iOS.",
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_GOOGLE_ENABLED: boolean().required(),
@@ -902,6 +916,7 @@ const EXTERNAL_PROVIDER_GOOGLE = {
             'At least one Authorized Client ID is required when not using the OAuth flow.'
           ),
       }),
+    EXTERNAL_GOOGLE_SKIP_NONCE_CHECK: boolean(),
   }),
   misc: {
     iconKey: 'google-icon',

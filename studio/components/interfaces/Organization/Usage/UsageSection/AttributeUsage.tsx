@@ -21,7 +21,6 @@ import {
 } from '../Usage.utils'
 import UsageBarChart from '../UsageBarChart'
 import { ChartMeta } from './UsageSection'
-import { useIsFeatureEnabled } from 'hooks'
 
 export interface AttributeUsageProps {
   slug: string
@@ -55,8 +54,6 @@ const AttributeUsage = ({
   isSuccess,
   currentBillingCycleSelected,
 }: AttributeUsageProps) => {
-  const billingEnabled = useIsFeatureEnabled('billing:all')
-
   const upgradeUrl = getUpgradeUrl(slug ?? '', subscription)
   const usageRatio = (usageMeta?.usage ?? 0) / (usageMeta?.pricing_free_units ?? 0)
   const usageExcess = (usageMeta?.usage ?? 0) - (usageMeta?.pricing_free_units ?? 0)
@@ -152,16 +149,14 @@ const AttributeUsage = ({
                         )}
                       </div>
 
-                      {billingEnabled && showUsageWarning && (
-                        <Link href={upgradeUrl}>
-                          <a className="pb-1">
-                            <Button type="default" size="tiny">
-                              {subscription?.plan?.id === 'free'
-                                ? 'Upgrade plan'
-                                : 'Change spend cap'}
-                            </Button>
-                          </a>
-                        </Link>
+                      {showUsageWarning && (
+                        <Button type="default" size="tiny" asChild>
+                          <Link href={upgradeUrl} className="pb-1">
+                            {subscription?.plan?.id === 'free'
+                              ? 'Upgrade plan'
+                              : 'Change spend cap'}
+                          </Link>
+                        </Button>
                       )}
                     </div>
 
@@ -285,13 +280,10 @@ const AttributeUsage = ({
                         </p>
                       </div>
                     </div>
-                    {billingEnabled && (
-                      <Link href={upgradeUrl}>
-                        <a>
-                          <Button type="primary">Upgrade plan</Button>
-                        </a>
-                      </Link>
-                    )}
+
+                    <Button type="primary" asChild>
+                      <Link href={upgradeUrl}>Upgrade plan</Link>
+                    </Button>
                   </div>
                 </Panel.Content>
               </Panel>

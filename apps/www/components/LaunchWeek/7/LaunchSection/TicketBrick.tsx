@@ -38,6 +38,7 @@ export function TicketBrick({ user }: Props) {
             isLoading ? 'grayscale blur-2xl scale-110' : 'grayscale-0 blur-0 scale-100',
           ].join(' ')}
           onLoadingComplete={() => setLoading(false)}
+          alt=""
         />
         <div className="z-20 relative">
           <TicketHeader size="small" />

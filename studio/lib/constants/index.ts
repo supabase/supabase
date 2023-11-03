@@ -98,6 +98,7 @@ export const LOCAL_STORAGE_KEYS = {
   TELEMETRY_CONSENT: 'supabase-consent',
   UI_PREVIEW_NAVIGATION_LAYOUT: 'supabase-ui-preview-nav-layout',
   UI_PREVIEW_API_SIDE_PANEL: 'supabase-ui-api-side-panel',
+  DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
 }
 
 export const OPT_IN_TAGS = {
