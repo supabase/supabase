@@ -317,12 +317,12 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
         },
         set(name: string, value: string, options: CookieOptions) {
           context.res.appendHeader(
-            "set-cookie",
+            "Set-Cookie",
             serialize(name, value, options)
           );
         },
         remove(name: string, options: CookieOptions) {
-          context.res.appendHeader("set-cookie", serialize(name, "", options));
+          context.res.appendHeader("Set-Cookie", serialize(name, "", options));
         },
       },
     }
@@ -374,10 +374,10 @@ export default async function handler(
           return req.cookies[name];
         },
         set(name: string, value: string, options: CookieOptions) {
-          res.appendHeader("set-cookie", serialize(name, value, options));
+          res.appendHeader("Set-Cookie", serialize(name, value, options));
         },
         remove(name: string, options: CookieOptions) {
-          res.appendHeader("set-cookie", serialize(name, "", options));
+          res.appendHeader("Set-Cookie", serialize(name, "", options));
         },
       },
     }
