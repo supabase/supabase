@@ -347,8 +347,8 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
 
     1. Configure OAuth credentials for your Google Cloud project in the [Credentials](https://console.cloud.google.com/apis/credentials) page of the console. When creating a new OAuth client ID, choose _Android_ or _iOS_ depending on the mobile operating system your app is built for.
 
-    - For Android, use the instructions on screen to provide the SHA-1 certificate fingerprint used to sign your Android app.
-    - For iOS, use the instructions on screen to provide the app Bundle ID, and App Store ID and Team ID if the app is already published on the Apple AppStore.
+      - For Android, use the instructions on screen to provide the SHA-1 certificate fingerprint used to sign your Android app.
+      - For iOS, use the instructions on screen to provide the app Bundle ID, and App Store ID and Team ID if the app is already published on the Apple AppStore.
 
     2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. In particular, make sure you have set up links to your app's privacy policy and terms of service.
     3. Finally, add the client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Authorized Client IDs_.
