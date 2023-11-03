@@ -80,7 +80,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
               onChange={(table) => setTempConfig({ ...tempConfig, table })}
             />
           </div>
-          <div className="border-b border-overlay p-4">
+          <div className="border-b border-overlay p-4 flex flex-col gap-2">
             <div className="flex flex-row gap-4">
               <p className="w-[60px] flex justify-end text-sm">AND</p>
               <Input
@@ -91,6 +91,16 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
                 onChange={(v) => setTempConfig({ ...tempConfig, filter: v.target.value })}
               />
             </div>
+            <p className="text-xs text-foreground-light pl-7">
+              Learn more about realtime filtering in{' '}
+              <a
+                href="https://supabase.com/docs/guides/realtime/postgres-changes#available-filters"
+                className="underline"
+                target="_blank"
+              >
+                our docs
+              </a>
+            </p>
           </div>
           <div className="px-4 py-2 gap-2 flex justify-end">
             <Button type="default" onClick={() => setOpen(false)}>
