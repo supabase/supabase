@@ -302,39 +302,27 @@ export default async function Page () {
 
 <TabPanel id="get-server-side-props" label="getServerSideProps">
 
-Cookies have many edge cases when not using a helper function, therefore we recommend using the `cookies` package in `getServerSideProps` to provide a similar API to the Next.js `cookies` function in the App Router.
-
-```bash
-npm install cookies
-```
-
-Types can optionally be installed as well.
-
-```bash
-npm install --save-dev @types/cookies
-```
-
 ```ts index.tsx
 import { type GetServerSidePropsContext } from 'next'
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
-import Cookies from 'cookies'
+import { createServerClient, type CookieOptions, serialize } from '@supabase/ssr'
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
-  const cookies = new Cookies(context.req, context.res)
-
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         get(name: string) {
-          return cookies.get(name)
+          return context.req.cookies[name];
         },
         set(name: string, value: string, options: CookieOptions) {
-          cookies.set(name, value, options)
+          context.res.appendHeader(
+            "Set-Cookie",
+            serialize(name, value, options)
+          );
         },
         remove(name: string, options: CookieOptions) {
-          cookies.set(name, '', options)
+          context.res.appendHeader("Set-Cookie", serialize(name, "", options));
         },
       },
     }
@@ -356,8 +344,6 @@ from `supabase-js`.
 import { createClient } from '@supabase/supabase-js'
 
 export const getStaticProps = async () => {
-  const cookies = new Cookies(context.req, context.res)
-
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -371,42 +357,27 @@ export const getStaticProps = async () => {
 
 <TabPanel id="api-route" label="API Route">
 
-Cookies have many edge cases when not using a helper function, therefore, we recommend using the `cookies` package in API Routes to provide a similar API to the Next.js `cookies` function in the App Router.
-
-```bash
-npm install cookies
-```
-
-Types can optionally be installed as well.
-
-```bash
-npm install --save-dev @types/cookies
-```
-
 ```ts index.tsx
-import { createServerClient, type CookieOptions } from "@supabase/ssr"
+import { createServerClient, type CookieOptions, serialize } from "@supabase/ssr"
 import { type NextApiRequest, type NextApiResponse } from "next"
-import Cookies from "cookies"
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const cookies = new Cookies(req, res)
-
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         get(name: string) {
-          return cookies.get(name)
+          return req.cookies[name];
         },
         set(name: string, value: string, options: CookieOptions) {
-          cookies.set(name, value, options)
+          res.appendHeader("Set-Cookie", serialize(name, value, options));
         },
         remove(name: string, options: CookieOptions) {
-          cookies.set(name, "", options)
+          res.appendHeader("Set-Cookie", serialize(name, "", options));
         },
       },
     }
@@ -589,6 +560,16 @@ export const actions: Actions = {
 </TabPanel>
 <TabPanel id="astro" label="Astro">
 
+By default, Astro apps are static. This means the requests for data happen at build time, rather than when the user requests a page. At build time, there is no user, session or cookies. Therefore, we need to configure Astro for Server-side Rendering (SSR) if you want data to be fetched dynamically per request.
+
+```js astro.config.mjs
+import { defineConfig } from 'astro/config'
+
+export default defineConfig({
+  output: 'server',
+})
+```
+
 <Tabs
   scrollable
   size="small"
@@ -633,6 +614,37 @@ const supabase = createServerClient(
     import.meta.env.PUBLIC_SUPABASE_ANON_KEY
   );
 </script>
+```
+
+</TabPanel>
+
+<TabPanel id="astro-server-endpoint" label="Server Endpoint">
+
+```ts route.ts
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import type { APIContext } from "astro";
+
+export async function GET(context: APIContext) {
+  const supabase = createServerClient(
+    import.meta.env.PUBLIC_SUPABASE_URL,
+    import.meta.env.PUBLIC_SUPABASE_ANON_KEY,
+    {
+      cookies: {
+        get(key: string) {
+          return context.cookies.get(key)?.value;
+        },
+        set(key: string, value: string, options: CookieOptions) {
+          context.cookies.set(key, value, options);
+        },
+        remove(key: string, options) {
+          context.cookies.delete(key, options);
+        },
+      },
+    }
+  );
+
+  return ...
+}
 ```
 
 </TabPanel>
