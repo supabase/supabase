@@ -223,10 +223,6 @@ const TableGridEditor = ({
     if (gridRef.current) gridRef.current.rowEdited(row, idx)
   }
 
-  const onColumnSaved = (hasEncryptedColumns = false) => {
-    if (hasEncryptedColumns) getEncryptedColumns(selectedTable)
-  }
-
   const onTableCreated = (table: PostgresTable) => {
     router.push(`/project/${projectRef}/editor/${table.id}`)
   }
@@ -396,7 +392,6 @@ const TableGridEditor = ({
           selectedTable={selectedTable as PostgresTable}
           onRowCreated={onRowCreated}
           onRowUpdated={onRowUpdated}
-          onColumnSaved={onColumnSaved}
           onTableCreated={onTableCreated}
         />
       )}
