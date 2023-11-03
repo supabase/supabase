@@ -17,9 +17,6 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   const invoicesEnabled = useIsFeatureEnabled('billing:invoices')
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
-  const showOAuthApps = useFlag('oauthApps')
-  const showAuditLogs = useFlag('auditLogs')
-  const showIntegrationsV2 = useFlag('integrationsV2')
 
   if (navLayoutV2) {
     return <SettingsLayout>{children}</SettingsLayout>
@@ -47,14 +44,14 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
             >
               <Tabs.Panel id="general" label="General" className="!my-0" />
               <Tabs.Panel id="team" label="Team" className="!my-0" />
-              {showIntegrationsV2 && (
-                <Tabs.Panel id="integrations" label="Integrations" className="!my-0" />
-              )}
+
+              <Tabs.Panel id="integrations" label="Integrations" className="!my-0" />
+
               <Tabs.Panel id="billing" label="Billing" className="!my-0" />
               <Tabs.Panel id="usage" label="Usage" className="!my-0" />
               {invoicesEnabled && <Tabs.Panel id="invoices" label="Invoices" className="!my-0" />}
-              {showOAuthApps && <Tabs.Panel id="apps" label="OAuth Apps" className="!my-0" />}
-              {showAuditLogs && <Tabs.Panel id="audit" label="Audit Logs" className="!my-0" />}
+              <Tabs.Panel id="apps" label="OAuth Apps" className="!my-0" />
+              <Tabs.Panel id="audit" label="Audit Logs" className="!my-0" />
 
               <Tabs.Panel id="documents" label="Legal Documents" className="!my-0" />
             </Tabs>
