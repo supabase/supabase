@@ -28,9 +28,6 @@ const routesToIgnoreProjectDetailsRequest = [
   '/project/[ref]/settings/database',
   '/project/[ref]/settings/storage',
   '/project/[ref]/settings/infrastructure',
-  '/project/[ref]/settings/billing/subscription',
-  '/project/[ref]/settings/billing/usage',
-  '/project/[ref]/settings/billing/invoices',
 ]
 
 const routesToIgnoreDBConnection = ['/project/[ref]/branches']
@@ -40,9 +37,6 @@ const routesToIgnorePostgrestConnection = [
   '/project/[ref]/settings/general',
   '/project/[ref]/settings/database',
   '/project/[ref]/settings/infrastructure',
-  '/project/[ref]/settings/billing/subscription',
-  '/project/[ref]/settings/billing/usage',
-  '/project/[ref]/settings/billing/invoices',
 ]
 
 export interface ProjectLayoutProps {
