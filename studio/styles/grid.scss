@@ -11,7 +11,7 @@
 .rdg-cell {
   @apply flex;
   @apply text-grid;
-  @apply border-border border-r border-b;
+  @apply border-default border-r border-b;
   @apply text-foreground;
   white-space: nowrap;
   overflow: hidden;
@@ -29,7 +29,7 @@
 }
 
 .rdg-cell-frozen-last {
-  @apply border-border border-r-4 shadow-none;
+  @apply border-default border-r-4 shadow-none;
 }
 
 .rdg-cell[aria-selected='true'] {
@@ -38,7 +38,7 @@
 
 .rdg {
   @apply box-border select-none overflow-x-auto overflow-y-scroll bg-transparent;
-  @apply border-border border-t border-b border-r-0 border-l-0;
+  @apply border-default border-t border-b border-r-0 border-l-0;
   contain: strict;
   -webkit-user-select: none;
   font-size: 14px;
@@ -81,7 +81,7 @@
 }
 
 .rdg-header-row .rdg-cell {
-  @apply bg-surface-200 border-border border-b;
+  @apply bg-surface-200 border-default border-b;
 }
 
 .rdg-header-row .rdg-cell p {
@@ -94,10 +94,10 @@
   @apply bg-surface-200;
 }
 .rdg-header-row .rdg-checkbox {
-  @apply bg-surface-200 border-border rounded-sm border;
+  @apply bg-surface-200 border-default rounded-sm border;
 }
 .rdg-header-row .rdg-checkbox-input:checked + .rdg-checkbox {
-  @apply border-border border-4 bg-green-900;
+  @apply border-default border-4 bg-green-900;
 }
 .rdg-header-row .rdg-checkbox-input:focus + .rdg-checkbox {
   box-shadow: none;
@@ -185,7 +185,7 @@
   [type='checkbox'] {
     @apply cursor-pointer rounded border border-solid;
 
-    @apply text-brand-600 border-border transition-all;
+    @apply text-brand-600 border-default transition-all;
     @apply hover:border-brand focus:ring-brand-300 focus:outline-none;
 
     @apply dark:bg-transparent dark:text-white;
@@ -274,7 +274,7 @@
 }
 
 .rdg__segmented-control {
-  @apply border-border relative mx-2 h-8 rounded-md border;
+  @apply border-default relative mx-2 h-8 rounded-md border;
 }
 
 .rdg__segmented-control__button {

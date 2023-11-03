@@ -258,7 +258,7 @@ function Partner({
               </div>
             </div>
             {partner.call_to_action_link && (
-              <div className="bg-background hover:border-border-control border-border rounded-2xl border p-10 drop-shadow-sm max-w-5xl mx-auto mt-12">
+              <div className="bg-background hover:border-default-control border-default rounded-2xl border p-10 drop-shadow-sm max-w-5xl mx-auto mt-12">
                 <div className="flex flex-row justify-between">
                   <h1 className="text-2xl font-medium self-center">
                     Get started with {partner.title} and Supabase.

@@ -26,7 +26,7 @@ const DocsButton = () => {
     <button
       className="
                 bg-surface-100
-                border-border  
+                border-default  
                 hover:border-strong  
                 group
                 my-6 flex
@@ -241,7 +241,7 @@ const AuthForm = () => {
     return (
       <div
         className="
-          bg-surface-200 border-border hover:border-strong hover:bg-overlay-hover mx-auto overflow-hidden
+          bg-surface-200 border-default hover:border-strong hover:bg-overlay-hover mx-auto overflow-hidden
           border shadow
           transition first:rounded-tr  
           first:rounded-tl
@@ -284,7 +284,7 @@ const AuthForm = () => {
             bg-surface-100 
             hover:bg-overlay-hover
             data-open:bg-selection
-            border-border 
+            border-default 
             hover:border-strong data-open:border-strong
 
             data-open:pb-px col-span-12 mx-auto
@@ -391,7 +391,7 @@ const AuthForm = () => {
               <div
                 className="
                   bg-surface-100
-                  text-foreground border-border group border-t py-6 px-6
+                  text-foreground border-default group border-t py-6 px-6
                 "
               >
                 <div className="mx-auto max-w-md space-y-6">
@@ -640,7 +640,7 @@ const DomainsForm = () => {
           return (
             <>
               <div
-                className="bg-surface-100 border-border text-foreground flex items-center 
+                className="bg-surface-100 border-default text-foreground flex items-center 
               justify-between gap-2
               border px-6 
               py-4 text-sm
@@ -1077,7 +1077,7 @@ export function WholeForm() {
             <button
               className="
                 bg-surface-300
-                border-border  
+                border-default  
                 hover:border-strong
                 group
                 my-6 flex

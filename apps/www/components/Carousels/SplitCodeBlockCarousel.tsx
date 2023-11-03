@@ -100,7 +100,7 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
         })}
       </Swiper>
 
-      <div className="bg-surface-100 border-border overflow-hidden rounded-md border p-8">
+      <div className="bg-surface-100 border-default overflow-hidden rounded-md border p-8">
         <Swiper
           // @ts-ignore
           onSwiper={setSwiperDetails}

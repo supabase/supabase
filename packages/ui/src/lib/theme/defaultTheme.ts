@@ -17,7 +17,7 @@ const defaults = {
   },
   border: {
     brand: 'border-brand-600',
-    primary: 'border-border',
+    primary: 'border-default',
     secondary: 'border-secondary',
     alternative: 'border-alternative',
   },
@@ -143,7 +143,7 @@ export default {
         container: `
           group
           border
-          border-border
+          border-default
 
           first:rounded-tl-md first:rounded-tr-md
           last:rounded-bl-md last:rounded-br-md
@@ -277,7 +277,7 @@ export default {
         description: `text-brand-600`,
       },
       neutral: {
-        base: `bg-surface-100 border-border`,
+        base: `bg-surface-100 border-default`,
         icon: `text-foreground-muted`,
         header: `text-foreground`,
         description: `text-foreground-light`,
@@ -1149,7 +1149,7 @@ export default {
           `,
           normal: `
             font-normal
-            border-border
+            border-default
             group-hover:border-foreground-muted`,
           active: `
             font-semibold
@@ -1164,7 +1164,7 @@ export default {
           normal: `
             border-l
             font-normal
-            border-border
+            border-default
             group-hover:border-foreground-muted`,
           active: `
             font-semibold
@@ -1184,7 +1184,7 @@ export default {
           `,
           normal: `
             font-normal
-            border-border
+            border-default
             group-hover:border-foreground-muted`,
           active: `
             font-semibold

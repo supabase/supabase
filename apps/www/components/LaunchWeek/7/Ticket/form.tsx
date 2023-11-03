@@ -161,7 +161,7 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
             className={`
               transition-all
               border border-background-surface-100 bg-background h-10
-              focus:border-border focus:ring-background-surface-100
+              focus:border-default focus:ring-background-surface-100
               text-foreground text-base rounded-full w-full px-5
             `}
             type="email"
@@ -181,7 +181,7 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
               'transition-all',
               'absolute bg-surface-100 text-foreground border border-control text-sm hover:bg-overlay-hover',
               'rounded-full px-4',
-              'focus:invalid:border-border focus:invalid:ring-background-surface-100',
+              'focus:invalid:border-default focus:invalid:ring-background-surface-100',
               'absolute right-1 my-auto h-8 top-0 bottom-0',
             ].join(' ')}
             disabled={formState === 'loading'}

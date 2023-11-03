@@ -72,7 +72,7 @@ const NavigationBar = () => {
     <div
       className={[
         'flex w-14 flex-col justify-between overflow-y-hidden p-2',
-        'border-r bg-background border-border',
+        'border-r bg-background border-default',
       ].join(' ')}
     >
       <ul className="flex flex-col space-y-2">

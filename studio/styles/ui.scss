@@ -120,7 +120,7 @@
 .table-container thead th {
   @apply text-foreground-light font-normal text-sm;
   @apply bg-surface-200;
-  @apply border-t border-b border-border;
+  @apply border-t border-b border-default;
 }
 
 .table-container thead th:first-child {
@@ -146,15 +146,15 @@
 }
 
 .table-container tbody td {
-  @apply border-b p-3 px-4 text-sm text-gray-1100 border-border;
+  @apply border-b p-3 px-4 text-sm text-gray-1100 border-default;
 }
 
 .table-container tbody td:first-child {
-  @apply pl-6 border-b border-l border-border;
+  @apply pl-6 border-b border-l border-default;
 }
 
 .table-container tbody td:last-child {
-  @apply pr-6 border-b border-r border-border;
+  @apply pr-6 border-b border-r border-default;
 }
 
 .table-container tbody tr:last-child td:first-child {
@@ -221,7 +221,7 @@
   }
 
   .doc-section {
-    @apply border-b flex border-border;
+    @apply border-b flex border-default;
   }
 
   &.Docs--table-editor .doc-section--introduction {

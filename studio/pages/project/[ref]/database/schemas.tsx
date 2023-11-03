@@ -32,7 +32,7 @@ const SchemasPage: NextPageWithLayout = () => {
   return (
     <>
       <div className="flex w-full h-full flex-col">
-        <div className="p-4 border-b border-border">
+        <div className="p-4 border-b border-default">
           {isLoading && (
             <div className="h-[34px] w-[260px] bg-foreground-lighter rounded shimmering-loader" />
           )}

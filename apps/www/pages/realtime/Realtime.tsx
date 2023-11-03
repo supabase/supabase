@@ -63,7 +63,7 @@ function RealtimePage() {
           h1={[<span key={'authentication-h1'}>Build modern web and mobile applications</span>]}
           subheader={['Sync client state globally over WebSockets in Realtime']}
           image={[
-            <div className="bg-surface-100 border-border relative flex h-[372px] w-[560px] items-center justify-center overflow-hidden rounded border drop-shadow-md">
+            <div className="bg-surface-100 border-default relative flex h-[372px] w-[560px] items-center justify-center overflow-hidden rounded border drop-shadow-md">
               <div
                 className={[
                   'border-brand-300 relative h-12 w-48 bg-[#34B27B]',
@@ -106,7 +106,7 @@ function RealtimePage() {
               >
                 <p className="text-lg">😄</p>
               </div>
-              <div className="bg-background border-border absolute top-0 flex h-9 w-full items-center justify-between border-b">
+              <div className="bg-background border-default absolute top-0 flex h-9 w-full items-center justify-between border-b">
                 <div className="flex items-center">
                   <IconMenu className="text-foreground mx-3" strokeWidth={1} size={16} />
                   <IconGrid className="text-foreground mx-3" strokeWidth={1} size={15} />

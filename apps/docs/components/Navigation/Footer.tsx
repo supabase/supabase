@@ -40,7 +40,7 @@ const Footer = () => (
         ))}
       </ul>
     </div>
-    <hr className="border-border my-6"></hr>
+    <hr className="border-default my-6"></hr>
     <div className="flex gap-4 items-center justify-between">
       <div className="flex flex-col lg:flex-row gap-3 ">
         <Link href="https://supabase.com/" className="text-xs text-foreground-lighter">

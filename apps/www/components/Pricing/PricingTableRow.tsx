@@ -97,7 +97,7 @@ export const PricingTableRowMobile = (props: any) => {
   return (
     <>
       <table className="mt-8 w-full" id={`${props.sectionId}-mobile`}>
-        <caption className="bg-background border-border border-t px-4 py-3 text-left text-sm font-medium dark:text-white">
+        <caption className="bg-background border-default border-t px-4 py-3 text-left text-sm font-medium dark:text-white">
           <div className="flex items-center gap-2">
             {category.icon ? <ProductIcon icon={props.icon} /> : null}
             <span className="text-foreground font-normal">{category.title}</span>
@@ -113,10 +113,10 @@ export const PricingTableRowMobile = (props: any) => {
             </th>
           </tr>
         </thead>
-        <tbody className="divide-border-border divide-y">
+        <tbody className="divide-border-default divide-y">
           {category.features.map((feat: any, i: number) => {
             return (
-              <tr key={i} className="border-border border-t">
+              <tr key={i} className="border-default border-t">
                 <th
                   className="text-foreground-light px-4 py-3 text-left text-sm font-normal"
                   scope="row"

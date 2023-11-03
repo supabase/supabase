@@ -67,7 +67,7 @@ const WrappersDisabledState = () => {
   return (
     <div>
       <div
-        className="w-full px-12 py-12 bg-no-repeat border rounded bg-background border-border"
+        className="w-full px-12 py-12 bg-no-repeat border rounded bg-background border-default"
         style={{
           backgroundSize: '45%',
           backgroundPosition: '105% 40%',
@@ -88,7 +88,7 @@ const WrappersDisabledState = () => {
           </div>
           {isNotAvailable ? (
             <div className="space-y-4">
-              <div className="rounded border border-border px-4 py-2 flex items-center justify-between">
+              <div className="rounded border border-default px-4 py-2 flex items-center justify-between">
                 <div>
                   <p className="text-foreground-light text-sm">
                     Wrappers is not available for this project yet.

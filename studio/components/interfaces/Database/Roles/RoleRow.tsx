@@ -74,7 +74,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
         'bg-surface-100',
         'hover:bg-overlay-hover',
         'data-open:bg-selection',
-        'border-border hover:border-strong',
+        'border-default hover:border-strong',
         'data-open:border-strong',
         'data-open:pb-px col-span-12 mx-auto',
         '-space-y-px overflow-hidden',
@@ -155,7 +155,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
               </button>
             </Collapsible.Trigger>
             <Collapsible.Content>
-              <div className="group border-t border-border bg-surface-100 py-6 px-20 text-foreground">
+              <div className="group border-t border-default bg-surface-100 py-6 px-20 text-foreground">
                 <div className="py-4 space-y-[9px]">
                   {Object.keys(ROLE_PERMISSIONS).map((permission) => (
                     <Toggle

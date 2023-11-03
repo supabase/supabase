@@ -84,7 +84,7 @@ export const CodeBlock = ({
   return (
     <>
       {title && (
-        <div className="rounded-t-md bg-surface-100 py-2 px-4 border-b border-border text-blue-1100 font-sans">
+        <div className="rounded-t-md bg-surface-100 py-2 px-4 border-b border-default text-blue-1100 font-sans">
           {title.replace(/%20/g, ' ')}
         </div>
       )}

@@ -735,7 +735,7 @@ const FunctionEmpty = observer(({}) => {
       className={[
         'relative w-full',
         'rounded',
-        'border border-border',
+        'border border-default',
         'bg-surface-200 px-5 py-1',
         'shadow-sm transition-all',
         'hover:border-strong hover:bg-overlay-hover',
@@ -759,7 +759,7 @@ const FunctionWithArguments = observer(({}) => {
           'relative w-full',
           'flex items-center justify-between',
           'space-x-3 px-5 py-4',
-          'border border-border',
+          'border border-default',
           'rounded shadow-sm transition-shadow',
         ].join(' ')}
       >

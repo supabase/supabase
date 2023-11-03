@@ -143,7 +143,7 @@ const SecretsManagement = () => {
         </div>
 
         {/* Table of secrets */}
-        <div className="border border-border rounded">
+        <div className="border border-default rounded">
           {!vault.isLoaded ? (
             <div className="px-6 py-6 space-x-2 flex items-center justify-center">
               <IconLoader

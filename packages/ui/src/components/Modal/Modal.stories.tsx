@@ -30,7 +30,7 @@ export const withUseState = () => {
           py-4 px-8
           bg-surface-100 
           border 
-          border-border 
+          border-default 
           rounded flex gap-4 
           shadow-sm
           justify-between
@@ -111,7 +111,7 @@ export const withUseState = () => {
                       <span className="text-foreground font-regular">MyProject</span>.
                     </p>
                   </div>
-                  <div className="border-t border-muted dark:border-border"></div>
+                  <div className="border-t border-muted dark:border-default"></div>
                   <div className="px-5">
                     <Input
                       id="name"
@@ -120,7 +120,7 @@ export const withUseState = () => {
                       label="Please type MyProject to confirm."
                     />
                   </div>
-                  <div className="border-t border-muted dark:border-border"></div>
+                  <div className="border-t border-muted dark:border-default"></div>
                   <div className="px-5">
                     <Button
                       type="danger"

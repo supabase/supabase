@@ -188,7 +188,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                                   })}
                                 {sql && (
                                   <CodeBlock
-                                    className="useless-code-block-class my-0 border border-t-0 border-border !rounded-tl-none !rounded-tr-none"
+                                    className="useless-code-block-class my-0 border border-t-0 border-default !rounded-tl-none !rounded-tr-none"
                                     language="sql"
                                     hideLineNumbers={true}
                                   >
@@ -206,7 +206,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                               defaultOpen={false}
                             >
                               <CodeBlock
-                                className="useless-code-block-class rounded !rounded-tl-none !rounded-tr-none border border-border"
+                                className="useless-code-block-class rounded !rounded-tl-none !rounded-tr-none border border-default"
                                 language={codeBlockLang}
                                 hideLineNumbers={true}
                               >
@@ -221,7 +221,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                               label="Notes"
                               defaultOpen={false}
                             >
-                              <div className="bg-surface-100 border border-border rounded !rounded-tl-none !rounded-tr-none prose max-w-none px-5 py-2">
+                              <div className="bg-surface-100 border border-default rounded !rounded-tl-none !rounded-tr-none prose max-w-none px-5 py-2">
                                 <ReactMarkdown className="text-sm">
                                   {example.description}
                                 </ReactMarkdown>

@@ -56,7 +56,7 @@ const RolesHelperModal = () => {
             </p>
           </Modal.Content>
           <Modal.Content>
-            <div className="rounded border border-border bg-surface-200">
+            <div className="rounded border border-default bg-surface-200">
               <div className="flex items-center border-b border-control">
                 <div className={permissionColumnClassName}>Permissions</div>
                 <div className={roleColumnClassName}>Owner</div>

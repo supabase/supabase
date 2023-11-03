@@ -203,7 +203,7 @@ function AuthWidgetSection() {
                   <button
                     onClick={() => setRadius('4px')}
                     className={[
-                      'bg-surface-100 ring-foreground-muted border-border flex h-10 w-10 items-center justify-center rounded-full border hover:scale-105',
+                      'bg-surface-100 ring-foreground-muted border-default flex h-10 w-10 items-center justify-center rounded-full border hover:scale-105',
                       radius === '4px'
                         ? 'ring-foreground-muted border-foreground-lighter border-2 ring-2'
                         : '',
@@ -229,7 +229,7 @@ function AuthWidgetSection() {
                   <button
                     onClick={() => setRadius('10px')}
                     className={[
-                      'bg-surface-100 border-border flex h-10 w-10 items-center justify-center rounded-full  border transition hover:scale-105',
+                      'bg-surface-100 border-default flex h-10 w-10 items-center justify-center rounded-full  border transition hover:scale-105',
                       radius === '10px'
                         ? 'ring-foreground-muted border-foreground-lighter border-2 ring-2'
                         : '',
@@ -255,7 +255,7 @@ function AuthWidgetSection() {
                   <button
                     onClick={() => setRadius('32px')}
                     className={[
-                      'bg-surface-100 border-border flex h-10 w-10 items-center justify-center rounded-full  border transition hover:scale-105',
+                      'bg-surface-100 border-default flex h-10 w-10 items-center justify-center rounded-full  border transition hover:scale-105',
                       radius === '32px'
                         ? 'ring-foreground-muted border-foreground-lighter border-2 ring-2'
                         : '',

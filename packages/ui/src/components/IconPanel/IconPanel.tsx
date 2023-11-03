@@ -45,7 +45,7 @@ const IconPanel = ({
           'border rounded-full',
           background
             ? 'hover:border-strong bg-surface-100'
-            : 'border-muted hover:border-border bg-transparent',
+            : 'border-muted hover:border-default bg-transparent',
           'transition',
         ].join(' ')}
       >

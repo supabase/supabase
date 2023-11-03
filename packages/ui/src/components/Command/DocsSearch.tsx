@@ -194,7 +194,7 @@ const DocsSearch = () => {
                 <ChevronArrow />
               </CommandItem>
               {pageSections.length > 0 && (
-                <div className="border-l border-border ml-3 pt-3">
+                <div className="border-l border-default ml-3 pt-3">
                   {pageSections.map((section, i) => (
                     <CommandItem
                       className="ml-3 mb-3"

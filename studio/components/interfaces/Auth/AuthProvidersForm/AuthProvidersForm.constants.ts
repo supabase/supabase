@@ -2,7 +2,7 @@ export const ProviderCollapsibleClasses = [
   'bg-surface-100',
   'hover:bg-overlay-hover',
   'data-open:bg-selection',
-  'border-border',
+  'border-default',
   'hover:border-strong data-open:border-strong',
   'data-open:pb-px col-span-12 mx-auto',
   '-space-y-px overflow-hidden',

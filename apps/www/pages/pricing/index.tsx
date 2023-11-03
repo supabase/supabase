@@ -219,7 +219,7 @@ export default function IndexPage() {
                           )}
                         </div>
                       </div>
-                      <p className="text-foreground-light my-4 text-sm border-b border-border pb-4 2xl:pr-4">
+                      <p className="text-foreground-light my-4 text-sm border-b border-default pb-4 2xl:pr-4">
                         {plan.description}
                       </p>
 
@@ -231,7 +231,7 @@ export default function IndexPage() {
                         lg:text-4xl
                         xl:text-4xl
                         border-b
-                        border-border
+                        border-default
                         min-h-[175px] ${plan.priceLabel ? 'pt-6' : 'pt-10'}`}
                       >
                         <div className="flex flex-col gap-1">
@@ -271,7 +271,7 @@ export default function IndexPage() {
                     </div>
                     <div
                       className={[
-                        `border-border bg-surface-100 flex h-full rounded-bl-[4px] rounded-br-[4px] flex-1 flex-col px-8 xl:px-4 2xl:px-8 py-6`,
+                        `border-default bg-surface-100 flex h-full rounded-bl-[4px] rounded-br-[4px] flex-1 flex-col px-8 xl:px-4 2xl:px-8 py-6`,
                         plan.name === 'Pro' ? 'mb-0.5 rounded-bl-[4px] rounded-br-[4px]' : '',
                       ].join(' ')}
                     >
@@ -730,7 +730,7 @@ export default function IndexPage() {
                       scope="col"
                       key={`th-${plan.name}`}
                     >
-                      <p className="p text-sm border-b border-border pb-4">{plan.description}</p>
+                      <p className="p text-sm border-b border-default pb-4">{plan.description}</p>
                       <div
                         className="h-0.25 absolute bottom-0 left-0 w-full"
                         style={{ height: '1px' }}
@@ -738,7 +738,7 @@ export default function IndexPage() {
                     </th>
                   ))}
                 </tr>
-                <tbody className="border-border divide-border divide-y">
+                <tbody className="border-default divide-border divide-y">
                   <tr>
                     <th
                       className="text-foreground-light px-6 py-8 text-left align-top text-sm font-medium"
@@ -834,7 +834,7 @@ export default function IndexPage() {
                   />
                 </tbody>
                 <tfoot>
-                  <tr className="border-border border-t">
+                  <tr className="border-default border-t">
                     <th className="sr-only" scope="row">
                       Choose your plan
                     </th>

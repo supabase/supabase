@@ -182,7 +182,7 @@ const EdgeFunctionDetails = () => {
                         label="Enforce JWT Verification"
                         descriptionText="Require a valid JWT in the authorization header when invoking the function"
                       />
-                      <div className="space-y-1 border rounded border-border bg-surface-200 px-4 py-4">
+                      <div className="space-y-1 border rounded border-default bg-surface-200 px-4 py-4">
                         <div className="flex items-center space-x-2">
                           <p className="text-sm">
                             Import maps are{' '}

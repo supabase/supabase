@@ -148,7 +148,7 @@ const Footer = (props: Props) => {
             </div>
           </div>
         </div>
-        <div className="border-border mt-32 flex justify-between border-t pt-8">
+        <div className="border-default mt-32 flex justify-between border-t pt-8">
           <small className="small">&copy; Supabase Inc</small>
           <ThemeToggle forceDark={isLaunchWeekPage} />
         </div>

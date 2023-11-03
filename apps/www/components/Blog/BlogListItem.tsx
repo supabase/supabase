@@ -29,7 +29,7 @@ const BlogListItem = ({ post }: Props) => {
         <div className="flex flex-col space-y-6">
           <div className="flex flex-col space-y-3">
             <div
-              className={`border-border relative mb-4 h-60 w-full overflow-auto rounded-lg border shadow-sm`}
+              className={`border-default relative mb-4 h-60 w-full overflow-auto rounded-lg border shadow-sm`}
             >
               <Image
                 layout="fill"

@@ -37,7 +37,7 @@ const NavigationIconButton = ({ route, isActive = false }: NavigationIconButtonP
           <div
             className={[
               'bg-alternative shadow-lg shadow-background-surface-100	py-1.5 px-3 rounded leading-none', // background
-              'border border-border', //border
+              'border border-default', //border
             ].join(' ')}
           >
             <span className="text-foreground text-xs">{route.label}</span>

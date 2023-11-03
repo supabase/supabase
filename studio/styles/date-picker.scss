@@ -61,7 +61,7 @@
   @apply w-10 h-10 flex items-center font-normal justify-center text-sm leading-loose transition text-foreground-light;
   /* @apply mb-1 py-1; */
   @apply -space-y-px;
-  @apply border border-border;
+  @apply border border-default;
 }
 
 .react-datepicker__day--disabled {

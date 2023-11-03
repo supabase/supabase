@@ -10,7 +10,7 @@ const collapsibleClasses = [
   'bg-surface-100',
   'hover:bg-overlay-hover',
   'data-open:bg-selection',
-  'border-border',
+  'border-default',
   'hover:border-strong data-open:border-strong',
   'data-open:pb-px col-span-12 rounded',
   '-space-y-px overflow-hidden',
@@ -48,7 +48,7 @@ const Security: NextPageWithLayout = () => {
             ) : null}
           </button>
         </Collapsible.Trigger>
-        <Collapsible.Content className="group border-t border-border bg-surface-100 py-6 px-6 text-foreground">
+        <Collapsible.Content className="group border-t border-default bg-surface-100 py-6 px-6 text-foreground">
           <TOTPFactors />
         </Collapsible.Content>
       </Collapsible>

@@ -36,7 +36,7 @@ const FlyOut = (props: Props) => {
         <>
           <div className="absolute inset-x-0 transform shadow-lg ">
             <div
-              className="border-border absolute inset-0 flex border-b sm:flex-col lg:flex-row"
+              className="border-default absolute inset-0 flex border-b sm:flex-col lg:flex-row"
               aria-hidden="true"
             >
               <div className="bg-background border-muted border-r sm:h-1/2 sm:w-full lg:h-full lg:w-1/2" />

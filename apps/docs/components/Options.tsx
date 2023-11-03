@@ -18,7 +18,7 @@ const Options: FC<PropsWithChildren<IOptions>> & OptionsSubComponents = (props) 
       <button
         className={[
           'px-5',
-          'border-t border-l border-r border-border',
+          'border-t border-l border-r border-default',
           'text-left text-sm text-foreground-light',
           'hover:bg-surface-100 transition-all',
 
@@ -50,7 +50,7 @@ const Option: FC<IOption> = (props) => {
     <div
       className="
         px-5 py-3 first:border-t border-b border-l border-r
-        border-border
+        border-default
         last:rounded-bl-lg last:rounded-br-lg
         flex flex-col gap-3
       "
