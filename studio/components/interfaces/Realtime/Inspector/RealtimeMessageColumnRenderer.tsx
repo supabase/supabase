@@ -1,14 +1,15 @@
 import { Column } from 'react-data-grid'
-import { IconBroadcast, IconDatabaseChanges, IconPresence } from 'ui'
+import { IconAlertTriangle, IconBroadcast, IconDatabaseChanges, IconPresence, cn } from 'ui'
 
 import { LogData, PreviewLogData } from './Messages.types'
 import { RowLayout } from './MessagesFormatters'
+import { isErrorLog } from './MessagesTable'
 
 const ICONS = {
-  PRESENCE: <IconPresence size="xlarge" className="bg-brand-400 rounded text-brand-600" />,
-  BROADCAST: <IconBroadcast size="xlarge" className="bg-brand-400 rounded text-brand-600" />,
-  POSTGRES: <IconDatabaseChanges size="xlarge" className="bg-brand-400 rounded text-brand-600" />,
-  SYSTEM: <IconDatabaseChanges size="xlarge" className="bg-brand-400 rounded text-brand-600" />,
+  PRESENCE: <IconPresence size="xlarge" />,
+  BROADCAST: <IconBroadcast size="xlarge" />,
+  POSTGRES: <IconDatabaseChanges size="xlarge" />,
+  SYSTEM: <IconAlertTriangle size="xlarge" />,
 }
 
 export const ColumnRenderer: Column<LogData, unknown>[] = [
@@ -20,9 +21,17 @@ export const ColumnRenderer: Column<LogData, unknown>[] = [
 
       return (
         <RowLayout>
-          <div>{ICONS[type]}</div>
-          <span className="font-mono">{new Date(data.row.timestamp).toISOString()}</span>
-          <span className="truncate font-mono">{JSON.stringify(data.row.metadata)}</span>
+          <div className={isErrorLog(data.row) ? 'text-warning-600' : 'text-green-900'}>
+            {ICONS[type]}
+          </div>
+          <span className={cn('font-mono', isErrorLog(data.row) ? '!text-warning-600' : '')}>
+            {new Date(data.row.timestamp).toISOString()}
+          </span>
+          <span
+            className={cn('truncate font-mono', isErrorLog(data.row) ? '!text-warning-600' : '')}
+          >
+            {JSON.stringify(data.row.metadata)}
+          </span>
         </RowLayout>
       )
     },
