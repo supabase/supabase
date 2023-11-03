@@ -36,7 +36,6 @@ export interface SidePanelEditorProps {
   // Because the panel is shared between grid editor and database pages
   // Both require different responses upon success of these events
   onTableCreated?: (table: PostgresTable) => void
-  onColumnSaved?: (hasEncryptedColumns?: boolean) => void
 }
 
 const SidePanelEditor = ({
@@ -45,7 +44,6 @@ const SidePanelEditor = ({
   onRowCreated = noop,
   onRowUpdated = noop,
   onTableCreated = noop,
-  onColumnSaved = noop,
 }: SidePanelEditorProps) => {
   const snap = useTableEditorStateSnapshot()
   const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
@@ -221,18 +219,17 @@ const SidePanelEditor = ({
     payload: CreateColumnPayload | UpdateColumnPayload,
     foreignKey: ExtendedPostgresRelationship | undefined,
     isNewRecord: boolean,
-    configuration: { columnId?: string; isEncrypted: boolean; keyId?: string; keyName?: string },
+    configuration: { columnId?: string },
     resolve: any
   ) => {
     const selectedColumnToEdit = snap.sidePanel?.type === 'column' && snap.sidePanel.column
 
-    const { columnId, ...securityConfig } = configuration
+    const { columnId } = configuration
     const response = isNewRecord
       ? await meta.createColumn(
           payload as CreateColumnPayload,
           selectedTable as PostgresTable,
-          foreignKey,
-          securityConfig
+          foreignKey
         )
       : await meta.updateColumn(
           columnId as string,
@@ -268,13 +265,8 @@ const SidePanelEditor = ({
         ),
         queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
       ])
-      onColumnSaved(configuration.isEncrypted)
       setIsEdited(false)
       snap.closeSidePanel()
-    }
-
-    if (configuration.isEncrypted && selectedTable?.schema) {
-      await meta.views.loadBySchema(selectedTable.schema)
     }
 
     resolve()
