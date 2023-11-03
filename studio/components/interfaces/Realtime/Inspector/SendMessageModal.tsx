@@ -1,5 +1,6 @@
 import { Input, Modal } from 'ui'
 
+import CodeEditor from 'components/ui/CodeEditor'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useEffect, useState } from 'react'
 
@@ -27,7 +28,7 @@ export const SendMessageModal = (props: SendMessageModalProps) => {
       onSelectConfirm={() => props.onSelectConfirm(values)}
     >
       <Modal.Content>
-        <div className="py-4 flex  flex-col gap-y-4">
+        <div className="py-4 flex flex-col gap-y-4">
           <Input
             label="Message name"
             size="small"
@@ -35,14 +36,19 @@ export const SendMessageModal = (props: SendMessageModalProps) => {
             value={values.message}
             onChange={(v) => setValues({ ...values, message: v.target.value })}
           />
-
-          <Input
-            label="Message payload"
-            size="small"
-            className="flex-grow"
-            value={values.payload}
-            onChange={(v) => setValues({ ...values, payload: v.target.value })}
-          />
+          <div className="flex flex-col gap-y-2">
+            <p className="text-sm text-scale-1100">Message payload</p>
+            <CodeEditor
+              id="message-payload"
+              language="json"
+              className="!mb-0 h-32 overflow-hidden rounded border"
+              onInputChange={(e: string | undefined) =>
+                setValues({ ...values, payload: e ?? '{}' })
+              }
+              options={{ wordWrap: 'off', contextmenu: false }}
+              value={values.payload}
+            />
+          </div>
         </div>
       </Modal.Content>
     </ConfirmationModal>
