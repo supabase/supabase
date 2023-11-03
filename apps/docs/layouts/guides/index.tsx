@@ -23,13 +23,14 @@ interface Props {
     tocVideo?: string
     canonical?: string
   }
+  editLink?: string
   children: any
   toc?: any
   currentPage?: string
   hideToc?: boolean
 }
 
-const Layout: FC<Props> = (props) => {
+const Layout: FC<Props> = (props, test) => {
   const [hash] = useHash()
 
   const articleRef = useRef()
@@ -136,7 +137,11 @@ const Layout: FC<Props> = (props) => {
                 <div className="mt-16 not-prose">
                   <div>
                     <a
-                      href={`https://github.com/supabase/supabase/edit/master/apps/docs/pages${router.asPath}.mdx`}
+                      href={`https://github.com/${
+                        props.editLink ||
+                        `supabase/supabase/edit/master/apps/docs/pages${router.asPath}.mdx`
+                      }
+                    `}
                       className="text-sm transition flex items-center gap-1 text-scale-1000 hover:text-scale-1200 w-fit"
                     >
                       Edit this page on GitHub <IconExternalLink size={14} strokeWidth={1.5} />
