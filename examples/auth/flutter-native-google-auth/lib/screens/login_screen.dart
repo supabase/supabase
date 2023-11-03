@@ -34,23 +34,23 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<AuthResponse> _googleSignIn() async {
     /// TODO: update the Web client ID with your own.
     ///
-    /// Client ID that you registered with Google Cloud.
-    /// Note that in order to perform Google sign in on Android, you need to
-    /// provide the web client ID, not the Android client ID.
-    const clientId = 'WEB_CLIENT_ID';
+    /// Web Client ID that you registered with Google Cloud.
+    const webClientId = 'my-web.apps.googleusercontent.com';
+
+    /// TODO: update the iOS client ID with your own.
+    ///
+    /// iOS Client ID that you registered with Google Cloud.
+    const iosClientId = 'my-ios.apps.googleusercontent.com';
+
+    // Google sign in on Android will work without providing the Android
+    // Client ID registered on Google Cloud.
 
     late final String? idToken;
     late final String? accessToken;
 
-    // Use AppAuth to perform Google sign in on iOS
-    // and use GoogleSignIn package for Google sign in on Android
-
     final GoogleSignIn googleSignIn = GoogleSignIn(
-      serverClientId: clientId,
-      scopes: [
-        'openid',
-        'email',
-      ],
+      clientId: iosClientId,
+      serverClientId: webClientId,
     );
     final googleUser = await googleSignIn.signIn();
     final googleAuth = await googleUser!.authentication;
