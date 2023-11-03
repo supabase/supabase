@@ -240,8 +240,6 @@ This method calls the Google sign-in package to perform the sign-in flow.
 Once the user completes the sign-in flow, we obtain an access token and an ID token.
 We will pass these tokens to Supabase auth to then obtain a Supabase session.
 
-This process of obtaining user session from ID token provided by a third-party authentication provider is called Open ID Connect.
-
 ## Create the Profile Screen
 
 The `ProfileScreen` will be just a simple UI presenting some of the information we obtained in the `LoginPage`. We can access the user data with `supabase.auth.currentUser`, where Supabase has saved the personal information in a property called `userMetadata`. In this example, we are displaying the `avatar_url` and `full_name` to display a basic profile page. Create a `lib/screens/profile_screen.dart` file and add the following.
