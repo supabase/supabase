@@ -210,9 +210,9 @@ const DocsSearch = () => {
                         openLink(page.type, formatSectionUrl(page, section))
                       }}
                       key={`${page.meta.title}__${section.heading}-item-index-${i}`}
-                      value={`${removeDoubleQuotes(page.meta.title)}__${
-                        section.heading ? removeDoubleQuotes(section.heading) : ''
-                      }-item-index-${i}`}
+                      value={`${removeDoubleQuotes(page.meta.title)}__${removeDoubleQuotes(
+                        section.heading ?? ''
+                      )}-item-index-${i}`}
                       type="block-link"
                     >
                       <div className="grow flex gap-3 items-center">
