@@ -916,7 +916,7 @@ const EXTERNAL_PROVIDER_GOOGLE = {
             'At least one Authorized Client ID is required when not using the OAuth flow.'
           ),
       }),
-    EXTERNAL_GOOGLE_SKIP_NONCE_CHECK: boolean(),
+    EXTERNAL_GOOGLE_SKIP_NONCE_CHECK: boolean().required(),
   }),
   misc: {
     iconKey: 'google-icon',

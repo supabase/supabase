@@ -1,18 +1,24 @@
 import { createClient } from '@supabase/supabase-js'
 import dotenv from 'dotenv'
-import minimist from 'minimist'
 import 'openai'
 import { Configuration, OpenAIApi } from 'openai'
 import { inspect } from 'util'
 import { v4 as uuidv4 } from 'uuid'
 import { fetchSources } from './sources'
+import { parseArgs } from 'node:util'
 
 dotenv.config()
 
-async function generateEmbeddings() {
-  const argv = minimist(process.argv.slice(2))
+const args = parseArgs({
+  options: {
+    refresh: {
+      type: 'boolean',
+    },
+  },
+})
 
-  const shouldRefresh = Boolean(argv.refresh)
+async function generateEmbeddings() {
+  const shouldRefresh = Boolean(args.values.refresh)
 
   const requiredEnvVars = [
     'NEXT_PUBLIC_SUPABASE_URL',
