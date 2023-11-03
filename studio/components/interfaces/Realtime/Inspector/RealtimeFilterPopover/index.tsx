@@ -41,17 +41,14 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
         <PopoverTrigger_Shadcn_ asChild>
           <Button
             icon={<PlusCircle size="16" />}
-            type="dashed"
-            className={cn(
-              'rounded-full px-1.5 pr-0.5 !py-0.5',
-              isFiltered ? '!bg-brand-400 !border-brand-500 !text-brand-600' : ''
-            )}
+            type={isFiltered ? 'primary' : 'dashed'}
+            className={cn('rounded-full px-1.5 pr-0.5 !py-0.5')}
             size="tiny"
           >
             {isFiltered ? (
               <>
-                <span className="text-brand-600 mr-1">Filtered by </span>
-                <Badge className="!bg-brand-600 !text-brand-200 !px-1.5">
+                <span className="mr-1">Filtered by </span>
+                <Badge className="!bg-brand-400 !text-brand-600">
                   schema: {config.schema === '*' ? 'All schemas' : config.schema}
                 </Badge>
               </>
@@ -61,8 +58,8 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
 
             {config.table !== '*' ? (
               <>
-                <span className="text-brand-600"> and </span>
-                <Badge className="!bg-brand-600 !text-brand-200">table: {config.table}</Badge>
+                <span> and </span>
+                <Badge className="!bg-brand-400 !text-brand-600">table: {config.table}</Badge>
               </>
             ) : null}
           </Button>
