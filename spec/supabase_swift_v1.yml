@@ -3039,7 +3039,8 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          let buckets: [Bucket] = try await supabase.storage.listBuckets()
+          try await supabase.storage
+            .listBuckets()
           ```
 
   - id: get-bucket
@@ -3055,7 +3056,8 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          try await supabase.storage.getBucket(id: "avatars")
+          let bucket = try await supabase.storage
+            .getBucket("avatars")
           ```
 
   - id: create-bucket
@@ -3071,7 +3073,15 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          try await supabase.storage.createBucket(id: "avatars")
+          try await supabase.storage
+            .createBucket(
+              "avatars", 
+              options: BucketOptions(
+                public: false,
+                allowedMimeTypes: ["image/png"],
+                fileSizeLimit: 1024
+              )
+            )
           ```
 
   - id: empty-bucket
@@ -3087,8 +3097,33 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          try await supabase.storage.emptyBucket(id: "avatars")
+          try await supabase.storage
+            .emptyBucket("avatars")
           ```
+  - id: update-bucket
+    title: updateBucket()
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: `select` and `update`
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    examples:
+      - id: update-bucket
+        name: Update bucket
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.storage
+            .updateBucket(
+              "avatars", 
+              options: BucketOptions(
+                public: false,
+                allowedMimeTypes: ["image/png"],
+                fileSizeLimit: 1024
+              )
+            )
+          ```
+
   - id: delete-bucket
     title: deleteBucket()
     notes: |
@@ -3102,7 +3137,8 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          try await supabase.storage.deleteBucket(id: "avatars")
+          try await supabase.storage
+            .deleteBucket("avatars")
           ```
 
   - id: from-upload
@@ -3110,7 +3146,7 @@ functions:
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
-        - `objects` table permissions: `insert`
+        - `objects` table permissions: only `insert` when you are uploading new files and `select`, `insert` and `update` when you are upserting files
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: upload-file
@@ -3118,18 +3154,25 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          import SupabaseStorage
+          let fileName = "avatar1.png"
 
-          let file = File(name: "avatar1",
-                          data: fileData,
-                          fileName: "avatar1.png",
-                          contentType: "png")
+          let file = File(
+            name: fileName,
+            data: fileData,
+            fileName: fileName,
+            contentType: "image/png"
+          )
 
-          try await supabase.storage.from(id: "avatars").upload(
-                          path: "public/avatar1.png",
-                          file: file,
-                          fileOptions: FileOptions(cacheControl: "3600")
-                      )
+          try await supabase.storage
+            .from("avatars")
+            .upload(
+              path: "public/\(fileName)",
+              file: file,
+              fileOptions: FileOptions(
+                cacheControl: "3600",
+                upsert: false
+              )
+            )
           ```
 
   - id: from-update
@@ -3145,18 +3188,25 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          import SupabaseStorage
+          let fileName = "avatar1.png"
 
-          let file = File(name: "avatar2",
-                          data: fileData,
-                          fileName: "avatar2.png",
-                          contentType: "png")
+          let file = File(
+            name: fileName,
+            data: fileData,
+            fileName: fileName,
+            contentType: "image/png"
+          )
 
-          try await supabase.storage.from(id: "avatars").update(
-                          path: "public/avatar1.png",
-                          file: file,
-                          fileOptions: FileOptions(cacheControl: "3600")
-                      )
+          try await supabase.storage
+            .from("avatars")
+            .update(
+              path: "public/\(fileName)",
+              file: file,
+              fileOptions: FileOptions(
+                cacheControl: "3600",
+                upsert: true
+              )
+            )
           ```
 
   - id: from-move
@@ -3172,10 +3222,29 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          try await supabase.storage.
-                  .from(id: "avatars")
-                  .move(fromPath: "public/avatar1.png",
-                        toPath: "public/avatar2.png")
+          try await supabase
+            .storage
+            .from("avatars")
+            .move(from: "public/avatar1.png", to: "private/avatar2.png")
+          ```
+
+  - id: from-copy
+    title: from.copy()
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `insert` and `select`
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    examples:
+      - id: copy-file
+        name: Copy file
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase
+            .storage
+            .from("avatars")
+            .copy(from: "public/avatar1.png", to: "private/avatar2.png")
           ```
 
   - id: from-create-signed-url
@@ -3191,10 +3260,89 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          try await supabase.storage.
-                  .from(id: "avatars")
-                  .createSignedURL(path: "avatar1.png", expiresIn: 60)
+          let signedURL = try await supabase.storage
+            .from("avatars")
+            .createSignedURL(path: "folder/avatar1.png", expiresIn: 60)
           ```
+      - id: create-signed-url-with-transformations
+        name: Create a signed URL for an asset with transformations
+        isSpotlight: true
+        code: |
+          ```swift
+          let signedURL = try await supabase.storage
+            .from("avatars")
+            .createSignedURL(
+              path: "folder/avatar1.png",
+              expiresIn: 60,
+              transform: TransformOptions(
+                width: 100,
+                height: 100
+              )
+            )
+          ```
+      - id: create-signed-url-with-download
+        name: Create a signed URL which triggers the download of the asset
+        isSpotlight: true
+        code: |
+          ```swift
+          let signedURL = try await supabase.storage
+            .from("avatars")
+            .createSignedURL(
+              path: "folder/avatar1.png", expiresIn: 60,
+              download: true
+            )
+          ```
+        note: |
+          You can also sepcify a `String` in the `download` parameter to define the file name for the downloaded asset.
+
+  - id: from-get-public-url
+    title: from.getPublicUrl()
+    notes: |
+      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [supabase.com/dashboard](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    examples:
+      - id: returns-the-url-for-an-asset-in-a-public-bucket
+        name: Returns the URL for an asset in a public bucket
+        isSpotlight: true
+        code: |
+          ```swift
+          let publicURL = try supabase.storage
+            .from("public-bucket")
+            .getPublicURL(path: "folder/avatar1.png")
+          ```
+      - id: transform-asset-in-public-bucket
+        name: Returns the URL for an asset in a public bucket with transformations
+        isSpotlight: true
+        code: |
+          ```swift
+          let publicURL = try supabase.storage
+            .from("public-bucket")
+            .getPublicURL(
+              path: "folder/avatar1.png",
+              transform: TransformOptions(
+                width: 100,
+                height: 100
+              )
+            )
+          ```
+      - id: download-asset-in-public-bucket
+        name: Returns the URL which triggers the download of an asset in a public bucket
+        isSpotlight: true
+        code: |
+          ```swift
+          let publicURL = try supabase.storage
+            .from("public-bucket")
+            .getPublicURL(
+              path: "folder/avatar1.png",
+              download: true
+            )
+          ```
+        note: |
+          You can also sepcify a `String` in the `download` parameter to define the file name for the downloaded asset.
+
   - id: from-download
     title: from.download()
     notes: |
@@ -3208,10 +3356,27 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          try await supabase.storage.
-                  .from(id: "avatars")
-                  .download(path: "public/avatar1.png")
+          let data = try await supabase.storage
+            .from("avatars")
+            .download(path: "folder/avatar1.png")
           ```
+      - id: download-file-with-transformations
+        name: Download file with transformations
+        isSpotlight: true
+        code: |
+          ```swift
+          let data = try await supabase.storage
+            .from("avatars")
+            .download(
+              path: "folder/avatar1.png",
+              options: TransformOptions(
+                width: 100,
+                height: 100,
+                quality: 80
+              )
+            )
+          ```
+
   - id: from-remove
     title: from.remove()
     notes: |
@@ -3225,9 +3390,9 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          try await supabase.storage.
-                  .from(id: "avatars")
-                  .remove(paths: ["avatar1.png"])
+          try await supabase.storage
+            .from("avatars")
+            .remove(paths: ["folder/avatar1.png"])
           ```
 
   - id: from-list
@@ -3243,7 +3408,30 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          try await supabase.storage.
-                  .from(id: "avatars")
-                  .list()
+          let files = try await supabase.storage
+            .from("avatars")
+            .list(
+              path: "folder",
+              options: SearchOptions(
+                limit: 100,
+                offset: 0,
+                sortBy: SortBy(column: "name", order: "asc")
+              )
+            )
+          ```
+      - id: search-files-in-a-bucket
+        name: Search files in a bucket
+        code: |
+          ```swift
+          let files = try await supabase.storage
+            .from("avatars")
+            .list(
+              path: "folder",
+              options: SearchOptions(
+                limit: 100,
+                offset: 0,
+                sortBy: SortBy(column: "name", order: "asc"),
+                search: "jon"
+              )
+            )
           ```
