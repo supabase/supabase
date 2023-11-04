@@ -25,14 +25,14 @@ functions:
         name: Initialize Client
         code: |
           ```swift
-          let client = SupabaseClient(supabaseURL: "https://xyzcompany.supabase.co", supabaseKey: "public-anon-key")
+          let client = SupabaseClient(supabaseURL: URL(string: "https://xyzcompany.supabase.co")!, supabaseKey: "public-anon-key")
           ```
       - id: initialize-client-custom-options
         name: Initialize Client with custom options
         code: |
           ```swift
           let client = SupabaseClient(
-            supabaseURL: "https://xyzcompany.supabase.co", 
+            supabaseURL: URL(string: "https://xyzcompany.supabase.co")!, 
             supabaseKey: "public-anon-key",
             options: SupabaseClientOptions(
               db: .init(
@@ -59,7 +59,7 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          let supabase = SupabaseClient(supabaseURL: "https://xyzcompany.supabase.co'", supabaseKey: "public-anon-key")
+          let supabase = SupabaseClient(supabaseURL: URL(string: "https://xyzcompany.supabase.co")!, supabaseKey: "public-anon-key")
           let auth = supabase.auth
           ```
       - id: create-auth-client-with-custom-storage
@@ -68,7 +68,7 @@ functions:
         code: |
           ```swift
           let supabase = SupabaseClient(
-            supabaseURL: "https://xyzcompany.supabase.co'", 
+            supabaseURL: URL(string: "https://xyzcompany.supabase.co")!, 
             supabaseKey: "public-anon-key",
             options: .init(
               auth: .init(
@@ -261,10 +261,12 @@ functions:
         description: Use this method to implement native Sign In With Apple.
         code: |
           ```swift
-          let session = await supabase.auth.signInWithIdToken(
-            provider: .apple,
-            token: "your-id-token",
-            nonce: "your nonce"
+          let session = try await supabase.auth.signInWithIdToken(
+            credentials: OpenIDConnectCredentials(
+              provider: .apple,
+              idToken: "your-id-token",
+              nonce: "your nonce"
+            )
           )
           ```
   - id: sign-out
@@ -423,7 +425,7 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          for await (event, session) in supabase.auth.onAuthStateChange() {
+          for await (event, session) in await supabase.auth.onAuthStateChange() {
             print(event, session)
           }
           ```
@@ -431,7 +433,7 @@ functions:
         name: Listen to a specific event
         code: |
           ```swift
-          for await (_, session) in supabase.auth.onAuthStateChange().filter({ $0.event == .signedIn }) {
+          for await (_, session) in await supabase.auth.onAuthStateChange().filter({ $0.event == .signedIn }) {
             // handle signIn event.
           }
           ```
@@ -471,7 +473,7 @@ functions:
           ```swift
           let response = try await supabase.auth.mfa.enroll(
             params: MFAEnrollParams(
-              issuer: "optional issuer"
+              issuer: "optional issuer",
               friendlyName: "optional friendly name"
             )
           )
@@ -512,7 +514,7 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          let session = await supabase.auth.mfa.verify(
+          let session = try await supabase.auth.mfa.verify(
             params: MFAVerifyParams(
               factorId: "34e770dd-9ff9-416c-87fa-43b31d7ef225",
               challengeId: "4034ae6f-a8ce-4fb5-8ee5-69a5863a7c15",
@@ -598,7 +600,7 @@ functions:
             let name: String
           }
 
-          let countries: [Country] = try await client.database
+          let countries: [Country] = try await supabase.database
             .from("countries")
             .select()
             .execute()
@@ -1223,7 +1225,7 @@ functions:
             let name: String
           }
 
-          let country = Country(id: 1, name: Denmark)
+          let country = Country(id: 1, name: "Denmark")
 
           try await supabase.database
             .from("countries")
@@ -1249,7 +1251,7 @@ functions:
         name: Create a record and return it
         code: |
           ```swift
-          struct Country: Encodable {
+          struct Country: Codable {
             let id: Int
             let name: String
           }
@@ -1257,7 +1259,7 @@ functions:
           let country: Country = try await supabase.database
             .from("countries")
             // use `returning: .representation` to return the created object.
-            .insert(Country(id: 1, name: Denmark), returning: .representation)
+            .insert(Country(id: 1, name: "Denmark"), returning: .representation)
             // specify you want a single value returned, otherwise it returns a list.
             .single() 
             .execute()
@@ -1438,7 +1440,7 @@ functions:
               ),
               returning: .representation
             )
-            .eq("address->postcode", "90210")
+            .eq("address->postcode", value: "90210")
             .execute()
             .value
           ```
@@ -1489,9 +1491,13 @@ functions:
         name: Upsert your data
         code: |
           ```swift
+          struct Country: Encodable {
+            let id: Int
+            let name: String
+          }
           try await supabase.database
             .from("countries")
-            .upsert(["id": 1, "name": "Albania"])
+            .upsert(Country(id: 1, name: "Albania"))
             .execute()
           ```
         data:
@@ -1762,54 +1768,6 @@ functions:
         description: |
           You can process large payloads by passing in an array as an argument.
         hideCodeBlock: true
-      - id: call-a-postgres-function-with-filters
-        name: Call a Postgres function with filters
-        code: |
-          ```swift
-          struct Country: Decodable {
-            let id: Int
-            let name: String
-          }
-
-          let country: Country = await supabase.database
-            .rpc("list_stored_countries")
-            .eq("id", value: 1)
-            .single()
-            .execute()
-            .value
-          ```
-        data:
-          sql: |
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'France'),
-              (2, 'United Kingdom');
-
-            create function list_stored_countries() returns setof countries as $$
-              select * from countries;
-            $$ language sql;
-            ```
-        response: |
-          ```json
-          {
-            "data": {
-              "id": 1,
-              "name": "France"
-            },
-            "status": 200,
-            "statusText": "OK"
-          }
-          ```
-        description: |
-          Postgres functions that return tables can also be combined with
-          [Filters](/docs/reference/swift/using-filters) and
-          [Modifiers](/docs/reference/swift/using-modifiers).
-        hideCodeBlock: true
 
   - id: using-filters
     title: Using Filters
@@ -1839,7 +1797,7 @@ functions:
 
           try await supabase.database
             .from("citites")
-            .eq("name", "The Shire")    // Incorrect
+            .eq("name", value: "The Shire")    // Incorrect
             .select("name, country_id")
           ```
       - id: chaining-filters
@@ -1862,10 +1820,10 @@ functions:
         code: |
           ```swift
           let filterByName: String? = nil
-          let filterPopLow = 1000
-          let filterPopHigh = 10000
+          let filterPopLow: Int? = 1000
+          let filterPopHigh: Int? = 10000
 
-          var query = supabase.database
+          var query = await supabase.database
             .from("cities")
             .select("name, country_id")
 
@@ -1879,7 +1837,10 @@ functions:
             query = query.lt("population", value: filterPopHigh)
           }
 
-          let result: ResponseType = try await query.execute().value
+          struct Response: Decodable {
+            // expected fields
+          }
+          let result: Response = try await query.execute().value
           ```
       - id: filter-by-value-within-json-column
         name: Filter by values within a JSON column
@@ -1888,7 +1849,7 @@ functions:
           try await supabase.database
             .from("users")
             .select()
-            .eq("address->postcode", 90210)
+            .eq("address->postcode", value: 90210)
           ```
         data:
           sql: |
@@ -1987,8 +1948,8 @@ functions:
       or() expects you to use the raw PostgREST syntax for the filter names and values.
 
       ```swift
-      .or(#"id.in.(5,6,7), arraycol.cs.{"a","b"}")  // Use `()` for `in` filter, `{}` for array values and `cs` for `contains()`.
-      .or(#"id.in.(5,6,7), arraycol.cd.{"a","b"}")  // Use `cd` for `containedBy()`
+      .or(#"id.in.(5,6,7), arraycol.cs.{"a","b"}"#)  // Use `()` for `in` filter, `{}` for array values and `cs` for `contains()`.
+      .or(#"id.in.(5,6,7), arraycol.cd.{"a","b"}"#)  // Use `cd` for `containedBy()`
       ```
     examples:
       - id: with-select
@@ -2075,7 +2036,7 @@ functions:
 
         ```swift
         .not("name", operator: .eq, value: "Paris")
-        .not("arraycol", operator: .cs, value: #"{"a","b"}") // Use Postgres array {} for array column and 'cs' for contains.
+        .not("arraycol", operator: .cs, value: #"{"a","b"}"#) // Use Postgres array {} for array column and 'cs' for contains.
         .not("rangecol", operator: .cs, value: "(1,2]") // Use Postgres range syntax for range column.
         .not("id", operator: .in, value: "(6,7)")  // Use Postgres list () and 'in' for in_ filter.
         .not("id", operator: .in, value: "(\(mylist.join(separator: ",")))")  // You can insert a Swift list array.
@@ -2086,10 +2047,10 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          try await client.database
+          try await supabase.database
             .from("countries")
             .select()
-            .not(column: "name", operator: .is, value: "")
+            .not("name", operator: .is, value: "")
             .execute()
           ```
 
@@ -2099,7 +2060,7 @@ functions:
       - id: with-select
         name: With `select()`
         code: |
-          ```ts
+          ```swift
           try await supabase.database
             .from("countries")
             .select("name")
@@ -2140,7 +2101,7 @@ functions:
 
       ```swift
       .filter("id", operator: .in, value: "(5,6,7)")  // Use `()` for `in` filter
-      .filter("arraycol", operator: .cs, value: #"{"a","b"}")  // Use `cs` for `contains()`, `{}` for array values
+      .filter("arraycol", operator: .cs, value: #"{"a","b"}"#)  // Use `cs` for `contains()`, `{}` for array values
       ```
     examples:
       - id: with-select
@@ -2150,7 +2111,7 @@ functions:
           try await supabase.database
             .from("countries")
             .select()
-            .filter("name", operator: .in, #"("Algeria","Japan")")
+            .filter("name", operator: .in, value: #"("Algeria","Japan")"#)
           ```
         data:
           sql: |
@@ -2456,7 +2417,7 @@ functions:
         name: On a foreign table
         code: |
           ```swift
-          try await client.database
+          try await supabase.database
             .from("countries")
             .select(
               """
@@ -2682,7 +2643,7 @@ functions:
               }
             )
 
-          print(typeof(response)) // String?
+          print(type(of: response)) // String?
           ```
       - id: error-handling
         name: Error handling
@@ -2777,19 +2738,23 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          supabase
+          let channel = supabase
             .realtime
             .channel("room1")
+
+          channel
             .on("broadcast", filter: ChannelFilter(event: "cursor-pos")) { message in 
               print("Cursor position received!", message.payload)
             }
             .subscribe { status, error in
               if status == .subscribed {
-                channel.send(
-                  type: .broadcast,
-                  event: "cursor-pos",
-                  payload: ["x": Double.random(in: 0...1), "y": Double.random(in: 0...1)],
-                )
+                Task {
+                  await channel.send(
+                    type: .broadcast,
+                    event: "cursor-pos",
+                    payload: ["x": Double.random(in: 0...1), "y": Double.random(in: 0...1)]
+                  )
+                }
               }
             }
           ```
@@ -2798,7 +2763,7 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          let channel = supabase.channel("room1")
+          let channel = supabase.realtime.channel("room1")
           channel
             .on("presence", filter: ChannelFilter(event: "sync")) { _ in
               print("Synced presence state: ", channel.presenceState())
@@ -2816,10 +2781,10 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          let channel = supabase.channel("room1")
+          let channel = supabase.realtime.channel("room1")
           channel
             .on("presence", filter: ChannelFilter(event: "join")) { message in 
-              print('Newly joined presences: ', message.payload)
+              print("Newly joined presences: ", message.payload)
             }
             .subscribe { status, error in
               if status == .subscribed {
@@ -2834,11 +2799,11 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          let channel = supabase.channel("room1")
+          let channel = supabase.realtime.channel("room1")
           channel
             .on("presence", filter: ChannelFilter(event: "leave")) { message in 
-              print('Newly left presences: ', message.payload)
-            })
+              print("Newly left presences: ", message.payload)
+            }
             .subscribe { status, error in
               if status == .subscribed {
                 Task {
@@ -2853,10 +2818,10 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          supabase
+          supabase.realtime
             .channel("room1")
             .on("postgres_changes", filter: ChannelFilter(event: "*", schema: "*")) { message in
-              print('Change received!', message.payload)
+              print("Change received!", message.payload)
             }
             .subscribe()
           ```
@@ -2864,10 +2829,10 @@ functions:
         name: Listen to a specific table
         code: |
           ```swift
-          supabase
+          supabase.realtime
             .channel("room1")
             .on("postgres_changes", filter: ChannelFilter(event: "*", schema: "public", table: "countries")) { message in
-              print('Change received!', message.payload)
+              print("Change received!", message.payload)
             }
             .subscribe()
           ```
@@ -2875,10 +2840,10 @@ functions:
         name: Listen to inserts
         code: |
           ```swift
-          supabase
+          supabase.realtime
             .channel("room1")
             .on("postgres_changes", filter: ChannelFilter(event: "INSERT", schema: "public", table: "countries")) { message in
-              print('Change received!', message.payload)
+              print("Change received!", message.payload)
             }
             .subscribe()
           ```
@@ -2893,10 +2858,10 @@ functions:
           ```
         code: |
           ```swift
-          supabase
+          supabase.realtime
             .channel("room1")
             .on("postgres_changes", filter: ChannelFilter(event: "UPDATE", schema: "public", table: "countries")) { message in
-              print('Change received!', message.payload)
+              print("Change received!", message.payload)
             }
             .subscribe()
           ```
@@ -2911,10 +2876,10 @@ functions:
           ```
         code: |
           ```swift
-          supabase
+          supabase.realtime
             .channel("room1")
             .on("postgres_changes", filter: ChannelFilter(event: "DELETE", schema: "public", table: "countries")) { message in
-              print('Change received!', message.payload)
+              print("Change received!", message.payload)
             }
             .subscribe()
           ```
@@ -2923,11 +2888,19 @@ functions:
         description: You can chain listeners if you want to listen to multiple events for each table.
         code: |
           ```swift
-          supabase
+          supabase.realtime
             .channel("room1")
             .on("postgres_changes", filter: ChannelFilter(event: "INSERT", schema: "public", table: "countries"), handler: handleRecordInserted)
             .on("postgres_changes", filter: ChannelFilter(event: "DELETE", schema: "public", table: "countries"), handler: handleRecordDeleted)
             .subscribe()
+
+          func handleRecordInserted(_ message: Message) {
+            // handle message
+          }
+
+          func handleRecordDeleted(_ message: Message) {
+            // handle message
+          }
           ```
       - id: listening-to-row-level-changes
         name: Listen to row level changes
@@ -2936,7 +2909,7 @@ functions:
           - ``eq`` filter works with all database types as under the hood, it's casting both the filter value and the database value to the correct type and then comparing them.
         code: |
           ```swift
-          supabase
+          supabase.realtime
             .channel("room1")
             .on(
               "postgres_changes",
@@ -2949,6 +2922,10 @@ functions:
               handler: handleRecordInserted
             )
             .subscribe()
+
+            func handleRecordInserted(_ message: Message) {
+              // handle message
+            }
           ```
   - id: broadcast-message
     title: broadcastMessage()
@@ -2962,7 +2939,7 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          supabase
+          supabase.realtime
             .channel("room1")
             .subscribe { status, error in
               if status == .subscribed {
@@ -2981,7 +2958,7 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          await supabase
+          await supabase.realtime
             .channel("room1")
             .send(
               type: "broadcast",
@@ -3118,8 +3095,8 @@ functions:
               "avatars", 
               options: BucketOptions(
                 public: false,
-                allowedMimeTypes: ["image/png"],
-                fileSizeLimit: 1024
+                fileSizeLimit: 1024,
+                allowedMimeTypes: ["image/png"]
               )
             )
           ```
@@ -3322,7 +3299,7 @@ functions:
             .from("public-bucket")
             .getPublicURL(
               path: "folder/avatar1.png",
-              transform: TransformOptions(
+              options: TransformOptions(
                 width: 100,
                 height: 100
               )
