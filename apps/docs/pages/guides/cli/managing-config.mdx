@@ -45,6 +45,27 @@ secret = "env(GITHUB_SECRET)"
 redirect_uri = "" # Overrides the default auth redirectUrl.
 ```
 
+### Next.js Secrets
+
+In Next.js projects, `.env` is allowed to be checked into version control. In this case, you should be using the `.env.local` to store your secrets as this file is not meant to be checked into version control. So, now the above instructions would be:
+
+For example, if your `.env.local` contained the following values:
+
+```bash
+GITHUB_CLIENT_ID=""
+GITHUB_SECRET=""
+```
+
+Then you would reference them inside of our `config.toml` like this:
+
+```toml
+[auth.external.github]
+enabled = true
+client_id = "env.local(GITHUB_CLIENT_ID)"
+secret = "env.local(GITHUB_SECRET)"
+redirect_uri = "" # Overrides the default auth redirectUrl.
+```
+
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
 export default Page
