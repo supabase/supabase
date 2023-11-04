@@ -3297,7 +3297,7 @@ functions:
           }
           val changeFlow = channel.postgresChangeFlow<PostgresAction.Delete>(schema = "public") {
               table = "users"
-              filter = "id.eq.1"
+              filter = "id=eq.1"
           }
 
           //in a new coroutine:
