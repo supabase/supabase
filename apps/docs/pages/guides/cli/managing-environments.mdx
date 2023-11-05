@@ -178,6 +178,9 @@ The Supabase CLI requires a few environment variables to run in non-interactive 
 
 We recommend adding these as [encrypted secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets) to your GitHub Actions runners.
 
+Note that the Supabase CLI will automatically detect and use the `SUPABASE_ACCESS_TOKEN` and `SUPABASE_DB_PASSWORD` environment variables if they are present. 
+However, the `SUPABASE_PROJECT_ID` needs to be passed via the `--project-ref` flag as shown in the example below. 
+
 Create the following files inside the `.github/workflows` directory:
 
 <Tabs
