@@ -1,7 +1,13 @@
-import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
+import {
+  QueryClient,
+  useInfiniteQuery,
+  UseInfiniteQueryOptions,
+  useQueryClient,
+} from '@tanstack/react-query'
 import { executeSql, ExecuteSqlVariables } from 'data/sql/execute-sql-query'
 import { Entity } from './entity-type-query'
 import { entityTypeKeys } from './keys'
+import { useCallback } from 'react'
 
 export type EntityTypesVariables = {
   projectRef?: string
@@ -141,3 +147,62 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
       ...options,
     }
   )
+
+export function prefetchEntityTypes(
+  client: QueryClient,
+  {
+    projectRef,
+    connectionString,
+    schema = 'public',
+    search,
+    limit = 100,
+    sort,
+  }: Omit<EntityTypesVariables, 'page'>
+) {
+  return client.prefetchInfiniteQuery<EntityTypesData, EntityTypesError>(
+    entityTypeKeys.list(projectRef, { schema, search, sort, limit }),
+    {
+      queryFn: ({ signal, pageParam }) =>
+        getEntityTypes(
+          { projectRef, connectionString, schema, search, limit, page: pageParam, sort },
+          signal
+        ),
+      getNextPageParam(lastPage, pages) {
+        const page = pages.length
+        const currentTotalCount = page * limit
+        const totalCount = lastPage.data.count
+
+        if (currentTotalCount >= totalCount) {
+          return undefined
+        }
+
+        return page
+      },
+    }
+  )
+}
+
+export function usePrefetchEntityTypes() {
+  const client = useQueryClient()
+
+  return useCallback(
+    ({
+      projectRef,
+      connectionString,
+      schema = 'public',
+      search,
+      limit = 100,
+      sort,
+    }: Omit<EntityTypesVariables, 'page'>) => {
+      return prefetchEntityTypes(client, {
+        projectRef,
+        connectionString,
+        schema,
+        search,
+        limit,
+        sort,
+      })
+    },
+    [client]
+  )
+}
