@@ -60,8 +60,7 @@ While serving your local Edge Function, you can invoke it using curl or one of t
 <CH.Code>
 
 ```bash cURL
-# Run `supabase status` to get your SUPABASE_ANON_KEY
-curl --request POST 'http://localhost:54321/functions/v1/function-name' \
+curl --request POST 'http://localhost:54321/functions/v1/hello-world' \
   --header 'Authorization: Bearer SUPABASE_ANON_KEY' \
   --header 'Content-Type: application/json' \
   --data '{ "name":"Functions" }'
@@ -70,19 +69,25 @@ curl --request POST 'http://localhost:54321/functions/v1/function-name' \
 ```js JavaScript
 import { createClient } from '@supabase/supabase-js'
 
-// Run `supabase status` to see your local credentials
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY)
 
-const { data, error } = await supabase.functions.invoke('function-name', {
+const { data, error } = await supabase.functions.invoke('hello-world', {
   body: { name: 'Functions' },
 })
 ```
 
 </CH.Code>
 
+<Admonition type="tip" label="Where is my SUPABASE_ANON_KEY?">
+
+Run `supabase status` to see your local credentials.
+
+</Admonition>
+
 You should see the response `{ "message":"Hello Functions!" }`.
 
-If you execute the function with a different payload the response will change. <br />
+If you execute the function with a different payload the response will change.
+
 Modify the `--data '{"name":"Functions"}'` line to `--data '{"name":"World"}'` and try invoking the command again!
 
 ## Next steps
