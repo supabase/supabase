@@ -28,7 +28,6 @@ In order to use OAuth we will need to setup a endpoint for the `code` exchange, 
 Create a new file at `app/auth/callback/route.ts` and populate with the following:
 
 ```ts app/auth/callback/route.ts
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { type CookieOptions, createServerClient } from "@supabase/ssr";
