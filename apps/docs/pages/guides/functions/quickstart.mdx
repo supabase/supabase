@@ -155,15 +155,13 @@ import_map = './import_map.json'
 
 ### Error Handling
 
-When interacting with Edge Functions, it's important to be prepared for potential errors that might occur during the invocation. To handle errors effectively, the following error handling code can be used:
+The `supabase-js` library provides several error types that you can use to handle errors that might occur when invoking Edge Functions:
 
 ```js
 import { FunctionsHttpError, FunctionsRelayError, FunctionsFetchError } from '@supabase/supabase-js'
 
 const { data, error } = await supabase.functions.invoke('hello', {
-  headers: {
-    'my-custom-header': 'my-custom-header-value',
-  },
+  headers: { 'my-custom-header': 'my-custom-header-value' },
   body: { foo: 'bar' },
 })
 
@@ -176,10 +174,6 @@ if (error instanceof FunctionsHttpError) {
   console.log('Fetch error:', error.message)
 }
 ```
-
-In the provided error handling code, we're checking the type of error that occurred using the "instanceof" operator. This helps us differentiate between different types of errors and handle them appropriately. Depending on the type of error, we either log the error message or information specific to that type of error.
-
-This error handling mechanism ensures that your application can gracefully handle errors that might arise during the execution of Edge Functions, providing a more robust user experience.
 
 ### Database Functions vs Edge Functions
 

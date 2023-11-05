@@ -855,7 +855,7 @@ export const functions: NavMenuConstant = {
           name: 'Integrating with Supabase Storage',
           url: '/guides/functions/storage-caching',
         },
-        { name: 'Regional Invocations', url: '/guides/functions/regional-invocation' },
+        { name: 'Regional invocations', url: '/guides/functions/regional-invocation' },
         { name: 'Deploying with GitHub Actions', url: '/guides/functions/cicd-workflow' },
       ],
     },
@@ -871,9 +871,8 @@ export const functions: NavMenuConstant = {
       name: 'Examples',
       url: '/guides/functions/examples',
       items: [
-        { name: 'CORS support for Invoking from the browser', url: '/guides/functions/cors' },
+        { name: 'CORS support for invoking from the browser', url: '/guides/functions/cors' },
         { name: 'Scheduling Functions', url: '/guides/functions/schedule-functions' },
-        { name: 'Generating OpenAI GPT3 completions', url: '/guides/ai/examples/openai' },
         { name: 'Generating OG images ', url: '/guides/functions/examples/og-image' },
         {
           name: 'CAPTCHA support with Cloudflare Turnstile',
@@ -882,8 +881,7 @@ export const functions: NavMenuConstant = {
         { name: 'Building a Discord Bot', url: '/guides/functions/examples/discord-bot' },
         { name: 'Building a Telegram Bot', url: '/guides/functions/examples/telegram-bot' },
         { name: 'Handling Stripe Webhooks ', url: '/guides/functions/examples/stripe-webhooks' },
-        { name: 'Integrating with Upstash Redis', url: '/guides/functions/examples/upstash-redis' },
-        { name: 'Rate Limiting Edge Functions', url: '/guides/functions/examples/rate-limiting' },
+        { name: 'Rate-limiting with Redis', url: '/guides/functions/examples/rate-limiting' },
         {
           name: 'Taking Screenshots with Puppeteer',
           url: '/guides/functions/examples/screenshots',
