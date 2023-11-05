@@ -846,11 +846,11 @@ export const functions: NavMenuConstant = {
       items: [
         { name: 'Managing packages using Import Maps', url: '/guides/functions/import-maps' },
         { name: 'Managing Environment Variables', url: '/guides/functions/secrets' },
+        { name: 'Integrating with Supabase Auth', url: '/guides/functions/auth' },
         {
           name: 'Integrating with Postgres',
           url: '/guides/functions/connect-to-postgres',
         },
-        { name: 'Integrating with Supabase Auth', url: '/guides/functions/auth' },
         {
           name: 'Integrating with Supabase Storage',
           url: '/guides/functions/storage-caching',

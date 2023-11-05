@@ -8,11 +8,11 @@ export const meta = {
   tocVideo: 'cl7EuF1-RsY',
 }
 
-There are various ways to connect to your database using Edge Functions.
+There are various ways to connect to your Postgres database using Edge Functions.
 
 ## Using supabase-js
 
-The `supabase-js` client is a great option for connection. It is a lightweight wrapper around the Supabase REST API, and it handles authentication for you. `supabase-js` works well with Row Level Security.
+The `supabase-js` client is a great option for connecting to your Supabase database since it handles authorization with Row Level Security, and it automatically formats your response as JSON.
 
 ```ts index.ts
 import { serve } from 'https://deno.land/std/http/server.ts'
