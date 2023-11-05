@@ -855,7 +855,7 @@ export const functions: NavMenuConstant = {
           name: 'Integrating with Supabase Storage',
           url: '/guides/functions/storage-caching',
         },
-        { name: 'Regional Invocation', url: '/guides/functions/regional-invocation' },
+        { name: 'Regional Invocations', url: '/guides/functions/regional-invocation' },
         { name: 'Deploying with GitHub Actions', url: '/guides/functions/cicd-workflow' },
       ],
     },
