@@ -2,17 +2,41 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   id: 'functions-import-maps',
-  title: 'Using Import Maps',
-  description: 'Managing packages and dependencies using Import Maps.',
-  subtitle: 'Managing packages and dependencies using Import Maps.',
+  title: 'Managing dependencies',
+  description: 'Managing packages and dependencies.',
+  subtitle: 'Managing packages and dependencies.',
   tocVideo: 'ILr3cneZuFk',
 }
 
-An Import Map us similar to a `package.json` file. They are a way to manage your dependencies.
+Developing with Edge Functions is similar to developing with Node.js, but with a few key differences. This guide will help you understand how to manage your dependencies.
 
-## What are Import Maps?
+## Importing dependencies
 
-An [Import Map](https://github.com/WICG/import-maps#the-import-map) is a web-platform standard that allows you to use bare specifiers. Consider this code:
+Supabase Edge Functions support:
+
+- The Deno [standard library](https://deno.land/std)
+- Third party [modules](https://deno.land/x)
+- Node.js modules published to npm
+
+We recommend using [esm.sh](https://esm.sh/) for importing that are published to npm. To do so you simply put `https://esm.sh/` in front of the package name. For example, when you want to use supabase-js within Supabase Edge Functions, you would import `createClient` as follows:
+
+```ts
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+```
+
+<Admonition label="npm support">
+
+Full support for NPM is under development and coming soon.
+
+</Admonition>
+
+## Importing Types
+
+If your [environment is set up properly](/docs/guides/functions/local-development) and the module you're importing is exporting types, the import will have types and autocompletion support.
+
+## Using Import Maps
+
+An [Import Map](https://github.com/WICG/import-maps#the-import-map) is similar to a `package.json` file. They are a way to manage your dependencies. Consider this code:
 
 ```ts
 // without import maps:
@@ -32,8 +56,6 @@ We can accomplish this using an Import Map, which is simply a JSON file with the
 }
 ```
 
-## Import Map Placement
-
 We recommend creating one `import_map.json` within the `/supabase/functions` folder, similar to a `package.json` file, to define imports that can be used across all of your project's functions.
 
 ```bash
@@ -49,7 +71,7 @@ Alternatively, you can create one `import_map.json` file in each function folder
 
 You can override this default behaviour by providing the `--import-map <string>` flag to the `serve` and `deploy` commands.
 
-## Visual Studio Code Configuration
+### Configuring VSCode
 
 In order for vscode to understand the imports correctly, you need to specify the `deno.importMap` flag in your `.vscode/settings.json` file:
 

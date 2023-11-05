@@ -143,22 +143,6 @@ We recommend this folder structure:
     └── config.toml
 ```
 
-### Importing modules
-
-Supabase Edge Functions support:
-
-- The Deno [standard library](https://deno.land/std)
-- Third party [modules](https://deno.land/x)
-- Node.js modules published to npm
-
-We recommend using [esm.sh](https://esm.sh/) for importing that are published to npm. To do so you simply put `https://esm.sh/` in front of the package name. For example, when you want to use supabase-js within Supabase Edge Functions, you would import `createClient` as follows:
-
-```ts
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-```
-
-If your [environment is set up properly](/docs/guides/functions/local-development) and the module you're importing is exporting types, the import will have types and autocompletion support.
-
 ### Using config.toml
 
 Individual function configuration like [JWT verification](/docs/guides/cli/config#functions.function_name.verify_jwt) and [import map location](/docs/guides/cli/config#functions.function_name.import_map) can be set via the `config.toml` file.

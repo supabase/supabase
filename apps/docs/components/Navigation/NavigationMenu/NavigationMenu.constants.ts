@@ -844,7 +844,7 @@ export const functions: NavMenuConstant = {
       name: 'Guides',
       url: undefined,
       items: [
-        { name: 'Managing packages using Import Maps', url: '/guides/functions/import-maps' },
+        { name: 'Managing dependencies', url: '/guides/functions/import-maps' },
         { name: 'Managing Environment Variables', url: '/guides/functions/secrets' },
         { name: 'Integrating with Supabase Auth', url: '/guides/functions/auth' },
         {
