@@ -49,7 +49,7 @@ const { data, error } = await supabase.functions.invoke('hello-world', {
 
 You can verify the region the function was executed by looking at the `x-sb-edge-region` HTTP header in the response. You can also find it as metadata in [Edge Function Logs](/docs/guides/functions/debugging).
 
-## Supported regions
+## Available regions
 
 These are the currently supported region values you can provide for `x-region` header.
 
