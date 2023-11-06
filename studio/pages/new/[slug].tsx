@@ -83,7 +83,7 @@ const Wizard: NextPageWithLayout = () => {
   )
 
   const isAdmin = useCheckPermissions(PermissionAction.CREATE, 'projects')
-  const isInvalidSlug = currentOrg !== undefined
+  const isInvalidSlug = isOrganizationsSuccess && currentOrg === undefined
   const isEmptyOrganizations = (organizations?.length ?? 0) <= 0 && isOrganizationsSuccess
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
 
@@ -116,12 +116,12 @@ const Wizard: NextPageWithLayout = () => {
   useEffect(() => {
     /*
      * Redirect to first org if the slug doesn't match an org slug
-     * this is mainly to capture the /project/new url, which is redirected from database.new
+     * this is mainly to capture the /new/new-project url, which is redirected from database.new
      */
     if (isInvalidSlug && (organizations?.length ?? 0) > 0) {
       router.push(`/new/${organizations?.[0].slug}`)
     }
-  }, [isInvalidSlug, organizations, router])
+  }, [isInvalidSlug, organizations])
 
   useEffect(() => {
     // User added a new payment method
