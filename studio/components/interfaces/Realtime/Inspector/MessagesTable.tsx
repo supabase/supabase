@@ -1,12 +1,13 @@
+import { useParams } from 'common'
 import { isEqual } from 'lodash'
 import { Loader2 } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { Key, useEffect, useState } from 'react'
 import DataGrid, { RenderRowProps, Row } from 'react-data-grid'
 import { Button, IconBroadcast, IconDatabaseChanges, IconExternalLink, IconPresence, cn } from 'ui'
 
-import { useParams } from 'common'
 import ShimmerLine from 'components/ui/ShimmerLine'
-import { useRouter } from 'next/router'
 import MessageSelection from './MessageSelection'
 import { LogData } from './Messages.types'
 import { ColumnRenderer } from './RealtimeMessageColumnRenderer'
@@ -33,54 +34,59 @@ const NoResultAlert = ({
 
   return (
     <div className="w-full max-w-md flex items-center flex-col">
-      {enabled ? <div>No Realtime messages found</div> : null}
-      <div className="text-foreground-lighter">Realtime message logs will be shown here</div>
+      {enabled ? <p>No Realtime messages found</p> : null}
+      <p className="text-foreground-lighter">Realtime message logs will be shown here</p>
+
       <div className="mt-4 border bg-surface-100 border-border rounded-md justify-start items-center flex flex-col w-full">
         <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">
           <IconBroadcast size="xlarge" className="bg-brand-400 rounded w-6 text-brand-600" />
           <div className="grow flex-col flex">
-            <div className="text-foreground">Create a Broadcast message</div>
-            <div className="text-foreground-lighter text-xs">Start developing in preview</div>
+            <p className="text-foreground">Create a Broadcast message</p>
+            <p className="text-foreground-lighter text-xs">Start developing in preview</p>
           </div>
           <Button type="default" onClick={showSendMessage}>
-            <span>Send a test message</span>
+            Send a test message
           </Button>
         </div>
         <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">
           <IconPresence size="xlarge" className="bg-brand-400 rounded w-6 text-brand-600" />
           <div className="grow flex-col flex">
-            <div className="text-foreground">Join from another browser tab</div>
-            <div className="text-foreground-lighter text-xs">
+            <p className="text-foreground">Join from another browser tab</p>
+            <p className="text-foreground-lighter text-xs">
               Experiment with presence messages between multiple clients
-            </div>
+            </p>
           </div>
-          <Button type="default" iconRight={<IconExternalLink />}>
-            <a href={`${router.basePath}${router.asPath}`} target="_blank">
-              <span>Open inspector</span>
-            </a>
-          </Button>
+          <Link href={`${router.basePath}${router.asPath}`} target="_blank">
+            <Button type="default" iconRight={<IconExternalLink />}>
+              Open inspector
+            </Button>
+          </Link>
         </div>
 
         <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">
           <IconDatabaseChanges size="xlarge" className="bg-brand-400 rounded w-6 text-brand-600" />
           <div className="grow flex-col flex">
-            <div className="text-foreground">Listen to a table for changes</div>
-            <div className="text-foreground-lighter text-xs">Start developing in preview</div>
+            <p className="text-foreground">Listen to a table for changes</p>
+            <p className="text-foreground-lighter text-xs">Start developing in preview</p>
           </div>
-          <Button type="default" iconRight={<IconExternalLink />}>
-            <a href={`${router.basePath}/project/${ref}/database/replication`} target="_blank">
-              <span>Replication settings</span>
-            </a>
-          </Button>
+          <Link
+            href={`${router.basePath}/project/${ref}/database/replication`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <Button type="default" iconRight={<IconExternalLink />}>
+              Replication settings
+            </Button>
+          </Link>
         </div>
         <div className="w-full px-5 py-4 items-center gap-4 inline-flex rounded-b-md bg-background">
           <div className="grow flex-col flex">
-            <div className="text-foreground">Not sure what to do?</div>
-            <div className="text-foreground-lighter text-xs">Browse our documentation</div>
+            <p className="text-foreground">Not sure what to do?</p>
+            <p className="text-foreground-lighter text-xs">Browse our documentation</p>
           </div>
           <Button type="default" iconRight={<IconExternalLink />}>
-            <a href="https://supabase.com/docs/guides/realtime" target="_blank">
-              <span>Documentation</span>
+            <a href="https://supabase.com/docs/guides/realtime" target="_blank" rel="noreferrer">
+              Documentation
             </a>
           </Button>
         </div>
