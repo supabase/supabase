@@ -54,7 +54,6 @@ const Hero = () => {
                       href="https://supabase.com/dashboard"
                       as="https://supabase.com/dashboard"
                       onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_startProject'])}
-                      tabIndex={-1}
                     >
                       Start your project
                     </Link>
@@ -64,7 +63,6 @@ const Hero = () => {
                       href="/docs"
                       as="/docs"
                       onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_documentation'])}
-                      tabIndex={-1}
                     >
                       Documentation
                     </Link>
