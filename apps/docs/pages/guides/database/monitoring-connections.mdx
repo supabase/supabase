@@ -1,0 +1,61 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'monitoring-connections',
+  title: 'Monitoring Connections',
+  description: 'Monitoring connections with Postgres and Supavisor.',
+}
+
+## max_connections
+
+Every Postgres database has a connection limit.
+
+Return the direct connection limit of your database with the query:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+  queryGroup="database-method"
+>
+<TabPanel id="sql" label="SQL">
+
+```sql
+show max_connections;
+```
+
+</TabPanel>
+</Tabs>
+
+Change your `max_connections` with a [custom Postgres configuration](/docs/guides/platform/custom-postgres-config) using the CLI.
+
+## pg_stat_activity
+
+We can see exactly how many connections Supavisor is using and confirm our connection pool size:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+  queryGroup="database-method"
+>
+<TabPanel id="sql" label="SQL">
+
+```sql
+select
+  count(*) as count,
+  application_name
+from pg_stat_activity
+where application_name like '%supavisor%'
+group by application_name
+order by application_name desc;
+```
+
+</TabPanel>
+</Tabs>
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

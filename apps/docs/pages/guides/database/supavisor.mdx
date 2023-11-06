@@ -1,0 +1,43 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'supavisor',
+  title: 'Supavisor',
+  description: 'Connection pooling with Supavisor.',
+}
+
+<Admonition type="note">
+
+PgBouncer is being deprecated in favor of Supavisor. Supavisor is available on all new and existing projects.
+
+On 15th January 2024 PgBouncer will be disabled.
+
+Additionally, your Supabase database domain (db.projectref.supabase.co) will start resolving to an IPv6 address.
+
+No changes are required if your network supports communicating via IPv6. Otherwise, update your applications to use Supavisor which will continue to support IPv4 connections.
+
+[Full details here](https://github.com/orgs/supabase/discussions/17817).
+
+</Admonition>
+
+Supavisor is a connection pooler by Supabase. It can provide a more scalable connection pool than PgBouncer, and runs on a high-availability cluster segregated from your database.
+
+Using a clustered connection pooler can free up some CPU cycles for your database to use for queries. It also makes connecting to Postgres in a serverless environment much easier.
+
+## PgBouncer Compatability
+
+Supavisor is compatible with with PgBouncer pool modes. Application changes will not be required to switch from PgBouncer to Supavisor.
+
+## Migrating to Supavisor
+
+When a project is switched from PgBouncer to Supavisor, the appropriate connection string will be made available under the Connection Pooling section on [Database settings](https://supabase.com/dashboard/project/_/settings/database).
+
+While PgBouncer remains accessible for use, it will no longer be available for configuration from the dashboard. The PgBouncer connection string will also be similarly inaccessible from the dashboard.
+
+## Contribute
+
+Supavisor is open source and compatible with any Postgres deployment. Check out [the Github repository](https://github.com/supabase/supavisor).
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

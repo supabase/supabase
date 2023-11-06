@@ -1,0 +1,51 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'pool-modes',
+  title: 'Pooling & Pool Modes',
+  description: 'Understand different pool modes offered by Supavisor.',
+}
+
+## How connection pooling works
+
+A "connection pool" is a system (external to Postgres) which manages connections, rather than PostgreSQL's native system. Supabase uses [Supavisor](https://github.com/supabase/supavisor) for connection pooling.
+
+When a client makes a request, Supavisor "allocates" an available connection to the client. When the client transaction or session is completed the connection is returned to the pool and is free to be used by another client.
+
+![Connection pooling](/docs/img/guides/database/connection-pool.png)
+
+## Pool Modes
+
+Supavisor provides two Pool Modes, each handling connections differently:
+
+### Session
+
+When a new client connects, a connection is assigned to the client until it disconnects. Afterward, the connection is returned back to the pool.
+
+All PostgreSQL features except migrations can be used with this option.
+
+### Transaction
+
+This is the suggested option for serverless functions. A connection is only assigned to the client for the duration of a transaction. Two consecutive transactions from the same client could be executed over two different connections.
+
+Some session-based PostgreSQL features such as prepared statements are not available with this option. A comprehensive list of incompatible features can be found [here](https://www.pgbouncer.org/features.html).
+
+## Pooler Configuration
+
+You can [customize some parameters](https://supabase.com/dashboard/project/_/settings/database) for the connection pooler:
+
+1. Pooling Mode
+1. Default Pool Size
+
+The default pool size, and the maximum number of clients allowed to connect concurrently is automatically optimized based on the compute add-on being used. At the moment, the Dashboard only reflects any custom configuration being used, and does not include the default optimized numbers used for your project.
+
+A custom pooler configuration may also require manual updates to any relevant overrides when changing compute add-ons.
+
+## Additional Resources
+
+1. [Heroku Pooling Best Practices](https://devcenter.heroku.com/articles/best-practices-pgbouncer-configuration#database-connections-sessions-and-connection-pooling)
+1. [PgBouncer config](https://www.pgbouncer.org/config.html)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

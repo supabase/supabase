@@ -626,6 +626,15 @@ export const database: NavMenuConstant = {
       ],
     },
     {
+      name: 'Connection management',
+      url: undefined,
+      items: [
+        { name: 'Supavisor', url: '/guides/database/supavisor' },
+        { name: 'Pooling & pool modes', url: '/guides/database/supavisor-pool-modes' },
+        { name: 'Monitoring connections', url: '/guides/database/monitoring-connections' },
+      ],
+    },
+    {
       name: 'Postgres Guides',
       url: undefined,
       items: [
