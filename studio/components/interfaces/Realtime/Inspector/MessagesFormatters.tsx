@@ -1,5 +1,6 @@
-import CopyButton from 'components/ui/CopyButton'
 import { PropsWithChildren } from 'react'
+
+import CopyButton from 'components/ui/CopyButton'
 import { unixMicroToIsoTimestamp } from './Messages.utils'
 
 export const RowLayout = ({ children }: PropsWithChildren<{}>) => (
@@ -30,9 +31,7 @@ export const SelectionDetailedRow = ({
         className="group-hover:opacity-100 opacity-0 my-auto transition col-span-2  h-4 w-4 px-0 py-0"
         type="text"
         title="Copy to clipboard"
-      >
-        {''}
-      </CopyButton>
+      />
     </div>
   )
 }

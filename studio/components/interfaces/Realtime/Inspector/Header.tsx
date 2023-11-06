@@ -25,7 +25,7 @@ export const Header = ({ config, onChangeConfig }: HeaderProps) => {
           icon={config.enabled ? <StopCircle size="16" /> : <PlayCircle size="16" />}
           onClick={() => onChangeConfig({ ...config, enabled: !config.enabled })}
         >
-          <span>{config.enabled ? `Stop listening` : `Start listening`}</span>
+          {config.enabled ? `Stop listening` : `Start listening`}
         </Button>
       </div>
       <RealtimeTokensPopover config={config} onChangeConfig={onChangeConfig} />
