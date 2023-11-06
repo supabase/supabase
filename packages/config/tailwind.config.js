@@ -122,10 +122,6 @@ const uiConfig = ui({
             },
             '--tw-prose-body': theme('colors.scale[1100]'),
             '--tw-prose-headings': theme('colors.scale[1200]'),
-            h5: {
-              // h5 not included in --tw-prose-headings
-              color: theme('colors.scale[1200]'),
-            },
             '--tw-prose-lead': theme('colors.scale[1100]'),
             '--tw-prose-links': theme('colors.scale[1100]'),
             '--tw-prose-bold': theme('colors.scale[1100]'),
@@ -154,12 +150,20 @@ const uiConfig = ui({
             // the following are typography overrides
             // examples can be seen here —> https://github.com/tailwindlabs/tailwindcss-typography/blob/master/src/styles.js
             // reset all header font weights
-
-            'h1, h2, h3, h4, h5': {
+            h4: {
+              // override font size
+              fontSize: '1.15em',
+            },
+            h5: {
+              // h5 not included in --tw-prose-headings
+              color: theme('colors.scale[1200]'),
+            },
+            'h2, h3, h4, h5, h6': {
               fontWeight: '400',
             },
-            h2: {
-              fontWeight: '400',
+            'article h1, article h2, article h3, article h4, article h5, article h6': {
+              marginTop: '2em',
+              marginBottom: '1em',
             },
             p: {
               fontWeight: '400',
