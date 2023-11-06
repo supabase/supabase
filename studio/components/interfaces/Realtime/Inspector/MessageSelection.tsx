@@ -61,8 +61,8 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
         </div>
       </div>
       <div className="relative h-px flex-grow">
-        <div className="pt-4 px-4 flex flex-col gap-4">
-          <div className="flex flex-row justify-between items-center">
+        <div className="pt-4 flex flex-col gap-4">
+          <div className="px-4 flex flex-row justify-between items-center">
             <div className="transition">
               <CopyButton text={selectionText} type="default" title="Copy log to clipboard" />
             </div>
