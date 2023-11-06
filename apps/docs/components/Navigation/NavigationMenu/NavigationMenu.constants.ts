@@ -824,7 +824,6 @@ export const functions: NavMenuConstant = {
       name: 'Overview',
       url: '/guides/functions',
     },
-    ,
     {
       name: 'Quickstart',
       url: undefined,
