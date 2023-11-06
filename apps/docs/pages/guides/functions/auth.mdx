@@ -14,10 +14,9 @@ Edge Functions work seamlessly with [Supabase Auth](/docs/guides/auth).
 When a user makes a request to an Edge Function, you can use the Authorization header to set the Auth context in the Supabase client:
 
 ```js mark=10
-import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-serve(async (req: Request) => {
+Deno.serve(async (req: Request) => {
 
   const authHeader = req.headers.get('Authorization')!
   const supabaseClient = createClient(
@@ -33,13 +32,12 @@ Importantly, this is done _inside_ the `Deno.serve()` callback argument, so that
 
 ## Fetching the user
 
-After initializing a Supabase client with the Auth context, we can use `getUser()` to fetch the user object, and run queries in the context of the user with [Row Level Security (RLS)](/docs/guides/auth/row-level-security) policies enforced.
+After initializing a Supabase client with the Auth context, you can use `getUser()` to fetch the user object, and run queries in the context of the user with [Row Level Security (RLS)](/docs/guides/auth/row-level-security) policies enforced.
 
 ```js mark=13:14
-import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-serve(async (req: Request) => {
+Deno.serve(async (req: Request) => {
 
   const supabaseClient = createClient(
     Deno.env.get('SUPABASE_URL') ?? '',
@@ -47,7 +45,7 @@ serve(async (req: Request) => {
     { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
   )
 
-  // Now we can get the session or user object
+  // Get the session or user object
   const { data } = await supabaseClient.auth.getUser()
   const user = data.user
 
@@ -64,10 +62,9 @@ serve(async (req: Request) => {
 After initializing a Supabase client with the Auth context, all queries will be executed with the context of the user. For database queries, this means [Row Level Security](/docs/guides/auth/row-level-security) will be enforced.
 
 ```js mark=13
-import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-serve(async (req: Request) => {
+Deno.serve(async (req: Request) => {
 
   const supabaseClient = createClient(
     Deno.env.get('SUPABASE_URL') ?? '',

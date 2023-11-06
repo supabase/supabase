@@ -12,7 +12,7 @@ Once you have developed your Edge Functions locally, you can deploy them to your
 
 ## Login to the CLI
 
-If you're not yet logged into the Supabase CLI, you can do so by running:
+Log in to the Supabase CLI if necessary:
 
 ```bash
 supabase login
@@ -20,13 +20,13 @@ supabase login
 
 <Admonition type="tip" label="CLI not installed?">
 
-Check out the [CLI Docs](/docs/guides/cli) to learn how to install the Supabase CLI on your local machine.
+See the [CLI Docs](/docs/guides/cli) to learn how to install the Supabase CLI on your local machine.
 
 </Admonition>
 
 ## Get your Project ID
 
-Now we need to get your project ID. You can find by running
+Get the project ID associated with your function by running:
 
 ```bash
 supabase projects list
@@ -40,7 +40,7 @@ If you haven't yet created a Supabase project, you can do so by visiting [databa
 
 ## Link your local project
 
-Now we can [link](/docs/reference/cli/usage#supabase-link) your local project to your remote Supabase project using the ID you just retrieved:
+[Link](/docs/reference/cli/usage#supabase-link) your local project to your remote Supabase project using the ID you just retrieved:
 
 ```bash
 supabase link --project-ref your-project-id

@@ -4,12 +4,12 @@ export const meta = {
   id: 'function-regional-invocation',
   title: 'Regional Invocations',
   description: 'How to execute an Edge Functions in a particular region.',
-  subtitle: 'How to execute an Edge Functions in a particular region.',
+  subtitle: 'How to execute an Edge Function in a particular region.',
 }
 
 Edge Functions are executed in the region closest to the user making the request. This helps to reduce network latency and provide faster responses to the user.
 
-However, if your Function performs lot of database or storage operations, invoking the Function in the same region as your database may provide better performance. Some situations where this might be helpful include:
+However, if your Function performs lots of database or storage operations, invoking the Function in the same region as your database may provide better performance. Some situations where this might be helpful include:
 
 - Bulk adding and editing records in your database
 - Uploading files

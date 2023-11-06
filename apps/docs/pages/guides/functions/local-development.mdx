@@ -19,7 +19,7 @@ When using VSCode, you should install both the Deno CLI and the the Deno languag
 
 ## Deno support in subfolders
 
-In a given workspace (or workspace folder), sub-paths can be enabled for Deno, while code outside those paths will be not be enabled and the vscode built-in JavaScript/TypeScript language server will be used.
+You can enable the Deno language server for specific sub-paths in a workspace, while using VSCode's built-in JavaScript/TypeScript language server for all other files.
 
 For example if you have a project like this:
 
@@ -30,7 +30,7 @@ project
   └── functions
 ```
 
-Where you only want to enabled the `supabase/functions` path (and its subpaths) to be Deno enabled, you will want to add `./supabase/functions` to the list of _Deno: Enable Paths_ in the configuration. In your `.vscode/settings.json` file add:
+To enable the Deno language server only for the `supabase/functions` folder, add `./supabase/functions` to the list of _Deno: Enable Paths_ in the configuration. In your `.vscode/settings.json` file add:
 
 ```json
 {
