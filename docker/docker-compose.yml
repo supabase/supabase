@@ -154,7 +154,7 @@ services:
     command: "postgrest"
 
   realtime:
-    container_name: realtime-dev.supabase-realtime
+    container_name: supabase-realtime
     image: supabase/realtime:v2.10.1
     depends_on:
       db:
