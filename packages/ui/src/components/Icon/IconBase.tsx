@@ -1,7 +1,7 @@
 import React from 'react'
 import styleHandler from '../../lib/theme/styleHandler'
-import { IconContext } from './IconContext'
 import { cn } from '../../lib/utils'
+import { IconContext } from './IconContext'
 // @ts-ignore
 // import IconStyles from './Icon.module.css'
 
@@ -16,6 +16,7 @@ interface Props {
   background?: 'brand' | 'gray' | 'red' | 'yellow' | 'green' | 'blue' | 'indigo' | 'purple' | 'pink'
   src?: React.ReactNode
   icon?: any
+  viewBox?: string
 }
 
 interface StringMap {
