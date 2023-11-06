@@ -24,6 +24,9 @@ This upgrade method is currently in Beta, and is being slowly made available to 
 
 pg_upgrade performs an in-place upgrade on your database. For projects larger than 1GB, pg_upgrade is generally faster than a pause+restore cycle, and the speed advantage grows with the size of the database.
 
+1. Plan for an appropriate downtime window, and ensure you have reviewed the [caveats](#caveats) section of this document before executing the upgrade.
+1. Use the "Upgrade project" button on the [Infrastructure](https://supabase.com/dashboard/project/_/settings/infrastructure) section of your dashboard.
+
 Additionally, if a pg_upgrade upgrade should fail, your original DB would be brought back up online and be able to service requests.
 
 As a rough rule of thumb, pg_upgrade operates at ~100mbps (when executing an upgrade on your data). Using the size of your database, you can use this metric to derive an approximate sense of the downtime window necessary for the upgrade. During this window, you should plan for your DB and associated services to be unavailable.
