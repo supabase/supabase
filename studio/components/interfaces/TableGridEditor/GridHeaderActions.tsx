@@ -141,75 +141,51 @@ const GridHeaderActions = ({ table, openAPIDocsPanel, refreshDocs }: GridHeaderA
           <Tooltip.Trigger className="w-full">
             {(table.rls_enabled || showRLSWarning) && (
               <Link passHref href={`/project/${projectRef}/auth/policies?search=${table.id}`}>
-                <a>
-                  <Button
-                    type={table.rls_enabled ? 'link' : 'warning'}
-                    className="group"
-                    icon={
-                      table.rls_enabled ? (
-                        <IconLock strokeWidth={2} size={14} />
-                      ) : (
-                        <IconAlertCircle strokeWidth={2} size={14} />
-                      )
-                    }
-                  >
-                    {table.rls_enabled ? (
-                      <>
-                        <span className="flex-1 text-left mr-1">Security policies</span>
-                        <span className="text-right rounded-full px-2 py-1 font-bold hover:bg-brand-400 bg-brand-400 text-brand-1100">
-                          {policies.length}
-                        </span>
-                      </>
+                <Button
+                  type={table.rls_enabled ? 'link' : 'warning'}
+                  className="group"
+                  icon={
+                    table.rls_enabled ? (
+                      <IconLock strokeWidth={2} size={14} />
                     ) : (
-                      <span className="flex-1 text-left mr-1">No security policies</span>
-                    )}
-                    {!table.rls_enabled && (
-                      <Tooltip.Portal>
-                        <Tooltip.Content side="bottom">
-                          <Tooltip.Arrow className="radix-tooltip-arrow" />
-                          <div
-                            className={[
-                              'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                              'border border-scale-200',
-                            ].join(' ')}
-                          >
-                            <span className="text-xs text-foreground">
-                              You are allowing anonymous access to your data. Enable Row Level
-                              Security.
-                            </span>
-                          </div>
-                        </Tooltip.Content>
-                      </Tooltip.Portal>
-                    )}
-                    {/* {!table.rls_enabled && 'RLS is not enabled'} */}
-                  </Button>
-                </a>
+                      <IconAlertCircle strokeWidth={2} size={14} />
+                    )
+                  }
+                >
+                  {table.rls_enabled ? (
+                    <>
+                      <span className="flex-1 text-left mr-1">Security policies</span>
+                      <span className="text-right rounded-full px-2 py-1 font-bold hover:bg-brand-400 bg-brand-400 text-brand-1100">
+                        {policies.length}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="flex-1 text-left mr-1">No security policies</span>
+                  )}
+                  {!table.rls_enabled && (
+                    <Tooltip.Portal>
+                      <Tooltip.Content side="bottom">
+                        <Tooltip.Arrow className="radix-tooltip-arrow" />
+                        <div
+                          className={[
+                            'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                            'border border-scale-200',
+                          ].join(' ')}
+                        >
+                          <span className="text-xs text-foreground">
+                            You are allowing anonymous access to your data. Enable Row Level
+                            Security.
+                          </span>
+                        </div>
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  )}
+                  {/* {!table.rls_enabled && 'RLS is not enabled'} */}
+                </Button>
               </Link>
             )}
           </Tooltip.Trigger>
         </Tooltip.Root>
-
-        {(table.rls_enabled || showRLSWarning) && (
-          <Button
-            asChild
-            type={table.rls_enabled ? 'link' : 'warning'}
-            icon={
-              table.rls_enabled ? (
-                <IconLock strokeWidth={2} size={14} />
-              ) : (
-                <IconAlertCircle strokeWidth={2} size={14} />
-              )
-            }
-          >
-            <Link href={`/project/${projectRef}/auth/policies?search=${table.id}`}>
-              {!table.rls_enabled
-                ? 'RLS is not enabled'
-                : `${policies.length == 0 ? 'No' : policies.length} active RLS polic${
-                    policies.length > 1 || policies.length == 0 ? 'ies' : 'y'
-                  }`}
-            </Link>
-          </Button>
-        )}
         <Button
           type="default"
           icon={
