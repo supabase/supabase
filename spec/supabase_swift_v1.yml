@@ -2657,7 +2657,7 @@ functions:
       Invoke a Supabase Edge Function.
     notes: |
       - Requires an Authorization header.
-      - When you pass in a body to your function, we automatically attach the Content-Type header for `String`, and `Data`. If it doesn't match any of these types we assume the payload is `json`, serialise it and attach the `Content-Type` header as `application/json`. You can override this behaviour by passing in a `Content-Type` header of your own.
+      - When you pass in a body to your function, we automatically attach the Content-Type header for `String`, and `Data`. If it doesn't match any of these types we assume the payload is `json`, serialize it and attach the `Content-Type` header as `application/json`. You can override this behaviour by passing in a `Content-Type` header of your own.
     examples:
       - id: invocation-with-decodable
         name: Invocation with `Decodable` response
