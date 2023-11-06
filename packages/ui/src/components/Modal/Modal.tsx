@@ -37,6 +37,10 @@ interface Props {
   cancelText?: string
   onConfirm?: any
   confirmText?: string
+  /**
+   * @deprecated This prop is no longer being used in the Modal component
+   */
+  closable?: boolean
   showIcon?: boolean
   showCloseButton?: boolean
   footerBackground?: boolean
@@ -67,6 +71,7 @@ const Modal = ({
   onConfirm = () => {},
   onCancel = () => {},
   confirmText = 'Confirm',
+  closable = false,
   showIcon = false,
   showCloseButton = false,
   title,
