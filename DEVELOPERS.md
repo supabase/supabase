@@ -1,6 +1,6 @@
 # Developing Supabase
 
-1. [ started](#getting-started)
+1. [Getting started](#getting-started)
    - [Install dependencies](#install-dependencies)
 2. [Local development](#local-development)
    - [Fork the repository](#fork-the-repository)
