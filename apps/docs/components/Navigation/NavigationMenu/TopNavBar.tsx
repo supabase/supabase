@@ -1,5 +1,5 @@
 import { useTheme } from 'next-themes'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, useState } from 'react'
@@ -55,19 +55,17 @@ const TopNavBar: FC = () => {
     <nav className="h-[60px] border-b backdrop-blur backdrop-filter bg bg-opacity-75">
       <div className="px-5 max-w-7xl mx-auto flex gap-3 justify-between items-center h-full">
         <div className="lg:hidden">
-          <Link href="/">
-            <a className=" flex items-center gap-2">
-              <Image
-                className="cursor-pointer"
-                src={
-                  resolvedTheme === 'dark' ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'
-                }
-                width={96}
-                height={24}
-                alt="Supabase Logo"
-              />
-              <span className="font-mono text-sm font-medium text-brand">DOCS</span>
-            </a>
+          <Link href="/" className=" flex items-center gap-2">
+            <Image
+              className="cursor-pointer"
+              src={
+                resolvedTheme === 'dark' ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'
+              }
+              width={96}
+              height={24}
+              alt="Supabase Logo"
+            />
+            <span className="font-mono text-sm font-medium text-brand">DOCS</span>
           </Link>
         </div>
 
@@ -117,10 +115,9 @@ const TopNavBar: FC = () => {
             href="https://github.com/supabase/supabase"
             target="_blank"
             rel="noreferrer noopener"
+            className="px-2.5 py-1"
           >
-            <a className="px-2.5 py-1" target="_blank">
-              <IconGitHub size={16} className="text-scale-1100 hover:text-scale-1200 transition" />
-            </a>
+            <IconGitHub size={16} className="text-scale-1100 hover:text-scale-1200 transition" />
           </Link>
           <ThemeToggle />
         </div>

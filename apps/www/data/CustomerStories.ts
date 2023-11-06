@@ -1,6 +1,25 @@
 export const data = [
   {
     type: 'Customer Story',
+    title:
+      'Good Tape migrates to Supabase managed Postgres and Authentication and achieves database efficiency and a 60% cost reduction',
+    description:
+      "Explore how GoodTape achieved remarkable database efficiency and reduced costs by 60% through their successful migration to Supabase's managed services.",
+    imgUrl: 'images/customers/logos/goodtape.png',
+    logoUrl: 'images/customers/logos/goodtape.png',
+    organization: 'GoodTape',
+    url: '/customers/good-tape',
+    path: '/customers/good-tape',
+    postMeta: {
+      name: 'Paul Copplestone',
+      avatarUrl: 'https://avatars0.githubusercontent.com/u/10214025?v=4',
+      publishDate: 'Oct 31, 2023',
+      readLength: 4,
+    },
+    ctaText: 'View story',
+  },
+  {
+    type: 'Customer Story',
     title: 'Scaling securely: one million users in 7 months protected with Supabase Auth',
     description:
       'Learn how Pebblely, an AI image generation company, used Supabase Auth for rapid growth and adaptable security solutions.',

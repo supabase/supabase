@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Collapsible, Form, IconChevronRight, Input, Toggle } from 'ui'
 
-import NoProjectsOnPaidOrgInfo from 'components/interfaces/BillingV2/NoProjectsOnPaidOrgInfo'
+import NoProjectsOnPaidOrgInfo from 'components/interfaces/Billing/NoProjectsOnPaidOrgInfo'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import {
   FormActions,
@@ -169,14 +169,13 @@ const GeneralSettings = () => {
                           <p>
                             For more information about how we use personal information, please see
                             our{' '}
-                            <Link href="https://supabase.com/privacy">
-                              <a
-                                target="_blank"
-                                rel="noreferrer"
-                                className="text-brand border-b border-brand"
-                              >
-                                privacy policy
-                              </a>
+                            <Link
+                              href="https://supabase.com/privacy"
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-brand border-b border-brand"
+                            >
+                              privacy policy
                             </Link>
                             .
                           </p>

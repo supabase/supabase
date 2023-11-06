@@ -26,10 +26,10 @@ const AnnouncementBadge = ({
       className
     )}
   >
-    <Link href={url}>
-      <a
-        target={target}
-        className="
+    <Link
+      href={url}
+      target={target}
+      className="
           group/announcement
           relative
           flex flex-row
@@ -49,18 +49,18 @@ const AnnouncementBadge = ({
           overflow-hidden
           focus-visible:outline-none focus-visible:ring-brand-600 focus-visible:ring-2 focus-visible:rounded-full
           "
-      >
-        {badge && (
-          <Badge color="brandAlt" size="large" className="py-1">
-            {badge}
-          </Badge>
-        )}
-        <span className="text-foreground">{announcement}</span>
-        {hasArrow && (
-          <ArrowNarrowRightIcon className="h-4 ml-2 -translate-x-1 transition-transform group-hover/announcement:translate-x-0" />
-        )}
-        <div
-          className="absolute inset-0 -z-10 bg-gradient-to-br
+    >
+      {badge && (
+        <Badge color="brandAlt" size="large" className="py-1">
+          {badge}
+        </Badge>
+      )}
+      <span className="text-foreground">{announcement}</span>
+      {hasArrow && (
+        <ArrowNarrowRightIcon className="h-4 ml-2 -translate-x-1 transition-transform group-hover/announcement:translate-x-0" />
+      )}
+      <div
+        className="absolute inset-0 -z-10 bg-gradient-to-br
             opacity-70
             group-hover/announcement:opacity-100
             transition-opacity
@@ -69,8 +69,7 @@ const AnnouncementBadge = ({
             to-background-surface-300
             backdrop-blur-md
             "
-        />
-      </a>
+      />
     </Link>
   </div>
 )
