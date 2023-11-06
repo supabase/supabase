@@ -40,7 +40,6 @@ const TableSelector = ({
   onSelectTable,
 }: TableSelectorProps) => {
   const [open, setOpen] = useState(false)
-
   const { project } = useProjectContext()
 
   const { data, isLoading, isSuccess, isError, error, refetch } = useEntityTypesQuery({
@@ -58,14 +57,10 @@ const TableSelector = ({
       {isLoading && (
         <Button
           type="outline"
-          className="w-full [&>span]:w-full"
+          className="w-full [&>span]:w-full text-xs text-light"
           icon={<IconLoader className="animate-spin" size={12} />}
         >
-          <div>
-            <div className="w-full flex space-x-3">
-              <p className="text-xs text-light">Loading tables...</p>
-            </div>
-          </div>
+          <p className="flex">Loading tables...</p>
         </Button>
       )}
 

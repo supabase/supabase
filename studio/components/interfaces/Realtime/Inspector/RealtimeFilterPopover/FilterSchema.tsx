@@ -1,4 +1,4 @@
-import AllSchemasSelector from './AllSchemasSelector'
+import SchemaSelector from 'components/ui/SchemaSelector'
 
 export const FilterSchema = ({
   value,
@@ -12,7 +12,8 @@ export const FilterSchema = ({
       <p className="w-[60px] flex justify-end text-sm">WHERE</p>
 
       <div className="flex flex-row">
-        <AllSchemasSelector
+        <SchemaSelector
+          supportSelectAll
           size="small"
           selectedSchemaName={value}
           onSelectSchema={onChange}

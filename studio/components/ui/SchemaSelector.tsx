@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { PropsWithChildren, useState } from 'react'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -19,6 +19,7 @@ import {
   Popover_Shadcn_,
   ScrollArea,
 } from 'ui'
+import { PostgresSchema } from '@supabase/postgres-meta'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSchemasQuery } from 'data/database/schemas-query'
@@ -28,6 +29,7 @@ interface SchemaSelectorProps {
   size?: 'tiny' | 'small'
   showError?: boolean
   selectedSchemaName: string
+  supportSelectAll?: boolean
   onSelectSchema: (name: string) => void
   onSelectCreateSchema?: () => void
 }
@@ -37,6 +39,7 @@ const SchemaSelector = ({
   size = 'tiny',
   showError = true,
   selectedSchemaName,
+  supportSelectAll = false,
   onSelectSchema,
   onSelectCreateSchema,
 }: SchemaSelectorProps) => {
@@ -65,10 +68,8 @@ const SchemaSelector = ({
           className="w-full [&>span]:w-full"
           icon={<IconLoader className="animate-spin" size={12} />}
         >
-          <div>
-            <div className="w-full flex space-x-3 py-0.5">
-              <p className="text-xs text-light">Loading schemas...</p>
-            </div>
+          <div className="w-full flex space-x-3 py-0.5">
+            <p className="text-xs text-light">Loading schemas...</p>
           </div>
         </Button>
       )}
@@ -111,6 +112,25 @@ const SchemaSelector = ({
                 <CommandEmpty_Shadcn_>No schemas found</CommandEmpty_Shadcn_>
                 <CommandGroup_Shadcn_>
                   <ScrollArea className={(schemas || []).length > 7 ? 'h-[210px]' : ''}>
+                    {supportSelectAll && (
+                      <CommandItem_Shadcn_
+                        key="select-all"
+                        className="cursor-pointer flex items-center justify-between space-x-2 w-full"
+                        onSelect={() => {
+                          onSelectSchema('*')
+                          setOpen(false)
+                        }}
+                        onClick={() => {
+                          onSelectSchema('*')
+                          setOpen(false)
+                        }}
+                      >
+                        <span>All schemas</span>
+                        {selectedSchemaName === '*' && (
+                          <IconCheck className="text-brand" strokeWidth={2} />
+                        )}
+                      </CommandItem_Shadcn_>
+                    )}
                     {schemas?.map((schema) => (
                       <CommandItem_Shadcn_
                         key={schema.id}
@@ -125,7 +145,7 @@ const SchemaSelector = ({
                         }}
                       >
                         <span>{schema.name}</span>
-                        {schema.name === selectedSchemaName && (
+                        {selectedSchemaName === schema.name && (
                           <IconCheck className="text-brand" strokeWidth={2} />
                         )}
                       </CommandItem_Shadcn_>
