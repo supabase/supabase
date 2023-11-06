@@ -16,8 +16,8 @@ const Frameworks = () => {
     {
       name: 'Expo React Native',
       logo: {
-        light: '/docs/img/icons/expo-icon.svg',
-        dark: '/docs/img/icons/expo-icon-dark.svg',
+        light: '/docs/img/icons/expo-icon-light.svg',
+        dark: '/docs/img/icons/expo-icon.svg',
       },
       href: '/guides/with-expo-react-native',
     },
@@ -48,8 +48,8 @@ const Frameworks = () => {
     {
       name: 'Next.js',
       logo: {
-        light: '/docs/img/icons/nextjs-light-icon.svg',
-        dark: '/docs/img/icons/nextjs-dark-icon.svg',
+        light: '/docs/img/icons/nextjs-icon-light.svg',
+        dark: '/docs/img/icons/nextjs-icon.svg',
       },
       href: '/guides/with-nextjs',
     },
