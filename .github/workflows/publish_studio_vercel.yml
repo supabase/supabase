@@ -39,4 +39,4 @@ jobs:
       - name: Build Project Artifacts
         run: vercel build --cwd studio --token=${{ secrets.VERCEL_TOKEN }}
       - name: Deploy Project Artifacts to Vercel
-        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel deploy --cwd studio --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
