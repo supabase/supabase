@@ -1,9 +1,7 @@
 import React from 'react'
-import { ComponentStory, ComponentMeta } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import dayjs from 'dayjs'
 import Chart from './Sparkline'
-import { StackedChartProps } from './Charts.types'
-import { STACK_COLORS } from './Charts.constants'
 
 export default {
   title: 'Charts/Sparkline',
@@ -44,7 +42,7 @@ export const Sparkline = () => (
   </div>
 )
 
-const ExampleName: React.FC = ({ children }) => (
+const ExampleName: React.FC<React.PropsWithChildren> = ({ children }) => (
   <h1
     className="font-bold text-scale-
   1100"

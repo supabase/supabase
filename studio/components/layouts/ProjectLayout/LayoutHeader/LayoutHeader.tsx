@@ -1,51 +1,52 @@
 import { useParams } from 'common'
 import Link from 'next/link'
-import { Badge } from 'ui'
+import { useMemo } from 'react'
 
-import { getResourcesExceededLimits } from 'components/ui/OveragesBanner/OveragesBanner.utils'
-import { useProjectReadOnlyQuery } from 'data/config/project-read-only-query'
-import { useProjectUsageQuery } from 'data/usage/project-usage-query'
+import BranchDropdown from 'components/layouts/AppLayout/BranchDropdown'
+import EnableBranchingButton from 'components/layouts/AppLayout/EnableBranchingButton/EnableBranchingButton'
+import OrganizationDropdown from 'components/layouts/AppLayout/OrganizationDropdown'
+import ProjectDropdown from 'components/layouts/AppLayout/ProjectDropdown'
+import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
+import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useFlag, useSelectedOrganization, useSelectedProject } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
+import { Badge } from 'ui'
 import BreadcrumbsView from './BreadcrumbsView'
 import FeedbackDropdown from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopover from './NotificationsPopover'
-import OrgDropdown from './OrgDropdown'
-import ProjectDropdown from './ProjectDropdown'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
-  const selectedOrganization = useSelectedOrganization()
-  const selectedProject = useSelectedProject()
-
   const { ref: projectRef } = useParams()
-  const { data: isReadOnlyMode } = useProjectReadOnlyQuery({
-    projectRef: selectedProject?.ref,
-    connectionString: selectedProject?.connectionString,
-  })
+  const selectedProject = useSelectedProject()
+  const selectedOrganization = useSelectedOrganization()
 
-  // Skip with org-based-billing, as quota is for the entire org
-  const { data: usage } = useProjectUsageQuery(
-    { projectRef },
-    { enabled: selectedOrganization && !selectedOrganization.subscription_id }
-  )
-  const resourcesExceededLimits = getResourcesExceededLimits(usage)
+  const enableBranchManagement = useFlag('branchManagement')
 
-  // Skip with org-based-billing, as quota is for the entire org
-  const { data: subscription } = useProjectSubscriptionV2Query(
-    { projectRef },
-    { enabled: selectedOrganization && !selectedOrganization.subscription_id }
-  )
+  const isBranchingEnabled =
+    selectedProject?.is_branch_enabled === true || selectedProject?.parent_project_ref !== undefined
 
-  const projectHasNoLimits = subscription?.usage_billing_enabled === false
+  const { data: orgUsage } = useOrgUsageQuery({ orgSlug: selectedOrganization?.slug })
+
+  const exceedingLimits = useMemo(() => {
+    if (orgUsage) {
+      return getResourcesExceededLimitsOrg(orgUsage?.usages || []).length > 0
+    } else {
+      return false
+    }
+  }, [orgUsage])
+
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
+
+  const projectHasNoLimits = subscription?.usage_billing_enabled === true
 
   const showOverUsageBadge =
     useFlag('overusageBadge') &&
     subscription !== undefined &&
-    (subscription.plan.id === 'free' || subscription?.plan.id === 'pro') &&
+    (subscription.plan.id === 'free' || subscription.plan.id === 'pro') &&
     !projectHasNoLimits &&
-    resourcesExceededLimits.length > 0
+    exceedingLimits
 
   return (
     <div
@@ -55,13 +56,11 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
     >
       <div className="-ml-2 flex items-center text-sm">
         {/* Organization is selected */}
-        {projectRef && selectedOrganization ? (
+        {projectRef && (
           <>
-            {/* Org Dropdown */}
-            <OrgDropdown />
+            <OrganizationDropdown />
 
-            {/* Project is selected */}
-            {selectedProject && (
+            {projectRef && (
               <>
                 <span className="text-scale-800 dark:text-scale-700">
                   <svg
@@ -78,42 +77,42 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
                     <path d="M16 3.549L7.12 20.600"></path>
                   </svg>
                 </span>
-                {/* Project Dropdown */}
-                <ProjectDropdown />
 
-                {/* [Terry] Temporary until we figure out how we want to display this permanently */}
-                {/* context: https://www.notion.so/supabase/DB-Disk-Size-Free-tier-Read-only-Critical-f2b8937c13a149e3ac769fe5888f6db0*/}
-                {isReadOnlyMode && (
-                  <div className="ml-2">
-                    <Link href={`/project/${projectRef}/settings/billing/usage`}>
-                      <a>
-                        <Badge color="red">Project is in read-only mode</Badge>
-                      </a>
-                    </Link>
-                  </div>
-                )}
+                <ProjectDropdown />
 
                 {showOverUsageBadge && (
                   <div className="ml-2">
-                    <Link href={`/project/${projectRef}/settings/billing/usage`}>
-                      <a>
-                        <Badge color="red">Exceeding usage limits</Badge>
-                      </a>
+                    <Link href={`/org/${selectedOrganization?.slug}/usage`}>
+                      <Badge color="red">Exceeding usage limits</Badge>
                     </Link>
                   </div>
                 )}
               </>
             )}
+
+            {selectedProject && enableBranchManagement && (
+              <>
+                <span className="text-scale-800 dark:text-scale-700">
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="16"
+                    height="16"
+                    stroke="currentColor"
+                    strokeWidth="1"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    fill="none"
+                    shapeRendering="geometricPrecision"
+                  >
+                    <path d="M16 3.549L7.12 20.600"></path>
+                  </svg>
+                </span>
+                {isBranchingEnabled ? <BranchDropdown /> : <EnableBranchingButton />}
+              </>
+            )}
           </>
-        ) : (
-          <Link href="/projects">
-            <a
-              className={`cursor-pointer px-2 py-1 text-xs text-scale-1200 focus:bg-transparent focus:outline-none`}
-            >
-              Supabase
-            </a>
-          </Link>
         )}
+
         {/* Additional breadcrumbs are supplied */}
         <BreadcrumbsView defaultValue={breadcrumbs} />
       </div>

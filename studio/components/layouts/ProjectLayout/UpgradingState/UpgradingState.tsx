@@ -15,6 +15,7 @@ import {
   IconSettings,
 } from 'ui'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common/hooks'
 import { useProjectUpgradingStatusQuery } from 'data/config/project-upgrade-status-query'
 import { getProjectDetail, invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
@@ -22,7 +23,6 @@ import { useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { useProjectContext } from '../ProjectContext'
 import { DATABASE_UPGRADE_MESSAGES } from './UpgradingState.constants'
-import { useQueryClient } from '@tanstack/react-query'
 
 const UpgradingState = () => {
   const { ref } = useParams()
@@ -48,10 +48,11 @@ const UpgradingState = () => {
   const isFailed = status === DatabaseUpgradeStatus.Failed
   const isCompleted = status === DatabaseUpgradeStatus.Upgraded
 
-  const initiatedAt = dayjs(initiated_at ?? 0).format('DD MMM YYYY HH:mm:ss (ZZ)')
-  const initiatedAtUTC = dayjs(initiated_at ?? 0)
-    .utc()
-    .format('DD MMM YYYY HH:mm:ss')
+  const initiatedAtUTC = dayjs.utc(initiated_at ?? 0).format('DD MMM YYYY HH:mm:ss')
+  const initiatedAt = dayjs
+    .utc(initiated_at ?? 0)
+    .local()
+    .format('DD MMM YYYY HH:mm:ss (ZZ)')
 
   const refetchProjectDetails = async () => {
     setLoading(true)
@@ -79,7 +80,7 @@ const UpgradingState = () => {
                 </div>
                 <div className="space-y-2">
                   <p className="text-center">Upgrade completed!</p>
-                  <p className="mt-4 text-center text-sm text-scale-1100 w-[300px] mx-auto">
+                  <p className="mt-4 text-center text-sm text-foreground-light w-[300px] mx-auto">
                     Your project has been successfully upgraded to Postgres {target_version} and is
                     now back online.
                   </p>
@@ -97,19 +98,21 @@ const UpgradingState = () => {
                 </div>
                 <div className="space-y-2">
                   <p className="text-center">We ran into an issue while upgrading your project</p>
-                  <p className="mt-4 text-center text-sm text-scale-1100 w-[450px] mx-auto">
+                  <p className="mt-4 text-center text-sm text-foreground-light w-[450px] mx-auto">
                     Your project is back online and its data is not affected. Please reach out to us
                     via our support form for assistance with the upgrade.
                   </p>
                 </div>
                 <div className="flex items-center mx-auto space-x-2">
-                  <Link
-                    href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
-                  >
-                    <a target="_blank" rel="noreferrer">
-                      <Button type="default">Contact support</Button>
-                    </a>
-                  </Link>
+                  <Button asChild type="default">
+                    <Link
+                      href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Contact support
+                    </Link>
+                  </Button>
                   <Button loading={loading} disabled={loading} onClick={refetchProjectDetails}>
                     Return to project
                   </Button>
@@ -121,11 +124,11 @@ const UpgradingState = () => {
                   <div className="absolute flex items-center justify-center w-full h-full">
                     <IconSettings className="animate-spin" size={20} strokeWidth={2} />
                   </div>
-                  <IconCircle className="text-scale-900" size={50} strokeWidth={1.5} />
+                  <IconCircle className="text-foreground-lighter" size={50} strokeWidth={1.5} />
                 </div>
                 <div className="space-y-2">
                   <p className="text-center">Upgrading in progress</p>
-                  <p className="text-sm text-center text-scale-1100">
+                  <p className="text-sm text-center text-foreground-light">
                     Upgrades can take from a few minutes up to several hours depending on the size
                     of your database. Your project will be offline while it is being upgraded.
                   </p>
@@ -172,13 +175,13 @@ const UpgradingState = () => {
                               <div className="flex items-center justify-center w-5 h-5 rounded-full">
                                 <IconLoader
                                   size={20}
-                                  className="animate-spin text-scale-1100"
+                                  className="animate-spin text-foreground-light"
                                   strokeWidth={2}
                                 />
                               </div>
                             ) : isCompleted ? (
-                              <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-brand-300 border-brand-400">
-                                <IconCheck size={12} className="text-white" strokeWidth={2} />
+                              <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-brand border-brand">
+                                <IconCheck size={12} className="text-white" strokeWidth={3} />
                               </div>
                             ) : (
                               <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-scale-600" />
@@ -186,11 +189,11 @@ const UpgradingState = () => {
                             <p
                               className={`text-sm ${
                                 isCurrent
-                                  ? 'text-scale-1200'
+                                  ? 'text-foreground'
                                   : isCompleted
-                                  ? 'text-scale-1100'
-                                  : 'text-scale-1000'
-                              } hover:text-scale-1200 transition`}
+                                  ? 'text-foreground-light'
+                                  : 'text-foreground-lighter'
+                              } hover:text-foreground transition`}
                             >
                               {isCurrent
                                 ? message.progress
@@ -207,7 +210,7 @@ const UpgradingState = () => {
                   {initiated_at !== undefined && (
                     <Tooltip.Root delayDuration={0}>
                       <Tooltip.Trigger className="w-full">
-                        <p className="text-sm text-center text-scale-1000">
+                        <p className="text-sm text-center text-foreground-light">
                           Started on: {initiatedAtUTC} (UTC)
                         </p>
                       </Tooltip.Trigger>
@@ -220,7 +223,7 @@ const UpgradingState = () => {
                               'border border-scale-200 ', //border
                             ].join(' ')}
                           >
-                            <span className="text-xs text-scale-1200">{initiatedAt}</span>
+                            <span className="text-xs text-foreground">{initiatedAt}</span>
                           </div>
                         </Tooltip.Content>
                       </Tooltip.Portal>

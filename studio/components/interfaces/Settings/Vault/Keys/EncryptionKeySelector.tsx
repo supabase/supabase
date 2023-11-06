@@ -62,9 +62,10 @@ const EncryptionKeySelector = ({
       {selectedKeyId === 'create-new' && (
         <Input
           id={nameId}
-          label="Name"
+          label="Name of encryption key"
           error={error}
           onChange={(event) => onUpdateDescription(event.target.value)}
+          descriptionText="Provide a name for your key for easier identification"
         />
       )}
     </>

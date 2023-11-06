@@ -44,7 +44,7 @@ You can enable RLS for any table using the `enable row level security` clause:
 alter table "table_name" enable row level security;
 ```
 
-Once you have enabled RLS, no data will be accessible until you create policies.
+Once you have enabled RLS, no data will be accessible via the [API](/docs/guides/api) when using the public `anon` key, until you create policies.
 
 ## Creating Policies
 
@@ -79,14 +79,14 @@ using ( true ); -- the actual Policy
 Alternatively, if you only wanted users to be able to see their own profiles:
 
 ```sql
-create policy "Profiles are viewable by everyone."
+create policy "User can see their own profile only."
 on profiles
 for select using ( auth.uid() = user_id );
 ```
 
 ### INSERT Policies
 
-You can specify select policies with the `with check` clause.
+You can specify insert policies with the `with check` clause.
 
 Let's say you have a table called `profiles` in the public schema and you only want users to be able to create a profile for themselves. In that case, we want to check their User ID matches the value that they are trying to insert:
 
@@ -104,13 +104,13 @@ alter table profiles enable row level security;
 -- 3. Create Policy
 create policy "Users can create a profile."
 on profiles for insert
-to authenticated                    -- the Postgres Role (recommended)
-using ( auth.id() = user_id );      -- the actual Policy
+to authenticated                          -- the Postgres Role (recommended)
+with check ( auth.uid() = user_id );      -- the actual Policy
 ```
 
 ### UPDATE Policies
 
-You can specify select policies with the `using` clause.
+You can specify update policies with the `using` clause.
 
 Let's say you have a table called `profiles` in the public schema and you only want users to be able to update their own profile:
 
@@ -128,13 +128,13 @@ alter table profiles enable row level security;
 -- 3. Create Policy
 create policy "Users can update their own profile."
 on profiles for update
-to authenticated                    -- the Postgres Role (recommended)
-using ( auth.id() = user_id );      -- the actual Policy
+to authenticated                     -- the Postgres Role (recommended)
+using ( auth.uid() = user_id );      -- the actual Policy
 ```
 
 ### DELETE Policies
 
-You can specify select policies with the `using` clause.
+You can specify delete policies with the `using` clause.
 
 Let's say you have a table called `profiles` in the public schema and you only want users to be able to delete their own profile:
 
@@ -152,8 +152,8 @@ alter table profiles enable row level security;
 -- 3. Create Policy
 create policy "Users can delete a profile."
 on profiles for delete
-to authenticated                    -- the Postgres Role (recommended)
-using ( auth.id() = user_id );      -- the actual Policy
+to authenticated                     -- the Postgres Role (recommended)
+using ( auth.uid() = user_id );      -- the actual Policy
 ```
 
 ## Bypassing Row Level Security
@@ -216,9 +216,10 @@ using ( (select auth.uid()) = user_id );
 
 This method works well for JWT functions like `auth.uid()` and `auth.jwt()` as well as `security definer` Functions. Wrapping the function causes an initPlan to be run by the Postgres optimizer, which allows it to "cache" the results per-statement, rather than calling the function on each row.
 
-{/* prettier-ignore */}
 <Admonition type="caution">
+
 You can only use this technique if the results of the query or function do not change based on the row data.
+
 </Admonition>
 
 #### Benchmarks
@@ -287,7 +288,7 @@ begin
   return exists (
     select 1 from roles_table
     where auth.uid() = user_id and role = 'good_role'
-  )
+  );
 end;
 $$;
 
@@ -298,9 +299,10 @@ to authenticated
 using ( private.has_good_role() );
 ```
 
-{/* prettier-ignore */}
 <Admonition type="caution">
-Security-definer functions should never be created in a schema in the "Exposed schemas" inside your [API settings](https://supabase.com/dashboard/project/_/settings/api)`. 
+
+Security-definer functions should never be created in a schema in the "Exposed schemas" inside your [API settings](https://supabase.com/dashboard/project/_/settings/api)`.
+
 </Admonition>
 
 ### Minimize joins
@@ -337,7 +339,6 @@ using (
 
 In this case you can also consider [using a `security definer` function](#use-security-definer-functions) to bypass RLS on the join table:
 
-{/* prettier-ignore */}
 <Admonition type="note">
 
 If the list exceeds 1000 items, a different approach may be needed or you may need to analyze the approach to ensure that the performance is acceptable.

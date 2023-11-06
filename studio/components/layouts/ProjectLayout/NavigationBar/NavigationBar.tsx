@@ -1,22 +1,36 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { useParams, useTheme } from 'common'
+import { useParams } from 'common'
 import { isUndefined } from 'lodash'
+import { FlaskConical } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { useFlag } from 'hooks'
-import { IS_PLATFORM } from 'lib/constants'
-import { detectOS } from 'lib/helpers'
 import {
   Button,
-  Dropdown,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   IconCommand,
+  IconFileText,
   IconHome,
   IconSearch,
   IconSettings,
   IconUser,
   useCommandMenu,
 } from 'ui'
+
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useFlag, useIsFeatureEnabled } from 'hooks'
+import { IS_PLATFORM } from 'lib/constants'
+import { detectOS } from 'lib/helpers'
+import { useAppStateSnapshot } from 'state/app-state'
 import { useProjectContext } from '../ProjectContext'
 import {
   generateOtherRoutes,
@@ -26,21 +40,36 @@ import {
 import NavigationIconButton from './NavigationIconButton'
 
 const NavigationBar = () => {
-  const router = useRouter()
-  const { isDarkMode, toggleTheme } = useTheme()
-  const { ref: projectRef } = useParams()
-
   const os = detectOS()
+  const router = useRouter()
+  const snap = useAppStateSnapshot()
+  const { theme, setTheme } = useTheme()
+  const { ref: projectRef } = useParams()
   const { setIsOpen } = useCommandMenu()
 
   const { project } = useProjectContext()
   const navLayoutV2 = useFlag('navigationLayoutV2')
   const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
+  const showFeaturePreviews = useFlag('featurePreviews')
+  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
+
+  const {
+    projectAuthAll: authEnabled,
+    projectEdgeFunctionAll: edgeFunctionsEnabled,
+    projectStorageAll: storageEnabled,
+  } = useIsFeatureEnabled(['project_auth:all', 'project_edge_function:all', 'project_storage:all'])
+  const realtimeEnabled = useFlag('realtimeDashboard')
 
   const activeRoute = router.pathname.split('/')[3]
   const toolRoutes = generateToolRoutes(projectRef, project, supabaseAIEnabled)
-  const productRoutes = generateProductRoutes(projectRef, project)
-  const otherRoutes = generateOtherRoutes(projectRef, project)
+  const productRoutes = generateProductRoutes(projectRef, project, {
+    auth: authEnabled,
+    edgeFunctions: edgeFunctionsEnabled,
+    storage: storageEnabled,
+    realtime: realtimeEnabled,
+  })
+  const otherRoutes = generateOtherRoutes(projectRef, project, isNewAPIDocsEnabled)
+
   return (
     <div
       className={[
@@ -50,14 +79,12 @@ const NavigationBar = () => {
     >
       <ul className="flex flex-col space-y-2">
         {(!navLayoutV2 || !IS_PLATFORM) && (
-          <Link href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}>
-            <a className="block">
-              <img
-                src={`${router.basePath}/img/supabase-logo.svg`}
-                alt="Supabase"
-                className="mx-auto h-[40px] w-6 cursor-pointer rounded"
-              />
-            </a>
+          <Link href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`} className="block">
+            <img
+              src={`${router.basePath}/img/supabase-logo.svg`}
+              alt="Supabase"
+              className="mx-auto h-[40px] w-6 cursor-pointer rounded"
+            />
           </Link>
         )}
         <NavigationIconButton
@@ -97,6 +124,35 @@ const NavigationBar = () => {
       </ul>
       {!navLayoutV2 && (
         <ul className="flex flex-col space-y-4 items-center">
+          {isNewAPIDocsEnabled && (
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger asChild>
+                <Button
+                  type="text"
+                  size="tiny"
+                  onClick={() => snap.setShowProjectApiDocs(true)}
+                  className="border-none"
+                >
+                  <div className="py-1">
+                    <IconFileText size={18} strokeWidth={2} className="text-foreground-lighter" />
+                  </div>
+                </Button>
+              </Tooltip.Trigger>
+              <Tooltip.Portal>
+                <Tooltip.Content side="right">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded py-1 px-2 leading-none shadow text-xs',
+                      'border border-scale-200 flex items-center space-x-1',
+                    ].join(' ')}
+                  >
+                    Project API Docs
+                  </div>
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            </Tooltip.Root>
+          )}
           {IS_PLATFORM && (
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger asChild>
@@ -107,7 +163,7 @@ const NavigationBar = () => {
                   className="border-none"
                 >
                   <div className="py-1">
-                    <IconSearch size={18} strokeWidth={2} className="text-scale-900" />
+                    <IconSearch size={18} strokeWidth={2} className="text-foreground-lighter" />
                   </div>
                 </Button>
               </Tooltip.Trigger>
@@ -121,7 +177,7 @@ const NavigationBar = () => {
                     ].join(' ')}
                   >
                     {os === 'macos' ? (
-                      <IconCommand size={11.5} strokeWidth={1.5} className="text-scale-1200" />
+                      <IconCommand size={11.5} strokeWidth={1.5} className="text-foreground" />
                     ) : (
                       <p className="text-xs">CTRL</p>
                     )}
@@ -131,44 +187,52 @@ const NavigationBar = () => {
               </Tooltip.Portal>
             </Tooltip.Root>
           )}
-          <Dropdown
-            side="right"
-            align="start"
-            overlay={
-              <>
-                {IS_PLATFORM && (
-                  <>
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <Button asChild type="text" size="tiny">
+                <span className="py-1 h-10 border-none">
+                  <IconUser size={18} strokeWidth={2} className="text-foreground-lighter" />
+                </span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="right" align="start">
+              {IS_PLATFORM && (
+                <>
+                  <DropdownMenuItem key="header" className="space-x-2" asChild>
                     <Link href="/account/me">
-                      <Dropdown.Item
-                        key="header"
-                        icon={<IconSettings size={14} strokeWidth={1.5} />}
-                      >
-                        Account Preferences
-                      </Dropdown.Item>
+                      <IconSettings size={14} strokeWidth={1.5} />
+                      <p>Account preferences</p>
                     </Link>
-                    <Dropdown.Separator />
-                  </>
-                )}
-                <Dropdown.Label>Theme</Dropdown.Label>
-                <Dropdown.RadioGroup
-                  key="theme"
-                  value={isDarkMode ? 'dark' : 'light'}
-                  onChange={(e: any) => toggleTheme(e === 'dark')}
+                  </DropdownMenuItem>
+                  {showFeaturePreviews && (
+                    <DropdownMenuItem
+                      key="header"
+                      className="space-x-2"
+                      onClick={() => snap.setShowFeaturePreviewModal(true)}
+                      onSelect={() => snap.setShowFeaturePreviewModal(true)}
+                    >
+                      <FlaskConical size={14} strokeWidth={2} />
+                      <p>Feature previews</p>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                </>
+              )}
+              <DropdownMenuLabel>Theme</DropdownMenuLabel>
+              <DropdownMenuGroup>
+                <DropdownMenuRadioGroup
+                  value={theme}
+                  onValueChange={(value) => {
+                    setTheme(value)
+                  }}
                 >
-                  {/* [Joshen] Removing system default for now, needs to be supported in useTheme from common packages */}
-                  {/* <Dropdown.Radio value="system">System default</Dropdown.Radio> */}
-                  <Dropdown.Radio value="dark">Dark</Dropdown.Radio>
-                  <Dropdown.Radio value="light">Light</Dropdown.Radio>
-                </Dropdown.RadioGroup>
-              </>
-            }
-          >
-            <Button asChild type="text" size="tiny">
-              <span className="py-1 h-10 border-none">
-                <IconUser size={18} strokeWidth={2} className="text-scale-900" />
-              </span>
-            </Button>
-          </Dropdown>
+                  <DropdownMenuRadioItem value={'system'}>System</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value={'dark'}>Dark</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value={'light'}>Light</DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </ul>
       )}
     </div>

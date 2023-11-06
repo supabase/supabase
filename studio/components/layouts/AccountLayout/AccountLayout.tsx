@@ -6,9 +6,9 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useFlag, useSelectedOrganization, withAuth } from 'hooks'
 import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
+import SettingsLayout from '../SettingsLayout/SettingsLayout'
 import { SidebarSection } from './AccountLayout.types'
 import WithSidebar from './WithSidebar'
-import SettingsLayout from '../SettingsLayout/SettingsLayout'
 
 export interface AccountLayoutProps {
   title: string
@@ -84,6 +84,21 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
                 label: 'Access Tokens',
                 href: `/account/tokens`,
                 key: `/account/tokens`,
+              },
+
+              {
+                isActive: router.pathname === `/account/security`,
+                icon: `${router.basePath}/img/user.svg`,
+                label: 'Security',
+                href: `/account/security`,
+                key: `/account/security`,
+              },
+              {
+                isActive: router.pathname === `/account/audit`,
+                icon: `${router.basePath}/img/user.svg`,
+                label: 'Audit Logs',
+                href: `/account/audit`,
+                key: `/account/audit`,
               },
             ],
           },

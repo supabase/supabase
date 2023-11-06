@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common/hooks'
 import { SupaTable } from 'components/grid/types'
 import { sqlKeys } from 'data/sql/keys'
-import { useParams } from 'common/hooks'
 import { useEffect, useState } from 'react'
 import { Button, IconCheck, IconRefreshCw } from 'ui'
 import { SupabaseGridQueue } from '../../constants'
@@ -49,7 +49,7 @@ const RefreshButton = ({ table, isRefetching }: RefreshButtonProps) => {
       type="text"
       icon={
         !status ? (
-          <IconRefreshCw className="text-scale-1000" strokeWidth={1.5} />
+          <IconRefreshCw className="text-foreground-light" strokeWidth={1.5} />
         ) : status === 'saved' ? (
           <IconCheck className="text-brand" strokeWidth={3} />
         ) : (

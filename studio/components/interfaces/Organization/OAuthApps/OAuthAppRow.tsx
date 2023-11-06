@@ -5,7 +5,11 @@ import { copyToClipboard } from 'lib/helpers'
 import { useState } from 'react'
 import {
   Button,
-  Dropdown,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   IconCheck,
   IconClipboard,
   IconEdit,
@@ -65,22 +69,22 @@ const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) =>
       </Table.td>
       <Table.td>{dayjs(app.created_at).format('DD/MM/YYYY, HH:mm:ss')}</Table.td>
       <Table.td align="right">
-        <Dropdown
-          size="tiny"
-          align="end"
-          side="bottom"
-          overlay={[
-            <Dropdown.Item key="edit" icon={<IconEdit />} onClick={() => onSelectEdit()}>
-              Edit app
-            </Dropdown.Item>,
-            <Dropdown.Separator key="separator" />,
-            <Dropdown.Item key="delete" icon={<IconTrash />} onClick={() => onSelectDelete()}>
-              Delete app
-            </Dropdown.Item>,
-          ]}
-        >
-          <Button type="default" icon={<IconMoreVertical />} className="px-1" />
-        </Dropdown>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button type="default" icon={<IconMoreVertical />} className="px-1" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" side="bottom">
+            <DropdownMenuItem className="space-x-2" key="edit" onClick={() => onSelectEdit()}>
+              <IconEdit />
+              <p>Edit app</p>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="space-x-2" key="delete" onClick={() => onSelectDelete()}>
+              <IconTrash />
+              <p>Delete app</p>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </Table.td>
     </Table.tr>
   )

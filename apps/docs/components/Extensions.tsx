@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import React, { useState } from 'react'
-import { GlassPanel, IconLink, IconX, Input } from 'ui'
-import extensions from '../data/extensions.json'
+import { extensions } from 'shared-data'
+import { GlassPanel, IconX, Input } from 'ui'
 
 type Extension = {
   name: string
@@ -105,14 +105,16 @@ export default function Extensions() {
                 filters.length === 0 ? x : x.tags.some((item) => filters.includes(item))
               )
               .map((extension) => (
-                <Link passHref href={extension.link}>
-                  <a target={getLinkTarget(extension.link)} className="no-underline">
-                    <GlassPanel title={extension.name} background={false} key={extension.name}>
-                      <p className="mt-4">
-                        {extension.comment.charAt(0).toUpperCase() + extension.comment.slice(1)}
-                      </p>
-                    </GlassPanel>
-                  </a>
+                <Link
+                  href={extension.link}
+                  target={getLinkTarget(extension.link)}
+                  className="no-underline"
+                >
+                  <GlassPanel title={extension.name} background={false} key={extension.name}>
+                    <p className="mt-4">
+                      {extension.comment.charAt(0).toUpperCase() + extension.comment.slice(1)}
+                    </p>
+                  </GlassPanel>
                 </Link>
                 // <div className="my-2 px-2 relative" key={extension.name}>
                 //   <div className="border rounded-sm p-4">

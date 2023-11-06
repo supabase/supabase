@@ -122,7 +122,7 @@ const ChartHandler = ({
     return (
       <div className="flex h-52 w-full flex-col items-center justify-center space-y-4">
         <IconLoader className="animate-spin text-scale-700" />
-        <p className="text-xs text-scale-900">Loading data for {label}</p>
+        <p className="text-xs text-foreground-lighter">Loading data for {label}</p>
       </div>
     )
   }
@@ -131,7 +131,7 @@ const ChartHandler = ({
     return (
       <div className="flex h-52 w-full flex-col items-center justify-center space-y-4">
         <IconAlertCircle className="text-scale-700" />
-        <p className="text-xs text-scale-900">Unable to load data for {label}</p>
+        <p className="text-xs text-foreground-lighter">Unable to load data for {label}</p>
       </div>
     )
   }

@@ -33,13 +33,13 @@ export enum PageType {
 }
 
 export interface PageSection {
-  slug: string
-  heading: string
+  slug?: string
+  heading?: string
 }
 
 export interface PageMetadata {
   title: string
-  description: string
+  description?: string
 }
 
 export interface PageResult {
@@ -166,12 +166,10 @@ const DocsSearch = () => {
           return (
             <CommandGroup
               heading=""
-              forceMount
               key={`${page.meta.title}-group-index-${i}`}
               value={`${page.meta.title}-group-index-${i}`}
             >
               <CommandItem
-                forceMount
                 key={`${page.meta.title}-item-index-${i}`}
                 value={`${page.meta.title}-item-index-${i}`}
                 type="block-link"
@@ -185,9 +183,11 @@ const DocsSearch = () => {
                     <CommandLabel>
                       <TextHighlighter text={page.meta.title} query={search} />
                     </CommandLabel>
-                    <div className="text-xs text-scale-900">
-                      <TextHighlighter text={page.meta.description} query={search} />
-                    </div>
+                    {page.meta.description && (
+                      <div className="text-xs text-scale-900">
+                        <TextHighlighter text={page.meta.description} query={search} />
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -197,7 +197,6 @@ const DocsSearch = () => {
                 <div className="border-l border-scale-500 ml-3 pt-3">
                   {pageSections.map((section, i) => (
                     <CommandItem
-                      forceMount
                       className="ml-3 mb-3"
                       onSelect={() => {
                         openLink(page.type, formatSectionUrl(page, section))
@@ -216,9 +215,11 @@ const DocsSearch = () => {
                               query={search}
                             />
                           </cite>
-                          <CommandLabel>
-                            <TextHighlighter text={section.heading} query={search} />
-                          </CommandLabel>
+                          {section.heading && (
+                            <CommandLabel>
+                              <TextHighlighter text={section.heading} query={search} />
+                            </CommandLabel>
+                          )}
                         </div>
                       </div>
                       <ChevronArrow />
@@ -230,7 +231,7 @@ const DocsSearch = () => {
           )
         })}
       {!results && !hasSearchError && !isLoading && (
-        <CommandGroup forceMount>
+        <CommandGroup>
           {questions.map((question) => {
             const key = question.replace(/\s+/g, '_')
             return (
@@ -243,7 +244,6 @@ const DocsSearch = () => {
                   }
                 }}
                 type="command"
-                forceMount
                 key={key}
               >
                 <IconSearch />
@@ -302,9 +302,9 @@ export function formatSectionUrl(page: PageResult, section: PageSection) {
   switch (page.type) {
     case PageType.Markdown:
     case PageType.GithubDiscussion:
-      return `${formatPageUrl(page)}#${section.slug}`
+      return `${formatPageUrl(page)}#${section.slug ?? ''}`
     case PageType.Reference:
-      return `${formatPageUrl(page)}/${section.slug}`
+      return `${formatPageUrl(page)}/${section.slug ?? ''}`
     default:
       throw new Error(`Unknown page type '${page.type}'`)
   }

@@ -4,13 +4,14 @@ import Link from 'next/link'
 import { ReactNode } from 'react'
 import { Button } from 'ui'
 
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useCheckPermissions, useFlag } from 'hooks'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 interface UpgradeToProProps {
   icon?: ReactNode
   primaryText: string
   projectRef: string
+  organizationSlug: string
   secondaryText: string
   addon?: 'pitr' | 'customDomain' | 'computeInstance'
 }
@@ -19,10 +20,11 @@ const UpgradeToPro = ({
   icon,
   primaryText,
   projectRef,
+  organizationSlug,
   secondaryText,
   addon,
 }: UpgradeToProProps) => {
-  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organizationSlug })
   const plan = subscription?.plan?.id
 
   const canUpdateSubscription = useCheckPermissions(
@@ -45,18 +47,20 @@ const UpgradeToPro = ({
           <div className="space-y-1">
             <p className="text-sm">{primaryText}</p>
             <div>
-              <p className="text-sm text-scale-1100">{secondaryText}</p>
+              <p className="text-sm text-foreground-light">{secondaryText}</p>
             </div>
           </div>
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger>
               <Button type="primary" disabled={!canUpdateSubscription || projectUpdateDisabled}>
                 <Link
-                  href={`/project/${projectRef}/settings/billing/subscription?panel=${
-                    plan === 'free' ? 'subscriptionPlan' : addon || 'subscriptionPlan'
-                  }`}
+                  href={
+                    plan === 'free'
+                      ? `/org/${organizationSlug}/billing?panel=subscriptionPlan`
+                      : `/project/${projectRef}/settings/addons?panel=${addon}`
+                  }
                 >
-                  <a>{plan === 'free' ? 'Upgrade to Pro' : 'Enable Addon'}</a>
+                  {plan === 'free' ? 'Upgrade to Pro' : 'Enable Addon'}
                 </Link>
               </Button>
             </Tooltip.Trigger>
@@ -70,7 +74,7 @@ const UpgradeToPro = ({
                       'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">
+                    <span className="text-xs text-foreground">
                       {projectUpdateDisabled ? (
                         <>
                           Subscription changes are currently disabled.

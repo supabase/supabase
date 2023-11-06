@@ -135,7 +135,7 @@ const RedirectUrls = () => {
                     'border border-scale-200',
                   ].join(' ')}
                 >
-                  <span className="text-xs text-scale-1200">
+                  <span className="text-xs text-foreground">
                     You need additional permissions to update redirect URLs
                   </span>
                 </div>
@@ -186,7 +186,7 @@ const RedirectUrls = () => {
             return (
               <div className="mb-4 space-y-4 pt-4">
                 <div className="px-5">
-                  <p className="text-sm text-scale-1100">
+                  <p className="text-sm text-foreground-light">
                     This will add a URL to a list of allowed URLs that can interact with your
                     Authentication services for this project.
                   </p>
@@ -222,11 +222,11 @@ const RedirectUrls = () => {
       >
         <div className="mb-4 space-y-4 pt-4">
           <div className="px-5">
-            <p className="mb-2 text-sm text-scale-1100">
+            <p className="mb-2 text-sm text-foreground-light">
               Are you sure you want to remove{' '}
-              <span className="text-scale-1200">{selectedUrlToDelete}</span>?
+              <span className="text-foreground">{selectedUrlToDelete}</span>?
             </p>
-            <p className="text-scale-1100 text-sm">
+            <p className="text-foreground-light text-sm">
               This URL will no longer work with your authentication configuration.
             </p>
           </div>

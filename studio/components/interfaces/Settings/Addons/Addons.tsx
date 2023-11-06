@@ -2,8 +2,9 @@ import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useMemo } from 'react'
 
-import { useParams, useTheme } from 'common'
-import { getAddons } from 'components/interfaces/BillingV2/Subscription/Subscription.utils'
+import { useParams } from 'common'
+import { useTheme } from 'next-themes'
+import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
 import {
   useIsProjectActive,
@@ -23,6 +24,7 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useFlag, useProjectByRef } from 'hooks'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH } from 'lib/constants'
+import { getSemanticVersion } from 'lib/helpers'
 import { SUBSCRIPTION_PANEL_KEYS, useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import {
   Alert,
@@ -34,10 +36,13 @@ import {
   IconChevronRight,
   IconExternalLink,
 } from 'ui'
-import { ComputeInstanceSidePanel, CustomDomainSidePanel, PITRSidePanel } from './'
+import Image from 'next/image'
+import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
+import PITRSidePanel from './PITRSidePanel'
+import CustomDomainSidePanel from './CustomDomainSidePanel'
 
 const Addons = () => {
-  const { isDarkMode } = useTheme()
+  const { resolvedTheme } = useTheme()
   const { ref: projectRef, panel } = useParams()
   const snap = useSubscriptionPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
@@ -52,6 +57,8 @@ const Addons = () => {
   }
 
   const cpuArchitecture = getCloudProviderArchitecture(selectedProject?.cloud_provider)
+  // Only projects of version greater than supabase-postgrest-14.1.0.44 can use PITR
+  const sufficientPgVersion = getSemanticVersion(selectedProject?.dbVersion ?? '') >= 141044
 
   // [Joshen] We could possibly look into reducing the interval to be more "realtime"
   // I tried setting the interval to 1m but no data was returned, may need to experiment
@@ -82,7 +89,7 @@ const Addons = () => {
         <div className="mx-auto flex flex-col gap-10 py-6">
           <div>
             <p className="text-xl">Add ons</p>
-            <p className="text-sm text-scale-1000">Level up your project with add-ons</p>
+            <p className="text-sm text-foreground-light">Level up your project with add-ons</p>
           </div>
         </div>
       </ScaffoldContainer>
@@ -99,8 +106,11 @@ const Addons = () => {
             <AlertDescription_Shadcn_>
               Updating addons are not available while you're on a preview branch. To manage your
               addons, you may return to your{' '}
-              <Link passHref href={`/project/${parentProject.ref}/settings/general`}>
-                <a className="text-brand-900">main branch</a>
+              <Link
+                href={`/project/${parentProject.ref}/settings/general`}
+                className="text-brand-900"
+              >
+                main branch
               </Link>
               .
             </AlertDescription_Shadcn_>
@@ -134,27 +144,31 @@ const Addons = () => {
             <ScaffoldSection>
               <ScaffoldSectionDetail>
                 <div className="space-y-6">
-                  <p>Optimized compute</p>
+                  <p className="m-0">Optimized compute</p>
                   <div className="space-y-2">
-                    <p className="text-sm text-scale-1100">More information</p>
+                    <p className="text-sm text-foreground-light m-0">More information</p>
                     <div>
-                      <Link href="https://supabase.com/docs/guides/platform/compute-add-ons">
-                        <a target="_blank" rel="noreferrer">
-                          <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                            <p className="text-sm">About compute add-ons</p>
-                            <IconExternalLink size={16} strokeWidth={1.5} />
-                          </div>
-                        </a>
+                      <Link
+                        href="https://supabase.com/docs/guides/platform/compute-add-ons"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
+                          <p className="text-sm m-0">About compute add-ons</p>
+                          <IconExternalLink size={16} strokeWidth={1.5} />
+                        </div>
                       </Link>
                     </div>
                     <div>
-                      <Link href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler">
-                        <a target="_blank" rel="noreferrer">
-                          <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                            <p className="text-sm">Connection Pooler</p>
-                            <IconExternalLink size={16} strokeWidth={1.5} />
-                          </div>
-                        </a>
+                      <Link
+                        href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
+                          <p className="text-sm m-0">Connection Pooler</p>
+                          <IconExternalLink size={16} strokeWidth={1.5} />
+                        </div>
                       </Link>
                     </div>
                   </div>
@@ -164,24 +178,24 @@ const Addons = () => {
                 <div className="flex space-x-6">
                   <div>
                     <div className="rounded-md bg-scale-100 dark:bg-scale-400 w-[160px] h-[96px] shadow">
-                      <img
+                      <Image
                         alt="Optimized Compute"
                         width={160}
                         height={96}
                         src={
                           computeInstance !== undefined
                             ? `${BASE_PATH}/img/optimized-compute-on${
-                                isDarkMode ? '' : '--light'
+                                resolvedTheme === 'dark' ? '' : '--light'
                               }.png`
                             : `${BASE_PATH}/img/optimized-compute-off${
-                                isDarkMode ? '' : '--light'
+                                resolvedTheme === 'dark' ? '' : '--light'
                               }.png`
                         }
                       />
                     </div>
                   </div>
                   <div className="flex-grow">
-                    <p className="text-sm text-scale-1000">Current option:</p>
+                    <p className="text-sm text-foreground-light">Current option:</p>
                     <p className="">{computeInstance?.variant.name ?? 'Micro'}</p>
                     <ProjectUpdateDisabledTooltip
                       projectUpdateDisabled={projectUpdateDisabled}
@@ -193,7 +207,7 @@ const Addons = () => {
                         onClick={() => snap.setPanelKey('computeInstance')}
                         disabled={isBranch || !isProjectActive || projectUpdateDisabled}
                       >
-                        Change optimized compute
+                        Change compute size
                       </Button>
                     </ProjectUpdateDisabledTooltip>
 
@@ -238,35 +252,31 @@ const Addons = () => {
 
                     <div className="mt-2 w-full flex items-center justify-between border-b py-2">
                       <Link href={`/project/${projectRef}/settings/infrastructure#ram`}>
-                        <a>
-                          <div className="group flex items-center space-x-2">
-                            <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition cursor-pointer">
-                              Memory
-                            </p>
-                            <IconChevronRight
-                              strokeWidth={1.5}
-                              size={16}
-                              className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
-                            />
-                          </div>
-                        </a>
+                        <div className="group flex items-center space-x-2">
+                          <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
+                            Memory
+                          </p>
+                          <IconChevronRight
+                            strokeWidth={1.5}
+                            size={16}
+                            className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
+                          />
+                        </div>
                       </Link>
                       <p className="text-sm">{computeInstance?.variant?.meta?.memory_gb ?? 1} GB</p>
                     </div>
                     <div className="w-full flex items-center justify-between border-b py-2">
                       <Link href={`/project/${projectRef}/settings/infrastructure#cpu`}>
-                        <a>
-                          <div className="group flex items-center space-x-2">
-                            <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition cursor-pointer">
-                              CPU
-                            </p>
-                            <IconChevronRight
-                              strokeWidth={1.5}
-                              size={16}
-                              className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
-                            />
-                          </div>
-                        </a>
+                        <div className="group flex items-center space-x-2">
+                          <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
+                            CPU
+                          </p>
+                          <IconChevronRight
+                            strokeWidth={1.5}
+                            size={16}
+                            className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
+                          />
+                        </div>
                       </Link>
                       <p className="text-sm">
                         {computeInstance?.variant?.meta?.cpu_cores ?? 2}-core {cpuArchitecture}{' '}
@@ -274,31 +284,29 @@ const Addons = () => {
                       </p>
                     </div>
                     <div className="w-full flex items-center justify-between border-b py-2">
-                      <p className="text-sm text-scale-1000">No. of direct connections</p>
+                      <p className="text-sm text-foreground-light">No. of direct connections</p>
                       <p className="text-sm">
                         {computeInstance?.variant?.meta?.connections_direct ?? 60}
                       </p>
                     </div>
                     <div className="w-full flex items-center justify-between border-b py-2">
-                      <p className="text-sm text-scale-1000">No. of pooler connections</p>
+                      <p className="text-sm text-foreground-light">No. of pooler connections</p>
                       <p className="text-sm">
                         {computeInstance?.variant?.meta?.connections_pooler ?? 200}
                       </p>
                     </div>
                     <div className="w-full flex items-center justify-between border-b py-2">
                       <Link href={`/project/${projectRef}/settings/infrastructure#disk_io`}>
-                        <a>
-                          <div className="group flex items-center space-x-2">
-                            <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition cursor-pointer">
-                              Max Disk Throughput
-                            </p>
-                            <IconChevronRight
-                              strokeWidth={1.5}
-                              size={16}
-                              className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
-                            />
-                          </div>
-                        </a>
+                        <div className="group flex items-center space-x-2">
+                          <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
+                            Max Disk Throughput
+                          </p>
+                          <IconChevronRight
+                            strokeWidth={1.5}
+                            size={16}
+                            className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
+                          />
+                        </div>
                       </Link>
                       <p className="text-sm">
                         {computeInstance?.variant?.meta?.max_disk_io_mbs?.toLocaleString() ??
@@ -308,18 +316,16 @@ const Addons = () => {
                     </div>
                     <div className="w-full flex items-center justify-between py-2">
                       <Link href={`/project/${projectRef}/settings/infrastructure#disk_io`}>
-                        <a>
-                          <div className="group flex items-center space-x-2">
-                            <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition cursor-pointer">
-                              Baseline Disk Throughput
-                            </p>
-                            <IconChevronRight
-                              strokeWidth={1.5}
-                              size={16}
-                              className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
-                            />
-                          </div>
-                        </a>
+                        <div className="group flex items-center space-x-2">
+                          <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
+                            Baseline Disk Throughput
+                          </p>
+                          <IconChevronRight
+                            strokeWidth={1.5}
+                            size={16}
+                            className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
+                          />
+                        </div>
                       </Link>
                       <p className="text-sm">
                         {computeInstance?.variant?.meta?.baseline_disk_io_mbs?.toLocaleString() ??
@@ -339,17 +345,19 @@ const Addons = () => {
             <ScaffoldSection>
               <ScaffoldSectionDetail>
                 <div className="space-y-6">
-                  <p>Point in time recovery</p>
+                  <p className="m-0">Point in time recovery</p>
                   <div className="space-y-2">
-                    <p className="text-sm text-scale-1100">More information</p>
+                    <p className="text-sm text-foreground-light m-0">More information</p>
                     <div>
-                      <Link href="https://supabase.com/docs/guides/platform/backups#point-in-time-recovery">
-                        <a target="_blank" rel="noreferrer">
-                          <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                            <p className="text-sm">About PITR backups</p>
-                            <IconExternalLink size={16} strokeWidth={1.5} />
-                          </div>
-                        </a>
+                      <Link
+                        href="https://supabase.com/docs/guides/platform/backups#point-in-time-recovery"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
+                          <p className="text-sm m-0">About PITR backups</p>
+                          <IconExternalLink size={16} strokeWidth={1.5} />
+                        </div>
                       </Link>
                     </div>
                   </div>
@@ -359,38 +367,67 @@ const Addons = () => {
                 <div className="flex space-x-6">
                   <div>
                     <div className="rounded-md bg-scale-100 dark:bg-scale-400 w-[160px] h-[96px] shadow">
-                      <img
+                      <Image
                         alt="Point-In-Time-Recovery"
                         width={160}
                         height={96}
                         src={
                           pitr !== undefined
-                            ? `${BASE_PATH}/img/pitr-on${isDarkMode ? '' : '--light'}.png?v=2`
-                            : `${BASE_PATH}/img/pitr-off${isDarkMode ? '' : '--light'}.png?v=2`
+                            ? `${BASE_PATH}/img/pitr-on${
+                                resolvedTheme === 'dark' ? '' : '--light'
+                              }.png?v=2`
+                            : `${BASE_PATH}/img/pitr-off${
+                                resolvedTheme === 'dark' ? '' : '--light'
+                              }.png?v=2`
                         }
                       />
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm text-scale-1000">Current option:</p>
+                    <p className="text-sm text-foreground-light">Current option:</p>
                     <p className="">
                       {pitr !== undefined
                         ? `Point in time recovery of ${pitr.variant.meta?.backup_duration_days} days is enabled`
                         : 'Point in time recovery is not enabled'}
                     </p>
-                    <ProjectUpdateDisabledTooltip
-                      projectUpdateDisabled={projectUpdateDisabled}
-                      projectNotActive={!isProjectActive}
-                    >
-                      <Button
-                        type="default"
-                        className="mt-2 pointer-events-auto"
-                        onClick={() => snap.setPanelKey('pitr')}
-                        disabled={isBranch || !isProjectActive || projectUpdateDisabled}
+                    {!sufficientPgVersion ? (
+                      <Alert_Shadcn_ className="mt-2">
+                        <AlertTitle_Shadcn_>
+                          Your project is too old to enable PITR
+                        </AlertTitle_Shadcn_>
+                        <AlertDescription_Shadcn_>
+                          <p className="text-sm leading-normal mb-2">
+                            Reach out to us via support if you're interested
+                          </p>
+                          <Button asChild type="default">
+                            <Link
+                              href={`/support/new?ref=${projectRef}&category=sales&subject=Project%20too%20old%20old%20for%20PITR`}
+                            >
+                              <a>Contact support</a>
+                            </Link>
+                          </Button>
+                        </AlertDescription_Shadcn_>
+                      </Alert_Shadcn_>
+                    ) : (
+                      <ProjectUpdateDisabledTooltip
+                        projectUpdateDisabled={projectUpdateDisabled}
+                        projectNotActive={!isProjectActive}
                       >
-                        Change point in time recovery
-                      </Button>
-                    </ProjectUpdateDisabledTooltip>
+                        <Button
+                          type="default"
+                          className="mt-2 pointer-events-auto"
+                          onClick={() => snap.setPanelKey('pitr')}
+                          disabled={
+                            isBranch ||
+                            !isProjectActive ||
+                            projectUpdateDisabled ||
+                            !sufficientPgVersion
+                          }
+                        >
+                          Change point in time recovery
+                        </Button>
+                      </ProjectUpdateDisabledTooltip>
+                    )}
                   </div>
                 </div>
               </ScaffoldSectionContent>
@@ -403,17 +440,19 @@ const Addons = () => {
             <ScaffoldSection>
               <ScaffoldSectionDetail>
                 <div className="space-y-6">
-                  <p>Custom domain</p>
+                  <p className="m-0">Custom domain</p>
                   <div className="space-y-2">
-                    <p className="text-sm text-scale-1100">More information</p>
+                    <p className="text-sm text-foreground-light m-0">More information</p>
                     <div>
-                      <Link href="https://supabase.com/docs/guides/platform/custom-domains">
-                        <a target="_blank" rel="noreferrer">
-                          <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                            <p className="text-sm">About custom domains</p>
-                            <IconExternalLink size={16} strokeWidth={1.5} />
-                          </div>
-                        </a>
+                      <Link
+                        href="https://supabase.com/docs/guides/platform/custom-domains"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
+                          <p className="text-sm m-0">About custom domains</p>
+                          <IconExternalLink size={16} strokeWidth={1.5} />
+                        </div>
                       </Link>
                     </div>
                   </div>
@@ -429,14 +468,18 @@ const Addons = () => {
                         height={96}
                         src={
                           customDomain !== undefined
-                            ? `${BASE_PATH}/img/custom-domain-on${isDarkMode ? '' : '--light'}.png`
-                            : `${BASE_PATH}/img/custom-domain-off${isDarkMode ? '' : '--light'}.png`
+                            ? `${BASE_PATH}/img/custom-domain-on${
+                                resolvedTheme === 'dark' ? '' : '--light'
+                              }.png`
+                            : `${BASE_PATH}/img/custom-domain-off${
+                                resolvedTheme === 'dark' ? '' : '--light'
+                              }.png`
                         }
                       />
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm text-scale-1000">Current option:</p>
+                    <p className="text-sm text-foreground-light">Current option:</p>
                     <p className="">
                       {customDomain !== undefined
                         ? 'Custom domain is enabled'

@@ -7,6 +7,12 @@ export const meta = {
   sidebar_label: 'SvelteKit',
 }
 
+<Admonition type="caution">
+
+We generally recommend using the new `@supabase/ssr` package instead of `auth-helpers`. `@supabase/ssr` takes the core concepts of the Auth Helpers package and makes them available to any server framework. Check out the [migration doc](/docs/guides/auth/server-side/migrating-to-ssr-from-auth-helpers) to learn more.
+
+</Admonition>
+
 This submodule provides convenience helpers for implementing user authentication in [SvelteKit](https://kit.svelte.dev/) applications.
 
 ## Configuration
@@ -36,6 +42,7 @@ PUBLIC_SUPABASE_ANON_KEY=your-anon-key
   size="small"
   type="underlined"
   defaultActiveId="js"
+  queryGroup="language"
 >
 <TabPanel id="js" label="JavaScript">
 
@@ -130,6 +137,7 @@ The `Code Exchange` route is required for the [server-side auth flow](https://su
   size="small"
   type="underlined"
   defaultActiveId="js"
+  queryGroup="language"
 >
 <TabPanel id="js" label="JavaScript">
 
@@ -218,6 +226,7 @@ To make the session available across the UI, including pages and layouts, it is 
   size="small"
   type="underlined"
   defaultActiveId="js"
+  queryGroup="language"
 >
 <TabPanel id="js" label="JavaScript">
 
@@ -254,6 +263,7 @@ To utilize Supabase in shared load functions and within pages, it is essential t
   size="small"
   type="underlined"
   defaultActiveId="js"
+  queryGroup="language"
 >
 <TabPanel id="js" label="JavaScript">
 
@@ -411,6 +421,7 @@ We can access the supabase instance in our `+page.svelte` file through the data 
   size="small"
   type="underlined"
   defaultActiveId="js"
+  queryGroup="language"
 >
 <TabPanel id="js" label="JavaScript">
 
@@ -464,6 +475,8 @@ export const actions = {
 
 ```js src/routes/login/+page.server.ts
 // src/routes/login/+page.server.ts
+import { fail } from '@sveltejs/kit'
+
 export const actions = {
   default: async ({ request, url, locals: { supabase } }) => {
     const formData = await request.formData()
@@ -579,6 +592,7 @@ protect multiple routes at once.
   size="small"
   type="underlined"
   defaultActiveId="js"
+  queryGroup="language"
 >
 <TabPanel id="js" label="JavaScript">
 
@@ -677,7 +691,7 @@ For [row level security](https://supabase.com/docs/guides/auth/row-level-securit
 <script lang="ts">
   export let data
 
-  let { user, tableData } = data
+  const { user, tableData } = data
   $: ({ user, tableData } = data)
 </script>
 
@@ -784,6 +798,7 @@ In version 0.9 we now setup our Supabase client for the server inside of a `hook
   size="small"
   type="underlined"
   defaultActiveId="older-0.8"
+  queryGroup="migration-version"
 >
 <TabPanel id="older-0.8" label="0.8.x">
 
@@ -846,6 +861,7 @@ In order to use the Supabase library in your client code you will need to setup 
   size="small"
   type="underlined"
   defaultActiveId="older-0.8"
+  queryGroup="migration-version"
 >
 <TabPanel id="older-0.8" label="0.8.x">
 
@@ -942,6 +958,7 @@ Since version 0.9 relies on `hooks.server.ts` to setup our client, we no longer 
   size="small"
   type="underlined"
   defaultActiveId="older-0-8"
+  queryGroup="migration-version"
 >
 <TabPanel id="older-0-8" label="0.8.x">
 
@@ -1000,6 +1017,7 @@ declare global {
   size="small"
   type="underlined"
   defaultActiveId="older-0-8"
+  queryGroup="migration-version"
 >
 <TabPanel id="older-0-8" label="0.8.x">
 
@@ -1082,6 +1100,7 @@ export const load: PageLoad = async ({ parent }) => {
   size="small"
   type="underlined"
   defaultActiveId="older-0-8"
+  queryGroup="migration-version"
 >
 <TabPanel id="older-0-8" label="0.8.x">
 
@@ -1134,6 +1153,7 @@ export const GET: RequestHandler = async ({ locals: { supabase, getSession } }) 
   size="small"
   type="underlined"
   defaultActiveId="older-0.7"
+  queryGroup="migration-version"
 >
 <TabPanel id="older-0.7" label="0.7.x">
 
@@ -1182,6 +1202,7 @@ export const supabaseClient = createClient(env.PUBLIC_SUPABASE_URL, env.PUBLIC_S
   size="small"
   type="underlined"
   defaultActiveId="older-0.7"
+  queryGroup="migration-version"
 >
 <TabPanel id="older-0.7" label="0.7.x">
 
@@ -1238,6 +1259,7 @@ export const supabaseClient = createClient(env.PUBLIC_SUPABASE_URL, env.PUBLIC_S
   size="small"
   type="underlined"
   defaultActiveId="older-0-7"
+  queryGroup="migration-version"
 >
 <TabPanel id="older-0-7" label="0.7.x">
 
@@ -1285,6 +1307,7 @@ import '$lib/db'
   size="small"
   type="underlined"
   defaultActiveId="older-0-7"
+  queryGroup="migration-version"
 >
 <TabPanel id="older-0-7" label="0.7.x">
 
@@ -1342,6 +1365,7 @@ declare namespace App {
   size="small"
   type="underlined"
   defaultActiveId="older-0-7"
+  queryGroup="migration-version"
 >
 <TabPanel id="older-0-7" label="0.7.x">
 
@@ -1420,6 +1444,7 @@ export const load: PageLoad = async (event) => {
   size="small"
   type="underlined"
   defaultActiveId="older-0-7"
+  queryGroup="migration-version"
 >
 <TabPanel id="older-0-7" label="0.7.x">
 
@@ -1481,6 +1506,7 @@ The environment variable prefix is now `PUBLIC_` instead of `VITE_` (e.g., `VITE
   size="small"
   type="underlined"
   defaultActiveId="older"
+  queryGroup="migration-version"
 >
 <TabPanel id="older" label="0.6.11 and below">
 
@@ -1530,6 +1556,7 @@ setupSupabaseHelpers({
   size="small"
   type="underlined"
   defaultActiveId="older"
+  queryGroup="migration-version"
 >
 <TabPanel id="older" label="0.6.11 and below">
 
@@ -1578,6 +1605,7 @@ The `@supabase/auth-helpers-svelte` library is no longer required as the `@supab
   size="small"
   type="underlined"
   defaultActiveId="older"
+  queryGroup="migration-version"
 >
 <TabPanel id="older" label="0.6.11 and below">
 
@@ -1632,6 +1660,7 @@ export const handle = sequence(auth(), yourHandler)
   size="small"
   type="underlined"
   defaultActiveId="older"
+  queryGroup="migration-version"
 >
 <TabPanel id="older" label="0.6.11 and below">
 
@@ -1689,6 +1718,7 @@ declare namespace App {
   size="small"
   type="underlined"
   defaultActiveId="older"
+  queryGroup="migration-version"
 >
 <TabPanel id="older" label="0.6.11 and below">
 
@@ -1731,6 +1761,7 @@ declare namespace App {
   size="small"
   type="underlined"
   defaultActiveId="older"
+  queryGroup="migration-version"
 >
 <TabPanel id="older" label="0.6.11 and below">
 
@@ -1807,6 +1838,7 @@ export const load: PageLoad = withAuth(async ({ session, getSupabaseClient }) =>
   size="small"
   type="underlined"
   defaultActiveId="older"
+  queryGroup="migration-version"
 >
 <TabPanel id="older" label="0.6.11 and below">
 
@@ -1868,8 +1900,6 @@ export const GET: RequestHandler = withAuth(async ({ session, getSupabaseClient 
 
 - [Auth Helpers Source code](https://github.com/supabase/auth-helpers)
 - [SvelteKit example](https://github.com/supabase/auth-helpers/tree/main/examples/sveltekit)
-- [SvelteKit Email/Password example](https://github.com/supabase/auth-helpers/tree/main/examples/sveltekit-email-password)
-- [SvelteKit Magiclink example](https://github.com/supabase/auth-helpers/tree/main/examples/sveltekit-magic-link)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

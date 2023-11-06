@@ -1,6 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { observer } from 'mobx-react-lite'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import { Fragment, useState } from 'react'
 
 import { useParams } from 'common/hooks'
@@ -173,7 +173,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                                   <IconUser size={20} strokeWidth={2} />
                                 </span>
                               ) : isEmailUser ? (
-                                <div className="w-[40px] h-[40px] bg-scale-300 border border-scale-400 rounded-full text-scale-900 flex items-center justify-center">
+                                <div className="w-[40px] h-[40px] bg-scale-300 border border-scale-400 rounded-full text-foreground-lighter flex items-center justify-center">
                                   <IconUser strokeWidth={1.5} />
                                 </div>
                               ) : (
@@ -187,9 +187,9 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                               )}
                             </div>
                             <div>
-                              <p className="text-scale-1200">{getUserDisplayName(x)}</p>
+                              <p className="text-foreground">{getUserDisplayName(x)}</p>
                               {x.invited_id === undefined && (
-                                <p className="text-scale-1100">{x.primary_email}</p>
+                                <p className="text-foreground-light">{x.primary_email}</p>
                               )}
                             </div>
                           </div>
@@ -210,25 +210,27 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                             </div>
                           ) : role !== undefined ? (
                             <Tooltip.Root delayDuration={0}>
-                              <Tooltip.Trigger className="w-[140px]">
-                                <Listbox
-                                  className={disableRoleEdit ? 'pointer-events-none' : ''}
-                                  disabled={disableRoleEdit}
-                                  value={role.id}
-                                  onChange={validateSelectedRoleToChange}
-                                >
-                                  {roles.map((r: any) => (
-                                    <Listbox.Option
-                                      key={r.id}
-                                      value={r.id}
-                                      label={r.name}
-                                      disabled={disableRoleEdit}
-                                      className="w-36"
-                                    >
-                                      {r.name}
-                                    </Listbox.Option>
-                                  ))}
-                                </Listbox>
+                              <Tooltip.Trigger className="w-[140px]" asChild>
+                                <div>
+                                  <Listbox
+                                    className={disableRoleEdit ? 'pointer-events-none' : ''}
+                                    disabled={disableRoleEdit}
+                                    value={role.id}
+                                    onChange={validateSelectedRoleToChange}
+                                  >
+                                    {roles.map((r: any) => (
+                                      <Listbox.Option
+                                        key={r.id}
+                                        value={r.id}
+                                        label={r.name}
+                                        disabled={disableRoleEdit}
+                                        className="w-36"
+                                      >
+                                        {r.name}
+                                      </Listbox.Option>
+                                    ))}
+                                  </Listbox>
+                                </div>
                               </Tooltip.Trigger>
                               {memberIsPendingInvite ? (
                                 <Tooltip.Portal>
@@ -240,7 +242,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                                         'border border-scale-200 ', //border
                                       ].join(' ')}
                                     >
-                                      <span className="text-xs text-scale-1200">
+                                      <span className="text-xs text-foreground">
                                         Role can only be changed after the user has accepted the
                                         invite
                                       </span>
@@ -257,7 +259,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                                         'border border-scale-200 ', //border
                                       ].join(' ')}
                                     >
-                                      <span className="text-xs text-scale-1200">
+                                      <span className="text-xs text-foreground">
                                         You need additional permissions to manage this team member
                                       </span>
                                     </div>
@@ -269,7 +271,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                             </Tooltip.Root>
                           ) : (
                             <div className="flex items-center space-x-2">
-                              <p className="text-sm text-scale-1100">Invalid role</p>
+                              <p className="text-sm text-foreground-light">Invalid role</p>
                               <Tooltip.Root delayDuration={0}>
                                 <Tooltip.Trigger>
                                   <IconAlertCircle size={16} strokeWidth={1.5} />
@@ -283,7 +285,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                                         'border border-scale-200 ', //border
                                       ].join(' ')}
                                     >
-                                      <span className="text-xs text-scale-1200">
+                                      <span className="text-xs text-foreground">
                                         This user has an invalid role, please reach out to us via
                                         support
                                       </span>
@@ -310,7 +312,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                         <Table.td colSpan={12}>
                           <div className="flex items-center space-x-3 opacity-75">
                             <IconAlertCircle size={16} strokeWidth={2} />
-                            <p className="text-scale-1100">
+                            <p className="text-foreground-light">
                               No users matched the search query "{searchString}"
                             </p>
                           </div>
@@ -323,7 +325,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                   className="bg-panel-secondary-light dark:bg-panel-secondary-dark"
                 >
                   <Table.td colSpan={4}>
-                    <p className="text-scale-1100">
+                    <p className="text-foreground-light">
                       {searchString ? `${filteredMembers.length} of ` : ''}
                       {members.length || '0'} {members.length == 1 ? 'user' : 'users'}
                     </p>
@@ -344,14 +346,14 @@ const MembersView = ({ searchString }: MembersViewProps) => {
       >
         <div className="flex flex-col gap-2 py-4">
           <Modal.Content>
-            <p className="text-sm text-scale-1100">
+            <p className="text-sm text-foreground-light">
               You are changing the role of{' '}
-              <span className="text-scale-1200">{getUserDisplayName(selectedMember)}</span> from{' '}
-              <span className="text-scale-1200">{getRoleNameById(selectedMember?.oldRoleId)}</span>{' '}
+              <span className="text-foreground">{getUserDisplayName(selectedMember)}</span> from{' '}
+              <span className="text-foreground">{getRoleNameById(selectedMember?.oldRoleId)}</span>{' '}
               to{' '}
-              <span className="text-scale-1200">{getRoleNameById(selectedMember?.newRoleId)}</span>
+              <span className="text-foreground">{getRoleNameById(selectedMember?.newRoleId)}</span>
             </p>
-            <p className="mt-3 text-sm text-scale-1200">
+            <p className="mt-3 text-sm text-foreground">
               By changing the role of this member their permissions will change.
             </p>
           </Modal.Content>

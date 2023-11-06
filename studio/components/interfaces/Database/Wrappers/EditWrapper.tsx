@@ -1,49 +1,51 @@
-import Link from 'next/link'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
 import { isEmpty } from 'lodash'
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+
+import { useParams } from 'common/hooks'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import {
+  FormActions,
+  FormPanel,
+  FormsContainer,
+  FormSection,
+  FormSectionContent,
+  FormSectionLabel,
+} from 'components/ui/Forms'
+import Loading from 'components/ui/Loading'
+import { invalidateSchemasQuery } from 'data/database/schemas-query'
+import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
+import { useFDWsQuery } from 'data/fdw/fdws-query'
+import { useCheckPermissions, useImmutableValue, useStore } from 'hooks'
+import { VaultSecret } from 'types'
 import {
   Button,
   Form,
-  Input,
   IconArrowLeft,
-  IconExternalLink,
   IconEdit,
-  IconTrash,
+  IconExternalLink,
   IconLoader,
+  IconTrash,
+  Input,
 } from 'ui'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-
-import { VaultSecret } from 'types'
-import { useCheckPermissions, useImmutableValue, useStore } from 'hooks'
-import { useParams } from 'common/hooks'
-import { useFDWsQuery } from 'data/fdw/fdws-query'
-import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
-
 import InputField from './InputField'
 import { WRAPPERS } from './Wrappers.constants'
-import WrapperTableEditor from './WrapperTableEditor'
 import {
+  convertKVStringArrayToJson,
   formatWrapperTables,
   makeValidateRequired,
-  convertKVStringArrayToJson,
 } from './Wrappers.utils'
-import Loading from 'components/ui/Loading'
-import {
-  FormPanel,
-  FormActions,
-  FormSection,
-  FormSectionLabel,
-  FormSectionContent,
-  FormsContainer,
-} from 'components/ui/Forms'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import WrapperTableEditor from './WrapperTableEditor'
 
 const EditWrapper = () => {
   const formId = 'edit-wrapper-form'
   const router = useRouter()
-  const { ui, meta, vault } = useStore()
+  const queryClient = useQueryClient()
+  const { ui, vault } = useStore()
   const { ref, id } = useParams()
   const { project } = useProjectContext()
 
@@ -67,7 +69,7 @@ const EditWrapper = () => {
       setWrapperTables([])
 
       const hasNewSchema = wrapperTables.some((table) => table.is_new_schema)
-      if (hasNewSchema) meta.schemas.load()
+      if (hasNewSchema) invalidateSchemasQuery(queryClient, ref)
 
       router.push(`/project/${ref}/database/wrappers`)
     },
@@ -91,7 +93,7 @@ const EditWrapper = () => {
 
   useEffect(() => {
     if (wrapper?.id) {
-      setWrapperTables(formatWrapperTables(wrapper?.tables ?? []))
+      setWrapperTables(formatWrapperTables(wrapper, wrapperMeta))
     }
   }, [wrapper?.id])
 
@@ -118,16 +120,14 @@ const EditWrapper = () => {
         <div className="flex flex-col items-center justify-center w-full h-full space-y-4">
           <div className="space-y-2 flex flex-col items-center w-[400px]">
             <p>Unknown wrapper</p>
-            <p className="text-sm text-center text-scale-1000">
+            <p className="text-sm text-center text-foreground-light">
               The wrapper ID {id} cannot be found in your project. Head back to select another
               wrapper.
             </p>
           </div>
-          <Link href={`/project/${ref}/database/wrappers`}>
-            <a>
-              <Button type="default">Head back</Button>
-            </a>
-          </Link>
+          <Button asChild type="default">
+            <Link href={`/project/${ref}/database/wrappers`}>Head back</Link>
+          </Button>
         </div>
       )
     }
@@ -179,23 +179,23 @@ const EditWrapper = () => {
             ].join(' ')}
           >
             <Link href={`/project/${ref}/database/wrappers`}>
-              <a>
-                <div className="flex items-center space-x-2">
-                  <IconArrowLeft strokeWidth={1.5} size={14} />
-                  <p className="text-sm">Back</p>
-                </div>
-              </a>
+              <div className="flex items-center space-x-2">
+                <IconArrowLeft strokeWidth={1.5} size={14} />
+                <p className="text-sm">Back</p>
+              </div>
             </Link>
           </div>
-          <h3 className="mb-2 text-xl text-scale-1200">Edit wrapper: {wrapper.name}</h3>
+          <h3 className="mb-2 text-xl text-foreground">Edit wrapper: {wrapper.name}</h3>
           <div className="flex items-center space-x-2">
-            <Link href="https://supabase.github.io/wrappers/stripe/">
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                  Documentation
-                </Button>
-              </a>
-            </Link>
+            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+              <Link
+                href="https://supabase.github.io/wrappers/stripe/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Documentation
+              </Link>
+            </Button>
           </div>
         </div>
 
@@ -310,7 +310,7 @@ const EditWrapper = () => {
                   header={
                     <FormSectionLabel>
                       <p>Foreign Tables</p>
-                      <p className="text-scale-1000 mt-2 w-[90%]">
+                      <p className="text-foreground-light mt-2 w-[90%]">
                         You can query your data from these foreign tables after the wrapper is
                         created
                       </p>
@@ -326,41 +326,45 @@ const EditWrapper = () => {
                       </div>
                     ) : (
                       <div className="space-y-2">
-                        {wrapperTables.map((table, i) => (
-                          <div
-                            key={`${table.schema_name}.${table.table_name}`}
-                            className="flex items-center justify-between px-4 py-2 border rounded-md border-scale-600"
-                          >
-                            <div>
-                              <p className="text-sm">
-                                {table.schema_name}.{table.table_name}
-                              </p>
-                              <p className="text-sm text-scale-1000">
-                                {wrapperMeta.tables[table.index].label}:{' '}
-                                {table.columns.map((column: any) => column.name).join(', ')}
-                              </p>
+                        {wrapperTables.map((table, i) => {
+                          const label = wrapperMeta.tables[table.index].label
+
+                          return (
+                            <div
+                              key={`${table.schema_name}.${table.table_name}`}
+                              className="flex items-center justify-between px-4 py-2 border rounded-md border-scale-600"
+                            >
+                              <div>
+                                <p className="text-sm">
+                                  {table.schema_name}.{table.table_name}
+                                </p>
+                                <p className="text-sm text-foreground-light">
+                                  {label}:{' '}
+                                  {table.columns.map((column: any) => column.name).join(', ')}
+                                </p>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Button
+                                  type="default"
+                                  className="px-1"
+                                  icon={<IconEdit />}
+                                  onClick={() => {
+                                    setIsEditingTable(true)
+                                    setSelectedTableToEdit({ ...table, tableIndex: i })
+                                  }}
+                                />
+                                <Button
+                                  type="default"
+                                  className="px-1"
+                                  icon={<IconTrash />}
+                                  onClick={() => {
+                                    setWrapperTables((prev) => prev.filter((_, j) => j !== i))
+                                  }}
+                                />
+                              </div>
                             </div>
-                            <div className="flex items-center space-x-2">
-                              <Button
-                                type="default"
-                                className="px-1"
-                                icon={<IconEdit />}
-                                onClick={() => {
-                                  setIsEditingTable(true)
-                                  setSelectedTableToEdit({ ...table, tableIndex: i })
-                                }}
-                              />
-                              <Button
-                                type="default"
-                                className="px-1"
-                                icon={<IconTrash />}
-                                onClick={() => {
-                                  setWrapperTables((prev) => prev.filter((_, j) => j !== i))
-                                }}
-                              />
-                            </div>
-                          </div>
-                        ))}
+                          )
+                        })}
                       </div>
                     )}
                     {wrapperTables.length > 0 && (

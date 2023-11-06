@@ -1,6 +1,9 @@
-import ActionBar from 'components/interfaces/TableGridEditor/SidePanelEditor/ActionBar'
-import { useStore } from 'hooks'
 import { useEffect, useState } from 'react'
+
+import ActionBar from 'components/interfaces/TableGridEditor/SidePanelEditor/ActionBar'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useSchemasQuery } from 'data/database/schemas-query'
 import { Form, IconDatabase, IconPlus, Input, Listbox, Modal, SidePanel } from 'ui'
 import WrapperDynamicColumns from './WrapperDynamicColumns'
 import { Table, TableOption } from './Wrappers.types'
@@ -160,8 +163,15 @@ const TableForm = ({
   onSubmit: OnSubmitFn
   initialData: any
 }) => {
-  const { meta } = useStore()
-  const schemas = meta.schemas.list()
+  const { project } = useProjectContext()
+  const {
+    data: schemas,
+    isLoading,
+    isSuccess,
+  } = useSchemasQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   const requiredOptions =
     table.options.filter((option) => option.editable && option.required && !option.defaultValue) ??
@@ -197,32 +207,37 @@ const TableForm = ({
       {({ errors, values, setFieldValue }: any) => {
         return (
           <div className="space-y-4">
-            <Listbox size="small" name="schema" label="Select a schema for the foreign table">
-              <Listbox.Option
-                key="custom"
-                id="custom"
-                label={`Create a new schema`}
-                value="custom"
-                addOnBefore={() => <IconPlus size={16} strokeWidth={1.5} />}
-              >
-                Create a new schema
-              </Listbox.Option>
-              <Modal.Separator />
-              {/* @ts-ignore */}
-              {schemas.map((schema: PostgresSchema) => {
-                return (
-                  <Listbox.Option
-                    key={schema.id}
-                    id={schema.name}
-                    label={schema.name}
-                    value={schema.name}
-                    addOnBefore={() => <IconDatabase size={16} strokeWidth={1.5} />}
-                  >
-                    {schema.name}
-                  </Listbox.Option>
-                )
-              })}
-            </Listbox>
+            {isLoading && <ShimmeringLoader className="py-4" />}
+
+            {isSuccess && (
+              <Listbox size="small" name="schema" label="Select a schema for the foreign table">
+                <Listbox.Option
+                  key="custom"
+                  id="custom"
+                  label={`Create a new schema`}
+                  value="custom"
+                  addOnBefore={() => <IconPlus size={16} strokeWidth={1.5} />}
+                >
+                  Create a new schema
+                </Listbox.Option>
+                <Modal.Separator />
+
+                {(schemas ?? [])?.map((schema) => {
+                  return (
+                    <Listbox.Option
+                      key={schema.id}
+                      id={schema.name}
+                      label={schema.name}
+                      value={schema.name}
+                      addOnBefore={() => <IconDatabase size={16} strokeWidth={1.5} />}
+                    >
+                      {schema.name}
+                    </Listbox.Option>
+                  )
+                })}
+              </Listbox>
+            )}
+
             {values.schema === 'custom' && (
               <Input id="schema_name" name="schema_name" label="Schema name" />
             )}

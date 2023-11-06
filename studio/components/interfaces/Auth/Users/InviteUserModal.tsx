@@ -1,12 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
-import { useContext } from 'react'
 import { Button, Form, IconMail, Input, Modal } from 'ui'
 
-import { useParams } from 'common'
 import { useUserInviteMutation } from 'data/auth/user-invite-mutation'
 import { useCheckPermissions, useStore } from 'hooks'
-import { PageContext } from 'pages/project/[ref]/auth/users'
 
 export type InviteUserModalProps = {
   visible: boolean
@@ -15,8 +13,7 @@ export type InviteUserModalProps = {
 
 const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
   const { ui } = useStore()
-  const { ref } = useParams()
-  const PageState: any = useContext(PageContext)
+  const { ref: projectRef } = useParams()
 
   const handleToggle = () => setVisible(!visible)
   const { mutateAsync: inviteUser, isLoading: isInviting } = useUserInviteMutation()
@@ -37,10 +34,9 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
   }
 
   const onInviteUser = async (values: any) => {
-    if (!ref) return console.error('Project ref is required')
+    if (!projectRef) return console.error('Project ref is required')
 
-    await inviteUser({ projectRef: ref, email: values.email })
-    PageState.fetchData(1)
+    await inviteUser({ projectRef, email: values.email })
     ui.setNotification({ category: 'success', message: `Sent invite email to ${values.email}` })
     setVisible(false)
   }

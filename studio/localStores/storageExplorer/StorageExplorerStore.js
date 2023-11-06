@@ -1088,21 +1088,26 @@ class StorageExplorerStore {
   /* Folders CRUD */
 
   fetchFolderContents = async (folderId, folderName, index, searchString = '') => {
-    this.abortApiCalls()
+    if (this.selectedBucket.id === undefined) return
 
+    this.abortApiCalls()
     this.updateRowStatus(folderName, STORAGE_ROW_STATUS.LOADING, index)
     this.pushColumnAtIndex(
       { id: folderId, name: folderName, status: STORAGE_ROW_STATUS.LOADING, items: [] },
       index
     )
 
-    const prefix = this.openedFolders.map((folder) => folder.name).join('/')
+    const prefix = this.openedFolders
+      .slice(0, index + 1)
+      .map((folder) => folder.name)
+      .join('/')
     const options = {
       limit: LIMIT,
       offset: OFFSET,
       search: searchString,
       sortBy: { column: this.sortBy, order: this.sortByOrder },
     }
+
     const res = await post(
       `${this.endpoint}/buckets/${this.selectedBucket.id}/objects/list`,
       { path: prefix, options },
@@ -1177,8 +1182,16 @@ class StorageExplorerStore {
     await this.fetchFoldersByPath(paths)
   }
 
-  fetchFoldersByPath = async (paths) => {
+  fetchFoldersByPath = async (paths, searchString = '', showLoading = false) => {
+    if (this.selectedBucket.id === undefined) return
+
     const pathsWithEmptyPrefix = [''].concat(paths)
+
+    if (showLoading) {
+      this.columns = [this.selectedBucket.name].concat(paths).map((path) => {
+        return { id: path, name: path, status: STORAGE_ROW_STATUS.LOADING, items: [] }
+      })
+    }
 
     const foldersItems = await Promise.all(
       pathsWithEmptyPrefix.map(async (path, idx) => {
@@ -1186,6 +1199,7 @@ class StorageExplorerStore {
         const options = {
           limit: LIMIT,
           offset: OFFSET,
+          search: searchString,
           sortBy: { column: this.sortBy, order: this.sortByOrder },
         }
 

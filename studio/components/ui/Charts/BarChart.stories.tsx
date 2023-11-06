@@ -1,7 +1,7 @@
-import React from 'react'
 import { ComponentMeta } from '@storybook/react'
-import Chart, { BarChartProps } from './BarChart'
 import dayjs from 'dayjs'
+import React from 'react'
+import Chart, { BarChartProps } from './BarChart'
 
 export default {
   title: 'Charts',
@@ -12,7 +12,7 @@ const DATA = [290, 430, 649, 422, 321, 893, 111].map((value, index) => ({
   timestamp: dayjs().subtract(index, 'day').toISOString(),
 }))
 
-const PROPS: BarChartProps<typeof DATA[number]> = {
+const PROPS: BarChartProps<(typeof DATA)[number]> = {
   title: 'Memory usage',
   xAxisKey: 'timestamp',
   yAxisKey: 'ram_usage',
@@ -51,6 +51,6 @@ export const BarChart = () => (
   </div>
 )
 
-const ExampleName: React.FC = ({ children }) => (
-  <h1 className="font-bold text-scale-1100">{children}</h1>
+const ExampleName: React.FC<React.PropsWithChildren> = ({ children }) => (
+  <h1 className="font-bold text-foreground-light">{children}</h1>
 )

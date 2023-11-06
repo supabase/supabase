@@ -3,8 +3,8 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'organization-based-billing',
   title: 'How billing works',
-  description: 'Learn how organzation-based billing works in Supabase.',
-  subtitle: 'Learn how organzation-based billing works in Supabase.',
+  description: 'Learn how organization-based billing works in Supabase.',
+  subtitle: 'Learn how organization-based billing works in Supabase.',
 }
 
 Our goal at Supabase is to provide a _predictable_ billing system that grows with your project.
@@ -103,9 +103,10 @@ With Organization-based Billing you won't get an immediate charge upfront when c
 
 If you launch a second or third instance on your paid plan, we add the additional compute hours to the final invoice.
 
-{/* prettier-ignore */}
 <Admonition type="note" label="Paused projects">
-  We only count compute hours for instances that are active. Paused projects do not count towards compute usage. We’re working on self-serve pausing and unpausing on paid plans to further manage costs.
+
+We only count compute hours for instances that are active. Paused projects do not count towards compute usage. We’re working on self-serve pausing and unpausing on paid plans to further manage costs.
+
 </Admonition>
 
 ### Compute pricing
@@ -123,7 +124,7 @@ If you launch a second or third instance on your paid plan, we add the additiona
 | 12XL          | $3.836       | ~$2800                  |
 | 16XL          | $5.12        | ~$3730                  |
 
-With Legacy Billing, when you upgraded the [Compute Add-On](/docs/guides/platform/compute-add-ons), you were immediately charged the prorated amount (days left in your current billing cycle) and when your billing cycle reset you were charged upfront for the entire month. When you downgraded, you got the appropriate credits for unused time.
+With Legacy Billing, when you upgraded the [Compute Add-On](/docs/guides/platform/compute-add-ons), you were immediately charged the prorated amount (days remaining in your current billing cycle) and when your billing cycle reset you were charged upfront for the entire month. When you downgraded, you got the appropriate credits for unused time.
 
 ### Free plan
 
@@ -244,9 +245,10 @@ If you're currently running a mix of Free and Pro plan projects and migrate that
 
 All [benefits](https://supabase.com/pricing) of the Pro plan apply to all projects within your organization.
 
-{/* prettier-ignore */}
 <Admonition type="note">
-  You can transfer projects to a free organization, in case you haven't used up your 2 free project limit, if you don't want additional projects on the Pro plan. See [Project Transfers](/docs/guides/platform/project-transfer).
+
+You can transfer projects to a free organization, in case you haven't used up your 2 free project limit, if you don't want additional projects on the Pro plan. See [Project Transfers](/docs/guides/platform/project-transfer).
+
 </Admonition>
 
 ### Self-Serve-Migration
@@ -313,6 +315,15 @@ If you head over to your [organizations' billing settings](https://supabase.com/
   </summary>
   Not at all. There are no service disruptions during the migration, as we’re not touching your projects’
   infrastructure.
+</details>
+
+<details>
+<summary>
+  <i>Where do I change my project add-ons such as PITR, Compute and Custom Domain?</i>
+</summary>
+
+Head over to your project [Add-ons page](https://supabase.com/dashboard/project/_/settings/addons) to change your compute size, Point-In-Time-Recovery or custom domain.
+
 </details>
 
 <details>

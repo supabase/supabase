@@ -1,6 +1,7 @@
+import { ListTree } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 
 import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -18,7 +19,6 @@ import {
   IconAlertCircle,
   IconCheck,
   IconCode,
-  IconGitBranch,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
@@ -43,7 +43,6 @@ const BranchLink = ({
   return (
     <Link passHref href={href}>
       <CommandItem_Shadcn_
-        asChild
         value={branch.name}
         className="cursor-pointer w-full flex items-center justify-between"
         onSelect={() => {
@@ -54,20 +53,23 @@ const BranchLink = ({
           setOpen(false)
         }}
       >
-        <a>
+        <p className="truncate w-60" title={branch.name}>
           {branch.name}
-          {isSelected && <IconCheck />}
-        </a>
+        </p>
+        {isSelected && <IconCheck />}
       </CommandItem_Shadcn_>
     </Link>
   )
 }
 
-const BranchDropdown = () => {
+interface BranchDropdownProps {
+  isNewNav?: boolean
+}
+
+const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const projectDetails = useSelectedProject()
-  const branchNameRef = useRef<HTMLAnchorElement>(null)
 
   const isBranch = projectDetails?.parent_project_ref !== undefined
   const projectRef =
@@ -75,7 +77,6 @@ const BranchDropdown = () => {
   const { data: branches, isLoading, isError, isSuccess } = useBranchesQuery({ projectRef })
 
   const [open, setOpen] = useState(false)
-  const popoverOffset = (branchNameRef.current?.offsetWidth ?? 0) + 12
   const selectedBranch = branches?.find((branch) => branch.project_ref === ref)
 
   return (
@@ -90,18 +91,18 @@ const BranchDropdown = () => {
       )}
 
       {isSuccess && branches.length > 0 && (
-        <div className="flex items-center space-x-2 px-2">
+        <div className="flex items-center px-2">
           <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
             <PopoverTrigger_Shadcn_ asChild>
               <Button
                 type="text"
                 className="pr-2"
                 iconRight={
-                  <IconCode className="text-scale-1100 rotate-90" strokeWidth={2} size={12} />
+                  <IconCode className="text-foreground-light rotate-90" strokeWidth={2} size={12} />
                 }
               >
                 <div className="flex items-center space-x-2">
-                  <p className="text-sm">{selectedBranch?.name}</p>
+                  <p className={isNewNav ? 'text-sm' : 'text-xs'}>{selectedBranch?.name}</p>
                   {selectedBranch?.is_default ? (
                     <Badge color="amber">Production</Badge>
                   ) : (
@@ -110,18 +111,13 @@ const BranchDropdown = () => {
                 </div>
               </Button>
             </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_
-              className="p-0"
-              side="bottom"
-              align="start"
-              style={{ marginLeft: `-${popoverOffset}px` }}
-            >
+            <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
               <Command_Shadcn_>
                 <CommandInput_Shadcn_ placeholder="Find branch..." />
                 <CommandList_Shadcn_>
                   <CommandEmpty_Shadcn_>No branches found</CommandEmpty_Shadcn_>
                   <CommandGroup_Shadcn_>
-                    <ScrollArea className={(branches || []).length > 7 ? 'h-[210px]' : ''}>
+                    <ScrollArea className="max-h-[210px] overflow-y-auto">
                       {branches?.map((branch) => (
                         <BranchLink
                           key={branch.id}
@@ -133,22 +129,22 @@ const BranchDropdown = () => {
                     </ScrollArea>
                   </CommandGroup_Shadcn_>
                   <CommandGroup_Shadcn_ className="border-t">
-                    <Link passHref href={`/project/${ref}/branches`}>
-                      <CommandItem_Shadcn_
-                        asChild
-                        className="cursor-pointer flex items-center space-x-2 w-full"
-                        onSelect={(e) => {
-                          setOpen(false)
-                          router.push(`/project/${ref}/branches`)
-                        }}
-                        onClick={() => setOpen(false)}
+                    <CommandItem_Shadcn_
+                      className="cursor-pointer w-full"
+                      onSelect={(e) => {
+                        setOpen(false)
+                        router.push(`/project/${ref}/branches`)
+                      }}
+                      onClick={() => setOpen(false)}
+                    >
+                      <Link
+                        href={`/project/${ref}/branches`}
+                        className="w-full flex items-center gap-2"
                       >
-                        <a>
-                          <IconGitBranch size={14} strokeWidth={1.5} />
-                          <p>Manage branches</p>
-                        </a>
-                      </CommandItem_Shadcn_>
-                    </Link>
+                        <ListTree size={14} strokeWidth={1.5} />
+                        <p>Manage branches</p>
+                      </Link>
+                    </CommandItem_Shadcn_>
                   </CommandGroup_Shadcn_>
                 </CommandList_Shadcn_>
               </Command_Shadcn_>

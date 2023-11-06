@@ -28,26 +28,32 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import Head from 'next/head'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import toast from 'react-hot-toast'
 // @ts-ignore
 import Prism from 'prism-react-renderer/prism'
+import ConsentToast from 'ui/src/components/ConsentToast'
+import PortalToast from 'ui/src/layout/PortalToast'
 
 import Favicons from 'components/head/Favicons'
 import {
   AppBannerWrapper,
   CommandMenuWrapper,
-  PortalToast,
   RouteValidationWrapper,
 } from 'components/interfaces/App'
+import {
+  FeaturePreviewContextProvider,
+  FeaturePreviewModal,
+} from 'components/interfaces/App/FeaturePreview'
 import FlagProvider from 'components/ui/Flag/FlagProvider'
 import PageTelemetry from 'components/ui/PageTelemetry'
 import { useRootQueryClient } from 'data/query-client'
 import { StoreProvider } from 'hooks'
-import useAutoAuthRedirect from 'hooks/misc/useAutoAuthRedirect'
 import { AuthProvider } from 'lib/auth'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { dart } from 'lib/constants/prism'
 import { ProfileProvider } from 'lib/profile'
+import { useAppStateSnapshot } from 'state/app-state'
 import { RootStore } from 'stores'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
@@ -77,7 +83,10 @@ loader.config({
 // the dashboard, all other layout components should not be doing that
 
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
+  const snap = useAppStateSnapshot()
   const queryClient = useRootQueryClient()
+
+  const consentToastId = useRef<string>()
   const [rootStore] = useState(() => new RootStore())
 
   // [Joshen] Some issues with using createBrowserSupabaseClient
@@ -90,42 +99,10 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
       : undefined
   )
 
-  const getSavingState = () => rootStore.content.savingState
-
-  // prompt the user if they try and leave with unsaved content store changes
-  useEffect(() => {
-    const warningText = 'You have unsaved changes - are you sure you wish to leave this page?'
-
-    const handleWindowClose = (e: BeforeUnloadEvent) => {
-      const savingState = getSavingState()
-
-      const unsavedChanges =
-        savingState === 'UPDATING_REQUIRED' ||
-        savingState === 'UPDATING' ||
-        savingState === 'UPDATING_FAILED'
-
-      if (!unsavedChanges) {
-        return
-      }
-
-      e.preventDefault()
-
-      return (e.returnValue = warningText)
-    }
-
-    window.addEventListener('beforeunload', handleWindowClose)
-
-    return () => {
-      window.removeEventListener('beforeunload', handleWindowClose)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  useAutoAuthRedirect(queryClient)
-
   const getLayout = Component.getLayout ?? ((page) => page)
 
   const AuthContainer = useMemo(
+    // eslint-disable-next-line react/display-name
     () => (props: any) => {
       return IS_PLATFORM ? (
         <SessionContextProvider supabaseClient={supabase as any}>
@@ -137,6 +114,34 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
     },
     [supabase]
   )
+
+  useEffect(() => {
+    // Check for telemetry consent
+    if (typeof window !== 'undefined') {
+      const onAcceptConsent = () => {
+        snap.setIsOptedInTelemetry(true)
+        if (consentToastId.current) toast.dismiss(consentToastId.current)
+      }
+
+      const onOptOut = () => {
+        snap.setIsOptedInTelemetry(false)
+        if (consentToastId.current) toast.dismiss(consentToastId.current)
+      }
+
+      const hasAcknowledgedConsent = localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
+      if (hasAcknowledgedConsent === null) {
+        consentToastId.current = toast(
+          <ConsentToast onAccept={onAcceptConsent} onOptOut={onOptOut} />,
+          {
+            id: 'consent-toast',
+            position: 'bottom-right',
+            duration: Infinity,
+          }
+        )
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -154,10 +159,18 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                 <PageTelemetry>
                   <TooltipProvider>
                     <RouteValidationWrapper>
-                      <ThemeProvider>
+                      <ThemeProvider
+                        attribute="class"
+                        defaultTheme="system"
+                        enableSystem
+                        disableTransitionOnChange
+                      >
                         <CommandMenuWrapper>
                           <AppBannerWrapper>
-                            {getLayout(<Component {...pageProps} />)}
+                            <FeaturePreviewContextProvider>
+                              {getLayout(<Component {...pageProps} />)}
+                              <FeaturePreviewModal />
+                            </FeaturePreviewContextProvider>
                           </AppBannerWrapper>
                         </CommandMenuWrapper>
                       </ThemeProvider>

@@ -2,9 +2,10 @@ import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
 import { IconAlertCircle, IconLoader } from 'ui'
 
-import { NewProjectPanel, ProjectUsage } from 'components/interfaces/Home'
+import { NewProjectPanel } from 'components/interfaces/Home'
 import InformationBox from 'components/ui/InformationBox'
 import { ProjectUsageResponseUsageKeys, useProjectUsageQuery } from 'data/usage/project-usage-query'
+import ProjectUsage from './ProjectUsage'
 
 const ProjectUsageSection = observer(() => {
   const { ref: projectRef } = useParams()
@@ -42,7 +43,7 @@ const ProjectUsageSection = observer(() => {
           <IconLoader className="animate-spin" size={14} />
           <p className="text-sm">Retrieving project usage statistics</p>
         </div>
-      ) : true ? (
+      ) : hasProjectData ? (
         <ProjectUsage />
       ) : (
         <NewProjectPanel />

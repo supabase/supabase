@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Alert, Button, IconDownload, IconExternalLink, IconLoader, Toggle } from 'ui'
 
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   FormHeader,
   FormPanel,
@@ -49,7 +50,12 @@ const SSLConfiguration = () => {
     }
   )
 
-  const canUpdateSSLEnforcement = useCheckPermissions(PermissionAction.UPDATE, 'projects')
+  const { project } = useProjectContext()
+  const canUpdateSSLEnforcement = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: {
+      project_id: project?.id,
+    },
+  })
   const initialIsEnforced = isSuccess
     ? sslEnforcementConfiguration.appliedSuccessfully &&
       sslEnforcementConfiguration.currentConfig.database
@@ -74,17 +80,15 @@ const SSLConfiguration = () => {
   }
 
   return (
-    <div>
+    <div id="ssl-configuration">
       <div className="flex items-center justify-between">
         <FormHeader title="SSL Configuration" description="" />
         <div className="flex items-center space-x-2 mb-6">
-          <Link href="https://supabase.com/docs/guides/platform/ssl-enforcement">
-            <a target="_blank">
-              <Button type="default" icon={<IconExternalLink />}>
-                Documentation
-              </Button>
-            </a>
-          </Link>
+          <Button asChild type="default" icon={<IconExternalLink />}>
+            <Link href="https://supabase.com/docs/guides/platform/ssl-enforcement" target="_blank">
+              Documentation
+            </Link>
+          </Button>
         </div>
       </div>
       <FormPanel>
@@ -94,7 +98,7 @@ const SSLConfiguration = () => {
               className="lg:col-span-7"
               description={
                 <div className="space-y-4">
-                  <p className="text-sm text-scale-1000">
+                  <p className="text-sm text-foreground-light">
                     Reject non-SSL connections to your database
                   </p>
                   {isSuccess && !sslEnforcementConfiguration?.appliedSuccessfully && (
@@ -104,10 +108,13 @@ const SSLConfiguration = () => {
                       title="SSL enforcement was not updated successfully"
                     >
                       Please try updating again, or contact{' '}
-                      <Link href="/support/new">
-                        <a target="_blank" rel="noreferrer" className="underline">
-                          support
-                        </a>
+                      <Link
+                        href="/support/new"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="underline"
+                      >
+                        support
                       </Link>{' '}
                       if this error persists
                     </Alert>
@@ -147,7 +154,7 @@ const SSLConfiguration = () => {
                           'border border-scale-200 w-[250px]',
                         ].join(' ')}
                       >
-                        <span className="text-xs text-scale-1200 text-center flex items-center justify-center">
+                        <span className="text-xs text-foreground text-center flex items-center justify-center">
                           {!canUpdateSSLEnforcement
                             ? 'You need additional permissions to update SSL enforcement for your project'
                             : !hasAccessToSSLEnforcement
@@ -194,7 +201,7 @@ const SSLConfiguration = () => {
                         'border border-scale-200 w-[250px]',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text-foreground">
                         Projects before 15:08 (GMT+08), 29th April 2021 do not have SSL certificates
                         installed
                       </span>

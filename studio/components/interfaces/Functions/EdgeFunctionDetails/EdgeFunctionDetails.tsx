@@ -1,6 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -18,7 +19,6 @@ import {
   Toggle,
 } from 'ui'
 
-import { useParams } from 'common/hooks'
 import {
   FormActions,
   FormHeader,
@@ -29,6 +29,7 @@ import {
 } from 'components/ui/Forms'
 import Panel from 'components/ui/Panel'
 import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from 'data/edge-functions/edge-functions-delete-mutation'
 import { useEdgeFunctionUpdateMutation } from 'data/edge-functions/edge-functions-update-mutation'
@@ -44,6 +45,7 @@ const EdgeFunctionDetails = () => {
   const [showInstructions, setShowInstructions] = useState(false)
 
   const { data: settings } = useProjectApiQuery({ projectRef })
+  const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
   const { mutateAsync: updateEdgeFunction, isLoading: isUpdating } = useEdgeFunctionUpdateMutation()
   const { mutate: deleteEdgeFunction, isLoading: isDeleting } = useEdgeFunctionDeleteMutation({
@@ -66,7 +68,10 @@ const EdgeFunctionDetails = () => {
     : '[YOUR ANON KEY]'
 
   const endpoint = apiService?.app_config.endpoint ?? ''
-  const functionUrl = `${apiService?.protocol}://${endpoint}/functions/v1/${selectedFunction?.slug}`
+  const functionUrl =
+    customDomainData?.customDomain?.status === 'active'
+      ? `${apiService?.protocol}://${customDomainData.customDomain.hostname}/functions/v1/${selectedFunction?.slug}`
+      : `${apiService?.protocol}://${endpoint}/functions/v1/${selectedFunction?.slug}`
 
   const { managementCommands, secretCommands, invokeCommands } = generateCLICommands(
     selectedFunction,
@@ -187,18 +192,24 @@ const EdgeFunctionDetails = () => {
                             for this function
                           </p>
                         </div>
-                        <p className="text-sm text-scale-1000">
+                        <p className="text-sm text-foreground-light">
                           Import maps allow the use of bare specifiers in functions instead of
                           explicit import URLs
                         </p>
                         <div className="!mt-4">
-                          <Link href="https://supabase.com/docs/guides/functions/import-maps">
-                            <a target="_blank" rel="noreferrer">
-                              <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                                More about import maps
-                              </Button>
-                            </a>
-                          </Link>
+                          <Button
+                            asChild
+                            type="default"
+                            icon={<IconExternalLink strokeWidth={1.5} />}
+                          >
+                            <Link
+                              href="https://supabase.com/docs/guides/functions/import-maps"
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              More about import maps
+                            </Link>
+                          </Button>
                         </div>
                       </div>
                     </FormSectionContent>
@@ -215,7 +226,7 @@ const EdgeFunctionDetails = () => {
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded border bg-scale-1200 p-2 text-scale-100 dark:bg-scale-100 dark:text-scale-1200">
+              <div className="flex h-8 w-8 items-center justify-center rounded border bg-scale-1200 p-2 text-scale-100 dark:bg-scale-100 dark:text-foreground">
                 <IconTerminal strokeWidth={2} />
               </div>
               <h4>Command line access</h4>
@@ -270,7 +281,7 @@ const EdgeFunctionDetails = () => {
                             'border border-scale-200',
                           ].join(' ')}
                         >
-                          <span className="text-xs text-scale-1200">
+                          <span className="text-xs text-foreground">
                             You need additional permissions to delete an edge function
                           </span>
                         </div>

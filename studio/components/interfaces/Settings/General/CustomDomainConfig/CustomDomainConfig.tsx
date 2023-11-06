@@ -9,15 +9,17 @@ import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { IconAlertCircle } from 'ui'
 import CustomDomainActivate from './CustomDomainActivate'
 import CustomDomainDelete from './CustomDomainDelete'
-import CustomDomainVerify from './CustomDomainVerify'
 import CustomDomainsConfigureHostname from './CustomDomainsConfigureHostname'
 import CustomDomainsShimmerLoader from './CustomDomainsShimmerLoader'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import CustomDomainVerify from './CustomDomainVerify'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks'
 
 const CustomDomainConfig = () => {
   const { ref } = useParams()
+  const organization = useSelectedOrganization()
 
-  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef: ref })
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
   const plan = subscription?.plan?.id
   const { isLoading: isSettingsLoading, data: settings } = useProjectApiQuery({
@@ -34,7 +36,7 @@ const CustomDomainConfig = () => {
   const isLoading = isSettingsLoading || isCustomDomainsLoading
 
   return (
-    <section>
+    <section id="custom-domains">
       <FormHeader title="Custom Domains" description="Present a branded experience to your users" />
       {isLoading ? (
         <Panel>
@@ -47,10 +49,10 @@ const CustomDomainConfig = () => {
           <Panel.Content className="space-y-6">
             <div className="flex items-center justify-center space-x-2 py-8">
               <IconAlertCircle size={16} strokeWidth={1.5} />
-              <p className="text-sm text-scale-1100">
+              <p className="text-sm text-foreground-light">
                 Failed to retrieve custom domain configuration. Please try again later or{' '}
-                <Link href={`/support/new?ref=${ref}&category=sales`}>
-                  <a className="underline">contact support</a>
+                <Link href={`/support/new?ref=${ref}&category=sales`} className="underline">
+                  contact support
                 </Link>
                 .
               </p>
@@ -64,6 +66,7 @@ const CustomDomainConfig = () => {
           icon={<IconAlertCircle size={18} strokeWidth={1.5} />}
           primaryText="Custom domains are a Pro plan add-on"
           projectRef={ref as string}
+          organizationSlug={organization!.slug}
           secondaryText={
             plan === 'free'
               ? 'To configure a custom domain for your project, please upgrade to the Pro plan with the custom domains add-on selected'

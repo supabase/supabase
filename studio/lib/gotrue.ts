@@ -1,8 +1,5 @@
-import { IS_PLATFORM } from './constants'
-import { User, Session } from '@supabase/gotrue-js'
+import { Session, User } from '@supabase/gotrue-js'
 import { gotrueClient } from 'common'
-
-import { getFlags } from './configcat'
 
 export { STORAGE_KEY } from 'common'
 
@@ -70,15 +67,22 @@ export const getIdentity = (gotrueUser: User) => {
   }
 }
 
-// NOTE: do not use any imports in this function as it is used standalone in the documents head
-// [Joshen] Potentially can remove after full move over to /dashboard
+/**
+ * Transfers the search params from the current location path to a newly built path
+ */
+export const buildPathWithParams = (pathname: string) => {
+  const searchParams = new URLSearchParams(location.search)
+  return `${pathname}?${searchParams.toString()}`
+}
+
 export const getReturnToPath = (fallback = '/projects') => {
   const searchParams = new URLSearchParams(location.search)
 
-  // [Joshen] Remove base path value ("/dashboard") from returnTo
-  // because we're having this in the document's head, we won't have access
-  // to process.env, hardcoding the value as a workaround
-  const returnTo = (searchParams.get('returnTo') ?? fallback).replace('/dashboard', '')
+  let returnTo = searchParams.get('returnTo') ?? fallback
+
+  if (process.env.NEXT_PUBLIC_BASE_PATH) {
+    returnTo = returnTo.replace(process.env.NEXT_PUBLIC_BASE_PATH, '')
+  }
 
   searchParams.delete('returnTo')
 
@@ -86,7 +90,7 @@ export const getReturnToPath = (fallback = '/projects') => {
 
   let validReturnTo
 
-  // only allow returning to internal pages. e.g. /dashboard
+  // only allow returning to internal pages. e.g. /projects
   try {
     // if returnTo is a relative path, this will throw an error
     new URL(returnTo)

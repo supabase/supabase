@@ -448,7 +448,7 @@ const AiCommand = () => {
         })}
 
         {messages.length === 0 && !hasError && (
-          <CommandGroup heading="Examples" forceMount>
+          <CommandGroup heading="Examples">
             {questions.map((question) => {
               const key = question.replace(/\s+/g, '_')
               return (
@@ -459,7 +459,6 @@ const AiCommand = () => {
                       handleSubmit(question)
                     }
                   }}
-                  forceMount
                   key={key}
                 >
                   <AiIconAnimation />

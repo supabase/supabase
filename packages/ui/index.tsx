@@ -21,6 +21,7 @@ export * from './src/components/Icon/IconBackground'
 // DISPLAYS
 
 export * from './src/components/Card'
+export * from './src/components/TweetCard'
 export * from './src/components/Badge'
 export * from './src/components/Tabs'
 export * from './src/components/Alert'
@@ -36,15 +37,18 @@ export * from './src/components/Menu'
 
 export * from './src/components/Modal'
 export * from './src/components/SidePanel'
-export * from './src/components/Dropdown'
+export * from './src/components/ConsentToast'
 export * from './src/components/ContextMenu'
-export * from './src/components/Popover'
 export * from './src/components/ExpandableVideo'
+export * from './src/components/PrivacySettings'
+export * from './src/components/Popover'
+export * from './src/layout/PortalToast'
 
 // UTILITIES
 
 export * from './src/components/Space'
 export * from './src/components/Loading'
+export * from './src/components/LogoLoader'
 export * from './src/components/Divider'
 
 // DATA ENTRY
@@ -77,27 +81,13 @@ export * from './src/layout/ai-icon-animation'
 // utilities
 export * from './src/lib/utils'
 
+// theme switcher
+export * from './src/components/ThemeProvider/ThemeToggle'
+
 // animated ui
 
 // shadcn
-
-export {
-  DropdownMenu as DropdownMenu_Shadcn_,
-  DropdownMenuTrigger as DropdownMenuTrigger_Shadcn_,
-  DropdownMenuContent as DropdownMenuContent_Shadcn_,
-  DropdownMenuItem as DropdownMenuItem_Shadcn_,
-  DropdownMenuCheckboxItem as DropdownMenuCheckboxItem_Shadcn_,
-  DropdownMenuRadioItem as DropdownMenuRadioItem_Shadcn_,
-  DropdownMenuLabel as DropdownMenuLabel_Shadcn_,
-  DropdownMenuSeparator as DropdownMenuSeparator_Shadcn_,
-  DropdownMenuShortcut as DropdownMenuShortcut_Shadcn_,
-  DropdownMenuGroup as DropdownMenuGroup_Shadcn_,
-  DropdownMenuPortal as DropdownMenuPortal_Shadcn_,
-  DropdownMenuSub as DropdownMenuSub_Shadcn_,
-  DropdownMenuSubContent as DropdownMenuSubContent_Shadcn_,
-  DropdownMenuSubTrigger as DropdownMenuSubTrigger_Shadcn_,
-  DropdownMenuRadioGroup as DropdownMenuRadioGroup_Shadcn_,
-} from './src/components/shadcn/ui/dropdown-menu'
+export * from './src/components/shadcn/ui/dropdown-menu'
 
 export {
   Command as Command_Shadcn_,
@@ -221,10 +211,13 @@ export * from './src/components/Icon/icons/IconBook'
 export * from './src/components/Icon/icons/IconBookmark'
 export * from './src/components/Icon/icons/IconBox'
 export * from './src/components/Icon/icons/IconBriefcase'
+export * from './src/components/Icon/icons/IconBriefcase2'
+export * from './src/components/Icon/icons/IconBroadcast'
 export * from './src/components/Icon/icons/IconCalendar'
 export * from './src/components/Icon/icons/IconCameraOff'
 export * from './src/components/Icon/icons/IconCamera'
 export * from './src/components/Icon/icons/IconCast'
+export * from './src/components/Icon/icons/IconChangelog'
 export * from './src/components/Icon/icons/IconCheckCircle'
 export * from './src/components/Icon/icons/IconCheckSquare'
 export * from './src/components/Icon/icons/IconCheck'
@@ -267,11 +260,15 @@ export * from './src/components/Icon/icons/IconCreditCard'
 export * from './src/components/Icon/icons/IconCrop'
 export * from './src/components/Icon/icons/IconCrosshair'
 export * from './src/components/Icon/icons/IconDatabase'
+export * from './src/components/Icon/icons/IconDatabaseChanges'
 export * from './src/components/Icon/icons/IconDelete'
 export * from './src/components/Icon/icons/IconDisc'
+export * from './src/components/Icon/icons/IconDiscord'
+export * from './src/components/Icon/icons/IconDiscussions'
 export * from './src/components/Icon/icons/IconDivideCircle'
 export * from './src/components/Icon/icons/IconDivideSquare'
 export * from './src/components/Icon/icons/IconDivide'
+export * from './src/components/Icon/icons/IconDocumentation'
 export * from './src/components/Icon/icons/IconDollarSign'
 export * from './src/components/Icon/icons/IconDownloadCloud'
 export * from './src/components/Icon/icons/IconDownload'
@@ -305,6 +302,7 @@ export * from './src/components/Icon/icons/IconGitCommit'
 export * from './src/components/Icon/icons/IconGitMerge'
 export * from './src/components/Icon/icons/IconGitPullRequest'
 export * from './src/components/Icon/icons/IconGitHub'
+export * from './src/components/Icon/icons/IconGitHubSolid'
 export * from './src/components/Icon/icons/IconGitlab'
 export * from './src/components/Icon/icons/IconGlobe'
 export * from './src/components/Icon/icons/IconGrid'
@@ -319,14 +317,17 @@ export * from './src/components/Icon/icons/IconImage'
 export * from './src/components/Icon/icons/IconInbox'
 export * from './src/components/Icon/icons/IconInfo'
 export * from './src/components/Icon/icons/IconInstagram'
+export * from './src/components/Icon/icons/IconIntegrations'
 export * from './src/components/Icon/icons/IconItalic'
 export * from './src/components/Icon/icons/IconKey'
 export * from './src/components/Icon/icons/IconLayers'
 export * from './src/components/Icon/icons/IconLayout'
 export * from './src/components/Icon/icons/IconLifeBuoy'
+export * from './src/components/Icon/icons/IconLifeBuoy2'
 export * from './src/components/Icon/icons/IconLink2'
 export * from './src/components/Icon/icons/IconLink'
 export * from './src/components/Icon/icons/IconLinkedin'
+export * from './src/components/Icon/icons/IconLinkedinSolid'
 export * from './src/components/Icon/icons/IconList'
 export * from './src/components/Icon/icons/IconLoader'
 export * from './src/components/Icon/icons/IconLock'
@@ -360,6 +361,7 @@ export * from './src/components/Icon/icons/IconNavigation'
 export * from './src/components/Icon/icons/IconOctagon'
 export * from './src/components/Icon/icons/IconPackage'
 export * from './src/components/Icon/icons/IconPaperclip'
+export * from './src/components/Icon/icons/IconPartners'
 export * from './src/components/Icon/icons/IconPauseCircle'
 export * from './src/components/Icon/icons/IconPause'
 export * from './src/components/Icon/icons/IconPenTool'
@@ -380,6 +382,7 @@ export * from './src/components/Icon/icons/IconPlus'
 export * from './src/components/Icon/icons/IconPocket'
 export * from './src/components/Icon/icons/IconPower'
 export * from './src/components/Icon/icons/IconPrinter'
+export * from './src/components/Icon/icons/IconPresence'
 export * from './src/components/Icon/icons/IconRadio'
 export * from './src/components/Icon/icons/IconRefreshCcw'
 export * from './src/components/Icon/icons/IconRefreshCw'
@@ -437,6 +440,7 @@ export * from './src/components/Icon/icons/IconTruck'
 export * from './src/components/Icon/icons/IconTv'
 export * from './src/components/Icon/icons/IconTwitch'
 export * from './src/components/Icon/icons/IconTwitter'
+export * from './src/components/Icon/icons/IconTwitterX'
 export * from './src/components/Icon/icons/IconType'
 export * from './src/components/Icon/icons/IconUmbrella'
 export * from './src/components/Icon/icons/IconUnderline'
@@ -464,7 +468,9 @@ export * from './src/components/Icon/icons/IconXCircle'
 export * from './src/components/Icon/icons/IconXOctagon'
 export * from './src/components/Icon/icons/IconXSquare'
 export * from './src/components/Icon/icons/IconX'
+export * from './src/components/Icon/icons/IconYCombinator'
 export * from './src/components/Icon/icons/IconYoutube'
+export * from './src/components/Icon/icons/IconYoutubeSolid'
 export * from './src/components/Icon/icons/IconZapOff'
 export * from './src/components/Icon/icons/IconZap'
 export * from './src/components/Icon/icons/IconZoomIn'

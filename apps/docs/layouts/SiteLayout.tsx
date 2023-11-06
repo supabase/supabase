@@ -1,14 +1,13 @@
-import { useTheme } from 'common/Providers'
-import Image from 'next/image'
+import { useTheme } from 'next-themes'
+import Image from 'next/legacy/image'
 import Link from 'next/link'
 import NavigationMenu from '~/components/Navigation/NavigationMenu/NavigationMenu'
-import TopNavBarRef from '~/components/Navigation/NavigationMenu/TopNavBarRef'
+import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
 
 import Head from 'next/head'
-import { PropsWithChildren, memo } from 'react'
+import { PropsWithChildren, memo, useEffect } from 'react'
 import Footer from '~/components/Navigation/Footer'
 import { menuState, useMenuLevelId, useMenuMobileOpen } from '~/hooks/useMenuState'
-import { Announcement, LW8CountdownBanner } from 'ui'
 
 const levelsData = {
   home: {
@@ -24,8 +23,12 @@ const levelsData = {
     name: 'Database',
   },
   api: {
-    icon: '/docs/img/icons/menu/database',
-    name: 'Serverless APIs',
+    icon: '/docs/img/icons/menu/rest',
+    name: 'REST API',
+  },
+  graphql: {
+    icon: '/docs/img/icons/menu/graphql',
+    name: 'GraphQL',
   },
   auth: {
     icon: '/docs/img/icons/menu/auth',
@@ -199,6 +202,19 @@ const MobileHeader = memo(function MobileHeader() {
 
 const MobileMenuBackdrop = memo(function MobileMenuBackdrop() {
   const mobileMenuOpen = useMenuMobileOpen()
+
+  useEffect(() => {
+    window.addEventListener('resize', (e: UIEvent) => {
+      const w = e.target as Window
+      if (mobileMenuOpen && w.innerWidth >= 1024) {
+        menuState.setMenuMobileOpen(!mobileMenuOpen)
+      }
+    })
+    return () => {
+      window.removeEventListener('resize', () => {})
+    }
+  }, [mobileMenuOpen])
+
   return (
     <div
       className={[
@@ -217,24 +233,22 @@ const MobileMenuBackdrop = memo(function MobileMenuBackdrop() {
 })
 
 const HeaderLogo = memo(function HeaderLogo() {
-  const { isDarkMode } = useTheme()
+  const { resolvedTheme } = useTheme()
   return (
-    <Link href="/">
-      <a className="px-10 flex items-center gap-2">
-        <Image
-          className="cursor-pointer"
-          src={isDarkMode ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'}
-          width={96}
-          height={24}
-          alt="Supabase Logo"
-        />
-        <span className="font-mono text-sm font-medium text-brand">DOCS</span>
-      </a>
+    <Link href="/" className="px-10 flex items-center gap-2">
+      <Image
+        className="cursor-pointer"
+        src={resolvedTheme === 'dark' ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'}
+        width={96}
+        height={24}
+        alt="Supabase Logo"
+      />
+      <span className="font-mono text-sm font-medium text-brand">DOCS</span>
     </Link>
   )
 })
 
-const Container = memo(function Container(props) {
+const Container = memo(function Container(props: PropsWithChildren) {
   const mobileMenuOpen = useMenuMobileOpen()
 
   return (
@@ -244,7 +258,7 @@ const Container = memo(function Container(props) {
       className={[
         // 'overflow-x-auto',
         'w-full h-screen transition-all ease-out',
-        'absolute lg:relative',
+        // 'absolute lg:relative',
         mobileMenuOpen
           ? '!w-auto ml-[75%] sm:ml-[50%] md:ml-[33%] overflow-hidden'
           : 'overflow-auto',
@@ -327,14 +341,11 @@ const SiteLayout = ({ children }: PropsWithChildren<{}>) => {
         <title>Supabase Docs</title>
       </Head>
       <main>
-        <Announcement>
-          <LW8CountdownBanner />
-        </Announcement>
         <div className="flex flex-row h-screen">
           <NavContainer />
           <Container>
             <div className={['lg:sticky top-0 z-10 overflow-hidden'].join(' ')}>
-              <TopNavBarRef />
+              <TopNavBar />
             </div>
             <div
               className={[

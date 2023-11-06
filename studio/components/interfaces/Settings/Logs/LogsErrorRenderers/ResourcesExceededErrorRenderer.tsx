@@ -2,7 +2,7 @@ import { Accordion, Input } from 'ui'
 import { ErrorRendererProps } from './DefaultErrorRenderer'
 
 const ResourcesExceededErrorRenderer: React.FC<ErrorRendererProps> = ({ error, isCustomQuery }) => (
-  <div className="flex flex-col gap-2 text-scale-1100">
+  <div className="flex flex-col gap-2 text-foreground-light">
     <div className="flex flex-col gap-1 text-sm">
       <p>This query requires too much memory to be executed.</p>
       <p>

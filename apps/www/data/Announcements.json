@@ -1,6 +1,21 @@
 [
   {
     "type": "Announcement",
+    "title": "Supabase Beta August 2023",
+    "description": "Launch Week 8 review and more things we shipped 🚀",
+    "imgUrl": "/images/blog/2023-09-07-beta-update-august-2023/monthly-update-august-2023.jpg",
+    "logoUrl": "/images/blog/2023-09-07-beta-update-august-2023/monthly-update-august-2023.jpg",
+    "organization": "Supabase",
+    "url": "/blog/beta-update-august-2023",
+    "postMeta": {
+      "name": "Ant Wilson",
+      "publishDate": "Sep 08, 2023",
+      "readLength": 5
+    },
+    "ctaText": "Learn more"
+  },
+  {
+    "type": "Announcement",
     "title": "Launch Week 8 Hackathon Winners",
     "description": "Announcing the winners of the Launch Week 8 Hackathon!",
     "imgUrl": "/images/blog/lw8-hackathon-winners/hackathon-winners.png",
@@ -13,20 +28,5 @@
       "readLength": 3
     },
     "ctaText": "See the winners"
-  },
-  {
-    "type": "Announcement",
-    "title": "Supabase Launch Week 8",
-    "description": "One new feature (or more) every day during a week.",
-    "imgUrl": "/images/launchweek/8/lw8-og.jpg",
-    "logoUrl": "/images/launchweek/8/lw8-og.jpg",
-    "organization": "Supabase",
-    "url": "/launch-week",
-    "postMeta": {
-      "name": "Paul Copplestone",
-      "publishDate": "Aug 07, 2023",
-      "readLength": 5
-    },
-    "ctaText": "Learn more"
   }
 ]

@@ -85,15 +85,15 @@ function CustomerStoriesPage(props: any) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0, transition: { duration: 0.5, easing: 'easeOut' } }}
               >
-                <h1 className="text-scale-1200 mb-3 text-3xl">Customer stories</h1>
-                <h2 className="text-scale-1100 text-xl">
+                <h1 className="text-foreground mb-3 text-3xl">Customer stories</h1>
+                <h2 className="text-light text-xl">
                   Discover case studies on how Supabase is being used around the world to quickly
                   create outstanding products and set new industry standards.
                 </h2>
               </motion.div>
               <div className="mx-auto my-12 md:my-20 grid grid-cols-12 gap-6 not-prose">
                 {caseStudyThumbs.map((caseStudy: any, i: number) => (
-                  <Link href={`${caseStudy.link}`} key={caseStudy.title} passHref>
+                  <Link href={`${caseStudy.link}`} key={caseStudy.title} passHref legacyBehavior>
                     <motion.a
                       className="col-span-12 md:col-span-4"
                       initial={{ opacity: 0, y: 20 }}

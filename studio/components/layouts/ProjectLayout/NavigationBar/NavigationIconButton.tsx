@@ -15,19 +15,15 @@ const NavigationIconButton = ({ route, isActive = false }: NavigationIconButtonP
       <Tooltip.Trigger>
         <ConditionalWrap
           condition={route.link !== undefined}
-          wrap={(children) => (
-            <Link href={route.link!}>
-              <a>{children}</a>
-            </Link>
-          )}
+          wrap={(children) => <Link href={route.link!}>{children}</Link>}
         >
           <span
             className={[
               'transition-colors duration-200',
               'flex items-center justify-center h-10 w-10 rounded', // Layout
               'bg-scale-200 hover:bg-scale-500', // Light mode
-              'text-scale-900 hover:text-scale-1200 ', // Dark mode
-              `${isActive ? 'bg-scale-500 shadow-sm text-scale-1200' : ''}`,
+              'text-foreground-lighter hover:text-foreground ', // Dark mode
+              `${isActive ? 'bg-scale-500 shadow-sm text-foreground' : ''}`,
             ].join(' ')}
           >
             {route.icon}
@@ -44,7 +40,7 @@ const NavigationIconButton = ({ route, isActive = false }: NavigationIconButtonP
               'border border-scale-500 ', //border
             ].join(' ')}
           >
-            <span className="text-scale-1200 text-xs">{route.label}</span>
+            <span className="text-foreground text-xs">{route.label}</span>
           </div>
         </Tooltip.Content>
       </Tooltip.Portal>

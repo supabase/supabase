@@ -49,6 +49,11 @@ const menus: Menu[] = [
     type: 'guide',
   },
   {
+    id: 'graphql',
+    path: '/guides/graphql',
+    type: 'guide',
+  },
+  {
     id: 'auth',
     path: '/guides/auth',
     type: 'guide',

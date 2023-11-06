@@ -1,14 +1,13 @@
-import * as React from 'react'
-import { IconArrowRight, IconKey, IconLink, IconLock } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { useDrag, useDrop, DropTargetMonitor } from 'react-dnd'
+import { getForeignKeyCascadeAction } from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
+import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { XYCoord } from 'dnd-core'
-import { useDispatch } from '../../store'
+import * as React from 'react'
+import { useDrag, useDrop } from 'react-dnd'
+import { IconArrowRight, IconKey, IconLink, IconLock } from 'ui'
+import { useDispatch, useTrackedState } from '../../store'
 import { ColumnHeaderProps, ColumnType, DragItem, GridForeignKey } from '../../types'
 import { ColumnMenu } from '../menu'
-import { useTrackedState } from '../../store'
-import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
-import { getForeignKeyDeletionAction } from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
 
 export function ColumnHeader<R>({
   column,
@@ -37,10 +36,10 @@ export function ColumnHeader<R>({
   const [{ isDragging }, drag] = useDrag({
     type: 'column-header',
     item: () => {
-      return { key: columnKey, index: columnIdx }
+      return { key: columnKey, index: columnIdx } as DragItem
     },
     canDrag: () => !column.frozen,
-    collect: (monitor: any) => ({
+    collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
   })
@@ -52,7 +51,7 @@ export function ColumnHeader<R>({
         handlerId: monitor.getHandlerId(),
       }
     },
-    hover(item: DragItem, monitor: DropTargetMonitor) {
+    hover(item, monitor) {
       if (!ref.current) {
         return
       }
@@ -61,8 +60,8 @@ export function ColumnHeader<R>({
         return
       }
 
-      const dragIndex = item.index
-      const dragKey = item.key
+      const dragIndex = (item as DragItem).index
+      const dragKey = (item as DragItem).key
       const hoverIndex = columnIdx
       const hoverKey = columnKey
 
@@ -102,7 +101,7 @@ export function ColumnHeader<R>({
       // Generally it's better to avoid mutations,
       // but it's good here for the sake of performance
       // to avoid expensive index searches.
-      item.index = hoverIndex
+      ;(item as DragItem).index = hoverIndex
     },
   })
 
@@ -139,7 +138,7 @@ export function ColumnHeader<R>({
                       'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">Primary key</span>
+                    <span className="text-xs text-foreground">Primary key</span>
                   </div>
                 </Tooltip.Content>
               </Tooltip.Portal>
@@ -163,7 +162,7 @@ export function ColumnHeader<R>({
                       'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">Encrypted column</span>
+                    <span className="text-xs text-foreground">Encrypted column</span>
                   </div>
                 </Tooltip.Content>
               </Tooltip.Portal>
@@ -198,18 +197,18 @@ function renderColumnIcon(
                 ].join(' ')}
               >
                 <div>
-                  <p className="text-xs text-scale-1100">Foreign key relation:</p>
+                  <p className="text-xs text-foreground-light">Foreign key relation:</p>
                   <div className="flex items-center space-x-1">
-                    <p className="text-xs text-scale-1200">{name}</p>
+                    <p className="text-xs text-foreground">{name}</p>
                     <IconArrowRight size="tiny" strokeWidth={1.5} />
-                    <p className="text-xs text-scale-1200">
+                    <p className="text-xs text-foreground">
                       {foreignKey?.targetTableSchema}.{foreignKey?.targetTableName}.
                       {foreignKey?.targetColumnName}
                     </p>
                   </div>
-                  {foreignKey?.deletionAction !== FOREIGN_KEY_DELETION_ACTION.NO_ACTION && (
-                    <p className="text-xs text-scale-1200 mt-1">
-                      On delete: {getForeignKeyDeletionAction(foreignKey?.deletionAction)}
+                  {foreignKey?.deletionAction !== FOREIGN_KEY_CASCADE_ACTION.NO_ACTION && (
+                    <p className="text-xs text-foreground mt-1">
+                      On delete: {getForeignKeyCascadeAction(foreignKey?.deletionAction)}
                     </p>
                   )}
                 </div>

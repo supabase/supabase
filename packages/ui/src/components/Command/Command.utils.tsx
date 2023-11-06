@@ -1,16 +1,25 @@
-import { Command as CommandPrimitive } from 'cmdk-supabase'
+import { Command as CommandPrimitive } from 'cmdk'
 import * as React from 'react'
 
 import { cn } from './../../lib/utils'
 
 import { DetailedHTMLProps, HTMLAttributes, KeyboardEventHandler } from 'react'
+import { LoadingLine } from '../LoadingLine/LoadingLine'
 import { Modal } from '../Modal'
 import { ModalProps } from '../Modal/Modal'
 import { useCommandMenu } from './CommandMenuProvider'
-import { LoadingLine } from '../LoadingLine/LoadingLine'
 
 type CommandPrimitiveElement = React.ElementRef<typeof CommandPrimitive>
 type CommandPrimitiveProps = React.ComponentPropsWithoutRef<typeof CommandPrimitive>
+
+export const copyToClipboard = (str: string, callback = () => {}) => {
+  const focused = window.document.hasFocus()
+  if (focused) {
+    window.navigator?.clipboard?.writeText(str).then(callback)
+  } else {
+    console.warn('Unable to copy to clipboard')
+  }
+}
 
 export const Command = React.forwardRef<CommandPrimitiveElement, CommandPrimitiveProps>(
   ({ className, ...props }, ref) => (
@@ -303,28 +312,24 @@ CommandShortcut.displayName = 'CommandLabel'
 
 export interface TextHighlighterProps
   extends DetailedHTMLProps<HTMLAttributes<HTMLSpanElement>, HTMLSpanElement> {
-  text: string | undefined
-  query: string | undefined
+  text: string
+  query: string
 }
 
 export const TextHighlighter = ({ text, query, ...props }: TextHighlighterProps) => {
-  const highlightMatches = (text?: string) => {
-    if (!text) {
-      return ''
+  // Wrap all instances of `query` in a span to make them bold
+  const elements = text.split(query).flatMap((part, index, parts) => {
+    const returnValue = [<>{part}</>]
+
+    // Add back the wrapped `query` (if it's not the last element)
+    if (index !== parts.length - 1) {
+      returnValue.push(<span className="font-semibold text-scale-1200">{query}</span>)
     }
 
-    if (!query) {
-      return text
-    }
+    return returnValue
+  })
 
-    const regex = new RegExp(query, 'gi')
-    return text.replace(
-      regex,
-      (match) => `<span class="font-semibold text-scale-1200">${match}</span>`
-    )
-  }
-
-  return <span dangerouslySetInnerHTML={{ __html: highlightMatches(text) }} {...props} />
+  return <span {...props}>{elements}</span>
 }
 
 TextHighlighter.displayName = 'TextHighlighter'

@@ -64,7 +64,7 @@ const RestoringState = () => {
               </div>
               <div className="space-y-1">
                 <p>Restoration complete!</p>
-                <p className="text-sm text-scale-1100">
+                <p className="text-sm text-foreground-light">
                   Your project has been successfully restored and is now back online.
                 </p>
               </div>
@@ -83,7 +83,7 @@ const RestoringState = () => {
               </div>
               <div className="space-y-1">
                 <p>Something went wrong while restoring your project</p>
-                <p className="text-sm text-scale-1100">
+                <p className="text-sm text-foreground-light">
                   Our engineers have already been notified of this, do hang tight while we are
                   investigating into the issue.
                 </p>
@@ -91,13 +91,13 @@ const RestoringState = () => {
             </div>
             {isFailed && (
               <div className="border-t border-scale-400 flex items-center justify-end py-4 px-8">
-                <Link
-                  href={`/support/new?category=Database_unresponsive&ref=${project?.ref}&subject=Restoration%20failed%20for%20project`}
-                >
-                  <a>
-                    <Button type="default">Contact support</Button>
-                  </a>
-                </Link>
+                <Button asChild type="default">
+                  <Link
+                    href={`/support/new?category=Database_unresponsive&ref=${project?.ref}&subject=Restoration%20failed%20for%20project`}
+                  >
+                    Contact support
+                  </Link>
+                </Button>
               </div>
             )}
           </div>
@@ -109,7 +109,7 @@ const RestoringState = () => {
               </div>
               <div className="space-y-1">
                 <p>Restoration in progress</p>
-                <p className="text-sm text-scale-1100">
+                <p className="text-sm text-foreground-light">
                   Restoration can take from a few minutes up to several hours depending on the size
                   of your database. Your project will be offline while the restoration is running.
                 </p>

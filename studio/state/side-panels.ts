@@ -11,7 +11,7 @@ export const sidePanelsState = proxy({
     sidePanelsState.vercelConnectionsOpen = bool
   },
   // ID to determine which vercel integration installation to use
-  vercelConnectionsIntegrationId: '' as string,
+  vercelConnectionsIntegrationId: undefined as undefined | string,
   setVercelConnectionsIntegrationId: (id: string) => {
     sidePanelsState.vercelConnectionsIntegrationId = id
   },
@@ -24,7 +24,7 @@ export const sidePanelsState = proxy({
     sidePanelsState.githubConnectionsOpen = bool
   },
   // ID to determine which github integration installation to use
-  githubConnectionsIntegrationId: '' as string,
+  githubConnectionsIntegrationId: undefined as undefined | string,
   setGithubConnectionsIntegrationId: (id: string) => {
     sidePanelsState.githubConnectionsIntegrationId = id
   },

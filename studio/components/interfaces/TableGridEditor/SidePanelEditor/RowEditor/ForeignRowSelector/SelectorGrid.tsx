@@ -1,12 +1,12 @@
-import DataGrid, { Column } from '@supabase/react-data-grid'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { SupaRow, SupaTable } from 'components/grid'
-import { IconKey } from 'ui'
+import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
 import {
   ESTIMATED_CHARACTER_PIXEL_WIDTH,
   getColumnDefaultWidth,
 } from 'components/grid/utils/gridColumns'
-import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
+import DataGrid, { Column } from 'react-data-grid'
+import { IconKey } from 'ui'
 
 export interface SelectorGridProps {
   table: SupaTable
@@ -28,7 +28,7 @@ const columnRender = (name: string, isPrimaryKey = false) => {
             <Tooltip.Content side="bottom">
               <Tooltip.Arrow className="radix-tooltip-arrow" />
               <div className="rounded bg-scale-100 py-1 px-2 leading-none shadow border border-scale-200">
-                <span className="text-xs text-scale-1200">Primary key</span>
+                <span className="text-xs text-foreground">Primary key</span>
               </div>
             </Tooltip.Content>
           </Tooltip.Portal>
@@ -40,7 +40,7 @@ const columnRender = (name: string, isPrimaryKey = false) => {
   )
 }
 
-const formatter = (column: string, row: any) => {
+const formatter = (column: string, row: SupaRow) => {
   const formattedValue = typeof row[column] === 'object' ? JSON.stringify(row[column]) : row[column]
   return (
     <div className="group sb-grid-select-cell__formatter overflow-hidden">
@@ -57,15 +57,16 @@ const SelectorGrid = ({ table, rows, onRowSelect }: SelectorGridProps) => {
     const columnWidth =
       columnDefaultWidth < columnWidthBasedOnName ? columnWidthBasedOnName : columnDefaultWidth
 
-    return {
+    const result: Column<SupaRow> = {
       key: column.name,
       name: column.name,
-      formatter: ({ row }: any) => formatter(column.name, row),
-      headerRenderer: () => columnRender(column.name, column.isPrimaryKey),
+      renderCell: (props) => formatter(column.name, props.row),
+      renderHeaderCell: () => columnRender(column.name, column.isPrimaryKey),
       resizable: true,
       width: columnWidth,
       minWidth: COLUMN_MIN_WIDTH,
     }
+    return result
   })
 
   return (
@@ -73,7 +74,7 @@ const SelectorGrid = ({ table, rows, onRowSelect }: SelectorGridProps) => {
       columns={columns}
       rows={rows}
       style={{ height: '100%' }}
-      onRowClick={onRowSelect}
+      onCellClick={(props) => onRowSelect(props.row)}
       rowClass={() => 'cursor-pointer'}
     />
   )

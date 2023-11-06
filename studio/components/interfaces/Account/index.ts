@@ -1,5 +1,7 @@
 import AccessTokenList from './AccessTokenList'
-import NewTokenBanner from './NewTokenBanner'
+import AuditLogs from './AuditLogs'
 import NewAccessTokenButton from './NewAccessTokenButton'
+import NewTokenBanner from './NewTokenBanner'
+import TOTPFactors from './TOTPFactors'
 
-export { AccessTokenList, NewTokenBanner, NewAccessTokenButton }
+export { AccessTokenList, NewTokenBanner, NewAccessTokenButton, TOTPFactors, AuditLogs }

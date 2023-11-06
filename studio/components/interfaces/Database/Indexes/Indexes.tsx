@@ -18,17 +18,17 @@ import {
 } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
+import CodeEditor from 'components/ui/CodeEditor'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { DatabaseIndex, useIndexesQuery } from 'data/database/indexes-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import Table from 'components/to-be-cleaned/Table'
-import CodeEditor from 'components/ui/CodeEditor'
-import CreateIndexSidePanel from './CreateIndexSidePanel'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useStore } from 'hooks'
-import MonacoEditor from 'components/interfaces/SQLEditor/MonacoEditor'
+import CreateIndexSidePanel from './CreateIndexSidePanel'
+import SchemaSelector from 'components/ui/SchemaSelector'
 
 const Indexes = () => {
   const { ui } = useStore()
@@ -97,27 +97,31 @@ const Indexes = () => {
     <>
       <div className="pb-8">
         <div className="flex items-center justify-between mb-6">
-          <div>
-            <h3 className="mb-2 text-xl text-scale-1200">Indexes</h3>
-            <div className="text-sm text-scale-900">
+          <div className="space-y-1">
+            <h3 className="text-xl text-foreground">Database Indexes</h3>
+            <div className="text-sm text-foreground-lighter">
               Improve query performance against your database
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <Link href="https://supabase.com/docs/guides/database/query-optimization">
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                  Documentation
-                </Button>
-              </a>
-            </Link>
-            <Link href="https://supabase.com/docs/guides/database/extensions/index_advisor">
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                  Optimization with index_advisor
-                </Button>
-              </a>
-            </Link>
+            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+              <Link
+                href="https://supabase.com/docs/guides/database/query-optimization"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Documentation
+              </Link>
+            </Button>
+            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+              <Link
+                href="https://supabase.com/docs/guides/database/extensions/index_advisor"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Optimization with index_advisor
+              </Link>
+            </Button>
           </div>
         </div>
 
@@ -131,28 +135,18 @@ const Indexes = () => {
               </div>
             )}
             {isSuccessSchemas && (
-              <Listbox
-                size="small"
-                value={selectedSchema}
-                onChange={setSelectedSchema}
+              <SchemaSelector
                 className="w-[260px]"
-              >
-                {(schemas?.result ?? []).map((schema) => (
-                  <Listbox.Option
-                    key={schema.name}
-                    value={schema.name}
-                    label={schema.name}
-                    addOnBefore={() => <span className="text-scale-900">schema</span>}
-                  >
-                    {schema.name}
-                  </Listbox.Option>
-                ))}
-              </Listbox>
+                size="small"
+                showError={false}
+                selectedSchemaName={selectedSchema}
+                onSelectSchema={setSelectedSchema}
+              />
             )}
             <Input
               size="small"
               value={search}
-              className="w-[250px]"
+              className="w-64"
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search for an index"
               icon={<IconSearch size={14} />}
@@ -186,7 +180,7 @@ const Indexes = () => {
                 {sortedIndexes.length === 0 && search.length === 0 && (
                   <Table.tr>
                     <Table.td colSpan={4}>
-                      <p className="text-sm text-scale-1200">No indexes created yet</p>
+                      <p className="text-sm text-foreground">No indexes created yet</p>
                       <p className="text-sm text-light">
                         There are no indexes found in the schema "{selectedSchema}"
                       </p>
@@ -196,7 +190,7 @@ const Indexes = () => {
                 {sortedIndexes.length === 0 && search.length > 0 && (
                   <Table.tr>
                     <Table.td colSpan={4}>
-                      <p className="text-sm text-scale-1200">No results found</p>
+                      <p className="text-sm text-foreground">No results found</p>
                       <p className="text-sm text-light">
                         Your search for "{search}" did not return any results
                       </p>

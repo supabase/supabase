@@ -36,6 +36,7 @@ const CommandMenuWrapper = ({ children }: PropsWithChildren<{}>) => {
     anon: settings?.autoApiService?.defaultApiKey ?? undefined,
     service: settings?.autoApiService?.serviceApiKey ?? undefined,
   }
+  const apiUrl = `${settings?.autoApiService.protocol}://${settings?.autoApiService.endpoint}`
 
   const { data } = useEntityDefinitionsQuery(
     {
@@ -100,6 +101,7 @@ const CommandMenuWrapper = ({ children }: PropsWithChildren<{}>) => {
       site="studio"
       projectRef={ref}
       apiKeys={apiKeys}
+      apiUrl={apiUrl}
       metadata={cmdkMetadata}
       isOptedInToAI={isOptedInToAI}
       saveGeneratedSQL={onSaveGeneratedSQL}

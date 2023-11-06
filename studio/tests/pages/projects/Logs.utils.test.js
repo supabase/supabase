@@ -214,15 +214,21 @@ test.each([
     len: 24,
     min: '2023-05-18T00:00:00',
     max: '2023-05-18T23:00:00',
-    valKey: ['total_auth_requests', 'total_realtime_requests', 'total_rest_requests', 'total_storage_requests'],
-    includes: [   {
-      // timestamp format is with higher precision and with tz
-      timestamp: '2023-05-18T14:00:00.000Z',
-      total_auth_requests: 0,
-      total_realtime_requests: 0,
-      total_rest_requests: 0,
-      total_storage_requests: 0,
-    },
+    valKey: [
+      'total_auth_requests',
+      'total_realtime_requests',
+      'total_rest_requests',
+      'total_storage_requests',
+    ],
+    includes: [
+      {
+        // timestamp format is with higher precision and with tz
+        timestamp: '2023-05-18T14:00:00.000Z',
+        total_auth_requests: 0,
+        total_realtime_requests: 0,
+        total_rest_requests: 0,
+        total_storage_requests: 0,
+      },
     ],
   },
 ])(

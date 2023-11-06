@@ -1,7 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { includes, noop } from 'lodash'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 
 import { useParams } from 'common/hooks'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -9,7 +9,18 @@ import Table from 'components/to-be-cleaned/Table'
 import { useDatabaseHooks } from 'data/database-triggers/database-triggers-query'
 import { useCheckPermissions } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
-import { Badge, Button, Dropdown, IconEdit3, IconMoreVertical, IconTrash } from 'ui'
+import {
+  Badge,
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  IconEdit3,
+  IconMoreVertical,
+  IconTrash,
+} from 'ui'
 
 export interface HookListProps {
   schema: string
@@ -41,7 +52,8 @@ const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: 
     <>
       {filteredHooks.map((x: any) => {
         const isEdgeFunction = (url: string) =>
-          url.includes(`https://${ref}.functions.supabase.${restUrlTld}/`)
+          url.includes(`https://${ref}.functions.supabase.${restUrlTld}/`) ||
+          url.includes(`https://${ref}.supabase.${restUrlTld}/functions/`)
         const [url, method] = x.function_args
 
         return (
@@ -78,26 +90,27 @@ const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: 
             <Table.td className="text-right">
               <div className="flex justify-end gap-4">
                 {canUpdateWebhook ? (
-                  <Dropdown
-                    side="left"
-                    overlay={
+                  <DropdownMenu>
+                    <DropdownMenuTrigger>
+                      <Button asChild type="default" icon={<IconMoreVertical />} className="px-1">
+                        <span></span>
+                      </Button>
+                    </DropdownMenuTrigger>
+
+                    <DropdownMenuContent side="left">
                       <>
-                        <Dropdown.Item icon={<IconEdit3 size="tiny" />} onClick={() => editHook(x)}>
-                          Edit hook
-                        </Dropdown.Item>
-                        <Dropdown.Item
-                          icon={<IconTrash stroke="red" size="tiny" />}
-                          onClick={() => deleteHook(x)}
-                        >
-                          Delete hook
-                        </Dropdown.Item>
+                        <DropdownMenuItem className="space-x-2" onClick={() => editHook(x)}>
+                          <IconEdit3 size="tiny" />
+                          <p>Edit hook</p>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="space-x-2" onClick={() => deleteHook(x)}>
+                          <IconTrash stroke="red" size="tiny" />
+                          <p>Delete hook</p>
+                        </DropdownMenuItem>
                       </>
-                    }
-                  >
-                    <Button asChild type="default" icon={<IconMoreVertical />} className="px-1">
-                      <span></span>
-                    </Button>
-                  </Dropdown>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 ) : (
                   <Tooltip.Root delayDuration={0}>
                     <Tooltip.Trigger asChild>
@@ -112,7 +125,7 @@ const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: 
                             'border border-scale-200',
                           ].join(' ')}
                         >
-                          <span className="text-xs text-scale-1200">
+                          <span className="text-xs text-foreground">
                             You need additional permissions to update webhooks
                           </span>
                         </div>

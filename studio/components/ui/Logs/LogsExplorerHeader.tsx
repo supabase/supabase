@@ -35,17 +35,13 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
           <IconList size={14} strokeWidth={3} />
         </div>
 
-        <h1 className="text-2xl text-scale-1200">Logs Explorer</h1>
-        {subtitle && <span className="text-2xl text-scale-1000">{subtitle}</span>}
+        <h1 className="text-2xl text-foreground">Logs Explorer</h1>
+        {subtitle && <span className="text-2xl text-foreground-light">{subtitle}</span>}
       </div>
       <div className="flex flex-row gap-2">
-        <Link href={LOGS_EXPLORER_DOCS_URL}>
-          <a>
-            <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-              Documentation
-            </Button>
-          </a>
-        </Link>
+        <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+          <Link href={LOGS_EXPLORER_DOCS_URL}>Documentation</Link>
+        </Button>
 
         <SidePanel
           size="large"
@@ -80,15 +76,18 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
                 The following table shows all the available paths that can be queried from each
                 respective source. Do note that to access nested keys, you would need to perform the
                 necessary{' '}
-                <Link href="https://supabase.com/docs/guides/platform/logs#unnesting-arrays">
-                  <a target="_blank" rel="noreferrer" className="text-brand">
-                    unnesting joins
-                    <IconExternalLink
-                      size="tiny"
-                      className="ml-1 inline -translate-y-[2px]"
-                      strokeWidth={1.5}
-                    />
-                  </a>
+                <Link
+                  href="https://supabase.com/docs/guides/platform/logs#unnesting-arrays"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-brand"
+                >
+                  unnesting joins
+                  <IconExternalLink
+                    size="tiny"
+                    className="ml-1 inline -translate-y-[2px]"
+                    strokeWidth={1.5}
+                  />
                 </Link>
               </p>
             </div>
@@ -147,7 +146,7 @@ const Field = ({
   return (
     <Table.tr>
       <Table.td
-        className="font-mono text-xs !p-2 cursor-pointer hover:text-scale-1200 transition flex items-center space-x-2"
+        className="font-mono text-xs !p-2 cursor-pointer hover:text-foreground transition flex items-center space-x-2"
         onClick={() =>
           copyToClipboard(field.path, () => {
             setIsCopied(true)
@@ -170,7 +169,7 @@ const Field = ({
                     'border border-scale-200',
                   ].join(' ')}
                 >
-                  <span className="text-xs text-scale-1200">Copied</span>
+                  <span className="text-xs text-foreground">Copied</span>
                 </div>
               </Tooltip.Content>
             </Tooltip.Portal>
@@ -189,7 +188,7 @@ const Field = ({
                     'border border-scale-200',
                   ].join(' ')}
                 >
-                  <span className="text-xs text-scale-1200">Copy value</span>
+                  <span className="text-xs text-foreground">Copy value</span>
                 </div>
               </Tooltip.Content>
             </Tooltip.Portal>

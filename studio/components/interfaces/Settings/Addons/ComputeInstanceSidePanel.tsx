@@ -5,21 +5,33 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
-import { useParams, useTheme } from 'common'
+import { useParams } from 'common'
+import { useTheme } from 'next-themes'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
 import Telemetry from 'lib/telemetry'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
-import { Alert, Button, IconExternalLink, IconInfo, Modal, Radio, SidePanel } from 'ui'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconAlertTriangle,
+  IconExternalLink,
+  IconInfo,
+  Modal,
+  Radio,
+  SidePanel,
+} from 'ui'
 
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 const COMPUTE_CATEGORY_OPTIONS: {
   id: 'micro' | 'optimized'
@@ -46,10 +58,9 @@ const ComputeInstanceSidePanel = () => {
   const { ui } = useStore()
   const router = useRouter()
   const { ref: projectRef } = useParams()
-  const { isDarkMode } = useTheme()
+  const { resolvedTheme } = useTheme()
   const { project: selectedProject } = useProjectContext()
   const organization = useSelectedOrganization()
-  const isOrgBilling = !!organization?.subscription_id
 
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<'micro' | 'optimized'>('micro')
@@ -65,7 +76,7 @@ const ComputeInstanceSidePanel = () => {
   const onClose = () => snap.setPanelKey(undefined)
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
-  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
       ui.setNotification({
@@ -182,13 +193,15 @@ const ComputeInstanceSidePanel = () => {
         header={
           <div className="flex items-center justify-between">
             <h4>Change project compute size</h4>
-            <Link href="https://supabase.com/docs/guides/platform/compute-add-ons">
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                  About compute sizes
-                </Button>
-              </a>
-            </Link>
+            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+              <Link
+                href="https://supabase.com/docs/guides/platform/compute-add-ons"
+                target="_blank"
+                rel="noreferrer"
+              >
+                About compute sizes
+              </Link>
+            </Button>
           </div>
         }
       >
@@ -235,13 +248,13 @@ const ComputeInstanceSidePanel = () => {
                         )}
                         width={160}
                         height={96}
-                        src={isDarkMode ? option.imageUrl : option.imageUrlLight}
+                        src={resolvedTheme === 'dark' ? option.imageUrl : option.imageUrlLight}
                       />
 
                       <p
                         className={clsx(
                           'text-sm transition',
-                          isSelected ? 'text-scale-1200' : 'text-scale-1000'
+                          isSelected ? 'text-foreground' : 'text-foreground-light'
                         )}
                       >
                         {option.name}
@@ -261,17 +274,11 @@ const ComputeInstanceSidePanel = () => {
                     variant="info"
                     title="Changing your compute size is only available on the Pro plan"
                     actions={
-                      isOrgBilling ? (
-                        <Link href={`/org/${organization.slug}/billing?panel=subscriptionPlan`}>
-                          <a>
-                            <Button type="default">View available plans</Button>
-                          </a>
-                        </Link>
-                      ) : (
-                        <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
+                      <Button asChild type="default">
+                        <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
                           View available plans
-                        </Button>
-                      )
+                        </Link>
+                      </Button>
                     }
                   >
                     Upgrade your plan to change the compute size of your project
@@ -299,17 +306,19 @@ const ComputeInstanceSidePanel = () => {
                           <p className="text-sm">{option.name}</p>
                         </div>
                         <div className="px-4 py-2">
-                          <p className="text-scale-1000">{option.meta?.memory_gb ?? 0} GB memory</p>
-                          <p className="text-scale-1000">
+                          <p className="text-foreground-light">
+                            {option.meta?.memory_gb ?? 0} GB memory
+                          </p>
+                          <p className="text-foreground-light">
                             {option.meta?.cpu_cores ?? 0}-core {cpuArchitecture} CPU (
                             {option.meta?.cpu_dedicated ? 'Dedicated' : 'Shared'})
                           </p>
                           <div className="flex justify-between items-center mt-2">
                             <div className="flex items-center space-x-1">
-                              <span className="text-scale-1200 text-sm">
+                              <span className="text-foreground text-sm">
                                 ${option.price.toLocaleString()}
                               </span>
-                              <span className="text-scale-1000 translate-y-[1px]">
+                              <span className="text-foreground-light translate-y-[1px]">
                                 {' '}
                                 / {option.price_interval === 'monthly' ? 'month' : 'hour'}
                               </span>
@@ -321,7 +330,7 @@ const ComputeInstanceSidePanel = () => {
                                     <IconInfo
                                       size={14}
                                       strokeWidth={2}
-                                      className="hover:text-scale-1000"
+                                      className="hover:text-foreground-light"
                                     />
                                   </div>
                                 </Tooltip.Trigger>
@@ -335,7 +344,7 @@ const ComputeInstanceSidePanel = () => {
                                       ].join(' ')}
                                     >
                                       <div className="flex items-center space-x-1">
-                                        <p className="text-scale-1200 text-sm">
+                                        <p className="text-foreground text-sm">
                                           ${Number(option.price * 672).toFixed(0)} - $
                                           {Number(option.price * 744).toFixed(0)} per month
                                         </p>
@@ -355,23 +364,18 @@ const ComputeInstanceSidePanel = () => {
             )}
 
             {selectedCategory === 'micro' && (
-              <p className="text-sm text-scale-1100">
+              <p className="text-sm text-foreground-light">
                 Your database will use the standard Micro size instance of 2-core {cpuArchitecture}{' '}
                 CPU (Shared) with 1GB of memory.
               </p>
             )}
 
             {hasChanges &&
-              (selectedCategory === 'micro' && !isOrgBilling ? (
-                <p className="text-sm text-scale-1100">
-                  Upon clicking confirm, the amount of that's unused during the current billing
-                  cycle will be returned as credits that can be used for subsequent billing cycles
-                </p>
-              ) : selectedCategory !== 'micro' && selectedCompute?.price_interval === 'monthly' ? (
+              (selectedCategory !== 'micro' && selectedCompute?.price_interval === 'monthly' ? (
                 // Monthly payment with project-level subscription
-                <p className="text-sm text-scale-1100">
+                <p className="text-sm text-foreground-light">
                   Upon clicking confirm, the amount of{' '}
-                  <span className="text-scale-1200">
+                  <span className="text-foreground">
                     ${selectedCompute?.price.toLocaleString()}
                   </span>{' '}
                   will be added to your monthly invoice. Any previous compute addon is prorated and
@@ -381,14 +385,17 @@ const ComputeInstanceSidePanel = () => {
                 </p>
               ) : selectedCategory !== 'micro' ? (
                 // Hourly usage-billing with org-based subscription
-                <p className="text-sm text-scale-1100">
+                <p className="text-sm text-foreground-light">
                   There are no immediate charges when changing compute. Compute Hours are a
                   usage-based item and you're billed at the end of your billing cycle based on your
                   compute usage. Read more about{' '}
-                  <Link href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute">
-                    <a target="_blank" rel="noreferrer" className="underline">
-                      Compute Billing
-                    </a>
+                  <Link
+                    href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline"
+                  >
+                    Compute Billing
                   </Link>
                   .
                 </p>
@@ -426,6 +433,18 @@ const ComputeInstanceSidePanel = () => {
                 <p>You need to disable PITR before downgrading to Micro Compute.</p>
               </Alert>
             )}
+
+            {hasChanges &&
+              subscription?.billing_via_partner &&
+              subscription.scheduled_plan_change?.target_plan !== undefined && (
+                <Alert_Shadcn_ variant={'warning'} className="mb-2">
+                  <IconAlertTriangle className="h-4 w-4" />
+                  <AlertDescription_Shadcn_>
+                    You have a scheduled subscription change that will be canceled if you change
+                    your PITR add on.
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+              )}
           </div>
         </SidePanel.Content>
       </SidePanel>

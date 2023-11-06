@@ -1,19 +1,19 @@
 import { useState } from 'react'
 
 import { useParams } from 'common'
+import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { AuthorizedApp, useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
 import { OAuthAppCreateResponse } from 'data/oauth/oauth-app-create-mutation'
 import { OAuthApp, useOAuthAppsQuery } from 'data/oauth/oauth-apps-query'
 import { Alert, Button, IconX, Input } from 'ui'
+import AuthorizedAppRow from './AuthorizedAppRow'
 import DeleteAppModal from './DeleteAppModal'
 import OAuthAppRow from './OAuthAppRow'
 import PublishAppModal from './PublishAppSidePanel'
-import { AuthorizedApp, useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
-import AuthorizedAppRow from './AuthorizedAppRow'
 import RevokeAppModal from './RevokeAppModal'
-import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 
 // [Joshen] Note on nav UX
 // Kang Ming mentioned that it might be better to split Published Apps and Authorized Apps into 2 separate tabs
@@ -58,7 +58,7 @@ const OAuthApps = () => {
           <div className="flex items-center justify-between">
             <div>
               <p>Published Apps</p>
-              <p className="text-scale-1000 text-sm">
+              <p className="text-foreground-light text-sm">
                 Build integrations that extend Supabase's functionality
               </p>
             </div>
@@ -158,7 +158,7 @@ const OAuthApps = () => {
 
         <div>
           <p>Authorized Apps</p>
-          <p className="text-scale-1000 text-sm">
+          <p className="text-foreground-light text-sm">
             Applications that have access to your organization's settings and projects
           </p>
 
