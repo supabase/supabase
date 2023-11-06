@@ -434,7 +434,7 @@ export default {
     `,
     variants: {
       standard: `
-        bg-control
+        bg-foreground/[.026]
         border border-control
         `,
       error: `
