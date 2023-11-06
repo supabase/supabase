@@ -1,8 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import generator from 'generate-password'
-import { debounce, isUndefined } from 'lodash'
-import { observer } from 'mobx-react-lite'
+import { debounce } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
@@ -84,7 +83,7 @@ const Wizard: NextPageWithLayout = () => {
   )
 
   const isAdmin = useCheckPermissions(PermissionAction.CREATE, 'projects')
-  const isInvalidSlug = isUndefined(currentOrg)
+  const isInvalidSlug = isOrganizationsSuccess && currentOrg === undefined
   const isEmptyOrganizations = (organizations?.length ?? 0) <= 0 && isOrganizationsSuccess
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
 
@@ -104,28 +103,32 @@ const Wizard: NextPageWithLayout = () => {
     debounce((value) => checkPasswordStrength(value), 300)
   ).current
 
-  /*
-   * Handle no org
-   * redirect to new org route
-   */
-  if (isEmptyOrganizations) {
-    router.push(`/new`)
-  }
+  useEffect(() => {
+    /*
+     * Handle no org
+     * redirect to new org route
+     */
+    if (isEmptyOrganizations) {
+      router.push(`/new`)
+    }
+  }, [isEmptyOrganizations, router])
 
-  /*
-   * Redirect to first org if the slug doesn't match an org slug
-   * this is mainly to capture the /project/new url, which is redirected from database.new
-   */
-  if (isInvalidSlug && (organizations?.length ?? 0) > 0) {
-    router.push(`/new/${organizations?.[0].slug}`)
-  }
+  useEffect(() => {
+    /*
+     * Redirect to first org if the slug doesn't match an org slug
+     * this is mainly to capture the /new/new-project url, which is redirected from database.new
+     */
+    if (isInvalidSlug && (organizations?.length ?? 0) > 0) {
+      router.push(`/new/${organizations?.[0].slug}`)
+    }
+  }, [isInvalidSlug, organizations])
 
   useEffect(() => {
     // User added a new payment method
     if (router.query.setup_intent && router.query.redirect_status) {
       ui.setNotification({ category: 'success', message: 'Successfully added new payment method' })
     }
-  }, [])
+  }, [router.query.redirect_status, router.query.setup_intent, ui])
 
   function onProjectNameChange(e: any) {
     e.target.value = e.target.value.replace(/\./g, '')
@@ -507,7 +510,7 @@ const PageLayout = withAuth(({ children }: PropsWithChildren) => {
   const { slug } = useParams()
 
   const { data: organizations } = useOrganizationsQuery()
-  const currentOrg = organizations?.find((o: any) => o.slug === slug)
+  const currentOrg = organizations?.find((o) => o.slug === slug)
 
   return (
     <WizardLayoutWithoutAuth organization={currentOrg} project={null}>
@@ -518,4 +521,4 @@ const PageLayout = withAuth(({ children }: PropsWithChildren) => {
 
 Wizard.getLayout = (page) => <PageLayout>{page}</PageLayout>
 
-export default observer(Wizard)
+export default Wizard
