@@ -42,7 +42,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
           <Button
             icon={<PlusCircle size="16" />}
             type={isFiltered ? 'primary' : 'dashed'}
-            className={cn('rounded-full px-1.5 !py-1')}
+            className={cn('rounded-full px-1.5 text-xs', isFiltered ? '!py-0.5' : '!py-1')}
             size="small"
           >
             {isFiltered ? (
@@ -53,7 +53,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
                 </Badge>
               </>
             ) : (
-              <span className="mr-1">Filter</span>
+              <span className="mr-1">Filter messages</span>
             )}
 
             {config.table !== '*' ? (

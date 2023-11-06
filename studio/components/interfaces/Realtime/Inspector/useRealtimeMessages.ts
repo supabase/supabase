@@ -6,6 +6,7 @@ import { uuidv4 } from 'lib/helpers'
 import { EMPTY_ARR } from 'lib/void'
 import { useCallback, useEffect, useReducer, useState } from 'react'
 import { LogData } from './Messages.types'
+import toast from 'react-hot-toast'
 
 function reducer(
   state: LogData[],
@@ -196,11 +197,16 @@ export const useRealtimeMessages = ({
 
   const sendMessage = useCallback(
     (message: string, payload: any) => {
-      channel?.send({
-        type: 'broadcast',
-        event: message,
-        payload,
-      })
+      if (channel) {
+        channel.send({
+          type: 'broadcast',
+          event: message,
+          payload,
+        })
+        toast.success('Successfully broadcasted message')
+      } else {
+        toast.error('Failed to broadcast message: channel as not been set')
+      }
     },
     [channel]
   )

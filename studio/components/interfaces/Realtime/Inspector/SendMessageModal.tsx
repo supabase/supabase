@@ -1,8 +1,8 @@
 import { Input, Modal } from 'ui'
 
 import CodeEditor from 'components/ui/CodeEditor'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useEffect, useState } from 'react'
+import { tryParseJson } from 'lib/helpers'
 
 interface SendMessageModalProps {
   visible: boolean
@@ -10,22 +10,37 @@ interface SendMessageModalProps {
   onSelectConfirm: (v: { message: string; payload: string }) => void
 }
 
-export const SendMessageModal = (props: SendMessageModalProps) => {
+export const SendMessageModal = ({
+  visible,
+  onSelectCancel,
+  onSelectConfirm,
+}: SendMessageModalProps) => {
+  const [error, setError] = useState<string>()
   const [values, setValues] = useState({ message: 'test', payload: '{}' })
 
   useEffect(() => {
-    if (props.visible) {
+    if (visible) {
+      setError(undefined)
       setValues({ message: 'test', payload: '{}' })
     }
-  }, [props.visible])
+  }, [visible])
 
   return (
-    <ConfirmationModal
-      header="Broadcast a message to all clients"
-      buttonLabel="Send"
+    <Modal
       size="medium"
-      {...props}
-      onSelectConfirm={() => props.onSelectConfirm(values)}
+      alignFooter="right"
+      header="Broadcast a message to all clients"
+      visible={visible}
+      loading={false}
+      onCancel={onSelectCancel}
+      onConfirm={() => {
+        const payload = tryParseJson(values.payload)
+        if (payload === undefined) {
+          setError('Please provide a valid JSON')
+        } else {
+          onSelectConfirm(values)
+        }
+      }}
     >
       <Modal.Content>
         <div className="py-4 flex flex-col gap-y-4">
@@ -48,9 +63,10 @@ export const SendMessageModal = (props: SendMessageModalProps) => {
               options={{ wordWrap: 'off', contextmenu: false }}
               value={values.payload}
             />
+            {error !== undefined && <p className="text-sm text-red-900">{error}</p>}
           </div>
         </div>
       </Modal.Content>
-    </ConfirmationModal>
+    </Modal>
   )
 }

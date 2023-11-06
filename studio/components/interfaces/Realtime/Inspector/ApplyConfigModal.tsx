@@ -14,15 +14,15 @@ export const ApplyConfigModal = (props: ApplyConfigModalProps) => {
       header="Previously found messages will be lost"
       danger
       buttonLabel="Confirm"
-      size="medium"
+      size="small"
       {...props}
     >
       <Modal.Content>
         <div className="py-4">
           <p className="text-sm text-foreground"></p>
           <p className="text-sm text-foreground-light">
-            Realtime inspector will lose currently collected messages and start listening for
-            messages matching new filtering settings.
+            The realtime inspector will clear currently collected messages and start listening for
+            new messages matching the updated filters.
           </p>
         </div>
       </Modal.Content>

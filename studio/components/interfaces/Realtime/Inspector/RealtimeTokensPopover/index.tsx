@@ -3,6 +3,8 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import {
   Button,
   IconKey,
+  IconUnlock,
+  IconUser,
   Input,
   Listbox,
   PopoverContent_Shadcn_,
@@ -32,6 +34,8 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
   const selectedToken = apiKeys.find((k) => k.api_key === tempConfig.token)
   const bearerEnabled = selectedToken?.tags === 'anon'
 
+  const isService = config.token === apiKeys.find((key) => key.tags === 'service_role')?.api_key
+
   useEffect(() => {
     const anonKey = apiKeys.find((k) => k.tags === 'anon')
     if (anonKey) {
@@ -56,12 +60,16 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
     <Popover_Shadcn_ open={open} onOpenChange={onOpen}>
       <PopoverTrigger_Shadcn_ asChild>
         <Button
-          icon={<PlusCircle size="16" />}
+          icon={<PlusCircle size={16} />}
           type="dashed"
-          className="rounded-full px-1.5 pr-2 !py-1"
+          className="rounded-full px-1.5 pr-2 !py-1 text-xs"
           size="small"
         >
-          <span className="text-xs">Test RLS policies</span>
+          {isService
+            ? 'Bypassing RLS policies'
+            : config.bearer
+            ? 'Viewing events as user'
+            : 'Test RLS policies'}
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="w-[500px] p-0" align="start">
@@ -93,22 +101,22 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
           </Listbox>
           {selectedToken?.tags === 'service_role' ? (
             <span className="text-sm text-foreground-light">
-              <span className="text-foreground">Service role</span> is a predefined Postgres role
-              with elevated privileges. It will bypass all Row Level Security (RLS) policies.
+              The <span className="text-foreground">Service role</span> is a predefined Postgres
+              role with elevated privileges. It will bypass all Row Level Security (RLS) policies.
             </span>
           ) : (
             <span className="text-sm text-foreground-light">
-              <span className="text-foreground">Anon key</span> will respect Row Level Security
-              (RLS) policies.
+              The <span className="text-foreground">anonymous key</span> will respect Row Level
+              Security (RLS) policies.
             </span>
           )}
         </div>
         {bearerEnabled && (
           <div className="border-b border-overlay p-4 flex-grow flex flex-col gap-y-2">
-            <p className="text-sm text-foreground">Impersonate a User</p>
+            <p className="text-sm text-foreground">Impersonate a user</p>
             <p className="text-sm text-foreground-light">
-              Select a user or use a JWT token to respect your database's Row-Level Security
-              policies for that particular user.
+              Provide a JWT token of a user to receive events from the perspective of the user. This
+              respects RLS policies relevant for that particular user.
             </p>
             <Input
               icon={<IconKey />}
