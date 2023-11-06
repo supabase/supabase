@@ -58,7 +58,7 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
         <Button
           icon={<PlusCircle size="16" />}
           type="dashed"
-          className="rounded-[28px] px-1.5 pr-2 !py-1"
+          className="rounded-full px-1.5 pr-2 !py-1"
           size="small"
         >
           <span className="text-xs">Test RLS policies</span>
