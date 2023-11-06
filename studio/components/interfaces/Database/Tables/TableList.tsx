@@ -201,7 +201,32 @@ const TableList = ({
                     tables.map((x: any, i: any) => (
                       <Table.tr key={x.id}>
                         <Table.td>
-                          <p title={x.name}>{x.name}</p>
+                          {/* only show tooltips if required, to reduce noise */}
+                          {x.name.length > 20 ? (
+                            <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
+                              <Tooltip.Trigger
+                                asChild
+                                className="max-w-[95%] overflow-hidden text-ellipsis whitespace-nowrap"
+                              >
+                                <p>{x.name}</p>
+                              </Tooltip.Trigger>
+                              <Tooltip.Portal>
+                                <Tooltip.Content side="bottom">
+                                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                  <div
+                                    className={[
+                                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                      'border border-scale-200',
+                                    ].join(' ')}
+                                  >
+                                    <span className="text-xs text-foreground">{x.name}</span>
+                                  </div>
+                                </Tooltip.Content>
+                              </Tooltip.Portal>
+                            </Tooltip.Root>
+                          ) : (
+                            <p>{x.name}</p>
+                          )}
                         </Table.td>
                         <Table.td className="hidden max-w-sm truncate lg:table-cell break-all whitespace-normal">
                           {x.comment !== null ? (

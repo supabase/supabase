@@ -1,14 +1,13 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useTheme } from 'next-themes'
-import { useFlag } from 'hooks'
-import { usePushNext } from 'hooks/misc/useAutoAuthRedirect'
-import { BASE_PATH } from 'lib/constants'
-import { auth, buildPathWithParams, getAccessToken } from 'lib/gotrue'
-import { observer } from 'mobx-react-lite'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
+
+import { useFlag } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
+import { auth, buildPathWithParams, getAccessToken, getReturnToPath } from 'lib/gotrue'
 import { tweets } from 'shared-data'
 import { Button, IconFileText } from 'ui'
 
@@ -27,7 +26,6 @@ const SignInLayout = ({
   children,
 }: PropsWithChildren<SignInLayoutProps>) => {
   const router = useRouter()
-  const pushNext = usePushNext()
   const queryClient = useQueryClient()
   const { resolvedTheme } = useTheme()
   const ongoingIncident = useFlag('ongoingIncident')
@@ -64,7 +62,7 @@ const SignInLayout = ({
           }
 
           await queryClient.resetQueries()
-          await pushNext()
+          router.push(getReturnToPath())
         } else {
           // if the user doesn't have a token, he needs to go back to the sign-in page
           const redirectTo = buildPathWithParams('/sign-in')
@@ -194,4 +192,4 @@ const SignInLayout = ({
   )
 }
 
-export default observer(SignInLayout)
+export default SignInLayout

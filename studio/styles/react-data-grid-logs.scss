@@ -1,7 +1,7 @@
 .data-grid--simple-logs {
   .rdg-cell,
   .rdg-cell span {
-    @apply text-foreground-light font-normal #{!important};
+    @apply text-foreground-light font-normal;
     border-left: none;
     border-right: none;
   }

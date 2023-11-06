@@ -362,7 +362,6 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                           key={`option-${option.value}`}
                           label={option.label}
                           value={option.value}
-                          disabled={option.value === 'Critical' && isFreeProject}
                         >
                           <span>{option.label}</span>
                           <span className="block text-xs opacity-50">{option.description}</span>

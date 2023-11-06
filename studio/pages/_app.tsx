@@ -49,7 +49,6 @@ import FlagProvider from 'components/ui/Flag/FlagProvider'
 import PageTelemetry from 'components/ui/PageTelemetry'
 import { useRootQueryClient } from 'data/query-client'
 import { StoreProvider } from 'hooks'
-import useAutoAuthRedirect from 'hooks/misc/useAutoAuthRedirect'
 import { AuthProvider } from 'lib/auth'
 import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { dart } from 'lib/constants/prism'
@@ -99,8 +98,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
         )
       : undefined
   )
-
-  useAutoAuthRedirect(queryClient)
 
   const getLayout = Component.getLayout ?? ((page) => page)
 
