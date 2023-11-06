@@ -2,33 +2,53 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   id: 'functions-import-maps',
-  title: 'Managing packages using Import Maps',
-  description: 'Managing packages using Import Maps.',
-  video: 'https://www.youtube.com/v/ILr3cneZuFk',
+  title: 'Managing dependencies',
+  description: 'Managing packages and dependencies.',
+  subtitle: 'Managing packages and dependencies.',
+  tocVideo: 'ILr3cneZuFk',
 }
 
-<div class="video-container">
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/ILr3cneZuFk"
-    frameBorder="1"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  ></iframe>
-</div>
+Developing with Edge Functions is similar to developing with Node.js, but with a few key differences. This guide will help you understand how to manage your dependencies.
 
-Since [Supabase CLI](https://supabase.com/docs/guides/resources/supabase-cli) version `1.33.0` [import maps](https://deno.land/manual@v1.29.2/node/import_maps) can be used with Supabase Edge Functions.
+## Importing dependencies
 
-[Import maps](https://github.com/WICG/import-maps#the-import-map) is a web-platform standard that allows you to use bare specifiers with Deno without having to install the Node.js package locally.
+Supabase Edge Functions support:
 
-So if we want to do the following in our code:
+- The Deno [standard library](https://deno.land/std)
+- Third party [modules](https://deno.land/x)
+- Node.js modules published to npm
 
-```ts, ignore
-import lodash from "lodash";
+We recommend using [esm.sh](https://esm.sh/) for importing modules that are published to npm. To do so, put `https://esm.sh/` in front of the package name. For example, import the `supabase-js` package like this:
+
+```ts
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 ```
 
-We can accomplish this using an import map, and we don't even have to install the `lodash` package locally. We would want to create a JSON file (for example **import_map.json**) with the following:
+<Admonition label="npm support">
 
-```json
+Full support for NPM is under development and coming soon.
+
+</Admonition>
+
+## Importing Types
+
+If your [environment is set up properly](/docs/guides/functions/local-development) and the module you're importing is exporting types, the import will have types and autocompletion support.
+
+## Using Import Maps
+
+An [Import Map](https://github.com/WICG/import-maps#the-import-map) is similar to a `package.json` file. They are a way to manage your dependencies. Consider this code:
+
+```ts
+// without import maps:
+import lodash from 'https://cdn.skypack.dev/lodash'
+
+// with import maps:
+import lodash from 'lodash'
+```
+
+You can accomplish this using an Import Map, which is a JSON file with the following:
+
+```json supabase/functions/import_map.json
 {
   "imports": {
     "lodash": "https://cdn.skypack.dev/lodash"
@@ -36,15 +56,22 @@ We can accomplish this using an import map, and we don't even have to install th
 }
 ```
 
-## Import Map Placement
+We recommend creating one `import_map.json` within the `/supabase/functions` folder, similar to a `package.json` file, to define imports that can be used across all of your project's functions.
 
-We recommend creating one `import_map.json` within the `/supabase/functions` folder (see [Organizing your Edge Functions](/docs/guides/functions/quickstart#organizing-your-edge-functions)), similar to a `package.json` file, to define imports that can be used across all of your project's functions.
+```bash
+└── supabase
+    ├── functions
+    │   ├── import_map.json # A top-level import map to use across functions..
+    │   ├── function-one
+    │   │   └── index.ts
+    └── config.toml
+```
 
 Alternatively, you can create one `import_map.json` file in each function folder, which will take priority over a top-level file.
 
-Lastly, you can override this default behaviour by providing the `--import-map <string>` flag to the `serve` and `deploy` commands.
+You can override this default behavior by providing the `--import-map <string>` flag to the `serve` and `deploy` commands.
 
-## Visual Studio Code Configuration
+### Configuring VSCode
 
 In order for vscode to understand the imports correctly, you need to specify the `deno.importMap` flag in your `.vscode/settings.json` file:
 
