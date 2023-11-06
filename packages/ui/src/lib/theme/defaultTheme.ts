@@ -1235,7 +1235,7 @@ export default {
     `,
     header: `
       bg-scale-200 dark:bg-scale-400
-      space-y-1 py-3 px-4 sm:px-5
+      space-y-1 py-3 px-4 sm:px-5 flex items-center justify-between
       border-b border-scale-300 dark:border-scale-500
     `,
     footer: `
