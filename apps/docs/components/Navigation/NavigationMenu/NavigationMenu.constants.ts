@@ -496,6 +496,7 @@ export const auth = {
       name: 'Authentication',
       url: undefined,
       items: [
+        { name: 'User Management', url: '/guides/auth/auth-user-management' },
         { name: 'Email Login', url: '/guides/auth/auth-email' },
         { name: 'Magic Link Login', url: '/guides/auth/auth-magic-link' },
         {
