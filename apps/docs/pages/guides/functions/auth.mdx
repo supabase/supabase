@@ -29,7 +29,7 @@ serve(async (req: Request) => {
 })
 ```
 
-Importantly, this is done _inside_ the `serve()` function, so that the Authorization header is set for each request.
+Importantly, this is done _inside_ the `Deno.serve()` callback argument, so that the Authorization header is set for each request.
 
 ## Fetching the user
 
