@@ -209,7 +209,9 @@ const ProjectLinker = ({
                       ) : null
                     }
                   >
-                    {selectedSupabaseProject ? selectedSupabaseProject.name : 'Choose Supabase Project'}
+                    {selectedSupabaseProject
+                      ? selectedSupabaseProject.name
+                      : 'Choose Supabase Project'}
                   </Button>
                 </PopoverTrigger_Shadcn_>
                 <PopoverContent_Shadcn_
