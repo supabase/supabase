@@ -5,12 +5,28 @@ import { useState } from 'react'
 import { IconAlertCircle, IconLoader, Input } from 'ui'
 
 import { useParams } from 'common/hooks'
-import Snippets from 'components/interfaces/Docs/Snippets'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCheckPermissions } from 'hooks'
+
+const generateInitSnippet = (endpoint: string) => ({
+  js: `
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = '${endpoint}'
+const supabaseKey = process.env.SUPABASE_KEY
+const supabase = createClient(supabaseUrl, supabaseKey)`,
+  dart: `
+const supabaseUrl = '${endpoint}';
+const supabaseKey = String.fromEnvironment('SUPABASE_KEY');
+
+Future<void> main() async {
+  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
+  runApp(MyApp());
+}`,
+})
 
 const APIKeys = () => {
   const { ref: projectRef } = useParams()
@@ -50,9 +66,8 @@ const APIKeys = () => {
   const apiUrl = `${apiService?.protocol ?? 'https'}://${apiService?.endpoint ?? '-'}`
   const anonKey = apiKeys.find((key) => key.tags === 'anon')
 
-  const clientInitSnippet: any = Snippets.init(apiUrl)
-  const selectedLanguageSnippet =
-    clientInitSnippet[selectedLanguage.key]?.code ?? 'No snippet available'
+  const clientInitSnippet: any = generateInitSnippet(apiUrl)
+  const selectedLanguageSnippet = clientInitSnippet[selectedLanguage.key] ?? 'No snippet available'
 
   return (
     <Panel
