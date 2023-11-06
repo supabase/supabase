@@ -929,7 +929,7 @@ export default {
       cursor-pointer
       transition-colors ease-in-out duration-200
       ${defaults.focus}
-      focus:ring-border
+      focus:!ring-border
       bg-foreground-muted/40
 
       hover:bg-foreground-muted/60
