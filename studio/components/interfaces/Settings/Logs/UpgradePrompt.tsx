@@ -3,6 +3,7 @@ import { Button, Modal } from 'ui'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { TIER_QUERY_LIMITS } from '.'
+import { useSelectedOrganization } from 'hooks'
 
 interface Props {
   show: boolean
@@ -10,8 +11,7 @@ interface Props {
 }
 
 const UpgradePrompt: React.FC<Props> = ({ show, setShowUpgradePrompt }) => {
-  const router = useRouter()
-  const { ref } = router.query
+  const organization = useSelectedOrganization()
 
   return (
     <Modal
@@ -61,11 +61,11 @@ const UpgradePrompt: React.FC<Props> = ({ show, setShowUpgradePrompt }) => {
             <Button type="default" onClick={() => setShowUpgradePrompt(false)}>
               Close
             </Button>
-            <Link href={`/project/${ref}/settings/billing/subscription`} passHref>
-              <a>
-                <Button size="tiny">Upgrade</Button>
-              </a>
-            </Link>
+            <Button asChild size="tiny">
+              <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
+                Upgrade
+              </Link>
+            </Button>
           </div>
         </Modal.Content>
       </div>

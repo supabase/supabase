@@ -1,21 +1,15 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertCircle,
-  IconFileText,
-  IconGitBranch,
-  Modal,
-} from 'ui'
+import { useForm } from 'react-hook-form'
+import { Button, Form_Shadcn_, IconFileText, IconGitBranch, Modal } from 'ui'
+import * as z from 'zod'
 
 import SidePanelGitHubRepoLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
+import { useCheckGithubBranchValidity } from 'data/integrations/integrations-github-branch-check'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useSelectedOrganization, useStore } from 'hooks'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -24,16 +18,13 @@ import GithubRepositorySelection from './GithubRepositorySelection'
 const EnableBranchingModal = () => {
   const { ui } = useStore()
   const { ref } = useParams()
+  const snap = useAppStateSnapshot()
   const selectedOrg = useSelectedOrganization()
 
-  const snap = useAppStateSnapshot()
-  const [selectedBranch, setSelectedBranch] = useState<string>()
-
-  const isOrgBilling = !!selectedOrg?.subscription_id
-
-  useEffect(() => {
-    if (snap.showEnableBranchingModal) setSelectedBranch(undefined)
-  }, [snap.showEnableBranchingModal])
+  // [Joshen] There's something weird with RHF that I can't figure out atm
+  // but calling form.formState.isValid somehow removes the onBlur check,
+  // and makes the validation run onChange instead. This is a workaround
+  const [isValid, setIsValid] = useState(false)
 
   const {
     data: integrations,
@@ -45,13 +36,6 @@ const EnableBranchingModal = () => {
     orgSlug: selectedOrg?.slug,
   })
 
-  const { mutate: createBranch, isLoading: isCreating } = useBranchCreateMutation({
-    onSuccess: () => {
-      ui.setNotification({ category: 'success', message: `Successfully created new branch` })
-      snap.setShowEnableBranchingModal(false)
-    },
-  })
-
   const hasGithubIntegrationInstalled =
     integrations?.some((integration) => integration.integration.name === 'GitHub') ?? false
   const githubIntegration = integrations?.find(
@@ -59,12 +43,63 @@ const EnableBranchingModal = () => {
       integration.integration.name === 'GitHub' &&
       integration.organization.slug === selectedOrg?.slug
   )
+  const githubConnection = githubIntegration?.connections.find(
+    (connection) => connection.supabase_project_ref === ref
+  )
+  const [repoOwner, repoName] = githubConnection?.metadata.name.split('/') ?? []
 
-  const onEnableBranching = () => {
+  const { mutateAsync: checkGithubBranchValidity, isLoading: isChecking } =
+    useCheckGithubBranchValidity({ onError: () => {} })
+
+  const { mutate: createBranch, isLoading: isCreating } = useBranchCreateMutation({
+    onSuccess: () => {
+      ui.setNotification({ category: 'success', message: `Successfully created new branch` })
+      snap.setShowEnableBranchingModal(false)
+    },
+  })
+
+  const formId = 'enable-branching-form'
+  const FormSchema = z.object({
+    branchName: z
+      .string()
+      .refine((val) => val.length > 1, `Please enter a branch name from ${repoOwner}/${repoName}`)
+      .refine(async (val) => {
+        try {
+          if (val.length > 0) {
+            await checkGithubBranchValidity({
+              organizationIntegrationId: githubIntegration?.id,
+              repoOwner,
+              repoName,
+              branchName: val,
+            })
+            setIsValid(true)
+          }
+          return true
+        } catch (error) {
+          setIsValid(false)
+          return false
+        }
+      }, `Unable to find branch from ${repoOwner}/${repoName}`),
+  })
+  const form = useForm<z.infer<typeof FormSchema>>({
+    mode: 'onBlur',
+    reValidateMode: 'onChange',
+    resolver: zodResolver(FormSchema),
+    defaultValues: { branchName: '' },
+  })
+
+  const canSubmit = form.getValues('branchName').length > 0 && !isChecking && isValid
+  const onSubmit = (data: z.infer<typeof FormSchema>) => {
     if (!ref) return console.error('Project ref is required')
-    if (!selectedBranch) return console.error('No branch selected')
-    createBranch({ projectRef: ref, branchName: selectedBranch, gitBranch: selectedBranch })
+    createBranch({ projectRef: ref, branchName: data.branchName, gitBranch: data.branchName })
   }
+
+  useEffect(() => {
+    if (form && snap.showEnableBranchingModal) {
+      setIsValid(false)
+      form.reset()
+    }
+  }, [form, snap.showEnableBranchingModal])
 
   return (
     <>
@@ -75,52 +110,20 @@ const EnableBranchingModal = () => {
         className="!bg"
         size="medium"
       >
-        <Modal.Content className="px-7 py-5 flex items-center space-x-4">
-          <IconGitBranch strokeWidth={2} size={20} />
-          <div>
-            <p className="text-foreground">Enable database branching</p>
-            <p className="text-sm text-light">Manage environments in Supabase</p>
-          </div>
-        </Modal.Content>
-
-        {!isOrgBilling ? (
-          <>
-            <Modal.Content className="px-3 border-y bg-alternative">
-              <Alert_Shadcn_ variant="default" className="rounded-none border-0">
-                <IconAlertCircle strokeWidth={2} />
-                <AlertTitle_Shadcn_>
-                  Organization-based billing migration required
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  <p className="!leading-normal">
-                    Your organization will first need to be migrated to use our new
-                    organization-based billing before you can enable Branching.
-                  </p>
-                  <p className="!leading-normal mt-1">
-                    You may do so under the billing settings of your organization.
-                  </p>
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
-            </Modal.Content>
-            <Modal.Content className="px-4 pt-3">
-              <div className="flex items-center justify-end space-x-2 py-2 pb-4">
-                <Button
-                  disabled={isCreating}
-                  type="default"
-                  onClick={() => snap.setShowEnableBranchingModal(false)}
-                >
-                  Understood
-                </Button>
-                <Link passHref href={`/org/${selectedOrg?.slug}/billing`}>
-                  <Button asChild>
-                    <a>Organization settings</a>
-                  </Button>
-                </Link>
+        <Form_Shadcn_ {...form}>
+          <form
+            id={formId}
+            onSubmit={form.handleSubmit(onSubmit)}
+            onChange={() => setIsValid(false)}
+          >
+            <Modal.Content className="px-7 py-5 flex items-center space-x-4">
+              <IconGitBranch strokeWidth={2} size={20} />
+              <div>
+                <p className="text-foreground">Enable database branching</p>
+                <p className="text-sm text-light">Manage environments in Supabase</p>
               </div>
             </Modal.Content>
-          </>
-        ) : (
-          <>
+
             {isLoadingIntegrations && (
               <>
                 <Modal.Separator />
@@ -142,14 +145,13 @@ const EnableBranchingModal = () => {
             )}
 
             {isSuccessIntegrations && (
-              <>
-                <GithubRepositorySelection
-                  integration={githubIntegration}
-                  selectedBranch={selectedBranch}
-                  hasGithubIntegrationInstalled={hasGithubIntegrationInstalled}
-                  setSelectedBranch={setSelectedBranch}
-                />
-              </>
+              <GithubRepositorySelection
+                form={form}
+                isChecking={isChecking}
+                isValid={canSubmit}
+                integration={githubIntegration}
+                hasGithubIntegrationInstalled={hasGithubIntegrationInstalled}
+              />
             )}
 
             <Modal.Content className="px-7 py-6 flex flex-col gap-3">
@@ -187,19 +189,20 @@ const EnableBranchingModal = () => {
                   Cancel
                 </Button>
                 <Button
-                  size="medium"
                   block
-                  disabled={selectedBranch === undefined || isCreating}
+                  size="medium"
+                  form={formId}
+                  disabled={isCreating || !canSubmit}
                   loading={isCreating}
                   type="primary"
-                  onClick={() => onEnableBranching()}
+                  htmlType="submit"
                 >
                   I understand, enable branching
                 </Button>
               </div>
             </Modal.Content>
-          </>
-        )}
+          </form>
+        </Form_Shadcn_>
       </Modal>
 
       <SidePanelGitHubRepoLinker projectRef={ref} />

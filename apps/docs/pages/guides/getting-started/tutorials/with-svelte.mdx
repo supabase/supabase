@@ -10,8 +10,9 @@ export const meta = {
 ![Supabase User Management example](/docs/img/user-management-demo.png)
 
 <Admonition type="note">
-  If you get stuck while working through this guide, refer to the [full example on
-  GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/svelte-user-management).
+
+If you get stuck while working through this guide, refer to the [full example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/svelte-user-management).
+
 </Admonition>
 
 <ProjectSetup />
@@ -65,7 +66,7 @@ Let's set up a Svelte component to manage logins and sign ups. We'll use Magic L
 
 ```html src/lib/Auth.svelte
 <script lang="ts">
-  import { supabase } from 'src/supabaseClient'
+  import { supabase } from '../supabaseClient'
 
   let loading = false
   let email = ''

@@ -1,3 +1,4 @@
+import { Monaco } from '@monaco-editor/react'
 import { useParams, useTelemetryProps } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import dynamic from 'next/dynamic'
@@ -8,7 +9,6 @@ import { format } from 'sql-formatter'
 import {
   AiIconAnimation,
   Button,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -20,6 +20,7 @@ import {
   IconSettings,
   IconX,
   Input_Shadcn_,
+  cn,
 } from 'ui'
 
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
@@ -30,7 +31,6 @@ import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useFormatQueryMutation } from 'data/sql/format-sql-query'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { isError } from 'data/utils/error-check'
 import {
   useFlag,
@@ -45,7 +45,7 @@ import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import Telemetry from 'lib/telemetry'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { subscriptionHasHipaaAddon } from '../BillingV2/Subscription/Subscription.utils'
+import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
 import AISettingsModal from './AISettingsModal'
 import { sqlAiDisclaimerComment, untitledSnippetTitle } from './SQLEditor.constants'
@@ -63,7 +63,7 @@ import {
   getDiffTypeDropdownLabel,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
-import { Monaco } from '@monaco-editor/react'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -98,6 +98,7 @@ const SQLEditor = () => {
 
   const { profile } = useProfile()
   const project = useSelectedProject()
+  const organization = useSelectedOrganization()
   const snap = useSqlEditorStateSnapshot()
 
   const { mutate: formatQuery } = useFormatQueryMutation()
@@ -113,7 +114,7 @@ const SQLEditor = () => {
   const inputRef = useRef<HTMLInputElement>(null)
   const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
 
-  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef: project?.ref })
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
   // Customers on HIPAA plans should not have access to Supabase AI
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
@@ -516,8 +517,9 @@ const SQLEditor = () => {
       <ConfirmModal
         visible={isConfirmModalOpen}
         title="Destructive operation"
+        danger
         description="We've detected a potentially destructive operation in the query. Please confirm that you would like to execute this query."
-        buttonLabel="Execute query"
+        buttonLabel="Run destructive query"
         onSelectCancel={() => {
           setIsConfirmModalOpen(false)
         }}

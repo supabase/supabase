@@ -5,11 +5,10 @@ import SchemaGraph from 'components/interfaces/Database/Schemas/SchemaGraph'
 import { DatabaseLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
+import SchemaSelector from 'components/ui/SchemaSelector'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { NextPageWithLayout } from 'types'
-import { IconLock, Listbox } from 'ui'
-import SchemaSelector from 'components/ui/SchemaSelector'
 
 const SchemasPage: NextPageWithLayout = () => {
   const { project } = useProjectContext()

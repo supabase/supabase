@@ -1,6 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import dayjs from 'dayjs'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
@@ -18,7 +18,6 @@ import { useOrganizationDetailQuery } from 'data/organizations/organization-deta
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useIsFeatureEnabled } from 'hooks'
 import Link from 'next/link'
 import {
   Alert,
@@ -52,8 +51,6 @@ const AuditLogs = () => {
     users: [], // gotrue_id[]
     projects: [], // project_ref[]
   })
-
-  const billingEnabled = useIsFeatureEnabled('billing:all')
 
   const { data: projects } = useProjectsQuery()
   const { data: organizations } = useOrganizationsQuery()
@@ -235,13 +232,13 @@ const AuditLogs = () => {
                     </AlertDescription_Shadcn_>
                   </div>
 
-                  {billingEnabled && (
-                    <div className="flex items-center">
+                  <div className="flex items-center">
+                    <Button type="primary" asChild>
                       <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
-                        <Button type="primary">Upgrade subscription</Button>
+                        Upgrade subscription
                       </Link>
-                    </div>
-                  )}
+                    </Button>
+                  </div>
                 </div>
               </Alert_Shadcn_>
             ) : (
@@ -278,7 +275,7 @@ const AuditLogs = () => {
                         <p>Date</p>
 
                         <Tooltip.Root delayDuration={0}>
-                          <Tooltip.Trigger>
+                          <Tooltip.Trigger asChild>
                             <Button
                               type="text"
                               className="px-1"
@@ -293,21 +290,19 @@ const AuditLogs = () => {
                             />
                           </Tooltip.Trigger>
                           <Tooltip.Portal>
-                            <Tooltip.Portal>
-                              <Tooltip.Content side="right">
-                                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                <div
-                                  className={[
-                                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                    'border border-scale-200',
-                                  ].join(' ')}
-                                >
-                                  <span className="text-xs text-foreground">
-                                    {dateSortDesc ? 'Sort latest first' : 'Sort earliest first'}
-                                  </span>
-                                </div>
-                              </Tooltip.Content>
-                            </Tooltip.Portal>
+                            <Tooltip.Content side="right">
+                              <Tooltip.Arrow className="radix-tooltip-arrow" />
+                              <div
+                                className={[
+                                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                  'border border-scale-200',
+                                ].join(' ')}
+                              >
+                                <span className="text-xs text-foreground">
+                                  {dateSortDesc ? 'Sort latest first' : 'Sort earliest first'}
+                                </span>
+                              </div>
+                            </Tooltip.Content>
                           </Tooltip.Portal>
                         </Tooltip.Root>
                       </div>

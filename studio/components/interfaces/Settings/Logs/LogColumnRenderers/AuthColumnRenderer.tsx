@@ -1,30 +1,31 @@
-import { PreviewLogData } from '..'
+import { Column } from 'react-data-grid'
+import { LogData } from '..'
 import {
   RowLayout,
   SeverityFormatter,
   TextFormatter,
   TimestampLocalFormatter,
 } from '../LogsFormatters'
-import DefaultPreviewColumnRenderer from './DefaultPreviewColumnRenderer'
+import { defaultRenderCell } from './DefaultPreviewColumnRenderer'
 
-export default [
+const columns: Column<LogData>[] = [
   {
-    formatter: (data: {
-      row: PreviewLogData & { level: string; msg: string | null; status: number; path: string }
-    }) => {
-      if (!data.row.level) {
-        return DefaultPreviewColumnRenderer[0].formatter(data)
+    name: 'auth-first-column',
+    key: 'auth-first-column',
+    renderCell: (props) => {
+      if (!props.row.level) {
+        return defaultRenderCell(props)
       }
 
       return (
         <RowLayout>
-          <TimestampLocalFormatter value={data.row.timestamp!} />
-          {data.row.level && <SeverityFormatter value={data.row.level} />}
+          <TimestampLocalFormatter value={props.row.timestamp!} />
+          {props.row.level && <SeverityFormatter value={props.row.level as string} />}
           <TextFormatter
             className="w-full"
-            value={`${data.row.path ? data.row.path + ' | ' : ''}${
+            value={`${props.row.path ? props.row.path + ' | ' : ''}${
               // not all log events have metadata.msg
-              data.row.msg?.trim() || data.row.event_message
+              (props.row.msg as string)?.trim() || props.row.event_message
             }`}
           />
         </RowLayout>
@@ -32,3 +33,5 @@ export default [
     },
   },
 ]
+
+export default columns

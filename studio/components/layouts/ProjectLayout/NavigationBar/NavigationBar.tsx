@@ -58,6 +58,7 @@ const NavigationBar = () => {
     projectEdgeFunctionAll: edgeFunctionsEnabled,
     projectStorageAll: storageEnabled,
   } = useIsFeatureEnabled(['project_auth:all', 'project_edge_function:all', 'project_storage:all'])
+  const realtimeEnabled = useFlag('realtimeDashboard')
 
   const activeRoute = router.pathname.split('/')[3]
   const toolRoutes = generateToolRoutes(projectRef, project, supabaseAIEnabled)
@@ -65,6 +66,7 @@ const NavigationBar = () => {
     auth: authEnabled,
     edgeFunctions: edgeFunctionsEnabled,
     storage: storageEnabled,
+    realtime: realtimeEnabled,
   })
   const otherRoutes = generateOtherRoutes(projectRef, project, isNewAPIDocsEnabled)
 
@@ -77,14 +79,12 @@ const NavigationBar = () => {
     >
       <ul className="flex flex-col space-y-2">
         {(!navLayoutV2 || !IS_PLATFORM) && (
-          <Link href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}>
-            <a className="block">
-              <img
-                src={`${router.basePath}/img/supabase-logo.svg`}
-                alt="Supabase"
-                className="mx-auto h-[40px] w-6 cursor-pointer rounded"
-              />
-            </a>
+          <Link href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`} className="block">
+            <img
+              src={`${router.basePath}/img/supabase-logo.svg`}
+              alt="Supabase"
+              className="mx-auto h-[40px] w-6 cursor-pointer rounded"
+            />
           </Link>
         )}
         <NavigationIconButton
@@ -198,12 +198,12 @@ const NavigationBar = () => {
             <DropdownMenuContent side="right" align="start">
               {IS_PLATFORM && (
                 <>
-                  <Link href="/account/me">
-                    <DropdownMenuItem key="header" className="space-x-2">
+                  <DropdownMenuItem key="header" className="space-x-2" asChild>
+                    <Link href="/account/me">
                       <IconSettings size={14} strokeWidth={1.5} />
                       <p>Account preferences</p>
-                    </DropdownMenuItem>
-                  </Link>
+                    </Link>
+                  </DropdownMenuItem>
                   {showFeaturePreviews && (
                     <DropdownMenuItem
                       key="header"

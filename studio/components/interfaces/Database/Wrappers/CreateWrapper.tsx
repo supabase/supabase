@@ -76,11 +76,9 @@ const CreateWrapper = () => {
             wrapper.
           </p>
         </div>
-        <Link href={`/project/${ref}/database/wrappers`}>
-          <a>
-            <Button type="default">Head back</Button>
-          </a>
-        </Link>
+        <Button asChild type="default">
+          <Link href={`/project/${ref}/database/wrappers`}>Head back</Link>
+        </Button>
       </div>
     )
   }
@@ -130,23 +128,19 @@ const CreateWrapper = () => {
             ].join(' ')}
           >
             <Link href={`/project/${ref}/database/wrappers`}>
-              <a>
-                <div className="flex items-center space-x-2">
-                  <IconArrowLeft strokeWidth={1.5} size={14} />
-                  <p className="text-sm">Back</p>
-                </div>
-              </a>
+              <div className="flex items-center space-x-2">
+                <IconArrowLeft strokeWidth={1.5} size={14} />
+                <p className="text-sm">Back</p>
+              </div>
             </Link>
           </div>
           <h3 className="mb-2 text-xl text-foreground">Create a {wrapperMeta.label} Wrapper</h3>
           <div className="flex items-center space-x-2">
-            <Link href={wrapperMeta.docsUrl}>
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                  Documentation
-                </Button>
-              </a>
-            </Link>
+            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+              <Link href={wrapperMeta.docsUrl} target="_blank" rel="noreferrer">
+                Documentation
+              </Link>
+            </Button>
           </div>
         </div>
 
