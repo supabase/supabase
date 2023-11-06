@@ -68,9 +68,9 @@ These are the currently supported region values you can provide for `x-region` h
 - `us-west-1`
 - `us-west-2`
 
-## What happens if the region has an outage?
+## Handling regional outages
 
-If you explicitly specify the region via `x-region` header, the **request will NOT be automatically re-routed** to another region.
+If you explicitly specify the region via `x-region` header, requests **will NOT** be automatically re-routed to another region and you should consider temporarily changing regions during the outage.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
