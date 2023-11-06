@@ -288,7 +288,7 @@ begin
   return exists (
     select 1 from roles_table
     where auth.uid() = user_id and role = 'good_role'
-  )
+  );
 end;
 $$;
 
