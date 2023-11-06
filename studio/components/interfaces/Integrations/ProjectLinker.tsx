@@ -209,7 +209,9 @@ const ProjectLinker = ({
                       ) : null
                     }
                   >
-                    {selectedSupabaseProject ? selectedSupabaseProject.name : 'Choose Project'}
+                    {selectedSupabaseProject
+                      ? selectedSupabaseProject.name
+                      : 'Choose Supabase Project'}
                   </Button>
                 </PopoverTrigger_Shadcn_>
                 <PopoverContent_Shadcn_
@@ -219,7 +221,7 @@ const ProjectLinker = ({
                   style={{ width: supabaseProjectsComboBoxRef.current?.offsetWidth }}
                 >
                   <Command_Shadcn_>
-                    <CommandInput_Shadcn_ placeholder="Search organization..." />
+                    <CommandInput_Shadcn_ placeholder="Search for a project" />
                     <CommandList_Shadcn_ className="!max-h-[170px]">
                       <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
                       <CommandGroup_Shadcn_>
@@ -291,7 +293,7 @@ const ProjectLinker = ({
                   style={{ width: foreignProjectsComboBoxRef.current?.offsetWidth }}
                 >
                   <Command_Shadcn_>
-                    <CommandInput_Shadcn_ placeholder="Search organization..." />
+                    <CommandInput_Shadcn_ placeholder="Search for a project" />
                     <CommandList_Shadcn_ className="!max-h-[170px]">
                       <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
                       <CommandGroup_Shadcn_>
