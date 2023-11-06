@@ -23,7 +23,6 @@ import {
   ForeignKeyConstraint,
   useForeignKeyConstraintsQuery,
 } from 'data/database/foreign-key-constraints-query'
-import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { sqlKeys } from 'data/sql/keys'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
@@ -63,7 +62,6 @@ const TableGridEditor = ({
   const gridRef = useRef<SupabaseGridRef>(null)
 
   const [encryptedColumns, setEncryptedColumns] = useState([])
-  const [apiPreviewPanelOpen, setApiPreviewPanelOpen] = useState(false)
 
   const [{ view: selectedView = 'data' }, setUrlState] = useUrlState()
   const setSelectedView = (view: string) => {
@@ -141,9 +139,6 @@ const TableGridEditor = ({
       onError(error)
     },
   })
-
-  const { refetch } = useProjectJsonSchemaQuery({ projectRef })
-  const refreshDocs = async () => await refetch()
 
   const { data } = useForeignKeyConstraintsQuery({
     projectRef: project?.ref,
@@ -318,19 +313,11 @@ const TableGridEditor = ({
         editable={!isReadOnly && canEditViaTableEditor}
         schema={selectedTable.schema}
         table={gridTable}
-        refreshDocs={refreshDocs}
         headerActions={
           isTableSelected || isViewSelected || canEditViaTableEditor ? (
             <>
               {canEditViaTableEditor && (
-                <GridHeaderActions
-                  table={selectedTable as PostgresTable}
-                  openAPIDocsPanel={() => {
-                    appSnap.setActiveDocsSection(['entities', selectedTable.name])
-                    appSnap.setShowProjectApiDocs(true)
-                  }}
-                  refreshDocs={refreshDocs}
-                />
+                <GridHeaderActions table={selectedTable as PostgresTable} />
               )}
               {(isTableSelected || isViewSelected) && (
                 <>
