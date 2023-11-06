@@ -122,6 +122,10 @@ const uiConfig = ui({
             },
             '--tw-prose-body': theme('colors.scale[1100]'),
             '--tw-prose-headings': theme('colors.scale[1200]'),
+            h5: {
+              // h5 not included in --tw-prose-headings
+              color: theme('colors.scale[1200]'),
+            },
             '--tw-prose-lead': theme('colors.scale[1100]'),
             '--tw-prose-links': theme('colors.scale[1100]'),
             '--tw-prose-bold': theme('colors.scale[1100]'),
@@ -150,6 +154,7 @@ const uiConfig = ui({
             // the following are typography overrides
             // examples can be seen here —> https://github.com/tailwindlabs/tailwindcss-typography/blob/master/src/styles.js
             // reset all header font weights
+
             'h1, h2, h3, h4, h5': {
               fontWeight: '400',
             },
@@ -185,8 +190,14 @@ const uiConfig = ui({
               paddingLeft: '1rem',
               counterReset: 'item',
               listStyleType: 'none',
+              marginBottom: '3rem',
             },
-            'ol>li': { display: 'block', position: 'relative', paddingLeft: '1rem' },
+            'ol>li': {
+              display: 'block',
+              position: 'relative',
+              paddingLeft: '1rem',
+              marginBottom: '2rem',
+            },
             'ol>li::before': {
               position: 'absolute',
               top: '0.25rem',
@@ -232,21 +243,28 @@ const uiConfig = ui({
               fontWeight: '400',
               color: 'var(--colors-scale12)',
               textDecorationLine: 'underline',
-              textDecorationColor: 'hsl(var(--brand-400))',
+              textDecorationColor: 'hsl(var(--colors-scale9))',
               textDecorationThickness: '1px',
               textUnderlineOffset: '4px',
             },
             'a:hover': {
-              textDecorationColor: 'hsl(var(--brand-default))',
+              textDecorationColor: 'hsl(var(--colors-scale12))',
             },
             figcaption: {
               color: 'var(--colors-scale9)',
+              fontFamily: 'Office Code Pro, monospace',
             },
             'figure.quote-figure p:first-child': {
               marginTop: '0 !important',
             },
             'figure.quote-figure p:last-child': {
               marginBottom: '0 !important',
+            },
+            figure: {
+              margin: '3rem 0',
+            },
+            'figure img': {
+              margin: '0 !important',
             },
           },
         },
