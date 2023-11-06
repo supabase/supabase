@@ -44,7 +44,8 @@ const buttonVariants = cva(
             shadow-sm`,
         default: `
             text-foreground
-            bg-surface-100 dark:bg-surface-300 hover:bg-selection
+            bg-surface-100 hover:bg-selection
+            dark:bg-surface-300 hover:dark:bg-selection
             border-control hover:border-strong
             focus-visible:outline-brand-600
             shadow-sm`,
