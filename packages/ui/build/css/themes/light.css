@@ -29,7 +29,7 @@
   --border-control: var(--colors-slate-light-600);
   --border-overlay: var(--colors-slate-light-500);
   --border-secondary: var(--colors-slate-light-400);
-  --border-muted: var(--colors-gray-dark-400);
+  --border-muted: var(--colors-slate-light-400);
   --border-default: var(--colors-slate-light-500);
   --background-overlay-hover: var(--colors-slate-light-300);
   --background-overlay-default: var(--colors-slate-light-100);
