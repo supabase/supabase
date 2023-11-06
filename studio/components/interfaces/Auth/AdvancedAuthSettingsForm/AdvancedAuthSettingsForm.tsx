@@ -69,7 +69,6 @@ const AdvancedAuthSettingsForm = observer(() => {
 
   const onSubmit = (values: any, { resetForm }: any) => {
     const payload = { ...values }
-    payload.DISABLE_SIGNUP = !values.DISABLE_SIGNUP
 
     updateAuthConfig(
       { projectRef: projectRef!, config: payload },
