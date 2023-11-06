@@ -12,8 +12,8 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useMfaChallengeAndVerifyMutation } from 'data/profile/mfa-challenge-and-verify-mutation'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import { useStore } from 'hooks'
-import { usePushNext } from 'hooks/misc/useAutoAuthRedirect'
 import { useSignOut } from 'lib/auth'
+import { getReturnToPath } from 'lib/gotrue'
 
 const signInSchema = object({
   code: string().required('MFA Code is required'),
@@ -21,7 +21,6 @@ const signInSchema = object({
 
 const SignInMfaForm = () => {
   const { ui } = useStore()
-  const pushNext = usePushNext()
   const queryClient = useQueryClient()
   const router = useRouter()
   const {
@@ -48,13 +47,13 @@ const SignInMfaForm = () => {
     if (isSuccessFactors) {
       // if the user wanders into this page and he has no MFA setup, send the user to the next screen
       if (factors.totp.length === 0) {
-        queryClient.resetQueries().then(() => pushNext())
+        queryClient.resetQueries().then(() => router.push(getReturnToPath()))
       }
       if (factors.totp.length > 0) {
         setSelectedFactor(factors.totp[0])
       }
     }
-  }, [factors?.totp, isSuccessFactors, pushNext, queryClient])
+  }, [factors?.totp, isSuccessFactors, router, queryClient])
 
   const onSignIn = async ({ code }: { code: string }) => {
     const toastId = ui.setNotification({
@@ -74,7 +73,7 @@ const SignInMfaForm = () => {
 
             await queryClient.resetQueries()
 
-            await pushNext()
+            router.push(getReturnToPath())
           },
           onError: (error) => {
             ui.setNotification({
