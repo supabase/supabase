@@ -1,12 +1,12 @@
 import { createClient, RealtimeChannel, SupabaseClient } from '@supabase/supabase-js'
 import { sortBy, take } from 'lodash'
+import { useCallback, useEffect, useReducer, useState } from 'react'
+import toast from 'react-hot-toast'
 
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { uuidv4 } from 'lib/helpers'
 import { EMPTY_ARR } from 'lib/void'
-import { useCallback, useEffect, useReducer, useState } from 'react'
 import { LogData } from './Messages.types'
-import toast from 'react-hot-toast'
 
 function reducer(
   state: LogData[],
@@ -205,7 +205,7 @@ export const useRealtimeMessages = ({
         })
         toast.success('Successfully broadcasted message')
       } else {
-        toast.error('Failed to broadcast message: channel as not been set')
+        toast.error('Failed to broadcast message: channel has not been set')
       }
     },
     [channel]

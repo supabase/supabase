@@ -1,4 +1,4 @@
-import { PropsWithChildren, useState } from 'react'
+import { useState } from 'react'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -19,7 +19,6 @@ import {
   Popover_Shadcn_,
   ScrollArea,
 } from 'ui'
-import { PostgresSchema } from '@supabase/postgres-meta'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSchemasQuery } from 'data/database/schemas-query'

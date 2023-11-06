@@ -13,9 +13,9 @@ export const SelectedRealtimeMessagePanel = ({ log }: { log: LogData }) => {
       <div className="px-8">
         <span className="col-span-4 text-sm text-scale-900">Message</span>
 
-        <div className="text-wrap mt-2 overflow-x-auto whitespace-pre-wrap font-mono text-xs text-scale-1200">
+        <p className="text-wrap mt-2 overflow-x-auto whitespace-pre-wrap font-mono text-xs text-scale-1200">
           {log.message}
-        </div>
+        </p>
       </div>
       <LogsDivider />
       <div className="px-8 space-y-2">

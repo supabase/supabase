@@ -10,6 +10,7 @@ import {
   cn,
 } from 'ui'
 
+import Link from 'next/link'
 import { ApplyConfigModal } from '../ApplyConfigModal'
 import { RealtimeConfig } from '../useRealtimeMessages'
 import { FilterSchema } from './FilterSchema'
@@ -93,22 +94,21 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
             </div>
             <p className="text-xs text-foreground-light pl-[80px]">
               Learn more about realtime filtering in{' '}
-              <a
-                href="https://supabase.com/docs/guides/realtime/postgres-changes#available-filters"
+              <Link
                 className="underline"
                 target="_blank"
+                rel="noreferrer"
+                href="https://supabase.com/docs/guides/realtime/postgres-changes#available-filters"
               >
                 our docs
-              </a>
+              </Link>
             </p>
           </div>
           <div className="px-4 py-2 gap-2 flex justify-end">
             <Button type="default" onClick={() => setOpen(false)}>
-              <span>Cancel</span>
+              Cancel
             </Button>
-            <Button onClick={() => setApplyConfigOpen(true)}>
-              <span>Apply</span>
-            </Button>
+            <Button onClick={() => setApplyConfigOpen(true)}>Apply</Button>
           </div>
         </PopoverContent_Shadcn_>
       </Popover_Shadcn_>

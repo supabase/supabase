@@ -15,6 +15,7 @@ import {
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
 import { RealtimeConfig } from '../useRealtimeMessages'
+import Link from 'next/link'
 
 interface RealtimeTokensPopoverProps {
   config: RealtimeConfig
@@ -128,23 +129,22 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
             />
             <p className="text-xs text-foreground-light">
               Learn more about JWT tokens in{' '}
-              <a
-                href="https://supabase.com/docs/learn/auth-deep-dive/auth-deep-dive-jwts"
+              <Link
                 className="underline"
                 target="_blank"
+                rel="noreferrer"
+                href="https://supabase.com/docs/learn/auth-deep-dive/auth-deep-dive-jwts"
               >
                 our docs
-              </a>
+              </Link>
             </p>
           </div>
         )}
         <div className="px-4 py-3 gap-2 flex justify-end">
           <Button type="default" onClick={() => setOpen(false)}>
-            <span>Cancel</span>
+            Cancel
           </Button>
-          <Button onClick={onApply}>
-            <span>Apply</span>
-          </Button>
+          <Button onClick={onApply}>Apply</Button>
         </div>
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>
