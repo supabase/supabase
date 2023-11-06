@@ -100,7 +100,9 @@ const SchemaSelector = ({
             >
               <div className="w-full flex space-x-3 py-0.5">
                 <p className="text-xs text-light">schema</p>
-                <p className="text-xs">{selectedSchemaName}</p>
+                <p className="text-xs">
+                  {selectedSchemaName === '*' ? 'All schemas' : selectedSchemaName}
+                </p>
               </div>
             </Button>
           </PopoverTrigger_Shadcn_>
