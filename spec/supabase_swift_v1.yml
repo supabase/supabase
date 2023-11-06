@@ -167,7 +167,7 @@ functions:
     title: "signInWithOTP()"
     notes: |
       - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
-      - If the user doesn't exist, `signInWithOTP()` will signup the user instead. To restrict this behaviour, you can set `shouldCreateUser` to `false`.
+      - If the user doesn't exist, `signInWithOTP()` will signup the user instead. To restrict this behavior, you can set `shouldCreateUser` to `false`.
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/reference/auth/config#site_url).
