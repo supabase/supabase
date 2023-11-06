@@ -35,8 +35,6 @@ import { EMPTY_ARR } from 'lib/void'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { SchemaView } from 'types'
-import { useIsAPIDocsSidePanelEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
-import APIDocumentationPanel from './APIDocumentationPanel'
 import GridHeaderActions from './GridHeaderActions'
 import NotFoundState from './NotFoundState'
 import SidePanelEditor from './SidePanelEditor'
@@ -63,7 +61,6 @@ const TableGridEditor = ({
   const appSnap = useAppStateSnapshot()
   const snap = useTableEditorStateSnapshot()
   const gridRef = useRef<SupabaseGridRef>(null)
-  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
 
   const [encryptedColumns, setEncryptedColumns] = useState([])
   const [apiPreviewPanelOpen, setApiPreviewPanelOpen] = useState(false)
@@ -329,12 +326,8 @@ const TableGridEditor = ({
                 <GridHeaderActions
                   table={selectedTable as PostgresTable}
                   openAPIDocsPanel={() => {
-                    if (isNewAPIDocsEnabled) {
-                      appSnap.setActiveDocsSection(['entities', selectedTable.name])
-                      appSnap.setShowProjectApiDocs(true)
-                    } else {
-                      setApiPreviewPanelOpen(true)
-                    }
+                    appSnap.setActiveDocsSection(['entities', selectedTable.name])
+                    appSnap.setShowProjectApiDocs(true)
                   }}
                   refreshDocs={refreshDocs}
                 />
@@ -395,11 +388,6 @@ const TableGridEditor = ({
           onTableCreated={onTableCreated}
         />
       )}
-
-      <APIDocumentationPanel
-        visible={apiPreviewPanelOpen}
-        onClose={() => setApiPreviewPanelOpen(false)}
-      />
     </>
   )
 }

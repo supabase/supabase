@@ -26,7 +26,6 @@ import {
   useCommandMenu,
 } from 'ui'
 
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
@@ -51,7 +50,6 @@ const NavigationBar = () => {
   const navLayoutV2 = useFlag('navigationLayoutV2')
   const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
   const showFeaturePreviews = useFlag('featurePreviews')
-  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
 
   const {
     projectAuthAll: authEnabled,
@@ -68,7 +66,7 @@ const NavigationBar = () => {
     storage: storageEnabled,
     realtime: realtimeEnabled,
   })
-  const otherRoutes = generateOtherRoutes(projectRef, project, isNewAPIDocsEnabled)
+  const otherRoutes = generateOtherRoutes(projectRef, project)
 
   return (
     <div
@@ -114,45 +112,50 @@ const NavigationBar = () => {
           />
         ))}
         <div className="h-px w-full bg-scale-500"></div>
-        {otherRoutes.map((route) => (
-          <NavigationIconButton
-            key={route.key}
-            route={route}
-            isActive={activeRoute === route.key}
-          />
-        ))}
+        {otherRoutes.map((route) => {
+          if (route.key === 'api') {
+            return (
+              <Tooltip.Root delayDuration={0} key={route.key}>
+                <Tooltip.Trigger asChild>
+                  <Button
+                    type="text"
+                    size="tiny"
+                    onClick={() => snap.setShowProjectApiDocs(true)}
+                    className="border-none"
+                  >
+                    <div className="py-[7px]">
+                      <IconFileText size={18} strokeWidth={2} className="text-foreground-lighter" />
+                    </div>
+                  </Button>
+                </Tooltip.Trigger>
+                <Tooltip.Portal>
+                  <Tooltip.Content side="right">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'bg-scale-100 shadow-lg shadow-scale-700 dark:shadow-scale-300	py-1.5 px-3 rounded leading-none', // background
+                        'border border-scale-500 ', //border
+                      ].join(' ')}
+                    >
+                      <span className="text-foreground text-xs">Project API Docs</span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              </Tooltip.Root>
+            )
+          } else {
+            return (
+              <NavigationIconButton
+                key={route.key}
+                route={route}
+                isActive={activeRoute === route.key}
+              />
+            )
+          }
+        })}
       </ul>
       {!navLayoutV2 && (
         <ul className="flex flex-col space-y-4 items-center">
-          {isNewAPIDocsEnabled && (
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger asChild>
-                <Button
-                  type="text"
-                  size="tiny"
-                  onClick={() => snap.setShowProjectApiDocs(true)}
-                  className="border-none"
-                >
-                  <div className="py-1">
-                    <IconFileText size={18} strokeWidth={2} className="text-foreground-lighter" />
-                  </div>
-                </Button>
-              </Tooltip.Trigger>
-              <Tooltip.Portal>
-                <Tooltip.Content side="right">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded py-1 px-2 leading-none shadow text-xs',
-                      'border border-scale-200 flex items-center space-x-1',
-                    ].join(' ')}
-                  >
-                    Project API Docs
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            </Tooltip.Root>
-          )}
           {IS_PLATFORM && (
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger asChild>
