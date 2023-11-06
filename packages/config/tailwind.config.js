@@ -158,7 +158,7 @@ const uiConfig = ui({
               // h5 not included in --tw-prose-headings
               color: theme('colors.scale[1200]'),
             },
-            'h2, h3, h4, h5, h6': {
+            'h1, h2, h3, h4, h5, h6': {
               fontWeight: '400',
             },
             'article h1, article h2, article h3, article h4, article h5, article h6': {
