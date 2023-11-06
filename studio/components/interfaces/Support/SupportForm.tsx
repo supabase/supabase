@@ -362,7 +362,6 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                           key={`option-${option.value}`}
                           label={option.label}
                           value={option.value}
-                          disabled={option.value === 'Critical' && isFreeProject}
                         >
                           <span>{option.label}</span>
                           <span className="block text-xs opacity-50">{option.description}</span>
@@ -445,7 +444,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                       <div className="flex items-center space-x-2">
                         <Button asChild>
                           <Link
-                            href={`/project/${values.projectRef}/settings/billing/subscription?panel=subscriptionPlan`}
+                            href={`/org/${values.organizationSlug}/billing?panel=subscriptionPlan`}
                           >
                             Upgrade project
                           </Link>
@@ -473,7 +472,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                 {['Performance'].includes(values.category) && isFreeProject ? (
                   <DisabledStateForFreeTier
                     category={selectedCategory?.label ?? ''}
-                    projectRef={values.projectRef}
+                    organizationSlug={selectedOrganizationSlug ?? ''}
                   />
                 ) : (
                   <>

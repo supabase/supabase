@@ -97,6 +97,11 @@ const components = {
       {props.children}
     </Heading>
   ),
+  h4: (props: any) => (
+    <Heading tag="h4" {...props}>
+      {props.children}
+    </Heading>
+  ),
   RefSubLayout,
   RefHeaderSection: (props: any) => <RefHeaderSection {...props} />,
   CliGlobalFlagsHandler: () => <CliGlobalFlagsHandler />,
