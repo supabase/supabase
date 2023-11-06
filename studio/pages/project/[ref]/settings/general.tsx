@@ -6,13 +6,12 @@ import {
 } from 'components/interfaces/Settings/General'
 import { SettingsLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useFlag, useIsFeatureEnabled } from 'hooks'
+import { useIsFeatureEnabled } from 'hooks'
 import { NextPageWithLayout } from 'types'
 
 const ProjectSettings: NextPageWithLayout = () => {
   const { project } = useProjectContext()
   const isBranch = !!project?.parent_project_ref
-  const transferProjectEnabledFlag = useFlag('transferProject')
   const { projectsTransfer: projectTransferEnabled } = useIsFeatureEnabled(['projects:transfer'])
 
   // [Joshen] Opting for larger gap instead of gap-8 as compared to other pages for better grouping of content
@@ -22,7 +21,7 @@ const ProjectSettings: NextPageWithLayout = () => {
       {!isBranch ? (
         <>
           <CustomDomainConfig />
-          {projectTransferEnabled && transferProjectEnabledFlag && <TransferProjectPanel />}
+          {projectTransferEnabled && <TransferProjectPanel />}
           <DeleteProjectPanel />
         </>
       ) : null}

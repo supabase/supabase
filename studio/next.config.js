@@ -31,7 +31,19 @@ const nextConfig = {
     return [
       {
         source: '/',
-        destination: '/sign-in',
+        has: [
+          {
+            type: 'query',
+            key: 'next',
+            value: 'new-project',
+          },
+        ],
+        destination: '/new/new-project',
+        permanent: false,
+      },
+      {
+        source: '/',
+        destination: '/projects',
         permanent: false,
       },
       {
