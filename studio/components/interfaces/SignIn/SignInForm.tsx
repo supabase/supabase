@@ -2,16 +2,16 @@ import HCaptcha from '@hcaptcha/react-hcaptcha'
 import * as Sentry from '@sentry/nextjs'
 import { AuthError } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
-import { getMfaAuthenticatorAssuranceLevel } from 'data/profile/mfa-authenticator-assurance-level-query'
-import { useStore } from 'hooks'
-import { usePushNext } from 'hooks/misc/useAutoAuthRedirect'
-import { auth, buildPathWithParams } from 'lib/gotrue'
-import { incrementSignInClicks } from 'lib/local-storage'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
-import { Button, Form, Input } from 'ui'
 import { object, string } from 'yup'
+
+import { getMfaAuthenticatorAssuranceLevel } from 'data/profile/mfa-authenticator-assurance-level-query'
+import { useStore } from 'hooks'
+import { auth, buildPathWithParams, getReturnToPath } from 'lib/gotrue'
+import { incrementSignInClicks } from 'lib/local-storage'
+import { Button, Form, Input } from 'ui'
 
 const signInSchema = object({
   email: string().email('Must be a valid email').required('Email is required'),
@@ -21,7 +21,6 @@ const signInSchema = object({
 const SignInForm = () => {
   const { ui } = useStore()
   const router = useRouter()
-  const pushNext = usePushNext()
   const queryClient = useQueryClient()
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
@@ -74,7 +73,7 @@ const SignInForm = () => {
 
         await queryClient.resetQueries()
 
-        await pushNext()
+        router.push(getReturnToPath())
       } catch (error) {
         ui.setNotification({
           id: toastId,

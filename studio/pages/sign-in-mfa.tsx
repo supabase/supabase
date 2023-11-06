@@ -2,8 +2,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import SignInMfaForm from 'components/interfaces/SignIn/SignInMfaForm'
 import { SignInLayout } from 'components/layouts'
 import Loading from 'components/ui/Loading'
-import { usePushNext } from 'hooks/misc/useAutoAuthRedirect'
-import { auth, buildPathWithParams, getAccessToken } from 'lib/gotrue'
+import { auth, buildPathWithParams, getAccessToken, getReturnToPath } from 'lib/gotrue'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -12,7 +11,6 @@ import { NextPageWithLayout } from 'types'
 const SignInMfaPage: NextPageWithLayout = () => {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
-  const pushNext = usePushNext()
   const queryClient = useQueryClient()
 
   // This useEffect redirects the user to MFA if they're already halfway signed in
@@ -36,13 +34,14 @@ const SignInMfaPage: NextPageWithLayout = () => {
               `Failed to retrieve assurance level: ${error.message}. Please try signing in again`
             )
             setLoading(false)
-            return router.push('/sign-in')
+            return router.push({ pathname: '/sign-in', query: router.query })
           }
 
           if (data) {
             if (data.currentLevel === data.nextLevel) {
               await queryClient.resetQueries()
-              await pushNext()
+              router.push(getReturnToPath())
+
               return
             }
             if (data.currentLevel !== data.nextLevel) {
