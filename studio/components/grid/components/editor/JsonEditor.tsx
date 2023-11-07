@@ -39,7 +39,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
     if (newValue && newValue.slice(-3, -2) === ',') {
       newValue = newValue.replace(/,(?=\s*?[\}\]])/g, '')
     }
-    commitChange(newValue)
+    if (newValue !== value) commitChange(newValue)
   }, [])
 
   const onChange = (_value: string | undefined) => {
