@@ -33,9 +33,6 @@ jobs:
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
-      - name: Link Studio folder
-        run: vercel link --cwd studio --yes --token=${{ secrets.VERCEL_TOKEN }}
-
       - name: Pull Vercel Environment Information
         run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
 
