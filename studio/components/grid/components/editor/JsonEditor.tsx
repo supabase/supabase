@@ -36,7 +36,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   }, [])
 
   const saveChanges = useCallback((newValue: string | null) => {
-    commitChange(newValue)
+    if (newValue !== value) commitChange(newValue)
   }, [])
 
   const onChange = (_value: string | undefined) => {
