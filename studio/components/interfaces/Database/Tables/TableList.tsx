@@ -131,8 +131,8 @@ const TableList = ({
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                        'border border-scale-200',
+                        'rounded bg-alternative py-1 px-2 leading-none shadow',
+                        'border border-background',
                       ].join(' ')}
                     >
                       <span className="text-xs text-foreground">
@@ -181,7 +181,7 @@ const TableList = ({
                     <Table.tr key={snap.selectedSchemaName}>
                       <Table.td colSpan={6}>
                         <p className="text-sm text-foreground">No tables created yet</p>
-                        <p className="text-sm text-light">
+                        <p className="text-sm text-foreground-light">
                           There are no tables found in the schema "{snap.selectedSchemaName}"
                         </p>
                       </Table.td>
@@ -191,7 +191,7 @@ const TableList = ({
                     <Table.tr key={snap.selectedSchemaName}>
                       <Table.td colSpan={6}>
                         <p className="text-sm text-foreground">No results found</p>
-                        <p className="text-sm text-light">
+                        <p className="text-sm text-foreground-light">
                           Your search for "{filterString}" did not return any results
                         </p>
                       </Table.td>
@@ -232,7 +232,7 @@ const TableList = ({
                           {x.comment !== null ? (
                             <p title={x.comment}>{x.comment}</p>
                           ) : (
-                            <p className="text-scale-800">No description</p>
+                            <p className="text-border-stronger">No description</p>
                           )}
                         </Table.td>
                         <Table.td className="hidden text-right xl:table-cell">
@@ -294,8 +294,8 @@ const TableList = ({
                                             <Tooltip.Arrow className="radix-tooltip-arrow" />
                                             <div
                                               className={[
-                                                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                                'border border-scale-200',
+                                                'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                                'border border-background',
                                               ].join(' ')}
                                             >
                                               <span className="text-xs text-foreground">
@@ -323,8 +323,8 @@ const TableList = ({
                                             <Tooltip.Arrow className="radix-tooltip-arrow" />
                                             <div
                                               className={[
-                                                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                                'border border-scale-200',
+                                                'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                                'border border-background',
                                               ].join(' ')}
                                             >
                                               <span className="text-xs text-foreground">

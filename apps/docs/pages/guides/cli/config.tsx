@@ -40,7 +40,7 @@ export default function Config() {
         </div>
         <div className="md:col-span-3">
           <div className="sticky top-20 border-l">
-            <span className="block font-mono text-xs uppercase text-scale-1200 pl-5 mb-4">
+            <span className="block font-mono text-xs uppercase text-foreground pl-5 mb-4">
               On this page
             </span>
             <GuidesTableOfContents list={tocList} />

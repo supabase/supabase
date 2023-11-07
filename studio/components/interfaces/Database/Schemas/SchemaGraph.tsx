@@ -229,13 +229,13 @@ function TableNode({ data, targetPosition, sourcePosition }: NodeProps<TableNode
         </div>
       ) : (
         <div className="rounded-lg overflow-hidden" style={{ width: NODE_WIDTH / 2 }}>
-          <header className="text-[0.5rem] leading-5 font-bold px-2 text-center bg-brand text-gray-300">
+          <header className="text-[0.5rem] leading-5 font-bold px-2 text-center bg-brand text-background-surface-100">
             {data.name}
           </header>
 
           {data.columns.map((column) => (
             <div
-              className="text-[8px] leading-5 relative flex flex-row justify-items-start odd:bg-scale-300 even:bg-scale-400"
+              className="text-[8px] leading-5 relative flex flex-row justify-items-start odd:bg-surface-100 even:bg-surface-200"
               key={column.id}
             >
               <div className="gap-[0.24rem] flex mx-2 align-middle basis-1/5 items-center justify-start">
@@ -269,7 +269,7 @@ function TableNode({ data, targetPosition, sourcePosition }: NodeProps<TableNode
                 <span
                   className={clsx(
                     column.isPrimary && 'pl-[6px]',
-                    'absolute top-0 left-0 right-0 pl-2 bg-scale-500 text-ellipsis overflow-hidden whitespace-nowrap opacity-0 hover:opacity-100'
+                    'absolute top-0 left-0 right-0 pl-2 bg-surface-300 text-ellipsis overflow-hidden whitespace-nowrap opacity-0 hover:opacity-100'
                   )}
                 >
                   {column.name}
@@ -351,7 +351,7 @@ const TablesGraph = ({ tables }: { tables: PostgresTable[] }) => {
             zoomable
             nodeColor={miniMapNodeColor}
             maskColor={miniMapMaskColor}
-            className="border border-scale-600 rounded-md shadow-sm"
+            className="border border-control rounded-md shadow-sm"
           />
         </ReactFlow>
       </div>

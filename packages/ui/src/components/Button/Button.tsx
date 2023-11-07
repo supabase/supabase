@@ -36,41 +36,39 @@ const buttonVariants = cva(
             focus-visible:outline-brand-600
             shadow-sm`,
         secondary: `
-            bg-scale-1200
-            text-scale-100 hover:text-scale-800
-            focus-visible:text-scale-600
-            border-scale-1100 hover:border-scale-900
-            focus-visible:outline-scale-700
+            bg-foreground
+            text-background hover:text-border-stronger
+            focus-visible:text-border-control
+            border-foreground-light hover:border-foreground-lighter
+            focus-visible:outline-border-strong
             shadow-sm`,
         default: `
-            text-scale-1200
-            bg-scale-100 hover:bg-scale-300
-            border-scale-600 hover:border-scale-700
-            dark:border-scale-700 hover:dark:border-scale-800
-            dark:bg-scale-500 dark:hover:bg-scale-600
+            text-foreground
+            bg-surface-100 hover:bg-selection
+            dark:bg-surface-300 hover:dark:bg-selection
+            border-control hover:border-strong
+            dark:border-strong hover:dark:border-stronger
             focus-visible:outline-brand-600
             shadow-sm`,
         alternative: `
             text-brand-600
             bg-brand-200 hover:bg-brand-400
-            border-brand-600 hover:border-brand-300
-            dark:border-brand-400 hover:dark:border-brand-300
+            border-brand-600
             focus-visible:border-brand-300
             focus-visible:outline-brand-600
             shadow-sm`,
         outline: `
-            text-scale-1200
+            text-foreground
             bg-transparent
-            border-scale-600 hover:border-scale-700
-            dark:border-scale-800 hover:dark:border-scale-900
-            focus-visible:outline-scale-700`,
+            border-strong hover:border-stronger
+            focus-visible:outline-border-strong`,
         dashed: `
-            text-scale-1200
+            text-foreground
             border
             border-dashed
-            border-scale-700 hover:border-scale-900
+            border-strong hover:border-stronger
             bg-transparent
-            focus-visible:outline-scale-700
+            focus-visible:outline-border-strong
             shadow-sm`,
         link: `
             text-brand-600
@@ -80,12 +78,12 @@ const buttonVariants = cva(
             border-opacity-0
             bg-opacity-0 dark:bg-opacity-0
             shadow-none
-            focus-visible:outline-scale-700`,
+            focus-visible:outline-border-strong`,
         text: `
-            text-scale-1200
-            hover:bg-scale-500
+            text-foreground
+            hover:bg-surface-300
             shadow-none
-            focus-visible:outline-scale-700
+            focus-visible:outline-border-strong
             border-transparent`,
         danger: `
             text-red-1100
@@ -111,7 +109,7 @@ const buttonVariants = cva(
         ...sizes,
       },
       overlay: {
-        base: `absolute inset-0 bg-scale-200 opacity-50`,
+        base: `absolute inset-0 bg-background opacity-50`,
         container: `fixed inset-0 transition-opacity`,
       },
       disabled: {

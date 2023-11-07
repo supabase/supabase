@@ -280,7 +280,7 @@ const FileExplorerHeader = ({
       className="
     flex h-[40px] pl-2
     items-center justify-between
-    rounded-t-md border-b border-panel-border-light bg-panel-header-light dark:border-panel-border-dark dark:bg-panel-header-dark"
+    rounded-t-md border-b border-overlay bg-surface-100"
     >
       {/* Navigation */}
       <div className={`flex items-center ${isEditingPath ? 'w-1/2' : ''}`}>
@@ -511,7 +511,7 @@ const FileExplorerHeader = ({
           )}
         </div>
 
-        <div className="h-6 border-r border-scale-600" />
+        <div className="h-6 border-r border-control" />
         <div className="flex items-center space-x-1 px-2">
           <div className="hidden">
             {/* @ts-ignore */}
@@ -534,8 +534,8 @@ const FileExplorerHeader = ({
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200',
+                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                      'border border-background',
                     ].join(' ')}
                   >
                     <span className="text-xs text-foreground">
@@ -563,8 +563,8 @@ const FileExplorerHeader = ({
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200',
+                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                      'border border-background',
                     ].join(' ')}
                   >
                     <span className="text-xs text-foreground">
@@ -577,7 +577,7 @@ const FileExplorerHeader = ({
           </Tooltip.Root>
         </div>
 
-        <div className="h-6 border-r border-scale-600" />
+        <div className="h-6 border-r border-control" />
         <div className="flex items-center px-2">
           {snap.isSearching ? (
             <Input
@@ -612,7 +612,7 @@ const FileExplorerHeader = ({
 
         {isNewAPIDocsEnabled && (
           <>
-            <div className="h-6 border-r border-scale-600" />
+            <div className="h-6 border-r border-control" />
             <Button
               size="tiny"
               className="mx-2"

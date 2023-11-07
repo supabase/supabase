@@ -72,7 +72,7 @@ const DeleteEnumeratedTypeModal = ({
           </Alert_Shadcn_>
           <div className="mt-4">
             <strong className="text-sm">Before deleting this enumerated type, consider:</strong>
-            <ul className="space-y-2 mt-2 text-sm text-light">
+            <ul className="space-y-2 mt-2 text-sm text-foreground-light">
               <li className="list-disc ml-6">
                 This enumerated type is no longer in use in any tables or functions
               </li>

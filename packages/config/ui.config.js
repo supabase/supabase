@@ -289,8 +289,8 @@ const uiConfig = {
       },
       colors: {
         ...colorClasses,
-        'hi-contrast': `var(--colors-fixed-scale12)`,
-        'lo-contrast': `var(--colors-fixed-scale1)`,
+        'hi-contrast': `hsl(var(--foreground-default))`,
+        'lo-contrast': `hsl(var(--background-alternative))`,
         warning: {
           default: 'red',
           100: '#342355',

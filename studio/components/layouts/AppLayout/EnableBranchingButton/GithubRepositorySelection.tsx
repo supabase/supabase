@@ -72,7 +72,7 @@ const GithubRepositorySelection = ({
             <p>Git Connection</p>
             <Badge color="amber">Required</Badge>
           </div>
-          <p className="text-sm text-light !mb-4">
+          <p className="text-sm text-foreground-light !mb-4">
             {githubConnection !== undefined
               ? 'Your database preview branches will be based on the branches in the following repository that your project is connected with:'
               : 'Your database preview branches will be based on the branches in the Git repository that your project is connected with.'}
