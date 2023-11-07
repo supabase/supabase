@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import { useEffect } from 'react'
 
 import Table from 'components/to-be-cleaned/Table'
 import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
@@ -33,7 +34,7 @@ const Entity = ({ language, apikey = '', endpoint = '' }: ContentProps) => {
   const snap = useAppStateSnapshot()
   const resource = snap.activeDocsSection[1]
 
-  const { data: jsonSchema } = useProjectJsonSchemaQuery({ projectRef: ref })
+  const { data: jsonSchema, refetch } = useProjectJsonSchemaQuery({ projectRef: ref })
   const definition = jsonSchema?.definitions?.[resource]
   const columns =
     definition !== undefined
@@ -43,6 +44,10 @@ const Entity = ({ language, apikey = '', endpoint = '' }: ContentProps) => {
           required: definition.required.includes(id),
         }))
       : []
+
+  useEffect(() => {
+    if (resource !== undefined) refetch()
+  }, [resource])
 
   if (resource === undefined) return null
 

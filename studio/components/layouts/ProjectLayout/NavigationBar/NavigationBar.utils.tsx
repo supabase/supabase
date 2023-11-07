@@ -196,11 +196,7 @@ export const generateProductRoutes = (
   ]
 }
 
-export const generateOtherRoutes = (
-  ref?: string,
-  project?: ProjectBase,
-  isNewAPIDocsEnabled?: boolean
-): Route[] => {
+export const generateOtherRoutes = (ref?: string, project?: ProjectBase): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}/building`
 
@@ -221,16 +217,12 @@ export const generateOtherRoutes = (
       icon: <IconList size={18} strokeWidth={2.5} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/logs/explorer`),
     },
-    ...(!isNewAPIDocsEnabled
-      ? [
-          {
-            key: 'api',
-            label: 'API Docs',
-            icon: <IconFileText size={18} strokeWidth={2} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/api`),
-          },
-        ]
-      : []),
+    {
+      key: 'api',
+      label: 'API Docs',
+      icon: <IconFileText size={18} strokeWidth={2} />,
+      link: undefined,
+    },
     ...(IS_PLATFORM
       ? [
           {

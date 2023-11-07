@@ -2,6 +2,9 @@ import { handleError, handleResponse, handleResponseError, constructHeaders } fr
 import { uuidv4 } from '../../helpers'
 import { SupaResponse } from 'types/base'
 
+/**
+ * @deprecated please use del method from data/fetchers instead
+ */
 export async function delete_<T = any>(
   url: string,
   data?: { [prop: string]: any },

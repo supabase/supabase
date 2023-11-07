@@ -2,6 +2,9 @@ import { constructHeaders, handleError, handleResponse, handleResponseError } fr
 import { uuidv4 } from '../../helpers'
 import { SupaResponse } from 'types/base'
 
+/**
+ * @deprecated please use patch method from data/fetchers instead
+ */
 export async function patch<T = any>(
   url: string,
   data: { [prop: string]: any },
