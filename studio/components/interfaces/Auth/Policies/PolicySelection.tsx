@@ -32,7 +32,7 @@ const PolicySelection = ({
                   className="
                   flex h-8 w-8 items-center
                   justify-center
-                  rounded bg-scale-1200 text-scale-100  
+                  rounded bg-scale-1200 text-scale-100
                 "
                 >
                   <IconGrid size={14} strokeWidth={2} />
@@ -50,7 +50,7 @@ const PolicySelection = ({
                   className="
                   flex h-8 w-8 items-center
                   justify-center
-                  rounded bg-scale-1200 text-scale-100  
+                  rounded bg-scale-1200 text-scale-100
                 "
                 >
                   <IconEdit size={14} strokeWidth={2} />
@@ -74,7 +74,9 @@ const PolicySelection = ({
             .
           </p>
           <div className="flex justify-end w-full items-center space-x-3">
-            <Button type="default" onClick={onSelectCancel}>Cancel</Button>
+            <Button type="default" onClick={onSelectCancel}>
+              Cancel
+            </Button>
           </div>
         </div>
       </div>
