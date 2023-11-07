@@ -1,19 +1,14 @@
 import React from 'react'
-import { useTheme } from 'next-themes'
 import { m } from 'framer-motion'
 import { DEFAULT_EASE } from '~/lib/animations'
 
 const CustomersVisual = () => {
-  const { resolvedTheme } = useTheme()
-
   const RenderedVisual = () => (
     <>
       <div
         className="absolute inset-0 mx-auto aspect-[5.13/1] h-full z-10"
         style={{
-          background: `radial-gradient(50% 50% at 50% 50%, transparent, ${
-            resolvedTheme === 'dark' ? 'var(--colors-scale1)' : 'var(--colors-scale3)'
-          })`,
+          background: `radial-gradient(50% 50% at 50% 50%, transparent, hsl(var(--background-alternative))`,
         }}
       />
       <m.svg
@@ -55,7 +50,7 @@ const CustomersVisual = () => {
             cy="151.574"
             rx="271.124"
             ry="82.5656"
-            fill={resolvedTheme === 'dark' ? '#161616' : '#F1F3F5'}
+            fill="hsl(var(--background-alternative))"
           />
         </g>
         <path
@@ -94,13 +89,13 @@ const CustomersVisual = () => {
         <g filter="url(#filter2_f_4353_100693)">
           <path
             d="M930.203 82.036C914.556 60.4668 890.905 48.1616 865.905 48.1616H865.057C840.76 48.1616 817.7 60.0178 802.035 80.564C818.898 64.5075 841.409 55.49 864.944 55.49H865.882C890.122 55.49 913.214 65.1309 930.203 82.036Z"
-            fill={resolvedTheme === 'dark' ? '#1EC77C' : '#2AB377'}
+            fill="hsl(var(--brand-default))"
           />
         </g>
         <g filter="url(#filter3_f_4353_100693)">
           <path
             d="M944.969 69.0081C925.715 47.439 896.616 35.1338 865.854 35.1338H864.811C834.915 35.1338 806.542 46.99 787.268 67.5362C808.016 51.4797 835.714 39.2051 864.673 39.2051H865.826C895.651 39.2051 924.064 52.1031 944.969 69.0081Z"
-            fill={resolvedTheme === 'dark' ? '#232323' : '#E1E1E1'}
+            fill="hsl(var(--background-default))"
           />
         </g>
         {/* logo bg rays */}
@@ -236,7 +231,7 @@ const CustomersVisual = () => {
             rx="303.093"
             ry="68.9323"
             transform="matrix(1 -0.000779452 -0.000779452 -1 562 296.168)"
-            fill={resolvedTheme === 'dark' ? '#161616' : '#F1F3F5'}
+            fill="hsl(var(--background-alternative))"
           />
         </g>
         {/* coordinates */}
@@ -448,17 +443,9 @@ const CustomersVisual = () => {
             gradientUnits="userSpaceOnUse"
             gradientTransform="translate(859.159 138.208) rotate(92.2122) scale(263.179 749.441)"
           >
-            <stop stopColor={resolvedTheme === 'dark' ? '#161616' : '#F2F4F6'} stopOpacity="0" />
-            <stop
-              offset="0.489999"
-              stopColor={resolvedTheme === 'dark' ? '#414141' : '#5F5F5F'}
-              stopOpacity="0.84"
-            />
-            <stop
-              offset="1"
-              stopColor={resolvedTheme === 'dark' ? '#171717' : '#F2F4F6'}
-              stopOpacity="0"
-            />
+            <stop stopColor="hsl(var(--foreground-default))" stopOpacity="0" />
+            <stop offset="0.489999" stopColor="hsl(var(--foreground-muted))" stopOpacity="0.84" />
+            <stop offset="1" stopColor="hsl(var(--background-default))" stopOpacity="0" />
           </radialGradient>
           <radialGradient
             id="paint1_radial_4353_100693"
@@ -468,17 +455,9 @@ const CustomersVisual = () => {
             gradientUnits="userSpaceOnUse"
             gradientTransform="translate(859.159 136.974) rotate(-103.238) scale(44.3621 730.071)"
           >
-            <stop stopColor={resolvedTheme === 'dark' ? '#161616' : '#F2F4F6'} stopOpacity="0" />
-            <stop
-              offset="0.489999"
-              stopColor={resolvedTheme === 'dark' ? '#414141' : '#5F5F5F'}
-              stopOpacity="0.84"
-            />
-            <stop
-              offset="1"
-              stopColor={resolvedTheme === 'dark' ? '#171717' : '#F2F4F6'}
-              stopOpacity="0"
-            />
+            <stop stopColor="hsl(var(--foreground-default))" stopOpacity="0" />
+            <stop offset="0.489999" stopColor="hsl(var(--foreground-muted))" stopOpacity="0.84" />
+            <stop offset="1" stopColor="hsl(var(--background-default))" stopOpacity="0" />
           </radialGradient>
           <radialGradient
             id="paint2_radial_4353_100693"
@@ -488,17 +467,9 @@ const CustomersVisual = () => {
             gradientUnits="userSpaceOnUse"
             gradientTransform="translate(863.122 127.579) rotate(-92.6074) scale(137.882 462.616)"
           >
-            <stop stopColor={resolvedTheme === 'dark' ? '#161616' : '#F2F4F6'} stopOpacity="0" />
-            <stop
-              offset="0.489999"
-              stopColor={resolvedTheme === 'dark' ? '#414141' : '#5F5F5F'}
-              stopOpacity="0.84"
-            />
-            <stop
-              offset="1"
-              stopColor={resolvedTheme === 'dark' ? '#171717' : '#F2F4F6'}
-              stopOpacity="0"
-            />
+            <stop stopColor="hsl(var(--foreground-default))" stopOpacity="0" />
+            <stop offset="0.489999" stopColor="hsl(var(--foreground-muted))" stopOpacity="0.84" />
+            <stop offset="1" stopColor="hsl(var(--background-default))" stopOpacity="0" />
           </radialGradient>
           <radialGradient
             id="paint3_radial_4353_100693"
@@ -508,17 +479,9 @@ const CustomersVisual = () => {
             gradientUnits="userSpaceOnUse"
             gradientTransform="translate(861.752 133.22) rotate(-90) scale(115.815 675.283)"
           >
-            <stop stopColor={resolvedTheme === 'dark' ? '#161616' : '#F2F4F6'} stopOpacity="0" />
-            <stop
-              offset="0.592292"
-              stopColor={resolvedTheme === 'dark' ? '#414141' : '#5F5F5F'}
-              stopOpacity="0.84"
-            />
-            <stop
-              offset="1"
-              stopColor={resolvedTheme === 'dark' ? '#171717' : '#F2F4F6'}
-              stopOpacity="0"
-            />
+            <stop stopColor="hsl(var(--foreground-default))" stopOpacity="0" />
+            <stop offset="0.592292" stopColor="hsl(var(--foreground-muted))" stopOpacity="0.84" />
+            <stop offset="1" stopColor="hsl(var(--background-default))" stopOpacity="0" />
           </radialGradient>
           <radialGradient
             id="paint4_radial_4353_100693"
@@ -528,17 +491,9 @@ const CustomersVisual = () => {
             gradientUnits="userSpaceOnUse"
             gradientTransform="translate(862.511 138.502) rotate(105.433) scale(25.8224 489.043)"
           >
-            <stop stopColor={resolvedTheme === 'dark' ? '#161616' : '#F2F4F6'} stopOpacity="0" />
-            <stop
-              offset="0.489999"
-              stopColor={resolvedTheme === 'dark' ? '#414141' : '#A3A3A3'}
-              stopOpacity="0.84"
-            />
-            <stop
-              offset="1"
-              stopColor={resolvedTheme === 'dark' ? '#171717' : '#F2F4F6'}
-              stopOpacity="0"
-            />
+            <stop stopColor="hsl(var(--foreground-default))" stopOpacity="0" />
+            <stop offset="0.489999" stopColor="hsl(var(--foreground-light))" stopOpacity="0.84" />
+            <stop offset="1" stopColor="hsl(var(--background-default))" stopOpacity="0" />
           </radialGradient>
           <radialGradient
             id="paint5_radial_4353_100693"
@@ -548,8 +503,8 @@ const CustomersVisual = () => {
             gradientUnits="userSpaceOnUse"
             gradientTransform="translate(862.32 54.7715) rotate(90) scale(193.44 193.44)"
           >
-            <stop stopColor={resolvedTheme === 'dark' ? '#161616' : '#ffffff'} />
-            <stop offset="1" stopColor={resolvedTheme === 'dark' ? '#161616' : '#F1F3F500'} />
+            <stop stopColor="hsl(var(--background-default))" />
+            <stop offset="1" stopColor="hsl(var(--background-alternative))" />
           </radialGradient>
           <m.linearGradient
             animate={{
@@ -568,11 +523,7 @@ const CustomersVisual = () => {
             gradientUnits="userSpaceOnUse"
           >
             <stop stopColor="transparent" stopOpacity="0" />
-            <stop
-              offset="0.5"
-              stopColor={resolvedTheme === 'dark' ? '#60e7aa' : '#096e40'}
-              stopOpacity="0.6"
-            />
+            <stop offset="0.5" stopColor="hsl(var(--brand-default))" stopOpacity="0.6" />
             <stop offset="1" stopColor="transparent" stopOpacity="0" />
           </m.linearGradient>
           <linearGradient
@@ -583,8 +534,8 @@ const CustomersVisual = () => {
             y2="193.79"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor="#3DCB8C" />
-            <stop offset="1" stopColor={resolvedTheme === 'dark' ? '#171717' : '#F1F3F5'} />
+            <stop stopColor="hsl(var(--brand-default))" />
+            <stop offset="1" stopColor="hsl(var(--background-alternative))" />
           </linearGradient>
           <linearGradient
             id="paint7_linear_4353_100693"
@@ -596,11 +547,11 @@ const CustomersVisual = () => {
           >
             <stop
               offset="0.331593"
-              stopColor={resolvedTheme === 'dark' ? '#151515' : '#EAE8E9'}
+              stopColor="hsl(var(--background-alternative))"
               stopOpacity="0"
             />
-            <stop offset="0.594681" stopColor={resolvedTheme === 'dark' ? '#A3A3A3' : '#636363'} />
-            <stop offset="1" stopColor={resolvedTheme === 'dark' ? '#171717' : '#F2F4F6'} />
+            <stop offset="0.594681" stopColor="hsl(var(--foreground-lighter))" />
+            <stop offset="1" stopColor="hsl(var(--background-default))" />
           </linearGradient>
           <linearGradient
             id="paint8_linear_4353_100693"
@@ -610,9 +561,9 @@ const CustomersVisual = () => {
             y2="236.32"
             gradientUnits="userSpaceOnUse"
           >
-            <stop offset="0.0114691" stopColor={resolvedTheme === 'dark' ? '#171717' : '#F1F3F5'} />
-            <stop offset="0.540433" stopColor="#3DCB8C" />
-            <stop offset="1" stopColor={resolvedTheme === 'dark' ? '#161616' : '#F1F3F5'} />
+            <stop offset="0.0114691" stopColor="hsl(var(--background-alternative))" />
+            <stop offset="0.540433" stopColor="hsl(var(--brand-default))" />
+            <stop offset="1" stopColor="hsl(var(--background-alternative))" />
           </linearGradient>
           <linearGradient
             id="paint9_linear_4353_100693"
@@ -622,7 +573,7 @@ const CustomersVisual = () => {
             y2="105.386"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor="#3DCB8C" />
+            <stop stopColor="hsl(var(--brand-default))" />
             <stop offset="1" stopColor="white" stopOpacity="0" />
           </linearGradient>
           <radialGradient
@@ -633,13 +584,9 @@ const CustomersVisual = () => {
             gradientUnits="userSpaceOnUse"
             gradientTransform="translate(864.407 138.314) rotate(90) scale(55.0818)"
           >
-            <stop stopColor={resolvedTheme === 'dark' ? '#343434' : '#C7C8C8'} stopOpacity="0" />
-            <stop offset="0.522658" stopColor={resolvedTheme === 'dark' ? '#212121' : '#D3D3D3'} />
-            <stop
-              offset="1"
-              stopColor={resolvedTheme === 'dark' ? '#232323' : '#CFD1D1'}
-              stopOpacity="0"
-            />
+            <stop stopColor="hsl(var(--foreground-lighter))" stopOpacity="0" />
+            <stop offset="0.522658" stopColor="hsl(var(--border-default))" />
+            <stop offset="1" stopColor="hsl(var(--background-overlay-default))" stopOpacity="0" />
           </radialGradient>
           <linearGradient
             id="paint11_linear_4353_100693"
@@ -649,10 +596,10 @@ const CustomersVisual = () => {
             y2="163.315"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor={resolvedTheme === 'dark' ? '#E2E2E2' : '#B1AFAF'} />
+            <stop stopColor="hsl(var(--foreground-light))" />
             <stop
               offset="1"
-              stopColor={resolvedTheme === 'dark' ? '#202020' : '#F2F2F2'}
+              stopColor="hsl(var(--background-overlay-default))"
               stopOpacity="0.29"
             />
           </linearGradient>
@@ -664,8 +611,8 @@ const CustomersVisual = () => {
             y2="163.788"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor={resolvedTheme === 'dark' ? 'white' : '#151515'} />
-            <stop offset="1" stopColor="#4D4D4D" stopOpacity="0" />
+            <stop stopColor="hsl(var(--background-default))" />
+            <stop offset="1" stopColor="hsl(var(--foreground-light))" stopOpacity="0" />
           </linearGradient>
           <linearGradient
             id="paint13_linear_4353_100693"
@@ -675,12 +622,8 @@ const CustomersVisual = () => {
             y2="105.061"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor={resolvedTheme === 'dark' ? '#BFBFBF' : '#333333'} />
-            <stop
-              offset="0.3125"
-              stopColor={resolvedTheme === 'dark' ? '#232323' : 'white'}
-              stopOpacity="0"
-            />
+            <stop stopColor="hsl(var(--foreground-light))" />
+            <stop offset="0.3125" stopColor="hsl(var(--foreground-lighter))" stopOpacity="0" />
           </linearGradient>
           <linearGradient
             id="paint14_linear_4353_100693"
@@ -690,12 +633,8 @@ const CustomersVisual = () => {
             y2="105.061"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor={resolvedTheme === 'dark' ? '#BFBFBF' : '#333333'} />
-            <stop
-              offset="0.3125"
-              stopColor={resolvedTheme === 'dark' ? '#232323' : 'white'}
-              stopOpacity="0"
-            />
+            <stop stopColor="hsl(var(--foreground-light))" />
+            <stop offset="0.3125" stopColor="hsl(var(--foreground-lighter))" stopOpacity="0" />
           </linearGradient>
           <linearGradient
             id="paint15_linear_4353_100693"
@@ -705,12 +644,8 @@ const CustomersVisual = () => {
             y2="105.061"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor={resolvedTheme === 'dark' ? '#BFBFBF' : '#333333'} />
-            <stop
-              offset="0.3125"
-              stopColor={resolvedTheme === 'dark' ? '#232323' : 'white'}
-              stopOpacity="0"
-            />
+            <stop stopColor="hsl(var(--foreground-light))" />
+            <stop offset="0.3125" stopColor="hsl(var(--foreground-lighter))" stopOpacity="0" />
           </linearGradient>
           <linearGradient
             id="paint16_linear_4353_100693"
@@ -720,12 +655,8 @@ const CustomersVisual = () => {
             y2="105.061"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor={resolvedTheme === 'dark' ? '#BFBFBF' : '#333333'} />
-            <stop
-              offset="0.3125"
-              stopColor={resolvedTheme === 'dark' ? '#232323' : 'white'}
-              stopOpacity="0"
-            />
+            <stop stopColor="hsl(var(--foreground-light))" />
+            <stop offset="0.3125" stopColor="hsl(var(--foreground-lighter))" stopOpacity="0" />
           </linearGradient>
           <linearGradient
             id="paint17_linear_4353_100693"
@@ -735,12 +666,8 @@ const CustomersVisual = () => {
             y2="105.061"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor={resolvedTheme === 'dark' ? '#BFBFBF' : '#A4A4A4'} />
-            <stop
-              offset="0.3125"
-              stopColor={resolvedTheme === 'dark' ? '#232323' : 'white'}
-              stopOpacity="0"
-            />
+            <stop stopColor="hsl(var(--foreground-lighter))" />
+            <stop offset="0.3125" stopColor="hsl(var(--foreground-lighter))" stopOpacity="0" />
           </linearGradient>
           <linearGradient
             id="paint18_linear_4353_100693"
@@ -750,12 +677,8 @@ const CustomersVisual = () => {
             y2="105.061"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor={resolvedTheme === 'dark' ? '#BFBFBF' : '#A4A4A4'} />
-            <stop
-              offset="0.3125"
-              stopColor={resolvedTheme === 'dark' ? '#232323' : 'white'}
-              stopOpacity="0"
-            />
+            <stop stopColor="hsl(var(--foreground-lighter))" />
+            <stop offset="0.3125" stopColor="hsl(var(--foreground-lighter))" stopOpacity="0" />
           </linearGradient>
           <linearGradient
             id="paint19_linear_4353_100693"
@@ -765,12 +688,8 @@ const CustomersVisual = () => {
             y2="105.061"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor={resolvedTheme === 'dark' ? '#BFBFBF' : '#A4A4A4'} />
-            <stop
-              offset="0.3125"
-              stopColor={resolvedTheme === 'dark' ? '#232323' : 'white'}
-              stopOpacity="0"
-            />
+            <stop stopColor="hsl(var(--foreground-lighter))" />
+            <stop offset="0.3125" stopColor="hsl(var(--foreground-lighter))" stopOpacity="0" />
           </linearGradient>
           <linearGradient
             id="paint20_linear_4353_100693"
@@ -780,12 +699,8 @@ const CustomersVisual = () => {
             y2="105.061"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor={resolvedTheme === 'dark' ? '#BFBFBF' : '#A4A4A4'} />
-            <stop
-              offset="0.3125"
-              stopColor={resolvedTheme === 'dark' ? '#232323' : 'white'}
-              stopOpacity="0"
-            />
+            <stop stopColor="hsl(var(--foreground-lighter))" />
+            <stop offset="0.3125" stopColor="hsl(var(--foreground-lighter))" stopOpacity="0" />
           </linearGradient>
           <linearGradient
             id="paint21_linear_4353_100693"
@@ -795,12 +710,8 @@ const CustomersVisual = () => {
             y2="105.061"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor={resolvedTheme === 'dark' ? '#00FF8E' : '#727272'} />
-            <stop
-              offset="0.15625"
-              stopColor={resolvedTheme === 'dark' ? '#232323' : 'white'}
-              stopOpacity="0"
-            />
+            <stop stopColor="hsl(var(--brand-default))" />
+            <stop offset="0.15625" stopColor="hsl(var(--foreground-lighter))" stopOpacity="0" />
           </linearGradient>
           <linearGradient
             id="paint22_linear_4353_100693"
@@ -810,12 +721,8 @@ const CustomersVisual = () => {
             y2="105.061"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor={resolvedTheme === 'dark' ? 'white' : '#757575'} />
-            <stop
-              offset="0.15625"
-              stopColor={resolvedTheme === 'dark' ? '#232323' : 'white'}
-              stopOpacity="0"
-            />
+            <stop stopColor="hsl(var(--foreground-lighter))" />
+            <stop offset="0.15625" stopColor="hsl(var(--foreground-lighter))" stopOpacity="0" />
           </linearGradient>
           <linearGradient
             id="paint23_linear_4353_100693"
@@ -825,12 +732,8 @@ const CustomersVisual = () => {
             y2="105.061"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor={resolvedTheme === 'dark' ? 'white' : '#757575'} />
-            <stop
-              offset="0.15625"
-              stopColor={resolvedTheme === 'dark' ? '#232323' : 'white'}
-              stopOpacity="0"
-            />
+            <stop stopColor="hsl(var(--foreground-lighter))" />
+            <stop offset="0.15625" stopColor="hsl(var(--foreground-lighter))" stopOpacity="0" />
           </linearGradient>
           <linearGradient
             id="paint24_linear_4353_100693"
@@ -840,12 +743,8 @@ const CustomersVisual = () => {
             y2="105.061"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor={resolvedTheme === 'dark' ? 'white' : '#757575'} />
-            <stop
-              offset="0.15625"
-              stopColor={resolvedTheme === 'dark' ? '#232323' : 'white'}
-              stopOpacity="0"
-            />
+            <stop stopColor="hsl(var(--foreground-lighter))" />
+            <stop offset="0.15625" stopColor="hsl(var(--foreground-lighter))" stopOpacity="0" />
           </linearGradient>
           <linearGradient
             id="paint25_linear_4353_100693"
@@ -855,12 +754,8 @@ const CustomersVisual = () => {
             y2="94.3999"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor={resolvedTheme === 'dark' ? '#49FFAA' : '#0c0c0c'} />
-            <stop
-              offset="1"
-              stopColor={resolvedTheme === 'dark' ? '#49FFAA' : '#002313'}
-              stopOpacity="1"
-            />
+            <stop stopColor="hsl(var(--brand-default))" />
+            <stop offset="1" stopColor="hsl(var(--brand-default))" stopOpacity="1" />
           </linearGradient>
           <linearGradient
             id="paint26_linear_4353_100693"
@@ -870,12 +765,8 @@ const CustomersVisual = () => {
             y2="203.949"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor={resolvedTheme === 'dark' ? '#49FFAA' : '#3D4943'} />
-            <stop
-              offset="1"
-              stopColor={resolvedTheme === 'dark' ? '#49FFAA' : '#002313'}
-              stopOpacity="1"
-            />
+            <stop stopColor="hsl(var(--brand-500))" />
+            <stop offset="1" stopColor="hsl(var(--brand-default))" stopOpacity="1" />
           </linearGradient>
           <linearGradient
             id="paint27_linear_4353_100693"
@@ -885,12 +776,8 @@ const CustomersVisual = () => {
             y2="185.046"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor={resolvedTheme === 'dark' ? '#49FFAA' : '#1a1a1a'} />
-            <stop
-              offset="1"
-              stopColor={resolvedTheme === 'dark' ? '#49FFAA' : '#002313'}
-              stopOpacity="1"
-            />
+            <stop stopColor="hsl(var(--brand-500))" />
+            <stop offset="1" stopColor="hsl(var(--brand-default))" stopOpacity="1" />
           </linearGradient>
           <linearGradient
             id="paint28_linear_4353_100693"
@@ -900,12 +787,8 @@ const CustomersVisual = () => {
             y2="237.781"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor={resolvedTheme === 'dark' ? '#49FFAA' : '#3D4943'} />
-            <stop
-              offset="1"
-              stopColor={resolvedTheme === 'dark' ? '#49FFAA' : '#002313'}
-              stopOpacity="1"
-            />
+            <stop stopColor="hsl(var(--brand-500))" />
+            <stop offset="1" stopColor="hsl(var(--brand-default))" stopOpacity="1" />
           </linearGradient>
           <linearGradient
             id="paint29_linear_4353_100693"
@@ -915,12 +798,8 @@ const CustomersVisual = () => {
             y2="74.8884"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor={resolvedTheme === 'dark' ? '#49FFAA' : '#3D4943'} />
-            <stop
-              offset="1"
-              stopColor={resolvedTheme === 'dark' ? '#49FFAA' : '#002313'}
-              stopOpacity="1"
-            />
+            <stop stopColor="hsl(var(--brand-500))" />
+            <stop offset="1" stopColor="hsl(var(--brand-default))" stopOpacity="1" />
           </linearGradient>
         </defs>
       </m.svg>

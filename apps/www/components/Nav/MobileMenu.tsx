@@ -147,7 +147,7 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
               <button
                 onClick={() => setOpen(false)}
                 type="button"
-                className="inline-flex items-center justify-center p-2 bg-white rounded-md text-lighter focus:ring-brand dark:bg-surface-100 dark:hover:bg-surface-200 hover:bg-surface-100 focus:outline-none focus:ring-2 focus:ring-inset"
+                className="inline-flex items-center justify-center p-2 bg-white rounded-md text-foreground-lighter focus:ring-brand dark:bg-surface-100 dark:hover:bg-surface-200 hover:bg-surface-100 focus:outline-none focus:ring-2 focus:ring-inset"
               >
                 <span className="sr-only">Close menu</span>
                 <svg

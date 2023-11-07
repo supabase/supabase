@@ -25,7 +25,7 @@ export function LaunchWeekLogoHeader() {
             />
           </span>
         </h1>
-        <p className="text-white radial-gradient-text-scale-600 text-md sm:text-lg text-center">
+        <p className="text-white radial-gradient-text-600 text-md sm:text-lg text-center">
           April 10th – 14th at 7AM PT | 10AM ET
         </p>
       </motion.div>

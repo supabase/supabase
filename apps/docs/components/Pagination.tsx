@@ -13,7 +13,7 @@ const Pagination = ({ currentPage, totalCount }: { currentPage: number; totalCou
       <li>
         <Link
           href={`/discussions?page=${currentPage - 1}`}
-          className="border-scale-600 bg-scale-300 inline-flex h-8 w-8 items-center justify-center rounded border"
+          className="border border-control bg-surface-100 inline-flex h-8 w-8 items-center justify-center rounded"
         >
           <IconArrowLeft className="stroke-2 transition group-hover:-translate-x-1" height={12.5} />
         </Link>
@@ -25,7 +25,7 @@ const Pagination = ({ currentPage, totalCount }: { currentPage: number; totalCou
             <Link
               href={`/discussions?page=${page}`}
               className={`border-scale-600 inline-flex h-8 w-8 items-center justify-center rounded border ${
-                currentPage === page ? 'bg-brand' : 'bg-scale-300'
+                currentPage === page ? 'bg-brand' : 'bg-surface-100'
               }`}
             >
               {page}
@@ -36,7 +36,7 @@ const Pagination = ({ currentPage, totalCount }: { currentPage: number; totalCou
       <li>
         <Link
           href={`/discussions?page=${currentPage + 1}`}
-          className="border-scale-600 bg-scale-300 inline-flex h-8 w-8 items-center justify-center rounded border"
+          className="border-control bg-surface-100 inline-flex h-8 w-8 items-center justify-center rounded border"
         >
           <IconArrowRight
             className="stroke-2 transition group-hover:-translate-x-1"

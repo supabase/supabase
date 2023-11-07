@@ -66,14 +66,14 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
     <>
       <div
         className={[
-          'flex border-panel-border-light dark:border-panel-border-dark',
+          'flex border-overlay',
           'flex-col overflow-hidden rounded border shadow-sm',
         ].join(' ')}
       >
         <div
           className={[
-            'border-panel-border-light bg-panel-header-light dark:bg-panel-header-dark',
-            'flex justify-between w-full border-b py-3 px-4 dark:border-panel-border-dark',
+            'border-overlay bg-surface-100',
+            'flex justify-between w-full border-b py-3 px-4',
           ].join(' ')}
         >
           <div className="flex items-center gap-1 max-w-[85%]">
@@ -84,7 +84,7 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
               >
                 {extension.name}
               </h3>
-              <p className="text-sm text-light">
+              <p className="text-sm text-foreground-light">
                 {extension?.installed_version ?? extension.default_version}
               </p>
             </div>

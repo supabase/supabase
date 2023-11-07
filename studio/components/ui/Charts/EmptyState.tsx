@@ -13,8 +13,8 @@ const EmptyState = ({
     className="
       flex h-full
       w-full flex-col items-center
-      justify-center space-y-2 space-y-2 border
-      border-dashed border-scale-600 py-4 text-center
+      justify-center space-y-2 border
+      border-dashed border-control py-4 text-center
     "
   >
     <IconBarChart2 className="text-foreground-light" />

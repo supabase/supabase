@@ -107,7 +107,7 @@ const EnumeratedTypes = () => {
                 <Table.tr>
                   <Table.td colSpan={4}>
                     <p className="text-sm text-foreground">No enumerated types created yet</p>
-                    <p className="text-sm text-light">
+                    <p className="text-sm text-foreground-light">
                       There are no enumerated types found in the schema "{selectedSchema}"
                     </p>
                   </Table.td>
@@ -117,7 +117,7 @@ const EnumeratedTypes = () => {
                 <Table.tr>
                   <Table.td colSpan={4}>
                     <p className="text-sm text-foreground">No results found</p>
-                    <p className="text-sm text-light">
+                    <p className="text-sm text-foreground-light">
                       Your search for "{search}" did not return any results
                     </p>
                   </Table.td>

@@ -120,7 +120,7 @@ const VercelIntegrationConnectionForm = ({
                     <FormLabel_Shadcn_ className="!text">
                       Sync environment variables for Vercel Production deployments
                     </FormLabel_Shadcn_>
-                    <FormDescription_Shadcn_ className="text-xs text-lighter">
+                    <FormDescription_Shadcn_ className="text-xs text-foreground-lighter">
                       Deploy Edge Functions when merged into Production Branch
                     </FormDescription_Shadcn_>
                   </div>
@@ -147,7 +147,7 @@ const VercelIntegrationConnectionForm = ({
                     <FormLabel_Shadcn_ className="!text">
                       Auto update Auth Redirect URIs for Vercel Production Deployments
                     </FormLabel_Shadcn_>
-                    <FormDescription_Shadcn_ className="text-xs text-lighter">
+                    <FormDescription_Shadcn_ className="text-xs text-foreground-lighter">
                       Deploy Edge Functions when merged into Production Branch
                     </FormDescription_Shadcn_>
                   </div>
@@ -177,7 +177,7 @@ const VercelIntegrationConnectionForm = ({
                     <FormLabel_Shadcn_ className="!text">
                       Sync environment variables for Vercel Preview Deployments
                     </FormLabel_Shadcn_>
-                    <FormDescription_Shadcn_ className="text-xs text-lighter">
+                    <FormDescription_Shadcn_ className="text-xs text-foreground-lighter">
                       Preview deployments will be able to connect to Supabase Database Preview
                       branches
                     </FormDescription_Shadcn_>
@@ -204,7 +204,7 @@ const VercelIntegrationConnectionForm = ({
                     <FormLabel_Shadcn_ className="!text">
                       Auto update Auth Redirect URIs for Vercel Preview Deployments
                     </FormLabel_Shadcn_>
-                    <FormDescription_Shadcn_ className="text-xs text-lighter">
+                    <FormDescription_Shadcn_ className="text-xs text-foreground-lighter">
                       Deploy Edge Functions when merged into Production Branch
                     </FormDescription_Shadcn_>
                   </div>

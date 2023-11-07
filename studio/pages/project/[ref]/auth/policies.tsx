@@ -115,7 +115,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
             <Input
               size="small"
               placeholder="Filter tables and policies"
-              className="block w-64 text-sm placeholder-gray-400"
+              className="block w-64 text-sm placeholder-border-muted"
               value={searchString}
               onChange={(e) => setSearchString(e.target.value)}
               icon={<IconSearch size="tiny" />}

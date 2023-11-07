@@ -73,7 +73,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
     <>
       <div className="space-y-4">
         <div className="w-full mx-auto mb-16 max-w-7xl">
-          <div className="mx-6 flex h-[500px] items-center justify-center rounded border border-scale-400 bg-scale-300 p-8">
+          <div className="mx-6 flex h-[500px] items-center justify-center rounded border border-overlay bg-surface-100 p-8">
             <div className="grid w-[480px] gap-4">
               <div className="mx-auto flex max-w-[300px] items-center justify-center space-x-4 lg:space-x-8">
                 <IconPauseCircle className="text-foreground-light" size={50} strokeWidth={1.5} />
@@ -135,8 +135,8 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                         <Tooltip.Arrow className="radix-tooltip-arrow" />
                         <div
                           className={[
-                            'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                            'border border-scale-200 ', //border
+                            'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                            'border border-background', //border
                           ].join(' ')}
                         >
                           <span className="text-xs text-foreground">

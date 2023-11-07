@@ -18,15 +18,14 @@ const RefDetailCollapse: React.FC<
             className={[
               'transition-all ease-out',
               'h-8',
-              'bg-scale-200 data-open:bg-scale-300',
-              'dark:bg-scale-300 dark:data-open:bg-scale-500',
-              'border border-scale-500 w-full flex items-center gap-3 px-5',
+              'bg-surface-100 data-open:bg-surface-200',
+              'border w-full flex items-center gap-3 px-5',
               'rounded-tl rounded-tr',
               'data-closed:rounded-bl data-closed:rounded-br',
-              'text-scale-1100 text-xs',
+              'text-foreground-light text-xs',
             ].join(' ')}
           >
-            <div className="data-open-parent:rotate-90 text-scale-900">
+            <div className="data-open-parent:rotate-90 text-foreground-lighter">
               <IconChevronRight size={12} strokeWidth={2} />
             </div>
             {props.label}
