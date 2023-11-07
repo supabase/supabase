@@ -96,7 +96,7 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
       />
       {typeof window !== 'undefined' &&
         createPortal(
-          <Menu id={SQL_CONTEXT_EDITOR_ID} animation={false} className="!bg-surface-200">
+          <Menu id={SQL_CONTEXT_EDITOR_ID} animation={false}>
             <Item onClick={onCopyCell}>
               <IconClipboard size="tiny" />
               <span className="ml-2 text-xs">Copy cell content</span>
