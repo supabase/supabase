@@ -34,13 +34,26 @@ jobs:
           cache: 'npm'
 
       - name: Install Vercel CLI
-        run: npm install --global vercel@latest
+        run: |
+          npm install
+          npm install --global vercel@latest turbo-ignore
+
+      - name: Check for changes to studio
+        run: |
+          if npx turbo-ignore studio; then
+            echo "NO_CHANGES=false" >> "$GITHUB_ENV"
+          else
+            echo "NO_CHANGES=true" >> "$GITHUB_ENV"
+          fi
 
       - name: Pull Vercel Environment Information
+        if: env.NO_CHANGES != 'true'
         run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Build Project Artifacts
+        if: env.NO_CHANGES != 'true'
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy Project Artifacts to Vercel
+        if: env.NO_CHANGES != 'true'
         run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
