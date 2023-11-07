@@ -1,4 +1,4 @@
-import Lottie from 'lottie-react'
+import Lottie from 'lottie-light-react'
 import loadingAnim from './Loading.anim.json'
 
 const Connecting = () => (

@@ -61,7 +61,7 @@
     "date-fns": "^2.30.0",
     "formik": "^2.2.9",
     "lodash": "^4.17.21",
-    "lottie-react": "^2.4.0",
+    "lottie-light-react": "^2.4.0",
     "lucide-react": "^0.167.0",
     "next-themes": "^0.2.1",
     "openai": "^3.3.0",
