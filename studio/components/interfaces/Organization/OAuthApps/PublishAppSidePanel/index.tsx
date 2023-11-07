@@ -279,7 +279,7 @@ const PublishAppSidePanel = ({
                           ) : (
                             <div
                               className={clsx(
-                                'border border-scale-700 transition opacity-75 hover:opacity-100',
+                                'border border-strong transition opacity-75 hover:opacity-100',
                                 'mt-4 mr-4 space-y-2 rounded-full h-[120px] w-[120px] flex flex-col items-center justify-center cursor-pointer'
                               )}
                               onClick={() => {
@@ -414,7 +414,7 @@ const PublishAppSidePanel = ({
                         <p className="prose text-sm">
                           Select an organization to grant API access to
                         </p>
-                        <div className="border border-scale-600 text-foreground-light rounded px-4 py-2 text-sm bg-scale-400">
+                        <div className="border border-control text-foreground-light rounded px-4 py-2 text-sm bg-surface-200">
                           Organizations that you have access to will be listed here
                         </div>
                       </div>

@@ -72,7 +72,7 @@ const NavigationBar = () => {
     <div
       className={[
         'flex w-14 flex-col justify-between overflow-y-hidden p-2',
-        'border-r bg-body border-scale-500',
+        'border-r bg-background border-default',
       ].join(' ')}
     >
       <ul className="flex flex-col space-y-2">
@@ -94,7 +94,7 @@ const NavigationBar = () => {
             link: `/project/${projectRef}`,
           }}
         />
-        <div className="bg-scale-500 h-px w-full" />
+        <div className="bg-border h-px w-full" />
         {toolRoutes.map((route) => (
           <NavigationIconButton
             key={route.key}
@@ -102,7 +102,7 @@ const NavigationBar = () => {
             isActive={activeRoute === route.key}
           />
         ))}
-        <div className="bg-scale-500 h-px w-full"></div>
+        <div className="bg-border h-px w-full"></div>
 
         {productRoutes.map((route) => (
           <NavigationIconButton
@@ -111,7 +111,7 @@ const NavigationBar = () => {
             isActive={activeRoute === route.key}
           />
         ))}
-        <div className="h-px w-full bg-scale-500"></div>
+        <div className="h-px w-full bg-border"></div>
         {otherRoutes.map((route) => {
           if (route.key === 'api') {
             return (
@@ -133,8 +133,8 @@ const NavigationBar = () => {
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'bg-scale-100 shadow-lg shadow-scale-700 dark:shadow-scale-300	py-1.5 px-3 rounded leading-none', // background
-                        'border border-scale-500 ', //border
+                        'bg-alternative shadow-lg shadow-background-surface-100	py-1.5 px-3 rounded leading-none', // background
+                        'border border-default', //border
                       ].join(' ')}
                     >
                       <span className="text-foreground text-xs">Project API Docs</span>
@@ -176,7 +176,7 @@ const NavigationBar = () => {
                   <div
                     className={[
                       'rounded  py-1 px-2 leading-none shadow',
-                      'border border-scale-200 flex items-center space-x-1',
+                      'border border-background flex items-center space-x-1',
                     ].join(' ')}
                   >
                     {os === 'macos' ? (

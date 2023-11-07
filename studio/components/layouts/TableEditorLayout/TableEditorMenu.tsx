@@ -135,8 +135,8 @@ const TableEditorMenu = () => {
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                        'border border-scale-200',
+                        'rounded bg-alternative py-1 px-2 leading-none shadow',
+                        'border border-background',
                       ].join(' ')}
                     >
                       <span className="text-xs text-foreground">
@@ -199,14 +199,14 @@ const TableEditorMenu = () => {
             <p className="text-sm text-foreground-light">Loading entities...</p>
           </div>
         ) : searchText.length === 0 && (entityTypes?.length ?? 0) === 0 ? (
-          <div className="mx-4 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
+          <div className="mx-4 space-y-1 rounded-md border border-muted bg-surface-100 py-3 px-4">
             <p className="text-xs">No entities available</p>
             <p className="text-xs text-foreground-light">
               This schema has no entities available yet
             </p>
           </div>
         ) : searchText.length > 0 && (entityTypes?.length ?? 0) === 0 ? (
-          <div className="mx-4 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
+          <div className="mx-4 space-y-1 rounded-md border border-muted bg-surface-100 py-3 px-4">
             <p className="text-xs">No results found</p>
             <p className="text-xs text-foreground-light">
               There are no entities that match your search
@@ -244,8 +244,8 @@ const TableEditorMenu = () => {
                                 <Tooltip.Arrow className="radix-tooltip-arrow" />
                                 <div
                                   className={[
-                                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                    'border border-scale-200',
+                                    'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                    'border border-background',
                                   ].join(' ')}
                                 >
                                   <span className="text-xs">Sort By</span>

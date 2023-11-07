@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { IconStar } from 'ui'
-import InteractiveShimmerCard from '../InteractiveShimmerCard'
+
+import Panel from '~/components/Panel'
 
 const RepoCard = ({ repo, activeTab, index }: { repo: any; activeTab: number; index: number }) => (
   <motion.div
@@ -11,8 +12,7 @@ const RepoCard = ({ repo, activeTab, index }: { repo: any; activeTab: number; in
     exit={{ opacity: 0, y: 5, transition: { duration: 0.05 } }}
   >
     <Link href={repo.html_url} target="_blank">
-      <InteractiveShimmerCard
-        outerClassName=""
+      <Panel
         innerClassName="relative group flex flex-col gap-2 p-4 min-h-[170px] md:!h-[200px]"
         hasActiveOnHover
       >
@@ -37,8 +37,8 @@ const RepoCard = ({ repo, activeTab, index }: { repo: any; activeTab: number; in
             {repo.name}
           </p>
         </div>
-        <p className="text-sm flex-1 text-lighter">{repo.description}</p>
-        <div className="text-sm w-full flex justify-between text-lighter mt-8">
+        <p className="text-sm flex-1 text-foreground-lighter">{repo.description}</p>
+        <div className="text-sm w-full flex justify-between text-foreground-lighter mt-8">
           <p className="">{repo.full_name}</p>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1">
@@ -61,7 +61,7 @@ const RepoCard = ({ repo, activeTab, index }: { repo: any; activeTab: number; in
             </div>
           </div>
         </div>
-      </InteractiveShimmerCard>
+      </Panel>
     </Link>
   </motion.div>
 )
