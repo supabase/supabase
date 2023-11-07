@@ -403,10 +403,6 @@ module.exports = {
   cssVariable: "var(--foreground-default)",
   value: "hsl(0, 0%, 92.9%)"
 },
-"foreground-strong": {
-  cssVariable: "var(--foreground-strong)",
-  value: "hsl(0, 0%, 100%)"
-},
 "foreground-light": {
   cssVariable: "var(--foreground-light)",
   value: "hsl(0, 0%, 69%)"
@@ -427,8 +423,12 @@ module.exports = {
   cssVariable: "var(--background-default)",
   value: "hsl(200, 11.1%, 5.3%)"
 },
-"background-alternative": {
-  cssVariable: "var(--background-alternative)",
+"background-alternative-200": {
+  cssVariable: "var(--background-alternative-200)",
+  value: "hsl(0, 0%, 5.5%)"
+},
+"background-alternative-DEFAULT": {
+  cssVariable: "var(--background-alternative-default)",
   value: "hsl(200, 20%, 2.9%)"
 },
 "background-selection": {
@@ -451,10 +451,6 @@ module.exports = {
   cssVariable: "var(--background-surface-300)",
   value: "hsl(202.5, 10.5%, 14.9%)"
 },
-"background-surface-_contrast-300": {
-  cssVariable: "var(--background-surface-contrast-300)",
-  value: "hsl(202.5, 10.5%, 14.9%)"
-},
 "background-overlay-DEFAULT": {
   cssVariable: "var(--background-overlay-default)",
   value: "hsl(192, 14.3%, 6.9%)"
@@ -462,10 +458,6 @@ module.exports = {
 "background-overlay-hover": {
   cssVariable: "var(--background-overlay-hover)",
   value: "hsl(190, 10.7%, 11%)"
-},
-"background-secondary": {
-  cssVariable: "var(--background-secondary)",
-  value: "hsl(0, 0%, 100%)"
 },
 "background-muted": {
   cssVariable: "var(--background-muted)",
@@ -569,7 +561,7 @@ module.exports = {
 },
 "brand-600": {
   cssVariable: "var(--brand-600)",
-  value: "hsl(176, 59.5%, 70%)"
+  value: "hsl(156.29999999999995, 59.5%, 70%)"
 },
 "brand-DEFAULT": {
   cssVariable: "var(--brand-default)",
@@ -579,8 +571,36 @@ module.exports = {
   cssVariable: "var(--brand-accent)",
   value: "hsl(160, 100%, 50%)"
 },
-"secondary": {
-  cssVariable: "var(--secondary)",
-  value: "hsl(0, 0%, 100%)"
+"_secondary-200": {
+  cssVariable: "var(--secondary-200)",
+  value: "hsl(248, 53.6%, 11%)"
+},
+"_secondary-400": {
+  cssVariable: "var(--secondary-400)",
+  value: "hsl(248.29999999999995, 54.5%, 25.9%)"
+},
+"_secondary-DEFAULT": {
+  cssVariable: "var(--secondary-default)",
+  value: "hsl(247.79999999999995, 100%, 70%)"
+},
+"code_block-1": {
+  cssVariable: "var(--code-block-1)",
+  value: "hsl(170.79999999999995, 43.1%, 61.4%)"
+},
+"code_block-2": {
+  cssVariable: "var(--code-block-2)",
+  value: "hsl(33.19999999999999, 90.3%, 75.7%)"
+},
+"code_block-3": {
+  cssVariable: "var(--code-block-3)",
+  value: "hsl(83.80000000000001, 61.7%, 63.1%)"
+},
+"code_block-4": {
+  cssVariable: "var(--code-block-4)",
+  value: "hsl(276.1, 67.7%, 74.5%)"
+},
+"code_block-5": {
+  cssVariable: "var(--code-block-5)",
+  value: "hsl(13.800000000000011, 89.7%, 69.6%)"
 }
 }

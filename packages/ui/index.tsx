@@ -83,6 +83,7 @@ export * from './src/lib/utils'
 
 // theme switcher
 export * from './src/components/ThemeProvider/ThemeToggle'
+export * from './src/components/ThemeProvider/themes'
 
 // animated ui
 

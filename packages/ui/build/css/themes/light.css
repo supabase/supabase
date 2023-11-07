@@ -1,5 +1,13 @@
+[data-theme='light'],
 .light {
-  --secondary: 0deg 0% 100%;
+  --code-block-5: 0deg 0% 100%;
+  --code-block-4: 0deg 0% 100%;
+  --code-block-3: 0deg 0% 100%;
+  --code-block-2: 0deg 0% 100%;
+  --code-block-1: 0deg 0% 100%;
+  --secondary-default: 0deg 0% 100%;
+  --secondary-400: 0deg 0% 100%;
+  --secondary-200: 0deg 0% 100%;
   --brand-accent: 152.9deg 60% 52.9%;
   --brand-default: 152.9deg 60% 52.9%;
   --brand-600: 153.2deg 49.7% 33.5%;
@@ -20,8 +28,8 @@
   --destructive-300: 7.1deg 100% 96.7%;
   --destructive-200: 0deg 100% 99.4%;
   --background-muted: 0deg 0% 100%;
-  --background-secondary: 0deg 0% 100%;
-  --background-alternative: 0deg 0% 100%;
+  --background-alternative-default: 0deg 0% 100%;
+  --background-alternative-200: 0deg 0% 100%;
   --foreground-contrast: 210deg 25% 98.4%;
   --border-stronger: var(--colors-gray-light-800);
   --border-strong: var(--colors-gray-light-700);
@@ -33,7 +41,6 @@
   --border-default: var(--colors-slate-light-500);
   --background-overlay-hover: var(--colors-slate-light-300);
   --background-overlay-default: var(--colors-slate-light-100);
-  --background-surface-contrast-300: var(--colors-slate-light-400);
   --background-surface-300: var(--colors-slate-light-400);
   --background-surface-200: var(--colors-slate-light-300);
   --background-surface-100: var(--colors-slate-light-100);
@@ -43,6 +50,5 @@
   --foreground-muted: var(--colors-slate-light-900);
   --foreground-lighter: var(--colors-slate-light-1000);
   --foreground-light: var(--colors-slate-light-1100);
-  --foreground-strong: var(--colors-slate-light-1200);
   --foreground-default: var(--colors-slate-light-1200);
 }
