@@ -35,7 +35,7 @@ const HeroGrid = () => {
   const isSm = useBreakpoint(640)
 
   const svgGridOptions = {
-    color: resolvedTheme === 'dark' ? '#00d4ad' : '#015a42',
+    color: resolvedTheme?.includes('dark') ? '#00d4ad' : '#015a42',
     boxWidth: width ? width * 7 : 7500,
     boxHeight: width ? width * 5 : 6000,
     xLines: isSm ? 20 : 49,

@@ -10,7 +10,7 @@ import { AppProps } from 'next/app'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import { CommandMenuProvider, PortalToast, useConsent } from 'ui'
+import { CommandMenuProvider, PortalToast, themes, useConsent } from 'ui'
 import Meta from '~/components/Favicons'
 import { post } from '~/lib/fetchWrapper'
 import supabase from '~/lib/supabase'
@@ -95,6 +95,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <AuthProvider>
           <ThemeProvider
             // attribute="class"
+            themes={themes.map((theme) => theme.value)}
             defaultTheme="system"
             enableSystem
             disableTransitionOnChange

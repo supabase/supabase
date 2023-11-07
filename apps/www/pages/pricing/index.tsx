@@ -345,7 +345,7 @@ export default function IndexPage() {
                     layout="fill"
                     objectFit="contain"
                     src={`${basePath}/images/pricing/${addon.heroImg}${
-                      resolvedTheme === 'dark' ? '' : '-light'
+                      resolvedTheme?.includes('dark') ? '' : '-light'
                     }.png`}
                     alt=""
                   />
@@ -355,7 +355,7 @@ export default function IndexPage() {
                   <div className="flex items-center gap-2 mt-2">
                     <Image
                       src={`${basePath}/images/pricing/${addon.icon}${
-                        resolvedTheme === 'dark' ? '' : '-light'
+                        resolvedTheme?.includes('dark') ? '' : '-light'
                       }.svg`}
                       className="file:"
                       width={14}
@@ -424,7 +424,7 @@ export default function IndexPage() {
               objectFit="contain"
               className="w-full"
               src={`${basePath}/images/pricing/spend-cap${
-                resolvedTheme === 'dark' ? '' : '-light'
+                resolvedTheme?.includes('dark') ? '' : '-light'
               }.png`}
               alt=""
             />

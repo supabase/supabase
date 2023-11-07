@@ -84,7 +84,7 @@ function AuthWidgetSection() {
                     <Auth
                       // @ts-ignore
                       socialLayout={layout}
-                      theme={resolvedTheme === 'dark' ? 'dark' : 'default'}
+                      theme={resolvedTheme?.includes('dark') ? 'dark' : 'default'}
                       providers={['google', 'facebook', 'twitter']}
                       supabaseClient={supabase}
                       appearance={{

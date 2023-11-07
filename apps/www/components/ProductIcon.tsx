@@ -10,7 +10,7 @@ function ProductIcon({ icon, color }: ProductIcon) {
     switch (color) {
       case 'green':
         return {
-          container: 'bg-brand-600 dark:bg-brand-500 text-brand-100',
+          container: 'bg-brand-600 text-brand-100',
           svg: 'stroke-brand',
         }
       case 'alt':
@@ -27,7 +27,7 @@ function ProductIcon({ icon, color }: ProductIcon) {
       default:
         return {
           container: 'bg-foreground text-background-alternative',
-          svg: 'stroke-white dark:stroke-black',
+          svg: 'stroke-background',
         }
     }
   }
@@ -46,7 +46,7 @@ function ProductIcon({ icon, color }: ProductIcon) {
       <svg
         className={[
           'h-5 w-5',
-          !color || color === 'black' ? 'stroke-white dark:stroke-black' : '',
+          !color || color === 'black' ? 'stroke-background' : '',
           color && color === 'gray' ? 'stroke-foreground-light' : '',
           color && color === 'green' ? 'stroke-brand-200 dark:stroke-brand' : '',
           color && color === 'alt' ? 'stroke-brand' : '',

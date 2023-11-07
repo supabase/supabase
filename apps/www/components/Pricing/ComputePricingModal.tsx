@@ -44,7 +44,7 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
                   height={24}
                   className="w-6"
                   src={`${basePath}/images/pricing/compute-upgrade${
-                    resolvedTheme === 'dark' ? '-green' : '-light'
+                    resolvedTheme?.includes('dark') ? '-green' : '-light'
                   }.svg`}
                   alt=""
                 />

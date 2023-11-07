@@ -55,7 +55,7 @@ const Footer = (props: Props) => {
                 src={
                   isLaunchWeekPage
                     ? supabaseLogoWordmarkDark
-                    : resolvedTheme === 'dark'
+                    : resolvedTheme?.includes('dark')
                     ? supabaseLogoWordmarkDark
                     : supabaseLogoWordmarkLight
                 }

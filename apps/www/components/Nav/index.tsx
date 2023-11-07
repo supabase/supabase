@@ -26,12 +26,14 @@ import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wo
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 
 const Nav = () => {
-  const { resolvedTheme } = useTheme()
+  const { resolvedTheme, themes } = useTheme()
   const router = useRouter()
   const { width } = useWindowSize()
   const [open, setOpen] = useState(false)
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
+
+  console.log(resolvedTheme, themes)
 
   const isHomePage = router.pathname === '/'
   const isLaunchWeekPage = router.pathname.includes('launch-week')
@@ -78,7 +80,7 @@ const Nav = () => {
                   >
                     <Image
                       src={
-                        isLaunchWeekPage || resolvedTheme === 'dark' || isHomePage
+                        isLaunchWeekPage || resolvedTheme?.includes('dark') || isHomePage
                           ? supabaseLogoWordmarkDark
                           : supabaseLogoWordmarkLight
                       }
@@ -161,7 +163,7 @@ const Nav = () => {
           <MobileMenu
             open={open}
             setOpen={setOpen}
-            isDarkMode={isLaunchWeekPage || resolvedTheme === 'dark' || isHomePage}
+            isDarkMode={isLaunchWeekPage || resolvedTheme?.includes('dark') || isHomePage}
             menu={menu}
           />
         </nav>

@@ -29,7 +29,7 @@ const SignInFlyTos = () => {
                 <div>
                   <Image
                     src={
-                      resolvedTheme === 'dark'
+                      resolvedTheme?.includes('dark')
                         ? `${router.basePath}/img/supabase-dark.svg`
                         : `${router.basePath}/img/supabase-light.svg`
                     }

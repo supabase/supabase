@@ -238,7 +238,9 @@ const HeaderLogo = memo(function HeaderLogo() {
     <Link href="/" className="px-10 flex items-center gap-2">
       <Image
         className="cursor-pointer"
-        src={resolvedTheme === 'dark' ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'}
+        src={
+          resolvedTheme?.includes('dark') ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'
+        }
         width={96}
         height={24}
         alt="Supabase Logo"

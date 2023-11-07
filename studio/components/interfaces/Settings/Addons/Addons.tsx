@@ -185,10 +185,10 @@ const Addons = () => {
                         src={
                           computeInstance !== undefined
                             ? `${BASE_PATH}/img/optimized-compute-on${
-                                resolvedTheme === 'dark' ? '' : '--light'
+                                resolvedTheme?.includes('dark') ? '' : '--light'
                               }.png`
                             : `${BASE_PATH}/img/optimized-compute-off${
-                                resolvedTheme === 'dark' ? '' : '--light'
+                                resolvedTheme?.includes('dark') ? '' : '--light'
                               }.png`
                         }
                       />
@@ -374,10 +374,10 @@ const Addons = () => {
                         src={
                           pitr !== undefined
                             ? `${BASE_PATH}/img/pitr-on${
-                                resolvedTheme === 'dark' ? '' : '--light'
+                                resolvedTheme?.includes('dark') ? '' : '--light'
                               }.png?v=2`
                             : `${BASE_PATH}/img/pitr-off${
-                                resolvedTheme === 'dark' ? '' : '--light'
+                                resolvedTheme?.includes('dark') ? '' : '--light'
                               }.png?v=2`
                         }
                       />
@@ -469,10 +469,10 @@ const Addons = () => {
                         src={
                           customDomain !== undefined
                             ? `${BASE_PATH}/img/custom-domain-on${
-                                resolvedTheme === 'dark' ? '' : '--light'
+                                resolvedTheme?.includes('dark') ? '' : '--light'
                               }.png`
                             : `${BASE_PATH}/img/custom-domain-off${
-                                resolvedTheme === 'dark' ? '' : '--light'
+                                resolvedTheme?.includes('dark') ? '' : '--light'
                               }.png`
                         }
                       />
