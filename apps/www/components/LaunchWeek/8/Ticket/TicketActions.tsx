@@ -68,9 +68,9 @@ export default function TicketActions({
     <div className="grid gap-1 grid-cols-1 sm:grid-cols-3">
       {!sharePage ? (
         <>
-          <div className="rounded bg-[#E6E8EB] text-scale-500 py-1 px-3 border border-[#3e3e3e] text-xs mb-1">
+          <div className="rounded bg-[#E6E8EB] text-background-surface-300 py-1 px-3 border border-[#3e3e3e] text-xs mb-1">
             <div className="flex items-center justify-center gap-2">
-              <div className="text-scale-300">
+              <div className="text-background-surface-100">
                 <IconCheckCircle size={10} strokeWidth={1.5} />
               </div>
               Connect with GitHub
@@ -79,8 +79,8 @@ export default function TicketActions({
           <button
             onClick={() => handleShare('twitter')}
             className={[
-              `flex items-center justify-center gap-2 rounded text-scale-500 py-1 px-3 border border-[#3e3e3e] text-xs mb-1 transition-all ease-out hover:text-scale-100 hover:bg-[#dfe1e3]`,
-              userData.sharedOnTwitter ? 'bg-[#E6E8EB] text-scale-500' : 'text-white',
+              `flex items-center justify-center gap-2 rounded text-background-surface-300 py-1 px-3 border border-[#3e3e3e] text-xs mb-1 transition-all ease-out hover:text-background-alternative hover:bg-[#dfe1e3]`,
+              userData.sharedOnTwitter ? 'bg-[#E6E8EB] text-background-surface-300' : 'text-white',
             ].join(' ')}
           >
             {userData.sharedOnTwitter && (
@@ -93,8 +93,8 @@ export default function TicketActions({
           <button
             onClick={() => handleShare('linkedin')}
             className={[
-              `flex items-center justify-center gap-2 rounded text-scale-500 py-1 px-3 border border-[#3e3e3e] text-xs mb-1 transition-all ease-out hover:text-scale-100 hover:bg-[#dfe1e3]`,
-              userData.sharedOnLinkedIn ? 'bg-[#E6E8EB] text-scale-500' : 'text-white',
+              `flex items-center justify-center gap-2 rounded text-background-surface-300 py-1 px-3 border border-[#3e3e3e] text-xs mb-1 transition-all ease-out hover:text-background-alternative hover:bg-[#dfe1e3]`,
+              userData.sharedOnLinkedIn ? 'bg-[#E6E8EB] text-background-surface-300' : 'text-white',
             ].join(' ')}
           >
             {userData.sharedOnLinkedIn && (

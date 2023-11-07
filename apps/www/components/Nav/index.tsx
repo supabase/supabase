@@ -63,7 +63,7 @@ const Nav = () => {
         />
         <nav
           className={cn(
-            `relative z-40 border-border border-b backdrop-blur-sm transition-opacity`,
+            `relative z-40 border-default border-b backdrop-blur-sm transition-opacity`,
             showLaunchWeekNavMode ? '!opacity-100 !border-[#e0d2f430]' : '',
             isLaunchWeekPage && showLaunchWeekNavMode ? '!border-b-0' : ''
           )}

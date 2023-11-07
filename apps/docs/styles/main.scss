@@ -29,7 +29,7 @@
 }
 
 body {
-  @apply bg-scale-200;
+  @apply bg-background;
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -76,12 +76,12 @@ article h1 {
 }
 
 .p:not(.prose *):not(.overwrite) {
-  @apply text-scale-1100;
+  @apply text-foreground-light;
   margin-bottom: 16px;
 }
 
 .small:not(.prose *):not(.overwrite) {
-  @apply text-scale-900 text-xs;
+  @apply text-foreground-muted text-xs;
 }
 
 .prose :where(p):not(:where([class~='not-prose'] *)) {
@@ -125,7 +125,7 @@ pre[class*='language-'] {
 
 .method-list-item-validation {
   code {
-    @apply text-xs bg-scale-300 rounded;
+    @apply text-xs bg-control rounded;
     padding: 1px 6px;
   }
 }
@@ -135,7 +135,7 @@ pre[class*='language-'] {
 }
 
 .method-list-group .method-list-group {
-  @apply border border-scale-400 rounded-md;
+  @apply border border-overlay rounded-md;
   margin-bottom: 20px;
   max-width: 600px;
 }
@@ -209,7 +209,7 @@ h4 code {
 
 // code inside admonitions
 .admonition-content p code {
-  @apply bg-scale-300;
+  @apply bg-control;
   word-break: keep-all !important;
   white-space: nowrap !important;
 }
@@ -281,4 +281,10 @@ div[role='tablist'] {
   width: 100% !important;
   position: relative !important;
   height: unset !important;
+}
+
+/* dat.GUI */
+
+.dg.ac {
+  z-index: 9999 !important;
 }

@@ -43,7 +43,7 @@ const BlogCollapsible = ({ title, ...props }: { title: string }) => {
       <CollapsibleTrigger_Shadcn_
         className="    
         data-[state=open]:text
-        hover:text-light
+        hover:text-foreground-light
         flex items-center gap-3
         [&>svg]:fill-current
         [&>svg]:rotate-90

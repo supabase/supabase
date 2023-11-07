@@ -86,17 +86,17 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
             readOnly={!isEditable}
             onChange={onChange}
           />
-          <div className="flex items-start justify-between p-2 bg-scale-400 space-x-2">
+          <div className="flex items-start justify-between p-2 bg-surface-200 space-x-2">
             {isEditable ? (
               <div className="space-y-1">
                 <div className="flex items-center space-x-2">
-                  <div className="px-1.5 py-[2.5px] rounded bg-scale-600 border border-scale-700 flex items-center justify-center">
+                  <div className="px-1.5 py-[2.5px] rounded bg-selection border border-strong flex items-center justify-center">
                     <span className="text-[10px]">⏎</span>
                   </div>
                   <p className="text-xs text-foreground-light">Save changes</p>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <div className="px-1 py-[2.5px] rounded bg-scale-600 border border-scale-700 flex items-center justify-center">
+                  <div className="px-1 py-[2.5px] rounded bg-selection border border-strong flex items-center justify-center">
                     <span className="text-[10px]">Esc</span>
                   </div>
                   <p className="text-xs text-foreground-light">Cancel changes</p>
@@ -109,8 +109,8 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
               <Tooltip.Trigger>
                 <div
                   className={[
-                    'border border-scale-700 rounded p-1 flex items-center justify-center',
-                    'transition cursor-pointer bg-scale-600 hover:bg-scale-700',
+                    'border border-strong rounded p-1 flex items-center justify-center',
+                    'transition cursor-pointer bg-selection hover:bg-border-strong',
                   ].join(' ')}
                   onClick={() => onSelectExpand()}
                 >
@@ -122,8 +122,8 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200',
+                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                      'border border-background',
                     ].join(' ')}
                   >
                     <span className="text-xs text-foreground">Expand editor</span>

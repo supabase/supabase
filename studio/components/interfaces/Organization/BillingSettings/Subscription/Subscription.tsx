@@ -210,11 +210,11 @@ const Subscription = () => {
                 type="horizontal"
                 value={daysWithinCycle - daysToCycleEnd}
                 max={daysWithinCycle}
-                barClass="bg-scale-1200"
+                barClass="bg-foreground"
                 labelBottom={`Current billing cycle (${billingCycleStart.format(
                   'MMM DD'
                 )} - ${billingCycleEnd.format('MMM DD')})`}
-                bgClass="bg-gray-300 dark:bg-gray-600"
+                bgClass="bg-surface-300"
                 labelBottomClass="!text-foreground-light pb-1"
                 labelTop={`${daysToCycleEnd} days remaining`}
               />
