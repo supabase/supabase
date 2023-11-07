@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import { useEffect } from 'react'
 import { Badge } from 'ui'
 
 import Table from 'components/to-be-cleaned/Table'
@@ -13,8 +14,10 @@ const RPC = ({ language }: ContentProps) => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
 
-  const { data: jsonSchema } = useProjectJsonSchemaQuery({ projectRef: ref })
-  const { data } = useOpenAPISpecQuery({ projectRef: ref })
+  const { data: jsonSchema, refetch: refetchJsonSchema } = useProjectJsonSchemaQuery({
+    projectRef: ref,
+  })
+  const { data, refetch: refetchOpenAPISpec } = useOpenAPISpecQuery({ projectRef: ref })
   const functions = data?.functions ?? []
 
   const rpcName = snap.activeDocsSection[1]
@@ -23,6 +26,13 @@ const RPC = ({ language }: ContentProps) => {
 
   const summary = rpcJsonSchema?.post.summary
   const parameters = rpc?.get.parameters ?? []
+
+  useEffect(() => {
+    if (rpcName !== undefined) {
+      refetchJsonSchema()
+      refetchOpenAPISpec()
+    }
+  }, [rpcName])
 
   if (rpc === undefined) return null
 

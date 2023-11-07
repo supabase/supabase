@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 import { Button, IconCode, IconExternalLink } from 'ui'
 
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import APIDocsButton from 'components/ui/APIDocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
@@ -21,7 +21,6 @@ interface FunctionsLayoutProps {
 const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutProps>) => {
   const snap = useAppStateSnapshot()
   const { functionSlug, ref } = useParams()
-  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { data: functions, isLoading } = useEdgeFunctionsQuery({ projectRef: ref })
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
 
@@ -114,24 +113,13 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
                     <Button asChild type="default">
                       <Link href={`/project/${ref}/settings/functions`}>Manage secrets</Link>
                     </Button>
-                    {isNewAPIDocsEnabled && (
-                      <Button
-                        size="tiny"
-                        className="mx-2 translate-y-[1px]"
-                        type="default"
-                        icon={<IconCode size={14} strokeWidth={2} />}
-                        onClick={() => {
-                          snap.setActiveDocsSection(
-                            functionSlug !== undefined
-                              ? ['edge-functions', functionSlug]
-                              : ['edge-functions']
-                          )
-                          snap.setShowProjectApiDocs(true)
-                        }}
-                      >
-                        API
-                      </Button>
-                    )}
+                    <APIDocsButton
+                      section={
+                        functionSlug !== undefined
+                          ? ['edge-functions', functionSlug]
+                          : ['edge-functions']
+                      }
+                    />
                     <Button
                       asChild
                       type="default"
