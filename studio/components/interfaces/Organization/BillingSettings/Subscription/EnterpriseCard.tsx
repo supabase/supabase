@@ -12,7 +12,7 @@ const EnterpriseCard = ({ plan, isCurrentPlan }: EnterpriseCardProps) => {
     <div
       key={plan.id}
       className={clsx(
-        'grid grid-cols-1 md:grid-cols-3 border rounded-md bg-scale-200',
+        'grid grid-cols-1 md:grid-cols-3 border rounded-md bg-background',
         'py-4 col-span-12 justify-between gap-x-8'
       )}
     >
@@ -20,11 +20,11 @@ const EnterpriseCard = ({ plan, isCurrentPlan }: EnterpriseCardProps) => {
         <div className="flex items-center space-x-2">
           <p className={clsx('text-brand text-sm uppercase')}>{plan.name}</p>
           {isCurrentPlan ? (
-            <div className="text-xs bg-scale-500 text-foreground-light rounded px-2 py-0.5">
+            <div className="text-xs bg-surface-300 text-foreground-light rounded px-2 py-0.5">
               Current plan
             </div>
           ) : plan.nameBadge ? (
-            <div className="text-xs bg-brand-400 text-brand rounded px-2 py-0.5">
+            <div className="text-xs bg-surface-200 text-brand rounded px-2 py-0.5">
               {plan.nameBadge}
             </div>
           ) : null}

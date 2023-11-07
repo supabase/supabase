@@ -65,7 +65,7 @@ const FirstLevelNav = () => {
                     <p
                       key={section.key}
                       title={section.title}
-                      className="text-sm text-light px-4 hover:text-foreground transition cursor-pointer"
+                      className="text-sm text-foreground-light px-4 hover:text-foreground transition cursor-pointer"
                       onClick={() => {
                         snap.setActiveDocsSection([item.key])
                         navigateToSection(section.key)
@@ -81,7 +81,7 @@ const FirstLevelNav = () => {
                         <p
                           key={table.name}
                           title={table.name}
-                          className="text-sm text-light px-4 hover:text-foreground transition cursor-pointer"
+                          className="text-sm text-foreground-light px-4 hover:text-foreground transition cursor-pointer"
                           onClick={() => snap.setActiveDocsSection([item.key, table.name])}
                         >
                           {table.name}
@@ -96,7 +96,7 @@ const FirstLevelNav = () => {
                         <p
                           key={fn.name}
                           title={fn.name}
-                          className="text-sm text-light px-4 hover:text-foreground transition cursor-pointer"
+                          className="text-sm text-foreground-light px-4 hover:text-foreground transition cursor-pointer"
                           onClick={() => snap.setActiveDocsSection([item.key, fn.name])}
                         >
                           {fn.name}
@@ -111,7 +111,7 @@ const FirstLevelNav = () => {
                         <p
                           key={bucket.name}
                           title={bucket.name}
-                          className="text-sm text-light px-4 hover:text-foreground transition cursor-pointer"
+                          className="text-sm text-foreground-light px-4 hover:text-foreground transition cursor-pointer"
                           onClick={() => snap.setActiveDocsSection([item.key, bucket.name])}
                         >
                           {bucket.name}
@@ -126,7 +126,7 @@ const FirstLevelNav = () => {
                         <p
                           key={fn.name}
                           title={fn.name}
-                          className="text-sm text-light px-4 hover:text-foreground transition cursor-pointer"
+                          className="text-sm text-foreground-light px-4 hover:text-foreground transition cursor-pointer"
                           onClick={() => snap.setActiveDocsSection([item.key, fn.name])}
                         >
                           {fn.name}

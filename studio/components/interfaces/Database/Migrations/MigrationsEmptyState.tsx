@@ -46,7 +46,7 @@ const MigrationsEmptyState = () => {
   ]
 
   return (
-    <div className="w-full px-12 py-12 bg-white bg-no-repeat border rounded dark:bg-scale-200 border-scale-500">
+    <div className="w-full px-12 py-12 bg-no-repeat border rounded bg-background border-default">
       <div className="space-y-8">
         <div className="space-y-2 w-4/5">
           <h4 className="text-lg">Database migrations</h4>
@@ -62,26 +62,26 @@ const MigrationsEmptyState = () => {
             <button
               type="button"
               className={clsx(
-                'flex w-full items-center justify-between rounded py-3 px-6 text-foreground border bg-scale-100 dark:bg-scale-300',
+                'flex w-full items-center justify-between rounded py-3 px-6 text-foreground border bg-surface-100',
                 showInstructions && 'rounded-b-none'
               )}
             >
               <div className="flex items-center justify-between gap-3 w-full">
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-8 h-8 p-2 border rounded bg-scale-100">
+                  <div className="flex items-center justify-center w-8 h-8 p-2 border rounded bg-alternative">
                     <IconTerminal strokeWidth={2} />
                   </div>
                   <h4>Terminal instructions</h4>
                 </div>
                 {showInstructions ? (
                   <IconMinimize2
-                    className="text-scale-800 transition data-open-parent:rotate-0 data-closed-parent:rotate-180"
+                    className="text-border-stronger transition data-open-parent:rotate-0 data-closed-parent:rotate-180"
                     strokeWidth={2}
                     width={14}
                   />
                 ) : (
                   <IconMaximize2
-                    className="text-scale-800 transition data-open-parent:rotate-0 data-closed-parent:rotate-180"
+                    className="text-border-stronger transition data-open-parent:rotate-0 data-closed-parent:rotate-180"
                     strokeWidth={2}
                     width={14}
                   />
@@ -90,7 +90,7 @@ const MigrationsEmptyState = () => {
             </button>
           </Collapsible.Trigger>
           <Collapsible.Content>
-            <div className="border border-t-0 bg-scale-100 dark:bg-scale-300 rounded-b py-3 px-6">
+            <div className="border border-t-0 bg-surface-100 rounded-b py-3 px-6">
               <CommandRender commands={commands} />
             </div>
           </Collapsible.Content>

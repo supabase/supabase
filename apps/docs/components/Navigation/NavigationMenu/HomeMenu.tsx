@@ -12,10 +12,7 @@ const NavigationMenuHome = () => {
           return (
             <Fragment key={`section-container-${sectionIndex}-border`}>
               {sectionIndex !== 0 && (
-                <div
-                  className="h-px w-full bg-blackA-300 dark:bg-whiteA-300"
-                  key={`section-${sectionIndex}-border`}
-                ></div>
+                <div className="h-px w-full border-b" key={`section-${sectionIndex}-border`}></div>
               )}
               <div key={`section-${sectionIndex}`}>
                 <div className="flex flex-col gap-4">
@@ -25,7 +22,7 @@ const NavigationMenuHome = () => {
                         <div
                           key={link.label}
                           className={cn(
-                            'font-mono uppercase text-xs text-scale-900 ',
+                            'font-mono uppercase text-xs text-foreground-lighter',
                             i !== 0 && 'mt-4'
                           )}
                         >
@@ -38,7 +35,7 @@ const NavigationMenuHome = () => {
                           <li
                             className={[
                               'group flex items-center gap-2',
-                              'text-sm transition-all duration-150 text-scale-1100 hover:text-scale-1200  hover:cursor-pointer ',
+                              'text-sm transition-all duration-150 text-foreground-light hover:text-foreground hover:cursor-pointer ',
                             ].join(' ')}
                           >
                             {link?.icon && <HomeMenuIconPicker icon={link.icon} />}

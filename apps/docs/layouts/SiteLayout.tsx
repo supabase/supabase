@@ -162,13 +162,13 @@ const MobileHeader = memo(function MobileHeader() {
         >
           <span
             className={[
-              'transition-all ease-out block w-4 h-px bg-scale-900 group-hover:bg-scale-1200',
+              'transition-all ease-out block w-4 h-px bg-foreground-muted group-hover:bg-foreground',
               !mobileMenuOpen ? 'w-4' : 'absolute rotate-45 top-[6px]',
             ].join(' ')}
           ></span>
           <span
             className={[
-              'transition-all ease-out block h-px bg-scale-900 group-hover:bg-scale-1200',
+              'transition-all ease-out block h-px bg-foreground-muted group-hover:bg-foreground',
               !mobileMenuOpen ? 'w-3 group-hover:w-4' : 'absolute w-4 -rotate-45 top-[2px]',
             ].join(' ')}
           ></span>
@@ -186,7 +186,7 @@ const MobileHeader = memo(function MobileHeader() {
       <span
         className={[
           'transition-all duration-200',
-          'text-scale-1200',
+          'text-foreground',
           mobileMenuOpen ? 'text-xs' : 'text-sm',
         ].join(' ')}
       >
@@ -222,7 +222,7 @@ const MobileMenuBackdrop = memo(function MobileMenuBackdrop() {
         'left-0',
         'right-0',
         'z-10',
-        'backdrop-blur-sm backdrop-filter bg-white-1200 dark:bg-scale-200/90',
+        'backdrop-blur-sm backdrop-filter bg-alternative/90',
         mobileMenuOpen ? 'absolute h-full w-full top-0 left-0' : 'hidden h-0',
         // always hide on desktop
         'lg:hidden',
@@ -295,7 +295,7 @@ const NavContainer = memo(function NavContainer() {
           'relative',
           'w-auto',
           'border-r overflow-auto h-screen',
-          'backdrop-blur backdrop-filter bg-white-1200 dark:bg-scale-200',
+          'backdrop-blur backdrop-filter bg-background',
           'flex flex-col',
         ].join(' ')}
       >
@@ -305,13 +305,13 @@ const NavContainer = memo(function NavContainer() {
               <div
                 className={[
                   'hidden lg:flex lg:height-auto',
-                  'pt-8 bg-scale-200 flex-col gap-8',
+                  'pt-8 bg-background flex-col gap-8',
                 ].join(' ')}
               >
                 <HeaderLogo />
               </div>
-              <div className="h-4 bg-scale-200 w-full"></div>
-              <div className="bg-gradient-to-b from-scale-200 to-transparent h-4 w-full"></div>
+              <div className="h-4 bg-background w-full"></div>
+              <div className="bg-gradient-to-b from-background to-transparent h-4 w-full"></div>
             </div>
           </div>
         </div>
@@ -321,7 +321,7 @@ const NavContainer = memo(function NavContainer() {
             'absolute left-0 right-0 h-screen',
             'px-5 pl-5 py-16',
             'top-[0px]',
-            'bg-scale-200',
+            'bg-background',
             // desktop styles
             'lg:relative lg:top-0 lg:left-0 lg:pb-10 lg:px-10 lg:pt-0 lg:flex',
             'lg:opacity-100 lg:visible',
@@ -351,7 +351,7 @@ const SiteLayout = ({ children }: PropsWithChildren<{}>) => {
               className={[
                 'sticky transition-all top-0',
                 'z-10',
-                'backdrop-blur backdrop-filter bg-white-1200 dark:bg-scale-200',
+                'backdrop-blur backdrop-filter bg-background',
               ].join(' ')}
             >
               <div className={['lg:hidden', 'px-5 ', 'border-b z-10'].join(' ')}>

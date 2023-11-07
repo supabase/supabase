@@ -104,7 +104,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
         <Accordion
           openBehaviour="multiple"
           chevronAlign="right"
-          className=" border p-2 bg-scale-300 rounded"
+          className="border p-2 bg-surface-100 rounded"
         >
           <Accordion.Item
             header={

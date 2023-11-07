@@ -126,7 +126,7 @@ function Blog(props: any) {
           </div>
         </div>
 
-        <div className="border-scale-600 border-t">
+        <div className="border-default border-t">
           <div className="container mx-auto mt-16 px-8 sm:px-16 xl:px-20">
             <BlogFilters
               posts={blogs}

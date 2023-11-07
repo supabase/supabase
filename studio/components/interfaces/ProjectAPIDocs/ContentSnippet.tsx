@@ -37,7 +37,7 @@ const ContentSnippet = ({
         <h2 className="doc-heading">{snippet.title}</h2>
         {snippet.description !== undefined && (
           <div className="doc-section">
-            <article className="text text-sm text-light">
+            <article className="text text-sm text-foreground-light">
               <Markdown
                 className="max-w-none"
                 content={snippet.description.replaceAll('[ref]', projectRef ?? '_')}

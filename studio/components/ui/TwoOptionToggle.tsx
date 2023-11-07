@@ -13,14 +13,14 @@ const TwoOptionToggle = ({
   width = 50,
   activeOption,
   onClickOption,
-  borderOverride = 'border-gray-600 dark:border-gray-800',
+  borderOverride = 'border-stronger',
 }: TwoOptionToggleProps) => {
   const buttonStyle = (
     isActive: boolean
   ) => `absolute top-0 z-1 text-xs inline-flex h-full items-center justify-center font-medium
     ${
-      isActive ? 'hover:text-foreground-light dark:hover:text-white' : 'hover:text-gray-600'
-    } dark:hover:text-white focus:z-10 focus:outline-none focus:border-blue-300 focus:ring-blue
+      isActive ? 'hover:text-foreground-light hover:text-foreground' : 'hover:text-foreground'
+    } hover:text-foreground focus:z-10 focus:outline-none focus:border-blue-300 focus:ring-blue
     transition ease-in-out duration-150`
 
   return (
@@ -32,8 +32,8 @@ const TwoOptionToggle = ({
         style={{ width, translate: activeOption === options[1] ? '0px' : `${width - 2}px` }}
         aria-hidden="true"
         className={clsx(
-          'z-0 inline-block rounded h-full bg-scale-200 dark:bg-scale-600 shadow transform',
-          'transition-all ease-in-out border border-scale-700'
+          'z-0 inline-block rounded h-full bg-overlay-hover shadow transform',
+          'transition-all ease-in-out border border-strong'
         )}
       ></span>
       {options.map((option: any, index: number) => (

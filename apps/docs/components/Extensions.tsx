@@ -48,7 +48,7 @@ export default function Extensions() {
   return (
     <>
       <div className="mb-8 grid">
-        <label className="mb-2 text-xs text-scale-1100">Search extensions</label>
+        <label className="mb-2 text-xs text-foreground-light">Search extensions</label>
         <Input
           type="text"
           placeholder="Extension name"
@@ -58,14 +58,14 @@ export default function Extensions() {
       <div className="lg:grid lg:grid-cols-12">
         <div className="col-span-3 not-prose">
           <div className="lg:sticky top-24">
-            <h3 className="text-sm text-scale-1100">Filter</h3>
+            <h3 className="text-sm text-foreground-light">Filter</h3>
             <ul className="mt-3 flex flex-wrap lg:grid gap-2 grow">
               {tags.sort().map((tag) => (
                 <li key={tag}>
                   <label
                     htmlFor={tag}
-                    className={`text-sm text-scale-1000 py-0.5 px-2 capitalize inline-block rounded-lg hover:bg-slate-400  hover:border-slate-400 cursor-pointer border ${
-                      filters.includes(tag) ? 'bg-slate-400 ' : ''
+                    className={`text-sm text-foreground-lighter py-0.5 px-2 capitalize inline-block rounded-lg hover:bg-surface-100 cursor-pointer border ${
+                      filters.includes(tag) ? 'bg-surface-100 ' : ''
                     }`}
                   >
                     <span className="flex items-center gap-1">

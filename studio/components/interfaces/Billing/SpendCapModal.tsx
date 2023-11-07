@@ -24,7 +24,7 @@ const SpendCapModal = ({ visible, onHide }: SpendCapModalProps) => {
             </p>
             {/* Maybe instead of a table, show something more interactive like a spend cap playground */}
             {/* Maybe ideate this in Figma first but this is good enough for now */}
-            <div className="border rounded border-scale-600 bg-scale-500">
+            <div className="border rounded border-control bg-overlay-hover">
               <div className="flex items-center px-4 pt-2 pb-1">
                 <p className="w-[50%] text-sm text-foreground-light">Item</p>
                 <p className="w-[25%] text-sm text-foreground-light">Limit</p>
@@ -60,8 +60,8 @@ const SpendCapModal = ({ visible, onHide }: SpendCapModalProps) => {
                             <Tooltip.Arrow className="radix-tooltip-arrow" />
                             <div
                               className={[
-                                'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                                'border border-scale-200 ', //border
+                                'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                                'border border-background', //border
                               ].join(' ')}
                             >
                               <span className="text-xs text-foreground">
@@ -94,8 +94,8 @@ const SpendCapModal = ({ visible, onHide }: SpendCapModalProps) => {
                             <Tooltip.Arrow className="radix-tooltip-arrow" />
                             <div
                               className={[
-                                'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                                'border border-scale-200 ', //border
+                                'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                                'border border-background', //border
                               ].join(' ')}
                             >
                               <span className="text-xs text-foreground">

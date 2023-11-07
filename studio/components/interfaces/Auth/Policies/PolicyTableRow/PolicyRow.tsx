@@ -32,10 +32,9 @@ const PolicyRow = ({
 
   return (
     <Panel.Content
-      className={[
-        'flex border-panel-border-light dark:border-panel-border-dark',
-        'w-full space-x-4 border-b py-4 lg:items-center',
-      ].join(' ')}
+      className={['flex border-overlay', 'w-full space-x-4 border-b py-4 lg:items-center'].join(
+        ' '
+      )}
     >
       <div className="flex grow flex-col space-y-1">
         <div className="flex items-center space-x-4">
@@ -62,8 +61,8 @@ const PolicyRow = ({
                 <Tooltip.Arrow className="radix-tooltip-arrow" />
                 <div
                   className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200 max-w-[220px] text-center',
+                    'rounded bg-alternative py-1 px-2 leading-none shadow',
+                    'border border-background max-w-[220px] text-center',
                   ].join(' ')}
                 >
                   <span className="text-xs text-foreground">
@@ -113,8 +112,8 @@ const PolicyRow = ({
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200',
+                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                      'border border-background',
                     ].join(' ')}
                   >
                     <span className="text-xs text-foreground">

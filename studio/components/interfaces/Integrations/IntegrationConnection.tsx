@@ -131,7 +131,7 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
           onSelectConfirm={onConfirm}
         >
           <Modal.Content>
-            <p className="py-4 text-sm text-light">
+            <p className="py-4 text-sm text-foreground-light">
               {`This action cannot be undone. Are you sure you want to delete this connection?`}
             </p>
           </Modal.Content>

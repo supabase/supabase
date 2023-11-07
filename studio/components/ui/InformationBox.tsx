@@ -32,7 +32,7 @@ const InformationBox = ({
   return (
     <div
       className={`${block ? 'block w-full' : ''}
-      block w-full rounded border border-scale-600 bg-scale-100 py-3 dark:border-scale-500 dark:bg-scale-400 ${className}`}
+      block w-full rounded border bg-surface-200 py-3 ${className}`}
     >
       <div className="flex flex-col px-4">
         <div className="flex items-center justify-between">

@@ -156,8 +156,8 @@ const PITRSelection = () => {
                           <Tooltip.Arrow className="radix-tooltip-arrow" />
                           <div
                             className={[
-                              'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                              'border-scale-200 border w-48 text-center',
+                              'bg-alternative rounded py-1 px-2 leading-none shadow',
+                              'border-background border w-48 text-center',
                             ].join(' ')}
                           >
                             <span className="text-foreground text-xs">
@@ -220,7 +220,7 @@ const PITRSelection = () => {
                     )}
                   />
                   <div className="flex items-center space-x-2">
-                    <div className="border w-4 h-4 border-scale-800 bg-brand-600" />
+                    <div className="border w-4 h-4 border-stronger bg-overlay-hover" />
                     <p className="text-xs text-foreground-light">Point in time back up available</p>
                   </div>
                 </div>

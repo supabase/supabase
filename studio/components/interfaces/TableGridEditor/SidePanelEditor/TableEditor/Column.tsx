@@ -107,8 +107,8 @@ const Column = ({
               <Tooltip.Arrow className="radix-tooltip-arrow" />
               <div
                 className={[
-                  'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                  'border border-scale-200 ', //border
+                  'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                  'border border-background', //border
                 ].join(' ')}
               >
                 {column.foreignKey === undefined ? (
@@ -262,7 +262,7 @@ const Column = ({
             >
               <div className="group flex items-center -space-x-1">
                 {settingsCount > 0 && (
-                  <div className="rounded-full bg-scale-1200 py-0.5 px-2 text-xs text-scale-100 dark:bg-scale-100 dark:text-foreground-light">
+                  <div className="rounded-full bg-foreground py-0.5 px-2 text-xs text-background">
                     {settingsCount}
                   </div>
                 )}

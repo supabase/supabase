@@ -34,12 +34,12 @@ const WrapperRow = ({
         open={isOpen}
         onOpenChange={() => onOpen(wrapperMeta.name)}
         className={[
-          'bg-scale-100 dark:bg-scale-300 ',
-          'hover:bg-scale-200 dark:hover:bg-scale-500',
-          'data-open:bg-scale-200 dark:data-open:bg-scale-500',
-          'border-scale-300',
-          'dark:border-scale-500 hover:border-scale-500',
-          'dark:hover:border-scale-700 data-open:border-scale-700',
+          'bg-surface-100',
+          'hover:bg-overlay-hover',
+          'data-open:bg-selection',
+          'border-default',
+          'hover:border-strong',
+          'data-open:border-strong',
           'col-span-12 mx-auto',
           '-space-y-px overflow-hidden',
           'transition border shadow hover:z-50',
@@ -54,7 +54,7 @@ const WrapperRow = ({
           >
             <div className="flex items-center gap-3">
               <IconChevronUp
-                className="transition text-scale-800 data-open-parent:rotate-0 data-closed-parent:rotate-180"
+                className="transition text-border-stronger data-open-parent:rotate-0 data-closed-parent:rotate-180"
                 strokeWidth={2}
                 width={14}
               />
@@ -67,14 +67,14 @@ const WrapperRow = ({
               <span className="text-sm capitalize">{wrapperMeta.label}</span>
             </div>
             <div className="flex items-center gap-3">
-              <div className="px-3 py-1 text-xs border rounded-md border-scale-500 bg-scale-100 text-foreground dark:border-scale-700 dark:bg-scale-300">
+              <div className="px-3 py-1 text-xs border rounded-md border-strong bg-surface-100 text-foreground">
                 {wrappers.length} wrapper{wrappers.length > 1 ? 's' : ''}
               </div>
             </div>
           </button>
         </Collapsible.Trigger>
         <Collapsible.Content>
-          <div className="border-t group border-scale-500 bg-scale-100 text-foreground dark:bg-scale-300 divide-y">
+          <div className="border-t group border-strong bg-surface-100 text-foreground divide-y">
             {wrappers.map((wrapper) => {
               const serverOptions = Object.fromEntries(
                 wrapper.server_options.map((option: any) => option.split('='))
@@ -119,7 +119,7 @@ const WrapperRow = ({
                         {wrapper.tables ? (
                           wrapper.tables.map((table: any) => (
                             <Link key={table.id} href={`/project/${ref}/editor/${table.id}`}>
-                              <div className="text-sm border rounded px-2 py-1 transition bg-scale-400 hover:bg-scale-500">
+                              <div className="text-sm border rounded px-2 py-1 transition bg-surface-200 hover:bg-overlay-hover">
                                 {table.name}
                               </div>
                             </Link>
@@ -155,8 +155,8 @@ const WrapperRow = ({
                               <Tooltip.Arrow className="radix-tooltip-arrow" />
                               <div
                                 className={[
-                                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                  'border border-scale-200',
+                                  'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                  'border border-background',
                                 ].join(' ')}
                               >
                                 <span className="text-xs text-foreground">
@@ -184,8 +184,8 @@ const WrapperRow = ({
                             <Tooltip.Arrow className="radix-tooltip-arrow" />
                             <div
                               className={[
-                                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                'border border-scale-200',
+                                'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                'border border-background',
                               ].join(' ')}
                             >
                               <span className="text-xs text-foreground">

@@ -16,40 +16,26 @@ function Panel(props: PropsWithChildren<PanelProps>) {
   let headerClasses: string[] = []
 
   if (!props.hideHeaderStyling) {
-    headerClasses = [
-      `
-    bg-panel-header-light dark:bg-panel-header-dark
-    border-b border-panel-border-light dark:border-panel-border-dark`,
-    ]
+    headerClasses = [`bg-surface-100 border-b border-overlay`]
   } else {
-    headerClasses = [
-      `
-    bg-panel-body-light dark:bg-panel-body-dark`,
-    ]
+    headerClasses = [`bg-surface-100`]
   }
 
   const content = (
     <div
       className={`
         ${props.noHideOverflow ? '' : 'overflow-hidden'} rounded-md border
-        border-panel-border-light shadow-sm
-        dark:border-panel-border-dark ${props.noMargin ? '' : 'mb-8'} ${props.className}`}
+        border-overlay shadow-sm ${props.noMargin ? '' : 'mb-8'} ${props.className}`}
     >
       {props.title && (
         <div className={headerClasses.join(' ')}>
           <div className="flex items-center px-6 py-4">{props.title}</div>
         </div>
       )}
-      <div className={`bg-panel-body-light dark:bg-panel-body-dark ${props.bodyClassName || ''}`}>
-        {props.children}
-      </div>
+      <div className={`bg-surface-100 ${props.bodyClassName || ''}`}>{props.children}</div>
 
       {props.footer && (
-        <div
-          className="
-      border-t border-panel-border-interior-light
-      bg-panel-footer-light dark:border-panel-border-interior-dark dark:bg-panel-footer-dark"
-        >
+        <div className="bg-surface-100 border-t border-overlay">
           <div className="flex h-12 items-center px-6">{props.footer}</div>
         </div>
       )}

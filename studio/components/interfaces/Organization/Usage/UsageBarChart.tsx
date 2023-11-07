@@ -45,7 +45,11 @@ const UsageBarChart = ({
     <div className="w-full h-[200px]">
       <ResponsiveContainer width="100%" height={200}>
         <ComposedChart data={data} margin={{ top: 0, right: 0, left: yLeftMargin, bottom: 0 }}>
-          <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-scale-800" />
+          <CartesianGrid
+            vertical={false}
+            strokeDasharray="3 3"
+            className="stroke-border-stronger"
+          />
           <XAxis dataKey="periodStartFormatted" />
           <YAxis
             width={40}
@@ -63,7 +67,7 @@ const UsageBarChart = ({
                 return (
                   <div
                     className={clsx(
-                      'border bg-scale-300 rounded-md px-2 py-2',
+                      'border bg-surface-100 rounded-md px-2 py-2',
                       attributes.length > 1 && !isAfterToday ? 'w-[250px]' : 'w-[170px]'
                     )}
                   >

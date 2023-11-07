@@ -21,10 +21,10 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
     icon?: string
   }) => {
     return (
-      <li key={id} className="function-link-item text-scale-1000 leading-3">
+      <li key={id} className="function-link-item text-foreground-lighter leading-3">
         <Link
           href={`#${id}`}
-          className="cursor-pointer transition text-scale-1000 text-sm hover:text-brand flex gap-3"
+          className="cursor-pointer transition text-foreground-lighter text-sm hover:text-brand flex gap-3"
         >
           {icon && <img className="w-3" src={`${router.basePath}${icon}`} />}
           {title}
@@ -38,7 +38,7 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
       <span
         className="
     font-mono text-xs uppercase
-    text-scale-1200 font-medium
+    text-foreground font-medium
     tracking-wider
     mb-3
     "
@@ -49,7 +49,7 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
   }
 
   const Divider = () => {
-    return <div className="h-px w-full bg-scale-500 my-3"></div>
+    return <div className="h-px w-full bg-border my-3"></div>
   }
 
   const MenuSections = [
@@ -117,7 +117,7 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
             className="w-5 rounded"
           />
 
-          <h2 className={['text-scale-1200 ', !menu.title && 'capitalize'].join(' ')}>
+          <h2 className={['text-foreground ', !menu.title && 'capitalize'].join(' ')}>
             {menu.title ?? currentLevel}
           </h2>
         </div>

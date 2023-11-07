@@ -99,7 +99,7 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
                 <Fragment key={`row-${i}`}>
                   {i === 0 && (
                     <tr className="">
-                      <td className="pb-1 bg-scale-700 px-3 py-1 -mr-1 border-l-4 border-scale-700">
+                      <td className="pb-1 bg-border-strong px-3 py-1 -mr-1 border-l-4 border-strong">
                         <span className="">First instance is free on paid plans</span>
                       </td>
                     </tr>
@@ -107,8 +107,8 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
                   <tr
                     key={i}
                     className={[
-                      i % 2 === 0 ? 'bg-scale-300 rounded-lg' : '',
-                      i === 0 ? 'border-4 border-scale-700' : '',
+                      i % 2 === 0 ? 'bg-surface-100 rounded-lg' : '',
+                      i === 0 ? 'border-4 border-strong' : '',
                     ].join(' ')}
                   >
                     {row.columns.map((column) => (

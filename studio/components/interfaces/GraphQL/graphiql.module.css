@@ -16,12 +16,12 @@
 }
 
 .graphiqlContainer .graphiqlQueryEditor {
-  @apply border-b border-scale-500;
+  @apply border-b border-default;
 }
 
 .graphiqlContainer .graphiqlSessionHeader {
   background-color: hsl(var(--color-base));
-  @apply border-b border-scale-500;
+  @apply border-b border-default;
 }
 
 .graphiqlContainer .graphiqlResponseSingleTab {
@@ -33,11 +33,11 @@
 }
 
 .graphiqlContainer .graphiqlSidebar {
-  @apply border-l border-scale-500;
+  @apply border-l border-default;
 }
 
 .graphiqlHorizontalDragBar {
-  @apply border-l border-scale-500;
+  @apply border-l border-default;
 }
 
 .graphiqlAddTabWrapper {

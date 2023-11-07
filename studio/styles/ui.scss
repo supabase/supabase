@@ -69,7 +69,7 @@
 }
 
 .Form .form-help {
-  @apply text-gray-400;
+  @apply text-border-muted;
 }
 
 .Form hr {
@@ -77,11 +77,11 @@
 }
 
 .section-block {
-  @apply p-0 rounded bg-panel-body-light dark:bg-panel-body-dark border border-panel-border-light dark:border-panel-border-dark;
+  @apply p-0 rounded bg-surface-100 border border-overlay;
 }
 
 .section-block--header {
-  @apply border-b border-panel-border-light dark:border-panel-border-dark;
+  @apply border-b border-overlay;
 }
 
 .section-block--header h1,
@@ -96,7 +96,7 @@
 }
 
 .section-block--footer {
-  @apply bg-panel-footer-light dark:bg-panel-footer-dark border-t border-panel-border-light dark:border-panel-border-dark;
+  @apply border-overlay bg-surface-100;
 }
 
 .section-block--footer button:not(.mr-0) {
@@ -119,8 +119,8 @@
 
 .table-container thead th {
   @apply text-foreground-light font-normal text-sm;
-  @apply bg-table-header-light dark:bg-table-header-dark;
-  @apply border-t border-b border-table-border-light dark:border-table-border-dark;
+  @apply bg-surface-200;
+  @apply border-t border-b border-default;
 }
 
 .table-container thead th:first-child {
@@ -134,7 +134,7 @@
 }
 
 .table-container tbody tr {
-  @apply bg-table-body-light dark:bg-table-body-dark;
+  @apply bg-surface-100;
 }
 
 .table-container tbody .tr--link {
@@ -142,19 +142,19 @@
 }
 
 .table-container tbody .tr--link:hover {
-  @apply bg-table-header-light dark:bg-table-header-dark;
+  @apply bg-surface-200;
 }
 
 .table-container tbody td {
-  @apply border-b p-3 px-4 text-sm text-gray-1100 border-table-border-light dark:border-table-border-dark;
+  @apply border-b p-3 px-4 text-sm text-gray-1100 border-default;
 }
 
 .table-container tbody td:first-child {
-  @apply pl-6 border-b border-l border-table-border-light dark:border-table-border-dark;
+  @apply pl-6 border-b border-l border-default;
 }
 
 .table-container tbody td:last-child {
-  @apply pr-6 border-b border-r border-table-border-light dark:border-table-border-dark;
+  @apply pr-6 border-b border-r border-default;
 }
 
 .table-container tbody tr:last-child td:first-child {
@@ -192,12 +192,20 @@
 /* Docs */
 .Docs {
   &--inner-wrapper {
-    background: linear-gradient(90deg, var(--colors-scale1) 50%, var(--colors-scale3) 50%);
+    background: linear-gradient(
+      90deg,
+      hsl(var(--background-alternative)) 50%,
+      hsl(var(--background-surface-100)) 50%
+    );
     width: 100%;
   }
 
   .dark &--inner-wrapper {
-    background: linear-gradient(90deg, var(--colors-scale3) 50%, var(--colors-scale2) 50%);
+    background: linear-gradient(
+      90deg,
+      hsl(var(--background-surface-100)) 50%,
+      hsl(var(--background-default)) 50%
+    );
   }
 
   // h1,
@@ -207,13 +215,13 @@
   // }
 
   .doc-heading {
-    @apply text-black dark:text-white capitalize mt-4 px-6 w-1/2;
+    @apply text-foreground capitalize mt-4 px-6 w-1/2;
     hyphens: auto;
     max-width: 50%;
   }
 
   .doc-section {
-    @apply border-b flex border-scale-500;
+    @apply border-b flex border-default;
   }
 
   &.Docs--table-editor .doc-section--introduction {
@@ -351,7 +359,7 @@
 
 .radix-tooltip-arrow {
   polygon {
-    @apply fill-scale-100 dark:fill-scale-100;
+    @apply fill-background-alternative dark:fill-background-alternative;
     // fill: #eeeeee;
   }
 }
@@ -368,37 +376,37 @@
 
 .thin-scrollbars {
   scrollbar-width: thin;
-  scrollbar-color: var(--colors-slate9) var(--colors-slate1);
+  scrollbar-color: hsl(var(--foreground-muted)) hsl(var(--background-alternative));
 
   .dark & {
-    scrollbar-color: var(--colors-slate10) var(--colors-slate3o);
+    scrollbar-color: hsl(var(--foreground-lighter)) hsl(var(--background-surface-100));
   }
 
   ::-webkit-scrollbar {
-    background: var(--colors-slate2);
+    background: hsl(var(--background-default));
     height: 3px;
     width: 0px;
     border-radius: 0;
 
     .dark & {
-      background: var(--colors-slate6);
+      background: hsl(var(--border-control));
     }
   }
 
   ::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px var(--colors-slate6);
+    -webkit-box-shadow: inset 0 0 6px hsl(var(--border-control));
     -webkit-border-radius: 5px;
     border-radius: 5px;
 
     .dark & {
-      -webkit-box-shadow: inset 0 0 6px var(--colors-slate8);
+      -webkit-box-shadow: inset 0 0 6px hsl(var(--border-stronger));
     }
   }
 
   ::-webkit-scrollbar-thumb {
     -webkit-border-radius: 5px;
     border-radius: 5px;
-    background: var(--colors-slate9);
+    background: hsl(var(--foreground-muted));
 
     .dark & {
       -webkit-box-shadow: inset 0 0 6px var(--colors-slate12);
@@ -438,6 +446,6 @@
 }
 .recharts-reference-line {
   line {
-    @apply stroke-scale-1000;
+    @apply stroke-foreground-lighter;
   }
 }

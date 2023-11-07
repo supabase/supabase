@@ -63,8 +63,8 @@ const AISchemaSuggestionPopover = ({
             initial="hidden"
             animate="visible"
           >
-            <Popover.Arrow className="fill-scale-300 dark:fill-scale-500" />
-            <div className="flex flex-col gap-2 border border-scale-300 dark:border-scale-500 rounded-md p-4 bg-scale-300 shadow-xl">
+            <Popover.Arrow className="fill-background-surface-300" />
+            <div className="flex flex-col gap-2 border border-background-surface-100 dark:border-default rounded-md p-4 bg-surface-100 shadow-xl">
               <div className="flex flex-row items-center gap-4 max-w-md">
                 <IconInfo className="w-6 h-6" />
                 <p className="text-sm">

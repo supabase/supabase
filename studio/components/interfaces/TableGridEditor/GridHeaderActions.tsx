@@ -116,7 +116,7 @@ const GridHeaderActions = ({ table, openAPIDocsPanel, refreshDocs }: GridHeaderA
         {isReadOnly && (
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger className="w-full">
-              <div className="border border-scale-700 rounded bg-scale-500 px-3 py-1 text-xs">
+              <div className="border border-strong rounded bg-overlay-hover px-3 py-1 text-xs">
                 Viewing as read-only
               </div>
             </Tooltip.Trigger>
@@ -125,8 +125,8 @@ const GridHeaderActions = ({ table, openAPIDocsPanel, refreshDocs }: GridHeaderA
                 <Tooltip.Arrow className="radix-tooltip-arrow" />
                 <div
                   className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200',
+                    'rounded bg-alternative py-1 px-2 leading-none shadow',
+                    'border border-background',
                   ].join(' ')}
                 >
                   <span className="text-xs text-foreground">
@@ -164,7 +164,7 @@ const GridHeaderActions = ({ table, openAPIDocsPanel, refreshDocs }: GridHeaderA
           icon={
             <MousePointer2
               size={14}
-              className={isRealtimeEnabled ? 'text-brand' : 'text-lighter'}
+              className={isRealtimeEnabled ? 'text-brand' : 'text-foreground-lighter'}
             />
           }
           onClick={() => setShowEnableRealtime(true)}

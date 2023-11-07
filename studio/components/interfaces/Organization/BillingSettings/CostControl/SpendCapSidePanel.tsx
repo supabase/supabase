@@ -251,10 +251,10 @@ const SpendCapSidePanel = () => {
                       className={clsx(
                         'relative rounded-xl transition border bg-no-repeat bg-center bg-cover w-[160px] h-[96px]',
                         isSelected
-                          ? 'border-scale-1200'
-                          : 'border-scale-900 opacity-50 group-hover:border-scale-1000 group-hover:opacity-100',
+                          ? 'border-foreground'
+                          : 'border-foreground-muted opacity-50 group-hover:border-foreground-lighter group-hover:opacity-100',
                         !isFreePlan && 'cursor-pointer',
-                        !isFreePlan && !isSelected && 'group-hover:border-scale-1100'
+                        !isFreePlan && !isSelected && 'group-hover:border-foreground-light'
                       )}
                       width={160}
                       height={96}

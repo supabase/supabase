@@ -342,7 +342,7 @@ const TableGridEditor = ({
               {(isTableSelected || isViewSelected) && (
                 <>
                   {canEditViaTableEditor && (
-                    <div className="h-[20px] w-px border-r border-scale-600"></div>
+                    <div className="h-[20px] w-px border-r border-control"></div>
                   )}
                   <div>
                     <TwoOptionToggle

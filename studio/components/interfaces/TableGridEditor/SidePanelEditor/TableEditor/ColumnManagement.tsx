@@ -206,8 +206,8 @@ const ColumnManagement = ({
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                        'border border-scale-200 ', //border
+                        'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                        'border border-background', //border
                       ].join(' ')}
                     >
                       <span className="text-xs text-foreground">
@@ -236,8 +236,8 @@ const ColumnManagement = ({
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                        'border border-scale-200 ', //border
+                        'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                        'border border-background', //border
                       ].join(' ')}
                     >
                       <span className="text-xs text-foreground">
@@ -266,7 +266,7 @@ const ColumnManagement = ({
                 {(droppableProvided: DroppableProvided) => (
                   <div
                     ref={droppableProvided.innerRef}
-                    className={`space-y-2 rounded-md bg-gray-400 px-3 py-2 ${
+                    className={`space-y-2 rounded-md bg-surface-200 px-3 py-2 ${
                       isNewRecord ? '' : '-mx-3'
                     }`}
                   >

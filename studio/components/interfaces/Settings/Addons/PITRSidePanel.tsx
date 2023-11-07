@@ -203,8 +203,8 @@ const PITRSidePanel = () => {
                       className={clsx(
                         'relative rounded-xl transition border bg-no-repeat bg-center bg-cover cursor-pointer w-[160px] h-[96px]',
                         isSelected
-                          ? 'border-scale-1200'
-                          : 'border-scale-900 opacity-50 group-hover:border-scale-1000 group-hover:opacity-100'
+                          ? 'border-foreground'
+                          : 'border-foreground-muted opacity-50 group-hover:border-foreground-lighter group-hover:opacity-100'
                       )}
                       width={160}
                       height={96}
@@ -282,7 +282,7 @@ const PITRSidePanel = () => {
                     value={option.identifier}
                   >
                     <div className="w-full group">
-                      <div className="border-b border-scale-500 px-4 py-2">
+                      <div className="border-b border-default px-4 py-2">
                         <p className="text-sm">{option.name}</p>
                       </div>
                       <div className="px-4 py-2">

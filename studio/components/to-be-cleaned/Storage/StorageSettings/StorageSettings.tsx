@@ -117,12 +117,12 @@ const StorageConfig = ({ config, projectRef, organizationSlug }: any) => {
               <div className="space-y-20">
                 <div
                   className={[
-                    'bg-scale-100 dark:bg-scale-300',
-                    'overflow-hidden border-scale-400',
+                    'bg-surface-100',
+                    'overflow-hidden border-muted',
                     'rounded-md border shadow',
                   ].join(' ')}
                 >
-                  <div className="flex flex-col gap-0 divide-y divide-scale-400">
+                  <div className="flex flex-col gap-0 divide-y divide-border-muted">
                     <div className="grid grid-cols-12 gap-6 px-8 py-8 lg:gap-12">
                       <div className="relative flex flex-col col-span-12 gap-6 lg:col-span-4">
                         <p className="text-sm">Upload file size limit</p>
@@ -185,7 +185,7 @@ const StorageConfig = ({ config, projectRef, organizationSlug }: any) => {
                       />
                     </div>
                   )}
-                  <div className="border-t border-scale-400" />
+                  <div className="border-t border-overlay" />
                   <div className="flex justify-between px-8 py-4">
                     <div className="flex items-center justify-between w-full gap-2">
                       {!canUpdateStorageSettings ? (

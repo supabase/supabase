@@ -59,7 +59,7 @@ const DeleteFactorModal = ({
         </Alert_Shadcn_>
         <div className="text-sm px-1 pt-4">
           <p>Before deleting this factor, consider:</p>
-          <ul className="text-light py-1 list-disc mx-4 space-y-1">
+          <ul className="text-foreground-light py-1 list-disc mx-4 space-y-1">
             {lastFactorToBeDeleted ? (
               <>
                 <li>Adding another authenticator app as a factor prior to deleting</li>

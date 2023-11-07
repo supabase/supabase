@@ -104,7 +104,7 @@ export default function TicketContainer({ user, sharePage, referrals, supabase }
             )}
           </h1>
 
-          <div className="text-sm text-light leading-5">
+          <div className="text-sm text-foreground-light leading-5">
             {!sharePage ? (
               golden ? (
                 <p>

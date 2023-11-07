@@ -10,7 +10,7 @@ const BlogLinks = () => {
   if (!activeDays.length) return null
 
   return (
-    <div className="flex flex-col gap-3 lg:gap-4 border-t border-scale-400 py-4 lg:py-8 mt-4 lg:mt-8">
+    <div className="flex flex-col gap-3 lg:gap-4 border-t border-muted py-4 lg:py-8 mt-4 lg:mt-8">
       <h3 className="text-black dark:text-white text-xl mb-4">More Launch Week 7</h3>
       {activeDays.map((day) =>
         day.steps?.map((step, i) => {

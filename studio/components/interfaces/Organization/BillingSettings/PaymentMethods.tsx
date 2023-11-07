@@ -202,8 +202,8 @@ const PaymentMethods = () => {
                                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                                     <div
                                       className={[
-                                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                                        'w-48 border border-scale-200 text-center', //border
+                                        'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                                        'w-48 border border-background text-center', //border
                                       ].join(' ')}
                                     >
                                       <span className="text-xs text-foreground">

@@ -13,7 +13,7 @@ const AuthorizedAppRow = ({ app, onSelectRevoke }: AuthorizedAppRowProps) => {
     <Table.tr>
       <Table.td>
         <div
-          className="w-[30px] h-[30px] rounded-full bg-no-repeat bg-cover bg-center border border-scale-600 flex items-center justify-center"
+          className="w-[30px] h-[30px] rounded-full bg-no-repeat bg-cover bg-center border border-control flex items-center justify-center"
           style={{ backgroundImage: app.icon ? `url('${app.icon}')` : 'none' }}
         >
           {!!app.icon ? '' : `${app.name[0]}`}

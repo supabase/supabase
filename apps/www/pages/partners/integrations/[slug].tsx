@@ -94,7 +94,7 @@ function Partner({
             {/* Back button */}
             <Link
               href="/partners/integrations"
-              className="text-foreground hover:text-lighter flex cursor-pointer items-center transition-colors"
+              className="text-foreground hover:text-foreground-lighter flex cursor-pointer items-center transition-colors"
             >
               <IconChevronLeft style={{ padding: 0 }} />
               Back
@@ -210,7 +210,7 @@ function Partner({
                   <div className="text-foreground divide-y">
                     {partner.type === 'technology' && (
                       <div className="flex items-center justify-between py-2">
-                        <span className="text-lighter">Developer</span>
+                        <span className="text-foreground-lighter">Developer</span>
                         <span className="text-foreground">{partner.developer}</span>
                       </div>
                     )}
@@ -226,7 +226,7 @@ function Partner({
                     </div>
 
                     <div className="flex items-center justify-between py-2">
-                      <span className="text-lighter">Website</span>
+                      <span className="text-foreground-lighter">Website</span>
                       <a
                         href={partner.website}
                         target="_blank"
@@ -239,7 +239,7 @@ function Partner({
 
                     {partner.type === 'technology' && partner.docs && (
                       <div className="flex items-center justify-between py-2">
-                        <span className="text-lighter">Documentation</span>
+                        <span className="text-foreground-lighter">Documentation</span>
                         <a
                           href={partner.docs}
                           target="_blank"
@@ -258,7 +258,7 @@ function Partner({
               </div>
             </div>
             {partner.call_to_action_link && (
-              <div className="bg-background hover:border-border-control border-border rounded-2xl border p-10 drop-shadow-sm max-w-5xl mx-auto mt-12">
+              <div className="bg-background hover:border-default-control border-default rounded-2xl border p-10 drop-shadow-sm max-w-5xl mx-auto mt-12">
                 <div className="flex flex-row justify-between">
                   <h1 className="text-2xl font-medium self-center">
                     Get started with {partner.title} and Supabase.

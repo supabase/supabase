@@ -162,7 +162,7 @@ function CaseStudyPage(props: any) {
                           <span className="not-prose ">
                             <a
                               href={props.blog.company_url}
-                              className=" flex cursor-pointer items-center space-x-1 opacity-50 transition-opacity hover:opacity-100"
+                              className="flex cursor-pointer items-center space-x-1 transition-opacity text-foreground-lightround-ligtext-foreground-light:text-foreground-light"
                               target="_blank"
                             >
                               <span>{props.blog.company_url}</span>
@@ -175,12 +175,12 @@ function CaseStudyPage(props: any) {
                           return (
                             <div className="flex flex-col gap-0">
                               <span className="text-foreground-lighter">{x.label}</span>
-                              <span className="text-light">{x.text}</span>
+                              <span className="text-foreground-light">{x.text}</span>
                             </div>
                           )
                         })}
 
-                        <div className="">
+                        <div>
                           <p>Ready to get started?</p>
                           <div>
                             <Button asChild type="default" iconRight={<IconChevronRight />}>

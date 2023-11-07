@@ -35,7 +35,7 @@ const ActionBar = ({
   }
 
   return (
-    <div className="flex w-full justify-end space-x-3 border-t border-scale-500 px-3 py-4">
+    <div className="flex w-full justify-end space-x-3 border-t border-default px-3 py-4">
       <Button
         size="small"
         type="default"

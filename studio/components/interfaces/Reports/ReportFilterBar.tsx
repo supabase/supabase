@@ -207,7 +207,7 @@ const ReportFilterBar = ({
           .map((filter) => (
             <div
               key={`${filter.key}-${filter.compare}-${filter.value}`}
-              className="text-xs rounded border border-scale-1000 bg-scale-500 px-2 h-7 flex flex-row justify-center gap-1 items-center"
+              className="text-xs rounded border border-foreground-lighter bg-surface-300 px-2 h-7 flex flex-row justify-center gap-1 items-center"
             >
               {filter.key} {filter.compare} {filter.value}
               <Button

@@ -46,8 +46,9 @@ export default function SchemaFormPanel({
         className="
           flex h-12
           items-center overflow-hidden
-          border-b border-panel-border-light bg-panel-header-light
-          px-6 dark:border-panel-border-dark dark:bg-panel-header-dark"
+          border-b px-6
+          border-overlay bg-surface-100
+          "
       >
         <div className="flex-1 text-left">
           <h6>{title || ''}</h6>

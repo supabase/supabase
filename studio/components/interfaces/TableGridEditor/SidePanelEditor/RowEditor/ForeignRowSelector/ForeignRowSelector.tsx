@@ -163,7 +163,7 @@ const ForeignRowSelector = ({
                   onRowSelect={(row) => onSelect(row[columnName ?? ''])}
                 />
               ) : (
-                <div className="flex h-full items-center justify-center border-b border-t border-scale-500">
+                <div className="flex h-full items-center justify-center border-b border-t border-default">
                   <span className="text-foreground-light text-sm">No Rows Found</span>
                 </div>
               )}

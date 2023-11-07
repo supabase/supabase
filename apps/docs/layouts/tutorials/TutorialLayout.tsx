@@ -72,7 +72,7 @@ const Layout: FC<Props> = (props: Props) => {
         {hasTableOfContents && !props.meta?.hide_table_of_contents && (
           <div
             className={[
-              'border-scale-400 dark:bg-scale-200 table-of-contents-height border-l',
+              'border-overlay bg-background table-of-contents-height border-l',
               'thin-scrollbar overflow-y-auto sticky hidden md:block md:col-span-3 px-2',
             ].join(' ')}
           >

@@ -16,7 +16,7 @@ const formatTOCHeader = (content: string) => {
     if (x === '`') {
       if (!begin) {
         begin = true
-        res.push(`<code class="text-xs border rounded bg-scale-400 border-scale-500">`)
+        res.push(`<code class="text-xs border rounded bg-muted">`)
       } else {
         begin = false
         res.push(`</code>`)
@@ -46,7 +46,7 @@ const GuidesTableOfContents: FC<Props> = ({ list }) => {
         <li key={`${item.level}-${i}`} className={item.level === 3 ? 'ml-4' : ''}>
           <a
             href={`#${formatSlug(item.link)}`}
-            className="text-scale-1000 hover:text-brand transition-colors"
+            className="text-foreground-lighter hover:text-brand transition-colors"
             dangerouslySetInnerHTML={{ __html: formatTOCHeader(removeAnchor(item.text)) }}
           />
         </li>

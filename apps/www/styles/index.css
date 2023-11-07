@@ -143,12 +143,12 @@ h6:not(.overwrite) {
 }
 
 .p:not(.prose *):not(.overwrite) {
-  @apply text-light;
+  @apply text-foreground-light;
   margin-bottom: 16px;
 }
 
 .small:not(.prose *):not(.overwrite) {
-  @apply text-lighter text-xs;
+  @apply text-foreground-lighter text-xs;
 }
 
 .sbui-border-fix select {
@@ -647,11 +647,11 @@ launch week
       hsl(var(--brand-default)) 100%
     );
   }
-  .gradient-text-scale-100 {
+  .gradient-text-100 {
     background-image: -webkit-linear-gradient(45deg, #fff 0%, var(--colors-green12) 100%);
   }
 
-  .gradient-text-scale-500 {
+  .gradient-text-500 {
     background-image: -webkit-linear-gradient(
       45deg,
       hsl(var(--foreground-lighter)) 0%,
@@ -675,10 +675,10 @@ launch week
     background-image: -webkit-linear-gradient(45deg, #e4b641 100%, #f5bf0069 41%);
   }
 
-  .radial-gradient-text-scale-500 {
+  .radial-gradient-text-500 {
     background: radial-gradient(45% 100% at 50% 50%, #fff 30%, hsla(0, 0%, 100%, 0.35) 100%);
   }
-  .radial-gradient-text-scale-600 {
+  .radial-gradient-text-600 {
     background: radial-gradient(45% 100% at 50% 50%, #fff 30%, hsla(0, 0%, 100%, 0.6) 100%);
   }
 }

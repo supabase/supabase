@@ -71,11 +71,11 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
       }}
       onSubmit={onSaveChanges}
       className={[
-        'bg-scale-100 dark:bg-scale-300',
-        'hover:bg-scale-200 dark:hover:bg-scale-500',
-        'data-open:bg-scale-200 dark:data-open:bg-scale-500',
-        'border-scale-300 dark:border-scale-500 hover:border-scale-500',
-        'dark:hover:border-scale-700 data-open:border-scale-700',
+        'bg-surface-100',
+        'hover:bg-overlay-hover',
+        'data-open:bg-selection',
+        'border-default hover:border-strong',
+        'data-open:border-strong',
         'data-open:pb-px col-span-12 mx-auto',
         '-space-y-px overflow-hidden',
         'border border-t-0 first:border-t first:!mt-0 hover:border-t hover:-mt-[1px] shadow transition hover:z-50',
@@ -100,7 +100,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                 <div className="flex items-start space-x-3">
                   <IconChevronUp
                     id="collapsible-trigger"
-                    className="text-scale-800 transition data-open-parent:rotate-0 data-closed-parent:rotate-180"
+                    className="text-border-stronger transition data-open-parent:rotate-0 data-closed-parent:rotate-180"
                     strokeWidth={2}
                     width={14}
                   />
@@ -155,7 +155,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
               </button>
             </Collapsible.Trigger>
             <Collapsible.Content>
-              <div className="group border-t border-scale-500 bg-scale-100 py-6 px-20 text-foreground dark:bg-scale-300">
+              <div className="group border-t border-default bg-surface-100 py-6 px-20 text-foreground">
                 <div className="py-4 space-y-[9px]">
                   {Object.keys(ROLE_PERMISSIONS).map((permission) => (
                     <Toggle
@@ -185,8 +185,8 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                                 <Tooltip.Arrow className="radix-tooltip-arrow" />
                                 <div
                                   className={[
-                                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                    'border border-scale-200 space-y-1',
+                                    'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                    'border border-background space-y-1',
                                   ].join(' ')}
                                 >
                                   <span className="text-xs">

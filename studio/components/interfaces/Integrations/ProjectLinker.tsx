@@ -165,7 +165,7 @@ const ProjectLinker = ({
         ) : noSupabaseProjects || noForeignProjects ? (
           <div className="text-center">
             <h5 className="text-foreground">No {missingEntity} Projects found</h5>
-            <p className="text-light text-sm">
+            <p className="text-foreground-light text-sm">
               You will need to create a {missingEntity} Project to link to a {oppositeMissingEntity}{' '}
               Project.
               <br />
@@ -253,7 +253,7 @@ const ProjectLinker = ({
                 </PopoverContent_Shadcn_>
               </Popover_Shadcn_>
             </Panel>
-            <div className="border border-scale-1000 h-px w-16 border-dashed self-end mb-5"></div>
+            <div className="border border-foreground-lighter h-px w-16 border-dashed self-end mb-5"></div>
             <Panel>
               <div className="bg-black shadow rounded p-1 w-12 h-12 flex justify-center items-center">
                 {integrationIcon}

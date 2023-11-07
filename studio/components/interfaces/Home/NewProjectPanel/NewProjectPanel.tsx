@@ -113,7 +113,7 @@ const NewProjectPanel = () => {
                 <Panel>
                   <Panel.Content className="flex flex-col space-y-4 md:px-3">
                     <div className="flex items-center space-x-3">
-                      <div className="rounded bg-scale-600 p-1.5 text-foreground-light shadow-sm">
+                      <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
                         <IconKey strokeWidth={2} size={16} />
                       </div>
                       <h5>Authentication</h5>
@@ -149,7 +149,7 @@ const NewProjectPanel = () => {
                 <Panel>
                   <Panel.Content className="flex flex-col space-y-4 md:px-3">
                     <div className="flex items-center space-x-3">
-                      <div className="rounded bg-scale-600 p-1.5 text-foreground-light shadow-sm">
+                      <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
                         <IconArchive strokeWidth={2} size={16} />
                       </div>
                       <h5>Storage</h5>
@@ -185,7 +185,7 @@ const NewProjectPanel = () => {
                 <Panel>
                   <Panel.Content className="flex flex-col space-y-4 md:px-3">
                     <div className="flex items-center space-x-3">
-                      <div className="rounded bg-scale-600 p-1.5 text-foreground-light shadow-sm">
+                      <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
                         <IconCode strokeWidth={2} size={16} />
                       </div>
                       <h5>Edge Functions</h5>
@@ -220,7 +220,7 @@ const NewProjectPanel = () => {
                 <Panel>
                   <Panel.Content className="flex flex-col space-y-4 md:px-3">
                     <div className="flex items-center space-x-4">
-                      <div className="rounded bg-scale-600 p-1.5 text-foreground-light shadow-sm">
+                      <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
                         <IconActivity strokeWidth={2} size={16} />
                       </div>
                       <h5>Realtime</h5>

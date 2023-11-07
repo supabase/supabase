@@ -3,8 +3,8 @@
 
 // For ChartHandler
 export const CHART_COLORS = {
-  TICK: 'var(--colors-scale6)',
-  AXIS: 'var(--colors-scale6)',
+  TICK: 'hsl(var(--background-overlay-hover))',
+  AXIS: 'hsl(var(--background-overlay-hover))',
   GREEN_1: 'hsl(var(--brand-default))', // #3ECF8E
   GREEN_2: 'hsl(var(--brand-500))',
 }

@@ -101,7 +101,7 @@ const SpreadsheetImportPreview = ({
             {previewHeaders.length > 0 && previewRows.length > 0 ? (
               <SpreadsheetPreviewGrid height={350} headers={previewHeaders} rows={previewRows} />
             ) : (
-              <div className="flex items-center justify-center py-4 border border-scale-600 rounded-md space-x-2">
+              <div className="flex items-center justify-center py-4 border border-control rounded-md space-x-2">
                 <IconAlertCircle size={16} strokeWidth={1.5} className="text-foreground-light" />
                 <p className="text-sm text-foreground-light">
                   {previewHeaders.length === 0
@@ -130,7 +130,7 @@ const SpreadsheetImportPreview = ({
                   <div className="space-y-2">
                     <div className="flex items-start space-x-2">
                       <div className="w-[14px] h-[14px] flex items-center justify-center translate-y-[3px]">
-                        <div className="w-[6px] h-[6px] rounded-full bg-scale-1000" />
+                        <div className="w-[6px] h-[6px] rounded-full bg-foreground-lighter" />
                       </div>
                       <p className="text-sm">
                         This CSV <span className="text-red-900">cannot</span> be imported into your
@@ -160,7 +160,7 @@ const SpreadsheetImportPreview = ({
                           />
                         ) : (
                           <div className="w-[14px] h-[14px] flex items-center justify-center">
-                            <div className="w-[6px] h-[6px] rounded-full bg-scale-1000" />
+                            <div className="w-[6px] h-[6px] rounded-full bg-foreground-lighter" />
                           </div>
                         )}
                         {error.data !== undefined && (

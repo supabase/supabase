@@ -104,10 +104,10 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
               </Badge>
             </div>
             <div className="flex flex-col gap-0">
-              <span className="text-lighter text-xs">
+              <span className="text-foreground-lighter text-xs">
                 Created {dayjs(integration.inserted_at).fromNow()}
               </span>
-              <span className="text-lighter text-xs">
+              <span className="text-foreground-lighter text-xs">
                 Added by {integration?.added_by?.primary_email}
               </span>
             </div>
@@ -149,14 +149,10 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
         ref={ref}
         key={connection.id}
         {...props}
-        className={cn(
-          showNode && 'pl-8 ml-6 border-l border-scale-600 dark:border-scale-400',
-          'pb-2',
-          'relative'
-        )}
+        className={cn(showNode && 'pl-8 ml-6 border-l border-muted', 'pb-2', 'relative')}
       >
         {showNode && (
-          <div className="absolute w-8 rounded-bl-full border-b border-l border-scale-600 dark:border-scale-400 h-10 -left-px"></div>
+          <div className="absolute w-8 rounded-bl-full border-b border-l border-muted h-10 -left-px"></div>
         )}
         <div
           className={cn(
@@ -227,7 +223,7 @@ const IntegrationConnectionOption = React.forwardRef<HTMLLIElement, IntegrationC
             <span className="text-sm">{connection.metadata.name}</span>
           </div>
 
-          <span className="text-lighter text-xs">
+          <span className="text-foreground-lighter text-xs">
             Connected {dayjs(connection.inserted_at).fromNow()}
           </span>
         </div>
@@ -259,12 +255,12 @@ const EmptyIntegrationConnection = React.forwardRef<
       )}
     >
       {showNode && (
-        <div className="absolute w-8 rounded-bl-full border-b border-l border-scale-600 dark:border-scale-400 h-10 -left-px"></div>
+        <div className="absolute w-8 rounded-bl-full border-b border-l border-muted h-10 -left-px"></div>
       )}
       <div
         className={cn(
           'w-full',
-          'border border-dashed bg-scale-300 dark:bg-scale-100 border-scale-600 dark:border-scale-400',
+          'border border-dashed bg-surface-100 border-overlay',
           '',
           'flex h-20 px-10 rounded-lg justify-center items-center'
         )}
@@ -290,7 +286,7 @@ const IntegrationConnectionHeader = React.forwardRef<HTMLDivElement, Integration
         {...props}
         ref={ref}
         className={cn(
-          showNode && 'border-l border-scale-600 dark:border-scale-400 ml-6 pl-8',
+          showNode && 'border-l border-muted ml-6 pl-8',
           'pt-6 pb-3',
           'prose text-sm',
           className

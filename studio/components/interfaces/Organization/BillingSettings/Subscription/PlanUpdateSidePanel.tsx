@@ -172,14 +172,14 @@ const PlanUpdateSidePanel = () => {
                   className={clsx(
                     'border rounded-md px-4 py-4 flex flex-col items-start justify-between',
                     plan.id === 'tier_enterprise' ? 'col-span-12' : 'col-span-12 md:col-span-4',
-                    plan.id === 'tier_enterprise' ? 'bg-scale-200' : 'bg-scale-300'
+                    plan.id === 'tier_enterprise' ? 'bg-background' : 'bg-surface-200'
                   )}
                 >
                   <div className="w-full">
                     <div className="flex items-center space-x-2">
                       <p className={clsx('text-brand text-sm uppercase')}>{plan.name}</p>
                       {isCurrentPlan ? (
-                        <div className="text-xs bg-scale-500 text-foreground-light rounded px-2 py-0.5">
+                        <div className="text-xs bg-surface-300 text-foreground-light rounded px-2 py-0.5">
                           Current plan
                         </div>
                       ) : plan.nameBadge ? (
@@ -202,7 +202,7 @@ const PlanUpdateSidePanel = () => {
                       <p className="text-foreground-light text-sm">{tierMeta?.costUnit}</p>
                     </div>
                     <div className={clsx('flex mt-1 mb-4', !tierMeta?.warning && 'opacity-0')}>
-                      <div className="bg-scale-200 text-brand-600 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
+                      <div className="bg-background text-brand-600 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
                         {tierMeta?.warning}
                       </div>
                     </div>
@@ -249,8 +249,8 @@ const PlanUpdateSidePanel = () => {
                               <Tooltip.Arrow className="radix-tooltip-arrow" />
                               <div
                                 className={[
-                                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                  'border border-scale-200',
+                                  'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                  'border border-background',
                                 ].join(' ')}
                               >
                                 <span className="text-xs text-foreground">

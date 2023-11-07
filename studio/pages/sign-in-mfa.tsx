@@ -61,7 +61,7 @@ const SignInMfaPage: NextPageWithLayout = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col flex-1 bg-scale-100 h-full items-center justify-center">
+      <div className="flex flex-col flex-1 bg-alternative h-full items-center justify-center">
         <Loading />
       </div>
     )

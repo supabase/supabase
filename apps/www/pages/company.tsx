@@ -209,14 +209,14 @@ const Community = () => {
               </div>
               <div>
                 <h1 className="text-foreground mb-0 text-4xl">{x.stat}</h1>
-                <p className="text-light text-sm">{x.statLabel}</p>
+                <p className="text-foreground-light text-sm">{x.statLabel}</p>
               </div>
             </div>
           ))}
         </div>
         <div className="space-y-8">
           <div className="max-w-3xl">
-            <p className="text-light text-sm">
+            <p className="text-foreground-light text-sm">
               With developer signups from the world's leading brands.
             </p>
           </div>
@@ -252,10 +252,9 @@ const Investors = () => {
           <div key={x.name}>
             <div
               className="
-              dark:bg-scale-400
+              bg-surface-100
               col-span-1 flex h-32 content-end
-              items-center justify-center
-              bg-gray-50"
+              items-center justify-center"
             >
               <div className="relative h-8 w-full overflow-auto">
                 <Image
@@ -286,7 +285,7 @@ const Investors = () => {
               <div className="flex flex-col justify-center space-y-2">
                 <div>
                   <h1 className="text-foreground mb-0 text-base">{x.name}</h1>
-                  <p className="text-lighter mb-0 text-xs">{x.title}</p>
+                  <p className="text-foreground-lighter mb-0 text-xs">{x.title}</p>
                 </div>
               </div>
             </div>
@@ -305,11 +304,11 @@ const Press = () => {
       <div className="mx-auto mt-5 grid gap-5 lg:max-w-none lg:grid-cols-3">
         {PressData.filter((x) => x.type == 'article').map((x) => (
           <Link href={x.href} key={x.href} target="_blank">
-            <Card key={`press_${x.href}`} hoverable className="dark:bg-scale-400 h-36 bg-white">
+            <Card key={`press_${x.href}`} hoverable className="h-36">
               <Space className="h-40 justify-between" direction="vertical">
                 <div>
                   <h1 className="text-foreground text-xl">{x.type.toUpperCase()}</h1>
-                  <p className="text-light line-clamp block h-12 overflow-hidden text-ellipsis text-base">
+                  <p className="text-foreground-light line-clamp block h-12 overflow-hidden text-ellipsis text-base">
                     {x.title}
                   </p>
                 </div>
@@ -321,11 +320,11 @@ const Press = () => {
       <div className="mx-auto mt-5 grid gap-5 sm:grid-cols-2 lg:max-w-none lg:grid-cols-4">
         {PressData.filter((x) => x.type == 'podcast').map((x) => (
           <Link href={x.href} key={x.href} target="_blank">
-            <Card key={`press_${x.href}`} hoverable className="dark:bg-scale-400 h-36 bg-white">
+            <Card key={`press_${x.href}`} hoverable className="h-36">
               <Space className="h-40 justify-between" direction="vertical">
                 <div>
                   <h1 className="text-foreground text-xl">{x.type.toUpperCase()}</h1>
-                  <p className="text-light line-clamp block h-12 overflow-hidden text-ellipsis text-base">
+                  <p className="text-foreground-light line-clamp block h-12 overflow-hidden text-ellipsis text-base">
                     {x.title}
                   </p>
                 </div>

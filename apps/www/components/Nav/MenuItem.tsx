@@ -15,7 +15,7 @@ const MenuItem = React.forwardRef<
       href={href}
       ref={ref}
       className={cn(
-        'group/menu-item flex items-center text-light text-sm hover:text-foreground select-none gap-3 rounded-md p-2 leading-none no-underline outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground',
+        'group/menu-item flex items-center text-foreground-light text-sm hover:text-foreground select-none gap-3 rounded-md p-2 leading-none no-underline outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground',
         description && 'items-center',
         className
       )}
@@ -53,7 +53,7 @@ const MenuItem = React.forwardRef<
               )}
             </div>
             {description && (
-              <p className="line-clamp-1 -mb-1 leading-relaxed text-lighter group-hover/menu-item:text-light group-focus-visible/menu-item:text-light">
+              <p className="line-clamp-1 -mb-1 leading-relaxed text-foreground-lighter group-hover/menu-item:text-foreground-light group-focus-visible/menu-item:text-foreground-light">
                 {description}
               </p>
             )}

@@ -182,7 +182,7 @@ const EdgeFunctionDetails = () => {
                         label="Enforce JWT Verification"
                         descriptionText="Require a valid JWT in the authorization header when invoking the function"
                       />
-                      <div className="space-y-1 border rounded border-scale-500 bg-scale-400 px-4 py-4">
+                      <div className="space-y-1 border rounded border-default bg-surface-200 px-4 py-4">
                         <div className="flex items-center space-x-2">
                           <p className="text-sm">
                             Import maps are{' '}
@@ -221,12 +221,12 @@ const EdgeFunctionDetails = () => {
         </Form>
 
         <div
-          className="space-y-6 rounded border bg-scale-100 px-6 py-4 drop-shadow-sm dark:bg-scale-300 transition-all overflow-hidden"
+          className="space-y-6 rounded border bg-surface-100 px-6 py-4 drop-shadow-sm transition-all overflow-hidden"
           style={{ maxHeight: showInstructions ? 800 : 66 }}
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded border bg-scale-1200 p-2 text-scale-100 dark:bg-scale-100 dark:text-foreground">
+              <div className="flex h-8 w-8 items-center justify-center rounded border bg-foreground p-2 text-background">
                 <IconTerminal strokeWidth={2} />
               </div>
               <h4>Command line access</h4>
@@ -277,8 +277,8 @@ const EdgeFunctionDetails = () => {
                         <Tooltip.Arrow className="radix-tooltip-arrow" />
                         <div
                           className={[
-                            'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                            'border border-scale-200',
+                            'rounded bg-alternative py-1 px-2 leading-none shadow',
+                            'border border-background',
                           ].join(' ')}
                         >
                           <span className="text-xs text-foreground">

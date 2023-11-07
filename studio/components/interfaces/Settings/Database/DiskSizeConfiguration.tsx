@@ -118,8 +118,8 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
                           <Tooltip.Arrow className="radix-tooltip-arrow" />
                           <div
                             className={[
-                              'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                              'border border-scale-200 ', //border
+                              'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                              'border border-background', //border
                             ].join(' ')}
                           >
                             <span className="text-xs text-foreground">

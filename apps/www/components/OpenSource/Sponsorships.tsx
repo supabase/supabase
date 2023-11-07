@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import React from 'react'
-import InteractiveShimmerCard from '../InteractiveShimmerCard'
 import { IconArrowUpRight, cn } from 'ui'
+
+import Panel from '~/components/Panel'
 
 const Sponsorships = ({ sponsorships }: { sponsorships: any[] }) => {
   return (
@@ -10,14 +11,14 @@ const Sponsorships = ({ sponsorships }: { sponsorships: any[] }) => {
         <h2 className="text-3xl xl:text-4xl max-w-[280px] sm:max-w-xs xl:max-w-[360px] tracking-[-1px]">
           Sponsored Projects
         </h2>
-        <p className="text-muted mb-4 max-w-sm">
+        <p className="text-foreground-lighter mb-4 max-w-sm">
           We don't just live and breath open-source, we also sponsor projects we love.
         </p>
       </div>
       <div className="relative w-full h-fit grid md:grid-cols-2 lg:grid-cols-3 gap-4">
         {sponsorships.map((link) => (
           <Link href={link.url} key={link.name} target="_blank">
-            <InteractiveShimmerCard
+            <Panel
               outerClassName=""
               innerClassName={cn(
                 'relative group flex flex-col gap-2 p-4 ',
@@ -48,11 +49,11 @@ const Sponsorships = ({ sponsorships }: { sponsorships: any[] }) => {
                   {link.name}
                 </p>
               </div>
-              <p className="text-sm flex-1 text-lighter">{link.description}</p>
-              <div className="text-sm w-full flex justify-between text-lighter mt-2">
+              <p className="text-sm flex-1 text-foreground-lighter">{link.description}</p>
+              <div className="text-sm w-full flex justify-between text-foreground-lighter mt-2">
                 <IconArrowUpRight className="w-4 stroke-[1.5px]" />
               </div>
-            </InteractiveShimmerCard>
+            </Panel>
           </Link>
         ))}
       </div>

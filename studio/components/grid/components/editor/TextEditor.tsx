@@ -50,16 +50,16 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
             onChange={onChange}
           />
           {isEditable && (
-            <div className="flex items-start justify-between p-2 bg-scale-400 space-x-2">
+            <div className="flex items-start justify-between p-2 bg-surface-200 space-x-2">
               <div className="space-y-1">
                 <div className="flex items-center space-x-2">
-                  <div className="px-1.5 py-[2.5px] rounded bg-scale-600 border border-scale-700 flex items-center justify-center">
+                  <div className="px-1.5 py-[2.5px] rounded bg-surface-300 border border-strong flex items-center justify-center">
                     <span className="text-[10px]">⏎</span>
                   </div>
                   <p className="text-xs text-foreground-light">Save changes</p>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <div className="px-1 py-[2.5px] rounded bg-scale-600 border border-scale-700 flex items-center justify-center">
+                  <div className="px-1 py-[2.5px] rounded bg-surface-300 border border-strong flex items-center justify-center">
                     <span className="text-[10px]">Esc</span>
                   </div>
                   <p className="text-xs text-foreground-light">Cancel changes</p>

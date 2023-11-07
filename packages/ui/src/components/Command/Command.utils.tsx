@@ -51,8 +51,8 @@ export const CommandDialog = ({ children, onKeyDown, page, ...props }: CommandDi
       {...props}
       hideFooter
       className={cn(
-        '!bg-[#f8f9fa]/95 dark:!bg-[#1c1c1c]/80 backdrop-filter backdrop-blur-sm',
-        '!border-[#e6e8eb]/90 dark:!border-[#282828]/90',
+        '!bg-overlay/90 backdrop-filter backdrop-blur-sm',
+        '!border-overlay/90',
         'transition ease-out',
         'place-self-start mx-auto top-24',
         animateBounce ? 'scale-[101.5%]' : 'scale-100'
@@ -60,7 +60,7 @@ export const CommandDialog = ({ children, onKeyDown, page, ...props }: CommandDi
     >
       <Command
         className={[
-          '[&_[cmdk-group]]:px-2 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-scale-800 [&_[cmdk-input]]:h-12',
+          '[&_[cmdk-group]]:px-2 [&_[cmdk-group]]:!bg-transparent [&_[cmdk-group-heading]]:!bg-transparent [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-border-stronger [&_[cmdk-input]]:h-12',
           '[&_[cmdk-item]_svg]:h-5',
           '[&_[cmdk-item]_svg]:w-5',
           '[&_[cmdk-input-wrapper]_svg]:h-5',
@@ -96,7 +96,7 @@ export const CommandInput = React.forwardRef<
         className={cn(
           'flex h-11 w-full rounded-md bg-transparent px-4 py-7 text-sm outline-none',
           'focus:shadow-none focus:ring-transparent',
-          'text-scale-1100 placeholder:text-scale-800 dark:placeholder:text-scale-800 disabled:cursor-not-allowed disabled:opacity-50 dark:text-scale-1200 border-0',
+          'text-foreground-light placeholder:text-border-stronger disabled:cursor-not-allowed disabled:opacity-50 border-0',
           className
         )}
         {...props}
@@ -115,7 +115,7 @@ export const CommandList = React.forwardRef<CommandPrimitiveListElement, Command
   ({ className, ...props }, ref) => (
     <CommandPrimitive.List
       ref={ref}
-      className={cn('overflow-y-auto overflow-x-hidden', className)}
+      className={cn('overflow-y-auto overflow-x-hidden bg-transparent', className)}
       {...props}
     />
   )
@@ -132,7 +132,7 @@ export const CommandEmpty = React.forwardRef<
 >((props, ref) => (
   <CommandPrimitive.Empty
     ref={ref}
-    className="py-6 text-center text-sm text-scale-900"
+    className="py-6 text-center text-sm text-foreground-muted"
     {...props}
   />
 ))
@@ -149,7 +149,7 @@ export const CommandGroup = React.forwardRef<
   <CommandPrimitive.Group
     ref={ref}
     className={cn(
-      'overflow-hidden py-3 px-2 text-scale-700 dark:text-scale-800 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:text-sm [&_[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-scale-900 [&_[cmdk-group-heading]]:dark:text-sca-300',
+      'overflow-hidden py-3 px-2 text-border-strong [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:text-sm [&_[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted',
       className
     )}
     {...props}
@@ -172,7 +172,7 @@ export const CommandSeparator = React.forwardRef<
     className={cn(
       `h-px
     w-full
-    bg-scale-50
+    bg-alternative
     `,
       className
     )}
@@ -202,42 +202,32 @@ export const CommandItem = React.forwardRef<CommandPrimitiveItemElement, Command
         'text-sm',
         'group',
         'py-3',
-        'text-scale-1100',
+        'text-foreground-light',
         'relative',
         'flex',
         type === 'block-link'
           ? `
-      bg-[#fbfcfd]/90
-      dark:bg-[#232323]/90
+        bg-transparent
         border
-      border-[#ddd]/90
-      dark:border-[#282828]/90
-        backdrop-filter
-        backdrop-blur-md
+        border-overlay/90
         px-5
         transition-all
         outline-none
-      aria-selected:border-[#ccc]
-      dark:aria-selected:border-[#323232]
-      aria-selected:bg-[#f1f3f5]/90
-      dark:aria-selected:bg-[#323232]
+        aria-selected:border-overlay
+        aria-selected:bg-overlay-hover/90
         aria-selected:shadow-sm
         aria-selected:scale-[100.3%]
         data-[disabled]:pointer-events-none data-[disabled]:opacity-50`
           : type === 'link'
           ? `
         px-2
-        backdrop-filter
-        backdrop-blur-md
         transition-all
         outline-none
-        aria-selected:bg-[#f1f3f5]/90
-        dark:aria-selected:bg-[#323232]
+        aria-selected:bg-overlay-hover/90
         data-[disabled]:pointer-events-none data-[disabled]:opacity-50`
           : `
         px-2
-        aria-selected:bg-scale-300
-        dark:aria-selected:bg-[#323232]/80
+        aria-selected:bg-overlay-hover/80
         aria-selected:backdrop-filter
         aria-selected:backdrop-blur-md
         data-[disabled]:pointer-events-none
@@ -262,7 +252,7 @@ export const CommandItemStale = React.forwardRef<CommandPrimitiveItemElement, Co
     <CommandPrimitive.Item
       ref={ref}
       className={cn(
-        'text-scale-1100 relative flex cursor-default select-none items-center rounded-md py-1.5 px-2 text-sm outline-none aria-selected:bg-scale-500 data-[disabled]:pointer-events-none data-[disabled]:opacity-50 dark:aria-selected:bg-scale-500',
+        'text-foreground-light relative flex cursor-default select-none items-center rounded-md py-1.5 px-2 text-sm outline-none aria-selected:bg-overlay-selection data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
         className
       )}
       {...props}
@@ -292,8 +282,8 @@ export const CommandShortcut = ({
         'cursor-default px-1.5 py-0.5 rounded text-xs [&:not(:last-child)]:hover:cursor-pointer',
         'justify-end',
         type === 'breadcrumb'
-          ? 'text-scale-900'
-          : 'bg-scale-500 text-scale-900 [&:not(:last-child)]:hover:bg-scale-600 last:bg-scale-600 last:text-scale-900',
+          ? 'text-foreground-muted'
+          : 'bg-overlay-hover text-foreground-muted [&:not(:last-child)]:hover:bg-selection last:bg-selection last:text-foreground-muted',
         className
       )}
     >
@@ -323,7 +313,7 @@ export const TextHighlighter = ({ text, query, ...props }: TextHighlighterProps)
 
     // Add back the wrapped `query` (if it's not the last element)
     if (index !== parts.length - 1) {
-      returnValue.push(<span className="font-semibold text-scale-1200">{query}</span>)
+      returnValue.push(<span className="font-semibold text-foreground">{query}</span>)
     }
 
     return returnValue

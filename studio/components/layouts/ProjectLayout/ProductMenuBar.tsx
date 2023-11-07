@@ -9,8 +9,8 @@ const ProductMenuBar = ({ title, children }: PropsWithChildren<ProductMenuBarPro
     <div
       className={[
         'hide-scrollbar flex w-64 flex-col border-r', // Layout
-        'bg-scale-200', // Light mode
-        'dark:border-dark ', // Dark mode
+        'bg-background',
+        'border-default ',
       ].join(' ')}
     >
       <div

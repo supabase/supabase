@@ -78,10 +78,5 @@ export const StackedBarChart = () => (
 )
 
 const ExampleName: React.FC<React.PropsWithChildren> = ({ children }) => (
-  <h1
-    className="font-bold text-scale-
-  1100"
-  >
-    {children}
-  </h1>
+  <h1 className="font-bold text-light">{children}</h1>
 )

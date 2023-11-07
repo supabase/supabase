@@ -46,7 +46,7 @@ const SidebarItem = ({
     <Link href={href || ''} className="block" target={isExternal ? '_blank' : '_self'}>
       <button
         className={[
-          'group border-scale-500 ring-scale-1200 group-hover:border-scale-900',
+          'group border-default ring-foreground group-hover:border-foreground-muted',
           'flex max-w-full cursor-pointer items-center space-x-2 py-1 font-normal',
           'outline-none focus-visible:z-10 focus-visible:ring-1',
         ].join(' ')}

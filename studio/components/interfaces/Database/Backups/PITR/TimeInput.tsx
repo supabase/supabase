@@ -84,13 +84,9 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
       <div
         className={[
           'flex items-center justify-between transition',
-          'rounded-md bg-scaleA-200 border px-3.5 py-2 w-[200px]',
+          'rounded-md bg-background border px-3.5 py-2 w-[200px]',
           `${
-            isFocused
-              ? 'border-scale-900'
-              : error === undefined
-              ? 'border-scale-700'
-              : 'border-red-800'
+            isFocused ? 'border-stronger' : error === undefined ? 'border-strong' : 'border-red-800'
           }`,
         ].join(' ')}
       >
@@ -115,8 +111,8 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
               <Tooltip.Arrow className="radix-tooltip-arrow" />
               <div
                 className={[
-                  'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                  'border-scale-200 border',
+                  'bg-alternative rounded py-1 px-2 leading-none shadow',
+                  'border-background border',
                 ].join(' ')}
               >
                 <span className="text-foreground text-xs">Hours (HH)</span>
@@ -145,8 +141,8 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
               <Tooltip.Arrow className="radix-tooltip-arrow" />
               <div
                 className={[
-                  'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                  'border-scale-200 border',
+                  'bg-alternative rounded py-1 px-2 leading-none shadow',
+                  'border-background border',
                 ].join(' ')}
               >
                 <span className="text-foreground text-xs">Minutes (MM)</span>
@@ -175,8 +171,8 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
               <Tooltip.Arrow className="radix-tooltip-arrow" />
               <div
                 className={[
-                  'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                  'border-scale-200 border',
+                  'bg-alternative rounded py-1 px-2 leading-none shadow',
+                  'border-background border',
                 ].join(' ')}
               >
                 <span className="text-foreground text-xs">Seconds (SS)</span>

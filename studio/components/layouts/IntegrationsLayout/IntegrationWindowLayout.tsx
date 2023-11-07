@@ -28,13 +28,13 @@ const IntegrationWindowLayout = ({
       <Header title={title} integrationIcon={integrationIcon} />
       <LoadingLine loading={loading} />
       <main className="overflow-auto flex flex-col h-full bg">{children}</main>
-      <ScaffoldContainer className="bg-body flex flex-row gap-6 py-6 border-t">
+      <ScaffoldContainer className="bg-background flex flex-row gap-6 py-6 border-t">
         {docsHref && (
           <Link
             href={docsHref}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 text-xs text-light hover:text"
+            className="flex items-center gap-2 text-xs text-foreground-light hover:text"
           >
             <IconBook size={16} />
             Docs
@@ -74,7 +74,7 @@ const Header = ({ title, integrationIcon }: HeaderProps) => {
             <div className="bg-white shadow border rounded p-1 w-8 h-8 flex justify-center items-center">
               <img src={`${BASE_PATH}/img/supabase-logo.svg`} alt="Supabase" className="w-4" />
             </div>
-            <IconX className="text-scale-800" strokeWidth={2} size={16} />
+            <IconX className="text-border-stronger" strokeWidth={2} size={16} />
             {integrationIcon}
           </div>
           <span className="text-sm" title={title}>

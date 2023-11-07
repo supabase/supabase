@@ -14,7 +14,7 @@ function getComponents(type: any) {
           <div
             className={[
               'next-image--dynamic-fill',
-              type === 'blog' && 'to-scale-400 from-scale-500 rounded-lg border bg-gradient-to-r',
+              type === 'blog' && 'to-border-overlay from-border rounded-lg border bg-gradient-to-r',
             ].join(' ')}
           >
             <Image

@@ -17,36 +17,36 @@ export const Admonition = ({
         'shadow p-4 rounded border-l-[5px] space-y-2 my-4',
         `${
           type === 'note'
-            ? 'bg-scale-400 border-scale-800'
+            ? 'bg-surface-200 border-stronger'
             : type === 'info'
-            ? 'bg-scale-500 border-scale-800'
+            ? 'bg-surface-300 border-stronger'
             : type === 'tip'
             ? 'bg-brand-300 border-brand-300'
             : type === 'caution'
             ? 'bg-yellow-400 border-yellow-800'
             : type === 'danger'
             ? 'bg-red-500 border-red-800'
-            : 'bg-scale-500 border-scale-800'
+            : 'bg-surface-300 border-stronger'
         }`,
       ].join(' ')}
     >
       <div className="flex items-center space-x-2">
         {type === 'note' ? (
-          <IconInfo className="text-scale-1200" size={18} strokeWidth={1.5} />
+          <IconInfo className="text-foreground" size={18} strokeWidth={1.5} />
         ) : type === 'info' ? (
-          <IconInfo className="text-scale-1200" size={18} strokeWidth={1.5} />
+          <IconInfo className="text-foreground" size={18} strokeWidth={1.5} />
         ) : type === 'tip' ? (
-          <IconHelpCircle className="text-scale-1200" size={18} strokeWidth={1.5} />
+          <IconHelpCircle className="text-foreground" size={18} strokeWidth={1.5} />
         ) : type === 'caution' ? (
-          <IconAlertTriangle className="text-scale-1200" size={18} strokeWidth={1.5} />
+          <IconAlertTriangle className="text-foreground" size={18} strokeWidth={1.5} />
         ) : type === 'danger' ? (
-          <IconAlertTriangle className="text-scale-1200" size={18} strokeWidth={1.5} />
+          <IconAlertTriangle className="text-foreground" size={18} strokeWidth={1.5} />
         ) : (
-          <IconInfo className="text-scale-1200" size={18} strokeWidth={1.5} />
+          <IconInfo className="text-foreground" size={18} strokeWidth={1.5} />
         )}
-        <p className="text-sm text-scale-1200 uppercase my-0 font-bold">{label || type}</p>
+        <p className="text-sm text-foreground uppercase my-0 font-bold">{label || type}</p>
       </div>
-      <div className="admonition-content text-scale-1200 text-base space-y-1">{children}</div>
+      <div className="admonition-content text-foreground text-base space-y-1">{children}</div>
     </div>
   )
 }

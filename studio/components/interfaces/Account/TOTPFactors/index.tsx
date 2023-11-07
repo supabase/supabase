@@ -23,7 +23,7 @@ const TOTPFactors = () => {
   return (
     <>
       <section className="space-y-3">
-        <p className="text-sm text-light">
+        <p className="text-sm text-foreground-light">
           Generate one-time passwords via authenticator apps like 1Password, Authy, etc. as a second
           factor to verify your identity during sign-in.
         </p>
@@ -50,11 +50,11 @@ const TOTPFactors = () => {
                   return (
                     <div key={factor.id} className="flex flex-row justify-between py-2">
                       <p className="text-sm text-foreground flex items-center space-x-2">
-                        <span className="text-light">Name:</span>{' '}
+                        <span className="text-foreground-light">Name:</span>{' '}
                         <span>{factor.friendly_name ?? 'No name provided'}</span>
                       </p>
                       <div className="flex items-center gap-4">
-                        <p className="text-sm text-light">
+                        <p className="text-sm text-foreground-light">
                           Added on {dayjs(factor.updated_at).format(DATETIME_FORMAT)}
                         </p>
                         <Button

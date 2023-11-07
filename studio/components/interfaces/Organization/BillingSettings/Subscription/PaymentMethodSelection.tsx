@@ -74,12 +74,12 @@ const PaymentMethodSelection = ({
     <>
       <div>
         {isLoading ? (
-          <div className="flex items-center px-4 py-2 space-x-4 border rounded-md border-scale-700 bg-scale-400">
+          <div className="flex items-center px-4 py-2 space-x-4 border rounded-md border-strong bg-surface-200">
             <IconLoader className="animate-spin" size={14} />
             <p className="text-sm text-foreground-light">Retrieving payment methods</p>
           </div>
         ) : paymentMethods.length === 0 ? (
-          <div className="flex items-center justify-between px-4 py-2 border border-dashed rounded-md bg-scale-100">
+          <div className="flex items-center justify-between px-4 py-2 border border-dashed rounded-md bg-alternative">
             <div className="flex items-center space-x-4 text-foreground-light">
               <IconAlertCircle size={16} strokeWidth={1.5} />
               <p className="text-sm">No saved payment methods</p>
@@ -103,8 +103,8 @@ const PaymentMethodSelection = ({
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                        'w-48 border border-scale-200 text-center', //border
+                        'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                        'w-48 border border-background text-center', //border
                       ].join(' ')}
                     >
                       <span className="text-xs text-foreground">
@@ -149,7 +149,7 @@ const PaymentMethodSelection = ({
               )
             })}
             <div
-              className="flex items-center px-3 py-2 space-x-2 transition cursor-pointer group hover:bg-scale-500"
+              className="flex items-center px-3 py-2 space-x-2 transition cursor-pointer group hover:bg-surface-300"
               onClick={() => setShowAddNewPaymentMethodModal(true)}
             >
               <IconPlus size={16} />

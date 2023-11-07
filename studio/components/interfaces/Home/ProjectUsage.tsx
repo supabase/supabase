@@ -113,7 +113,7 @@ const ProjectUsage = () => {
           <Panel.Content className="space-y-4">
             <PanelHeader
               icon={
-                <div className="rounded bg-scale-600 p-1.5 text-foreground-light shadow-sm">
+                <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
                   <IconDatabase strokeWidth={2} size={16} />
                 </div>
               }
@@ -139,7 +139,7 @@ const ProjectUsage = () => {
             <Panel.Content className="space-y-4">
               <PanelHeader
                 icon={
-                  <div className="rounded bg-scale-600 p-1.5 text-foreground-light shadow-sm">
+                  <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
                     <IconKey strokeWidth={2} size={16} />
                   </div>
                 }
@@ -165,7 +165,7 @@ const ProjectUsage = () => {
             <Panel.Content className="space-y-4">
               <PanelHeader
                 icon={
-                  <div className="rounded bg-scale-600 p-1.5 text-foreground-light shadow-sm">
+                  <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
                     <IconArchive strokeWidth={2} size={16} />
                   </div>
                 }
@@ -191,7 +191,7 @@ const ProjectUsage = () => {
           <Panel.Content className="space-y-4">
             <PanelHeader
               icon={
-                <div className="rounded bg-scale-600 p-1.5 text-foreground-light shadow-sm">
+                <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
                   <IconZap strokeWidth={2} size={16} />
                 </div>
               }

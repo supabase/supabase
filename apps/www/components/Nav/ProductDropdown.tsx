@@ -36,7 +36,7 @@ const ProductDropdown = () => {
         <div className="col-span-3 xl:w-auto">
           <Link
             href="/customers"
-            className="group flex items-center gap-1 text-lighter hover:text-foreground text-xs uppercase tracking-widest font-mono mb-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm focus-visible:text-foreground"
+            className="group flex items-center gap-1 text-foreground-lighter hover:text-foreground text-xs uppercase tracking-widest font-mono mb-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm focus-visible:text-foreground"
           >
             Customer Stories
             <IconChevronRight className="h-3 w-3 transition-transform will-change-transform -translate-x-1 group-hover:translate-x-0" />
@@ -68,7 +68,7 @@ const ProductDropdown = () => {
           </ul>
         </div>
         <div className="col-span-2">
-          <p className="text-lighter text-xs uppercase tracking-widest font-mono mb-6">
+          <p className="text-foreground-lighter text-xs uppercase tracking-widest font-mono mb-6">
             {ComparisonsData.label}
           </p>
           <ul className="flex flex-col gap-2">

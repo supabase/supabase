@@ -120,7 +120,7 @@ const EnableBranchingModal = () => {
               <IconGitBranch strokeWidth={2} size={20} />
               <div>
                 <p className="text-foreground">Enable database branching</p>
-                <p className="text-sm text-light">Manage environments in Supabase</p>
+                <p className="text-sm text-foreground-light">Manage environments in Supabase</p>
               </div>
             </Modal.Content>
 
@@ -155,7 +155,7 @@ const EnableBranchingModal = () => {
             )}
 
             <Modal.Content className="px-7 py-6 flex flex-col gap-3">
-              <p className="text-sm text-light">Please keep in mind the following:</p>
+              <p className="text-sm text-foreground-light">Please keep in mind the following:</p>
               <div className="flex flex-row gap-4">
                 <div>
                   <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-300 flex items-center justify-center">
@@ -166,7 +166,7 @@ const EnableBranchingModal = () => {
                   <p className="text-sm text-foreground">
                     You will not be able to use the dashboard to make changes to the database
                   </p>
-                  <p className="text-sm text-light">
+                  <p className="text-sm text-foreground-light">
                     Schema changes for database preview branches must be done via Git. We are
                     nonetheless working on allowing the dashboard to make schema changes for preview
                     branches.

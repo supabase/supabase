@@ -28,9 +28,9 @@ export const withUseState = () => {
       <div
         className="
           py-4 px-8
-          bg-scale-300 
+          bg-surface-100 
           border 
-          border-scale-500 
+          border-default 
           rounded flex gap-4 
           shadow-sm
           justify-between
@@ -45,8 +45,8 @@ export const withUseState = () => {
           -translate-y-1/2"
       >
         <div>
-          <h4 className="text-scale-1200 text-base">Delete your project</h4>
-          <p className="text-scale-1100 text-sm">It will be sad to see you go</p>
+          <h4 className="text-foreground text-base">Delete your project</h4>
+          <p className="text-foreground-light text-sm">It will be sad to see you go</p>
         </div>
         <Button type="default" onClick={() => setVisible(!visible)} icon={<IconTrash />}>
           Delete this project
@@ -58,13 +58,13 @@ export const withUseState = () => {
           visible={visible}
           onCancel={() => setVisible(!visible)}
           header={
-            <div className="flex items-center gap-2 text-scale-1200">
-              {/* <div className="text-scale-600">
+            <div className="flex items-center gap-2 text-foreground">
+              {/* <div className="text-border-control">
               <IconTrash strokeWidth={2} />
             </div> */}
               <div className="flex items-baseline gap-2">
                 <h3 className="text-sm">Delete your project</h3>
-                <span className="text-xs text-scale-900">Are you sure?</span>
+                <span className="text-xs text-foreground-muted">Are you sure?</span>
               </div>
             </div>
           }
@@ -106,12 +106,12 @@ export const withUseState = () => {
                     </span>
                   </div>
                   <div className="px-5">
-                    <p className="text-sm text-scale-1100">
+                    <p className="text-sm text-foreground-light">
                       This action cannot be undone. This will permanently delete the project{' '}
-                      <span className="text-scale-1200 font-regular">MyProject</span>.
+                      <span className="text-foreground font-regular">MyProject</span>.
                     </p>
                   </div>
-                  <div className="border-t border-scale-300 dark:border-scale-500"></div>
+                  <div className="border-t border-muted dark:border-default"></div>
                   <div className="px-5">
                     <Input
                       id="name"
@@ -120,7 +120,7 @@ export const withUseState = () => {
                       label="Please type MyProject to confirm."
                     />
                   </div>
-                  <div className="border-t border-scale-300 dark:border-scale-500"></div>
+                  <div className="border-t border-muted dark:border-default"></div>
                   <div className="px-5">
                     <Button
                       type="danger"
@@ -146,13 +146,13 @@ export const Default = (args: any) => (
   <Modal
     {...args}
     header={
-      <div className="flex items-center gap-2 text-scale-1200">
+      <div className="flex items-center gap-2 text-foreground">
         <div className="text-brand-400">
           <IconLink2 />
         </div>
         <div className="flex items-baseline gap-2">
           <h3>This is the title</h3>
-          <span className="text-xs text-scale-900">This is the title</span>
+          <span className="text-xs text-foreground-muted">This is the title</span>
         </div>
       </div>
     }

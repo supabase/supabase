@@ -11,7 +11,7 @@ const ClientLoadingError = ({
   description = 'An error has occurred',
 }: ClientLoadingErrorProps) => {
   return (
-    <div className="px-6 py-4 bg-scale-400 border border-scale-600 rounded flex justify-between items-center">
+    <div className="px-6 py-4 bg-surface-200 border border-overlay rounded flex justify-between items-center">
       <div className="flex space-x-4">
         <IconAlertCircle strokeWidth={1.5} className="text-foreground-light" />
         <div className="space-y-1">

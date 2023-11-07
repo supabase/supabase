@@ -88,7 +88,7 @@ const TerminalInstructions = ({
 
   return (
     <div
-      className={`col-span-7 overflow-hidden transition-all rounded bg-scale-100 dark:bg-scale-300 ${
+      className={`col-span-7 overflow-hidden transition-all rounded bg-surface-100 ${
         removeBorder ? '' : 'border shadow'
       }`}
       style={{ maxHeight: showInstructions ? 500 : 80 }}
@@ -96,7 +96,7 @@ const TerminalInstructions = ({
       <div className="px-8 py-6 space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-8 h-8 p-2 border rounded bg-scale-100">
+            <div className="flex items-center justify-center w-8 h-8 p-2 border rounded bg-alternative">
               <IconTerminal strokeWidth={2} />
             </div>
             <h4>Create your first Edge Function via the CLI</h4>

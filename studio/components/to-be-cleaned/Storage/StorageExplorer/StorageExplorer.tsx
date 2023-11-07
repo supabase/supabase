@@ -203,8 +203,8 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
     <div
       ref={storageExplorerRef}
       className="
-        bg-scale-200
-        border-panel-border-light dark:border-panel-border-dark flex
+        bg-background
+        border-overlay flex
         h-full w-full flex-col rounded-md border"
     >
       {selectedItems.length === 0 ? (

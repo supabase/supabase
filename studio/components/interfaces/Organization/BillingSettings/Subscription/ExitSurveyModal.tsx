@@ -157,8 +157,8 @@ const ExitSurveyModal = ({ visible, subscription, onClose }: ExitSurveyModalProp
                       shadow-sm transition-all duration-100
                       ${
                         active
-                          ? ` bg-scale-1200 text-scale-100 opacity-100 hover:bg-opacity-75`
-                          : ` bg-scale-700 text-foreground opacity-25 hover:opacity-50`
+                          ? ` bg-foreground text-background opacity-100 hover:bg-opacity-75`
+                          : ` bg-border-strong text-foreground opacity-25 hover:opacity-50`
                       }
                   `}
                     >

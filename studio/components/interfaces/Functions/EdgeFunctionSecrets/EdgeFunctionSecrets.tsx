@@ -100,7 +100,7 @@ const EdgeFunctionSecrets = () => {
                 <Table.tr>
                   <Table.td colSpan={3}>
                     <p className="text-sm text-foreground">No results found</p>
-                    <p className="text-sm text-light">
+                    <p className="text-sm text-foreground-light">
                       Your search for "{searchString}" did not return any results
                     </p>
                   </Table.td>
@@ -109,7 +109,7 @@ const EdgeFunctionSecrets = () => {
                 <Table.tr>
                   <Table.td colSpan={3}>
                     <p className="text-sm text-foreground">No secrets created</p>
-                    <p className="text-sm text-light">
+                    <p className="text-sm text-foreground-light">
                       There are no secrets associated with your project yet
                     </p>
                   </Table.td>

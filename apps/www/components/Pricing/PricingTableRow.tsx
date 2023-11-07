@@ -9,11 +9,7 @@ export const PricingTableRowDesktop = (props: any) => {
 
   return (
     <>
-      <tr
-        className="divide-border-secondary"
-        style={{ borderTop: 'none' }}
-        id={`${props.sectionId}-desktop`}
-      >
+      <tr className="divide-border" style={{ borderTop: 'none' }} id={`${props.sectionId}-desktop`}>
         <th
           className="bg-background text-foreground sticky top-[62px] z-10 py-3 pl-6 text-left text-sm font-medium dark:text-white"
           scope="colgroup"
@@ -32,7 +28,7 @@ export const PricingTableRowDesktop = (props: any) => {
       {category.features.map((feat: any, i: number) => {
         return (
           <Fragment key={feat.title}>
-            <tr className="divide-border-secondary" key={i}>
+            <tr className="divide-border" key={i}>
               <th
                 className={`text-foreground flex items-center px-6 py-5 last:pb-24 text-left text-xs font-normal dark:text-white `}
                 scope="row"
@@ -101,7 +97,7 @@ export const PricingTableRowMobile = (props: any) => {
   return (
     <>
       <table className="mt-8 w-full" id={`${props.sectionId}-mobile`}>
-        <caption className="bg-background border-border border-t px-4 py-3 text-left text-sm font-medium dark:text-white">
+        <caption className="bg-background border-default border-t px-4 py-3 text-left text-sm font-medium dark:text-white">
           <div className="flex items-center gap-2">
             {category.icon ? <ProductIcon icon={props.icon} /> : null}
             <span className="text-foreground font-normal">{category.title}</span>
@@ -117,11 +113,14 @@ export const PricingTableRowMobile = (props: any) => {
             </th>
           </tr>
         </thead>
-        <tbody className="divide-border-border divide-y">
+        <tbody className="divide-border-default divide-y">
           {category.features.map((feat: any, i: number) => {
             return (
-              <tr key={i} className="border-border border-t">
-                <th className="text-light px-4 py-3 text-left text-sm font-normal" scope="row">
+              <tr key={i} className="border-default border-t">
+                <th
+                  className="text-foreground-light px-4 py-3 text-left text-sm font-normal"
+                  scope="row"
+                >
                   <span>
                     <p>{feat.title}</p>
                   </span>

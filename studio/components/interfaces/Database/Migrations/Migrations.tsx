@@ -141,7 +141,7 @@ const Migrations = () => {
                         <Table.tr>
                           <Table.td colSpan={3}>
                             <p className="text-sm text-foreground">No results found</p>
-                            <p className="text-sm text-light">
+                            <p className="text-sm text-foreground-light">
                               Your search for "{search}" did not return any results
                             </p>
                           </Table.td>

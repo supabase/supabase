@@ -124,7 +124,7 @@ const JWTSettings = () => {
                 layout="horizontal"
               />
               <div className="space-y-3">
-                <div className="p-3 px-6 border rounded-md shadow-sm bg-scale-200 dark:border-dark dark:bg-scale-200">
+                <div className="p-3 px-6 border rounded-md shadow-sm bg-background">
                   {isUpdatingJwtSecret ? (
                     <div className="flex items-center space-x-2">
                       <IconLoader className="animate-spin" size={14} />
@@ -158,8 +158,8 @@ const JWTSettings = () => {
                                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                                   <div
                                     className={[
-                                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                      'border border-scale-200',
+                                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                      'border border-background',
                                     ].join(' ')}
                                   >
                                     <span className="text-xs text-foreground">

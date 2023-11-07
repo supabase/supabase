@@ -271,8 +271,8 @@ export const VideoPreviewTrigger = ({
   title?: string
   thumbnail: string
 }) => (
-  <div className="flex items-center h-full gap-3 text-xs group/vid text-light hover:text-foreground transition-colors">
-    <div className="relative h-10 !aspect-video flex items-center justify-center rounded overflow-hidden border border-scale-1000 opacity-80 group-hover/vid:opacity-100 transition-colors">
+  <div className="flex items-center h-full gap-3 text-xs group/vid text-foreground-light hover:text-foreground transition-colors">
+    <div className="relative h-10 !aspect-video flex items-center justify-center rounded overflow-hidden border border-foreground-lighter opacity-80 group-hover/vid:opacity-100 transition-colors">
       <div className="absolute z-10 w-2.5 h-2.5 text-white opacity-100">
         <svg viewBox="0 0 81 91" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
@@ -321,7 +321,7 @@ export const ChipLink = ({
   uiOnly ? (
     <span
       className={[
-        'flex flex-auto justify-center sm:justify-between w-full text-center sm:text-left min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444460] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191990] hover:border-scale-800 backdrop-blur-xl rounded-full text-sm py-2 px-3 sm:pr-2',
+        'flex flex-auto justify-center sm:justify-between w-full text-center sm:text-left min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444460] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191990] hover:border-stronger backdrop-blur-xl rounded-full text-sm py-2 px-3 sm:pr-2',
         className,
       ].join(' ')}
     >
@@ -333,7 +333,7 @@ export const ChipLink = ({
       target={target ?? '_self'}
       rel="noopener"
       className={[
-        'flex flex-auto justify-center sm:justify-between w-full text-center sm:text-left min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444460] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191990] hover:border-scale-800 backdrop-blur-xl rounded-full text-sm py-2 px-3 sm:pr-2',
+        'flex flex-auto justify-center sm:justify-between w-full text-center sm:text-left min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444460] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191990] hover:border-stronger backdrop-blur-xl rounded-full text-sm py-2 px-3 sm:pr-2',
         className,
       ].join(' ')}
     >

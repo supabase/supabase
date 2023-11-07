@@ -276,7 +276,7 @@ const IntegrationProject = observer(() => {
         </Select>
       </div>
       <div
-        className="w-full rounded-sm border border-scale-700
+        className="w-full rounded-sm border border-strong
       bg-panel-header-light dark:bg-panel-header-dark"
       >
         <div className="flex items-center justify-between p-6">

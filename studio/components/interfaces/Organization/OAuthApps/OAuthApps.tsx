@@ -124,7 +124,7 @@ const OAuthApps = () => {
           {isSuccessPublishedApps && (
             <>
               {(publishedApps?.length ?? 0) === 0 ? (
-                <div className="bg-scale-100 dark:bg-scale-300 border rounded p-4 flex items-center justify-between mt-4">
+                <div className="bg-surface-100 border rounded p-4 flex items-center justify-between mt-4">
                   <p className="prose text-sm">You do not have any published applications yet</p>
                 </div>
               ) : (
@@ -176,7 +176,7 @@ const OAuthApps = () => {
             {isSuccessAuthorizedApps && (
               <>
                 {(authorizedApps.length ?? 0) === 0 ? (
-                  <div className="bg-scale-100 dark:bg-scale-300 border rounded p-4 flex items-center justify-between">
+                  <div className="bg-surface-100 border rounded p-4 flex items-center justify-between">
                     <p className="prose text-sm">You do not have any authorized applications yet</p>
                   </div>
                 ) : (

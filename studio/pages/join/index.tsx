@@ -189,7 +189,7 @@ const JoinOrganizationPage = () => {
       </div>
 
       <div
-        className={['border-t border-scale-400', isError ? 'bg-scale-100' : 'bg-transparent'].join(
+        className={['border-t border-muted', isError ? 'bg-alternative' : 'bg-transparent'].join(
           ' '
         )}
       >
@@ -236,7 +236,7 @@ const JoinOrganizationPage = () => {
   return (
     <div
       className={[
-        'flex h-full min-h-screen bg-scale-200',
+        'flex h-full min-h-screen bg-background',
         'w-full flex-col place-items-center',
         'items-center justify-center gap-8 px-5',
       ].join(' ')}
@@ -251,7 +251,7 @@ const JoinOrganizationPage = () => {
       <div
         className="
           mx-auto overflow-hidden rounded-md border
-          border-scale-400 bg-scale-100 text-center shadow
+          border-muted bg-alternative text-center shadow
           md:w-[400px]
           "
       >

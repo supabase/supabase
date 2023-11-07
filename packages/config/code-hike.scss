@@ -216,6 +216,8 @@
   top: 0.8em;
 }
 .ch-editor-tab {
+  border: none;
+  border-right: 1px solid var(--ch-16);
   min-width: -webkit-fit-content;
   min-width: -moz-fit-content;
   min-width: fit-content;
@@ -228,10 +230,9 @@
   box-sizing: border-box;
   padding-left: 15px;
   padding-right: 15px;
-  background-color: var(--ch-24) !important;
-  color: hsla(0, 0%, 100%, 0.5);
+  background-color: var(--ch-21) !important;
+  color: var(--ch-15);
   min-width: 0;
-  border-bottom: 1px solid;
 }
 .ch-editor-tab-active {
   background-color: red;
@@ -261,8 +262,8 @@
   //   border: 1px solid red;
 }
 .ch-editor-frame .ch-frame-title-bar {
-  background-color: var(--ch-t-background) !important;
-  background: var(--ch-t-background) !important;
+  background-color: var(--ch-21) !important;
+  background: var(--ch-21) !important;
 }
 .ch-editor-terminal {
   position: absolute;
@@ -642,7 +643,7 @@
   background-color: rgba(186, 230, 253, 0.4);
 }
 .ch-editor-tab[data-active='true'] {
-  background-color: var(--ch-24);
+  background-color: var(--ch-16) !important;
 }
 .ch-section-link[data-active='true'],
 .ch-section-link[data-active='true'] * {

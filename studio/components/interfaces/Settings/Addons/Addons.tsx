@@ -177,7 +177,7 @@ const Addons = () => {
               <ScaffoldSectionContent>
                 <div className="flex space-x-6">
                   <div>
-                    <div className="rounded-md bg-scale-100 dark:bg-scale-400 w-[160px] h-[96px] shadow">
+                    <div className="rounded-md bg-surface-200 w-[160px] h-[96px] shadow">
                       <Image
                         alt="Optimized Compute"
                         width={160}
@@ -366,7 +366,7 @@ const Addons = () => {
               <ScaffoldSectionContent>
                 <div className="flex space-x-6">
                   <div>
-                    <div className="rounded-md bg-scale-100 dark:bg-scale-400 w-[160px] h-[96px] shadow">
+                    <div className="rounded-md bg-surface-200 w-[160px] h-[96px] shadow">
                       <Image
                         alt="Point-In-Time-Recovery"
                         width={160}
@@ -461,7 +461,7 @@ const Addons = () => {
               <ScaffoldSectionContent>
                 <div className="flex space-x-6">
                   <div>
-                    <div className="rounded-md bg-scale-100 dark:bg-scale-400 w-[160px] h-[96px] shadow">
+                    <div className="rounded-md bg-surface-200 w-[160px] h-[96px] shadow">
                       <img
                         alt="Custom Domain"
                         width={160}

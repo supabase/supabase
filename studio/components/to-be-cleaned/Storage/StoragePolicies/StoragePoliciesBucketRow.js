@@ -24,7 +24,7 @@ const PolicyRow = ({
   const { name, command } = policy
   return (
     <div className="group">
-      <Panel.Content className="flex justify-between gap-2 border-b border-panel-border-light py-4 dark:border-panel-border-dark">
+      <Panel.Content className="flex justify-between gap-2 border-b border-overlay py-4">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
           <div className="font-mono text-xs text-foreground-lighter">{command}</div>
           <div className="flex flex-col gap-2 lg:flex-row">

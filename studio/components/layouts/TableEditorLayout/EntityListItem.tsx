@@ -114,7 +114,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
     <div
       className={clsx(
         'group flex items-center justify-between rounded-md',
-        isActive && 'text-foreground bg-scale-300'
+        isActive && 'text-foreground bg-surface-100'
       )}
     >
       <Link
@@ -148,7 +148,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                   entity.type === ENTITY_TYPE.FOREIGN_TABLE && 'text-yellow-900 bg-yellow-500',
                   entity.type === ENTITY_TYPE.MATERIALIZED_VIEW && 'text-purple-1000 bg-purple-500',
                   entity.type === ENTITY_TYPE.PARTITIONED_TABLE &&
-                    'text-foreground-light bg-scale-800'
+                    'text-foreground-light bg-border-stronger'
                 )}
               >
                 {Object.entries(ENTITY_TYPE)
@@ -162,8 +162,8 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
               <Tooltip.Arrow className="radix-tooltip-arrow" />
               <div
                 className={[
-                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                  'border border-scale-200',
+                  'rounded bg-alternative py-1 px-2 leading-none shadow',
+                  'border border-background',
                 ].join(' ')}
               >
                 <span className="text-xs text-foreground capitalize">
@@ -185,8 +185,8 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200',
+                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                      'border border-background',
                     ].join(' ')}
                   >
                     <span className="text-xs text-foreground">{entity.name}</span>

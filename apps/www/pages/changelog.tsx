@@ -63,7 +63,7 @@ function ChangelogPage(props: any) {
           {/* Title and description */}
           <div className="py-10">
             <h1 className="h1">Changelog</h1>
-            <p className="text-muted text-lg">New updates and product improvements</p>
+            <p className="text-foreground-lighter text-lg">New updates and product improvements</p>
           </div>
 
           {/* Content */}
@@ -71,13 +71,13 @@ function ChangelogPage(props: any) {
             {props.changelog.map((changelog: any, i: number) => {
               const date = changelog.published_at.split('T')
               return (
-                <div key={i} className="border-border grid border-l pb-10 lg:grid-cols-12 lg:gap-8">
+                <div key={i} className="border-muted grid border-l pb-10 lg:grid-cols-12 lg:gap-8">
                   <div
                     className="col-span-12 mb-8 self-start lg:sticky lg:top-0 lg:col-span-4 lg:-mt-32 lg:pt-32
                 "
                   >
                     <div className="flex w-full items-baseline gap-6">
-                      <div className="bg-surface-300 border-control text-lighter -ml-2.5 flex h-5 w-5 items-center justify-center rounded border drop-shadow-sm">
+                      <div className="bg-border border-muted text-foreground-lighter -ml-2.5 flex h-5 w-5 items-center justify-center rounded border drop-shadow-sm">
                         <IconGitCommit size={14} strokeWidth={1.5} />
                       </div>
                       <div className="flex w-full flex-col gap-1">

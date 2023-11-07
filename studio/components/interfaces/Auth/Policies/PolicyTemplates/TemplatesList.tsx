@@ -28,8 +28,7 @@ const TemplatesList = ({
             <div
               key={i}
               className={
-                'border-b border-scale-400 hover:bg-scale-400 ' +
-                (active ? 'bg-scale-300 dark:bg-scale-500' : '')
+                'border-b border-overlay hover:bg-surface-200 ' + (active ? 'bg-surface-300' : '')
               }
             >
               <Menu.Item

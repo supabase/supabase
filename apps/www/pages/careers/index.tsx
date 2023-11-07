@@ -107,7 +107,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
             <h2 className="text-3xl md:text-4xl xl:text-5xl lg:max-w-2xl xl:max-w-3xl lg:mx-auto tracking-[-1.5px]">
               We're on a mission to build the best developer platform
             </h2>
-            <p className="text-sm md:text-base text-lighter max-w-sm sm:max-w-md md:max-w-lg mx-auto">
+            <p className="text-sm md:text-base text-foreground-lighter max-w-sm sm:max-w-md md:max-w-lg mx-auto">
               Explore remote possibilities and join our team to help us achieve it.
             </p>
             <a href="#positions">
@@ -127,7 +127,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                     <h2 className="text-3xl lg:text-4xl pt-3 tracking-[-1.5px]">
                       {company.number}
                     </h2>
-                    <ReactMarkdown className="text-light text-sm lg:text-base">
+                    <ReactMarkdown className="text-foreground-light text-sm lg:text-base">
                       {company.text}
                     </ReactMarkdown>
                   </div>
@@ -136,8 +136,8 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
             </div>
           </SectionContainer>
 
-          <div className="py-[1.25px] bg-gradient-to-r from-scale-100 via-scale-700 to-scale-100">
-            <div className="bg-scale-100 overflow-clip">
+          <div className="py-[1.25px] bg-gradient-to-r from-background via-border to-background">
+            <div className="bg-alternative overflow-clip">
               <SectionContainer className="!py-0 !pb-16 lg:!pt-16">
                 <div className="lg:flex lg:h-[500px]">
                   <div className="relative aspect-square -top-[110px] -left-[200px] w-[575px] sm:-top-[150px] sm:-left-[300px] sm:w-[850px] lg:-top-[225px] lg:-left-[330px] lg:w-[800px] lg:h-[800px] xl:-left-[200px] xl:-top-[210px] xl:w-[1000px]">
@@ -147,7 +147,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                     <h2 className="text-2xl sm:text-3xl xl:text-4xl max-w-[300px] lg:max-w-xs tracking-[-1.5px]">
                       We work together, wherever we are
                     </h2>
-                    <p className="text-light mt-4 text-xs sm:text-sm lg:text-base md:w-5/6 lg:w-full">
+                    <p className="text-foreground-light mt-4 text-xs sm:text-sm lg:text-base md:w-5/6 lg:w-full">
                       Working in a globally distributed team is rewarding but has its challenges. We
                       are across many different timezones, so we use tools like Notion, Slack, and
                       Discord to stay connected to our team, and our community.
@@ -169,7 +169,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                       <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1.5px]">
                         What is Supabase
                       </h2>
-                      <p className="text-light text-xs sm:text-sm lg:text-base pt-2 sm:max-w-md xl:max-w-lg">
+                      <p className="text-foreground-light text-xs sm:text-sm lg:text-base pt-2 sm:max-w-md xl:max-w-lg">
                         Supabase is an open source Firebase alternative, built by developers for
                         developers. Supabase adds auth, realtime, storage, restful APIs, and edge
                         functions to Postgres without a single line of code. Supabase was
@@ -269,7 +269,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                 <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1.5px]">
                   Human powered
                 </h2>
-                <p className="text-lighter text-xs sm:text-sm lg:text-base pt-3 sm:w-3/5 lg:max-w-sm">
+                <p className="text-foreground-lighter text-xs sm:text-sm lg:text-base pt-3 sm:w-3/5 lg:max-w-sm">
                   As a completely remote and asynchronous team, we focus on these five traits to
                   keep our team effective:
                 </p>
@@ -293,7 +293,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                           </div>
                           <div className="">
                             <h2 className="text-base">{human.title}</h2>
-                            <p className="text-light text-xs lg:text-sm">{human.text}</p>
+                            <p className="text-foreground-light text-xs lg:text-sm">{human.text}</p>
                           </div>
                         </div>
                       )
@@ -319,7 +319,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                   <h2 className="text-2xl sm:text-3xl xl:text-4xl max-w-[300px] xl:max-w-none mx-auto tracking-[-1.5px]">
                     1,000 + Contributors building Supabase
                   </h2>
-                  <p className="text-light text-xs sm:text-sm lg:text-base sm:max-w-lg lg:max-w-2xl mx-auto pt-3">
+                  <p className="text-foreground-light text-xs sm:text-sm lg:text-base sm:max-w-lg lg:max-w-2xl mx-auto pt-3">
                     We're building a community of communities, bringing together developers from
                     many different backgrounds, as well as new developers looking to get involved
                     with open source. We love celebrating everyone who contributes their time to the
@@ -332,7 +332,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                       <div
                         className={`${
                           Styles[`contributors-${i}`]
-                        } absolute w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full border-[1.5px] border-scale-600 z-10
+                        } absolute w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full border-[1.5px] border-default z-10
                           transition-all hover:scale-105 drop-shadow-sm hover:drop-shadow-md
                         `}
                         key={i}
@@ -354,22 +354,22 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                   <div
                     className={`${Styles['contributors-bg-circle']} w-[100%] lg:w-[80%] left-[0%] lg:left-[10%] -bottom-[30%] xs:-bottom-[36%] sm:-bottom-[52%] md:-bottom-[64%] lg:-bottom-[80%] xl:-bottom-[100%]`}
                   >
-                    <div className="flex flex-col justify-between h-full bg-scale-100 rounded-full p-4"></div>
+                    <div className="flex flex-col justify-between h-full bg-alternative rounded-full p-4"></div>
                   </div>
                   <div
                     className={`${Styles['contributors-bg-circle']} w-[80%] lg:w-[60%] left-[10%] lg:left-[20%] -bottom-[25%] xs:-bottom-[30%] sm:-bottom-[44%] md:-bottom-[54%] lg:-bottom-[60%] xl:-bottom-[75%]`}
                   >
-                    <div className="flex flex-col justify-between h-full bg-scale-100 rounded-full p-4"></div>
+                    <div className="flex flex-col justify-between h-full bg-alternative rounded-full p-4"></div>
                   </div>
                   <div
                     className={`${Styles['contributors-bg-circle']} w-[60%] lg:w-[40%] left-[20%] lg:left-[30%] -bottom-[20%] xs:-bottom-[25%] sm:-bottom-[38%] md:-bottom-[44%] lg:-bottom-[40%] xl:-bottom-[50%]`}
                   >
-                    <div className="flex flex-col justify-between h-full bg-scale-100 rounded-full p-4"></div>
+                    <div className="flex flex-col justify-between h-full bg-alternative rounded-full p-4"></div>
                   </div>
                   <div
                     className={`${Styles['contributors-bg-circle']} w-[40%] lg:w-[20%] left-[30%] lg:left-[40%] -bottom-[15%] xs:-bottom-[19%] sm:-bottom-[30%] md:-bottom-[34%] lg:-bottom-[20%] xl:-bottom-[25%]`}
                   >
-                    <div className="flex flex-col justify-between h-full bg-scale-100 rounded-full p-4"></div>
+                    <div className="flex flex-col justify-between h-full bg-alternative rounded-full p-4"></div>
                   </div>
                 </div>
               </SectionContainer>
@@ -388,7 +388,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                   (benefits: { icon: string; title: string; text: string }, i: number) => {
                     return (
                       <div
-                        className="h-full bg-white dark:bg-scale-300 drop-shadow-sm border-scale-400 border-[1px] p-6 rounded-lg flex items-start space-x-6 w-full"
+                        className="h-full bg-alternative drop-shadow-sm border-muted border-[1px] p-6 rounded-lg flex items-start space-x-6 w-full"
                         key={i}
                       >
                         <div className="w-12 h-12 sm:w-10 sm:h-10 lg:w-12 lg:h-12 aspect-square rounded-lg flex items-center">
@@ -432,7 +432,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
             </div>
             <div className="text-center sm:max-w-md md:w-3/4 lg:max-w-lg xl:max-w-2xl mx-auto">
               <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1.5px]">How we hire</h2>
-              <p className="text-xs sm:text-sm lg:text-base text-light pt-3">
+              <p className="text-xs sm:text-sm lg:text-base text-foreground-light pt-3">
                 The entire process is fully remote and all communication happens over email or via
                 video chat in Google Meet. The calls are all 1:1 and usually take between 20-45
                 minutes. We know you are interviewing us too, so please ask questions. We are happy
@@ -456,7 +456,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                       <h2 className="sm:text-lg max-w-[75%] xl:max-w-none xl:w-11/12 lg:max-w-none">
                         {hiring.title}
                       </h2>
-                      <p className="text-light text-xs sm:text-sm mt-1 md:w-3/4 lg:w-11/12">
+                      <p className="text-foreground-light text-xs sm:text-sm mt-1 md:w-3/4 lg:w-11/12">
                         {hiring.text}
                       </p>
                     </div>
@@ -487,7 +487,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                     return (
                       <div className="cursor-pointer md:cursor-default" key={i}>
                         <Link href={job.absolute_url}>
-                          <div className="bg-white border-scale-300 drop-shadow-sm dark:bg-scale-300 border dark:border-scale-400 p-4 px-7 rounded-md sm:flex sm:items-center transition ease-out hover:bg-scale-100 dark:hover:bg-scale-400 hover:drop-shadow-md hover:cursor-pointer">
+                          <div className="bg-alternative border-muted drop-shadow-sm border p-4 px-7 rounded-md sm:flex sm:items-center transition ease-out hover:bg-alternative dark:hover:bg-surface-100 hover:drop-shadow-md hover:cursor-pointer">
                             <h2 className="text-base min-w-[240px] lg:min-w-[316px] truncate mr-6">
                               {job.title}
                             </h2>

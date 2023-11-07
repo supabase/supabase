@@ -103,18 +103,18 @@ const CommunitySlider = () => {
   }, [ref.current, swiperInstance?.autoplay])
 
   const Card = (card: CardInterface) => (
-    <div className="dark:bg-scale-300 hover:border-scale-600 hover:dark:border-scale-700 border-scale-300 dark:border-scale-400 rounded-2xl border bg-white p-6 drop-shadow-sm flex flex-col gap-4">
+    <div className="bg-surface-100 hover:border-strong border-overlay rounded-2xl border p-6 drop-shadow-sm flex flex-col gap-4">
       <div className="flex items-center gap-2">
-        <div className="h-10 w-10 overflow-hidden rounded-full border dark:border-gray-600">
+        <div className="h-10 w-10 overflow-hidden rounded-full border border-control">
           <Image src={card.avatar!} layout="responsive" width="64" height="64" alt={card.author} />
         </div>
         <div>
           <p className="text-foreground font-medium">{card.author}</p>
-          <p className="text-muted text-sm">{card.role}</p>
+          <p className="text-foreground-muted text-sm">{card.role}</p>
         </div>
       </div>
 
-      <p className="text-muted mt-2 text-base">{card.quote}</p>
+      <p className="text-foreground-muted mt-2 text-base">{card.quote}</p>
 
       <div className="mt-3 pt-3 border-t">
         <div className="relative h-10">
@@ -127,7 +127,7 @@ const CommunitySlider = () => {
           />
         </div>
       </div>
-      <p className="text-muted my-3 text-base">{card.abstract}</p>
+      <p className="text-foreground-muted my-3 text-base">{card.abstract}</p>
 
       {card.url && (
         <div className="text-brand block cursor-pointer text-sm">Read Customer Story</div>
@@ -136,7 +136,7 @@ const CommunitySlider = () => {
   )
 
   return (
-    <div className="py-16 sm:py-18 md:py-24 bg-scale-100">
+    <div className="py-16 sm:py-18 md:py-24 bg-alternative">
       <div className="relative h-[300px] w-screen mx-auto md:w-full -mb-32 z-0">
         <Image
           src="/images/product/vector/community/vector-community.svg"

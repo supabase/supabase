@@ -59,7 +59,7 @@ const AuthorizeRequesterDetails = ({
       <div className="flex flex-row space-x-4">
         <div className="flex items-center">
           <div
-            className="w-14 h-14 md:w-16 md:h-16 bg-center bg-no-repeat bg-cover flex items-center justify-center rounded-md border border-scale-600"
+            className="w-14 h-14 md:w-16 md:h-16 bg-center bg-no-repeat bg-cover flex items-center justify-center rounded-md border border-control"
             style={{
               backgroundImage: icon !== null ? `url('${icon}')` : 'none',
             }}

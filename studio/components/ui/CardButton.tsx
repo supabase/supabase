@@ -54,7 +54,7 @@ const CardButton = ({
     containerClasses = [
       ...containerClasses,
       'cursor-pointer',
-      'hover:bg-surface-200',
+      'hover:bg-overlay-hover',
       'hover:border-control',
     ]
   }

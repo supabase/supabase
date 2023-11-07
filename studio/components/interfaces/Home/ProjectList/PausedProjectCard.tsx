@@ -19,10 +19,10 @@ const PausedProjectCard = ({
       <a className="col-span-3 w-full md:col-span-1 ">
         <div
           className={[
-            'bg-panel-header-light dark:bg-panel-header-dark',
-            'hover:bg-scale-200 dark:hover:bg-scale-200',
-            'border border-scale-700',
-            'hover:border-scale-900',
+            'bg-surface-100',
+            'hover:bg-background',
+            'border border-strong',
+            'hover:border-stronger',
             'h-32 rounded p-4',
             'flex flex-col justify-between transition duration-150 ease-in-out',
           ].join(' ')}

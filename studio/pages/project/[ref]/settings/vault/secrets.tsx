@@ -30,7 +30,7 @@ const VaultSettingsSecrets: NextPageWithLayout = () => {
     <div className="1xl:px-28 mx-auto flex flex-col px-5 py-6 lg:px-16 xl:px-24 2xl:px-32 ">
       <FormHeader title="Vault" description="Application level encryption for your project" />
       {isLoading ? (
-        <div className="border rounded border-scale-500 p-12 space-y-2">
+        <div className="border rounded border-default p-12 space-y-2">
           <ShimmeringLoader />
           <ShimmeringLoader className="w-3/4" />
           <ShimmeringLoader className="w-1/2" />

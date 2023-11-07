@@ -156,7 +156,7 @@ const FeedbackWidget = ({
                   const blobUrl = URL.createObjectURL(blob)
                   window.open(blobUrl, '_blank')
                 }}
-                className="cursor-pointer rounded h-[26px] w-[30px] border border-scale-600 relative bg-cover bg-center bg-no-repeat"
+                className="cursor-pointer rounded h-[26px] w-[30px] border border-control relative bg-cover bg-center bg-no-repeat"
               >
                 <button
                   className={[

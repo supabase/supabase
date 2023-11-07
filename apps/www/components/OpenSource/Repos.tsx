@@ -19,7 +19,9 @@ const Tab = ({ isActive, label, icon, onClick }: TabProps) => (
   <button
     onClick={onClick}
     className={`rounded-full px-4 md:px-3 py-2 md:py-1 nowrap flex group gap-1 transition-all ${
-      isActive ? 'text-strong bg-surface-300' : 'text-lighter bg-surface-200 hover:bg-overlay-hover'
+      isActive
+        ? 'text-strong bg-surface-300'
+        : 'text-foreground-lighter bg-surface-200 hover:bg-overlay-hover'
     }`}
     aria-selected={isActive}
     role="tab"
@@ -32,7 +34,7 @@ const Tab = ({ isActive, label, icon, onClick }: TabProps) => (
           viewBox="0 0 16 16"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className={cn('text-light shrink-0', isActive && 'text-brand')}
+          className={cn('text-foreground-light shrink-0', isActive && 'text-brand')}
         >
           <path
             d={icon}
@@ -106,7 +108,7 @@ const Repos = ({ tabs }: Props) => {
       <div className="flex mx-auto items-center gap-6 text-sm sm:gap-8">
         <Link
           href="https://github.com/supabase/supabase/blob/master/DEVELOPERS.md"
-          className="text-lighter hover:underline flex gap-1 items-center"
+          className="text-foreground-lighter hover:underline flex gap-1 items-center"
           target="_blank"
         >
           <GitHubIcon />
@@ -114,7 +116,7 @@ const Repos = ({ tabs }: Props) => {
         </Link>
         <Link
           href="https://github.com/supabase/.github/blob/main/CODE_OF_CONDUCT.md"
-          className="text-lighter hover:underline flex gap-1 items-center"
+          className="text-foreground-lighter hover:underline flex gap-1 items-center"
           target="_blank"
         >
           <GitHubIcon />

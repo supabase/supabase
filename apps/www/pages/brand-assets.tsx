@@ -60,7 +60,7 @@ const Index = () => {
                 <div className="p-16">
                   <div className="space-y-2">
                     <h1 className="text-foreground text-4xl">Supabase logos</h1>
-                    <p className="text-light text-sm">
+                    <p className="text-foreground-light text-sm">
                       <p>
                         Download Supabase official logos, including as SVG's, in both light and dark
                         theme.
@@ -91,7 +91,7 @@ const Index = () => {
                 <div className="p-16">
                   <div className="space-y-2">
                     <h1 className="text-foreground text-4xl">Supabase Integrations</h1>
-                    <p className="text-light text-sm">
+                    <p className="text-foreground-light text-sm">
                       <p>
                         When building a{' '}
                         <a

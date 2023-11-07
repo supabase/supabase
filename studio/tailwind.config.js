@@ -17,64 +17,64 @@ module.exports = config({
       colors: {
         /*  typography */
         'typography-body': {
-          light: 'var(--colors-scale11)',
-          dark: 'var(--colors-scale11)',
+          light: 'hsl(var(--foreground-light))',
+          dark: 'hsl(var(--foreground-light))',
         },
         'typography-body-secondary': {
-          light: 'var(--colors-scale10)',
-          dark: 'var(--colors-scale10)',
+          light: 'hsl(var(--foreground-lighter))',
+          dark: 'hsl(var(--foreground-lighter))',
         },
         'typography-body-strong': {
-          light: 'var(--colors-scale12)',
-          dark: 'var(--colors-scale12)',
+          light: 'hsl(var(--foreground-default))',
+          dark: 'hsl(var(--foreground-default))',
         },
         'typography-body-faded': {
-          light: 'var(--colors-scale9)',
-          dark: 'var(--colors-scale9)',
+          light: 'hsl(var(--foreground-muted))',
+          dark: 'hsl(var(--foreground-muted))',
         },
 
         /* Tables */
         'table-body': {
-          light: 'var(--colors-scale1)',
-          dark: 'var(--colors-scale2)',
+          light: 'hsl(var(--background-default))',
+          dark: 'hsl(var(--background-default))',
         },
         'table-header': {
-          light: 'var(--colors-scale2)', // gray[100],
-          dark: 'var(--colors-scale3)', // '#1a1a1a', //gray[700],
+          light: 'hsl(var(--background-surface-100))',
+          dark: 'hsl(var(--background-surface-100))',
         },
         'table-footer': {
-          light: 'var(--colors-scale2)', // gray[100],
-          dark: 'var(--colors-scale4)', // '#1a1a1a',
+          light: 'hsl(var(--background-surface-100))',
+          dark: 'hsl(var(--background-surface-100))',
         },
         'table-border': {
-          light: 'var(--colors-scale5)', // gray[100],
-          dark: 'var(--colors-scale4)', // '#1a1a1a',
+          light: 'hsl(var(--border-default))',
+          dark: 'hsl(var(--border-default))',
         },
 
         /* Panels */
         'panel-body': {
-          light: 'var(--colors-scale1)',
-          dark: 'var(--colors-scale3)',
+          light: 'hsl(var(--background-surface-100))',
+          dark: 'hsl(var(--background-surface-100))',
         },
         'panel-header': {
-          light: 'var(--colors-scale1)',
-          dark: 'var(--colors-scale3)',
+          light: 'hsl(var(--background-surface-100))',
+          dark: 'hsl(var(--background-surface-100))',
         },
         'panel-footer': {
-          light: 'var(--colors-scale1)',
-          dark: 'var(--colors-scale3)',
+          light: 'hsl(var(--background-surface-100))',
+          dark: 'hsl(var(--background-surface-100))',
         },
         'panel-border': {
-          light: 'var(--colors-scale5)',
-          dark: 'var(--colors-scale4)',
+          light: 'hsl(var(--border-default))',
+          dark: 'hsl(var(--border-default))',
         },
         'panel-border-interior': {
-          light: 'var(--colors-scale4)',
-          dark: 'var(--colors-scale4)',
+          light: 'hsl(var(--border-muted))',
+          dark: 'hsl(var(--border-muted))',
         },
         'panel-border-hover': {
-          light: 'var(--colors-scale2)',
-          dark: 'var(--colors-scale4)',
+          light: 'hsl(var(--border-muted))',
+          dark: 'hsl(var(--border-muted))',
         },
       },
 

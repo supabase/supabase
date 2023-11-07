@@ -44,8 +44,8 @@ const IconPanel = ({
           'overflow-hidden',
           'border rounded-full',
           background
-            ? 'border-scale-500 hover:border-scale-700 bg-white dark:bg-scale-300'
-            : 'border-scale-400 hover:border-scale-500 bg-transparent',
+            ? 'hover:border-strong bg-surface-100'
+            : 'border-muted hover:border-default bg-transparent',
           'transition',
         ].join(' ')}
       >
@@ -84,12 +84,12 @@ const IconPanel = ({
             )}
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-3">
-                {title && <h5 className="text-base text-scale-1200 m-0">{title}</h5>}
+                {title && <h5 className="text-base text-foreground m-0">{title}</h5>}
                 {!hideArrow && (
                   <div
                     className="
                 transition-all ease-out -ml-1 opacity-0
-                text-scale-800
+                text-foreground-muted
                 group-hover:opacity-100
                 group-hover:ml-0"
                   >
@@ -97,7 +97,9 @@ const IconPanel = ({
                   </div>
                 )}
               </div>
-              {children && <span className="text-sm text-scale-1100 not-prose">{children}</span>}
+              {children && (
+                <span className="text-sm text-foreground-light not-prose">{children}</span>
+              )}
               {showLink && <span className="text-brand justify-end text-sm">Learn more</span>}
             </div>
           </div>
@@ -106,14 +108,14 @@ const IconPanel = ({
           className="
         absolute transition-all ease-in
         -z-10 -inset-3 rounded-2xl
-        bg-scale-200 dark:bg-whiteA-300 opacity-0 peer-hover:opacity-100"
+        bg-surface-100 opacity-0 peer-hover:opacity-100"
         ></div>
       </div>
       {tooltip && (
         <ReactTooltip
           effect="solid"
-          backgroundColor="var(--colors-scale1)"
-          textColor="var(--colors-scale11)"
+          backgroundColor="hsl(var(--background-alternative))"
+          textColor="hsl(var(--foreground-light))"
           className="!py-2 !px-4"
         />
       )}

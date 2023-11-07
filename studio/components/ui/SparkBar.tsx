@@ -48,7 +48,7 @@ const SparkBar = ({
         )}
         <div
           className={`relative rounded h-1 overflow-hidden w-full border p-0 ${
-            bgClass ? bgClass : 'bg-gray-100 dark:bg-gray-600'
+            bgClass ? bgClass : 'bg-overlay-hover'
           } ${borderClass ? borderClass : 'border-none'}`}
         >
           <div

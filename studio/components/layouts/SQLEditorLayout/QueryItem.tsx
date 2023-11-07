@@ -63,7 +63,7 @@ const QueryItem = ({ tabInfo }: QueryItemProps) => {
       key={id}
       className={clsx(
         'flex items-center justify-between rounded-md group',
-        isActive && 'text-foreground bg-scale-400 dark:bg-scale-600 -active'
+        isActive && 'text-foreground bg-surface-300 -active'
       )}
       ref={isActive ? (activeItemRef as React.RefObject<HTMLDivElement>) : null}
     >
@@ -207,8 +207,8 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
               className={clsx(
                 'rounded p-1',
                 isActive
-                  ? 'text-foreground-light hover:bg-scale-800'
-                  : 'text-scale-300 dark:text-scale-200 hover:bg-scale-500 group-hover:text-foreground-light'
+                  ? 'text-foreground-light hover:bg-border-stronger'
+                  : 'text-background hover:bg-overlay-hover group-hover:text-foreground-light'
               )}
             >
               <IconChevronDown size="tiny" strokeWidth={2} />

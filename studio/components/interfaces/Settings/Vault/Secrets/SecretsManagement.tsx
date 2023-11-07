@@ -127,8 +127,8 @@ const SecretsManagement = () => {
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                        'border border-scale-200',
+                        'rounded bg-alternative py-1 px-2 leading-none shadow',
+                        'border border-background',
                       ].join(' ')}
                     >
                       <span className="text-xs text-foreground">
@@ -143,7 +143,7 @@ const SecretsManagement = () => {
         </div>
 
         {/* Table of secrets */}
-        <div className="border border-scale-500 rounded">
+        <div className="border border-default rounded">
           {!vault.isLoaded ? (
             <div className="px-6 py-6 space-x-2 flex items-center justify-center">
               <IconLoader

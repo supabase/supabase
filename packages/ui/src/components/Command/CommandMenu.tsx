@@ -115,7 +115,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                     {search ? (
                       <>
                         {': '}
-                        <span className="text-scale-1200 font-semibold">{search}</span>
+                        <span className="text-foreground font-semibold">{search}</span>
                       </>
                     ) : (
                       '...'
@@ -135,7 +135,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                     {search ? (
                       <>
                         {': '}
-                        <span className="text-scale-1200 font-semibold">{search}</span>
+                        <span className="text-foreground font-semibold">{search}</span>
                       </>
                     ) : (
                       '...'
@@ -148,7 +148,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                 <CommandGroup heading="Quickstarts">
                   {sharedItems.quickstarts.map((item) => (
                     <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
-                      <IconArrowRight className="text-scale-900" />
+                      <IconArrowRight className="text-foreground-muted" />
                       <CommandLabel>
                         Start with <span className="font-bold"> {item.label}</span>
                       </CommandLabel>
@@ -161,7 +161,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                 <CommandGroup heading="Projects">
                   {sharedItems.projectTools.map((item) => (
                     <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
-                      <IconArrowRight className="text-scale-900" />
+                      <IconArrowRight className="text-foreground-muted" />
                       <CommandLabel>
                         <span className="font-bold"> {item.label}</span>
                       </CommandLabel>
@@ -174,7 +174,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                 <CommandGroup heading="Studio tools">
                   {sharedItems.tools.map((item) => (
                     <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
-                      <IconArrowRight className="text-scale-900" />
+                      <IconArrowRight className="text-foreground-muted" />
                       <CommandLabel>
                         Go to <span className="font-bold"> {item.label}</span>
                       </CommandLabel>
@@ -190,7 +190,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                     badge={<BadgeExperimental />}
                     onSelect={() => setPages([...pages, COMMAND_ROUTES.GENERATE_SQL])}
                   >
-                    <AiIcon className="text-scale-1100" />
+                    <AiIcon className="text-foreground-light" />
                     <CommandLabel>Generate SQL with Supabase AI</CommandLabel>
                   </CommandItem>
                 </CommandGroup>
@@ -205,7 +205,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                       setPages([...pages, COMMAND_ROUTES.API_KEYS])
                     }}
                   >
-                    <IconKey className="text-scale-1100" />
+                    <IconKey className="text-foreground-light" />
                     <CommandLabel>Get API keys</CommandLabel>
                   </CommandItem>
                   {project?.apiUrl !== undefined && (
@@ -217,7 +217,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                       }}
                       className="space-x-2"
                     >
-                      <IconLink className="text-scale-1100" />
+                      <IconLink className="text-foreground-light" />
                       <CommandLabel>Copy API URL</CommandLabel>
                     </ChildItem>
                   )}
@@ -240,7 +240,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                           setIsOpen(false)
                         }}
                       >
-                        <IconArrowRight className="text-scale-900" />
+                        <IconArrowRight className="text-foreground-muted" />
                         <CommandLabel>
                           Go to <span className="font-bold"> {item.label}</span>
                         </CommandLabel>
@@ -255,7 +255,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
               <CommandGroup heading="Support">
                 {sharedItems.support.map((item) => (
                   <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
-                    <IconLifeBuoy className="text-scale-900" />
+                    <IconLifeBuoy className="text-foreground-muted" />
                     <CommandLabel>
                       Go to <span className="font-bold"> {item.label}</span>
                     </CommandLabel>

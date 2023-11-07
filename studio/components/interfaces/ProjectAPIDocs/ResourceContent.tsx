@@ -34,7 +34,7 @@ const ResourceContent = ({ selectedLanguage, snippet, codeSnippets }: ResourceCo
         </div>
         {snippet.description !== undefined && (
           <div className="doc-section">
-            <article className="text text-sm text-light">
+            <article className="text text-sm text-foreground-light">
               <Markdown
                 className="max-w-none"
                 content={snippet.description.replaceAll('[ref]', projectRef ?? '_')}

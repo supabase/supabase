@@ -43,8 +43,8 @@ export const generateCascadeActionDescription = (
                 <Tooltip.Arrow className="radix-tooltip-arrow" />
                 <div
                   className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'w-[300px] space-y-2 border border-scale-200',
+                    'rounded bg-alternative py-1 px-2 leading-none shadow',
+                    'w-[300px] space-y-2 border border-background',
                   ].join(' ')}
                 >
                   <p className="text-xs text-foreground">

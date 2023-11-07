@@ -203,7 +203,7 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
         </div>
       </Panel.Content>
 
-      <div className="border-t border-scale-400" />
+      <div className="border-t border-muted" />
 
       <Panel.Content>
         <div className="flex items-center justify-between">

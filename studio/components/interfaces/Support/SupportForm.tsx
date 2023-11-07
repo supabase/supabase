@@ -550,7 +550,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                             return (
                               <div
                                 key={library.name}
-                                className="w-[230px] min-w-[230px] min-h-[128px] rounded border border-scale-600 bg-scale-300 space-y-3 px-4 py-3"
+                                className="w-[230px] min-w-[230px] min-h-[128px] rounded border border-control bg-surface-100 space-y-3 px-4 py-3"
                               >
                                 <div className="space-y-1">
                                   <p className="text-sm">{library.name}</p>
@@ -574,7 +574,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                           })}
                           <div
                             className={[
-                              'px-4 py-3 rounded border border-scale-600 bg-scale-300',
+                              'px-4 py-3 rounded border border-control bg-surface-100',
                               'w-[230px] min-w-[230px] min-h-[128px] flex flex-col justify-between space-y-3',
                             ].join(' ')}
                           >
@@ -678,7 +678,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                         {uploadedFiles.length < MAX_ATTACHMENTS && (
                           <div
                             className={[
-                              'border border-scale-800 opacity-50 transition hover:opacity-100',
+                              'border border-stronger opacity-50 transition hover:opacity-100',
                               'group flex h-14 w-14 cursor-pointer items-center justify-center rounded',
                             ].join(' ')}
                             onClick={() => {

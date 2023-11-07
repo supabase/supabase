@@ -60,7 +60,7 @@ const ColumnList = ({
       <div className="flex items-center space-x-2">
         <div className="flex items-center space-x-2">
           <h3 className="mb-1 text-xl text-foreground">Database Tables</h3>
-          <IconChevronRight strokeWidth={1.5} className="text-light" />
+          <IconChevronRight strokeWidth={1.5} className="text-foreground-light" />
           <h3 className="mb-1 text-xl text-foreground">{table.name}</h3>
         </div>
       </div>
@@ -99,8 +99,8 @@ const ColumnList = ({
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                        'border border-scale-200',
+                        'rounded bg-alternative py-1 px-2 leading-none shadow',
+                        'border border-background',
                       ].join(' ')}
                     >
                       <span className="text-xs text-foreground">
@@ -155,7 +155,7 @@ const ColumnList = ({
                       {x.comment !== null ? (
                         <p title={x.comment}>{x.comment}</p>
                       ) : (
-                        <p className="text-scale-800">No description</p>
+                        <p className="text-border-stronger">No description</p>
                       )}
                     </Table.td>
                     <Table.td>
@@ -193,8 +193,8 @@ const ColumnList = ({
                                       <Tooltip.Arrow className="radix-tooltip-arrow" />
                                       <div
                                         className={[
-                                          'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                          'border border-scale-200',
+                                          'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                          'border border-background',
                                         ].join(' ')}
                                       >
                                         <span className="text-xs text-foreground">
@@ -222,8 +222,8 @@ const ColumnList = ({
                                       <Tooltip.Arrow className="radix-tooltip-arrow" />
                                       <div
                                         className={[
-                                          'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                          'border border-scale-200',
+                                          'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                          'border border-background',
                                         ].join(' ')}
                                       >
                                         <span className="text-xs text-foreground">
