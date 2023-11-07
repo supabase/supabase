@@ -223,7 +223,7 @@ const CreateWrapper = () => {
                         {newTables.map((table, i) => (
                           <div
                             key={`${table.schema_name}.${table.table_name}`}
-                            className="flex items-center justify-between px-4 py-2 border rounded-md border-scale-600"
+                            className="flex items-center justify-between px-4 py-2 border rounded-md border-control"
                           >
                             <div>
                               <p className="text-sm">

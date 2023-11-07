@@ -129,7 +129,7 @@ const Indexes = () => {
           <div className="flex items-center space-x-2">
             {isLoadingSchemas && <ShimmeringLoader className="w-[260px]" />}
             {isErrorSchemas && (
-              <div className="w-[260px] text-light text-sm border px-3 py-1.5 rounded flex items-center space-x-2">
+              <div className="w-[260px] text-foreground-light text-sm border px-3 py-1.5 rounded flex items-center space-x-2">
                 <IconAlertCircle strokeWidth={2} size={16} />
                 <p>Failed to load schemas</p>
               </div>
@@ -181,7 +181,7 @@ const Indexes = () => {
                   <Table.tr>
                     <Table.td colSpan={4}>
                       <p className="text-sm text-foreground">No indexes created yet</p>
-                      <p className="text-sm text-light">
+                      <p className="text-sm text-foreground-light">
                         There are no indexes found in the schema "{selectedSchema}"
                       </p>
                     </Table.td>
@@ -191,7 +191,7 @@ const Indexes = () => {
                   <Table.tr>
                     <Table.td colSpan={4}>
                       <p className="text-sm text-foreground">No results found</p>
-                      <p className="text-sm text-light">
+                      <p className="text-sm text-foreground-light">
                         Your search for "{search}" did not return any results
                       </p>
                     </Table.td>
@@ -286,7 +286,7 @@ const Indexes = () => {
               <li className="flex gap-3">
                 <div>
                   <strong className="text-sm">Before deleting this index, consider:</strong>
-                  <ul className="space-y-2 mt-2 text-sm text-light">
+                  <ul className="space-y-2 mt-2 text-sm text-foreground-light">
                     <li className="list-disc ml-6">This index is no longer in use</li>
                     <li className="list-disc ml-6">
                       The table which the index is on is not currently in use, as dropping an index

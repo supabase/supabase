@@ -28,8 +28,8 @@
   --border-alternative: var(--colors-slate-light-500);
   --border-control: var(--colors-slate-light-600);
   --border-overlay: var(--colors-slate-light-500);
-  --border-secondary: var(--colors-gray-dark-400);
-  --border-muted: var(--colors-gray-dark-400);
+  --border-secondary: var(--colors-slate-light-400);
+  --border-muted: var(--colors-slate-light-400);
   --border-default: var(--colors-slate-light-500);
   --background-overlay-hover: var(--colors-slate-light-300);
   --background-overlay-default: var(--colors-slate-light-100);
@@ -40,7 +40,7 @@
   --background-control: var(--colors-slate-light-300);
   --background-selection: var(--colors-gray-light-400);
   --background-default: var(--colors-slate-light-200);
-  --foreground-muted: var(--colors-slate-light-800);
+  --foreground-muted: var(--colors-slate-light-900);
   --foreground-lighter: var(--colors-slate-light-1000);
   --foreground-light: var(--colors-slate-light-1100);
   --foreground-strong: var(--colors-slate-light-1200);

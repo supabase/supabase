@@ -21,7 +21,6 @@ export const useFeaturePreviewContext = () => useContext(FeaturePreviewContext)
 export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}>) => {
   const [flags, setFlags] = useState({
     [LOCAL_STORAGE_KEYS.UI_PREVIEW_NAVIGATION_LAYOUT]: false,
-    [LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL]: false,
   })
 
   useEffect(() => {
@@ -29,8 +28,6 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}
       setFlags({
         [LOCAL_STORAGE_KEYS.UI_PREVIEW_NAVIGATION_LAYOUT]:
           localStorage.getItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_NAVIGATION_LAYOUT) === 'true',
-        [LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL]:
-          localStorage.getItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL) === 'true',
       })
     }
   }, [])
@@ -53,9 +50,4 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}
 export const useIsNavigationPreviewEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_NAVIGATION_LAYOUT]
-}
-
-export const useIsAPIDocsSidePanelEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL]
 }

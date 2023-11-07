@@ -159,7 +159,7 @@ const CostControl = ({}: CostControlProps) => {
 
               <div className="flex space-x-6">
                 <div>
-                  <div className="rounded-md bg-scale-100 dark:bg-scale-400 w-[160px] h-[96px] shadow">
+                  <div className="rounded-md bg-surface-200 w-[160px] h-[96px] shadow">
                     <Image
                       alt="Spend Cap"
                       width={160}

@@ -50,13 +50,13 @@ const WithSidebar = ({
           id="with-sidebar"
           style={{ height: maxHeight, maxHeight }}
           className={[
-            'h-full bg-body',
-            'hide-scrollbar w-64 overflow-auto border-r border-scale-500',
+            'h-full bg-background',
+            'hide-scrollbar w-64 overflow-auto border-r border-default',
           ].join(' ')}
         >
           {title && (
             <div className="mb-2">
-              <div className="flex h-12 max-h-12 items-center border-b px-6 border-scale-500">
+              <div className="flex h-12 max-h-12 items-center border-b px-6 border-default">
                 <h4 className="mb-0 text-lg truncate" title={title}>
                   {title}
                 </h4>
@@ -76,7 +76,7 @@ const WithSidebar = ({
                     subitemsParentKey={subitemsParentKey}
                   />
                 ) : (
-                  <div className="border-b py-5 px-6 border-scale-400" key={section.key}>
+                  <div className="border-b py-5 px-6 border-default" key={section.key}>
                     <SidebarItem
                       links={section.links}
                       subitems={subitems}
@@ -105,7 +105,7 @@ interface SectionWithHeadersProps {
 }
 
 const SectionWithHeaders = ({ section, subitems, subitemsParentKey }: SectionWithHeadersProps) => (
-  <div key={section.heading} className="border-b py-5 px-6 border-scale-500">
+  <div key={section.heading} className="border-b py-5 px-6 border-default">
     {section.heading && <Menu.Group title={section.heading} />}
     {section.versionLabel && (
       <div className="mb-1 px-3">
@@ -207,7 +207,7 @@ const SidebarLinkItem = ({
 
   return (
     <Link href={href || ''} className="block" target={isExternal ? '_blank' : '_self'}>
-      <span className="group flex max-w-full cursor-pointer items-center space-x-2 border-scale-500 py-1 font-normal outline-none ring-scale-1200 focus-visible:z-10 focus-visible:ring-1 group-hover:border-scale-900">
+      <span className="group flex max-w-full cursor-pointer items-center space-x-2 border-default py-1 font-normal outline-none ring-foreground focus-visible:z-10 focus-visible:ring-1 group-hover:border-foreground-muted">
         {isExternal && (
           <span className="truncate text-sm text-foreground-lighter transition group-hover:text-foreground-light">
             <IconArrowUpRight size={'tiny'} />

@@ -65,7 +65,7 @@ const Scope = ({
 
   return (
     <div
-      className="flex flex-row justify-between p-4 border border-scale-300 dark:border-scale-500 first:rounded-t last:rounded-b"
+      className="flex flex-row justify-between p-4 border first:rounded-t last:rounded-b"
       key={title}
     >
       <div className="flex flex-col">

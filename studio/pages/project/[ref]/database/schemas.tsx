@@ -32,9 +32,9 @@ const SchemasPage: NextPageWithLayout = () => {
   return (
     <>
       <div className="flex w-full h-full flex-col">
-        <div className="p-4 border-b border-scale-500">
+        <div className="p-4 border-b border-default">
           {isLoading && (
-            <div className="h-[34px] w-[260px] bg-scale-1000 rounded shimmering-loader" />
+            <div className="h-[34px] w-[260px] bg-foreground-lighter rounded shimmering-loader" />
           )}
 
           {isError && <AlertError error={error} subject="Failed to retrieve schemas" />}

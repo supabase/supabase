@@ -24,10 +24,10 @@ const BillingLayout = ({ children }: PropsWithChildren<BillingLayoutProps>) => {
           </Link>
           <div className="flex items-center space-x-6">
             <h1 className="text-sm text-foreground">Customize your plan</h1>
-            <div className="h-6 w-px bg-scale-600"></div>
+            <div className="h-6 w-px bg-selection"></div>
             <div className="flex items-center space-x-3">
               <p className="text-sm text-foreground-light">{selectedOrganization?.name}</p>
-              <span className="text-scale-800">
+              <span className="text-border-stronger">
                 <svg
                   viewBox="0 0 24 24"
                   width="16"
