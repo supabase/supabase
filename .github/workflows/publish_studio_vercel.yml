@@ -23,6 +23,9 @@ jobs:
     steps:
       - name: Check out repo
         uses: actions/checkout@v4
+        # use the PR head commit, not the merge commit between this branch and master
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
