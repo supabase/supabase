@@ -1,5 +1,7 @@
 .react-contexify {
-  @apply !bg-surface-200 border border-default;
+  @apply border border-default;
+  background-color: hsl(var(--background-surface-100)) !important;
+
   .react-contexify__item {
     .react-contexify__item__content {
       @apply text-foreground text-sm;
