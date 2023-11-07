@@ -30,7 +30,7 @@ const GlassPanel = ({
   showIconBg = false,
 }: Props) => {
   const { resolvedTheme } = useTheme()
-  const showLogoInverse = logoInverse && resolvedTheme === 'dark'
+  const showLogoInverse = logoInverse && resolvedTheme?.includes('dark')
   const showLogo = !showLogoInverse && logo
 
   const IconBackground: React.FC<React.PropsWithChildren> = (props) => (
