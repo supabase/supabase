@@ -46,7 +46,7 @@ const ItemContextMenu = ({ id = '', onCopyUrl = noop }: ItemContextMenuProps) =>
   }
 
   return (
-    <Menu id={id} animation="fade">
+    <Menu id={id} animation="fade" className="!bg-surface-200">
       {isPublic ? (
         <Item onClick={({ props }) => onHandleClick('copy', props.item)}>
           <IconClipboard size="tiny" />
