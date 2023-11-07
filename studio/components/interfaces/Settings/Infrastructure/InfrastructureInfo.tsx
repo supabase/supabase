@@ -23,6 +23,7 @@ import {
   Input,
 } from 'ui'
 import ProjectUpgradeAlert from '../General/Infrastructure/ProjectUpgradeAlert'
+import InstanceConfiguration from './InfrastructureConfiguration/InstanceConfiguration'
 
 const InfrastructureInfo = () => {
   const { ref } = useParams()
@@ -60,7 +61,11 @@ const InfrastructureInfo = () => {
           </div>
         </div>
       </ScaffoldContainer>
+
       <ScaffoldDivider />
+      <InstanceConfiguration />
+      <ScaffoldDivider />
+
       <ScaffoldContainer>
         <ScaffoldSection>
           <ScaffoldSectionDetail>

@@ -1,0 +1,8 @@
+.instance-configuration {
+  .react-flow__pane {
+    @apply cursor-default;
+  }
+  .react-flow__node {
+    @apply cursor-pointer;
+  }
+}
