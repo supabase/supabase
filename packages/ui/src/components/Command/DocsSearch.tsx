@@ -49,6 +49,11 @@ export interface PageResult {
   sections: PageSection[]
 }
 
+function removeDoubleQuotes(inputString: string): string {
+  // Use the replace method with a regular expression to remove double quotes
+  return inputString.replace(/"/g, '')
+}
+
 const getDocsUrl = () => {
   if (!process.env.NEXT_PUBLIC_SITE_URL || !process.env.NEXT_PUBLIC_LOCAL_SUPABASE) {
     return 'https://supabase.com/docs'
@@ -171,7 +176,7 @@ const DocsSearch = () => {
             >
               <CommandItem
                 key={`${page.meta.title}-item-index-${i}`}
-                value={`${page.meta.title}-item-index-${i}`}
+                value={`${removeDoubleQuotes(page.meta.title)}-item-index-${i}`}
                 type="block-link"
                 onSelect={() => {
                   openLink(page.type, formatPageUrl(page))
@@ -202,7 +207,9 @@ const DocsSearch = () => {
                         openLink(page.type, formatSectionUrl(page, section))
                       }}
                       key={`${page.meta.title}__${section.heading}-item-index-${i}`}
-                      value={`${page.meta.title}__${section.heading}-item-index-${i}`}
+                      value={`${removeDoubleQuotes(page.meta.title)}__${removeDoubleQuotes(
+                        section.heading ?? ''
+                      )}-item-index-${i}`}
                       type="block-link"
                     >
                       <div className="grow flex gap-3 items-center">
