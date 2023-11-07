@@ -46,10 +46,13 @@ We can see exactly how many connections Supavisor is using and confirm our conne
 ```sql
 select
   count(*) as count,
+  usename,
   application_name
 from pg_stat_activity
-where application_name like '%supavisor%'
-group by application_name
+where application_name ilike '%supavisor%'
+group by
+  usename,
+  application_name
 order by application_name desc;
 ```
 
