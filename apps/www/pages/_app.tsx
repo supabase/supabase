@@ -1,7 +1,5 @@
 import '@code-hike/mdx/styles'
 import 'config/code-hike.scss'
-import '../../../packages/ui/build/css/themes/dark.css'
-import '../../../packages/ui/build/css/themes/light.css'
 import '../styles/index.css'
 
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
@@ -96,7 +94,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <SessionContextProvider supabaseClient={supabase}>
         <AuthProvider>
           <ThemeProvider
-            attribute="class"
+            // attribute="class"
             defaultTheme="system"
             enableSystem
             disableTransitionOnChange
