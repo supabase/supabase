@@ -18,7 +18,7 @@ const FolderContextMenu = ({ id = '' }: FolderContextMenuProps) => {
   const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   return (
-    <Menu id={id} animation="fade">
+    <Menu id={id} animation="fade" className="!bg-surface-200">
       {canUpdateFiles && (
         <Item onClick={({ props }) => setSelectedItemToRename(props.item)}>
           <IconEdit size="tiny" />
