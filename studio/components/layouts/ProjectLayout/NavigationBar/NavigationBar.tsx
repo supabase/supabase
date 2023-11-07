@@ -23,6 +23,8 @@ import {
   IconSearch,
   IconSettings,
   IconUser,
+  Theme,
+  themes,
   useCommandMenu,
 } from 'ui'
 
@@ -229,9 +231,11 @@ const NavigationBar = () => {
                     setTheme(value)
                   }}
                 >
-                  <DropdownMenuRadioItem value={'system'}>System</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value={'dark'}>Dark</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value={'light'}>Light</DropdownMenuRadioItem>
+                  {themes.map((theme: Theme) => (
+                    <DropdownMenuRadioItem key={theme.value} value={theme.value}>
+                      {theme.name}
+                    </DropdownMenuRadioItem>
+                  ))}
                 </DropdownMenuRadioGroup>
               </DropdownMenuGroup>
             </DropdownMenuContent>
