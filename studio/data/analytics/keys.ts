@@ -68,6 +68,9 @@ export const analyticsKeys = {
     ] as const,
   usageApiCounts: (projectRef: string | undefined, interval: string | undefined) =>
     ['projects', projectRef, 'usage.api-counts', interval] as const,
+
+  usageApiRequestsCount: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'usage.api-requests-count'] as const,
 }
 
 function isoDateStringToDate(isoDateString: string | undefined): string | undefined {
