@@ -114,14 +114,7 @@ export const BranchRow = ({
       <div className="flex items-center gap-x-8">
         {pullRequest !== undefined && (
           <div className="flex items-center">
-            <Link
-              href={pullRequest.url}
-              target="_blank"
-              rel="noreferrer"
-              className="text-xs transition text-foreground-lighter mr-4 hover:text-foreground"
-            >
-              #{branch.pr_number}
-            </Link>
+            <p className="text-xs text-foreground-lighter mr-4">#{branch.pr_number}</p>
             <div className="flex items-center gap-x-2 bg-brand-500 px-3 py-1 rounded-full">
               <GitPullRequest size={14} />
               <p className="text-xs">Open</p>
@@ -139,6 +132,7 @@ export const BranchRow = ({
             </Button>
           </div>
         )}
+
         {isMain ? (
           <div className="flex items-center gap-x-2">
             <Button asChild type="default" iconRight={<IconExternalLink />}>
