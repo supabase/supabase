@@ -94,6 +94,61 @@ An Information request about Supabase or feature request.
 
 Business hours are from 6am to 6pm (local time), except where otherwise stated.
 
+## SLA Exclusions
+
+### **General Service exclusions**
+
+- (i) caused by factors outside of our reasonable control, including but not limited to any force majeure event or Internet access, ISP provider issues, and / or related problems beyond the demarcation point of Supabase. For the avoidance of doubt, this list is not exhaustive and we will endeavour to inform you if the issue is beyond a factor that we can reasonably control;
+- (ii) that result from any voluntary actions or inactions from you;
+- (iii) that result from instance class CPU and memory resource limitations;
+- (iv) that result from you not following the basic operational guidelines described in our [Docs](https://supabase.com/docs) (e.g., overloading a database instance to the point it is inoperable, creating excessively large number of tables that significantly increase the recovery time etc.);
+- (vi) that result in long recovery time due to insufficient IO capacity for your database workload;
+- (vii) that result from your equipment, software or other technology; or
+- (viii) arising from our suspension and termination of your right to use Supabase in accordance with our Terms.
+
+### Database SLA exclusions
+
+- (i) Unofficially supported postgres extensions are excluded from our SLA.
+- (ii) Our SLA only applies to the 2 most recent major released of Postgres that Supabase has officially supported. Older versions are excluded.
+
+### **Auth SLA exclusions**
+
+- (i) Inappropriately provisioned compute resources related to your project for the expected load on your database and Auth servers, especially in the case of verifying or storing password-based credentials in the sign in, sign up, password change, password reset, and other such flows and APIs
+- (ii) Any accidental or intentional modifications, additions or deletions of database objects (tables, views, triggers, roles, functions, indexes, constraints, permissions, grants and similar) in the `auth` schema, or foreign key relationships in any schema to non-primary key columns within the `auth` schema, that may cause total or partial outage, including outages caused in the future but related to such modifications, additions or deletions in the past when arising from schema migrations initiated by Supabase
+- (iii) Total or partial outages caused by third-party services as configured by default or by choice including and not limited to: OAuth, OpenID Connect, Security Assertion Markup Language servers and related APIs and protocols; Email (via SMTP or otherwise) and SMS sending servers and related APIs; CAPTCHA services and APIs; Password Strength Checking services such as HaveIBeenPwned.org; IP geo-location; and other such services
+- (iv) Outages caused by overly permissive rate-limiting configurations
+- (v) Outages caused by email sending issues when using the provisional (default) email sending configuration included with any Supabase project with the intention of getting started but not for production use
+- (vi) Outages or issues caused by retracted versions of official Supabase libraries, frameworks, software packages (CLI, Docker image, executable, Infrastructure-as-Code plugins, etc.) or APIs, including urgent retractions due to identified security vulnerabilities
+- (vi) Outages or issues caused by unofficial Supabase client libraries, frameworks or API proxies, including security vulnerabilities, even when those libraries internally use official Supabase libraries
+- (vii) Outages or issues that could have been resolved by upgrading to a higher minor or patch version of an official Supabase client library, framework or software package (CLI, Docker image, executable, Infrastructure-as-Code plugin, etc.)
+
+### **Storage SLA Exclusions**
+
+(i) Inappropriately provisioned compute resources related to your project for the expected load on your database
+
+(ii) Low amount of pgBouncer or Supavisor connection pool configuration such as max_clients and pool_size for high amount of traffic
+
+(iii) Any accidental or intentional modifications, additions, or deletions of database objects (tables, views, triggers, roles, functions, indexes, constraints, permissions, grants and similar) in the `storage` schema, or foreign key relationships in any schema to non-primary key columns within the `storage` schema, that may cause total or partial outage, including outages caused in the future but related to such modifications, additions or deletions in the past when arising from schema migrations initiated by Supabase
+
+(iv) Outages or issues that could have been resolved by upgrading to a higher minor or patch version of an official Supabase client library, framework or software package (CLI, Docker image, executable, Infrastructure-as-Code plugin, etc.)
+
+(v) Outages caused by accidental deletions of objects or buckets via the Storage API by the user
+
+### M**anagement API SLA Exclusions**
+
+- (i) until the management API reach General Availability (GA), we cannot provide an uptime commitment.
+- (ii) personal access token getting lost or leaked due to improper maintenance or improper use of confidential information.
+- (iii) violation of Supabase fair-use policy.
+
+### **Realtime SLA Exclusions**
+
+- (i) Inappropriately provisioned compute resources related to your project for the expected load on your database.
+- (ii) The Realtime service does not guarantee messaging deliverability. If you need at-least-once, exactly-once, or at-most-once guarantees you will need to build this functionality on top of the realtime service.
+
+### **Edge Functions**
+
+- (i) **Uptime Commitment Exclusion:** Until Edge Functions reach General Availability (GA), we cannot provide an uptime commitment. Customers acknowledge that the service may experience downtime, interruptions, or performance issues, and no specific availability percentage is promised at this time.
+
 </SectionContainer>
 
 export default (context) => <Layout meta={meta} children={context.children} context={context} />
