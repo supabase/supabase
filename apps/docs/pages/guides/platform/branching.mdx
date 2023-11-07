@@ -28,25 +28,7 @@ Branching is an alpha feature. To try out branching for non-production experimen
 
 ### How branching works
 
-Conceptually, Supabase branching works like Git branching.
-
-It uses SQL migration files to manage database changes between branches. When you create a preview branch, the SQL migration files on that branch are run to create a preview instance. The preview instance reflects your current production schema, plus the migration changes.
-
-When you merge a preview branch into the production branch, the associated migrations are run on the production instance.
-
-Each branch has its own preview instance, which is deployed on its own isolated server.
-
-<Admonition type="note">
-
-Only schema changes are captured in preview branches.
-
-Preview instances contain no data by default. You can include a seed file to seed your preview instance with sample data. Future versions of branching may allow for automated data seeding and cloning.
-
-</Admonition>
-
-### Github Branching workflow
-
-When branching is turned on, each Supabase project can consist of multiple branches. Each branch is backed by an isolated Supabase instance. Each instance contains all Supabase features, and has its own API credentials.
+Each Supabase project can consist of multiple Preview Branches. Each Preview Branch is backed by an isolated Supabase instance. Each instance contains all Supabase features, and has its own API credentials.
 
 <figure className="max-w-[700px] mx-auto">
   <Image
@@ -62,11 +44,36 @@ When branching is turned on, each Supabase project can consist of multiple branc
   <figcaption>Each branch has a separate Supabase instance.</figcaption>
 </figure>
 
-Supabase uses Git operations to manage Supabase branching. Once you install the integration for your Git provider, Supabase watches all commits, branches, and pull requests.
+Conceptually, Supabase Branching works like Git branching, in which you usually have a designated branch for Production, and then you use other branches to propose changes that will be merged into your Production branch.
 
-One of your Git branches will be a designated Production Branch which is treated as the corresponding Production branch for your Supabase project's Production Branch.
+Those changes are SQL migrations, and Supabase Branching uses SQL migration files to manage database migrations from Preview Branches into your Production branch.
 
-For every Git Branch in your Git Repository, you may have a corresponding Preview Branch. Each time a new Preview Branch is created the migrations from the GitHub Production branch are run on the Preview Branch, and the Preview Branch is seeded with sample data based on `./supabase/seed.sql`, if that file exists.
+When you create a Preview Branch, which will be merged off from your Production branch, the SQL migration files from your `Production` branch are run on the new Preview Branch.
+The Preview Branch then reflects your current Production branch schema, plus any migration changes you make.
+
+When you merge a Preview Branch into the Production branch, the associated migrations are run on the Supabase Production Branch.
+
+<Admonition type="note">
+
+Only schema changes are captured in preview branches.
+
+Preview instances contain no data by default. You can include a seed file to seed your preview instance with sample data when the Preview Branch is created. Future versions of branching may allow for automated data seeding and cloning.
+
+</Admonition>
+
+#### Git providers
+
+Supabase Branching is planned to work with various Git providers, like GitHub, GitLab or BitBucket.
+
+Our first supported Git provider uses [GitHub](#branching-with-github).
+
+### Branching with GitHub
+
+Supabase Branching uses the Supabase GitHub integration to read files from your GitHub repository. With this integration, Supabase watches all commits, branches, and pull requests of your GitHub repository so that Preview Branches can be correctly created and managed.
+
+One of your Git branches will be a designated Production Branch which is will also reflect your Supabase project's Production Branch.
+
+For every Git Branch in your GitHub Repository, you may have a corresponding Preview Branch. Each time a new Preview Branch is created the migrations in the Git branch of that Preview Branch are run on the Preview Branch, and the Preview Branch is seeded with sample data based on `./supabase/seed.sql`, if that file exists.
 
 <figure className="max-w-[700px] mx-auto">
   <Image
@@ -124,7 +131,7 @@ You can also combine both strategies to perform both local and staging tests.
 
 </Admonition>
 
-### Prepare your GitHub repository
+### Preparing your GitHub repository
 
 You need a GitHub repository to use Supabase branching. The `./supabase` directory in your repository contains your SQL migration files and your database seed file.
 
