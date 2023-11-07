@@ -139,6 +139,26 @@ export const RESOURCE_WARNING_MESSAGES = {
     buttonText: 'Check usage',
     metric: 'ram',
   },
+  auth_rate_limit_exhaustion: {
+    // There is no notion of critical rate limits for auth at the moment
+    bannerContent: {
+      warning: {
+        title:
+          'Your project has exceeded email rate limits, and its performance is affected',
+        description:
+          'You will need to set up custom SMTP and adjust rate limits where necessary. You may also wish to set up CAPTCHA',
+      },
+    },
+    cardContent: {
+      warning: {
+        title: 'Your project has exceeded email rate limits, and its performance is affected',
+        description: `You will need to set up a custom SMTP and adjust rate limits where necessary`,
+      },
+    },
+    docsUrl: undefined,
+    buttonText: 'Check usage',
+    metric: 'auth_email_rate_limit',
+  },
   multiple_resource_warnings: {
     bannerContent: {
       warning: {
