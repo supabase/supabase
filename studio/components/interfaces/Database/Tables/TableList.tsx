@@ -131,8 +131,8 @@ const TableList = ({
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                        'border border-scale-200',
+                        'rounded bg-alternative py-1 px-2 leading-none shadow',
+                        'border border-background',
                       ].join(' ')}
                     >
                       <span className="text-xs text-foreground">
@@ -181,7 +181,7 @@ const TableList = ({
                     <Table.tr key={snap.selectedSchemaName}>
                       <Table.td colSpan={6}>
                         <p className="text-sm text-foreground">No tables created yet</p>
-                        <p className="text-sm text-light">
+                        <p className="text-sm text-foreground-light">
                           There are no tables found in the schema "{snap.selectedSchemaName}"
                         </p>
                       </Table.td>
@@ -191,7 +191,7 @@ const TableList = ({
                     <Table.tr key={snap.selectedSchemaName}>
                       <Table.td colSpan={6}>
                         <p className="text-sm text-foreground">No results found</p>
-                        <p className="text-sm text-light">
+                        <p className="text-sm text-foreground-light">
                           Your search for "{filterString}" did not return any results
                         </p>
                       </Table.td>
@@ -201,13 +201,38 @@ const TableList = ({
                     tables.map((x: any, i: any) => (
                       <Table.tr key={x.id}>
                         <Table.td>
-                          <p title={x.name}>{x.name}</p>
+                          {/* only show tooltips if required, to reduce noise */}
+                          {x.name.length > 20 ? (
+                            <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
+                              <Tooltip.Trigger
+                                asChild
+                                className="max-w-[95%] overflow-hidden text-ellipsis whitespace-nowrap"
+                              >
+                                <p>{x.name}</p>
+                              </Tooltip.Trigger>
+                              <Tooltip.Portal>
+                                <Tooltip.Content side="bottom">
+                                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                  <div
+                                    className={[
+                                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                      'border border-scale-200',
+                                    ].join(' ')}
+                                  >
+                                    <span className="text-xs text-foreground">{x.name}</span>
+                                  </div>
+                                </Tooltip.Content>
+                              </Tooltip.Portal>
+                            </Tooltip.Root>
+                          ) : (
+                            <p>{x.name}</p>
+                          )}
                         </Table.td>
                         <Table.td className="hidden max-w-sm truncate lg:table-cell break-all whitespace-normal">
                           {x.comment !== null ? (
                             <p title={x.comment}>{x.comment}</p>
                           ) : (
-                            <p className="text-scale-800">No description</p>
+                            <p className="text-border-stronger">No description</p>
                           )}
                         </Table.td>
                         <Table.td className="hidden text-right xl:table-cell">
@@ -269,8 +294,8 @@ const TableList = ({
                                             <Tooltip.Arrow className="radix-tooltip-arrow" />
                                             <div
                                               className={[
-                                                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                                'border border-scale-200',
+                                                'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                                'border border-background',
                                               ].join(' ')}
                                             >
                                               <span className="text-xs text-foreground">
@@ -298,8 +323,8 @@ const TableList = ({
                                             <Tooltip.Arrow className="radix-tooltip-arrow" />
                                             <div
                                               className={[
-                                                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                                'border border-scale-200',
+                                                'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                                'border border-background',
                                               ].join(' ')}
                                             >
                                               <span className="text-xs text-foreground">

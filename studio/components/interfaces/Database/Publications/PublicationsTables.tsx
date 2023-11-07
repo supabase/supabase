@@ -55,7 +55,7 @@ const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsT
 
   // const toggleReplicationForAllTables = async (publication: any, disable: boolean) => {
   //   const toggle = disable ? 'disable' : 'enable'
-  //   confirmAlert({
+  //   ConfirmAlert({
   //     title: 'Confirm',
   //     type: 'warn',
   //     message: `Are you sure you want to ${toggle} replication for all tables in ${publication.name}?`,

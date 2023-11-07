@@ -42,11 +42,12 @@ function Partner({
         <SectionContainer>
           <div className="col-span-12 mx-auto mb-2 max-w-5xl space-y-12 lg:col-span-2">
             {/* Back button */}
-            <Link href="/partners/experts">
-              <a className="text-foreground hover:text-lighter flex cursor-pointer items-center transition-colors">
-                <IconChevronLeft style={{ padding: 0 }} />
-                Back
-              </a>
+            <Link
+              href="/partners/experts"
+              className="text-foreground hover:text-foreground-lighter flex cursor-pointer items-center transition-colors"
+            >
+              <IconChevronLeft style={{ padding: 0 }} />
+              Back
             </Link>
 
             <div className="flex items-center space-x-4">
@@ -54,7 +55,7 @@ function Partner({
                 layout="fixed"
                 width={56}
                 height={56}
-                className="bg-scale-400 flex-shrink-f0 h-14 w-14 rounded-full"
+                className="bg-surface2100 flex-shrink-f0 h-14 w-14 rounded-full"
                 src={partner.logo}
                 alt={partner.title}
               />
@@ -64,7 +65,7 @@ function Partner({
             </div>
 
             <div
-              className="bg-scale-300 py-6"
+              className="bg-surface-100 py-6"
               style={{ marginLeft: 'calc(50% - 50vw)', marginRight: 'calc(50% - 50vw)' }}
             >
               <Swiper
@@ -122,7 +123,7 @@ function Partner({
 
                 {partner.video && (
                   <div
-                    className="bg-scale-1000 relative w-full rounded-md shadow-lg"
+                    className="bg-foreground-lighter relative w-full rounded-md shadow-lg"
                     style={{ padding: '56.25% 0 0 0', marginBottom: '1rem' }}
                   >
                     <iframe
@@ -152,27 +153,28 @@ function Partner({
                 <div className="text-foreground divide-y">
                   {partner.type === 'technology' && (
                     <div className="flex items-center justify-between py-2">
-                      <span className="text-lighter">Developer</span>
+                      <span className="text-foreground-lighter">Developer</span>
                       <span className="text-foreground">{partner.developer}</span>
                     </div>
                   )}
 
                   <div className="flex items-center justify-between py-2">
                     <span className="text-lighter">Category</span>
-                    <Link href={`/partners/experts#${partner.category.toLowerCase()}`}>
-                      <a className="text-brand hover:text-brand-300 transition-colors">
-                        {partner.category}
-                      </a>
+                    <Link
+                      href={`/partners/experts#${partner.category.toLowerCase()}`}
+                      className="text-brand hover:underline transition-colors"
+                    >
+                      {partner.category}
                     </Link>
                   </div>
 
                   <div className="flex items-center justify-between py-2">
-                    <span className="text-lighter">Website</span>
+                    <span className="text-foreground-lighter">Website</span>
                     <a
                       href={partner.website}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-brand hover:text-brand-300 transition-colors"
+                      className="text-brand hover:underline transition-colors"
                     >
                       {new URL(partner.website).host}
                     </a>
@@ -180,12 +182,12 @@ function Partner({
 
                   {partner.type === 'technology' && partner.docs && (
                     <div className="flex items-center justify-between py-2">
-                      <span className="text-lighter">Documentation</span>
+                      <span className="text-foreground-lighter">Documentation</span>
                       <a
                         href={partner.docs}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-brand hover:text-brand-300 transition-colors"
+                        className="text-brand hover:underline transition-colors"
                       >
                         <span className="flex items-center space-x-1">
                           <span>Learn</span>

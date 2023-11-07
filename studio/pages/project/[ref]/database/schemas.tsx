@@ -5,11 +5,10 @@ import SchemaGraph from 'components/interfaces/Database/Schemas/SchemaGraph'
 import { DatabaseLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
+import SchemaSelector from 'components/ui/SchemaSelector'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { NextPageWithLayout } from 'types'
-import { IconLock, Listbox } from 'ui'
-import SchemaSelector from 'components/ui/SchemaSelector'
 
 const SchemasPage: NextPageWithLayout = () => {
   const { project } = useProjectContext()
@@ -33,9 +32,9 @@ const SchemasPage: NextPageWithLayout = () => {
   return (
     <>
       <div className="flex w-full h-full flex-col">
-        <div className="p-4 border-b border-scale-500">
+        <div className="p-4 border-b border-default">
           {isLoading && (
-            <div className="h-[34px] w-[260px] bg-scale-1000 rounded shimmering-loader" />
+            <div className="h-[34px] w-[260px] bg-foreground-lighter rounded shimmering-loader" />
           )}
 
           {isError && <AlertError error={error} subject="Failed to retrieve schemas" />}

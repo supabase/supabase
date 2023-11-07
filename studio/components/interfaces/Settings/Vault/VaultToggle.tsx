@@ -60,7 +60,7 @@ const VaultToggle = () => {
   return (
     <div>
       <div
-        className="px-12 py-12 w-full bg-white dark:bg-scale-200 border border-scale-500 rounded bg-no-repeat"
+        className="px-12 py-12 w-full bg-background border rounded bg-no-repeat"
         style={{
           backgroundSize: isNotAvailable ? '50%' : '40%',
           backgroundPosition: '100% 24%',
@@ -80,7 +80,7 @@ const VaultToggle = () => {
           </div>
           {isNotAvailable ? (
             <div className="space-y-4">
-              <div className="rounded border border-scale-500 px-4 py-2 flex items-center justify-between">
+              <div className="rounded border px-4 py-2 flex items-center justify-between">
                 <div>
                   <p className="text-foreground-light text-sm">
                     Vault is not available for this project yet.
@@ -90,34 +90,32 @@ const VaultToggle = () => {
                   </p>
                 </div>
                 <div>
-                  <Link
-                    href={`/support/new?ref=${ref}&category=sales&subject=Request%20for%20access%20to%20vault`}
-                  >
-                    <a target="_blank" rel="noreferrer">
-                      <Button type="primary">Contact us</Button>
-                    </a>
-                  </Link>
+                  <Button asChild type="primary">
+                    <Link
+                      href={`/support/new?ref=${ref}&category=sales&subject=Request%20for%20access%20to%20vault`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Contact us
+                    </Link>
+                  </Button>
                 </div>
               </div>
               <div className="flex items-center space-x-2 my-1 ml-[1px]">
-                <Link href="https://github.com/supabase/vault">
-                  <a target="_blank" rel="noreferrer">
-                    <Button type="default" icon={<IconExternalLink />}>
-                      About Vault
-                    </Button>
-                  </a>
-                </Link>
+                <Button asChild type="default" icon={<IconExternalLink />}>
+                  <Link href="https://github.com/supabase/vault" target="_blank" rel="noreferrer">
+                    About Vault
+                  </Link>
+                </Button>
               </div>
             </div>
           ) : (
             <div className="flex items-center space-x-2">
-              <Link href="https://github.com/supabase/vault">
-                <a target="_blank" rel="noreferrer">
-                  <Button type="default" icon={<IconExternalLink />}>
-                    About Vault
-                  </Button>
-                </a>
-              </Link>
+              <Button asChild type="default" icon={<IconExternalLink />}>
+                <Link href="https://github.com/supabase/vault" target="_blank" rel="noreferrer">
+                  About Vault
+                </Link>
+              </Button>
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger>
                   <Button
@@ -135,8 +133,8 @@ const VaultToggle = () => {
                       <Tooltip.Arrow className="radix-tooltip-arrow" />
                       <div
                         className={[
-                          'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                          'border border-scale-200',
+                          'rounded bg-alternative py-1 px-2 leading-none shadow',
+                          'border border-background',
                         ].join(' ')}
                       >
                         <span className="text-xs text-foreground">

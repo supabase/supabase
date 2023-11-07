@@ -85,13 +85,15 @@ const SpreadsheetImport = ({
         <div className="space-y-1">
           <p>The dashboard currently only supports importing of CSVs below 100MB.</p>
           <p>For bulk data loading, we recommend doing so directly through the database.</p>
-          <Link passHref href="https://supabase.com/docs/guides/database/tables#bulk-data-loading">
-            <Button asChild type="default" icon={<IconExternalLink />} className="!mt-2">
-              <a target="_blank" rel="noreferrer">
-                Learn more
-              </a>
-            </Button>
-          </Link>
+          <Button asChild type="default" icon={<IconExternalLink />} className="!mt-2">
+            <Link
+              href="https://supabase.com/docs/guides/database/tables#bulk-data-loading"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Learn more
+            </Link>
+          </Button>
         </div>,
         { duration: Infinity }
       )

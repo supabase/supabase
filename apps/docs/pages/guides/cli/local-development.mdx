@@ -373,6 +373,16 @@ supabase db pull
 `supabase/migrations` is now populated with a migration in `<timestamp>_remote_schema.sql`.
 This migration captures any changes required for your local database to match the schema of your remote Supabase project.
 
+Review the generated migration file and once happy, apply the changes to your local instance:
+
+```bash
+# To apply the new migration to your local database:
+supabase migration up
+
+# To reset your local database completely:
+supabase db reset
+```
+
 <Admonition type="note">
 
 There are a few commands required to link your project. We are in the process of consolidating these commands into a single command. Bear with us!
@@ -426,7 +436,7 @@ supabase db pull --schema auth
 
 ### Sync Storage buckets
 
-Your RLS policies on storge buckets can be pulled locally by specifying `storage` schema. For example,
+Your RLS policies on storage buckets can be pulled locally by specifying `storage` schema. For example,
 
 ```bash
 supabase db pull --schema storage

@@ -31,9 +31,7 @@ const CardButton = ({
   loading = false,
 }: PropsWithChildren<CardButtonProps>) => {
   const LinkContainer = ({ children }: { children: React.ReactNode }) => (
-    <Link href={linkHref}>
-      <a>{children}</a>
-    </Link>
+    <Link href={linkHref}>{children}</Link>
   )
   const UrlContainer = ({ children }: { children: React.ReactNode }) => <a href={url}>{children}</a>
   const NonLinkContainer = ({ children }: { children: React.ReactNode }) => <div>{children}</div>
@@ -56,7 +54,7 @@ const CardButton = ({
     containerClasses = [
       ...containerClasses,
       'cursor-pointer',
-      'hover:bg-surface-200',
+      'hover:bg-overlay-hover',
       'hover:border-control',
     ]
   }

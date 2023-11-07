@@ -78,11 +78,6 @@ export const SEVERITY_OPTIONS = [
     label: 'Urgent',
     description: 'Production system down',
   },
-  {
-    value: 'Critical',
-    label: 'Critical',
-    description: 'Business-critical system down (Unavailable for free projects)',
-  },
 ]
 
 export const SERVICE_OPTIONS = [

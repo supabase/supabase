@@ -149,7 +149,7 @@ You can change the scope of the access for Supabase by configuring
                                 onDeleteConnection={onDeleteVercelConnection}
                                 className="!rounded-b-none !mb-0"
                               />
-                              <div className="relative pl-8 ml-6 border-l border-scale-600 dark:border-scale-400 pb-6">
+                              <div className="relative pl-8 ml-6 border-l border-muted pb-6">
                                 <div className="border-b border-l border-r rounded-b-lg">
                                   <VercelIntegrationConnectionForm
                                     connection={connection}
@@ -180,15 +180,15 @@ You can change the scope of the access for Supabase by configuring
               })
           ) : (
             <div>
-              <Link href="https://vercel.com/integrations/supabase-v2" passHref>
-                <Button type="default" iconRight={<IconExternalLink />} asChild>
-                  <a target="_blank">Install Vercel Integration</a>
-                </Button>
-              </Link>
+              <Button asChild type="default" iconRight={<IconExternalLink />}>
+                <Link href="https://vercel.com/integrations/supabase-v2" target="_blank">
+                  Install Vercel Integration
+                </Link>
+              </Button>
             </div>
           )}
           {VercelContentSectionBottom && (
-            <Markdown content={VercelContentSectionBottom} className="text-lighter" />
+            <Markdown content={VercelContentSectionBottom} className="text-foreground-lighter" />
           )}
         </ScaffoldSectionContent>
       </ScaffoldSection>

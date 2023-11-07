@@ -21,7 +21,6 @@ import {
 } from '../Usage.utils'
 import UsageBarChart from '../UsageBarChart'
 import { ChartMeta } from './UsageSection'
-import { useIsFeatureEnabled } from 'hooks'
 
 export interface AttributeUsageProps {
   slug: string
@@ -55,8 +54,6 @@ const AttributeUsage = ({
   isSuccess,
   currentBillingCycleSelected,
 }: AttributeUsageProps) => {
-  const billingEnabled = useIsFeatureEnabled('billing:all')
-
   const upgradeUrl = getUpgradeUrl(slug ?? '', subscription)
   const usageRatio = (usageMeta?.usage ?? 0) / (usageMeta?.pricing_free_units ?? 0)
   const usageExcess = (usageMeta?.usage ?? 0) - (usageMeta?.pricing_free_units ?? 0)
@@ -133,8 +130,8 @@ const AttributeUsage = ({
                                 <Tooltip.Arrow className="radix-tooltip-arrow" />
                                 <div
                                   className={[
-                                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                    'border border-scale-200',
+                                    'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                    'border border-background',
                                   ].join(' ')}
                                 >
                                   <p className="text-xs text-foreground">
@@ -152,16 +149,14 @@ const AttributeUsage = ({
                         )}
                       </div>
 
-                      {billingEnabled && showUsageWarning && (
-                        <Link href={upgradeUrl}>
-                          <a className="pb-1">
-                            <Button type="default" size="tiny">
-                              {subscription?.plan?.id === 'free'
-                                ? 'Upgrade plan'
-                                : 'Change spend cap'}
-                            </Button>
-                          </a>
-                        </Link>
+                      {showUsageWarning && (
+                        <Button type="default" size="tiny" asChild>
+                          <Link href={upgradeUrl} className="pb-1">
+                            {subscription?.plan?.id === 'free'
+                              ? 'Upgrade plan'
+                              : 'Change spend cap'}
+                          </Link>
+                        </Button>
                       )}
                     </div>
 
@@ -171,14 +166,14 @@ const AttributeUsage = ({
                         barClass={clsx(
                           usageRatio >= 1
                             ? usageBasedBilling
-                              ? 'bg-scale-1100'
+                              ? 'bg-foreground-light'
                               : 'bg-red-900'
                             : usageBasedBilling === false &&
                               usageRatio >= USAGE_APPROACHING_THRESHOLD
                             ? 'bg-amber-900'
-                            : 'bg-scale-1100'
+                            : 'bg-foreground-light'
                         )}
-                        bgClass="bg-gray-300 dark:bg-gray-600"
+                        bgClass="bg-surface-300"
                         value={usageMeta?.usage ?? 0}
                         max={usageMeta?.pricing_free_units || 1}
                       />
@@ -285,13 +280,10 @@ const AttributeUsage = ({
                         </p>
                       </div>
                     </div>
-                    {billingEnabled && (
-                      <Link href={upgradeUrl}>
-                        <a>
-                          <Button type="primary">Upgrade plan</Button>
-                        </a>
-                      </Link>
-                    )}
+
+                    <Button type="primary" asChild>
+                      <Link href={upgradeUrl}>Upgrade plan</Link>
+                    </Button>
                   </div>
                 </Panel.Content>
               </Panel>

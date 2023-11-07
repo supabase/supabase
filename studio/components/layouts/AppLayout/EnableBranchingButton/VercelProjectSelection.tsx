@@ -21,17 +21,19 @@ const VercelProjectSelection = ({ integration }: VercelProjectSelectionProps) =>
           <p>Frontend Cloud Previews</p>
           <Badge color="gray">Optional</Badge>
         </div>
-        <p className="text-sm text-light">
+        <p className="text-sm text-foreground-light">
           Previews can be available by connecting your Supabase project to a Vercel project.
         </p>
         {!integration && (
-          <Link passHref href="https://vercel.com/integrations/supabase-v2-local">
-            <a target="_blank" rel="noreferrer">
-              <Button type="default" className="!mt-3">
-                Install Vercel Integration
-              </Button>
-            </a>
-          </Link>
+          <Button asChild type="default" className="!mt-3">
+            <Link
+              href="https://vercel.com/integrations/supabase-v2-local"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Install Vercel Integration
+            </Link>
+          </Button>
         )}
         {integration && !vercelProjectIntegration && <div>Connect project</div>}
         {integration && vercelProjectIntegration && <div>Select project</div>}

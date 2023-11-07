@@ -24,13 +24,15 @@ const DatabaseEnumeratedTypes: NextPageWithLayout = () => {
           </ScaffoldSectionContent>
           <ScaffoldSectionDetail className="flex items-center justify-end">
             <div>
-              <Link passHref href="https://www.postgresql.org/docs/current/datatype-enum.html">
-                <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                  <a target="_blank" rel="noreferrer">
-                    Documentation
-                  </a>
-                </Button>
-              </Link>
+              <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                <Link
+                  href="https://www.postgresql.org/docs/current/datatype-enum.html"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Documentation
+                </Link>
+              </Button>
             </div>
           </ScaffoldSectionDetail>
           <div className="col-span-12 mt-3">
