@@ -41,7 +41,7 @@ For at se, hvordan man bidrager, besøg [Getting Started](../DEVELOPERS.md)
 - [x] Alpha: Vi tester Supabase med et lukket sæt af kunder
 - [x] Offentlig Alpha: Alle kan tilmelde sig på [supabase.com/dashboard](https://supabase.com/dashboard). Men vær forsigtig med os, der er et par knuder
 - [x] Public Beta: Stabil nok til de fleste ikke-virksomhedsrelaterede brugssager
-- [ ] Public: Public: Generel tilgængelighed [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [ ] Public: Generel tilgængelighed [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
 Vi er i øjeblikket i Public Beta. Hold øje med "releases" i denne repo for at få besked om større opdateringer.
 
