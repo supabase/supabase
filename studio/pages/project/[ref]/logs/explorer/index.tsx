@@ -279,7 +279,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
                   </div>
                 </Modal.Content>
               </div>
-              <div className="py-3 border-t bg-scale-300">
+              <div className="py-3 border-t bg-surface-100">
                 <Modal.Content>
                   <div className="flex items-center justify-end gap-2">
                     <Button

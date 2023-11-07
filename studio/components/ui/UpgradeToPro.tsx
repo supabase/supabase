@@ -37,8 +37,7 @@ const UpgradeToPro = ({
     <div
       className={[
         'block w-full rounded border border-opacity-20 py-4 px-6',
-        'border-gray-600 bg-gray-100',
-        'dark:border-gray-300 dark:bg-gray-400',
+        'border-overlay bg-surface-200',
       ].join(' ')}
     >
       <div className="flex space-x-3">
@@ -70,8 +69,8 @@ const UpgradeToPro = ({
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'border border-scale-200 text-center', //border
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                      'border border-background text-center', //border
+                      'rounded bg-alternative py-1 px-2 leading-none shadow', // background
                     ].join(' ')}
                   >
                     <span className="text-xs text-foreground">

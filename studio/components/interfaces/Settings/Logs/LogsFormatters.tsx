@@ -60,7 +60,7 @@ export const ResponseCodeFormatter = ({ value }: any) => {
   if (!value) {
     return (
       <div>
-        <label className="text-xs text-scale-800">No data</label>
+        <label className="text-xs text-border-stronger">No data</label>
       </div>
     )
   }
@@ -73,11 +73,7 @@ export const ResponseCodeFormatter = ({ value }: any) => {
     case '2':
       return (
         <div className="flex h-full items-center">
-          <div
-            className="relative flex h-6 items-center justify-center rounded border bg-scale-500 px-2
-            py-1 text-center dark:bg-scale-400
-            "
-          >
+          <div className="relative flex h-6 items-center justify-center rounded border bg-surface-200 px-2 py-1 text-center">
             <label className="block font-mono text-sm text-foreground-lighter">{value}</label>
           </div>
         </div>
@@ -121,7 +117,7 @@ export const ResponseCodeFormatter = ({ value }: any) => {
       return (
         <div className="flex h-full items-center">
           <div
-            className="relative flex h-6 items-center justify-center rounded bg-scale-300 px-2 py-1
+            className="relative flex h-6 items-center justify-center rounded bg-surface-100 px-2 py-1
             text-center
 
             "
@@ -150,7 +146,7 @@ export const SeverityFormatter = ({
   if (!value) {
     return (
       <div>
-        <label className="text-xs text-scale-800">No data</label>
+        <label className="text-xs text-border-stronger">No data</label>
       </div>
     )
   }
@@ -216,7 +212,7 @@ export const SeverityFormatter = ({
     default:
       return (
         <Layout>
-          <div className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center bg-scale-300">
+          <div className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center bg-surface-100">
             <label className="block font-mono text-sm text-foreground-lighter">{text}</label>
           </div>
         </Layout>

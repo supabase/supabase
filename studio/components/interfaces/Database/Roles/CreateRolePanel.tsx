@@ -61,7 +61,7 @@ const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
       loading={false}
       onCancel={onClose}
       customFooter={
-        <div className="flex w-full justify-end space-x-3 border-t border-scale-500 px-3 py-4">
+        <div className="flex w-full justify-end space-x-3 border-t border-default px-3 py-4">
           <Button
             size="tiny"
             type="default"
@@ -137,8 +137,8 @@ const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
                                 <Tooltip.Arrow className="radix-tooltip-arrow" />
                                 <div
                                   className={[
-                                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                    'border border-scale-200 space-y-1',
+                                    'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                    'border border-background space-y-1',
                                   ].join(' ')}
                                 >
                                   <span className="text-xs">

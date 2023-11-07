@@ -178,7 +178,9 @@ export default function launchweek() {
                 className="w-40 flex lg:w-80"
               />
             </div>
-            <p className="text-light text-sm text-center">Dec 12 – 16 at 6 AM PT | 9 AM ET</p>
+            <p className="text-foreground-light text-sm text-center">
+              Dec 12 – 16 at 6 AM PT | 9 AM ET
+            </p>
           </div>
         </SectionContainer>
         <div

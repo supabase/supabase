@@ -362,7 +362,6 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                           key={`option-${option.value}`}
                           label={option.label}
                           value={option.value}
-                          disabled={option.value === 'Critical' && isFreeProject}
                         >
                           <span>{option.label}</span>
                           <span className="block text-xs opacity-50">{option.description}</span>
@@ -445,7 +444,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                       <div className="flex items-center space-x-2">
                         <Button asChild>
                           <Link
-                            href={`/project/${values.projectRef}/settings/billing/subscription?panel=subscriptionPlan`}
+                            href={`/org/${values.organizationSlug}/billing?panel=subscriptionPlan`}
                           >
                             Upgrade project
                           </Link>
@@ -473,7 +472,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                 {['Performance'].includes(values.category) && isFreeProject ? (
                   <DisabledStateForFreeTier
                     category={selectedCategory?.label ?? ''}
-                    projectRef={values.projectRef}
+                    organizationSlug={selectedOrganizationSlug ?? ''}
                   />
                 ) : (
                   <>
@@ -551,7 +550,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                             return (
                               <div
                                 key={library.name}
-                                className="w-[230px] min-w-[230px] min-h-[128px] rounded border border-scale-600 bg-scale-300 space-y-3 px-4 py-3"
+                                className="w-[230px] min-w-[230px] min-h-[128px] rounded border border-control bg-surface-100 space-y-3 px-4 py-3"
                               >
                                 <div className="space-y-1">
                                   <p className="text-sm">{library.name}</p>
@@ -575,7 +574,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                           })}
                           <div
                             className={[
-                              'px-4 py-3 rounded border border-scale-600 bg-scale-300',
+                              'px-4 py-3 rounded border border-control bg-surface-100',
                               'w-[230px] min-w-[230px] min-h-[128px] flex flex-col justify-between space-y-3',
                             ].join(' ')}
                           >
@@ -679,7 +678,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                         {uploadedFiles.length < MAX_ATTACHMENTS && (
                           <div
                             className={[
-                              'border border-scale-800 opacity-50 transition hover:opacity-100',
+                              'border border-stronger opacity-50 transition hover:opacity-100',
                               'group flex h-14 w-14 cursor-pointer items-center justify-center rounded',
                             ].join(' ')}
                             onClick={() => {

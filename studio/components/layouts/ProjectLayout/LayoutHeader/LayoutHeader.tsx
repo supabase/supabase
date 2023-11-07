@@ -51,7 +51,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
   return (
     <div
       className={`flex h-12 max-h-12 items-center justify-between py-2 px-5 ${
-        headerBorder ? 'border-b border-scale-500' : ''
+        headerBorder ? 'border-b border-default' : ''
       }`}
     >
       <div className="-ml-2 flex items-center text-sm">
@@ -62,7 +62,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
 
             {projectRef && (
               <>
-                <span className="text-scale-800 dark:text-scale-700">
+                <span className="text-border-stronger dark:text-border-strong">
                   <svg
                     viewBox="0 0 24 24"
                     width="16"
@@ -82,13 +82,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
 
                 {showOverUsageBadge && (
                   <div className="ml-2">
-                    <Link
-                      href={
-                        selectedOrganization?.subscription_id
-                          ? `/org/${selectedOrganization.slug}/usage`
-                          : `/project/${projectRef}/settings/billing/usage`
-                      }
-                    >
+                    <Link href={`/org/${selectedOrganization?.slug}/usage`}>
                       <Badge color="red">Exceeding usage limits</Badge>
                     </Link>
                   </div>
@@ -98,7 +92,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
 
             {selectedProject && enableBranchManagement && (
               <>
-                <span className="text-scale-800 dark:text-scale-700">
+                <span className="text-border-stronger dark:text-border-strong">
                   <svg
                     viewBox="0 0 24 24"
                     width="16"

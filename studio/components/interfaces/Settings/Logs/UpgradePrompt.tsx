@@ -3,6 +3,7 @@ import { Button, Modal } from 'ui'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { TIER_QUERY_LIMITS } from '.'
+import { useSelectedOrganization } from 'hooks'
 
 interface Props {
   show: boolean
@@ -10,8 +11,7 @@ interface Props {
 }
 
 const UpgradePrompt: React.FC<Props> = ({ show, setShowUpgradePrompt }) => {
-  const router = useRouter()
-  const { ref } = router.query
+  const organization = useSelectedOrganization()
 
   return (
     <Modal
@@ -29,7 +29,7 @@ const UpgradePrompt: React.FC<Props> = ({ show, setShowUpgradePrompt }) => {
               Logs can be retained up to a duration of 3 months depending on the plan that your
               project is on.
             </p>
-            <div className="border-scale-600 bg-scale-500 rounded border">
+            <div className="border-control bg-surface-300 rounded border">
               <div className="flex items-center px-4 pt-2 pb-1">
                 <p className="text-foreground-light w-[40%] text-sm">Plan</p>
                 <p className="text-foreground-light w-[60%] text-sm">Retention duration</p>
@@ -62,7 +62,9 @@ const UpgradePrompt: React.FC<Props> = ({ show, setShowUpgradePrompt }) => {
               Close
             </Button>
             <Button asChild size="tiny">
-              <Link href={`/project/${ref}/settings/billing/subscription`}>Upgrade</Link>
+              <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
+                Upgrade
+              </Link>
             </Button>
           </div>
         </Modal.Content>

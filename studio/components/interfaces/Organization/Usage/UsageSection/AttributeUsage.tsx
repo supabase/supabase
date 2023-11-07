@@ -130,8 +130,8 @@ const AttributeUsage = ({
                                 <Tooltip.Arrow className="radix-tooltip-arrow" />
                                 <div
                                   className={[
-                                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                    'border border-scale-200',
+                                    'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                    'border border-background',
                                   ].join(' ')}
                                 >
                                   <p className="text-xs text-foreground">
@@ -166,14 +166,14 @@ const AttributeUsage = ({
                         barClass={clsx(
                           usageRatio >= 1
                             ? usageBasedBilling
-                              ? 'bg-scale-1100'
+                              ? 'bg-foreground-light'
                               : 'bg-red-900'
                             : usageBasedBilling === false &&
                               usageRatio >= USAGE_APPROACHING_THRESHOLD
                             ? 'bg-amber-900'
-                            : 'bg-scale-1100'
+                            : 'bg-foreground-light'
                         )}
-                        bgClass="bg-gray-300 dark:bg-gray-600"
+                        bgClass="bg-surface-300"
                         value={usageMeta?.usage ?? 0}
                         max={usageMeta?.pricing_free_units || 1}
                       />

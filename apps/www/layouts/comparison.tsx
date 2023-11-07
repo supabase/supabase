@@ -38,7 +38,7 @@ const LayoutComparison = ({ components, props }: Props) => {
     return (
       <Link href={`${post.url}`} as={`${post.url}`}>
         <div className={className}>
-          <div className="border-scale-500 hover:bg-scale-100 dark:hover:bg-scale-300 cursor-pointer rounded border p-6 transition">
+          <div className="border-default hover:bg-surface-100 cursor-pointer rounded border p-6 transition">
             <div className="space-y-4">
               <div>
                 <p className="text-muted text-sm">{label}</p>
@@ -132,7 +132,9 @@ const LayoutComparison = ({ components, props }: Props) => {
               <MDXRemote {...content} components={components} />
             </div>
             <div className="py-16">
-              <div className="text-muted dark:text-lighter text-sm">Share this article</div>
+              <div className="text-muted dark:text-foreground-lighter text-sm">
+                Share this article
+              </div>
               <div className="mt-4 flex items-center space-x-4">
                 <Link
                   href={`https://twitter.com/share?text=${props.blog.title}&url=https://supabase.com/blog/${props.blog.slug}`}

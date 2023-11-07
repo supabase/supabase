@@ -118,8 +118,8 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
                           <Tooltip.Arrow className="radix-tooltip-arrow" />
                           <div
                             className={[
-                              'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                              'border border-scale-200 ', //border
+                              'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                              'border border-background', //border
                             ].join(' ')}
                           >
                             <span className="text-xs text-foreground">
@@ -161,7 +161,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
           title={'Disk size configuration is not available for projects on the Free plan'}
           actions={
             <Button asChild type="default">
-              <Link href={`/project/${projectRef}/settings/billing/subscription`}>
+              <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
                 Upgrade subscription
               </Link>
             </Button>

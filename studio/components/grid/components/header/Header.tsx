@@ -63,7 +63,7 @@ const Header = ({
 
   return (
     <div>
-      <div className="flex h-10 items-center justify-between bg-scale-100 px-5 py-1.5 dark:bg-scale-300">
+      <div className="flex h-10 items-center justify-between bg-surface-100 px-5 py-1.5">
         {customHeader ? (
           <>{customHeader}</>
         ) : (
@@ -122,7 +122,7 @@ const DefaultHeader = ({
       </div>
       {canAddNew && (
         <>
-          <div className="h-[20px] w-px border-r border-scale-600"></div>
+          <div className="h-[20px] w-px border-r border-control"></div>
           <div className="flex items-center gap-2">
             {canCreateColumns && (
               <DropdownMenu>
@@ -141,11 +141,11 @@ const DefaultHeader = ({
                             onClick={onAddRow}
                           >
                             <div className="-mt-2 pr-1.5">
-                              <div className="border border-scale-1000 w-[15px] h-[4px]" />
-                              <div className="border border-scale-1000 w-[15px] h-[4px] my-[2px]" />
+                              <div className="border border-foreground-lighter w-[15px] h-[4px]" />
+                              <div className="border border-foreground-lighter w-[15px] h-[4px] my-[2px]" />
                               <div
                                 className={cn([
-                                  'border border-scale-1100 w-[15px] h-[4px] translate-x-0.5',
+                                  'border border-foreground-light w-[15px] h-[4px] translate-x-0.5',
                                   'transition duration-200 group-data-[highlighted]:border-brand group-data-[highlighted]:translate-x-0',
                                 ])}
                               />
@@ -167,11 +167,11 @@ const DefaultHeader = ({
                             onClick={onAddColumn}
                           >
                             <div className="flex -mt-2 pr-1.5">
-                              <div className="border border-scale-1000 w-[4px] h-[15px]" />
-                              <div className="border border-scale-1000 w-[4px] h-[15px] mx-[2px]" />
+                              <div className="border border-foreground-lighter w-[4px] h-[15px]" />
+                              <div className="border border-foreground-lighter w-[4px] h-[15px] mx-[2px]" />
                               <div
                                 className={cn([
-                                  'border border-scale-1100 w-[4px] h-[15px] -translate-y-0.5',
+                                  'border border-foreground-light w-[4px] h-[15px] -translate-y-0.5',
                                   'transition duration-200 group-data-[highlighted]:border-brand group-data-[highlighted]:translate-y-0',
                                 ])}
                               />
