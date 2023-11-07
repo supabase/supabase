@@ -193,8 +193,6 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
             data.count === 0 || data.count > 1 ? `records` : 'record'
           }`}</p>
 
-          {isLoadingRows && <IconLoader size={14} className="animate-spin" />}
-
           <ConfirmationModal
             visible={isConfirmPreviousModalOpen}
             header="Confirm moving to previous page"

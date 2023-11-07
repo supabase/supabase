@@ -202,10 +202,12 @@ const Policies = ({ tables, hasTables, isLocked }: PoliciesProps) => {
       <ConfirmModal
         danger={selectedTableToToggleRLS.rls_enabled}
         visible={!isEmpty(selectedTableToToggleRLS)}
-        title={`Confirm to ${selectedTableToToggleRLS.rls_enabled ? 'disable' : 'enable'} RLS`}
+        title={`Confirm to ${
+          selectedTableToToggleRLS.rls_enabled ? 'disable' : 'enable'
+        } Row Level Security`}
         description={`Are you sure you want to ${
           selectedTableToToggleRLS.rls_enabled ? 'disable' : 'enable'
-        } row level security for the table "${selectedTableToToggleRLS.name}"?`}
+        } Row Level Security for the table "${selectedTableToToggleRLS.name}"?`}
         buttonLabel="Confirm"
         buttonLoadingLabel="Saving"
         onSelectCancel={closeConfirmModal}

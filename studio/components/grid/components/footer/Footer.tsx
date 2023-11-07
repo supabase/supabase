@@ -34,7 +34,7 @@ const Footer = ({ isLoading, isRefetching }: FooterProps) => {
   }
 
   return (
-    <div className="bg-scale-100 px-2 w-full">
+    <div className="px-2 w-full">
       <div className="flex h-10 items-center">
         {selectedView === 'data' && <Pagination isLoading={isLoading} />}
 

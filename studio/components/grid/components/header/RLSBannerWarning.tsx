@@ -57,7 +57,7 @@ export default function RLSBannerWarning() {
             >
               Enable Row Level Security
             </Link>
-            <div className="ml-20 absolute right-2">
+            <div className="ml-20 absolute right-5">
               <Button
                 type="outline"
                 className="hover:text-foreground"
