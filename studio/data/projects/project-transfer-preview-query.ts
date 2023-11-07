@@ -1,7 +1,6 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { useCallback } from 'react'
 import { projectKeys } from './keys'
 
 export type ProjectTransferPreviewVariables = {
@@ -105,19 +104,3 @@ export const useProjectTransferPreviewQuery = <TData = ProjectTransferPreviewDat
       },
     }
   )
-
-export const useProjectTransferPreviewPrefetch = ({
-  projectRef,
-  targetOrganizationSlug,
-}: ProjectTransferPreviewVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef && targetOrganizationSlug) {
-      client.prefetchQuery(
-        projectKeys.projectTransferPreview(projectRef, targetOrganizationSlug),
-        ({ signal }) => previewProjectTransfer({ projectRef, targetOrganizationSlug }, signal)
-      )
-    }
-  }, [projectRef, targetOrganizationSlug])
-}

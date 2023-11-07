@@ -1,7 +1,6 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { useCallback } from 'react'
 import { analyticsKeys } from './keys'
 
 export type FunctionsInvStatsVariables = {
@@ -61,20 +60,3 @@ export const useFunctionsInvStatsQuery = <TData = FunctionsInvStatsData>(
       ...options,
     }
   )
-
-export const useFunctionsInvStatsPrefetch = ({
-  projectRef,
-  functionId,
-  interval,
-}: FunctionsInvStatsVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef && functionId && interval) {
-      client.prefetchQuery(
-        analyticsKeys.functionsInvStats(projectRef, { functionId, interval }),
-        ({ signal }) => getFunctionsInvStats({ projectRef, functionId, interval }, signal)
-      )
-    }
-  }, [projectRef, functionId, interval])
-}

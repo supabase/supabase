@@ -48,6 +48,7 @@ export interface Project extends ProjectBase {
    * irregardless of being on any branch, such as ProjectDropdown and Vercel integration
    * */
   parentRef?: string
+  volumeSizeGb?: number
 }
 
 export interface User {

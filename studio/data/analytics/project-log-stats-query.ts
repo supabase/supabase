@@ -1,7 +1,6 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get, isResponseOk } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { useCallback } from 'react'
 import { analyticsKeys } from './keys'
 
 export type ProjectLogStatsVariables = {
@@ -62,15 +61,3 @@ export const useProjectLogStatsQuery = <TData = ProjectLogStatsData>(
       ...options,
     }
   )
-
-export const useProjectLogStatsPrefetch = ({ projectRef, interval }: ProjectLogStatsVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef && interval) {
-      client.prefetchQuery(analyticsKeys.usageApiCounts(projectRef, interval), ({ signal }) =>
-        getProjectLogStats({ projectRef, interval }, signal)
-      )
-    }
-  }, [projectRef, interval])
-}

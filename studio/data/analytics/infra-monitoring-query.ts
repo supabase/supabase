@@ -1,8 +1,7 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { useCallback } from 'react'
 import { AnalyticsData } from './constants'
 import { analyticsKeys } from './keys'
 
@@ -88,23 +87,3 @@ export const useInfraMonitoringQuery = <TData = InfraMonitoringData>(
       ...options,
     }
   )
-
-export const useInfraMonitoringPrefetch = ({
-  projectRef,
-  attribute,
-  startDate,
-  endDate,
-  interval = '1d',
-}: InfraMonitoringVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef && attribute && startDate && endDate && interval) {
-      client.prefetchQuery(
-        analyticsKeys.infraMonitoring(projectRef, { attribute, startDate, endDate, interval }),
-        ({ signal }) =>
-          getInfraMonitoring({ projectRef, attribute, startDate, endDate, interval }, signal)
-      )
-    }
-  }, [projectRef])
-}
