@@ -42,9 +42,9 @@ jobs:
       - name: Check for changes to studio
         run: |
           if npx turbo-ignore studio; then
-            echo "HAS_CHANGES=true" >> "$GITHUB_ENV"
-          else
             echo "HAS_CHANGES=false" >> "$GITHUB_ENV"
+          else
+            echo "HAS_CHANGES=true" >> "$GITHUB_ENV"
           fi
 
       - name: Pull Vercel Environment Information
