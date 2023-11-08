@@ -3,6 +3,16 @@
     @apply cursor-default;
   }
   .react-flow__node {
-    @apply cursor-pointer;
+    @apply cursor-default;
+  }
+}
+
+.map-path {
+  animation: dash 8s linear infinite;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: 100;
   }
 }

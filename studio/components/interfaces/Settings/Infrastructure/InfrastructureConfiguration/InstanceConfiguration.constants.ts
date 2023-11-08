@@ -1,3 +1,5 @@
+import { AWS_REGIONS, AWS_REGIONS_KEYS } from 'lib/constants'
+
 export interface DatabaseConfiguration {
   id: number
   type: 'PRIMARY' | 'READ_REPLICA'
@@ -13,7 +15,7 @@ export const MOCK_DATABASES: DatabaseConfiguration[] = [
     id: 1,
     type: 'PRIMARY',
     cloud_provider: 'AWS',
-    region: 'ap-southeast-1b',
+    region: 'ap-southeast-1',
     size: 't4g.micro',
     status: 'ACTIVE_HEALTHY',
     inserted_at: '2023-11-01 06:47:46.837002',
@@ -22,7 +24,7 @@ export const MOCK_DATABASES: DatabaseConfiguration[] = [
     id: 2,
     type: 'READ_REPLICA',
     cloud_provider: 'AWS',
-    region: 'ap-southeast-1b',
+    region: 'ap-northeast-1',
     size: 't4g.micro',
     status: 'ACTIVE_HEALTHY',
     inserted_at: '2023-11-01 06:47:46.837002',
@@ -31,7 +33,7 @@ export const MOCK_DATABASES: DatabaseConfiguration[] = [
     id: 3,
     type: 'READ_REPLICA',
     cloud_provider: 'AWS',
-    region: 'us-west-1',
+    region: 'ap-southeast-1',
     size: 't4g.micro',
     status: 'ACTIVE_HEALTHY',
     inserted_at: '2023-11-01 06:47:46.837002',
@@ -40,34 +42,62 @@ export const MOCK_DATABASES: DatabaseConfiguration[] = [
     id: 4,
     type: 'READ_REPLICA',
     cloud_provider: 'AWS',
-    region: 'ap-southeast-1b',
+    region: 'ap-northeast-2',
+    size: 't4g.micro',
+    status: 'ACTIVE_HEALTHY',
+    inserted_at: '2023-11-01 06:47:46.837002',
+  },
+  {
+    id: 5,
+    type: 'READ_REPLICA',
+    cloud_provider: 'AWS',
+    region: 'ap-southeast-1',
     size: 't4g.micro',
     status: 'ACTIVE_HEALTHY',
     inserted_at: '2023-11-01 06:47:46.837002',
   },
 ]
 
-// [Joshen] FYI coordinates are manually eye-balled, but I don't think they need to be absolutely accurate
-export const MOCK_AVAILABLE_REPLICA_REGIONS: {
-  coordinates: [number, number]
-  key: string
-  country: string
-}[] = [
-  { coordinates: [104, 1], key: 'SOUTHEAST_ASIA', country: 'Singapore' },
-  { coordinates: [139, 36], key: 'NORTHEAST_ASIA', country: 'Tokyo' },
-  { coordinates: [128, 36], key: 'NORTHEAST_ASIA_2', country: 'Seoul' },
-  { coordinates: [-120, 60], key: 'CENTRAL_CANADA', country: 'Canada' },
-  { coordinates: [-120, 35], key: 'WEST_US', country: 'West US' },
-  { coordinates: [-77, 35], key: 'EAST_US', country: 'East US' },
-]
+// [Joshen] Coordinates from https://github.com/jsonmaur/aws-regions/issues/11
+const AWS_REGIONS_COORDINATES: { [key: string]: [number, number] } = {
+  SOUTHEAST_ASIA: [103.8, 1.37],
+  NORTHEAST_ASIA: [139.42, 35.41],
+  NORTHEAST_ASIA_2: [126.98, 37.56],
+  CENTRAL_CANADA: [-73.6, 45.5],
+  WEST_US: [-121.96, 37.35],
+  EAST_US: [-78.45, 38.13],
+  WEST_EU: [-8, 53],
+  WEST_EU_2: [-0.1, 51],
+  CENTRAL_EU: [8, 50],
+  SOUTH_ASIA: [72.88, 19.08],
+  OCEANIA: [151.2, -33.86],
+  SOUTH_AMERICA: [-46.38, -23.34],
+}
 
-export const MOCK_CREATED_REGIONS: {
-  name: string
-  coordinates: [number, number]
-  key: string
-  country: string
-}[] = [
-  { name: 'Primary', coordinates: [104, 1], key: 'SOUTHEAST_ASIA', country: 'Singapore' },
-  { name: 'Replica #1', coordinates: [139, 36], key: 'NORTHEAST_ASIA', country: 'Tokyo' },
-  { name: 'Replica #2', coordinates: [-100, 47], key: 'CENTRAL_CANADA', country: 'Canada' },
-]
+const AWS_REGIONS_VALUES: { [key: string]: string } = {
+  SOUTHEAST_ASIA: 'ap-southeast-1',
+  NORTHEAST_ASIA: 'ap-northeast-1',
+  NORTHEAST_ASIA_2: 'ap-northeast-2',
+  CENTRAL_CANADA: 'ca-central-1',
+  WEST_US: 'us-west-1',
+  EAST_US: 'es-east-1',
+  WEST_EU: 'eu-west-1',
+  WEST_EU_2: 'eu-west-2',
+  CENTRAL_EU: 'eu-central-1',
+  SOUTH_ASIA: 'ap-south-1',
+  OCEANIA: 'ap-southeast-2',
+  SOUTH_AMERICA: 'sa-east-1',
+}
+
+// [Joshen] Just to make sure that we just depend on AWS_REGIONS to determine available
+// regions for replicas. Just FYI - might need to update this if we support Fly in future
+export const AVAILABLE_REPLICA_REGIONS = Object.keys(AWS_REGIONS)
+  .map((key) => {
+    return {
+      key: key as AWS_REGIONS_KEYS,
+      name: AWS_REGIONS[key as AWS_REGIONS_KEYS],
+      region: AWS_REGIONS_VALUES[key],
+      coordinates: AWS_REGIONS_COORDINATES[key],
+    }
+  })
+  .filter((x) => x.coordinates !== undefined)

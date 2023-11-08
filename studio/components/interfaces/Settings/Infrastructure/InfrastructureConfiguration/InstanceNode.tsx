@@ -2,6 +2,7 @@ import { Database, DatabaseBackup } from 'lucide-react'
 import { Handle, NodeProps, Position } from 'reactflow'
 
 import {
+  Badge,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -77,7 +78,7 @@ export const ReplicaNode = ({ data }: NodeProps<NodeData>) => {
             <div className="flex items-center gap-x-2">
               <p className="text-sm">{label}</p>
               {/* [Joshen] Some status indication perhaps */}
-              <div className="h-2 w-2 rounded-full bg-brand border border-brand-500" />
+              <Badge color="green">Healthy</Badge>
             </div>
             <p className="flex text-xs text-foreground-light items-center gap-x-1">
               <span>{provider}</span>

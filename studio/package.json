@@ -50,7 +50,6 @@
     "configcat-js": "^7.0.0",
     "dat.gui": "^0.7.9",
     "dayjs": "^1.11.10",
-    "deck.gl": "^8.9.32",
     "eslint-config-next": "^13.3.0",
     "file-saver": "^2.0.5",
     "framer-motion": "^6.5.1",

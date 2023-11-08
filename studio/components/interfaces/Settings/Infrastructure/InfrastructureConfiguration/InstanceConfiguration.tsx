@@ -1,3 +1,4 @@
+import { partition } from 'lodash'
 import { Globe2, Network } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useMemo, useState } from 'react'
@@ -5,21 +6,21 @@ import ReactFlow, { Background, Edge, Node, ReactFlowProvider, useReactFlow } fr
 import 'reactflow/dist/style.css'
 import { Button, Modal } from 'ui'
 
-import { partition } from 'lodash'
-import { getGraphLayout } from '../Infrastructure.utils'
-import { DatabaseConfiguration, MOCK_DATABASES } from './InstanceConfiguration.constants'
-import { PrimaryNode, ReplicaNode } from './InstanceNode'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
-import MapView from './MapView'
 import DeployNewReplicaPanel from './DeployNewReplicaPanel'
+import { DatabaseConfiguration, MOCK_DATABASES } from './InstanceConfiguration.constants'
+import { getGraphLayout } from './InstanceConfiguration.utils'
+import { PrimaryNode, ReplicaNode } from './InstanceNode'
+import MapView from './MapView'
 
 // [Joshen] Just FYI, UI assumes single provider for primary + replicas
 // [Joshen] Idea to visualize grouping based on region: https://reactflow.dev/examples/layout/sub-flows
+// [Joshen] Show flags for regions
 
 const InstanceChart = () => {
   const reactFlow = useReactFlow()
   const { resolvedTheme } = useTheme()
-  const [view, setView] = useState<'flow' | 'map'>('flow')
+  const [view, setView] = useState<'flow' | 'map'>('map')
 
   const [showNewReplicaPanel, setShowNewReplicaPanel] = useState(false)
   const [selectedReplicaToResize, setSelectedReplicaToResize] = useState<DatabaseConfiguration>()
@@ -112,7 +113,14 @@ const InstanceChart = () => {
             <Background color={backgroundPatternColor} />
           </ReactFlow>
         ) : (
-          <MapView />
+          <MapView
+            onSelectDeployNewReplica={(region) => {
+              console.log(region)
+              setShowNewReplicaPanel(true)
+            }}
+            onSelectResizeReplica={() => console.log('resize')}
+            onSelectDropReplica={setSelectedReplicaToDrop}
+          />
         )}
       </div>
 

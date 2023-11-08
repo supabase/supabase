@@ -1,11 +1,11 @@
 import dagre from '@dagrejs/dagre'
 import { Edge, Node, Position } from 'reactflow'
-import { NODE_ROW_HEIGHT, NODE_WIDTH } from './Infrastructure.constants'
+import { NODE_ROW_HEIGHT, NODE_WIDTH } from '../Infrastructure.constants'
 
 export const getGraphLayout = (nodes: Node[], edges: Edge[]) => {
   const dagreGraph = new dagre.graphlib.Graph()
   dagreGraph.setDefaultEdgeLabel(() => ({}))
-  dagreGraph.setGraph({ rankdir: 'TB', ranksep: 100 })
+  dagreGraph.setGraph({ rankdir: 'TB', ranksep: 130, nodesep: 10 })
 
   nodes.forEach((node) =>
     dagreGraph.setNode(node.id, { width: NODE_WIDTH / 2, height: NODE_ROW_HEIGHT / 2 })
