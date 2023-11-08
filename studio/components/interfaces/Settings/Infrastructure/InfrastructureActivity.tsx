@@ -277,12 +277,14 @@ const InfrastructureActivity = () => {
                         {currentComputeInstanceSpecs.baseline_disk_io_mbs ===
                         currentComputeInstanceSpecs.max_disk_io_mbs ? (
                           <p className="text-sm text-foreground-light">
-                            Your current compute can has a baseline and maximum disk throughput of{' '}
+                            Your current compute of {computeInstance?.variant?.name ?? 'Micro'} has
+                            a baseline and maximum disk throughput of{' '}
                             {currentComputeInstanceSpecs.max_disk_io_mbs?.toLocaleString()} Mbps.
                           </p>
                         ) : (
                           <p className="text-sm text-foreground-light">
-                            Your current compute can burst up to{' '}
+                            Your current compute instance of{' '}
+                            {computeInstance?.variant?.name ?? 'Micro'} can burst up to{' '}
                             {currentComputeInstanceSpecs.max_disk_io_mbs?.toLocaleString()} Mbps for
                             30 minutes a day and reverts to the baseline performance of{' '}
                             {currentComputeInstanceSpecs.baseline_disk_io_mbs?.toLocaleString()}{' '}
@@ -354,8 +356,8 @@ const InfrastructureActivity = () => {
                     {attribute.key === 'ram_usage' && (
                       <div className="text-sm text-foreground-light">
                         <p>
-                          Your compute instance has {currentComputeInstanceSpecs.memory_gb} GB of
-                          memory.
+                          Your compute instance of {computeInstance?.variant?.name ?? 'Micro'} has{' '}
+                          {currentComputeInstanceSpecs.memory_gb} GB of memory.
                         </p>
                         {currentComputeInstanceSpecs.memory_gb === 1 && (
                           <p>
@@ -368,7 +370,8 @@ const InfrastructureActivity = () => {
 
                     {attribute.key === 'max_cpu_usage' && (
                       <p className="text-sm text-foreground-light">
-                        Your compute instance has {currentComputeInstanceSpecs.cpu_cores} CPU cores.
+                        Your compute instance of {computeInstance?.variant?.name ?? 'Micro'} has{' '}
+                        {currentComputeInstanceSpecs.cpu_cores} CPU cores.
                       </p>
                     )}
 
