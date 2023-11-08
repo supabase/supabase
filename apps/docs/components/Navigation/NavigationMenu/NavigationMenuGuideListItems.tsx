@@ -69,7 +69,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
               'cursor-pointer transition text-sm',
               activeItem
                 ? 'text-brand font-medium'
-                : 'hover:text-foreground dark:hover:text-foreground-light text-foreground-lighter',
+                : 'hover:text-foreground text-foreground-lighter',
             ].join(' ')}
             parent={props.subItem.parent}
           >
@@ -125,7 +125,7 @@ const ContentLink = React.memo(function ContentLink(props: any) {
           'cursor-pointer transition text-sm',
           props.url === router.asPath
             ? 'text-brand'
-            : 'hover:text-foreground dark:hover:text-foreground-light text-foreground-lighter',
+            : 'hover:text-foreground text-foreground-lighter',
         ].join(' ')}
       >
         {props.icon && (

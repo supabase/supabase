@@ -220,7 +220,7 @@ function StoragePage() {
         <div className="relative">
           <div className="section--masked">
             <div className="section--bg-masked">
-              <div className="section--bg border-t border-gray-100 dark:border-gray-600"></div>
+              <div className="section--bg border-t border-control"></div>
             </div>
             <div className="section-container pt-12 pb-0">
               {/* <FloatingIcons /> */}

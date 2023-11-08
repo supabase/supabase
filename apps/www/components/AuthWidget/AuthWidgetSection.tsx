@@ -61,7 +61,7 @@ function AuthWidgetSection() {
             <div className="relative lg:mx-auto lg:max-w-md">
               <div className="glow-area transition-all"></div>
 
-              <div className="border-overlay bg-white dark:bg-overlay pointer-events-none relative rounded-xl border px-8 py-12 drop-shadow-sm">
+              <div className="border-overlay bg-surface-100 pointer-events-none relative rounded-xl border px-8 py-12 drop-shadow-sm">
                 <div className="mb-6 flex flex-col gap-6">
                   <div className="flex items-center gap-3">
                     <div

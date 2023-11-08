@@ -92,7 +92,7 @@
 .sbui-divider--light.sbui-divider--center:before,
 .sbui-divider--light.sbui-divider--center:after,
 .sbui-divider--light.sbui-divider--no-text {
-  @apply border-gray-100 dark:border-dark-600;
+  @apply border-control;
 }
 
 .sbui-divider--light.sbui-divider > span {
