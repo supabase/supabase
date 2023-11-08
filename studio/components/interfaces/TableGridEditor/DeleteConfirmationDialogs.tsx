@@ -114,7 +114,9 @@ const DeleteConfirmationDialogs = ({
   }
 
   const isDeleteWithCascade =
-    snap.confirmationDialog?.type === 'column' ? snap.confirmationDialog.isDeleteWithCascade : false
+    snap.confirmationDialog?.type === 'column' || snap.confirmationDialog?.type === 'table'
+      ? snap.confirmationDialog.isDeleteWithCascade
+      : false
 
   const onConfirmDeleteColumn = async () => {
     if (!(snap.confirmationDialog?.type === 'column')) return

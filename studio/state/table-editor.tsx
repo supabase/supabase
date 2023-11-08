@@ -177,7 +177,8 @@ export const createTableEditorState = () => {
     toggleConfirmationIsWithCascade: (overrideIsDeleteWithCascade?: boolean) => {
       if (
         state.ui.open === 'confirmation-dialog' &&
-        state.ui.confirmationDialog.type === 'column'
+        (state.ui.confirmationDialog.type === 'column' ||
+          state.ui.confirmationDialog.type === 'table')
       ) {
         state.ui.confirmationDialog.isDeleteWithCascade =
           overrideIsDeleteWithCascade ?? !state.ui.confirmationDialog.isDeleteWithCascade
