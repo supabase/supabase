@@ -114,7 +114,9 @@ const DeleteConfirmationDialogs = ({
   }
 
   const isDeleteWithCascade =
-    snap.confirmationDialog?.type === 'column' ? snap.confirmationDialog.isDeleteWithCascade : false
+    snap.confirmationDialog?.type === 'column' || snap.confirmationDialog?.type === 'table'
+      ? snap.confirmationDialog.isDeleteWithCascade
+      : false
 
   const onConfirmDeleteColumn = async () => {
     if (!(snap.confirmationDialog?.type === 'column')) return
@@ -291,6 +293,7 @@ const DeleteConfirmationDialogs = ({
         onSelectConfirm={onConfirmDeleteTable}
       >
         <Modal.Content>
+          {' '}
           <div className="py-4 space-y-4">
             <p className="text-sm text-foreground-light">
               Are you sure you want to delete the selected table? This action cannot be undone.
