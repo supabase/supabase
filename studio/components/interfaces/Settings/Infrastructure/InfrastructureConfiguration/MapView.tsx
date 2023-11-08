@@ -45,7 +45,8 @@ const MapView = ({
   const [tooltip, setTooltip] = useState<{
     x: number
     y: number
-    region: { key: string; country?: string; name?: string }
+    region?: { key: string; country?: string; name?: string }
+    network?: any
   }>()
 
   const [[primary], replicas] = partition(MOCK_DATABASES, (database) => database.type === 'PRIMARY')
@@ -175,7 +176,7 @@ const MapView = ({
         </ZoomableGroup>
       </ComposableMap>
 
-      {tooltip !== undefined && (
+      {tooltip?.region !== undefined && (
         <div
           className="absolute w-[220px] bg-black bg-opacity-50 rounded border"
           style={{ left: tooltip.x - 420, top: tooltip.y - 130 }}
@@ -248,6 +249,9 @@ const MapView = ({
                           <Button type="text" icon={<IconMoreVertical />} className="px-1" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="p-0 w-32" side="bottom" align="end">
+                          <DropdownMenuItem className="gap-x-2" onClick={() => {}}>
+                            Restart replica
+                          </DropdownMenuItem>
                           <DropdownMenuItem
                             className="gap-x-2"
                             onClick={() => onSelectResizeReplica(database)}

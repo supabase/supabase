@@ -95,6 +95,9 @@ export const ReplicaNode = ({ data }: NodeProps<NodeData>) => {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="p-0 w-32" side="bottom" align="end">
               <DropdownMenuItem className="gap-x-2" onClick={() => onSelectResizeReplica()}>
+                Restart replica
+              </DropdownMenuItem>
+              <DropdownMenuItem className="gap-x-2" onClick={() => onSelectResizeReplica()}>
                 Resize replica
               </DropdownMenuItem>
               <div className="border-t" />
