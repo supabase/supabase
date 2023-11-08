@@ -14,7 +14,7 @@
     > .react-contexify__item__content,
   .react-contexify__item:not(.react-contexify__item--disabled):focus
     > .react-contexify__item__content {
-    @apply bg-overlay-hover;
+    background-color: hsl(var(--background-overlay-hover)) !important;
   }
   .react-contexify__separator {
     @apply bg-overlay;
