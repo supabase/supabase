@@ -232,7 +232,7 @@ const uiConfig = ui({
               fontWeight: '400',
               color: 'hsl(var(--colors-scale12))',
               textDecorationLine: 'underline',
-              textDecorationColor: 'hsl(var(--brand-400))',
+              textDecorationColor: 'hsl(var(--brand-500))',
               textDecorationThickness: '1px',
               textUnderlineOffset: '4px',
             },
