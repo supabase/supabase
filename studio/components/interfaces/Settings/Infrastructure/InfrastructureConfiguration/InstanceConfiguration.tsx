@@ -8,8 +8,12 @@ import { Button, Modal } from 'ui'
 
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import DeployNewReplicaPanel from './DeployNewReplicaPanel'
-import { DatabaseConfiguration, MOCK_DATABASES } from './InstanceConfiguration.constants'
-import { getGraphLayout } from './InstanceConfiguration.utils'
+import {
+  AVAILABLE_REPLICA_REGIONS,
+  DatabaseConfiguration,
+  MOCK_DATABASES,
+} from './InstanceConfiguration.constants'
+import { generateNodes, getGraphLayout } from './InstanceConfiguration.utils'
 import { PrimaryNode, ReplicaNode } from './InstanceNode'
 import MapView from './MapView'
 import { AWS_REGIONS_KEYS } from 'lib/constants'
@@ -35,32 +39,17 @@ const InstanceConfigurationUI = () => {
 
   const [[primary], replicas] = partition(MOCK_DATABASES, (database) => database.type === 'PRIMARY')
 
-  const nodes: Node[] = MOCK_DATABASES.sort((a, b) => (a.region > b.region ? 1 : -1)).map(
-    (database) => {
-      return {
-        id: database.id.toString(),
-        type: database.type,
-        data: {
-          label: database.type === 'PRIMARY' ? 'Primary Database' : 'Read Replica',
-          provider: database.cloud_provider,
-          region: database.region,
-          inserted_at: database.inserted_at,
-          ...(database.type === 'READ_REPLICA'
-            ? {
-                onSelectResizeReplica: () => setSelectedReplicaToResize(database),
-                onSelectDropReplica: () => setSelectedReplicaToDrop(database),
-              }
-            : {}),
-        },
-        position,
-      }
-    }
-  )
+  const nodes = generateNodes(MOCK_DATABASES, {
+    onSelectRestartReplica: () => {},
+    onSelectResizeReplica: setSelectedReplicaToResize,
+    onSelectDropReplica: setSelectedReplicaToDrop,
+  })
+
   const edges: Edge[] = replicas.map((database) => {
     return {
       id: `${primary.id}-${database.id}`,
-      source: primary.id.toString(),
-      target: database.id.toString(),
+      source: `database-${primary.id}`,
+      target: `database-${database.id}`,
       type: edgeType,
       animated: true,
     }

@@ -56,6 +56,15 @@ export const MOCK_DATABASES: DatabaseConfiguration[] = [
     status: 'ACTIVE_HEALTHY',
     inserted_at: '2023-11-01 06:47:46.837002',
   },
+  {
+    id: 6,
+    type: 'READ_REPLICA',
+    cloud_provider: 'AWS',
+    region: 'eu-central-1',
+    size: 't4g.micro',
+    status: 'ACTIVE_HEALTHY',
+    inserted_at: '2023-11-01 06:47:46.837002',
+  },
 ]
 
 // [Joshen] Coordinates from https://github.com/jsonmaur/aws-regions/issues/11

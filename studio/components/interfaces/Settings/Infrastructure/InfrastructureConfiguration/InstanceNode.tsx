@@ -12,37 +12,45 @@ import {
 } from 'ui'
 import { NODE_WIDTH } from '../Infrastructure.constants'
 import dayjs from 'dayjs'
-import { DATETIME_FORMAT } from 'lib/constants'
+import { BASE_PATH, DATETIME_FORMAT } from 'lib/constants'
 
 interface NodeData {
   label: string
   provider: string
   region: string
+  regionKey: string
   inserted_at: string
   onSelectResizeReplica: () => void
   onSelectDropReplica: () => void
 }
 
 export const PrimaryNode = ({ data }: NodeProps<NodeData>) => {
-  const { label, provider, region } = data
+  const { label, provider, region, regionKey } = data
 
   return (
     <>
       <div
-        className="flex rounded bg-surface-100 border border-default p-3 gap-x-3"
+        className="flex justify-between rounded bg-surface-100 border border-default p-3"
         style={{ width: NODE_WIDTH / 2 - 10 }}
       >
-        <div className="w-8 h-8 bg-brand-500 border border-brand-600 rounded-md flex items-center justify-center">
-          <Database size={16} />
+        <div className="flex gap-x-3">
+          <div className="w-8 h-8 bg-brand-500 border border-brand-600 rounded-md flex items-center justify-center">
+            <Database size={16} />
+          </div>
+          <div className="flex flex-col gap-y-0.5">
+            <p className="text-sm">{label}</p>
+            <p className="flex items-center gap-x-1">
+              <span className="text-xs text-foreground-light">{provider}</span>
+              <span className="text-xs text-foreground-light">•</span>
+              <span className="text-xs text-foreground-light">{region}</span>
+            </p>
+          </div>
         </div>
-        <div className="flex flex-col gap-y-0.5">
-          <p className="text-sm">{label}</p>
-          <p className="flex items-center gap-x-1">
-            <span className="text-xs text-foreground-light">{provider}</span>
-            <span className="text-xs text-foreground-light">•</span>
-            <span className="text-xs text-foreground-light">{region}</span>
-          </p>
-        </div>
+        <img
+          alt="region icon"
+          className="w-8 rounded-sm"
+          src={`${BASE_PATH}/img/regions/${regionKey}.svg`}
+        />
       </div>
       <Handle
         type="source"
@@ -93,7 +101,7 @@ export const ReplicaNode = ({ data }: NodeProps<NodeData>) => {
             <DropdownMenuTrigger asChild>
               <Button type="text" icon={<IconMoreVertical />} className="px-1" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="p-0 w-32" side="bottom" align="end">
+            <DropdownMenuContent className="p-0 w-40" side="bottom" align="end">
               <DropdownMenuItem className="gap-x-2" onClick={() => onSelectResizeReplica()}>
                 Restart replica
               </DropdownMenuItem>

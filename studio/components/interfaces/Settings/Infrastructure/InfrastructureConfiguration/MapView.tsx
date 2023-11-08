@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { partition } from 'lodash'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   ComposableMap,
   Geographies,
@@ -40,6 +40,7 @@ const MapView = ({
   onSelectResizeReplica,
   onSelectDropReplica,
 }: MapViewProps) => {
+  const [mount, setMount] = useState(false)
   const [zoom, setZoom] = useState<number>(1)
   const [center, setCenter] = useState<[number, number]>([14, 7])
   const [tooltip, setTooltip] = useState<{
@@ -68,10 +69,15 @@ const MapView = ({
     [selectedRegionKey]
   )
 
+  useEffect(() => {
+    setTimeout(() => setMount(true), 100)
+  }, [])
+
   return (
     <div className="bg-background">
       <ComposableMap projectionConfig={{ scale: 140 }} height={354}>
         <ZoomableGroup
+          className={mount ? 'transition-all duration-300' : ''}
           center={center}
           zoom={zoom}
           minZoom={1}
@@ -248,7 +254,7 @@ const MapView = ({
                         <DropdownMenuTrigger asChild>
                           <Button type="text" icon={<IconMoreVertical />} className="px-1" />
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent className="p-0 w-32" side="bottom" align="end">
+                        <DropdownMenuContent className="p-0 w-40" side="bottom" align="end">
                           <DropdownMenuItem className="gap-x-2" onClick={() => {}}>
                             Restart replica
                           </DropdownMenuItem>

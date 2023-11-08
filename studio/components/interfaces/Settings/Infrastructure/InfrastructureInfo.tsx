@@ -67,7 +67,7 @@ const InfrastructureInfo = () => {
       <ScaffoldDivider />
 
       <ScaffoldContainer>
-        <ScaffoldSection>
+        {/* <ScaffoldSection>
           <ScaffoldSectionDetail>
             <p>Configuration</p>
             <p className="text-foreground-light text-sm">Information on your server provider</p>
@@ -76,8 +76,8 @@ const InfrastructureInfo = () => {
             <Input readOnly disabled value={project?.cloud_provider} label="Cloud provider" />
             <Input readOnly disabled value={project?.region} label="Region" />
           </ScaffoldSectionContent>
-        </ScaffoldSection>
-        <ScaffoldSection className="!pt-0">
+        </ScaffoldSection> */}
+        <ScaffoldSection>
           <ScaffoldSectionDetail>
             <p>Service Versions</p>
             <p className="text-foreground-light text-sm">
