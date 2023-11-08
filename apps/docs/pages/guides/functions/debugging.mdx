@@ -28,7 +28,7 @@ When [developing locally](/docs/guides/functions/local-development) you will see
 
 - Outgoing connections to ports `25`, `465`, and `587` are not allowed.
 - Serving of HTML content is not supported (`GET` requests that return `text/html` will be rewritten to `text/plain`).
-- Functions cannot read or write to the file system (Deno FileSystem APIs are not available to use within edge functions).
+- Deno FileSystem APIs are not available to use within Edge Functions.
 - Importing modules using `npm:` specifier is currently not supported ([use a CDN to load npm modules](/docs/guides/functions/import-maps)).
 
 ## Troubleshooting
