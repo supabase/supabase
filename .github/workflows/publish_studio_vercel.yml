@@ -34,18 +34,18 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
-      - name: Install Vercel CLI
-        run: |
-          npm install
-          npm install --global vercel@latest turbo-ignore
-
       - name: Check for changes to studio
         run: |
+          npm install --global turbo-ignore
           if npx turbo-ignore studio; then
             echo "HAS_CHANGES=false" >> "$GITHUB_ENV"
           else
             echo "HAS_CHANGES=true" >> "$GITHUB_ENV"
           fi
+
+      - name: Install Vercel CLI
+        if: env.HAS_CHANGES == 'true'
+        run: npm install --global vercel@latest
 
       - name: Pull Vercel Environment Information
         if: env.HAS_CHANGES == 'true'
