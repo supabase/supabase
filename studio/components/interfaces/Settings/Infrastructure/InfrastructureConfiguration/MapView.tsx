@@ -49,8 +49,8 @@ const MapView = ({
   }>()
 
   const [[primary], replicas] = partition(MOCK_DATABASES, (database) => database.type === 'PRIMARY')
-  const primaryCoordinates = AVAILABLE_REPLICA_REGIONS.find(
-    (region) => region.region === primary.region
+  const primaryCoordinates = AVAILABLE_REPLICA_REGIONS.find((region) =>
+    primary.region.includes(region.region)
   )?.coordinates ?? [0, 0]
 
   const selectedRegionKey =
@@ -94,8 +94,8 @@ const MapView = ({
           </Geographies>
 
           {replicas.map((database) => {
-            const coordinates = AVAILABLE_REPLICA_REGIONS.find(
-              (region) => region.region === database.region
+            const coordinates = AVAILABLE_REPLICA_REGIONS.find((region) =>
+              database.region.includes(region.region)
             )?.coordinates
 
             return (
@@ -115,7 +115,7 @@ const MapView = ({
 
           {AVAILABLE_REPLICA_REGIONS.map((region) => {
             const databases =
-              MOCK_DATABASES.filter((database) => database.region === region.region) ?? []
+              MOCK_DATABASES.filter((database) => database.region.includes(region.region)) ?? []
             const coordinates = AVAILABLE_REPLICA_REGIONS.find(
               (r) => r.region === region.region
             )?.coordinates
@@ -153,6 +153,12 @@ const MapView = ({
                   }
                 }}
               >
+                {selectedRegionKey === region.region && (
+                  <circle
+                    r={4}
+                    className={`animate-ping ${hasNoDatabases ? 'fill-white/30' : 'fill-brand'}`}
+                  />
+                )}
                 <circle
                   r={4}
                   className={`cursor-pointer ${

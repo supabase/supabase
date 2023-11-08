@@ -12,17 +12,19 @@ import { DatabaseConfiguration, MOCK_DATABASES } from './InstanceConfiguration.c
 import { getGraphLayout } from './InstanceConfiguration.utils'
 import { PrimaryNode, ReplicaNode } from './InstanceNode'
 import MapView from './MapView'
+import { AWS_REGIONS_KEYS } from 'lib/constants'
 
 // [Joshen] Just FYI, UI assumes single provider for primary + replicas
 // [Joshen] Idea to visualize grouping based on region: https://reactflow.dev/examples/layout/sub-flows
 // [Joshen] Show flags for regions
 
-const InstanceChart = () => {
+const InstanceConfigurationUI = () => {
   const reactFlow = useReactFlow()
   const { resolvedTheme } = useTheme()
-  const [view, setView] = useState<'flow' | 'map'>('map')
+  const [view, setView] = useState<'flow' | 'map'>('flow')
 
   const [showNewReplicaPanel, setShowNewReplicaPanel] = useState(false)
+  const [newReplicaRegion, setNewReplicaRegion] = useState<AWS_REGIONS_KEYS>()
   const [selectedReplicaToResize, setSelectedReplicaToResize] = useState<DatabaseConfiguration>()
   const [selectedReplicaToDrop, setSelectedReplicaToDrop] = useState<DatabaseConfiguration>()
 
@@ -45,7 +47,7 @@ const InstanceChart = () => {
           inserted_at: database.inserted_at,
           ...(database.type === 'READ_REPLICA'
             ? {
-                onSelectResizeReplica: () => console.log('resize'),
+                onSelectResizeReplica: () => setSelectedReplicaToResize(database),
                 onSelectDropReplica: () => setSelectedReplicaToDrop(database),
               }
             : {}),
@@ -66,6 +68,10 @@ const InstanceChart = () => {
 
   const nodeTypes = useMemo(() => ({ PRIMARY: PrimaryNode, READ_REPLICA: ReplicaNode }), [])
 
+  const onConfirmDropReplica = () => {
+    console.log('Drop replica', selectedReplicaToDrop)
+  }
+
   return (
     <>
       <div className="h-[500px] w-full relative">
@@ -77,13 +83,17 @@ const InstanceChart = () => {
             <Button
               type="default"
               icon={<Network size={15} />}
-              className="rounded-r-none"
+              className={`rounded-r-none transition ${
+                view === 'flow' ? 'opacity-100' : 'opacity-50'
+              }`}
               onClick={() => setView('flow')}
             />
             <Button
               type="default"
               icon={<Globe2 size={15} />}
-              className="rounded-l-none"
+              className={`rounded-l-none transition ${
+                view === 'map' ? 'opacity-100' : 'opacity-50'
+              }`}
               onClick={() => setView('map')}
             />
           </div>
@@ -115,10 +125,10 @@ const InstanceChart = () => {
         ) : (
           <MapView
             onSelectDeployNewReplica={(region) => {
-              console.log(region)
+              setNewReplicaRegion(region)
               setShowNewReplicaPanel(true)
             }}
-            onSelectResizeReplica={() => console.log('resize')}
+            onSelectResizeReplica={setSelectedReplicaToResize}
             onSelectDropReplica={setSelectedReplicaToDrop}
           />
         )}
@@ -132,7 +142,7 @@ const InstanceChart = () => {
         buttonLabel="Drop replica"
         buttonLoadingLabel="Dropping replica"
         onSelectCancel={() => setSelectedReplicaToDrop(undefined)}
-        onSelectConfirm={() => console.log('DROP')}
+        onSelectConfirm={() => onConfirmDropReplica()}
       >
         <Modal.Content className="py-3">
           <p className="text-sm">Add some more content here</p>
@@ -142,7 +152,11 @@ const InstanceChart = () => {
 
       <DeployNewReplicaPanel
         visible={showNewReplicaPanel}
-        onClose={() => setShowNewReplicaPanel(false)}
+        selectedDefaultRegion={newReplicaRegion}
+        onClose={() => {
+          setNewReplicaRegion(undefined)
+          setShowNewReplicaPanel(false)
+        }}
       />
     </>
   )
@@ -151,7 +165,7 @@ const InstanceChart = () => {
 const InstanceConfiguration = () => {
   return (
     <ReactFlowProvider>
-      <InstanceChart />
+      <InstanceConfigurationUI />
     </ReactFlowProvider>
   )
 }
