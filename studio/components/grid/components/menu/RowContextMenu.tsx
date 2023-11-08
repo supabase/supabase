@@ -60,7 +60,7 @@ const RowContextMenu = ({ rows }: RowContextMenuProps) => {
 
   return (
     <>
-      <Menu id={ROW_CONTEXT_MENU_ID} animation={false} className="!bg-surface-200">
+      <Menu id={ROW_CONTEXT_MENU_ID} animation={false}>
         <Item onClick={onCopyCellContent}>
           <IconClipboard size="tiny" />
           <span className="ml-2 text-xs">Copy cell content</span>
