@@ -1,7 +1,6 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { useCallback } from 'react'
 import { Member, ResponseError } from 'types'
 import { organizationKeys } from './keys'
 
@@ -73,15 +72,3 @@ export const useOrganizationDetailQuery = <TData = OrganizationDetailData>(
       ...options,
     }
   )
-
-export const useOrganizationDetailPrefetch = ({ slug }: OrganizationDetailVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (slug) {
-      client.prefetchQuery(organizationKeys.detail(slug), ({ signal }) =>
-        getOrganizationDetail({ slug }, signal)
-      )
-    }
-  }, [slug])
-}
