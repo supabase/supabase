@@ -1,20 +1,22 @@
-import { Accordion, Badge, Button, IconCheck, Select } from 'ui'
-import Solutions from 'data/Solutions'
-import { NextSeo } from 'next-seo'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { NextSeo } from 'next-seo'
+import { useTheme } from 'next-themes'
+import { Accordion, Button, IconCheck, Select } from 'ui'
+
+import AnnouncementBadge from '~/components/Announcement/Badge'
 import CTABanner from '~/components/CTABanner'
+import ComputePricingModal from '~/components/Pricing/ComputePricingModal'
 import DefaultLayout from '~/components/Layouts/Default'
 import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/Pricing/PricingTableRow'
-import { pricing } from 'shared-data/pricing'
+
+import Solutions from '~/data/Solutions'
 import pricingFaq from '~/data/PricingFAQ.json'
-import { useTheme } from 'next-themes'
-import ComputePricingModal from '~/components/Pricing/ComputePricingModal'
+import { pricing } from 'shared-data/pricing'
 import { plans } from 'shared-data/plans'
-import AnnouncementBadge from '../../components/Announcement/Badge'
-import Image from 'next/image'
 
 export default function IndexPage() {
   const router = useRouter()
@@ -106,30 +108,24 @@ export default function IndexPage() {
   }) => {
     return (
       <div className="mt-8 px-4 mobile-header">
-        <h2 className="text-brand-600 dark:text-brand text-3xl font-medium uppercase font-mono">
-          {plan}
-        </h2>
+        <h2 className="text-brand text-3xl font-medium uppercase font-mono">{plan}</h2>
         <div className="flex items-baseline gap-2">
-          {from && <span className="text-scale-1200 text-base">From</span>}
+          {from && <span className="text-foreground text-base">From</span>}
           {showDollarSign ? (
             <span className="h1">
               {plan !== 'Enterprise' ? '$' : ''}
               {price}
             </span>
           ) : (
-            <span className="text-scale-1100">{price}</span>
+            <span className="text-foreground-light">{price}</span>
           )}
 
           <p className="p">{priceDescription}</p>
         </div>
         <p className="p">{description}</p>
-        <Link href="https://supabase.com/dashboard/new" passHref>
-          <a>
-            <Button size="medium" block>
-              Get started
-            </Button>
-          </a>
-        </Link>
+        <Button asChild size="medium" block>
+          <Link href="https://supabase.com/dashboard/new">Get started</Link>
+        </Button>
       </div>
     )
   }
@@ -173,7 +169,7 @@ export default function IndexPage() {
         </div>
 
         <div className="mx-auto lg:container lg:px-16 xl:px-12 flex flex-col">
-          {/* <div className="absolute inset-0 shadow-sm bg-scale-200 h-3/5" /> */}
+          {/* <div className="absolute inset-0 shadow-sm bg-background h-3/5" /> */}
 
           <div
             className="relative z-10 mx-auto -mt-8 w-full px-4 sm:px-6
@@ -192,7 +188,7 @@ export default function IndexPage() {
                   ].join(' ')}
                 >
                   {plan.name === 'Pro' && (
-                    <p className="text-[13px] leading-4 text-center py-2 text-scale-100">
+                    <p className="text-[13px] leading-4 text-center py-2 text-background">
                       Most Popular
                     </p>
                   )}
@@ -204,7 +200,7 @@ export default function IndexPage() {
                     ].join(' ')}
                   >
                     <div
-                      className={`dark:bg-scale-300 bg-white px-8 xl:px-4 2xl:px-8 pt-6 rounded-tr-[4px] rounded-tl-[4px] ${
+                      className={`bg-surface-100 px-8 xl:px-4 2xl:px-8 pt-6 rounded-tr-[4px] rounded-tl-[4px] ${
                         plan.name === 'Pro' ? 'rounded-tr-[4px] rounded-tl-[4px]' : ''
                       }`}
                     >
@@ -223,47 +219,47 @@ export default function IndexPage() {
                           )}
                         </div>
                       </div>
-                      <p className="text-scale-1100 my-4 text-sm  border-b dark:border-scale-500 pb-4 2xl:pr-4">
+                      <p className="text-foreground-light my-4 text-sm border-b border-default pb-4 2xl:pr-4">
                         {plan.description}
                       </p>
 
                       <div
                         className={`
-                        text-scale-1200 flex items-baseline
+                        text-foreground flex items-baseline
                         text-5xl
                         font-normal
                         lg:text-4xl
                         xl:text-4xl
                         border-b
-                        dark:border-scale-500
+                        border-default
                         min-h-[175px] ${plan.priceLabel ? 'pt-6' : 'pt-10'}`}
                       >
                         <div className="flex flex-col gap-1">
                           <div className="flex items-end gap-2">
                             <div>
                               {plan.priceLabel && (
-                                <p className="text-scale-900 ml-1 text-[13px] leading-4 font-normal">
+                                <p className="text-foreground-lighter ml-1 text-[13px] leading-4 font-normal">
                                   {plan.priceLabel}
                                 </p>
                               )}
 
                               <div className="flex items-end">
                                 <p
-                                  className={`mt-2 gradient-text-scale-500 dark:gradient-text-scale-100 pb-1 ${
+                                  className={`mt-2 gradient-text-500 dark:gradient-text-100 pb-1 ${
                                     plan.name !== 'Enterprise' ? 'text-5xl' : 'text-4xl'
                                   }`}
                                 >
                                   {plan.name !== 'Enterprise' ? '$' : ''}
                                   {plan.priceMonthly}
                                 </p>
-                                <p className="text-scale-900 mb-1.5 ml-1 text-[13px] leading-4">
-                                  {plan.costUnitOrg}
+                                <p className="text-foreground-lighter mb-1.5 ml-1 text-[13px] leading-4">
+                                  {plan.costUnit}
                                 </p>
                               </div>
 
                               {plan.warning && (
                                 <p className="-mt-2">
-                                  <span className="bg-scale-200 text-brand-600 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4">
+                                  <span className="bg-background text-brand-600 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4">
                                     {plan.warning}
                                   </span>
                                 </p>
@@ -275,15 +271,17 @@ export default function IndexPage() {
                     </div>
                     <div
                       className={[
-                        `dark:border-scale-400 dark:bg-scale-300 flex h-full rounded-bl-[4px] rounded-br-[4px] flex-1 flex-col bg-white px-8 xl:px-4 2xl:px-8 py-6`,
+                        `border-default bg-surface-100 flex h-full rounded-bl-[4px] rounded-br-[4px] flex-1 flex-col px-8 xl:px-4 2xl:px-8 py-6`,
                         plan.name === 'Pro' ? 'mb-0.5 rounded-bl-[4px] rounded-br-[4px]' : '',
                       ].join(' ')}
                     >
                       {plan.preface && (
-                        <p className="text-scale-1100 text-[13px] mt-2 mb-4">{plan.preface}</p>
+                        <p className="text-foreground-light text-[13px] mt-2 mb-4">
+                          {plan.preface}
+                        </p>
                       )}
-                      {/* <p className="text-scale-900 text-sm">Included with plan:</p> */}
-                      <ul role="list" className="text-[13px] text-scale-1000">
+                      {/* <p className="text-foreground-lighter text-sm">Included with plan:</p> */}
+                      <ul role="list" className="text-[13px] text-foreground-lighter">
                         {plan.features.map((feature) => (
                           <li key={feature} className="flex items-center py-2 first:mt-0">
                             <IconCheck
@@ -292,7 +290,7 @@ export default function IndexPage() {
                               strokeWidth={3}
                             />
                             {/* </div> */}
-                            <span className="dark:text-scale-1200 mb-0 ml-3 ">{feature}</span>
+                            <span className="text-foreground mb-0 ml-3 ">{feature}</span>
                           </li>
                         ))}
                       </ul>
@@ -332,15 +330,15 @@ export default function IndexPage() {
       >
         <div>
           <div className="text-center">
-            <h2 className="text-scale-1200 text-3xl">Easily customizable add-ons</h2>
-            <p className="text-scale-1100 mt-4 mb-8 lg:mb-16 text-lg">
+            <h2 className="text-foreground text-3xl">Easily customizable add-ons</h2>
+            <p className="text-foreground-light mt-4 mb-8 lg:mb-16 text-lg">
               Level up your Supabase experience with add-ons.
             </p>
           </div>
 
           <div className="grid lg:grid-cols-3 gap-4 mb-16">
             {addons.map((addon) => (
-              <div className="bg-white dark:bg-scale-300 rounded-[4px]" key={addon.name}>
+              <div className="bg-surface-100 border rounded-[4px]" key={addon.name}>
                 <div className="overflow-hidden rounded-lg relative h-56">
                   <Image
                     className="w-full"
@@ -349,10 +347,11 @@ export default function IndexPage() {
                     src={`${basePath}/images/pricing/${addon.heroImg}${
                       resolvedTheme === 'dark' ? '' : '-light'
                     }.png`}
+                    alt=""
                   />
                 </div>
                 <div className="px-8 -mt-1">
-                  <p className="text-[13px] text-scale-900">{addon.price}</p>
+                  <p className="text-[13px] text-foreground-lighter">{addon.price}</p>
                   <div className="flex items-center gap-2 mt-2">
                     <Image
                       src={`${basePath}/images/pricing/${addon.icon}${
@@ -363,19 +362,17 @@ export default function IndexPage() {
                       height={14}
                       alt="Compute"
                     />
-                    <span className="text-sm text-scale-1200">{addon.name}</span>
+                    <span className="text-sm text-foreground">{addon.name}</span>
                   </div>
-                  <p className="mt-2 text-scale-900 text-[13px] min-h-[40px] lg:min-h-[50px] lg:max-w-[290px]">
+                  <p className="mt-2 text-foreground-lighter text-[13px] min-h-[40px] lg:min-h-[50px] lg:max-w-[290px]">
                     {addon.description}
                   </p>
                   <div className="flex items-center justify-between mt-4 mb-4 lg:mb-8">
-                    <Link href={addon.leftCtaLink} as={addon.leftCtaLink}>
-                      <a>
-                        <Button size="tiny" type="default">
-                          {addon.leftCtaText}
-                        </Button>
-                      </a>
-                    </Link>
+                    <Button asChild size="tiny" type="default">
+                      <Link href={addon.leftCtaLink} as={addon.leftCtaLink}>
+                        {addon.leftCtaText}
+                      </Link>
+                    </Button>
                     {addon.name === 'Optimized Compute' ? (
                       <button
                         className="text-brand-600 text-[13px] leading-4 hover:underline "
@@ -393,16 +390,15 @@ export default function IndexPage() {
           </div>
           <div className="flex flex-col md:flex-row items-center gap-4 justify-center text-center">
             <span className="prose">Got something you'd like to see here?</span>
-            <Link
-              href="https://github.com/supabase/supabase/discussions/categories/feature-requests"
-              as="https://github.com/supabase/supabase/discussions/categories/feature-requests"
-            >
-              <a target="_blank">
-                <Button size="tiny" type="default">
-                  Request a feature
-                </Button>
-              </a>
-            </Link>
+            <Button asChild size="tiny" type="default">
+              <Link
+                href="https://github.com/supabase/supabase/discussions/categories/feature-requests"
+                as="https://github.com/supabase/supabase/discussions/categories/feature-requests"
+                target="_blank"
+              >
+                Request a feature
+              </Link>
+            </Button>
           </div>
         </div>
 
@@ -411,10 +407,10 @@ export default function IndexPage() {
           className="grid lg:grid-cols-2 gap-8 items-center mt-12 lg:mt-8 max-w-6xl mx-auto"
         >
           <div className="lg:py-12">
-            <span className="bg-brand-300 text-brand-600 rounded-md bg-opacity-30 inline-block  dark:bg-scale-400 dark:text-scale-1100 py-0.5 px-2 text-[13px] leading-4 mt-2">
+            <span className="bg-brand-400 text-brand-600 rounded-md bg-opacity-30 inline-block py-0.5 px-2 text-[13px] leading-4 mt-2">
               Available for Pro plan
             </span>
-            <h2 className="text-scale-1200 text-4xl mt-4">Cost control with spend caps</h2>
+            <h2 className="text-foreground text-4xl mt-4">Cost control with spend caps</h2>
             <p className="mt-3 prose lg:max-w-lg">
               The Pro plan has a usage quota included and a spend cap turned on by default. If you
               need to go beyond the inclusive limits, simply switch off your spend cap to pay for
@@ -430,18 +426,19 @@ export default function IndexPage() {
               src={`${basePath}/images/pricing/spend-cap${
                 resolvedTheme === 'dark' ? '' : '-light'
               }.png`}
+              alt=""
             />
           </div>
         </div>
       </div>
 
-      <div className="bg-scale-200">
+      <div className="bg-background">
         <div className="sm:py-18 container relative mx-auto px-4 py-16 md:py-24 lg:px-16 lg:py-24 xl:px-20">
           <div className="text-center">
-            <h2 className="text-scale-1200 text-3xl scroll-m-20" id="compare-plans">
+            <h2 className="text-foreground text-3xl scroll-m-20" id="compare-plans">
               Compare Plans
             </h2>
-            <p className="text-scale-1100 mt-4 mb-8 lg:mb-16 text-lg">
+            <p className="text-foreground-light mt-4 mb-8 lg:mb-16 text-lg">
               Start with a hobby project, collaborate with a team, and scale to millions of users.
             </p>
           </div>
@@ -453,7 +450,7 @@ export default function IndexPage() {
               {/* Free - Mobile  */}
               <div className="bg-slate-200 p-2 sticky top-14 z-10 pt-4">
                 <div className="bg-slate-300 rounded-lg border border-slate-500 py-2 px-4 flex justify-between items-center">
-                  <label className="text-scale-1000">Change plan</label>
+                  <label className="text-foreground-lighter">Change plan</label>
                   <Select
                     id="change-plan"
                     name="Change plan"
@@ -691,10 +688,10 @@ export default function IndexPage() {
             <div className="hidden lg:block">
               <table className="h-px w-full table-fixed">
                 <caption className="sr-only">Pricing plan comparison</caption>
-                <thead className="bg-scale-200 dark:bg-scale-200 sticky top-[62px] z-10">
+                <thead className="bg-background dark:bg-background sticky top-[62px] z-10">
                   <tr>
                     <th
-                      className="text-scale-1200 w-1/3 px-6 pt-2 pb-2 text-left text-sm font-normal"
+                      className="text-foreground w-1/3 px-6 pt-2 pb-2 text-left text-sm font-normal"
                       scope="col"
                     >
                       <span className="sr-only">Feature by</span>
@@ -706,7 +703,7 @@ export default function IndexPage() {
 
                     {plans.map((plan) => (
                       <th
-                        className="text-scale-1200 w-1/4 px-6 pr-2 pt-2 pb-2 text-left text-sm font-normal"
+                        className="text-foreground w-1/4 px-6 pr-2 pt-2 pb-2 text-left text-sm font-normal"
                         scope="col"
                         key={plan.name}
                       >
@@ -723,17 +720,17 @@ export default function IndexPage() {
                 </thead>
                 <tr className="descriptions">
                   <th
-                    className="text-scale-1200 w-1/3 px-6 pt-2 pb-2 text-left text-sm font-normal"
+                    className="text-foreground w-1/3 px-6 pt-2 pb-2 text-left text-sm font-normal"
                     scope="col"
                   ></th>
 
                   {plans.map((plan) => (
                     <th
-                      className="text-scale-1200 w-1/4 px-6 pt-2 pb-2 text-left text-sm font-normal"
+                      className="text-foreground w-1/4 px-6 pt-2 pb-2 text-left text-sm font-normal"
                       scope="col"
                       key={`th-${plan.name}`}
                     >
-                      <p className="p text-sm border-b border-scale-700 pb-4">{plan.description}</p>
+                      <p className="p text-sm border-b border-default pb-4">{plan.description}</p>
                       <div
                         className="h-0.25 absolute bottom-0 left-0 w-full"
                         style={{ height: '1px' }}
@@ -741,10 +738,10 @@ export default function IndexPage() {
                     </th>
                   ))}
                 </tr>
-                <tbody className="border-scale-700 dark:border-scale-400 divide-scale-700 dark:divide-scale-400 divide-y">
+                <tbody className="border-default divide-border divide-y">
                   <tr>
                     <th
-                      className="text-scale-900 px-6 py-8 text-left align-top text-sm font-medium dark:text-white"
+                      className="text-foreground-light px-6 py-8 text-left align-top text-sm font-medium"
                       scope="row"
                     ></th>
 
@@ -754,7 +751,7 @@ export default function IndexPage() {
                           <div className="flex flex-col justify-between h-full">
                             <>
                               <span
-                                className={`text-scale-1200 ${
+                                className={`text-foreground ${
                                   plan.name !== 'Enterprise' ? 'text-5xl' : 'text-4xl'
                                 }`}
                               >
@@ -771,24 +768,23 @@ export default function IndexPage() {
 
                             {plan.warning && (
                               <p className="-mt-2">
-                                <span className="bg-scale-100 text-brand-600 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4">
+                                <span className="bg-alternative text-brand-600 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4">
                                   {plan.warning}
                                 </span>
                               </p>
                             )}
 
                             <div className={plan.name === 'Enterprise' ? 'mt-auto' : 'mt-8'}>
-                              <Link href={plan.href} as={plan.href}>
-                                <a>
-                                  <Button
-                                    size="tiny"
-                                    type={plan.name === 'Enterprise' ? 'default' : 'primary'}
-                                    block
-                                  >
-                                    {plan.cta}
-                                  </Button>
-                                </a>
-                              </Link>
+                              <Button
+                                asChild
+                                size="tiny"
+                                type={plan.name === 'Enterprise' ? 'default' : 'primary'}
+                                block
+                              >
+                                <Link href={plan.href} as={plan.href}>
+                                  {plan.cta}
+                                </Link>
+                              </Button>
                             </div>
                           </div>
                         </div>
@@ -838,55 +834,43 @@ export default function IndexPage() {
                   />
                 </tbody>
                 <tfoot>
-                  <tr className="border-scale-200 dark:border-scale-600 border-t">
+                  <tr className="border-default border-t">
                     <th className="sr-only" scope="row">
                       Choose your plan
                     </th>
 
                     <td className="px-6 pt-5">
-                      <Link
-                        href="https://supabase.com/dashboard/new?plan=free"
-                        as="https://supabase.com/dashboard/new?plan=free"
-                      >
-                        <a>
-                          <Button size="tiny" type="primary" block>
-                            Get Started
-                          </Button>
-                        </a>
-                      </Link>
+                      <Button asChild size="tiny" type="primary" block>
+                        <Link
+                          href="https://supabase.com/dashboard/new?plan=free"
+                          as="https://supabase.com/dashboard/new?plan=free"
+                        >
+                          Get Started
+                        </Link>
+                      </Button>
                     </td>
 
                     <td className="px-6 pt-5">
-                      <Link
-                        href="https://supabase.com/dashboard/new?plan=pro"
-                        as="https://supabase.com/dashboard/new?plan=pro"
-                      >
-                        <a>
-                          <Button size="tiny" type="primary" block>
-                            Get Started
-                          </Button>
-                        </a>
-                      </Link>
+                      <Button asChild size="tiny" type="primary" block>
+                        <Link
+                          href="https://supabase.com/dashboard/new?plan=pro"
+                          as="https://supabase.com/dashboard/new?plan=pro"
+                        >
+                          Get Started
+                        </Link>
+                      </Button>
                     </td>
 
                     <td className="px-6 pt-5">
-                      <Link href="https://supabase.com/dashboard/new?plan=team">
-                        <a>
-                          <Button size="tiny" type="primary" block>
-                            Get Started
-                          </Button>
-                        </a>
-                      </Link>
+                      <Button asChild size="tiny" type="primary" block>
+                        <Link href="https://supabase.com/dashboard/new?plan=team">Get Started</Link>
+                      </Button>
                     </td>
 
                     <td className="px-6 pt-5">
-                      <Link href="https://forms.supabase.com/enterprise">
-                        <a>
-                          <Button size="tiny" type="default" block>
-                            Contact Us
-                          </Button>
-                        </a>
-                      </Link>
+                      <Button asChild size="tiny" type="default" block>
+                        <Link href="https://forms.supabase.com/enterprise">Contact Us</Link>
+                      </Button>
                     </td>
                   </tr>
                 </tfoot>
@@ -905,16 +889,16 @@ export default function IndexPage() {
                   chevronAlign="right"
                   justified
                   size="medium"
-                  className="text-scale-900 dark:text-white"
+                  className="text-foreground-light"
                 >
                   {pricingFaq.map((faq, i) => {
                     return (
                       <div className="border-b py-2" key={i}>
                         <Accordion.Item
-                          header={<span className="text-scale-1200">{faq.question}</span>}
+                          header={<span className="text-foreground">{faq.question}</span>}
                           id={`faq--${i.toString()}`}
                         >
-                          <ReactMarkdown className="text-scale-900 prose">
+                          <ReactMarkdown className="text-foreground-lighter prose">
                             {faq.answer}
                           </ReactMarkdown>
                         </Accordion.Item>

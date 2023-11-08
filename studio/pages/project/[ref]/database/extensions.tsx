@@ -21,9 +21,7 @@ const DatabaseExtensions: NextPageWithLayout = () => {
     <ScaffoldContainer>
       <ScaffoldSection>
         <div className="col-span-12">
-          <div className="mb-4">
-            <h3 className="mb-1 text-xl text-foreground">Database Extensions</h3>
-          </div>
+          <h3 className="mb-4 text-xl text-foreground">Database Extensions</h3>
           <Extensions />
         </div>
       </ScaffoldSection>

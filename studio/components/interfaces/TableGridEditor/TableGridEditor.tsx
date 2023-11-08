@@ -23,7 +23,6 @@ import {
   ForeignKeyConstraint,
   useForeignKeyConstraintsQuery,
 } from 'data/database/foreign-key-constraints-query'
-import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { sqlKeys } from 'data/sql/keys'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
@@ -35,8 +34,6 @@ import { EMPTY_ARR } from 'lib/void'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { SchemaView } from 'types'
-import { useIsAPIDocsSidePanelEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
-import APIDocumentationPanel from './APIDocumentationPanel'
 import GridHeaderActions from './GridHeaderActions'
 import NotFoundState from './NotFoundState'
 import SidePanelEditor from './SidePanelEditor'
@@ -63,10 +60,8 @@ const TableGridEditor = ({
   const appSnap = useAppStateSnapshot()
   const snap = useTableEditorStateSnapshot()
   const gridRef = useRef<SupabaseGridRef>(null)
-  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
 
   const [encryptedColumns, setEncryptedColumns] = useState([])
-  const [apiPreviewPanelOpen, setApiPreviewPanelOpen] = useState(false)
 
   const [{ view: selectedView = 'data' }, setUrlState] = useUrlState()
   const setSelectedView = (view: string) => {
@@ -145,9 +140,6 @@ const TableGridEditor = ({
     },
   })
 
-  const { refetch } = useProjectJsonSchemaQuery({ projectRef })
-  const refreshDocs = async () => await refetch()
-
   const { data } = useForeignKeyConstraintsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -221,10 +213,6 @@ const TableGridEditor = ({
 
   const onRowUpdated = (row: Dictionary<any>, idx: number) => {
     if (gridRef.current) gridRef.current.rowEdited(row, idx)
-  }
-
-  const onColumnSaved = (hasEncryptedColumns = false) => {
-    if (hasEncryptedColumns) getEncryptedColumns(selectedTable)
   }
 
   const onTableCreated = (table: PostgresTable) => {
@@ -325,28 +313,16 @@ const TableGridEditor = ({
         editable={!isReadOnly && canEditViaTableEditor}
         schema={selectedTable.schema}
         table={gridTable}
-        refreshDocs={refreshDocs}
         headerActions={
           isTableSelected || isViewSelected || canEditViaTableEditor ? (
             <>
               {canEditViaTableEditor && (
-                <GridHeaderActions
-                  table={selectedTable as PostgresTable}
-                  openAPIDocsPanel={() => {
-                    if (isNewAPIDocsEnabled) {
-                      appSnap.setActiveDocsSection(['entities', selectedTable.name])
-                      appSnap.setShowProjectApiDocs(true)
-                    } else {
-                      setApiPreviewPanelOpen(true)
-                    }
-                  }}
-                  refreshDocs={refreshDocs}
-                />
+                <GridHeaderActions table={selectedTable as PostgresTable} />
               )}
               {(isTableSelected || isViewSelected) && (
                 <>
                   {canEditViaTableEditor && (
-                    <div className="h-[20px] w-px border-r border-scale-600"></div>
+                    <div className="h-[20px] w-px border-r border-control"></div>
                   )}
                   <div>
                     <TwoOptionToggle
@@ -396,15 +372,9 @@ const TableGridEditor = ({
           selectedTable={selectedTable as PostgresTable}
           onRowCreated={onRowCreated}
           onRowUpdated={onRowUpdated}
-          onColumnSaved={onColumnSaved}
           onTableCreated={onTableCreated}
         />
       )}
-
-      <APIDocumentationPanel
-        visible={apiPreviewPanelOpen}
-        onClose={() => setApiPreviewPanelOpen(false)}
-      />
     </>
   )
 }

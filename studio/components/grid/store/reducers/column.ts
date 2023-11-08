@@ -1,5 +1,5 @@
 import update from 'immutability-helper'
-import { CalculatedColumn } from '@supabase/react-data-grid'
+import { CalculatedColumn } from 'react-data-grid'
 import { cloneColumn, getInitialGridColumns } from '../../utils'
 import { INIT_ACTIONTYPE } from './base'
 

@@ -1,6 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { observer } from 'mobx-react-lite'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import { Fragment, useState } from 'react'
 
 import { useParams } from 'common/hooks'
@@ -169,11 +169,11 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                           <div className="flex items-center space-x-4">
                             <div>
                               {x.invited_id ? (
-                                <span className="flex p-2 border-2 rounded-full border-scale-700">
+                                <span className="flex p-2 border-2 rounded-full border-strong">
                                   <IconUser size={20} strokeWidth={2} />
                                 </span>
                               ) : isEmailUser ? (
-                                <div className="w-[40px] h-[40px] bg-scale-300 border border-scale-400 rounded-full text-foreground-lighter flex items-center justify-center">
+                                <div className="w-[40px] h-[40px] bg-surface-100 border border-overlay rounded-full text-foreground-lighter flex items-center justify-center">
                                   <IconUser strokeWidth={1.5} />
                                 </div>
                               ) : (
@@ -210,25 +210,27 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                             </div>
                           ) : role !== undefined ? (
                             <Tooltip.Root delayDuration={0}>
-                              <Tooltip.Trigger className="w-[140px]">
-                                <Listbox
-                                  className={disableRoleEdit ? 'pointer-events-none' : ''}
-                                  disabled={disableRoleEdit}
-                                  value={role.id}
-                                  onChange={validateSelectedRoleToChange}
-                                >
-                                  {roles.map((r: any) => (
-                                    <Listbox.Option
-                                      key={r.id}
-                                      value={r.id}
-                                      label={r.name}
-                                      disabled={disableRoleEdit}
-                                      className="w-36"
-                                    >
-                                      {r.name}
-                                    </Listbox.Option>
-                                  ))}
-                                </Listbox>
+                              <Tooltip.Trigger className="w-[140px]" asChild>
+                                <div>
+                                  <Listbox
+                                    className={disableRoleEdit ? 'pointer-events-none' : ''}
+                                    disabled={disableRoleEdit}
+                                    value={role.id}
+                                    onChange={validateSelectedRoleToChange}
+                                  >
+                                    {roles.map((r: any) => (
+                                      <Listbox.Option
+                                        key={r.id}
+                                        value={r.id}
+                                        label={r.name}
+                                        disabled={disableRoleEdit}
+                                        className="w-36"
+                                      >
+                                        {r.name}
+                                      </Listbox.Option>
+                                    ))}
+                                  </Listbox>
+                                </div>
                               </Tooltip.Trigger>
                               {memberIsPendingInvite ? (
                                 <Tooltip.Portal>
@@ -236,8 +238,8 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                                     <div
                                       className={[
-                                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                                        'border border-scale-200 ', //border
+                                        'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                                        'border border-background', //border
                                       ].join(' ')}
                                     >
                                       <span className="text-xs text-foreground">
@@ -253,8 +255,8 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                                     <div
                                       className={[
-                                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                                        'border border-scale-200 ', //border
+                                        'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                                        'border border-background', //border
                                       ].join(' ')}
                                     >
                                       <span className="text-xs text-foreground">
@@ -279,8 +281,8 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                                     <div
                                       className={[
-                                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                                        'border border-scale-200 ', //border
+                                        'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                                        'border border-background', //border
                                       ].join(' ')}
                                     >
                                       <span className="text-xs text-foreground">

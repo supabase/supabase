@@ -28,6 +28,7 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useStore } from 'hooks'
 import CreateIndexSidePanel from './CreateIndexSidePanel'
+import SchemaSelector from 'components/ui/SchemaSelector'
 
 const Indexes = () => {
   const { ui } = useStore()
@@ -96,27 +97,31 @@ const Indexes = () => {
     <>
       <div className="pb-8">
         <div className="flex items-center justify-between mb-6">
-          <div>
-            <h3 className="mb-1 text-xl text-foreground">Database Indexes</h3>
+          <div className="space-y-1">
+            <h3 className="text-xl text-foreground">Database Indexes</h3>
             <div className="text-sm text-foreground-lighter">
               Improve query performance against your database
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <Link href="https://supabase.com/docs/guides/database/query-optimization">
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                  Documentation
-                </Button>
-              </a>
-            </Link>
-            <Link href="https://supabase.com/docs/guides/database/extensions/index_advisor">
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                  Optimization with index_advisor
-                </Button>
-              </a>
-            </Link>
+            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+              <Link
+                href="https://supabase.com/docs/guides/database/query-optimization"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Documentation
+              </Link>
+            </Button>
+            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+              <Link
+                href="https://supabase.com/docs/guides/database/extensions/index_advisor"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Optimization with index_advisor
+              </Link>
+            </Button>
           </div>
         </div>
 
@@ -124,34 +129,24 @@ const Indexes = () => {
           <div className="flex items-center space-x-2">
             {isLoadingSchemas && <ShimmeringLoader className="w-[260px]" />}
             {isErrorSchemas && (
-              <div className="w-[260px] text-light text-sm border px-3 py-1.5 rounded flex items-center space-x-2">
+              <div className="w-[260px] text-foreground-light text-sm border px-3 py-1.5 rounded flex items-center space-x-2">
                 <IconAlertCircle strokeWidth={2} size={16} />
                 <p>Failed to load schemas</p>
               </div>
             )}
             {isSuccessSchemas && (
-              <Listbox
-                size="small"
-                value={selectedSchema}
-                onChange={setSelectedSchema}
+              <SchemaSelector
                 className="w-[260px]"
-              >
-                {(schemas ?? []).map((schema) => (
-                  <Listbox.Option
-                    key={schema.name}
-                    value={schema.name}
-                    label={schema.name}
-                    addOnBefore={() => <span className="text-foreground-lighter">schema</span>}
-                  >
-                    {schema.name}
-                  </Listbox.Option>
-                ))}
-              </Listbox>
+                size="small"
+                showError={false}
+                selectedSchemaName={selectedSchema}
+                onSelectSchema={setSelectedSchema}
+              />
             )}
             <Input
               size="small"
               value={search}
-              className="w-[250px]"
+              className="w-64"
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search for an index"
               icon={<IconSearch size={14} />}
@@ -186,7 +181,7 @@ const Indexes = () => {
                   <Table.tr>
                     <Table.td colSpan={4}>
                       <p className="text-sm text-foreground">No indexes created yet</p>
-                      <p className="text-sm text-light">
+                      <p className="text-sm text-foreground-light">
                         There are no indexes found in the schema "{selectedSchema}"
                       </p>
                     </Table.td>
@@ -196,7 +191,7 @@ const Indexes = () => {
                   <Table.tr>
                     <Table.td colSpan={4}>
                       <p className="text-sm text-foreground">No results found</p>
-                      <p className="text-sm text-light">
+                      <p className="text-sm text-foreground-light">
                         Your search for "{search}" did not return any results
                       </p>
                     </Table.td>
@@ -291,7 +286,7 @@ const Indexes = () => {
               <li className="flex gap-3">
                 <div>
                   <strong className="text-sm">Before deleting this index, consider:</strong>
-                  <ul className="space-y-2 mt-2 text-sm text-light">
+                  <ul className="space-y-2 mt-2 text-sm text-foreground-light">
                     <li className="list-disc ml-6">This index is no longer in use</li>
                     <li className="list-disc ml-6">
                       The table which the index is on is not currently in use, as dropping an index

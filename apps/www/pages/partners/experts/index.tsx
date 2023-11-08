@@ -4,7 +4,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import BecomeAPartner from '~/components/Partners/BecomeAPartner'
 import PartnerLinkBox from '~/components/Partners/PartnerLinkBox'
-import supabase from '~/lib/supabase'
+import supabase from '~/lib/supabaseMisc'
 import { Partner } from '~/types/partners'
 import TileGrid from '../../../components/Partners/TileGrid'
 
@@ -52,11 +52,11 @@ function ExpertPartnersPage(props: Props) {
           ],
         }}
       />
-      <DefaultLayout className="bg-scale-400 dark:bg-scale-100">
+      <DefaultLayout className="bg-alternative">
         <SectionContainer className="space-y-12">
           <div>
             <h1 className="h1">{meta_title}</h1>
-            <h2 className="text-scale-900 text-xl">{meta_description}</h2>
+            <p className="text-foreground-lighter text-xl">{meta_description}</p>
           </div>
           <div className="grid space-y-12 md:gap-8 lg:grid-cols-12 lg:gap-16 lg:space-y-0 xl:gap-16">
             <div className="lg:col-span-4 xl:col-span-3">
@@ -64,7 +64,7 @@ function ExpertPartnersPage(props: Props) {
               <div className="space-y-6">
                 {/* Search Bar */}
                 <div className="space-y-4">
-                  <div className="text-scale-900 mb-2 text-sm">Explore more</div>
+                  <div className="text-foreground-light mb-2 text-sm">Explore more</div>
                   <div className="grid grid-cols-2 gap-4 lg:grid-cols-1">
                     <PartnerLinkBox
                       title="Integrations"
@@ -120,15 +120,14 @@ function ExpertPartnersPage(props: Props) {
                 {partners.length ? (
                   <TileGrid partners={partners} hideCategories={true} />
                 ) : (
-                  <h2 className="h2">No Partners Found</h2>
+                  <p className="h2">No Partners Found</p>
                 )}
               </div>
             </div>
           </div>
-
-          {/* Become a partner form */}
         </SectionContainer>
-        <BecomeAPartner supabase={supabase} />
+        {/* Become a partner form */}
+        <BecomeAPartner />
       </DefaultLayout>
     </>
   )

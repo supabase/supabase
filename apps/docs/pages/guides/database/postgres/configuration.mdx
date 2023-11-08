@@ -4,15 +4,15 @@ export const meta = {
   id: 'postgres-configuration',
   title: 'Database configuration',
   slug: 'postgres-configuration',
-  description: 'Updating the default congfiguration for your Postgres database.',
-  subtitle: 'Updating the default congfiguration for your Postgres database.',
+  description: 'Updating the default configuration for your Postgres database.',
+  subtitle: 'Updating the default configuration for your Postgres database.',
 }
 
 Postgres provides a set of sensible defaults for you database size. In some cases, these defaults can be updated. We do not recommend changing these defaults unless you know what you're doing.
 
 ## Timeouts
 
-By default, Supabase limits the maximum statement execution time to _8 seconds_ for users accessing the API. Additionally, all users are subject to a global limit of _2 minutes_. This serves as a backstop against resource exhaustion due to either poorly written queries, or abusive usage.
+By default, Supabase limits the maximum statement execution time to _8 seconds_ for users accessing the API. Additionally, all users are subject to a global limit of _2 minutes_. This serves as a backstop against resource exhaustion due to either poorly written queries, or abusive usage. This can be overridden using [Custom Postgres configuration](https://supabase.com/docs/guides/platform/custom-postgres-config#supported-parameters).
 
 ### Changing the default timeout
 

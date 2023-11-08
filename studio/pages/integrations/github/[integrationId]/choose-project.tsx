@@ -26,7 +26,7 @@ const GITHUB_ICON = (
 
 const ChooseProjectGitHubPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const { integrationId, slug, organizationSlug } = useParams()
+  const { integrationId, slug, organizationSlug, state: projectRef } = useParams()
   const orgSlug = slug ?? organizationSlug
 
   const { data: integrations } = useOrgIntegrationsQuery({
@@ -58,11 +58,17 @@ const ChooseProjectGitHubPage: NextPageWithLayout = () => {
     [allRepos]
   )
 
+  function onDone() {
+    if (projectRef) {
+      router.push(`/project/${projectRef}?enableBranching=true`)
+    } else {
+      router.push(`/org/${orgSlug}/integrations`)
+    }
+  }
+
   const { mutate: createConnections, isLoading: isCreatingConnection } =
     useIntegrationGitHubConnectionsCreateMutation({
-      onSuccess() {
-        router.push(`/org/${orgSlug}/integrations`)
-      },
+      onSuccess: onDone,
     })
 
   return (
@@ -92,18 +98,17 @@ This Supabase integration will allow you to link a Supabase project to a GitHub 
               isLoading={isCreatingConnection}
               integrationIcon={GITHUB_ICON}
               choosePrompt="Choose GitHub Repo"
-              onSkip={() => {
-                router.push(`/org/${orgSlug}/integrations`)
-              }}
+              onSkip={onDone}
               loadingForeignProjects={isLoadingGithubReposData}
               loadingSupabaseProjects={isLoadingSupabaseProjectsData}
+              defaultSupabaseProjectRef={projectRef}
             />
           </ScaffoldContainer>
         </>
 
         <ScaffoldDivider />
       </main>
-      <ScaffoldContainer className="bg-body flex flex-row gap-6 py-6 border-t">
+      <ScaffoldContainer className="bg-background flex flex-row gap-6 py-6 border-t">
         <div className="flex items-center gap-2 text-xs text-foreground-lighter">
           <IconBook size={16} /> Docs
         </div>

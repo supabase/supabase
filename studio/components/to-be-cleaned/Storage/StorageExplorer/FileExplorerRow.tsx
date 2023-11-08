@@ -321,7 +321,7 @@ const FileExplorerRow = ({
         className={[
           'storage-row group flex h-full items-center px-2.5',
           'hover:bg-panel-footer-light dark:hover:bg-panel-footer-dark',
-          `${isOpened ? 'bg-scale-400' : ''}`,
+          `${isOpened ? 'bg-surface-200' : ''}`,
           `${isPreviewed ? 'bg-green-500 hover:bg-green-500 dark:hover:bg-green-500' : ''}`,
           `${item.status !== STORAGE_ROW_STATUS.LOADING ? 'cursor-pointer' : ''}`,
         ].join(' ')}
@@ -382,8 +382,8 @@ const FileExplorerRow = ({
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200',
+                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                      'border border-background',
                     ].join(' ')}
                   >
                     <span className="text-xs text-foreground">

@@ -21,13 +21,12 @@ import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { createClient } from '@supabase/supabase-js'
 import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { ThemeProvider } from 'common'
+import { ThemeProvider, useThemeSandbox } from 'common'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
-import LogRocket from 'logrocket'
 import Head from 'next/head'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -50,7 +49,6 @@ import FlagProvider from 'components/ui/Flag/FlagProvider'
 import PageTelemetry from 'components/ui/PageTelemetry'
 import { useRootQueryClient } from 'data/query-client'
 import { StoreProvider } from 'hooks'
-import useAutoAuthRedirect from 'hooks/misc/useAutoAuthRedirect'
 import { AuthProvider } from 'lib/auth'
 import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { dart } from 'lib/constants/prism'
@@ -65,11 +63,6 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(relativeTime)
 dart(Prism)
-
-if (IS_PLATFORM && process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging') {
-  // [Joshen] For staff only to debug internal issues
-  LogRocket.init('bffopb/supabase-dashboard-staff')
-}
 
 loader.config({
   // [Joshen] Attempt for offline support/bypass ISP issues is to store the assets required for monaco
@@ -90,9 +83,10 @@ loader.config({
 // the dashboard, all other layout components should not be doing that
 
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
-  const consentToastId = useRef<string>()
-  const queryClient = useRootQueryClient()
   const snap = useAppStateSnapshot()
+  const queryClient = useRootQueryClient()
+
+  const consentToastId = useRef<string>()
   const [rootStore] = useState(() => new RootStore())
 
   // [Joshen] Some issues with using createBrowserSupabaseClient
@@ -103,6 +97,22 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
           process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
         )
       : undefined
+  )
+
+  const getLayout = Component.getLayout ?? ((page) => page)
+
+  const AuthContainer = useMemo(
+    // eslint-disable-next-line react/display-name
+    () => (props: any) => {
+      return IS_PLATFORM ? (
+        <SessionContextProvider supabaseClient={supabase as any}>
+          <AuthProvider>{props.children}</AuthProvider>
+        </SessionContextProvider>
+      ) : (
+        <AuthProvider>{props.children}</AuthProvider>
+      )
+    },
+    [supabase]
   )
 
   useEffect(() => {
@@ -133,23 +143,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  useAutoAuthRedirect(queryClient)
-
-  const getLayout = Component.getLayout ?? ((page) => page)
-
-  const AuthContainer = useMemo(
-    // eslint-disable-next-line react/display-name
-    () => (props: any) => {
-      return IS_PLATFORM ? (
-        <SessionContextProvider supabaseClient={supabase as any}>
-          <AuthProvider>{props.children}</AuthProvider>
-        </SessionContextProvider>
-      ) : (
-        <AuthProvider>{props.children}</AuthProvider>
-      )
-    },
-    [supabase]
-  )
+  useThemeSandbox()
 
   return (
     <QueryClientProvider client={queryClient}>
