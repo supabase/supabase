@@ -17,8 +17,8 @@
     "codegen": "openapi-typescript http://localhost:8080/api-json -o data/api.d.ts && prettier --write data/api.d.ts"
   },
   "dependencies": {
-    "@dagrejs/dagre": "^1.0.4",
     "@graphiql/react": "^0.19.4",
+    "@dagrejs/dagre": "^1.0.4",
     "@graphiql/toolkit": "^0.9.1",
     "@hcaptcha/react-hcaptcha": "^1.8.1",
     "@headlessui/react": "^1.7.17",
