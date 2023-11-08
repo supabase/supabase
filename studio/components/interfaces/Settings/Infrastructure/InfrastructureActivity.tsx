@@ -1,8 +1,9 @@
 import { useParams } from 'common'
+import { useRouter } from 'next/router'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { Fragment, useMemo, useState } from 'react'
-import { IconBarChart2, IconExternalLink } from 'ui'
+import { IconBarChart2, IconExternalLink, Button } from 'ui'
 
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import {
@@ -26,14 +27,24 @@ import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
-import { useSelectedOrganization } from 'hooks'
+import { useSelectedOrganization, useFlag, useProjectByRef } from 'hooks'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants'
 import { INFRA_ACTIVITY_METRICS } from './Infrastructure.constants'
+import {
+  useIsProjectActive,
+  useProjectContext,
+} from 'components/layouts/ProjectLayout/ProjectContext'
 
 const InfrastructureActivity = () => {
   const { ref: projectRef } = useParams()
   const organization = useSelectedOrganization()
   const [dateRange, setDateRange] = useState<any>()
+  const router = useRouter()
+  const { project: selectedProject } = useProjectContext()
+  const isProjectActive = useIsProjectActive()
+  const parentProject = useProjectByRef(selectedProject?.parent_project_ref)
+  const isBranch = parentProject !== undefined
+  const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const { data: subscription, isLoading: isLoadingSubscription } = useOrgSubscriptionQuery({
     orgSlug: organization?.slug,
@@ -72,7 +83,7 @@ const InfrastructureActivity = () => {
       ? `/`
       : subscription.plan.id === 'free'
       ? `/org/${organization?.slug ?? '[slug]'}/billing#subscription`
-      : `/project/${projectRef}/settings/addons`
+      : `/project/${projectRef}/settings/addons?panel=computeInstance`
 
   const categoryMeta = INFRA_ACTIVITY_METRICS.find((category) => category.key === 'infra')
 
@@ -222,6 +233,16 @@ const InfrastructureActivity = () => {
                         ))}
                       </div>
                     </div>
+                    <Button
+                      type="default"
+                      className="mt-2 pointer-events-auto"
+                      onClick={() =>
+                        router.push(`/project/${projectRef}/settings/addons?panel=computeInstance`)
+                      }
+                      disabled={isBranch || !isProjectActive || projectUpdateDisabled}
+                    >
+                      Change compute size
+                    </Button>
                     <div className="space-y-2">
                       <p className="text-sm text-foreground dark:text-foreground-light mb-2">
                         More information
