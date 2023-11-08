@@ -847,7 +847,7 @@ export const functions: NavMenuConstant = {
         { name: 'Managing environment variables', url: '/guides/functions/secrets' },
         { name: 'Integrating with Supabase Auth', url: '/guides/functions/auth' },
         {
-          name: 'Connecting directly to Postgres',
+          name: 'Integrating with Postgres',
           url: '/guides/functions/connect-to-postgres',
         },
         {
