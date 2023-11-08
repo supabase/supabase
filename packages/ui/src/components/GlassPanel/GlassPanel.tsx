@@ -106,7 +106,9 @@ const GlassPanel = ({
               <img
                 className="w-5"
                 alt={title}
-                src={`${icon}${hasLightIcon && resolvedTheme !== 'dark' ? '-light' : ''}.svg`}
+                src={`${icon}${
+                  hasLightIcon && !resolvedTheme?.includes('dark') ? '-light' : ''
+                }.svg`}
               />
             </IconBackground>
           ) : (

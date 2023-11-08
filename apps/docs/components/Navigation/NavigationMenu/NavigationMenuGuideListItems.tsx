@@ -78,7 +78,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
                 alt={props.subItem.name + router.basePath}
                 src={
                   `${router.basePath}` +
-                  `${props.subItem.icon}${resolvedTheme !== 'dark' ? '-light' : ''}.svg`
+                  `${props.subItem.icon}${!resolvedTheme?.includes('dark') ? '-light' : ''}.svg`
                 }
                 width={15}
                 height={15}
