@@ -11,12 +11,30 @@ Set up Email Logins for your Supabase application.
 - Enable the email provider in your [Supabase Project](/dashboard/project/_/auth/providers)
 - Configure the Site URL and any additional redirect URLs in the [authentication management tab](/dashboard/project/_/auth/url-configuration).
 - The Site URL represents the default URL that the user will be redirected to after clicking on the email signup confirmation link.
+- Additional configuration:
+  - `Confirm Email`
+    - **Enabled** - Users will need to click the confirmation link in their email before they can login.
+    - **Disabled** - Users can sign in immediately after signing up.
+  - `Secure email change`
+    - **Enabled** - Users will need to confirm email address changes on **both** new **and** old email addresses.
+    - **Disabled** - Users will only to confirm email address changes on their **new** email address.
+  - `Secure password change`
+    - **Enabled** - Users will need to be signed in recently before changing their password; otherwise they will need to reauthenticate.
+    - **Disabled** - Users can change their password without requiring a recent login.
 
 <Admonition type="info" label="Self hosting">
 
 For self-hosting, you can update your project configuration using the files and environment variables provided.
 
 See the [self-hosting docs](/docs/guides/hosting/overview#configuration) for details.
+
+</Admonition>
+
+<Admonition type="info" label="Duplicate Emails">
+
+If a user signs in with Social Logins, then signs up with the same email address, the social login method will be added to the existing user account
+
+If email registration fails because the user exists with a social login, a password recovery can be sent for the user to set a password.
 
 </Admonition>
 
