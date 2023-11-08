@@ -54,7 +54,7 @@ const JsonEdit = ({
     }
   }
 
-  function onInputChange(value: any) {
+  function onInputChange(value: string | undefined) {
     setJsonStr(value ?? '')
   }
 
@@ -102,9 +102,10 @@ const JsonEdit = ({
             {view === 'edit' ? (
               <div className="h-[500px] w-full flex-grow border dark:border-dark">
                 <JsonEditor
+                  key={jsonString}
                   readOnly={readOnly}
                   onInputChange={onInputChange}
-                  defaultValue={jsonStr.toString()}
+                  value={jsonStr.toString()}
                 />
               </div>
             ) : (
