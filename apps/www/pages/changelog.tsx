@@ -6,123 +6,12 @@ import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
-import { createAppAuth } from '@octokit/auth-app'
-import { Octokit } from '@octokit/core'
-import { paginateGraphql } from '@octokit/plugin-paginate-graphql'
-
-export const ExtendedOctokit = Octokit.plugin(paginateGraphql)
-export type ExtendedOctokit = InstanceType<typeof ExtendedOctokit>
-
-export type Discussion = {
-  id: string
-  updatedAt: string
-  url: string
-  title: string
-  body: string
-  databaseId: number
-}
-
-export type DiscussionsResponse = {
-  repository: {
-    discussions: {
-      totalCount: number
-      nodes: Discussion[]
-    }
-  }
-}
 
 export async function getStaticProps() {
-  // const response = await fetch('https://api.github.com/repos/supabase/supabase/releases')
-  // const data = await response.json()
+  const response = await fetch('https://api.github.com/repos/supabase/supabase/releases')
+  const data = await response.json()
 
-  async function fetchDiscussions(owner: string, repo: string, categoryId: string) {
-    const octokit = new ExtendedOctokit({
-      authStrategy: createAppAuth,
-      auth: {
-        appId: process.env.SEARCH_GITHUB_APP_ID,
-        installationId: process.env.SEARCH_GITHUB_APP_INSTALLATION_ID,
-        privateKey: process.env.SEARCH_GITHUB_APP_PRIVATE_KEY,
-      },
-    })
-
-    const {
-      repository: {
-        discussions: { nodes: discussions },
-      },
-    } = await octokit.graphql.paginate<DiscussionsResponse>(
-      `
-      query troubleshootDiscussions($cursor: String, $owner: String!, $repo: String!, $categoryId: ID!) {
-        repository(owner: $owner, name: $repo) {
-          discussions(first: 100, after: $cursor, categoryId: $categoryId, orderBy: { field: CREATED_AT, direction: DESC }) {
-            totalCount
-            nodes {
-              id
-              publishedAt
-              createdAt
-              url
-              title
-              # body, currently causing mdx rendering issues so disabled for the moment
-            }
-            pageInfo {
-              hasNextPage
-              endCursor
-            }
-          }
-        }
-      }
-    `,
-      {
-        owner,
-        repo,
-        categoryId,
-      }
-    )
-
-    //     use this to find discussion category ids
-    //     const result = await octokit.graphql.paginate<DiscussionsResponse>(
-    //       `
-    //       query {
-    //   repository(owner: "supabase", name: "supabase") {
-    //     discussionCategories(first: 100) {
-    //       # type: DiscussionConnection
-    //       totalCount # Int!
-    //  pageInfo {
-    //         # type: PageInfo (from the public schema)
-    //         startCursor
-    //         endCursor
-    //         hasNextPage
-    //         hasPreviousPage
-    //       }
-    //       nodes {
-    //         # type: Discussion
-    //         id
-    //         name
-    //       }
-    //     }
-    //   }
-    // }
-    //     `,
-    //       {
-    //         owner,
-    //         repo,
-    //         categoryId,
-    //       }
-    //     )
-
-    //     // parse result as a string
-    //     console.log('JSON.stringify', JSON.stringify(result, null, 2))
-    return discussions
-  }
-
-  const discussions = await fetchDiscussions(
-    'supabase',
-    'supabase',
-    'DIC_kwDODMpXOc4CAFUr' // 'Changelog' category
-  )
-
-  //console.log(discussions)
-
-  if (!discussions) {
+  if (!data) {
     return {
       props: {
         notFound: true,
@@ -131,7 +20,7 @@ export async function getStaticProps() {
   }
 
   const changelogRenderToString = await Promise.all(
-    discussions.map(async (item: any): Promise<any> => {
+    data.map(async (item: any): Promise<any> => {
       const mdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
       return {
         ...item,
@@ -147,9 +36,10 @@ export async function getStaticProps() {
   }
 }
 
-function ChangelogPage({ changelog }: any) {
+function ChangelogPage(props: any) {
   const TITLE = 'Changelog'
   const DESCRIPTION = 'New updates and improvements to Supabase'
+
   return (
     <>
       <NextSeo
@@ -178,8 +68,8 @@ function ChangelogPage({ changelog }: any) {
 
           {/* Content */}
           <div>
-            {changelog.map((changelogEntry: any, i: number) => {
-              console.log({ changelogEntry })
+            {props.changelog.map((changelog: any, i: number) => {
+              const date = changelog.published_at.split('T')
               return (
                 <div key={i} className="border-muted grid border-l pb-10 lg:grid-cols-12 lg:gap-8">
                   <div
@@ -191,18 +81,16 @@ function ChangelogPage({ changelog }: any) {
                         <IconGitCommit size={14} strokeWidth={1.5} />
                       </div>
                       <div className="flex w-full flex-col gap-1">
-                        {changelogEntry.title && (
-                          <h3 className="text-foreground text-2xl">{changelogEntry.title}</h3>
+                        {changelog.name && (
+                          <h3 className="text-foreground text-2xl">{changelog.name}</h3>
                         )}
-                        <p className="text-muted text-lg">
-                          {dayjs(changelogEntry.publishedAt).format('MMM D, YYYY')}
-                        </p>
+                        <p className="text-muted text-lg">{dayjs(date[0]).format('MMM D, YYYY')}</p>
                       </div>
                     </div>
                   </div>
                   <div className="col-span-8 ml-8 lg:ml-0 max-w-[calc(100vw-80px)]">
                     <article className="prose prose-docs max-w-none">
-                      <MDXRemote {...changelogEntry.source} components={mdxComponents('blog')} />
+                      <MDXRemote {...changelog.source} components={mdxComponents('blog')} />
                     </article>
                   </div>
                 </div>
