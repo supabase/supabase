@@ -178,7 +178,8 @@ function ChangelogPage({ changelog }: any) {
 
           {/* Content */}
           <div>
-            {changelog.map((changelog: any, i: number) => {
+            {changelog.map((changelogEntry: any, i: number) => {
+              console.log({ changelogEntry })
               return (
                 <div key={i} className="border-muted grid border-l pb-10 lg:grid-cols-12 lg:gap-8">
                   <div
@@ -190,18 +191,18 @@ function ChangelogPage({ changelog }: any) {
                         <IconGitCommit size={14} strokeWidth={1.5} />
                       </div>
                       <div className="flex w-full flex-col gap-1">
-                        {changelog.title && (
-                          <h3 className="text-foreground text-2xl">{changelog.title}</h3>
+                        {changelogEntry.title && (
+                          <h3 className="text-foreground text-2xl">{changelogEntry.title}</h3>
                         )}
                         <p className="text-muted text-lg">
-                          {dayjs(changelog.publishedAt).format('MMM D, YYYY')}
+                          {dayjs(changelogEntry.publishedAt).format('MMM D, YYYY')}
                         </p>
                       </div>
                     </div>
                   </div>
                   <div className="col-span-8 ml-8 lg:ml-0 max-w-[calc(100vw-80px)]">
                     <article className="prose prose-docs max-w-none">
-                      <MDXRemote {...changelog.source} components={mdxComponents('blog')} />
+                      <MDXRemote {...changelogEntry.source} components={mdxComponents('blog')} />
                     </article>
                   </div>
                 </div>
