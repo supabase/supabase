@@ -132,7 +132,7 @@ const RedirectUrls = () => {
             </Link>
           </Button>
           <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
+            <Tooltip.Trigger asChild>
               <Button disabled={!canUpdateConfig} onClick={() => setOpen(true)}>
                 Add URL
               </Button>
