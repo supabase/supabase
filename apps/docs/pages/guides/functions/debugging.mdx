@@ -26,15 +26,10 @@ When [developing locally](/docs/guides/functions/local-development) you will see
 
 ## Limitations
 
-### Deno Deploy limitations
-
-- Deno does not support outgoing connections to ports `25`, `465`, and `587`.
-- Deno-deployed functions cannot read or write to the file system.
-- NPM modules are not supported.
-
-### Supabase Edge Functions
-
+- Outgoing connections to ports `25`, `465`, and `587` are not allowed.
 - Serving of HTML content is not supported (`GET` requests that return `text/html` will be rewritten to `text/plain`).
+- Deno FileSystem APIs are not available to use within Edge Functions.
+- Importing modules using `npm:` specifier is currently not supported ([use a CDN to load npm modules](/docs/guides/functions/import-maps)).
 
 ## Troubleshooting
 
