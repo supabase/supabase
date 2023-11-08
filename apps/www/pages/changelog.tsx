@@ -148,14 +148,15 @@ export async function getStaticProps() {
 }
 
 function ChangelogPage({ changelog }: any) {
-  console.log({ changelog })
+  const TITLE = 'Changelog'
+  const DESCRIPTION = 'New updates and improvements to Supabase'
   return (
     <>
       <NextSeo
-        title={'Changelog'}
+        title={TITLE}
         openGraph={{
-          title: 'Changelog',
-          description: 'props.blog.description',
+          title: TITLE,
+          description: DESCRIPTION,
           url: `https://supabase.com/changelog`,
           type: 'article',
           article: {
