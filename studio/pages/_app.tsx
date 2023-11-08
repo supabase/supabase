@@ -21,7 +21,7 @@ import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { createClient } from '@supabase/supabase-js'
 import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { ThemeProvider } from 'common'
+import { ThemeProvider, useThemeSandbox } from 'common'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -49,7 +49,6 @@ import FlagProvider from 'components/ui/Flag/FlagProvider'
 import PageTelemetry from 'components/ui/PageTelemetry'
 import { useRootQueryClient } from 'data/query-client'
 import { StoreProvider } from 'hooks'
-import useAutoAuthRedirect from 'hooks/misc/useAutoAuthRedirect'
 import { AuthProvider } from 'lib/auth'
 import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { dart } from 'lib/constants/prism'
@@ -100,8 +99,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
       : undefined
   )
 
-  useAutoAuthRedirect(queryClient)
-
   const getLayout = Component.getLayout ?? ((page) => page)
 
   const AuthContainer = useMemo(
@@ -145,6 +142,8 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useThemeSandbox()
 
   return (
     <QueryClientProvider client={queryClient}>

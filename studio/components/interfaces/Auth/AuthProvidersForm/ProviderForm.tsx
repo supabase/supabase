@@ -32,17 +32,19 @@ export interface ProviderFormProps {
 }
 
 const ProviderForm = ({ config, provider }: ProviderFormProps) => {
-  const [open, setOpen] = useState(false)
   const { ui } = useStore()
+  const [open, setOpen] = useState(false)
   const { ref: projectRef } = useParams()
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
+
   const doubleNegativeKeys = ['MAILER_AUTOCONFIRM', 'SMS_AUTOCONFIRM']
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
 
   const generateInitialValues = () => {
-    const initialValues: { [x: string]: string } = {}
+    const initialValues: { [x: string]: string | boolean } = {}
+
     // the config is already loaded through the parent component
     Object.keys(provider.properties).forEach((key) => {
       // When the key is a 'double negative' key, we must reverse the boolean before adding it to the form
@@ -51,9 +53,19 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
       if (provider.title === 'SAML 2.0') {
         initialValues[key] = (config as any)[key] ?? false
       } else {
-        initialValues[key] = isDoubleNegative ? !(config as any)[key] : (config as any)[key] ?? ''
+        if (isDoubleNegative) {
+          initialValues[key] = !(config as any)[key]
+        } else {
+          const configValue = (config as any)[key]
+          initialValues[key] = configValue
+            ? configValue
+            : provider.properties[key].type === 'boolean'
+            ? false
+            : ''
+        }
       }
     })
+
     return initialValues
   }
 
@@ -107,7 +119,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
         >
           <div className="flex items-center gap-3">
             <IconChevronUp
-              className="text-scale-800 transition data-open-parent:rotate-0 data-closed-parent:rotate-180"
+              className="text-border-stronger transition data-open-parent:rotate-0 data-closed-parent:rotate-180"
               strokeWidth={2}
               width={14}
             />
@@ -127,7 +139,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                 <span className="px-1">Enabled</span>
               </div>
             ) : (
-              <div className="rounded-md border border-scale-500 bg-scale-100 py-1 px-3 text-xs text-foreground-lighter dark:border-scale-700 dark:bg-scale-300">
+              <div className="rounded-md border border-strong bg-surface-100 py-1 px-3 text-xs text-foreground-lighter">
                 Disabled
               </div>
             )}
@@ -147,7 +159,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
               <div
                 className="
             group border-t
-            border-scale-500 bg-scale-100 py-6 px-6 text-foreground dark:bg-scale-300
+            border-strong bg-surface-100 py-6 px-6 text-foreground
             "
               >
                 <div className="mx-auto my-6 max-w-lg space-y-6">
@@ -163,6 +175,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                       </AlertDescription_Shadcn_>
                     </Alert_Shadcn_>
                   )}
+
                   {/* TODO (Joel): Remove after 30th November when we disable the provider */}
                   {provider.title === 'LinkedIn (Deprecated)' &&
                     Object.keys(provider.properties).map((x: string) => (
@@ -185,11 +198,13 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                         disabled={!canUpdateConfig}
                       />
                     ))}
+
                   {provider?.misc?.alert && (
                     <Alert title={provider.misc.alert.title} variant="warning" withIcon>
                       <ReactMarkdown>{provider.misc.alert.description}</ReactMarkdown>
                     </Alert>
                   )}
+
                   {provider.misc.requiresRedirect && (
                     <>
                       <Input
@@ -238,8 +253,8 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                             <Tooltip.Arrow className="radix-tooltip-arrow" />
                             <div
                               className={[
-                                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                'border border-scale-200',
+                                'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                'border border-background',
                               ].join(' ')}
                             >
                               <span className="text-xs text-foreground">

@@ -48,7 +48,7 @@ const BillingMetric = ({ idx, slug, metric, usage, subscription }: BillingMetric
   return (
     <div
       className={clsx(
-        'col-span-12 md:col-span-6 space-y-4 py-4 border-scale-400',
+        'col-span-12 md:col-span-6 space-y-4 py-4 border-overlay',
         idx % 2 === 0 ? 'md:border-r md:pr-4' : 'md:pl-4',
         idx < BILLING_BREAKDOWN_METRICS.length - 3 && 'border-b'
       )}
@@ -79,8 +79,8 @@ const BillingMetric = ({ idx, slug, metric, usage, subscription }: BillingMetric
                 <Tooltip.Arrow className="radix-tooltip-arrow" />
                 <div
                   className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200',
+                    'rounded bg-alternative py-1 px-2 leading-none shadow',
+                    'border border-background',
                   ].join(' ')}
                 >
                   <div className="text-xs text-foreground">
@@ -134,8 +134,8 @@ const BillingMetric = ({ idx, slug, metric, usage, subscription }: BillingMetric
                 <Tooltip.Arrow className="radix-tooltip-arrow" />
                 <div
                   className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200',
+                    'rounded bg-alternative py-1 px-2 leading-none shadow',
+                    'border border-background',
                   ].join(' ')}
                 >
                   <p className="text-xs text-foreground">
@@ -157,14 +157,14 @@ const BillingMetric = ({ idx, slug, metric, usage, subscription }: BillingMetric
           value={usageMeta.usage ?? 0}
           barClass={
             !hasLimit && usageMeta.usage > 0
-              ? 'bg-scale-1100'
+              ? 'bg-foreground-light'
               : isExceededLimit && !isUsageBillingEnabled
               ? 'bg-red-900'
               : isApproachingLimit && !isUsageBillingEnabled
               ? 'bg-amber-900'
-              : 'bg-scale-1100'
+              : 'bg-foreground-light'
           }
-          bgClass="bg-gray-300 dark:bg-gray-600"
+          bgClass="bg-overlay-hover"
           labelBottom={usageLabel}
           labelBottomClass="!text-foreground-light"
           labelTop={hasLimit ? percentageLabel : undefined}

@@ -19,7 +19,6 @@ interface TabsProps {
   addOnBefore?: React.ReactNode
   addOnAfter?: React.ReactNode
   listClassNames?: string
-  children: PanelPropsProps[]
 }
 
 interface TabsSubComponents {

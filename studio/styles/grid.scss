@@ -11,7 +11,7 @@
 .rdg-cell {
   @apply flex;
   @apply text-grid;
-  @apply border-scale-400 dark:border-scale-500 border-r border-b;
+  @apply border-default border-r border-b;
   @apply text-foreground;
   white-space: nowrap;
   overflow: hidden;
@@ -29,7 +29,7 @@
 }
 
 .rdg-cell-frozen-last {
-  @apply border-scale-400 dark:border-scale-500 border-r-4 shadow-none;
+  @apply border-default border-r-4 shadow-none;
 }
 
 .rdg-cell[aria-selected='true'] {
@@ -38,7 +38,7 @@
 
 .rdg {
   @apply box-border select-none overflow-x-auto overflow-y-scroll bg-transparent;
-  @apply border-scale-400 dark:border-scale-500 border-t border-b border-r-0 border-l-0;
+  @apply border-default border-t border-b border-r-0 border-l-0;
   contain: strict;
   -webkit-user-select: none;
   font-size: 14px;
@@ -71,7 +71,7 @@
 */
 
 .rdg-header-row {
-  @apply bg-table-header-light dark:bg-table-header-dark select-none border-none;
+  @apply bg-surface-200 select-none border-none;
 }
 
 .rdg-header-row {
@@ -81,7 +81,7 @@
 }
 
 .rdg-header-row .rdg-cell {
-  @apply bg-table-header-light dark:bg-table-header-dark border-scale-400 dark:border-scale-500 border-b;
+  @apply bg-surface-200 border-default border-b;
 }
 
 .rdg-header-row .rdg-cell p {
@@ -91,13 +91,13 @@
   @apply flex h-full items-center px-2 transition duration-100 ease-in-out;
 }
 .rdg-header-row .rdg-cell .react-contextmenu-wrapper:hover {
-  @apply bg-scale-400;
+  @apply bg-surface-200;
 }
 .rdg-header-row .rdg-checkbox {
-  @apply bg-table-header-light dark:bg-table-header-dark border-scale-400 dark:border-scale-500 rounded-sm border;
+  @apply bg-surface-200 border-default rounded-sm border;
 }
 .rdg-header-row .rdg-checkbox-input:checked + .rdg-checkbox {
-  @apply border-scale-400 dark:border-scale-500 border-4 bg-green-900;
+  @apply border-default border-4 bg-green-900;
 }
 .rdg-header-row .rdg-checkbox-input:focus + .rdg-checkbox {
   box-shadow: none;
@@ -132,8 +132,8 @@
 
 /* select row */
 .rdg-row[aria-selected='true'] {
-  @apply bg-scale-300 dark:bg-scale-300;
-  @apply hover:bg-scale-300 dark:bg-scale-300;
+  @apply bg-surface-100;
+  @apply hover:bg-surface-100;
 }
 
 .tab-cursor {
@@ -185,10 +185,10 @@
   [type='checkbox'] {
     @apply cursor-pointer rounded border border-solid;
 
-    @apply text-brand-600 border-scale-400 transition-all;
+    @apply text-brand-600 border-default transition-all;
     @apply hover:border-brand focus:ring-brand-300 focus:outline-none;
 
-    @apply dark:border-scale-500 dark:bg-transparent dark:text-white;
+    @apply dark:bg-transparent dark:text-white;
     @apply dark:hover:border-green-900;
 
     margin-top: 2px;
@@ -274,21 +274,21 @@
 }
 
 .rdg__segmented-control {
-  @apply border-scale-400 dark:border-scale-500 relative mx-2 h-8 rounded-md border;
+  @apply border-default relative mx-2 h-8 rounded-md border;
 }
 
 .rdg__segmented-control__button {
   @apply absolute top-0 inline-flex h-full items-center justify-center;
   @apply text-xs font-medium;
-  @apply text-scale-400;
-  @apply active:bg-scale-100 hover:text-white focus:z-10 focus:outline-none;
+  @apply text-border-muted;
+  @apply active:bg-alternative hover:text-white focus:z-10 focus:outline-none;
   @apply transition duration-150 ease-in-out;
   @apply cursor-pointer;
   z-index: 1;
 }
 
 .rdg__segmented-control__button--option {
-  @apply text-scale-200;
+  @apply text-background;
 }
 
 .rdg__segmented-control__button--right {
@@ -300,7 +300,7 @@
 }
 
 .rdg__segmented-control__label {
-  @apply bg-scale-600 border-scale-600 z-0 inline-block h-full transform rounded border shadow transition duration-200 ease-in-out;
+  @apply bg-overlay-hover border-control z-0 inline-block h-full transform rounded border shadow transition duration-200 ease-in-out;
 }
 
 .rdg__segmented-control__label--left {
@@ -433,7 +433,7 @@
 */
 
 .sb-grid-footer {
-  @apply bg-scale-100 dark:bg-scale-300 flex h-10 items-center justify-between px-2;
+  @apply bg-surface-100 flex h-10 items-center justify-between px-2;
 }
 
 .sb-grid-footer__inner {
@@ -524,7 +524,7 @@
 
 .sb-grid-select-cell__header__input {
   /* @apply focus:ring-brand-300; */
-  @apply border-scale-300;
+  @apply border-background-surface-100;
 }
 
 /*
@@ -532,7 +532,7 @@
 */
 
 .sb-grid-header {
-  @apply bg-scale-100 dark:bg-scale-300 flex h-10 justify-between px-2;
+  @apply bg-surface-100 flex h-10 justify-between px-2;
 }
 
 .sb-grid-header__inner {

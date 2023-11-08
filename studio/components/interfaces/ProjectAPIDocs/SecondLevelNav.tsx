@@ -131,7 +131,7 @@ const SecondLevelNav = () => {
             <p
               key={item.key}
               title={item.title}
-              className="text-sm text-light px-4 hover:text-foreground transition cursor-pointer"
+              className="text-sm text-foreground-light px-4 hover:text-foreground transition cursor-pointer"
               onClick={() => navigateToSection(item.key)}
             >
               {item.title}

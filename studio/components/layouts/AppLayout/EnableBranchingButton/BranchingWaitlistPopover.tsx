@@ -34,7 +34,7 @@ const BranchingWaitlistPopover = ({ isNewNav = false }: BranchingWaitlistPopover
           <IconGitBranch strokeWidth={2} />
           <p>Database Branching</p>
         </div>
-        <p className="text-xs text-light">
+        <p className="text-xs text-foreground-light">
           Register for early access and you'll be contacted by email when your organization is
           enrolled in database branching.
         </p>

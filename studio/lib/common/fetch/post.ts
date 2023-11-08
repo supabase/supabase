@@ -2,6 +2,9 @@ import { handleError, handleResponse, handleResponseError, constructHeaders } fr
 import { uuidv4 } from 'lib/helpers'
 import { SupaResponse } from 'types/base'
 
+/**
+ * @deprecated please use post method from data/fetchers instead
+ */
 export async function post<T = any>(
   url: string,
   data: { [prop: string]: any },

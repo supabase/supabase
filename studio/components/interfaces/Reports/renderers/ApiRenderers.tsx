@@ -111,7 +111,7 @@ export const TopApiRoutesRenderer = (
 
   const [showMore, setShowMore] = useState(false)
   if (props.data.length === 0) return null
-  const headerClasses = '!text-xs !py-2 p-0 font-bold !bg-scale-400'
+  const headerClasses = '!text-xs !py-2 p-0 font-bold !bg-surface-200'
   const cellClasses = '!text-xs !py-2'
 
   return (
@@ -280,7 +280,10 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
             />
           </span>
         </Button>
-        <TextFormatter className="w-10 h-4 text-center rounded bg-scale-500" value={datum.method} />
+        <TextFormatter
+          className="w-10 h-4 text-center rounded bg-surface-300"
+          value={datum.method}
+        />
         {datum.status_code && (
           <TextFormatter
             className={`w-10 h-4 text-center rounded ${
@@ -304,7 +307,7 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
     </Collapsible.Trigger>
     <Collapsible.Content className="pt-2">
       {datum.search ? (
-        <pre className={`syntax-highlight overflow-auto rounded bg-scale-300 p-2 !text-xs`}>
+        <pre className={`syntax-highlight overflow-auto rounded bg-surface-100 p-2 !text-xs`}>
           <div
             className="text-wrap"
             dangerouslySetInnerHTML={{

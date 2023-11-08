@@ -1,21 +1,16 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { observer } from 'mobx-react-lite'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
-  Button,
   Form,
   IconAlertCircle,
-  IconEye,
-  IconEyeOff,
-  Input,
   InputNumber,
-  Radio,
   Toggle,
 } from 'ui'
-import { boolean, number, object, string } from 'yup'
+import { boolean, number, object } from 'yup'
 
 import { useParams } from 'common'
 import {
@@ -56,7 +51,6 @@ const AdvancedAuthSettingsForm = observer(() => {
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
   const formId = 'auth-config-advanced-form'
-  const [hidden, setHidden] = useState(true)
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const INITIAL_VALUES = {
@@ -69,7 +63,6 @@ const AdvancedAuthSettingsForm = observer(() => {
 
   const onSubmit = (values: any, { resetForm }: any) => {
     const payload = { ...values }
-    payload.DISABLE_SIGNUP = !values.DISABLE_SIGNUP
 
     updateAuthConfig(
       { projectRef: projectRef!, config: payload },

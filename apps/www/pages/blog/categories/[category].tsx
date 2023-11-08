@@ -42,7 +42,7 @@ function CategoriesIndex(props: Props) {
       />
       <DefaultLayout>
         <div className="container mx-auto px-8 py-16 sm:px-16 xl:px-20">
-          <div className="text-lighter flex space-x-1">
+          <div className="text-foreground-lighter flex space-x-1">
             <h1 className="cursor-pointer">
               <Link href="/blog">Blog</Link>
               <span className="px-2">/</span>

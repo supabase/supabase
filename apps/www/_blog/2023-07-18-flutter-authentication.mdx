@@ -52,45 +52,49 @@ flutter create myauthapp
 then we can install the dependencies. Change the working directory to the newly created app directory and run the following command to install our dependencies.
 
 ```dart
-flutter pub add supabase_flutter flutter_appauth crypto google_sign_in
+flutter pub add supabase_flutter google_sign_in
 ```
 
-We will use [supabase_flutter](https://pub.dev/packages/supabase_flutter) to interact with our Supabase instance. [google_sign_in](https://pub.dev/packages/google_sign_in) will be used to authenticate on Android, and [flutter_appauth](https://pub.dev/packages/flutter_appauth) will be used for iOS. [crypto](https://pub.dev/packages/crypto) is a library that has utility functions for encryption that we will use when performing OIDC logins.
+The [supabase_flutter](https://pub.dev/packages/supabase_flutter) package is used to interact with a Supabase instance. The [google_sign_in](https://pub.dev/packages/google_sign_in) package is used to implement social sign-in with Google.
 
 We are done installing our dependencies. Let’s set up [authentication](https://supabase.com/docs/guides/auth) now.
 
 ## Configure Google sign-in on Supabase Auth
 
 We will obtain client IDs for iOS, Android, and web from the Google Cloud console, and register them to our Supabase project.
-We need the web client ID in order to use the Google sign-in flow on Android.
+The web client ID will be used by the auth server of Supabase to verify the ID token provided by the Google sign-in package.
 
 First, create your Google Cloud project [here](https://cloud.google.com/) if you do not have one yet.
 Within your Google Cloud project, follow the [Get an OAuth client ID for the iOS](https://developers.google.com/identity/sign-in/ios/start-integrating#get_an_oauth_client_id) guide, [Configure a Google API Console project for Android](https://developers.google.com/identity/sign-in/android/start-integrating#configure_a_project) guide, and [Get your backend server's OAuth 2.0 client ID](https://developers.google.com/identity/sign-in/android/start-integrating#configure_a_project) to obtain client IDs for iOS, Android, and web respectively.
 
-Once you have the client IDs, let’s add them to our Supabase dashboard. If you don’t have a Supabase project created yet, you can create one at [database.new](https://database.new) for free. The name is just an internal name, so we can call it “Auth” for now. Database Password will not be used in this example and can be reconfigured later, so press the `Generate a password` button and let Supabase generate a secure random password. No need to copy it anywhere. The region should be anywhere close to where you live, or where your users live in an actual production app.
-
+Once you have the client IDs, let’s add them to our Supabase dashboard. If you don’t have a Supabase project created yet, you can create one at [database.new](https://database.new) for free. The name is just an internal name, so we can call it “Auth” for now.
+The database password won't be used in this example and can be reconfigured later, so press the `Generate a password` button and let Supabase generate a secure random password. The region should be anywhere close to where you live, or where your users live in an actual production app.
 Lastly, for the pricing plan choose the free plan that allows you to connect with all major social OAuth providers and supports up to 50,000 monthly active users.
 
 ![Supabase project creation](/images/blog/flutter-authentication/supabase-project-creation.png)
 
-Your project should be ready in a minute or two. Once your project is ready, you can open `authentication -> Providers -> Google` to set up Google auth. Toggle the `Enable Sign in with Google` switch first. Then add the two client IDs you obtained in your Google Cloud console to `Authorized Client IDs` field with a comma in between the two client IDs like this: `IOS_CLIENT_ID,ANDROID_CLIENT_ID,WEB_CLIENT_ID`.
+Your project should be ready in a minute or two. Once your project is ready, open `authentication -> Providers -> Google` to set up Google auth. Toggle the `Enable Sign in with Google` switch first. Then add the web client ID you obtained in your Google Cloud console to `Authorized Client IDs` field. No need to add the Android or iOS client IDs here.
+
+Turn on the `Skip nonce checks` option. This would allow us to use the Google sign in package on iOS, which is not compatible with providing a method to access or specify a nonce.
 
 ![Supabase auth Google auth provider](/images/blog/flutter-authentication/supabase-google-provider.png)
 
-We also need some Android specific settings to make [flutter_appauth](https://pub.dev/packages/flutter_appauth#android-setup) not throw during app building. Open `android/app/build.gradle` and find the `defaultConfig`. We need to to provide an empty string here.
+We also need some iOS specific settings. Open `ios/Runner/Info.plist` file and add the `CFBundleURLTypes` like the following. You need to provide the reverse client ID of the iOS client ID you registered earlier.
 
-```groovy
-...
-android {
-    ...
-    defaultConfig {
-        ...
-        // We need an empty manifestPlaceholders for appauth to not throw an error
-        manifestPlaceholders += [
-                'appAuthRedirectScheme': ''
-        ]
-    }
-}
+```plist
+<key>CFBundleURLTypes</key>
+<array>
+  <dict>
+    <key>CFBundleTypeRole</key>
+    <string>Editor</string>
+    <key>CFBundleURLSchemes</key>
+    <array>
+      <!-- TODO Replace this value: -->
+      <!-- Copied from GoogleService-Info.plist key REVERSED_CLIENT_ID -->
+      <string>com.googleusercontent.apps.my-ios</string>
+    </array>
+  </dict>
+</array>
 ```
 
 That is it for setting up our [Supabase auth to prepare for Google sign-in](https://supabase.com/docs/guides/auth/social-login/auth-google?platform=flutter).
@@ -140,13 +144,7 @@ You can find your Supabase URL and Anon key in `Settings -> API` from your [Supa
 We will have two screens for this app, `LoginScreen` and `ProfileScreen`. `LoginScreen` presents a single sign-in button for the user to perform Google sign-in. Create a `lib/screens/login_screen.dart` file add add the following.
 
 ```dart
-import 'dart:convert';
-import 'dart:io';
-import 'dart:math';
-
-import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_appauth/flutter_appauth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:myauthapp/main.dart';
 import 'package:myauthapp/screens/profile_screen.dart';
@@ -179,103 +177,40 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  /// Function to generate a random 16 character string.
-  String _generateRandomString() {
-    final random = Random.secure();
-    return base64Url.encode(List<int>.generate(16, (_) => random.nextInt(256)));
-  }
-
   Future<AuthResponse> _googleSignIn() async {
-    /// TODO: update the iOS and Web client ID with your own.
+    /// TODO: update the Web client ID with your own.
     ///
-    /// Client ID that you registered with Google Cloud.
-    /// Note that in order to perform Google sign in on Android, you need to
-    /// provide the web client ID, not the Android client ID.
-    final clientId = Platform.isIOS ? 'IOS_CLIENT_ID' : 'WEB_CLIENT_ID';
+    /// Web Client ID that you registered with Google Cloud.
+    const webClientId = 'my-web.apps.googleusercontent.com';
 
-    late final String? idToken;
-    late final String? accessToken;
-    String? rawNonce;
+    /// TODO: update the iOS client ID with your own.
+    ///
+    /// iOS Client ID that you registered with Google Cloud.
+    const iosClientId = 'my-ios.apps.googleusercontent.com';
 
-    // Use AppAuth to perform Google sign in on iOS
-    // and use GoogleSignIn package for Google sign in on Android
-    if (Platform.isIOS) {
-      const appAuth = FlutterAppAuth();
+    // Google sign in on Android will work without providing the Android
+    // Client ID registered on Google Cloud.
 
-      // Just a random string
-      rawNonce = _generateRandomString();
-      final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
+    final GoogleSignIn googleSignIn = GoogleSignIn(
+      clientId: iosClientId,
+      serverClientId: webClientId,
+    );
+    final googleUser = await googleSignIn.signIn();
+    final googleAuth = await googleUser!.authentication;
+    final accessToken = googleAuth.accessToken;
+    final idToken = googleAuth.idToken;
 
-      /// Set as reversed DNS form of Google Client ID + `:/` for Google login
-      final redirectUrl = '${clientId.split('.').reversed.join('.')}:/';
-
-      /// Fixed value for google login
-      const discoveryUrl =
-          'https://accounts.google.com/.well-known/openid-configuration';
-
-      // authorize the user by opening the concent page
-      final result = await appAuth.authorize(
-        AuthorizationRequest(
-          clientId,
-          redirectUrl,
-          discoveryUrl: discoveryUrl,
-          nonce: hashedNonce,
-          scopes: [
-            'openid',
-            'email',
-            'profile',
-          ],
-        ),
-      );
-
-      if (result == null) {
-        throw 'No result';
-      }
-
-      // Request the access and id token to google
-      final tokenResult = await appAuth.token(
-        TokenRequest(
-          clientId,
-          redirectUrl,
-          authorizationCode: result.authorizationCode,
-          discoveryUrl: discoveryUrl,
-          codeVerifier: result.codeVerifier,
-          nonce: result.nonce,
-          scopes: [
-            'openid',
-            'email',
-          ],
-        ),
-      );
-
-      accessToken = tokenResult?.accessToken;
-      idToken = tokenResult?.idToken;
-    } else {
-      final GoogleSignIn googleSignIn = GoogleSignIn(
-        serverClientId: clientId,
-        scopes: [
-          'openid',
-          'email',
-        ],
-      );
-      final googleUser = await googleSignIn.signIn();
-      final googleAuth = await googleUser!.authentication;
-      accessToken = googleAuth.accessToken;
-      idToken = googleAuth.idToken;
-    }
-
-    if (idToken == null) {
-      throw 'No ID Token';
-    }
     if (accessToken == null) {
-      throw 'No Access Token';
+      throw 'No Access Token found.';
+    }
+    if (idToken == null) {
+      throw 'No ID Token found.';
     }
 
     return supabase.auth.signInWithIdToken(
       provider: Provider.google,
       idToken: idToken,
       accessToken: accessToken,
-      nonce: rawNonce,
     );
   }
 
@@ -300,87 +235,10 @@ In terms of UI, this page is very simple, it just has a basic `Scaffold` with an
 
 ![Google sign in](/images/blog/flutter-authentication/google-sign-in.png)
 
-Let’s break down what is going on within the `onPressed` callback of the sign in button.
-At the top, we check on which platform the user is running the application.
-We will break down the iOS flow, because it helps us understand how the Open ID Connect flow works.
-
-First, we are generating a [nonce](https://openid.net/specs/openid-connect-core-1_0.html#SelfIssuedDiscovery:~:text=auth_time%20response%20parameter.)-,nonce,-String%20value%20used), which is essentially just a random string. This string is later passed to Google after being hashed to verify that the ID token has not been tampered to prevent a man-in-the-middle attack.
-
-```dart
-// Random string to verify the integrity of the ID Token
-final rawNonce = _generateRandomString();
-final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
-```
-
-`clientId` and `applicationId` are the app-specific values. These will be used to the authentication request to Google later on.
-
-```dart
-  /// Client ID that you registered with Google Cloud.
-  /// You will have two different values for iOS and Android.
-  final clientId = Platform.isIOS ? 'IOS_CLIENT_ID' : 'ANDROID_CLIENT_ID';
-```
-
-`redirectUrl` is the URL at which the user will be redirected after a successful authentication request. For Google sign-in, we can set it to the reversed DNS form of the client ID followed by `:/`. `discoveryUrl` is a URL provided by Google that contains information about their Open ID configuration.
-
-```dart
-/// Set as reversed DNS form of Google Client ID + `:/` for Google login
-final redirectUrl = '${clientId.split('.').reversed.join('.')}:/';
-
-/// Fixed value for google login
-const discoveryUrl = 'https://accounts.google.com/.well-known/openid-configuration';
-```
-
-Then we are sending an authorization request to Google. This is where the user is taken to Google’s page to perform sign in and consent our app to obtain some personal information. Note that we are requesting three scopes here. `openid` and `email` are required by Supabase auth to complete the sign-in process. `profile` is not required by Supabase auth, but we are requesting it to display some profile information on the profile screen later on. We do not actually obtain the requested information in this step though. All we are doing is requesting an access token that has permission to obtain the personal information we have requested.
-
-```dart
-// Authorize the user by opening the concent page
-final result = await appAuth.authorize(
-  AuthorizationRequest(
-    clientId,
-    redirectUrl,
-    discoveryUrl: discoveryUrl,
-    nonce: hashedNonce,
-    scopes: [
-      'openid',
-      'email',
-      'profile',
-    ],
-  ),
-);
-```
-
-Using the authorization token obtained in the previous step, we make the final request to Google’s auth server to obtain the personal information we asked for earlier. We get an ID token in return, which contains the personal information.
-
-```dart
-// Request the access and id token to google
-final tokenResult = await appAuth.token(
-  TokenRequest(
-    clientId,
-    redirectUrl,
-    authorizationCode: result.authorizationCode,
-    discoveryUrl: discoveryUrl,
-    codeVerifier: result.codeVerifier,
-    nonce: result.nonce,
-    scopes: [
-      'openid',
-      'email',
-      'profile',
-    ],
-  ),
-);
-```
-
-And lastly, we pass the ID token we obtained from Google to Supabase to complete the sign-in on Supabase auth. Once the user is signed in, the auth state listener in the `initState` fires and takes the user to the `ProfileScreen`.
-
-```dart
-await supabase.auth.signInWithIdToken(
-  provider: Provider.google,
-  idToken: idToken,
-  nonce: rawNonce,
-);
-```
-
-The android flow goes through similar steps, but all of the heavy lifting of obtaining the access token and ID token is done by the `google_sign_in` package.
+Within the `onPressed` callback of the button, we are calling the `_googleSignIn` method.
+This method calls the Google sign-in package to perform the sign-in flow.
+Once the user completes the sign-in flow, we obtain an access token and an ID token.
+We will pass these tokens to Supabase auth to then obtain a Supabase session.
 
 ## Create the Profile Screen
 

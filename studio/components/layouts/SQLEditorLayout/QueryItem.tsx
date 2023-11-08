@@ -32,7 +32,7 @@ import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEdi
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useCheckPermissions, useFlag, useSelectedProject, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedProject, useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -63,7 +63,7 @@ const QueryItem = ({ tabInfo }: QueryItemProps) => {
       key={id}
       className={clsx(
         'flex items-center justify-between rounded-md group',
-        isActive && 'text-foreground bg-scale-400 dark:bg-scale-600 -active'
+        isActive && 'text-foreground bg-surface-300 -active'
       )}
       ref={isActive ? (activeItemRef as React.RefObject<HTMLDivElement>) : null}
     >
@@ -95,7 +95,6 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
 
   const snap = useSqlEditorStateSnapshot()
   const project = useSelectedProject()
-  const sharedSnippetsFeature = useFlag<boolean>('sharedSnippets')
 
   const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
     onSuccess(data) {
@@ -208,8 +207,8 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
               className={clsx(
                 'rounded p-1',
                 isActive
-                  ? 'text-foreground-light hover:bg-scale-800'
-                  : 'text-scale-300 dark:text-scale-200 hover:bg-scale-500 group-hover:text-foreground-light'
+                  ? 'text-foreground-light hover:bg-border-stronger'
+                  : 'text-background hover:bg-overlay-hover group-hover:text-foreground-light'
               )}
             >
               <IconChevronDown size="tiny" strokeWidth={2} />
@@ -220,13 +219,13 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
               <IconEdit2 size="tiny" />
               <p>Rename query</p>
             </DropdownMenuItem>
-            {sharedSnippetsFeature && visibility === 'user' && canCreateSQLSnippet && (
+            {visibility === 'user' && canCreateSQLSnippet && (
               <DropdownMenuItem onClick={onClickShare} className="space-x-2">
                 <IconShare size="tiny" />
                 <p>Share query</p>
               </DropdownMenuItem>
             )}
-            {sharedSnippetsFeature && visibility === 'project' && canCreateSQLSnippet && (
+            {visibility === 'project' && canCreateSQLSnippet && (
               <DropdownMenuItem onClick={createPersonalCopy} className="space-x-2">
                 <IconCopy size="tiny" />
                 <p>Duplicate personal copy</p>
@@ -266,7 +265,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
           <div className="my-6">
             <div className="text-sm text-foreground-light grid gap-4">
               <div className="grid gap-1">
-                {sharedSnippetsFeature && visibility === 'project' && (
+                {visibility === 'project' && (
                   <Alert_Shadcn_ variant="destructive">
                     <IconAlertCircle strokeWidth={2} />
                     <AlertTitle_Shadcn_>This SQL snippet will be lost forever</AlertTitle_Shadcn_>
