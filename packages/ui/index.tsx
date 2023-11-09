@@ -17,6 +17,7 @@ export * from './src/components/Icon/IconContext'
 export * from './src/components/GlassPanel'
 export * from './src/components/IconPanel'
 export * from './src/components/Icon/IconBackground'
+export * from './src/components/ThemeImage'
 
 // DISPLAYS
 
