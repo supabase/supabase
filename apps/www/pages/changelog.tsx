@@ -32,10 +32,14 @@ export type DiscussionsResponse = {
 }
 
 export async function getStaticProps() {
-  // const response = await fetch('https://api.github.com/repos/supabase/supabase/releases')
-  // const data = await response.json()
+  const response = await fetch('https://api.github.com/repos/supabase/supabase/releases')
+  const restApiData = await response.json()
 
   async function fetchDiscussions(owner: string, repo: string, categoryId: string) {
+    let cursor = null
+    let allDiscussions = []
+    const first = 3
+
     const octokit = new ExtendedOctokit({
       authStrategy: createAppAuth,
       auth: {
@@ -53,7 +57,7 @@ export async function getStaticProps() {
       `
       query troubleshootDiscussions($cursor: String, $owner: String!, $repo: String!, $categoryId: ID!) {
         repository(owner: $owner, name: $repo) {
-          discussions(first: 100, after: $cursor, categoryId: $categoryId, orderBy: { field: CREATED_AT, direction: DESC }) {
+          discussions(first: ${first}, after: $cursor, categoryId: $categoryId, orderBy: { field: CREATED_AT, direction: DESC }) {
             totalCount
             nodes {
               id
@@ -61,6 +65,11 @@ export async function getStaticProps() {
               createdAt
               url
               title
+              labels(first: 10) { # You can specify the number of labels you want to retrieve
+                nodes {
+                  name # You can retrieve other label fields as needed
+                }
+        }
               # body, currently causing mdx rendering issues so disabled for the moment
             }
             pageInfo {
@@ -75,6 +84,8 @@ export async function getStaticProps() {
         owner,
         repo,
         categoryId,
+        cursor,
+        first,
       }
     )
 
@@ -120,8 +131,6 @@ export async function getStaticProps() {
     'DIC_kwDODMpXOc4CAFUr' // 'Changelog' category
   )
 
-  //console.log(discussions)
-
   if (!discussions) {
     return {
       props: {
@@ -130,19 +139,58 @@ export async function getStaticProps() {
     }
   }
 
-  const changelogRenderToString = await Promise.all(
+  // Process discussions
+  const discussionsRender = await Promise.all(
     discussions.map(async (item: any): Promise<any> => {
-      const mdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
+      console.log('discussion item', { item })
+      const discussionsMdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
+
       return {
         ...item,
-        source: mdxSource,
+        source: discussionsMdxSource,
+        type: 'discussion',
+        created_at: item.createdAt,
+        labels: item.labels.nodes ?? [],
       }
     })
   )
 
+  // Process restApiData
+  const restApiDataRender = await Promise.all(
+    restApiData.map(async (item: any): Promise<any> => {
+      //console.log('restapi item', { item })
+      const restApiDataMdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
+
+      return {
+        ...item,
+        source: restApiDataMdxSource,
+        type: 'restData',
+        created_at: item.created_at,
+        title: item.name ?? '',
+      }
+    })
+  )
+
+  // Combine discussionsRender and restApiDataRender into a single array
+  const combinedRenderArray = discussionsRender.concat(restApiDataRender)
+
+  // Sort the combinedRenderArray by the created_at field in each entry
+  combinedRenderArray.sort((a: any, b: any) => {
+    const dateA = new Date(a.created_at)
+    const dateB = new Date(b.created_at)
+    if (!isNaN(dateA.getTime()) && !isNaN(dateB.getTime())) {
+      return dateB.getTime() - dateA.getTime() // sort desc
+    } else {
+      return 0 // Handle invalid date values gracefully
+    }
+  })
+
+  combinedRenderArray.map((item) =>
+    console.log(item.title, ' | ', item.type, ' | ', item.created_at, ' | ', item.labels)
+  )
   return {
     props: {
-      changelog: changelogRenderToString,
+      changelog: combinedRenderArray,
     },
   }
 }
@@ -178,36 +226,44 @@ function ChangelogPage({ changelog }: any) {
 
           {/* Content */}
           <div>
-            {changelog.map((changelogEntry: any, i: number) => {
-              console.log({ changelogEntry })
-              return (
-                <div key={i} className="border-muted grid border-l pb-10 lg:grid-cols-12 lg:gap-8">
-                  <div
-                    className="col-span-12 mb-8 self-start lg:sticky lg:top-0 lg:col-span-4 lg:-mt-32 lg:pt-32
+            {changelog.length > 0 &&
+              changelog
+                .filter((changelogEntry: any) => !changelogEntry.title.includes('[d]'))
+                .map((changelogEntry: any, i: number) => {
+                  return (
+                    <div
+                      key={i}
+                      className="border-muted grid border-l pb-10 lg:grid-cols-12 lg:gap-8"
+                    >
+                      <div
+                        className="col-span-12 mb-8 self-start lg:sticky lg:top-0 lg:col-span-4 lg:-mt-32 lg:pt-32
                 "
-                  >
-                    <div className="flex w-full items-baseline gap-6">
-                      <div className="bg-border border-muted text-foreground-lighter -ml-2.5 flex h-5 w-5 items-center justify-center rounded border drop-shadow-sm">
-                        <IconGitCommit size={14} strokeWidth={1.5} />
+                      >
+                        <div className="flex w-full items-baseline gap-6">
+                          <div className="bg-border border-muted text-foreground-lighter -ml-2.5 flex h-5 w-5 items-center justify-center rounded border drop-shadow-sm">
+                            <IconGitCommit size={14} strokeWidth={1.5} />
+                          </div>
+                          <div className="flex w-full flex-col gap-1">
+                            {changelogEntry.title && (
+                              <h3 className="text-foreground text-2xl">{changelogEntry.title}</h3>
+                            )}
+                            <p className="text-muted text-lg">
+                              {dayjs(changelogEntry.publishedAt).format('MMM D, YYYY')}
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex w-full flex-col gap-1">
-                        {changelogEntry.title && (
-                          <h3 className="text-foreground text-2xl">{changelogEntry.title}</h3>
-                        )}
-                        <p className="text-muted text-lg">
-                          {dayjs(changelogEntry.publishedAt).format('MMM D, YYYY')}
-                        </p>
+                      <div className="col-span-8 ml-8 lg:ml-0 max-w-[calc(100vw-80px)]">
+                        <article className="prose prose-docs max-w-none">
+                          <MDXRemote
+                            {...changelogEntry.source}
+                            components={mdxComponents('blog')}
+                          />
+                        </article>
                       </div>
                     </div>
-                  </div>
-                  <div className="col-span-8 ml-8 lg:ml-0 max-w-[calc(100vw-80px)]">
-                    <article className="prose prose-docs max-w-none">
-                      <MDXRemote {...changelogEntry.source} components={mdxComponents('blog')} />
-                    </article>
-                  </div>
-                </div>
-              )
-            })}
+                  )
+                })}
           </div>
         </div>
 
