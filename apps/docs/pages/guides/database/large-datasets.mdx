@@ -13,26 +13,26 @@ Importing large datasets requires careful planning and execution to ensure the p
 ## **You have multiple options for importing your data into Supabase**
 
 ### Option 1: CSV Import via Supabase Dashboard
-    
+
     Supabase dashboard provides a user-friendly way to import data. However, for very large datasets, this method may not be the most efficient choice, given the size limit is 100MB. It's generally better suited for smaller datasets and quick data imports. Consider using alternative methods like pgloader for large-scale data imports.
-    
+
     - Navigate to the relevant table in the [Table Editor.](https://supabase.com/dashboard/project/_/editor)
     - Click on “Insert” then choose "Import Data from CSV" and follow the on-screen instructions to upload your CSV file.
 
 ### Option 2: Bulk Import using pgloader
-    
-    [pgloader](https://pgloader.io/) is a powerful tool for efficiently importing data into a PostgreSQL database that supports a wide range of source database engines, including MySQL and MS SQL. 
-    
+
+    [pgloader](https://pgloader.io/) is a powerful tool for efficiently importing data into a PostgreSQL database that supports a wide range of source database engines, including MySQL and MS SQL.
+
     You can use it in conjunction with Supabase by following these steps:
-    
+
     1. Install pgloader on your local machine or a server. For more info, you can refer to the official pgloader installation page available at: https://pgloader.readthedocs.io/en/latest/install.html
-        
+
         ```jsx
         $ apt-get install pgloader
         ```
-        
+
     2. Create a configuration file that specifies the source data and the target Supabase database (e.g., config.load).
-    
+
         Here's an example configuration file:
         ```sql
         LOAD DATABASE
@@ -41,27 +41,27 @@ Importing large datasets requires careful planning and execution to ensure the p
         ALTER SCHEMA 'public' OWNER TO 'postgres';
         set wal_buffers = '64MB', max_wal_senders = 0, statement_timeout = 0, work_mem to '2GB';
         ```
-    
+
         Customize the source and Supabase database URL and options to fit your specific use case.
-    
+
     3. Run pgloader with the configuration file.
-    
+
         ```jsx
         pgloader config.load
         ```
-    
-    For databases using the Postgres engine, we recommend using the [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) and [psql](https://www.postgresql.org/docs/current/app-psql.html) command line tools. 
+
+    For databases using the Postgres engine, we recommend using the [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) and [psql](https://www.postgresql.org/docs/current/app-psql.html) command line tools.
 
 ### Option 3: Using Postgres Copy command
-    
+
     Read more about [Bulk data loading.](https://supabase.com/docs/guides/database/tables#bulk-data-loading)
-    
+
 ### Option 4: Using the Supabase API
-    
+
     The Supabase API allows you to programmatically import data into your tables. You can use various client libraries to interact with the API and perform data import operations. This approach is useful when you need to automate data imports, and it gives you fine-grained control over the process. Refer to our [API guide](https://supabase.com/docs/guides/api) for more details.
     <Admonition type="note">
     When importing data via the Supabase API, it's advisable to refrain from bulk imports. This helps ensure a smooth data transfer process and prevents any potential disruptions.
-    
+
     Read more about [Rate Limiting, Resource Allocation, & Abuse Prevention.](https://supabase.com/docs/guides/platform/going-into-prod#rate-limiting-resource-allocation--abuse-prevention)
     </Admonition>
 
@@ -102,11 +102,10 @@ To build an index after the data import:
 
 ```sql
 -- Create an index on a table
-CREATE INDEX index_name ON table_name (column_name);
-
+create index index_name on table_name (column_name);
 ```
 
-Read more about [Managing Indexes in PostgreSQL.](https://supabase.com/docs/guides/database/postgres/indexes) 
+Read more about [Managing Indexes in PostgreSQL.](https://supabase.com/docs/guides/database/postgres/indexes)
 
 ## **Common Pitfalls to Avoid**
 
