@@ -49,6 +49,7 @@ export default {
     "bg-brand-600",
     "bg-brand",
     "bg-brand-accent",
+    "bg-brand-button",
     "bg-_secondary-200",
     "bg-_secondary-400",
     "bg-_secondary",

@@ -571,6 +571,10 @@ module.exports = {
   cssVariable: "var(--brand-accent)",
   value: "hsl(160, 100%, 50%)"
 },
+"brand-button": {
+  cssVariable: "var(--brand-button)",
+  value: "hsl(160.39999999999998, 100%, 19.2%)"
+},
 "_secondary-200": {
   cssVariable: "var(--secondary-200)",
   value: "hsl(248, 53.6%, 11%)"

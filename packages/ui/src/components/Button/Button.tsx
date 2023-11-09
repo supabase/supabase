@@ -30,9 +30,9 @@ const buttonVariants = cva(
     variants: {
       type: {
         primary: `
-            bg-brand-600 dark:bg-brand/70 hover:bg-brand-600/80 dark:hover:bg-brand
+            bg-brand-button hover:bg-brand-button/80
             text-white
-            border-brand dark:border-brand
+            border-brand
             focus-visible:outline-brand-600
             shadow-sm`,
         secondary: `
