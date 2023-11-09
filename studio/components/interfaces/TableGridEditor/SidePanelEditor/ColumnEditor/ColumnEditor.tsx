@@ -361,11 +361,11 @@ const ColumnEditor = ({
               <Alert_Shadcn_>
                 <IconAlertCircle />
                 <AlertTitle_Shadcn_>
-                  Column Encryption has been removed from the GUI
+                  Column encryption has been removed from the GUI
                 </AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_>
                   <p className="!leading-normal">
-                    You may still encrypt columns through the SQL editor using{' '}
+                    You may still encrypt new columns through the SQL editor using{' '}
                     <Link
                       href={`/project/${ref}/database/extensions?filter=pgsodium`}
                       className="text-brand hover:underline"
@@ -374,9 +374,12 @@ const ColumnEditor = ({
                     </Link>{' '}
                     Transparent Column Encryption (TCE).
                   </p>
-                  {/* Pending decision on comms: https://supabase.slack.com/archives/C0543H0QL1Z/p1699001072364709 */}
                   <Button type="default" icon={<IconExternalLink />} className="mt-2">
-                    <Link href="/" target="_blank" rel="noreferrer">
+                    <Link
+                      target="_blank"
+                      rel="noreferrer"
+                      href="https://github.com/orgs/supabase/discussions/18849"
+                    >
                       Learn more
                     </Link>
                   </Button>
