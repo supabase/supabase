@@ -615,6 +615,7 @@ export const database: NavMenuConstant = {
         { name: 'Managing database triggers', url: '/guides/database/postgres/triggers' },
         { name: 'Managing database webhooks', url: '/guides/database/webhooks' },
         { name: 'Using Full Text Search', url: '/guides/database/full-text-search' },
+        { name: 'Importing large datasets', url: '/guides/database/large-datasets' },
       ],
     },
     {
