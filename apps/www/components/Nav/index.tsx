@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -36,7 +36,6 @@ const Nav = () => {
   const isHomePage = router.pathname === '/'
   const isLaunchWeekPage = router.pathname.includes('launch-week')
   const showLaunchWeekNavMode = isLaunchWeekPage && !open
-  const showDarkLogo = isLaunchWeekPage || resolvedTheme?.includes('dark') || isHomePage
 
   React.useEffect(() => {
     if (open) {
@@ -51,6 +50,24 @@ const Nav = () => {
   React.useEffect(() => {
     if (width >= 1024) setOpen(false)
   }, [width])
+
+  /**
+   * Temporary fix for next-theme client side bug
+   * https://github.com/pacocoursey/next-themes/issues/169
+   * TODO: remove when bug has been fixed
+   */
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return null
+  }
+
+  const showDarkLogo =
+    isLaunchWeekPage || (mounted && resolvedTheme?.includes('dark')) || isHomePage
 
   return (
     <>

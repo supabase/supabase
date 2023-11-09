@@ -808,6 +808,14 @@ export interface paths {
     /** Gets github pull requests for a given repo */
     get: operations['GitHubPullRequestController_getPullRequests']
   }
+  '/platform/cli/login': {
+    /** Create CLI login session */
+    post: operations['CliLoginController_createCliLoginSession']
+  }
+  '/platform/cli/login/{session_id}': {
+    /** Retrieve CLI login session */
+    get: operations['CliLoginController_getCliLoginSession']
+  }
   '/system/auth/{ref}/templates/{template}': {
     /** Gets GoTrue template */
     get: operations['AuthTemplateController_getTemplate']
@@ -10261,6 +10269,25 @@ export interface operations {
       500: {
         content: never
       }
+    }
+  }
+  /** Create CLI login session */
+  CliLoginController_createCliLoginSession: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateCliLoginSessionBody']
+      }
+    }
+    responses: {
+      /** @description Failed to create CLI login session */
+      500: never
+    }
+  }
+  /** Retrieve CLI login session */
+  CliLoginController_getCliLoginSession: {
+    responses: {
+      /** @description Failed to retrieve CLI login session */
+      500: never
     }
   }
   /** Gets GoTrue template */
