@@ -65,7 +65,7 @@ const Infrastructure = ({}: InfrastructureProps) => {
 
             {isFreeProject && (
               <>
-                <div className="border-t border-scale-400" />
+                <div className="border-t border-muted" />
                 <div className="flex w-full items-center justify-between px-8 py-4">
                   <div>
                     <p className="text-sm">Pause project</p>
@@ -111,8 +111,8 @@ const Infrastructure = ({}: InfrastructureProps) => {
                         <Tooltip.Arrow className="radix-tooltip-arrow" />
                         <div
                           className={[
-                            'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                            'border border-scale-200 w-[200px]',
+                            'rounded bg-alternative py-1 px-2 leading-none shadow',
+                            'border border-background w-[200px]',
                           ].join(' ')}
                         >
                           <span className="text-xs text-foreground">

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -51,6 +51,21 @@ const Nav = () => {
     if (width >= 1024) setOpen(false)
   }, [width])
 
+  /**
+   * Temporary fix for next-theme client side bug
+   * https://github.com/pacocoursey/next-themes/issues/169
+   * TODO: remove when bug has been fixed
+   */
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return null
+  }
+
   return (
     <>
       <div className="sticky top-0 z-40 transform" style={{ transform: 'translate3d(0,0,999px)' }}>
@@ -63,7 +78,7 @@ const Nav = () => {
         />
         <nav
           className={cn(
-            `relative z-40 border-border border-b backdrop-blur-sm transition-opacity`,
+            `relative z-40 border-default border-b backdrop-blur-sm transition-opacity`,
             showLaunchWeekNavMode ? '!opacity-100 !border-[#e0d2f430]' : '',
             isLaunchWeekPage && showLaunchWeekNavMode ? '!border-b-0' : ''
           )}
@@ -78,7 +93,7 @@ const Nav = () => {
                   >
                     <Image
                       src={
-                        isLaunchWeekPage || resolvedTheme === 'dark' || isHomePage
+                        isLaunchWeekPage || (mounted && resolvedTheme === 'dark') || isHomePage
                           ? supabaseLogoWordmarkDark
                           : supabaseLogoWordmarkLight
                       }
@@ -161,7 +176,7 @@ const Nav = () => {
           <MobileMenu
             open={open}
             setOpen={setOpen}
-            isDarkMode={isLaunchWeekPage || resolvedTheme === 'dark' || isHomePage}
+            isDarkMode={isLaunchWeekPage || (mounted && resolvedTheme === 'dark') || isHomePage}
             menu={menu}
           />
         </nav>

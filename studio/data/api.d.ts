@@ -800,6 +800,10 @@ export interface paths {
     /** Gets a specific github branch for a given repo */
     get: operations['GitHubBranchController_getBranchByName']
   }
+  '/platform/integrations/github/pull-requests/{organization_integration_id}/{repo_owner}/{repo_name}': {
+    /** Gets github pull requests for a given repo */
+    get: operations['GitHubPullRequestController_getPullRequestsByNumber']
+  }
   '/platform/integrations/github/pull-requests/{organization_integration_id}/{repo_owner}/{repo_name}/{target}': {
     /** Gets github pull requests for a given repo */
     get: operations['GitHubPullRequestController_getPullRequests']
@@ -4184,7 +4188,7 @@ export interface components {
     GitRef: {
       repo: string
       branch: string
-      label: string
+      label?: string
     }
     GetGithubPullRequest: {
       id: number
@@ -4195,7 +4199,7 @@ export interface components {
       created_by?: string
       repo: string
       branch: string
-      label: string
+      label?: string
     }
     FunctionResponse: {
       id: string
@@ -10204,6 +10208,30 @@ export interface operations {
         }
       }
       /** @description Failed to get github branch for a given repo */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets github pull requests for a given repo */
+  GitHubPullRequestController_getPullRequestsByNumber: {
+    parameters: {
+      query: {
+        pr_number: number
+      }
+      path: {
+        organization_integration_id: string
+        repo_owner: string
+        repo_name: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['GetGithubPullRequest'][]
+        }
+      }
+      /** @description Failed to get github pull requests for a given repo */
       500: {
         content: never
       }

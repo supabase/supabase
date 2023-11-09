@@ -3,7 +3,6 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import { useFlag, useSelectedOrganization, withAuth } from 'hooks'
 import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
@@ -23,12 +22,9 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
   const router = useRouter()
   const { data: organizations } = useOrganizationsQuery()
   const selectedOrganization = useSelectedOrganization()
-  const { data: factors } = useMfaListFactorsQuery()
 
   const ongoingIncident = useFlag('ongoingIncident')
   const navLayoutV2 = useFlag('navigationLayoutV2')
-  const mfaSetup = useFlag('mfaSetup')
-  const showAuditLogs = useFlag('auditLogs')
   const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
 
   const signOut = useSignOut()
@@ -89,30 +85,21 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
                 href: `/account/tokens`,
                 key: `/account/tokens`,
               },
-              // show the MFA page only if the feature flag is set or the user has already MFA setup.
-              // He should be able to edit/revoke his MFA even if MFA feature flag is disabled.
-              ...(mfaSetup || (factors?.all || []).length > 0
-                ? [
-                    {
-                      isActive: router.pathname === `/account/security`,
-                      icon: `${router.basePath}/img/user.svg`,
-                      label: 'Security',
-                      href: `/account/security`,
-                      key: `/account/security`,
-                    },
-                  ]
-                : []),
-              ...(showAuditLogs
-                ? [
-                    {
-                      isActive: router.pathname === `/account/audit`,
-                      icon: `${router.basePath}/img/user.svg`,
-                      label: 'Audit Logs',
-                      href: `/account/audit`,
-                      key: `/account/audit`,
-                    },
-                  ]
-                : []),
+
+              {
+                isActive: router.pathname === `/account/security`,
+                icon: `${router.basePath}/img/user.svg`,
+                label: 'Security',
+                href: `/account/security`,
+                key: `/account/security`,
+              },
+              {
+                isActive: router.pathname === `/account/audit`,
+                icon: `${router.basePath}/img/user.svg`,
+                label: 'Audit Logs',
+                href: `/account/audit`,
+                key: `/account/audit`,
+              },
             ],
           },
         ]

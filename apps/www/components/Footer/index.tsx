@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
 import { Badge, IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid, cn } from 'ui'
@@ -21,6 +22,21 @@ const Footer = (props: Props) => {
 
   const isLaunchWeekPage = pathname.includes('launch-week') || pathname === '/'
 
+  /**
+   * Temporary fix for next-theme client side bug
+   * https://github.com/pacocoursey/next-themes/issues/169
+   * TODO: remove when bug has been fixed
+   */
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return null
+  }
+
   return (
     <footer className={cn('bg-alternative', props.className)} aria-labelledby="footerHeading">
       <h2 id="footerHeading" className="sr-only">
@@ -37,11 +53,11 @@ const Footer = (props: Props) => {
           <ul className="flex flex-col md:flex-row gap-2 md:gap-8 justify-center md:items-center">
             <li className="flex items-center gap-2 whitespace-nowrap flex-nowrap">
               <CheckIcon className="w-4 h-4" /> SOC2 Type 2{' '}
-              <span className="text-lighter hidden sm:inline">Certified</span>
+              <span className="text-foreground-lighter hidden sm:inline">Certified</span>
             </li>
             <li className="flex items-center gap-2 whitespace-nowrap flex-nowrap">
               <CheckIcon className="w-4 h-4" /> HIPAA{' '}
-              <span className="text-lighter hidden sm:inline">Compliant</span>
+              <span className="text-foreground-lighter hidden sm:inline">Compliant</span>
             </li>
           </ul>
         </SectionContainer>
@@ -55,7 +71,7 @@ const Footer = (props: Props) => {
                 src={
                   isLaunchWeekPage
                     ? supabaseLogoWordmarkDark
-                    : resolvedTheme === 'dark'
+                    : mounted && resolvedTheme === 'dark'
                     ? supabaseLogoWordmarkDark
                     : supabaseLogoWordmarkLight
                 }
@@ -67,7 +83,7 @@ const Footer = (props: Props) => {
             <div className="flex space-x-5">
               <a
                 href="https://twitter.com/supabase"
-                className="text-lighter hover:text-foreground transition"
+                className="text-foreground-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">Twitter</span>
                 <IconTwitterX size={22} />
@@ -75,7 +91,7 @@ const Footer = (props: Props) => {
 
               <a
                 href="https://github.com/supabase"
-                className="text-lighter hover:text-foreground transition"
+                className="text-foreground-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">GitHub</span>
                 <IconGitHubSolid size={22} />
@@ -83,7 +99,7 @@ const Footer = (props: Props) => {
 
               <a
                 href="https://discord.supabase.com/"
-                className="text-lighter hover:text-foreground transition"
+                className="text-foreground-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">Discord</span>
                 <IconDiscord size={22} />
@@ -91,7 +107,7 @@ const Footer = (props: Props) => {
 
               <a
                 href="https://youtube.com/c/supabase"
-                className="text-lighter hover:text-foreground transition"
+                className="text-foreground-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">Youtube</span>
                 <IconYoutubeSolid size={22} />
@@ -110,8 +126,8 @@ const Footer = (props: Props) => {
                           <div
                             className={`text-sm transition-colors ${
                               link.url || Component
-                                ? 'text-lighter hover:text-foreground'
-                                : 'text-muted hover:text-lighter'
+                                ? 'text-foreground-lighter hover:text-foreground'
+                                : 'text-muted hover:text-foreground-lighter'
                             } `}
                           >
                             {link.text}
@@ -148,7 +164,7 @@ const Footer = (props: Props) => {
             </div>
           </div>
         </div>
-        <div className="border-border mt-32 flex justify-between border-t pt-8">
+        <div className="border-default mt-32 flex justify-between border-t pt-8">
           <small className="small">&copy; Supabase Inc</small>
           <ThemeToggle forceDark={isLaunchWeekPage} />
         </div>

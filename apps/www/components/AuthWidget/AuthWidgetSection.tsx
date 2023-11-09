@@ -75,7 +75,9 @@ function AuthWidgetSection() {
                     </div>
                     <h1 className="text-foreground text-2xl">Acme Industries</h1>
                   </div>
-                  <p className="text-light text-auth-widget-test">Sign in today for Supa stuff</p>
+                  <p className="text-foreground-light text-auth-widget-test">
+                    Sign in today for Supa stuff
+                  </p>
                 </div>
                 <Auth.UserContextProvider supabaseClient={supabase}>
                   <AuthContainer supabaseClient={supabase}>
@@ -111,7 +113,7 @@ function AuthWidgetSection() {
             <div className="prose !max-w-md">
               <h3 className="text-2xl">Auth UI</h3>
               <p className="!mb-0">Pre-built auth widgets to get started in minutes.</p>
-              <p className="text-lighter mt-0">
+              <p className="text-foreground-lighter mt-0">
                 Customizable authentication UI component with custom themes and extensible styles to
                 match your brand and aesthetic
               </p>
@@ -201,7 +203,7 @@ function AuthWidgetSection() {
                   <button
                     onClick={() => setRadius('4px')}
                     className={[
-                      'bg-surface-100 ring-foreground-muted border-border flex h-10 w-10 items-center justify-center rounded-full border hover:scale-105',
+                      'bg-surface-100 ring-foreground-muted border-default flex h-10 w-10 items-center justify-center rounded-full border hover:scale-105',
                       radius === '4px'
                         ? 'ring-foreground-muted border-foreground-lighter border-2 ring-2'
                         : '',
@@ -227,7 +229,7 @@ function AuthWidgetSection() {
                   <button
                     onClick={() => setRadius('10px')}
                     className={[
-                      'bg-surface-100 border-border flex h-10 w-10 items-center justify-center rounded-full  border transition hover:scale-105',
+                      'bg-surface-100 border-default flex h-10 w-10 items-center justify-center rounded-full  border transition hover:scale-105',
                       radius === '10px'
                         ? 'ring-foreground-muted border-foreground-lighter border-2 ring-2'
                         : '',
@@ -253,7 +255,7 @@ function AuthWidgetSection() {
                   <button
                     onClick={() => setRadius('32px')}
                     className={[
-                      'bg-surface-100 border-border flex h-10 w-10 items-center justify-center rounded-full  border transition hover:scale-105',
+                      'bg-surface-100 border-default flex h-10 w-10 items-center justify-center rounded-full  border transition hover:scale-105',
                       radius === '32px'
                         ? 'ring-foreground-muted border-foreground-lighter border-2 ring-2'
                         : '',

@@ -79,7 +79,7 @@ const OrganizationPicker = ({
             }
           >
             <div className="flex gap-2">
-              <span className={cn('truncate', !selectedOrg && 'text-light')}>
+              <span className={cn('truncate', !selectedOrg && 'text-foreground-light')}>
                 {selectedOrg?.name ? selectedOrg?.name : 'Choose an organization'}
               </span>
               {selectedOrg && configurationId && installed[selectedOrg.slug] && (

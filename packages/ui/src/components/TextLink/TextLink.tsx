@@ -21,7 +21,7 @@ function TextLink({
     <Link
       href={url}
       className={cn(
-        'text-scale-1100 hover:text-scale-1200 mt-3 block cursor-pointer text-sm focus-visible:ring-2 focus-visible:outline-none focus-visible:rounded-sm focus-visible:ring-foreground-lighter focus-visible:text-foreground-strong',
+        'text-foreground-light hover:text-foreground mt-3 block cursor-pointer text-sm focus-visible:ring-2 focus-visible:outline-none focus-visible:rounded-sm focus-visible:ring-foreground-lighter focus-visible:text-foreground-strong',
         className
       )}
       {...props}
