@@ -9,6 +9,7 @@ import {
   Button,
   Form,
   IconAlertCircle,
+  IconExternalLink,
   Input,
   Modal,
 } from 'ui'
@@ -23,6 +24,7 @@ import { useCheckPermissions, useStore } from 'hooks'
 import { urlRegex } from '../Auth.constants'
 import RedirectUrlList from './RedirectUrlList'
 import ValueContainer from './ValueContainer'
+import Link from 'next/link'
 
 const RedirectUrls = () => {
   const { ui } = useStore()
@@ -119,30 +121,41 @@ const RedirectUrls = () => {
           title="Redirect URLs"
           description={`URLs that auth providers are permitted to redirect to post authentication. Wildcards are allowed, for example, https://*.domain.com`}
         />
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger>
-            <Button disabled={!canUpdateConfig} onClick={() => setOpen(true)}>
-              Add URL
-            </Button>
-          </Tooltip.Trigger>
-          {!canUpdateConfig && (
-            <Tooltip.Portal>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                    'border border-background',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-foreground">
-                    You need additional permissions to update redirect URLs
-                  </span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          )}
-        </Tooltip.Root>
+        <div className="flex items-center gap-2 mb-6 ml-12">
+          <Button asChild type="default" icon={<IconExternalLink />}>
+            <Link
+              href="https://supabase.com/docs/guides/auth/concepts/redirect-urls"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Documentation
+            </Link>
+          </Button>
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger asChild>
+              <Button disabled={!canUpdateConfig} onClick={() => setOpen(true)}>
+                Add URL
+              </Button>
+            </Tooltip.Trigger>
+            {!canUpdateConfig && (
+              <Tooltip.Portal>
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                      'border border-background',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-foreground">
+                      You need additional permissions to update redirect URLs
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            )}
+          </Tooltip.Root>
+        </div>
       </div>
       {isLoading && (
         <>
