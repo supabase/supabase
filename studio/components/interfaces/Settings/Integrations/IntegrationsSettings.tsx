@@ -20,7 +20,7 @@ const IntegrationSettings = () => {
     <>
       <GitHubSection />
       <ScaffoldDivider />
-      <VercelSection />
+      <VercelSection isProjectScoped={true} />
       <SidePanelVercelProjectLinker />
       <SidePanelGitHubRepoLinker />
     </>
