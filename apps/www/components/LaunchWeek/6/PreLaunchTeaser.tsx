@@ -70,7 +70,7 @@ export function PreLaunchTeaser() {
             </div>
             <div className="flex flex-col">
               <h4 className="text-foreground text-base">Founders Fireside Chat</h4>
-              <p className="text-light text-sm">
+              <p className="text-foreground-light text-sm">
                 Our two co-founders, Copple and Ant, discuss open source development and the future
                 of Supabase.
               </p>
@@ -78,12 +78,12 @@ export function PreLaunchTeaser() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <div className="text-light w-8">
+            <div className="text-foreground-light w-8">
               <NewspaperIcon strokeWidth={1} />
             </div>
             <div>
               <h3 className="text-foreground text-base">Supabase Series B</h3>
-              <p className="text-light text-sm">
+              <p className="text-foreground-light text-sm">
                 Supabase raised $80M in May, bringing our total funding to $116M.
               </p>
             </div>

@@ -20,7 +20,7 @@ const SQLCard = ({ title, description, sql, onClick }: SQLCardProps) => {
       title={title}
       loading={loading}
       onClick={() => handleOnClick()}
-      footer={<span className="text-foreground-light text-sm">{description}</span>}
+      description={description}
     />
   )
 }

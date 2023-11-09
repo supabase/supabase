@@ -41,7 +41,7 @@ const TimezoneSelection = ({
           <div
             className={[
               'fixed top-0 flex w-full items-center',
-              'rounded-t-md border-b border-gray-600 bg-gray-500',
+              'rounded-t-md border-b border-overlay bg-surface-300',
               'mb-4 space-x-2 px-4 py-2',
             ].join(' ')}
             style={{ zIndex: 1 }}
@@ -49,7 +49,7 @@ const TimezoneSelection = ({
             <IconSearch size={14} />
             <input
               autoFocus
-              className="placeholder-scale-1000 w-72 bg-transparent text-sm outline-none"
+              className="placeholder-foreground-lighter w-72 bg-transparent text-sm outline-none"
               value={searchString}
               placeholder={''}
               onChange={(e: FormEvent<HTMLInputElement>) => setSearchString(e.currentTarget.value)}

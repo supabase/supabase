@@ -165,7 +165,7 @@ const ProjectLinker = ({
         ) : noSupabaseProjects || noForeignProjects ? (
           <div className="text-center">
             <h5 className="text-foreground">No {missingEntity} Projects found</h5>
-            <p className="text-light text-sm">
+            <p className="text-foreground-light text-sm">
               You will need to create a {missingEntity} Project to link to a {oppositeMissingEntity}{' '}
               Project.
               <br />
@@ -209,7 +209,9 @@ const ProjectLinker = ({
                       ) : null
                     }
                   >
-                    {selectedSupabaseProject ? selectedSupabaseProject.name : 'Choose Project'}
+                    {selectedSupabaseProject
+                      ? selectedSupabaseProject.name
+                      : 'Choose Supabase Project'}
                   </Button>
                 </PopoverTrigger_Shadcn_>
                 <PopoverContent_Shadcn_
@@ -219,7 +221,7 @@ const ProjectLinker = ({
                   style={{ width: supabaseProjectsComboBoxRef.current?.offsetWidth }}
                 >
                   <Command_Shadcn_>
-                    <CommandInput_Shadcn_ placeholder="Search organization..." />
+                    <CommandInput_Shadcn_ placeholder="Search for a project" />
                     <CommandList_Shadcn_ className="!max-h-[170px]">
                       <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
                       <CommandGroup_Shadcn_>
@@ -251,7 +253,7 @@ const ProjectLinker = ({
                 </PopoverContent_Shadcn_>
               </Popover_Shadcn_>
             </Panel>
-            <div className="border border-scale-1000 h-px w-16 border-dashed self-end mb-5"></div>
+            <div className="border border-foreground-lighter h-px w-16 border-dashed self-end mb-5"></div>
             <Panel>
               <div className="bg-black shadow rounded p-1 w-12 h-12 flex justify-center items-center">
                 {integrationIcon}
@@ -291,7 +293,7 @@ const ProjectLinker = ({
                   style={{ width: foreignProjectsComboBoxRef.current?.offsetWidth }}
                 >
                   <Command_Shadcn_>
-                    <CommandInput_Shadcn_ placeholder="Search organization..." />
+                    <CommandInput_Shadcn_ placeholder="Search for a project" />
                     <CommandList_Shadcn_ className="!max-h-[170px]">
                       <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
                       <CommandGroup_Shadcn_>

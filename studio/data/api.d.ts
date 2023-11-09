@@ -52,6 +52,10 @@ export interface paths {
      */
     get: operations['ProjectsResourceWarningsController_getProjectsResourceWarnings']
   }
+  '/platform/tos/fly': {
+    /** Redirects to Fly sso flow */
+    get: operations['TermsOfServiceController_flyTosAccepted']
+  }
   '/platform/auth/{ref}/config': {
     /** Gets GoTrue config */
     get: operations['GoTrueConfigController_getGoTrueConfig']
@@ -549,6 +553,10 @@ export interface paths {
     /** Gets project's usage api counts */
     get: operations['UsageApiController_getApiCounts']
   }
+  '/platform/projects/{ref}/analytics/endpoints/usage.api-requests-count': {
+    /** Gets project's usage api requests count */
+    get: operations['UsageApiController_getApiRequestsCount']
+  }
   '/platform/projects/{ref}/config/pgbouncer': {
     /** Gets project's pgbouncer config */
     get: operations['PgbouncerConfigController_getPgbouncerConfig']
@@ -792,9 +800,21 @@ export interface paths {
     /** Gets a specific github branch for a given repo */
     get: operations['GitHubBranchController_getBranchByName']
   }
+  '/platform/integrations/github/pull-requests/{organization_integration_id}/{repo_owner}/{repo_name}': {
+    /** Gets github pull requests for a given repo */
+    get: operations['GitHubPullRequestController_getPullRequestsByNumber']
+  }
   '/platform/integrations/github/pull-requests/{organization_integration_id}/{repo_owner}/{repo_name}/{target}': {
     /** Gets github pull requests for a given repo */
     get: operations['GitHubPullRequestController_getPullRequests']
+  }
+  '/platform/cli/login': {
+    /** Create CLI login session */
+    post: operations['CliLoginController_createCliLoginSession']
+  }
+  '/platform/cli/login/{session_id}': {
+    /** Retrieve CLI login session */
+    get: operations['CliLoginController_getCliLoginSession']
   }
   '/system/auth/{ref}/templates/{template}': {
     /** Gets GoTrue template */
@@ -1281,6 +1301,10 @@ export interface paths {
     /** Gets project's usage api counts */
     get: operations['UsageApiController_getApiCounts']
   }
+  '/v0/projects/{ref}/analytics/endpoints/usage.api-requests-count': {
+    /** Gets project's usage api requests count */
+    get: operations['UsageApiController_getApiRequestsCount']
+  }
   '/v0/projects/{ref}/config/pgbouncer': {
     /** Gets project's pgbouncer config */
     get: operations['PgbouncerConfigController_getPgbouncerConfig']
@@ -1655,7 +1679,7 @@ export interface paths {
     get: operations['SnippetsController_getSnippet']
   }
   '/partners/flyio/callback': {
-    /** Redirects to Supabase dashboard after Fly sso with Gotrue */
+    /** Redirects to Supabase dashboard after completing Fly sso */
     get: operations['CallbackController_redirectToDashboardFlyioExtensionScreen']
   }
   '/partners/flyio/extensions/{extension_id}': {
@@ -1665,7 +1689,7 @@ export interface paths {
     delete: operations['ExtensionController_deleteResource']
   }
   '/partners/flyio/extensions/{extension_id}/sso': {
-    /** Starts Flyio single sign on */
+    /** Starts Fly single sign on */
     get: operations['ExtensionController_startFlyioSSO']
   }
   '/partners/flyio/extensions/{extension_id}/billing': {
@@ -1675,6 +1699,14 @@ export interface paths {
   '/partners/flyio/extensions': {
     /** Creates a database */
     post: operations['ExtensionsController_provisionResource']
+  }
+  '/partners/flyio/organizations/{organization_id}/extensions': {
+    /** Gets all databases that belong to the Fly organization */
+    get: operations['OrganizationsController_getOrgExtensions']
+  }
+  '/partners/flyio/organizations/{organization_id}/sso': {
+    /** Starts Fly single sign on */
+    get: operations['OrganizationsController_startFlyioSSO']
   }
 }
 
@@ -3295,11 +3327,11 @@ export interface components {
         | 'project_storage:all'
         | 'project_edge_function:all'
         | 'profile:update'
-        | 'billing:all'
         | 'billing:account_data'
         | 'billing:credits'
         | 'billing:invoices'
         | 'billing:payment_methods'
+        | 'realtime:all'
       )[]
     }
     UpdateProfileBody: {
@@ -4164,7 +4196,7 @@ export interface components {
     GitRef: {
       repo: string
       branch: string
-      label: string
+      label?: string
     }
     GetGithubPullRequest: {
       id: number
@@ -4175,7 +4207,7 @@ export interface components {
       created_by?: string
       repo: string
       branch: string
-      label: string
+      label?: string
     }
     FunctionResponse: {
       id: string
@@ -4403,6 +4435,9 @@ export interface components {
     }
     UpgradeDatabaseBody: {
       target_version: number
+    }
+    ProjectUpgradeInitiateResponse: {
+      tracking_id: string
     }
     ProjectVersion: {
       postgres_version: number
@@ -4785,6 +4820,29 @@ export interface components {
       /** @description Welcome message */
       message: string
     }
+    OrganizationExtensionStatus: {
+      /** @description Supabase project instance compute size */
+      compute: string
+      /** @description Unique ID representing the fly extension */
+      id: string
+      /**
+       * @description Supabase project status
+       * @example ACTIVE_HEALTHY
+       * @enum {string}
+       */
+      status:
+        | 'REMOVED'
+        | 'COMING_UP'
+        | 'INACTIVE'
+        | 'ACTIVE_HEALTHY'
+        | 'ACTIVE_UNHEALTHY'
+        | 'UNKNOWN'
+        | 'GOING_DOWN'
+        | 'INIT_FAILED'
+        | 'RESTORING'
+        | 'UPGRADING'
+        | 'PAUSING'
+    }
   }
   responses: never
   parameters: never
@@ -4957,6 +5015,20 @@ export interface operations {
         content: {
           'application/json': components['schemas']['ProjectResourceWarningsResponse'][]
         }
+      }
+    }
+  }
+  /** Redirects to Fly sso flow */
+  TermsOfServiceController_flyTosAccepted: {
+    parameters: {
+      query: {
+        extension_id: string
+        organization_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
       }
     }
   }
@@ -8778,6 +8850,26 @@ export interface operations {
       }
     }
   }
+  /** Gets project's usage api requests count */
+  UsageApiController_getApiRequestsCount: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['AnalyticsResponse']
+        }
+      }
+      /** @description Failed to get project's usage api requests count */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Gets project's pgbouncer config */
   PgbouncerConfigController_getPgbouncerConfig: {
     parameters: {
@@ -10130,6 +10222,30 @@ export interface operations {
     }
   }
   /** Gets github pull requests for a given repo */
+  GitHubPullRequestController_getPullRequestsByNumber: {
+    parameters: {
+      query: {
+        pr_number: number
+      }
+      path: {
+        organization_integration_id: string
+        repo_owner: string
+        repo_name: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['GetGithubPullRequest'][]
+        }
+      }
+      /** @description Failed to get github pull requests for a given repo */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets github pull requests for a given repo */
   GitHubPullRequestController_getPullRequests: {
     parameters: {
       query?: {
@@ -10153,6 +10269,25 @@ export interface operations {
       500: {
         content: never
       }
+    }
+  }
+  /** Create CLI login session */
+  CliLoginController_createCliLoginSession: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateCliLoginSessionBody']
+      }
+    }
+    responses: {
+      /** @description Failed to create CLI login session */
+      500: never
+    }
+  }
+  /** Retrieve CLI login session */
+  CliLoginController_getCliLoginSession: {
+    responses: {
+      /** @description Failed to retrieve CLI login session */
+      500: never
     }
   }
   /** Gets GoTrue template */
@@ -11477,7 +11612,9 @@ export interface operations {
     }
     responses: {
       201: {
-        content: never
+        content: {
+          'application/json': components['schemas']['ProjectUpgradeInitiateResponse']
+        }
       }
       403: {
         content: never
@@ -12137,7 +12274,7 @@ export interface operations {
       }
     }
   }
-  /** Redirects to Supabase dashboard after Fly sso with Gotrue */
+  /** Redirects to Supabase dashboard after completing Fly sso */
   CallbackController_redirectToDashboardFlyioExtensionScreen: {
     responses: {
       200: {
@@ -12173,7 +12310,7 @@ export interface operations {
       }
     }
   }
-  /** Starts Flyio single sign on */
+  /** Starts Fly single sign on */
   ExtensionController_startFlyioSSO: {
     parameters: {
       path: {
@@ -12213,6 +12350,34 @@ export interface operations {
         content: {
           'application/json': components['schemas']['ResourceProvisioningResponse']
         }
+      }
+    }
+  }
+  /** Gets all databases that belong to the Fly organization */
+  OrganizationsController_getOrgExtensions: {
+    parameters: {
+      path: {
+        organization_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['OrganizationExtensionStatus'][]
+        }
+      }
+    }
+  }
+  /** Starts Fly single sign on */
+  OrganizationsController_startFlyioSSO: {
+    parameters: {
+      path: {
+        organization_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
       }
     }
   }

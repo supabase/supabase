@@ -60,7 +60,7 @@ const VaultToggle = () => {
   return (
     <div>
       <div
-        className="px-12 py-12 w-full bg-white dark:bg-scale-200 border border-scale-500 rounded bg-no-repeat"
+        className="px-12 py-12 w-full bg-background border rounded bg-no-repeat"
         style={{
           backgroundSize: isNotAvailable ? '50%' : '40%',
           backgroundPosition: '100% 24%',
@@ -80,7 +80,7 @@ const VaultToggle = () => {
           </div>
           {isNotAvailable ? (
             <div className="space-y-4">
-              <div className="rounded border border-scale-500 px-4 py-2 flex items-center justify-between">
+              <div className="rounded border px-4 py-2 flex items-center justify-between">
                 <div>
                   <p className="text-foreground-light text-sm">
                     Vault is not available for this project yet.
@@ -133,8 +133,8 @@ const VaultToggle = () => {
                       <Tooltip.Arrow className="radix-tooltip-arrow" />
                       <div
                         className={[
-                          'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                          'border border-scale-200',
+                          'rounded bg-alternative py-1 px-2 leading-none shadow',
+                          'border border-background',
                         ].join(' ')}
                       >
                         <span className="text-xs text-foreground">
