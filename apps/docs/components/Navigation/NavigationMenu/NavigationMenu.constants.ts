@@ -558,6 +558,10 @@ export const auth = {
           name: 'OAuth with PKCE flow',
           url: '/guides/auth/server-side/oauth-with-pkce-flow-for-ssr',
         },
+        {
+          name: 'OTP with PKCE flow',
+          url: '/guides/auth/server-side/otp-with-pkce-flow-for-ssr',
+        },
         { name: 'Server-side Rendering', url: '/guides/auth/server-side-rendering' },
         {
           name: 'Migrating from Auth Helpers',

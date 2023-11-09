@@ -1003,6 +1003,12 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/docs/guides/auth/server-side/otp-with-pkce-flow-for-ssr</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
     <loc
       >https://supabase.com/docs/guides/auth/server-side/migrating-to-ssr-from-auth-helpers</loc
     >
