@@ -34,6 +34,7 @@ $ apt-get install pgloader
 2. Create a configuration file that specifies the source data and the target Supabase database (e.g., config.load).
 
 Here's an example configuration file:
+
 ```sql
 LOAD DATABASE
     FROM sourcedb://USER:PASSWORD@HOST/SOURCE_DB
@@ -44,10 +45,10 @@ set wal_buffers = '64MB', max_wal_senders = 0, statement_timeout = 0, work_mem t
 
 Customize the source and Supabase database URL and options to fit your specific use case:
 
-- `wal_buffers`: This parameter is set to '64MB' to allocate 64 megabytes of memory for write-ahead logging buffers. A larger value can help improve write performance by caching more data in memory before writing it to disk. This can be useful during data import operations to speed up the writing of transaction logs. 
-- `max_wal_senders`: It is set to 0, to disable replication connections. This is done during the data import process to prevent replication-related conflicts and issues. 
-- `statement_timeout`: The value is set to 0, which means it's disabled, allowing SQL statements to run without a time limit. 
-- `work_mem`:  It is set to '2GB', allocating 2 GB of memory for query operations. This enhance the performance of complex queries by allowing larger in-memory datasets.
+- `wal_buffers`: This parameter is set to '64MB' to allocate 64 megabytes of memory for write-ahead logging buffers. A larger value can help improve write performance by caching more data in memory before writing it to disk. This can be useful during data import operations to speed up the writing of transaction logs.
+- `max_wal_senders`: It is set to 0, to disable replication connections. This is done during the data import process to prevent replication-related conflicts and issues.
+- `statement_timeout`: The value is set to 0, which means it's disabled, allowing SQL statements to run without a time limit.
+- `work_mem`: It is set to '2GB', allocating 2 GB of memory for query operations. This enhance the performance of complex queries by allowing larger in-memory datasets.
 
 3. Run pgloader with the configuration file.
 
@@ -69,6 +70,7 @@ The Supabase API allows you to programmatically import data into your tables. Yo
 When importing data via the Supabase API, it's advisable to refrain from bulk imports. This helps ensure a smooth data transfer process and prevents any potential disruptions.
 
 Read more about [Rate Limiting, Resource Allocation, & Abuse Prevention.](https://supabase.com/docs/guides/platform/going-into-prod#rate-limiting-resource-allocation--abuse-prevention)
+
 </Admonition>
 
 ## Before you dive into the import process, it's essential to plan and prepare
