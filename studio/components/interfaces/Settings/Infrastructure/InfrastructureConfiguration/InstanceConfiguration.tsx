@@ -32,8 +32,6 @@ const InstanceConfigurationUI = () => {
   const [selectedReplicaToResize, setSelectedReplicaToResize] = useState<DatabaseConfiguration>()
   const [selectedReplicaToDrop, setSelectedReplicaToDrop] = useState<DatabaseConfiguration>()
 
-  const position = { x: 0, y: 0 }
-  const edgeType = 'smoothstep'
   const backgroundPatternColor =
     resolvedTheme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.4)'
 
@@ -50,7 +48,7 @@ const InstanceConfigurationUI = () => {
       id: `${primary.id}-${database.id}`,
       source: `database-${primary.id}`,
       target: `database-${database.id}`,
-      type: edgeType,
+      type: 'smoothstep',
       animated: true,
     }
   })
@@ -90,10 +88,8 @@ const InstanceConfigurationUI = () => {
         {view === 'flow' ? (
           <ReactFlow
             fitView
-            fitViewOptions={{ maxZoom: 1 }}
+            fitViewOptions={{ minZoom: 0.9, maxZoom: 1 }}
             className="instance-configuration"
-            panOnDrag={false}
-            zoomOnScroll={false}
             zoomOnPinch={false}
             nodesDraggable={false}
             nodesConnectable={false}
@@ -105,7 +101,6 @@ const InstanceConfigurationUI = () => {
               const graph = getGraphLayout(nodes, edges)
               reactFlow.setNodes(graph.nodes)
               reactFlow.setEdges(graph.edges)
-              setTimeout(() => reactFlow.fitView({ maxZoom: 1 }))
             }}
             proOptions={{ hideAttribution: true }}
           >

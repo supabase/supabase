@@ -1,4 +1,5 @@
 import dagre from '@dagrejs/dagre'
+import ELK from 'elkjs/lib/elk.bundled.js'
 import { Edge, Node, Position } from 'reactflow'
 import { groupBy } from 'lodash'
 
@@ -18,21 +19,21 @@ export const generateNodes = (
   }
 ): Node[] => {
   const position = { x: 0, y: 0 }
-  const regions = Object.keys(groupBy(databases, 'region'))
+  // const regions = Object.keys(groupBy(databases, 'region'))
 
-  const regionNodes: Node[] = regions.map((region) => {
-    const regionMeta = AVAILABLE_REPLICA_REGIONS.find((r) => region.includes(r.region))
+  // const regionNodes: Node[] = regions.map((region) => {
+  //   const regionMeta = AVAILABLE_REPLICA_REGIONS.find((r) => region.includes(r.region))
 
-    return {
-      position,
-      id: regionMeta?.key ?? '',
-      type: 'REGION',
-      data: {
-        label: regionMeta?.name,
-        region: regionMeta?.region,
-      },
-    }
-  })
+  //   return {
+  //     position,
+  //     id: regionMeta?.key ?? '',
+  //     type: 'REGION',
+  //     data: {
+  //       label: regionMeta?.name,
+  //       region: regionMeta?.region,
+  //     },
+  //   }
+  // })
 
   const databaseNodes: Node[] = databases
     .sort((a, b) => (a.region > b.region ? 1 : -1))
