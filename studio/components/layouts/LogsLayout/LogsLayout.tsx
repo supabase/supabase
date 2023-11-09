@@ -17,10 +17,11 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
   const pathArr = router.pathname.split('/')
   const page = pathArr[pathArr.length - 1]
 
-  const { projectAuthAll: authEnabled, projectStorageAll: storageEnabled } = useIsFeatureEnabled([
-    'project_storage:all',
-    'project_auth:all',
-  ])
+  const {
+    projectAuthAll: authEnabled,
+    projectStorageAll: storageEnabled,
+    realtimeAll: realtimeEnabled,
+  } = useIsFeatureEnabled(['project_storage:all', 'project_auth:all', 'realtime:all'])
 
   const project = useSelectedProject()
 
@@ -46,6 +47,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
           menu={generateLogsMenu(project, {
             auth: authEnabled,
             storage: storageEnabled,
+            realtime: realtimeEnabled,
           })}
         />
       }
