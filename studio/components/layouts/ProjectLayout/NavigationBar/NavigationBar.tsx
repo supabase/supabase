@@ -55,8 +55,14 @@ const NavigationBar = () => {
     projectAuthAll: authEnabled,
     projectEdgeFunctionAll: edgeFunctionsEnabled,
     projectStorageAll: storageEnabled,
-  } = useIsFeatureEnabled(['project_auth:all', 'project_edge_function:all', 'project_storage:all'])
-  const realtimeEnabled = useFlag('realtimeDashboard')
+    realtimeAll: realtimeEnabled,
+  } = useIsFeatureEnabled([
+    'project_auth:all',
+    'project_edge_function:all',
+    'project_storage:all',
+    'realtime:all',
+  ])
+  const realtimeFlagEnabled = useFlag('realtimeDashboard')
 
   const activeRoute = router.pathname.split('/')[3]
   const toolRoutes = generateToolRoutes(projectRef, project, supabaseAIEnabled)
@@ -64,7 +70,7 @@ const NavigationBar = () => {
     auth: authEnabled,
     edgeFunctions: edgeFunctionsEnabled,
     storage: storageEnabled,
-    realtime: realtimeEnabled,
+    realtime: realtimeEnabled && realtimeFlagEnabled,
   })
   const otherRoutes = generateOtherRoutes(projectRef, project)
 
