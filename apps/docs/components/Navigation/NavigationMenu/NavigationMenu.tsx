@@ -147,10 +147,10 @@ const menus: Menu[] = [
     type: 'reference',
   },
   {
-    id: 'reference_swift_v0',
+    id: 'reference_swift_v1',
     path: '/reference/swift',
     commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_swift_v0.yml',
+    specFile: 'supabase_swift_v1.yml',
     type: 'reference',
   },
   {
