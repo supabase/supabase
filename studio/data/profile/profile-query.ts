@@ -15,8 +15,7 @@ export async function getProfile(signal?: AbortSignal) {
   })
   if (response.error) throw response.error
 
-  // if (!IS_PLATFORM) {
-  if (true) {
+  if (!IS_PLATFORM) {
     response.disabled_features = process.env.NEXT_PUBLIC_DISABLED_FEATURES?.split(',') ?? []
   }
 
