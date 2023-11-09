@@ -226,15 +226,15 @@ You can change the scope of the access for Supabase by configuring
             })
           ) : (
             <div>
-              <Link href={integrationUrl} passHref>
-                <Button type="default" iconRight={<IconExternalLink />} asChild>
-                  <a target="_blank">Install Vercel Integration</a>
-                </Button>
-              </Link>
+              <Button asChild type="default" iconRight={<IconExternalLink />}>
+                <Link href={integrationUrl} target="_blank">
+                  Install Vercel Integration
+                </Link>
+              </Button>
             </div>
           )}
           {VercelContentSectionBottom && (
-            <Markdown content={VercelContentSectionBottom} className="text-lighter" />
+            <Markdown content={VercelContentSectionBottom} className="text-foreground-lighter" />
           )}
         </ScaffoldSectionContent>
       </ScaffoldSection>

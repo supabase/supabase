@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
-import { useFlag } from 'hooks'
 import { useSignOut } from 'lib/auth'
 import { useProfile } from 'lib/profile'
 import { useTheme } from 'next-themes'
@@ -26,7 +25,6 @@ const UserSettingsDropdown = () => {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const { profile } = useProfile()
-  const showAuditLogs = useFlag('auditLogs')
   const { setIsOpen: setCommandMenuOpen } = useCommandMenu()
   const { theme, setTheme } = useTheme()
 
@@ -55,23 +53,17 @@ const UserSettingsDropdown = () => {
           </div>
 
           <DropdownMenuSeparator />
-          <Link passHref href="/account/me">
-            <DropdownMenuItem className="cursor-pointer" onClick={() => setOpen(false)} asChild>
-              <a>Preferences</a>
-            </DropdownMenuItem>
-          </Link>
-          <Link passHref href="/account/tokens">
-            <DropdownMenuItem className="cursor-pointer" onClick={() => setOpen(false)} asChild>
-              <a>Access tokens</a>
-            </DropdownMenuItem>
-          </Link>
-          {showAuditLogs ? (
-            <Link passHref href="/account/audit">
-              <DropdownMenuItem className="cursor-pointer" onClick={() => setOpen(false)} asChild>
-                <a>Audit logs</a>
-              </DropdownMenuItem>
-            </Link>
-          ) : null}
+          <DropdownMenuItem className="cursor-pointer" onClick={() => setOpen(false)} asChild>
+            <Link href="/account/me">Preferences</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer" onClick={() => setOpen(false)} asChild>
+            <Link href="/account/tokens">Access tokens</Link>
+          </DropdownMenuItem>
+
+          <DropdownMenuItem className="cursor-pointer" onClick={() => setOpen(false)} asChild>
+            <Link href="/account/audit">Audit logs</Link>
+          </DropdownMenuItem>
+
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="cursor-pointer"

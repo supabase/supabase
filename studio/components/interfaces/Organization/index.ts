@@ -1,5 +1,4 @@
 import BillingSettings from './BillingSettings/BillingSettings'
-import BillingSettingsV2 from './BillingSettingsV2/BillingSettings'
 import GeneralSettings from './GeneralSettings/GeneralSettings'
 import IntegrationSettings from './IntegrationSettings/IntegrationSettings'
 import InvoicesSettings from './InvoicesSettings/InvoicesSettings'
@@ -12,7 +11,6 @@ import Documents from './Documents/Documents'
 
 export {
   BillingSettings,
-  BillingSettingsV2,
   GeneralSettings,
   IntegrationSettings,
   InvoicesSettings,

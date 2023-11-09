@@ -1,11 +1,12 @@
+import { useEffect, useState } from 'react'
+
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { useUrlState } from 'hooks'
-import { useEffect, useState } from 'react'
-import { Button, IconArrowLeft, IconArrowRight, IconLoader, InputNumber } from 'ui'
+import { Button, IconArrowLeft, IconArrowRight, IconLoader, InputNumber, Modal } from 'ui'
 import { useDispatch, useTrackedState } from '../../../store'
 import { DropdownControl } from '../../common'
 
@@ -74,44 +75,44 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
   // at least until we can send an abort signal to cancel requests if users are mashing the
   // pagination buttons to find the data they want
 
+  const [isConfirmPreviousModalOpen, setIsConfirmPreviousModalOpen] = useState(false)
+
   const onPreviousPage = () => {
     if (state.page > 1) {
       if (state.selectedRows.size >= 1) {
-        confirmAlert({
-          title: 'Confirm moving to previous page',
-          message: 'The currently selected lines will be deselected, do you want to proceed?',
-          onConfirm: () => {
-            goToPreviousPage()
-            dispatch({
-              type: 'SELECTED_ROWS_CHANGE',
-              payload: { selectedRows: new Set() },
-            })
-          },
-        })
+        setIsConfirmPreviousModalOpen(true)
       } else {
         goToPreviousPage()
       }
     }
   }
 
+  const onConfirmPreviousPage = () => {
+    goToPreviousPage()
+    dispatch({
+      type: 'SELECTED_ROWS_CHANGE',
+      payload: { selectedRows: new Set() },
+    })
+  }
+
+  const [isConfirmNextModalOpen, setIsConfirmNextModalOpen] = useState(false)
+
   const onNextPage = () => {
     if (state.page < maxPages) {
       if (state.selectedRows.size >= 1) {
-        confirmAlert({
-          title: 'Confirm moving to next page',
-          message: 'The currently selected lines will be deselected, do you want to proceed?',
-          onConfirm: () => {
-            goToNextPage()
-            dispatch({
-              type: 'SELECTED_ROWS_CHANGE',
-              payload: { selectedRows: new Set() },
-            })
-          },
-        })
+        setIsConfirmNextModalOpen(true)
       } else {
         goToNextPage()
       }
     }
+  }
+
+  const onConfirmNextPage = () => {
+    goToNextPage()
+    dispatch({
+      type: 'SELECTED_ROWS_CHANGE',
+      payload: { selectedRows: new Set() },
+    })
   }
 
   // TODO: look at aborting useTableRowsQuery if the user presses the button quickly
@@ -192,6 +193,38 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
             data.count === 0 || data.count > 1 ? `records` : 'record'
           }`}</p>
           {isLoadingRows && <IconLoader size={14} className="animate-spin" />}
+
+          <ConfirmationModal
+            visible={isConfirmPreviousModalOpen}
+            header="Confirm moving to previous page"
+            buttonLabel="Confirm"
+            onSelectCancel={() => setIsConfirmPreviousModalOpen(false)}
+            onSelectConfirm={() => {
+              onConfirmPreviousPage()
+            }}
+          >
+            <Modal.Content>
+              <p className="py-4 text-sm text-foreground-light">
+                The currently selected lines will be deselected, do you want to proceed?
+              </p>
+            </Modal.Content>
+          </ConfirmationModal>
+
+          <ConfirmationModal
+            visible={isConfirmNextModalOpen}
+            header="Confirm moving to next page"
+            buttonLabel="Confirm"
+            onSelectCancel={() => setIsConfirmNextModalOpen(false)}
+            onSelectConfirm={() => {
+              onConfirmNextPage()
+            }}
+          >
+            <Modal.Content>
+              <p className="py-4 text-sm text-foreground-light">
+                The currently selected lines will be deselected, do you want to proceed?
+              </p>
+            </Modal.Content>
+          </ConfirmationModal>
         </>
       )}
 

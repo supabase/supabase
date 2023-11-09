@@ -50,10 +50,11 @@ export default function RLSBannerWarning() {
             <IconAlertCircle size={16} strokeWidth={2} />
             <span className="uppercase font-bold ml-2">Warning</span>: You are allowing anonymous
             access to your table.{' '}
-            <Link href={`/project/${projectRef}/auth/policies?search=${tableID}`}>
-              <a className="underline ml-2 opacity-80 hover:opacity-100 transition">
-                Enable Row Level Security
-              </a>
+            <Link
+              href={`/project/${projectRef}/auth/policies?search=${tableID}`}
+              className="underline ml-2 opacity-80 hover:opacity-100 transition"
+            >
+              Enable Row Level Security
             </Link>
             <div className="ml-20 absolute right-2">
               <Button

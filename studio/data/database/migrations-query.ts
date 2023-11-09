@@ -39,7 +39,6 @@ export const useMigrationsQuery = <TData extends MigrationsData = MigrationsData
       queryKey: ['migrations'],
       handleError: (error: { code: number; message: string; requestId: string }) => {
         if (
-          error.code === 400 &&
           error.message.includes('relation "supabase_migrations.schema_migrations" does not exist')
         ) {
           return { result: [] }

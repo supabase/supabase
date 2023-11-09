@@ -100,7 +100,7 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
         })}
       </Swiper>
 
-      <div className="bg-scale-100 dark:bg-scale-300 border-scale-500 overflow-hidden rounded-md border p-8">
+      <div className="bg-surface-100 border-default overflow-hidden rounded-md border p-8">
         <Swiper
           // @ts-ignore
           onSwiper={setSwiperDetails}
@@ -124,11 +124,11 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
                 <p className="p mb-6 block">{extension.detail_text}</p>
                 <Space className="justify-between">
                   {extension.url && (
-                    <Link href={extension.url} as={extension.url}>
-                      <a className="ml-px">
-                        <Button type="default">View documentation</Button>
-                      </a>
-                    </Link>
+                    <Button asChild type="default">
+                      <Link href={extension.url} as={extension.url} className="ml-px">
+                        View documentation
+                      </Link>
+                    </Button>
                   )}
                   <div>
                     <p className="p mr-4">{extension.badges_label}</p>

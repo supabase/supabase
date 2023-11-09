@@ -4,7 +4,7 @@ import {
   precisionFormatter,
   useStacked,
 } from 'components/ui/Charts/Charts.utils'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 
 test('isFloat', () => {
   expect(isFloat(123)).toBe(false)

@@ -1,19 +1,16 @@
 import { useParams } from 'common'
 import { useState } from 'react'
-import { Button, IconCode, IconRefreshCw, IconSearch, IconX, Input, Listbox } from 'ui'
+import { Button, IconRefreshCw, IconSearch, IconX, Input, Listbox } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import APIDocsButton from 'components/ui/APIDocsButton'
 import { useUsersQuery } from 'data/auth/users-query'
 import AddUserDropdown from './AddUserDropdown'
 import UsersList from './UsersList'
-import { useAppStateSnapshot } from 'state/app-state'
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 const Users = () => {
   const { project } = useProjectContext()
   const { ref: projectRef } = useParams()
-  const snap = useAppStateSnapshot()
-  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
 
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
@@ -84,19 +81,7 @@ const Users = () => {
           </Listbox>
         </div>
         <div className="mt-4 flex items-center gap-2 md:mt-0">
-          {isNewAPIDocsEnabled && (
-            <Button
-              size="tiny"
-              type="default"
-              icon={<IconCode size={14} strokeWidth={2} />}
-              onClick={() => {
-                snap.setActiveDocsSection(['user-management'])
-                snap.setShowProjectApiDocs(true)
-              }}
-            >
-              API
-            </Button>
-          )}
+          <APIDocsButton section={['user-management']} />
           <Button
             size="tiny"
             icon={<IconRefreshCw />}

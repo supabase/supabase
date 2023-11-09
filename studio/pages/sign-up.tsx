@@ -12,10 +12,10 @@ const SignUpPage: NextPageWithLayout = () => {
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-scale-700" />
+            <div className="w-full border-t border-strong" />
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="bg-scale-200 px-2 text-sm text-foreground">or</span>
+            <span className="bg-background px-2 text-sm text-foreground">or</span>
           </div>
         </div>
 
@@ -24,10 +24,11 @@ const SignUpPage: NextPageWithLayout = () => {
 
       <div className="my-8 self-center text-sm">
         <span className="text-foreground-light">Have an account?</span>{' '}
-        <Link href="/sign-in">
-          <a className="underline text-foreground hover:text-foreground-light transition">
-            Sign In Now
-          </a>
+        <Link
+          href="/sign-in"
+          className="underline text-foreground hover:text-foreground-light transition"
+        >
+          Sign In Now
         </Link>
       </div>
     </>
