@@ -16,56 +16,62 @@ Importing large datasets requires careful planning and execution to ensure the p
 
 Supabase dashboard provides a user-friendly way to import data. However, for very large datasets, this method may not be the most efficient choice, given the size limit is 100MB. It's generally better suited for smaller datasets and quick data imports. Consider using alternative methods like pgloader for large-scale data imports.
 
-    - Navigate to the relevant table in the [Table Editor.](https://supabase.com/dashboard/project/_/editor)
-    - Click on “Insert” then choose "Import Data from CSV" and follow the on-screen instructions to upload your CSV file.
+- Navigate to the relevant table in the [Table Editor.](https://supabase.com/dashboard/project/_/editor)
+- Click on “Insert” then choose "Import Data from CSV" and follow the on-screen instructions to upload your CSV file.
 
 ### Option 2: Bulk Import using pgloader
 
 [pgloader](https://pgloader.io/) is a powerful tool for efficiently importing data into a PostgreSQL database that supports a wide range of source database engines, including MySQL and MS SQL.
 
-    You can use it in conjunction with Supabase by following these steps:
+You can use it in conjunction with Supabase by following these steps:
 
-    1. Install pgloader on your local machine or a server. For more info, you can refer to the official pgloader installation page available at: https://pgloader.readthedocs.io/en/latest/install.html
+1. Install pgloader on your local machine or a server. For more info, you can refer to the official pgloader installation page available at: https://pgloader.readthedocs.io/en/latest/install.html
 
-        ```jsx
-        $ apt-get install pgloader
-        ```
+```jsx
+$ apt-get install pgloader
+```
 
-    2. Create a configuration file that specifies the source data and the target Supabase database (e.g., config.load).
+2. Create a configuration file that specifies the source data and the target Supabase database (e.g., config.load).
 
-        Here's an example configuration file:
-        ```sql
-        LOAD DATABASE
-            FROM sourcedb://USER:PASSWORD@HOST/SOURCE_DB
-            INTO postgres://postgres:password@db.xxxx.supabase.co:6543/postgres
-        ALTER SCHEMA 'public' OWNER TO 'postgres';
-        set wal_buffers = '64MB', max_wal_senders = 0, statement_timeout = 0, work_mem to '2GB';
-        ```
+Here's an example configuration file:
+```sql
+LOAD DATABASE
+    FROM sourcedb://USER:PASSWORD@HOST/SOURCE_DB
+    INTO postgres://postgres:password@db.xxxx.supabase.co:6543/postgres
+ALTER SCHEMA 'public' OWNER TO 'postgres';
+set wal_buffers = '64MB', max_wal_senders = 0, statement_timeout = 0, work_mem to '2GB';
+```
 
-        Customize the source and Supabase database URL and options to fit your specific use case.
+Customize the source and Supabase database URL and options to fit your specific use case:
 
-    3. Run pgloader with the configuration file.
+- `wal_buffers`: This parameter is set to '64MB' to allocate 64 megabytes of memory for write-ahead logging buffers. A larger value can help improve write performance by caching more data in memory before writing it to disk. This can be useful during data import operations to speed up the writing of transaction logs. 
+- `max_wal_senders`: It is set to 0, to disable replication connections. This is done during the data import process to prevent replication-related conflicts and issues. 
+- `statement_timeout`: The value is set to 0, which means it's disabled, allowing SQL statements to run without a time limit. 
+- `work_mem`:  It is set to '2GB', allocating 2 GB of memory for query operations. This enhance the performance of complex queries by allowing larger in-memory datasets.
 
-        ```jsx
-        pgloader config.load
-        ```
+3. Run pgloader with the configuration file.
 
-    For databases using the Postgres engine, we recommend using the [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) and [psql](https://www.postgresql.org/docs/current/app-psql.html) command line tools.
+```jsx
+pgloader config.load
+```
+
+For databases using the Postgres engine, we recommend using the [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) and [psql](https://www.postgresql.org/docs/current/app-psql.html) command line tools.
 
 ### Option 3: Using Postgres Copy command
 
-    Read more about [Bulk data loading.](https://supabase.com/docs/guides/database/tables#bulk-data-loading)
+Read more about [Bulk data loading.](https://supabase.com/docs/guides/database/tables#bulk-data-loading)
 
 ### Option 4: Using the Supabase API
 
-    The Supabase API allows you to programmatically import data into your tables. You can use various client libraries to interact with the API and perform data import operations. This approach is useful when you need to automate data imports, and it gives you fine-grained control over the process. Refer to our [API guide](https://supabase.com/docs/guides/api) for more details.
-    <Admonition type="note">
-    When importing data via the Supabase API, it's advisable to refrain from bulk imports. This helps ensure a smooth data transfer process and prevents any potential disruptions.
+The Supabase API allows you to programmatically import data into your tables. You can use various client libraries to interact with the API and perform data import operations. This approach is useful when you need to automate data imports, and it gives you fine-grained control over the process. Refer to our [API guide](https://supabase.com/docs/guides/api) for more details.
 
-    Read more about [Rate Limiting, Resource Allocation, & Abuse Prevention.](https://supabase.com/docs/guides/platform/going-into-prod#rate-limiting-resource-allocation--abuse-prevention)
-    </Admonition>
+<Admonition type="note">
+When importing data via the Supabase API, it's advisable to refrain from bulk imports. This helps ensure a smooth data transfer process and prevents any potential disruptions.
 
-## **Before you dive into the import process, it's essential to plan and prepare**
+Read more about [Rate Limiting, Resource Allocation, & Abuse Prevention.](https://supabase.com/docs/guides/platform/going-into-prod#rate-limiting-resource-allocation--abuse-prevention)
+</Admonition>
+
+## Before you dive into the import process, it's essential to plan and prepare
 
 ### 1. Statement Timeouts
 
@@ -91,7 +97,6 @@ ALTER TABLE table_name DISABLE TRIGGER ALL;
 
 -- To re-enable triggers
 ALTER TABLE table_name ENABLE TRIGGER ALL;
-
 ```
 
 ### 4. Building Indices at the End
