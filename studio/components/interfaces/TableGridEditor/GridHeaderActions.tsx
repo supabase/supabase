@@ -5,7 +5,7 @@ import { useParams } from 'common'
 import { MousePointer2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import { Button, IconAlertCircle, IconCode, IconLock, Modal } from 'ui'
+import { Button, IconAlertCircle, IconLock, Modal } from 'ui'
 
 import { rlsAcknowledgedKey } from 'components/grid/constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -22,6 +22,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   const { meta, ui } = useStore()
   const { project } = useProjectContext()
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
+  console.log({ realtimeEnabled })
 
   const [isTogglingRealtime, setIsTogglingRealtime] = useState(false)
   const [showEnableRealtime, setShowEnableRealtime] = useState(false)
