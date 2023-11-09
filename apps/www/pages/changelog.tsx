@@ -30,14 +30,15 @@ export type DiscussionsResponse = {
     }
   }
 }
+// convert to getserversideprops
+export async function getServerSideProps({ req, res }: any) {
+  res.setHeader('Cache-Control', 'public, s-maxage=10, stale-while-revalidate=59')
 
-export async function getStaticProps() {
   const response = await fetch('https://api.github.com/repos/supabase/supabase/releases')
   const restApiData = await response.json()
 
   async function fetchDiscussions(owner: string, repo: string, categoryId: string) {
     let cursor = null
-    let allDiscussions = []
     const first = 3
 
     const octokit = new ExtendedOctokit({
@@ -57,7 +58,7 @@ export async function getStaticProps() {
       `
       query troubleshootDiscussions($cursor: String, $owner: String!, $repo: String!, $categoryId: ID!) {
         repository(owner: $owner, name: $repo) {
-          discussions(first: ${first}, after: $cursor, categoryId: $categoryId, orderBy: { field: CREATED_AT, direction: DESC }) {
+          discussions(first: 5, after: $cursor, categoryId: $categoryId, orderBy: { field: CREATED_AT, direction: DESC }) {
             totalCount
             nodes {
               id
@@ -89,39 +90,6 @@ export async function getStaticProps() {
       }
     )
 
-    //     use this to find discussion category ids
-    //     const result = await octokit.graphql.paginate<DiscussionsResponse>(
-    //       `
-    //       query {
-    //   repository(owner: "supabase", name: "supabase") {
-    //     discussionCategories(first: 100) {
-    //       # type: DiscussionConnection
-    //       totalCount # Int!
-    //  pageInfo {
-    //         # type: PageInfo (from the public schema)
-    //         startCursor
-    //         endCursor
-    //         hasNextPage
-    //         hasPreviousPage
-    //       }
-    //       nodes {
-    //         # type: Discussion
-    //         id
-    //         name
-    //       }
-    //     }
-    //   }
-    // }
-    //     `,
-    //       {
-    //         owner,
-    //         repo,
-    //         categoryId,
-    //       }
-    //     )
-
-    //     // parse result as a string
-    //     console.log('JSON.stringify', JSON.stringify(result, null, 2))
     return discussions
   }
 
