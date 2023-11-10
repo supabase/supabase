@@ -28,6 +28,8 @@
   --destructive-400: 6.7deg 60% 20.6%;
   --destructive-300: 7.5deg 51.3% 15.3%;
   --destructive-200: 10.9deg 23.4% 9.2%;
+  --border-button-hover: 0deg 0% 100%;
+  --border-button-default: 188deg 16.5% 17.8%;
   --border-stronger: 190deg 16.1% 22%;
   --border-strong: 188deg 16.5% 17.8%;
   --border-alternative: 190.9deg 16.4% 13.1%;
@@ -36,6 +38,7 @@
   --border-secondary: 196.4deg 21.6% 10%;
   --border-muted: 197.1deg 14.9% 9.2%;
   --border-default: 186deg 17.9% 11%;
+  --background-button-default: 202.5deg 10.5% 14.9%;
   --background-muted: 0deg 0% 100%;
   --background-overlay-hover: 190deg 10.7% 11%;
   --background-overlay-default: 192deg 14.3% 6.9%;

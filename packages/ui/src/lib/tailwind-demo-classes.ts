@@ -10,7 +10,8 @@ export default {
     "bg-surface-300",
     "bg-overlay",
     "bg-overlay-hover",
-    "bg-muted"
+    "bg-muted",
+    "bg-button"
   ],
   "border": [
     "border",
@@ -20,7 +21,9 @@ export default {
     "border-control",
     "border-alternative",
     "border-strong",
-    "border-stronger"
+    "border-stronger",
+    "border-button",
+    "border-button-hover"
   ],
   "text": [
     "text",

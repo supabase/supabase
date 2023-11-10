@@ -463,6 +463,10 @@ module.exports = {
   cssVariable: "var(--background-muted)",
   value: "hsl(0, 0%, 100%)"
 },
+"background-button-DEFAULT": {
+  cssVariable: "var(--background-button-default)",
+  value: "hsl(202.5, 10.5%, 14.9%)"
+},
 "border-DEFAULT": {
   cssVariable: "var(--border-default)",
   value: "hsl(186, 17.9%, 11%)"
@@ -494,6 +498,14 @@ module.exports = {
 "border-stronger": {
   cssVariable: "var(--border-stronger)",
   value: "hsl(190, 16.1%, 22%)"
+},
+"border-button-DEFAULT": {
+  cssVariable: "var(--border-button-default)",
+  value: "hsl(188, 16.5%, 17.8%)"
+},
+"border-button-hover": {
+  cssVariable: "var(--border-button-hover)",
+  value: "hsl(0, 0%, 100%)"
 },
 "destructive-200": {
   cssVariable: "var(--destructive-200)",
