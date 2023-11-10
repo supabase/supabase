@@ -1,0 +1,60 @@
+name: Vercel Preview Deployment
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_STUDIO_STAGING_PROJECT_ID }}
+
+# Cancel old builds on new commit for same workflow + branch/PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    branches: [master]
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+        # use the PR head commit, not the merge commit between this branch and master
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Check for changes to studio
+        run: |
+          npm install --global turbo-ignore
+          if npx turbo-ignore studio; then
+            echo "HAS_CHANGES=false" >> "$GITHUB_ENV"
+          else
+            echo "HAS_CHANGES=true" >> "$GITHUB_ENV"
+          fi
+
+      - name: Install Vercel CLI
+        if: env.HAS_CHANGES == 'true'
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel Environment Information
+        if: env.HAS_CHANGES == 'true'
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Project Artifacts
+        if: env.HAS_CHANGES == 'true'
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy Project Artifacts to Vercel
+        if: env.HAS_CHANGES == 'true'
+        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
