@@ -293,19 +293,19 @@ functions:
         description: If your database has foreign key relationships, you can query related tables too.
         code: |
           ```kotlin
+          val columns = Columns.raw("""
+              id,
+              name,
+              cities (
+                id,
+                name
+              )
+          """.trimIndent())
           val country = client.postgrest["countries"]
-                      .select(
-                          columns = Columns.raw(
-                                          """
-                                          id,
-                                          name,
-                                          cities (
-                                              id,
-                                              name
-                                          )
-                                          """)
-                      )
-                      .decodeSingle<Country>()
+            .select(
+              columns = columns
+            )
+            .decodeSingle<Country>()
           ```
         note: |
           What about join tables
@@ -323,13 +323,13 @@ functions:
           (both in the users) table
         code: |
           ```kotlin
+          val columns = Columns.raw("""
+              content,
+              from: sender_id(name),
+              to: receiver_id(name)
+          """.trimIndent())
           val message = client.postgrest["messages"]
-                      .select(columns = Columns.raw(
-                                        """
-                                        content,
-                                        from: sender_id(name),
-                                        to: receiver_id(name)
-                                        """))
+                      .select(columns = columns)
                       .decodeSingle<Message>()
           ```
       - id: querying-with-count-option
@@ -353,12 +353,12 @@ functions:
           [PostgREST docs](http://postgrest.org/en/v7.0.0/api.html#json-columns) for more details.
         code: |
           ```kotlin
+          val columns = Columns.raw("""
+              id, name
+              address->city
+          """.trimIndent())
           val user = client.postgrest["users"]
-                      .select(columns = Columns.raw(
-                                      """
-                                      id, name
-                                      address->city
-                                      """)
+                      .select(columns = columns)
                       .decodeSingle<User>()
           ```
 
