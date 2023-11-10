@@ -6,6 +6,7 @@ import Description from 'components/interfaces/Docs/Description'
 import Param from 'components/interfaces/Docs/Param'
 import Snippets from 'components/interfaces/Docs/Snippets'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
+import { useIsFeatureEnabled } from 'hooks'
 
 const ResourceContent = ({
   autoApiService,
@@ -35,6 +36,8 @@ const ResourceContent = ({
     id,
     required: resourceDefinition?.required?.includes(id),
   }))
+
+  const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
 
   if (!paths || !definitions) return null
 
@@ -258,55 +261,56 @@ const ResourceContent = ({
           </div>
         </>
       )}
-      {(methods.includes('DELETE') || methods.includes('POST') || methods.includes('PATCH')) && (
-        <>
-          <h3 className="text-foreground mt-4 px-6">Subscribe to changes</h3>
-          <div className="doc-section">
-            <article className="code-column text-foreground">
-              <p>
-                Supabase provides realtime functionality and broadcasts database changes to
-                authorized users depending on Row Level Security (RLS) policies.
-              </p>
-              <p>
-                <a
-                  href="https://supabase.com/docs/reference/javascript/subscribe"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Learn more
-                </a>
-              </p>
-            </article>
-            <article className="code">
-              <CodeSnippet
-                selectedLang={selectedLang}
-                snippet={Snippets.subscribeAll(resourceMeta.camelCase, resourceId)}
-              />
-              <CodeSnippet
-                selectedLang={selectedLang}
-                snippet={Snippets.subscribeInserts(resourceMeta.camelCase, resourceId)}
-              />
-              <CodeSnippet
-                selectedLang={selectedLang}
-                snippet={Snippets.subscribeUpdates(resourceMeta.camelCase, resourceId)}
-              />
-              <CodeSnippet
-                selectedLang={selectedLang}
-                snippet={Snippets.subscribeDeletes(resourceMeta.camelCase, resourceId)}
-              />
-              <CodeSnippet
-                selectedLang={selectedLang}
-                snippet={Snippets.subscribeEq(
-                  resourceMeta.camelCase,
-                  resourceId,
-                  'column_name',
-                  'someValue'
-                )}
-              />
-            </article>
-          </div>
-        </>
-      )}
+      {realtimeEnabled &&
+        (methods.includes('DELETE') || methods.includes('POST') || methods.includes('PATCH')) && (
+          <>
+            <h3 className="text-foreground mt-4 px-6">Subscribe to changes</h3>
+            <div className="doc-section">
+              <article className="code-column text-foreground">
+                <p>
+                  Supabase provides realtime functionality and broadcasts database changes to
+                  authorized users depending on Row Level Security (RLS) policies.
+                </p>
+                <p>
+                  <a
+                    href="https://supabase.com/docs/reference/javascript/subscribe"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Learn more
+                  </a>
+                </p>
+              </article>
+              <article className="code">
+                <CodeSnippet
+                  selectedLang={selectedLang}
+                  snippet={Snippets.subscribeAll(resourceMeta.camelCase, resourceId)}
+                />
+                <CodeSnippet
+                  selectedLang={selectedLang}
+                  snippet={Snippets.subscribeInserts(resourceMeta.camelCase, resourceId)}
+                />
+                <CodeSnippet
+                  selectedLang={selectedLang}
+                  snippet={Snippets.subscribeUpdates(resourceMeta.camelCase, resourceId)}
+                />
+                <CodeSnippet
+                  selectedLang={selectedLang}
+                  snippet={Snippets.subscribeDeletes(resourceMeta.camelCase, resourceId)}
+                />
+                <CodeSnippet
+                  selectedLang={selectedLang}
+                  snippet={Snippets.subscribeEq(
+                    resourceMeta.camelCase,
+                    resourceId,
+                    'column_name',
+                    'someValue'
+                  )}
+                />
+              </article>
+            </div>
+          </>
+        )}
     </>
   )
 }
