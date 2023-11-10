@@ -1,31 +1,17 @@
-import Editor from '@monaco-editor/react'
-import { uuidv4 } from 'lib/helpers'
+import Editor, { OnChange, OnMount } from '@monaco-editor/react'
 import { noop } from 'lodash'
-import { useRef, useState, useEffect } from 'react'
 
 // [Joshen] Should just use CodeEditor instead of declaring Editor here so that all the mount logic is consistent
 
 interface JsonEditorProps {
-  queryId?: string
-  defaultValue: string
+  value: string
   readOnly?: boolean
-  onInputChange: (value: any) => void
+  onInputChange: OnChange
 }
 
-const JsonEditor = ({
-  queryId,
-  defaultValue = '',
-  readOnly = false,
-  onInputChange = noop,
-}: JsonEditorProps) => {
-  const editorRef = useRef()
-  const [id, setId] = useState<string>(uuidv4())
-
-  const onMount = (editor: any, monaco: any) => {
-    editorRef.current = editor
-
-    // Add margin above first line
-    editor.changeViewZones((accessor: any) => {
+const JsonEditor = ({ value = '', readOnly = false, onInputChange = noop }: JsonEditorProps) => {
+  const onMount: OnMount = (editor) => {
+    editor.changeViewZones((accessor) => {
       accessor.addZone({
         afterLineNumber: 0,
         heightInPx: 4,
@@ -36,17 +22,12 @@ const JsonEditor = ({
 
   const Loading = () => <h4>Loading</h4>
 
-  useEffect(() => {
-    setId(uuidv4())
-  }, [defaultValue])
-
   return (
     <Editor
       className="monaco-editor"
       theme="supabase"
       defaultLanguage="json"
-      defaultValue={defaultValue}
-      path={queryId || id}
+      value={value}
       loading={<Loading />}
       options={{
         readOnly,

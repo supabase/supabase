@@ -52,13 +52,13 @@ export const EXAMPLE_PROJECTS = [
     url: 'https://github.com/joshnuss/supabase-kanban',
   },
   {
-    framework: 'Next.js',
+    framework: 'nextjs',
     title: 'Next.js Realtime chat app',
     description: 'Next.js Slack clone app using Supabase realtime subscriptions',
     url: 'https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone',
   },
   {
-    framework: 'Next.js',
+    framework: 'nextjs',
     title: 'Next.js Subscription and Auth',
     description: 'The all-in-one starter kit for high-performance SaaS applications.',
     url: 'https://github.com/vercel/nextjs-subscription-payments',
@@ -94,7 +94,7 @@ export const EXAMPLE_PROJECTS = [
     url: 'https://github.com/supabase/examples/tree/main/supabase-js-v1/todo-list/expo-todo-list',
   },
   {
-    framework: 'Next.js',
+    framework: 'nextjs',
     title: 'Next.js todo list app',
     description: 'Next.js todo list example',
     url: 'https://github.com/supabase/supabase/tree/master/examples/todo-list/nextjs-todo-list',

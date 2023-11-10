@@ -9,7 +9,7 @@ export const meta = {
 }
 
 Connect to your Postgres database from an Edge Function by using the `supabase-js` client.
-You can also substitute any other Postgres client.
+You can also use other Postgres clients like [Deno Postgres](https://deno.land/x/postgres)
 
 ## Using supabase-js
 
@@ -46,11 +46,12 @@ Deno.serve(async (_req) => {
 
 Because Edge Functions are a server-side technology, it's safe to connect directly to your database using any popular Postgres client. This means you can run raw SQL from your Edge Functions.
 
-[`deno-postgres`](https://deno.land/x/postgres) is a lightweight PostgreSQL driver for Deno. Check out our [example](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/postgres-on-the-edge) for the full code.
+Here is how you can connect to the database using Deno Postgres driver and run raw SQL.
+
+Check out the [full example](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/postgres-on-the-edge).
 
 ```ts index.ts
 import * as postgres from 'https://deno.land/x/postgres@v0.17.0/mod.ts'
-import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 
 // Get the connection string from the environment variable "SUPABASE_DB_URL"
 const databaseUrl = Deno.env.get('SUPABASE_DB_URL')!
@@ -58,7 +59,7 @@ const databaseUrl = Deno.env.get('SUPABASE_DB_URL')!
 // Create a database pool with three connections that are lazily established
 const pool = new postgres.Pool(databaseUrl, 3, true)
 
-serve(async (_req) => {
+Deno.serve(async (_req) => {
   try {
     // Grab a connection from the pool
     const connection = await pool.connect()
@@ -89,6 +90,21 @@ serve(async (_req) => {
     return new Response(String(err?.message ?? err), { status: 500 })
   }
 })
+```
+
+## SSL Connections
+
+Deployed edge functions are pre-configured to use SSL for connections to the Supabase database. You don't need to add any extra configurations.
+
+If you want to use SSL connections during local development, follow these steps:
+
+- Download the SSL certificate from [Database settings](https://supabase.com/dashboard/project/_/settings/database)
+
+- In your [local .env file](https://supabase.com/docs/guides/functions/secrets), add these two variables:
+
+```bash
+SSL_CERT_FILE=/path/to/cert.crt # set the path to the downloaded cert
+DENO_TLS_CA_STORE=mozilla,system
 ```
 
 <div class="video-container">
