@@ -1,8 +1,62 @@
 export const analyticsKeys = {
   functionsInvStats: (
     projectRef: string | undefined,
-    { interval, functionId }: { functionId: string | undefined; interval: string | undefined }
-  ) => ['projects', projectRef, 'functions-inv-stats', { interval, functionId }] as const,
+    {
+      interval,
+      functionId,
+    }: {
+      functionId: string | undefined
+      interval: string | undefined
+    }
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'functions-inv-stats',
+      {
+        interval,
+        functionId,
+      },
+    ] as const,
+  functionsReqStats: (
+    projectRef: string | undefined,
+    {
+      interval,
+      functionId,
+    }: {
+      functionId: string | undefined
+      interval: string | undefined
+    }
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'functions-req-stats',
+      {
+        interval,
+        functionId,
+      },
+    ] as const,
+  functionsResourceUsage: (
+    projectRef: string | undefined,
+    {
+      interval,
+      functionId,
+    }: {
+      functionId: string | undefined
+      interval: string | undefined
+    }
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'functions-resource-usage',
+      {
+        interval,
+        functionId,
+      },
+    ] as const,
+
   dailyStats: (
     projectRef: string | undefined,
     {
@@ -10,7 +64,12 @@ export const analyticsKeys = {
       startDate,
       endDate,
       interval,
-    }: { attribute?: string; startDate?: string; endDate?: string; interval?: string }
+    }: {
+      attribute?: string
+      startDate?: string
+      endDate?: string
+      interval?: string
+    }
   ) =>
     [
       'projects',
@@ -58,7 +117,12 @@ export const analyticsKeys = {
       startDate,
       endDate,
       interval,
-    }: { attribute?: string; startDate?: string; endDate?: string; interval?: string }
+    }: {
+      attribute?: string
+      startDate?: string
+      endDate?: string
+      interval?: string
+    }
   ) =>
     [
       'projects',
