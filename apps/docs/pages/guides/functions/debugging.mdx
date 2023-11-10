@@ -7,16 +7,22 @@ export const meta = {
   subtitle: 'Debugging tips and Edge Function limitiations.',
 }
 
-## Debugging
+## Logs & Debugging
 
 Logs are provided for each function invocation, locally and in production.
+
+Any uncaught exceptions thrown by a function during the execution will be automatically logged.
+
+You can also use `console.log`, `console.error`, and `console.warn` in your code to emit custom log events.
+
+A custom log message can contain up to 10,000 characters. A function can log up to 100 events within a 10 second period.
 
 ### Debugging in production
 
 You can debug your deployed Edge Functions using the ["Functions" section](https://supabase.com/dashboard/project/_/functions) of the Dashboard. There are two debugging tools available:
 
 - Invocations: shows the Request and Response for each execution.
-- Logs: shows any platform events, including deployments and errors.
+- Logs: shows any platform events, uncaught exceptions, and custom log events.
 
 ![Function invocations.](/docs/img/guides/functions/function-logs.png)
 

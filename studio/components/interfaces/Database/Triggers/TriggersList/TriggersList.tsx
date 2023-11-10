@@ -96,30 +96,32 @@ const TriggersList = ({
               />
             </div>
 
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
-                <Button disabled={!canCreateTriggers} onClick={() => createTrigger()}>
-                  Create a new trigger
-                </Button>
-              </Tooltip.Trigger>
-              {!canCreateTriggers && (
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow',
-                        'border border-background',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">
-                        You need additional permissions to create triggers
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              )}
-            </Tooltip.Root>
+            {!isLocked && (
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger>
+                  <Button disabled={!canCreateTriggers} onClick={() => createTrigger()}>
+                    Create a new trigger
+                  </Button>
+                </Tooltip.Trigger>
+                {!canCreateTriggers && (
+                  <Tooltip.Portal>
+                    <Tooltip.Content side="bottom">
+                      <Tooltip.Arrow className="radix-tooltip-arrow" />
+                      <div
+                        className={[
+                          'rounded bg-alternative py-1 px-2 leading-none shadow',
+                          'border border-background',
+                        ].join(' ')}
+                      >
+                        <span className="text-xs text-foreground">
+                          You need additional permissions to create triggers
+                        </span>
+                      </div>
+                    </Tooltip.Content>
+                  </Tooltip.Portal>
+                )}
+              </Tooltip.Root>
+            )}
           </div>
 
           {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="triggers" />}
