@@ -4,7 +4,7 @@ import { ReactElement, useEffect } from 'react'
 
 import Error from 'components/ui/Error'
 import ProductMenu from 'components/ui/ProductMenu'
-import { useSelectedProject, useStore, withAuth } from 'hooks'
+import { useIsFeatureEnabled, useSelectedProject, useStore, withAuth } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
 import ProjectLayout from '../'
 import { generateDocsMenu } from './DocsLayout.utils'
@@ -19,6 +19,8 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
 
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const hideMenu = isNewAPIDocsEnabled && router.pathname.endsWith('/graphiql')
+
+  const { projectAuthAll: authEnabled } = useIsFeatureEnabled(['project_auth:all'])
 
   const getPage = () => {
     if (router.pathname.endsWith('graphiql')) return 'graphiql'
@@ -55,7 +57,7 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
         !hideMenu && (
           <ProductMenu
             page={getPage()}
-            menu={generateDocsMenu(projectRef, tableNames, functionNames)}
+            menu={generateDocsMenu(projectRef, tableNames, functionNames, { authEnabled })}
           />
         )
       }
