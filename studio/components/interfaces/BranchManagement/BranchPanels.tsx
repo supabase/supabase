@@ -139,6 +139,7 @@ export const BranchRow = ({
             </Button>
           </div>
         )}
+
         {isMain ? (
           <div className="flex items-center gap-x-2">
             <Button asChild type="default" iconRight={<IconExternalLink />}>

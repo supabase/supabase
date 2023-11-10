@@ -70,6 +70,10 @@ const BranchManagement = () => {
   } = useBranchesQuery({ projectRef })
   const [[mainBranch], previewBranches] = partition(branches, (branch) => branch.is_default)
   const branchesWithPRs = previewBranches.filter((branch) => branch.pr_number !== undefined)
+  const prNumbers =
+    branches !== undefined
+      ? (branchesWithPRs.map((branch) => branch.pr_number).filter(Boolean) as number[])
+      : undefined
 
   const githubIntegration = integrations?.find(
     (integration) =>
@@ -92,7 +96,7 @@ const BranchManagement = () => {
     organizationIntegrationId: githubIntegration?.id,
     repoOwner,
     repoName,
-    target: mainBranch?.git_branch,
+    prNumbers,
   })
   const pullRequests = allPullRequests ?? []
 
