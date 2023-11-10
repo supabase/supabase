@@ -10,8 +10,7 @@ const NoPermission = ({ resourceText, isFullPage = false }: NoPermissionProps) =
     <div
       className={[
         'block w-full rounded border border-opacity-20 py-4 px-6',
-        'border-gray-600 bg-gray-100',
-        'dark:border-gray-300 dark:bg-gray-400',
+        'border-overlay bg-surface-200',
       ].join(' ')}
     >
       <div className="flex space-x-3">

@@ -19,14 +19,8 @@ const FunctionsPage: NextPageWithLayout = () => {
   const canReadFunctions = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'functions')
 
   useEffect(() => {
-    if (ui.selectedProjectRef) {
-      fetchFunctions()
-    }
+    if (ui.selectedProjectRef) meta.functions.load()
   }, [ui.selectedProjectRef])
-
-  const fetchFunctions = async () => {
-    meta.functions.load()
-  }
 
   const createFunction = () => {
     setSelectedFunction(undefined)
@@ -52,9 +46,7 @@ const FunctionsPage: NextPageWithLayout = () => {
       <ScaffoldContainer>
         <ScaffoldSection>
           <div className="col-span-12">
-            <div className="mb-4">
-              <h3 className="mb-1 text-xl text-foreground">Database Functions</h3>
-            </div>
+            <h3 className=" mb-4 text-xl text-foreground">Database Functions</h3>
             <FunctionsList
               createFunction={createFunction}
               editFunction={editFunction}

@@ -38,11 +38,11 @@ const ProjectCard = ({
         className="h-44 !px-0 group pt-5 pb-0"
         title={
           <div className="w-full justify-between space-y-1.5 px-5">
-            <p className="flex-shrink truncate text-sm">{name}</p>
+            <p className="flex-shrink truncate text-sm pr-4">{name}</p>
             <span className="text-sm lowercase text-foreground-light">{desc}</span>
             <div className="flex items-center space-x-1.5">
               {isVercelIntegrated && (
-                <div className="w-fit p-1 border rounded-md flex items-center border-scale-600">
+                <div className="w-fit p-1 border rounded-md flex items-center border-controler">
                   <img
                     src={`${BASE_PATH}/img/icons/vercel-icon.svg`}
                     alt="Vercel Icon"
@@ -51,13 +51,13 @@ const ProjectCard = ({
                 </div>
               )}
               {isBranchingEnabled && (
-                <div className="w-fit p-1 border rounded-md flex items-center border-scale-600">
+                <div className="w-fit p-1 border rounded-md flex items-center border-controler">
                   <GitBranch size={12} strokeWidth={1.5} />
                 </div>
               )}
               {isGithubIntegrated && (
                 <>
-                  <div className="w-fit p-1 border rounded-md flex items-center border-scale-600">
+                  <div className="w-fit p-1 border rounded-md flex items-center border-controler">
                     <Github size={12} strokeWidth={1.5} />
                   </div>
                   <p className="text-xs !ml-2 text-foreground-light">{githubRepository}</p>

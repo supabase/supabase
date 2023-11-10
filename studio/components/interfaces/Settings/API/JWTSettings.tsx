@@ -124,7 +124,7 @@ const JWTSettings = () => {
                 layout="horizontal"
               />
               <div className="space-y-3">
-                <div className="p-3 px-6 border rounded-md shadow-sm bg-scale-200 dark:border-dark dark:bg-scale-200">
+                <div className="p-3 px-6 border rounded-md shadow-sm bg-background">
                   {isUpdatingJwtSecret ? (
                     <div className="flex items-center space-x-2">
                       <IconLoader className="animate-spin" size={14} />
@@ -158,8 +158,8 @@ const JWTSettings = () => {
                                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                                   <div
                                     className={[
-                                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                      'border border-scale-200',
+                                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                      'border border-background',
                                     ].join(' ')}
                                   >
                                     <span className="text-xs text-foreground">
@@ -229,13 +229,13 @@ const JWTSettings = () => {
             <IconAlertTriangle />
             <AlertTitle_Shadcn_>This will invalidate all existing API keys</AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_>
-              Generating a new JWT secret will invalidate <u className="text">all</u> of your API
-              keys, including your <code className="text-xs">service_role</code> and{' '}
+              Generating a new JWT secret will invalidate <u className="text-foreground">all</u> of
+              your API keys, including your <code className="text-xs">service_role</code> and{' '}
               <code className="text-xs">anon</code> keys. Your project will also be restarted during
               this process, which will terminate any existing connections.
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
-          <p className="text text-sm">
+          <p className="text-foreground text-sm">
             This action cannot be undone and the old JWT secret will be lost. All existing API keys
             will be invalidated, and any open connections will be terminated.
           </p>
@@ -277,8 +277,8 @@ const JWTSettings = () => {
               <IconAlertTriangle />
               <AlertTitle_Shadcn_>This will invalidate all existing API keys</AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
-                Generating a new JWT secret will invalidate <u className="text">all</u> of your API
-                keys, including your <code className="text-xs">service_role</code> and{' '}
+                Generating a new JWT secret will invalidate <u className="text-foreground">all</u>{' '}
+                of your API keys, including your <code className="text-xs">service_role</code> and{' '}
                 <code className="text-xs">anon</code> keys. Your project will also be restarted
                 during this process, which will terminate any existing connections.
               </AlertDescription_Shadcn_>

@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Button, IconRefreshCw, IconSearch, IconX, Input, Listbox } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import APIDocsButton from 'components/ui/APIDocsButton'
 import { useUsersQuery } from 'data/auth/users-query'
 import AddUserDropdown from './AddUserDropdown'
 import UsersList from './UsersList'
@@ -16,7 +17,7 @@ const Users = () => {
   const [filterKeywords, setFilterKeywords] = useState('')
   const [filterVerified, setFilterVerified] = useState<'verified' | 'unverified'>()
 
-  const { data, isLoading, isSuccess, refetch } = useUsersQuery({
+  const { data, isLoading, isSuccess, refetch, isRefetching } = useUsersQuery({
     projectRef,
     page,
     keywords: filterKeywords,
@@ -80,16 +81,16 @@ const Users = () => {
           </Listbox>
         </div>
         <div className="mt-4 flex items-center gap-2 md:mt-0">
+          <APIDocsButton section={['user-management']} />
           <Button
             size="tiny"
             icon={<IconRefreshCw />}
             type="default"
-            loading={isLoading}
+            loading={isLoading || isRefetching}
             onClick={() => refetch()}
           >
             Reload
           </Button>
-
           <AddUserDropdown projectKpsVersion={project?.kpsVersion} />
         </div>
       </div>

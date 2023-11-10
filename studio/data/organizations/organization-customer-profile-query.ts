@@ -58,17 +58,3 @@ export const useOrganizationCustomerProfileQuery = <TData = OrganizationCustomer
       ...options,
     }
   )
-
-export const useOrganizationCustomerProfilePrefetch = ({
-  slug,
-}: OrganizationCustomerProfileVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (slug) {
-      client.prefetchQuery(organizationKeys.customerProfile(slug), ({ signal }) =>
-        getOrganizationCustomerProfile({ slug }, signal)
-      )
-    }
-  }, [slug])
-}

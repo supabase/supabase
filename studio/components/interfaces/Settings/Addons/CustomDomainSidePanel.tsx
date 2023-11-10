@@ -8,18 +8,26 @@ import { useParams } from 'common'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import Telemetry from 'lib/telemetry'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
-import { Alert, Button, IconExternalLink, Radio, SidePanel } from 'ui'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconAlertTriangle,
+  IconExternalLink,
+  Radio,
+  SidePanel,
+} from 'ui'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 const CustomDomainSidePanel = () => {
   const { ui } = useStore()
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const organization = useSelectedOrganization()
-  const isOrgBilling = !!organization?.subscription_id
 
   const [selectedOption, setSelectedOption] = useState<string>('cd_none')
 
@@ -33,7 +41,7 @@ const CustomDomainSidePanel = () => {
   const onClose = () => snap.setPanelKey(undefined)
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
-  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
       ui.setNotification({
@@ -129,13 +137,15 @@ const CustomDomainSidePanel = () => {
       header={
         <div className="flex items-center justify-between">
           <h4>Custom domains</h4>
-          <Link href="https://supabase.com/docs/guides/platform/custom-domains">
-            <a target="_blank" rel="noreferrer">
-              <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                About custom domains
-              </Button>
-            </a>
-          </Link>
+          <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+            <Link
+              href="https://supabase.com/docs/guides/platform/custom-domains"
+              target="_blank"
+              rel="noreferrer"
+            >
+              About custom domains
+            </Link>
+          </Button>
         </div>
       }
     >
@@ -144,8 +154,8 @@ const CustomDomainSidePanel = () => {
           <p className="text-sm">
             Custom domains allow you to present a branded experience to your users. You may set up
             your custom domain in the{' '}
-            <Link href={`/project/${projectRef}/settings/general`}>
-              <a className="text-brand">General Settings</a>
+            <Link href={`/project/${projectRef}/settings/general`} className="text-brand">
+              General Settings
             </Link>{' '}
             page after enabling the add-on.
           </p>
@@ -180,7 +190,7 @@ const CustomDomainSidePanel = () => {
                 value="cd_none"
               >
                 <div className="w-full group">
-                  <div className="border-b border-scale-500 px-4 py-2 group-hover:border-scale-600">
+                  <div className="border-b border-default px-4 py-2 group-hover:border-control">
                     <p className="text-sm">No custom domain</p>
                   </div>
                   <div className="px-4 py-2">
@@ -205,7 +215,7 @@ const CustomDomainSidePanel = () => {
                   value={option.identifier}
                 >
                   <div className="w-full group">
-                    <div className="border-b border-scale-500 px-4 py-2 group-hover:border-scale-600">
+                    <div className="border-b border-default px-4 py-2 group-hover:border-control">
                       <p className="text-sm">{option.name}</p>
                     </div>
                     <div className="px-4 py-2">
@@ -242,6 +252,17 @@ const CustomDomainSidePanel = () => {
                   of a downgrade, you get credits for the remaining time.
                 </p>
               )}
+
+              {subscription?.billing_via_partner &&
+                subscription.scheduled_plan_change?.target_plan !== undefined && (
+                  <Alert_Shadcn_ variant={'warning'} className="mb-2">
+                    <IconAlertTriangle className="h-4 w-4" />
+                    <AlertDescription_Shadcn_>
+                      You have a scheduled subscription change that will be canceled if you change
+                      your custom domain add on.
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
+                )}
             </>
           )}
 
@@ -251,17 +272,11 @@ const CustomDomainSidePanel = () => {
               variant="info"
               title="Custom domains are unavailable on the free plan"
               actions={
-                isOrgBilling ? (
-                  <Link href={`/org/${organization.slug}/billing?panel=subscriptionPlan`}>
-                    <a>
-                      <Button type="default">View available plans</Button>
-                    </a>
-                  </Link>
-                ) : (
-                  <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
+                <Button asChild type="default">
+                  <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
                     View available plans
-                  </Button>
-                )
+                  </Link>
+                </Button>
               }
             >
               Upgrade your plan to add a custom domain to your project

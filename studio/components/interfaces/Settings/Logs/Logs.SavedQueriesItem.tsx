@@ -53,7 +53,7 @@ const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
       <Table.td
         className={`${
           expand ? ' h-auto opacity-100' : 'h-0 opacity-0'
-        } expanded-row-content border-l border-r bg-scale-100 !pt-0 !pb-0 transition-all`}
+        } expanded-row-content border-l border-r bg-alternative !pt-0 !pb-0 transition-all`}
         colSpan={5}
       >
         {expand && <SqlSnippetCode>{item.content.sql}</SqlSnippetCode>}

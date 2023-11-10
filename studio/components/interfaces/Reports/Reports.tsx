@@ -26,7 +26,7 @@ import { useParams } from 'common/hooks'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import Loading from 'components/ui/Loading'
 import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions, useIsFeatureEnabled } from 'hooks'
 import { METRICS, METRIC_CATEGORIES, TIME_PERIODS_REPORTS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -40,6 +40,11 @@ const DEFAULT_CHART_ROW_COUNT = 4
 const Reports = () => {
   const { id, ref } = useParams()
   const { profile } = useProfile()
+
+  const { projectAuthAll: authEnabled, projectStorageAll: storageEnabled } = useIsFeatureEnabled([
+    'project_auth:all',
+    'project_storage:all',
+  ])
 
   const [report, setReport] = useState<any>()
 
@@ -268,10 +273,16 @@ const Reports = () => {
     })
   }
 
+  const metricCategories = Object.values(METRIC_CATEGORIES).filter(({ key }) => {
+    if (key === 'api_auth') return authEnabled
+    if (key === 'api_storage') return storageEnabled
+    return true
+  })
+
   const MetricOptions = () => {
     return (
       <>
-        {Object.values(METRIC_CATEGORIES).map((cat) => {
+        {metricCategories.map((cat) => {
           return (
             <DropdownMenuSub key={cat.key}>
               <DropdownMenuSubTrigger className="space-x-2">
@@ -371,8 +382,8 @@ const Reports = () => {
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200',
+                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                      'border border-background',
                     ].join(' ')}
                   >
                     <span className="text-xs text-foreground">
