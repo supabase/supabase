@@ -96,7 +96,7 @@ When your user signs in, call [loginWith(Provider)](/docs/reference/kotlin/auth-
 
 ```kotlin
 suspend fun signInWithKakao() {
-	supabase.gotrue.loginWith(Kakao)
+	supabase.auth.loginWith(Kakao)
 }
 ```
 
@@ -127,7 +127,7 @@ When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) t
 
 ```kotlin
 suspend fun signOut() {
-	supabase.gotrue.logout()
+	supabase.auth.logout()
 }
 ```
 

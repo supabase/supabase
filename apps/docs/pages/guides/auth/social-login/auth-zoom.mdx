@@ -87,7 +87,7 @@ When your user signs in, call [loginWith(Provider)](/docs/reference/kotlin/auth-
 
 ```kotlin
 suspend fun signInWithZoom() {
-	supabase.gotrue.loginWith(Zoom)
+	supabase.auth.loginWith(Zoom)
 }
 ```
 
@@ -118,7 +118,7 @@ When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) t
 
 ```kotlin
 suspend fun signOut() {
-	supabase.gotrue.logout()
+	supabase.auth.logout()
 }
 ```
 

@@ -144,7 +144,7 @@ When your user signs in, call [loginWith(Provider)](/docs/reference/kotlin/auth-
 
 ```kotlin
 suspend fun signInWithAzure() {
-    supabase.gotrue.loginWith(Azure) {
+    supabase.auth.loginWith(Azure) {
         scopes.add("email")
     }
 }
@@ -177,7 +177,7 @@ When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) t
 
 ```kotlin
 suspend fun signOut() {
-    supabase.gotrue.logout()
+    supabase.auth.logout()
 }
 ```
 
@@ -213,7 +213,7 @@ async function signInWithAzure() {
 
 ```kotlin
 suspend fun signInWithAzure() {
-    supabase.gotrue.loginWith(Azure) {
+    supabase.auth.loginWith(Azure) {
         scopes.add("offline_access")
     }
 }

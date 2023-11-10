@@ -37,8 +37,8 @@ functions:
       **On JS**, it uses the website origin as the callback url. Session importing gets handled automatically.
       **Windows, tvOS, watchOS & Linux** currently have no default implementation. Feel free to create a PR.
 
-      You always make your own implementation and use `gotrue.parseSessionFromFragment(fragment)` or `gotrue.parseSessionFromUrl(url)` to let [supabase-kt](https://github.com/supabase-community/supabase-kt) handle the parsing after receiving a callback.
-      Then you can simply use `gotrue.importSession(session)`.
+      You always make your own implementation and use `auth.parseSessionFromFragment(fragment)` or `auth.parseSessionFromUrl(url)` to let [supabase-kt](https://github.com/supabase-community/supabase-kt) handle the parsing after receiving a callback.
+      Then you can simply use `auth.importSession(session)`.
 
       ### Configure deeplink callbacks for Authentication
 
@@ -48,11 +48,11 @@ functions:
       On IOS & MacOS you may setup a [url scheme](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app).
       2. **Add your deeplink to the [redirect URLs](https://supabase.com/dashboard/project/_/auth/url-configuration)** \
       **Pattern**: scheme://host
-      3. **Configure the GoTrue plugin**
-      You have to set the `host` and the `scheme` in the GoTrue config:
+      3. **Configure the Auth plugin**
+      You have to set the `host` and the `scheme` in the Auth config:
           ```kotlin
-          install(GoTrue) {
-             host = "deeplink host" // this can be anything, eg. your package name or app/company url (not your supabase url)
+          install(Auth) {
+             host = "deeplink host" // this can be anything, eg. your package name or app/company url (not your Supabase url)
              scheme = "deeplink scheme"
 
              //Android only, you can also change that OAuth/SSO logins open in a custom tab, rather than an external browser:
@@ -65,15 +65,15 @@ functions:
 
       Then you can just login using OAuth:
       ```kotlin
-      client.gotrue.loginWith(Google)
+      client.auth.loginWith(Google)
       ```
       Or open OTP links directly in your app.
 
       ### PKCE Authentication flow
       supabase-kt supports the [PKCE authentication flow](https://supabase.com/blog/supabase-auth-sso-pkce).
-      To use it, you just have to change the `flowType` in the GoTrue configuration:
+      To use it, you just have to change the `flowType` in the Auth configuration:
       ```kotlin
-      install(GoTrue) {
+      install(Auth) {
         flowType = FlowType.PKCE
       }
       ```
@@ -87,20 +87,20 @@ functions:
               supabaseUrl = "https://xyzcompany.supabase.co",
               supabaseKey = "public-anon-key"
           ) {
-              install(GoTrue)
+              install(Auth)
               install(Postgrest)
               //install other modules
           }
           ```
-      - id: configure-gotrue
-        name: Configure GoTrue module
+      - id: configure-auth
+        name: Configure Auth module
         code: |
           ```kotlin
           val client = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
               supabaseKey = "public-anon-key"
           ) {
-              install(GoTrue) {
+              install(Auth) {
                   alwaysAutoRefresh = false // default: true
                   autoLoadFromStorage = false // default: true
                   //and more...
@@ -110,21 +110,21 @@ functions:
         description: |
           **Common:**
 
-          `alwaysAutoRefresh` - whether the GoTrue plugin should always auto refresh expired sessions automatically. Default: `true`
+          `alwaysAutoRefresh` - whether the Auth plugin should always auto refresh expired sessions automatically. Default: `true`
 
-          `autoLoadFromStorage` - whether the GoTrue plugin should automatically load the session from the session manager. Default: `true`
+          `autoLoadFromStorage` - whether the Auth plugin should automatically load the session from the session manager. Default: `true`
 
-          `autoSaveToStorage` - whether the GoTrue plugin should automatically save the session to the session manager. Default: `true`
+          `autoSaveToStorage` - whether the Auth plugin should automatically save the session to the session manager. Default: `true`
 
           `flowType` - Which authentication flow to use. Currently available: FlowType.PKCE and FlowType.IMPLICIT. Default: `FlowType.IMPLICIT`
 
           `codeVerifierCache` - Interface for saving and loading codes for the PKCE authentication flow. Default: `SettingsCodeVerifierCache`
 
-          `customUrl` - Custom url for the GoTrue API. Can be safely ignored when using Supabase. Default: `null`
+          `customUrl` - Custom url for the Auth API. Can be safely ignored when using Supabase. Default: `null`
 
-          `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
+          `jwtToken` - Plugin specific JWT Token. Can be ignored when using the Auth plugin. Default: `null`
 
-          `retryDelay` - Duration after which the GoTrue plugin should retry a failed session refresh. Default: `10.seconds`
+          `retryDelay` - Duration after which the Auth plugin should retry a failed session refresh. Default: `10.seconds`
 
           `sessionManager` - Interface for saving and loading the user session. Default: `SettingsSessionManager`
 
@@ -170,7 +170,7 @@ functions:
 
           `customUrl` - Custom url for the PostgREST API. Can be safely ignored when using Supabase. Default: `null`
 
-          `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
+          `jwtToken` - Plugin specific JWT Token. Can be ignored when using the Auth plugin. Default: `null`
       - id: configure-storage
         name: Configure Storage module
         code: |
@@ -197,7 +197,7 @@ functions:
 
           `customUrl` - Custom url for the Storage API. Can be safely ignored when using Supabase. Default: `null`
 
-          `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
+          `jwtToken` - Plugin specific JWT Token. Can be ignored when using the Auth plugin. Default: `null`
       - id: configure-realtime
         name: Configure Realtime module
         code: |
@@ -224,7 +224,7 @@ functions:
 
           `customUrl` - Custom url for the Realtime websocket. Can be safely ignored when using Supabase. Default: `null`
 
-          `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
+          `jwtToken` - Plugin specific JWT Token. Can be ignored when using the Auth plugin. Default: `null`
       - id: configure-functions
         name: Configure Functions plugin
         code: |
@@ -241,7 +241,7 @@ functions:
         description: |
           `customUrl` - Custom url for the Functions API. Can be safely ignored when using Supabase. Default: `null`
 
-          `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
+          `jwtToken` - Plugin specific JWT Token. Can be ignored when using the Auth plugin. Default: `null`
       - id: configure-graphql
         name: Configure GraphQL plugin
         code: |
@@ -262,7 +262,7 @@ functions:
 
           `customUrl` - Custom url for the GraphQL API. Can be safely ignored when using Supabase. Default: `null`
 
-          `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
+          `jwtToken` - Plugin specific JWT Token. Can be ignored when using the Auth plugin. Default: `null`
 
           **You can access the created ApolloClient via `client.graphql.apolloClient`, which automatically adds the required headers depending on your session.**
 
@@ -2081,15 +2081,15 @@ functions:
   - id: auth-api
     title: 'Overview'
     notes: |
-      - The auth methods can be accessed via the Supabase GoTrue Auth client.
+      - The auth methods can be accessed via the Supabase Auth client.
     examples:
       - id: create-auth-client
-        name: Create gotrue client
+        name: Create auth client
         isSpotlight: true
         code: |
           ```kotlin
           val client = createSupabaseClient(supabaseURL = "https://xyzcompany.supabase.co'", supabaseKey = "public-anon-key") { ... }
-          val gotrue = client.gotrue
+          val auth = client.auth
           ```
   - id: sign-up
     title: 'signUp()'
@@ -2111,7 +2111,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val user = client.gotrue.signUpWith(Email) {
+          val user = client.auth.signUpWith(Email) {
               email = "example@email.com"
               password = "example-password"
           }
@@ -2121,7 +2121,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val user = client.gotrue.signUpWith(Phone) {
+          val user = client.auth.signUpWith(Phone) {
               phoneNumber = "+4912345679"
               password = "example-password"
           }
@@ -2131,7 +2131,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          val user = client.gotrue.signUpWith(Email) {
+          val user = client.auth.signUpWith(Email) {
               email = "example@email.com"
               password = "example-password"
               data = buildJsonObject {
@@ -2146,7 +2146,7 @@ functions:
           - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
         code: |
           ```kotlin
-          val user = client.gotrue.signUpWith(Email, redirectUrl = "https://example.com") {
+          val user = client.auth.signUpWith(Email, redirectUrl = "https://example.com") {
               email = "example@email.com"
               password = "example-password"
           }
@@ -2163,7 +2163,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          client.gotrue.loginWith(Email) {
+          client.auth.loginWith(Email) {
               email = "example@email.com"
               password = "example-password"
           }
@@ -2173,7 +2173,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          client.gotrue.loginWith(Phone) {
+          client.auth.loginWith(Phone) {
               phoneNumber = "+4912345679"
               password = "example-password"
           }
@@ -2183,7 +2183,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          client.gotrue.loginWith(IDToken) {
+          client.auth.loginWith(IDToken) {
               idToken = "token"
               provider = Google //Also supported: Apple, Azure and Facebook
               //optional:
@@ -2215,7 +2215,7 @@ functions:
         description: The user will be sent an email which contains either a magiclink or a OTP or both. By default, a given user can only request a OTP once every 60 seconds.
         code: |
           ```kotlin
-          client.gotrue.sendOtpTo(Email) {
+          client.auth.sendOtpTo(Email) {
               email = "example@email.com"
           }
           ```
@@ -2225,7 +2225,7 @@ functions:
         description: The user will be sent a SMS which contains a OTP. By default, a given user can only request a OTP once every 60 seconds.
         code: |
           ```kotlin
-          client.gotrue.sendOtpTo(Phone) {
+          client.auth.sendOtpTo(Phone) {
               phoneNumber = "+4912345679"
           }
           ```
@@ -2242,14 +2242,14 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          client.gotrue.loginWith(Github)
+          client.auth.loginWith(Github)
           ```
       - id: sign-in-using-a-third-party-provider with scopes
         name: Sign in using a third-party provider with scopes
         isSpotlight: true
         code: |
           ```kotlin
-          client.gotrue.loginWith(Github) {
+          client.auth.loginWith(Github) {
               scopes.add("email")
           }
           ```
@@ -2265,7 +2265,7 @@ functions:
           - To see how you can use a custom in-app browser on Android, check our [demo](https://github.com/supabase-community/supabase-kt/tree/development/demos/android-login) on GitHub.
         code: |
           ```kotlin
-          val url = client.gotrue.oAuthUrl(Github, redirectUrl = "https://example.com")
+          val url = client.auth.oAuthUrl(Github, redirectUrl = "https://example.com")
           ```
       - id: sign-in-with-scopes
         name: Create a custom url with scopes
@@ -2275,7 +2275,7 @@ functions:
           You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider. The list of scopes will be documented by the third-party provider you are using and specifying scopes will enable you to use the OAuth provider token to call additional APIs supported by the third-party provider to get more information.
         code: |
           ```kotlin
-          val url = client.gotrue.oAuthUrl(Github, redirectUrl = "https://example.com") {
+          val url = client.auth.oAuthUrl(Github, redirectUrl = "https://example.com") {
               scopes.add("email")
           }
           ```
@@ -2299,7 +2299,7 @@ functions:
             // You can extract the user's email domain and use it to trigger the
             // authentication flow with the correct identity provider.
 
-            client.gotrue.loginWith(SSO.withDomain("company.com"))
+            client.auth.loginWith(SSO.withDomain("company.com"))
 
             //the url was opened automatically, if you don't want that, provide a custom redirect url
           ```
@@ -2311,7 +2311,7 @@ functions:
             // Useful when you need to map a user's sign in request according
             // to different rules that can't use email domains.
 
-            client.gotrue.loginWith(SSO.withProvider("21648a9d-8d5a-4555-a9d1-d6375dc14e92"))
+            client.auth.loginWith(SSO.withProvider("21648a9d-8d5a-4555-a9d1-d6375dc14e92"))
 
             //the url was opened automatically, if you don't want that, provide a custom redirect url
           ```
@@ -2327,21 +2327,21 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          client.gotrue.logout()
+          client.auth.logout()
           ```
       - id: sign-out-all-sessions
         name: Sign out all sessions
         isSpotlight: true
         code: |
           ```kotlin
-          client.gotrue.logout(LogoutScope.GLOBAL)
+          client.auth.logout(LogoutScope.GLOBAL)
           ```
       - id: sign-out-others
         name: Sign out all sessions except the current
         isSpotlight: true
         code: |
           ```kotlin
-          client.gotrue.logout(LogoutScope.OTHERS)
+          client.auth.logout(LogoutScope.OTHERS)
           ```
   - id: verify-otp
     title: 'Verify OTPs'
@@ -2354,7 +2354,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          client.gotrue.verifyEmailOtp(type = OtpType.Email.INVITE, email = "example@email.com", token = "token")
+          client.auth.verifyEmailOtp(type = OtpType.Email.INVITE, email = "example@email.com", token = "token")
           ```
         description: |
           Available types are:
@@ -2368,7 +2368,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          client.gotrue.verifyPhoneOtp(type = OtpType.Phone.SMS, phoneNumber = "+491234567", token = "token")
+          client.auth.verifyPhoneOtp(type = OtpType.Phone.SMS, phoneNumber = "+491234567", token = "token")
           ```
         description: |
           Available types are:
@@ -2387,7 +2387,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          client.gotrue.reauthenticate()
+          client.auth.reauthenticate()
           ```
   - id: resend-email-or-phone-otps
     title: 'resend()'
@@ -2404,28 +2404,28 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          client.gotrue.resendEmail(OtpType.Email.SIGNUP, "example@email.com")
+          client.auth.resendEmail(OtpType.Email.SIGNUP, "example@email.com")
           ```
       - id: resend-phone-signup-confirmation
         name: Resend a phone signup confirmation
         description: Resends the phone signup confirmation email to the user
         code: |
           ```kotlin
-          client.gotrue.resendPhone(OtpType.Phone.SMS, "1234567890")
+          client.auth.resendPhone(OtpType.Phone.SMS, "1234567890")
           ```
       - id: resend-email-change-email
         name: Resend email change email
         description: Resends the email change email to the user
         code: |
           ```kotlin
-          client.gotrue.resendEmail(OtpType.Email.EMAIL_CHANGE, "example@email.com")
+          client.auth.resendEmail(OtpType.Email.EMAIL_CHANGE, "example@email.com")
           ```
       - id: resend-phone-change
         name: Resend phone change OTP
         description: Resends the phone change OTP to the user
         code: |
           ```kotlin
-          client.gotrue.resendPhone(OtpType.Phone.PHONE_CHANGE, "1234567890")
+          client.auth.resendPhone(OtpType.Phone.PHONE_CHANGE, "1234567890")
           ```
   - id: get-session
     title: 'Get current session'
@@ -2438,7 +2438,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val session = client.gotrue.currentSessionOrNull()
+          val session = client.auth.currentSessionOrNull()
           ```
   - id: get-user
     title: 'getUser()'
@@ -2453,7 +2453,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val user = client.gotrue.retrieveUserForCurrentSession(updateSession = true)
+          val user = client.auth.retrieveUserForCurrentSession(updateSession = true)
           ```
         description: |
           `updateSession` updates the local session with the new user
@@ -2462,7 +2462,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val user = client.gotrue.retrieveUser("JWT")
+          val user = client.auth.retrieveUser("JWT")
           ```
   - id: update-user
     title: 'modifyUser()'
@@ -2479,7 +2479,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          val user = client.gotrue.modifyUser {
+          val user = client.auth.modifyUser {
              email = "newEmail@email.com"
           }
           ```
@@ -2488,7 +2488,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          val user = client.gotrue.modifyUser {
+          val user = client.auth.modifyUser {
              password = "secretPassword"
           }
           ```
@@ -2497,7 +2497,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val user = client.gotrue.modifyUser {
+          val user = client.auth.modifyUser {
              data {
                 put("name", "John")
              }
@@ -2518,7 +2518,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          client.gotrue.importSession(UserSession(accessToken = "token", refreshToken = "refresh", expiresIn = 2000, tokenType = "Bearer", user = null))
+          client.auth.importSession(UserSession(accessToken = "token", refreshToken = "refresh", expiresIn = 2000, tokenType = "Bearer", user = null))
           ```
   - id: refresh-session
     title: 'refreshSession()'
@@ -2526,21 +2526,21 @@ functions:
     notes: |
       This method will refresh the session whether the current one is expired or not.
 
-      - This is done automatically, but can be disabled in the GoTrue config.
+      - This is done automatically, but can be disabled in the Auth config.
     examples:
       - id: refresh-current-session
         name: Refresh current session
         isSpotlight: true
         code: |
           ```kotlin
-          val session = client.gotrue.refreshCurrentSession()
+          val session = client.auth.refreshCurrentSession()
           ```
       - id: refresh-session-using-the-current-session
         name: Refresh session using the refresh token
         isSpotlight: true
         code: |
           ```kotlin
-          val session = client.gotrue.refreshSession(refreshToken = "refreshToken")
+          val session = client.auth.refreshSession(refreshToken = "refreshToken")
           ```
   - id: on-auth-state-change
     title: 'sessionStatus'
@@ -2553,7 +2553,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          client.gotrue.sessionStatus.collect {
+          client.auth.sessionStatus.collect {
               when(it) {
                   is SessionStatus.Authenticated -> println(it.session.user)
                   SessionStatus.LoadingFromStorage -> println("Loading from storage")
@@ -2578,7 +2578,7 @@ functions:
       - The user gets redirected back to your app, assuming you setup [OTP handling](/docs/reference/kotlin/initializing)
       - After the user has been redirected successfully, prompt them for a new password and call `modifyUser()`:
         ```kotlin
-        client.gotrue.modifyUser {
+        client.auth.modifyUser {
             password = "1234567"
         }
         ```
@@ -2588,25 +2588,25 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          client.gotrue.sendRecoveryEmail(email = "example@email.com")
+          client.auth.sendRecoveryEmail(email = "example@email.com")
           ```
   - id: exchange-code-for-session
     title: 'exchangeCodeForSession()'
     $ref: '@supabase/gotrue-js.GoTrueClient.exchangeCodeForSession'
     notes: |
-      - Used when `flowType` is set to `FlowType.PKCE` in the GoTrue configuration.
+      - Used when `flowType` is set to `FlowType.PKCE` in the Auth configuration.
     examples:
       - id: exchange-auth-code
         name: Exchange Auth Code
         isSpotlight: true
         code: |
           ```kotlin
-          client.gotrue.exchangeCodeForSession("34e770dd-9ff9-416c-87fa-43b31d7ef225")
+          client.auth.exchangeCodeForSession("34e770dd-9ff9-416c-87fa-43b31d7ef225")
           ```
   - id: auth-mfa-api
     title: 'Overview'
     notes: |
-      This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `client.gotrue.mfa` namespace.
+      This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `client.auth.mfa` namespace.
 
       Currently, we only support time-based one-time password (TOTP) as the 2nd factor. We don't support recovery codes but we allow users to enroll more than 1 TOTP factor, with an upper limit of 10.
 
@@ -2626,7 +2626,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val factor = client.gotrue.mfa.enroll(factorType = FactorType.TOTP)
+          val factor = client.auth.mfa.enroll(factorType = FactorType.TOTP)
 
           // Use the id to create a challenge.
           // The challenge can be verified by entering the code generated from the authenticator app.
@@ -2639,14 +2639,14 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val verifiedFactors = client.gotrue.mfa.verifiedFactors
+          val verifiedFactors = client.auth.mfa.verifiedFactors
           ```
       - id: retrieve-verified-factors
         name: Retrieve verified factors
         isSpotlight: true
         code: |
           ```kotlin
-          val verifiedFactors = client.gotrue.mfa.retrieveFactorsForCurrentUser()
+          val verifiedFactors = client.auth.mfa.retrieveFactorsForCurrentUser()
           ```
   - id: mfa-challenge
     title: 'mfa.challenge()'
@@ -2661,7 +2661,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val challenge = client.gotrue.mfa.createChallenge(factorId = "34e770dd-9ff9-416c-87fa-43b31d7ef225")
+          val challenge = client.auth.mfa.createChallenge(factorId = "34e770dd-9ff9-416c-87fa-43b31d7ef225")
           ```
   - id: mfa-verify
     title: 'mfa.verify()'
@@ -2675,7 +2675,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          client.gotrue.mfa.verifyChallenge(
+          client.auth.mfa.verifyChallenge(
               factorId = "34e770dd-9ff9-416c-87fa-43b31d7ef225",
               challengeId = "4034ae6f-a8ce-4fb5-8ee5-69a5863a7c15",
               code = "123456",
@@ -2695,7 +2695,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          client.gotrue.mfa.createChallengeAndVerify(
+          client.auth.mfa.createChallengeAndVerify(
               factorId = "34e770dd-9ff9-416c-87fa-43b31d7ef225",
               code = "123456",
               saveSession = true // this is set to true by default, but you can set it to false if you want to handle the session yourself
@@ -2712,7 +2712,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          client.gotrue.mfa.unenroll(factorId = "34e770dd-9ff9-416c-87fa-43b31d7ef225")
+          client.auth.mfa.unenroll(factorId = "34e770dd-9ff9-416c-87fa-43b31d7ef225")
           ```
   - id: mfa-get-authenticator-assurance-level
     title: 'mfa.getAuthenticatorAssuranceLevel()'
@@ -2727,30 +2727,30 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val (current, next) = client.gotrue.mfa.getAuthenticatorAssuranceLevel()
+          val (current, next) = client.auth.mfa.getAuthenticatorAssuranceLevel()
           ```
       - id: aal-enabled
         name: Check whether the user has at least one verified factor
         isSpotlight: true
         code: |
           ```kotlin
-          val enabled = client.gotrue.mfa.isMfaEnabled
+          val enabled = client.auth.mfa.isMfaEnabled
           //flow variant, automatically emitting new values on session changes
-          val enabledFlow = client.gotrue.mfa.isMfaEnabledFlow
+          val enabledFlow = client.auth.mfa.isMfaEnabledFlow
           ```
       - id: aal-enabled-for-current-session
         name: Check whether the user is logged in using AAL2
         isSpotlight: true
         code: |
           ```kotlin
-          val loggedInUsingMfa = client.gotrue.mfa.loggedInUsingMfa
+          val loggedInUsingMfa = client.auth.mfa.loggedInUsingMfa
           //flow variant, automatically emitting new values on session changes
-          val loggedInUsingMfaFlow = client.gotrue.mfa.loggedInUsingMfaFlow
+          val loggedInUsingMfaFlow = client.auth.mfa.loggedInUsingMfaFlow
           ```
   - id: admin-api
     title: 'Overview'
     notes: |
-      - Any method under the `client.gotrue.admin` namespace requires a `service_role` key.
+      - Any method under the `client.auth.admin` namespace requires a `service_role` key.
       - These methods are considered admin methods and should be called on a trusted server. Never expose your `service_role` key in the browser.
     examples:
       - id: create-auth-admin-client
@@ -2762,16 +2762,16 @@ functions:
               supabaseUrl = "https://id.supabase.co",
               supabaseKey = "supabaseKey"
           ) {
-              install(GoTrue) {
+              install(Auth) {
                   autoLoadFromStorage = false
                   alwaysAutoRefresh = false
               }
               // install other plugins (these will use the service role key)
           }
-          client.gotrue.importAuthToken("service_role")
+          client.auth.importAuthToken("service_role")
 
           // Access auth admin api
-          val adminGoTrueClient = client.gotrue.admin
+          val adminGoTrueClient = client.auth.admin
           ```
 
   - id: get-user-by-id
@@ -2786,7 +2786,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val user = client.gotrue.admin.retrieveUserById(uid = "f2a0b0a0-6b1a-4b7a-8f1a-4b7a6b1a8f1a")
+          val user = client.auth.admin.retrieveUserById(uid = "f2a0b0a0-6b1a-4b7a-8f1a-4b7a6b1a8f1a")
           ```
 
   - id: list-users
@@ -2801,14 +2801,14 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val users = client.gotrue.admin.retrieveUsers()
+          val users = client.auth.admin.retrieveUsers()
           ```
       - id: get-paginated-list-of-users
         name: Paginated list of users
         isSpotlight: false
         code: |
           ```kotlin
-          val users = client.gotrue.admin.retrieveUsers(
+          val users = client.auth.admin.retrieveUsers(
               page = 1,
               perPage = 100
           )
@@ -2825,7 +2825,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val userWithEmail = client.gotrue.admin.createUserWithEmail {
+          val userWithEmail = client.auth.admin.createUserWithEmail {
               email = "example@email.com"
               password = "secretpassword"
               userMetadata {
@@ -2838,7 +2838,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val userWithPhone = client.gotrue.admin.createUserWithPhone {
+          val userWithPhone = client.auth.admin.createUserWithPhone {
               phoneNumber = "+49123456789"
               password = "secretpassword"
               userMetadata {
@@ -2850,7 +2850,7 @@ functions:
         name: Auto-confirm the user's email
         code: |
           ```kotlin
-          val userWithEmail = client.gotrue.admin.createUserWithEmail {
+          val userWithEmail = client.auth.admin.createUserWithEmail {
               email = "example@email.com"
               password = "secretpassword"
               autoConfirm = true
@@ -2860,7 +2860,7 @@ functions:
         name: Auto-confirm the user's phone number
         code: |
           ```kotlin
-          val userWithPhone = client.gotrue.admin.createUserWithPhone {
+          val userWithPhone = client.auth.admin.createUserWithPhone {
               phoneNumber = "+49123456789"
               password = "secretpassword"
               autoConfirm = true
@@ -2878,7 +2878,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          client.gotrue.admin.deleteUser(uid = "uid")
+          client.auth.admin.deleteUser(uid = "uid")
           ```
 
   - id: invite-user-by-email
@@ -2892,7 +2892,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          client.gotrue.admin.inviteUserByEmail(
+          client.auth.admin.inviteUserByEmail(
               email = "example@email.com",
               //optional:
               redirectTo = "https://example.com/redirect",
@@ -2913,7 +2913,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val (url, user) = client.gotrue.admin.generateLinkFor(LinkType.Signup) {
+          val (url, user) = client.auth.admin.generateLinkFor(LinkType.Signup) {
               email = "example@email.com"
               password = "secretpassword"
           }
@@ -2923,7 +2923,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          val (url, user) = client.gotrue.admin.generateLinkFor(LinkType.Invite) {
+          val (url, user) = client.auth.admin.generateLinkFor(LinkType.Invite) {
               email = "example@email.com"
           }
           ```
@@ -2932,7 +2932,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          val (url, user) = client.gotrue.admin.generateLinkFor(LinkType.MagicLink) {
+          val (url, user) = client.auth.admin.generateLinkFor(LinkType.MagicLink) {
               email = "example@email.com"
           }
           ```
@@ -2941,7 +2941,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          val (url, user) = client.gotrue.admin.generateLinkFor(LinkType.Recovery) {
+          val (url, user) = client.auth.admin.generateLinkFor(LinkType.Recovery) {
               email = "example@email.com"
           }
           ```
@@ -2951,13 +2951,13 @@ functions:
         code: |
           ```kotlin
           // generate an email change link to be sent to the current email address
-          val (url, user) = client.gotrue.admin.generateLinkFor(LinkType.EmailChangeCurrent) {
+          val (url, user) = client.auth.admin.generateLinkFor(LinkType.EmailChangeCurrent) {
               email = "example@email.com"
               newEmail = "newEmail@email.com"
           }
 
           // generate an email change link to be sent to the new email address
-          val (url, user) = client.gotrue.admin.generateLinkFor(LinkType.EmailChangeNew) {
+          val (url, user) = client.auth.admin.generateLinkFor(LinkType.EmailChangeNew) {
               email = "example@email.com"
               newEmail = "newEmail@email.com"
           }
@@ -2974,7 +2974,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          client.gotrue.admin.updateUserById(uid = "id") {
+          client.auth.admin.updateUserById(uid = "id") {
               email = "example@email.com"
           }
           ```
@@ -2983,7 +2983,7 @@ functions:
         isSpotlight: false
         code: |
           ```js
-          client.gotrue.admin.updateUserById(uid = "id") {
+          client.auth.admin.updateUserById(uid = "id") {
               password = "password"
           }
           ```
@@ -2992,7 +2992,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          client.gotrue.admin.updateUserById(uid = "id") {
+          client.auth.admin.updateUserById(uid = "id") {
               userMetadata = buildJsonObject {
                   put("key", "value")
               }
@@ -3003,7 +3003,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          client.gotrue.admin.updateUserById(uid = "id") {
+          client.auth.admin.updateUserById(uid = "id") {
               appMetadata = buildJsonObject {
                   put("key", "value")
               }
@@ -3014,7 +3014,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          client.gotrue.admin.updateUserById(uid = "id") {
+          client.auth.admin.updateUserById(uid = "id") {
               emailConfirm = true
           }
           ```
@@ -3023,7 +3023,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          client.gotrue.admin.updateUserById(uid = "id") {
+          client.auth.admin.updateUserById(uid = "id") {
               phoneConfirm = true
           }
           ```
@@ -3038,7 +3038,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          const factors = client.gotrue.admin.retrieveFactors(uid = "id")
+          const factors = client.auth.admin.retrieveFactors(uid = "id")
           ```
   - id: mfa-delete-factor
     title: 'mfa.deleteFactor()'
@@ -3051,7 +3051,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          client.gotrue.admin.deleteFactor(uid = "id", factorId = "factor_id")
+          client.auth.admin.deleteFactor(uid = "id", factorId = "factor_id")
           ```
   - id: invoke
     title: 'invoke()'
@@ -3481,7 +3481,7 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: `insert`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
-      - Resumable uploads use a `Disk` cache by default to store the upload urls. You can customize that in the GoTrue config by changing the `resumable.cache` property.
+      - Resumable uploads use a `Disk` cache by default to store the upload urls. You can customize that in the Auth config by changing the `resumable.cache` property.
     examples:
       - id: upload-file
         name: Upload file

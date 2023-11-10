@@ -87,7 +87,7 @@ When your user signs in, call [loginWith(Provider)](/docs/reference/kotlin/auth-
 
 ```kotlin
 suspend fun signInWithWorkOS() {
-	supabase.gotrue.loginWith(WorkOS) {
+	supabase.auth.loginWith(WorkOS) {
 		queryParams["connection"] = "<your_connection>"
 		queryParams["organization"] = "<your_organization>"
 		queryParams["workos_provider"] = "<your_provider>"
@@ -124,7 +124,7 @@ When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) t
 
 ```kotlin
 suspend fun signOut() {
-	supabase.gotrue.logout()
+	supabase.auth.logout()
 }
 ```
 

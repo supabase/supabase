@@ -64,7 +64,7 @@ When your user signs in, call [sendOtpTo()](/docs/reference/kotlin/auth-signinwi
 
 ```kotlin
 suspend fun loginWithEmail() {
-	supabase.gotrue.sendOtpTo(Email) {
+	supabase.auth.sendOtpTo(Email) {
 		email = "example@email.com"
 	}
 }
@@ -107,7 +107,7 @@ When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) t
 
 ```kotlin
 suspend fun logout() {
-	supabase.gotrue.logout()
+	supabase.auth.logout()
 }
 ```
 
