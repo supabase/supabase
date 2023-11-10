@@ -102,32 +102,34 @@ const FunctionsList = ({
               />
             </div>
 
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
-                <Button disabled={!canCreateFunctions} onClick={() => createFunction()}>
-                  Create a new function
-                </Button>
-              </Tooltip.Trigger>
-              {!canCreateFunctions && (
-                <Tooltip.Portal>
+            {!isLocked && (
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger>
+                  <Button disabled={!canCreateFunctions} onClick={() => createFunction()}>
+                    Create a new function
+                  </Button>
+                </Tooltip.Trigger>
+                {!canCreateFunctions && (
                   <Tooltip.Portal>
-                    <Tooltip.Content side="bottom">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-alternative py-1 px-2 leading-none shadow',
-                          'border border-background',
-                        ].join(' ')}
-                      >
-                        <span className="text-xs text-foreground">
-                          You need additional permissions to create functions
-                        </span>
-                      </div>
-                    </Tooltip.Content>
+                    <Tooltip.Portal>
+                      <Tooltip.Content side="bottom">
+                        <Tooltip.Arrow className="radix-tooltip-arrow" />
+                        <div
+                          className={[
+                            'rounded bg-alternative py-1 px-2 leading-none shadow',
+                            'border border-background',
+                          ].join(' ')}
+                        >
+                          <span className="text-xs text-foreground">
+                            You need additional permissions to create functions
+                          </span>
+                        </div>
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
                   </Tooltip.Portal>
-                </Tooltip.Portal>
-              )}
-            </Tooltip.Root>
+                )}
+              </Tooltip.Root>
+            )}
           </div>
 
           {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="functions" />}
