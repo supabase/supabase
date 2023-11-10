@@ -62,7 +62,7 @@ const FeaturePreviewModal = () => {
       onCancel={() => snap.setShowFeaturePreviewModal(false)}
     >
       {FEATURE_PREVIEWS.length > 0 ? (
-        <div className="flex">
+        <div className="flex border-t">
           <div>
             <ScrollArea className="h-[550px] w-[240px] border-r">
               {FEATURE_PREVIEWS.map((feature) => {

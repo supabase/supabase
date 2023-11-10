@@ -1232,6 +1232,7 @@ export default {
       bg-surface-200
       space-y-1 py-3 px-4 sm:px-5
       border-b border-overlay
+      flex items-center justify-between
     `,
     footer: `
       flex justify-end gap-2
