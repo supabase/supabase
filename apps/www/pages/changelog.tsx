@@ -9,6 +9,8 @@ import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { createAppAuth } from '@octokit/auth-app'
 import { Octokit } from '@octokit/core'
 import { paginateGraphql } from '@octokit/plugin-paginate-graphql'
+import { GetServerSideProps } from 'next'
+import Link from 'next/link'
 
 export const ExtendedOctokit = Octokit.plugin(paginateGraphql)
 export type ExtendedOctokit = InstanceType<typeof ExtendedOctokit>
@@ -30,16 +32,16 @@ export type DiscussionsResponse = {
     }
   }
 }
-// convert to getserversideprops
-export async function getServerSideProps({ req, res }: any) {
-  res.setHeader('Cache-Control', 'public, s-maxage=10, stale-while-revalidate=59')
 
+export const getServerSideProps: GetServerSideProps = async ({ res, query }) => {
+  res.setHeader('Cache-Control', 'public, max-age=3600, stale-while-revalidate=3600')
+  const pageNumber = Number(query.page) ?? 1
   const response = await fetch('https://api.github.com/repos/supabase/supabase/releases')
   const restApiData = await response.json()
 
   async function fetchDiscussions(owner: string, repo: string, categoryId: string) {
     let cursor = null
-    const first = 3
+    const first = 5
 
     const octokit = new ExtendedOctokit({
       authStrategy: createAppAuth,
@@ -50,12 +52,7 @@ export async function getServerSideProps({ req, res }: any) {
       },
     })
 
-    const {
-      repository: {
-        discussions: { nodes: discussions },
-      },
-    } = await octokit.graphql.paginate<DiscussionsResponse>(
-      `
+    const query = `
       query troubleshootDiscussions($cursor: String, $owner: String!, $repo: String!, $categoryId: ID!) {
         repository(owner: $owner, name: $repo) {
           discussions(first: 5, after: $cursor, categoryId: $categoryId, orderBy: { field: CREATED_AT, direction: DESC }) {
@@ -80,15 +77,21 @@ export async function getServerSideProps({ req, res }: any) {
           }
         }
       }
-    `,
-      {
-        owner,
-        repo,
-        categoryId,
-        cursor,
-        first,
-      }
-    )
+    `
+    const queryVars = {
+      owner,
+      repo,
+      categoryId,
+      cursor,
+      first,
+    }
+
+    // fetch discussions
+    const {
+      repository: {
+        discussions: { nodes: discussions },
+      },
+    } = await octokit.graphql.paginate<DiscussionsResponse>(query, queryVars)
 
     return discussions
   }
@@ -110,7 +113,7 @@ export async function getServerSideProps({ req, res }: any) {
   // Process discussions
   const discussionsRender = await Promise.all(
     discussions.map(async (item: any): Promise<any> => {
-      console.log('discussion item', { item })
+      //console.log('discussion item', { item })
       const discussionsMdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
 
       return {
@@ -153,17 +156,18 @@ export async function getServerSideProps({ req, res }: any) {
     }
   })
 
-  combinedRenderArray.map((item) =>
-    console.log(item.title, ' | ', item.type, ' | ', item.created_at, ' | ', item.labels)
-  )
+  // combinedRenderArray.map((item) =>
+  //   console.log(item.title, ' | ', item.type, ' | ', item.created_at, ' | ', item.labels)
+  // )
   return {
     props: {
       changelog: combinedRenderArray,
+      pageNumber,
     },
   }
 }
 
-function ChangelogPage({ changelog }: any) {
+function ChangelogPage({ changelog, pageNumber }: any) {
   const TITLE = 'Changelog'
   const DESCRIPTION = 'New updates and improvements to Supabase'
   return (
@@ -190,6 +194,12 @@ function ChangelogPage({ changelog }: any) {
           <div className="py-10">
             <h1 className="h1">Changelog</h1>
             <p className="text-foreground-lighter text-lg">New updates and product improvements</p>
+
+            <div className="my-8">
+              <h2>Pagination</h2>
+              {pageNumber > 1 && <Link href={`/changelog?page=${pageNumber - 1}`}>Previous</Link>}
+              <Link href={`/changelog?page=${pageNumber + 1}`}>Next</Link>
+            </div>
           </div>
 
           {/* Content */}
