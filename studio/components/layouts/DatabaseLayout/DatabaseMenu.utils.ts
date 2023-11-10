@@ -89,12 +89,6 @@ export const generateDatabaseMenu = (
           url: `/project/${ref}/database/types`,
           items: [],
         },
-        {
-          name: 'GraphiQL',
-          key: 'graphiql',
-          url: `/project/${ref}/database/graphiql`,
-          items: [],
-        },
       ],
     },
   ]
