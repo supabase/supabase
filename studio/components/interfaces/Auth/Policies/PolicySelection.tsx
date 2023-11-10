@@ -50,12 +50,7 @@ const PolicySelection = ({
                   className="
                   flex h-8 w-8 items-center
                   justify-center
-<<<<<<< HEAD
-                  rounded bg-scale-1200 text-scale-100
-=======
-                  rounded bg-foreground text-background
->>>>>>> @{-1}
-                "
+                  rounded bg-foreground text-background"
                 >
                   <IconEdit size={14} strokeWidth={2} />
                 </div>
