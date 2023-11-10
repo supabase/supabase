@@ -29,6 +29,7 @@ export type DiscussionsResponse = {
     discussions: {
       totalCount: number
       nodes: Discussion[]
+      pageInfo: any
     }
   }
 }
@@ -36,13 +37,19 @@ export type DiscussionsResponse = {
 export const getServerSideProps: GetServerSideProps = async ({ res, query }) => {
   res.setHeader('Cache-Control', 'public, max-age=3600, stale-while-revalidate=3600')
   const pageNumber = Number(query.page) ?? 1
-  const response = await fetch('https://api.github.com/repos/supabase/supabase/releases')
-  const restApiData = await response.json()
+  const endCursor = query.endCursor ?? (null as string | null)
+  console.log({ endCursor })
+  const perPage = 4
+  //const response = await fetch('https://api.github.com/repos/supabase/supabase/releases')
+  //const restApiData = await response.json()
 
-  async function fetchDiscussions(owner: string, repo: string, categoryId: string) {
-    let cursor = null
-    const first = 5
-
+  async function fetchDiscussions(
+    owner: string,
+    repo: string,
+    categoryId: string,
+    last: number,
+    endCursor: string
+  ) {
     const octokit = new ExtendedOctokit({
       authStrategy: createAppAuth,
       auth: {
@@ -53,26 +60,27 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
     })
 
     const query = `
-      query troubleshootDiscussions($cursor: String, $owner: String!, $repo: String!, $categoryId: ID!) {
+      query troubleshootDiscussions($cursor: String, $owner: String!, $repo: String!, $categoryId: ID!, $first: Int) {
         repository(owner: $owner, name: $repo) {
-          discussions(first: 5, after: $cursor, categoryId: $categoryId, orderBy: { field: CREATED_AT, direction: DESC }) {
+          discussions(first: $first, after: $cursor, categoryId: $categoryId, orderBy: { field: CREATED_AT, direction: DESC }) {
             totalCount
+            pageInfo {
+              hasNextPage
+              startCursor
+              endCursor
+            }
             nodes {
               id
               publishedAt
               createdAt
               url
               title
-              labels(first: 10) { # You can specify the number of labels you want to retrieve
-                nodes {
-                  name # You can retrieve other label fields as needed
-                }
-        }
+              # labels(first: 10) {
+                # nodes {
+                  # name
+                # }
+              # }
               # body, currently causing mdx rendering issues so disabled for the moment
-            }
-            pageInfo {
-              hasNextPage
-              endCursor
             }
           }
         }
@@ -82,24 +90,27 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
       owner,
       repo,
       categoryId,
-      cursor,
-      first,
+      first: perPage,
+      //cursor: endCursor,
     }
 
     // fetch discussions
     const {
       repository: {
-        discussions: { nodes: discussions },
+        discussions: { nodes: discussions, pageInfo },
       },
     } = await octokit.graphql.paginate<DiscussionsResponse>(query, queryVars)
 
-    return discussions
+    console.log({ pageInfo })
+    return { discussions, pageInfo }
   }
 
-  const discussions = await fetchDiscussions(
+  const { discussions, pageInfo } = await fetchDiscussions(
     'supabase',
     'supabase',
-    'DIC_kwDODMpXOc4CAFUr' // 'Changelog' category
+    'DIC_kwDODMpXOc4CAFUr', // 'Changelog' category
+    perPage,
+    endCursor as string
   )
 
   if (!discussions) {
@@ -121,29 +132,30 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
         source: discussionsMdxSource,
         type: 'discussion',
         created_at: item.createdAt,
-        labels: item.labels.nodes ?? [],
+        //labels: item.labels.nodes ?? [],
       }
     })
   )
 
   // Process restApiData
-  const restApiDataRender = await Promise.all(
-    restApiData.map(async (item: any): Promise<any> => {
-      //console.log('restapi item', { item })
-      const restApiDataMdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
+  // const restApiDataRender = await Promise.all(
+  //   restApiData.map(async (item: any): Promise<any> => {
+  //     //console.log('restapi item', { item })
+  //     const restApiDataMdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
 
-      return {
-        ...item,
-        source: restApiDataMdxSource,
-        type: 'restData',
-        created_at: item.created_at,
-        title: item.name ?? '',
-      }
-    })
-  )
+  //     return {
+  //       ...item,
+  //       source: restApiDataMdxSource,
+  //       type: 'restData',
+  //       created_at: item.created_at,
+  //       title: item.name ?? '',
+  //     }
+  //   })
+  // )
 
   // Combine discussionsRender and restApiDataRender into a single array
-  const combinedRenderArray = discussionsRender.concat(restApiDataRender)
+  //const combinedRenderArray = discussionsRender.concat(restApiDataRender)
+  const combinedRenderArray = discussionsRender
 
   // Sort the combinedRenderArray by the created_at field in each entry
   combinedRenderArray.sort((a: any, b: any) => {
@@ -159,15 +171,18 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
   // combinedRenderArray.map((item) =>
   //   console.log(item.title, ' | ', item.type, ' | ', item.created_at, ' | ', item.labels)
   // )
+
+  console.log('down here', { pageInfo })
   return {
     props: {
       changelog: combinedRenderArray,
       pageNumber,
+      end: pageInfo.endCursor,
     },
   }
 }
 
-function ChangelogPage({ changelog, pageNumber }: any) {
+function ChangelogPage({ changelog, pageNumber, end }: any) {
   const TITLE = 'Changelog'
   const DESCRIPTION = 'New updates and improvements to Supabase'
   return (
@@ -197,8 +212,13 @@ function ChangelogPage({ changelog, pageNumber }: any) {
 
             <div className="my-8">
               <h2>Pagination</h2>
-              {pageNumber > 1 && <Link href={`/changelog?page=${pageNumber - 1}`}>Previous</Link>}
-              <Link href={`/changelog?page=${pageNumber + 1}`}>Next</Link>
+              <Link href={`/changelog?endCursor=${end}`}>endcursor</Link>
+              {pageNumber > 1 && (
+                <Link href={pageNumber === 2 ? `/changelog` : `/changelog?page=${pageNumber - 1}`}>
+                  Previous
+                </Link>
+              )}
+              <Link href={`/changelog?page=${pageNumber ? pageNumber + 1 : 2}`}>Next</Link>
             </div>
           </div>
 
