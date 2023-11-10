@@ -1565,7 +1565,7 @@ export const reference_python_v2 = {
   parent: '/reference',
 }
 
-export const reference_swift_v0 = {
+export const reference_swift_v1 = {
   icon: 'reference-swift',
   title: 'swift',
   url: 'guides/reference/swift',

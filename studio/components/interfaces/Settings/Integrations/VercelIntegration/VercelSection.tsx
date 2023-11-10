@@ -25,8 +25,9 @@ import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { IntegrationImageHandler } from '../IntegrationsSettings'
 import VercelIntegrationConnectionForm from './VercelIntegrationConnectionForm'
+import clsx from 'clsx'
 
-const VercelSection = () => {
+const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
   const { ui } = useStore()
   const project = useSelectedProject()
   const org = useSelectedOrganization()
@@ -116,6 +117,23 @@ You can change the scope of the access for Supabase by configuring
 `
       : ''
 
+  const integrationUrl =
+    process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+      ? 'https://vercel.com/integrations/supabase-v2-staging'
+      : 'https://vercel.com/integrations/supabase-v2'
+
+  let connections =
+    (isProjectScoped
+      ? vercelIntegration?.connections.filter(
+          (connection) => connection.supabase_project_ref === project?.ref
+        )
+      : vercelIntegration?.connections) || []
+
+  const ConnectionHeaderTitle = `${connections.length} project ${pluralize(
+    connections.length,
+    'connection'
+  )} `
+
   return (
     <ScaffoldContainer>
       <ScaffoldSection>
@@ -125,63 +143,60 @@ You can change the scope of the access for Supabase by configuring
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
           <Markdown content={VercelContentSectionTop} />
-          {vercelIntegrations && vercelIntegrations.length > 0 ? (
-            vercelIntegrations
-              .filter((x) =>
-                x.connections.find((x) => x.supabase_project_ref === project?.parentRef)
-              )
-              .map((integration, i) => {
-                return (
-                  <div key={integration.id}>
-                    <IntegrationInstallation title={'Vercel'} integration={integration} />
-                    {integration.connections.length > 0 ? (
-                      <>
-                        <IntegrationConnectionHeader />
-                        <ul className="flex flex-col">
-                          {integration.connections.map((connection) => (
-                            <div
-                              key={connection.id}
-                              className="relative flex flex-col -gap-[1px] [&>li]:pb-0"
-                            >
-                              <IntegrationConnectionItem
+          {vercelIntegration ? (
+            <div key={vercelIntegration.id}>
+              <IntegrationInstallation title={'Vercel'} integration={vercelIntegration} />
+              {connections.length > 0 ? (
+                <>
+                  <IntegrationConnectionHeader
+                    title={ConnectionHeaderTitle}
+                    markdown={`Repository connections for Vercel`}
+                  />
+                  <ul className="flex flex-col">
+                    {connections.map((connection) => (
+                      <div
+                        key={connection.id}
+                        className={clsx(
+                          isProjectScoped && 'relative flex flex-col -gap-[1px] [&>li]:pb-0'
+                        )}
+                      >
+                        <IntegrationConnectionItem
+                          connection={connection}
+                          type={'Vercel' as IntegrationName}
+                          onDeleteConnection={onDeleteVercelConnection}
+                          className={clsx(isProjectScoped && '!rounded-b-none !mb-0')}
+                        />
+                        {isProjectScoped ? (
+                          <div className="relative pl-8 ml-6 border-l border-muted pb-6">
+                            <div className="border-b border-l border-r rounded-b-lg">
+                              <VercelIntegrationConnectionForm
                                 connection={connection}
-                                type={'Vercel' as IntegrationName}
-                                onDeleteConnection={onDeleteVercelConnection}
-                                className="!rounded-b-none !mb-0"
+                                integration={vercelIntegration}
                               />
-                              <div className="relative pl-8 ml-6 border-l border-muted pb-6">
-                                <div className="border-b border-l border-r rounded-b-lg">
-                                  <VercelIntegrationConnectionForm
-                                    connection={connection}
-                                    integration={integration}
-                                  />
-                                </div>
-                              </div>
                             </div>
-                          ))}
-                        </ul>
-                      </>
-                    ) : (
-                      <IntegrationConnectionHeader
-                        markdown={`### ${integration.connections.length} project ${pluralize(
-                          integration.connections.length,
-                          'connection'
-                        )} Repository connections for Vercel`}
-                      />
-                    )}
-                    <EmptyIntegrationConnection
-                      onClick={() => onAddVercelConnection(integration.id)}
-                      orgSlug={org?.slug}
-                    >
-                      Add new project connection
-                    </EmptyIntegrationConnection>
-                  </div>
-                )
-              })
+                          </div>
+                        ) : null}
+                      </div>
+                    ))}
+                  </ul>
+                </>
+              ) : (
+                <IntegrationConnectionHeader
+                  title={ConnectionHeaderTitle}
+                  markdown={`Repository connections for Vercel`}
+                />
+              )}
+              <EmptyIntegrationConnection
+                onClick={() => onAddVercelConnection(vercelIntegration.id)}
+                orgSlug={org?.slug}
+              >
+                Add new project connection
+              </EmptyIntegrationConnection>
+            </div>
           ) : (
             <div>
               <Button asChild type="default" iconRight={<IconExternalLink />}>
-                <Link href="https://vercel.com/integrations/supabase-v2" target="_blank">
+                <Link href={integrationUrl} target="_blank">
                   Install Vercel Integration
                 </Link>
               </Button>

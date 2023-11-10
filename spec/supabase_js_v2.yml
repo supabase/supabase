@@ -5061,7 +5061,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          const { data } = supabase
+          const { data } = await supabase
             .storage
             .from('avatars')
             .createSignedUrl('folder/avatar1.png', 60, {
@@ -5076,7 +5076,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          const { data } = supabase
+          const { data } = await supabase
             .storage
             .from('avatars')
             .createSignedUrl('folder/avatar1.png', 60, {
