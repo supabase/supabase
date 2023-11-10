@@ -1,12 +1,11 @@
-import Link from 'next/link'
-import { useCallback, useMemo } from 'react'
-import { Button, IconExternalLink } from 'ui'
+import { useCallback } from 'react'
 
 import {
   EmptyIntegrationConnection,
   IntegrationConnectionHeader,
   IntegrationInstallation,
 } from 'components/interfaces/Integrations/IntegrationPanels'
+import VercelSection from 'components/interfaces/Settings/Integrations/VercelIntegration/VercelSection'
 import { Markdown } from 'components/interfaces/Markdown'
 import {
   ScaffoldContainer,
@@ -17,13 +16,10 @@ import {
 } from 'components/layouts/Scaffold'
 import { useIntegrationsGitHubInstalledConnectionDeleteMutation } from 'data/integrations/integrations-github-connection-delete-mutation'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
-import { useIntegrationsVercelInstalledConnectionDeleteMutation } from 'data/integrations/integrations-vercel-installed-connection-delete-mutation'
-import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { IntegrationName, IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useSelectedOrganization, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { pluralize } from 'lib/helpers'
-import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { IntegrationConnectionItem } from '../../Integrations/IntegrationConnection'
 import SidePanelGitHubRepoLinker from './SidePanelGitHubRepoLinker'
@@ -45,17 +41,6 @@ const IntegrationSettings = () => {
   const { data } = useOrgIntegrationsQuery({ orgSlug: org?.slug })
   const sidePanelsStateSnapshot = useSidePanelsStateSnapshot()
 
-  const { mutate: deleteVercelConnection } = useIntegrationsVercelInstalledConnectionDeleteMutation(
-    {
-      onSuccess: () => {
-        ui.setNotification({
-          category: 'success',
-          message: 'Successfully deleted Vercel connection',
-        })
-      },
-    }
-  )
-
   const { mutate: deleteGitHubConnection } = useIntegrationsGitHubInstalledConnectionDeleteMutation(
     {
       onSuccess: () => {
@@ -67,44 +52,8 @@ const IntegrationSettings = () => {
     }
   )
 
-  const vercelIntegrations = useMemo(() => {
-    return data
-      ?.filter((integration) => integration.integration.name === 'Vercel')
-      .map((integration) => {
-        if (integration.metadata && integration.integration.name === 'Vercel') {
-          const avatarSrc =
-            !integration.metadata.account.avatar && integration.metadata.account.type === 'Team'
-              ? `https://vercel.com/api/www/avatar?teamId=${integration.metadata.account.team_id}&s=48`
-              : `https://vercel.com/api/www/avatar/${integration.metadata.account.avatar}?s=48`
-
-          integration['metadata']['account']['avatar'] = avatarSrc
-        }
-
-        return integration
-      })
-  }, [data])
-
   const githubIntegrations = data?.filter(
     (integration) => integration.integration.name === 'GitHub'
-  )
-
-  // We're only supporting one Vercel integration per org for now
-  // this will need to be updated when we support multiple integrations
-  const vercelIntegration = vercelIntegrations?.[0]
-  const { data: vercelProjectsData } = useVercelProjectsQuery(
-    {
-      organization_integration_id: vercelIntegration?.id,
-    },
-    { enabled: vercelIntegration?.id !== undefined }
-  )
-  const vercelProjectCount = vercelProjectsData?.length ?? 0
-
-  const onAddVercelConnection = useCallback(
-    (integrationId: string) => {
-      sidePanelsStateSnapshot.setVercelConnectionsIntegrationId(integrationId)
-      sidePanelsStateSnapshot.setVercelConnectionsOpen(true)
-    },
-    [sidePanelsStateSnapshot]
   )
 
   const onAddGitHubConnection = useCallback(
@@ -113,17 +62,6 @@ const IntegrationSettings = () => {
       sidePanelsStateSnapshot.setGithubConnectionsOpen(true)
     },
     [sidePanelsStateSnapshot]
-  )
-
-  const onDeleteVercelConnection = useCallback(
-    async (connection: IntegrationProjectConnection) => {
-      deleteVercelConnection({
-        id: connection.id,
-        organization_integration_id: connection.organization_integration_id,
-        orgSlug: org?.slug,
-      })
-    },
-    [deleteVercelConnection, org?.slug]
   )
 
   const onDeleteGitHubConnection = useCallback(
@@ -135,110 +73,6 @@ const IntegrationSettings = () => {
       })
     },
     [deleteGitHubConnection, org?.slug]
-  )
-
-  /**
-   * Vercel markdown content
-   */
-
-  const VercelTitle = `Vercel Integration`
-
-  const VercelDetailsSection = `
-
-Connect your Vercel teams to your Supabase organization.
-`
-
-  const VercelContentSectionTop = `
-
-### How does the Vercel integration work?
-
-Supabase will keep your environment variables up to date in each of the projects you assign to a Supabase project.
-You can also link multiple Vercel Projects to the same Supabase project.
-`
-
-  const VercelContentSectionBottom =
-    vercelProjectCount > 0 && vercelIntegration !== undefined
-      ? `
-Your Vercel connection has access to ${vercelProjectCount} Vercel Projects.
-You can change the scope of the access for Supabase by configuring
-[here](${getIntegrationConfigurationUrl(vercelIntegration)}).
-`
-      : ''
-
-  const integrationUrl =
-    process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-      ? 'https://vercel.com/integrations/supabase-v2-staging'
-      : 'https://vercel.com/integrations/supabase-v2'
-
-  const VercelSection = () => (
-    <ScaffoldContainer>
-      <ScaffoldSection>
-        <ScaffoldSectionDetail title={VercelTitle}>
-          <Markdown content={VercelDetailsSection} />
-          <IntegrationImageHandler title="vercel" />
-        </ScaffoldSectionDetail>
-        <ScaffoldSectionContent>
-          <Markdown content={VercelContentSectionTop} />
-
-          {vercelIntegrations && vercelIntegrations.length > 0 ? (
-            vercelIntegrations.map((integration, i) => {
-              const ConnectionHeaderTitle = `${integration.connections.length} project ${pluralize(
-                integration.connections.length,
-                'connection'
-              )} `
-
-              return (
-                <div key={integration.id}>
-                  <IntegrationInstallation title={'Vercel'} integration={integration} />
-                  {integration.connections.length > 0 ? (
-                    <>
-                      <IntegrationConnectionHeader
-                        title={ConnectionHeaderTitle}
-                        markdown={`Repository connections for Vercel`}
-                      />
-                      <ul className="flex flex-col">
-                        {integration.connections.map((connection) => (
-                          <IntegrationConnectionItem
-                            key={connection.id}
-                            connection={connection}
-                            type={'Vercel' as IntegrationName}
-                            onDeleteConnection={onDeleteVercelConnection}
-                          />
-                        ))}
-                      </ul>
-                    </>
-                  ) : (
-                    <IntegrationConnectionHeader
-                      markdown={`### ${integration.connections.length} project ${pluralize(
-                        integration.connections.length,
-                        'connection'
-                      )} Repository connections for Vercel`}
-                    />
-                  )}
-                  <EmptyIntegrationConnection
-                    onClick={() => onAddVercelConnection(integration.id)}
-                    orgSlug={org?.slug}
-                  >
-                    Add new project connection
-                  </EmptyIntegrationConnection>
-                </div>
-              )
-            })
-          ) : (
-            <div>
-              <Button asChild type="default" iconRight={<IconExternalLink />}>
-                <Link href={integrationUrl} target="_blank">
-                  Install Vercel Integration
-                </Link>
-              </Button>
-            </div>
-          )}
-          {VercelContentSectionBottom && (
-            <Markdown content={VercelContentSectionBottom} className="text-foreground-lighter" />
-          )}
-        </ScaffoldSectionContent>
-      </ScaffoldSection>
-    </ScaffoldContainer>
   )
 
   /**
@@ -324,7 +158,7 @@ These connections will be part of a GitHub workflow that is currently in develop
     <>
       <GitHubSection />
       <ScaffoldDivider />
-      <VercelSection />
+      <VercelSection isProjectScoped={false} />
       <SidePanelVercelProjectLinker />
       <SidePanelGitHubRepoLinker />
     </>

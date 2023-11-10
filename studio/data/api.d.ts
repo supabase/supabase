@@ -808,6 +808,14 @@ export interface paths {
     /** Gets github pull requests for a given repo */
     get: operations['GitHubPullRequestController_getPullRequests']
   }
+  '/platform/cli/login': {
+    /** Create CLI login session */
+    post: operations['CliLoginController_createCliLoginSession']
+  }
+  '/platform/cli/login/{session_id}': {
+    /** Retrieve CLI login session */
+    get: operations['CliLoginController_getCliLoginSession']
+  }
   '/system/auth/{ref}/templates/{template}': {
     /** Gets GoTrue template */
     get: operations['AuthTemplateController_getTemplate']
@@ -4754,40 +4762,6 @@ export interface components {
       overusageAllowed: boolean
       extensionId: string
       items: components['schemas']['ResourceBillingItem'][]
-    }
-    ResourceProvisioningBody: {
-      /** @description A UNIX epoch timestamp value */
-      timestamp: number
-      /** @description A random unique string identifying the individual request */
-      nonce: string
-      /** @description The full request target URL */
-      url: string
-      /** @description Name of the extension */
-      name: string
-      /** @description Unique ID representing the extension */
-      id: string
-      /** @description Unique ID representing an organization */
-      organization_id: string
-      /** @description Display name for an organization */
-      organization_name: string
-      /** @description Obfuscated email that routes to all organization admins */
-      organization_email: string
-      /** @description Obfuscated email that routes to the provisioning user */
-      user_email: string
-      /** @description Unique ID representing an user */
-      user_id: string
-      /** @description The three-letter, primary Fly.io region where the target app intends to write from */
-      primary_region: string
-      /** @description An IPv6 address on the customer network assigned to this extension */
-      ip_address: string
-      /**
-       * @description An array of Fly.io region codes where read replicas should be provisioned
-       * @default []
-       */
-      read_regions: string[]
-      /** @description Database password (Optional, don't send to generate one) */
-      db_pass?: string
-      user_name: string
     }
     ResourceProvisioningConfigResponse: {
       /**
@@ -10263,6 +10237,25 @@ export interface operations {
       }
     }
   }
+  /** Create CLI login session */
+  CliLoginController_createCliLoginSession: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateCliLoginSessionBody']
+      }
+    }
+    responses: {
+      /** @description Failed to create CLI login session */
+      500: never
+    }
+  }
+  /** Retrieve CLI login session */
+  CliLoginController_getCliLoginSession: {
+    responses: {
+      /** @description Failed to retrieve CLI login session */
+      500: never
+    }
+  }
   /** Gets GoTrue template */
   AuthTemplateController_getTemplate: {
     parameters: {
@@ -12313,11 +12306,6 @@ export interface operations {
   }
   /** Creates a database */
   ExtensionsController_provisionResource: {
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ResourceProvisioningBody']
-      }
-    }
     responses: {
       201: {
         content: {
