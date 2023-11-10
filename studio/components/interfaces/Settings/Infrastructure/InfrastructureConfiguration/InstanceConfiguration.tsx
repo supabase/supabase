@@ -5,7 +5,14 @@ import { useTheme } from 'next-themes'
 import { useMemo, useState } from 'react'
 import ReactFlow, { Background, Edge, ReactFlowProvider, useReactFlow } from 'reactflow'
 import 'reactflow/dist/style.css'
-import { Button, Modal } from 'ui'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconAlertTriangle,
+  Modal,
+} from 'ui'
 
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { AWS_REGIONS_KEYS } from 'lib/constants'
@@ -155,13 +162,27 @@ const InstanceConfigurationUI = () => {
         onSelectConfirm={() => onConfirmDropReplica()}
       >
         <Modal.Content className="py-3">
-          <p className="text-sm">Add some more content here</p>
-          <p className="text-sm">This action cannot be undone</p>
+          <Alert_Shadcn_ variant="warning">
+            <IconAlertTriangle strokeWidth={2} />
+            <AlertTitle_Shadcn_>This action cannot be undone</AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              You may still deploy a new replica in this region thereafter
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+          <div className="text-sm px-1 pt-4">
+            <p>Before deleting this replica, consider:</p>
+            <ul className="text-foreground-light py-1 list-disc mx-4 space-y-1">
+              <li>
+                Network traffic from this region may slow down, especially if you have no other
+                replicas in this region
+              </li>
+            </ul>
+          </div>
         </Modal.Content>
       </ConfirmationModal>
 
       <ConfirmationModal
-        size="small"
+        size="medium"
         visible={selectedReplicaToRestart !== undefined}
         header="Confirm to restart selected replica?"
         buttonLabel="Restart replica"
@@ -170,7 +191,16 @@ const InstanceConfigurationUI = () => {
         onSelectConfirm={() => onConfirmRestartReplica()}
       >
         <Modal.Content className="py-3">
-          <p className="text-sm">Add some more content here, what to expect from user POV</p>
+          <p className="text-sm">Before restarting the replica, consider:</p>
+          <ul className="text-sm text-foreground-light py-1 list-disc mx-4 space-y-1">
+            <li>
+              Network traffic from this region may slow down while the replica is restarting,
+              especially if you have no other replicas in this region
+            </li>
+          </ul>
+          <p className="text-sm mt-2">
+            Are you sure you want to restart this replica (ID: {selectedReplicaToRestart?.id}) now?{' '}
+          </p>
         </Modal.Content>
       </ConfirmationModal>
     </>
