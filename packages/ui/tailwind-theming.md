@@ -111,6 +111,7 @@ text-border-control
 | `500`     |
 | `DEFAULT` |
 | `600`     |
+| `button`  |
 
 ### Destructive
 

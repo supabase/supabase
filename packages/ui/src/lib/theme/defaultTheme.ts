@@ -217,7 +217,7 @@ export default {
     },
     dot: '-ml-0.5 mr-1.5 h-2 w-2 rounded-full',
     color: {
-      brand: 'bg-brand-500 text-brand-600 border border-brand-400',
+      brand: 'bg-brand-500 text-brand-600 border border-brand-500',
       brandAlt: 'bg-brand bg-opacity-100 text-background border border-brand',
       scale: 'bg-background text-foreground-light border border-strong',
       tomato: `bg-tomato-200 text-tomato-1100 border border-tomato-700`,
