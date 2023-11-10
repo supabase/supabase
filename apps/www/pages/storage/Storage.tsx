@@ -1,4 +1,13 @@
-import { Badge, Button, IconArrowUpRight, IconShuffle, IconWifi, IconX, Space } from 'ui'
+import {
+  Badge,
+  Button,
+  IconArrowUpRight,
+  IconShuffle,
+  IconWifi,
+  IconX,
+  Space,
+  ThemeImage,
+} from 'ui'
 import ApiExamples from 'data/products/storage/api-examples'
 import DashboardViewData from 'data/products/storage/dashboard-carousel.json'
 import StoragePermissionsData from 'data/products/storage/permissions-examples'
@@ -57,24 +66,16 @@ function StoragePage() {
             'With custom policies and permissions that are familiar and easy to implement.',
           ]}
           image={[
-            <div className="header--light block w-full" key="light">
-              <Image
-                src={`${basePath}/images/product/storage/header--light.png`}
-                alt="storage header"
-                layout="responsive"
-                width="1386"
-                height="1067"
-              />
-            </div>,
-            <div className="header--dark mr-0 w-full dark:block" key="dark">
-              <Image
-                src={`${basePath}/images/product/storage/header--dark.png`}
-                alt="storage header"
-                layout="responsive"
-                width="1386"
-                height="1067"
-              />
-            </div>,
+            <ThemeImage
+              src={{
+                light: `${basePath}/images/product/storage/header--light.png`,
+                dark: `${basePath}/images/product/storage/header--dark.png`,
+              }}
+              alt="storage header"
+              layout="responsive"
+              width="1386"
+              height="1067"
+            />,
           ]}
           documentation_url={'/docs/guides/storage'}
         />

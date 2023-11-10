@@ -102,7 +102,7 @@ const components = {
       {props.children}
     </Heading>
   ),
-  Image: ThemeImage,
+  Image: (props: any) => <ThemeImage fill className="object-contain" {...props} />,
   RefSubLayout,
   RefHeaderSection: (props: any) => <RefHeaderSection {...props} />,
   CliGlobalFlagsHandler: () => <CliGlobalFlagsHandler />,

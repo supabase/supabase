@@ -26,9 +26,9 @@ export const ThemeImage = ({ src, ...props }: any) => {
             ? src.dark
             : src.light
         }
-        className={cn('rounded-md border', props.className)}
-        layout="fill"
-        objectFit="contain"
+        // className={cn('rounded-md border', props.className)}
+        // layout="fill"
+        // objectFit="contain"
       />
     </span>
   )

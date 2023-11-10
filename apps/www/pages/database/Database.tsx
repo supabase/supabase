@@ -1,4 +1,4 @@
-import { Badge, Button, IconArrowUpRight, IconX, Tabs } from 'ui'
+import { Badge, Button, IconArrowUpRight, IconX, Tabs, ThemeImage } from 'ui'
 // data
 import ApiExamplesData from 'data/products/database/api-examples'
 import ExtensionsExamplesData from 'data/products/database/extensions-examples'
@@ -76,24 +76,16 @@ function Database() {
             'PostgreSQL is one of the worlds most scalable databases.',
           ]}
           image={[
-            <div className="header--light block w-full" key="light">
-              <Image
-                src={`${basePath}/images/product/database/header--light-2.png`}
-                alt="database header"
-                layout="responsive"
-                width="1680"
-                height="1116"
-              />
-            </div>,
-            <div className="header--dark mr-0 w-full dark:block" key="dark">
-              <Image
-                src={`${basePath}/images/product/database/header--dark-2.png`}
-                alt="database header"
-                layout="responsive"
-                width="1680"
-                height="1116"
-              />
-            </div>,
+            <ThemeImage
+              src={{
+                light: `${basePath}/images/product/database/header--light-2.png`,
+                dark: `${basePath}/images/product/database/header--dark-2.png`,
+              }}
+              alt="database header"
+              layout="responsive"
+              width="1680"
+              height="1116"
+            />,
           ]}
           documentation_url={'/docs/guides/database'}
         />
