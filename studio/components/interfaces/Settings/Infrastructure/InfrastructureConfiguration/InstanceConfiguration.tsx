@@ -1,22 +1,20 @@
+import { useParams } from 'common'
 import { partition } from 'lodash'
 import { Globe2, Network } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useMemo, useState } from 'react'
-import ReactFlow, { Background, Edge, Node, ReactFlowProvider, useReactFlow } from 'reactflow'
+import ReactFlow, { Background, Edge, ReactFlowProvider, useReactFlow } from 'reactflow'
 import 'reactflow/dist/style.css'
 import { Button, Modal } from 'ui'
 
 import ConfirmationModal from 'components/ui/ConfirmationModal'
-import DeployNewReplicaPanel from './DeployNewReplicaPanel'
-import {
-  AVAILABLE_REPLICA_REGIONS,
-  DatabaseConfiguration,
-  MOCK_DATABASES,
-} from './InstanceConfiguration.constants'
-import { generateNodes, getGraphLayout } from './InstanceConfiguration.utils'
-import { PrimaryNode, ReplicaNode } from './InstanceNode'
-import MapView from './MapView'
 import { AWS_REGIONS_KEYS } from 'lib/constants'
+import DeployNewReplicaPanel from './DeployNewReplicaPanel'
+import { DatabaseConfiguration, MOCK_DATABASES } from './InstanceConfiguration.constants'
+import { addRegionNodes, generateNodes, getDagreGraphLayout } from './InstanceConfiguration.utils'
+import { PrimaryNode, RegionNode, ReplicaNode } from './InstanceNode'
+import MapView from './MapView'
+import ResizeReplicaPanel from './ResizeReplicaPanel'
 
 // [Joshen] Just FYI, UI assumes single provider for primary + replicas
 // [Joshen] Idea to visualize grouping based on region: https://reactflow.dev/examples/layout/sub-flows
@@ -25,12 +23,14 @@ import { AWS_REGIONS_KEYS } from 'lib/constants'
 const InstanceConfigurationUI = () => {
   const reactFlow = useReactFlow()
   const { resolvedTheme } = useTheme()
-  const [view, setView] = useState<'flow' | 'map'>('flow')
+  const { ref: projectRef } = useParams()
 
+  const [view, setView] = useState<'flow' | 'map'>('flow')
   const [showNewReplicaPanel, setShowNewReplicaPanel] = useState(false)
   const [newReplicaRegion, setNewReplicaRegion] = useState<AWS_REGIONS_KEYS>()
   const [selectedReplicaToResize, setSelectedReplicaToResize] = useState<DatabaseConfiguration>()
   const [selectedReplicaToDrop, setSelectedReplicaToDrop] = useState<DatabaseConfiguration>()
+  const [selectedReplicaToRestart, setSelectedReplicaToRestart] = useState<DatabaseConfiguration>()
 
   const backgroundPatternColor =
     resolvedTheme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.4)'
@@ -38,7 +38,7 @@ const InstanceConfigurationUI = () => {
   const [[primary], replicas] = partition(MOCK_DATABASES, (database) => database.type === 'PRIMARY')
 
   const nodes = generateNodes(MOCK_DATABASES, {
-    onSelectRestartReplica: () => {},
+    onSelectRestartReplica: setSelectedReplicaToRestart,
     onSelectResizeReplica: setSelectedReplicaToResize,
     onSelectDropReplica: setSelectedReplicaToDrop,
   })
@@ -53,10 +53,17 @@ const InstanceConfigurationUI = () => {
     }
   })
 
-  const nodeTypes = useMemo(() => ({ PRIMARY: PrimaryNode, READ_REPLICA: ReplicaNode }), [])
+  const nodeTypes = useMemo(
+    () => ({ PRIMARY: PrimaryNode, READ_REPLICA: ReplicaNode, REGION: RegionNode }),
+    []
+  )
 
   const onConfirmDropReplica = () => {
     console.log('Drop replica', selectedReplicaToDrop)
+  }
+
+  const onConfirmRestartReplica = () => {
+    console.log('Restart replica', selectedReplicaToRestart)
   }
 
   return (
@@ -94,12 +101,15 @@ const InstanceConfigurationUI = () => {
             nodesDraggable={false}
             nodesConnectable={false}
             zoomOnDoubleClick={false}
+            edgesFocusable={false}
+            edgesUpdatable={false}
             defaultNodes={[]}
             defaultEdges={[]}
             nodeTypes={nodeTypes}
             onInit={() => {
-              const graph = getGraphLayout(nodes, edges)
-              reactFlow.setNodes(graph.nodes)
+              const graph = getDagreGraphLayout(nodes, edges)
+              const xxx = addRegionNodes(graph.nodes, graph.edges)
+              reactFlow.setNodes(xxx.nodes)
               reactFlow.setEdges(graph.edges)
             }}
             proOptions={{ hideAttribution: true }}
@@ -112,11 +122,27 @@ const InstanceConfigurationUI = () => {
               setNewReplicaRegion(region)
               setShowNewReplicaPanel(true)
             }}
+            onSelectRestartReplica={setSelectedReplicaToRestart}
             onSelectResizeReplica={setSelectedReplicaToResize}
             onSelectDropReplica={setSelectedReplicaToDrop}
           />
         )}
       </div>
+
+      <DeployNewReplicaPanel
+        visible={showNewReplicaPanel}
+        selectedDefaultRegion={newReplicaRegion}
+        onClose={() => {
+          setNewReplicaRegion(undefined)
+          setShowNewReplicaPanel(false)
+        }}
+      />
+
+      <ResizeReplicaPanel
+        visible={selectedReplicaToResize !== undefined}
+        selectedReplica={selectedReplicaToResize}
+        onClose={() => setSelectedReplicaToResize(undefined)}
+      />
 
       <ConfirmationModal
         danger
@@ -134,14 +160,19 @@ const InstanceConfigurationUI = () => {
         </Modal.Content>
       </ConfirmationModal>
 
-      <DeployNewReplicaPanel
-        visible={showNewReplicaPanel}
-        selectedDefaultRegion={newReplicaRegion}
-        onClose={() => {
-          setNewReplicaRegion(undefined)
-          setShowNewReplicaPanel(false)
-        }}
-      />
+      <ConfirmationModal
+        size="small"
+        visible={selectedReplicaToRestart !== undefined}
+        header="Confirm to restart selected replica?"
+        buttonLabel="Restart replica"
+        buttonLoadingLabel="Restarting replica"
+        onSelectCancel={() => setSelectedReplicaToRestart(undefined)}
+        onSelectConfirm={() => onConfirmRestartReplica()}
+      >
+        <Modal.Content className="py-3">
+          <p className="text-sm">Add some more content here, what to expect from user POV</p>
+        </Modal.Content>
+      </ConfirmationModal>
     </>
   )
 }

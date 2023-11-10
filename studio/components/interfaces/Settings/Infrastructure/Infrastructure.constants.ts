@@ -1,7 +1,3 @@
-// ReactFlow is scaling everything by the factor of 2
-export const NODE_WIDTH = 540
-export const NODE_ROW_HEIGHT = 40
-
 export interface Attribute {
   key: string
   name?: string

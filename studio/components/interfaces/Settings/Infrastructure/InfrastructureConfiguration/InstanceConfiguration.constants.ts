@@ -10,6 +10,18 @@ export interface DatabaseConfiguration {
   inserted_at: string
 }
 
+export interface Region {
+  key: AWS_REGIONS_KEYS
+  name: string
+  region: string
+  coordinates: [number, number]
+}
+
+// ReactFlow is scaling everything by the factor of 2
+export const NODE_WIDTH = 560
+export const NODE_ROW_HEIGHT = 50
+export const NODE_SEP = 20
+
 export const MOCK_DATABASES: DatabaseConfiguration[] = [
   {
     id: 1,
@@ -74,6 +86,15 @@ export const MOCK_DATABASES: DatabaseConfiguration[] = [
     status: 'ACTIVE_HEALTHY',
     inserted_at: '2023-11-01 06:47:46.837002',
   },
+  {
+    id: 8,
+    type: 'READ_REPLICA',
+    cloud_provider: 'AWS',
+    region: 'ap-southeast-1',
+    size: 't4g.micro',
+    status: 'ACTIVE_HEALTHY',
+    inserted_at: '2023-11-01 06:47:46.837002',
+  },
 ]
 
 // [Joshen] Coordinates from https://github.com/jsonmaur/aws-regions/issues/11
@@ -109,7 +130,7 @@ const AWS_REGIONS_VALUES: { [key: string]: string } = {
 
 // [Joshen] Just to make sure that we just depend on AWS_REGIONS to determine available
 // regions for replicas. Just FYI - might need to update this if we support Fly in future
-export const AVAILABLE_REPLICA_REGIONS = Object.keys(AWS_REGIONS)
+export const AVAILABLE_REPLICA_REGIONS: Region[] = Object.keys(AWS_REGIONS)
   .map((key) => {
     return {
       key: key as AWS_REGIONS_KEYS,

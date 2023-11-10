@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { partition } from 'lodash'
+import { partition, uniqBy } from 'lodash'
 import { useEffect, useMemo, useState } from 'react'
 import {
   ComposableMap,
@@ -19,6 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   IconMoreVertical,
+  ScrollArea,
 } from 'ui'
 import {
   AVAILABLE_REPLICA_REGIONS,
@@ -26,17 +27,20 @@ import {
   MOCK_DATABASES,
 } from './InstanceConfiguration.constants'
 import GeographyData from './MapData.json'
+import database from 'pages/project/[ref]/database'
 
 // [Joshen] Foresee that we'll skip this view for initial launch
 
 interface MapViewProps {
   onSelectDeployNewReplica: (region: AWS_REGIONS_KEYS) => void
+  onSelectRestartReplica: (database: DatabaseConfiguration) => void
   onSelectResizeReplica: (database: DatabaseConfiguration) => void
   onSelectDropReplica: (database: DatabaseConfiguration) => void
 }
 
 const MapView = ({
   onSelectDeployNewReplica,
+  onSelectRestartReplica,
   onSelectResizeReplica,
   onSelectDropReplica,
 }: MapViewProps) => {
@@ -54,6 +58,9 @@ const MapView = ({
   const primaryCoordinates = AVAILABLE_REPLICA_REGIONS.find((region) =>
     primary.region.includes(region.region)
   )?.coordinates ?? [0, 0]
+  const uniqueRegionsByReplicas = uniqBy(replicas, (r) => {
+    return AVAILABLE_REPLICA_REGIONS.find((region) => r.region.includes(region.region))?.key
+  })
 
   const selectedRegionKey =
     AVAILABLE_REPLICA_REGIONS.find((region) => region.coordinates === center)?.region ?? ''
@@ -100,24 +107,28 @@ const MapView = ({
             }
           </Geographies>
 
-          {replicas.map((database) => {
+          {uniqueRegionsByReplicas.map((database) => {
             const coordinates = AVAILABLE_REPLICA_REGIONS.find((region) =>
               database.region.includes(region.region)
             )?.coordinates
 
-            return (
-              <Line
-                key={`line-${database.id}-${primary.id}`}
-                from={coordinates}
-                to={primaryCoordinates}
-                stroke="white"
-                strokeWidth={1}
-                strokeLinecap="round"
-                strokeOpacity={0.2}
-                strokeDasharray={'3, 3'}
-                className="map-path"
-              />
-            )
+            if (coordinates !== primaryCoordinates) {
+              return (
+                <Line
+                  key={`line-${database.id}-${primary.id}`}
+                  from={coordinates}
+                  to={primaryCoordinates}
+                  stroke="white"
+                  strokeWidth={1}
+                  strokeLinecap="round"
+                  strokeOpacity={0.2}
+                  strokeDasharray={'3, 3'}
+                  className="map-path"
+                />
+              )
+            } else {
+              return null
+            }
           })}
 
           {AVAILABLE_REPLICA_REGIONS.map((region) => {
@@ -145,7 +156,9 @@ const MapView = ({
                       name: hasNoDatabases
                         ? undefined
                         : hasPrimary
-                        ? 'Primary Database'
+                        ? `Primary Database${
+                            replicas.length > 0 ? ` + ${replicas.length} replicas` : ''
+                          }`
                         : `${replicas.length} Read Replica${
                             replicas.length > 1 ? 's' : ''
                           } deployed`,
@@ -208,8 +221,8 @@ const MapView = ({
       )}
 
       {showRegionDetails && selectedRegion && (
-        <div className="absolute bottom-4 right-4 flex flex-col gap-y-2 bg-black bg-opacity-50 backdrop-blur-sm border rounded w-[400px] py-4">
-          <div className="flex items-center justify-between px-4">
+        <div className="absolute bottom-4 right-4 flex flex-col bg-black bg-opacity-50 backdrop-blur-sm border rounded w-[400px]">
+          <div className="flex items-center justify-between py-4 px-4 border-b">
             <div>
               <p className="text-xs text-foreground-light">
                 {databasesInSelectedRegion.length} database
@@ -224,63 +237,69 @@ const MapView = ({
             />
           </div>
 
-          <div>
-            <ul
-              className={`flex flex-col border-t divide-y ${
-                databasesInSelectedRegion.length > 0 ? 'border-b' : ''
-              }`}
-            >
-              {databasesInSelectedRegion.map((database) => {
-                const created = dayjs(database.inserted_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
+          {databasesInSelectedRegion.length > 0 && (
+            <ScrollArea style={{ height: databasesInSelectedRegion.length > 2 ? '180px' : 'auto' }}>
+              <ul className={`flex flex-col divide-y`}>
+                {databasesInSelectedRegion.map((database) => {
+                  const created = dayjs(database.inserted_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
 
-                return (
-                  <li
-                    key={database.id}
-                    className="text-sm px-4 py-2 flex items-center justify-between"
-                  >
-                    <div className="flex flex-col gap-y-1">
-                      <p className="flex items-center gap-x-2">
-                        {database.type === 'PRIMARY'
-                          ? 'Primary Database'
-                          : `Read Replica (ID: ${database.id})`}
-                        {database.type === 'READ_REPLICA' && <Badge color="green">Healthy</Badge>}
-                      </p>
+                  return (
+                    <li
+                      key={database.id}
+                      className="text-sm px-4 py-2 flex items-center justify-between"
+                    >
+                      <div className="flex flex-col gap-y-1">
+                        <p className="flex items-center gap-x-2">
+                          {database.type === 'PRIMARY'
+                            ? 'Primary Database'
+                            : `Read Replica (ID: ${database.id})`}
+                          {database.type === 'READ_REPLICA' && <Badge color="green">Healthy</Badge>}
+                        </p>
+                        <p className="text-xs text-foreground-light">AWS • {database.size}</p>
+                        {database.type === 'READ_REPLICA' && (
+                          <p className="text-xs text-foreground-light">Created on: {created}</p>
+                        )}
+                      </div>
                       {database.type === 'READ_REPLICA' && (
-                        <p className="text-xs text-foreground-light">Created on: {created}</p>
+                        <DropdownMenu modal={false}>
+                          <DropdownMenuTrigger asChild>
+                            <Button type="text" icon={<IconMoreVertical />} className="px-1" />
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent className="p-0 w-40" side="bottom" align="end">
+                            <DropdownMenuItem
+                              className="gap-x-2"
+                              onClick={() => onSelectRestartReplica(database)}
+                            >
+                              Restart replica
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="gap-x-2"
+                              onClick={() => onSelectResizeReplica(database)}
+                            >
+                              Resize replica
+                            </DropdownMenuItem>
+                            <div className="border-t" />
+                            <DropdownMenuItem
+                              className="gap-x-2"
+                              onClick={() => onSelectDropReplica(database)}
+                            >
+                              Drop replica
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       )}
-                    </div>
-                    {database.type === 'READ_REPLICA' && (
-                      <DropdownMenu modal={false}>
-                        <DropdownMenuTrigger asChild>
-                          <Button type="text" icon={<IconMoreVertical />} className="px-1" />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="p-0 w-40" side="bottom" align="end">
-                          <DropdownMenuItem className="gap-x-2" onClick={() => {}}>
-                            Restart replica
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="gap-x-2"
-                            onClick={() => onSelectResizeReplica(database)}
-                          >
-                            Resize replica
-                          </DropdownMenuItem>
-                          <div className="border-t" />
-                          <DropdownMenuItem
-                            className="gap-x-2"
-                            onClick={() => onSelectDropReplica(database)}
-                          >
-                            Drop replica
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
-                  </li>
-                )
-              })}
-            </ul>
-          </div>
+                    </li>
+                  )
+                })}
+              </ul>
+            </ScrollArea>
+          )}
 
-          <div className="mt-2 flex items-center justify-end gap-x-2 px-4">
+          <div
+            className={`flex items-center justify-end gap-x-2 px-4 py-4 ${
+              databasesInSelectedRegion.length > 0 ? 'border-t' : ''
+            }`}
+          >
             <Button type="default" onClick={() => onSelectDeployNewReplica(selectedRegion.key)}>
               Deploy new replica here
             </Button>
