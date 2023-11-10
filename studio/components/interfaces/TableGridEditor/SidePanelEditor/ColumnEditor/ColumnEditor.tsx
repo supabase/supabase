@@ -374,7 +374,7 @@ const ColumnEditor = ({
                     </Link>{' '}
                     Transparent Column Encryption (TCE).
                   </p>
-                  <Button type="default" icon={<IconExternalLink />} className="mt-2">
+                  <Button asChild type="default" icon={<IconExternalLink />} className="mt-2">
                     <Link
                       target="_blank"
                       rel="noreferrer"
