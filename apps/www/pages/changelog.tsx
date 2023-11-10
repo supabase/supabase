@@ -11,6 +11,7 @@ import { Octokit } from '@octokit/core'
 import { paginateGraphql } from '@octokit/plugin-paginate-graphql'
 import { GetServerSideProps } from 'next'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
 export const ExtendedOctokit = Octokit.plugin(paginateGraphql)
 export type ExtendedOctokit = InstanceType<typeof ExtendedOctokit>
@@ -37,9 +38,10 @@ export type DiscussionsResponse = {
 export const getServerSideProps: GetServerSideProps = async ({ res, query }) => {
   res.setHeader('Cache-Control', 'public, max-age=3600, stale-while-revalidate=3600')
   const pageNumber = Number(query.page) ?? 1
-  const endCursor = query.endCursor ?? (null as string | null)
-  console.log({ endCursor })
-  const perPage = 4
+  const next = query.next ?? (null as string | null)
+  const forward = query.forward ?? null
+  console.log({ next }, { forward })
+  const perPage = 2
   //const response = await fetch('https://api.github.com/repos/supabase/supabase/releases')
   //const restApiData = await response.json()
 
@@ -48,7 +50,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
     repo: string,
     categoryId: string,
     last: number,
-    endCursor: string
+    cursor: string
   ) {
     const octokit = new ExtendedOctokit({
       authStrategy: createAppAuth,
@@ -62,9 +64,12 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
     const query = `
       query troubleshootDiscussions($cursor: String, $owner: String!, $repo: String!, $categoryId: ID!, $first: Int) {
         repository(owner: $owner, name: $repo) {
-          discussions(first: $first, after: $cursor, categoryId: $categoryId, orderBy: { field: CREATED_AT, direction: DESC }) {
+          discussions(first: $first, ${
+            forward ? 'after' : 'before'
+          }: $cursor, categoryId: $categoryId, orderBy: { field: CREATED_AT, direction: DESC }) {
             totalCount
             pageInfo {
+              hasPreviousPage
               hasNextPage
               startCursor
               endCursor
@@ -91,7 +96,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
       repo,
       categoryId,
       first: perPage,
-      //cursor: endCursor,
+      cursor: next,
     }
 
     // fetch discussions
@@ -99,7 +104,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
       repository: {
         discussions: { nodes: discussions, pageInfo },
       },
-    } = await octokit.graphql.paginate<DiscussionsResponse>(query, queryVars)
+    } = await octokit.graphql<DiscussionsResponse>(query, queryVars)
 
     console.log({ pageInfo })
     return { discussions, pageInfo }
@@ -110,7 +115,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
     'supabase',
     'DIC_kwDODMpXOc4CAFUr', // 'Changelog' category
     perPage,
-    endCursor as string
+    next as string
   )
 
   if (!discussions) {
@@ -178,11 +183,12 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
       changelog: combinedRenderArray,
       pageNumber,
       end: pageInfo.endCursor,
+      start: pageInfo.startCursor,
     },
   }
 }
 
-function ChangelogPage({ changelog, pageNumber, end }: any) {
+function ChangelogPage({ changelog, end, start }: any) {
   const TITLE = 'Changelog'
   const DESCRIPTION = 'New updates and improvements to Supabase'
   return (
@@ -211,14 +217,11 @@ function ChangelogPage({ changelog, pageNumber, end }: any) {
             <p className="text-foreground-lighter text-lg">New updates and product improvements</p>
 
             <div className="my-8">
-              <h2>Pagination</h2>
-              <Link href={`/changelog?endCursor=${end}`}>endcursor</Link>
-              {pageNumber > 1 && (
-                <Link href={pageNumber === 2 ? `/changelog` : `/changelog?page=${pageNumber - 1}`}>
-                  Previous
-                </Link>
-              )}
-              <Link href={`/changelog?page=${pageNumber ? pageNumber + 1 : 2}`}>Next</Link>
+              <h2>
+                <Link href="http://localhost:3000/changelog">Pagination</Link>
+              </h2>
+              <Link href={`/changelog`}>back</Link>
+              <Link href={`/changelog?forward=true&next=${end}`}>Next</Link>
             </div>
           </div>
 
@@ -243,7 +246,9 @@ function ChangelogPage({ changelog, pageNumber, end }: any) {
                           </div>
                           <div className="flex w-full flex-col gap-1">
                             {changelogEntry.title && (
-                              <h3 className="text-foreground text-2xl">{changelogEntry.title}</h3>
+                              <Link href={changelogEntry.url}>
+                                <h3 className="text-foreground text-2xl">{changelogEntry.title}</h3>
+                              </Link>
                             )}
                             <p className="text-muted text-lg">
                               {dayjs(changelogEntry.publishedAt).format('MMM D, YYYY')}
