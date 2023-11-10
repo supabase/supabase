@@ -240,7 +240,7 @@ export default function MultiSelect({
               ) : options.length === 0 ? (
                 <div
                   className={[
-                    'flex h-full w-full flex-col dark:border-dark',
+                    'flex h-full w-full flex-col border-default',
                     'items-center justify-center border border-dashed p-3',
                   ].join(' ')}
                 >
@@ -260,7 +260,7 @@ export default function MultiSelect({
               ) : (
                 <div
                   className={[
-                    'flex h-full w-full flex-col dark:border-dark',
+                    'flex h-full w-full flex-col border-default',
                     'items-center justify-center border border-dashed p-3',
                   ].join(' ')}
                 >

@@ -64,7 +64,7 @@ const Nav = () => {
     return null
   }
 
-  const showDarkLogo = isLaunchWeekPage || (mounted && resolvedTheme?.includes('dark'))
+  const showDarkLogo = isLaunchWeekPage || (mounted && resolvedTheme?.includes('dark')!)
 
   return (
     <>

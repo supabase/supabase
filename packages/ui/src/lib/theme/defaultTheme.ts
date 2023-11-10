@@ -59,9 +59,8 @@ const defaults = {
 
 const utils = {
   border: {
-    hover:
-      'border-opacity-50 dark:border-opacity-50 hover:border-opacity-100 dark:hover:border-opacity-100',
-    fix: 'border-opacity-100 dark:border-opacity-100',
+    hover: 'border-opacity-50 hover:border-opacity-100',
+    fix: 'border-opacity-100',
   },
 }
 
@@ -253,13 +252,13 @@ export default {
     description: `text-xs`,
     variant: {
       danger: {
-        base: `bg-red-200 dark:bg-red-100 btext-red-1200 border-red-700`,
+        base: `bg-red-200 btext-red-1200 border-red-700`,
         icon: `text-red-900`,
         header: `text-red-1200`,
         description: `text-red-1100`,
       },
       warning: {
-        base: `bg-amber-200 dark:bg-amber-100 border-amber-700`,
+        base: `bg-amber-200 border-amber-700`,
         icon: `text-amber-900`,
         header: `text-amber-1200`,
         description: `text-amber-1100`,
@@ -271,7 +270,7 @@ export default {
         description: `text-foreground-light`,
       },
       success: {
-        base: `bg-brand-300 dark:bg-brand-100 border-brand-400`,
+        base: `bg-brand-300 border-brand-400`,
         icon: `text-brand`,
         header: `text-brand-600`,
         description: `text-brand-600`,

@@ -309,7 +309,7 @@ const FileExplorerRow = ({
 
   return (
     <div
-      className="h-full border-b dark:border-dark"
+      className="h-full border-b border-default"
       onContextMenu={(event) => {
         event.stopPropagation()
         item.type === STORAGE_ROW_TYPES.FILE
