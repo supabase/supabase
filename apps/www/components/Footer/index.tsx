@@ -20,7 +20,7 @@ const Footer = (props: Props) => {
   const { resolvedTheme } = useTheme()
   const { pathname } = useRouter()
 
-  const isLaunchWeekPage = pathname.includes('launch-week') || pathname === '/'
+  const isLaunchWeekPage = pathname.includes('launch-week')
 
   /**
    * Temporary fix for next-theme client side bug

@@ -26,14 +26,12 @@ import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wo
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 
 const Nav = () => {
-  const { resolvedTheme, themes } = useTheme()
+  const { resolvedTheme } = useTheme()
   const router = useRouter()
   const { width } = useWindowSize()
   const [open, setOpen] = useState(false)
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
-
-  const isHomePage = router.pathname === '/'
   const isLaunchWeekPage = router.pathname.includes('launch-week')
   const showLaunchWeekNavMode = isLaunchWeekPage && !open
 
@@ -66,8 +64,7 @@ const Nav = () => {
     return null
   }
 
-  const showDarkLogo =
-    isLaunchWeekPage || (mounted && resolvedTheme?.includes('dark')) || isHomePage
+  const showDarkLogo = isLaunchWeekPage || (mounted && resolvedTheme?.includes('dark'))
 
   return (
     <>
