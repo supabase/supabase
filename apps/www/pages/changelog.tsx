@@ -11,7 +11,7 @@ import { Octokit } from '@octokit/core'
 import { paginateGraphql } from '@octokit/plugin-paginate-graphql'
 import { GetServerSideProps } from 'next'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/outline'
 
 export const ExtendedOctokit = Octokit.plugin(paginateGraphql)
 export type ExtendedOctokit = InstanceType<typeof ExtendedOctokit>
@@ -39,19 +39,11 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
   res.setHeader('Cache-Control', 'public, max-age=3600, stale-while-revalidate=3600')
   const pageNumber = Number(query.page) ?? 1
   const next = query.next ?? (null as string | null)
-  const forward = query.forward ?? null
-  console.log({ next }, { forward })
-  const perPage = 2
-  //const response = await fetch('https://api.github.com/repos/supabase/supabase/releases')
-  //const restApiData = await response.json()
 
-  async function fetchDiscussions(
-    owner: string,
-    repo: string,
-    categoryId: string,
-    last: number,
-    cursor: string
-  ) {
+  const response = await fetch('https://api.github.com/repos/supabase/supabase/releases')
+  const restApiData = await response.json()
+
+  async function fetchDiscussions(owner: string, repo: string, categoryId: string, cursor: string) {
     const octokit = new ExtendedOctokit({
       authStrategy: createAppAuth,
       auth: {
@@ -62,11 +54,9 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
     })
 
     const query = `
-      query troubleshootDiscussions($cursor: String, $owner: String!, $repo: String!, $categoryId: ID!, $first: Int) {
+      query troubleshootDiscussions($cursor: String, $owner: String!, $repo: String!, $categoryId: ID!) {
         repository(owner: $owner, name: $repo) {
-          discussions(first: $first, ${
-            forward ? 'after' : 'before'
-          }: $cursor, categoryId: $categoryId, orderBy: { field: CREATED_AT, direction: DESC }) {
+          discussions(first: 25, after: $cursor, categoryId: $categoryId, orderBy: { field: CREATED_AT, direction: DESC }) {
             totalCount
             pageInfo {
               hasPreviousPage
@@ -85,7 +75,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
                   # name
                 # }
               # }
-              # body, currently causing mdx rendering issues so disabled for the moment
+              body
             }
           }
         }
@@ -95,7 +85,6 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
       owner,
       repo,
       categoryId,
-      first: perPage,
       cursor: next,
     }
 
@@ -106,7 +95,6 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
       },
     } = await octokit.graphql<DiscussionsResponse>(query, queryVars)
 
-    console.log({ pageInfo })
     return { discussions, pageInfo }
   }
 
@@ -114,7 +102,6 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
     'supabase',
     'supabase',
     'DIC_kwDODMpXOc4CAFUr', // 'Changelog' category
-    perPage,
     next as string
   )
 
@@ -129,7 +116,6 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
   // Process discussions
   const discussionsRender = await Promise.all(
     discussions.map(async (item: any): Promise<any> => {
-      //console.log('discussion item', { item })
       const discussionsMdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
 
       return {
@@ -143,24 +129,23 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
   )
 
   // Process restApiData
-  // const restApiDataRender = await Promise.all(
-  //   restApiData.map(async (item: any): Promise<any> => {
-  //     //console.log('restapi item', { item })
-  //     const restApiDataMdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
+  const restApiDataRender = await Promise.all(
+    restApiData.map(async (item: any): Promise<any> => {
+      const restApiDataMdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
 
-  //     return {
-  //       ...item,
-  //       source: restApiDataMdxSource,
-  //       type: 'restData',
-  //       created_at: item.created_at,
-  //       title: item.name ?? '',
-  //     }
-  //   })
-  // )
+      return {
+        ...item,
+        source: restApiDataMdxSource,
+        type: 'restData',
+        created_at: item.created_at,
+        title: item.name ?? '',
+      }
+    })
+  )
 
   // Combine discussionsRender and restApiDataRender into a single array
-  //const combinedRenderArray = discussionsRender.concat(restApiDataRender)
-  const combinedRenderArray = discussionsRender
+  const combinedRenderArray = discussionsRender.concat(restApiDataRender)
+  //const combinedRenderArray = discussionsRender
 
   // Sort the combinedRenderArray by the created_at field in each entry
   combinedRenderArray.sort((a: any, b: any) => {
@@ -169,26 +154,22 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
     if (!isNaN(dateA.getTime()) && !isNaN(dateB.getTime())) {
       return dateB.getTime() - dateA.getTime() // sort desc
     } else {
-      return 0 // Handle invalid date values gracefully
+      return 0
     }
   })
 
-  // combinedRenderArray.map((item) =>
-  //   console.log(item.title, ' | ', item.type, ' | ', item.created_at, ' | ', item.labels)
-  // )
-
-  console.log('down here', { pageInfo })
   return {
     props: {
       changelog: combinedRenderArray,
       pageNumber,
-      end: pageInfo.endCursor,
-      start: pageInfo.startCursor,
+      pageInfo: pageInfo,
     },
   }
 }
 
-function ChangelogPage({ changelog, end, start }: any) {
+function ChangelogPage({ changelog, pageInfo }: any) {
+  const { endCursor: end, hasNextPage, hasPreviousPage } = pageInfo
+
   const TITLE = 'Changelog'
   const DESCRIPTION = 'New updates and improvements to Supabase'
   return (
@@ -215,27 +196,16 @@ function ChangelogPage({ changelog, end, start }: any) {
           <div className="py-10">
             <h1 className="h1">Changelog</h1>
             <p className="text-foreground-lighter text-lg">New updates and product improvements</p>
-
-            <div className="my-8">
-              <h2>
-                <Link href="http://localhost:3000/changelog">Pagination</Link>
-              </h2>
-              <Link href={`/changelog`}>back</Link>
-              <Link href={`/changelog?forward=true&next=${end}`}>Next</Link>
-            </div>
           </div>
 
           {/* Content */}
-          <div>
+          <div className="lg:grid gap-24">
             {changelog.length > 0 &&
               changelog
-                .filter((changelogEntry: any) => !changelogEntry.title.includes('[d]'))
-                .map((changelogEntry: any, i: number) => {
+                .filter((entry: any) => !entry.title.includes('[d]'))
+                .map((entry: any, i: number) => {
                   return (
-                    <div
-                      key={i}
-                      className="border-muted grid border-l pb-10 lg:grid-cols-12 lg:gap-8"
-                    >
+                    <div key={i} className="border-muted grid border-l lg:grid-cols-12 lg:gap-8">
                       <div
                         className="col-span-12 mb-8 self-start lg:sticky lg:top-0 lg:col-span-4 lg:-mt-32 lg:pt-32
                 "
@@ -245,28 +215,37 @@ function ChangelogPage({ changelog, end, start }: any) {
                             <IconGitCommit size={14} strokeWidth={1.5} />
                           </div>
                           <div className="flex w-full flex-col gap-1">
-                            {changelogEntry.title && (
-                              <Link href={changelogEntry.url}>
-                                <h3 className="text-foreground text-2xl">{changelogEntry.title}</h3>
+                            {entry.title && (
+                              <Link href={entry.url}>
+                                <h3 className="text-foreground text-2xl">{entry.title}</h3>
                               </Link>
                             )}
                             <p className="text-muted text-lg">
-                              {dayjs(changelogEntry.publishedAt).format('MMM D, YYYY')}
+                              {dayjs(entry.publishedAt).format('MMM D, YYYY')}
                             </p>
                           </div>
                         </div>
                       </div>
                       <div className="col-span-8 ml-8 lg:ml-0 max-w-[calc(100vw-80px)]">
                         <article className="prose prose-docs max-w-none">
-                          <MDXRemote
-                            {...changelogEntry.source}
-                            components={mdxComponents('blog')}
-                          />
+                          <MDXRemote {...entry.source} components={mdxComponents('blog')} />
                         </article>
                       </div>
                     </div>
                   )
                 })}
+          </div>
+          <div className="my-8 flex items-center gap-4">
+            {hasPreviousPage && (
+              <Link href={`/changelog`} className="flex items-center gap-2">
+                <ArrowLeftIcon width={16} /> Previous
+              </Link>
+            )}
+            {hasNextPage && (
+              <Link href={`/changelog?next=${end}`} className="flex items-center gap-2">
+                Next <ArrowRightIcon width={16} />
+              </Link>
+            )}
           </div>
         </div>
 
