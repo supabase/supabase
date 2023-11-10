@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
-import { cn } from 'ui'
 
 export const ThemeImage = ({ src, ...props }: any) => {
   const { resolvedTheme } = useTheme()
@@ -26,9 +25,6 @@ export const ThemeImage = ({ src, ...props }: any) => {
             ? src.dark
             : src.light
         }
-        // className={cn('rounded-md border', props.className)}
-        // layout="fill"
-        // objectFit="contain"
       />
     </span>
   )
