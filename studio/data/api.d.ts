@@ -798,6 +798,14 @@ export interface paths {
     /** Gets github pull requests for a given repo */
     get: operations['GitHubPullRequestController_getPullRequests']
   }
+  '/platform/cli/login': {
+    /** Create CLI login session */
+    post: operations['CliLoginController_createCliLoginSession']
+  }
+  '/platform/cli/login/{session_id}': {
+    /** Retrieve CLI login session */
+    get: operations['CliLoginController_getCliLoginSession']
+  }
   '/system/auth/{ref}/templates/{template}': {
     /** Gets GoTrue template */
     get: operations['AuthTemplateController_getTemplate']
