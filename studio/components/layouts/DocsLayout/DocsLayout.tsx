@@ -8,6 +8,7 @@ import { useSelectedProject, useStore, withAuth } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
 import ProjectLayout from '../'
 import { generateDocsMenu } from './DocsLayout.utils'
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 function DocsLayout({ title, children }: { title: string; children: ReactElement }) {
   const router = useRouter()
@@ -15,6 +16,9 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
   const { data, isLoading, error } = meta.openApi
   const selectedProject = useSelectedProject()
   const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
+
+  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
+  const hideMenu = isNewAPIDocsEnabled && router.pathname.endsWith('/graphiql')
 
   const getPage = () => {
     if (router.pathname.endsWith('graphiql')) return 'graphiql'
@@ -48,10 +52,12 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
       isLoading={isLoading}
       product="API Docs"
       productMenu={
-        <ProductMenu
-          page={getPage()}
-          menu={generateDocsMenu(projectRef, tableNames, functionNames)}
-        />
+        !hideMenu && (
+          <ProductMenu
+            page={getPage()}
+            menu={generateDocsMenu(projectRef, tableNames, functionNames)}
+          />
+        )
       }
     >
       {children}

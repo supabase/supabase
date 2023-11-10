@@ -16,9 +16,9 @@ import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { NextPageWithLayout } from 'types'
 
 const GraphiQLPage: NextPageWithLayout = () => {
-  const { ref: projectRef } = useParams()
   const { ui, meta } = useStore()
   const { resolvedTheme } = useTheme()
+  const { ref: projectRef } = useParams()
   const currentTheme = resolvedTheme === 'dark' ? 'dark' : 'light'
 
   const isExtensionsLoading = meta.extensions.isLoading
@@ -84,5 +84,4 @@ const GraphiQLPage: NextPageWithLayout = () => {
 }
 
 GraphiQLPage.getLayout = (page) => <DocsLayout title="GraphiQL">{page}</DocsLayout>
-
 export default observer(GraphiQLPage)

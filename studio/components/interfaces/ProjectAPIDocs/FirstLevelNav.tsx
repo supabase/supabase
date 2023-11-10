@@ -140,6 +140,39 @@ const FirstLevelNav = () => {
           )
         })}
       </div>
+
+      <div className="px-2 py-4 border-b">
+        <Button
+          block
+          asChild
+          type="text"
+          size="small"
+          icon={
+            <SVG
+              src={`${BASE_PATH}/img/graphql.svg`}
+              style={{ width: `${16}px`, height: `${16}px` }}
+              className="text-foreground"
+              preProcessor={(code) => code.replace(/svg/, 'svg class="m-auto text-color-inherit"')}
+            />
+          }
+          onClick={() => snap.setShowProjectApiDocs(false)}
+        >
+          <Link className="!justify-start" href={`/project/${ref}/api/graphiql`}>
+            GraphiQL
+          </Link>
+        </Button>
+        <Button block asChild type="text" size="small" icon={<IconBookOpen />}>
+          <Link
+            href="https://supabase.com/docs/guides/graphql"
+            target="_blank"
+            rel="noreferrer"
+            className="!justify-start"
+          >
+            GraphQL guide
+          </Link>
+        </Button>
+      </div>
+
       <div className="px-2 py-4">
         <Button block asChild type="text" size="small" icon={<IconBook />}>
           <Link
@@ -159,29 +192,6 @@ const FirstLevelNav = () => {
             className="!justify-start"
           >
             REST guide
-          </Link>
-        </Button>
-        <Button
-          block
-          asChild
-          type="text"
-          size="small"
-          icon={
-            <SVG
-              src={`${BASE_PATH}/img/graphql.svg`}
-              style={{ width: `${16}px`, height: `${16}px` }}
-              className="text-foreground"
-              preProcessor={(code) => code.replace(/svg/, 'svg class="m-auto text-color-inherit"')}
-            />
-          }
-        >
-          <Link
-            href="https://supabase.com/docs/guides/graphql"
-            target="_blank"
-            rel="noreferrer"
-            className="!justify-start"
-          >
-            GraphQL guide
           </Link>
         </Button>
       </div>

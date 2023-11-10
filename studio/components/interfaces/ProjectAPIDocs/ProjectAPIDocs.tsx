@@ -26,6 +26,11 @@ import SecondLevelNav from './SecondLevelNav'
  * [Joshen] Reminder: when we choose to release this as a main feature
  * Ensure that UX is better than the existing, and make sure we do the
  * necessary communications around releasing this.
+ *
+ * Problems:
+ * - Needs URL support
+ * - Language selector is not clear, users are missing the bash language option
+ * - GraphiQL needs a better home, cannot be placed under Database as its "API"
  */
 
 const ProjectAPIDocs = () => {
