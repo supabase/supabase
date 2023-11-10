@@ -13,7 +13,7 @@ Set up Email OTP for your Supabase application.
 - Enable the email provider in your [Supabase Project](/dashboard/project/_/auth/providers)
 - The Site URL represents the default URL that the user will be redirected to after clicking on the email signup confirmation link.
 - If a user has not signed up yet, signing in with an OTP will automatically sign up the user. To prevent users from signing up this way, you can set the `shouldCreateUser` option to `false`.
-- Navigate to the [email template settings](/dashboard/project/_/auth/templates) and modify the template to include the `{{ .Token }}` vairable, for example:
+- Navigate to the [email template settings](/dashboard/project/_/auth/templates) and modify the template to include the `{{ .Token }}` variable, for example:
 
 ```html
 <h2>One time login code</h2>
