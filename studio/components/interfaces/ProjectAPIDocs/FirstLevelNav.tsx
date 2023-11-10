@@ -23,12 +23,19 @@ const FirstLevelNav = () => {
     projectAuthAll: authEnabled,
     projectStorageAll: storageEnabled,
     projectEdgeFunctionAll: edgeFunctionsEnabled,
-  } = useIsFeatureEnabled(['project_auth:all', 'project_storage:all', 'project_edge_function:all'])
+    realtimeAll: realtimeEnabled,
+  } = useIsFeatureEnabled([
+    'project_auth:all',
+    'project_storage:all',
+    'project_edge_function:all',
+    'realtime:all',
+  ])
 
   const docsMenu = DOCS_MENU.filter((item) => {
     if (item.key === 'user-management') return authEnabled
     if (item.key === 'storage') return storageEnabled
     if (item.key === 'edge-functions') return edgeFunctionsEnabled
+    if (item.key === 'realtime') return realtimeEnabled
     return true
   })
 
