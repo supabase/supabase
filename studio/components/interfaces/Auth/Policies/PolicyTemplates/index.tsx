@@ -20,7 +20,7 @@ const PolicyTemplates = ({
   const [selectedTemplate, setSelectedTemplate] = useState(templates[0])
   return (
     <div>
-      <div className="flex justify-between border-t dark:border-dark">
+      <div className="flex justify-between border-t border-default">
         <TemplatesList
           templatesNote={templatesNote}
           templates={templates}
@@ -29,7 +29,7 @@ const PolicyTemplates = ({
         />
         <TemplatePreview selectedTemplate={selectedTemplate} />
       </div>
-      <div className="flex w-full items-center justify-end gap-3 border-t px-6 py-4 dark:border-dark">
+      <div className="flex w-full items-center justify-end gap-3 border-t px-6 py-4 border-default">
         <span className="text-sm text-foreground-lighter">
           This will override any existing code you've written
         </span>

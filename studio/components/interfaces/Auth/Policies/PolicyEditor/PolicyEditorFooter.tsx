@@ -12,7 +12,7 @@ const PolicyEditorFooter = ({
   onViewTemplates = noop,
   onReviewPolicy = noop,
 }: PolicyEditorFooterProps) => (
-  <div className="flex justify-between items-center border-t px-6 py-4 dark:border-dark">
+  <div className="flex justify-between items-center border-t px-6 py-4 border-default">
     <a
       href="https://supabase.com/docs/learn/auth-deep-dive/auth-policies"
       target="_blank"
