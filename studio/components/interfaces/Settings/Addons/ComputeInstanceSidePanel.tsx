@@ -12,7 +12,6 @@ import { setProjectStatus } from 'data/projects/projects-query'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
@@ -32,7 +31,7 @@ import {
 } from 'ui'
 
 import * as Tooltip from '@radix-ui/react-tooltip'
-import Image from 'next/image'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 const COMPUTE_CATEGORY_OPTIONS: {
   id: 'micro' | 'optimized'
@@ -62,7 +61,6 @@ const ComputeInstanceSidePanel = () => {
   const { resolvedTheme } = useTheme()
   const { project: selectedProject } = useProjectContext()
   const organization = useSelectedOrganization()
-  const isOrgBilling = !!organization?.subscription_id
 
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<'micro' | 'optimized'>('micro')
@@ -78,7 +76,7 @@ const ComputeInstanceSidePanel = () => {
   const onClose = () => snap.setPanelKey(undefined)
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
-  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
       ui.setNotification({
@@ -195,13 +193,15 @@ const ComputeInstanceSidePanel = () => {
         header={
           <div className="flex items-center justify-between">
             <h4>Change project compute size</h4>
-            <Link href="https://supabase.com/docs/guides/platform/compute-add-ons">
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                  About compute sizes
-                </Button>
-              </a>
-            </Link>
+            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+              <Link
+                href="https://supabase.com/docs/guides/platform/compute-add-ons"
+                target="_blank"
+                rel="noreferrer"
+              >
+                About compute sizes
+              </Link>
+            </Button>
           </div>
         }
       >
@@ -243,8 +243,8 @@ const ComputeInstanceSidePanel = () => {
                         className={clsx(
                           'relative rounded-xl transition border bg-no-repeat bg-center bg-cover cursor-pointer w-[160px] h-[96px]',
                           isSelected
-                            ? 'border-scale-1200'
-                            : 'border-scale-900 opacity-50 group-hover:border-scale-1000 group-hover:opacity-100'
+                            ? 'border-foreground'
+                            : 'border-foreground-muted opacity-50 group-hover:border-foreground-lighter group-hover:opacity-100'
                         )}
                         width={160}
                         height={96}
@@ -274,17 +274,11 @@ const ComputeInstanceSidePanel = () => {
                     variant="info"
                     title="Changing your compute size is only available on the Pro plan"
                     actions={
-                      isOrgBilling ? (
-                        <Link href={`/org/${organization.slug}/billing?panel=subscriptionPlan`}>
-                          <a>
-                            <Button type="default">View available plans</Button>
-                          </a>
-                        </Link>
-                      ) : (
-                        <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
+                      <Button asChild type="default">
+                        <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
                           View available plans
-                        </Button>
-                      )
+                        </Link>
+                      </Button>
                     }
                   >
                     Upgrade your plan to change the compute size of your project
@@ -308,7 +302,7 @@ const ComputeInstanceSidePanel = () => {
                       value={option.identifier}
                     >
                       <div className="w-full group">
-                        <div className="border-b border-scale-500 px-4 py-2">
+                        <div className="border-b border-default px-4 py-2">
                           <p className="text-sm">{option.name}</p>
                         </div>
                         <div className="px-4 py-2">
@@ -345,8 +339,8 @@ const ComputeInstanceSidePanel = () => {
                                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                                     <div
                                       className={[
-                                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                        'border border-scale-200',
+                                        'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                        'border border-background',
                                       ].join(' ')}
                                     >
                                       <div className="flex items-center space-x-1">
@@ -377,12 +371,7 @@ const ComputeInstanceSidePanel = () => {
             )}
 
             {hasChanges &&
-              (selectedCategory === 'micro' && !isOrgBilling ? (
-                <p className="text-sm text-foreground-light">
-                  Upon clicking confirm, the amount of that's unused during the current billing
-                  cycle will be returned as credits that can be used for subsequent billing cycles
-                </p>
-              ) : selectedCategory !== 'micro' && selectedCompute?.price_interval === 'monthly' ? (
+              (selectedCategory !== 'micro' && selectedCompute?.price_interval === 'monthly' ? (
                 // Monthly payment with project-level subscription
                 <p className="text-sm text-foreground-light">
                   Upon clicking confirm, the amount of{' '}
@@ -400,10 +389,13 @@ const ComputeInstanceSidePanel = () => {
                   There are no immediate charges when changing compute. Compute Hours are a
                   usage-based item and you're billed at the end of your billing cycle based on your
                   compute usage. Read more about{' '}
-                  <Link href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute">
-                    <a target="_blank" rel="noreferrer" className="underline">
-                      Compute Billing
-                    </a>
+                  <Link
+                    href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline"
+                  >
+                    Compute Billing
                   </Link>
                   .
                 </p>

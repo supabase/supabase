@@ -36,6 +36,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/database/column-encryption',
+    destination: '/docs/guides/database/extensions/pgsodium',
+  },
+  {
+    permanent: true,
     source: '/edge-functions/edge-functions',
     destination: '/edge-functions',
   },
@@ -2317,5 +2322,20 @@ module.exports = [
     permanent: true,
     source: '/blog/supabase-ai-content-storm',
     destination: 'https://dev.to/supabase/ai-ignites-the-rain-content-storm-is-back-kdl',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/functions/global-deployments',
+    destination: '/docs/guides/functions/regional-invocation',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/functions/typescript-support',
+    destination: '/docs/guides/functions',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/functions/troubleshooting',
+    destination: '/docs/guides/functions/debugging',
   },
 ]

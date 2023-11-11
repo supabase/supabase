@@ -60,7 +60,7 @@ const CustomExpiryModal = ({ onCopyUrl }: CustomExpiryModalProps) => {
           <>
             <div className="pt-4 pb-2">
               <Modal.Content>
-                <p className="text-sm text-light mb-2">
+                <p className="text-sm text-foreground-light mb-2">
                   Enter the duration for which the URL will be valid for:
                 </p>
                 <div className="flex items-center space-x-2">
@@ -81,7 +81,7 @@ const CustomExpiryModal = ({ onCopyUrl }: CustomExpiryModalProps) => {
                   </Listbox>
                 </div>
                 {values.expiresIn !== '' && (
-                  <p className="text-sm text-light mt-2">
+                  <p className="text-sm text-foreground-light mt-2">
                     URL will expire on{' '}
                     {dayjs().add(values.expiresIn, values.units).format(DATETIME_FORMAT)}
                   </p>

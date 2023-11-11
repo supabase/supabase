@@ -18,13 +18,12 @@ export const meta = {
         <Link
           href={`${resource.href}`}
           key={resource.title}
+          className={'col-span-12 md:col-span-4'}
           passHref
         >
-          <a className={'col-span-12 md:col-span-4'}>
-            <GlassPanel {...resource} background={false} showIconBg={true}>
-              {resource.description}
-            </GlassPanel>
-          </a>
+          <GlassPanel {...resource} background={false} showIconBg={true}>
+            {resource.description}
+          </GlassPanel>
         </Link>
       )
 
@@ -41,18 +40,16 @@ export const meta = {
 <div className="grid lg:grid-cols-12 gap-6 not-prose">
   {useCases.map((item) => {
     return (
-      <Link href={`${item.href}`} key={item.title} passHref>
-        <a className={'col-span-4'}>
-          <GlassPanel
-            title={item.title}
-            span="col-span-6"
-            background={false}
-            icon={item.icon}
-            hasLightIcon={item.hasLightIcon}
-          >
-            {item.description}
-          </GlassPanel>
-        </a>
+      <Link href={`${item.href}`} key={item.title} passHref className={'col-span-4'}>
+        <GlassPanel
+          title={item.title}
+          span="col-span-6"
+          background={false}
+          icon={item.icon}
+          hasLightIcon={item.hasLightIcon}
+        >
+          {item.description}
+        </GlassPanel>
       </Link>
     )
   })}
@@ -63,12 +60,16 @@ export const meta = {
 <div className="grid lg:grid-cols-12 gap-6 not-prose">
   {quickstarts.map((item) => {
     return (
-      <Link href={`${item.href}`} key={item.title} passHref>
-        <a className={'col-span-4'}>
-          <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
-            {item.description}
-          </GlassPanel>
-        </a>
+      <Link href={`${item.href}`} key={item.title} passHref className={'col-span-4'}>
+        <GlassPanel
+          title={item.title}
+          span="col-span-6"
+          background={false}
+          icon={item.icon}
+          hasLightIcon={item.hasLightIcon}
+        >
+          {item.description}
+        </GlassPanel>
       </Link>
     )
   })}
@@ -79,15 +80,21 @@ export const meta = {
 <div className="grid lg:grid-cols-12 gap-6 not-prose">
   {webapps.map((item) => {
     return (
-      <Link href={`${item.href}`} key={item.title} passHref>
-        <a className={'col-span-4'}>
-          <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
-            {item.description}
-          </GlassPanel>
-        </a>
+      <Link href={`${item.href}`} key={item.title} passHref className={'col-span-4'}>
+        <GlassPanel
+          title={item.title}
+          span="col-span-6"
+          background={false}
+          icon={item.icon}
+          hasLightIcon={item.hasLightIcon}
+        >
+          {item.description}
+        </GlassPanel>
       </Link>
     )
-  })}
+
+})}
+
 </div>
 
 ### Mobile Tutorials
@@ -95,15 +102,21 @@ export const meta = {
 <div className="grid lg:grid-cols-12 gap-6 not-prose">
   {mobile.map((item) => {
     return (
-      <Link href={`${item.href}`} key={item.title} passHref>
-        <a className={'col-span-4'}>
-          <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
-            {item.description}
-          </GlassPanel>
-        </a>
+      <Link href={`${item.href}`} key={item.title} passHref className={'col-span-4'}>
+        <GlassPanel
+          title={item.title}
+          span="col-span-6"
+          background={false}
+          icon={item.icon}
+          hasLightIcon={item.hasLightIcon}
+        >
+          {item.description}
+        </GlassPanel>
       </Link>
     )
-  })}
+
+})}
+
 </div>
 
 export const useCases = [
@@ -142,6 +155,7 @@ export const quickstarts = [
     description:
       'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Next.js app.',
     icon: '/docs/img/icons/nextjs-icon',
+    hasLightIcon: true,
   },
   {
     title: 'NuxtJS',
@@ -203,11 +217,12 @@ export const quickstarts = [
 
 export const webapps = [
   {
-    title: 'NextJS',
+    title: 'Next.js',
     href: '/guides/getting-started/tutorials/with-nextjs',
     description:
-      'Learn how to build a user management app with NextJS and Supabase Database, Auth, and Storage functionality.',
+      'Learn how to build a user management app with Next.js and Supabase Database, Auth, and Storage functionality.',
     icon: '/docs/img/icons/nextjs-icon',
+    hasLightIcon: true,
   },
   {
     title: 'React',
@@ -281,6 +296,7 @@ export const mobile = [
     description:
       'Learn how to build a user management app with Expo React Native and Supabase Database, Auth, and Storage functionality.',
     icon: '/docs/img/icons/expo-icon',
+    hasLightIcon: true,
   },
   {
     title: 'Android Kotlin',

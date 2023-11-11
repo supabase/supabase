@@ -18,11 +18,9 @@ The Supabase CLI provides tools to develop your project locally, deploy to the S
   {integrations.map((x) => (
     <div className="col-span-6" key={x.href}>
       <Link href={x.href} passHref>
-        <a>
-          <GlassPanel icon={'/docs/img/icons/github-icon'} hasLightIcon={true} title={x.name}>
-            {x.description}
-          </GlassPanel>
-        </a>
+        <GlassPanel icon={'/docs/img/icons/github-icon'} hasLightIcon={true} title={x.name}>
+          {x.description}
+        </GlassPanel>
       </Link>
     </div>
   ))}

@@ -11,9 +11,8 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { FormHeader } from 'components/ui/Forms'
 import Panel from 'components/ui/Panel'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { useProjectUsageQuery } from 'data/usage/project-usage-query'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 export interface DiskSizeConfigurationProps {
   disabled?: boolean
@@ -22,6 +21,7 @@ export interface DiskSizeConfigurationProps {
 const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps) => {
   const { ui } = useStore()
   const { project } = useProjectContext()
+  const organization = useSelectedOrganization()
   const { ref: projectRef } = useParams()
   const { lastDatabaseResizeAt } = project ?? {}
 
@@ -42,8 +42,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
     },
   })
 
-  const { data: projectUsage } = useProjectUsageQuery({ projectRef })
-  const { data: projectSubscriptionData } = useProjectSubscriptionV2Query({ projectRef })
+  const { data: projectSubscriptionData } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { mutate: updateProjectUsage, isLoading: isUpdatingDiskSize } =
     useProjectDiskResizeMutation({
       onSuccess: (res, variables) => {
@@ -61,7 +60,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
     updateProjectUsage({ projectRef, volumeSize })
   }
 
-  const currentDiskSize = projectUsage?.disk_volume_size_gb ?? 0
+  const currentDiskSize = project?.volumeSizeGb ?? 0
   // to do, update with max_disk_volume_size_gb
   const maxDiskSize = 200
 
@@ -86,7 +85,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
             <Panel.Content>
               <div className="grid grid-cols-1 items-center lg:grid-cols-3">
                 <div className="col-span-2 space-y-1">
-                  {projectUsage?.disk_volume_size_gb && (
+                  {currentDiskSize && (
                     <span className="text-foreground-light flex gap-2 items-baseline">
                       <span className="text-foreground">Current Disk Storage Size:</span>
                       <span className="text-foreground text-xl">
@@ -117,8 +116,8 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
                           <Tooltip.Arrow className="radix-tooltip-arrow" />
                           <div
                             className={[
-                              'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                              'border border-scale-200 ', //border
+                              'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                              'border border-background', //border
                             ].join(' ')}
                           >
                             <span className="text-xs text-foreground">
@@ -159,9 +158,11 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
           variant="info"
           title={'Disk size configuration is not available for projects on the Free plan'}
           actions={
-            <Link href={`/project/${projectRef}/settings/billing/subscription`}>
-              <Button type="default">Upgrade subscription</Button>
-            </Link>
+            <Button asChild type="default">
+              <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
+                Upgrade subscription
+              </Link>
+            </Button>
           }
         >
           <div>

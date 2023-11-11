@@ -9,14 +9,16 @@ export type EnumeratedTypeDeleteVariables = {
   projectRef: string
   connectionString: string
   name: string
+  schema: string
 }
 
 export async function deleteEnumeratedType({
   projectRef,
   connectionString,
   name,
+  schema,
 }: EnumeratedTypeDeleteVariables) {
-  const sql = `drop type if exists ${name}`
+  const sql = `drop type if exists ${schema}.${name}`
   const { result } = await executeSql({ projectRef, connectionString, sql })
   return result
 }

@@ -16,7 +16,7 @@ const defaultRouterMock = () => {
 useRouter.mockReturnValue(defaultRouterMock())
 
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { fireEvent, waitFor, screen, act } from '@testing-library/react'
 import { render } from '../../helpers'
 import userEvent from '@testing-library/user-event'
@@ -498,7 +498,7 @@ test('filters accept filterOverride', async () => {
 
 describe.each(['free', 'pro', 'team', 'enterprise'])('upgrade modal for %s', (key) => {
   beforeEach(() => {
-    useProjectSubscriptionV2Query.mockReturnValue({
+    useOrgSubscriptionQuery.mockReturnValue({
       data: {
         plan: {
           id: key,
@@ -522,7 +522,7 @@ describe.each(['free', 'pro', 'team', 'enterprise'])('upgrade modal for %s', (ke
 })
 
 test('datepicker onChange will set the query params for outbound api request', async () => {
-  useProjectSubscriptionV2Query.mockReturnValue({
+  useOrgSubscriptionQuery.mockReturnValue({
     data: {
       plan: {
         id: 'enterprise',

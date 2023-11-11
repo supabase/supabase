@@ -21,7 +21,7 @@ export const meta = {
 export const Section = ({ children, icon, img }) => (
   <div>
     {icon && (
-      <div className="bordershadow-scale-500 not-prose dark:bg-scale-400 -mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-white">
+      <div className="border shadow-background-surface-300 not-prose bg-surface-100 -mb-4 flex h-10 w-10 items-center justify-center rounded-full">
         <figure className="w-5">{icon}</figure>
       </div>
     )}
@@ -33,7 +33,7 @@ export const Section = ({ children, icon, img }) => (
 <div className="container mx-auto px-8 sm:px-16 xl:px-20 grid grid-cols-12 items-center my-16">
   <div className="col-span-12 lg:col-span-6">
     <h1>Security at Supabase</h1>
-    <h2 className="text-xl text-light max-w-xl">
+    <h2 className="text-xl text-foreground-light max-w-xl">
       Supabase is trusted by thousands of developers for building and deploying secure applications.
     </h2>
   </div>

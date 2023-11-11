@@ -6,13 +6,11 @@ import { MemberWithFreeProjectLimit } from 'data/organizations/free-project-limi
 
 interface FreeProjectLimitWarningProps {
   membersExceededLimit: MemberWithFreeProjectLimit[]
-  orgLevelBilling: boolean
   orgSlug: string
 }
 
 const FreeProjectLimitWarning = ({
   membersExceededLimit,
-  orgLevelBilling,
   orgSlug,
 }: FreeProjectLimitWarningProps) => {
   return (
@@ -41,15 +39,11 @@ const FreeProjectLimitWarning = ({
               projects before you're able to create a free project within this organization.
             </p>
 
-            {orgLevelBilling && (
-              <div>
-                <Link passHref href={`/org/${orgSlug}/billing?panel=subscriptionPlan`}>
-                  <Button asChild type="primary">
-                    <a>Upgrade plan</a>
-                  </Button>
-                </Link>
-              </div>
-            )}
+            <div>
+              <Button asChild type="primary">
+                <Link href={`/org/${orgSlug}/billing?panel=subscriptionPlan`}>Upgrade plan</Link>
+              </Button>
+            </div>
           </div>
         }
       />
