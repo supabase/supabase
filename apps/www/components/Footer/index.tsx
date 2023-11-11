@@ -144,13 +144,7 @@ const Footer = (props: Props) => {
                         return (
                           <li key={`${segment.title}_link_${idx}`}>
                             {link.url ? (
-                              link.url.startsWith('https') ? (
-                                <a href={link.url}>{children}</a>
-                              ) : (
-                                <Link href={link.url} legacyBehavior>
-                                  {children}
-                                </Link>
-                              )
+                              <a href={link.url}>{children}</a>
                             ) : (
                               Component && <Component>{children}</Component>
                             )}
