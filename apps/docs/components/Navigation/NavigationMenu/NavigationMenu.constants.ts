@@ -796,7 +796,7 @@ export const api: NavMenuConstant = {
         { name: 'Securing your API', url: '/guides/api/securing-your-api' },
         {
           name: 'Debugging performance issues',
-          url: '/guides/api/debugging-performance',
+          url: '/guides/api/rest/debugging-performance',
         },
         {
           name: 'Querying joins and nested tables',
