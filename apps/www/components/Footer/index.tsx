@@ -142,7 +142,7 @@ const Footer = (props: Props) => {
                         )
 
                         return (
-                          <li key={`${segment.title}_link_${idx}`}>
+                          <li key={`${segment.title}_link_${idx}`} className="cursor-pointer">
                             {link.url ? (
                               link.url.startsWith('https') ? (
                                 <a href={link.url}>{children}</a>
