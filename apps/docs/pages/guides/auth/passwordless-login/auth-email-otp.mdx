@@ -50,7 +50,7 @@ When your user signs in, call [signInWithOtp()](/docs/reference/dart/auth-signin
 
 ```dart
 Future<void> signInWithEmailOtp() async {
-  final AuthResponse res = await supabase.auth.signinwithotp(email: 'example@email.com');
+  final AuthResponse res = await supabase.auth.signInWithOtp(email: 'example@email.com');
 }
 ```
 
