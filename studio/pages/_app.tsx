@@ -57,6 +57,7 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { RootStore } from 'stores'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
+import { GraphiQLQueryEditorFocusProvider } from 'components/interfaces/App/GraphiQLQueryEditorFocusContext'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -167,6 +168,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                         enableSystem
                         disableTransitionOnChange
                       >
+                        <GraphiQLQueryEditorFocusProvider>
                         <CommandMenuWrapper>
                           <AppBannerWrapper>
                             <FeaturePreviewContextProvider>
@@ -175,6 +177,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                             </FeaturePreviewContextProvider>
                           </AppBannerWrapper>
                         </CommandMenuWrapper>
+                        </GraphiQLQueryEditorFocusProvider>
                       </ThemeProvider>
                     </RouteValidationWrapper>
                   </TooltipProvider>

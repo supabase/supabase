@@ -32,8 +32,9 @@ import {
 } from '@graphiql/react'
 import { Fetcher } from '@graphiql/toolkit'
 import clsx from 'clsx'
-import { MouseEventHandler, useCallback, useEffect, useState } from 'react'
+import { MouseEventHandler, useCallback, useContext, useEffect, useState } from 'react'
 import styles from './graphiql.module.css'
+import { useGraphiQLQueryEditorFocus } from '../App/GraphiQLQueryEditorFocusContext'
 
 export interface GraphiQLProps {
   fetcher: Fetcher
@@ -131,6 +132,8 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
       </ToolbarButton>
     </>
   )
+
+  const { setIsGraphiQLEditorOnFocus } = useGraphiQLQueryEditorFocus()
 
   const onClickReference = useCallback(() => {
     if (pluginResize.hiddenElement === 'second') {
@@ -265,7 +268,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                       className={clsx('graphiql-query-editor text-sm', styles.graphiqlQueryEditor)}
                       aria-label="Query Editor"
                     >
-                      <QueryEditor onClickReference={onClickReference} />
+                      <QueryEditor onClickReference={onClickReference}  onFocus={() => setIsGraphiQLEditorOnFocus(true)} onBlur={() => setIsGraphiQLEditorOnFocus(false)} />
                       <div className="graphiql-toolbar" role="toolbar" aria-label="Editor Commands">
                         <ExecuteButton />
                         {toolbar}

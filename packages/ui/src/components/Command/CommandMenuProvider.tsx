@@ -65,6 +65,10 @@ export interface CommandMenuProviderProps {
    * Call back when save SQL snippet button is selected
    */
   saveGeneratedSQL?: (answer: string, title: string) => Promise<void>
+  /**
+   * If GraphiQL editor is on focus
+   */
+  isGraphiQLEditorOnFocus: boolean
 }
 
 const CommandMenuProvider = ({
@@ -76,6 +80,7 @@ const CommandMenuProvider = ({
   metadata,
   isOptedInToAI = false,
   saveGeneratedSQL,
+  isGraphiQLEditorOnFocus
 }: PropsWithChildren<CommandMenuProviderProps>) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -85,7 +90,7 @@ const CommandMenuProvider = ({
 
   const project = projectRef !== undefined ? { ref: projectRef, apiKeys, apiUrl } : undefined
 
-  useKeyboardEvents({ setIsOpen, currentPage, setSearch, setPages })
+  useKeyboardEvents({ setIsOpen, currentPage, setSearch, setPages, isGraphiQLEditorOnFocus })
 
   return (
     <CommandMenuContext.Provider
@@ -116,11 +121,13 @@ function useKeyboardEvents({
   currentPage,
   setSearch,
   setPages,
+  isGraphiQLEditorOnFocus
 }: {
   setIsOpen: (isOpen: boolean) => void
   setSearch: React.Dispatch<React.SetStateAction<string>>
   setPages: React.Dispatch<React.SetStateAction<string[]>>
-  currentPage?: string
+  currentPage?: string,
+  isGraphiQLEditorOnFocus: boolean
 }) {
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -138,7 +145,7 @@ function useKeyboardEvents({
           if (event.metaKey || event.ctrlKey) {
             // Some browsers (ie. firefox) will focus the address bar by default
             event.preventDefault()
-
+            if(!isGraphiQLEditorOnFocus)
             setIsOpen(true)
           }
           return

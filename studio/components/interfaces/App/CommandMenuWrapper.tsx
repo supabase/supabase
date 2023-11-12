@@ -14,6 +14,7 @@ import { useProfile } from 'lib/profile'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { createSqlSnippetSkeleton } from '../SQLEditor/SQLEditor.utils'
 import { OPT_IN_TAGS } from 'lib/constants'
+import { useGraphiQLQueryEditorFocus } from './GraphiQLQueryEditorFocusContext'
 
 const CommandMenuWrapper = ({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
@@ -21,6 +22,8 @@ const CommandMenuWrapper = ({ children }: PropsWithChildren<{}>) => {
   const selectedOrganization = useSelectedOrganization()
   const { project: selectedProject } = useProjectContext()
   const opt_in_tags = selectedOrganization?.opt_in_tags
+
+  const { isGraphiQLEditorOnFocus } = useGraphiQLQueryEditorFocus()
 
   const snap = useSqlEditorStateSnapshot()
   const isOptedInToAI = opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
@@ -105,6 +108,7 @@ const CommandMenuWrapper = ({ children }: PropsWithChildren<{}>) => {
       metadata={cmdkMetadata}
       isOptedInToAI={isOptedInToAI}
       saveGeneratedSQL={onSaveGeneratedSQL}
+      isGraphiQLEditorOnFocus={isGraphiQLEditorOnFocus}
     >
       {children}
     </CommandMenuProvider>
