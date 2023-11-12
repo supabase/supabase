@@ -72,8 +72,8 @@ const Footer = (props: Props) => {
                   isLaunchWeekPage
                     ? supabaseLogoWordmarkDark
                     : mounted && resolvedTheme === 'dark'
-                    ? supabaseLogoWordmarkDark
-                    : supabaseLogoWordmarkLight
+                      ? supabaseLogoWordmarkDark
+                      : supabaseLogoWordmarkLight
                 }
                 width={160}
                 height={30}
@@ -122,29 +122,33 @@ const Footer = (props: Props) => {
                     <h6 className="text-foreground overwrite text-base">{segment.title}</h6>
                     <ul className="mt-4 space-y-2">
                       {segment.links.map(({ component: Component, ...link }, idx) => {
+                        const isExternalLink = link.url && link.url.startsWith('https');
+
                         const children = (
-                          <div
-                            className={`text-sm transition-colors ${
-                              link.url || Component
-                                ? 'text-foreground-lighter hover:text-foreground'
+                          <a href= {link.url} target='_blank'>
+                            <div
+                              className={`text-sm transition-colors ${(link.url || Component)
+                                ? 'text-foreground-lighter hover:text-foreground hover:underline'
                                 : 'text-muted hover:text-foreground-lighter'
-                            } `}
-                          >
-                            {link.text}
-                            {!link.url && !Component && (
-                              <div className="ml-2 inline text-xs xl:ml-0 xl:block 2xl:ml-2 2xl:inline">
-                                <Badge color="scale" size="small">
-                                  Coming soon
-                                </Badge>
-                              </div>
-                            )}
-                          </div>
+                                }`}
+                              rel="noreferrer noopener"
+                            >
+                              {link.text}
+                              {!link.url && !Component && (
+                                <div className="ml-2 inline text-xs xl:ml-0 xl:block 2xl:ml-2 2xl:inline">
+                                  <Badge color="scale" size="small">
+                                    Coming soon
+                                  </Badge>
+                                </div>
+                              )}
+                            </div>
+                          </a>
                         )
 
                         return (
                           <li key={`${segment.title}_link_${idx}`}>
                             {link.url ? (
-                              link.url.startsWith('https') ? (
+                              isExternalLink ? (
                                 <a href={link.url}>{children}</a>
                               ) : (
                                 <Link href={link.url} legacyBehavior>
