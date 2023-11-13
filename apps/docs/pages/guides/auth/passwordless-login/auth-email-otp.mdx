@@ -6,9 +6,11 @@ export const meta = {
   description: 'Use Supabase to authenticate your users using one-time password emails.',
 }
 
-Email one-time passwords (OTP) are a form of passwordless logins where users key in a six digit code sent to their email address to log in to their accounts. By default, a user can only request an OTP once every 60 seconds and they expire after 24 hours.
+Email one-time passwords (OTP) are a form of passwordless login where users key in a six digit code sent to their email address to log in to their accounts. By default, a user can only request an OTP once every 60 seconds and they expire after 24 hours.
 
-Set up Email OTP for your Supabase application.
+## Setting up Email OTP
+
+To set up email OTP for your Supabase app:
 
 - Enable the email provider in your [Supabase Project](/dashboard/project/_/auth/providers)
 - The Site URL represents the default URL that the user will be redirected to after clicking on the email signup confirmation link.
@@ -18,10 +20,10 @@ Set up Email OTP for your Supabase application.
 ```html
 <h2>One time login code</h2>
 
-<p>Please enter this code:{{ .Token }}</p>
+<p>Please enter this code: {{ .Token }}</p>
 ```
 
-## Sign in with email OTP
+## Signing in a user with email OTP
 
 <Tabs
   scrollable
