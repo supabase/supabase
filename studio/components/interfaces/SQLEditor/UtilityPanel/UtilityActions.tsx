@@ -1,10 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
-import { useState } from 'react'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { Button, IconAlignLeft, IconCommand, IconCornerDownLeft, IconDownload } from 'ui'
-import DownloadSnippetModal from '../DownloadSnippetModal'
+import { Button, IconAlignLeft, IconCommand, IconCornerDownLeft } from 'ui'
 
 import FavoriteButton from './FavoriteButton'
 import SavingIndicator from './SavingIndicator'
@@ -26,31 +23,11 @@ const UtilityActions = ({
   executeQuery,
 }: UtilityActionsProps) => {
   const os = detectOS()
-  const snap = useSqlEditorStateSnapshot()
-  const [isDownloadSnippetModalOpen, setIsDownloadSnippetModalOpen] = useState(false)
-
-  const snippet = snap.snippets[id]?.snippet
 
   return (
     <>
-      {snippet && (
-        <DownloadSnippetModal
-          id={id}
-          visible={isDownloadSnippetModalOpen}
-          onCancel={() => setIsDownloadSnippetModalOpen(false)}
-        />
-      )}
       <SavingIndicator id={id} />
-      {IS_PLATFORM && snippet && (
-        <Button
-          type="text"
-          size="tiny"
-          icon={<IconDownload size="tiny" />}
-          onClick={() => setIsDownloadSnippetModalOpen(true)}
-        >
-          Download as migration file
-        </Button>
-      )}
+
       {IS_PLATFORM && <FavoriteButton id={id} />}
       <SizeToggleButton id={id} />
       <Tooltip.Root delayDuration={0}>

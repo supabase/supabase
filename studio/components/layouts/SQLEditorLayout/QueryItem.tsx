@@ -19,6 +19,7 @@ import {
   IconAlertTriangle,
   IconChevronDown,
   IconCopy,
+  IconDownload,
   IconEdit2,
   IconEye,
   IconShare,
@@ -37,6 +38,7 @@ import { IS_PLATFORM } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import DownloadSnippetModal from 'components/interfaces/SQLEditor/DownloadSnippetModal'
 
 export interface QueryItemProps {
   tabInfo: SqlSnippet
@@ -129,6 +131,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
   const [renameModalOpen, setRenameModalOpen] = useState(false)
   const [shareModalOpen, setShareModalOpen] = useState(false)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [isDownloadSnippetModalOpen, setIsDownloadSnippetModalOpen] = useState(false)
   const isActive = id === activeId
 
   const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
@@ -154,6 +157,8 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
     e.stopPropagation()
     setDeleteModalOpen(true)
   }
+
+  const onClickDownloadMigration = () => {}
 
   const onConfirmShare = async () => {
     if (id) {
@@ -229,6 +234,16 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
               <DropdownMenuItem onClick={createPersonalCopy} className="space-x-2">
                 <IconCopy size="tiny" />
                 <p>Duplicate personal copy</p>
+              </DropdownMenuItem>
+            )}
+
+            {IS_PLATFORM && (
+              <DropdownMenuItem
+                onClick={() => setIsDownloadSnippetModalOpen(!isDownloadSnippetModalOpen)}
+                className="space-x-2"
+              >
+                <IconDownload size="tiny" />
+                <p>Download as migration file</p>
               </DropdownMenuItem>
             )}
             <>
@@ -317,6 +332,11 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
           </div>
         </Modal.Content>
       </ConfirmationModal>
+      <DownloadSnippetModal
+        id={id as string}
+        visible={isDownloadSnippetModalOpen}
+        onCancel={() => setIsDownloadSnippetModalOpen(false)}
+      />
     </div>
   )
 })
