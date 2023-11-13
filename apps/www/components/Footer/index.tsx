@@ -147,9 +147,7 @@ const Footer = (props: Props) => {
                               link.url.startsWith('https') ? (
                                 <a href={link.url}>{children}</a>
                               ) : (
-                                <Link href={link.url} legacyBehavior>
-                                  {children}
-                                </Link>
+                                <Link href={link.url}>{children}</Link>
                               )
                             ) : (
                               Component && <Component>{children}</Component>
