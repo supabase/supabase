@@ -2,6 +2,7 @@ import { useParams } from 'common'
 import { useState } from 'react'
 import { Button, IconRefreshCw, IconSearch, IconX, Input, Listbox } from 'ui'
 
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import APIDocsButton from 'components/ui/APIDocsButton'
 import { useUsersQuery } from 'data/auth/users-query'
@@ -11,6 +12,7 @@ import UsersList from './UsersList'
 const Users = () => {
   const { project } = useProjectContext()
   const { ref: projectRef } = useParams()
+  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
 
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
@@ -81,7 +83,7 @@ const Users = () => {
           </Listbox>
         </div>
         <div className="mt-4 flex items-center gap-2 md:mt-0">
-          <APIDocsButton section={['user-management']} />
+          {isNewAPIDocsEnabled && <APIDocsButton section={['user-management']} />}
           <Button
             size="tiny"
             icon={<IconRefreshCw />}
