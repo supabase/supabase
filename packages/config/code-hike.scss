@@ -1,4 +1,4 @@
-[data-theme='dark'],
+[data-theme*='dark'],
 .dark {
   --ch-0: dark;
   --ch-1: #8b949e;
@@ -18,36 +18,6 @@
   --ch-15: #8b949e;
   // --ch-16: hsl(var(--foreground-lighter));
   --ch-16: #2a2929;
-  --ch-17: #264f78;
-  --ch-18: #3794ff;
-  --ch-19: #ffffff0b;
-  --ch-20: #6e7681;
-  --ch-21: #010409;
-  --ch-22: #30363d;
-  --ch-23: #f78166;
-  --ch-24: #6e768166;
-  --ch-25: #6e76811a;
-}
-
-[data-theme='deep-dark'],
-.deep-dark {
-  --ch-0: dark;
-  --ch-1: #8b949e;
-  --ch-2: #79c0ff;
-  --ch-3: #ffcda1;
-  --ch-4: #f8f8f2;
-  --ch-5: #bda4ff;
-  --ch-6: hsl(var(--brand-600));
-  --ch-7: #569cd6;
-  --ch-8: hsl(var(--brand-default));
-  --ch-9: #ffa198;
-  --ch-10: #f0f6fc;
-  --ch-11: #490202;
-  --ch-12: #04260f;
-  --ch-13: #5a1e02;
-  --ch-14: #161b22;
-  --ch-15: #8b949e;
-  --ch-16: #0d1117;
   --ch-17: #264f78;
   --ch-18: #3794ff;
   --ch-19: #ffffff0b;
