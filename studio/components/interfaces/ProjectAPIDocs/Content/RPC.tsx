@@ -38,7 +38,7 @@ const RPC = ({ language }: ContentProps) => {
 
   return (
     <div className="divide-y">
-      <div className="space-y-1 px-4 py-6">
+      <div className="space-y-1 px-4 py-4">
         <h2 className="text-xl">{rpc.name}</h2>
         <p className="text-sm text-foreground-light">{summary ?? 'No description available'}</p>
       </div>
