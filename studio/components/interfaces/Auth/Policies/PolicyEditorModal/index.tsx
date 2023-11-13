@@ -1,7 +1,7 @@
 import type { PostgresRole } from '@supabase/postgres-meta'
 import { isEmpty, noop } from 'lodash'
 import { useEffect, useState } from 'react'
-import { IconX, Modal } from 'ui'
+import { Modal } from 'ui'
 
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useStore } from 'hooks'
@@ -187,15 +187,11 @@ const PolicyEditorModal = ({
           schema={schema}
           table={table}
           onSelectBackFromTemplates={onSelectBackFromTemplates}
+          setIsClosingPolicyEditorModal={setIsClosingPolicyEditorModal}
         />,
       ]}
       onCancel={isClosingPolicyEditor}
     >
-      <IconX
-        size={18}
-        className="absolute right-3 top-4 cursor-pointer"
-        onClick={() => setIsClosingPolicyEditorModal(true)}
-      />
       <div className="">
         <ConfirmationModal
           visible={isClosingPolicyEditorModal}

@@ -1,5 +1,5 @@
 import { noop } from 'lodash'
-import { Button, IconEdit, IconGrid, Modal } from 'ui'
+import { Button, IconEdit, IconExternalLink, IconGrid, Modal } from 'ui'
 
 import CardButton from 'components/ui/CardButton'
 
@@ -59,24 +59,17 @@ const PolicySelection = ({
             onClick={onViewEditor}
           />
         </div>
-        <div>
-          <p className="text-sm text-foreground-light">
-            Not sure what policies are? Check out our resources{' '}
-            <a
-              target="_blank"
-              rel="noreferrer"
-              className="text-brand transition-colors hover:text-brand-600"
-              href="https://supabase.com/docs/guides/auth#policies"
-            >
-              here
-            </a>
-            .
-          </p>
-          <div className="flex justify-end w-full items-center space-x-3">
-            <Button type="default" onClick={onSelectCancel}>
-              Cancel
-            </Button>
-          </div>
+      </div>
+      <div className="flex w-full items-center justify-end space-x-4 border-t py-3 dark:border-dark">
+        <Button asChild type="link" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
+          <a href="https://supabase.com/docs/guides/auth#policies" target="_blank" rel="noreferrer">
+            Documentation
+          </a>
+        </Button>
+        <div className="flex w-full items-center justify-end gap-2">
+          <Button type="default" onClick={onSelectCancel}>
+            Cancel
+          </Button>
         </div>
       </div>
     </Modal.Content>
