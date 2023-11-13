@@ -3,7 +3,7 @@ import { KeyboardEvent, ReactNode, useCallback, useEffect, useRef } from 'react'
 
 interface BlockKeysProps {
   value: string | null
-  initialValue: unknown | null
+  initialValue?: unknown | null
   children: ReactNode
   onEscape?: (value: string | null) => void
   onEnter?: (value: string | null) => void
@@ -38,7 +38,11 @@ export const BlockKeys = ({ value, initialValue, children, onEscape, onEnter }: 
   )
 
   useEffect(() => {
-    if (isClickedOutside && onEnter !== undefined && value !== initialValue) {
+    if (
+      isClickedOutside &&
+      onEnter !== undefined &&
+      (initialValue === undefined || value !== initialValue)
+    ) {
       onEnter(value)
     }
   }, [isClickedOutside])
