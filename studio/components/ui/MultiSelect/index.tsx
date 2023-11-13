@@ -209,10 +209,14 @@ export default function MultiSelect({
                       key={`multiselect-option-${option.id}`}
                       onClick={() => handleChange(option)}
                       className={[
-                        'text-typography-body-light dark:text-typography-body-dark',
+                        'text-typography-body-light [[data-theme*=dark]_&]:text-typography-body-dark',
                         'group flex cursor-pointer items-center justify-between transition',
                         'space-x-1 rounded bg-transparent p-2 px-4 text-sm hover:bg-overlay-hover',
-                        `${active ? ' dark:bg-green-600 dark:bg-opacity-25' : ''}`,
+                        `${
+                          active
+                            ? ' [[data-theme*=dark]_&]:bg-green-600 [[data-theme*=dark]_&]:bg-opacity-25'
+                            : ''
+                        }`,
                       ].join(' ')}
                     >
                       <div className="flex items-center space-x-2">

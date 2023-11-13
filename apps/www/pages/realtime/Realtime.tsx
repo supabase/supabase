@@ -21,7 +21,7 @@ const Cursor = ({ className = '', color = 'none' }) => {
       fill={color}
       viewBox="0 0 24 24"
       aria-hidden="true"
-      className={`h-10 w-10 stroke-black dark:stroke-white ${className}`}
+      className={`h-10 w-10 stroke-foreground ${className}`}
     >
       <path
         strokeLinecap="round"
