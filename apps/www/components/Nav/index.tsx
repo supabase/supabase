@@ -32,6 +32,8 @@ const Nav = () => {
   const [open, setOpen] = useState(false)
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
+
+  const isHomePage = router.pathname === '/'
   const isLaunchWeekPage = router.pathname.includes('launch-week')
   const showLaunchWeekNavMode = isLaunchWeekPage && !open
 
@@ -64,7 +66,8 @@ const Nav = () => {
     return null
   }
 
-  const showDarkLogo = isLaunchWeekPage || (mounted && resolvedTheme?.includes('dark')!)
+  const showDarkLogo =
+    isLaunchWeekPage || (mounted && resolvedTheme?.includes('dark')!) || isHomePage
 
   return (
     <>

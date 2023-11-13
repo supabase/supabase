@@ -20,7 +20,7 @@ const Footer = (props: Props) => {
   const { resolvedTheme } = useTheme()
   const { pathname } = useRouter()
 
-  const isLaunchWeekPage = pathname.includes('launch-week')
+  const forceDark = pathname.includes('launch-week') || pathname === '/'
 
   /**
    * Temporary fix for next-theme client side bug
@@ -69,7 +69,7 @@ const Footer = (props: Props) => {
             <Link href="#" as="/" className="w-40">
               <Image
                 src={
-                  isLaunchWeekPage
+                  forceDark
                     ? supabaseLogoWordmarkDark
                     : mounted && resolvedTheme?.includes('dark')
                     ? supabaseLogoWordmarkDark
@@ -164,7 +164,11 @@ const Footer = (props: Props) => {
         </div>
         <div className="border-default mt-32 flex justify-between border-t pt-8">
           <small className="small">&copy; Supabase Inc</small>
-          <ThemeToggle forceDark={isLaunchWeekPage} />
+          <div
+            className={cn(forceDark && '[&>button]:opacity-50 [&>button]:hover:cursor-not-allowed')}
+          >
+            <ThemeToggle forceDark={forceDark} />
+          </div>
         </div>
       </SectionContainer>
     </footer>
