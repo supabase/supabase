@@ -58,7 +58,7 @@ const FilterPopover = ({
               })}
             ></Checkbox.Group>
           </div>
-          <div className="flex items-center justify-end gap-2 border-t border-scale-400 bg-scale-200 py-2 px-3 dark:border-scale-500 dark:bg-scale-400 ">
+          <div className="flex items-center justify-end gap-2 border-t border-overlay bg-surface-200 py-2 px-3">
             <Button
               size="tiny"
               type="default"
@@ -82,16 +82,22 @@ const FilterPopover = ({
         </>
       }
     >
-      <Button type={activeOptions.length > 0 ? 'default' : 'dashed'} onClick={() => setOpen(false)}>
-        <span>{name}</span>
-        {activeOptions.length > 0 && <span className="mr-1">:</span>}
-        {activeOptions.length >= 3 ? (
-          <span>
-            {formattedOptions[0]} and {activeOptions.length - 1} others
-          </span>
-        ) : activeOptions.length > 0 ? (
-          <span>{formattedOptions.join(', ')}</span>
-        ) : null}
+      <Button
+        asChild
+        type={activeOptions.length > 0 ? 'default' : 'dashed'}
+        onClick={() => setOpen(false)}
+      >
+        <div>
+          <span>{name}</span>
+          {activeOptions.length > 0 && <span className="mr-1">:</span>}
+          {activeOptions.length >= 3 ? (
+            <span>
+              {formattedOptions[0]} and {activeOptions.length - 1} others
+            </span>
+          ) : activeOptions.length > 0 ? (
+            <span>{formattedOptions.join(', ')}</span>
+          ) : null}
+        </div>
       </Button>
     </Popover>
   )

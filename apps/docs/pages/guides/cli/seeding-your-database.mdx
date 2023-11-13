@@ -67,21 +67,18 @@ We can use the Snaplet configuration file to define the values you want to gener
 - Three `Post.comments` from three different users.
 
 ```ts snaplet.config.ts
-defineConfig({
+import { defineConfig } from 'snaplet'
+import { copycat } from '@snaplet/copycat'
+
+export default defineConfig({
    generate: {
-      plan(snaplet) {
-        return snaplet.Post({
-          data: {
-            title: "There is a lot of snow around here!"
-            User: {
-                data: {
-                  email: copycat.email(seed, { domain: 'acme.org' })
-                }
-            },
-            Comment: {
-              count: 3,
-            }
-          }
+      async run(snaplet) {
+        await snaplet.posts({
+          title: "There is a lot of snow around here!"
+          userByCreatedBy: {
+            email: copycat.email(seed, { domain: 'acme.org' })
+          },
+          comments: (x) => x(3)
         })
       }
    }
@@ -111,7 +108,7 @@ INSERT INTO "User" (name, email) VALUES ("Steven Plank", "s@plank.org")
 INSERT INTO "Comment" (text, userId, postId) VALUES ("Actually, that's not correct...", 4, 1)
 ```
 
-For more information, check out Snaplet's ["generate" documentation](https://docs.snaplet.dev/references/data-operations/generate)
+For more information, check out Snaplet's ["generate" documentation](https://docs.snaplet.dev/getting-started/quick-start/generate)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

@@ -1,14 +1,14 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import { useTheme } from 'next-themes'
-import { PropsWithChildren } from 'react'
-import { BASE_PATH } from 'lib/constants'
 import Divider from 'components/ui/Divider'
+import { BASE_PATH } from 'lib/constants'
+import { useTheme } from 'next-themes'
+import Head from 'next/head'
+import Image from 'next/legacy/image'
+import { PropsWithChildren } from 'react'
 
 export interface APIAuthorizationLayoutProps {}
 
 const APIAuthorizationLayout = ({ children }: PropsWithChildren<APIAuthorizationLayoutProps>) => {
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
   return (
     <>
       <Head>
@@ -23,7 +23,7 @@ const APIAuthorizationLayout = ({ children }: PropsWithChildren<APIAuthorization
                   <span className="sr-only">Supabase</span>
                   <Image
                     src={
-                      theme === 'dark'
+                      resolvedTheme === 'dark'
                         ? `${BASE_PATH}/img/supabase-dark.svg`
                         : `${BASE_PATH}/img/supabase-light.svg`
                     }
@@ -37,7 +37,7 @@ const APIAuthorizationLayout = ({ children }: PropsWithChildren<APIAuthorization
           </div>
         </div>
         <Divider light />
-        <div className="flex flex-col justify-center flex-grow mx-auto max-w-[90vw] md:max-w-xl h-full space-y-4">
+        <div className="flex flex-col justify-center flex-grow mx-auto w-[90vw] max-w-[600px] h-full space-y-4">
           {children}
         </div>
       </main>

@@ -1,3 +1,4 @@
+import { Monaco } from '@monaco-editor/react'
 import { useParams, useTelemetryProps } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import dynamic from 'next/dynamic'
@@ -8,11 +9,10 @@ import { format } from 'sql-formatter'
 import {
   AiIconAnimation,
   Button,
-  cn,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   IconCheck,
   IconChevronDown,
   IconCornerDownLeft,
@@ -20,6 +20,7 @@ import {
   IconSettings,
   IconX,
   Input_Shadcn_,
+  cn,
 } from 'ui'
 
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
@@ -30,7 +31,6 @@ import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useFormatQueryMutation } from 'data/sql/format-sql-query'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { isError } from 'data/utils/error-check'
 import {
   useFlag,
@@ -41,18 +41,14 @@ import {
   useStore,
 } from 'hooks'
 import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
-import { removeCommentsFromSql, uuidv4 } from 'lib/helpers'
+import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import Telemetry from 'lib/telemetry'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { subscriptionHasHipaaAddon } from '../BillingV2/Subscription/Subscription.utils'
+import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
 import AISettingsModal from './AISettingsModal'
-import {
-  destructiveSqlRegex,
-  sqlAiDisclaimerComment,
-  untitledSnippetTitle,
-} from './SQLEditor.constants'
+import { sqlAiDisclaimerComment, untitledSnippetTitle } from './SQLEditor.constants'
 import {
   ContentDiff,
   DiffType,
@@ -61,11 +57,13 @@ import {
   SQLEditorContextValues,
 } from './SQLEditor.types'
 import {
+  checkDestructiveQuery,
   createSqlSnippetSkeleton,
   getDiffTypeButtonLabel,
   getDiffTypeDropdownLabel,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -100,6 +98,7 @@ const SQLEditor = () => {
 
   const { profile } = useProfile()
   const project = useSelectedProject()
+  const organization = useSelectedOrganization()
   const snap = useSqlEditorStateSnapshot()
 
   const { mutate: formatQuery } = useFormatQueryMutation()
@@ -115,7 +114,7 @@ const SQLEditor = () => {
   const inputRef = useRef<HTMLInputElement>(null)
   const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
 
-  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef: project?.ref })
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
   // Customers on HIPAA plans should not have access to Supabase AI
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
@@ -140,6 +139,7 @@ const SQLEditor = () => {
 
   const [selectedDiffType, setSelectedDiffType] = useState(DiffType.Modification)
   const [isFirstRender, setIsFirstRender] = useState(true)
+  const [lineHighlights, setLineHighlights] = useState<string[]>([])
 
   const isAiLoading = isGenerateSqlLoading || isEditSqlLoading
 
@@ -174,8 +174,35 @@ const SQLEditor = () => {
       // Refetching instead of invalidating since invalidate doesn't work with `enabled` flag
       refetchEntityDefinitions()
     },
-    onError(error) {
-      if (id) snap.addResultError(id, error)
+    onError(error: any) {
+      if (id) {
+        if (error.position && monacoRef.current) {
+          const editor = editorRef.current
+          const monaco = monacoRef.current
+
+          const formattedError = error.formattedError ?? ''
+          const lineError = formattedError.slice(formattedError.indexOf('LINE'))
+          const line = Number(lineError.slice(0, lineError.indexOf(':')).split(' ')[1])
+
+          if (!isNaN(line)) {
+            const decorations = editor?.deltaDecorations(
+              [],
+              [
+                {
+                  range: new monaco.Range(line, 1, line, 20),
+                  options: { isWholeLine: true, inlineClassName: 'bg-amber-800' },
+                },
+              ]
+            )
+            if (decorations) {
+              editor?.revealLineInCenter(line)
+              setLineHighlights(decorations)
+            }
+          }
+        }
+
+        snap.addResultError(id, error)
+      }
     },
   })
 
@@ -194,6 +221,7 @@ const SQLEditor = () => {
   )
 
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
+  const monacoRef = useRef<Monaco | null>(null)
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
 
   /**
@@ -263,9 +291,7 @@ const SQLEditor = () => {
           ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql
           : selectedValue || editorRef.current?.getValue()
 
-        const containsDestructiveOperations = destructiveSqlRegex.some((regex) =>
-          regex.test(removeCommentsFromSql(sql))
-        )
+        const containsDestructiveOperations = checkDestructiveQuery(sql)
 
         if (!force && containsDestructiveOperations) {
           setIsConfirmModalOpen(true)
@@ -275,6 +301,11 @@ const SQLEditor = () => {
         if (supabaseAIEnabled && !hasHipaaAddon && snippet?.snippet.name === untitledSnippetTitle) {
           // Intentionally don't await title gen (lazy)
           setAiTitle(id, sql)
+        }
+
+        if (lineHighlights.length > 0) {
+          editor?.deltaDecorations(lineHighlights, [])
+          setLineHighlights([])
         }
 
         execute({
@@ -486,8 +517,9 @@ const SQLEditor = () => {
       <ConfirmModal
         visible={isConfirmModalOpen}
         title="Destructive operation"
+        danger
         description="We've detected a potentially destructive operation in the query. Please confirm that you would like to execute this query."
-        buttonLabel="Execute query"
+        buttonLabel="Run destructive query"
         onSelectCancel={() => {
           setIsConfirmModalOpen(false)
         }}
@@ -707,19 +739,19 @@ const SQLEditor = () => {
                         >
                           {getDiffTypeButtonLabel(selectedDiffType)}
                         </Button>
-                        <DropdownMenu_Shadcn_>
-                          <DropdownMenuTrigger_Shadcn_>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
                             <Button
                               type="primary"
-                              className="rounded-l-none border-l-0 px-[4px] py-[5px]"
+                              className="rounded-l-none border-l-0 px-[4px] py-[5px] flex"
                               icon={<IconChevronDown />}
                             />
-                          </DropdownMenuTrigger_Shadcn_>
-                          <DropdownMenuContent_Shadcn_ align="end" side="bottom">
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" side="bottom">
                             {Object.values(DiffType)
                               .filter((diffType) => diffType !== selectedDiffType)
                               .map((diffType) => (
-                                <DropdownMenuItem_Shadcn_
+                                <DropdownMenuItem
                                   key={diffType}
                                   onClick={() => {
                                     setSelectedDiffType(diffType)
@@ -735,11 +767,11 @@ const SQLEditor = () => {
                                     }
                                   }}
                                 >
-                                  <p className="text">{getDiffTypeDropdownLabel(diffType)}</p>
-                                </DropdownMenuItem_Shadcn_>
+                                  <p>{getDiffTypeDropdownLabel(diffType)}</p>
+                                </DropdownMenuItem>
                               ))}
-                          </DropdownMenuContent_Shadcn_>
-                        </DropdownMenu_Shadcn_>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                       <Button
                         type="alternative"
@@ -916,6 +948,7 @@ const SQLEditor = () => {
                     autoFocus
                     id={id}
                     editorRef={editorRef}
+                    monacoRef={monacoRef}
                     executeQuery={executeQuery}
                   />
                 </motion.div>

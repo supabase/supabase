@@ -15,7 +15,7 @@ const ApiSettings: NextPageWithLayout = () => {
       ) : (
         <div>
           <h3 className="mb-6 text-xl text-foreground">API Settings</h3>
-          <div className="flex items-center justify-center rounded border border-scale-400 bg-scale-300 p-8">
+          <div className="flex items-center justify-center rounded border border-overlay bg-surface-100 p-8">
             <IconAlertCircle strokeWidth={1.5} />
             <p className="text-sm text-foreground-light ml-2">
               API settings are unavailable as the project is not active

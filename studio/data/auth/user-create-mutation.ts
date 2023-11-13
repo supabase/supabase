@@ -47,7 +47,6 @@ export async function createUser({ protocol, endpoint, serviceApiKey, user }: Us
         apikey: serviceApiKey,
         Authorization: `Bearer ${serviceApiKey}`,
       },
-      credentials: 'omit',
     }
   )
   if (response.error) {

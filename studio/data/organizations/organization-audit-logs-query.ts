@@ -1,6 +1,5 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { useCallback } from 'react'
 
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
@@ -80,21 +79,4 @@ export const useOrganizationAuditLogsQuery = <TData = OrganizationAuditLogsData>
       ...options,
     }
   )
-}
-
-export const useOrganizationAuditLogsPrefetch = (vars: OrganizationAuditLogsVariables) => {
-  const { slug, iso_timestamp_start, iso_timestamp_end } = vars
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (slug) {
-      const date_start = dayjs(iso_timestamp_start).utc().format('YYYY-MM-DD')
-      const date_end = dayjs(iso_timestamp_end).utc().format('YYYY-MM-DD')
-      client.prefetchQuery(
-        organizationKeys.auditLogs(slug, { date_start, date_end }),
-        ({ signal }) => getOrganizationAuditLogs(vars, signal)
-      )
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [client, vars])
 }

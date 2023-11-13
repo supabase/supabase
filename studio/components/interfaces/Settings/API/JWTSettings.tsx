@@ -12,11 +12,11 @@ import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   IconAlertCircle,
   IconAlertTriangle,
   IconChevronDown,
@@ -124,7 +124,7 @@ const JWTSettings = () => {
                 layout="horizontal"
               />
               <div className="space-y-3">
-                <div className="p-3 px-6 border rounded-md shadow-sm bg-scale-200 dark:border-dark dark:bg-scale-200">
+                <div className="p-3 px-6 border rounded-md shadow-sm bg-background">
                   {isUpdatingJwtSecret ? (
                     <div className="flex items-center space-x-2">
                       <IconLoader className="animate-spin" size={14} />
@@ -158,8 +158,8 @@ const JWTSettings = () => {
                                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                                   <div
                                     className={[
-                                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                      'border border-scale-200',
+                                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                      'border border-background',
                                     ].join(' ')}
                                   >
                                     <span className="text-xs text-foreground">
@@ -170,30 +170,30 @@ const JWTSettings = () => {
                               </Tooltip.Portal>
                             </Tooltip.Root>
                           ) : (
-                            <DropdownMenu_Shadcn_>
-                              <DropdownMenuTrigger_Shadcn_>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger>
                                 <Button asChild type="default" iconRight={<IconChevronDown />}>
                                   <span>Generate a new secret</span>
                                 </Button>
-                              </DropdownMenuTrigger_Shadcn_>
-                              <DropdownMenuContent_Shadcn_ align="end" side="bottom">
-                                <DropdownMenuItem_Shadcn_
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" side="bottom">
+                                <DropdownMenuItem
                                   className="space-x-2"
                                   onClick={() => setIsGeneratingKey(true)}
                                 >
                                   <IconRefreshCw size={16} />
-                                  <p className="text">Generate a random secret</p>
-                                </DropdownMenuItem_Shadcn_>
-                                <DropdownMenuSeparator_Shadcn_ />
-                                <DropdownMenuItem_Shadcn_
+                                  <p>Generate a random secret</p>
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
                                   className="space-x-2"
                                   onClick={() => setIsCreatingKey(true)}
                                 >
                                   <IconPenTool size={16} />
-                                  <p className="text">Create my own secret</p>
-                                </DropdownMenuItem_Shadcn_>
-                              </DropdownMenuContent_Shadcn_>
-                            </DropdownMenu_Shadcn_>
+                                  <p>Create my own secret</p>
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           )}
                         </div>
                       </div>
@@ -229,13 +229,13 @@ const JWTSettings = () => {
             <IconAlertTriangle />
             <AlertTitle_Shadcn_>This will invalidate all existing API keys</AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_>
-              Generating a new JWT secret will invalidate <u className="text">all</u> of your API
-              keys, including your <code className="text-xs">service_role</code> and{' '}
+              Generating a new JWT secret will invalidate <u className="text-foreground">all</u> of
+              your API keys, including your <code className="text-xs">service_role</code> and{' '}
               <code className="text-xs">anon</code> keys. Your project will also be restarted during
               this process, which will terminate any existing connections.
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
-          <p className="text text-sm">
+          <p className="text-foreground text-sm">
             This action cannot be undone and the old JWT secret will be lost. All existing API keys
             will be invalidated, and any open connections will be terminated.
           </p>
@@ -277,8 +277,8 @@ const JWTSettings = () => {
               <IconAlertTriangle />
               <AlertTitle_Shadcn_>This will invalidate all existing API keys</AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
-                Generating a new JWT secret will invalidate <u className="text">all</u> of your API
-                keys, including your <code className="text-xs">service_role</code> and{' '}
+                Generating a new JWT secret will invalidate <u className="text-foreground">all</u>{' '}
+                of your API keys, including your <code className="text-xs">service_role</code> and{' '}
                 <code className="text-xs">anon</code> keys. Your project will also be restarted
                 during this process, which will terminate any existing connections.
               </AlertDescription_Shadcn_>

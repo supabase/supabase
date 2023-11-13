@@ -9,6 +9,7 @@ import {
 
 import SSLConfiguration from 'components/interfaces/Settings/Database/SSLConfiguration'
 import DiskSizeConfiguration from 'components/interfaces/Settings/Database/DiskSizeConfiguration'
+import BannedIPs from 'components/interfaces/Settings/Database/BannedIPs'
 
 const ProjectSettings: NextPageWithLayout = () => {
   return (
@@ -19,6 +20,7 @@ const ProjectSettings: NextPageWithLayout = () => {
         <SSLConfiguration />
         <DiskSizeConfiguration />
         <NetworkRestrictions />
+        <BannedIPs />
       </div>
     </div>
   )

@@ -46,7 +46,7 @@ const DeleteOrganizationButton = () => {
         category: 'success',
         message: `Successfully deleted ${orgName}`,
       })
-      router.push('/')
+      router.push('/projects')
     }
   }
 

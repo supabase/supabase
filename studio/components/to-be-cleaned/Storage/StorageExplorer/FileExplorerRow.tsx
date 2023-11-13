@@ -5,15 +5,15 @@ import { useContextMenu } from 'react-contexify'
 import SVG from 'react-inlinesvg'
 import {
   Checkbox,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuPortal_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuSubContent_Shadcn_,
-  DropdownMenuSubTrigger_Shadcn_,
-  DropdownMenuSub_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuSub,
+  DropdownMenuTrigger,
   IconAlertCircle,
   IconClipboard,
   IconDownload,
@@ -321,7 +321,7 @@ const FileExplorerRow = ({
         className={[
           'storage-row group flex h-full items-center px-2.5',
           'hover:bg-panel-footer-light dark:hover:bg-panel-footer-dark',
-          `${isOpened ? 'bg-scale-400' : ''}`,
+          `${isOpened ? 'bg-surface-200' : ''}`,
           `${isPreviewed ? 'bg-green-500 hover:bg-green-500 dark:hover:bg-green-500' : ''}`,
           `${item.status !== STORAGE_ROW_STATUS.LOADING ? 'cursor-pointer' : ''}`,
         ].join(' ')}
@@ -382,8 +382,8 @@ const FileExplorerRow = ({
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200',
+                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                      'border border-background',
                     ].join(' ')}
                   >
                     <span className="text-xs text-foreground">
@@ -421,51 +421,51 @@ const FileExplorerRow = ({
               strokeWidth={2}
             />
           ) : (
-            <DropdownMenu_Shadcn_ modal={false}>
-              <DropdownMenuTrigger_Shadcn_>
+            <DropdownMenu modal={false}>
+              <DropdownMenuTrigger>
                 <div className="storage-row-menu opacity-0">
                   <IconMoreVertical size={16} strokeWidth={2} />
                 </div>
-              </DropdownMenuTrigger_Shadcn_>
-              <DropdownMenuContent_Shadcn_ side="bottom" align="end">
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="bottom" align="end">
                 {rowOptions.map((option) => {
                   if ((option?.children ?? []).length > 0) {
                     return (
-                      <DropdownMenuSub_Shadcn_ key={option.name}>
-                        <DropdownMenuSubTrigger_Shadcn_ className="space-x-2">
+                      <DropdownMenuSub key={option.name}>
+                        <DropdownMenuSubTrigger className="space-x-2">
                           {option.icon || <></>}
-                          <p className="text-xs">{option.name}</p>
-                        </DropdownMenuSubTrigger_Shadcn_>
-                        <DropdownMenuPortal_Shadcn_>
-                          <DropdownMenuSubContent_Shadcn_>
+                          <p>{option.name}</p>
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuPortal>
+                          <DropdownMenuSubContent>
                             {(option?.children ?? [])?.map((child) => {
                               return (
-                                <DropdownMenuItem_Shadcn_ key={child.name} onClick={child.onClick}>
-                                  <p className="text-xs">{child.name}</p>
-                                </DropdownMenuItem_Shadcn_>
+                                <DropdownMenuItem key={child.name} onClick={child.onClick}>
+                                  <p>{child.name}</p>
+                                </DropdownMenuItem>
                               )
                             })}
-                          </DropdownMenuSubContent_Shadcn_>
-                        </DropdownMenuPortal_Shadcn_>
-                      </DropdownMenuSub_Shadcn_>
+                          </DropdownMenuSubContent>
+                        </DropdownMenuPortal>
+                      </DropdownMenuSub>
                     )
                   } else if (option.name === 'Separator') {
-                    return <DropdownMenuSeparator_Shadcn_ key={option.name} />
+                    return <DropdownMenuSeparator key={option.name} />
                   } else {
                     return (
-                      <DropdownMenuItem_Shadcn_
+                      <DropdownMenuItem
                         className="space-x-2"
                         key={option.name}
                         onClick={option.onClick}
                       >
                         {option.icon || <></>}
-                        <p className="text-xs">{option.name}</p>
-                      </DropdownMenuItem_Shadcn_>
+                        <p>{option.name}</p>
+                      </DropdownMenuItem>
                     )
                   }
                 })}
-              </DropdownMenuContent_Shadcn_>
-            </DropdownMenu_Shadcn_>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
         </div>
       </div>

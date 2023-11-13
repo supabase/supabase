@@ -38,6 +38,7 @@ export default function LW7BgGraphic() {
           quality={100}
           unoptimized
           priority
+          alt="Launch Week 7"
         />
       </motion.div>
     </div>

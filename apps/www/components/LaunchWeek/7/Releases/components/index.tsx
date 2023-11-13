@@ -144,7 +144,7 @@ export const AccordionHeader = ({ date, day, title, shipped }: any) => {
           </span>
         </Badge>
 
-        <span className="text-scale-900 text-sm">
+        <span className="text-muted text-sm">
           <span className="inline sm:hidden md:inline">{day} </span>
           {date && (
             <span>
@@ -153,7 +153,7 @@ export const AccordionHeader = ({ date, day, title, shipped }: any) => {
           )}
         </span>
       </div>
-      {shipped && <span className="text-scale-1200 text-lg mt-3 sm:mt-0">{title}</span>}
+      {shipped && <span className="text-foreground text-lg mt-3 sm:mt-0">{title}</span>}
     </div>
   )
 }
@@ -161,7 +161,7 @@ export const MultistepSectionHeader = ({ title, blog }: any) => {
   return (
     <div className="flex flex-1 flex-col sm:flex-row py-8">
       <div className="flex gap-4 w-full items-center justify-between md:justify-start">
-        {title && <span className="text-scale-1200 text-lg mt-3 sm:mt-0">{title}</span>}
+        {title && <span className="text-foreground text-lg mt-3 sm:mt-0">{title}</span>}
         {!!blog && (
           <ChipLink href={blog} className="!w-auto !text-left !justify-between !flex-none">
             Blog post
@@ -198,17 +198,16 @@ export const ChipLink = ({
       {children}
     </span>
   ) : !!href ? (
-    <Link href={href}>
-      <a
-        target={target ?? '_self'}
-        rel="noopener"
-        className={[
-          'flex flex-auto justify-center sm:justify-between w-full text-center sm:text-left min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444490] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191980] backdrop-blur-xl rounded-full text-sm py-2 px-3 sm:pr-2',
-          className,
-        ].join(' ')}
-      >
-        {children}
-      </a>
+    <Link
+      href={href}
+      target={target ?? '_self'}
+      rel="noopener"
+      className={[
+        'flex flex-auto justify-center sm:justify-between w-full text-center sm:text-left min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444490] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191980] backdrop-blur-xl rounded-full text-sm py-2 px-3 sm:pr-2',
+        className,
+      ].join(' ')}
+    >
+      {children}
     </Link>
   ) : null
 

@@ -38,8 +38,8 @@ const Template = ({ projectRef, template }: { projectRef?: string; template: Log
       icon={
         <div
           className="duration-400 flex h-6 w-6 items-center justify-center rounded
-          bg-scale-1200
-          text-scale-100
+          bg-foreground
+          text-background
           transition-colors
           group-hover:bg-brand
           group-hover:text-brand-600
@@ -58,10 +58,10 @@ const Template = ({ projectRef, template }: { projectRef?: string; template: Log
           <Popover
             onOpenChange={setShowPreview}
             open={showPreview}
-            className="rounded-lg bg-scale-100"
+            className="rounded-lg bg-alternative"
             size="content"
             overlay={
-              <pre className="whitespace-pre-line break-words rounded-lg bg-scale-100 p-4 text-sm">
+              <pre className="whitespace-pre-line break-words rounded-lg bg-alternative p-4 text-sm">
                 {template.searchString}
               </pre>
             }

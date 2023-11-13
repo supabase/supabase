@@ -53,8 +53,8 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
             <Tooltip.Arrow className="radix-tooltip-arrow" />
             <div
               className={[
-                'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                'border-scale-200 border ',
+                'bg-alternative rounded py-1 px-2 leading-none shadow',
+                'border-background border ',
               ].join(' ')}
             >
               <span className="text-foreground text-xs">All changes saved</span>
@@ -70,8 +70,8 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
             <Tooltip.Arrow className="radix-tooltip-arrow" />
             <div
               className={[
-                'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                'border-scale-200 border',
+                'bg-alternative rounded py-1 px-2 leading-none shadow',
+                'border-background border',
               ].join(' ')}
             >
               <span className="text-foreground text-xs">Saving changes...</span>
@@ -87,8 +87,8 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
             <Tooltip.Arrow className="radix-tooltip-arrow" />
             <div
               className={[
-                'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                'border-scale-200 border ',
+                'bg-alternative rounded py-1 px-2 leading-none shadow',
+                'border-background border ',
               ].join(' ')}
             >
               <span className="text-foreground text-xs">Failed to save changes</span>

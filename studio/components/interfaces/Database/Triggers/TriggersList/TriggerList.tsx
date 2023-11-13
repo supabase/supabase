@@ -5,10 +5,10 @@ import { observer } from 'mobx-react-lite'
 import {
   Badge,
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   IconCheck,
   IconEdit3,
   IconMoreVertical,
@@ -48,7 +48,9 @@ const TriggerList = ({
       <Table.tr key={schema}>
         <Table.td colSpan={6}>
           <p className="text-sm text-foreground">No triggers created yet</p>
-          <p className="text-sm text-light">There are no triggers found in the schema "{schema}"</p>
+          <p className="text-sm text-foreground-light">
+            There are no triggers found in the schema "{schema}"
+          </p>
         </Table.td>
       </Table.tr>
     )
@@ -59,7 +61,7 @@ const TriggerList = ({
       <Table.tr key={schema}>
         <Table.td colSpan={5}>
           <p className="text-sm text-foreground">No results found</p>
-          <p className="text-sm text-light">
+          <p className="text-sm text-foreground-light">
             Your search for "{filterString}" did not return any results
           </p>
         </Table.td>
@@ -111,31 +113,23 @@ const TriggerList = ({
             {!isLocked && (
               <div className="flex items-center justify-end">
                 {canUpdateTriggers ? (
-                  <DropdownMenu_Shadcn_>
-                    <DropdownMenuTrigger_Shadcn_>
-                      <Button asChild type="default" icon={<IconMoreVertical />}>
-                        <span></span>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger>
+                      <Button asChild type="default" className="px-1" icon={<IconMoreVertical />}>
+                        <span />
                       </Button>
-                    </DropdownMenuTrigger_Shadcn_>
-                    <DropdownMenuContent_Shadcn_ side="bottom" align="end">
-                      <>
-                        <DropdownMenuItem_Shadcn_
-                          className="space-x-2"
-                          onClick={() => editTrigger(x)}
-                        >
-                          <IconEdit3 size="tiny" />
-                          <p className="text">Edit trigger</p>
-                        </DropdownMenuItem_Shadcn_>
-                        <DropdownMenuItem_Shadcn_
-                          className="space-x-2"
-                          onClick={() => deleteTrigger(x)}
-                        >
-                          <IconTrash stroke="red" size="tiny" />
-                          <p className="text">Delete trigger</p>
-                        </DropdownMenuItem_Shadcn_>
-                      </>
-                    </DropdownMenuContent_Shadcn_>
-                  </DropdownMenu_Shadcn_>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent side="bottom" align="end" className="w-36">
+                      <DropdownMenuItem className="space-x-2" onClick={() => editTrigger(x)}>
+                        <IconEdit3 size="tiny" />
+                        <p>Edit trigger</p>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="space-x-2" onClick={() => deleteTrigger(x)}>
+                        <IconTrash stroke="red" size="tiny" />
+                        <p>Delete trigger</p>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 ) : (
                   <Tooltip.Root delayDuration={0}>
                     <Tooltip.Trigger asChild>
@@ -146,8 +140,8 @@ const TriggerList = ({
                         <Tooltip.Arrow className="radix-tooltip-arrow" />
                         <div
                           className={[
-                            'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                            'border border-scale-200',
+                            'rounded bg-alternative py-1 px-2 leading-none shadow',
+                            'border border-background',
                           ].join(' ')}
                         >
                           <span className="text-xs text-foreground">

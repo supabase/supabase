@@ -1,7 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { includes, noop } from 'lodash'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 
 import { useParams } from 'common/hooks'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -12,11 +12,11 @@ import { BASE_PATH } from 'lib/constants'
 import {
   Badge,
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   IconEdit3,
   IconMoreVertical,
   IconTrash,
@@ -52,7 +52,8 @@ const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: 
     <>
       {filteredHooks.map((x: any) => {
         const isEdgeFunction = (url: string) =>
-          url.includes(`https://${ref}.functions.supabase.${restUrlTld}/`)
+          url.includes(`https://${ref}.functions.supabase.${restUrlTld}/`) ||
+          url.includes(`https://${ref}.supabase.${restUrlTld}/functions/`)
         const [url, method] = x.function_args
 
         return (
@@ -89,30 +90,27 @@ const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: 
             <Table.td className="text-right">
               <div className="flex justify-end gap-4">
                 {canUpdateWebhook ? (
-                  <DropdownMenu_Shadcn_>
-                    <DropdownMenuTrigger_Shadcn_>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger>
                       <Button asChild type="default" icon={<IconMoreVertical />} className="px-1">
                         <span></span>
                       </Button>
-                    </DropdownMenuTrigger_Shadcn_>
+                    </DropdownMenuTrigger>
 
-                    <DropdownMenuContent_Shadcn_ side="left">
+                    <DropdownMenuContent side="left">
                       <>
-                        <DropdownMenuItem_Shadcn_ className="space-x-2" onClick={() => editHook(x)}>
+                        <DropdownMenuItem className="space-x-2" onClick={() => editHook(x)}>
                           <IconEdit3 size="tiny" />
-                          <p className="text">Edit hook</p>
-                        </DropdownMenuItem_Shadcn_>
-                        <DropdownMenuSeparator_Shadcn_ />
-                        <DropdownMenuItem_Shadcn_
-                          className="space-x-2"
-                          onClick={() => deleteHook(x)}
-                        >
+                          <p>Edit hook</p>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="space-x-2" onClick={() => deleteHook(x)}>
                           <IconTrash stroke="red" size="tiny" />
-                          <p className="text">Delete hook</p>
-                        </DropdownMenuItem_Shadcn_>
+                          <p>Delete hook</p>
+                        </DropdownMenuItem>
                       </>
-                    </DropdownMenuContent_Shadcn_>
-                  </DropdownMenu_Shadcn_>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 ) : (
                   <Tooltip.Root delayDuration={0}>
                     <Tooltip.Trigger asChild>
@@ -123,8 +121,8 @@ const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: 
                         <Tooltip.Arrow className="radix-tooltip-arrow" />
                         <div
                           className={[
-                            'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                            'border border-scale-200',
+                            'rounded bg-alternative py-1 px-2 leading-none shadow',
+                            'border border-background',
                           ].join(' ')}
                         >
                           <span className="text-xs text-foreground">

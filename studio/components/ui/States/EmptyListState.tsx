@@ -10,8 +10,8 @@ const EmptyListState = ({ title, description }: { title: string; description: st
     "
     >
       <div className="flex flex-col gap-1">
-        <div className="border-scale-600 dark:border-scale-500 relative flex h-4 w-32 items-center rounded border border-dashed px-2"></div>
-        <div className="border-scale-600 dark:border-scale-500 relative flex h-4 w-32 items-center rounded border border-dashed px-2">
+        <div className="relative flex h-4 w-32 items-center rounded border border-dashed px-2"></div>
+        <div className="relative flex h-4 w-32 items-center rounded border border-dashed px-2">
           <div className="absolute right-1 -bottom-4">
             <svg
               xmlns="http://www.w3.org/2000/svg"

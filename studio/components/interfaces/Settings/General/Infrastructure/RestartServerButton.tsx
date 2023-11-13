@@ -6,10 +6,10 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   IconChevronDown,
 } from 'ui'
 
@@ -106,17 +106,17 @@ const RestartServerButton = () => {
               Restart project
             </Button>
             {canRestartProject && isProjectActive && (
-              <DropdownMenu_Shadcn_>
-                <DropdownMenuTrigger_Shadcn_>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
                   <Button
                     type="default"
                     className="rounded-l-none px-[4px] py-[5px]"
                     icon={<IconChevronDown />}
                     disabled={!canRestartProject}
                   />
-                </DropdownMenuTrigger_Shadcn_>
-                <DropdownMenuContent_Shadcn_ align="end" side="bottom">
-                  <DropdownMenuItem_Shadcn_
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" side="bottom">
+                  <DropdownMenuItem
                     key="database"
                     disabled={isLoading}
                     onClick={() => {
@@ -125,14 +125,14 @@ const RestartServerButton = () => {
                   >
                     <div className="space-y-1">
                       <p className="block text-foreground">Fast database reboot</p>
-                      <p className="block text-foreground-light text-xs">
+                      <p className="block text-foreground-light">
                         Restarts only the database - faster but may not be able to recover from all
                         failure modes
                       </p>
                     </div>
-                  </DropdownMenuItem_Shadcn_>
-                </DropdownMenuContent_Shadcn_>
-              </DropdownMenu_Shadcn_>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
           </div>
         </Tooltip.Trigger>
@@ -142,8 +142,8 @@ const RestartServerButton = () => {
               <Tooltip.Arrow className="radix-tooltip-arrow" />
               <div
                 className={[
-                  'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                  'border border-scale-200 ', //border
+                  'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                  'border border-background', //border
                 ].join(' ')}
               >
                 <span className="text-xs text-foreground">

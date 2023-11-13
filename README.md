@@ -12,9 +12,9 @@
 - [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database)
 - [x] Authentication and Authorization. [Docs](https://supabase.com/docs/guides/auth)
 - [x] Auto-generated APIs.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
-  - [x] Realtime subscriptions. [Docs](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] REST. [Docs](https://supabase.com/docs/guides/api)
+  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/graphql)
+  - [x] Realtime subscriptions. [Docs](https://supabase.com/docs/guides/realtime)
 - [x] Functions.
   - [x] Database Functions. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Edge Functions [Docs](https://supabase.com/docs/guides/functions)
@@ -224,7 +224,7 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
 <a href="https://supabase.com">
   <img
     width="168"
-    height="28"
+    height="30"
     src="https://supabase.com/badge-made-with-supabase.svg"
     alt="Made with Supabase"
   />
@@ -241,7 +241,7 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
 <a href="https://supabase.com">
   <img
     width="168"
-    height="28"
+    height="30"
     src="https://supabase.com/badge-made-with-supabase-dark.svg"
     alt="Made with Supabase"
   />
