@@ -187,7 +187,7 @@
     @apply text-brand-600 border-default transition-all;
     @apply hover:border-brand focus:ring-brand-300 focus:outline-none;
 
-    @apply bg-surface-100;
+    @apply bg-transparent;
 
     margin-top: 2px;
   }
