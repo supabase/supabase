@@ -21,14 +21,6 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
 
   const [selectedView, setSelectedView] = useState<'CLI' | 'NPM'>('CLI')
 
-  const setView = () => {
-    if (selectedView === 'CLI') {
-      setSelectedView('NPM')
-    } else {
-      setSelectedView('CLI')
-    }
-  }
-
   return (
     <Modal size="xlarge" header="Download snippet" hideFooter closable {...props}>
       <div className="flex flex-col items-start justify-between gap-4 px-6 py-3 mb-4">
@@ -64,7 +56,9 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
               options={['CLI', 'NPM']}
               activeOption={selectedView}
               borderOverride="border-gray-100"
-              onClickOption={setView}
+              onClickOption={() =>
+                selectedView === 'CLI' ? setSelectedView('NPM') : setSelectedView('CLI')
+              }
             />
           </div>
 
