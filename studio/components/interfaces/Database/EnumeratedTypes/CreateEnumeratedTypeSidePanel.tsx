@@ -32,11 +32,13 @@ import EnumeratedTypeValueRow from './EnumeratedTypeValueRow'
 interface CreateEnumeratedTypeSidePanelProps {
   visible: boolean
   onClose: () => void
+  schema: string
 }
 
 const CreateEnumeratedTypeSidePanel = ({
   visible,
   onClose,
+  schema,
 }: CreateEnumeratedTypeSidePanelProps) => {
   const submitRef = useRef<HTMLButtonElement>(null)
   const { project } = useProjectContext()
@@ -80,8 +82,9 @@ const CreateEnumeratedTypeSidePanel = ({
     createEnumeratedType({
       projectRef: project.ref,
       connectionString: project.connectionString,
+      schema,
       name: data.name,
-      description: data.description,
+      description: data.description?.replaceAll("'", "''"),
       values: data.values.filter((x) => x.value.length > 0).map((x) => x.value),
     })
   }
@@ -156,21 +159,20 @@ const CreateEnumeratedTypeSidePanel = ({
                                     You will need to delete and recreate the enumerated type with
                                     the updated values instead.
                                   </p>
-                                  <Link
-                                    passHref
-                                    href="https://www.postgresql.org/message-id/21012.1459434338%40sss.pgh.pa.us"
+                                  <Button
+                                    asChild
+                                    type="default"
+                                    icon={<IconExternalLink strokeWidth={1.5} />}
+                                    className="mt-2"
                                   >
-                                    <Button
-                                      asChild
-                                      type="default"
-                                      icon={<IconExternalLink strokeWidth={1.5} />}
-                                      className="mt-2"
+                                    <Link
+                                      href="https://www.postgresql.org/message-id/21012.1459434338%40sss.pgh.pa.us"
+                                      target="_blank"
+                                      rel="noreferrer"
                                     >
-                                      <a target="_blank" rel="noreferrer">
-                                        Learn more
-                                      </a>
-                                    </Button>
-                                  </Link>
+                                      Learn more
+                                    </Link>
+                                  </Button>
                                 </AlertDescription_Shadcn_>
                               </Alert_Shadcn_>
                             )}

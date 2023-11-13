@@ -1,4 +1,4 @@
-import { CommandGroup } from 'cmdk-supabase'
+import { CommandGroup } from 'cmdk'
 import { useCommandMenu } from './CommandMenuProvider'
 import ChildItem from './ChildItem'
 import { useTheme } from 'next-themes'

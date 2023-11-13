@@ -28,15 +28,12 @@ const PITRNotice = ({}) => {
             You can also increase your recovery retention period updating your PITR add-on
           </span>
           <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
-              <Link
-                href={`/project/${projectRef}/settings/billing/subscription?panel=pitr`}
-                passHref
-              >
-                <Button disabled={canUpdateSubscription} type="default" asChild>
-                  <a>Increase retention period</a>
-                </Button>
-              </Link>
+            <Tooltip.Trigger asChild>
+              <Button asChild disabled={canUpdateSubscription} type="default">
+                <Link href={`/project/${projectRef}/settings/addons?panel=pitr`}>
+                  Increase retention period
+                </Link>
+              </Button>
             </Tooltip.Trigger>
             {!canUpdateSubscription && (
               <Tooltip.Portal>
@@ -44,8 +41,8 @@ const PITRNotice = ({}) => {
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200',
+                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                      'border border-background',
                     ].join(' ')}
                   >
                     <span className="text-xs text-foreground">
@@ -60,7 +57,7 @@ const PITRNotice = ({}) => {
       }
     >
       <div className="flex p-6 space-x-6">
-        <div className="flex items-center justify-center w-10 h-10 rounded bg-scale-700">
+        <div className="flex items-center justify-center w-10 h-10 rounded bg-border-strong">
           <IconCalendar strokeWidth={2} />
         </div>
         <div className="space-y-2">

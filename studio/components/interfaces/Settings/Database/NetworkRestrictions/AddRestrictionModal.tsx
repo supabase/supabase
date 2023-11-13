@@ -34,7 +34,9 @@ const AddRestrictionModal = ({
 
     // Validate CIDR block size
     const isOutOfCidrSizeRange = cidrBlockSize < 0 || cidrBlockSize > 32
-    if (isOutOfCidrSizeRange) errors.cidrBlockSize = 'Size has to be between 0 to 32'
+    if (cidrBlockSize.length === 0 || isOutOfCidrSizeRange) {
+      errors.cidrBlockSize = 'Size has to be between 0 to 32'
+    }
 
     // Validate IP address
     const isValid = Address4.isValid(ipAddress)
@@ -78,7 +80,7 @@ const AddRestrictionModal = ({
         validateOnBlur
         id={formId}
         className="!border-t-0"
-        initialValues={{ ipAddress: '', cidrBlockSize: undefined }}
+        initialValues={{ ipAddress: '', cidrBlockSize: 32 }}
         validate={validate}
         onSubmit={onSubmit}
       >
@@ -152,8 +154,8 @@ const AddRestrictionModal = ({
                                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                                   <div
                                     className={[
-                                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                      'border border-scale-200 w-[300px]',
+                                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                      'border border-background w-[300px]',
                                     ].join(' ')}
                                   >
                                     <span className="text-xs text-foreground">
@@ -171,7 +173,7 @@ const AddRestrictionModal = ({
                         id="cidrBlockSize"
                         name="cidrBlockSize"
                         type="number"
-                        placeholder="0"
+                        placeholder="32"
                         min={0}
                         max={32}
                       />

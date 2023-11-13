@@ -6,11 +6,12 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
 import { ResponseError } from 'types'
 import { getPrimaryKeys } from './utils'
+import { Table } from 'data/tables/table-query'
 
 export type TableRowDeleteVariables = {
   projectRef: string
   connectionString?: string
-  table: SupaTable
+  table: Table
   rows: SupaRow[]
 }
 

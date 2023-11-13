@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import { useEffect } from 'react'
 
 import Table from 'components/to-be-cleaned/Table'
 import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
@@ -6,6 +7,7 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
 import ResourceContent from '../ResourceContent'
 import { ContentProps } from './Content.types'
+import { tempRemovePostgrestText } from './Content.utils'
 
 function getColumnType(type: string, format: string) {
   // json and jsonb both have type=undefined, so check format instead
@@ -32,7 +34,7 @@ const Entity = ({ language, apikey = '', endpoint = '' }: ContentProps) => {
   const snap = useAppStateSnapshot()
   const resource = snap.activeDocsSection[1]
 
-  const { data: jsonSchema } = useProjectJsonSchemaQuery({ projectRef: ref })
+  const { data: jsonSchema, refetch } = useProjectJsonSchemaQuery({ projectRef: ref })
   const definition = jsonSchema?.definitions?.[resource]
   const columns =
     definition !== undefined
@@ -42,6 +44,10 @@ const Entity = ({ language, apikey = '', endpoint = '' }: ContentProps) => {
           required: definition.required.includes(id),
         }))
       : []
+
+  useEffect(() => {
+    if (resource !== undefined) refetch()
+  }, [resource])
 
   if (resource === undefined) return null
 
@@ -71,7 +77,9 @@ const Entity = ({ language, apikey = '', endpoint = '' }: ContentProps) => {
                   <p className="truncate">{column.format}</p>
                 </Table.td>
                 <Table.td title={formattedColumnType}>{formattedColumnType}</Table.td>
-                <Table.td title={column.description}>{column.description ?? ''}</Table.td>
+                <Table.td title={column.description}>
+                  {tempRemovePostgrestText(column.description ?? '').trim()}
+                </Table.td>
               </Table.tr>
             )
           })}

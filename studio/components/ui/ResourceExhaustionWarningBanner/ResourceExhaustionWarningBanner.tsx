@@ -24,8 +24,6 @@ const ResourceExhaustionWarningBanner = () => {
     (warning) => warning.project === ref
   )
 
-  const isOrgBilling = !!organization?.subscription_id
-
   // [Joshen] Read only takes higher precedence over multiple resource warnings
   const activeWarnings =
     projectResourceWarnings !== undefined
@@ -82,12 +80,12 @@ const ResourceExhaustionWarningBanner = () => {
       ? undefined
       : metric === null
       ? '/project/[ref]/settings/[infra-path]'
-      : metric === 'disk_space'
+      : metric === 'disk_space' || metric === 'read_only'
       ? '/project/[ref]/settings/database'
       : `/project/[ref]/settings/[infra-path]#${metric}`
   )
     ?.replace('[ref]', ref ?? 'default')
-    ?.replace('[infra-path]', isOrgBilling ? 'infrastructure' : 'billing/usage')
+    ?.replace('[infra-path]', 'infrastructure')
 
   const buttonText =
     activeWarnings.length > 1
@@ -99,7 +97,9 @@ const ResourceExhaustionWarningBanner = () => {
   if (
     activeWarnings.length === 0 ||
     ((router.pathname.endsWith('/usage') || router.pathname.endsWith('/infrastructure')) &&
-      !activeWarnings.includes('is_readonly_mode_enabled'))
+      !activeWarnings.includes('is_readonly_mode_enabled')) ||
+    (activeWarnings.includes('is_readonly_mode_enabled') &&
+      router.pathname.endsWith('settings/database'))
   )
     return null
 
@@ -114,20 +114,14 @@ const ResourceExhaustionWarningBanner = () => {
       <AlertDescription_Shadcn_>{description}</AlertDescription_Shadcn_>
       <div className="absolute top-5 right-5 flex items-center space-x-2">
         {learnMoreUrl !== undefined && (
-          <Link passHref href={learnMoreUrl}>
-            <a>
-              <Button type="default" icon={<IconExternalLink />}>
-                Learn more
-              </Button>
-            </a>
-          </Link>
+          <Button asChild type="default" icon={<IconExternalLink />}>
+            <Link href={learnMoreUrl}>Learn more</Link>
+          </Button>
         )}
         {correctionUrl !== undefined && (
-          <Link passHref href={correctionUrl}>
-            <a>
-              <Button type="default">{buttonText ?? 'Check'}</Button>
-            </a>
-          </Link>
+          <Button asChild type="default">
+            <Link href={correctionUrl}>{buttonText ?? 'Check'}</Link>
+          </Button>
         )}
       </div>
     </Alert_Shadcn_>

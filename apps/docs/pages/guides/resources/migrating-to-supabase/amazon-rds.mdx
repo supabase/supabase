@@ -35,7 +35,7 @@ Supabase's core is Postgres, enabling the use of row-level security and providin
 The fastest way to migrate your database is with the Supabase migration tool on
 [Google Colab](https://colab.research.google.com/github/mansueli/Supa-Migrate/blob/main/Amazon_RDS_to_Supabase.ipynb).
 
-Alternatively, you can use [pgloader](https://github.com/dimitri/pgloader), a flexible and powerful data migration tool that supports a wide range of source database engines, including MySQL and MS SQL, and migrates the data to a Postgres database. For databases using the Postgres engine, we recommend using the pg_dump and psql command line tools, which are included in a full PostgreSQL installation.
+Alternatively, you can use [pgloader](https://github.com/dimitri/pgloader), a flexible and powerful data migration tool that supports a wide range of source database engines, including MySQL and MS SQL, and migrates the data to a Postgres database. For databases using the Postgres engine, we recommend using the [`pg_dump`](https://www.postgresql.org/docs/current/app-pgdump.html) and [psql](https://www.postgresql.org/docs/current/app-psql.html) command line tools, which are included in a full PostgreSQL installation.
 
 <Tabs
   scrollable
@@ -94,12 +94,7 @@ pgloader config.load
 </TabPanel>
 </Tabs>
 
-<Admonition type="caution">
-
-- If you plan on migrating a database larger than 6 GB, we recommend [contacting support](https://supabase.com/dashboard/support/new) to ensure that you'll have the proper disk size pre-provisioned. You can read more about how the disk is managed on Supabase on the [Database usage](/docs/guides/platform/database-size#disk-management).
-- We also recommend upgrading to at least a [Large instance](/docs/guides/platform/compute-add-ons) for the migration (you can downgrade later) to avoid running out of IO-Budget.
-
-</Admonition>
+<MigrationWarnings />
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 export default Page

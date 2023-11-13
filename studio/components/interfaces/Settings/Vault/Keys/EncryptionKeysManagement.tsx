@@ -140,13 +140,15 @@ const EncryptionKeysManagement = () => {
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <Link href="https://supabase.com/docs/guides/database/vault">
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                  Vault Documentation
-                </Button>
-              </a>
-            </Link>
+            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+              <Link
+                href="https://supabase.com/docs/guides/database/vault"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Vault Documentation
+              </Link>
+            </Button>
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger>
                 <Button
@@ -163,8 +165,8 @@ const EncryptionKeysManagement = () => {
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                        'border border-scale-200',
+                        'rounded bg-alternative py-1 px-2 leading-none shadow',
+                        'border border-background',
                       ].join(' ')}
                     >
                       <span className="text-xs text-foreground">
@@ -179,7 +181,7 @@ const EncryptionKeysManagement = () => {
         </div>
 
         {/* Table of keys */}
-        <div className="border border-scale-500 rounded">
+        <div className="border rounded">
           {!vault.isLoaded ? (
             <div className="px-6 py-6 space-x-2 flex items-center justify-center">
               <IconLoader
@@ -230,8 +232,8 @@ const EncryptionKeysManagement = () => {
                                 <Tooltip.Arrow className="radix-tooltip-arrow" />
                                 <div
                                   className={[
-                                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                    'border border-scale-200',
+                                    'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                    'border border-background',
                                   ].join(' ')}
                                 >
                                   <span className="text-xs text-foreground">

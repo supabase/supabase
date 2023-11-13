@@ -102,15 +102,14 @@ const TableDefinition = ({ id }: TableDefinitionProps) => {
   }
 
   return (
-    <div className="flex-grow overflow-y-auto border-t border-scale-400 relative">
-      <Link
-        passHref
-        href={`/project/${ref}/sql/new?content=${encodeURIComponent(formattedDefinition ?? '')}`}
-      >
-        <Button asChild type="default" className="absolute top-2 right-5 z-10">
-          <a>Open in SQL Editor</a>
-        </Button>
-      </Link>
+    <div className="flex-grow overflow-y-auto border-t border-muted relative">
+      <Button asChild type="default" className="absolute top-2 right-5 z-10">
+        <Link
+          href={`/project/${ref}/sql/new?content=${encodeURIComponent(formattedDefinition ?? '')}`}
+        >
+          Open in SQL Editor
+        </Link>
+      </Button>
       <Editor
         className="monaco-editor"
         theme={resolvedTheme === 'dark' ? 'vs-dark' : 'vs'}

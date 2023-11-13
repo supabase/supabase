@@ -99,14 +99,14 @@ ${JSON.stringify(fullLog.metadata, null, 2)}
     <div
       className={[
         'relative flex h-full flex-grow flex-col border border-l',
-        'border-panel-border-light dark:border-panel-border-dark',
-        'overflow-y-scroll bg-gray-200',
+        'border-overlay',
+        'overflow-y-scroll bg-background',
       ].join(' ')}
     >
       <div
         className={
           `absolute flex
-          h-full w-full flex-col items-center justify-center gap-2 overflow-y-scroll bg-scale-200 text-center opacity-0 transition-all ` +
+          h-full w-full flex-col items-center justify-center gap-2 overflow-y-scroll bg-background text-center opacity-0 transition-all ` +
           (partialLog ? 'z-0 opacity-0' : 'z-10 opacity-100')
         }
       >
@@ -126,8 +126,8 @@ ${JSON.stringify(fullLog.metadata, null, 2)}
             (partialLog || isLoading ? 'mt-0 scale-95 opacity-0' : 'mt-8 scale-100 opacity-100')
           }
         >
-          <div className="relative flex h-4 w-32 items-center rounded border border-scale-600 px-2 dark:border-scale-400">
-            <div className="h-0.5 w-2/3 rounded-full bg-scale-600 dark:bg-scale-500"></div>
+          <div className="relative flex h-4 w-32 items-center rounded border border-control px-2">
+            <div className="h-0.5 w-2/3 rounded-full bg-surface-300"></div>
             <div className="absolute right-1 -bottom-4">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -154,7 +154,7 @@ ${JSON.stringify(fullLog.metadata, null, 2)}
           </div>
         </div>
       </div>
-      <div className="relative h-px flex-grow bg-scale-300">
+      <div className="relative h-px flex-grow bg-surface-100">
         <div className="pt-4 px-4 flex flex-col gap-4">
           <div className="flex flex-row justify-between items-center">
             <div className={`transition ${!isLoading ? 'opacity-100' : 'opacity-0'}`}>
@@ -168,10 +168,10 @@ ${JSON.stringify(fullLog.metadata, null, 2)}
               <IconX size={14} strokeWidth={2} className="text-foreground-lighter" />
             </Button>
           </div>
-          <div className="h-px w-full bg-scale-600 rounded " />
+          <div className="h-px w-full bg-selection rounded " />
         </div>
         {isLoading && <Connecting />}
-        <div className="flex flex-col space-y-6 bg-scale-300 py-4">
+        <div className="flex flex-col space-y-6 bg-surface-100 py-4">
           {!isLoading && <Formatter />}
         </div>
       </div>

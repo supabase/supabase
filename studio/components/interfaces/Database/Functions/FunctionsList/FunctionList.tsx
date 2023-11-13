@@ -44,7 +44,6 @@ const FunctionList = ({
     includes(x.name.toLowerCase(), filterString.toLowerCase())
   )
   const _functions = filteredFunctions.filter((x) => x.schema == schema)
-  const isApiDocumentAvailable = schema == 'public'
   const projectRef = selectedProject?.ref
 
   const canUpdateFunctions = useCheckPermissions(
@@ -55,9 +54,9 @@ const FunctionList = ({
   if (_functions.length === 0 && filterString.length === 0) {
     return (
       <Table.tr key={schema}>
-        <Table.td colSpan={4}>
+        <Table.td colSpan={5}>
           <p className="text-sm text-foreground">No functions created yet</p>
-          <p className="text-sm text-light">
+          <p className="text-sm text-foreground-light">
             There are no functions found in the schema "{schema}"
           </p>
         </Table.td>
@@ -68,9 +67,9 @@ const FunctionList = ({
   if (_functions.length === 0 && filterString.length > 0) {
     return (
       <Table.tr key={schema}>
-        <Table.td colSpan={4}>
+        <Table.td colSpan={5}>
           <p className="text-sm text-foreground">No results found</p>
-          <p className="text-sm text-light">
+          <p className="text-sm text-foreground-light">
             Your search for "{filterString}" did not return any results
           </p>
         </Table.td>
@@ -81,6 +80,8 @@ const FunctionList = ({
   return (
     <>
       {_functions.map((x) => {
+        const isApiDocumentAvailable = schema == 'public' && x.return_type !== 'trigger'
+
         return (
           <Table.tr key={x.id}>
             <Table.td className="truncate">
@@ -140,8 +141,8 @@ const FunctionList = ({
                           <Tooltip.Arrow className="radix-tooltip-arrow" />
                           <div
                             className={[
-                              'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                              'border border-scale-200',
+                              'rounded bg-alternative py-1 px-2 leading-none shadow',
+                              'border border-background',
                             ].join(' ')}
                           >
                             <span className="text-xs text-foreground">

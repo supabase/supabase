@@ -2,6 +2,7 @@ import { createGraphiQLFetcher, Fetcher } from '@graphiql/toolkit'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useMemo } from 'react'
 
+import '@graphiql/react/dist/style.css'
 import { useParams } from 'common/hooks'
 import ExtensionCard from 'components/interfaces/Database/Extensions/ExtensionCard'
 import GraphiQL from 'components/interfaces/GraphQL/GraphiQL'
@@ -17,8 +18,8 @@ import { NextPageWithLayout } from 'types'
 const GraphiQLPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
   const { ui, meta } = useStore()
-  const { theme } = useTheme()
-  const currentTheme = theme === 'dark' ? 'dark' : 'light'
+  const { resolvedTheme } = useTheme()
+  const currentTheme = resolvedTheme === 'dark' ? 'dark' : 'light'
 
   const isExtensionsLoading = meta.extensions.isLoading
   const pgGraphqlExtension = meta.extensions.byId('pg_graphql')

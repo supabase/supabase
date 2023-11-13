@@ -61,8 +61,8 @@ const StorageMenu = () => {
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200',
+                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                      'border border-background',
                     ].join(' ')}
                   >
                     <span className="text-xs text-foreground">
@@ -121,10 +121,10 @@ const StorageMenu = () => {
               )}
             </div>
           </div>
-          <div className="h-px w-full bg-scale-500"></div>
+          <div className="h-px w-full bg-border"></div>
           <div className="">
             <Menu.Group title="Configuration" />
-            <Link href={`/project/${ref}/storage/policies`}>
+            <Link href={`/project/${ref}/storage/policies`} legacyBehavior>
               <Menu.Item rounded active={page === 'policies'}>
                 <p className="truncate">Policies</p>
               </Menu.Item>

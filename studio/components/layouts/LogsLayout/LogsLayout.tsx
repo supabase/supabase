@@ -4,7 +4,7 @@ import { PropsWithChildren } from 'react'
 
 import NoPermission from 'components/ui/NoPermission'
 import ProductMenu from 'components/ui/ProductMenu'
-import { useCheckPermissions, useSelectedProject, withAuth } from 'hooks'
+import { useCheckPermissions, useIsFeatureEnabled, useSelectedProject, withAuth } from 'hooks'
 import ProjectLayout from '../'
 import { generateLogsMenu } from './LogsMenu.utils'
 
@@ -16,6 +16,12 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
   const router = useRouter()
   const pathArr = router.pathname.split('/')
   const page = pathArr[pathArr.length - 1]
+
+  const {
+    projectAuthAll: authEnabled,
+    projectStorageAll: storageEnabled,
+    realtimeAll: realtimeEnabled,
+  } = useIsFeatureEnabled(['project_storage:all', 'project_auth:all', 'realtime:all'])
 
   const project = useSelectedProject()
 
@@ -35,7 +41,16 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
     <ProjectLayout
       title={title}
       product="Logs"
-      productMenu={<ProductMenu page={page} menu={generateLogsMenu(project)} />}
+      productMenu={
+        <ProductMenu
+          page={page}
+          menu={generateLogsMenu(project, {
+            auth: authEnabled,
+            storage: storageEnabled,
+            realtime: realtimeEnabled,
+          })}
+        />
+      }
     >
       <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
         {children}

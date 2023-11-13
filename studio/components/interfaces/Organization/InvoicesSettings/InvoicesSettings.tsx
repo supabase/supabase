@@ -2,8 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
-import { InvoiceStatusBadge } from 'components/interfaces/BillingV2'
-import { InvoiceStatus } from 'components/interfaces/BillingV2/Invoices.types'
+import { InvoiceStatus } from 'components/interfaces/Billing/Invoices.types'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
@@ -14,6 +13,7 @@ import { useInvoicesCountQuery } from 'data/invoices/invoices-count-query'
 import { useInvoicesQuery } from 'data/invoices/invoices-query'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { Button, IconChevronLeft, IconChevronRight, IconDownload, IconFileText } from 'ui'
+import InvoiceStatusBadge from 'components/interfaces/Billing/InvoiceStatusBadge'
 
 const PAGE_LIMIT = 10
 
@@ -109,11 +109,15 @@ const InvoicesSettings = () => {
                       <Table.td className="align-right">
                         <div className="flex items-center justify-end space-x-2">
                           {[InvoiceStatus.UNCOLLECTIBLE, InvoiceStatus.OPEN].includes(x.status) && (
-                            <Link href={`https://redirect.revops.supabase.com/pay-invoice/${x.id}`}>
-                              <a target="_blank" rel="noreferrer">
-                                <Button>Pay Now</Button>
-                              </a>
-                            </Link>
+                            <Button asChild>
+                              <Link
+                                href={`https://redirect.revops.supabase.com/pay-invoice/${x.id}`}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                Pay Now
+                              </Link>
+                            </Button>
                           )}
 
                           <Button

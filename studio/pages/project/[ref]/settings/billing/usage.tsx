@@ -1,41 +1,36 @@
-import Usage from 'components/interfaces/BillingV2/Usage/Usage'
 import { SettingsLayout } from 'components/layouts'
-import { useSelectedOrganization } from 'hooks'
 import { NextPageWithLayout } from 'types'
-import { useParams } from 'common'
-import { useEffect } from 'react'
 import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+import { useSelectedOrganization } from 'hooks'
+import { useParams } from 'common'
 
 const ProjectBillingUsage: NextPageWithLayout = () => {
+  // This component is only used for redirects, as nextjs cant redirect based on hash
+  const router = useRouter()
   const { ref } = useParams()
   const organization = useSelectedOrganization()
-  const isOrgBilling = !!organization?.subscription_id
-  const router = useRouter()
+
   const hash = router.asPath.split('#')[1]
+  const route = router.route
 
   useEffect(() => {
-    if (ref && isOrgBilling && organization) {
-      let redirectUri = `/org/${organization.slug}/usage?projectRef=${ref}`
+    if (!organization) return
 
-      if (['cpu', 'ram', 'disk_io'].includes(hash)) {
-        redirectUri = `/project/${ref}/settings/infrastructure#${hash}`
-      } else if (hash && hash.length > 0) {
-        redirectUri = redirectUri + `#${hash}`
-      }
+    let redirectUrl
 
-      router.push(redirectUri)
+    if (['cpu', 'ram', 'disk_io'].includes(hash)) {
+      redirectUrl = `/project/${ref}/settings/infrastructure#${hash}`
+    } else {
+      redirectUrl = `/org/${organization.slug}/usage?projectRef=${ref}`
     }
-  }, [organization, isOrgBilling, ref, hash])
 
-  if (isOrgBilling) {
-    return null
-  }
+    router.push(redirectUrl)
+  }, [hash, route, organization, ref, router])
 
-  return <Usage />
+  return null
 }
 
-ProjectBillingUsage.getLayout = (page) => (
-  <SettingsLayout title="Billing and Usage">{page}</SettingsLayout>
-)
+ProjectBillingUsage.getLayout = (page) => <SettingsLayout title="Usage">{page}</SettingsLayout>
 
 export default ProjectBillingUsage

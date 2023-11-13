@@ -4,13 +4,13 @@
 #   Stop:           docker compose down
 #   Destroy:        docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml down -v --remove-orphans
 
+name: supabase
 version: "3.8"
-
 services:
 
   studio:
     container_name: supabase-studio
-    image: supabase/studio:20230921-d657f29
+    image: supabase/studio:20231023-7e2cd92
     restart: unless-stopped
     healthcheck:
       test:
@@ -154,8 +154,9 @@ services:
     command: "postgrest"
 
   realtime:
+    # This container name looks inconsistent but is correct because realtime constructs tenant id by parsing the subdomain
     container_name: realtime-dev.supabase-realtime
-    image: supabase/realtime:v2.10.1
+    image: supabase/realtime:v2.25.27
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -272,7 +273,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.18.1
+    image: supabase/edge-runtime:v1.22.3
     restart: unless-stopped
     depends_on:
       analytics:
@@ -282,7 +283,7 @@ services:
       SUPABASE_URL: http://kong:8000
       SUPABASE_ANON_KEY: ${ANON_KEY}
       SUPABASE_SERVICE_ROLE_KEY: ${SERVICE_ROLE_KEY}
-      SUPABASE_DB_URL: postgresql://postgres:${POSTGRES_PASSWORD}@{POSTGRES_DB}:${POSTGRES_PORT}/${POSTGRES_DB}
+      SUPABASE_DB_URL: postgresql://postgres:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
       # TODO: Allow configuring VERIFY_JWT per function. This PR might help: https://github.com/supabase/cli/pull/786
       VERIFY_JWT: "${FUNCTIONS_VERIFY_JWT}"
     volumes:
@@ -363,7 +364,7 @@ services:
     restart: unless-stopped
     ports:
       # Pass down internal port because it's set dynamically by other services
-      - 127.0.0.1:${POSTGRES_PORT}:${POSTGRES_PORT}
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
     environment:
       POSTGRES_HOST: /var/run/postgresql
       PGPORT: ${POSTGRES_PORT}
