@@ -1,45 +1,45 @@
+import AccountLayout, { AccountLayoutWithoutAuth } from './AccountLayout/AccountLayout'
 import AuthLayout from './AuthLayout/AuthLayout'
-import SignInLayout from './SignInLayout/SignInLayout'
-import ForgotPasswordLayout from './SignInLayout/ForgotPasswordLayout'
-import ProjectLayout, {
-  ProjectLayoutWithAuth,
-  ProjectLayoutNonBlocking,
-} from './ProjectLayout/ProjectLayout'
-import TableEditorLayout from './TableEditorLayout/TableEditorLayout'
-import SQLEditorLayout from './SQLEditorLayout/SQLEditorLayout'
-import DatabaseLayout from './DatabaseLayout/DatabaseLayout'
-import SettingsLayout from './ProjectSettingsLayout/SettingsLayout'
-import StorageLayout from './StorageLayout/StorageLayout'
-import AccountLayout from './AccountLayout/AccountLayout'
-import { AccountLayoutWithoutAuth } from './AccountLayout/AccountLayout'
-import WizardLayout from './WizardLayout'
-import { WizardLayoutWithoutAuth } from './WizardLayout'
-import VercelIntegrationLayout from './VercelIntegrationLayout'
 import BillingLayout from './BillingLayout'
+import DatabaseLayout from './DatabaseLayout/DatabaseLayout'
+import DocsLayout from './DocsLayout/DocsLayout'
 import LogsLayout from './LogsLayout/LogsLayout'
-import ReportsLayout from './ReportsLayout/ReportsLayout'
 import OrganizationLayout from './OrganizationLayout'
+import ProjectLayout, {
+  ProjectLayoutNonBlocking,
+  ProjectLayoutWithAuth,
+} from './ProjectLayout/ProjectLayout'
+import SettingsLayout from './ProjectSettingsLayout/SettingsLayout'
+import ReportsLayout from './ReportsLayout/ReportsLayout'
+import SQLEditorLayout from './SQLEditorLayout/SQLEditorLayout'
+import ForgotPasswordLayout from './SignInLayout/ForgotPasswordLayout'
+import SignInLayout from './SignInLayout/SignInLayout'
+import StorageLayout from './StorageLayout/StorageLayout'
+import TableEditorLayout from './TableEditorLayout/TableEditorLayout'
+import VercelIntegrationLayout from './VercelIntegrationLayout'
+import WizardLayout, { WizardLayoutWithoutAuth } from './WizardLayout'
 
 export {
-  ProjectLayoutWithAuth,
-  ProjectLayoutNonBlocking,
-  AuthLayout,
-  SignInLayout,
-  ForgotPasswordLayout,
-  DatabaseLayout,
-  TableEditorLayout,
-  SQLEditorLayout,
-  SettingsLayout,
-  StorageLayout,
   AccountLayout,
   AccountLayoutWithoutAuth,
+  AuthLayout,
+  BillingLayout,
+  DatabaseLayout,
+  DocsLayout,
+  ForgotPasswordLayout,
+  LogsLayout,
+  OrganizationLayout,
+  ProjectLayoutNonBlocking,
+  ProjectLayoutWithAuth,
+  ReportsLayout,
+  SQLEditorLayout,
+  SettingsLayout,
+  SignInLayout,
+  StorageLayout,
+  TableEditorLayout,
+  VercelIntegrationLayout,
   WizardLayout,
   WizardLayoutWithoutAuth,
-  VercelIntegrationLayout,
-  BillingLayout,
-  LogsLayout,
-  ReportsLayout,
-  OrganizationLayout,
 }
 
 export default ProjectLayout

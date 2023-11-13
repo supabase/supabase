@@ -1,24 +1,24 @@
+import '@graphiql/react/dist/style.css'
 import { createGraphiQLFetcher, Fetcher } from '@graphiql/toolkit'
+import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
+import { useTheme } from 'next-themes'
 import { useEffect, useMemo } from 'react'
 
-import '@graphiql/react/dist/style.css'
-import { useParams } from 'common/hooks'
 import ExtensionCard from 'components/interfaces/Database/Extensions/ExtensionCard'
 import GraphiQL from 'components/interfaces/GraphQL/GraphiQL'
-import { DatabaseLayout } from 'components/layouts'
+import { DocsLayout } from 'components/layouts'
 import Connecting from 'components/ui/Loading/Loading'
 import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useStore } from 'hooks'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
-import { useTheme } from 'next-themes'
 import { NextPageWithLayout } from 'types'
 
 const GraphiQLPage: NextPageWithLayout = () => {
-  const { ref: projectRef } = useParams()
   const { ui, meta } = useStore()
   const { resolvedTheme } = useTheme()
+  const { ref: projectRef } = useParams()
   const currentTheme = resolvedTheme === 'dark' ? 'dark' : 'light'
 
   const isExtensionsLoading = meta.extensions.isLoading
@@ -83,6 +83,5 @@ const GraphiQLPage: NextPageWithLayout = () => {
   return <GraphiQL fetcher={fetcher} theme={currentTheme} accessToken={anonKey} />
 }
 
-GraphiQLPage.getLayout = (page) => <DatabaseLayout title="GraphiQL">{page}</DatabaseLayout>
-
+GraphiQLPage.getLayout = (page) => <DocsLayout title="GraphiQL">{page}</DocsLayout>
 export default observer(GraphiQLPage)

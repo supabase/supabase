@@ -117,6 +117,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: '/project/:ref/database/graphiql',
+        destination: '/project/:ref/api/graphiql',
+        permanent: true,
+      },
+      {
         source: '/project/:ref/storage',
         destination: '/project/:ref/storage/buckets',
         permanent: true,

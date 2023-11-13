@@ -8,6 +8,7 @@ import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
 import ResourceContent from '../ResourceContent'
 import { ContentProps } from './Content.types'
 import { tempRemovePostgrestText } from './Content.utils'
+import LanguageSelector from '../LanguageSelector'
 
 function getColumnType(type: string, format: string) {
   // json and jsonb both have type=undefined, so check format instead
@@ -52,14 +53,17 @@ const Entity = ({ language, apikey = '', endpoint = '' }: ContentProps) => {
   if (resource === undefined) return null
 
   return (
-    <div className="divide-y">
-      <div className="space-y-1 px-4 py-6">
-        <h2 className="text-xl">{resource}</h2>
-        <p className="text-sm text-foreground-light">
-          {definition?.description ?? 'No description available'}
-        </p>
+    <div className="divide-y relative">
+      <div className="flex items-center justify-between px-4 py-4 sticky top-0 bg-surface-100 z-10 border-b shadow-md">
+        <div className="flex flex-col gap-y-1">
+          <h2 className="text-xl">{resource}</h2>
+          <p className="text-sm text-foreground-light">
+            {definition?.description ?? 'No description available'}
+          </p>
+        </div>
+        <LanguageSelector />
       </div>
-      <div className="space-y-2 px-4 py-4">
+      <div className="space-y-2 px-4 py-4 !border-t-0">
         <p className="text-sm text-foreground-light">Columns</p>
         <Table
           head={[
