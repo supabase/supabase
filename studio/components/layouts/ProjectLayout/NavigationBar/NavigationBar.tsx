@@ -181,7 +181,7 @@ const NavigationBar = () => {
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'bg-scale-100 shadow-lg shadow-scale-700 dark:shadow-scale-300	py-1.5 px-3 rounded leading-none',
+                      'bg-scale-100 shadow-lg shadow-scale-700 dark:shadow-scale-300 py-1.5 px-3 rounded leading-none',
                       'border border-background flex items-center space-x-1',
                     ].join(' ')}
                   >
