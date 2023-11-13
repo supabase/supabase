@@ -7,7 +7,6 @@ import { AnimationTailwindClasses } from '../../types'
 
 import * as Dialog from '@radix-ui/react-dialog'
 
-import { Transition } from '@headlessui/react'
 import styleHandler from '../../lib/theme/styleHandler'
 
 // import { Transition } from '@tailwindui/react'
@@ -28,7 +27,6 @@ interface RadixProps
 interface Props {
   children?: React.ReactNode
   customFooter?: React.ReactNode
-  closable?: boolean
   description?: string
   hideFooter?: boolean
   alignFooter?: 'right' | 'left'
@@ -39,7 +37,12 @@ interface Props {
   cancelText?: string
   onConfirm?: any
   confirmText?: string
+  /**
+   * @deprecated This prop is no longer being used in the Modal component
+   */
+  closable?: boolean
   showIcon?: boolean
+  showCloseButton?: boolean
   footerBackground?: boolean
   title?: string | React.ReactNode
   variant?: 'danger' | 'warning' | 'success'
@@ -59,7 +62,6 @@ interface Props {
 const Modal = ({
   children,
   customFooter = undefined,
-  closable,
   description,
   hideFooter = false,
   alignFooter = 'left',
@@ -69,7 +71,9 @@ const Modal = ({
   onConfirm = () => {},
   onCancel = () => {},
   confirmText = 'Confirm',
+  closable = false,
   showIcon = false,
+  showCloseButton = false,
   title,
   footerBackground,
   icon,
@@ -86,31 +90,11 @@ const Modal = ({
   ...props
 }: ModalProps) => {
   const [open, setOpen] = React.useState(visible ? visible : false)
-
   const __styles = styleHandler('modal')
 
   useEffect(() => {
     setOpen(visible)
   }, [visible])
-
-  function stopPropagation(e: React.MouseEvent) {
-    e.stopPropagation()
-  }
-
-  // let footerClasses = [ModalStyles['sbui-modal-footer']]
-  if (footerBackground) {
-    // footerClasses.push(ModalStyles['sbui-modal-footer--with-bg'])
-  }
-
-  let modalClasses = [
-    __styles.base,
-    // ModalStyles[`sbui-modal`],
-    // ModalStyles[`sbui-modal--${size}`],
-  ]
-  // if (className) modalClasses.push(className)
-
-  // let overlayClasses = [ModalStyles['sbui-modal-overlay']]
-  // if (overlayClassName) overlayClasses.push(overlayClassName)
 
   const footerContent = customFooter ? (
     customFooter
@@ -149,13 +133,7 @@ const Modal = ({
 
   return (
     <Dialog.Root open={open} onOpenChange={handleOpenChange}>
-      {triggerElement && (
-        <Dialog.Trigger
-        // className={ModalStyles[`sbui-modal__trigger`]}
-        >
-          {triggerElement}
-        </Dialog.Trigger>
-      )}
+      {triggerElement && <Dialog.Trigger>{triggerElement}</Dialog.Trigger>}
       <Dialog.Portal>
         <Dialog.Overlay className={__styles.overlay} />
         <Dialog.Overlay className={__styles.scroll_overlay}>
@@ -164,24 +142,21 @@ const Modal = ({
             onInteractOutside={props.onInteractOutside}
             onEscapeKeyDown={props.onEscapeKeyDown}
           >
-            {header && <div className={__styles.header}>{header}</div>}
-            {/* <div
-              className={ModalStyles['sbui-modal-content']}
-              style={contentStyle}
-            > */}
-            {children}
-            {/* </div> */}
-            {!hideFooter && <div className={__styles.footer}>{footerContent}</div>}
-            {/* {closable && (
-              <div className={ModalStyles['sbui-modal-close-container']}>
-                <Button
-                  onClick={onCancel}
-                  type="text"
-                  shadow={false}
-                  icon={<IconX size="medium" />}
-                />
+            {header && (
+              <div className={__styles.header}>
+                {header}
+                {showCloseButton && (
+                  <Button
+                    onClick={onCancel}
+                    type="text"
+                    icon={<IconX size="medium" />}
+                    className="px-1"
+                  />
+                )}
               </div>
-            )} */}
+            )}
+            {children}
+            {!hideFooter && <div className={__styles.footer}>{footerContent}</div>}
           </Dialog.Content>
         </Dialog.Overlay>
       </Dialog.Portal>

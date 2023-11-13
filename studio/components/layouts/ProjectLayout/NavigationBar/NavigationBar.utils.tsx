@@ -51,7 +51,7 @@ export const generateToolRoutes = (
 export const generateProductRoutes = (
   ref?: string,
   project?: ProjectBase,
-  features?: { auth?: boolean; edgeFunctions?: boolean; storage?: boolean }
+  features?: { auth?: boolean; edgeFunctions?: boolean; storage?: boolean; realtime?: boolean }
 ): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}/building`
@@ -59,6 +59,7 @@ export const generateProductRoutes = (
   const authEnabled = features?.auth ?? true
   const edgeFunctionsEnabled = features?.edgeFunctions ?? true
   const storageEnabled = features?.storage ?? true
+  const realtimeEnabled = features?.realtime ?? true
 
   return [
     {
@@ -165,14 +166,37 @@ export const generateProductRoutes = (
           },
         ]
       : []),
+    ...(IS_PLATFORM && realtimeEnabled
+      ? [
+          {
+            key: 'realtime',
+            label: 'Realtime',
+            icon: (
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 18 18"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d={products.realtime.icon[18]}
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeMiterlimit="10"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            ),
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/realtime/inspector`),
+          },
+        ]
+      : []),
   ]
 }
 
-export const generateOtherRoutes = (
-  ref?: string,
-  project?: ProjectBase,
-  isNewAPIDocsEnabled?: boolean
-): Route[] => {
+export const generateOtherRoutes = (ref?: string, project?: ProjectBase): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}/building`
 
@@ -193,16 +217,12 @@ export const generateOtherRoutes = (
       icon: <IconList size={18} strokeWidth={2.5} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/logs/explorer`),
     },
-    ...(!isNewAPIDocsEnabled
-      ? [
-          {
-            key: 'api',
-            label: 'API Docs',
-            icon: <IconFileText size={18} strokeWidth={2} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/api`),
-          },
-        ]
-      : []),
+    {
+      key: 'api',
+      label: 'API Docs',
+      icon: <IconFileText size={18} strokeWidth={2} />,
+      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/api`),
+    },
     ...(IS_PLATFORM
       ? [
           {

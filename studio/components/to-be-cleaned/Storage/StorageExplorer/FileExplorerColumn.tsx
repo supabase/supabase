@@ -148,11 +148,7 @@ const FileExplorerColumn = ({
     <div
       ref={fileExplorerColumnRef}
       className={`
-        ${
-          fullWidth
-            ? 'w-full'
-            : 'w-64 border-r border-panel-border-light dark:border-panel-border-dark'
-        }
+        ${fullWidth ? 'w-full' : 'w-64 border-r border-overlay'}
         ${view === STORAGE_VIEWS.COLUMNS ? '' : ''}
         hide-scrollbar relative flex flex-shrink-0 flex-col overflow-auto
       `}
@@ -189,8 +185,8 @@ const FileExplorerColumn = ({
         <div
           className="
           sticky top-0
-          z-10 flex min-w-min items-center border-b border-panel-border-light bg-panel-footer-light px-2.5
-          py-2 dark:border-panel-border-dark dark:bg-panel-footer-dark
+          z-10 flex min-w-min items-center border-b border-overlay bg-surface-100 px-2.5
+          py-2
         "
         >
           <div className="flex w-[40%] min-w-[250px] items-center">
@@ -208,7 +204,7 @@ const FileExplorerColumn = ({
       {column.status === STORAGE_ROW_STATUS.LOADING && (
         <div
           className={`
-            ${fullWidth ? 'w-full' : 'w-64 border-r border-gray-500'}
+            ${fullWidth ? 'w-full' : 'w-64 border-r border-default'}
             px-2 py-1 my-1 flex flex-shrink-0 flex-col space-y-2 overflow-auto
           `}
         >
@@ -258,7 +254,7 @@ const FileExplorerColumn = ({
         column.status !== STORAGE_ROW_STATUS.LOADING && (
           <div className="h-full w-full flex flex-col items-center justify-center">
             <p className="text-sm my-3 text-foreground">No results found in this folder</p>
-            <p className="w-40 text-center text-sm text-light">
+            <p className="w-40 text-center text-sm text-foreground-light">
               Your search for "{itemSearchString}" did not return any results
             </p>
           </div>

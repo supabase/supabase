@@ -19,7 +19,7 @@ const HeaderLink = React.memo(function HeaderLink(props: {
       className={[
         ' ',
         !props.title && 'capitalize',
-        props.url === router.asPath ? 'text-brand' : 'hover:text-brand text-scale-1200',
+        props.url === router.asPath ? 'text-brand' : 'hover:text-brand text-foreground',
       ].join(' ')}
     >
       {props.title ?? props.id}
@@ -54,8 +54,8 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
     <>
       {props.subItemIndex === 0 && (
         <>
-          <div className="h-px w-full bg-scale-500 my-3"></div>
-          <span className="font-mono text-xs uppercase text-scale-1200 font-medium tracking-wider">
+          <div className="h-px w-full bg-border my-3"></div>
+          <span className="font-mono text-xs uppercase text-foreground font-medium tracking-wider">
             {props.parent.name}
           </span>
         </>
@@ -69,7 +69,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
               'cursor-pointer transition text-sm',
               activeItem
                 ? 'text-brand font-medium'
-                : 'hover:text-scale-1200 dark:hover:text-scale-1100 text-scale-1000',
+                : 'hover:text-foreground dark:hover:text-foreground-light text-foreground-lighter',
             ].join(' ')}
             parent={props.subItem.parent}
           >
@@ -99,7 +99,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
                       'cursor-pointer transition text-sm',
                       subSubItem.url === router.asPath
                         ? 'text-brand'
-                        : 'hover:text-brand text-scale-1000',
+                        : 'hover:text-brand text-foreground-lighter',
                     ].join(' ')}
                   >
                     {subSubItem.name}
@@ -125,7 +125,7 @@ const ContentLink = React.memo(function ContentLink(props: any) {
           'cursor-pointer transition text-sm',
           props.url === router.asPath
             ? 'text-brand'
-            : 'hover:text-scale-1200 dark:hover:text-scale-1100 text-scale-1000',
+            : 'hover:text-foreground dark:hover:text-foreground-light text-foreground-lighter',
         ].join(' ')}
       >
         {props.icon && (

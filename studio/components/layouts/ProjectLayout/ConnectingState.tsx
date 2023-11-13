@@ -52,7 +52,7 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
               </Badge>
             </div>
           </div>
-          <div className="flex h-[500px] items-center justify-center rounded border border-scale-400 bg-scale-300 p-8">
+          <div className="flex h-[500px] items-center justify-center rounded border border-overlay bg-surface-100 p-8">
             <div className="w-[440px] space-y-4">
               <div className="mx-auto flex max-w-[300px] items-center justify-center">
                 <div>
@@ -70,7 +70,7 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
 
               <div className="space-y-1">
                 <p className="text-center">Connecting to {project.name}</p>
-                <p className="text-center text-sm text-light">
+                <p className="text-center text-sm text-foreground-light">
                   If you are unable to connect after a few minutes, check your project's health to
                   verify if it's running into any resource constraints.
                 </p>

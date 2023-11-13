@@ -84,25 +84,25 @@ const RolesList = ({}) => {
                 )
               }
             />
-            <div className="flex items-center border border-scale-700 rounded-full w-min h-[34px]">
+            <div className="flex items-center border border-strong rounded-full w-min h-[34px]">
               <button
                 className={[
                   'text-xs w-[90px] h-full text-center rounded-l-full flex items-center justify-center transition',
                   filterType === 'all'
-                    ? 'bg-scale-500 text-foreground'
-                    : 'hover:bg-scale-400 text-foreground-light',
+                    ? 'bg-overlay-hover text-foreground'
+                    : 'hover:bg-surface-200 text-foreground-light',
                 ].join(' ')}
                 onClick={() => setFilterType('all')}
               >
                 All roles
               </button>
-              <div className="h-full w-[1px] border-r border-scale-700"></div>
+              <div className="h-full w-[1px] border-r border-strong"></div>
               <button
                 className={[
                   'text-xs w-[90px] h-full text-center rounded-r-full flex items-center justify-center transition',
                   filterType === 'active'
-                    ? 'bg-scale-500 text-foreground'
-                    : 'hover:bg-scale-400 text-foreground-light',
+                    ? 'bg-overlay-hover text-foreground'
+                    : 'hover:bg-surface-200 text-foreground-light',
                 ].join(' ')}
                 onClick={() => setFilterType('active')}
               >
@@ -136,8 +136,8 @@ const RolesList = ({}) => {
                 <Tooltip.Arrow className="radix-tooltip-arrow" />
                 <div
                   className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200 space-y-1',
+                    'rounded bg-alternative py-1 px-2 leading-none shadow',
+                    'border border-background space-y-1',
                   ].join(' ')}
                 >
                   <p className="text-xs text-foreground-light pr-2">Connections by roles:</p>
@@ -165,8 +165,8 @@ const RolesList = ({}) => {
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200 text-xs',
+                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                      'border border-background text-xs',
                     ].join(' ')}
                   >
                     You need additional permissions to add a new role
@@ -180,7 +180,7 @@ const RolesList = ({}) => {
         <div className="space-y-4">
           <div>
             {supabaseRoles.length > 0 && (
-              <div className="bg-scale-100 dark:bg-scale-200 border border-scale-300 dark:border-scale-500 px-6 py-3 rounded-t flex items-center space-x-4">
+              <div className="bg-surface-100 border border-default px-6 py-3 rounded-t flex items-center space-x-4">
                 <p className="text-sm text-foreground-light">Roles managed by Supabase</p>
                 <Badge color="green">Protected</Badge>
               </div>
@@ -197,7 +197,7 @@ const RolesList = ({}) => {
 
           <div>
             {otherRoles.length > 0 && (
-              <div className="bg-scale-100 dark:bg-scale-200 border border-scale-300 dark:border-scale-500 px-6 py-3 rounded-t">
+              <div className="bg-surface-100 border border-default px-6 py-3 rounded-t">
                 <p className="text-sm text-foreground-light">Other database roles</p>
               </div>
             )}

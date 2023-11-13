@@ -83,7 +83,7 @@ const BannedIPs = () => {
           ipList.banned_ipv4_addresses.map((ip) => (
             <div key={ip} className="px-8 py-4 flex items-center justify-between">
               <div className="flex items-center space-x-5">
-                <IconGlobe size={16} className="text-scale-1000" />
+                <IconGlobe size={16} className="text-foreground-lighter" />
                 <p className="text-sm font-mono">{ip}</p>
               </div>
               <div>
@@ -94,7 +94,7 @@ const BannedIPs = () => {
             </div>
           ))
         ) : (
-          <p className="text-scale-1100 text-sm px-8 py-4">
+          <p className="text-foreground-light text-sm px-8 py-4">
             There are no banned IP addresses for your project.
           </p>
         )}

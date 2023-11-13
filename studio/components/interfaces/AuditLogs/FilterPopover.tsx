@@ -58,7 +58,7 @@ const FilterPopover = ({
               })}
             ></Checkbox.Group>
           </div>
-          <div className="flex items-center justify-end gap-2 border-t border-scale-400 bg-scale-200 py-2 px-3 dark:border-scale-500 dark:bg-scale-400 ">
+          <div className="flex items-center justify-end gap-2 border-t border-overlay bg-surface-200 py-2 px-3">
             <Button
               size="tiny"
               type="default"
