@@ -5,10 +5,10 @@ import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import {
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   IconCheck,
   IconEdit3,
   IconFileText,
@@ -44,7 +44,6 @@ const FunctionList = ({
     includes(x.name.toLowerCase(), filterString.toLowerCase())
   )
   const _functions = filteredFunctions.filter((x) => x.schema == schema)
-  const isApiDocumentAvailable = schema == 'public'
   const projectRef = selectedProject?.ref
 
   const canUpdateFunctions = useCheckPermissions(
@@ -55,9 +54,9 @@ const FunctionList = ({
   if (_functions.length === 0 && filterString.length === 0) {
     return (
       <Table.tr key={schema}>
-        <Table.td colSpan={4}>
+        <Table.td colSpan={5}>
           <p className="text-sm text-foreground">No functions created yet</p>
-          <p className="text-sm text-light">
+          <p className="text-sm text-foreground-light">
             There are no functions found in the schema "{schema}"
           </p>
         </Table.td>
@@ -68,9 +67,9 @@ const FunctionList = ({
   if (_functions.length === 0 && filterString.length > 0) {
     return (
       <Table.tr key={schema}>
-        <Table.td colSpan={4}>
+        <Table.td colSpan={5}>
           <p className="text-sm text-foreground">No results found</p>
-          <p className="text-sm text-light">
+          <p className="text-sm text-foreground-light">
             Your search for "{filterString}" did not return any results
           </p>
         </Table.td>
@@ -81,6 +80,8 @@ const FunctionList = ({
   return (
     <>
       {_functions.map((x) => {
+        const isApiDocumentAvailable = schema == 'public' && x.return_type !== 'trigger'
+
         return (
           <Table.tr key={x.id}>
             <Table.td className="truncate">
@@ -93,46 +94,38 @@ const FunctionList = ({
               <p title={x.return_type}>{x.return_type}</p>
             </Table.td>
             <Table.td className="hidden lg:table-cell">
-              <div className="flex justify-center">
-                {x.security_definer ? <IconCheck strokeWidth={1.5} className="text-brand" /> : null}
-              </div>
+              {x.security_definer ? 'Definer' : 'Invoker'}
             </Table.td>
             <Table.td className="text-right">
               {!isLocked && (
                 <div className="flex items-center justify-end">
                   {canUpdateFunctions ? (
-                    <DropdownMenu_Shadcn_>
-                      <DropdownMenuTrigger_Shadcn_>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger>
                         <Button asChild type="default" icon={<IconMoreVertical />} className="px-1">
                           <span></span>
                         </Button>
-                      </DropdownMenuTrigger_Shadcn_>
-                      <DropdownMenuContent_Shadcn_ side="left">
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent side="left">
                         {isApiDocumentAvailable && (
-                          <DropdownMenuItem_Shadcn_
+                          <DropdownMenuItem
                             className="space-x-2"
                             onClick={() => router.push(`/project/${projectRef}/api?rpc=${x.name}`)}
                           >
                             <IconFileText size="tiny" />
                             <p>Client API docs</p>
-                          </DropdownMenuItem_Shadcn_>
+                          </DropdownMenuItem>
                         )}
-                        <DropdownMenuItem_Shadcn_
-                          className="space-x-2"
-                          onClick={() => editFunction(x)}
-                        >
+                        <DropdownMenuItem className="space-x-2" onClick={() => editFunction(x)}>
                           <IconEdit3 size="tiny" />
                           <p>Edit function</p>
-                        </DropdownMenuItem_Shadcn_>
-                        <DropdownMenuItem_Shadcn_
-                          className="space-x-2"
-                          onClick={() => deleteFunction(x)}
-                        >
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="space-x-2" onClick={() => deleteFunction(x)}>
                           <IconTrash stroke="red" size="tiny" />
                           <p>Delete function</p>
-                        </DropdownMenuItem_Shadcn_>
-                      </DropdownMenuContent_Shadcn_>
-                    </DropdownMenu_Shadcn_>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   ) : (
                     <Tooltip.Root delayDuration={0}>
                       <Tooltip.Trigger asChild>
@@ -148,8 +141,8 @@ const FunctionList = ({
                           <Tooltip.Arrow className="radix-tooltip-arrow" />
                           <div
                             className={[
-                              'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                              'border border-scale-200',
+                              'rounded bg-alternative py-1 px-2 leading-none shadow',
+                              'border border-background',
                             ].join(' ')}
                           >
                             <span className="text-xs text-foreground">

@@ -9,11 +9,11 @@ import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { uuidv4 } from 'lib/helpers'
 import {
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   IconChevronDown,
   IconPlus,
   IconTrash,
@@ -92,13 +92,11 @@ const HTTPRequestFields = ({
           ) : type === 'supabase_function' && edgeFunctions.length === 0 ? (
             <div className="space-y-1">
               <p className="text-sm text-foreground-light">Select which edge function to trigger</p>
-              <div className="px-4 py-4 border rounded bg-scale-500 border-scale-700 flex items-center justify-between space-x-4">
+              <div className="px-4 py-4 border rounded bg-surface-300 border-strong flex items-center justify-between space-x-4">
                 <p className="text-sm">No edge functions created yet</p>
-                <Link href={`/project/${ref}/functions`}>
-                  <a>
-                    <Button>Create an edge function</Button>
-                  </a>
-                </Link>
+                <Button asChild>
+                  <Link href={`/project/${ref}/functions`}>Create an edge function</Link>
+                </Button>
               </div>
               {errors.http_url && <p className="text-sm text-red-900">{errors.http_url}</p>}
             </div>
@@ -107,7 +105,7 @@ const HTTPRequestFields = ({
               {edgeFunctions.map((fn) => {
                 const restUrl = selectedProject?.restUrl
                 const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
-                const functionUrl = `https://${ref}.functions.supabase.${restUrlTld}/${fn.slug}`
+                const functionUrl = `https://${ref}.supabase.${restUrlTld}/functions/v1/${fn.slug}`
 
                 return (
                   <Listbox.Option key={fn.id} id={functionUrl} value={functionUrl} label={fn.name}>
@@ -123,7 +121,7 @@ const HTTPRequestFields = ({
             label="Timeout"
             labelOptional="Between 1000ms to 5000ms"
             type="number"
-            actions={<p className="text-light pr-2">ms</p>}
+            actions={<p className="text-foreground-light pr-2">ms</p>}
           />
         </FormSectionContent>
       </FormSection>
@@ -169,16 +167,16 @@ const HTTPRequestFields = ({
                 Add a new header
               </Button>
               {type === 'supabase_function' && (
-                <DropdownMenu_Shadcn_>
-                  <DropdownMenuTrigger_Shadcn_>
+                <DropdownMenu>
+                  <DropdownMenuTrigger>
                     <Button
                       type="default"
                       className="rounded-l-none px-[4px] py-[5px]"
                       icon={<IconChevronDown />}
                     />
-                  </DropdownMenuTrigger_Shadcn_>
-                  <DropdownMenuContent_Shadcn_ align="end" side="bottom">
-                    <DropdownMenuItem_Shadcn_
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" side="bottom">
+                    <DropdownMenuItem
                       key="add-auth-header"
                       onClick={() =>
                         onAddHeader({
@@ -194,9 +192,9 @@ const HTTPRequestFields = ({
                           Required if your edge function enforces JWT verification
                         </p>
                       </div>
-                    </DropdownMenuItem_Shadcn_>
-                    <DropdownMenuSeparator_Shadcn_ />
-                    <DropdownMenuItem_Shadcn_
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
                       key="add-source-header"
                       onClick={() =>
                         onAddHeader({
@@ -212,9 +210,9 @@ const HTTPRequestFields = ({
                           Useful to verify that the edge function was triggered from this webhook
                         </p>
                       </div>
-                    </DropdownMenuItem_Shadcn_>
-                  </DropdownMenuContent_Shadcn_>
-                </DropdownMenu_Shadcn_>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
             </div>
           </div>

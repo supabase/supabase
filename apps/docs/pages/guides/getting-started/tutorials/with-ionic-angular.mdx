@@ -10,8 +10,9 @@ export const meta = {
 ![Supabase User Management example](/docs/img/ionic-demos/ionic-angular-account.png)
 
 <Admonition type="note">
-  If you get stuck while working through this guide, refer to the [full example on
-  GitHub](https://github.com/mhartington/supabase-ionic-angular).
+
+If you get stuck while working through this guide, refer to the [full example on GitHub](https://github.com/mhartington/supabase-ionic-angular).
+
 </Admonition>
 
 <ProjectSetup />
@@ -256,7 +257,7 @@ export class AccountPage implements OnInit {
 
   async getProfile() {
     try {
-      let { data: profile, error, status } = await this.supabase.profile
+      const { data: profile, error, status } = await this.supabase.profile
       if (error && status !== 406) {
         throw error
       }

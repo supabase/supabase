@@ -6,10 +6,10 @@ import Link from 'next/link'
 import { useState } from 'react'
 import {
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   IconEdit3,
   IconEye,
   IconEyeOff,
@@ -72,13 +72,12 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
             strokeWidth={2}
             className="text-foreground-light transition group-hover:text-brand"
           />
-          <Link href={`/project/${ref}/settings/vault/keys?id=${secret.key_id}`}>
-            <a
-              className="text-foreground-light font-mono text-xs cursor-pointer transition group-hover:text-brand"
-              title={secret.key_id}
-            >
-              {secret.key_id}
-            </a>
+          <Link
+            href={`/project/${ref}/settings/vault/keys?id=${secret.key_id}`}
+            className="text-foreground-light font-mono text-xs cursor-pointer transition group-hover:text-brand"
+            title={secret.key_id}
+          >
+            {secret.key_id}
           </Link>
         </div>
       </div>
@@ -110,23 +109,23 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
           {secret.updated_at === secret.created_at ? 'Added' : 'Updated'} on{' '}
           {dayjs(secret.updated_at).format('MMM D, YYYY')}
         </p>
-        <DropdownMenu_Shadcn_>
-          <DropdownMenuTrigger_Shadcn_>
+        <DropdownMenu>
+          <DropdownMenuTrigger>
             <Button asChild type="text" className="px-1" icon={<IconMoreVertical />}>
               <span></span>
             </Button>
-          </DropdownMenuTrigger_Shadcn_>
-          <DropdownMenuContent_Shadcn_ side="bottom">
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="bottom">
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger asChild>
-                <DropdownMenuItem_Shadcn_
+                <DropdownMenuItem
                   className="space-x-2"
                   disabled={!canManageSecrets}
                   onClick={() => onSelectEdit(secret)}
                 >
                   <IconEdit3 size="tiny" />
                   <p>Edit</p>
-                </DropdownMenuItem_Shadcn_>
+                </DropdownMenuItem>
               </Tooltip.Trigger>
               {!canManageSecrets && (
                 <Tooltip.Portal>
@@ -134,8 +133,8 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                        'border border-scale-200',
+                        'rounded bg-alternative py-1 px-2 leading-none shadow',
+                        'border border-background',
                       ].join(' ')}
                     >
                       <span className="text-xs text-foreground">
@@ -149,14 +148,14 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
 
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger asChild>
-                <DropdownMenuItem_Shadcn_
+                <DropdownMenuItem
                   className="space-x-2"
                   disabled={!canManageSecrets}
                   onClick={() => onSelectRemove(secret)}
                 >
                   <IconTrash stroke="red" size="tiny" />
-                  <p className="text-light">Delete</p>
-                </DropdownMenuItem_Shadcn_>
+                  <p className="text-foreground-light">Delete</p>
+                </DropdownMenuItem>
               </Tooltip.Trigger>
               {!canManageSecrets && (
                 <Tooltip.Portal>
@@ -164,8 +163,8 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                        'border border-scale-200',
+                        'rounded bg-alternative py-1 px-2 leading-none shadow',
+                        'border border-background',
                       ].join(' ')}
                     >
                       <span className="text-xs text-foreground">
@@ -176,8 +175,8 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
                 </Tooltip.Portal>
               )}
             </Tooltip.Root>
-          </DropdownMenuContent_Shadcn_>
-        </DropdownMenu_Shadcn_>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   )

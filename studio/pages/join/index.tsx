@@ -189,7 +189,7 @@ const JoinOrganizationPage = () => {
       </div>
 
       <div
-        className={['border-t border-scale-400', isError ? 'bg-scale-100' : 'bg-transparent'].join(
+        className={['border-t border-muted', isError ? 'bg-alternative' : 'bg-transparent'].join(
           ' '
         )}
       >
@@ -219,16 +219,12 @@ const JoinOrganizationPage = () => {
                 You will need to sign in to accept this invitation
               </p>
               <div className="flex justify-center gap-3">
-                <Link passHref href={loginRedirectLink}>
-                  <a>
-                    <Button type="default">Sign in</Button>
-                  </a>
-                </Link>
-                <Link passHref href={loginRedirectLink}>
-                  <a>
-                    <Button type="default">Create an account</Button>
-                  </a>
-                </Link>
+                <Button asChild type="default">
+                  <Link href={loginRedirectLink}>Sign in</Link>
+                </Button>
+                <Button asChild type="default">
+                  <Link href={loginRedirectLink}>Create an account</Link>
+                </Button>
               </div>
             </div>
           )}
@@ -240,24 +236,22 @@ const JoinOrganizationPage = () => {
   return (
     <div
       className={[
-        'flex h-full min-h-screen bg-scale-200',
+        'flex h-full min-h-screen bg-background',
         'w-full flex-col place-items-center',
         'items-center justify-center gap-8 px-5',
       ].join(' ')}
     >
-      <Link href="/projects">
-        <a className="flex items-center justify-center gap-4">
-          <img
-            src={`${router.basePath}/img/supabase-logo.svg`}
-            alt="Supabase"
-            className="block h-[24px] cursor-pointer rounded"
-          />
-        </a>
+      <Link href="/projects" className="flex items-center justify-center gap-4">
+        <img
+          src={`${router.basePath}/img/supabase-logo.svg`}
+          alt="Supabase"
+          className="block h-[24px] cursor-pointer rounded"
+        />
       </Link>
       <div
         className="
           mx-auto overflow-hidden rounded-md border
-          border-scale-400 bg-scale-100 text-center shadow
+          border-muted bg-alternative text-center shadow
           md:w-[400px]
           "
       >

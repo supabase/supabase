@@ -200,7 +200,7 @@ export const PgbouncerConfig = ({ projectRef, bouncerInfo, connectionInfo }: Con
   }
 
   return (
-    <div>
+    <div id="connection-pooling">
       <SchemaFormPanel
         title="Connection Pooling Custom Configuration"
         schema={formSchema}
@@ -243,10 +243,10 @@ export const PgbouncerConfig = ({ projectRef, bouncerInfo, connectionInfo }: Con
                   <AutoField name="ignore_startup_parameters" />
                   <Divider light />
                   <AutoField name="max_client_conn" />
-                  <Divider light />
-                  <AutoField name="default_pool_size" />
                 </>
               )}
+              <Divider light />
+              <AutoField name="default_pool_size" />
             </>
           )}
           <Divider light />

@@ -10,11 +10,11 @@ import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   IconAlertCircle,
   IconAlertTriangle,
   IconChevronDown,
@@ -32,7 +32,7 @@ import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEdi
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useCheckPermissions, useFlag, useSelectedProject, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedProject, useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -63,19 +63,17 @@ const QueryItem = ({ tabInfo }: QueryItemProps) => {
       key={id}
       className={clsx(
         'flex items-center justify-between rounded-md group',
-        isActive && 'text-foreground bg-scale-400 dark:bg-scale-600 -active'
+        isActive && 'text-foreground bg-surface-300 -active'
       )}
       ref={isActive ? (activeItemRef as React.RefObject<HTMLDivElement>) : null}
     >
-      <Link href={`/project/${ref}/sql/${id}`}>
-        <a className="py-1 px-3 w-full overflow-hidden">
-          <p
-            title={description || name}
-            className="text-sm text-foreground-light group-hover:text-foreground transition overflow-hidden text-ellipsis"
-          >
-            {name}
-          </p>
-        </a>
+      <Link href={`/project/${ref}/sql/${id}`} className="py-1 px-3 w-full overflow-hidden">
+        <p
+          title={description || name}
+          className="text-sm text-foreground-light group-hover:text-foreground transition overflow-hidden text-ellipsis"
+        >
+          {name}
+        </p>
       </Link>
       <div className="pr-1">{<QueryItemActions tabInfo={tabInfo} activeId={activeId} />}</div>
     </div>
@@ -97,7 +95,6 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
 
   const snap = useSqlEditorStateSnapshot()
   const project = useSelectedProject()
-  const sharedSnippetsFeature = useFlag<boolean>('sharedSnippets')
 
   const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
     onSuccess(data) {
@@ -204,45 +201,45 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
   return (
     <div className="group [div&>button[data-state='open']>span]:text-foreground-lighter flex items-center">
       {IS_PLATFORM ? (
-        <DropdownMenu_Shadcn_>
-          <DropdownMenuTrigger_Shadcn_ asChild>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
             <span
               className={clsx(
                 'rounded p-1',
                 isActive
-                  ? 'text-foreground-light hover:bg-scale-800'
-                  : 'text-scale-300 dark:text-scale-200 hover:bg-scale-500 group-hover:text-foreground-light'
+                  ? 'text-foreground-light hover:bg-border-stronger'
+                  : 'text-background hover:bg-overlay-hover group-hover:text-foreground-light'
               )}
             >
               <IconChevronDown size="tiny" strokeWidth={2} />
             </span>
-          </DropdownMenuTrigger_Shadcn_>
-          <DropdownMenuContent_Shadcn_ side="bottom" align="end">
-            <DropdownMenuItem_Shadcn_ onClick={onClickRename} className="space-x-2">
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="bottom" align="end">
+            <DropdownMenuItem onClick={onClickRename} className="space-x-2">
               <IconEdit2 size="tiny" />
               <p>Rename query</p>
-            </DropdownMenuItem_Shadcn_>
-            {sharedSnippetsFeature && visibility === 'user' && canCreateSQLSnippet && (
-              <DropdownMenuItem_Shadcn_ onClick={onClickShare} className="space-x-2">
+            </DropdownMenuItem>
+            {visibility === 'user' && canCreateSQLSnippet && (
+              <DropdownMenuItem onClick={onClickShare} className="space-x-2">
                 <IconShare size="tiny" />
                 <p>Share query</p>
-              </DropdownMenuItem_Shadcn_>
+              </DropdownMenuItem>
             )}
-            {sharedSnippetsFeature && visibility === 'project' && canCreateSQLSnippet && (
-              <DropdownMenuItem_Shadcn_ onClick={createPersonalCopy} className="space-x-2">
+            {visibility === 'project' && canCreateSQLSnippet && (
+              <DropdownMenuItem onClick={createPersonalCopy} className="space-x-2">
                 <IconCopy size="tiny" />
                 <p>Duplicate personal copy</p>
-              </DropdownMenuItem_Shadcn_>
+              </DropdownMenuItem>
             )}
             <>
-              <DropdownMenuSeparator_Shadcn_ />
-              <DropdownMenuItem_Shadcn_ onClick={onClickDelete} className="space-x-2">
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={onClickDelete} className="space-x-2">
                 <IconTrash size="tiny" />
                 <p>Delete query</p>
-              </DropdownMenuItem_Shadcn_>
+              </DropdownMenuItem>
             </>
-          </DropdownMenuContent_Shadcn_>
-        </DropdownMenu_Shadcn_>
+          </DropdownMenuContent>
+        </DropdownMenu>
       ) : (
         <Button asChild disabled type="text" style={{ padding: '3px' }}>
           <span></span>
@@ -268,7 +265,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
           <div className="my-6">
             <div className="text-sm text-foreground-light grid gap-4">
               <div className="grid gap-1">
-                {sharedSnippetsFeature && visibility === 'project' && (
+                {visibility === 'project' && (
                   <Alert_Shadcn_ variant="destructive">
                     <IconAlertCircle strokeWidth={2} />
                     <AlertTitle_Shadcn_>This SQL snippet will be lost forever</AlertTitle_Shadcn_>

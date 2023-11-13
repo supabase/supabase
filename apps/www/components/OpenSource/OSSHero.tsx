@@ -9,7 +9,7 @@ import styles from './hero.module.css'
 
 const OSSHero = () => (
   <>
-    <div className="absolute z-[-4] flex flex-col top-0 left-0 w-screen h-[500px] overflow-hidden pointer-events-none">
+    <div className="absolute z-[-4] flex flex-col top-0 left-0 w-full h-[500px] overflow-hidden pointer-events-none">
       <div className="absolute bottom-0 z-[1] w-full h-4/5 bg-gradient-to-t from-background to-transparent" />
       <div className="absolute top-0 z-[1] w-full h-2/5 bg-gradient-to-b from-background to-transparent" />
     </div>
@@ -30,12 +30,12 @@ const OSSHero = () => (
 )
 
 const HeroGrid = () => {
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
   const { width } = useWindowSize()
   const isSm = useBreakpoint(640)
 
   const svgGridOptions = {
-    color: theme === 'dark' ? '#00d4ad' : '#015a42',
+    color: resolvedTheme === 'dark' ? '#00d4ad' : '#015a42',
     boxWidth: width ? width * 7 : 7500,
     boxHeight: width ? width * 5 : 6000,
     xLines: isSm ? 20 : 49,

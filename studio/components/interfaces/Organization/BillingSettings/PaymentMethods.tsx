@@ -6,10 +6,10 @@ import {
   Alert,
   Badge,
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   IconCreditCard,
   IconMoreHorizontal,
   IconPlus,
@@ -18,7 +18,6 @@ import {
   Modal,
 } from 'ui'
 
-import { AddNewPaymentMethodModal } from 'components/interfaces/BillingV2'
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import Panel from 'components/ui/Panel'
@@ -30,6 +29,7 @@ import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organizat
 import { useCheckPermissions, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { getURL } from 'lib/helpers'
+import AddNewPaymentMethodModal from 'components/interfaces/Billing/Payment/AddNewPaymentMethodModal'
 
 const PaymentMethods = () => {
   const { ui } = useStore()
@@ -202,8 +202,8 @@ const PaymentMethods = () => {
                                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                                     <div
                                       className={[
-                                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                                        'w-48 border border-scale-200 text-center', //border
+                                        'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                                        'w-48 border border-background text-center', //border
                                       ].join(' ')}
                                     >
                                       <span className="text-xs text-foreground">
@@ -214,30 +214,30 @@ const PaymentMethods = () => {
                                 </Tooltip.Portal>
                               </Tooltip.Root>
                             ) : (
-                              <DropdownMenu_Shadcn_>
-                                <DropdownMenuTrigger_Shadcn_>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger>
                                   <Button
                                     type="outline"
                                     icon={<IconMoreHorizontal />}
                                     loading={isLoadingPaymentMethods}
                                     className="hover:border-gray-500"
                                   />
-                                </DropdownMenuTrigger_Shadcn_>
-                                <DropdownMenuContent_Shadcn_>
-                                  <DropdownMenuItem_Shadcn_
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                  <DropdownMenuItem
                                     key="make-default"
                                     onClick={() => setSelectedMethodForDefault(paymentMethod)}
                                   >
                                     <p>Make default</p>
-                                  </DropdownMenuItem_Shadcn_>
-                                  <DropdownMenuItem_Shadcn_
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
                                     key="delete-method"
                                     onClick={() => setSelectedMethodToDelete(paymentMethod)}
                                   >
                                     <p>Delete</p>
-                                  </DropdownMenuItem_Shadcn_>
-                                </DropdownMenuContent_Shadcn_>
-                              </DropdownMenu_Shadcn_>
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             )}
                           </>
                         )}

@@ -4,11 +4,11 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import {
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   IconEdit,
   IconMoreVertical,
   IconTrash,
@@ -32,10 +32,9 @@ const PolicyRow = ({
 
   return (
     <Panel.Content
-      className={[
-        'flex border-panel-border-light dark:border-panel-border-dark',
-        'w-full space-x-4 border-b py-4 lg:items-center',
-      ].join(' ')}
+      className={['flex border-overlay', 'w-full space-x-4 border-b py-4 lg:items-center'].join(
+        ' '
+      )}
     >
       <div className="flex grow flex-col space-y-1">
         <div className="flex items-center space-x-4">
@@ -62,8 +61,8 @@ const PolicyRow = ({
                 <Tooltip.Arrow className="radix-tooltip-arrow" />
                 <div
                   className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200 max-w-[220px] text-center',
+                    'rounded bg-alternative py-1 px-2 leading-none shadow',
+                    'border border-background max-w-[220px] text-center',
                   ].join(' ')}
                 >
                   <span className="text-xs text-foreground">
@@ -77,32 +76,26 @@ const PolicyRow = ({
       </div>
       <div>
         {canUpdatePolicies ? (
-          <DropdownMenu_Shadcn_>
-            <DropdownMenuTrigger_Shadcn_>
+          <DropdownMenu>
+            <DropdownMenuTrigger>
               <Button
                 type="default"
                 style={{ paddingLeft: 4, paddingRight: 4 }}
                 icon={<IconMoreVertical />}
               />
-            </DropdownMenuTrigger_Shadcn_>
-            <DropdownMenuContent_Shadcn_ side="bottom" align="end">
-              <DropdownMenuItem_Shadcn_
-                className="space-x-2"
-                onClick={() => onSelectEditPolicy(policy)}
-              >
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="bottom" align="end">
+              <DropdownMenuItem className="space-x-2" onClick={() => onSelectEditPolicy(policy)}>
                 <IconEdit size={14} />
                 <p>Edit</p>
-              </DropdownMenuItem_Shadcn_>
-              <DropdownMenuSeparator_Shadcn_ />
-              <DropdownMenuItem_Shadcn_
-                className="space-x-2"
-                onClick={() => onSelectDeletePolicy(policy)}
-              >
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="space-x-2" onClick={() => onSelectDeletePolicy(policy)}>
                 <IconTrash size={14} />
                 <p>Delete</p>
-              </DropdownMenuItem_Shadcn_>
-            </DropdownMenuContent_Shadcn_>
-          </DropdownMenu_Shadcn_>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         ) : (
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger>
@@ -119,8 +112,8 @@ const PolicyRow = ({
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200',
+                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                      'border border-background',
                     ].join(' ')}
                   >
                     <span className="text-xs text-foreground">
