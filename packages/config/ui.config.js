@@ -142,7 +142,7 @@ const uiConfig = {
         },
         colors: { ...variables.root },
       },
-      '.dark': {
+      "[data-theme*='dark']": {
         colors: { ...variables.dark },
       },
     },
