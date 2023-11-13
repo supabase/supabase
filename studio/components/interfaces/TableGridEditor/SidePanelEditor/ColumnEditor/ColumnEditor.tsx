@@ -3,7 +3,19 @@ import { useParams } from 'common'
 import { isEmpty, noop } from 'lodash'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Button, Checkbox, IconExternalLink, IconPlus, Input, SidePanel, Toggle } from 'ui'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  Checkbox,
+  IconAlertCircle,
+  IconExternalLink,
+  IconPlus,
+  Input,
+  SidePanel,
+  Toggle,
+} from 'ui'
 
 import { Dictionary } from 'components/grid'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -338,6 +350,46 @@ const ColumnEditor = ({
           />
         </FormSectionContent>
       </FormSection>
+
+      {isNewRecord && (
+        <>
+          <SidePanel.Separator />
+          <FormSection
+            header={<FormSectionLabel className="lg:!col-span-4">Security</FormSectionLabel>}
+          >
+            <FormSectionContent loading={false} className="lg:!col-span-8">
+              <Alert_Shadcn_>
+                <IconAlertCircle />
+                <AlertTitle_Shadcn_>
+                  Column encryption has been removed from the GUI
+                </AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>
+                  <p className="!leading-normal">
+                    You may still encrypt new columns through the SQL editor using{' '}
+                    <Link
+                      href={`/project/${ref}/database/extensions?filter=pgsodium`}
+                      className="text-brand hover:underline"
+                    >
+                      pgsodium's
+                    </Link>{' '}
+                    Transparent Column Encryption (TCE).
+                  </p>
+                  <Button asChild type="default" icon={<IconExternalLink />} className="mt-2">
+                    <Link
+                      target="_blank"
+                      rel="noreferrer"
+                      href="https://github.com/orgs/supabase/discussions/18849"
+                    >
+                      Learn more
+                    </Link>
+                  </Button>
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
+            </FormSectionContent>
+          </FormSection>
+        </>
+      )}
+
       <ForeignKeySelector
         column={columnFields}
         visible={isEditingRelation}
