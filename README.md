@@ -3,8 +3,6 @@
 <img src="https://user-images.githubusercontent.com/8291514/213727225-56186826-bee8-43b5-9b15-86e839d89393.png#gh-dark-mode-only">
 </p>
 
----
-
 # Supabase
 
 [Supabase](https://supabase.com) is an open source Firebase alternative. We're building the features of Firebase using enterprise-grade open source tools.
@@ -41,7 +39,6 @@ To see how to Contribute, visit [Getting Started](./DEVELOPERS.md)
 - [Email Support](https://supabase.com/docs/support#business-support). Best for: problems with your database or infrastructure.
 - [Discord](https://discord.supabase.com). Best for: sharing your applications and hanging out with the community.
 
----
 
 ## How it works
 
@@ -54,13 +51,13 @@ You can also [self-host](https://supabase.com/docs/guides/hosting/overview) and 
 
 ![Architecture](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 
-- [PostgreSQL](https://www.postgresql.org/) is an object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.
+- [Postgres](https://www.postgresql.org/) is an object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.
 - [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. Realtime polls Postgres' built-in replication functionality for database changes, converts changes to JSON, then broadcasts the JSON over websockets to authorized clients.
 - [PostgREST](http://postgrest.org/) is a web server that turns your PostgreSQL database directly into a RESTful API
-- [pg_graphql](http://github.com/supabase/pg_graphql/) a PostgreSQL extension that exposes a GraphQL API
-- [Storage](https://github.com/supabase/storage-api) provides a RESTful interface for managing Files stored in S3, using Postgres to manage permissions.
-- [postgres-meta](https://github.com/supabase/postgres-meta) is a RESTful API for managing your Postgres, allowing you to fetch tables, add roles, and run queries, etc.
 - [GoTrue](https://github.com/supabase/gotrue) is a JWT based API for managing users and issuing JWT tokens.
+- [Storage](https://github.com/supabase/storage-api) provides a RESTful interface for managing Files stored in S3, using Postgres to manage permissions.
+- [pg_graphql](http://github.com/supabase/pg_graphql/) a PostgreSQL extension that exposes a GraphQL API
+- [postgres-meta](https://github.com/supabase/postgres-meta) is a RESTful API for managing your Postgres, allowing you to fetch tables, add roles, and run queries, etc.
 - [Kong](https://github.com/Kong/kong) is a cloud-native API gateway.
 
 #### Client libraries
