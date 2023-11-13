@@ -124,7 +124,7 @@ const ContentLink = React.memo(function ContentLink(props: any) {
         className={[
           'cursor-pointer transition text-sm',
           props.url === router.asPath
-            ? 'text-brand'
+            ? 'text-brand-link'
             : 'hover:text-foreground text-foreground-lighter',
         ].join(' ')}
       >
@@ -146,7 +146,7 @@ const Content = (props) => {
         href={`${menu.parent ?? '/'}`}
         className={[
           'flex items-center gap-1 text-xs group mb-3',
-          'text-base transition-all duration-200 text-brand hover:text-brand-600 hover:cursor-pointer ',
+          'text-base transition-all duration-200 text-brand-link hover:text-brand-600 hover:cursor-pointer ',
         ].join(' ')}
       >
         <div className="relative w-2">
@@ -158,7 +158,7 @@ const Content = (props) => {
       </Link>
 
       <Link href={menu.url ?? ''}>
-        <div className="flex items-center gap-3 my-3 text-brand">
+        <div className="flex items-center gap-3 my-3 text-brand-link">
           <HomeMenuIconPicker icon={menu.icon} />
           <HeaderLink title={menu.title} url={menu.url} id={id} />
         </div>

@@ -912,7 +912,7 @@ export default function IndexPage() {
                 <a
                   target="_blank"
                   href="https://supabase.com/dashboard/support/new"
-                  className="transition text-brand hover:text-brand-600"
+                  className="transition underline text-brand-link hover:text-brand-600"
                 >
                   Open a support ticket
                 </a>{' '}
@@ -923,7 +923,7 @@ export default function IndexPage() {
                 <a
                   target="_blank"
                   href="https://supabase.com/dashboard/support/new"
-                  className="transition text-brand hover:text-brand-600"
+                  className="transition underline text-brand-link hover:text-brand-600"
                 >
                   you can contact the team here
                 </a>

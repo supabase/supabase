@@ -67,7 +67,7 @@ const TopNavBar: FC = () => {
               height={24}
               alt="Supabase Logo"
             />
-            <span className="font-mono text-sm font-medium text-brand">DOCS</span>
+            <span className="font-mono text-sm font-medium text-brand-link">DOCS</span>
           </Link>
         </div>
 

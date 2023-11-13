@@ -62,7 +62,7 @@ const MenuItem = React.forwardRef<
                 <p
                   className={cn(
                     'leading-snug text-foreground',
-                    hoverColor === 'brand' && 'group-hover/menu-item:text-brand'
+                    hoverColor === 'brand' && 'group-hover/menu-item:text-brand-link'
                   )}
                 >
                   {title}
