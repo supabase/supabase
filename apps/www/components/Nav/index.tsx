@@ -118,7 +118,7 @@ const Nav = () => {
                     {menu.primaryNav.map((menuItem) =>
                       menuItem.hasDropdown ? (
                         <NavigationMenuItem className="text-sm font-medium" key={menuItem.title}>
-                          <NavigationMenuTrigger className="bg-transparent text-foreground hover:text-brand data-[state=open]:!text-brand data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground-strong p-2 h-auto">
+                          <NavigationMenuTrigger className="bg-transparent text-foreground hover:text-brand data-[state=open]:!text-brand data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground p-2 h-auto">
                             {menuItem.title}
                           </NavigationMenuTrigger>
                           <NavigationMenuContent
