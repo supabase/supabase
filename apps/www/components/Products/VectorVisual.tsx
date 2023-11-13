@@ -62,6 +62,7 @@ const VectorVisual = () => {
           <path
             d="M195.918 125.344L276.779 172.029V265.399L195.918 312.084L115.057 265.399V172.029L195.918 125.344Z"
             stroke="url(#paint0_radial_484_53266)"
+            strokeWidth={2}
           />
           <defs>
             {isActive && (

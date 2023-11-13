@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { useTheme } from 'next-themes'
 
 const FunctionsVisual = () => {
-  const { resolvedTheme } = useTheme()
+  const { forcedTheme } = useTheme()
 
   const initial = { x1: [0, 0], x2: [0, 0], y1: [0, 0], y2: [0, 0] }
   const gradientVariant1 = {
@@ -25,7 +25,13 @@ const FunctionsVisual = () => {
     },
   }
 
-  const isDarkTheme = resolvedTheme?.includes('dark')!
+  // Switched to "resolvedTheme?." if theme is not forced
+  const isDarkTheme = forcedTheme?.includes('dark')!
+
+  const planetBg = isDarkTheme ? 'hsl(var(--background-default))' : 'hsl(var(--border-muted))'
+  const planetHighlight = isDarkTheme
+    ? 'hsl(var(--foreground-muted))'
+    : 'hsl(var(--background-alternative))'
 
   return (
     <figure
@@ -39,26 +45,6 @@ const FunctionsVisual = () => {
         fill="none"
         className="absolute w-[calc(100%+8px)] aspect-[1/1.44] inset-y-0 -inset-x-2 z-10 m-auto"
       >
-        <g opacity="0.5" filter="url(#filter0_f_934_3722)">
-          <ellipse
-            cx="162"
-            cy="155.6"
-            rx="162"
-            ry="155.6"
-            transform="matrix(1 0 0 -1 -51 480.255)"
-            fill="url(#paint0_radial_934_3722)"
-          />
-        </g>
-        <g filter="url(#filter1_f_934_3722)">
-          <ellipse
-            cx="232"
-            cy="223.5"
-            rx="232"
-            ry="223.5"
-            transform="matrix(1 0 0 -1 -131 548)"
-            fill="url(#paint1_radial_934_3722)"
-          />
-        </g>
         {/* Globe background */}
         <g filter="url(#filter2_b_934_3722)">
           <circle
@@ -66,7 +52,7 @@ const FunctionsVisual = () => {
             cy="191.986"
             r="191.986"
             transform="matrix(-0.978344 -0.206986 -0.206986 0.978344 443.438 268.734)"
-            fill={isDarkTheme ? 'hsl(var(--background-default))' : 'hsl(var(--border-muted))'}
+            fill={planetBg}
           />
         </g>
         {/* Globe wireframe */}
@@ -82,7 +68,7 @@ const FunctionsVisual = () => {
             cy="187.13"
             r="187.13"
             transform="matrix(-0.978344 -0.206986 -0.206986 0.978344 426.261 289.816)"
-            fill={isDarkTheme ? 'hsl(var(--background-default))' : 'hsl(var(--border-muted))'}
+            fill={planetBg}
           />
         </g>
         {/* <g filter="url(#filter4_f_934_3722)">
@@ -148,18 +134,11 @@ const FunctionsVisual = () => {
           </g>
 
           {/* satellite */}
-          <circle
-            cx="30.4958"
-            cy="190.902"
-            r="51.738"
-            fill={isDarkTheme ? 'hsl(var(--background-default))' : 'hsl(var(--border-muted))'}
-          />
+          <circle cx="30.4958" cy="190.902" r="51.738" fill={planetBg} />
           <g filter="url(#filter9_f_934_3722)">
             <path
               d="M55.8599 220.28C46.9137 227.025 37.2807 229.679 38.2528 230.968C39.225 232.257 49.8718 231.442 58.818 224.697C67.7642 217.952 71.6222 207.832 70.65 206.542C69.6778 205.253 64.8062 213.535 55.8599 220.28Z"
-              fill={
-                isDarkTheme ? 'hsl(var(--foreground-muted))' : 'hsl(var(--background-alternative))'
-              }
+              fill={planetHighlight}
             />
           </g>
         </g>
