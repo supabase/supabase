@@ -23,12 +23,16 @@ export const appState = proxy({
   },
 
   activeDocsSection: ['introduction'],
+  docsLanguage: 'js' as 'js' | 'bash',
   showProjectApiDocs: false,
   setShowProjectApiDocs: (value: boolean) => {
     appState.showProjectApiDocs = value
   },
   setActiveDocsSection: (value: string[]) => {
     appState.activeDocsSection = value
+  },
+  setDocsLanguage: (value: 'js' | 'bash') => {
+    appState.docsLanguage = value
   },
 
   isOptedInTelemetry: false,
