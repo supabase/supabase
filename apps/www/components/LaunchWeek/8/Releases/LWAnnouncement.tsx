@@ -53,7 +53,7 @@ const LWAnnouncement = ({
   return (
     <div className="w-full max-w-xl opacity-0 !animate-[fadeIn_0.5s_cubic-bezier(0.25,0.25,0,1)_0.5s_both]">
       <SmallCard
-        className="border hover:border-scale-800 transition-colors"
+        className="border hover:border-stronger transition-colors"
         innerClassName="bg-opacity-70 items-stretch"
       >
         {/* {isLaunchWeekPage ? (
@@ -68,10 +68,11 @@ const LWAnnouncement = ({
             }
           />
         ) : ( */}
-        <Link href="/launch-week">
-          <a className="flex flex-row justify-between items-center w-full h-full gap-2 text-left">
-            {announcement}
-          </a>
+        <Link
+          href="/launch-week"
+          className="flex flex-row justify-between items-center w-full h-full gap-2 text-left"
+        >
+          {announcement}
         </Link>
         {/* )} */}
       </SmallCard>

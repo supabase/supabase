@@ -158,7 +158,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                 onOpenChange={() => setShowConfiguration(!showConfiguration)}
               >
                 <Collapsible.Trigger asChild>
-                  <div className="w-full cursor-pointer py-3 px-5 flex items-center justify-between border-t border-scale-500">
+                  <div className="w-full cursor-pointer py-3 px-5 flex items-center justify-between border-t border-default">
                     <p className="text-sm">Additional configuration</p>
                     <IconChevronDown
                       size={18}
@@ -215,10 +215,11 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                             <div className="col-span-12">
                               <p className="text-foreground-light text-sm">
                                 Note: The{' '}
-                                <Link href={`/project/${ref}/settings/storage`}>
-                                  <a className="text-brand opacity-80 hover:opacity-100 transition">
-                                    global upload limit
-                                  </a>
+                                <Link
+                                  href={`/project/${ref}/settings/storage`}
+                                  className="text-brand opacity-80 hover:opacity-100 transition"
+                                >
+                                  global upload limit
                                 </Link>{' '}
                                 takes precedence over this value ({formattedGlobalUploadLimit})
                               </p>
@@ -238,7 +239,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                   </div>
                 </Collapsible.Content>
               </Collapsible>
-              <div className="w-full border-t border-scale-500 !mt-0" />
+              <div className="w-full border-t border-default !mt-0" />
               <Modal.Content>
                 <div className="flex items-center space-x-2 justify-end">
                   <Button

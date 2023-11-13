@@ -3,7 +3,7 @@ import { getForeignKeyCascadeAction } from 'components/interfaces/TableGridEdito
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { XYCoord } from 'dnd-core'
 import * as React from 'react'
-import { DropTargetMonitor, useDrag, useDrop } from 'react-dnd'
+import { useDrag, useDrop } from 'react-dnd'
 import { IconArrowRight, IconKey, IconLink, IconLock } from 'ui'
 import { useDispatch, useTrackedState } from '../../store'
 import { ColumnHeaderProps, ColumnType, DragItem, GridForeignKey } from '../../types'
@@ -36,10 +36,10 @@ export function ColumnHeader<R>({
   const [{ isDragging }, drag] = useDrag({
     type: 'column-header',
     item: () => {
-      return { key: columnKey, index: columnIdx }
+      return { key: columnKey, index: columnIdx } as DragItem
     },
     canDrag: () => !column.frozen,
-    collect: (monitor: any) => ({
+    collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
   })
@@ -51,7 +51,7 @@ export function ColumnHeader<R>({
         handlerId: monitor.getHandlerId(),
       }
     },
-    hover(item: DragItem, monitor: DropTargetMonitor) {
+    hover(item, monitor) {
       if (!ref.current) {
         return
       }
@@ -60,8 +60,8 @@ export function ColumnHeader<R>({
         return
       }
 
-      const dragIndex = item.index
-      const dragKey = item.key
+      const dragIndex = (item as DragItem).index
+      const dragKey = (item as DragItem).key
       const hoverIndex = columnIdx
       const hoverKey = columnKey
 
@@ -101,7 +101,7 @@ export function ColumnHeader<R>({
       // Generally it's better to avoid mutations,
       // but it's good here for the sake of performance
       // to avoid expensive index searches.
-      item.index = hoverIndex
+      ;(item as DragItem).index = hoverIndex
     },
   })
 
@@ -134,8 +134,8 @@ export function ColumnHeader<R>({
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200',
+                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                      'border border-background',
                     ].join(' ')}
                   >
                     <span className="text-xs text-foreground">Primary key</span>
@@ -158,8 +158,8 @@ export function ColumnHeader<R>({
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200',
+                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                      'border border-background',
                     ].join(' ')}
                   >
                     <span className="text-xs text-foreground">Encrypted column</span>
@@ -192,8 +192,8 @@ function renderColumnIcon(
               <Tooltip.Arrow className="radix-tooltip-arrow" />
               <div
                 className={[
-                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                  'border border-scale-200',
+                  'rounded bg-alternative py-1 px-2 leading-none shadow',
+                  'border border-background',
                 ].join(' ')}
               >
                 <div>

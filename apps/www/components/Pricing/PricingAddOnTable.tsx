@@ -35,14 +35,14 @@ const PricingAddOnTable = ({ icon, pricing }: PricingAddOnTableProps) => {
         <Collapsible.Trigger asChild>
           <button
             className={classNames(
-              'text-foreground bg-blue-500 border-scale-300 group flex w-full flex-col items-start rounded-t-md dark:border lg:flex-row lg:items-center',
+              'text-foreground bg-blue-500 border-background-surface-100 group flex w-full flex-col items-start rounded-t-md dark:border lg:flex-row lg:items-center',
               !isAddOnOpen && 'rounded-b-md'
             )}
             type="button"
           >
             <div className="flex w-full flex-1 flex-col items-start lg:w-auto lg:flex-row lg:items-center">
-              <div className="dark:bg-scale-300 relative flex w-full items-center space-x-3 self-stretch bg-white py-8 pl-4 lg:w-[420px] lg:py-0">
-                <span className="bg-scale-1200 text-scale-100 rounded-md p-2 shadow-sm transition-transform duration-500 group-hover:scale-105 group-hover:shadow">
+              <div className="bg-surface-100 relative flex w-full items-center space-x-3 self-stretch py-8 pl-4 lg:w-[420px] lg:py-0">
+                <span className="bg-foreground text-background rounded-md p-2 shadow-sm transition-transform duration-500 group-hover:scale-105 group-hover:shadow">
                   {icon}
                 </span>
                 <span className="flex-shrink-0">
@@ -50,7 +50,7 @@ const PricingAddOnTable = ({ icon, pricing }: PricingAddOnTableProps) => {
                 </span>
               </div>
 
-              <div className="border-scale-500 dark:border-scale-400 flex flex-1 items-center justify-between lg:border-l">
+              <div className="border-muted flex flex-1 items-center justify-between lg:border-l">
                 <div className="grid-flow-rows grid grid-cols-1 gap-y-3 gap-x-6 px-3 py-6 lg:grid-cols-2">
                   {pricing.features.map((feature, i) => (
                     <div key={i} className="flex items-center space-x-2">
@@ -72,7 +72,7 @@ const PricingAddOnTable = ({ icon, pricing }: PricingAddOnTableProps) => {
           <div>
             <table className="text-foreground m-0 hidden w-full table-auto overflow-hidden rounded-b lg:table">
               <thead>
-                <tr className="bg-scale-500">
+                <tr className="bg-surface-300">
                   {columnNames.map((column) => (
                     <th key={column.key} className="p-3 text-left font-medium">
                       {column.title}
@@ -82,7 +82,7 @@ const PricingAddOnTable = ({ icon, pricing }: PricingAddOnTableProps) => {
               </thead>
               <tbody>
                 {pricing.rows.map((row, i) => (
-                  <tr key={i} className={classNames(i % 2 === 0 && 'bg-scale-300')}>
+                  <tr key={i} className={classNames(i % 2 === 0 && 'bg-surface-100')}>
                     {row.columns.map((column) => (
                       <td key={column.key} className="p-3">
                         {column.value}
@@ -98,7 +98,7 @@ const PricingAddOnTable = ({ icon, pricing }: PricingAddOnTableProps) => {
                 {pricing.rows.map((row, i) => (
                   <Fragment key={i}>
                     {row.columns.map((column) => (
-                      <tr key={column.key} className={classNames(i % 2 === 0 && 'bg-scale-300')}>
+                      <tr key={column.key} className={classNames(i % 2 === 0 && 'bg-surface-100')}>
                         <th className="py-3 pl-4 text-left font-medium">{column.title}</th>
                         <td className="px-4 py-3">{column.value}</td>
                       </tr>

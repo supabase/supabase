@@ -5,7 +5,7 @@ import { v4 as _uuidV4 } from 'uuid'
 
 export const tryParseJson = (jsonString: any) => {
   try {
-    let parsed = JSON.parse(jsonString)
+    const parsed = JSON.parse(jsonString)
     return parsed
   } catch (error) {
     return undefined

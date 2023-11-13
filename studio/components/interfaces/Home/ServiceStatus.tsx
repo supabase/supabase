@@ -94,7 +94,7 @@ const ServiceStatus = () => {
           >
             <div>
               <p>{service.name}</p>
-              <p className="text-light">
+              <p className="text-foreground-light">
                 {service.isLoading
                   ? 'Checking status'
                   : service.isSuccess

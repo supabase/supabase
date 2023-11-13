@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
 import { Badge, IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid, cn } from 'ui'
@@ -21,6 +22,21 @@ const Footer = (props: Props) => {
 
   const isLaunchWeekPage = pathname.includes('launch-week') || pathname === '/'
 
+  /**
+   * Temporary fix for next-theme client side bug
+   * https://github.com/pacocoursey/next-themes/issues/169
+   * TODO: remove when bug has been fixed
+   */
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return null
+  }
+
   return (
     <footer className={cn('bg-alternative', props.className)} aria-labelledby="footerHeading">
       <h2 id="footerHeading" className="sr-only">
@@ -30,18 +46,18 @@ const Footer = (props: Props) => {
         <SectionContainer className="grid grid-cols-2 md:flex items-center justify-between md:justify-center gap-8 md:gap-16 xl:gap-28 !py-6 md:!py-10 text-sm">
           <div className="flex flex-col md:flex-row gap-2 md:items-center">
             We protect your data.
-            <Link href="/security">
-              <a className="text-brand hover:underline">More on Security</a>
+            <Link href="/security" className="text-brand hover:underline">
+              More on Security
             </Link>
           </div>
           <ul className="flex flex-col md:flex-row gap-2 md:gap-8 justify-center md:items-center">
             <li className="flex items-center gap-2 whitespace-nowrap flex-nowrap">
               <CheckIcon className="w-4 h-4" /> SOC2 Type 2{' '}
-              <span className="text-lighter hidden sm:inline">Certified</span>
+              <span className="text-foreground-lighter hidden sm:inline">Certified</span>
             </li>
             <li className="flex items-center gap-2 whitespace-nowrap flex-nowrap">
               <CheckIcon className="w-4 h-4" /> HIPAA{' '}
-              <span className="text-lighter hidden sm:inline">Compliant</span>
+              <span className="text-foreground-lighter hidden sm:inline">Compliant</span>
             </li>
           </ul>
         </SectionContainer>
@@ -50,26 +66,24 @@ const Footer = (props: Props) => {
       <SectionContainer className="py-8">
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="space-y-8 xl:col-span-1">
-            <Link href="#" as="/">
-              <a className="w-40">
-                <Image
-                  src={
-                    isLaunchWeekPage
-                      ? supabaseLogoWordmarkDark
-                      : resolvedTheme === 'dark'
-                      ? supabaseLogoWordmarkDark
-                      : supabaseLogoWordmarkLight
-                  }
-                  width={160}
-                  height={30}
-                  alt="Supabase"
-                />
-              </a>
+            <Link href="#" as="/" className="w-40">
+              <Image
+                src={
+                  isLaunchWeekPage
+                    ? supabaseLogoWordmarkDark
+                    : mounted && resolvedTheme === 'dark'
+                    ? supabaseLogoWordmarkDark
+                    : supabaseLogoWordmarkLight
+                }
+                width={160}
+                height={30}
+                alt="Supabase"
+              />
             </Link>
             <div className="flex space-x-5">
               <a
                 href="https://twitter.com/supabase"
-                className="text-lighter hover:text-foreground transition"
+                className="text-foreground-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">Twitter</span>
                 <IconTwitterX size={22} />
@@ -77,7 +91,7 @@ const Footer = (props: Props) => {
 
               <a
                 href="https://github.com/supabase"
-                className="text-lighter hover:text-foreground transition"
+                className="text-foreground-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">GitHub</span>
                 <IconGitHubSolid size={22} />
@@ -85,7 +99,7 @@ const Footer = (props: Props) => {
 
               <a
                 href="https://discord.supabase.com/"
-                className="text-lighter hover:text-foreground transition"
+                className="text-foreground-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">Discord</span>
                 <IconDiscord size={22} />
@@ -93,7 +107,7 @@ const Footer = (props: Props) => {
 
               <a
                 href="https://youtube.com/c/supabase"
-                className="text-lighter hover:text-foreground transition"
+                className="text-foreground-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">Youtube</span>
                 <IconYoutubeSolid size={22} />
@@ -112,8 +126,8 @@ const Footer = (props: Props) => {
                           <div
                             className={`text-sm transition-colors ${
                               link.url || Component
-                                ? 'text-lighter hover:text-foreground'
-                                : 'text-muted hover:text-lighter'
+                                ? 'text-foreground-lighter hover:text-foreground'
+                                : 'text-muted hover:text-foreground-lighter'
                             } `}
                           >
                             {link.text}
@@ -133,9 +147,7 @@ const Footer = (props: Props) => {
                               link.url.startsWith('https') ? (
                                 <a href={link.url}>{children}</a>
                               ) : (
-                                <Link href={link.url}>
-                                  <a>{children}</a>
-                                </Link>
+                                <Link href={link.url}>{children}</Link>
                               )
                             ) : (
                               Component && <Component>{children}</Component>
@@ -150,7 +162,7 @@ const Footer = (props: Props) => {
             </div>
           </div>
         </div>
-        <div className="border-border mt-32 flex justify-between border-t pt-8">
+        <div className="border-default mt-32 flex justify-between border-t pt-8">
           <small className="small">&copy; Supabase Inc</small>
           <ThemeToggle forceDark={isLaunchWeekPage} />
         </div>
