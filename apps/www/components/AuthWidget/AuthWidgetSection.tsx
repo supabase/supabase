@@ -118,12 +118,12 @@ function AuthWidgetSection() {
                 match your brand and aesthetic
               </p>
               <div className="mb-4 flex items-center space-x-2">
-                <div className="relative m-0 w-8 flex items-center">
+                <div className="relative m-0 w-8 aspect-square flex items-center">
                   <Image
                     src={`${basePath}/images/product/auth/react-icon.svg`}
                     alt="react icon"
                     layout="fill"
-                    className="w-full"
+                    className="w-full m-0"
                   />
                 </div>
                 <small>React only. Other frameworks coming soon.</small>
