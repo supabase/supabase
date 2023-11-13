@@ -1,12 +1,14 @@
 import { useTelemetryProps } from 'common'
+import { FlaskConical } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { Button, IconExternalLink, IconEye, IconEyeOff, Modal, ScrollArea, cn } from 'ui'
 
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import Telemetry from 'lib/telemetry'
-import { FlaskConical } from 'lucide-react'
-import Link from 'next/link'
 import { useAppStateSnapshot } from 'state/app-state'
+import APISidePanelPreview from './APISidePanelPreview'
 import { useFeaturePreviewContext } from './FeaturePreviewContext'
 
 // [Ivan] We should probably move this to a separate file, together with LOCAL_STORAGE_KEYS. We should make adding new feature previews as simple as possible.
@@ -17,6 +19,12 @@ const FEATURE_PREVIEWS: { key: string; name: string; content: any; discussionsUr
   //   name: 'Global navigation update',
   //   content: null,
   // },
+  {
+    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
+    name: 'Project API documentation',
+    content: <APISidePanelPreview />,
+    discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
+  },
 ]
 
 const FeaturePreviewModal = () => {
@@ -54,7 +62,7 @@ const FeaturePreviewModal = () => {
       onCancel={() => snap.setShowFeaturePreviewModal(false)}
     >
       {FEATURE_PREVIEWS.length > 0 ? (
-        <div className="flex">
+        <div className="flex border-t">
           <div>
             <ScrollArea className="h-[550px] w-[240px] border-r">
               {FEATURE_PREVIEWS.map((feature) => {
