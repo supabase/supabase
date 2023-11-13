@@ -2265,7 +2265,7 @@ functions:
           - To see how you can use a custom in-app browser on Android, check our [demo](https://github.com/supabase-community/supabase-kt/tree/development/demos/android-login) on GitHub.
         code: |
           ```kotlin
-          val url = supabase.gotrue.oAuthUrl(Github, redirectUrl = "https://example.com")
+          val url = supabase.auth.oAuthUrl(Github, redirectUrl = "https://example.com")
           ```
       - id: sign-in-with-scopes
         name: Create a custom url with scopes
@@ -2275,7 +2275,7 @@ functions:
           You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider. The list of scopes will be documented by the third-party provider you are using and specifying scopes will enable you to use the OAuth provider token to call additional APIs supported by the third-party provider to get more information.
         code: |
           ```kotlin
-          val url = supabase.gotrue.oAuthUrl(Github, redirectUrl = "https://example.com") {
+          val url = supabase.auth.oAuthUrl(Github, redirectUrl = "https://example.com") {
               scopes.add("email")
           }
           ```
@@ -2299,7 +2299,7 @@ functions:
             // You can extract the user's email domain and use it to trigger the
             // authentication flow with the correct identity provider.
 
-            supabase.gotrue.loginWith(SSO.withDomain("company.com"))
+            supabase.auth.loginWith(SSO.withDomain("company.com"))
 
             //the url was opened automatically, if you don't want that, provide a custom redirect url
           ```
@@ -2311,7 +2311,7 @@ functions:
             // Useful when you need to map a user's sign in request according
             // to different rules that can't use email domains.
 
-            supabase.gotrue.loginWith(SSO.withProvider("21648a9d-8d5a-4555-a9d1-d6375dc14e92"))
+            supabase.auth.loginWith(SSO.withProvider("21648a9d-8d5a-4555-a9d1-d6375dc14e92"))
 
             //the url was opened automatically, if you don't want that, provide a custom redirect url
           ```
@@ -2327,21 +2327,21 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.gotrue.logout()
+          supabase.auth.logout()
           ```
       - id: sign-out-all-sessions
         name: Sign out all sessions
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.gotrue.logout(LogoutScope.GLOBAL)
+          supabase.auth.logout(LogoutScope.GLOBAL)
           ```
       - id: sign-out-others
         name: Sign out all sessions except the current
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.gotrue.logout(LogoutScope.OTHERS)
+          supabase.auth.logout(LogoutScope.OTHERS)
           ```
   - id: verify-otp
     title: 'Verify OTPs'
@@ -2354,7 +2354,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.gotrue.verifyEmailOtp(type = OtpType.Email.INVITE, email = "example@email.com", token = "token")
+          supabase.auth.verifyEmailOtp(type = OtpType.Email.INVITE, email = "example@email.com", token = "token")
           ```
         description: |
           Available types are:
@@ -2368,7 +2368,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          supabase.gotrue.verifyPhoneOtp(type = OtpType.Phone.SMS, phoneNumber = "+491234567", token = "token")
+          supabase.auth.verifyPhoneOtp(type = OtpType.Phone.SMS, phoneNumber = "+491234567", token = "token")
           ```
         description: |
           Available types are:
@@ -2387,7 +2387,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.gotrue.reauthenticate()
+          supabase.auth.reauthenticate()
           ```
   - id: resend-email-or-phone-otps
     title: 'resend()'
@@ -2404,28 +2404,28 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.gotrue.resendEmail(OtpType.Email.SIGNUP, "example@email.com")
+          supabase.auth.resendEmail(OtpType.Email.SIGNUP, "example@email.com")
           ```
       - id: resend-phone-signup-confirmation
         name: Resend a phone signup confirmation
         description: Resends the phone signup confirmation email to the user
         code: |
           ```kotlin
-          supabase.gotrue.resendPhone(OtpType.Phone.SMS, "1234567890")
+          supabase.auth.resendPhone(OtpType.Phone.SMS, "1234567890")
           ```
       - id: resend-email-change-email
         name: Resend email change email
         description: Resends the email change email to the user
         code: |
           ```kotlin
-          supabase.gotrue.resendEmail(OtpType.Email.EMAIL_CHANGE, "example@email.com")
+          supabase.auth.resendEmail(OtpType.Email.EMAIL_CHANGE, "example@email.com")
           ```
       - id: resend-phone-change
         name: Resend phone change OTP
         description: Resends the phone change OTP to the user
         code: |
           ```kotlin
-          supabase.gotrue.resendPhone(OtpType.Phone.PHONE_CHANGE, "1234567890")
+          supabase.auth.resendPhone(OtpType.Phone.PHONE_CHANGE, "1234567890")
           ```
   - id: get-session
     title: 'Get current session'
@@ -2438,7 +2438,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val session = supabase.gotrue.currentSessionOrNull()
+          val session = supabase.auth.currentSessionOrNull()
           ```
   - id: get-user
     title: 'getUser()'
@@ -2453,7 +2453,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val user = supabase.gotrue.retrieveUserForCurrentSession(updateSession = true)
+          val user = supabase.auth.retrieveUserForCurrentSession(updateSession = true)
           ```
         description: |
           `updateSession` updates the local session with the new user
@@ -2462,7 +2462,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val user = supabase.gotrue.retrieveUser("JWT")
+          val user = supabase.auth.retrieveUser("JWT")
           ```
   - id: update-user
     title: 'modifyUser()'
@@ -2479,7 +2479,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          val user = supabase.gotrue.modifyUser {
+          val user = supabase.auth.modifyUser {
              email = "newEmail@email.com"
           }
           ```
@@ -2488,7 +2488,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          val user = supabase.gotrue.modifyUser {
+          val user = supabase.auth.modifyUser {
              password = "secretPassword"
           }
           ```
@@ -2497,7 +2497,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val user = supabase.gotrue.modifyUser {
+          val user = supabase.auth.modifyUser {
              data {
                 put("name", "John")
              }
@@ -2518,7 +2518,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.gotrue.importSession(UserSession(accessToken = "token", refreshToken = "refresh", expiresIn = 2000, tokenType = "Bearer", user = null))
+          supabase.auth.importSession(UserSession(accessToken = "token", refreshToken = "refresh", expiresIn = 2000, tokenType = "Bearer", user = null))
           ```
   - id: refresh-session
     title: 'refreshSession()'
@@ -2533,14 +2533,14 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val session = supabase.gotrue.refreshCurrentSession()
+          val session = supabase.auth.refreshCurrentSession()
           ```
       - id: refresh-session-using-the-current-session
         name: Refresh session using the refresh token
         isSpotlight: true
         code: |
           ```kotlin
-          val session = supabase.gotrue.refreshSession(refreshToken = "refreshToken")
+          val session = supabase.auth.refreshSession(refreshToken = "refreshToken")
           ```
   - id: on-auth-state-change
     title: 'sessionStatus'
@@ -2553,7 +2553,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.gotrue.sessionStatus.collect {
+          supabase.auth.sessionStatus.collect {
               when(it) {
                   is SessionStatus.Authenticated -> println(it.session.user)
                   SessionStatus.LoadingFromStorage -> println("Loading from storage")
@@ -2578,7 +2578,7 @@ functions:
       - The user gets redirected back to your app, assuming you setup [OTP handling](/docs/reference/kotlin/initializing)
       - After the user has been redirected successfully, prompt them for a new password and call `modifyUser()`:
         ```kotlin
-        supabase.gotrue.modifyUser {
+        supabase.auth.modifyUser {
             password = "1234567"
         }
         ```
@@ -2588,7 +2588,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.gotrue.sendRecoveryEmail(email = "example@email.com")
+          supabase.auth.sendRecoveryEmail(email = "example@email.com")
           ```
   - id: exchange-code-for-session
     title: 'exchangeCodeForSession()'
@@ -2601,12 +2601,12 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.gotrue.exchangeCodeForSession("34e770dd-9ff9-416c-87fa-43b31d7ef225")
+          supabase.auth.exchangeCodeForSession("34e770dd-9ff9-416c-87fa-43b31d7ef225")
           ```
   - id: auth-mfa-api
     title: 'Overview'
     notes: |
-      This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.gotrue.mfa` namespace.
+      This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.auth.mfa` namespace.
 
       Currently, we only support time-based one-time password (TOTP) as the 2nd factor. We don't support recovery codes but we allow users to enroll more than 1 TOTP factor, with an upper limit of 10.
 
@@ -2626,7 +2626,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val factor = supabase.gotrue.mfa.enroll(factorType = FactorType.TOTP)
+          val factor = supabase.auth.mfa.enroll(factorType = FactorType.TOTP)
 
           // Use the id to create a challenge.
           // The challenge can be verified by entering the code generated from the authenticator app.
@@ -2639,14 +2639,14 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val verifiedFactors = supabase.gotrue.mfa.verifiedFactors
+          val verifiedFactors = supabase.auth.mfa.verifiedFactors
           ```
       - id: retrieve-verified-factors
         name: Retrieve verified factors
         isSpotlight: true
         code: |
           ```kotlin
-          val verifiedFactors = supabase.gotrue.mfa.retrieveFactorsForCurrentUser()
+          val verifiedFactors = supabase.auth.mfa.retrieveFactorsForCurrentUser()
           ```
   - id: mfa-challenge
     title: 'mfa.challenge()'
@@ -2661,7 +2661,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val challenge = supabase.gotrue.mfa.createChallenge(factorId = "34e770dd-9ff9-416c-87fa-43b31d7ef225")
+          val challenge = supabase.auth.mfa.createChallenge(factorId = "34e770dd-9ff9-416c-87fa-43b31d7ef225")
           ```
   - id: mfa-verify
     title: 'mfa.verify()'
@@ -2675,7 +2675,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.gotrue.mfa.verifyChallenge(
+          supabase.auth.mfa.verifyChallenge(
               factorId = "34e770dd-9ff9-416c-87fa-43b31d7ef225",
               challengeId = "4034ae6f-a8ce-4fb5-8ee5-69a5863a7c15",
               code = "123456",
@@ -2695,7 +2695,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.gotrue.mfa.createChallengeAndVerify(
+          supabase.auth.mfa.createChallengeAndVerify(
               factorId = "34e770dd-9ff9-416c-87fa-43b31d7ef225",
               code = "123456",
               saveSession = true // this is set to true by default, but you can set it to false if you want to handle the session yourself
@@ -2712,7 +2712,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.gotrue.mfa.unenroll(factorId = "34e770dd-9ff9-416c-87fa-43b31d7ef225")
+          supabase.auth.mfa.unenroll(factorId = "34e770dd-9ff9-416c-87fa-43b31d7ef225")
           ```
   - id: mfa-get-authenticator-assurance-level
     title: 'mfa.getAuthenticatorAssuranceLevel()'
@@ -2727,30 +2727,30 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val (current, next) = supabase.gotrue.mfa.getAuthenticatorAssuranceLevel()
+          val (current, next) = supabase.auth.mfa.getAuthenticatorAssuranceLevel()
           ```
       - id: aal-enabled
         name: Check whether the user has at least one verified factor
         isSpotlight: true
         code: |
           ```kotlin
-          val enabled = supabase.gotrue.mfa.isMfaEnabled
+          val enabled = supabase.auth.mfa.isMfaEnabled
           //flow variant, automatically emitting new values on session changes
-          val enabledFlow = supabase.gotrue.mfa.isMfaEnabledFlow
+          val enabledFlow = supabase.auth.mfa.isMfaEnabledFlow
           ```
       - id: aal-enabled-for-current-session
         name: Check whether the user is logged in using AAL2
         isSpotlight: true
         code: |
           ```kotlin
-          val loggedInUsingMfa = supabase.gotrue.mfa.loggedInUsingMfa
+          val loggedInUsingMfa = supabase.auth.mfa.loggedInUsingMfa
           //flow variant, automatically emitting new values on session changes
-          val loggedInUsingMfaFlow = supabase.gotrue.mfa.loggedInUsingMfaFlow
+          val loggedInUsingMfaFlow = supabase.auth.mfa.loggedInUsingMfaFlow
           ```
   - id: admin-api
     title: 'Overview'
     notes: |
-      - Any method under the `supabase.gotrue.admin` namespace requires a `service_role` key.
+      - Any method under the `supabase.auth.admin` namespace requires a `service_role` key.
       - These methods are considered admin methods and should be called on a trusted server. Never expose your `service_role` key in the browser.
     examples:
       - id: create-auth-admin-client
@@ -2768,10 +2768,10 @@ functions:
               }
               // install other plugins (these will use the service role key)
           }
-          supabase.gotrue.importAuthToken("service_role")
+          supabase.auth.importAuthToken("service_role")
 
           // Access auth admin api
-          val adminGoTrueClient = supabase.gotrue.admin
+          val adminGoTrueClient = supabase.auth.admin
           ```
 
   - id: get-user-by-id
@@ -2786,7 +2786,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val user = supabase.gotrue.admin.retrieveUserById(uid = "f2a0b0a0-6b1a-4b7a-8f1a-4b7a6b1a8f1a")
+          val user = supabase.auth.admin.retrieveUserById(uid = "f2a0b0a0-6b1a-4b7a-8f1a-4b7a6b1a8f1a")
           ```
 
   - id: list-users
@@ -2801,14 +2801,14 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val users = supabase.gotrue.admin.retrieveUsers()
+          val users = supabase.auth.admin.retrieveUsers()
           ```
       - id: get-paginated-list-of-users
         name: Paginated list of users
         isSpotlight: false
         code: |
           ```kotlin
-          val users = supabase.gotrue.admin.retrieveUsers(
+          val users = supabase.auth.admin.retrieveUsers(
               page = 1,
               perPage = 100
           )
@@ -2825,7 +2825,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val userWithEmail = supabase.gotrue.admin.createUserWithEmail {
+          val userWithEmail = supabase.auth.admin.createUserWithEmail {
               email = "example@email.com"
               password = "secretpassword"
               userMetadata {
@@ -2838,7 +2838,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val userWithPhone = supabase.gotrue.admin.createUserWithPhone {
+          val userWithPhone = supabase.auth.admin.createUserWithPhone {
               phoneNumber = "+49123456789"
               password = "secretpassword"
               userMetadata {
@@ -2850,7 +2850,7 @@ functions:
         name: Auto-confirm the user's email
         code: |
           ```kotlin
-          val userWithEmail = supabase.gotrue.admin.createUserWithEmail {
+          val userWithEmail = supabase.auth.admin.createUserWithEmail {
               email = "example@email.com"
               password = "secretpassword"
               autoConfirm = true
@@ -2860,7 +2860,7 @@ functions:
         name: Auto-confirm the user's phone number
         code: |
           ```kotlin
-          val userWithPhone = supabase.gotrue.admin.createUserWithPhone {
+          val userWithPhone = supabase.auth.admin.createUserWithPhone {
               phoneNumber = "+49123456789"
               password = "secretpassword"
               autoConfirm = true
@@ -2878,7 +2878,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.gotrue.admin.deleteUser(uid = "uid")
+          supabase.auth.admin.deleteUser(uid = "uid")
           ```
 
   - id: invite-user-by-email
@@ -2892,7 +2892,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.gotrue.admin.inviteUserByEmail(
+          supabase.auth.admin.inviteUserByEmail(
               email = "example@email.com",
               //optional:
               redirectTo = "https://example.com/redirect",
@@ -2913,7 +2913,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val (url, user) = supabase.gotrue.admin.generateLinkFor(LinkType.Signup) {
+          val (url, user) = supabase.auth.admin.generateLinkFor(LinkType.Signup) {
               email = "example@email.com"
               password = "secretpassword"
           }
@@ -2923,7 +2923,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          val (url, user) = supabase.gotrue.admin.generateLinkFor(LinkType.Invite) {
+          val (url, user) = supabase.auth.admin.generateLinkFor(LinkType.Invite) {
               email = "example@email.com"
           }
           ```
@@ -2932,7 +2932,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          val (url, user) = supabase.gotrue.admin.generateLinkFor(LinkType.MagicLink) {
+          val (url, user) = supabase.auth.admin.generateLinkFor(LinkType.MagicLink) {
               email = "example@email.com"
           }
           ```
@@ -2941,7 +2941,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          val (url, user) = supabase.gotrue.admin.generateLinkFor(LinkType.Recovery) {
+          val (url, user) = supabase.auth.admin.generateLinkFor(LinkType.Recovery) {
               email = "example@email.com"
           }
           ```
@@ -2951,13 +2951,13 @@ functions:
         code: |
           ```kotlin
           // generate an email change link to be sent to the current email address
-          val (url, user) = supabase.gotrue.admin.generateLinkFor(LinkType.EmailChangeCurrent) {
+          val (url, user) = supabase.auth.admin.generateLinkFor(LinkType.EmailChangeCurrent) {
               email = "example@email.com"
               newEmail = "newEmail@email.com"
           }
 
           // generate an email change link to be sent to the new email address
-          val (url, user) = supabase.gotrue.admin.generateLinkFor(LinkType.EmailChangeNew) {
+          val (url, user) = supabase.auth.admin.generateLinkFor(LinkType.EmailChangeNew) {
               email = "example@email.com"
               newEmail = "newEmail@email.com"
           }
@@ -2974,7 +2974,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          supabase.gotrue.admin.updateUserById(uid = "id") {
+          supabase.auth.admin.updateUserById(uid = "id") {
               email = "example@email.com"
           }
           ```
@@ -2983,7 +2983,7 @@ functions:
         isSpotlight: false
         code: |
           ```js
-          supabase.gotrue.admin.updateUserById(uid = "id") {
+          supabase.auth.admin.updateUserById(uid = "id") {
               password = "password"
           }
           ```
@@ -2992,7 +2992,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.gotrue.admin.updateUserById(uid = "id") {
+          supabase.auth.admin.updateUserById(uid = "id") {
               userMetadata = buildJsonObject {
                   put("key", "value")
               }
@@ -3003,7 +3003,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          supabase.gotrue.admin.updateUserById(uid = "id") {
+          supabase.auth.admin.updateUserById(uid = "id") {
               appMetadata = buildJsonObject {
                   put("key", "value")
               }
@@ -3014,7 +3014,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          supabase.gotrue.admin.updateUserById(uid = "id") {
+          supabase.auth.admin.updateUserById(uid = "id") {
               emailConfirm = true
           }
           ```
@@ -3023,7 +3023,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          supabase.gotrue.admin.updateUserById(uid = "id") {
+          supabase.auth.admin.updateUserById(uid = "id") {
               phoneConfirm = true
           }
           ```
@@ -3038,7 +3038,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          const factors = supabase.gotrue.admin.retrieveFactors(uid = "id")
+          const factors = supabase.auth.admin.retrieveFactors(uid = "id")
           ```
   - id: mfa-delete-factor
     title: 'mfa.deleteFactor()'
@@ -3051,7 +3051,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.gotrue.admin.deleteFactor(uid = "id", factorId = "factor_id")
+          supabase.auth.admin.deleteFactor(uid = "id", factorId = "factor_id")
           ```
   - id: invoke
     title: 'invoke()'
