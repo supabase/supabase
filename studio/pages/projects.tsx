@@ -12,6 +12,7 @@ import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import { NextPageWithLayout } from 'types'
+import PromoToast from '@ui/components/PromoToast'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -73,6 +74,7 @@ const ProjectsPage: NextPageWithLayout = () => {
           <div className="my-8 space-y-8">
             <ProjectList />
           </div>
+          <PromoToast />
         </div>
       )}
     </>
