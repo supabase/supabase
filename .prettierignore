@@ -12,3 +12,4 @@ examples/slack-clone/nextjs-slack-clone/full-schema.sql
 # ignore files with custom js formatting
 apps/docs/pages/guides/auth/*.mdx
 apps/docs/pages/guides/integrations/*.mdx
+apps/studio/public
