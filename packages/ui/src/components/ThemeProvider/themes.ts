@@ -6,6 +6,6 @@ export interface Theme {
 export const themes = [
   { name: 'System', value: 'system' }, // Switches between dark and light
   { name: 'Dark', value: 'dark' }, // Classic Supabase dark
-  { name: 'Deep Dark', value: 'deep-dark' }, // High contrast dark introdused in Dec. 2023
+  { name: 'Deep Dark', value: 'deep-dark' }, // High contrast dark introduced in Dec. 2023
   { name: 'Light', value: 'light' }, // Classic Supabase light
 ]
