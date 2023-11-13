@@ -24,6 +24,10 @@
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
+Watch "releases" of this repo to get notified of major updates.
+
+<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
+
 ## Documentation
 
 For full documentation, visit [supabase.com/docs](https://supabase.com/docs)
@@ -36,17 +40,6 @@ To see how to Contribute, visit [Getting Started](./DEVELOPERS.md)
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Best for: bugs and errors you encounter using Supabase.
 - [Email Support](https://supabase.com/docs/support#business-support). Best for: problems with your database or infrastructure.
 - [Discord](https://discord.supabase.com). Best for: sharing your applications and hanging out with the community.
-
-## Status
-
-- [x] Alpha: We are testing Supabase with a closed set of customers
-- [x] Public Alpha: Anyone can sign up over at [supabase.com/dashboard](https://supabase.com/dashboard). But go easy on us, there are a few kinks
-- [x] Public Beta: Stable enough for most non-enterprise use-cases
-- [ ] Public: General Availability [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
-
-We are currently in Public Beta. Watch "releases" of this repo to get notified of major updates.
-
-<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
 ---
 
