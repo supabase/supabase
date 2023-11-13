@@ -594,7 +594,7 @@ const SQLEditor = () => {
                         disabled={isDiffOpen}
                         ref={inputRef}
                         className={cn(
-                          '!p-0 bg-transparent border-transparent text-sm text-brand-600 dark:text-brand placeholder:text-brand-500 focus:!ring-0',
+                          '!p-0 bg-transparent border-transparent text-sm text-brand-600 placeholder:text-brand-500 focus:!ring-0',
                           'focus-visible:ring-0 focus-visible:ring-offset-0',
                           'appearance-none outline-none'
                         )}
@@ -798,12 +798,12 @@ const SQLEditor = () => {
                           setIsSchemaSuggestionDismissed(true)
                           setIsAISettingsOpen(true)
                         }}
-                        className="text-brand-600 dark:text-brand hover:text-brand-600 transition"
+                        className="text-brand-600 hover:text-brand-600 transition"
                       >
                         <IconSettings className="cursor-pointer" />
                       </button>
                       <button
-                        className="text-brand-600 dark:text-brand hover:text-brand-600"
+                        className="text-brand-600 hover:text-brand-600"
                         onClick={() => setIsAiOpen(false)}
                       >
                         <IconX size={21} />
