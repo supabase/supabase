@@ -1,21 +1,9 @@
 import { useState } from 'react'
-import {
-  Button,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Command_Shadcn_,
-  IconTerminal,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-  SidePanel,
-} from 'ui'
+import { Button, SidePanel } from 'ui'
 
 import { useParams } from 'common'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { BASE_PATH } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   Bucket,
@@ -31,15 +19,28 @@ import {
   UserManagement,
 } from './Content'
 import FirstLevelNav from './FirstLevelNav'
+import LanguageSelector from './LanguageSelector'
 import SecondLevelNav from './SecondLevelNav'
+
+/**
+ * [Joshen] Reminder: when we choose to release this as a main feature
+ * Ensure that UX is better than the existing, and make sure we do the
+ * necessary communications around releasing this.
+ *
+ * Problems:
+ * - Needs URL support
+ * - Language selector is not clear, users are missing the bash language option
+ * - GraphiQL needs a better home, cannot be placed under Database as its "API"
+ */
 
 const ProjectAPIDocs = () => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
+  const isEntityDocs =
+    snap.activeDocsSection.length === 2 && snap.activeDocsSection[0] === 'entities'
 
-  const [openLanguage, setOpenLanguage] = useState(false)
   const [showKeys, setShowKeys] = useState(false)
-  const [language, setLanguage] = useState<'js' | 'bash'>('js')
+  const language = snap.docsLanguage
 
   const { data } = useProjectApiQuery({ projectRef: ref })
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
@@ -51,11 +52,6 @@ const ProjectAPIDocs = () => {
     customDomainData?.customDomain?.status === 'active'
       ? `https://${customDomainData.customDomain?.hostname}/auth/v1/callback`
       : `https://${data?.autoApiService.endpoint ?? ''}`
-
-  const updateLanguage = (value: 'js' | 'bash') => {
-    setLanguage(value)
-    setOpenLanguage(false)
-  }
 
   return (
     <SidePanel
@@ -70,47 +66,7 @@ const ProjectAPIDocs = () => {
           <div className="border-b px-4 py-2 flex items-center justify-between">
             <h4>API Docs</h4>
             <div className="flex items-center space-x-1">
-              <Popover_Shadcn_ open={openLanguage} onOpenChange={setOpenLanguage} modal={false}>
-                <PopoverTrigger_Shadcn_ asChild>
-                  <Button
-                    type="default"
-                    className="px-1"
-                    icon={
-                      language === 'js' ? (
-                        <img
-                          src={`${BASE_PATH}/img/libraries/javascript-icon.svg`}
-                          alt={`javascript logo`}
-                          width="14"
-                        />
-                      ) : (
-                        <IconTerminal size={14} strokeWidth={2.5} />
-                      )
-                    }
-                  />
-                </PopoverTrigger_Shadcn_>
-                <PopoverContent_Shadcn_ className="p-0 w-24" side="bottom" align="end">
-                  <Command_Shadcn_>
-                    <CommandList_Shadcn_>
-                      <CommandGroup_Shadcn_>
-                        <CommandItem_Shadcn_
-                          className="cursor-pointer"
-                          onSelect={() => updateLanguage('js')}
-                          onClick={() => updateLanguage('js')}
-                        >
-                          <p>Javascript</p>
-                        </CommandItem_Shadcn_>
-                        <CommandItem_Shadcn_
-                          className="cursor-pointer"
-                          onSelect={() => updateLanguage('bash')}
-                          onClick={() => updateLanguage('bash')}
-                        >
-                          <p>Bash</p>
-                        </CommandItem_Shadcn_>
-                      </CommandGroup_Shadcn_>
-                    </CommandList_Shadcn_>
-                  </Command_Shadcn_>
-                </PopoverContent_Shadcn_>
-              </Popover_Shadcn_>
+              {!isEntityDocs && <LanguageSelector simplifiedVersion />}
               <Button type="default" onClick={() => setShowKeys(!showKeys)}>
                 {showKeys ? 'Hide keys' : 'Show keys'}
               </Button>
@@ -120,7 +76,7 @@ const ProjectAPIDocs = () => {
           {snap.activeDocsSection.length === 1 ? <FirstLevelNav /> : <SecondLevelNav />}
         </div>
 
-        <div className="flex-1 divide-y space-y-4 max-h-screen overflow-auto px-4">
+        <div className="flex-1 divide-y space-y-4 max-h-screen overflow-auto">
           {snap.activeDocsSection[0] === 'introduction' && (
             <Introduction
               showKeys={showKeys}
