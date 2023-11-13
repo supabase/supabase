@@ -28,7 +28,6 @@
   --destructive-400: 7.1deg 91.3% 91%;
   --destructive-300: 7.1deg 100% 96.7%;
   --destructive-200: 0deg 100% 99.4%;
-  --background-muted: 0deg 0% 100%;
   --background-alternative-default: 0deg 0% 100%;
   --background-alternative-200: 0deg 0% 100%;
   --foreground-contrast: 210deg 25% 98.4%;
@@ -43,6 +42,7 @@
   --border-muted: var(--colors-slate-light-400);
   --border-default: var(--colors-slate-light-500);
   --background-button-default: var(--colors-slate-light-100);
+  --background-muted: var(--colors-slate-light-400);
   --background-overlay-hover: var(--colors-slate-light-300);
   --background-overlay-default: var(--colors-slate-light-100);
   --background-surface-300: var(--colors-slate-light-400);
