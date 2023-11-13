@@ -151,7 +151,7 @@ const BasicAuthSettingsForm = observer(() => {
                   />
                 </FormSectionContent>
               </FormSection>
-              <div className="border-t border-scale-400"></div>
+              <div className="border-t border-muted"></div>
               <FormSection header={<FormSectionLabel>Bot and Abuse Protection</FormSectionLabel>}>
                 <FormSectionContent loading={isLoading}>
                   <Toggle

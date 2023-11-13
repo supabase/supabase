@@ -5,7 +5,7 @@ import '../../../packages/ui/build/css/themes/light.css'
 import '../styles/index.css'
 
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
-import { AuthProvider, ThemeProvider, useTelemetryProps } from 'common'
+import { AuthProvider, ThemeProvider, useTelemetryProps, useThemeSandbox } from 'common'
 import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from 'lib/constants'
 import { DefaultSeo } from 'next-seo'
 import { AppProps } from 'next/app'
@@ -21,6 +21,8 @@ export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
   const { consentValue, hasAcceptedConsent } = useConsent()
+
+  useThemeSandbox()
 
   function handlePageTelemetry(route: string) {
     return post(`${API_URL}/telemetry/page`, {

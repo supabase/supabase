@@ -70,6 +70,10 @@ const BranchManagement = () => {
   } = useBranchesQuery({ projectRef })
   const [[mainBranch], previewBranches] = partition(branches, (branch) => branch.is_default)
   const branchesWithPRs = previewBranches.filter((branch) => branch.pr_number !== undefined)
+  const prNumbers =
+    branches !== undefined
+      ? (branchesWithPRs.map((branch) => branch.pr_number).filter(Boolean) as number[])
+      : undefined
 
   const githubIntegration = integrations?.find(
     (integration) =>
@@ -92,7 +96,7 @@ const BranchManagement = () => {
     organizationIntegrationId: githubIntegration?.id,
     repoOwner,
     repoName,
-    target: mainBranch?.git_branch,
+    prNumbers,
   })
   const pullRequests = allPullRequests ?? []
 
@@ -376,7 +380,7 @@ const BranchManagement = () => {
               <li className="flex gap-3">
                 <div>
                   <strong className="text-sm">Before you disable branching, consider:</strong>
-                  <ul className="space-y-2 mt-2 text-sm text-light">
+                  <ul className="space-y-2 mt-2 text-sm text-foreground-light">
                     <li className="list-disc ml-6">
                       Your project no longer requires database previews.
                     </li>

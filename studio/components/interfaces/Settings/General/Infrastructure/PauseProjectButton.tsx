@@ -68,8 +68,8 @@ const PauseProjectButton = () => {
               <Tooltip.Arrow className="radix-tooltip-arrow" />
               <div
                 className={[
-                  'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                  'border border-scale-200 ', //border
+                  'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                  'border border-background', //border
                 ].join(' ')}
               >
                 <span className="text-xs text-foreground">
@@ -98,7 +98,7 @@ const PauseProjectButton = () => {
         onSelectConfirm={requestPauseProject}
       >
         <Modal.Content className="py-4">
-          <p className="text-light text-sm">
+          <p className="text-foreground-light text-sm">
             Are you sure you want to pause this project? It will not be accessible until you unpause
             it.
           </p>

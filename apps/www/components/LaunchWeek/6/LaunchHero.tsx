@@ -9,7 +9,7 @@ export default function LaunchHero() {
         <h1 className="text-foreground text-4xl font-semibold tracking-tight md:text-5xl lg:text-7xl">
           {Controller.hero_header}
         </h1>
-        <h2 className="text-light text-sm lg:text-xl">
+        <h2 className="text-foreground-light text-sm lg:text-xl">
           Stay tuned all week for daily announcements
         </h2>
       </div>

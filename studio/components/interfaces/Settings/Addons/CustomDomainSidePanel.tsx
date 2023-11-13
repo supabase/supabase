@@ -190,7 +190,7 @@ const CustomDomainSidePanel = () => {
                 value="cd_none"
               >
                 <div className="w-full group">
-                  <div className="border-b border-scale-500 px-4 py-2 group-hover:border-scale-600">
+                  <div className="border-b border-default px-4 py-2 group-hover:border-control">
                     <p className="text-sm">No custom domain</p>
                   </div>
                   <div className="px-4 py-2">
@@ -215,7 +215,7 @@ const CustomDomainSidePanel = () => {
                   value={option.identifier}
                 >
                   <div className="w-full group">
-                    <div className="border-b border-scale-500 px-4 py-2 group-hover:border-scale-600">
+                    <div className="border-b border-default px-4 py-2 group-hover:border-control">
                       <p className="text-sm">{option.name}</p>
                     </div>
                     <div className="px-4 py-2">

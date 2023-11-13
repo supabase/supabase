@@ -72,8 +72,8 @@ const GlassPanel = ({
         'border rounded-lg',
         'text-left',
         background
-          ? 'border-scale-500 hover:border-scale-700 bg-white dark:bg-scale-300'
-          : 'border-scale-400 hover:border-scale-500 bg-transparent',
+          ? 'hover:border-strong bg-surface-100'
+          : 'border-muted hover:border-default bg-transparent',
         'transition',
       ].join(' ')}
     >
@@ -112,10 +112,10 @@ const GlassPanel = ({
           ) : (
             icon && <IconBackground>{icon}</IconBackground>
           )}
-          <p className="text-base text-scale-1200">{title}</p>
+          <p className="text-base text-foreground">{title}</p>
         </div>
 
-        {children && <span className="text-sm text-scale-1100 flex-grow">{children}</span>}
+        {children && <span className="text-sm text-foreground-light flex-grow">{children}</span>}
         {showLink && <span className="text-brand justify-end text-sm">Learn more</span>}
       </div>
     </div>

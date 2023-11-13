@@ -2,6 +2,9 @@ import { handleError, handleHeadResponse, handleResponseError, constructHeaders 
 import { uuidv4 } from '../../helpers'
 import { SupaResponse } from 'types/base'
 
+/**
+ * @deprecated please use head method from data/fetchers instead
+ */
 export async function head<T = any>(
   url: string,
   headersToRetrieve: string[],

@@ -1,7 +1,8 @@
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin')
 // import type { StorybookConfig } from '@storybook/your-framework'
+import type { StorybookConfig } from '@storybook/react-webpack5';
 
-const config: any = {
+const config: StorybookConfig = {
   stories: [
     // colors
     '../src/lib/colors.stories.tsx',
@@ -41,7 +42,10 @@ const config: any = {
      * resolve import paths from tsconfig
      * based on https://stackoverflow.com/a/71677949/4807782
      */
-    config.resolve.plugins = [new TsconfigPathsPlugin()] // ;<-- this line
+    if (config && config.resolve) {
+      config.resolve.plugins = [new TsconfigPathsPlugin()];
+    }
+
     return config
   },
 }
