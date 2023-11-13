@@ -74,7 +74,7 @@ const buttonVariants = cva(
             border-transparent
             hover:bg-brand-400
             border-opacity-0
-            bg-opacity-0 dark:bg-opacity-0
+            bg-opacity-0
             shadow-none
             focus-visible:outline-border-strong`,
         text: `

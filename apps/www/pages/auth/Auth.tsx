@@ -97,7 +97,7 @@ function AuthPage() {
                       viewBox="0 0 32.58 31.77"
                       width={21}
                       height={21}
-                      className="text-gray-800 dark:text-white"
+                      className="text-foreground-light"
                     >
                       <path
                         fill="currentColor"
