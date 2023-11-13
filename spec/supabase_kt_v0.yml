@@ -672,20 +672,21 @@ functions:
         code: |
           ```kotlin
           supabase.postgrest["users"].select {
-             eq("address->postcode", 90210)
+              eq("address->postcode", 90210)
           }
           ```
       - id: filter-foreign-tables
         name: Filter Foreign Tables
         code: |
           ```kotlin
+          val columns = Columns.raw("""
+              name,
+              cities!inner (
+                  name
+              )
+          """.trimIndent())
           supabase.postgrest["countries"].select(
-                columns = Columns.raw("""
-                                      name,
-                                      cities!inner (
-                                        name
-                                      )
-                                      """)
+                columns = columns
           ) {
               eq("cities.name", "Bali")
           }
@@ -1766,13 +1767,14 @@ functions:
         name: On a foreign table
         code: |
           ```kotlin
+          val columns = Columns.raw("""
+              name,
+              cities!inner (
+                  name
+              )
+          """.trimIndent())
           supabase.postgrest["countries"].select(
-             columns = Columns.raw("""
-                                   name,
-                                   cities!inner (
-                                     name
-                                   )
-                                   """)
+             columns = 
           ) {
              filter(column = "cities.name", operator = FilterOperator.EQ, value = "Bali")
           }
@@ -1872,15 +1874,14 @@ functions:
         name: On a foreign table
         code: |
           ```kotlin
-          supabase.postgrest["countries"].select(
-              columns = Columns.raw(
-                  """
-                              name,
-                              cities (
-                                name
-                              )
-                        """
+          val columns = Columns.raw("""
+              name,
+              cities (
+                  name
               )
+          """.trimIndent())
+          supabase.postgrest["countries"].select(
+              columns = columns
           ) {
               order(column = "id", order = Order.ASCENDING, foreignTable = "cities")
           }
@@ -1982,15 +1983,14 @@ functions:
         name: On a foreign table
         code: |
           ```kotlin
-          supabase.postgrest["countries"].select(
-              columns = Columns.raw(
-                  """
-                              name,
-                              cities (
-                                name
-                              )
-                        """
+          val columns = Columns.raw("""
+              name,
+              cities (
+                  name
               )
+          """)
+          supabase.postgrest["countries"].select(
+              columns = columns
           ) {
               limit(count = 20, foreignTable = "cities")
           }
