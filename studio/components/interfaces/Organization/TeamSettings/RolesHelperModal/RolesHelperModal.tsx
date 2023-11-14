@@ -1,16 +1,15 @@
-import { FC, Fragment, useState } from 'react'
-import { IconCheck, IconHelpCircle, IconInfo, Modal } from 'ui'
-import { PERMISSIONS_MAPPING } from './RolesHelperModal.constants'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { Fragment, useState } from 'react'
+import { IconCheck, IconHelpCircle, IconInfo, Modal } from 'ui'
 
-interface Props {}
+import { PERMISSIONS_MAPPING } from './RolesHelperModal.constants'
 
-const RolesHelperModal: FC<Props> = ({}) => {
+const RolesHelperModal = () => {
   const [showModal, setShowModal] = useState(false)
 
   const permissionColumnClassName = 'w-[40%] text-sm pl-4 font-bold'
   const roleColumnClassName =
-    'w-[12%] text-sm h-8 flex items-center justify-center border-l border-scale-600 font-bold'
+    'w-[12%] text-sm h-8 flex items-center justify-center border-l border-control font-bold'
 
   const accessTooltip = (
     <Tooltip.Root delayDuration={0}>
@@ -22,11 +21,11 @@ const RolesHelperModal: FC<Props> = ({}) => {
           <Tooltip.Arrow className="radix-tooltip-arrow" />
           <div
             className={[
-              'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-              'border border-scale-200 ', //border
+              'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+              'border border-background', //border
             ].join(' ')}
           >
-            <span className="text-xs text-scale-1200">Only available in Team/Enterprise plan.</span>
+            <span className="text-xs text-foreground">Only available in Team/Enterprise plan.</span>
           </div>
         </Tooltip.Content>
       </Tooltip.Portal>
@@ -38,7 +37,7 @@ const RolesHelperModal: FC<Props> = ({}) => {
       <IconHelpCircle
         size={16}
         strokeWidth={1.5}
-        className="cursor-pointer transition hover:text-scale-1200"
+        className="cursor-pointer transition hover:text-foreground"
         onClick={() => setShowModal(!showModal)}
       />
       <Modal
@@ -57,8 +56,8 @@ const RolesHelperModal: FC<Props> = ({}) => {
             </p>
           </Modal.Content>
           <Modal.Content>
-            <div className="rounded border border-scale-500 bg-scale-400">
-              <div className="flex items-center border-b border-scale-600">
+            <div className="rounded border border-default bg-surface-200">
+              <div className="flex items-center border-b border-control">
                 <div className={permissionColumnClassName}>Permissions</div>
                 <div className={roleColumnClassName}>Owner</div>
                 <div className={roleColumnClassName}>Adminstrator</div>
@@ -70,13 +69,13 @@ const RolesHelperModal: FC<Props> = ({}) => {
               <div className="max-h-[425px] overflow-y-auto">
                 {PERMISSIONS_MAPPING.map((group) => (
                   <Fragment key={group.title}>
-                    <div className="flex items-center border-b border-scale-600 py-2 px-4 last:border-none">
+                    <div className="flex items-center border-b border-control py-2 px-4 last:border-none">
                       <div className="w-[100%] text-sm">{group.title}</div>
                     </div>
                     {group.actions.map((action, idx) => (
                       <div
                         key={`${group.title}-${idx}`}
-                        className="flex items-center border-b border-scale-600 bg-scale-500 last:border-none"
+                        className="flex items-center border-b border-control bg-overlay-hover last:border-none"
                       >
                         <div className={permissionColumnClassName}>{action.description}</div>
                         <div className={roleColumnClassName}>

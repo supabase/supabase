@@ -13,22 +13,20 @@ const FileExplorerHeaderSelection = () => {
   } = storageExplorerStore
 
   return (
-    <div className="z-10 flex h-[40px] items-center rounded-t-md bg-brand-700 px-2 py-1 shadow dark:bg-brand-600">
+    <div className="z-10 flex h-[40px] items-center rounded-t-md bg-brand-400 px-2 py-1 shadow dark:bg-brand-600">
       <Button
         icon={<IconX size={16} strokeWidth={2} />}
         type="text"
-        shadow={false}
         onClick={() => clearSelectedItems()}
       />
       <div className="ml-4 flex items-center space-x-3">
-        <p className="mb-0 text-sm text-scale-1200">
+        <p className="mb-0 text-sm text-foreground">
           <span style={{ fontVariantNumeric: 'tabular-nums' }}>{selectedItems.length}</span> items
           selected
         </p>
         <Button
           icon={<IconDownload size={16} strokeWidth={2} />}
           type="primary"
-          shadow={false}
           onClick={async () => {
             if (selectedItems.length === 1) {
               await downloadFile(selectedItems[0])
@@ -43,7 +41,6 @@ const FileExplorerHeaderSelection = () => {
         <Button
           icon={<IconTrash2 size={16} strokeWidth={2} />}
           type="primary"
-          shadow={false}
           onClick={() => setSelectedItemsToDelete(selectedItems)}
         >
           Delete
@@ -51,7 +48,6 @@ const FileExplorerHeaderSelection = () => {
         <Button
           icon={<IconMove size={16} strokeWidth={2} />}
           type="primary"
-          shadow={false}
           onClick={() => setSelectedItemsToMove(selectedItems)}
         >
           Move

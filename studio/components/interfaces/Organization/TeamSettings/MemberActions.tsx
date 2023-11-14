@@ -1,129 +1,121 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { observer } from 'mobx-react-lite'
-import { FC } from 'react'
-import { Button, Dropdown, IconMoreHorizontal, IconTrash } from 'ui'
 
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import { checkPermissions, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import { Member, Role } from 'types'
-
+import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
 import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
 import { useOrganizationMemberInviteDeleteMutation } from 'data/organizations/organization-member-invite-delete-mutation'
+import { usePermissionsQuery } from 'data/permissions/permissions-query'
+import { useCheckPermissions, useIsFeatureEnabled, useSelectedOrganization, useStore } from 'hooks'
+import { observer } from 'mobx-react-lite'
+import { useState } from 'react'
+import { Member, Role } from 'types'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  IconMoreHorizontal,
+  IconTrash,
+  Modal,
+} from 'ui'
 import { isInviteExpired } from '../Organization.utils'
-import { getRolesManagementPermissions } from './TeamSettings.utils'
+import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 
-interface Props {
+interface MemberActionsProps {
   member: Member
   roles: Role[]
 }
 
-const MemberActions: FC<Props> = ({ member, roles }) => {
+const MemberActions = ({ member, roles }: MemberActionsProps) => {
   const { ui } = useStore()
   const { slug } = useParams()
-  const { rolesRemovable } = getRolesManagementPermissions(roles)
+
+  const organizationMembersDeletionEnabled = useIsFeatureEnabled('organization_members:delete')
+
+  const selectedOrganization = useSelectedOrganization()
+  const { data: permissions } = usePermissionsQuery()
+  const { rolesRemovable } = useGetRolesManagementPermissions(
+    selectedOrganization?.id,
+    roles,
+    permissions ?? []
+  )
 
   const isExpired = isInviteExpired(member?.invited_at ?? '')
   const isPendingInviteAcceptance = member.invited_id
 
   const roleId = member.role_ids?.[0] ?? -1
   const canRemoveMember = rolesRemovable.includes((member?.role_ids ?? [-1])[0])
-  const canResendInvite = checkPermissions(PermissionAction.CREATE, 'user_invites', {
+  const canResendInvite = useCheckPermissions(PermissionAction.CREATE, 'user_invites', {
     resource: { role_id: roleId },
   })
-  const canRevokeInvite = checkPermissions(PermissionAction.DELETE, 'user_invites', {
+  const canRevokeInvite = useCheckPermissions(PermissionAction.DELETE, 'user_invites', {
     resource: { role_id: roleId },
   })
 
-  const {
-    mutateAsync: deleteOrganizationMemberAsync,
-    isLoading: isOrganizationMemberDeleteLoading,
-  } = useOrganizationMemberDeleteMutation({
-    onSuccess() {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully removed ${member.primary_email}`,
-      })
-    },
-    onError(error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to delete user: ${error.message}`,
-      })
-    },
-  })
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
-  const handleMemberDelete = async () => {
-    confirmAlert({
-      title: 'Confirm to remove',
-      message: `This is permanent! Are you sure you want to remove ${member.primary_email}`,
-      onAsyncConfirm: async () => {
-        if (!slug) {
-          throw new Error('slug is required')
-        }
-        if (!member.gotrue_id) {
-          throw new Error('gotrue_id is required')
-        }
+  const { mutate: deleteOrganizationMember, isLoading: isDeletingMember } =
+    useOrganizationMemberDeleteMutation({
+      onSuccess: () => {
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully removed ${member.primary_email}`,
+        })
+        setIsDeleteModalOpen(false)
+      },
+    })
 
-        await deleteOrganizationMemberAsync({
-          slug,
-          gotrueId: member.gotrue_id,
+  const { mutate: createOrganizationMemberInvite, isLoading: isCreatingInvite } =
+    useOrganizationMemberInviteCreateMutation({
+      onSuccess: () => {
+        ui.setNotification({ category: 'success', message: 'Resent the invitation.' })
+      },
+      onError: (error) => {
+        ui.setNotification({
+          category: 'error',
+          message: `Failed to resend invitation: ${error.message}`,
         })
       },
     })
+
+  const { mutateAsync: asyncDeleteMemberInvite, isLoading: isDeletingInvite } =
+    useOrganizationMemberInviteDeleteMutation()
+
+  const handleMemberDelete = async () => {
+    if (!slug) return console.error('slug is required')
+    if (!member.gotrue_id) return console.error('gotrue_id is required')
+    deleteOrganizationMember({ slug, gotrueId: member.gotrue_id })
   }
 
-  const {
-    mutate: createOrganizationMemberInvite,
-    isLoading: isOrganizationMemberInviteCreateLoading,
-  } = useOrganizationMemberInviteCreateMutation({
-    onSuccess() {
-      ui.setNotification({ category: 'success', message: 'Resent the invitation.' })
-    },
-    onError(error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to resend invitation: ${error.message}`,
-      })
-    },
-  })
-
-  async function handleResendInvite(member: Member) {
-    if (!member.invited_id || !slug) return
-
+  const handleResendInvite = async (member: Member) => {
     const roleId = (member?.role_ids ?? [])[0]
+    const invitedId = member.invited_id
+
+    if (!slug) return console.error('Slug is required')
+    if (!invitedId) return console.error('Member invited ID is required')
+
+    await asyncDeleteMemberInvite({ slug, invitedId, invalidateDetail: false })
     createOrganizationMemberInvite({
       slug,
       invitedEmail: member.primary_email,
-      ownerId: member.invited_id,
+      ownerId: invitedId,
       roleId: roleId,
     })
   }
 
-  const {
-    mutate: deleteOrganizationMemberInvite,
-    isLoading: isOrganizationMemberInviteDeleteLoading,
-  } = useOrganizationMemberInviteDeleteMutation({
-    onSuccess() {
-      ui.setNotification({ category: 'success', message: 'Successfully revoked the invitation.' })
-    },
-    onError(error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to revoke invitation: ${error.message}`,
-      })
-    },
-  })
-
-  function handleRevokeInvitation(member: Member) {
+  const handleRevokeInvitation = async (member: Member) => {
     const invitedId = member.invited_id
-    if (!invitedId || !slug) return
+    if (!slug) return console.error('Slug is required')
+    if (!invitedId) return console.error('Member invited ID is required')
 
-    deleteOrganizationMemberInvite({
-      slug,
-      invitedId,
+    await asyncDeleteMemberInvite({ slug, invitedId })
+    ui.setNotification({
+      category: 'success',
+      message: 'Successfully revoked the invitation.',
     })
   }
 
@@ -131,19 +123,19 @@ const MemberActions: FC<Props> = ({ member, roles }) => {
     return (
       <div className="flex items-center justify-end">
         <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger>
-            <Button as="span" type="text" icon={<IconMoreHorizontal />} />
+          <Tooltip.Trigger asChild>
+            <Button type="text" icon={<IconMoreHorizontal />} />
           </Tooltip.Trigger>
           <Tooltip.Portal>
             <Tooltip.Content side="bottom">
               <Tooltip.Arrow className="radix-tooltip-arrow" />
               <div
                 className={[
-                  'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                  'border border-scale-200 ', //border
+                  'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                  'border border-background', //border
                 ].join(' ')}
               >
-                <span className="text-xs text-scale-1200">
+                <span className="text-xs text-foreground">
                   You need additional permissions to manage this team member
                 </span>
               </div>
@@ -154,58 +146,82 @@ const MemberActions: FC<Props> = ({ member, roles }) => {
     )
   }
 
-  const isLoading =
-    isOrganizationMemberDeleteLoading ||
-    isOrganizationMemberInviteDeleteLoading ||
-    isOrganizationMemberInviteCreateLoading
+  const isLoading = isDeletingMember || isDeletingInvite || isCreatingInvite
 
   return (
-    <div className="flex items-center justify-end">
-      <Dropdown
-        side="bottom"
-        align="end"
-        size="small"
-        overlay={
-          <>
-            {isPendingInviteAcceptance ? (
-              <>
-                {canRevokeInvite && (
-                  <Dropdown.Item onClick={() => handleRevokeInvitation(member)}>
-                    <div className="flex flex-col">
-                      <p>Cancel invitation</p>
-                      <p className="block opacity-50">Revoke this invitation.</p>
-                    </div>
-                  </Dropdown.Item>
-                )}
-                {canResendInvite && isExpired && (
-                  <>
-                    <Dropdown.Separator />
-                    <Dropdown.Item onClick={() => handleResendInvite(member)}>
+    <>
+      <div className="flex items-center justify-end">
+        <DropdownMenu>
+          <DropdownMenuTrigger>
+            <Button
+              asChild
+              type="text"
+              disabled={isLoading}
+              loading={isLoading}
+              icon={<IconMoreHorizontal />}
+            >
+              <span></span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="bottom" align="end">
+            <>
+              {isPendingInviteAcceptance ? (
+                <>
+                  {canRevokeInvite && (
+                    <DropdownMenuItem onClick={() => handleRevokeInvitation(member)}>
                       <div className="flex flex-col">
-                        <p>Resend invitation</p>
-                        <p className="block opacity-50">Invites expire after 24hrs.</p>
+                        <p>Cancel invitation</p>
+                        <p className="block opacity-50">Revoke this invitation.</p>
                       </div>
-                    </Dropdown.Item>
-                  </>
-                )}
-              </>
-            ) : (
-              <Dropdown.Item icon={<IconTrash size={16} />} onClick={handleMemberDelete}>
-                <p>Remove member</p>
-              </Dropdown.Item>
-            )}
-          </>
-        }
+                    </DropdownMenuItem>
+                  )}
+                  {/* canResendInvite && isExpired */}
+                  {true && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => handleResendInvite(member)}>
+                        <div className="flex flex-col">
+                          <p>Resend invitation</p>
+                          <p className="block opacity-50">Invites expire after 24hrs.</p>
+                        </div>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </>
+              ) : (
+                organizationMembersDeletionEnabled && (
+                  <DropdownMenuItem
+                    className="space-x-2"
+                    onClick={() => {
+                      setIsDeleteModalOpen(true)
+                    }}
+                  >
+                    <IconTrash size={16} />
+                    <p>Remove member</p>
+                  </DropdownMenuItem>
+                )
+              )}
+            </>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      <ConfirmationModal
+        visible={isDeleteModalOpen}
+        header="Confirm to remove"
+        buttonLabel="Remove"
+        onSelectCancel={() => setIsDeleteModalOpen(false)}
+        onSelectConfirm={() => {
+          handleMemberDelete()
+        }}
       >
-        <Button
-          as="span"
-          type="text"
-          disabled={isLoading}
-          loading={isLoading}
-          icon={<IconMoreHorizontal />}
-        />
-      </Dropdown>
-    </div>
+        <Modal.Content>
+          <p className="py-4 text-sm text-foreground-light">
+            This is permanent! Are you sure you want to remove {member.primary_email}
+          </p>
+        </Modal.Content>
+      </ConfirmationModal>
+    </>
   )
 }
 

@@ -4,18 +4,22 @@ import { IS_PLATFORM } from 'lib/constants'
 
 export const generateDatabaseMenu = (
   project?: Project,
-  foreignDataWrappersEnabled: boolean = false
+  flags?: { pgNetExtensionExists: boolean }
 ): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
-
-  const HOOKS_RELEASED = '2021-07-30T15:33:54.383Z'
-  const showHooksRoute = project?.inserted_at ? project.inserted_at > HOOKS_RELEASED : false
+  const { pgNetExtensionExists } = flags || {}
 
   return [
     {
       title: 'Database',
       items: [
         { name: 'Tables', key: 'tables', url: `/project/${ref}/database/tables`, items: [] },
+        {
+          name: 'Schema Visualizer',
+          key: 'schemas',
+          url: `/project/${ref}/database/schemas`,
+          items: [],
+        },
         {
           name: 'Triggers',
           key: 'triggers',
@@ -41,7 +45,7 @@ export const generateDatabaseMenu = (
           url: `/project/${ref}/database/replication`,
           items: [],
         },
-        ...(showHooksRoute
+        ...(!!pgNetExtensionExists
           ? [
               {
                 name: 'Webhooks',
@@ -51,17 +55,12 @@ export const generateDatabaseMenu = (
               },
             ]
           : []),
-        ...(foreignDataWrappersEnabled
-          ? [
-              {
-                name: 'Wrappers',
-                key: 'wrappers',
-                url: `/project/${ref}/database/wrappers`,
-                items: [],
-                label: 'ALPHA',
-              },
-            ]
-          : []),
+        {
+          name: 'Wrappers',
+          key: 'wrappers',
+          url: `/project/${ref}/database/wrappers`,
+          items: [],
+        },
         ...(IS_PLATFORM
           ? [
               {
@@ -72,6 +71,24 @@ export const generateDatabaseMenu = (
               },
             ]
           : []),
+        {
+          name: 'Migrations',
+          key: 'migrations',
+          url: `/project/${ref}/database/migrations`,
+          items: [],
+        },
+        {
+          name: 'Indexes',
+          key: 'indexes',
+          url: `/project/${ref}/database/indexes`,
+          items: [],
+        },
+        {
+          name: 'Enumerated Types',
+          key: 'types',
+          url: `/project/${ref}/database/types`,
+          items: [],
+        },
       ],
     },
   ]

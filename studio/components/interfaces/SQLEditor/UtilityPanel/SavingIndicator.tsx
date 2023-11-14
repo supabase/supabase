@@ -1,8 +1,8 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, IconAlertCircle, IconCheck, IconLoader, IconRefreshCcw } from 'ui'
 import { usePrevious } from 'hooks'
 import { useEffect, useState } from 'react'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { Button, IconAlertCircle, IconCheck, IconLoader, IconRefreshCcw } from 'ui'
 
 export type SavingIndicatorProps = { id: string }
 
@@ -38,7 +38,6 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
         <Button
           type="text"
           size="tiny"
-          shadow={false}
           icon={<IconRefreshCcw className="text-gray-1100" size="tiny" strokeWidth={2} />}
           onClick={retry}
         >
@@ -48,17 +47,17 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
       {showSavedText ? (
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger>
-            <IconCheck className="text-brand-800" size={14} strokeWidth={3} />
+            <IconCheck className="text-brand" size={14} strokeWidth={3} />
           </Tooltip.Trigger>
           <Tooltip.Content side="bottom">
             <Tooltip.Arrow className="radix-tooltip-arrow" />
             <div
               className={[
-                'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                'border-scale-200 border ',
+                'bg-alternative rounded py-1 px-2 leading-none shadow',
+                'border-background border ',
               ].join(' ')}
             >
-              <span className="text-scale-1200 text-xs">All changes saved</span>
+              <span className="text-foreground text-xs">All changes saved</span>
             </div>
           </Tooltip.Content>
         </Tooltip.Root>
@@ -71,11 +70,11 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
             <Tooltip.Arrow className="radix-tooltip-arrow" />
             <div
               className={[
-                'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                'border-scale-200 border',
+                'bg-alternative rounded py-1 px-2 leading-none shadow',
+                'border-background border',
               ].join(' ')}
             >
-              <span className="text-scale-1200 text-xs">Saving changes...</span>
+              <span className="text-foreground text-xs">Saving changes...</span>
             </div>
           </Tooltip.Content>
         </Tooltip.Root>
@@ -88,16 +87,16 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
             <Tooltip.Arrow className="radix-tooltip-arrow" />
             <div
               className={[
-                'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                'border-scale-200 border ',
+                'bg-alternative rounded py-1 px-2 leading-none shadow',
+                'border-background border ',
               ].join(' ')}
             >
-              <span className="text-scale-1200 text-xs">Failed to save changes</span>
+              <span className="text-foreground text-xs">Failed to save changes</span>
             </div>
           </Tooltip.Content>
         </Tooltip.Root>
       ) : null}
-      <span className="text-scale-1000 text-sm">
+      <span className="text-foreground-light text-sm">
         {savingState === 'UPDATING_FAILED' && 'Failed to save'}
       </span>
     </div>

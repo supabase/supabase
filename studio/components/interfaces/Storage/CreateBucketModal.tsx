@@ -1,29 +1,29 @@
 import clsx from 'clsx'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import {
   Alert,
   Button,
-  Modal,
-  Input,
-  Toggle,
-  Form,
   Collapsible,
+  Form,
   IconChevronDown,
+  Input,
   Listbox,
+  Modal,
+  Toggle,
 } from 'ui'
-import { BucketCreatePayload } from './Storage.types'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+
+import { useParams } from 'common'
 import { StorageSizeUnits } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.constants'
 import {
-  convertToBytes,
   convertFromBytes,
+  convertToBytes,
 } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
-import { useStore } from 'hooks'
-import { useParams } from 'common'
-import { IS_PLATFORM } from 'lib/constants'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
-import { useRouter } from 'next/router'
+import { useBucketCreateMutation } from 'data/storage/bucket-create-mutation'
+import { useStore } from 'hooks'
+import { IS_PLATFORM } from 'lib/constants'
 
 export interface CreateBucketModalProps {
   visible: boolean
@@ -34,8 +34,17 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
   const { ui } = useStore()
   const { ref } = useParams()
   const router = useRouter()
-  const storageExplorerStore = useStorageStore()
-  const { createBucket } = storageExplorerStore
+
+  const { mutate: createBucket, isLoading: isCreating } = useBucketCreateMutation({
+    onSuccess: (res) => {
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully created bucket ${res.name}`,
+      })
+      router.push(`/project/${ref}/storage/buckets/${res.name}`)
+      onClose()
+    },
+  })
 
   const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
@@ -58,16 +67,26 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
     if (!values.name) {
       errors.name = 'Please provide a name for your bucket'
     }
+    if (values.name && values.name.endsWith(' ')) {
+      errors.name = 'The name of the bucket cannot end with a whitespace'
+    }
+
     if (values.has_file_size_limit && values.formatted_size_limit < 0) {
       errors.formatted_size_limit = 'File size upload limit has to be at least 0'
+    }
+    if (values.name === 'public') {
+      errors.name = '"public" is a reserved name. Please choose another name'
     }
     return errors
   }
 
-  const onSubmit = async (values: any, { setSubmitting }: any) => {
-    const payload: BucketCreatePayload = {
+  const onSubmit = async (values: any) => {
+    if (!ref) return console.error('Project ref is required')
+
+    createBucket({
+      projectRef: ref,
       id: values.name,
-      public: values.public,
+      isPublic: values.public,
       file_size_limit: values.has_file_size_limit
         ? convertToBytes(values.formatted_size_limit, selectedUnit)
         : null,
@@ -75,20 +94,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
         values.allowed_mime_types.length > 0
           ? values.allowed_mime_types.split(',').map((x: string) => x.trim())
           : null,
-    }
-
-    setSubmitting(true)
-    const res = await createBucket(payload)
-    if (res.error) {
-      setSubmitting(false)
-    } else {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully created bucket "${res.name}"`,
-      })
-      router.push(`/project/${ref}/storage/buckets/${res.name}`)
-      onClose()
-    }
+    })
   }
 
   useEffect(() => {
@@ -104,7 +110,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
       visible={visible}
       size="medium"
       header="Create storage bucket"
-      onCancel={onClose}
+      onCancel={() => onClose()}
     >
       <Form
         validateOnBlur={false}
@@ -112,7 +118,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
         validate={validate}
         onSubmit={onSubmit}
       >
-        {({ values, isSubmitting }: { values: any; isSubmitting: boolean }) => {
+        {({ values }: { values: any }) => {
           return (
             <div className="space-y-4 py-4">
               <Modal.Content>
@@ -152,12 +158,12 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                 onOpenChange={() => setShowConfiguration(!showConfiguration)}
               >
                 <Collapsible.Trigger asChild>
-                  <div className="w-full cursor-pointer py-3 px-5 flex items-center justify-between border-t border-scale-500">
+                  <div className="w-full cursor-pointer py-3 px-5 flex items-center justify-between border-t border-default">
                     <p className="text-sm">Additional configuration</p>
                     <IconChevronDown
                       size={18}
                       strokeWidth={2}
-                      className={clsx('text-scale-1100', showConfiguration && 'rotate-180')}
+                      className={clsx('text-foreground-light', showConfiguration && 'rotate-180')}
                     />
                   </div>
                 </Collapsible.Trigger>
@@ -193,6 +199,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                           </div>
                           <div className="col-span-4">
                             <Listbox
+                              id="size_limit_units"
                               disabled={false}
                               value={selectedUnit}
                               onChange={setSelectedUnit}
@@ -206,12 +213,13 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                           </div>
                           {IS_PLATFORM && (
                             <div className="col-span-12">
-                              <p className="text-scale-1000 text-sm">
+                              <p className="text-foreground-light text-sm">
                                 Note: The{' '}
-                                <Link href={`/project/${ref}/settings/storage`}>
-                                  <a className="text-brand-900 opacity-80 hover:opacity-100 transition">
-                                    global upload limit
-                                  </a>
+                                <Link
+                                  href={`/project/${ref}/settings/storage`}
+                                  className="text-brand opacity-80 hover:opacity-100 transition"
+                                >
+                                  global upload limit
                                 </Link>{' '}
                                 takes precedence over this value ({formattedGlobalUploadLimit})
                               </p>
@@ -225,23 +233,28 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                       name="allowed_mime_types"
                       layout="vertical"
                       label="Allowed MIME types"
-                      placeholder="e.g image/jpg, image/png, audio/mpeg, video/mp4, etc"
+                      placeholder="e.g image/jpeg, image/png, audio/mpeg, video/mp4, etc"
                       descriptionText="Comma separated values"
                     />
                   </div>
                 </Collapsible.Content>
               </Collapsible>
-              <div className="w-full border-t border-scale-500 !mt-0" />
+              <div className="w-full border-t border-default !mt-0" />
               <Modal.Content>
                 <div className="flex items-center space-x-2 justify-end">
-                  <Button type="default" disabled={isSubmitting} onClick={() => onClose()}>
+                  <Button
+                    type="default"
+                    htmlType="button"
+                    disabled={isCreating}
+                    onClick={() => onClose()}
+                  >
                     Cancel
                   </Button>
                   <Button
                     type="primary"
                     htmlType="submit"
-                    loading={isSubmitting}
-                    disabled={isSubmitting}
+                    loading={isCreating}
+                    disabled={isCreating}
                   >
                     Save
                   </Button>

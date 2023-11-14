@@ -1,7 +1,7 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+
 import { get } from 'lib/common/fetch'
-import { API_ADMIN_URL } from 'lib/constants'
-import { useCallback } from 'react'
+import { API_ADMIN_URL, IS_PLATFORM } from 'lib/constants'
 import { customDomainKeys } from './keys'
 
 export type CustomDomainsVariables = {
@@ -132,17 +132,5 @@ export const useCustomDomainsQuery = <TData = CustomDomainsData>(
   useQuery<CustomDomainsData, CustomDomainsError, TData>(
     customDomainKeys.list(projectRef),
     ({ signal }) => getCustomDomains({ projectRef }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
+    { enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined', ...options }
   )
-
-export const useCustomDomainsPrefetch = ({ projectRef }: CustomDomainsVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef) {
-      client.prefetchQuery(customDomainKeys.list(projectRef), ({ signal }) =>
-        getCustomDomains({ projectRef }, signal)
-      )
-    }
-  }, [projectRef])
-}

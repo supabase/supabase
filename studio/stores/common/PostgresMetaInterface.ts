@@ -1,8 +1,8 @@
 import { action, computed, makeObservable, observable } from 'mobx'
-import { get, patch, post, delete_ } from 'lib/common/fetch'
+import { get, patch, post, delete_, isResponseOk } from 'lib/common/fetch'
 import { keyBy } from 'lodash'
 import { IRootStore } from '../RootStore'
-import { ResponseError } from 'types'
+import { ResponseError, SupaResponse } from 'types'
 
 type DataKeys = number | string
 
@@ -15,10 +15,10 @@ export interface IPostgresMetaInterface<T> {
   isInitialized: boolean
 
   load: () => void
-  loadBySchema: (schema: string) => Promise<T[] | { error: ResponseError }>
-  create: (payload: any) => Promise<T | { error: ResponseError }>
-  update: (id: number | string, updates: any) => Promise<T | { error: ResponseError }>
-  del: (id: number | string, cascade?: boolean) => Promise<boolean | { error: ResponseError }>
+  loadBySchema: (schema: string) => Promise<SupaResponse<T[]>>
+  create: (payload: any) => Promise<SupaResponse<T>>
+  update: (id: number | string, updates: any) => Promise<SupaResponse<T>>
+  del: (id: number | string, cascade?: boolean) => Promise<SupaResponse<boolean>>
   list: (filter?: any) => T[]
   find: (filter?: any) => T | undefined
   byId: (id: number | string) => T | undefined
@@ -95,7 +95,9 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
   async fetchData() {
     const headers = { 'Content-Type': 'application/json', ...this.headers }
     const response = await get<T[]>(this.url, { headers })
-    if (response.error) throw response.error
+    if (!isResponseOk(response)) {
+      throw response.error
+    }
 
     this.setDataArray(response)
     return response
@@ -213,7 +215,9 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
       const headers = { 'Content-Type': 'application/json', ...this.headers }
       const url = `${this.url}?id=${id}`
       const response = await patch<T>(url, payload, { headers })
-      if (response.error) throw response.error
+      if (!isResponseOk(response)) {
+        throw response.error
+      }
 
       this.data[id] = response
       return response
@@ -227,7 +231,9 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
       const headers = { 'Content-Type': 'application/json', ...this.headers }
       const url = cascade ? `${this.url}?id=${id}&cascade=${cascade}` : `${this.url}?id=${id}`
       const response = await delete_<T>(url, {}, { headers })
-      if (response.error) throw response.error
+      if (!isResponseOk(response)) {
+        throw response.error
+      }
 
       delete this.data[id]
       return true

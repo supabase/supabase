@@ -1,5 +1,4 @@
 import dayjs from 'dayjs'
-import { IS_PLATFORM } from 'lib/constants'
 import { DatetimeHelper, FilterTableSet, LogTemplate } from '.'
 
 export const LOGS_EXPLORER_DOCS_URL =
@@ -207,20 +206,42 @@ limit 100
     description: 'Number of requests done on Storage Objects',
     mode: 'custom',
     searchString: `select
-    r.method as http_verb,
-    r.path as filepath,
-    count(*) as num_requests
-  from edge_logs
-    cross join unnest(metadata) as m
-    cross join unnest(m.request) AS r
-    cross join unnest(r.headers) AS h
-  where
-    path like '%rest/v1/object%'
-  group by 
-    r.path, r.method
-  order by
-    num_requests desc
-  limit 100
+  r.method as http_verb,
+  r.path as filepath,
+  count(*) as num_requests
+from edge_logs
+  cross join unnest(metadata) as m
+  cross join unnest(m.request) AS r
+  cross join unnest(r.headers) AS h
+where
+  path like '%rest/v1/object%'
+group by 
+  r.path, r.method
+order by
+  num_requests desc
+limit 100
+`,
+    for: ['api'],
+  },
+  {
+    label: 'Storage Top Cache Misses',
+    description: 'The top Storage requests that miss caching',
+    mode: 'custom',
+    searchString: `select
+  r.path as path,
+  r.search as search,
+  count(id) as count
+from edge_logs f
+  cross join unnest(f.metadata) as m
+  cross join unnest(m.request) as r
+  cross join unnest(m.response) as res
+  cross join unnest(res.headers) as h
+where starts_with(r.path, '/storage/v1/object') 
+  and r.method = 'GET'
+  and h.cf_cache_status in ('MISS', 'NONE/UNKNOWN', 'EXPIRED', 'BYPASS', 'DYNAMIC')
+group by path, search
+order by count desc
+limit 100
 `,
     for: ['api'],
   },
@@ -278,19 +299,19 @@ export const SQL_FILTER_TEMPLATES: any = {
   },
   auth_logs: {
     ..._SQL_FILTER_COMMON,
-    'severity.error': `REGEXP_CONTAINS(event_message, "level.{3}error|level.{3}fatal")`,
-    'severity.warning': `REGEXP_CONTAINS(event_message, "level.{3}warning")`,
-    'severity.info': `REGEXP_CONTAINS(event_message, "level.{3}info")`,
-    'status_code.server_error': `REGEXP_CONTAINS(event_message, "status.{3}5[0-9]{2}")`,
-    'status_code.client_error': `REGEXP_CONTAINS(event_message, "status.{3}4[0-9]{2}")`,
-    'status_code.redirection': `REGEXP_CONTAINS(event_message, "status.{3}3[0-9]{2}")`,
-    'status_code.success': `REGEXP_CONTAINS(event_message, "status.{3}2[0-9]{2}")`,
-    'endpoints.admin': `REGEXP_CONTAINS(event_message, "path.{3}/admin")`,
-    'endpoints.signup': `REGEXP_CONTAINS(event_message, "path.{3}/signup|path.{3}/invite|path.{3}/verify")`,
-    'endpoints.authentication': `REGEXP_CONTAINS(event_message, "path.{3}/token|path.{3}/authorize|path.{3}/callback|path.{3}/otp|path.{3}/magiclink")`,
-    'endpoints.recover': `REGEXP_CONTAINS(event_message, "path.{3}/recover")`,
-    'endpoints.user': `REGEXP_CONTAINS(event_message, "path.{3}/user")`,
-    'endpoints.logout': `REGEXP_CONTAINS(event_message, "path.{3}/logout")`,
+    'severity.error': `metadata.level = 'error' or metadata.level = 'fatal'`,
+    'severity.warning': `metadata.level = 'warning'`,
+    'severity.info': `metadata.level = 'info'`,
+    'status_code.server_error': `metadata.status between 500 and 599`,
+    'status_code.client_error': `metadata.status between 400 and 499`,
+    'status_code.redirection': `metadata.status between 300 and 399`,
+    'status_code.success': `metadata.status between 200 and 299`,
+    'endpoints.admin': `REGEXP_CONTAINS(metadata.path, "/admin")`,
+    'endpoints.signup': `REGEXP_CONTAINS(metadata.path, "/signup|/invite|/verify")`,
+    'endpoints.authentication': `REGEXP_CONTAINS(metadata.path, "/token|/authorize|/callback|/otp|/magiclink")`,
+    'endpoints.recover': `REGEXP_CONTAINS(metadata.path, "/recover")`,
+    'endpoints.user': `REGEXP_CONTAINS(metadata.path, "/user")`,
+    'endpoints.logout': `REGEXP_CONTAINS(metadata.path, "/logout")`,
   },
   realtime_logs: {
     ..._SQL_FILTER_COMMON,
@@ -302,6 +323,9 @@ export const SQL_FILTER_TEMPLATES: any = {
     ..._SQL_FILTER_COMMON,
   },
   pgbouncer_logs: {
+    ..._SQL_FILTER_COMMON,
+  },
+  supavisor_logs: {
     ..._SQL_FILTER_COMMON,
   },
 }
@@ -316,6 +340,7 @@ export enum LogsTableName {
   STORAGE = 'storage_logs',
   PGBOUNCER = 'pgbouncer_logs',
   POSTGREST = 'postgrest_logs',
+  SUPAVISOR = 'supavisor_logs',
 }
 
 export const LOGS_TABLES = {
@@ -328,18 +353,20 @@ export const LOGS_TABLES = {
   storage: LogsTableName.STORAGE,
   postgrest: LogsTableName.POSTGREST,
   pgbouncer: LogsTableName.PGBOUNCER,
+  supavisor: LogsTableName.SUPAVISOR,
 }
 
 export const LOGS_SOURCE_DESCRIPTION = {
-  [LogsTableName.EDGE]: 'Logs obtained from the network edge, containing all API requests.',
-  [LogsTableName.POSTGRES]: 'Database logs obtained directly from Postgres.',
-  [LogsTableName.FUNCTIONS]: 'Function logs generated from runtime execution.',
-  [LogsTableName.FN_EDGE]: 'Function call logs, containing the request and response.',
+  [LogsTableName.EDGE]: 'Logs obtained from the network edge, containing all API requests',
+  [LogsTableName.POSTGRES]: 'Database logs obtained directly from Postgres',
+  [LogsTableName.FUNCTIONS]: 'Function logs generated from runtime execution',
+  [LogsTableName.FN_EDGE]: 'Function call logs, containing the request and response',
   [LogsTableName.AUTH]: 'Authentication logs from GoTrue',
   [LogsTableName.REALTIME]: 'Realtime server for Postgres logical replication broadcasting',
   [LogsTableName.STORAGE]: 'Object storage logs',
   [LogsTableName.PGBOUNCER]: 'Postgres connection pooler logs',
   [LogsTableName.POSTGREST]: 'RESTful API web server logs',
+  [LogsTableName.SUPAVISOR]: 'Cloud-native Postgres connection pooler logs',
 }
 
 export const genQueryParams = (params: { [k: string]: string }) => {
@@ -658,13 +685,11 @@ export const getDefaultHelper = (helpers: DatetimeHelper[]) =>
   helpers.find((helper) => helper.default) || helpers[0]
 
 export const TIER_QUERY_LIMITS: {
-  [x: string]: { text: string; value: 1 | 7 | 90; unit: 'day'; promptUpgrade: boolean }
+  [x: string]: { text: string; value: 1 | 7 | 28 | 90; unit: 'day'; promptUpgrade: boolean }
 } = {
   FREE: { text: '1 day', value: 1, unit: 'day', promptUpgrade: true },
   PRO: { text: '7 days', value: 7, unit: 'day', promptUpgrade: true },
-  PAYG: { text: '90 days', value: 90, unit: 'day', promptUpgrade: false },
-  TEAM: { text: '90 days', value: 90, unit: 'day', promptUpgrade: false },
+  PAYG: { text: '7 days', value: 7, unit: 'day', promptUpgrade: true },
+  TEAM: { text: '28 days', value: 28, unit: 'day', promptUpgrade: true },
   ENTERPRISE: { text: '90 days', value: 90, unit: 'day', promptUpgrade: false },
 }
-
-export const SHOW_O11Y = IS_PLATFORM || process.env.NEXT_PUBLIC_ENABLE_LOGS == 'true'

@@ -3,24 +3,12 @@ import { DEFAULT_QUERY_PARAMS } from './Reports.constants'
 
 export enum Presets {
   API = 'api',
+  STORAGE = 'storage',
   AUTH = 'auth',
   QUERY_PERFORMANCE = 'query_performance',
+  DATABASE = 'database',
 }
 
-export interface QueryDataBase {
-  isLoading: boolean
-  error: string
-}
-export interface DbQueryData<T = any> extends QueryDataBase {
-  data: T[]
-  params: BaseReportParams
-  logData?: never
-}
-export interface DbQueryHandler {
-  runQuery: () => void
-  setParams?: never
-  changeQuery?: never
-}
 export type MetaQueryResponse = any & { error: ResponseError }
 
 export type BaseReportParams = typeof DEFAULT_QUERY_PARAMS & { sql?: string } & unknown
@@ -31,9 +19,11 @@ export interface PresetConfig {
 export type BaseQueries<Keys extends string> = Record<Keys, ReportQuery>
 
 export interface ReportQuery {
-  queryType: 'db' | 'logs'
+  queryType: ReportQueryType
   sql: (filters: ReportFilterItem[]) => string
 }
+
+export type ReportQueryType = 'db' | 'logs'
 
 export interface StatusCodesDatum {
   timestamp: number

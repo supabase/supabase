@@ -1,7 +1,7 @@
 import { Button, Form, Input, Select } from 'ui'
 import { useState } from 'react'
 import countries from '~/data/Countries.json'
-import supabase from '~/lib/supabase'
+import supabase from '~/lib/supabaseMisc'
 
 const INITIAL_VALUES = {
   companyName: '',
@@ -68,7 +68,7 @@ const SOC2RequestForm = () => {
   return (
     <div>
       {formSubmitted ? (
-        <h3 className="h3 text-brand-900 mt-12 text-center">
+        <h3 className="h3 text-brand mt-12 text-center">
           Thank you for your submission! A member from the Supabase team will reach out to you
           shortly!
         </h3>

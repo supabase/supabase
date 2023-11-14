@@ -31,21 +31,21 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const queryHitRate = hooks.queryHitRate()
 
   const isLoading = [
-    mostFrequentlyInvoked[0].isLoading,
-    mostTimeConsuming[0].isLoading,
-    slowestExecutionTime[0].isLoading,
-    queryHitRate[0].isLoading,
+    mostFrequentlyInvoked.isLoading,
+    mostTimeConsuming.isLoading,
+    slowestExecutionTime.isLoading,
+    queryHitRate.isLoading,
   ].every((value) => value)
 
   const handleRefresh = async () => {
-    mostFrequentlyInvoked[1].runQuery()
-    mostTimeConsuming[1].runQuery()
-    slowestExecutionTime[1].runQuery()
-    queryHitRate[1].runQuery()
+    mostFrequentlyInvoked.runQuery()
+    mostTimeConsuming.runQuery()
+    slowestExecutionTime.runQuery()
+    queryHitRate.runQuery()
   }
 
   const checkAlert = (
-    <div className="w-5 h-5 text-brand-1400 text-brand-900 flex items-center justify-center">
+    <div className="w-5 h-5 text-brand-1400 text-brand flex items-center justify-center">
       <IconCheckCircle strokeWidth={2} size={16} />
     </div>
   )
@@ -60,22 +60,21 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     </div>
   )
 
-  const indexHitRate = queryHitRate[0]?.data?.[0]?.ratio
-  const tableHitRate = queryHitRate[0]?.data?.[1]?.ratio
+  const indexHitRate = queryHitRate.data?.[0]?.ratio
+  const tableHitRate = queryHitRate.data?.[1]?.ratio
   const showIndexWarning =
     indexHitRate && tableHitRate && (indexHitRate <= 0.99 || tableHitRate <= 0.99)
 
   const headerText = (
-    <p className="whitespace-pre-wrap prose text-sm max-w-2xl text-scale-1000">
+    <p className="whitespace-pre-wrap prose text-sm max-w-2xl text-foreground-light">
       Identify the queries that consume the most time and database resources.
       {'\n\n'}It relies on the <code>pg_stat_statements</code> table. Read more about{' '}
       <Link
         href="https://supabase.com/docs/guides/platform/performance#examining-query-performance"
-        passHref
+        target="_blank"
+        rel="noreferrer"
       >
-        <a target="_blank" rel="noreferrer">
-          examining query performance
-        </a>
+        examining query performance
       </Link>
       .{'\n\n'}Consider resetting the analysis after optimizing any queries.
     </p>
@@ -96,7 +95,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   Look for queries with high or mean execution times. These are often good candidates for optimization.
 `
   const panelClassNames = 'text-sm max-w-none flex flex-col gap-8 py-4'
-  const helperTextClassNames = 'prose text-sm max-w-2xl text-scale-1000'
+  const helperTextClassNames = 'prose text-sm max-w-2xl text-foreground-light'
 
   return (
     <ReportPadding>
@@ -105,7 +104,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
         <Accordion
           openBehaviour="multiple"
           chevronAlign="right"
-          className=" border p-2 bg-scale-300 rounded"
+          className="border p-2 bg-surface-100 rounded"
         >
           <Accordion.Item
             header={
@@ -130,7 +129,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                         : dangerAlert}
                       <div className="flex items-baseline">
                         <span className="text-3xl">
-                          {(queryHitRate[0]?.data![0]?.ratio * 100).toFixed(2)}
+                          {(queryHitRate?.data![0]?.ratio * 100).toFixed(2)}
                         </span>
                         <span className="text-xl">%</span>
                       </div>
@@ -138,7 +137,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                   </div>
 
                   <div className="w-1/2 bg-slate-200 rounded-md p-4">
-                    {queryHitRate[0]?.data![1]?.name == 'table hit rate' && 'Table Hit Rate'}
+                    {queryHitRate?.data![1]?.name == 'table hit rate' && 'Table Hit Rate'}
                     <div className="flex items-center gap-2">
                       {tableHitRate >= 0.99
                         ? checkAlert
@@ -147,7 +146,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                         : dangerAlert}
                       <div className="flex items-baseline">
                         <span className="text-3xl">
-                          {(queryHitRate[0]?.data![1]?.ratio * 100).toFixed(2)}
+                          {(queryHitRate?.data![1]?.ratio * 100).toFixed(2)}
                         </span>
                         <span className="text-xl">%</span>
                       </div>
@@ -155,7 +154,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                   </div>
                 </div>
                 <div className="px-8 pt-4 m-0">
-                  <p className="text-scale-1100 text-sm max-w-2xl">
+                  <p className="text-foreground-light text-sm max-w-2xl">
                     For best performance, ensure that the cache hit rate ratios above 99%. <br />{' '}
                     Consider upgrading to an instance with more memory if the ratios dip below 95%.
                   </p>
@@ -218,8 +217,8 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                     </>
                   }
                   body={
-                    !isLoading && mostTimeConsuming && mostTimeConsuming[0]?.data ? (
-                      mostTimeConsuming[0].data!.map((item, i) => {
+                    !isLoading && mostTimeConsuming && mostTimeConsuming?.data ? (
+                      mostTimeConsuming?.data!.map((item, i) => {
                         return (
                           <Table.tr key={i} hoverable className="relative">
                             <Table.td className="table-cell whitespace-nowrap w-36">
@@ -273,8 +272,8 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                     </>
                   }
                   body={
-                    !isLoading && mostFrequentlyInvoked && mostFrequentlyInvoked[0]?.data ? (
-                      mostFrequentlyInvoked[0].data!.map((item, i) => {
+                    !isLoading && mostFrequentlyInvoked && mostFrequentlyInvoked?.data ? (
+                      mostFrequentlyInvoked.data!.map((item, i) => {
                         return (
                           <Table.tr key={i} hoverable className="relative">
                             <Table.td className="table-cell whitespace-nowrap w-28">
@@ -336,8 +335,8 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                     </>
                   }
                   body={
-                    !isLoading && slowestExecutionTime && slowestExecutionTime[0]?.data ? (
-                      slowestExecutionTime[0].data!.map((item, i) => {
+                    !isLoading && slowestExecutionTime && slowestExecutionTime?.data ? (
+                      slowestExecutionTime.data!.map((item, i) => {
                         return (
                           <Table.tr key={i} hoverable className="relative">
                             <Table.td className="table-cell whitespace-nowrap w-24">

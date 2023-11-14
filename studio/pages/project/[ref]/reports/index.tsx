@@ -1,19 +1,16 @@
-import { useEffect, useState } from 'react'
-import { observer } from 'mobx-react-lite'
-import { useRouter } from 'next/router'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 
-import { NextPageWithLayout } from 'types'
-import { checkPermissions, useFlag, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import { post } from 'lib/common/fetch'
-import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import { useProjectContentStore } from 'stores/projectContentStore'
-import { useProfileQuery } from 'data/profile/profile-query'
-import Loading from 'components/ui/Loading'
+import { ReportsLayout } from 'components/layouts'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { createReport } from 'components/to-be-cleaned/Reports/Reports.utils'
-import { ReportsLayout } from 'components/layouts'
+import Loading from 'components/ui/Loading'
+import { useCheckPermissions, useStore } from 'hooks'
+import { useProfile } from 'lib/profile'
+import { useProjectContentStore } from 'stores/projectContentStore'
+import { NextPageWithLayout } from 'types'
 
 export const UserReportPage: NextPageWithLayout = () => {
   const [loading, setLoading] = useState(true)
@@ -21,23 +18,14 @@ export const UserReportPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = useParams()
 
-  const { data: profile } = useProfileQuery()
+  const { profile } = useProfile()
   const { ui } = useStore()
-  const project = ui.selectedProject
 
   const contentStore = useProjectContentStore(ref)
-  const canCreateReport = checkPermissions(PermissionAction.CREATE, 'user_content', {
+  const canCreateReport = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'report', owner_id: profile?.id },
     subject: { id: profile?.id },
   })
-
-  const kpsEnabled = useFlag('initWithKps')
-
-  useEffect(() => {
-    if (project && project.status === PROJECT_STATUS.INACTIVE) {
-      post(`${API_URL}/projects/${ref}/restore`, { kps_enabled: kpsEnabled })
-    }
-  }, [project])
 
   async function loadReports() {
     await contentStore.load()
@@ -75,8 +63,8 @@ export const UserReportPage: NextPageWithLayout = () => {
           disabled={!canCreateReport}
           disabledMessage="You need additional permissions to create a report"
         >
-          <p className="text-scale-1100 text-sm">Create custom reports for your projects.</p>
-          <p className="text-scale-1100 text-sm">
+          <p className="text-foreground-light text-sm">Create custom reports for your projects.</p>
+          <p className="text-foreground-light text-sm">
             Get a high level overview of your network traffic, user actions, and infrastructure
             health.
           </p>
@@ -88,4 +76,4 @@ export const UserReportPage: NextPageWithLayout = () => {
 
 UserReportPage.getLayout = (page) => <ReportsLayout>{page}</ReportsLayout>
 
-export default observer(UserReportPage)
+export default UserReportPage

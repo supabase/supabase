@@ -1,1 +1,0 @@
-export const USAGE_APPROACHING_THRESHOLD = 0.8

@@ -1,15 +1,17 @@
-import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { useStore } from 'hooks'
-import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
+import { useState } from 'react'
 
-type DeleteTriggerProps = {
+import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
+import { useStore } from 'hooks'
+import { isResponseOk } from 'lib/common/fetch'
+
+interface DeleteTriggerProps {
   trigger?: any
   visible: boolean
   setVisible: (value: boolean) => void
-} & any
+}
 
-const DeleteTrigger: FC<DeleteTriggerProps> = ({ store, trigger, visible, setVisible }) => {
+const DeleteTrigger = ({ trigger, visible, setVisible }: DeleteTriggerProps) => {
   const { ui, meta } = useStore()
   const [loading, setLoading] = useState(false)
   const { id, name, schema } = trigger ?? {}
@@ -20,8 +22,8 @@ const DeleteTrigger: FC<DeleteTriggerProps> = ({ store, trigger, visible, setVis
       if (!id) {
         throw Error('Invalid trigger info')
       }
-      const response: any = await meta.triggers.del(id)
-      if (response.error) {
+      const response = await meta.triggers.del(id)
+      if (!isResponseOk(response)) {
         throw response.error
       } else {
         ui.setNotification({ category: 'success', message: `Successfully removed ${name}` })

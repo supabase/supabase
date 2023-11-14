@@ -17,12 +17,12 @@ import {
 } from 'components/interfaces/Settings/Logs'
 import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react'
 import { API_URL } from 'lib/constants'
-import { get } from 'lib/common/fetch'
+import { get, isResponseOk } from 'lib/common/fetch'
 import dayjs from 'dayjs'
 import useFillTimeseriesSorted from './useFillTimeseriesSorted'
 import useTimeseriesUnixToIso from './useTimeseriesUnixToIso'
 
-interface Data {
+interface LogsPreviewHook {
   logData: LogData[]
   error: string | Object | null
   newCount: number
@@ -32,8 +32,6 @@ interface Data {
   params: LogsEndpointParams
   oldestTimestamp?: string
   eventChartData: EventChartData[]
-}
-interface Handlers {
   loadOlder: () => void
   refresh: () => void
   setFilters: (filters: Filters | ((previous: Filters) => Filters)) => void
@@ -43,7 +41,7 @@ function useLogsPreview(
   projectRef: string,
   table: LogsTableName,
   filterOverride?: Filters
-): [Data, Handlers] {
+): LogsPreviewHook {
   const defaultHelper = getDefaultHelper(PREVIEWER_DATEPICKER_HELPERS)
   const [latestRefresh, setLatestRefresh] = useState<string>(new Date().toISOString())
 
@@ -78,18 +76,17 @@ function useLogsPreview(
   } = useInfiniteQuery(
     ['projects', projectRef, 'logs', queryParamsKey],
     ({ signal, pageParam }) => {
-      return get<Logs>(
-        `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams({
-          ...params,
-          iso_timestamp_end: pageParam,
-        } as any)}`,
-        { signal }
-      )
+      const uri = `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams({
+        ...params,
+        // don't overwrite unless user has already clicked on load older
+        iso_timestamp_end: pageParam || params.iso_timestamp_end,
+      } as any)}`
+      return get<Logs>(uri, { signal })
     },
     {
       refetchOnWindowFocus: false,
       getNextPageParam(lastPage) {
-        if ((lastPage?.result?.length ?? 0) === 0) {
+        if (!isResponseOk(lastPage) || (lastPage.result?.length ?? 0) === 0) {
           return undefined
         }
         const len = lastPage.result.length
@@ -100,7 +97,24 @@ function useLogsPreview(
     }
   )
 
-  let logData: LogData[] = []
+  // memoize all this calculations stuff
+  const { logData, error, oldestTimestamp } = useMemo(() => {
+    let logData: LogData[] = []
+
+    let error: null | string | object = rqError ? (rqError as any).message : null
+    data?.pages.forEach((response) => {
+      if (isResponseOk(response) && response.result) {
+        logData = [...logData, ...response.result]
+      }
+      if (!error && response && response.error) {
+        error = response.error
+      }
+    })
+
+    const oldestTimestamp = logData[logData.length - 1]?.timestamp
+
+    return { logData, error, oldestTimestamp }
+  }, [data?.pages])
 
   const countUrl = () => {
     return `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams({
@@ -120,22 +134,25 @@ function useLogsPreview(
     ({ signal }) => get<Count>(countUrl(), { signal }),
     {
       refetchOnWindowFocus: false,
-      refetchInterval: 5000,
+      // refresh each minute only
+      refetchInterval: 60000,
+      // only enable if no errors are found and data has already been loaded
+      enabled: !error && data && data.pages.length > 0 ? true : false,
     }
   )
 
-  const newCount = countData?.result?.[0]?.count ?? 0
+  const newCount = isResponseOk(countData) ? countData.result?.[0]?.count ?? 0 : 0
 
   // chart data
 
-  const chartQuery = genChartQuery(table, params, filters)
-  const chartUrl = () => {
+  const chartQuery = useMemo(() => genChartQuery(table, params, filters), [params, filters])
+  const chartUrl = useMemo(() => {
     return `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams({
       iso_timestamp_end: params.iso_timestamp_end,
       project: params.project,
       sql: chartQuery,
     } as any)}`
-  }
+  }, [params, chartQuery])
 
   const { data: eventChartResponse, refetch: refreshEventChart } = useQuery(
     [
@@ -144,7 +161,7 @@ function useLogsPreview(
       'logs-chart',
       { iso_timestamp_end: params.iso_timestamp_end, project: params.project, sql: chartQuery },
     ],
-    ({ signal }) => get<EventChart>(chartUrl(), { signal }),
+    ({ signal }) => get<EventChart>(chartUrl, { signal }),
     { refetchOnWindowFocus: false }
   )
 
@@ -156,19 +173,7 @@ function useLogsPreview(
     refetch()
   }
 
-  let error: null | string | object = rqError ? (rqError as any).message : null
-  data?.pages.forEach((response) => {
-    if (!error && response?.result) {
-      logData = [...logData, ...response.result]
-    }
-    if (!error && response && response.error) {
-      error = response.error
-    }
-  })
-
-  const oldestTimestamp = logData[logData.length - 1]?.timestamp
-
-  const handleSetFilters: Handlers['setFilters'] = (newFilters) => {
+  const handleSetFilters: LogsPreviewHook['setFilters'] = (newFilters) => {
     if (typeof newFilters === 'function') {
       setFilters((prev) => {
         const resolved = newFilters(prev)
@@ -180,7 +185,7 @@ function useLogsPreview(
   }
 
   const normalizedEventChartData = useTimeseriesUnixToIso(
-    eventChartResponse?.result || [],
+    (isResponseOk(eventChartResponse) && eventChartResponse.result) || [],
     'timestamp'
   )
 
@@ -189,29 +194,25 @@ function useLogsPreview(
     'timestamp',
     'count',
     0,
-    params.iso_timestamp_start ,
+    params.iso_timestamp_start,
     // default to current time if not set
     params.iso_timestamp_end || new Date().toISOString()
   )
 
-  return [
-    {
-      newCount,
-      logData,
-      isLoading: isLoading || isRefetching,
-      isLoadingOlder: isFetchingNextPage,
-      error,
-      filters,
-      params,
-      oldestTimestamp: oldestTimestamp ? String(oldestTimestamp) : undefined,
-      eventChartData,
-    },
-    {
-      setFilters: handleSetFilters,
-      refresh,
-      loadOlder: () => fetchNextPage(),
-      setParams,
-    },
-  ]
+  return {
+    newCount,
+    logData,
+    isLoading: isLoading || isRefetching,
+    isLoadingOlder: isFetchingNextPage,
+    error,
+    filters,
+    params,
+    oldestTimestamp: oldestTimestamp ? String(oldestTimestamp) : undefined,
+    eventChartData,
+    setFilters: handleSetFilters,
+    refresh,
+    loadOlder: () => fetchNextPage(),
+    setParams,
+  }
 }
 export default useLogsPreview

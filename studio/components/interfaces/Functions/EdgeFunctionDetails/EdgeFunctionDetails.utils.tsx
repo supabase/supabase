@@ -10,7 +10,7 @@ export const generateCLICommands = (
       jsx: () => {
         return (
           <>
-            <span className="text-brand-1100">supabase</span> functions deploy{' '}
+            <span className="text-brand-600">supabase</span> functions deploy{' '}
             {selectedFunction?.slug}
           </>
         )
@@ -23,7 +23,7 @@ export const generateCLICommands = (
       jsx: () => {
         return (
           <>
-            <span className="text-brand-1100">supabase</span> functions delete{' '}
+            <span className="text-brand-600">supabase</span> functions delete{' '}
             {selectedFunction?.slug}
           </>
         )
@@ -39,7 +39,7 @@ export const generateCLICommands = (
       jsx: () => {
         return (
           <>
-            <span className="text-brand-1100">supabase</span> secrets list
+            <span className="text-brand-600">supabase</span> secrets list
           </>
         )
       },
@@ -51,7 +51,7 @@ export const generateCLICommands = (
       jsx: () => {
         return (
           <>
-            <span className="text-brand-1100">supabase</span> secrets set NAME1=VALUE1 NAME2=VALUE2
+            <span className="text-brand-600">supabase</span> secrets set NAME1=VALUE1 NAME2=VALUE2
           </>
         )
       },
@@ -63,7 +63,7 @@ export const generateCLICommands = (
       jsx: () => {
         return (
           <>
-            <span className="text-brand-1100">supabase</span> secrets unset NAME1 NAME2
+            <span className="text-brand-600">supabase</span> secrets unset NAME1 NAME2
           </>
         )
       },
@@ -80,7 +80,7 @@ export const generateCLICommands = (
       jsx: () => {
         return (
           <>
-            <span className="text-brand-1100">curl</span> -L -X POST '{functionUrl}' -H
+            <span className="text-brand-600">curl</span> -L -X POST '{functionUrl}' -H
             'Authorization: Bearer [YOUR ANON KEY]' {`--data '{"name":"Functions"}'`}
           </>
         )

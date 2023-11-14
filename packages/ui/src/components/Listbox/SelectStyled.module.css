@@ -7,7 +7,7 @@
   @apply text-gray-700 border border-solid border-gray-300;
   @apply cursor-default focus:outline-none focus:ring-1 focus:ring-brand-600 focus:border-brand-600;
   @apply dark:bg-transparent dark:text-white dark:border-gray-500;
-  @apply dark:focus:border-brand-500;
+  @apply dark:focus:border-brand-300;
   -webkit-appearance: none;
   -moz-appearance: none;
   text-indent: 1px;

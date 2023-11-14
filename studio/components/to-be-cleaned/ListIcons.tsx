@@ -2,9 +2,9 @@ import { IconDatabase } from 'ui'
 import SVG from 'react-inlinesvg'
 
 export const vercelIcon = (
-  <div className="flex items-center justify-center rounded bg-black p-1 dark:bg-white">
+  <div className="flex items-center justify-center rounded bg-black p-1">
     <svg
-      className="m-auto fill-current text-white dark:text-black"
+      className="m-auto fill-current text-white"
       width="12px"
       height="12px"
       viewBox="0 0 1155 1000"

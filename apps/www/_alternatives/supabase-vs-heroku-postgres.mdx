@@ -16,7 +16,7 @@ Heroku is a cloud application platform that offers managed PostgreSQL as a servi
 
 Supabase also offers managed Postgres, the main difference is that with each deployment you also get:
 
-- Auto-generated API - [never write an API again](https://supabase.com/docs/guides/database/api#rest-api-2)
+- Auto-generated API - [never write an API again](https://supabase.com/docs/guides/api#rest-api-overview)
 - Realtime - [subscribe to data changes via websockets](https://supabase.com/docs/reference/dart/subscribe)
 - Auth - [users can log in and out of your application](https://supabase.com/auth)
 - Functions - [deploy custom logic to the edge](https://supabase.com/edge-functions)
@@ -43,7 +43,7 @@ These are some of the key differences between Heroku Postgres and Supabase in te
 
 - Supabase is more than just the raw database, it also comes with:
   - [Connection pooling](https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pool) so that you won’t run out of connections in a serverless environment.
-  - [Auto-generated APIs](https://supabase.com/docs/guides/database/api#rest-api-2) based on your schema, so you can communicate with your database directly from the client.
+  - [Auto-generated APIs](https://supabase.com/docs/guides/api#rest-api-overview) based on your schema, so you can communicate with your database directly from the client.
   - [Realtime API](https://supabase.com/docs/reference/dart/subscribe) is useful for when you want to subscribe to changes to your database over websockets.
   - [Auth API](https://supabase.com/auth) can be used to leverage Postgres’s Row Level Security model, and control access to sensitive data on a per user, or per group level.
   - [Functions](https://supabase.com/edge-functions) can be deployed out to the edge directly from the Supabase CLI, which means you can run sensitive business logic or transformations in a serverless fashion.
@@ -58,13 +58,13 @@ The two services price quite differently, the key differences being:
 - [Supabase pricing is based around usage](https://supabase.com/pricing), so you only pay for what you use.
 - Heroku prices based on a tier model with [37 plans to choose from](https://elements.heroku.com/addons/heroku-postgresql#pricing).
 
-Supabase’s free tier also includes a dedicated Postgres instance, and the best bit is you can upgrade to pro later without any interruptions.
+Supabase’s free plan also includes a dedicated Postgres instance, and the best bit is you can upgrade to pro later without any interruptions.
 
 ### Global Deployments
 
 You may have strict data regulations that you must comply with, so choosing your region can be very important. Here’s how the deployment options stack up:
 
-- Supabase can be deployed to any one of [12 data centers across the globe](https://github.com/supabase/supabase/discussions/4815#discussioncomment-1915129) (free tier included).
+- Supabase can be deployed to any one of [12 data centers across the globe](https://github.com/supabase/supabase/discussions/4815#discussioncomment-1915129) (free plan included).
   - Since Supabase is fully open source - you can also [self host wherever you like](https://supabase.com/docs/guides/hosting/overview).
 - You can deploy Heroku Postgres to two data centers (US and Europe) however [6 more data centers](https://devcenter.heroku.com/articles/regions) are available on the Enterprise plan.
 

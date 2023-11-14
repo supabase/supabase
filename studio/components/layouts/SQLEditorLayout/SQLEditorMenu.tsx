@@ -1,45 +1,39 @@
-import { partition } from 'lodash'
-import { useState, useMemo } from 'react'
-import { observer } from 'mobx-react-lite'
-import {
-  Button,
-  Menu,
-  Input,
-  IconSearch,
-  IconPlus,
-  IconX,
-  Dropdown,
-  IconChevronDown,
-  useCommandMenu,
-} from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-
-import { checkPermissions, useFlag, useStore } from 'hooks'
-import { IS_PLATFORM } from 'lib/constants'
-import { useProfileQuery } from 'data/profile/profile-query'
-import { uuidv4 } from 'lib/helpers'
-
-import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import { useParams } from 'common'
-import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { SqlSnippet, useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import QueryItem from './QueryItem'
-import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
+import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { COMMAND_ROUTES } from 'ui/src/components/Command/Command.constants'
+import { useMemo, useState } from 'react'
+import { Button, cn, IconPlus, IconSearch, IconX, Input, Menu } from 'ui'
+
+import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
+import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
+import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { SqlSnippet, useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
+import { useCheckPermissions, useSelectedProject, useStore } from 'hooks'
+import { uuidv4 } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
+import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
+import QueryItem from './QueryItem'
 
 const SideBarContent = observer(() => {
   const { ui } = useStore()
-  const { ref, id } = useParams()
+  const { ref } = useParams()
   const router = useRouter()
-  const { data: profile } = useProfileQuery()
-  const [filterString, setFilterString] = useState('')
-  const { setPages, setIsOpen } = useCommandMenu()
-  const showCmdkHelper = useFlag('dashboardCmdk')
+  const { profile } = useProfile()
+  const project = useSelectedProject()
+
+  const [personalSnippetsFilterString, setPersonalSnippetsFilterString] = useState('')
+  const [projectSnippetsFilterString, setProjectSnippetsFilterString] = useState('')
+  const [favoritesFilterString, setFavoritesFilterString] = useState('')
+  const [isPersonalSnippetsFilterOpen, setIsPersonalSnippetsFilterOpen] = useState(false)
+  const [isProjectSnippetsFilterOpen, setIsProjectSnippetsFilterOpen] = useState(false)
+  const [isFavoritesFilterOpen, setIsFavoritesFilterOpen] = useState(false)
 
   const snap = useSqlEditorStateSnapshot()
   const { isLoading, isSuccess } = useSqlSnippetsQuery(ref, {
+    refetchOnWindowFocus: false,
+    staleTime: 300, // 5 minutes
     onSuccess(data) {
       if (ref) snap.setRemoteSnippets(data.snippets, ref)
     },
@@ -47,28 +41,53 @@ const SideBarContent = observer(() => {
 
   const snippets = useSnippets(ref)
 
-  const [favorites, queries] = useMemo(
-    () => (snippets ? partition(snippets, (snippet) => snippet.content.favorite) : [[], []]),
-    [snippets]
-  )
+  const projectSnippets = useMemo(() => {
+    return snippets.filter((snippet) => snippet.visibility === 'project')
+  }, [snippets])
 
-  const favouriteTabs =
-    filterString.length === 0
-      ? favorites
-      : favorites.filter((tab) => tab.name.toLowerCase().includes(filterString.toLowerCase()))
+  const filteredProjectSnippets = useMemo(() => {
+    if (projectSnippetsFilterString.length > 0) {
+      return projectSnippets.filter((tab) =>
+        tab.name.toLowerCase().includes(projectSnippetsFilterString.toLowerCase())
+      )
+    }
+    return projectSnippets
+  }, [projectSnippets, projectSnippetsFilterString])
 
-  const queryTabs =
-    filterString.length === 0
-      ? queries
-      : queries.filter((tab) => tab.name.toLowerCase().includes(filterString.toLowerCase()))
+  const personalSnippets = useMemo(() => {
+    const ss = snippets.filter(
+      (snippet) => snippet.visibility === 'user' && !snippet.content.favorite
+    )
 
-  const canCreateSQLSnippet = checkPermissions(PermissionAction.CREATE, 'user_content', {
+    if (personalSnippetsFilterString.length > 0) {
+      return ss.filter((tab) =>
+        tab.name.toLowerCase().includes(personalSnippetsFilterString.toLowerCase())
+      )
+    }
+    return ss
+  }, [personalSnippetsFilterString, snippets])
+
+  const favoriteSnippets = useMemo(() => {
+    return snippets.filter((snippet) => snippet.content.favorite)
+  }, [snippets])
+
+  const filteredFavoriteSnippets = useMemo(() => {
+    if (favoritesFilterString.length > 0) {
+      return favoriteSnippets.filter((tab) =>
+        tab.name.toLowerCase().includes(favoritesFilterString.toLowerCase())
+      )
+    }
+    return favoriteSnippets
+  }, [favoriteSnippets, favoritesFilterString])
+
+  const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
     subject: { id: profile?.id },
   })
 
   const handleNewQuery = async () => {
-    if (!ref) return console.error('Project ref is required')
+    if (!ref) return console.error('Project is required')
+    if (!profile) return console.error('Profile is required')
     if (!canCreateSQLSnippet) {
       return ui.setNotification({
         category: 'info',
@@ -77,12 +96,23 @@ const SideBarContent = observer(() => {
     }
 
     try {
-      const snippet = createSqlSnippetSkeleton({ name: 'Untitled query', owner_id: profile?.id })
-      const data = { ...snippet, id: uuidv4() }
+      const snippet = createSqlSnippetSkeleton({
+        id: uuidv4(),
+        name: untitledSnippetTitle,
+        owner_id: profile?.id,
+        project_id: project?.id,
+      })
 
-      snap.addSnippet(data as SqlSnippet, ref, true)
+      snap.addSnippet(snippet as SqlSnippet, ref)
 
-      router.push(`/project/${ref}/sql/${data.id}`)
+      router.push(`/project/${ref}/sql/${snippet.id}`)
+      // reset all search inputs when a new query is added
+      setPersonalSnippetsFilterString('')
+      setProjectSnippetsFilterString('')
+      setFavoritesFilterString('')
+      setIsPersonalSnippetsFilterOpen(false)
+      setIsProjectSnippetsFilterOpen(false)
+      setIsFavoritesFilterOpen(false)
     } catch (error: any) {
       ui.setNotification({
         category: 'error',
@@ -94,69 +124,6 @@ const SideBarContent = observer(() => {
   return (
     <div className="mt-6">
       <Menu type="pills">
-        {IS_PLATFORM && (
-          <div className="my-4 mx-3 space-y-1 px-3">
-            <div className="flex items-center">
-              <Button
-                className={showCmdkHelper ? 'rounded-r-none px-3' : undefined}
-                block
-                icon={<IconPlus />}
-                type="default"
-                disabled={isLoading}
-                style={{ justifyContent: 'start' }}
-                onClick={() => handleNewQuery()}
-              >
-                New query
-              </Button>
-              {showCmdkHelper && (
-                <Dropdown
-                  align="end"
-                  side="bottom"
-                  overlay={[
-                    <Dropdown.Item
-                      key="new-ai-query"
-                      onClick={() => {
-                        setIsOpen(true)
-                        setPages([COMMAND_ROUTES.GENERATE_SQL])
-                      }}
-                    >
-                      <div className="space-y-1">
-                        <p className="block text-scale-1200">New AI query</p>
-                        <p className="block text-scale-1100">
-                          Generate a SQL query using Supabase AI
-                        </p>
-                      </div>
-                    </Dropdown.Item>,
-                  ]}
-                >
-                  <Button
-                    disabled={isLoading}
-                    type="default"
-                    className="rounded-l-none px-[4px] py-[5px]"
-                    icon={<IconChevronDown />}
-                  />
-                </Dropdown>
-              )}
-            </div>
-            <Input
-              size="tiny"
-              icon={<IconSearch size="tiny" />}
-              placeholder="Search"
-              disabled={isLoading}
-              onChange={(e) => setFilterString(e.target.value)}
-              value={filterString}
-              actions={
-                filterString && (
-                  <IconX
-                    size={'tiny'}
-                    className="mr-2 cursor-pointer"
-                    onClick={() => setFilterString('')}
-                  />
-                )
-              }
-            />
-          </div>
-        )}
         {isLoading ? (
           <div className="px-5 my-4 space-y-2">
             <ShimmeringLoader />
@@ -165,44 +132,236 @@ const SideBarContent = observer(() => {
           </div>
         ) : isSuccess ? (
           <div className="space-y-6">
-            {IS_PLATFORM && (
-              <div className="px-3">
-                <Menu.Group title="Getting started" />
+            <div className="px-3 flex flex-col gap-2">
+              <Button
+                type="default"
+                className="mx-3 justify-start"
+                onClick={() => {
+                  handleNewQuery()
+                }}
+                icon={<IconPlus size="tiny" />}
+              >
+                New query
+              </Button>
+            </div>
+            <div className="space-y-6 px-3">
+              <div>
                 <ProductMenuItem
-                  name="Welcome"
-                  isActive={id === undefined}
-                  url={`/project/${ref}/sql`}
+                  name="Templates"
+                  isActive={router.asPath === `/project/${ref}/sql/templates`}
+                  url={`/project/${ref}/sql/templates`}
+                />
+                <ProductMenuItem
+                  name="Quickstarts"
+                  isActive={router.asPath === `/project/${ref}/sql/quickstarts`}
+                  url={`/project/${ref}/sql/quickstarts`}
                 />
               </div>
-            )}
-            <div className="space-y-6 px-3">
-              {favouriteTabs.length >= 1 && (
+              {favoriteSnippets.length >= 1 && (
                 <div className="editor-product-menu">
-                  <Menu.Group title="Favorites" />
-                  <div className="space-y-1">
-                    {favouriteTabs.map((tabInfo) => {
+                  <div className="flex flex-row justify-between">
+                    <Menu.Group title="Favorites" />
+                    <button
+                      className="flex items-center w-4 h-4 cursor-pointer mr-3"
+                      onClick={() => {
+                        setIsFavoritesFilterOpen(!isFavoritesFilterOpen)
+                      }}
+                    >
+                      <IconSearch
+                        className={cn(
+                          'w-4',
+                          'h-4',
+                          'cursor-pointer',
+                          isFavoritesFilterOpen ? 'text-foreground' : 'text-foreground-lighter'
+                        )}
+                        onClick={() => {
+                          setFavoritesFilterString('')
+                          setIsFavoritesFilterOpen((state) => !state)
+                        }}
+                      />
+                    </button>
+                  </div>
+                  {isFavoritesFilterOpen && (
+                    <div className="pl-3 mb-2 mr-3">
+                      <Input
+                        autoFocus
+                        size="tiny"
+                        icon={<IconSearch size="tiny" />}
+                        placeholder="Filter"
+                        disabled={isLoading}
+                        onChange={(e) => setFavoritesFilterString(e.target.value)}
+                        value={favoritesFilterString}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Escape') {
+                            setIsFavoritesFilterOpen(false)
+                            setFavoritesFilterString('')
+                          }
+                        }}
+                        actions={
+                          favoritesFilterString && (
+                            <IconX
+                              size={'tiny'}
+                              className="mr-2 cursor-pointer"
+                              onClick={() => setFavoritesFilterString('')}
+                            />
+                          )
+                        }
+                      />
+                    </div>
+                  )}
+                  {filteredFavoriteSnippets.length > 0 ? (
+                    <div className="space-y-1">
+                      {filteredFavoriteSnippets.map((tabInfo) => {
+                        const { id } = tabInfo || {}
+                        return <QueryItem key={id} tabInfo={tabInfo} />
+                      })}
+                    </div>
+                  ) : (
+                    <div className="text-foreground text-sm h-32 border border-dashed flex flex-col gap-3 items-center justify-center px-3 mx-3 rounded">
+                      <span className="text-foreground-lighter">No queries found</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {projectSnippets.length >= 1 && (
+                <div className="editor-product-menu">
+                  <div className="flex flex-row justify-between">
+                    <Menu.Group title="Project queries" />
+                    <button
+                      className="flex items-center w-4 h-4 cursor-pointer mr-3"
+                      onClick={() => {
+                        setIsProjectSnippetsFilterOpen(!isProjectSnippetsFilterOpen)
+                      }}
+                    >
+                      <IconSearch
+                        className={cn(
+                          'w-4',
+                          'h-4',
+                          'cursor-pointer',
+                          isProjectSnippetsFilterOpen
+                            ? 'text-foreground'
+                            : 'text-foreground-lighter'
+                        )}
+                        onClick={() => {
+                          setProjectSnippetsFilterString('')
+                          setIsProjectSnippetsFilterOpen((state) => !state)
+                        }}
+                      />
+                    </button>
+                  </div>
+                  {isProjectSnippetsFilterOpen && (
+                    <div className="pl-3 mb-2 mr-3">
+                      <Input
+                        autoFocus
+                        size="tiny"
+                        icon={<IconSearch size="tiny" />}
+                        placeholder="Filter"
+                        disabled={isLoading}
+                        onChange={(e) => setProjectSnippetsFilterString(e.target.value)}
+                        value={projectSnippetsFilterString}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Escape') {
+                            setIsProjectSnippetsFilterOpen(false)
+                            setProjectSnippetsFilterString('')
+                          }
+                        }}
+                        actions={
+                          projectSnippetsFilterString && (
+                            <IconX
+                              size={'tiny'}
+                              className="mr-2 cursor-pointer"
+                              onClick={() => setProjectSnippetsFilterString('')}
+                            />
+                          )
+                        }
+                      />
+                    </div>
+                  )}
+                  {filteredProjectSnippets.length > 0 ? (
+                    <div className="space-y-1">
+                      {filteredProjectSnippets.map((tabInfo) => {
+                        const { id } = tabInfo || {}
+                        return <QueryItem key={id} tabInfo={tabInfo} />
+                      })}
+                    </div>
+                  ) : (
+                    <div className="text-foreground text-sm h-32 border border-dashed flex flex-col gap-3 items-center justify-center px-3 mx-3 rounded">
+                      <span className="text-foreground-lighter">No queries found</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="editor-product-menu">
+                <div className="flex flex-row justify-between">
+                  <Menu.Group title="Your queries" />
+                  <button
+                    className="flex items-center w-4 h-4 cursor-pointer mr-3"
+                    onClick={() => {
+                      setIsPersonalSnippetsFilterOpen(!isPersonalSnippetsFilterOpen)
+                    }}
+                  >
+                    <IconSearch
+                      className={cn(
+                        'w-4',
+                        'h-4',
+                        'cursor-pointer',
+                        isPersonalSnippetsFilterOpen ? 'text-foreground' : 'text-foreground-lighter'
+                      )}
+                      onClick={() => {
+                        setPersonalSnippetsFilterString('')
+                        setIsPersonalSnippetsFilterOpen((state) => !state)
+                      }}
+                    />
+                  </button>
+                </div>
+                {isPersonalSnippetsFilterOpen && (
+                  <div className="pl-3 mb-2 mr-3">
+                    <Input
+                      autoFocus
+                      size="tiny"
+                      icon={<IconSearch size="tiny" />}
+                      placeholder="Filter"
+                      disabled={isLoading}
+                      onChange={(e) => setPersonalSnippetsFilterString(e.target.value)}
+                      value={personalSnippetsFilterString}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Escape') {
+                          setIsPersonalSnippetsFilterOpen(false)
+                          setPersonalSnippetsFilterString('')
+                        }
+                      }}
+                      actions={
+                        personalSnippetsFilterString && (
+                          <IconX
+                            size={'tiny'}
+                            className="mr-2 cursor-pointer"
+                            onClick={() => setPersonalSnippetsFilterString('')}
+                          />
+                        )
+                      }
+                    />
+                  </div>
+                )}
+                {personalSnippets.length > 0 ? (
+                  <div className="space-y-1 pb-8">
+                    {personalSnippets.map((tabInfo) => {
                       const { id } = tabInfo || {}
                       return <QueryItem key={id} tabInfo={tabInfo} />
                     })}
                   </div>
-                </div>
-              )}
-              {queryTabs.length >= 1 && (
-                <div className="editor-product-menu">
-                  <Menu.Group title="SQL snippets" />
-                  <div className="space-y-1">
-                    {queryTabs.map((tabInfo) => {
-                      const { id } = tabInfo || {}
-                      return <QueryItem key={id} tabInfo={tabInfo} />
-                    })}
+                ) : (
+                  <div className="text-foreground text-sm h-32 border border-dashed flex flex-col gap-3 items-center justify-center px-3 mx-3 rounded">
+                    {filteredFavoriteSnippets.length === 0 && (
+                      <span className="text-foreground-lighter">No queries found</span>
+                    )}
+                    <Button type="default" onClick={() => handleNewQuery()}>
+                      New Query
+                    </Button>
                   </div>
-                </div>
-              )}
-              {filterString.length > 0 && favouriteTabs.length === 0 && queryTabs.length === 0 && (
-                <div className="px-4">
-                  <p className="text-sm">No queries found</p>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
         ) : (

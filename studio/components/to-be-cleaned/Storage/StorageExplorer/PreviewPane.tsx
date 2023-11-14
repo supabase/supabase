@@ -1,25 +1,28 @@
-import { isEmpty } from 'lodash'
-import {
-  Button,
-  Dropdown,
-  IconX,
-  IconLoader,
-  IconClipboard,
-  IconDownload,
-  IconTrash2,
-  IconAlertCircle,
-  IconChevronDown,
-} from 'ui'
-import SVG from 'react-inlinesvg'
-import { formatBytes } from 'lib/helpers'
-import { BASE_PATH } from 'lib/constants'
 import { Transition } from '@headlessui/react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { BASE_PATH } from 'lib/constants'
+import { formatBytes } from 'lib/helpers'
+import { isEmpty } from 'lodash'
+import SVG from 'react-inlinesvg'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  IconAlertCircle,
+  IconChevronDown,
+  IconClipboard,
+  IconDownload,
+  IconLoader,
+  IconTrash2,
+  IconX,
+} from 'ui'
 
-import { checkPermissions } from 'hooks'
-import { URL_EXPIRY_DURATION } from '../Storage.constants'
+import { useCheckPermissions } from 'hooks'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import { URL_EXPIRY_DURATION } from '../Storage.constants'
 
 const PreviewFile = ({ mimeType, previewUrl }: { mimeType: string; previewUrl: string }) => {
   if (!mimeType || !previewUrl) {
@@ -34,7 +37,7 @@ const PreviewFile = ({ mimeType, previewUrl }: { mimeType: string; previewUrl: s
   }
   if (previewUrl === 'loading') {
     return (
-      <div className="flex h-full w-full items-center justify-center text-scale-900">
+      <div className="flex h-full w-full items-center justify-center text-foreground-lighter">
         <IconLoader size={14} strokeWidth={2} className="animate-spin" />
       </div>
     )
@@ -67,7 +70,7 @@ const PreviewFile = ({ mimeType, previewUrl }: { mimeType: string; previewUrl: s
       <div className="flex h-full w-full items-center justify-center px-10">
         <audio key={previewUrl} controls style={{ width: 'inherit' }}>
           <source src={previewUrl} type="audio/mpeg" />
-          <p className="text-sm text-scale-1100">
+          <p className="text-sm text-foreground-light">
             Your browser does not support the audio element.
           </p>
         </audio>
@@ -79,7 +82,9 @@ const PreviewFile = ({ mimeType, previewUrl }: { mimeType: string; previewUrl: s
       <div className="flex h-full w-full items-center justify-center">
         <video key={previewUrl} controls style={{ maxHeight: '100%' }}>
           <source src={previewUrl} type="video/mp4" />
-          <p className="text-sm text-scale-1100">Your browser does not support the video tag.</p>
+          <p className="text-sm text-foreground-light">
+            Your browser does not support the video tag.
+          </p>
         </video>
       </div>
     )
@@ -94,13 +99,17 @@ const PreviewFile = ({ mimeType, previewUrl }: { mimeType: string; previewUrl: s
   )
 }
 
-const PreviewPane = () => {
+export interface PreviewPaneProps {
+  onCopyUrl: (name: string, url: string) => void
+}
+
+const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
   const storageExplorerStore = useStorageStore()
   const {
+    getFileUrl,
     downloadFile,
     selectedBucket,
     selectedFilePreview: file,
-    copyFileURLToClipboard,
     closeFilePreview,
     setSelectedItemsToDelete,
     setSelectedFileCustomExpiry,
@@ -112,7 +121,7 @@ const PreviewPane = () => {
   const mimeType = file.metadata ? file.metadata.mimetype : null
   const createdAt = file.created_at ? new Date(file.created_at).toLocaleString() : 'Unknown'
   const updatedAt = file.updated_at ? new Date(file.updated_at).toLocaleString() : 'Unknown'
-  const canUpdateFiles = checkPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   return (
     <>
@@ -128,11 +137,11 @@ const PreviewPane = () => {
         <div
           className="
         h-full border-l
-        border-panel-border-light bg-panel-header-light p-4 dark:border-panel-border-dark dark:bg-panel-header-dark"
+        border-overlay bg-surface-100 p-4"
           style={{ width }}
         >
           {/* Preview Header */}
-          <div className="flex w-full justify-end text-scale-900 transition-colors hover:text-scale-1200">
+          <div className="flex w-full justify-end text-foreground-lighter transition-colors hover:text-foreground">
             <IconX
               className="cursor-pointer"
               size={14}
@@ -142,7 +151,7 @@ const PreviewPane = () => {
           </div>
 
           {/* Preview Thumbnail*/}
-          <div className="my-4 border border-panel-border-light dark:border-panel-border-dark">
+          <div className="my-4 border border-overlay">
             <div className="flex h-56 w-full items-center 2xl:h-72">
               <PreviewFile mimeType={mimeType} previewUrl={file.previewUrl} />
             </div>
@@ -151,17 +160,17 @@ const PreviewPane = () => {
           <div className="w-full space-y-6">
             {/* Preview Information */}
             <div className="space-y-1">
-              <h5 className="break-words text-base text-scale-1200">{file.name}</h5>
+              <h5 className="break-words text-base text-foreground">{file.name}</h5>
               {file.isCorrupted && (
                 <div className="flex items-center space-x-2">
-                  <IconAlertCircle size={14} strokeWidth={2} className="text-scale-1100" />
-                  <p className="text-sm text-scale-1100">
+                  <IconAlertCircle size={14} strokeWidth={2} className="text-foreground-light" />
+                  <p className="text-sm text-foreground-light">
                     File is corrupted, please delete and reupload this file again
                   </p>
                 </div>
               )}
               {mimeType && (
-                <p className="text-sm text-scale-1100">
+                <p className="text-sm text-foreground-light">
                   {mimeType}
                   {size && <span> - {size}</span>}
                 </p>
@@ -171,17 +180,17 @@ const PreviewPane = () => {
             {/* Preview Metadata */}
             <div className="space-y-2">
               <div>
-                <label className="mb-1 text-xs text-scale-900">Added on</label>
-                <p className="text-sm text-scale-1100">{createdAt}</p>
+                <label className="mb-1 text-xs text-foreground-lighter">Added on</label>
+                <p className="text-sm text-foreground-light">{createdAt}</p>
               </div>
               <div>
-                <label className="mb-1 text-xs text-scale-900">Last modified</label>
-                <p className="text-sm text-scale-1100">{updatedAt}</p>
+                <label className="mb-1 text-xs text-foreground-lighter">Last modified</label>
+                <p className="text-sm text-foreground-light">{updatedAt}</p>
               </div>
             </div>
 
             {/* Actions */}
-            <div className="flex space-x-2 border-b border-panel-border-light pb-4 dark:border-panel-border-dark">
+            <div className="flex space-x-2 border-b border-overlay pb-4">
               <Button
                 type="default"
                 icon={<IconDownload size={16} strokeWidth={2} />}
@@ -194,57 +203,56 @@ const PreviewPane = () => {
                 <Button
                   type="outline"
                   icon={<IconClipboard size={16} strokeWidth={2} />}
-                  onClick={async () => await copyFileURLToClipboard(file)}
+                  onClick={async () => onCopyUrl(file.name, await getFileUrl(file))}
                   disabled={file.isCorrupted}
                 >
                   Get URL
                 </Button>
               ) : (
-                <Dropdown
-                  side="bottom"
-                  align="center"
-                  overlay={[
-                    <Dropdown.Item
+                <DropdownMenu>
+                  <DropdownMenuTrigger>
+                    <Button
+                      type="outline"
+                      icon={<IconClipboard size={16} strokeWidth={2} />}
+                      iconRight={<IconChevronDown />}
+                      disabled={file.isCorrupted}
+                    >
+                      Get URL
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent side="bottom" align="center">
+                    <DropdownMenuItem
                       key="expires-one-week"
                       onClick={async () =>
-                        await copyFileURLToClipboard(file, URL_EXPIRY_DURATION.WEEK)
+                        onCopyUrl(file.name, await getFileUrl(file, URL_EXPIRY_DURATION.WEEK))
                       }
                     >
                       Expire in 1 week
-                    </Dropdown.Item>,
-                    <Dropdown.Item
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
                       key="expires-one-month"
                       onClick={async () =>
-                        await copyFileURLToClipboard(file, URL_EXPIRY_DURATION.MONTH)
+                        onCopyUrl(file.name, await getFileUrl(file, URL_EXPIRY_DURATION.MONTH))
                       }
                     >
                       Expire in 1 month
-                    </Dropdown.Item>,
-                    <Dropdown.Item
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
                       key="expires-one-year"
                       onClick={async () =>
-                        await copyFileURLToClipboard(file, URL_EXPIRY_DURATION.YEAR)
+                        onCopyUrl(file.name, await getFileUrl(file, URL_EXPIRY_DURATION.YEAR))
                       }
                     >
                       Expire in 1 year
-                    </Dropdown.Item>,
-                    <Dropdown.Item
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
                       key="custom-expiry"
                       onClick={() => setSelectedFileCustomExpiry(file)}
                     >
                       Custom expiry
-                    </Dropdown.Item>,
-                  ]}
-                >
-                  <Button
-                    type="outline"
-                    icon={<IconClipboard size={16} strokeWidth={2} />}
-                    iconRight={<IconChevronDown />}
-                    disabled={file.isCorrupted}
-                  >
-                    Get URL
-                  </Button>
-                </Dropdown>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
             </div>
             <Tooltip.Root delayDuration={0}>
@@ -252,7 +260,6 @@ const PreviewPane = () => {
                 <Button
                   type="outline"
                   disabled={!canUpdateFiles}
-                  shadow={false}
                   size="tiny"
                   icon={<IconTrash2 size={16} strokeWidth={2} />}
                   onClick={() => setSelectedItemsToDelete([file])}
@@ -266,11 +273,11 @@ const PreviewPane = () => {
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                        'border border-scale-200',
+                        'rounded bg-alternative py-1 px-2 leading-none shadow',
+                        'border border-background',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text-foreground">
                         You need additional permissions to delete this file
                       </span>
                     </div>

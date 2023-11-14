@@ -11,12 +11,10 @@ import { API_URL } from 'lib/constants'
 import { get } from 'lib/common/fetch'
 import { useQuery } from '@tanstack/react-query'
 
-interface Data {
+interface SingleLogHook {
   logData: LogData | undefined
   error: string | Object | null
   isLoading: boolean
-}
-interface Handlers {
   refresh: () => void
 }
 function useSingleLog(
@@ -24,7 +22,7 @@ function useSingleLog(
   queryType?: QueryType,
   paramsToMerge?: Partial<LogsEndpointParams>,
   id?: string | null
-): [Data, Handlers] {
+): SingleLogHook {
   const table = queryType ? LOGS_TABLES[queryType] : undefined
   const sql = id && table ? genSingleLogQuery(table, id) : ''
   const params: LogsEndpointParams = { ...paramsToMerge, project: projectRef, sql }
@@ -52,15 +50,11 @@ function useSingleLog(
   )
 
   let error: null | string | object = rcError ? (rcError as any).message : null
-  return [
-    {
-      logData: data?.result ? data.result[0] : undefined,
-      isLoading: (enabled && isLoading) || isRefetching,
-      error,
-    },
-    {
-      refresh: () => refetch(),
-    },
-  ]
+  return {
+    logData: data?.result ? data.result[0] : undefined,
+    isLoading: (enabled && isLoading) || isRefetching,
+    error,
+    refresh: () => refetch(),
+  }
 }
 export default useSingleLog

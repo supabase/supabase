@@ -1,12 +1,9 @@
-import { useMonaco } from '@monaco-editor/react'
 import { autorun } from 'mobx'
-import { createContext, FC, useContext, useEffect } from 'react'
+import { createContext, PropsWithChildren, useContext, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
-import { IRootStore } from 'stores'
-import { getTheme } from 'components/ui/CodeEditor'
 import SparkBar from 'components/ui/SparkBar'
-import { useTheme } from 'common'
+import { IRootStore } from 'stores'
 
 const StoreContext = createContext<IRootStore>(undefined!)
 
@@ -22,21 +19,10 @@ export function useStore() {
 interface StoreProvider {
   rootStore: IRootStore
 }
-export const StoreProvider: FC<StoreProvider> = ({ children, rootStore }) => {
-  const monaco = useMonaco()
+export const StoreProvider = ({ children, rootStore }: PropsWithChildren<StoreProvider>) => {
   const { ui } = rootStore
-  const { isDarkMode } = useTheme()
 
   useEffect(() => {
-    if (monaco) {
-      const theme: any = getTheme(isDarkMode)
-      monaco.editor.defineTheme('supabase', theme)
-    }
-  }, [isDarkMode, monaco])
-
-  useEffect(() => {
-    ui.load()
-
     autorun(() => {
       if (ui.notification) {
         const { id, category, error, message, description, progress, duration } = ui.notification
@@ -57,12 +43,12 @@ export const StoreProvider: FC<StoreProvider> = ({ children, rootStore }) => {
                     value={progress}
                     max={100}
                     type="horizontal"
-                    barClass="bg-brand-900"
+                    barClass="bg-brand"
                     labelBottom={message}
                     labelTop={`${progress.toFixed(2)}%`}
                   />
                   {description !== undefined && (
-                    <p className="text-xs text-scale-1100">{description}</p>
+                    <p className="text-xs text-foreground-light">{description}</p>
                   )}
                 </div>,
                 { id }

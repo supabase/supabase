@@ -1,30 +1,30 @@
-import Link from 'next/link'
-import { FC, ReactNode, useState } from 'react'
-import { observer } from 'mobx-react-lite'
-import { Button, IconExternalLink, IconCode, Modal, IconTerminal } from 'ui'
-
-import ProjectLayout from './'
-import { checkPermissions, withAuth } from 'hooks'
-import { useParams } from 'common/hooks'
-import FunctionsNav from '../interfaces/Functions/FunctionsNav'
-import NoPermission from 'components/ui/NoPermission'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { TerminalInstructions } from 'components/interfaces/Functions'
+import { useParams } from 'common'
+import { observer } from 'mobx-react-lite'
+import Link from 'next/link'
+import { PropsWithChildren } from 'react'
+import { Button, IconCode, IconExternalLink } from 'ui'
+
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import APIDocsButton from 'components/ui/APIDocsButton'
+import NoPermission from 'components/ui/NoPermission'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import { useCheckPermissions, withAuth } from 'hooks'
+import FunctionsNav from '../interfaces/Functions/FunctionsNav'
+import ProjectLayout from './'
 
-interface Props {
+interface FunctionsLayoutProps {
   title?: string
-  children?: ReactNode
 }
 
-const FunctionsLayout: FC<Props> = ({ title, children }) => {
+const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutProps>) => {
   const { functionSlug, ref } = useParams()
-  const [showTerminalInstructions, setShowTerminalInstructions] = useState(false)
+  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { data: functions, isLoading } = useEdgeFunctionsQuery({ projectRef: ref })
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
 
-  const canReadFunctions = checkPermissions(PermissionAction.FUNCTIONS_READ, '*')
+  const canReadFunctions = useCheckPermissions(PermissionAction.FUNCTIONS_READ, '*')
   if (!canReadFunctions) {
     return (
       <ProjectLayout title={title || 'Edge Functions'} product="Edge Functions">
@@ -53,17 +53,8 @@ const FunctionsLayout: FC<Props> = ({ title, children }) => {
             xl:flex-row"
             >
               <div className="flex items-center gap-3">
-                <div
-                  className={[
-                    'h-6 w-6 rounded border border-brand-600 bg-brand-300',
-                    'flex items-center justify-center text-brand-900',
-                  ].join(' ')}
-                >
-                  <IconCode size={14} strokeWidth={3} />
-                </div>
                 <div className="flex items-center space-x-4">
-                  <h1 className="text-2xl text-scale-1200">Edge Functions</h1>
-                  <p className="mt-1 text-scale-1000">Beta</p>
+                  <h1 className="text-2xl text-foreground">Edge Functions</h1>
                 </div>
               </div>
             </div>
@@ -84,7 +75,7 @@ const FunctionsLayout: FC<Props> = ({ title, children }) => {
                 <div
                   className={[
                     'h-6 w-6 rounded border border-brand-600 bg-brand-300',
-                    'flex items-center justify-center text-brand-900',
+                    'flex items-center justify-center text-brand',
                   ].join(' ')}
                 >
                   <IconCode size={14} strokeWidth={3} />
@@ -93,14 +84,13 @@ const FunctionsLayout: FC<Props> = ({ title, children }) => {
                 <div className="flex items-center justify-between w-full">
                   <div className="flex items-center space-x-4">
                     <Link href={`/project/${ref}/functions`}>
-                      <h1 className="cursor-pointer text-2xl text-scale-1200 transition-colors hover:text-scale-1100">
+                      <h1 className="cursor-pointer text-2xl text-foreground transition-colors hover:text-foreground-light">
                         Edge Functions
                       </h1>
                     </Link>
-                    <p className="mt-1 text-scale-1000">Beta</p>
                     {name && (
                       <div className="mt-1.5 flex items-center space-x-4">
-                        <span className="text-scale-1000">
+                        <span className="text-foreground-light">
                           <svg
                             viewBox="0 0 24 24"
                             width="16"
@@ -115,33 +105,38 @@ const FunctionsLayout: FC<Props> = ({ title, children }) => {
                             <path d="M16 3.549L7.12 20.600"></path>
                           </svg>
                         </span>
-                        <h5 className="text-lg text-scale-1200">{name}</h5>
+                        <h5 className="text-lg text-foreground">{name}</h5>
                       </div>
                     )}
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Button
-                      type="default"
-                      icon={<IconTerminal size={14} strokeWidth={1.5} />}
-                      onClick={() => setShowTerminalInstructions(true)}
-                    >
-                      Terminal Instructions
+                    <Button asChild type="default">
+                      <Link href={`/project/${ref}/settings/functions`}>Manage secrets</Link>
                     </Button>
-                    <Link href="https://supabase.com/docs/guides/functions">
-                      <a target="_link">
-                        <Button
-                          type="default"
-                          icon={<IconExternalLink size={14} strokeWidth={1.5} />}
-                        >
-                          Documentation
-                        </Button>
-                      </a>
-                    </Link>
+                    {isNewAPIDocsEnabled && (
+                      <APIDocsButton
+                        section={
+                          functionSlug !== undefined
+                            ? ['edge-functions', functionSlug]
+                            : ['edge-functions']
+                        }
+                      />
+                    )}
+                    <Button
+                      asChild
+                      type="default"
+                      className="translate-y-[1px]"
+                      icon={<IconExternalLink size={14} strokeWidth={1.5} />}
+                    >
+                      <Link href="https://supabase.com/docs/guides/functions" target="_link">
+                        Documentation
+                      </Link>
+                    </Button>
                   </div>
                 </div>
               </div>
             </div>
-            {selectedFunction !== undefined && <FunctionsNav item={selectedFunction} />}
+            {functionSlug !== undefined && <FunctionsNav item={selectedFunction} />}
           </div>
           <div
             className={[
@@ -153,24 +148,6 @@ const FunctionsLayout: FC<Props> = ({ title, children }) => {
           </div>
         </div>
       )}
-
-      <Modal
-        size="xlarge"
-        visible={showTerminalInstructions}
-        onCancel={() => setShowTerminalInstructions(false)}
-        header={<h3>Deploying an edge function to your project</h3>}
-        customFooter={
-          <div className="w-full flex items-center justify-end">
-            <Button type="primary" size="tiny" onClick={() => setShowTerminalInstructions(false)}>
-              Confirm
-            </Button>
-          </div>
-        }
-      >
-        <div className="py-4">
-          <TerminalInstructions removeBorder />
-        </div>
-      </Modal>
     </ProjectLayout>
   )
 }

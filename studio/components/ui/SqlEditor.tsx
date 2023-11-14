@@ -1,8 +1,12 @@
 import Editor, { OnChange, useMonaco } from '@monaco-editor/react'
-import { FC, useEffect, useRef } from 'react'
+import { noop } from 'lodash'
+import { useEffect, useRef } from 'react'
+
 import { useStore } from 'hooks'
 
-interface Props {
+// [Joshen] We should deprecate this and use CodeEditor instead
+
+interface SqlEditorProps {
   contextmenu?: boolean
   defaultValue?: string
   language?: string
@@ -11,33 +15,20 @@ interface Props {
   readOnly?: boolean
 }
 
-const SqlEditor: FC<Props> = ({
+const SqlEditor = ({
   queryId,
   language = 'pgsql',
   defaultValue = '',
   readOnly = false,
   contextmenu = true,
-  onInputChange = () => {},
-}) => {
+  onInputChange = noop,
+}: SqlEditorProps) => {
   const monaco = useMonaco()
   const { meta } = useStore()
   const editorRef = useRef<any>()
 
   useEffect(() => {
     if (monaco) {
-      // Supabase theming (Can't seem to get it to work for now)
-      monaco.editor.defineTheme('supabase', {
-        base: 'vs-dark',
-        inherit: true,
-        colors: {},
-        rules: [
-          { token: '', background: '4a5568' },
-          { token: 'string.sql', foreground: '24b47e' },
-          { token: 'comment', foreground: '666666' },
-          { token: 'predefined.sql', foreground: 'D4D4D4' },
-        ],
-      })
-
       // Enable pgsql format
       const formatprovider = monaco.languages.registerDocumentFormattingEditProvider('pgsql', {
         async provideDocumentFormattingEdits(model: any) {

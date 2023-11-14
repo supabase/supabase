@@ -1,10 +1,7 @@
 import { useState, useEffect } from 'react'
-import { createClient } from '@supabase/supabase-js'
+import { createPagesBrowserClient } from '@supabase/auth-helpers-nextjs'
 
-export const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_KEY
-)
+export const supabase = createPagesBrowserClient()
 
 /**
  * @param {number} channelId the currently selected Channel

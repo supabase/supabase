@@ -1,22 +1,29 @@
-import { useEffect, useState } from 'react'
+import { filter, find, get, isEmpty } from 'lodash'
 import { observer } from 'mobx-react-lite'
+import { useEffect, useState } from 'react'
 import { IconLoader } from 'ui'
-import { find, get, isEmpty, filter } from 'lodash'
 
+import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useStore } from 'hooks'
+import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { formatPoliciesForStorage } from '../Storage.utils'
-import StoragePoliciesPlaceholder from './StoragePoliciesPlaceholder'
 import StoragePoliciesBucketRow from './StoragePoliciesBucketRow'
 import StoragePoliciesEditPolicyModal from './StoragePoliciesEditPolicyModal'
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import StoragePoliciesPlaceholder from './StoragePoliciesPlaceholder'
 
+import { useParams } from 'common'
 import { PolicyEditorModal } from 'components/interfaces/Auth/Policies'
+import { useBucketsQuery } from 'data/storage/buckets-query'
 
 const StoragePolicies = () => {
   const { ui, meta } = useStore()
+  const { ref: projectRef } = useParams()
+
   const storageStore = useStorageStore()
-  const { loaded, buckets } = storageStore
+  const { loaded } = storageStore
+
+  const { data } = useBucketsQuery({ projectRef })
+  const buckets = data ?? []
 
   const roles = meta.roles.list((role) => !meta.roles.systemRoles.includes(role.name))
 
@@ -144,7 +151,7 @@ const StoragePolicies = () => {
   return (
     <div className="flex min-h-full w-full flex-col">
       <h3 className="text-xl">Storage policies</h3>
-      <p className="mt-2 text-sm text-scale-1100">
+      <p className="mt-2 text-sm text-foreground-light">
         Safeguard your files with policies that define the operations allowed for your users at the
         bucket level.
       </p>
@@ -179,7 +186,7 @@ const StoragePolicies = () => {
           })}
 
           <div className="!mb-4 w-full border-b border-gray-600" />
-          <p className="text-sm text-scale-1000">
+          <p className="text-sm text-foreground-light">
             You may also write policies for the tables under the storage schema directly for greater
             control
           </p>

@@ -1,43 +1,69 @@
-import { FC, useState } from 'react'
-import { useRouter } from 'next/router'
-import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Button, Dropdown, IconChevronDown } from 'ui'
+import { useQueryClient } from '@tanstack/react-query'
+import { observer } from 'mobx-react-lite'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  IconChevronDown,
+} from 'ui'
 
-import { Project } from 'types'
-import { useStore, checkPermissions } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import {
+  useIsProjectActive,
+  useProjectContext,
+} from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import { useProjectRestartMutation } from 'data/projects/project-restart-mutation'
+import { useProjectRestartServicesMutation } from 'data/projects/project-restart-services-mutation'
+import { setProjectPostgrestStatus } from 'data/projects/projects-query'
+import { useCheckPermissions, useStore } from 'hooks'
 
-interface Props {
-  project: Project
-}
-
-const RestartServerButton: FC<Props> = ({ project }) => {
-  const { ui, app } = useStore()
+const RestartServerButton = () => {
+  const { ui } = useStore()
   const router = useRouter()
-  const [loading, setLoading] = useState(false)
+  const queryClient = useQueryClient()
+  const { project } = useProjectContext()
+  const isProjectActive = useIsProjectActive()
   const [serviceToRestart, setServiceToRestart] = useState<'project' | 'database'>()
 
-  const projectId = project.id
-  const projectRef = project.ref
-  const projectRegion = project.region
+  const projectRef = project?.ref ?? ''
+  const projectRegion = project?.region ?? ''
 
-  const canRestartProject = checkPermissions(PermissionAction.INFRA_EXECUTE, 'reboot')
+  const canRestartProject = useCheckPermissions(PermissionAction.INFRA_EXECUTE, 'reboot')
 
-  const requestProjectRestart = async () => {
+  const { mutate: restartProject, isLoading: isRestartingProject } = useProjectRestartMutation({
+    onSuccess: () => {
+      onRestartSuccess()
+    },
+    onError: (error) => {
+      onRestartFailed(error, 'project')
+    },
+  })
+  const { mutate: restartProjectServices, isLoading: isRestartingServices } =
+    useProjectRestartServicesMutation({
+      onSuccess: () => {
+        onRestartSuccess()
+      },
+      onError: (error) => {
+        onRestartFailed(error, 'database')
+      },
+    })
+
+  const isLoading = isRestartingProject || isRestartingServices
+
+  const requestProjectRestart = () => {
     if (!canRestartProject) {
       return ui.setNotification({
         category: 'error',
         message: 'You do not have the required permissions to restart this project',
       })
     }
-    setLoading(true)
-    const res = await post(`${API_URL}/projects/${projectRef}/restart`, {})
-    if (res.error) onRestartFailed(res.error, 'project')
-    else onRestartSuccess()
+    restartProject({ ref: projectRef })
   }
 
   const requestDatabaseRestart = async () => {
@@ -47,32 +73,22 @@ const RestartServerButton: FC<Props> = ({ project }) => {
         message: 'You do not have the required permissions to restart this project',
       })
     }
-    setLoading(true)
-    const res = await post(`${API_URL}/projects/${projectRef}/restart-services`, {
-      restartRequest: {
-        region: projectRegion,
-        services: ['postgresql'],
-      },
-    })
-    if (res.error) onRestartFailed(res.error, 'database')
-    else onRestartSuccess()
+    restartProjectServices({ ref: projectRef, region: projectRegion, services: ['postgresql'] })
   }
 
   const onRestartFailed = (error: any, type: string) => {
     ui.setNotification({
       error,
       category: 'error',
-      message: `Unable to restart ${type}`,
+      message: `Unable to restart ${type}: ${error.message}`,
     })
-    setLoading(false)
     setServiceToRestart(undefined)
   }
 
   const onRestartSuccess = () => {
-    app.onProjectPostgrestStatusUpdated(projectId, 'OFFLINE')
-    ui.setNotification({ category: 'success', message: 'Restarting server' })
+    setProjectPostgrestStatus(queryClient, projectRef, 'OFFLINE')
+    ui.setNotification({ category: 'success', message: 'Restarting server...' })
     router.push(`/project/${projectRef}`)
-    setLoading(false)
     setServiceToRestart(undefined)
   }
 
@@ -83,56 +99,59 @@ const RestartServerButton: FC<Props> = ({ project }) => {
           <div className="flex items-center">
             <Button
               type="default"
-              className="rounded-r-none px-3"
-              disabled={!canRestartProject}
+              className={`px-3 ${canRestartProject && isProjectActive ? 'rounded-r-none' : ''}`}
+              disabled={project === undefined || !canRestartProject || !isProjectActive}
               onClick={() => setServiceToRestart('project')}
             >
               Restart project
             </Button>
-            {canRestartProject && (
-              <Dropdown
-                align="end"
-                side="bottom"
-                overlay={[
-                  <Dropdown.Item
+            {canRestartProject && isProjectActive && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    type="default"
+                    className="rounded-l-none px-[4px] py-[5px]"
+                    icon={<IconChevronDown />}
+                    disabled={!canRestartProject}
+                  />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" side="bottom">
+                  <DropdownMenuItem
                     key="database"
-                    disabled={loading}
+                    disabled={isLoading}
                     onClick={() => {
                       setServiceToRestart('database')
                     }}
                   >
                     <div className="space-y-1">
-                      <p className="block text-scale-1200">Fast database reboot</p>
-                      <p className="block text-scale-1100">
+                      <p className="block text-foreground">Fast database reboot</p>
+                      <p className="block text-foreground-light">
                         Restarts only the database - faster but may not be able to recover from all
                         failure modes
                       </p>
                     </div>
-                  </Dropdown.Item>,
-                ]}
-              >
-                <Button
-                  type="default"
-                  className="rounded-l-none px-[4px] py-[5px]"
-                  icon={<IconChevronDown />}
-                  disabled={!canRestartProject}
-                />
-              </Dropdown>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
           </div>
         </Tooltip.Trigger>
-        {!canRestartProject && (
+        {project !== undefined && (!canRestartProject || !isProjectActive) && (
           <Tooltip.Portal>
             <Tooltip.Content side="bottom">
               <Tooltip.Arrow className="radix-tooltip-arrow" />
               <div
                 className={[
-                  'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                  'border border-scale-200 ', //border
+                  'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                  'border border-background', //border
                 ].join(' ')}
               >
-                <span className="text-xs text-scale-1200">
-                  You need additional permissions to restart this project
+                <span className="text-xs text-foreground">
+                  {!canRestartProject
+                    ? 'You need additional permissions to restart this project'
+                    : !isProjectActive
+                    ? 'Unable to restart project as project is not active'
+                    : ''}
                 </span>
               </div>
             </Tooltip.Content>
@@ -147,7 +166,7 @@ const RestartServerButton: FC<Props> = ({ project }) => {
         description={
           <>
             Are you sure you want to restart the{' '}
-            <span className="text-scale-1200">{serviceToRestart}</span>? There will be a few minutes
+            <span className="text-foreground">{serviceToRestart}</span>? There will be a few minutes
             of downtime.
           </>
         }

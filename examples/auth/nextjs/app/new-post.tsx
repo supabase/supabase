@@ -1,22 +1,21 @@
-"use client";
+import { createServerActionClient } from '@supabase/auth-helpers-nextjs'
+import { revalidatePath } from 'next/cache'
+import { cookies } from 'next/headers'
 
-import { FormEvent } from "react";
+import type { Database } from '@/lib/database.types'
 
 export default function NewPost() {
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    const { content } = Object.fromEntries(new FormData(e.currentTarget));
-
-    await fetch("http://localhost:3000/api/posts", {
-      method: "post",
-      body: JSON.stringify({ content }),
-    });
-  };
+  const addPost = async (formData: FormData) => {
+    'use server'
+    const content = String(formData.get('content'))
+    const supabase = createServerActionClient<Database>({ cookies })
+    await supabase.from('posts').insert({ content }).select()
+    revalidatePath('/')
+  }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form action={addPost}>
       <input name="content" />
     </form>
-  );
+  )
 }

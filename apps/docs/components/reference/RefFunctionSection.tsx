@@ -10,6 +10,7 @@ import { extractTsDocNode, generateParameters } from '~/lib/refGenerator/helpers
 import RefDetailCollapse from '~/components/reference/RefDetailCollapse'
 import { Fragment } from 'react'
 import { IRefFunctionSection } from './Reference.types'
+import components from '~/components'
 
 const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
   const item = props.spec.functions.find((x: any) => x.id === props.funcData.id)
@@ -38,22 +39,22 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
             <header className={['prose'].join(' ')}>
               {shortText && <ReactMarkdown className="text-sm">{shortText}</ReactMarkdown>}
             </header>
-
             {item.description && (
               <div className="prose">
                 <ReactMarkdown className="text-sm">{item.description}</ReactMarkdown>
               </div>
             )}
-
             {item.notes && (
               <div className="prose">
-                <ReactMarkdown className="text-sm">{item.notes}</ReactMarkdown>
+                <ReactMarkdown className="text-sm" components={components}>
+                  {item.notes}
+                </ReactMarkdown>
               </div>
             )}
             {/* // parameters */}
             {parameters && (
               <div className="not-prose mt-12">
-                <h5 className="mb-3 text-base text-scale-1200">Parameters</h5>
+                <h5 className="mb-3 text-base text-foreground">Parameters</h5>
                 <ul className="">
                   {parameters.map((param) => {
                     // grab override params from yaml file
@@ -110,10 +111,17 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                   size="tiny"
                   type="rounded-pills"
                   scrollable
+                  queryGroup="example"
                 >
                   {item.examples &&
                     item.examples.map((example, exampleIndex) => {
-                      const exampleString = ''
+                      const exampleString =
+                        '' +
+                        (example.code &&
+                          example.code
+                            .trim()
+                            .replace(/^```.*/, '')
+                            .replace(/```$/, ''))
 
                       const codeBlockLang = example?.code?.startsWith('```js')
                         ? 'js'
@@ -132,7 +140,6 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                       // // Create a single supabase client for interacting with your database
                       // const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
                       // `
-                      const currentExampleId = example.id
                       const staticExample = item.examples[exampleIndex]
 
                       const response = staticExample.response
@@ -151,15 +158,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                             language={codeBlockLang}
                             hideLineNumbers={true}
                           >
-                            {exampleString +
-                              (example.code &&
-                                example.code
-                                  .replace(/```/g, '')
-                                  .replace('js', '')
-                                  .replace('ts', '')
-                                  .replace('dart', '')
-                                  .replace('c#', '')
-                                  .replace('kotlin', ''))}
+                            {exampleString}
                           </CodeBlock>
 
                           {((tables && tables.length > 0) || sql) && (
@@ -173,13 +172,13 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                                   tables.length > 0 &&
                                   tables.map((table) => {
                                     return (
-                                      <div className="bg-scale-300 border rounded prose max-w-none">
-                                        <div className="bg-scale-200 px-5 py-2">
+                                      <div className="bg-surface-100 border rounded prose max-w-none">
+                                        <div className="bg-background px-5 py-2">
                                           <div className="flex gap-2 items-center">
-                                            <div className="text-brand-900">
+                                            <div className="text-brand">
                                               <IconDatabase size={16} />
                                             </div>
-                                            <h5 className="text-xs text-scale-1200">
+                                            <h5 className="text-xs text-foreground">
                                               {table.name}
                                             </h5>
                                           </div>
@@ -189,7 +188,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                                   })}
                                 {sql && (
                                   <CodeBlock
-                                    className="useless-code-block-class my-0 border border-t-0 border-scale-500 !rounded-tl-none !rounded-tr-none"
+                                    className="useless-code-block-class my-0 border border-t-0 border-default !rounded-tl-none !rounded-tr-none"
                                     language="sql"
                                     hideLineNumbers={true}
                                   >
@@ -207,7 +206,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                               defaultOpen={false}
                             >
                               <CodeBlock
-                                className="useless-code-block-class rounded !rounded-tl-none !rounded-tr-none border border-scale-500"
+                                className="useless-code-block-class rounded !rounded-tl-none !rounded-tr-none border border-default"
                                 language={codeBlockLang}
                                 hideLineNumbers={true}
                               >
@@ -222,7 +221,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                               label="Notes"
                               defaultOpen={false}
                             >
-                              <div className="bg-scale-300 border border-scale-500 rounded !rounded-tl-none !rounded-tr-none prose max-w-none px-5 py-2">
+                              <div className="bg-surface-100 border border-default rounded !rounded-tl-none !rounded-tr-none prose max-w-none px-5 py-2">
                                 <ReactMarkdown className="text-sm">
                                   {example.description}
                                 </ReactMarkdown>

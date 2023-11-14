@@ -33,13 +33,13 @@ export enum PageType {
 }
 
 export interface PageSection {
-  slug: string
-  heading: string
+  slug?: string
+  heading?: string
 }
 
 export interface PageMetadata {
   title: string
-  description: string
+  description?: string
 }
 
 export interface PageResult {
@@ -47,6 +47,21 @@ export interface PageResult {
   path: string
   meta: PageMetadata
   sections: PageSection[]
+}
+
+function removeDoubleQuotes(inputString: string): string {
+  // Use the replace method with a regular expression to remove double quotes
+  return inputString.replace(/"/g, '')
+}
+
+const getDocsUrl = () => {
+  if (!process.env.NEXT_PUBLIC_SITE_URL || !process.env.NEXT_PUBLIC_LOCAL_SUPABASE) {
+    return 'https://supabase.com/docs'
+  }
+
+  const isLocal =
+    process.env.NEXT_PUBLIC_SITE_URL.includes('localhost') || process.env.NEXT_PUBLIC_LOCAL_SUPABASE
+  return isLocal ? 'http://localhost:3001/docs' : 'https://supabase.com/docs'
 }
 
 const DocsSearch = () => {
@@ -115,7 +130,7 @@ const DocsSearch = () => {
     <IconChevronRight
       strokeWidth={1.5}
       className="
-        text-scale-900
+        text-foreground-muted
         opacity-0
         -left-4
         group-aria-selected:scale-[101%]
@@ -132,11 +147,11 @@ const DocsSearch = () => {
       className="
         transition
         w-6 h-6
-        bg-scale-100
+        bg-alternative
         group-aria-selected:scale-[105%]
-        group-aria-selected:bg-scale-1200
-        text-scale-1200
-        group-aria-selected:text-scale-100
+        group-aria-selected:bg-foreground
+        text-foreground
+        group-aria-selected:text-background
         rounded flex
         items-center
         justify-center
@@ -156,14 +171,12 @@ const DocsSearch = () => {
           return (
             <CommandGroup
               heading=""
-              forceMount
               key={`${page.meta.title}-group-index-${i}`}
               value={`${page.meta.title}-group-index-${i}`}
             >
               <CommandItem
-                forceMount
                 key={`${page.meta.title}-item-index-${i}`}
-                value={`${page.meta.title}-item-index-${i}`}
+                value={`${removeDoubleQuotes(page.meta.title)}-item-index-${i}`}
                 type="block-link"
                 onSelect={() => {
                   openLink(page.type, formatPageUrl(page))
@@ -175,25 +188,28 @@ const DocsSearch = () => {
                     <CommandLabel>
                       <TextHighlighter text={page.meta.title} query={search} />
                     </CommandLabel>
-                    <div className="text-xs text-scale-900">
-                      <TextHighlighter text={page.meta.description} query={search} />
-                    </div>
+                    {page.meta.description && (
+                      <div className="text-xs text-foreground-muted">
+                        <TextHighlighter text={page.meta.description} query={search} />
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 <ChevronArrow />
               </CommandItem>
               {pageSections.length > 0 && (
-                <div className="border-l border-scale-500 ml-3 pt-3">
+                <div className="border-l border-default ml-3 pt-3">
                   {pageSections.map((section, i) => (
                     <CommandItem
-                      forceMount
                       className="ml-3 mb-3"
                       onSelect={() => {
                         openLink(page.type, formatSectionUrl(page, section))
                       }}
                       key={`${page.meta.title}__${section.heading}-item-index-${i}`}
-                      value={`${page.meta.title}__${section.heading}-item-index-${i}`}
+                      value={`${removeDoubleQuotes(page.meta.title)}__${removeDoubleQuotes(
+                        section.heading ?? ''
+                      )}-item-index-${i}`}
                       type="block-link"
                     >
                       <div className="grow flex gap-3 items-center">
@@ -201,14 +217,16 @@ const DocsSearch = () => {
                         <div className="flex flex-col gap-2">
                           <cite>
                             <TextHighlighter
-                              className="not-italic text-xs rounded-full px-2 py-1 bg-scale-500 text-scale-1200"
+                              className="not-italic text-xs rounded-full px-2 py-1 bg-overlay-hover text-foreground"
                               text={page.meta.title}
                               query={search}
                             />
                           </cite>
-                          <CommandLabel>
-                            <TextHighlighter text={section.heading} query={search} />
-                          </CommandLabel>
+                          {section.heading && (
+                            <CommandLabel>
+                              <TextHighlighter text={section.heading} query={search} />
+                            </CommandLabel>
+                          )}
                         </div>
                       </div>
                       <ChevronArrow />
@@ -220,7 +238,7 @@ const DocsSearch = () => {
           )
         })}
       {!results && !hasSearchError && !isLoading && (
-        <CommandGroup forceMount>
+        <CommandGroup>
           {questions.map((question) => {
             const key = question.replace(/\s+/g, '_')
             return (
@@ -233,7 +251,6 @@ const DocsSearch = () => {
                   }
                 }}
                 type="command"
-                forceMount
                 key={key}
               >
                 <IconSearch />
@@ -245,11 +262,11 @@ const DocsSearch = () => {
       )}
       {isLoading && !results && (
         <div className="p-6 grid gap-6 my-4">
-          <p className="text-lg text-scale-900 text-center">Searching for results</p>
+          <p className="text-lg text-foreground-muted text-center">Searching for results</p>
         </div>
       )}
       {results && results.length === 0 && (
-        <div className="p-6 flex flex-col items-center gap-6 mt-4 text-scale-1100">
+        <div className="p-6 flex flex-col items-center gap-6 mt-4 text-foreground-light">
           <IconAlertTriangle strokeWidth={1.5} size={40} />
           <p className="text-lg text-center">No results found.</p>
           <Button size="tiny" type="secondary" onClick={handleResetPrompt}>
@@ -276,10 +293,11 @@ const DocsSearch = () => {
 export default DocsSearch
 
 export function formatPageUrl(page: PageResult) {
+  const docsUrl = getDocsUrl()
   switch (page.type) {
     case PageType.Markdown:
     case PageType.Reference:
-      return `/docs/${page.path}`
+      return `${docsUrl}${page.path}`
     case PageType.GithubDiscussion:
       return page.path
     default:
@@ -291,9 +309,9 @@ export function formatSectionUrl(page: PageResult, section: PageSection) {
   switch (page.type) {
     case PageType.Markdown:
     case PageType.GithubDiscussion:
-      return `${formatPageUrl(page)}#${section.slug}`
+      return `${formatPageUrl(page)}#${section.slug ?? ''}`
     case PageType.Reference:
-      return `${formatPageUrl(page)}/${section.slug}`
+      return `${formatPageUrl(page)}/${section.slug ?? ''}`
     default:
       throw new Error(`Unknown page type '${page.type}'`)
   }

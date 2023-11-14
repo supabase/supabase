@@ -2,12 +2,14 @@ import { Children } from 'react'
 
 const FormSection = ({
   children,
+  id,
   header,
   disabled,
   visible = true,
   className,
 }: {
   children: React.ReactNode
+  id?: string
   header?: React.ReactNode
   disabled?: boolean
   visible?: boolean
@@ -21,7 +23,7 @@ const FormSection = ({
   ]
 
   return (
-    <div className={classes.join(' ')}>
+    <div id={id} className={classes.join(' ')}>
       {header}
       {children}
     </div>
@@ -40,13 +42,13 @@ const FormSectionLabel = ({
   if (description !== undefined) {
     return (
       <div className={`flex flex-col space-y-2 col-span-12 lg:col-span-5 ${className}`}>
-        <label className="text-scale-1200 text-sm">{children}</label>
+        <label className="text-foreground text-sm">{children}</label>
         {description}
       </div>
     )
   } else {
     return (
-      <label className={`text-scale-1200 col-span-12 text-sm lg:col-span-5 ${className}`}>
+      <label className={`text-foreground col-span-12 text-sm lg:col-span-5 ${className}`}>
         {children}
       </label>
     )

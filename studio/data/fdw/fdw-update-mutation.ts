@@ -1,9 +1,12 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
+
 import { WrapperMeta } from 'components/interfaces/Database/Wrappers/Wrappers.types'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
 import { wrapWithTransaction } from 'data/sql/utils/transaction'
 import { useStore } from 'hooks'
+import { ResponseError } from 'types'
 import { getCreateFDWSql } from './fdw-create-mutation'
 import { getDeleteFDWSql } from './fdw-delete-mutation'
 import { FDW } from './fdws-query'
@@ -45,14 +48,8 @@ export async function updateFDW({
   formState,
   tables,
 }: FDWUpdateVariables) {
-  if (!projectRef) {
-    throw new Error('projectRef is required')
-  }
-
   const sql = wrapWithTransaction(getUpdateFDWSql({ wrapper, wrapperMeta, formState, tables }))
-
   const { result } = await executeSql({ projectRef, connectionString, sql })
-
   return result
 }
 
@@ -60,12 +57,16 @@ type FDWUpdateData = Awaited<ReturnType<typeof updateFDW>>
 
 export const useFDWUpdateMutation = ({
   onSuccess,
+  onError,
   ...options
-}: Omit<UseMutationOptions<FDWUpdateData, unknown, FDWUpdateVariables>, 'mutationFn'> = {}) => {
+}: Omit<
+  UseMutationOptions<FDWUpdateData, ResponseError, FDWUpdateVariables>,
+  'mutationFn'
+> = {}) => {
   const queryClient = useQueryClient()
   const { vault } = useStore()
 
-  return useMutation<FDWUpdateData, unknown, FDWUpdateVariables>((vars) => updateFDW(vars), {
+  return useMutation<FDWUpdateData, ResponseError, FDWUpdateVariables>((vars) => updateFDW(vars), {
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
 
@@ -75,6 +76,15 @@ export const useFDWUpdateMutation = ({
       ])
 
       await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(
+          `Failed to update ${variables.wrapper.name} foreign data wrapper: ${data.message}`
+        )
+      } else {
+        onError(data, variables, context)
+      }
     },
     ...options,
   })

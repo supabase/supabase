@@ -1,19 +1,15 @@
-import * as React from 'react'
-import { TabsContext } from './TabsContext'
-
 import * as TabsPrimitive from '@radix-ui/react-tabs'
 import { useRouter } from 'next/router'
-
-// @ts-ignore
-// import TabsStyles from './Tabs.module.css'
-
+import { Children, PropsWithChildren, useEffect, useState } from 'react'
 import styleHandler from '../../lib/theme/styleHandler'
+import { useTabGroup } from './TabsProvider'
 
 interface TabsProps {
   type?: 'pills' | 'underlined' | 'cards' | 'rounded-pills'
   defaultActiveId?: string
   activeId?: string
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
+  queryGroup?: string
   block?: boolean
   tabBarGutter?: number
   tabBarStyle?: React.CSSProperties
@@ -23,18 +19,18 @@ interface TabsProps {
   addOnBefore?: React.ReactNode
   addOnAfter?: React.ReactNode
   listClassNames?: string
-  children: PanelPropsProps[]
 }
 
 interface TabsSubComponents {
-  Panel: React.FC<PanelProps>
+  Panel: React.FC<PropsWithChildren<PanelProps>>
 }
 
-const Tabs: React.FC<TabsProps> & TabsSubComponents = ({
+const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
   defaultActiveId,
   activeId,
   type = 'pills',
   size = 'tiny',
+  queryGroup,
   block,
   onChange,
   onClick,
@@ -42,56 +38,68 @@ const Tabs: React.FC<TabsProps> & TabsSubComponents = ({
   addOnBefore,
   addOnAfter,
   listClassNames,
-  children,
+  children: _children,
 }) => {
-  const [activeTab, setActiveTab] = React.useState(
-    defaultActiveId
-      ? defaultActiveId
-      : // if no defaultActiveId is set use the first panel
-      children && children[0].props
-      ? children[0].props.id
-      : ''
-  )
+  // toArray is used here to filter out invalid children
+  // another method would be to use React.Children.map
+  const children = Children.toArray(_children) as PanelPropsProps[]
+  const tabIds = children.map((tab) => tab.props.id)
 
   const router = useRouter()
-  const hash = router?.asPath?.split('#')[1]?.toUpperCase()
+  const queryTabs = queryGroup ? router.query[queryGroup] : undefined
+  const [queryTabRaw] = Array.isArray(queryTabs) ? queryTabs : [queryTabs]
+  const queryTab = queryTabRaw && tabIds.includes(queryTabRaw) ? queryTabRaw : undefined
+
+  const [activeTab, setActiveTab] = useState(
+    queryTab ??
+      defaultActiveId ??
+      // if no defaultActiveId is set use the first panel
+      children?.[0]?.props?.id
+  )
+
+  // If query param present for the query group, switch to that tab.
+  useEffect(() => {
+    if (queryTab) {
+      setActiveTab(queryTab)
+      setGroupActiveId?.(queryTab)
+    }
+  }, [queryTab])
 
   let __styles = styleHandler('tabs')
 
-  // activeId state can be overriden externally with `active`
-  // defaults to the first panelif we have one or url hash if not
-  const active = activeId ? activeId : activeTab ? activeTab : hash
+  const { groupActiveId, setGroupActiveId } = useTabGroup(tabIds)
+
+  const active = activeId ?? groupActiveId ?? activeTab
 
   function onTabClick(id: string) {
-    const newTabSelected = id !== active
     setActiveTab(id)
-    if (onClick) onClick(id)
-    if (onChange && newTabSelected) onChange(id)
-  }
+    setGroupActiveId?.(id)
 
-  // for styling the tabs for underline style
-  const underlined = type === 'underlined'
-  // for styling the tabs for cards style
+    if (queryGroup) {
+      const url = new URL(document.location.href)
+      url.searchParams.set(queryGroup, id)
+      window.history.replaceState(undefined, '', url)
+    }
+
+    onClick?.(id)
+    if (id !== active) {
+      onChange?.(id)
+    }
+  }
 
   const listClasses = [__styles[type].list]
   if (scrollable) listClasses.push(__styles.scrollable)
   if (listClassNames) listClasses.push(listClassNames)
 
-  // if only 1 react child, it needs to be converted to a list/array
-  // this is so 1 tab can be displayed
-  if (children && !Array.isArray(children)) {
-    children = [children]
-  }
-
   return (
-    <TabsPrimitive.Root defaultValue={defaultActiveId} value={active} className={__styles.base}>
+    <TabsPrimitive.Root value={active} className={__styles.base}>
       <TabsPrimitive.List className={listClasses.join(' ')}>
         {addOnBefore}
         {children.map((tab) => {
-          const activeMatch = active === tab.props.id
+          const isActive = active === tab.props.id
 
           const triggerClasses = [__styles[type].base, __styles.size[size]]
-          if (activeMatch) {
+          if (isActive) {
             triggerClasses.push(__styles[type].active)
           } else {
             triggerClasses.push(__styles[type].inactive)
@@ -118,10 +126,9 @@ const Tabs: React.FC<TabsProps> & TabsSubComponents = ({
             </TabsPrimitive.Trigger>
           )
         })}
-        {/* </Space> */}
         {addOnAfter}
       </TabsPrimitive.List>
-      <TabsContext.Provider value={{ activeId: active }}>{children}</TabsContext.Provider>
+      {children as any}
     </TabsPrimitive.Root>
   )
 }
@@ -138,20 +145,13 @@ interface PanelProps {
   className?: string
 }
 
-export const Panel: React.FC<PanelProps> = ({ children, id, className }) => {
+export const Panel: React.FC<PropsWithChildren<PanelProps>> = ({ children, id, className }) => {
   let __styles = styleHandler('tabs')
 
   return (
-    <TabsContext.Consumer>
-      {({ activeId }) => {
-        const active = activeId === id
-        return (
-          <TabsPrimitive.Content value={id} className={[__styles.content, className].join(' ')}>
-            {children}
-          </TabsPrimitive.Content>
-        )
-      }}
-    </TabsContext.Consumer>
+    <TabsPrimitive.Content value={id} className={[__styles.content, className].join(' ')}>
+      {children}
+    </TabsPrimitive.Content>
   )
 }
 

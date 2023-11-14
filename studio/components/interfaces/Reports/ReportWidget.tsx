@@ -1,10 +1,9 @@
-import { NextRouter, useRouter } from 'next/router'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, IconExternalLink, IconHelpCircle } from 'ui'
-import { BaseReportParams } from './Reports.types'
-import { LogsEndpointParams } from '../Settings/Logs'
 import Panel from 'components/ui/Panel'
-import LoadingOpacity from 'components/ui/LoadingOpacity'
+import { NextRouter, useRouter } from 'next/router'
+import { Button, IconExternalLink, IconHelpCircle, Loading } from 'ui'
+import { LogsEndpointParams } from '../Settings/Logs'
+import { BaseReportParams, ReportQueryType } from './Reports.types'
 
 export interface ReportWidgetProps<T = any> {
   data: T[]
@@ -18,7 +17,9 @@ export interface ReportWidgetProps<T = any> {
   appendProps?: Partial<ReportWidgetRendererProps>
   // omitting params will hide the "View in logs explorer" button
   params?: BaseReportParams | LogsEndpointParams
+  queryType?: ReportQueryType
   isLoading: boolean
+  resolvedSql?: string
 }
 
 export interface ReportWidgetRendererProps<T = any> extends ReportWidgetProps<T> {
@@ -46,25 +47,29 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
               {props?.tooltip && (
                 <Tooltip.Root delayDuration={0}>
                   <Tooltip.Trigger>
-                    <IconHelpCircle className="text-scale-1100" size="tiny" strokeWidth={1.5} />
+                    <IconHelpCircle
+                      className="text-foreground-light"
+                      size="tiny"
+                      strokeWidth={1.5}
+                    />
                   </Tooltip.Trigger>
                   <Tooltip.Portal>
                     <Tooltip.Content side="bottom">
                       <Tooltip.Arrow className="radix-tooltip-arrow" />
                       <div
                         className={[
-                          'rounded bg-scale-100 py-1 px-2 max-w-xs leading-none shadow',
-                          'border border-scale-200',
+                          'rounded bg-alternative py-1 px-2 max-w-xs leading-none shadow',
+                          'border border-background',
                         ].join(' ')}
                       >
-                        <span className="text-xs text-scale-1200">{props.tooltip}</span>
+                        <span className="text-xs text-foreground">{props.tooltip}</span>
                       </div>
                     </Tooltip.Content>
                   </Tooltip.Portal>
                 </Tooltip.Root>
               )}
             </div>
-            <p className="text-sm text-scale-1100">{props.description}</p>
+            <p className="text-sm text-foreground-light">{props.description}</p>
           </div>
           {props.params && (
             <Tooltip.Root delayDuration={0}>
@@ -74,13 +79,25 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
                   icon={<IconExternalLink strokeWidth={1.5} />}
                   className="px-1"
                   onClick={() => {
+                    const isDbQueryType = props.queryType === 'db'
+
+                    const pathname = isDbQueryType
+                      ? `/project/${projectRef}/sql/new`
+                      : `/project/${projectRef}/logs/explorer`
+
+                    const query: Record<string, string | undefined> = {}
+
+                    if (isDbQueryType) {
+                      query.content = props.resolvedSql
+                    } else {
+                      query.q = props.params?.sql
+                      query.its = props.params!.iso_timestamp_start
+                      query.ite = props.params!.iso_timestamp_end
+                    }
+
                     router.push({
-                      pathname: `/project/${projectRef}/logs/explorer`,
-                      query: {
-                        q: props.params?.sql,
-                        its: props.params!.iso_timestamp_start,
-                        ite: props.params!.iso_timestamp_end,
-                      },
+                      pathname,
+                      query,
                     })
                   }}
                 />
@@ -90,11 +107,13 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'rounded bg-scale-100 py-1 px-2 max-w-xs leading-none shadow',
-                      'border border-scale-200',
+                      'rounded bg-alternative py-1 px-2 max-w-xs leading-none shadow',
+                      'border border-background',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">Open in Logs Explorer</span>
+                    <span className="text-xs text-foreground">
+                      {props.queryType === 'db' ? 'Open in SQL Editor' : 'Open in Logs Explorer'}
+                    </span>
                   </div>
                 </Tooltip.Content>
               </Tooltip.Portal>
@@ -102,13 +121,14 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
           )}
         </div>
 
-        <LoadingOpacity className="w-full" active={props.isLoading}>
+        <Loading active={props.isLoading}>
           {props.data === undefined ? null : props.renderer({ ...props, router, projectRef })}
-        </LoadingOpacity>
-
-        {props.append &&
-          props.append({ ...props, ...(props.appendProps || {}), router, projectRef })}
+        </Loading>
       </Panel.Content>
+
+      {props.append && (
+        <>{props.append({ ...props, ...(props.appendProps || {}), router, projectRef })}</>
+      )}
     </Panel>
   )
 }

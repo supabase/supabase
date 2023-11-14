@@ -1,20 +1,21 @@
-import { FC } from 'react'
-import { Menu, Item, Separator } from 'react-contexify'
-import 'react-contexify/dist/ReactContexify.css'
-import { IconEdit, IconDownload, IconTrash2 } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Item, Menu, Separator } from 'react-contexify'
+import 'react-contexify/dist/ReactContexify.css'
+import { IconClipboard, IconDownload, IconEdit, IconTrash2 } from 'ui'
 
-import { checkPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import { copyPathToFolder } from './StorageExplorer.utils'
 
-interface Props {
+interface FolderContextMenuProps {
   id: string
 }
 
-const FolderContextMenu: FC<Props> = ({ id = '' }) => {
+const FolderContextMenu = ({ id = '' }: FolderContextMenuProps) => {
   const storageExplorerStore = useStorageStore()
-  const { downloadFolder, setSelectedItemToRename, setSelectedItemsToDelete } = storageExplorerStore
-  const canUpdateFiles = checkPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const { openedFolders, downloadFolder, setSelectedItemToRename, setSelectedItemsToDelete } =
+    storageExplorerStore
+  const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   return (
     <Menu id={id} animation="fade">
@@ -27,6 +28,10 @@ const FolderContextMenu: FC<Props> = ({ id = '' }) => {
       <Item onClick={({ props }) => downloadFolder(props.item)}>
         <IconDownload size="tiny" />
         <span className="ml-2 text-xs">Download</span>
+      </Item>
+      <Item onClick={({ props }) => copyPathToFolder(openedFolders, props.item)}>
+        <IconClipboard size="tiny" />
+        <span className="ml-2 text-xs">Copy path to folder</span>
       </Item>
       {canUpdateFiles && [
         <Separator key="separator" />,

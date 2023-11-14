@@ -1,14 +1,14 @@
-import React from 'react'
+import { PropsWithChildren } from 'react'
 
 const LoadingOpacity = ({
   children,
   active,
   className,
-}: {
+}: PropsWithChildren<{
   children?: React.ReactNode
   active: boolean
   className?: string
-}) => {
+}>) => {
   return (
     <div
       className={[

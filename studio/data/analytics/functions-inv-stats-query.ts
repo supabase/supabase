@@ -1,7 +1,6 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { useCallback } from 'react'
 import { analyticsKeys } from './keys'
 
 export type FunctionsInvStatsVariables = {
@@ -26,7 +25,7 @@ export async function getFunctionsInvStats(
     throw new Error('interval is required')
   }
 
-  const response = await get(
+  const response = await get<FunctionsInvStatsResponse>(
     `${API_URL}/projects/${projectRef}/analytics/endpoints/functions.inv-stats?interval=${interval}&function_id=${functionId}`,
     {
       signal,
@@ -36,7 +35,7 @@ export async function getFunctionsInvStats(
     throw response.error
   }
 
-  return response as FunctionsInvStatsResponse
+  return response
 }
 
 export type FunctionsInvStatsData = Awaited<ReturnType<typeof getFunctionsInvStats>>
@@ -61,20 +60,3 @@ export const useFunctionsInvStatsQuery = <TData = FunctionsInvStatsData>(
       ...options,
     }
   )
-
-export const useFunctionsInvStatsPrefetch = ({
-  projectRef,
-  functionId,
-  interval,
-}: FunctionsInvStatsVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef && functionId && interval) {
-      client.prefetchQuery(
-        analyticsKeys.functionsInvStats(projectRef, { functionId, interval }),
-        ({ signal }) => getFunctionsInvStats({ projectRef, functionId, interval }, signal)
-      )
-    }
-  }, [projectRef, functionId, interval])
-}

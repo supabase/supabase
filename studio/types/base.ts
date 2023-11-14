@@ -9,6 +9,7 @@ export interface Organization {
   is_owner?: boolean
   stripe_customer_id?: string
   opt_in_tags: string[]
+  subscription_id?: string | null
 }
 
 export interface ProjectBase {
@@ -21,6 +22,7 @@ export interface ProjectBase {
   region: string
   inserted_at: string
   subscription_id: string
+  preview_branch_refs: string[]
 }
 
 export interface Project extends ProjectBase {
@@ -29,8 +31,11 @@ export interface Project extends ProjectBase {
   dbVersion?: string
   kpsVersion?: string
   restUrl?: string
-  // store subscription tier products.metadata.supabase_prod_id
-  subscription_tier?: string
+  lastDatabaseResizeAt?: string | null
+  maxDatabasePreprovisionGb?: string | null
+  parent_project_ref?: string
+  is_branch_enabled?: boolean
+  serviceVersions: { gotrue: string; postgrest: string; 'supabase-postgres': string }
 
   /**
    * postgrestStatus is available on client side only.
@@ -38,6 +43,12 @@ export interface Project extends ProjectBase {
    * If not we will show ConnectingState and run a polling until it's back online
    */
   postgrestStatus?: 'ONLINE' | 'OFFLINE'
+  /**
+   * Only available on client side only, for components that require the parentRef
+   * irregardless of being on any branch, such as ProjectDropdown and Vercel integration
+   * */
+  parentRef?: string
+  volumeSizeGb?: number
 }
 
 export interface User {
@@ -78,12 +89,14 @@ export interface Permission {
   resources: string[]
 }
 
-export interface ResponseError {
-  message: string
-}
-
 export interface ResponseFailure {
   error: ResponseError
 }
 
-export type SupaResponse<T> = T & ResponseFailure
+export type SupaResponse<T> = T | ResponseFailure
+
+export interface ResponseError {
+  code?: number
+  message: string
+  requestId?: string
+}

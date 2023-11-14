@@ -1,22 +1,32 @@
-import { Button, Dropdown, IconChevronDown, IconClipboard, IconDownload } from 'ui'
+import { useTelemetryProps } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useStore } from 'hooks'
 import { copyToClipboard } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
-import { compact } from 'lodash'
+import { compact, isObject, isString, map } from 'lodash'
+import { useRouter } from 'next/router'
 import { useMemo, useRef } from 'react'
 import { CSVLink } from 'react-csv'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  IconChevronDown,
+  IconClipboard,
+  IconDownload,
+} from 'ui'
 // @ts-ignore
 import MarkdownTable from 'markdown-table'
-import { useTelemetryProps } from 'common'
-import { useRouter } from 'next/router'
 
 export type ResultsDropdownProps = {
   id: string
+  isExecuting?: boolean
 }
 
-const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
+const ResultsDropdown = ({ id, isExecuting }: ResultsDropdownProps) => {
   const { project } = useProjectContext()
   const snap = useSqlEditorStateSnapshot()
   const telemetryProps = useTelemetryProps()
@@ -25,10 +35,39 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
   const csvRef = useRef<CSVLink & HTMLAnchorElement & { link: HTMLAnchorElement }>(null)
   const router = useRouter()
 
-  const csvData = useMemo(
-    () => (result?.rows ? compact(Array.from(result.rows || [])) : ''),
-    [result?.rows]
-  )
+  const csvData = useMemo(() => {
+    if (result?.rows) {
+      const rows = Array.from(result.rows || []).map((row) => {
+        return map(row, (v, k) => {
+          if (isString(v)) {
+            // replace all newlines with the character \n
+            // escape all quotation marks
+            return v.replaceAll(/\n/g, '\\n').replaceAll(/"/g, '""')
+          }
+          if (isObject(v)) {
+            // replace all quotation marks with two quotation marks to escape them.
+            return JSON.stringify(v).replaceAll(/\"/g, '""')
+          }
+          return v
+        })
+      })
+
+      return compact(rows)
+    }
+    return ''
+  }, [result])
+
+  const headers = useMemo(() => {
+    if (result?.rows) {
+      const firstRow = Array.from(result.rows || [])[0]
+      if (firstRow) {
+        return Object.keys(firstRow)
+      }
+    }
+    // if undefined is returned no headers will be set. In this case, no headers would be better
+    // than malformed headers.
+    return undefined
+  }, [result])
 
   function onDownloadCSV() {
     csvRef.current?.link.click()
@@ -66,30 +105,38 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
   }
 
   return (
-    <Dropdown
-      side="bottom"
-      align="start"
-      overlay={
+    <DropdownMenu>
+      <DropdownMenuTrigger>
+        <Button asChild type="text" iconRight={<IconChevronDown />}>
+          <span>
+            Results
+            {!isExecuting &&
+              result &&
+              result.rows.length > 0 &&
+              ` (${result.rows.length.toLocaleString()})`}
+          </span>
+        </Button>
+        <CSVLink
+          ref={csvRef}
+          className="hidden"
+          headers={headers}
+          data={csvData}
+          filename={`supabase_${project?.ref}_${snap.snippets[id]?.snippet.name}`}
+        />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent side="bottom" align="start">
         <>
-          <Dropdown.Item icon={<IconDownload size="tiny" />} onClick={onDownloadCSV}>
-            Download CSV
-          </Dropdown.Item>
-          <Dropdown.Item icon={<IconClipboard size="tiny" />} onClick={onCopyAsMarkdown}>
-            Copy as markdown
-          </Dropdown.Item>
+          <DropdownMenuItem onClick={onDownloadCSV} className="space-x-2">
+            <IconDownload size="tiny" />
+            <p>Download CSV</p>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={onCopyAsMarkdown} className="space-x-2">
+            <IconClipboard size="tiny" />
+            <p>Copy as markdown</p>
+          </DropdownMenuItem>
         </>
-      }
-    >
-      <Button as="span" type="text" iconRight={<IconChevronDown />}>
-        Results
-      </Button>
-      <CSVLink
-        ref={csvRef}
-        className="hidden"
-        data={csvData}
-        filename={`supabase_${project?.ref}_${snap.snippets[id]?.snippet.name}`}
-      />
-    </Dropdown>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
 

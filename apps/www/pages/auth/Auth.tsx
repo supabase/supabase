@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import { Button, IconArrowUpRight, IconBriefcase, IconEye, IconLink, IconShield } from 'ui'
 import ApiExamples from 'data/products/auth/auth-api-examples'
 import AuthSqlRulesExamples from 'data/products/auth/auth-sql-rules-examples'
-import Solutions from 'data/Solutions.json'
+import Solutions from 'data/Solutions'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -122,8 +122,8 @@ function AuthPage() {
               </div>
               <h4 className="h4">All the social providers</h4>
               <p className="p text-base">
-                Enable social logins with the click of a button. Google, Facebook, GitHub, Azure,
-                Gitlab, Twitter, Discord, and many more.
+                Enable social logins with the click of a button. Google, Facebook, GitHub, Azure
+                (Microsoft), Gitlab, Twitter, Discord, and many more.
               </p>
             </div>
             <div className="col-span-12 mb-10 lg:col-span-3 lg:col-start-5 lg:mb-0">
@@ -218,13 +218,15 @@ function AuthPage() {
               </p>
               <p className="p">Policies can be written in SQL or using the dashboard online.</p>
 
-              <Link href="/docs/guides/auth#policy-examples">
-                <a>
-                  <Button size="small" type="default" className="mt-4" icon={<IconArrowUpRight />}>
-                    Explore documentation
-                  </Button>
-                </a>
-              </Link>
+              <Button
+                asChild
+                size="small"
+                type="default"
+                className="mt-4"
+                icon={<IconArrowUpRight />}
+              >
+                <Link href="/docs/guides/auth#policy-examples">Explore documentation</Link>
+              </Button>
             </div>
             <div className="col-span-12 lg:col-span-6 lg:col-start-7">
               <SplitCodeBlockCarousel

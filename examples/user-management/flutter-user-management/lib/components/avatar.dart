@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:supabase_quickstart/constants.dart';
+import 'package:supabase_quickstart/main.dart';
 
 class Avatar extends StatefulWidget {
   const Avatar({
@@ -76,11 +76,21 @@ class _AvatarState extends State<Avatar> {
       widget.onUpload(imageUrlResponse);
     } on StorageException catch (error) {
       if (mounted) {
-        context.showErrorSnackBar(message: error.message);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(error.message),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
       }
     } catch (error) {
       if (mounted) {
-        context.showErrorSnackBar(message: 'Unexpected error occurred');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Unexpected error occurred'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
       }
     }
 

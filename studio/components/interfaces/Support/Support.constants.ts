@@ -1,50 +1,58 @@
+import { SupportCategories } from '@supabase/shared-types/out/constants'
+
 export const CATEGORY_OPTIONS = [
   {
-    value: 'Problem',
+    value: SupportCategories.PROBLEM,
     label: 'Issues with APIs / client libraries',
     description: "Issues with your project's API and client libraries",
     query: undefined,
   },
   {
-    value: 'Dashboard_bug',
+    value: SupportCategories.DASHBOARD_BUG,
     label: 'Dashboard bug',
     description: 'Issues with the Supabase dashboard',
     query: undefined,
   },
   {
-    value: 'Database_unresponsive',
+    value: SupportCategories.DATABASE_UNRESPONSIVE,
     label: 'Database unresponsive',
     description: 'Issues with connecting to your database',
     query: 'Unable to connect',
   },
   {
-    value: 'Performance',
+    value: SupportCategories.PERFORMANCE_ISSUES,
     label: 'Performance issues',
-    description: 'Reporting of performance issues is only available on the Pro tier',
+    description: 'Reporting of performance issues is only available on the Pro plan',
     query: 'Performance',
   },
   {
-    value: 'Sales',
+    value: SupportCategories.SALES_ENQUIRY,
     label: 'Sales enquiry',
     description: 'Questions about pricing, paid plans and Enterprise plans',
     query: undefined,
   },
   {
-    value: 'Billing',
+    value: SupportCategories.BILLING,
     label: 'Billing',
     description: 'Issues with credit card charges | invoices | overcharging',
     query: undefined,
   },
   {
-    value: 'Problem',
+    value: SupportCategories.ABUSE,
     label: 'Abuse report',
     description: 'Report abuse of a Supabase project or Supabase brand',
     query: undefined,
   },
   {
-    value: 'Refund',
+    value: SupportCategories.REFUND,
     label: 'Refund enquiry',
     description: 'Formal enquiry form for requesting refunds',
+    query: undefined,
+  },
+  {
+    value: SupportCategories.LOGIN_ISSUES,
+    label: 'Issues with logging in',
+    description: 'Issues with logging in and MFA',
     query: undefined,
   },
 ]
@@ -69,11 +77,6 @@ export const SEVERITY_OPTIONS = [
     value: 'Urgent',
     label: 'Urgent',
     description: 'Production system down',
-  },
-  {
-    value: 'Critical',
-    label: 'Critical',
-    description: 'Business-critical system down (Unavailable for free projects)',
   },
 ]
 

@@ -1,8 +1,7 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { useCallback } from 'react'
-import { Role } from 'types'
+import { ResponseError, Role } from 'types'
 import { organizationKeys } from './keys'
 
 export type OrganizationRolesVariables = {
@@ -32,7 +31,7 @@ export async function getOrganizationRoles(
 }
 
 export type OrganizationRolesData = Awaited<ReturnType<typeof getOrganizationRoles>>
-export type OrganizationRolesError = unknown
+export type OrganizationRolesError = ResponseError
 
 export const useOrganizationRolesQuery = <TData = OrganizationRolesData>(
   { slug }: OrganizationRolesVariables,
@@ -49,15 +48,3 @@ export const useOrganizationRolesQuery = <TData = OrganizationRolesData>(
       ...options,
     }
   )
-
-export const useOrganizationRolesPrefetch = ({ slug }: OrganizationRolesVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (slug) {
-      client.prefetchQuery(organizationKeys.roles(slug), ({ signal }) =>
-        getOrganizationRoles({ slug }, signal)
-      )
-    }
-  }, [slug])
-}

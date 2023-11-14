@@ -1,7 +1,12 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
+
 import { post } from 'lib/common/fetch'
+import { ResponseError } from 'types'
+import { authKeys } from './keys'
 
 export type UserCreateVariables = {
+  projectRef?: string
   protocol: string
   endpoint: string
   serviceApiKey: string
@@ -10,6 +15,23 @@ export type UserCreateVariables = {
     password: string
     autoConfirmUser: string
   }
+}
+
+export type UserCreateResponse = {
+  id: string
+  phone: string
+  role: string
+  updated_at: string
+  app_metadata: {
+    provider: string
+    providers: string[]
+  }
+  aud: string
+  created_at: string
+  email: string
+  email_confirmed_at: string
+  identities: any[]
+  user_metadata: any
 }
 
 export async function createUser({ protocol, endpoint, serviceApiKey, user }: UserCreateVariables) {
@@ -25,7 +47,6 @@ export async function createUser({ protocol, endpoint, serviceApiKey, user }: Us
         apikey: serviceApiKey,
         Authorization: `Bearer ${serviceApiKey}`,
       },
-      credentials: 'omit',
     }
   )
   if (response.error) {
@@ -37,11 +58,31 @@ export async function createUser({ protocol, endpoint, serviceApiKey, user }: Us
 
 type UserCreateData = Awaited<ReturnType<typeof createUser>>
 
-export const useUserCreateMutation = (
-  options: Omit<UseMutationOptions<UserCreateData, unknown, UserCreateVariables>, 'mutationFn'> = {}
-) => {
-  return useMutation<UserCreateData, unknown, UserCreateVariables>(
+export const useUserCreateMutation = ({
+  onSuccess,
+  onError,
+  ...options
+}: Omit<
+  UseMutationOptions<UserCreateData, ResponseError, UserCreateVariables>,
+  'mutationFn'
+> = {}) => {
+  const queryClient = useQueryClient()
+  return useMutation<UserCreateData, ResponseError, UserCreateVariables>(
     (vars) => createUser(vars),
-    options
+    {
+      async onSuccess(data, variables, context) {
+        const { projectRef } = variables
+        if (projectRef) await queryClient.invalidateQueries(authKeys.users(projectRef))
+        await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to create user: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
+      },
+      ...options,
+    }
   )
 }

@@ -1,55 +1,49 @@
-import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { ComponentType, useEffect } from 'react'
 
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useStore } from 'hooks'
-import { useParams } from 'common/hooks'
+import { useAuthenticatorAssuranceLevelQuery } from 'data/profile/mfa-authenticator-assurance-level-query'
+import { useSelectedProject, useStore } from 'hooks'
 import { useAuth } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
-import { getReturnToPath, STORAGE_KEY } from 'lib/gotrue'
-import { isNextPageWithLayout, NextPageWithLayout } from 'types'
-import Error500 from '../../pages/500'
-
-const PLATFORM_ONLY_PAGES = [
-  'reports',
-  'settings',
-  'auth/providers',
-  'auth/templates',
-  'auth/url-configuration',
-]
+import { NextPageWithLayout, isNextPageWithLayout } from 'types'
 
 export function withAuth<T>(
   WrappedComponent: ComponentType<T> | NextPageWithLayout<T, T>,
-  options?: {
-    redirectTo: string
-    /* run the redirect if the user is logged in */
-    redirectIfFound?: boolean
-  }
+  options: {
+    /**
+     * The auth level used to check the user credentials. In most cases, if the user has MFA enabled
+     * we want the highest level (which is 2) for all pages. For certain pages, the user should be
+     * able to access them even if he didn't finished his login (typed in his MFA code), for example
+     * the support page: We want the user to be able to submit a ticket even if he's not fully
+     * signed in.
+     * @default true
+     */
+    useHighestAAL: boolean
+  } = { useHighestAAL: true }
 ) {
-  const WithAuthHOC: ComponentType<T> = (props: any) => {
+  // ignore auth in self-hosted
+  if (!IS_PLATFORM) {
+    return WrappedComponent
+  }
+
+  const WithAuthHOC: ComponentType<T> = (props) => {
     const router = useRouter()
-    const { basePath } = router
-    const { ref, slug } = useParams()
     const rootStore = useStore()
+    const { ui } = rootStore
+
     const { isLoading, session } = useAuth()
-
-    const { app, ui } = rootStore
-    const page = router.pathname.split('/').slice(3).join('/')
-
-    const redirectTo = options?.redirectTo ?? defaultRedirectTo(ref)
-    const redirectIfFound = options?.redirectIfFound
-
-    useEffect(() => {
-      if (!app.organizations.isInitialized) app.organizations.load()
-      if (!app.projects.isInitialized) app.projects.load()
-    }, [app.organizations.isInitialized, app.projects.isInitialized])
+    const { isLoading: isAALLoading, data: aalData } = useAuthenticatorAssuranceLevelQuery({
+      onError(error) {
+        ui.setNotification({
+          error,
+          category: 'error',
+          message: `Failed to fetch authenticator assurance level: ${error.message}. Try refreshing your browser, or reach out to us via a support ticket if the issue persists`,
+        })
+      },
+    })
 
     usePermissionsQuery({
-      enabled: IS_PLATFORM,
-      onSuccess(permissions) {
-        ui.setPermissions(permissions)
-      },
       onError(error: any) {
         ui.setNotification({
           error,
@@ -60,52 +54,36 @@ export function withAuth<T>(
     })
 
     const isLoggedIn = Boolean(session)
-
-    const isAccessingBlockedPage =
-      !IS_PLATFORM &&
-      PLATFORM_ONLY_PAGES.some((platformOnlyPage) => page.startsWith(platformOnlyPage))
-    const isRedirecting =
-      isAccessingBlockedPage ||
-      checkRedirectTo(isLoading, router.pathname, isLoggedIn, redirectTo, redirectIfFound)
+    const isFinishedLoading = !isLoading && !isAALLoading
 
     useEffect(() => {
-      // This should run after setting store data
-      if (isRedirecting) {
-        router.push(redirectTo)
-      }
-    }, [isRedirecting, redirectTo])
+      const isCorrectLevel = options.useHighestAAL
+        ? aalData?.currentLevel === aalData?.nextLevel
+        : true
 
-    useEffect(() => {
-      if (router.isReady) {
-        if (ref) {
-          rootStore.setProjectRef(ref)
+      if (isFinishedLoading && (!isLoggedIn || !isCorrectLevel)) {
+        const searchParams = new URLSearchParams(location.search)
+        let pathname = location.pathname
+        if (process.env.NEXT_PUBLIC_BASE_PATH) {
+          pathname = pathname.replace(process.env.NEXT_PUBLIC_BASE_PATH, '')
         }
-        rootStore.setOrganizationSlug(slug)
+
+        searchParams.set('returnTo', pathname)
+
+        router.push(`/sign-in?${searchParams.toString()}`)
       }
-    }, [isLoading, router.isReady, ref, slug])
+    }, [session, isLoading, router, aalData, isFinishedLoading, isLoggedIn])
 
-    if (!isLoading && !isRedirecting && !isLoggedIn) {
-      return <Error500 />
-    }
+    const selectedProject = useSelectedProject()
+    useEffect(() => {
+      if (selectedProject) {
+        rootStore.setProject(selectedProject)
+      }
+    }, [selectedProject])
 
-    return (
-      <>
-        <Head>
-          {/* This script will quickly (before the main JS loads) redirect the user
-          to the login page if they are guaranteed (no token at all) to not be logged in. */}
-          {IS_PLATFORM && (
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `window._getReturnToPath = ${getReturnToPath.toString()};if (!localStorage.getItem('${STORAGE_KEY}') && !location.hash) {const searchParams = new URLSearchParams(location.search);searchParams.set('returnTo', location.pathname);location.replace('${
-                  basePath ?? ''
-                }/sign-in' + '?' + searchParams.toString())}`,
-              }}
-            />
-          )}
-        </Head>
-        <WrappedComponent {...props} />
-      </>
-    )
+    const InnerComponent = WrappedComponent as any
+
+    return <InnerComponent {...props} />
   }
 
   WithAuthHOC.displayName = `withAuth(${WrappedComponent.displayName})`
@@ -115,27 +93,4 @@ export function withAuth<T>(
   }
 
   return WithAuthHOC
-}
-
-function defaultRedirectTo(ref: string | string[] | undefined) {
-  return IS_PLATFORM ? `/sign-in` : ref !== undefined ? `/project/${ref}` : '/projects'
-}
-
-function checkRedirectTo(
-  loading: boolean,
-  pathname: string,
-  isLoggedIn: boolean,
-  redirectTo: string,
-  redirectIfFound?: boolean
-) {
-  if (loading) return false
-  if (pathname === redirectTo) return false
-
-  // If redirectTo is set, redirect if the user is not logged in.
-  if (redirectTo && !redirectIfFound && !isLoggedIn) return true
-
-  // If redirectIfFound is also set, redirect if the user was found
-  if (redirectIfFound && isLoggedIn) return true
-
-  return false
 }

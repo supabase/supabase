@@ -60,6 +60,7 @@ export default function Form({ validate, ...props }: Props) {
       onSubmit={formik.handleSubmit}
       className={props.className}
       style={props.style}
+      method="POST"
     >
       <FormContextProvider
         values={formik.values}
@@ -88,6 +89,8 @@ export default function Form({ validate, ...props }: Props) {
           handleReset: formik.handleReset,
           /** Resets the form with custom values */
           resetForm: formik.resetForm,
+          /** Manually sets a fields value */
+          setFieldValue: formik.setFieldValue,
         })}
       </FormContextProvider>
     </form>

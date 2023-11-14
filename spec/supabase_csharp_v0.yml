@@ -57,7 +57,7 @@ functions:
                 {
                   AutoRefreshToken = true,
                   AutoConnectRealtime = true,
-                  SessionHandler = new SupabaseSessionHandler()
+                  // SessionHandler = new SupabaseSessionHandler() <-- This must be implemented by the developer
                 };
 
                 // Note the creation as a singleton.
@@ -119,13 +119,13 @@ functions:
     description: |
       Creates a new user.
     notes: |
-      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://app.supabase.com/project/_/auth/providers).
+      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://supabase.com/dashboard/project/_/auth/providers).
       - **Confirm email** determines if users need to confirm their email address after signing up.
         - If **Confirm email** is enabled, a `user` is returned but `session` is null.
         - If **Confirm email** is disabled, both a `user` and a `session` are returned.
-      - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://app.supabase.com/project/_/auth/url-configuration).
+      - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
       - If SignUp() is called for an existing confirmed user:
-          - If **Confirm email** is enabled in [your project](https://app.supabase.com/project/_/auth/providers), an obfuscated/fake user object is returned.
+          - If **Confirm email** is enabled in [your project](https://supabase.com/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
           - If **Confirm email** is disabled, the error message, `User already registered` is returned.
     examples:
       - id: sign-up
@@ -162,7 +162,7 @@ functions:
       - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
-      - The magic link's destination URL is determined by the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). You can modify the `SITE_URL` or add additional redirect urls in [your project](https://app.supabase.com/project/_/auth/settings).
+      - The magic link's destination URL is determined by the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). You can modify the `SITE_URL` or add additional redirect urls in [your project](https://supabase.com/dashboard/project/_/auth/settings).
     examples:
       - id: sign-in-with-email
         name: Send Magic Link.
@@ -269,7 +269,7 @@ functions:
     notes: |
       - In order to use the `UpdateUser()` method, the user needs to be signed in first.
       - By Default, email updates sends a confirmation link to both the user's current and new email.
-      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://app.supabase.com/project/_/auth/settings).
+      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://supabase.com/dashboard/project/_/auth/settings).
     examples:
       - id: update-the-email-for-an-authenticated-user
         name: Update the email for an authenticated user
@@ -311,22 +311,22 @@ functions:
         isSpotlight: true
         code: |
           ```c#
-          supabase.Auth.StateChanged += (sender, ev) =>
-            {
-                switch (ev.State)
-                {
-                    case AuthState.SignedIn:
-                        break;
-                    case AuthState.SignedOut:
-                        break;
-                    case AuthState.UserUpdated:
-                        break;
-                    case AuthState.PasswordRecovery:
-                        break;
-                    case AuthState.TokenRefreshed:
-                        break;
-                }
-            };
+          supabase.Auth.AddStateChangedListener((sender, changed) =>
+          {
+              switch (changed)
+              {
+                  case AuthState.SignedIn:
+                      break;
+                  case AuthState.SignedOut:
+                      break;
+                  case AuthState.UserUpdated:
+                      break;
+                  case AuthState.PasswordRecovery:
+                      break;
+                  case AuthState.TokenRefreshed:
+                      break;
+              }
+          });
           ```
   - id: auth-reset-password-for-email
     title: 'ResetPasswordForEmail()'
@@ -713,11 +713,10 @@ functions:
 
           var channel = supabase.Realtime.Channel("any");
           var broadcast = channel.Register<CursorBroadcast>();
-
-          broadcast.OnBroadcast += (sender, _) =>
+          broadcast.AddBroadcastEventHandler((sender, baseBroadcast) =>
           {
-            var data = broadcast.Current();
-          };
+              var response = broadcast.Current();
+          });
 
           await channel.Subscribe();
 
@@ -741,11 +740,11 @@ functions:
             var channel = supabase.Realtime.Channel("any");
             var presenceKey = Guid.NewGuid().ToString();
             var presence = channel.Register<UserPresence>(presenceKey);
-
-            presence.OnSync += (sender, _) =>
+            presence.AddPresenceEventHandler(EventType.Sync, (sender, type) =>
             {
-              var state = presence.CurrentState;
-            };
+                Debug.WriteLine($"The Event Type: {type}");
+                var state = presence.CurrentState;
+            });
 
             await channel.Subscribe();
 
@@ -757,9 +756,9 @@ functions:
         isSpotlight: true
         code: |
           ```c#
-          await supabase.From<City>().On(ChannelEventType.All, (sender, args) =>
+          await supabase.From<City>().On(ListenType.All, (sender, change) =>
           {
-              Debug.WriteLine(args.Response.Payload.Data);
+              Debug.WriteLine(change.Payload.Data);
           });
           ```
       - id: listen-to-all-database-changes
@@ -768,10 +767,13 @@ functions:
           ```c#
           var channel = supabase.Realtime.Channel("realtime", "public", "*");
 
-          channel.OnPostgresChanges += (sender, args) =>
+          channel.AddPostgresChangeHandler(ListenType.All, (sender, change) =>
           {
-              Debug.WriteLine(args.Response.Payload.Data);
-          };
+              // The event type
+              Debug.WriteLine(change.Event);
+              // The changed record
+              Debug.WriteLine(change.Payload);
+          });
 
           await channel.Subscribe();
           ```
@@ -779,9 +781,9 @@ functions:
         name: Listening to inserts
         code: |
           ```c#
-          await supabase.From<City>().On(ChannelEventType.Insert, (sender, args) =>
+          await supabase.From<City>().On(ListenType.Inserts, (sender, change) =>
           {
-              Debug.WriteLine(args.Response.Payload.Data);
+              Debug.WriteLine(change.Payload.Data);
           });
           ```
       - id: listening-to-updates
@@ -795,9 +797,9 @@ functions:
           ```
         code: |
           ```c#
-          await supabase.From<City>().On(ChannelEventType.Update, (sender, args) =>
+          await supabase.From<City>().On(ListenType.Updates, (sender, change) =>
           {
-              Debug.WriteLine(args.Response.Payload.Data);
+              Debug.WriteLine(change.Payload.Data);
           });
           ```
       - id: listening-to-deletes
@@ -811,9 +813,9 @@ functions:
           ```
         code: |
           ```c#
-          await supabase.From<City>().On(ChannelEventType.Delete, (sender, args) =>
+          await supabase.From<City>().On(ListenType.Deletes, (sender, change) =>
           {
-              Debug.WriteLine(args.Response.Payload.Data);
+              Debug.WriteLine(change.Payload.Data);
           });
           ```
       - id: listening-to-row-level-changes
@@ -823,10 +825,13 @@ functions:
           ```c#
           var channel = supabase.Realtime.Channel("realtime", "public", "countries", "id", "id=eq.200");
 
-          channel.OnMessage += (sender, args) =>
+          channel.AddPostgresChangeHandler(ListenType.All, (sender, change) =>
           {
-              Debug.WriteLine(args.Response.Payload);
-          };
+              // The event type
+              Debug.WriteLine(change.Event);
+              // The changed record
+              Debug.WriteLine(change.Payload);
+          });
 
           await channel.Subscribe();
           ```
@@ -843,7 +848,7 @@ functions:
         isSpotlight: true
         code: |
           ```c#
-          var channel = await supabase.From<City>().On(ChannelEventType.All, (sender, args) => { });
+          var channel = await supabase.From<City>().On(ChannelEventType.All, (sender, change) => { });
           channel.Unsubscribe();
 
           // OR
@@ -1055,7 +1060,7 @@ functions:
       Retrieve URLs for assets in public buckets
     title: 'from.getPublicUrl()'
     notes: |
-      - The bucket needs to be set to public, either via [UpdateBucket()](/docs/reference/csharp/storage-updatebucket) or by going to Storage on [app.supabase.com](https://app.supabase.com), clicking the overflow menu on a bucket and choosing "Make public"
+      - The bucket needs to be set to public, either via [UpdateBucket()](/docs/reference/csharp/storage-updatebucket) or by going to Storage on [supabase.com/dashboard](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
       - Policy permissions required:
         - `buckets` permissions: none
         - `objects` permissions: none

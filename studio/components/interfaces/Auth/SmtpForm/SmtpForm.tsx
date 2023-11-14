@@ -1,9 +1,24 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
-import { number, object, string } from 'yup'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Alert, Button, Form, Input, InputNumber, Toggle, IconEye, IconEyeOff } from 'ui'
 
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  Form,
+  IconAlertCircle,
+  IconAlertTriangle,
+  IconEye,
+  IconEyeOff,
+  Input,
+  InputNumber,
+  Toggle,
+} from 'ui'
+import { number, object, string } from 'yup'
+
+import { useParams } from 'common'
 import {
   FormActions,
   FormHeader,
@@ -12,27 +27,38 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from 'components/ui/Forms'
-import { useStore, checkPermissions } from 'hooks'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useCheckPermissions, useStore } from 'hooks'
+import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
 import { urlRegex } from './../Auth.constants'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
 
 const SmtpForm = () => {
-  const { authConfig, ui } = useStore()
-  const { config, isLoaded } = authConfig
+  const { ui } = useStore()
+  const { ref: projectRef } = useParams()
+  const {
+    data: authConfig,
+    error: authConfigError,
+    isLoading,
+    isError,
+    isSuccess,
+  } = useAuthConfigQuery({ projectRef })
+  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
   const [enableSmtp, setEnableSmtp] = useState(false)
   const [hidden, setHidden] = useState(true)
 
   const formId = 'auth-config-smtp-form'
-  const initialValues = generateFormValues(authConfig.config)
-  const canUpdateConfig = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const initialValues = generateFormValues(authConfig)
+  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   useEffect(() => {
-    if (isLoaded && isSmtpEnabled(config)) {
+    if (isSuccess && isSmtpEnabled(authConfig)) {
       setEnableSmtp(true)
     }
-  }, [isLoaded])
+  }, [isSuccess, authConfig])
 
   const schema = object({
     SMTP_ADMIN_EMAIL: string().when([], {
@@ -97,31 +123,42 @@ const SmtpForm = () => {
     }),
   })
 
-  const onSubmit = async (values: any, { setSubmitting, resetForm }: any) => {
+  const onSubmit = (values: any, { resetForm }: any) => {
     const payload = enableSmtp ? values : defaultDisabledSmtpFormValues
 
     // Format payload: Remove redundant value + convert port to string
     delete payload.ENABLE_SMTP
     payload.SMTP_PORT = payload.SMTP_PORT ? payload.SMTP_PORT.toString() : payload.SMTP_PORT
 
-    setSubmitting(true)
-    const { error } = await authConfig.update(payload)
+    updateAuthConfig(
+      { projectRef: projectRef!, config: payload },
+      {
+        onError: (error) => {
+          ui.setNotification({ category: 'error', message: 'Failed to update settings', error })
+        },
+        onSuccess: () => {
+          setHidden(true)
+          const updatedFormValues = generateFormValues(payload)
+          resetForm({ values: updatedFormValues, initialValues: updatedFormValues })
+          ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
+        },
+      }
+    )
+  }
 
-    if (!error) {
-      setHidden(true)
-      const updatedFormValues = generateFormValues(payload)
-      resetForm({ values: updatedFormValues, initialValues: updatedFormValues })
-      ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
-    } else {
-      ui.setNotification({ category: 'error', message: 'Failed to update settings', error })
-    }
-
-    setSubmitting(false)
+  if (isError) {
+    return (
+      <Alert_Shadcn_ variant="destructive">
+        <IconAlertCircle strokeWidth={2} />
+        <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
+        <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
+      </Alert_Shadcn_>
+    )
   }
 
   return (
     <Form id={formId} initialValues={initialValues} onSubmit={onSubmit} validationSchema={schema}>
-      {({ isSubmitting, resetForm, values }: any) => {
+      {({ resetForm, values }: any) => {
         const isValidSmtpConfig = isSmtpEnabled(values)
         const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
@@ -129,11 +166,11 @@ const SmtpForm = () => {
         // it won't error because the hooks are always rendered in the same order
         // eslint-disable-next-line react-hooks/rules-of-hooks
         useEffect(() => {
-          if (isLoaded) {
-            const formValues = generateFormValues(config)
+          if (isSuccess) {
+            const formValues = generateFormValues(authConfig)
             resetForm({ values: formValues, initialValues: formValues })
           }
-        }, [isLoaded])
+        }, [isSuccess, authConfig])
 
         const onResetForm = () => {
           setEnableSmtp(isSmtpEnabled(initialValues))
@@ -151,7 +188,7 @@ const SmtpForm = () => {
                 <div className="flex py-4 px-8">
                   <FormActions
                     form={formId}
-                    isSubmitting={isSubmitting}
+                    isSubmitting={isUpdatingConfig}
                     hasChanges={hasChanges}
                     handleReset={onResetForm}
                     disabled={!canUpdateConfig}
@@ -165,7 +202,7 @@ const SmtpForm = () => {
               }
             >
               <FormSection>
-                <FormSectionContent loading={!isLoaded}>
+                <FormSectionContent loading={isLoading}>
                   <Toggle
                     name="ENABLE_SMTP"
                     size="small"
@@ -180,11 +217,22 @@ const SmtpForm = () => {
                 </FormSectionContent>
               </FormSection>
 
-              {enableSmtp && !isValidSmtpConfig && (
+              {enableSmtp ? (
+                !isValidSmtpConfig && (
+                  <div className="mx-8 mb-8 -mt-4">
+                    <Alert_Shadcn_ variant="warning">
+                      <IconAlertTriangle strokeWidth={2} />
+                      <AlertTitle_Shadcn_>All fields below must be filled</AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_>
+                        The following fields must be filled before custom SMTP can be properly
+                        enabled
+                      </AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
+                  </div>
+                )
+              ) : (
                 <div className="mx-8 mb-8 -mt-4">
-                  <Alert withIcon variant="warning" title="All fields below must be filled">
-                    The following fields must be filled before custom SMTP can be properly enabled
-                  </Alert>
+                  <EmailRateLimitsAlert />
                 </div>
               )}
 
@@ -193,7 +241,7 @@ const SmtpForm = () => {
                 header={<FormSectionLabel>Sender details</FormSectionLabel>}
                 disabled={!enableSmtp}
               >
-                <FormSectionContent loading={!isLoaded}>
+                <FormSectionContent loading={isLoading}>
                   <Input
                     name="SMTP_ADMIN_EMAIL"
                     id="SMTP_ADMIN_EMAIL"
@@ -219,13 +267,13 @@ const SmtpForm = () => {
                 header={
                   <FormSectionLabel>
                     <span>SMTP Provider Settings</span>
-                    <p className="my-4 text-scale-900">
+                    <p className="my-4 text-foreground-lighter">
                       Your SMTP Credentials will always be encrypted in our database.
                     </p>
                   </FormSectionLabel>
                 }
               >
-                <FormSectionContent loading={!isLoaded}>
+                <FormSectionContent loading={isLoading}>
                   <Input
                     name="SMTP_HOST"
                     placeholder="your.smtp.host.com"
@@ -258,16 +306,7 @@ const SmtpForm = () => {
                     name="SMTP_MAX_FREQUENCY"
                     label="Minimum interval between emails being sent"
                     descriptionText="How long between each email can a new email be sent via your SMTP server."
-                    actions={<span className="mr-3 text-scale-900">seconds</span>}
-                    disabled={!canUpdateConfig}
-                  />
-                  <InputNumber
-                    name="RATE_LIMIT_EMAIL_SENT"
-                    id="RATE_LIMIT_EMAIL_SENT"
-                    min={0}
-                    label="Rate limit for sending emails"
-                    descriptionText="How many emails can be sent per hour."
-                    actions={<span className="mr-3 text-scale-900">emails per hour</span>}
+                    actions={<span className="mr-3 text-foreground-lighter">seconds</span>}
                     disabled={!canUpdateConfig}
                   />
                   <Input

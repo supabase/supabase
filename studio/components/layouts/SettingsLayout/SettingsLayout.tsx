@@ -1,49 +1,30 @@
-import { FC, ReactNode, useEffect } from 'react'
-import { observer } from 'mobx-react-lite'
+import { PropsWithChildren } from 'react'
+import AppLayout from '../AppLayout/AppLayout'
+import { useParams } from 'common'
+import OrganizationSettingsMenu from './OrganizationSettingsMenu'
+import AccountSettingsMenu from './AccountSettingsMenu'
 import { useRouter } from 'next/router'
-import { useFlag, useStore, withAuth } from 'hooks'
-import { generateSettingsMenu } from './SettingsMenu.utils'
 
-import ProjectLayout from '../'
-import ProductMenu from 'components/ui/ProductMenu'
-
-interface Props {
-  title?: string
-  children: ReactNode
-}
-
-const SettingsLayout: FC<Props> = ({ title, children }) => {
-  const { ui, meta } = useStore()
-  const projectRef = ui.selectedProjectRef as string
-  const projectBaseInfo = ui.selectedProjectBaseInfo
-
+const SettingsLayout = ({ children }: PropsWithChildren<{}>) => {
   const router = useRouter()
-  // billing pages live under /billing/invoices and /billing/subscription, etc
-  // so we need to pass the [5]th part of the url to the menu
-  const page = router.pathname.includes('billing')
-    ? router.pathname.split('/')[5]
-    : router.pathname.split('/')[4]
-
-  const isVaultEnabled = useFlag('vaultExtension')
-  const menuRoutes = generateSettingsMenu(projectRef, projectBaseInfo, isVaultEnabled)
-
-  useEffect(() => {
-    if (ui.selectedProject?.ref) {
-      meta.extensions.load()
-    }
-  }, [ui.selectedProject?.ref])
+  const { ref, slug } = useParams()
 
   return (
-    <ProjectLayout
-      title={title || 'Settings'}
-      product="Settings"
-      productMenu={<ProductMenu page={page} menu={menuRoutes} />}
-    >
-      <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
-        {children}
-      </main>
-    </ProjectLayout>
+    <AppLayout>
+      <div className="flex h-full">
+        {router.pathname !== '/projects' && (
+          <div className="h-full overflow-y-auto min-w-[280px] border-r px-8 py-8">
+            {slug === undefined && ref === undefined ? (
+              <AccountSettingsMenu />
+            ) : (
+              <OrganizationSettingsMenu />
+            )}
+          </div>
+        )}
+        <div className="h-full overflow-y-auto flex-grow">{children}</div>
+      </div>
+    </AppLayout>
   )
 }
 
-export default withAuth(observer(SettingsLayout))
+export default SettingsLayout

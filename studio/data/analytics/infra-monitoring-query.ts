@@ -1,17 +1,22 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { useCallback } from 'react'
 import { AnalyticsData } from './constants'
 import { analyticsKeys } from './keys'
 
 export type InfraMonitoringVariables = {
   projectRef?: string
-  attribute: 'cpu_usage' | 'disk_io_budget' | 'ram_usage'
+  attribute:
+    | 'max_cpu_usage'
+    | 'avg_cpu_usage'
+    | 'disk_io_budget'
+    | 'ram_usage'
+    | 'disk_io_consumption'
+    | 'swap_usage'
   startDate?: string
   endDate?: string
-  interval?: string
+  interval?: '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
   dateFormat?: string
   modifier?: (x: number) => number
 }
@@ -31,6 +36,7 @@ export async function getInfraMonitoring(
     )}&endDate=${encodeURIComponent(endDate)}&interval=${interval}`,
     { signal }
   )
+
   if (data.error) throw data.error
   return data as AnalyticsData
 }
@@ -54,7 +60,7 @@ export const useInfraMonitoringQuery = <TData = InfraMonitoringData>(
   }: UseQueryOptions<InfraMonitoringData, InfraMonitoringError, TData> = {}
 ) =>
   useQuery<InfraMonitoringData, InfraMonitoringError, TData>(
-    analyticsKeys.dailyStats(projectRef, { attribute, startDate, endDate, interval }),
+    analyticsKeys.infraMonitoring(projectRef, { attribute, startDate, endDate, interval }),
     ({ signal }) =>
       getInfraMonitoring({ projectRef, attribute, startDate, endDate, interval }, signal),
     {
@@ -77,26 +83,7 @@ export const useInfraMonitoringQuery = <TData = InfraMonitoringData>(
           }),
         } as TData
       },
+      staleTime: 1000 * 60, // default good for a minute
       ...options,
     }
   )
-
-export const useInfraMonitoringPrefetch = ({
-  projectRef,
-  attribute,
-  startDate,
-  endDate,
-  interval = '1d',
-}: InfraMonitoringVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef && attribute && startDate && endDate && interval) {
-      client.prefetchQuery(
-        analyticsKeys.dailyStats(projectRef, { attribute, startDate, endDate, interval }),
-        ({ signal }) =>
-          getInfraMonitoring({ projectRef, attribute, startDate, endDate, interval }, signal)
-      )
-    }
-  }, [projectRef])
-}

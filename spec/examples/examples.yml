@@ -96,6 +96,7 @@ functions:
         name: React Native options
         js: |
           ```js
+          import 'react-native-url-polyfill/auto'
           import { createClient } from '@supabase/supabase-js'
           import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -114,13 +115,13 @@ functions:
     title: 'signUp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
     notes: |
-      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://app.supabase.com/project/_/auth/providers).
+      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://supabase.com/dashboard/project/_/auth/providers).
       - **Confirm email** determines if users need to confirm their email address after signing up.
         - If **Confirm email** is enabled, a `user` is returned but `session` is null.
         - If **Confirm email** is disabled, both a `user` and a `session` are returned.
-      - By default, when the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://app.supabase.com/project/_/auth/url-configuration).
+      - By default, when the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
       - If signUp() is called for an existing confirmed user:
-          - If **Confirm email** is enabled in [your project](https://app.supabase.com/project/_/auth/providers), an obfuscated/fake user object is returned.
+          - If **Confirm email** is enabled in [your project](https://supabase.com/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
           - If **Confirm email** is disabled, the error message, `User already registered` is returned.
       - To fetch the currently logged-in user, refer to [`getUser()`](/docs/reference/javascript/auth-getuser).
     examples:
@@ -192,7 +193,7 @@ functions:
       - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
-      - The magic link's destination URL is determined by the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). You can modify the `SITE_URL` or add additional redirect URLs in [your project](https://app.supabase.com/project/_/auth/url-configuration).
+      - The magic link's destination URL is determined by the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). You can modify the `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
     examples:
       - id: sign-in-with-email.
         name: Sign in with email.
@@ -236,11 +237,11 @@ functions:
         isSpotlight: false
         description: |
           When the third-party provider successfully authenticates the user, the provider will redirect the user to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). It does not redirect the user immediately after invoking this method.
-          You can modify the `SITE_URL` or add additional redirect URLs in [your project](https://app.supabase.com/project/_/auth/url-configuration).
+          You can modify the `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
         js: |
           ```js
           const { data, error } = await supabase.auth.signInWithOAuth({
-            provider: 'github'
+            provider: 'github',
             options: {
               redirectTo: 'https://example.com/welcome'
             }
@@ -255,7 +256,7 @@ functions:
         js: |
           ```js
           const { data, error } = await supabase.auth.signInWithOAuth({
-            provider: 'github'
+            provider: 'github',
             options: {
               scopes: 'repo gist notifications'
             }
@@ -296,6 +297,13 @@ functions:
           ```js
           const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'signup'})
           ```
+      - id: verify-email-auth(tokenhash)
+        name: Verify Email Auth (Token Hash)
+        isSpotlight: false
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'email'})
+          ```
   - id: auth.getSession()
     title: 'getSession()'
     $ref: '@supabase/gotrue-js.GoTrueClient.getSession'
@@ -334,7 +342,7 @@ functions:
     notes: |
       - In order to use the `updateUser()` method, the user needs to be signed in first.
       - By Default, email updates sends a confirmation link to both the user's current and new email.
-      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://app.supabase.com/project/_/auth/providers).
+      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://supabase.com/dashboard/project/_/auth/providers).
     examples:
       - id: update-the-email-for-an-authenticated-user
         name: Update the email for an authenticated user
@@ -746,7 +754,7 @@ functions:
     description: 'This is the description'
     $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.select'
     notes: |
-      - By default, Supabase projects return a maximum of 1,000 rows. This setting can be changed in your project's [API settings](https://app.supabase.com/project/_/settings/api). It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
+      - By default, Supabase projects return a maximum of 1,000 rows. This setting can be changed in your project's [API settings](https://supabase.com/dashboard/project/_/settings/api). It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
       - `select()` can be combined with [Filters](/docs/reference/javascript/using-filters)
       - `select()` can be combined with [Modifiers](/docs/reference/javascript/using-modifiers)
       - `apikey` is a reserved keyword if you're using the [Supabase Platform](/docs/guides/platform) and [should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
@@ -5140,7 +5148,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: list-buckets
         name: List buckets
@@ -5159,7 +5167,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: get-bucket
         name: Get bucket
@@ -5178,7 +5186,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: `insert`
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: create-bucket
         name: Create bucket
@@ -5197,7 +5205,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
         - `objects` table permissions: `select` and `delete`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: empty-bucket
         name: Empty bucket
@@ -5215,7 +5223,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: `update`
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: update-bucket
         name: Update bucket
@@ -5234,7 +5242,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: `select` and `delete`
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: delete-bucket
         name: Delete bucket
@@ -5253,7 +5261,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `insert`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
       - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Upload file using `ArrayBuffer` from base64 file data instead, see example below.
     examples:
       - id: upload-file
@@ -5291,7 +5299,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `update` and `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
       - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Update file using `ArrayBuffer` from base64 file data instead, see example below.
     examples:
       - id: update-file
@@ -5329,7 +5337,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `update` and `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: move-file
         name: Move file
@@ -5349,7 +5357,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `insert` and `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: copy-file
         name: Copy file
@@ -5369,7 +5377,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: create-signed-url
         name: Create Signed URL
@@ -5389,7 +5397,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: create-signed-urls
         name: Create Signed URLs
@@ -5406,11 +5414,11 @@ functions:
     title: 'from.getPublicUrl()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.getPublicUrl'
     notes: |
-      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.com](https://app.supabase.com), clicking the overflow menu on a bucket and choosing "Make public"
+      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [supabase.com/dashboard](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: returns-the-url-for-an-asset-in-a-public-bucket
         name: Returns the URL for an asset in a public bucket
@@ -5430,7 +5438,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: download-file
         name: Download file
@@ -5450,7 +5458,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `delete` and `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: delete-file
         name: Delete file
@@ -5470,7 +5478,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: list-files-in-a-bucket
         name: List files in a bucket

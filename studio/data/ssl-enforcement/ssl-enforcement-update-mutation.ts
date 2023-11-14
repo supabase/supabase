@@ -1,6 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
+
 import { put } from 'lib/common/fetch'
 import { API_ADMIN_URL } from 'lib/constants'
+import { ResponseError } from 'types'
 import { sslEnforcementKeys } from './keys'
 
 export type SSLEnforcementUpdateVariables = {
@@ -32,20 +35,28 @@ type SSLEnforcementUpdateData = Awaited<ReturnType<typeof updateSSLEnforcement>>
 
 export const useSSLEnforcementUpdateMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
-  UseMutationOptions<SSLEnforcementUpdateData, unknown, SSLEnforcementUpdateVariables>,
+  UseMutationOptions<SSLEnforcementUpdateData, ResponseError, SSLEnforcementUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<SSLEnforcementUpdateData, unknown, SSLEnforcementUpdateVariables>(
+  return useMutation<SSLEnforcementUpdateData, ResponseError, SSLEnforcementUpdateVariables>(
     (vars) => updateSSLEnforcement(vars),
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
         await queryClient.invalidateQueries(sslEnforcementKeys.list(projectRef))
         await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to update SSL enforcement: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
       },
       ...options,
     }

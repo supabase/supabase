@@ -7,18 +7,40 @@ export const CLIENT_LIBRARIES = [
     gitUrl: 'https://github.com/supabase/supabase-js',
   },
   {
-    language: 'Python',
-    officialSupport: false,
-    releaseState: 'Alpha',
-    docsUrl: 'https://supabase.com/docs/reference/python/introduction',
-    gitUrl: 'https://github.com/supabase/supabase-py',
-  },
-  {
     language: 'Flutter',
     officialSupport: true,
     releaseState: undefined,
     docsUrl: 'https://supabase.com/docs/reference/dart/installing',
     gitUrl: 'https://github.com/supabase/supabase-flutter',
+  },
+  {
+    language: 'Python',
+    officialSupport: false,
+    releaseState: 'Alpha',
+    docsUrl: 'https://supabase.com/docs/reference/python/initializing',
+    gitUrl: 'https://github.com/supabase/supabase-py',
+  },
+  {
+    language: 'C#',
+    officialSupport: false,
+    releaseState: undefined,
+    docsUrl: 'https://supabase.com/docs/reference/csharp/installing',
+    gitUrl: 'https://github.com/supabase-community/supabase-csharp',
+    altIconName: 'c-sharp',
+  },
+  {
+    language: 'Swift',
+    officialSupport: false,
+    releaseState: undefined,
+    docsUrl: 'https://supabase.com/docs/reference/swift/initializing',
+    gitUrl: 'https://github.com/supabase-community/supabase-swift',
+  },
+  {
+    language: 'Kotlin',
+    officialSupport: false,
+    releaseState: undefined,
+    docsUrl: 'https://supabase.com/docs/reference/kotlin/installing',
+    gitUrl: 'https://github.com/supabase-community/supabase-kt',
   },
 ]
 
@@ -30,13 +52,13 @@ export const EXAMPLE_PROJECTS = [
     url: 'https://github.com/joshnuss/supabase-kanban',
   },
   {
-    framework: 'NextJS',
+    framework: 'nextjs',
     title: 'Next.js Realtime chat app',
     description: 'Next.js Slack clone app using Supabase realtime subscriptions',
     url: 'https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone',
   },
   {
-    framework: 'NextJS',
+    framework: 'nextjs',
     title: 'Next.js Subscription and Auth',
     description: 'The all-in-one starter kit for high-performance SaaS applications.',
     url: 'https://github.com/vercel/nextjs-subscription-payments',
@@ -72,9 +94,9 @@ export const EXAMPLE_PROJECTS = [
     url: 'https://github.com/supabase/examples/tree/main/supabase-js-v1/todo-list/expo-todo-list',
   },
   {
-    framework: 'NextJS',
+    framework: 'nextjs',
     title: 'Next.js todo list app',
-    description: 'NextJS todo list example',
+    description: 'Next.js todo list example',
     url: 'https://github.com/supabase/supabase/tree/master/examples/todo-list/nextjs-todo-list',
   },
   {

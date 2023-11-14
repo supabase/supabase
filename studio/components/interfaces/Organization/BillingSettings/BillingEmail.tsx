@@ -1,67 +1,72 @@
-import { useEffect } from 'react'
-import { Form, Input } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useStore, checkPermissions } from 'hooks'
-import { useParams } from 'common/hooks'
-import { API_URL } from 'lib/constants'
-import { patch } from 'lib/common/fetch'
+import { useQueryClient } from '@tanstack/react-query'
+import { useEffect } from 'react'
+
+import { useParams } from 'common'
+import {
+  ScaffoldSection,
+  ScaffoldSectionContent,
+  ScaffoldSectionDetail,
+} from 'components/layouts/Scaffold'
 import { FormActions, FormPanel, FormSection, FormSectionContent } from 'components/ui/Forms'
+import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
+import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { Form, Input } from 'ui'
 
 const BillingEmail = () => {
-  const { app, ui } = useStore()
+  const { ui } = useStore()
   const { slug } = useParams()
-  const { name, billing_email } = ui.selectedOrganization ?? {}
+  const queryClient = useQueryClient()
+  const selectedOrganization = useSelectedOrganization()
+  const { name, billing_email } = selectedOrganization ?? {}
 
   const formId = 'org-billing-email'
-  const initialValues = {
-    billing_email: billing_email ?? '',
-  }
+  const initialValues = { billing_email: billing_email ?? '' }
 
-  const canUpdateOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
-  const canReadBillingEmail = checkPermissions(PermissionAction.READ, 'organizations')
+  const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+  const canReadBillingEmail = useCheckPermissions(PermissionAction.READ, 'organizations')
+  const { mutateAsync: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
 
-  const onUpdateOrganization = async (values: any, { setSubmitting, resetForm }: any) => {
+  const onUpdateOrganizationEmail = async (values: any, { resetForm }: any) => {
     if (!canUpdateOrganization) {
       return ui.setNotification({
         category: 'error',
         message: 'You do not have the required permissions to update this organization',
       })
     }
+    if (!slug) return console.error('Slug is required')
+    if (!name) return console.error('Organization name is required')
 
-    setSubmitting(true)
-    const response = await patch(`${API_URL}/organizations/${slug}`, {
-      ...values,
-      name,
-    })
-    if (response.error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to update organization: ${response.error.message}`,
+    try {
+      const { billing_email } = await updateOrganization({
+        slug,
+        name,
+        billing_email: values.billing_email,
       })
-    } else {
-      const { billing_email } = response
-      resetForm({
-        values: { billing_email },
-        initialValues: { billing_email },
-      })
-
-      app.onOrgUpdated(response)
+      resetForm({ values: { billing_email }, initialValues: { billing_email } })
+      invalidateOrganizationsQuery(queryClient)
       ui.setNotification({
         category: 'success',
         message: 'Successfully saved settings',
       })
+    } finally {
     }
-    setSubmitting(false)
   }
 
   return (
-    <div className="container my-4 max-w-4xl">
-      <h4>Billing email</h4>
-      <p className="text-sm opacity-50">All billing correspondence will go to this email</p>
-
-      <div className="mt-3">
-        <Form id={formId} initialValues={initialValues} onSubmit={onUpdateOrganization}>
-          {({ isSubmitting, handleReset, values, initialValues, resetForm }: any) => {
+    <ScaffoldSection>
+      <ScaffoldSectionDetail>
+        <div className="sticky space-y-2 top-12">
+          <p className="text-base m-0">Email Recipient</p>
+          <p className="text-sm text-foreground-light m-0">
+            All billing correspondence will go to this email
+          </p>
+        </div>
+      </ScaffoldSectionDetail>
+      <ScaffoldSectionContent>
+        <Form id={formId} initialValues={initialValues} onSubmit={onUpdateOrganizationEmail}>
+          {({ handleReset, values, initialValues, resetForm }: any) => {
             const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
             // [Alaister] although this "technically" is breaking the rules of React hooks
@@ -70,6 +75,7 @@ const BillingEmail = () => {
             useEffect(() => {
               const values = { billing_email: billing_email ?? '' }
               resetForm({ values, initialValues: values })
+              // eslint-disable-next-line react-hooks/exhaustive-deps
             }, [slug])
 
             return (
@@ -78,7 +84,7 @@ const BillingEmail = () => {
                   <div className="flex py-4 px-8">
                     <FormActions
                       form={formId}
-                      isSubmitting={isSubmitting}
+                      isSubmitting={isUpdating}
                       hasChanges={hasChanges}
                       handleReset={handleReset}
                       helper={
@@ -90,8 +96,8 @@ const BillingEmail = () => {
                   </div>
                 }
               >
-                <FormSection className="-mx-2">
-                  <FormSectionContent loading={false}>
+                <FormSection>
+                  <FormSectionContent fullWidth loading={false}>
                     <Input
                       id="billing_email"
                       size="small"
@@ -105,8 +111,8 @@ const BillingEmail = () => {
             )
           }}
         </Form>
-      </div>
-    </div>
+      </ScaffoldSectionContent>
+    </ScaffoldSection>
   )
 }
 

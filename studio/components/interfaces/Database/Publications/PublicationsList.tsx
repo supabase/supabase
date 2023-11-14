@@ -1,28 +1,34 @@
-import { FC, useState } from 'react'
-import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Button, Input, Toggle, IconSearch, IconAlertCircle } from 'ui'
+import { noop } from 'lodash'
+import { observer } from 'mobx-react-lite'
+import { useState } from 'react'
 
-import { checkPermissions, useStore } from 'hooks'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import Table from 'components/to-be-cleaned/Table'
-import NoSearchResults from 'components/ui/NoSearchResults'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
 import InformationBox from 'components/ui/InformationBox'
+import NoSearchResults from 'components/ui/NoSearchResults'
+import { useCheckPermissions, useStore } from 'hooks'
+import { Button, IconAlertCircle, IconSearch, Input, Modal, Toggle } from 'ui'
 
-interface Props {
+interface PublicationEvent {
+  event: string
+  key: string
+}
+
+interface PublicationsListProps {
   onSelectPublication: (id: number) => void
 }
 
-const PublicationsList: FC<Props> = ({ onSelectPublication = () => {} }) => {
+const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps) => {
   const { ui, meta } = useStore()
   const [filterString, setFilterString] = useState<string>('')
 
-  const canUpdatePublications = checkPermissions(
+  const canUpdatePublications = useCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'publications'
   )
 
-  const publicationEvents = [
+  const publicationEvents: PublicationEvent[] = [
     { event: 'Insert', key: 'publish_insert' },
     { event: 'Update', key: 'publish_update' },
     { event: 'Delete', key: 'publish_delete' },
@@ -33,30 +39,34 @@ const PublicationsList: FC<Props> = ({ onSelectPublication = () => {} }) => {
       ? meta.publications.list()
       : meta.publications.list((publication: any) => publication.name.includes(filterString))
 
-  const toggleListenEvent = async (publication: any, event: any, currentStatus: any) => {
-    const startStop = currentStatus ? 'stop' : 'start'
-    confirmAlert({
-      title: 'Confirm',
-      message: `Are you sure you want to ${startStop} sending ${event} events for ${publication.name}?`,
-      onAsyncConfirm: async () => {
-        try {
-          let payload: any = { id: publication.id }
-          payload[`publish_${event}`] = !currentStatus
-          const { data, error }: any = await meta.publications.update(publication.id, payload)
-          if (error) {
-            throw error
-          } else {
-            return data
-          }
-        } catch (error: any) {
-          ui.setNotification({
-            category: 'error',
-            message: `Failed to toggle for ${publication.name}: ${error.message}`,
-          })
-          return false
-        }
-      },
-    })
+  const [toggleListenEventValue, setToggleListenEventValue] = useState<{
+    publication: any
+    event: PublicationEvent
+    currentStatus: any
+  } | null>(null)
+
+  const toggleListenEvent = async () => {
+    if (!toggleListenEventValue) return
+
+    const { publication, event, currentStatus } = toggleListenEventValue
+
+    try {
+      let payload: any = { id: publication.id }
+      payload[`publish_${event.event.toLowerCase()}`] = !currentStatus
+      const { data, error }: any = await meta.publications.update(publication.id, payload)
+      if (error) {
+        throw error
+      } else {
+        setToggleListenEventValue(null)
+        return data
+      }
+    } catch (error: any) {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to toggle for ${publication.name}: ${error.message}`,
+      })
+      return false
+    }
   }
 
   return (
@@ -75,7 +85,7 @@ const PublicationsList: FC<Props> = ({ onSelectPublication = () => {} }) => {
           {!canUpdatePublications && (
             <div className="w-[500px]">
               <InformationBox
-                icon={<IconAlertCircle className="text-scale-1100" strokeWidth={2} />}
+                icon={<IconAlertCircle className="text-foreground-light" strokeWidth={2} />}
                 title="You need additional permissions to update database replications"
               />
             </div>
@@ -100,7 +110,7 @@ const PublicationsList: FC<Props> = ({ onSelectPublication = () => {} }) => {
                 Source
               </Table.th>,
             ]}
-            body={publications.map((x: any, i: number) => (
+            body={publications.map((x, i) => (
               <Table.tr className="border-t " key={x.name}>
                 <Table.td className="px-4 py-3" style={{ width: '25%' }}>
                   {x.name}
@@ -114,7 +124,13 @@ const PublicationsList: FC<Props> = ({ onSelectPublication = () => {} }) => {
                       size="tiny"
                       checked={x[event.key]}
                       disabled={!canUpdatePublications}
-                      onChange={() => toggleListenEvent(x, event.event.toLowerCase(), x[event.key])}
+                      onChange={() => {
+                        setToggleListenEventValue({
+                          publication: x,
+                          event,
+                          currentStatus: x[event.key],
+                        })
+                      }}
                     />
                   </Table.td>
                 ))}
@@ -138,6 +154,24 @@ const PublicationsList: FC<Props> = ({ onSelectPublication = () => {} }) => {
           />
         </div>
       )}
+
+      <ConfirmationModal
+        visible={toggleListenEventValue !== null}
+        header="Confirm"
+        buttonLabel="Confirm"
+        onSelectCancel={() => setToggleListenEventValue(null)}
+        onSelectConfirm={() => {
+          toggleListenEvent()
+        }}
+      >
+        <Modal.Content>
+          <p className="py-4 text-sm text-foreground-light">
+            Are you sure you want to {toggleListenEventValue?.currentStatus ? 'stop' : 'start'}{' '}
+            sending {toggleListenEventValue?.event.event.toLowerCase()} events for{' '}
+            {toggleListenEventValue?.publication.name}?
+          </p>
+        </Modal.Content>
+      </ConfirmationModal>
     </>
   )
 }

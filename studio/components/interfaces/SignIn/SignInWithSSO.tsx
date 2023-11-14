@@ -3,13 +3,9 @@ import { Button, IconLock } from 'ui'
 
 const SignInWithSSO = () => {
   return (
-    <Link href="/sign-in-sso">
-      <a>
-        <Button block size="large" type="outline" icon={<IconLock width={18} height={18} />}>
-          Continue with SSO
-        </Button>
-      </a>
-    </Link>
+    <Button asChild block size="large" type="outline" icon={<IconLock width={18} height={18} />}>
+      <Link href="/sign-in-sso">Continue with SSO</Link>
+    </Button>
   )
 }
 

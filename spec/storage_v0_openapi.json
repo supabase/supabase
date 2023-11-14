@@ -555,6 +555,7 @@
                   "description": "Successful response",
                   "type": "object",
                   "properties": {
+                    "Id": { "type": "string" },
                     "Key": { "type": "string", "examples": ["avatars/folder/cat.png"] }
                   },
                   "required": ["Key"]
@@ -607,6 +608,7 @@
                   "description": "Successful response",
                   "type": "object",
                   "properties": {
+                    "Id": { "type": "string" },
                     "Key": { "type": "string", "examples": ["avatars/folder/cat.png"] }
                   },
                   "required": ["Key"]
@@ -678,6 +680,7 @@
                       "name": { "type": "string" },
                       "bucket_id": { "type": "string" },
                       "owner": { "type": "string" },
+                      "owner_id": { "type": "string" },
                       "version": { "type": "string" },
                       "id": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
                       "updated_at": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
@@ -1088,7 +1091,7 @@
                           "Either the object does not exist or you do not have access to it"
                         ]
                       },
-                      "version": { "type": "string", "examples": ["folder/cat.png"] },
+                      "path": { "type": "string", "examples": ["folder/cat.png"] },
                       "signedURL": {
                         "type": ["null", "string"],
                         "examples": [
@@ -1225,6 +1228,7 @@
                       "name": { "type": "string" },
                       "bucket_id": { "type": "string" },
                       "owner": { "type": "string" },
+                      "owner_id": { "type": "string" },
                       "version": { "type": "string" },
                       "id": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
                       "updated_at": { "anyOf": [{ "type": "string" }, { "type": "null" }] },

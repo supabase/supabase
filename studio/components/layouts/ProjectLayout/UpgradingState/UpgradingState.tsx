@@ -1,42 +1,46 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useState } from 'react'
-import * as Tooltip from '@radix-ui/react-tooltip'
 import {
   Button,
-  IconCircle,
-  IconCheckCircle,
-  IconSettings,
   IconAlertCircle,
-  IconLoader,
   IconCheck,
+  IconCheckCircle,
+  IconCircle,
+  IconLoader,
   IconMaximize2,
   IconMinimize2,
+  IconSettings,
 } from 'ui'
-import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
 
-import { useStore } from 'hooks'
+import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common/hooks'
-import { IS_PLATFORM } from 'lib/constants'
-import { DATABASE_UPGRADE_MESSAGES } from './UpgradingState.constants'
 import { useProjectUpgradingStatusQuery } from 'data/config/project-upgrade-status-query'
+import { getProjectDetail, invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
+import { useStore } from 'hooks'
+import { IS_PLATFORM } from 'lib/constants'
+import { useProjectContext } from '../ProjectContext'
+import { DATABASE_UPGRADE_MESSAGES } from './UpgradingState.constants'
 
 const UpgradingState = () => {
   const { ref } = useParams()
-  const { app, ui, meta } = useStore()
+  const { meta } = useStore()
+  const queryClient = useQueryClient()
+  const { project } = useProjectContext()
   const [loading, setLoading] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
   const { data } = useProjectUpgradingStatusQuery(
     {
       projectRef: ref,
-      projectStatus: ui.selectedProject?.status,
+      projectStatus: project?.status,
     },
     {
       enabled: IS_PLATFORM,
     }
   )
 
-  const project = ui.selectedProject
   const { initiated_at, status, progress, target_version, error } =
     data?.databaseUpgradeStatus ?? {}
   const progressStage = Number((progress || '').split('_')[0])
@@ -44,14 +48,18 @@ const UpgradingState = () => {
   const isFailed = status === DatabaseUpgradeStatus.Failed
   const isCompleted = status === DatabaseUpgradeStatus.Upgraded
 
-  const initiatedAt = dayjs(initiated_at ?? 0).format('DD MMM YYYY HH:mm:ss (ZZ)')
-  const initiatedAtUTC = dayjs(initiated_at ?? 0)
-    .utc()
-    .format('DD MMM YYYY HH:mm:ss')
+  const initiatedAtUTC = dayjs.utc(initiated_at ?? 0).format('DD MMM YYYY HH:mm:ss')
+  const initiatedAt = dayjs
+    .utc(initiated_at ?? 0)
+    .local()
+    .format('DD MMM YYYY HH:mm:ss (ZZ)')
 
   const refetchProjectDetails = async () => {
     setLoading(true)
-    await app.projects.fetchDetail(project?.ref ?? '', (project) => meta.setProjectDetails(project))
+
+    const projectDetail = await getProjectDetail({ ref })
+    if (projectDetail) meta.setProjectDetails(projectDetail)
+    if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
   }
 
   const subject = 'Upgrade%20failed%20for%20project'
@@ -64,15 +72,15 @@ const UpgradingState = () => {
           <h1 className="text-3xl">{project?.name}</h1>
         </div>
         <div className="w-full mx-auto mt-8 mb-16 max-w-7xl">
-          <div className="flex h-[500px] items-center justify-center rounded border border-scale-400 bg-scale-300 p-8">
+          <div className="flex h-[500px] items-center justify-center rounded border border-muted bg-surface-100 p-8">
             {isCompleted ? (
               <div className="grid gap-4">
                 <div className="relative mx-auto max-w-[300px]">
-                  <IconCheckCircle className="text-brand-900" size={40} strokeWidth={1.5} />
+                  <IconCheckCircle className="text-brand" size={40} strokeWidth={1.5} />
                 </div>
                 <div className="space-y-2">
                   <p className="text-center">Upgrade completed!</p>
-                  <p className="mt-4 text-center text-sm text-scale-1100 w-[300px] mx-auto">
+                  <p className="mt-4 text-center text-sm text-foreground-light w-[300px] mx-auto">
                     Your project has been successfully upgraded to Postgres {target_version} and is
                     now back online.
                   </p>
@@ -90,19 +98,21 @@ const UpgradingState = () => {
                 </div>
                 <div className="space-y-2">
                   <p className="text-center">We ran into an issue while upgrading your project</p>
-                  <p className="mt-4 text-center text-sm text-scale-1100 w-[450px] mx-auto">
+                  <p className="mt-4 text-center text-sm text-foreground-light w-[450px] mx-auto">
                     Your project is back online and its data is not affected. Please reach out to us
                     via our support form for assistance with the upgrade.
                   </p>
                 </div>
                 <div className="flex items-center mx-auto space-x-2">
-                  <Link
-                    href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
-                  >
-                    <a target="_blank" rel="noreferrer">
-                      <Button type="default">Contact support</Button>
-                    </a>
-                  </Link>
+                  <Button asChild type="default">
+                    <Link
+                      href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Contact support
+                    </Link>
+                  </Button>
                   <Button loading={loading} disabled={loading} onClick={refetchProjectDetails}>
                     Return to project
                   </Button>
@@ -114,11 +124,11 @@ const UpgradingState = () => {
                   <div className="absolute flex items-center justify-center w-full h-full">
                     <IconSettings className="animate-spin" size={20} strokeWidth={2} />
                   </div>
-                  <IconCircle className="text-scale-900" size={50} strokeWidth={1.5} />
+                  <IconCircle className="text-foreground-lighter" size={50} strokeWidth={1.5} />
                 </div>
                 <div className="space-y-2">
                   <p className="text-center">Upgrading in progress</p>
-                  <p className="text-sm text-center text-scale-1100">
+                  <p className="text-sm text-center text-foreground-light">
                     Upgrades can take from a few minutes up to several hours depending on the size
                     of your database. Your project will be offline while it is being upgraded.
                   </p>
@@ -165,25 +175,25 @@ const UpgradingState = () => {
                               <div className="flex items-center justify-center w-5 h-5 rounded-full">
                                 <IconLoader
                                   size={20}
-                                  className="animate-spin text-scale-1100"
+                                  className="animate-spin text-foreground-light"
                                   strokeWidth={2}
                                 />
                               </div>
                             ) : isCompleted ? (
-                              <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-brand-800 border-brand-700">
-                                <IconCheck size={12} className="text-white" strokeWidth={2} />
+                              <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-brand border-brand">
+                                <IconCheck size={12} className="text-white" strokeWidth={3} />
                               </div>
                             ) : (
-                              <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-scale-600" />
+                              <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-overlay-hover" />
                             )}
                             <p
                               className={`text-sm ${
                                 isCurrent
-                                  ? 'text-scale-1200'
+                                  ? 'text-foreground'
                                   : isCompleted
-                                  ? 'text-scale-1100'
-                                  : 'text-scale-1000'
-                              } hover:text-scale-1200 transition`}
+                                  ? 'text-foreground-light'
+                                  : 'text-foreground-lighter'
+                              } hover:text-foreground transition`}
                             >
                               {isCurrent
                                 ? message.progress
@@ -200,7 +210,7 @@ const UpgradingState = () => {
                   {initiated_at !== undefined && (
                     <Tooltip.Root delayDuration={0}>
                       <Tooltip.Trigger className="w-full">
-                        <p className="text-sm text-center text-scale-1000">
+                        <p className="text-sm text-center text-foreground-light">
                           Started on: {initiatedAtUTC} (UTC)
                         </p>
                       </Tooltip.Trigger>
@@ -209,11 +219,11 @@ const UpgradingState = () => {
                           <Tooltip.Arrow className="radix-tooltip-arrow" />
                           <div
                             className={[
-                              'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                              'border border-scale-200 ', //border
+                              'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                              'border border-background', //border
                             ].join(' ')}
                           >
-                            <span className="text-xs text-scale-1200">{initiatedAt}</span>
+                            <span className="text-xs text-foreground">{initiatedAt}</span>
                           </div>
                         </Tooltip.Content>
                       </Tooltip.Portal>

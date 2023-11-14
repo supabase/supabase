@@ -2,6 +2,8 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { organizationKeys } from './keys'
+import { toast } from 'react-hot-toast'
+import { ResponseError } from 'types'
 
 export type OrganizationMemberUpdateVariables = {
   slug: string
@@ -28,27 +30,40 @@ type OrganizationMemberUpdateData = Awaited<ReturnType<typeof updateOrganization
 
 export const useOrganizationMemberUpdateMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
-  UseMutationOptions<OrganizationMemberUpdateData, unknown, OrganizationMemberUpdateVariables>,
+  UseMutationOptions<
+    OrganizationMemberUpdateData,
+    ResponseError,
+    OrganizationMemberUpdateVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<OrganizationMemberUpdateData, unknown, OrganizationMemberUpdateVariables>(
-    (vars) => updateOrganizationMember(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { slug } = variables
+  return useMutation<
+    OrganizationMemberUpdateData,
+    ResponseError,
+    OrganizationMemberUpdateVariables
+  >((vars) => updateOrganizationMember(vars), {
+    async onSuccess(data, variables, context) {
+      const { slug } = variables
 
-        await Promise.all([
-          queryClient.invalidateQueries(organizationKeys.detail(slug)),
-          queryClient.invalidateQueries(organizationKeys.roles(slug)),
-        ])
+      await Promise.all([
+        queryClient.invalidateQueries(organizationKeys.detail(slug)),
+        queryClient.invalidateQueries(organizationKeys.roles(slug)),
+      ])
 
-        await onSuccess?.(data, variables, context)
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update member: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

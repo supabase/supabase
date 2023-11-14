@@ -1,17 +1,28 @@
-import { API_URL, APP_NAME, DESCRIPTION } from 'lib/constants'
+import '@code-hike/mdx/styles'
+import 'config/code-hike.scss'
+import '../../../packages/ui/build/css/themes/dark.css'
+import '../../../packages/ui/build/css/themes/light.css'
+import '../styles/index.css'
+
+import { SessionContextProvider } from '@supabase/auth-helpers-react'
+import { AuthProvider, ThemeProvider, useTelemetryProps, useThemeSandbox } from 'common'
+import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from 'lib/constants'
 import { DefaultSeo } from 'next-seo'
 import { AppProps } from 'next/app'
+import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
+import { CommandMenuProvider, PortalToast, useConsent } from 'ui'
 import Meta from '~/components/Favicons'
-import '../styles/index.css'
 import { post } from '~/lib/fetchWrapper'
-import { AuthProvider, ThemeProvider, useTelemetryProps } from 'common'
-import Head from 'next/head'
+import supabase from '~/lib/supabase'
 
-export default function MyApp({ Component, pageProps }: AppProps) {
+export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
+  const { consentValue, hasAcceptedConsent } = useConsent()
+
+  useThemeSandbox()
 
   function handlePageTelemetry(route: string) {
     return post(`${API_URL}/telemetry/page`, {
@@ -26,6 +37,8 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   }
 
   useEffect(() => {
+    if (!hasAcceptedConsent) return
+
     function handleRouteChange(url: string) {
       handlePageTelemetry(url)
     }
@@ -35,19 +48,22 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     return () => {
       router.events.off('routeChangeComplete', handleRouteChange)
     }
-  }, [router.events])
+  }, [router.events, consentValue])
 
   useEffect(() => {
+    if (!hasAcceptedConsent) return
     /**
      * Send page telemetry on first page load
      */
     if (router.isReady) {
       handlePageTelemetry(router.asPath)
     }
-  }, [router.isReady])
+  }, [router.isReady, consentValue])
 
-  const site_title = `The Open Source Firebase Alternative | ${APP_NAME}`
-  const { basePath } = useRouter()
+  const site_title = `${APP_NAME} | The Open Source Firebase Alternative`
+  const { basePath, pathname } = useRouter()
+
+  const forceDarkMode = pathname === '/' || router.pathname.startsWith('/launch-week')
 
   return (
     <>
@@ -57,14 +73,14 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       <Meta />
       <DefaultSeo
         title={site_title}
-        description={DESCRIPTION}
+        description={DEFAULT_META_DESCRIPTION}
         openGraph={{
           type: 'website',
           url: 'https://supabase.com/',
           site_name: 'Supabase',
           images: [
             {
-              url: `https://supabase.com${basePath}/images/og/og-image.jpg`,
+              url: `https://supabase.com${basePath}/images/og/og-image-v2.jpg`,
               width: 800,
               height: 600,
               alt: 'Supabase Og Image',
@@ -77,11 +93,22 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           cardType: 'summary_large_image',
         }}
       />
-      <AuthProvider>
-        <ThemeProvider>
-          <Component {...pageProps} />
-        </ThemeProvider>
-      </AuthProvider>
+      <SessionContextProvider supabaseClient={supabase}>
+        <AuthProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+            forcedTheme={forceDarkMode ? 'dark' : undefined}
+          >
+            <CommandMenuProvider site="website">
+              <PortalToast />
+              <Component {...pageProps} />
+            </CommandMenuProvider>
+          </ThemeProvider>
+        </AuthProvider>
+      </SessionContextProvider>
     </>
   )
 }

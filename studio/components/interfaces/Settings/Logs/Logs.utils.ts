@@ -1,12 +1,12 @@
 import { Filters, LogData, LogsEndpointParams, LogsTableName, SQL_FILTER_TEMPLATES } from '.'
 import dayjs, { Dayjs } from 'dayjs'
 import { get, isEqual } from 'lodash'
-import { StripeSubscription } from 'components/interfaces/Billing'
 import { useMonaco } from '@monaco-editor/react'
 import logConstants from 'shared-data/logConstants'
 import BackwardIterator from 'components/ui/CodeEditor/Providers/BackwardIterator'
 import uniqBy from 'lodash/uniqBy'
 import { useEffect } from 'react'
+import { PlanId } from 'data/subscriptions/org-subscription-query'
 
 /**
  * Convert a micro timestamp from number/string to iso timestamp
@@ -21,6 +21,12 @@ export const isUnixMicro = (unix: string | number): boolean => {
   return isNum && digitLength
 }
 
+/**
+ * Boolean check to verify that there are 3 columns:
+ * - id
+ * - timestamp
+ * - event_message
+ */
 export const isDefaultLogPreviewFormat = (log: LogData) =>
   log && log.timestamp && log.event_message && log.id
 
@@ -65,7 +71,7 @@ const getDotKeys = (obj: { [k: string]: unknown }, parent?: string): string[] =>
  *
  * @returns a where statement with WHERE clause.
  */
-const _genWhereStatement = (table: LogsTableName, filters: Filters) => {
+const genWhereStatement = (table: LogsTableName, filters: Filters) => {
   const keys = Object.keys(filters)
   const filterTemplates = SQL_FILTER_TEMPLATES[table]
   const _resolveTemplateToStatement = (dotKey: string): string | null => {
@@ -122,48 +128,88 @@ const _genWhereStatement = (table: LogsTableName, filters: Filters) => {
 }
 
 export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
-  const where = _genWhereStatement(table, filters)
-
+  const where = genWhereStatement(table, filters)
+  const joins = genCrossJoinUnnests(table)
+  const orderBy = 'order by timestamp desc'
   switch (table) {
     case 'edge_logs':
       return `select id, timestamp, event_message, request.method, request.path, response.status_code
   from ${table}
-  cross join unnest(metadata) as m
-  cross join unnest(m.request) as request
-  cross join unnest(m.response) as response
+  ${joins}
   ${where}
+  ${orderBy}
   limit 100
   `
 
     case 'postgres_logs':
       return `select postgres_logs.timestamp, id, event_message, parsed.error_severity from ${table}
-  cross join unnest(metadata) as m
-  cross join unnest(m.parsed) as parsed
+  ${joins}
   ${where}
+  ${orderBy}
   limit 100
   `
 
     case 'function_logs':
       return `select id, ${table}.timestamp, event_message, metadata.event_type, metadata.function_id, metadata.level from ${table}
-  cross join unnest(metadata) as metadata
+  ${joins}
   ${where}
+  ${orderBy}
+  limit 100
+    `
+
+    case 'auth_logs':
+      return `select id, ${table}.timestamp, event_message, metadata.level, metadata.status, metadata.path, metadata.msg as msg, metadata.error from ${table}
+  ${joins}
+  ${where}
+  ${orderBy}
   limit 100
     `
 
     case 'function_edge_logs':
       return `select id, ${table}.timestamp, event_message, response.status_code, request.method, m.function_id, m.execution_time_ms, m.deployment_id, m.version from ${table}
-  cross join unnest(metadata) as m
-  cross join unnest(m.response) as response
-  cross join unnest(m.request) as request
+  ${joins}
   ${where}
+  ${orderBy}
   limit 100
   `
 
     default:
       return `select id, ${table}.timestamp, event_message from ${table}
   ${where}
+  ${orderBy}
   limit 100
   `
+  }
+}
+
+/**
+ * Hardcoded cross join unnests and aliases for each table.
+ * Should be used together with the getWhereStatements to allow for filtering on aliases
+ */
+const genCrossJoinUnnests = (table: LogsTableName) => {
+  switch (table) {
+    case 'edge_logs':
+      return `cross join unnest(metadata) as m
+  cross join unnest(m.request) as request
+  cross join unnest(m.response) as response`
+
+    case 'postgres_logs':
+      return `cross join unnest(metadata) as m
+  cross join unnest(m.parsed) as parsed`
+
+    case 'function_logs':
+      return `cross join unnest(metadata) as metadata`
+
+    case 'auth_logs':
+      return `cross join unnest(metadata) as metadata`
+
+    case 'function_edge_logs':
+      return `cross join unnest(metadata) as m
+  cross join unnest(m.response) as response
+  cross join unnest(m.request) as request`
+
+    default:
+      return ''
   }
 }
 
@@ -176,23 +222,21 @@ export const genSingleLogQuery = (table: LogsTableName, id: string) =>
 /**
  * Determine if we should show the user an upgrade prompt while browsing logs
  */
-export const maybeShowUpgradePrompt = (
-  from: string | null | undefined,
-  tierKey?: StripeSubscription['tier']['key']
-) => {
+export const maybeShowUpgradePrompt = (from: string | null | undefined, planId?: PlanId) => {
   const day = Math.abs(dayjs().diff(dayjs(from), 'day'))
 
   return (
-    (day > 1 && tierKey === 'FREE') ||
-    (day > 7 && tierKey === 'PRO') ||
-    (day > 28 && tierKey === 'TEAM') ||
-    (day > 90 && tierKey === 'ENTERPRISE')
+    (day > 1 && planId === 'free') ||
+    (day > 7 && planId === 'pro') ||
+    (day > 28 && planId === 'team') ||
+    (day > 90 && planId === 'enterprise')
   )
 }
 
 export const genCountQuery = (table: LogsTableName, filters: Filters): string => {
-  const where = _genWhereStatement(table, filters)
-  return `SELECT count(*) as count FROM ${table} ${where}`
+  const where = genWhereStatement(table, filters)
+  const joins = genCrossJoinUnnests(table)
+  return `SELECT count(*) as count FROM ${table} ${joins} ${where}`
 }
 
 /** calculates how much the chart start datetime should be offset given the current datetime filter params */
@@ -227,18 +271,13 @@ export const genChartQuery = (
   filters: Filters
 ) => {
   const [startOffset, trunc] = calcChartStart(params)
-  const where = _genWhereStatement(table, filters)
+  const where = genWhereStatement(table, filters)
 
-  let joins = 'cross join unnest(t.metadata) as metadata'
-  if (table === LogsTableName.EDGE) {
-    joins += ' \n  cross join unnest(metadata.request) as request'
-    joins += ' \n  cross join unnest(metadata.response) as response'
-  } else if (table === LogsTableName.POSTGRES) {
-    joins += ' \n  cross join unnest(metadata.parsed) as parsed'
-  }
+  let joins = genCrossJoinUnnests(table)
 
   return `
 SELECT
+-- log-event-chart
   timestamp_trunc(t.timestamp, ${trunc}) as timestamp,
   count(t.timestamp) as count
 FROM
@@ -367,7 +406,7 @@ export const useEditorHints = () => {
 export const fillTimeseries = (
   timeseriesData: any[],
   timestampKey: string,
-  valueKey: string,
+  valueKey: string | string[],
   defaultValue: number,
   min?: string,
   max?: string
@@ -378,8 +417,9 @@ export const fillTimeseries = (
   const maxDate = max ? dayjs.utc(max) : dayjs.utc(Math.max.apply(null, dates as number[]))
   const minDate = min ? dayjs.utc(min) : dayjs.utc(Math.min.apply(null, dates as number[]))
 
-  const truncationSample = timeseriesData.length > 0 ? timeseriesData[0][timestampKey] : min || max
-  const truncation = getTimestampTruncation(truncationSample)
+  // const truncationSample = timeseriesData.length > 0 ? timeseriesData[0][timestampKey] : min || max
+  const truncationSamples = timeseriesData.length > 0 ? dates : [minDate, maxDate]
+  const truncation = getTimestampTruncation(truncationSamples as Dayjs[])
 
   const newData = timeseriesData.map((datum) => {
     const iso = dayjs.utc(datum[timestampKey]).toISOString()
@@ -388,12 +428,29 @@ export const fillTimeseries = (
   })
 
   const diff = maxDate.diff(minDate, truncation as dayjs.UnitType)
+  // Intentional throwing of error here to be caught by Sentry, as this would indicate a bug since charts shouldn't be rendering more than 10k data points
+  if (diff > 10000) {
+    throw new Error(
+      'Data error, filling timeseries dynamically with more than 10k data points degrades performance.'
+    )
+  }
   for (let i = 0; i <= diff; i++) {
     const dateToMaybeAdd = minDate.add(i, truncation as dayjs.ManipulateType)
+
+    const keys = typeof valueKey === 'string' ? [valueKey] : valueKey
+
+    const toMerge = keys.reduce(
+      (acc, key) => ({
+        ...acc,
+        [key]: defaultValue,
+      }),
+      {}
+    )
+
     if (!dates.find((d) => isEqual(d, dateToMaybeAdd))) {
       newData.push({
         [timestampKey]: dateToMaybeAdd.toISOString(),
-        [valueKey]: defaultValue,
+        ...toMerge,
       })
     }
   }
@@ -401,10 +458,30 @@ export const fillTimeseries = (
   return newData
 }
 
-export const getTimestampTruncation = (datetime: string): 'second' | 'minute' | 'hour' | 'day' => {
-  const values = ['second', 'minute', 'hour', 'day'].map((key) =>
-    dayjs(datetime).get(key as dayjs.UnitType)
+export const getTimestampTruncation = (samples: Dayjs[]): 'second' | 'minute' | 'hour' | 'day' => {
+  const truncationCounts = samples.reduce(
+    (acc, sample) => {
+      const truncation = _getTruncation(sample)
+      acc[truncation] += 1
+
+      return acc
+    },
+    {
+      second: 0,
+      minute: 0,
+      hour: 0,
+      day: 0,
+    }
   )
+
+  const mostLikelyTruncation = (
+    Object.keys(truncationCounts) as (keyof typeof truncationCounts)[]
+  ).reduce((a, b) => (truncationCounts[a] > truncationCounts[b] ? a : b))
+  return mostLikelyTruncation
+}
+
+const _getTruncation = (date: Dayjs) => {
+  const values = ['second', 'minute', 'hour'].map((key) => date.get(key as dayjs.UnitType))
   const zeroCount = values.reduce((acc, value) => {
     if (value === 0) {
       acc += 1

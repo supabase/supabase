@@ -10,6 +10,7 @@ export type ForeignKeyConstraint = {
   id: number
   constraint_name: string
   deletion_action: string
+  update_action: string
   source_id: string
   source_schema: string
   source_table: string
@@ -25,7 +26,8 @@ export const getForeignKeyConstraintsQuery = ({ schema }: GetForeignKeyConstrain
 SELECT 
   con.oid as id, 
   con.conname as constraint_name, 
-  con.confdeltype as deletion_action, 
+  con.confdeltype as deletion_action,
+  con.confupdtype as update_action,
   rel.oid as source_id,
   nsp.nspname as source_schema, 
   rel.relname as source_table, 

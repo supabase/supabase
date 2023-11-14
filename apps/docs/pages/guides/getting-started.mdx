@@ -18,13 +18,12 @@ export const meta = {
         <Link
           href={`${resource.href}`}
           key={resource.title}
+          className={'col-span-12 md:col-span-4'}
           passHref
         >
-          <a className={'col-span-12 md:col-span-4'}>
-            <GlassPanel {...resource} background={false} showIconBg={true}>
-              {resource.description}
-            </GlassPanel>
-          </a>
+          <GlassPanel {...resource} background={false} showIconBg={true}>
+            {resource.description}
+          </GlassPanel>
         </Link>
       )
 
@@ -41,12 +40,16 @@ export const meta = {
 <div className="grid lg:grid-cols-12 gap-6 not-prose">
   {useCases.map((item) => {
     return (
-      <Link href={`${item.href}`} key={item.title} passHref>
-        <a className={'col-span-4'}>
-          <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
-            {item.description}
-          </GlassPanel>
-        </a>
+      <Link href={`${item.href}`} key={item.title} passHref className={'col-span-4'}>
+        <GlassPanel
+          title={item.title}
+          span="col-span-6"
+          background={false}
+          icon={item.icon}
+          hasLightIcon={item.hasLightIcon}
+        >
+          {item.description}
+        </GlassPanel>
       </Link>
     )
   })}
@@ -57,12 +60,16 @@ export const meta = {
 <div className="grid lg:grid-cols-12 gap-6 not-prose">
   {quickstarts.map((item) => {
     return (
-      <Link href={`/${item.href}`} key={item.title} passHref>
-        <a className={'col-span-4'}>
-          <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
-            {item.description}
-          </GlassPanel>
-        </a>
+      <Link href={`${item.href}`} key={item.title} passHref className={'col-span-4'}>
+        <GlassPanel
+          title={item.title}
+          span="col-span-6"
+          background={false}
+          icon={item.icon}
+          hasLightIcon={item.hasLightIcon}
+        >
+          {item.description}
+        </GlassPanel>
       </Link>
     )
   })}
@@ -73,15 +80,21 @@ export const meta = {
 <div className="grid lg:grid-cols-12 gap-6 not-prose">
   {webapps.map((item) => {
     return (
-      <Link href={`/${item.href}`} key={item.title} passHref>
-        <a className={'col-span-4'}>
-          <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
-            {item.description}
-          </GlassPanel>
-        </a>
+      <Link href={`${item.href}`} key={item.title} passHref className={'col-span-4'}>
+        <GlassPanel
+          title={item.title}
+          span="col-span-6"
+          background={false}
+          icon={item.icon}
+          hasLightIcon={item.hasLightIcon}
+        >
+          {item.description}
+        </GlassPanel>
       </Link>
     )
-  })}
+
+})}
+
 </div>
 
 ### Mobile Tutorials
@@ -89,23 +102,30 @@ export const meta = {
 <div className="grid lg:grid-cols-12 gap-6 not-prose">
   {mobile.map((item) => {
     return (
-      <Link href={`/${item.href}`} key={item.title} passHref>
-        <a className={'col-span-4'}>
-          <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
-            {item.description}
-          </GlassPanel>
-        </a>
+      <Link href={`${item.href}`} key={item.title} passHref className={'col-span-4'}>
+        <GlassPanel
+          title={item.title}
+          span="col-span-6"
+          background={false}
+          icon={item.icon}
+          hasLightIcon={item.hasLightIcon}
+        >
+          {item.description}
+        </GlassPanel>
       </Link>
     )
-  })}
+
+})}
+
 </div>
 
 export const useCases = [
   {
-    title: 'OpenAI Vector Search',
-    href: '/guides/getting-started/openai/vector-search',
-    description: `Build your own custom ChatGPT with Next.js, OpenAI and pg_vector.`,
+    title: 'AI, Vectors, and embeddings',
+    href: '/docs/guides/ai#examples',
+    description: `Build AI-enabled applications using our Vector toolkit.`,
     icon: '/docs/img/icons/openai_logo',
+    hasLightIcon: true,
   },
   {
     title: 'Subscription Payments (SaaS)',
@@ -130,11 +150,19 @@ export const quickstarts = [
     icon: '/docs/img/icons/react-icon',
   },
   {
-    title: 'NextJS',
+    title: 'Next.js',
     href: '/guides/getting-started/quickstarts/nextjs',
     description:
-      'Learn how to create a Supabase project, add some sample data to your database, and query the data from a NextJS app.',
+      'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Next.js app.',
     icon: '/docs/img/icons/nextjs-icon',
+    hasLightIcon: true,
+  },
+  {
+    title: 'NuxtJS',
+    href: '/guides/getting-started/quickstarts/nuxtjs',
+    description:
+      'Learn how to create a Supabase project, add some sample data to your database, and query the data from a NuxtJS app.',
+    icon: '/docs/img/icons/nuxt-icon',
   },
   {
     title: 'RedwoodJS',
@@ -149,6 +177,13 @@ export const quickstarts = [
     description:
       'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Flutter app.',
     icon: '/docs/img/icons/flutter-icon',
+  },
+  {
+    title: 'Android Kotlin',
+    href: '/guides/getting-started/quickstarts/kotlin',
+    description:
+      'Learn how to create a Supabase project, add some sample data to your database, and query the data from an Android Kotlin app.',
+    icon: '/docs/img/icons/kotlin-icon',
   },
   {
     title: 'SvelteKit',
@@ -166,20 +201,28 @@ export const quickstarts = [
   },
   {
     title: 'Vue',
-    href: '/guides/getting-started/quickstarts/solidjs',
+    href: '/guides/getting-started/quickstarts/vue',
     description:
       'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Vue app.',
     icon: '/docs/img/icons/vuejs-icon',
+  },
+  {
+    title: 'refine',
+    href: '/guides/getting-started/quickstarts/refine',
+    description:
+      'Learn how to create a Supabase project, add some sample data to your database, and query the data from a refine app.',
+    icon: '/docs/img/icons/refine-icon',
   },
 ]
 
 export const webapps = [
   {
-    title: 'NextJS',
+    title: 'Next.js',
     href: '/guides/getting-started/tutorials/with-nextjs',
     description:
-      'Learn how to build a user management app with NextJS and Supabase Database, Auth, and Storage functionality.',
+      'Learn how to build a user management app with Next.js and Supabase Database, Auth, and Storage functionality.',
     icon: '/docs/img/icons/nextjs-icon',
+    hasLightIcon: true,
   },
   {
     title: 'React',
@@ -230,6 +273,13 @@ export const webapps = [
       'Learn how to build a user management app with SvelteKit and Supabase Database, Auth, and Storage functionality.',
     icon: '/docs/img/icons/svelte-icon',
   },
+  {
+    title: 'refine',
+    href: '/guides/getting-started/tutorials/with-refine',
+    description:
+      'Learn how to build a user management app with refine and Supabase Database, Auth, and Storage functionality.',
+    icon: '/docs/img/icons/refine-icon',
+  },
 ]
 
 export const mobile = [
@@ -241,11 +291,19 @@ export const mobile = [
     icon: '/docs/img/icons/flutter-icon',
   },
   {
-    title: 'Expo',
-    href: '/guides/getting-started/tutorials/with-expo',
+    title: 'Expo React Native',
+    href: '/guides/getting-started/tutorials/with-expo-react-native',
     description:
-      'Learn how to build a user management app with Expo and Supabase Database, Auth, and Storage functionality.',
+      'Learn how to build a user management app with Expo React Native and Supabase Database, Auth, and Storage functionality.',
     icon: '/docs/img/icons/expo-icon',
+    hasLightIcon: true,
+  },
+  {
+    title: 'Android Kotlin',
+    href: '/guides/getting-started/tutorials/with-kotlin',
+    description:
+      'Learn how to build a product management app with Android and Supabase Database, Auth, and Storage functionality.',
+    icon: '/docs/img/icons/kotlin-icon',
   },
   {
     title: 'Ionic React',

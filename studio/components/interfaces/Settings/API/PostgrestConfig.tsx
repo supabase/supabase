@@ -1,16 +1,10 @@
-import { useContext, FC, useEffect } from 'react'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { indexOf } from 'lodash'
 import { observer } from 'mobx-react-lite'
-import { Input, Form, IconAlertCircle, InputNumber } from 'ui'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useEffect } from 'react'
 
-import { checkPermissions, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
-import MultiSelect from 'components/ui/MultiSelect'
-import { PageContext } from 'pages/project/[ref]/settings/api'
-
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   FormActions,
   FormPanel,
@@ -18,65 +12,57 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from 'components/ui/Forms'
+import MultiSelect from 'components/ui/MultiSelect'
+import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
+import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
+import { useSchemasQuery } from 'data/database/schemas-query'
+import { useCheckPermissions, useStore } from 'hooks'
+import { Form, IconAlertCircle, Input, InputNumber } from 'ui'
 
-interface Props {}
-
-const PostgrestConfig: FC<Props> = ({}) => {
-  const PageState: any = useContext(PageContext)
-  const { ui } = useStore()
-  const { meta } = PageState
-
+const PostgrestConfig = () => {
   const { ref: projectRef } = useParams()
+  const { ui } = useStore()
 
-  const formId = 'project-postgres-config'
+  const { project } = useProjectContext()
+  const { data: schemas } = useSchemasQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
   const { data: config, isError } = useProjectPostgrestConfigQuery({ projectRef })
-
-  const initialValues = {
-    db_schema: '',
-    max_rows: '',
-    db_extra_search_path: '',
-  }
-
-  const canUpdatePostgrestConfig = checkPermissions(
+  const { mutate: updatePostgrestConfig, isLoading: isUpdating } =
+    useProjectPostgrestConfigUpdateMutation({
+      onSuccess: () => {
+        ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
+      },
+    })
+  const canUpdatePostgrestConfig = useCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_postgrest'
   )
 
-  const { mutateAsync: updatePostgrestConfig } = useProjectPostgrestConfigUpdateMutation()
+  const formId = 'project-postgres-config'
+  const initialValues = { db_schema: '', max_rows: '', db_extra_search_path: '' }
 
   const updateConfig = async (updatedConfig: typeof initialValues) => {
-    if (!projectRef) return
-
-    try {
-      await updatePostgrestConfig({
-        projectRef,
-        dbSchema: updatedConfig.db_schema,
-        maxRows: updatedConfig.max_rows,
-        dbExtraSearchPath: updatedConfig.db_extra_search_path,
-      })
-
-      ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
-    } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to update config: ${error.message}`,
-      })
-    }
+    if (!projectRef) return console.error('Project ref is required')
+    updatePostgrestConfig({
+      projectRef,
+      dbSchema: updatedConfig.db_schema,
+      maxRows: updatedConfig.max_rows,
+      dbExtraSearchPath: updatedConfig.db_extra_search_path,
+    })
   }
 
   const permanentSchema = ['public', 'storage']
   const hiddenSchema = ['auth', 'pgbouncer', 'hooks', 'extensions']
   const schema =
-    meta.schemas
-      .list(
-        (x: any) => {
-          const find = indexOf(hiddenSchema, x.name)
-          if (find < 0) return x
-        },
-        { allSchemas: true }
-      )
-      .map((x: any) => {
+    schemas
+      ?.filter((x) => {
+        const find = indexOf(hiddenSchema, x.name)
+        if (find < 0) return x
+      })
+      .map((x) => {
         return {
           id: x.id,
           value: x.name,
@@ -87,7 +73,7 @@ const PostgrestConfig: FC<Props> = ({}) => {
 
   return (
     <Form id={formId} initialValues={initialValues} validate={() => {}} onSubmit={updateConfig}>
-      {({ isSubmitting, handleReset, resetForm, values, initialValues }: any) => {
+      {({ handleReset, resetForm, values, initialValues }: any) => {
         const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
         // [Alaister] although this "technically" is breaking the rules of React hooks
@@ -113,7 +99,7 @@ const PostgrestConfig: FC<Props> = ({}) => {
                 <div className="flex px-8 py-4">
                   <FormActions
                     form={formId}
-                    isSubmitting={isSubmitting}
+                    isSubmitting={isUpdating}
                     hasChanges={hasChanges}
                     handleReset={handleReset}
                     disabled={!canUpdatePostgrestConfig}
@@ -129,7 +115,7 @@ const PostgrestConfig: FC<Props> = ({}) => {
               {isError ? (
                 <div className="flex items-center justify-center py-8 space-x-2">
                   <IconAlertCircle size={16} strokeWidth={1.5} />
-                  <p className="text-sm text-scale-1100">Failed to retrieve API settings</p>
+                  <p className="text-sm text-foreground-light">Failed to retrieve API settings</p>
                 </div>
               ) : (
                 <>

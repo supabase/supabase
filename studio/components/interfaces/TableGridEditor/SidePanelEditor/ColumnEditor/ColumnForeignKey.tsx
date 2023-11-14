@@ -1,13 +1,12 @@
-import { FC } from 'react'
 import { isUndefined } from 'lodash'
 import { Badge, Button, IconArrowRight } from 'ui'
 
-import { ColumnField } from '../SidePanelEditor.types'
 import InformationBox from 'components/ui/InformationBox'
-import { getForeignKeyDeletionAction, getForeignKeyUIState } from './ColumnEditor.utils'
 import type { ExtendedPostgresRelationship } from '../SidePanelEditor.types'
+import { ColumnField } from '../SidePanelEditor.types'
+import { getForeignKeyCascadeAction, getForeignKeyUIState } from './ColumnEditor.utils'
 
-interface Props {
+interface ColumnForeignKeyProps {
   column: ColumnField
   originalForeignKey: ExtendedPostgresRelationship | undefined
   onSelectEditRelation: () => void
@@ -15,13 +14,13 @@ interface Props {
   onSelectCancelRemoveRelation: () => void
 }
 
-const ColumnForeignKey: FC<Props> = ({
+const ColumnForeignKey = ({
   column,
   originalForeignKey,
-  onSelectEditRelation = () => {},
-  onSelectRemoveRelation = () => {},
+  onSelectEditRelation,
+  onSelectRemoveRelation,
   onSelectCancelRemoveRelation,
-}) => {
+}: ColumnForeignKeyProps) => {
   const hasNoForeignKey = isUndefined(originalForeignKey) && isUndefined(column?.foreignKey)
   if (hasNoForeignKey) {
     return (
@@ -80,27 +79,41 @@ export default ColumnForeignKey
 
 // Just to break the components into smaller ones, we can create separate files for these
 
-const ColumnForeignKeyInformation: FC<{
+interface ColumnForeignKeyInformationProps {
   columnName: string
   foreignKey?: ExtendedPostgresRelationship
   onSelectEditRelation: () => void
   onSelectRemoveRelation: () => void
-}> = ({ columnName, foreignKey, onSelectEditRelation, onSelectRemoveRelation }) => {
-  const deletionAction = getForeignKeyDeletionAction(foreignKey?.deletion_action)
+}
+
+const ColumnForeignKeyInformation = ({
+  columnName,
+  foreignKey,
+  onSelectEditRelation,
+  onSelectRemoveRelation,
+}: ColumnForeignKeyInformationProps) => {
+  const updateAction = getForeignKeyCascadeAction(foreignKey?.update_action)
+  const deletionAction = getForeignKeyCascadeAction(foreignKey?.deletion_action)
+
   return (
     <InformationBox
       block
       title={
         <div className="flex flex-col space-y-4">
           <div className="space-y-2">
-            <p className="text-scale-1100">This column has the following foreign key relation:</p>
-            <div className="flex items-center space-x-2 text-scale-1200">
-              <span className="text-xs text-code font-mono">{columnName}</span>
+            <p className="text-foreground-light">
+              This column has the following foreign key relation:
+            </p>
+            <div className="flex items-center space-x-2 text-foreground">
+              <p className="text-xs text-code font-mono">{columnName}</p>
               <IconArrowRight size={14} strokeWidth={2} />
-              <span className="text-xs text-code font-mono">
+              <p className="text-xs text-code font-mono">
                 {foreignKey?.target_table_schema}.{foreignKey?.target_table_name}.
                 {foreignKey?.target_column_name}
-              </span>
+              </p>
+            </div>
+            <div className="flex items-center space-x-2">
+              {updateAction !== undefined && <Badge color="gray">On update: {updateAction}</Badge>}
               {deletionAction !== undefined && (
                 <Badge color="gray">On delete: {deletionAction}</Badge>
               )}
@@ -120,36 +133,47 @@ const ColumnForeignKeyInformation: FC<{
   )
 }
 
-const ColumnForeignKeyAdded: FC<{
+interface ColumnForeignKeyAddedProps {
   columnName: string
   foreignKey?: ExtendedPostgresRelationship
   onSelectEditRelation: () => void
   onSelectRemoveRelation: () => void
-}> = ({ columnName, foreignKey, onSelectEditRelation, onSelectRemoveRelation }) => {
-  const deletionAction = getForeignKeyDeletionAction(foreignKey?.deletion_action)
+}
+
+const ColumnForeignKeyAdded = ({
+  columnName,
+  foreignKey,
+  onSelectEditRelation,
+  onSelectRemoveRelation,
+}: ColumnForeignKeyAddedProps) => {
+  const updateAction = getForeignKeyCascadeAction(foreignKey?.update_action)
+  const deletionAction = getForeignKeyCascadeAction(foreignKey?.deletion_action)
+
   return (
     <InformationBox
       block
       title={
-        <div className="flex flex-col space-y-4 text-scale-1100">
+        <div className="flex flex-col space-y-4 text-foreground-light">
           <div className="space-y-2">
             <span>
-              The following foreign key relation will be{' '}
-              <span className="text-brand-900">added</span>:
+              The following foreign key relation will be <span className="text-brand">added</span>:
             </span>
-            <div className="flex items-center space-x-2 text-scale-1200">
-              <span
+            <div className="flex items-center space-x-2 text-foreground">
+              <p
                 className={`${
                   columnName.length > 0 ? 'text-code font-mono text-xs' : ''
                 } max-w-xs truncate`}
               >
                 {columnName || 'This column'}
-              </span>
+              </p>
               <IconArrowRight size={14} strokeWidth={2} />
-              <span className="max-w-xs text-xs truncate text-code font-mono">
+              <p className="max-w-xs text-xs truncate text-code font-mono">
                 {foreignKey?.target_table_schema}.{foreignKey?.target_table_name}.
                 {foreignKey?.target_column_name}
-              </span>
+              </p>
+            </div>
+            <div className="flex items-center space-x-2">
+              {updateAction !== undefined && <Badge color="gray">On update: {updateAction}</Badge>}
               {deletionAction !== undefined && (
                 <Badge color="gray">On delete: {deletionAction}</Badge>
               )}
@@ -169,19 +193,26 @@ const ColumnForeignKeyAdded: FC<{
   )
 }
 
-const ColumnForeignKeyRemoved: FC<{
+interface ColumnForeignKeyRemovedProps {
   columnName: string
   originalForeignKey?: ExtendedPostgresRelationship
   onSelectEditRelation: () => void
   onSelectCancelRemoveRelation: () => void
-}> = ({ columnName, originalForeignKey, onSelectEditRelation, onSelectCancelRemoveRelation }) => {
+}
+
+const ColumnForeignKeyRemoved = ({
+  columnName,
+  originalForeignKey,
+  onSelectEditRelation,
+  onSelectCancelRemoveRelation,
+}: ColumnForeignKeyRemovedProps) => {
   return (
     <InformationBox
       block
       title={
         <div className="flex flex-col space-y-4">
           <div className="space-y-2">
-            <p className="text-scale-1100">
+            <p className="text-foreground-light">
               The following foreign key relation will be{' '}
               <span className="text-amber-900">removed</span>:
             </p>
@@ -208,24 +239,29 @@ const ColumnForeignKeyRemoved: FC<{
   )
 }
 
-const ColumnForeignKeyUpdated: FC<{
+interface ColumnForeignKeyUpdatedProps {
   columnName: string
   originalForeignKey?: ExtendedPostgresRelationship
   updatedForeignKey?: ExtendedPostgresRelationship
   onSelectEditRelation: () => void
   onSelectRemoveRelation: () => void
-}> = ({
+}
+
+const ColumnForeignKeyUpdated = ({
   columnName,
   originalForeignKey,
   updatedForeignKey,
   onSelectEditRelation,
   onSelectRemoveRelation,
-}) => {
+}: ColumnForeignKeyUpdatedProps) => {
   const originalKey = `${originalForeignKey?.target_table_schema}.${originalForeignKey?.target_table_name}.${originalForeignKey?.target_column_name}`
   const updatedKey = `${updatedForeignKey?.target_table_schema}.${updatedForeignKey?.target_table_name}.${updatedForeignKey?.target_column_name}`
 
-  const originalDeletionAction = getForeignKeyDeletionAction(originalForeignKey?.deletion_action)
-  const updatedDeletionAction = getForeignKeyDeletionAction(updatedForeignKey?.deletion_action)
+  const originalUpdateAction = getForeignKeyCascadeAction(originalForeignKey?.update_action)
+  const updatedUpdateAction = getForeignKeyCascadeAction(updatedForeignKey?.update_action)
+
+  const originalDeletionAction = getForeignKeyCascadeAction(originalForeignKey?.deletion_action)
+  const updatedDeletionAction = getForeignKeyCascadeAction(updatedForeignKey?.deletion_action)
 
   return (
     <InformationBox
@@ -234,8 +270,7 @@ const ColumnForeignKeyUpdated: FC<{
         <div className="flex flex-col space-y-4">
           <div className="space-y-2">
             <p>
-              The foreign key relation will be <span className="text-brand-900">updated</span> as
-              such:
+              The foreign key relation will be <span className="text-brand">updated</span> as such:
             </p>
             <div className="flex items-start space-x-2">
               <code className="text-xs font-mono">{columnName}</code>
@@ -248,19 +283,26 @@ const ColumnForeignKeyUpdated: FC<{
                 )}
                 <code className="text-xs font-mono">{updatedKey}</code>
               </div>
-              <div className="flex flex-col space-y-2">
-                {originalDeletionAction !== undefined &&
-                  originalDeletionAction !== updatedDeletionAction && (
-                    <Badge color="gray" className="line-through">
-                      On delete: {originalDeletionAction}
-                    </Badge>
-                  )}
-                {updatedDeletionAction !== undefined && (
-                  <div>
-                    <Badge color="green">On delete: {updatedDeletionAction}</Badge>
-                  </div>
-                )}
-              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              {originalDeletionAction !== updatedDeletionAction && (
+                <>
+                  <Badge color="gray" className="line-through">
+                    On delete: {originalDeletionAction ?? 'No action'}
+                  </Badge>
+                  <Badge color="green">On delete: {updatedDeletionAction ?? 'No action'}</Badge>
+                </>
+              )}
+            </div>
+            <div className="flex items-center space-x-2">
+              {originalUpdateAction !== updatedUpdateAction && (
+                <>
+                  <Badge color="gray" className="line-through">
+                    On update: {originalUpdateAction ?? 'No action'}
+                  </Badge>
+                  <Badge color="green">On update: {updatedUpdateAction ?? 'No action'}</Badge>
+                </>
+              )}
             </div>
           </div>
           <div className="flex items-center space-x-2">

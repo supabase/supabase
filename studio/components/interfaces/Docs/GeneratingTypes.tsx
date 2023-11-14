@@ -1,15 +1,14 @@
-import { FC, useState } from 'react'
 import Link from 'next/link'
-import React from 'react'
+import { useState } from 'react'
 import { Button, IconDownload, IconExternalLink } from 'ui'
-import { API_ADMIN_URL } from 'lib/constants'
-import { get } from 'lib/common/fetch'
-import { useStore } from 'hooks'
+
 import { useParams } from 'common/hooks'
-import CodeSnippet from 'components/to-be-cleaned/Docs/CodeSnippet'
+import CodeSnippet from 'components/interfaces/Docs/CodeSnippet'
+import { generateTypes } from 'data/projects/project-type-generation-query'
+import { useStore } from 'hooks'
 
 interface Props {
-  selectedLang: string
+  selectedLang: 'bash' | 'js'
 }
 
 export default function GeneratingTypes({ selectedLang }: Props) {
@@ -17,11 +16,10 @@ export default function GeneratingTypes({ selectedLang }: Props) {
   const { ui } = useStore()
   const [isGeneratingTypes, setIsGeneratingTypes] = useState(false)
 
-  const generateTypes = async () => {
-    setIsGeneratingTypes(true)
-    const res = await get(`${API_ADMIN_URL}/projects/${ref}/types/typescript`)
-
-    if (!res.error) {
+  const onClickGenerateTypes = async () => {
+    try {
+      setIsGeneratingTypes(true)
+      const res = await generateTypes({ ref })
       let element = document.createElement('a')
       element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(res.types))
       element.setAttribute('download', 'supabase.ts')
@@ -33,30 +31,33 @@ export default function GeneratingTypes({ selectedLang }: Props) {
         category: 'success',
         message: `Successfully generated types! File is being downloaded`,
       })
-    } else {
+    } catch (error: any) {
       ui.setNotification({
+        error,
         category: 'error',
-        message: `Failed to generate types: ${res.error.message}`,
-        error: res.error,
+        message: `Failed to generate types: ${error.message}`,
       })
+    } finally {
+      setIsGeneratingTypes(false)
     }
-
-    setIsGeneratingTypes(false)
   }
+
   return (
     <>
       <h2 className="doc-heading flex items-center justify-between">
         <span>Generating types</span>
-        <Link href="https://supabase.com/docs/guides/database/api/generating-types">
-          <a target="_blank" rel="noreferrer">
-            <Button type="default" icon={<IconExternalLink />}>
-              Documentation
-            </Button>
-          </a>
-        </Link>
+        <Button asChild type="default" icon={<IconExternalLink />}>
+          <Link
+            href="https://supabase.com/docs/guides/database/api/generating-types"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Documentation
+          </Link>
+        </Button>
       </h2>
       <div className="doc-section">
-        <article className="text ">
+        <article className="code-column text-foreground">
           <p>
             Supabase APIs are generated from your database, which means that we can use database
             introspection to generate type-safe API definitions.
@@ -81,13 +82,13 @@ export default function GeneratingTypes({ selectedLang }: Props) {
                   disabled={isGeneratingTypes}
                   loading={isGeneratingTypes}
                   icon={<IconDownload strokeWidth={1.5} />}
-                  onClick={generateTypes}
+                  onClick={onClickGenerateTypes}
                 >
                   Generate and download types
                 </Button>
               )}
             </p>
-            <p className="text-xs text-scale-1100 bg-scale-200 p-4 mt-2">
+            <p className="text-xs text-center text-foreground-light bg-background p-4">
               Remember to re-generate and download this file as you make changes to your tables.
             </p>
           </div>

@@ -81,7 +81,7 @@ const SQLOutputActions = ({ answer, messages }: SQLOutputActionsProps) => {
           type="default"
           icon={
             showCopied ? (
-              <IconCheck size="tiny" className="text-brand-900" strokeWidth={2} />
+              <IconCheck size="tiny" className="text-brand" strokeWidth={2} />
             ) : (
               <IconClipboard size="tiny" />
             )
@@ -98,7 +98,7 @@ const SQLOutputActions = ({ answer, messages }: SQLOutputActionsProps) => {
           disabled={isSaving}
           icon={
             isSaved ? (
-              <IconCheck size="tiny" className="text-brand-900" strokeWidth={2} />
+              <IconCheck size="tiny" className="text-brand" strokeWidth={2} />
             ) : (
               <IconSave size="tiny" />
             )

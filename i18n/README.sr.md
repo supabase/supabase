@@ -1,6 +1,6 @@
 <p align="center">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--light.svg#gh-light-mode-only">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--dark.svg#gh-dark-mode-only">
+<img src="https://user-images.githubusercontent.com/8291514/213727234-cda046d6-28c6-491a-b284-b86c5cede25d.png#gh-light-mode-only">
+<img src="https://user-images.githubusercontent.com/8291514/213727225-56186826-bee8-43b5-9b15-86e839d89393.png#gh-dark-mode-only">
 </p>
 
 ---
@@ -12,9 +12,9 @@
 - [x] Hostovana Postgres Baza. [Dokumentacija](https://supabase.com/docs/guides/database)
 - [x] Autentifikacija i Autorizacija. [Dokumentacija](https://supabase.com/docs/guides/auth)
 - [x] Auto-generisani API-ji.
-  - [x] REST. [Dokumentacija](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] Subskripcije u realnom vremenu. [Dokumentacija](https://supabase.com/docs/guides/database/api#realtime-api)
-  - [x] GraphQL (Beta). [Dokumentacija](https://supabase.com/docs/guides/database/api#graphql-api)
+  - [x] REST. [Dokumentacija](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] Subskripcije u realnom vremenu. [Dokumentacija](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] GraphQL (Beta). [Dokumentacija](https://supabase.com/docs/guides/api#graphql-api-overview)
 - [x] Funkcije.
   - [x] Funkcije u bazi. [Dokumentacija](https://supabase.com/docs/guides/database/functions)
   - [x] Edge Funkcije [Dokumentacija](https://supabase.com/docs/guides/functions)
@@ -39,7 +39,7 @@ Da vidite kako možete doprineti razvoju, posetite [Getting Started](../DEVELOPE
 ## Status
 
 - [x] Alfa: Testiramo Supabase sa zatvorenim setom klijenata
-- [x] Javna Alfa: Bilo ko može da se prijavi na [app.supabase.com](https://app.supabase.com). Ali ne budite grubi, biće nekih poteškoća
+- [x] Javna Alfa: Bilo ko može da se prijavi na [supabase.com/dashboard](https://supabase.com/dashboard). Ali ne budite grubi, biće nekih poteškoća
 - [x] Javna Beta: Dovoljno stabilno za većinu ne-enterprise projekata
 - [ ] Objavljeno: spremno za produkciju
 
@@ -55,10 +55,10 @@ Supabase je kombinacija open source alata. Razvijamo funkcionalnosti Firebase-a 
 
 **Arhitektura**
 
-Supabase je [hostovana platforma](https://app.supabase.com). Možete se prijaviti i početi sa korišćenjem Supabase-a bez instaliranja bilo čega.
+Supabase je [hostovana platforma](https://supabase.com/dashboard). Možete se prijaviti i početi sa korišćenjem Supabase-a bez instaliranja bilo čega.
 Takođe možete da [hostujete sami](https://supabase.com/docs/guides/hosting/overview) i da [razvijate u lokalu](https://supabase.com/docs/guides/local-development).
 
-![Arhitektura](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
+![Arhitektura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [PostgreSQL](https://www.postgresql.org/) je sistem objektno-relacione baze sa preko 30 godina aktivnog razvoja čime je zaslužio jaku reputaciju za pouzdanost, robustnost funkcionalnosti i performanse.
 - [Realtime](https://github.com/supabase/realtime) je Elixir server koji vam omogućava da slušate PostgreSQL inserte, updateove, i brisanja koristeći websokete. Realtime polluje Postgres-ovu ugrađenu funkcionalnost replikacije za promene nad bazom, konvertuje promene u JSON, zatim broadcastuje taj JSON kroz websoket autorizovanim klijentima.

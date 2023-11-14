@@ -1,5 +1,5 @@
 import { post } from 'lib/common/fetch'
-import { API_URL, IS_PLATFORM } from 'lib/constants'
+import { API_URL, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { User } from 'types'
 import { NextRouter } from 'next/router'
 
@@ -19,6 +19,12 @@ const sendEvent = (
   router: NextRouter
 ) => {
   if (!IS_PLATFORM) return
+
+  const consent =
+    typeof window !== 'undefined'
+      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
+      : null
+  if (consent !== 'true') return
 
   const { category, action, label, value } = event
 
@@ -44,6 +50,12 @@ const sendEvent = (
 const sendIdentify = (user: User, gaProps?: TelemetryProps) => {
   if (!IS_PLATFORM) return
 
+  const consent =
+    typeof window !== 'undefined'
+      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
+      : null
+  if (consent !== 'true') return
+
   return post(`${API_URL}/telemetry/identify`, {
     user,
     ga: {
@@ -53,7 +65,44 @@ const sendIdentify = (user: User, gaProps?: TelemetryProps) => {
   })
 }
 
+const sendActivity = (
+  event: {
+    activity: string
+    source: string
+    projectRef?: string
+    orgSlug?: string
+    data?: object
+  },
+  router: NextRouter
+) => {
+  if (!IS_PLATFORM) return
+
+  const consent =
+    typeof window !== 'undefined'
+      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
+      : null
+  if (consent !== 'true') return
+
+  const { activity, source, projectRef, orgSlug, data } = event
+
+  const properties = {
+    activity,
+    source,
+    page: {
+      path: router.route,
+      location: router.asPath,
+      referrer: document?.referrer || '',
+      title: document?.title || '',
+    },
+    ...(data && { data }),
+    ...(projectRef && { projectRef }),
+    ...(orgSlug && { orgSlug }),
+  }
+  return post(`${API_URL}/telemetry/activity`, properties)
+}
+
 export default {
   sendEvent,
   sendIdentify,
+  sendActivity,
 }

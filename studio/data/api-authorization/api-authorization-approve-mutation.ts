@@ -1,6 +1,9 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
+
 import { post } from 'lib/common/fetch'
 import { API_ADMIN_URL } from 'lib/constants'
+import { ResponseError } from 'types'
 
 export type ApiAuthorizationApproveVariables = {
   id: string
@@ -29,14 +32,23 @@ export async function approveApiAuthorization({
 type ApiAuthorizationApproveData = Awaited<ReturnType<typeof approveApiAuthorization>>
 
 export const useApiAuthorizationApproveMutation = ({
-  onSuccess,
+  onError,
   ...options
 }: Omit<
-  UseMutationOptions<ApiAuthorizationApproveData, unknown, ApiAuthorizationApproveVariables>,
+  UseMutationOptions<ApiAuthorizationApproveData, ResponseError, ApiAuthorizationApproveVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<ApiAuthorizationApproveData, unknown, ApiAuthorizationApproveVariables>(
+  return useMutation<ApiAuthorizationApproveData, ResponseError, ApiAuthorizationApproveVariables>(
     (vars) => approveApiAuthorization(vars),
-    options
+    {
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to approve authorization request: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
+      },
+      ...options,
+    }
   )
 }

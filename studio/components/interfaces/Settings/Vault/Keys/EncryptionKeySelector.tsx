@@ -1,8 +1,9 @@
-import { FC } from 'react'
-import { Input, Listbox, Modal, IconPlus } from 'ui'
+import { noop } from 'lodash'
+import { IconPlus, Input, Listbox, Modal } from 'ui'
+
 import { useStore } from 'hooks'
 
-interface Props {
+interface EncryptionKeySelectorProps {
   id?: string
   nameId?: string
   label?: string
@@ -13,16 +14,16 @@ interface Props {
   onUpdateDescription?: (desc: string) => void
 }
 
-const EncryptionKeySelector: FC<Props> = ({
+const EncryptionKeySelector = ({
   id = 'keyId',
   nameId = 'keyName',
   label = 'Encryption key',
   labelOptional,
   selectedKeyId,
   error,
-  onSelectKey = () => {},
-  onUpdateDescription = () => {},
-}) => {
+  onSelectKey = noop,
+  onUpdateDescription = noop,
+}: EncryptionKeySelectorProps) => {
   const { vault } = useStore()
   const keys = vault.listKeys()
 
@@ -61,9 +62,10 @@ const EncryptionKeySelector: FC<Props> = ({
       {selectedKeyId === 'create-new' && (
         <Input
           id={nameId}
-          label="Name"
+          label="Name of encryption key"
           error={error}
           onChange={(event) => onUpdateDescription(event.target.value)}
+          descriptionText="Provide a name for your key for easier identification"
         />
       )}
     </>

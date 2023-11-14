@@ -1,4 +1,4 @@
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 import * as React from 'react'
 import Image from 'next/image'
 
@@ -29,15 +29,17 @@ const GlassPanel = ({
   showLink = false,
   showIconBg = false,
 }: Props) => {
-  const { isDarkMode } = useTheme()
-  const showLogoInverse = logoInverse && isDarkMode
+  const { resolvedTheme } = useTheme()
+  const showLogoInverse = logoInverse && resolvedTheme === 'dark'
   const showLogo = !showLogoInverse && logo
 
-  const IconBackground: React.FC = (props) => (
+  const IconBackground: React.FC<React.PropsWithChildren> = (props) => (
     <div
       className={[
         'shrink-0',
-        showIconBg ? 'bg-green-600 w-8 h-8 flex items-center justify-center rounded' : '',
+        showIconBg
+          ? 'bg-brand-300 border border-brand-400 w-8 h-8 flex items-center justify-center rounded'
+          : '',
       ].join(' ')}
     >
       {props.children}
@@ -49,6 +51,7 @@ const GlassPanel = ({
       <div className="relative h-[33px] w-auto max-w-[145px]">
         <Image
           src={logoImage}
+          alt={title}
           layout="fill"
           objectFit="contain"
           objectPosition="left"
@@ -69,8 +72,8 @@ const GlassPanel = ({
         'border rounded-lg',
         'text-left',
         background
-          ? 'border-scale-500 hover:border-scale-700 bg-white dark:bg-scale-300'
-          : 'border-scale-400 hover:border-scale-500 bg-transparent',
+          ? 'hover:border-strong bg-surface-100'
+          : 'border-muted hover:border-default bg-transparent',
         'transition',
       ].join(' ')}
     >
@@ -102,17 +105,18 @@ const GlassPanel = ({
             <IconBackground>
               <img
                 className="w-5"
-                src={`${icon}${hasLightIcon && !isDarkMode ? '-light' : ''}.svg`}
+                alt={title}
+                src={`${icon}${hasLightIcon && resolvedTheme !== 'dark' ? '-light' : ''}.svg`}
               />
             </IconBackground>
           ) : (
             icon && <IconBackground>{icon}</IconBackground>
           )}
-          <h5 className="text-base text-scale-1200">{title}</h5>
+          <p className="text-base text-foreground">{title}</p>
         </div>
 
-        {children && <span className="text-sm text-scale-1100 flex-grow">{children}</span>}
-        {showLink && <span className="text-brand-900 justify-end text-sm">Learn more</span>}
+        {children && <span className="text-sm text-foreground-light flex-grow">{children}</span>}
+        {showLink && <span className="text-brand justify-end text-sm">Learn more</span>}
       </div>
     </div>
   )

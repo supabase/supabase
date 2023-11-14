@@ -13,23 +13,25 @@ import {
   ErrorCountsChartRenderer,
   ResponseSpeedChartRenderer,
   TopApiRoutesRenderer,
+  NetworkTrafficRenderer,
 } from 'components/interfaces/Reports/renderers/ApiRenderers'
 import { useState, useEffect } from 'react'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import { DatePickerToFrom, LogsEndpointParams } from 'components/interfaces/Settings/Logs'
 import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
-import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import { useParams } from 'common'
 import { isEqual } from 'lodash'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks'
 
 export const ApiReport: NextPageWithLayout = () => {
-  const { ref: projectRef } = useParams()
+  const organization = useSelectedOrganization()
   const report = useApiReport()
 
-  const { data: subscription } = useProjectSubscriptionQuery({ projectRef })
-  const tier = subscription?.tier
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+  const plan = subscription?.plan
 
   const handleDatepickerChange = ({ from, to }: DatePickerToFrom) => {
     report.mergeParams({
@@ -51,7 +53,7 @@ export const ApiReport: NextPageWithLayout = () => {
           filters={report.filters}
           datepickerHelpers={REPORTS_DATEPICKER_HELPERS.map((helper, index) => ({
             ...helper,
-            disabled: (index > 0 && tier?.key === 'FREE') || (index > 1 && tier?.key !== 'PRO'),
+            disabled: (index > 0 && plan?.id === 'free') || (index > 1 && plan?.id !== 'pro'),
           }))}
         />
         <div className="h-2 w-full">
@@ -66,7 +68,7 @@ export const ApiReport: NextPageWithLayout = () => {
         data={report.data.totalRequests || []}
         renderer={TotalRequestsChartRenderer}
         append={TopApiRoutesRenderer}
-        appendProps={{ data: report.data.topRoutes || [] }}
+        appendProps={{ data: report.data.topRoutes || [], params: report.params.topRoutes }}
       />
       <ReportWidget
         isLoading={report.isLoading}
@@ -75,7 +77,10 @@ export const ApiReport: NextPageWithLayout = () => {
         tooltip="Error responses with 4XX or 5XX status codes"
         data={report.data.errorCounts || []}
         renderer={ErrorCountsChartRenderer}
-        appendProps={{ data: report.data.topErrorRoutes || [] }}
+        appendProps={{
+          data: report.data.topErrorRoutes || [],
+          params: report.params.topErrorRoutes,
+        }}
         append={TopApiRoutesRenderer}
       />
       <ReportWidget
@@ -85,8 +90,17 @@ export const ApiReport: NextPageWithLayout = () => {
         tooltip="Average response speed (in miliseconds) of a request"
         data={report.data.responseSpeed || []}
         renderer={ResponseSpeedChartRenderer}
-        appendProps={{ data: report.data.topSlowRoutes || [] }}
+        appendProps={{ data: report.data.topSlowRoutes || [], params: report.params.topSlowRoutes }}
         append={TopApiRoutesRenderer}
+      />
+
+      <ReportWidget
+        isLoading={report.isLoading}
+        params={report.params.networkTraffic}
+        title="Network Traffic"
+        tooltip="Ingress and egress of requests and responses respectively"
+        data={report.data.networkTraffic || []}
+        renderer={NetworkTrafficRenderer}
       />
     </ReportPadding>
   )
@@ -106,6 +120,7 @@ const useApiReport = () => {
   const topErrorRoutes = queryHooks.topErrorRoutes()
   const responseSpeed = queryHooks.responseSpeed()
   const topSlowRoutes = queryHooks.topSlowRoutes()
+  const networkTraffic = queryHooks.networkTraffic()
   const activeHooks = [
     totalRequests,
     topRoutes,
@@ -113,6 +128,7 @@ const useApiReport = () => {
     topErrorRoutes,
     responseSpeed,
     topSlowRoutes,
+    networkTraffic,
   ]
   const [filters, setFilters] = useState<ReportFilterItem[]>([])
   const addFilter = (filter: ReportFilterItem) => {
@@ -141,55 +157,59 @@ const useApiReport = () => {
 
   useEffect(() => {
     // update sql for each query
-    if (totalRequests[1].changeQuery) {
-      totalRequests[1].changeQuery(PRESET_CONFIG.api.queries.totalRequests.sql(filters))
+    if (totalRequests.changeQuery) {
+      totalRequests.changeQuery(PRESET_CONFIG.api.queries.totalRequests.sql(filters))
     }
-    if (topRoutes[1].changeQuery) {
-      topRoutes[1].changeQuery(PRESET_CONFIG.api.queries.topRoutes.sql(filters))
+    if (topRoutes.changeQuery) {
+      topRoutes.changeQuery(PRESET_CONFIG.api.queries.topRoutes.sql(filters))
     }
-    if (errorCounts[1].changeQuery) {
-      errorCounts[1].changeQuery(PRESET_CONFIG.api.queries.errorCounts.sql(filters))
-    }
-
-    if (topErrorRoutes[1].changeQuery) {
-      topErrorRoutes[1].changeQuery(PRESET_CONFIG.api.queries.topErrorRoutes.sql(filters))
-    }
-    if (responseSpeed[1].changeQuery) {
-      responseSpeed[1].changeQuery(PRESET_CONFIG.api.queries.responseSpeed.sql(filters))
+    if (errorCounts.changeQuery) {
+      errorCounts.changeQuery(PRESET_CONFIG.api.queries.errorCounts.sql(filters))
     }
 
-    if (topSlowRoutes[1].changeQuery) {
-      topSlowRoutes[1].changeQuery(PRESET_CONFIG.api.queries.topSlowRoutes.sql(filters))
+    if (topErrorRoutes.changeQuery) {
+      topErrorRoutes.changeQuery(PRESET_CONFIG.api.queries.topErrorRoutes.sql(filters))
+    }
+    if (responseSpeed.changeQuery) {
+      responseSpeed.changeQuery(PRESET_CONFIG.api.queries.responseSpeed.sql(filters))
+    }
+
+    if (topSlowRoutes.changeQuery) {
+      topSlowRoutes.changeQuery(PRESET_CONFIG.api.queries.topSlowRoutes.sql(filters))
+    }
+
+    if (networkTraffic.changeQuery) {
+      networkTraffic.changeQuery(PRESET_CONFIG.api.queries.networkTraffic.sql(filters))
     }
   }, [JSON.stringify(filters)])
 
   const handleRefresh = async () => {
-    activeHooks.forEach(([_hookData, hookHandler]) => {
-      hookHandler.runQuery()
-    })
+    activeHooks.forEach((hook) => hook.runQuery())
   }
   const handleSetParams = (params: Partial<LogsEndpointParams>) => {
-    activeHooks.forEach(([_hookData, hookHandler]) => {
-      hookHandler.setParams?.((prev: LogsEndpointParams) => ({ ...prev, ...params }))
+    activeHooks.forEach((hook) => {
+      hook.setParams?.((prev: LogsEndpointParams) => ({ ...prev, ...params }))
     })
   }
-  const isLoading = activeHooks.some(([hookData]) => hookData.isLoading)
+  const isLoading = activeHooks.some((hook) => hook.isLoading)
   return {
     data: {
-      totalRequests: totalRequests[0].logData,
-      errorCounts: errorCounts[0].logData,
-      responseSpeed: responseSpeed[0].logData,
-      topRoutes: topRoutes[0].logData,
-      topErrorRoutes: topErrorRoutes[0].logData,
-      topSlowRoutes: topSlowRoutes[0].logData,
+      totalRequests: totalRequests.logData,
+      errorCounts: errorCounts.logData,
+      responseSpeed: responseSpeed.logData,
+      topRoutes: topRoutes.logData,
+      topErrorRoutes: topErrorRoutes.logData,
+      topSlowRoutes: topSlowRoutes.logData,
+      networkTraffic: networkTraffic.logData,
     },
     params: {
-      totalRequests: totalRequests[0].params,
-      errorCounts: errorCounts[0].params,
-      responseSpeed: responseSpeed[0].params,
-      topRoutes: topRoutes[0].params,
-      topErrorRoutes: topErrorRoutes[0].params,
-      topSlowRoutes: topSlowRoutes[0].params,
+      totalRequests: totalRequests.params,
+      errorCounts: errorCounts.params,
+      responseSpeed: responseSpeed.params,
+      topRoutes: topRoutes.params,
+      topErrorRoutes: topErrorRoutes.params,
+      topSlowRoutes: topSlowRoutes.params,
+      networkTraffic: networkTraffic.params,
     },
     mergeParams: handleSetParams,
     filters,

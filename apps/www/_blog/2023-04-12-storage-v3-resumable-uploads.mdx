@@ -1,6 +1,9 @@
 ---
 title: 'Supabase Storage v3: Resumable Uploads with support for 50GB files'
+description: Storage V3 with lots of new features including resumable uploads, more image transformationsm a Next.js image loader and more.
 launchweek: 7
+categories:
+  - product
 tags:
   - launch-week
   - storage
@@ -17,14 +20,14 @@ The key feature: **Resumable Uploads**! With Resumable Uploads, you can continue
 
 Resumable uploads divides the file into chunks before uploading them, emitting progress events during upload.
 
-<video width="100%" autoPlay="" loop="" muted="" playsInline="" controls="true">
+<video width="100%" autoPlay loop muted playsInline controls={true}>
   <source
     src="/images/blog/launch-week-7/day-3-storage-resumable-uploads/pause-upload.mov"
     type="video/mp4"
   />
 </video>
 
-With this release, you can now upload files as large as 50GB! (Previously the limit was 5GB).
+With this release, users on the Pro plan or higher can now upload files as large as 50GB! This substantial upgrade from the previous limit of 5GB offers even more flexibility for your file uploads.
 
 To build this feature, we implemented Postgres Advisory locks which solved some gnarly concurrency problems. We can now handle edge-cases, like two clients uploading to the same location. We’ll deep dive into how we implemented Advisory locks later in the post.
 
@@ -49,7 +52,7 @@ supabase.storage.from('bucket').download('image.jpg', {
 
 ### Next.js loader
 
-You can serve images from Storage with a simple Next.js loader for the Image component. Check out [our docs](https://supabase.com/docs/guides/storage/image-transformations#nextjs-loader) on how to get started.
+You can serve images from Storage with a simple Next.js loader for the Image component. Check out [our docs](https://supabase.com/docs/guides/storage/serving/image-transformations#nextjs-loader) on how to get started.
 
 ```js
 // supabase-image-loader.js
@@ -165,7 +168,7 @@ uppy.on('complete', (result) => {
 
 And there you have it, with a few lines of code, you can support parallel, resumable uploads of multiple files, with progress events!
 
-<video width="100%" autoPlay="" loop="" muted="" playsInline="" controls="true">
+<video width="100%" autoPlay loop muted playsInline controls={true}>
   <source
     src="/images/blog/launch-week-7/day-3-storage-resumable-uploads/parallel-uploads.mov"
     type="video/mp4"
@@ -240,6 +243,6 @@ We’ve got an exciting roadmap for the next few Storage releases:
 - Presigned upload URLs for TUS
 - Increasing max file size limit to 500 GB
 - Transform images stored outside Supabase Storage
-- [Smart CDN](https://supabase.com/docs/guides/storage/cdn#smart-cdn-caching) v2 with an even higher cache hit rate
+- [Smart CDN](https://supabase.com/docs/guides/storage/cdn/smart-cdn) v2 with an even higher cache hit rate
 
 Reach out on [Twitter](https://twitter.com/supabase) or [Discord](http://discord.supabase.com/) to share anything else you need to build amazing products.

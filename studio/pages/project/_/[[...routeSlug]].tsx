@@ -1,28 +1,23 @@
-import { FC } from 'react'
-import Link from 'next/link'
-import { NextPage } from 'next'
-import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
+import { NextPage } from 'next'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 
+import ProjectList from 'components/interfaces/Home/ProjectList'
 import { withAuth } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
-import ProjectList from 'components/interfaces/Home/ProjectList'
 
-interface Props {}
-
-const Header: FC<Props> = () => {
+const Header = () => {
   return (
     <div className="dark:border-dark border-b p-3">
       <div className="flex items-center space-x-2">
         <Link href="/projects">
-          <a>
-            <img
-              src={`${BASE_PATH}/img/supabase-logo.svg`}
-              alt="Supabase"
-              className="dark:border-dark rounded border p-1 hover:border-white"
-              style={{ height: 24 }}
-            />
-          </a>
+          <img
+            src={`${BASE_PATH}/img/supabase-logo.svg`}
+            alt="Supabase"
+            className="dark:border-dark rounded border p-1 hover:border-white"
+            style={{ height: 24 }}
+          />
         </Link>
       </div>
     </div>
@@ -36,19 +31,21 @@ const Header: FC<Props> = () => {
 const GenericProjectPage: NextPage = () => {
   const router = useRouter()
   const { routeSlug, ...queryParams } = router.query
-  const queryString =
-    Object.keys(queryParams).length > 0
-      ? new URLSearchParams(queryParams as Record<string, string>).toString()
-      : ''
+
+  const query = Object.keys(queryParams).length
+    ? `?${new URLSearchParams(queryParams as Record<string, string>)}`
+    : undefined
 
   const urlRewriterFactory = (slug: string | string[] | undefined) => {
     return (projectRef: string) => {
+      const hash = location.hash ? `#${location.hash}` : undefined
+
       if (!Array.isArray(slug)) {
-        return `/project/${projectRef}?${queryString}`
+        return [`/project/${projectRef}`, query, hash].filter(Boolean).join('')
       }
 
-      const slugPath = slug.reduce((a: string, b: string) => `${a}/${b}`, '').slice(1)
-      return `/project/${projectRef}/${slugPath}?${queryString}`
+      const slugPath = slug.reduce((a, b) => `${a}/${b}`, '').slice(1)
+      return [`/project/${projectRef}/${slugPath}`, query, hash].filter(Boolean).join('')
     }
   }
 

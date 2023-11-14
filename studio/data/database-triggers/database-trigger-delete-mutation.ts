@@ -1,8 +1,11 @@
+import { toast } from 'react-hot-toast'
 import { PostgresTrigger } from '@supabase/postgres-meta'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+
 import { delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { databaseTriggerKeys } from './keys'
+import { ResponseError } from 'types'
 
 export type DatabaseTriggerDeleteVariables = {
   id: number
@@ -17,8 +20,6 @@ export async function deleteDatabaseTrigger({
   projectRef,
   connectionString,
 }: DatabaseTriggerDeleteVariables) {
-  if (!projectRef) throw new Error('projectRef is required')
-
   let headers = new Headers()
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
@@ -34,20 +35,28 @@ type DatabaseTriggerDeleteData = Awaited<ReturnType<typeof deleteDatabaseTrigger
 
 export const useDatabaseTriggerDeleteMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseTriggerDeleteData, unknown, DatabaseTriggerDeleteVariables>,
+  UseMutationOptions<DatabaseTriggerDeleteData, ResponseError, DatabaseTriggerDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseTriggerDeleteData, unknown, DatabaseTriggerDeleteVariables>(
+  return useMutation<DatabaseTriggerDeleteData, ResponseError, DatabaseTriggerDeleteVariables>(
     (vars) => deleteDatabaseTrigger(vars),
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
         await queryClient.invalidateQueries(databaseTriggerKeys.list(projectRef))
         await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to delete database trigger: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
       },
       ...options,
     }

@@ -1,22 +1,27 @@
+import clsx from 'clsx'
 import Link from 'next/link'
+
+import { useParams } from 'common/hooks'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
+import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import { uuidv4 } from 'lib/helpers'
 import {
   Button,
-  Listbox,
-  Input,
-  SidePanel,
-  IconTrash,
-  IconPlus,
-  Dropdown,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   IconChevronDown,
+  IconPlus,
+  IconTrash,
+  Input,
+  Listbox,
+  SidePanel,
 } from 'ui'
-import { FormSection, FormSectionLabel, FormSectionContent } from 'components/ui/Forms'
 import { HTTPArgument } from './EditHookPanel'
-import { useStore } from 'hooks'
-import { useParams } from 'common/hooks'
-import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import clsx from 'clsx'
-import { uuidv4 } from 'lib/helpers'
-import { useProjectApiQuery } from 'data/config/project-api-query'
 
 interface HTTPRequestFieldsProps {
   type: 'http_request' | 'supabase_function'
@@ -43,7 +48,7 @@ const HTTPRequestFields = ({
   onUpdateParameter,
   onRemoveParameter,
 }: HTTPRequestFieldsProps) => {
-  const { ui } = useStore()
+  const { project: selectedProject } = useProjectContext()
   const { ref } = useParams()
   const { data: settings } = useProjectApiQuery({ projectRef: ref })
   const { data: functions } = useEdgeFunctionsQuery({ projectRef: ref })
@@ -86,23 +91,21 @@ const HTTPRequestFields = ({
             />
           ) : type === 'supabase_function' && edgeFunctions.length === 0 ? (
             <div className="space-y-1">
-              <p className="text-sm text-scale-1100">Select which edge function to trigger</p>
-              <div className="px-4 py-4 border rounded bg-scale-500 border-scale-700 flex items-center justify-between space-x-4">
+              <p className="text-sm text-foreground-light">Select which edge function to trigger</p>
+              <div className="px-4 py-4 border rounded bg-surface-300 border-strong flex items-center justify-between space-x-4">
                 <p className="text-sm">No edge functions created yet</p>
-                <Link href={`/project/${ref}/functions`}>
-                  <a>
-                    <Button>Create an edge function</Button>
-                  </a>
-                </Link>
+                <Button asChild>
+                  <Link href={`/project/${ref}/functions`}>Create an edge function</Link>
+                </Button>
               </div>
               {errors.http_url && <p className="text-sm text-red-900">{errors.http_url}</p>}
             </div>
           ) : type === 'supabase_function' && edgeFunctions.length > 0 ? (
             <Listbox id="http_url" name="http_url" label="Select which edge function to trigger">
               {edgeFunctions.map((fn) => {
-                const restUrl = ui.selectedProject?.restUrl
+                const restUrl = selectedProject?.restUrl
                 const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
-                const functionUrl = `https://${ref}.functions.supabase.${restUrlTld}/${fn.slug}`
+                const functionUrl = `https://${ref}.supabase.${restUrlTld}/functions/v1/${fn.slug}`
 
                 return (
                   <Listbox.Option key={fn.id} id={functionUrl} value={functionUrl} label={fn.name}>
@@ -112,6 +115,14 @@ const HTTPRequestFields = ({
               })}
             </Listbox>
           ) : null}
+          <Input
+            id="timeout_ms"
+            name="timeout_ms"
+            label="Timeout"
+            labelOptional="Between 1000ms to 5000ms"
+            type="number"
+            actions={<p className="text-foreground-light pr-2">ms</p>}
+          />
         </FormSectionContent>
       </FormSection>
       <SidePanel.Separator />
@@ -156,11 +167,16 @@ const HTTPRequestFields = ({
                 Add a new header
               </Button>
               {type === 'supabase_function' && (
-                <Dropdown
-                  align="end"
-                  side="bottom"
-                  overlay={[
-                    <Dropdown.Item
+                <DropdownMenu>
+                  <DropdownMenuTrigger>
+                    <Button
+                      type="default"
+                      className="rounded-l-none px-[4px] py-[5px]"
+                      icon={<IconChevronDown />}
+                    />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" side="bottom">
+                    <DropdownMenuItem
                       key="add-auth-header"
                       onClick={() =>
                         onAddHeader({
@@ -171,14 +187,14 @@ const HTTPRequestFields = ({
                       }
                     >
                       <div className="space-y-1">
-                        <p className="block text-scale-1200">Add auth header with service key</p>
-                        <p className="text-scale-1000">
+                        <p className="block text-foreground">Add auth header with service key</p>
+                        <p className="text-foreground-light">
                           Required if your edge function enforces JWT verification
                         </p>
                       </div>
-                    </Dropdown.Item>,
-                    <Dropdown.Separator key="separator" />,
-                    <Dropdown.Item
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
                       key="add-source-header"
                       onClick={() =>
                         onAddHeader({
@@ -189,20 +205,14 @@ const HTTPRequestFields = ({
                       }
                     >
                       <div className="space-y-1">
-                        <p className="block text-scale-1200">Add custom source header</p>
-                        <p className="text-scale-1000">
+                        <p className="block text-foreground">Add custom source header</p>
+                        <p className="text-foreground-light">
                           Useful to verify that the edge function was triggered from this webhook
                         </p>
                       </div>
-                    </Dropdown.Item>,
-                  ]}
-                >
-                  <Button
-                    type="default"
-                    className="rounded-l-none px-[4px] py-[5px]"
-                    icon={<IconChevronDown />}
-                  />
-                </Dropdown>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
             </div>
           </div>

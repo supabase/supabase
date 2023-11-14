@@ -1,26 +1,31 @@
-import { tryParseJson } from 'lib/helpers'
-import { PreviewLogData } from '..'
-import { AuthEventParsed } from '../LogSelectionRenderers/AuthSelectionRenderer'
+import { Column } from 'react-data-grid'
+import { LogData } from '..'
 import {
   RowLayout,
   SeverityFormatter,
   TextFormatter,
   TimestampLocalFormatter,
 } from '../LogsFormatters'
+import { defaultRenderCell } from './DefaultPreviewColumnRenderer'
 
-export default [
+const columns: Column<LogData>[] = [
   {
-    formatter: (data: { row: PreviewLogData }) => {
-      const parsed: AuthEventParsed | undefined = tryParseJson(data.row.event_message.trim())
+    name: 'auth-first-column',
+    key: 'auth-first-column',
+    renderCell: (props) => {
+      if (!props.row.level) {
+        return defaultRenderCell(props)
+      }
 
       return (
         <RowLayout>
-          <TimestampLocalFormatter value={data.row.timestamp!} />
-          {parsed?.level && <SeverityFormatter value={parsed?.level} />}
+          <TimestampLocalFormatter value={props.row.timestamp!} />
+          {props.row.level && <SeverityFormatter value={props.row.level as string} />}
           <TextFormatter
             className="w-full"
-            value={`${parsed?.path ? parsed?.path + ' | ' : ''}${
-              parsed?.msg.trim() || data.row.event_message
+            value={`${props.row.path ? props.row.path + ' | ' : ''}${
+              // not all log events have metadata.msg
+              (props.row.msg as string)?.trim() || props.row.event_message
             }`}
           />
         </RowLayout>
@@ -28,3 +33,5 @@ export default [
     },
   },
 ]
+
+export default columns

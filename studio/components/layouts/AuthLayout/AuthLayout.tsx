@@ -1,57 +1,39 @@
-import { FC, ReactNode, useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
+import { PropsWithChildren, useEffect } from 'react'
 
-import ProjectLayout from '../'
-import { useStore, withAuth } from 'hooks'
-import Error from 'components/ui/Error'
+import { useParams } from 'common'
 import ProductMenu from 'components/ui/ProductMenu'
+import { useAuthConfigPrefetch } from 'data/auth/auth-config-query'
+import { useStore, withAuth } from 'hooks'
+import ProjectLayout from '../'
 import { generateAuthMenu } from './AuthLayout.utils'
 
-interface Props {
+export interface AuthLayoutProps {
   title?: string
-  children: ReactNode
 }
 
-const AuthLayout: FC<Props> = ({ title, children }) => {
+const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => {
+  const { ref: projectRef = 'default' } = useParams()
   const { ui, meta } = useStore()
-  const { isInitialized, isLoading, error } = meta.tables
-  const projectRef = ui.selectedProject?.ref ?? 'default'
+
+  useAuthConfigPrefetch({ projectRef })
 
   const router = useRouter()
   const page = router.pathname.split('/')[4]
 
-  const [loaded, setLoaded] = useState<boolean>(isInitialized)
-
   useEffect(() => {
-    if (ui.selectedProject?.ref) {
+    if (ui.selectedProjectRef) {
       meta.policies.load()
-      meta.tables.load()
       meta.roles.load()
-      meta.schemas.load()
     }
-  }, [ui.selectedProject?.ref])
-
-  useEffect(() => {
-    if (!isLoading && !loaded) {
-      setLoaded(true)
-    }
-  }, [isLoading])
-
-  if (error) {
-    return (
-      <ProjectLayout>
-        <Error error={error} />
-      </ProjectLayout>
-    )
-  }
+  }, [ui.selectedProjectRef])
 
   return (
     <ProjectLayout
-      isLoading={!loaded}
       title={title || 'Authentication'}
       product="Authentication"
-      productMenu={<ProductMenu page={page} menu={generateAuthMenu(projectRef)} />}
+      productMenu={<ProductMenu page={page} menu={generateAuthMenu(projectRef ?? 'default')} />}
     >
       <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
         {children}

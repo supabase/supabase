@@ -1,36 +1,23 @@
-import { FC, useState } from 'react'
-import { Modal, Button } from 'ui'
+import { Button, Modal } from 'ui'
 
-import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
 
-interface Props {
+interface AllowAllModalProps {
   visible: boolean
   onClose: () => void
 }
 
-const AllowAllModal: FC<Props> = ({ visible, onClose }) => {
-  const { ui } = useStore()
+const AllowAllModal = ({ visible, onClose }: AllowAllModalProps) => {
   const { ref } = useParams()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const { mutateAsync: applyNetworkRestrictions } = useNetworkRestrictionsApplyMutation()
+  const { mutate: applyNetworkRestrictions, isLoading: isApplying } =
+    useNetworkRestrictionsApplyMutation({
+      onSuccess: () => onClose(),
+    })
 
   const onSubmit = async () => {
     if (!ref) return console.error('Project ref is required')
-
-    setIsSubmitting(true)
-    try {
-      await applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs: ['0.0.0.0/0'] })
-      onClose()
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to update restriction: ${error.message}`,
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
+    applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs: ['0.0.0.0/0'] })
   }
 
   return (
@@ -44,16 +31,16 @@ const AllowAllModal: FC<Props> = ({ visible, onClose }) => {
     >
       <Modal.Content>
         <div className="py-6 space-y-4">
-          <p className="text-sm text-scale-1100">
+          <p className="text-sm text-foreground-light">
             This will allow any IP address to access your project's database. Are you sure?
           </p>
         </div>
       </Modal.Content>
       <div className="flex items-center justify-end px-6 py-4 border-t space-x-2">
-        <Button type="default" disabled={isSubmitting} onClick={() => onClose()}>
+        <Button type="default" disabled={isApplying} onClick={() => onClose()}>
           Cancel
         </Button>
-        <Button loading={isSubmitting} disabled={isSubmitting} onClick={() => onSubmit()}>
+        <Button loading={isApplying} disabled={isApplying} onClick={() => onSubmit()}>
           Confirm
         </Button>
       </div>

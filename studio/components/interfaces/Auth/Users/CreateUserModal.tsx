@@ -1,12 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
-import { useContext } from 'react'
 import { Button, Checkbox, Form, IconLock, IconMail, Input, Loading, Modal } from 'ui'
 
 import { useUserCreateMutation } from 'data/auth/user-create-mutation'
 import { useProjectApiQuery } from 'data/config/project-api-query'
-import { checkPermissions, useStore } from 'hooks'
-import { PageContext } from 'pages/project/[ref]/auth/users'
+import { useCheckPermissions, useStore } from 'hooks'
 
 export type CreateUserModalProps = {
   visible: boolean
@@ -15,13 +14,12 @@ export type CreateUserModalProps = {
 
 const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
   const { ui } = useStore()
-  const PageState: any = useContext(PageContext)
-  const projectRef = PageState.projectRef
+  const { ref: projectRef } = useParams()
 
   const { data, isLoading, isSuccess } = useProjectApiQuery({ projectRef }, { enabled: visible })
 
   const handleToggle = () => setVisible(!visible)
-  const canCreateUsers = checkPermissions(PermissionAction.AUTH_EXECUTE, 'create_user')
+  const canCreateUsers = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'create_user')
 
   const validate = (values: any) => {
     const errors: any = {}
@@ -41,48 +39,26 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
     return errors
   }
 
-  const { mutateAsync: createUser } = useUserCreateMutation({
-    async onSuccess() {
-      await PageState.fetchData(1)
+  const { mutate: createUser, isLoading: isCreatingUser } = useUserCreateMutation({
+    async onSuccess(res) {
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully created user: ${res.email}`,
+      })
+      setVisible(false)
     },
   })
 
-  const onCreateUser = async (values: any, { setSubmitting }: any) => {
+  const onCreateUser = async (values: any) => {
     if (!isSuccess) {
-      ui.setNotification({
+      return ui.setNotification({
         category: 'error',
         message: `Failed to create user: Error loading project config`,
       })
-
-      return
     }
 
     const { protocol, endpoint, serviceApiKey } = data.autoApiService
-
-    setSubmitting(true)
-
-    try {
-      await createUser({
-        endpoint,
-        protocol,
-        serviceApiKey,
-        user: values,
-      })
-
-      ui.setNotification({
-        category: 'success',
-        message: `Created user: ${values.email}`,
-      })
-
-      setVisible(false)
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to create user: ${error.message}`,
-      })
-    }
-
-    setSubmitting(false)
+    createUser({ projectRef, endpoint, protocol, serviceApiKey, user: values })
   }
 
   return (
@@ -102,7 +78,7 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
         validate={validate}
         onSubmit={onCreateUser}
       >
-        {({ isSubmitting }: { isSubmitting: boolean }) => (
+        {() => (
           <Loading active={isLoading}>
             <div className="space-y-6 py-4">
               <Modal.Content>
@@ -115,7 +91,7 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
                     type="email"
                     name="email"
                     placeholder="user@example.com"
-                    disabled={isSubmitting || isLoading}
+                    disabled={isCreatingUser || isLoading}
                   />
 
                   <Input
@@ -125,7 +101,7 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
                     label="User Password"
                     placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
                     icon={<IconLock />}
-                    disabled={isSubmitting || isLoading}
+                    disabled={isCreatingUser || isLoading}
                     autoComplete="new-password"
                   />
 
@@ -137,7 +113,7 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
                     size="medium"
                     description="Creates the user without sending them a confirmation email"
                     defaultChecked={true}
-                    disabled={isSubmitting || isLoading}
+                    disabled={isCreatingUser || isLoading}
                   />
                 </div>
               </Modal.Content>
@@ -147,8 +123,8 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
                   block
                   size="small"
                   htmlType="submit"
-                  loading={isSubmitting}
-                  disabled={!canCreateUsers || isSubmitting || isLoading}
+                  loading={isCreatingUser}
+                  disabled={!canCreateUsers || isCreatingUser || isLoading}
                 >
                   Create user
                 </Button>

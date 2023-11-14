@@ -9,66 +9,74 @@ type Directories = '_blog' | '_case-studies' | '_customers' | '_alternatives'
 // based on YYYY-MM-DD format
 const FILENAME_SUBSTRING = 11
 
-export const getSortedPosts = (
-  directory: Directories,
-  limit?: number,
-  tags?: any,
-  runner?: any
-) => {
+type GetSortedPostsParams = {
+  directory: Directories
+  limit?: number
+  tags?: string[]
+  runner?: unknown
+  currentPostSlug?: string
+  categories?: any
+}
+
+export const getSortedPosts = ({
+  directory,
+  limit,
+  tags,
+  categories,
+  currentPostSlug,
+}: GetSortedPostsParams) => {
   //Finding directory named "blog" from the current working directory of Node.
   const postDirectory = path.join(process.cwd(), directory)
 
   //Reads all the files in the post directory
   const fileNames = fs.readdirSync(postDirectory)
 
-  // categories stored in this array
+  const allPosts = fileNames
+    .map((filename) => {
+      const slug =
+        directory === '_blog'
+          ? filename.replace('.mdx', '').substring(FILENAME_SUBSTRING)
+          : filename.replace('.mdx', '')
 
-  const allPostsData = fileNames.map((filename) => {
-    let slug = ''
-    slug = filename.replace('.mdx', '')
-    if (directory === '_blog') {
-      slug = slug.substring(FILENAME_SUBSTRING)
-    }
+      const fullPath = path.join(postDirectory, filename)
 
-    const fullPath = path.join(postDirectory, filename)
+      //Extracts contents of the MDX file
+      const fileContents = fs.readFileSync(fullPath, 'utf8')
+      const { data, content } = matter(fileContents) as unknown as {
+        data: { [key: string]: any; tags?: string[] }
+        content: string
+      }
 
-    //Extracts contents of the MDX file
-    const fileContents = fs.readFileSync(fullPath, 'utf8')
-    const { data, content } = matter(fileContents)
+      const options: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric', year: 'numeric' }
+      const formattedDate = new Date(data.date).toLocaleDateString('en-IN', options)
 
-    const options: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric', year: 'numeric' }
-    const formattedDate = new Date(data.date).toLocaleDateString('en-IN', options)
+      const readingTime = generateReadingTime(content)
 
-    const readingTime = generateReadingTime(content)
+      const url = `/${directory.replace('_', '')}/${slug}`
+      const contentPath = `/${directory.replace('_', '')}/${slug}`
 
-    // construct url to link to blog posts
-    // based on datestamp in file name
-    let url = ''
-    let contentPath = ''
+      const frontmatter = {
+        ...data,
+        date: formattedDate,
+        readingTime,
+        publishedAt: data.published_at ?? null,
+        url: url,
+        path: contentPath,
+      }
 
-    url = `/${directory.replace('_', '')}/${slug}`
-    contentPath = `/${directory.replace('_', '')}/${slug}`
+      return {
+        slug,
+        ...frontmatter,
+      }
+    })
+    // avoid reading content if it's the same post as the one the user is already reading
+    .filter((post) => post.slug !== currentPostSlug)
 
-    const frontmatter = {
-      ...data,
-      date: formattedDate,
-      readingTime,
-      publishedAt: data.published_at ?? null,
-      url: url,
-      path: contentPath,
-    }
-    return {
-      slug,
-      ...frontmatter,
-    }
-  })
+  let sortedPosts = [...allPosts]
 
-  let sortedPosts = [...allPostsData]
-
-  sortedPosts = sortedPosts.sort((a, b) => {
+  sortedPosts = sortedPosts.sort((a: any, b: any) => {
     const isPublishedAtBefore =
       a.publishedAt && b.publishedAt && Date.parse(a.publishedAt) < Date.parse(b.publishedAt)
-
     if (isPublishedAtBefore || new Date(a.date) < new Date(b.date)) {
       return 1
     } else {
@@ -76,9 +84,16 @@ export const getSortedPosts = (
     }
   })
 
+  if (categories) {
+    sortedPosts = sortedPosts.filter((post: any) => {
+      const found = categories?.some((tag: any) => post.categories?.includes(tag))
+      return found
+    })
+  }
+
   if (tags) {
     sortedPosts = sortedPosts.filter((post: any) => {
-      const found = tags.some((tag: any) => post.tags.includes(tag))
+      const found = tags.some((tag: any) => post.tags?.includes(tag))
       return found
     })
   }
@@ -146,17 +161,29 @@ export const getPostdata = async (slug: string, directory: string) => {
 }
 
 export const getAllCategories = (directory: Directories) => {
-  const posts = getSortedPosts(directory)
+  const posts = getSortedPosts({ directory })
   let categories: any = []
 
   posts.map((post: any) => {
-    // add tags into categories array
-    post.tags.map((tag: string) => {
+    post.categories?.map((tag: string) => {
       if (!categories.includes(tag)) return categories.push(tag)
     })
   })
 
   return categories
+}
+
+export const getAllTags = (directory: Directories) => {
+  const posts = getSortedPosts({ directory })
+  let tags: any = []
+
+  posts.map((post: any) => {
+    post.tags?.map((tag: string) => {
+      if (!tags.includes(tag)) return tags.push(tag)
+    })
+  })
+
+  return tags
 }
 
 const getDatesFromFileName = (filename: string) => {

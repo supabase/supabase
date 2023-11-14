@@ -1,13 +1,12 @@
-import React, { useEffect, useState, createRef } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FormLayout } from '../../lib/Layout/FormLayout'
 import { RadioContext } from './RadioContext'
 
 import { useFormContext } from '../Form/FormContext'
 
-import defaultTheme from '../../lib/theme/defaultTheme'
 import styleHandler from '../../lib/theme/styleHandler'
 
-import randomIdGenerator from './../../utils/randomIdGenerator'
+import { generateUID } from './../../lib/utils/randomIdGenerator'
 
 interface GroupProps {
   allowedValues?: any
@@ -135,19 +134,20 @@ function RadioGroup({
 }
 
 interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
-  label: string
-  afterLabel?: string
+  label: string | React.ReactNode
+  afterLabel?: string | React.ReactNode
   beforeLabel?: string | React.ReactNode
-  description?: string
+  description?: string | React.ReactNode
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
   hidden?: boolean
   align?: 'vertical' | 'horizontal'
   optionalLabel?: 'string' | React.ReactNode
   addOnBefore?: React.ReactNode
+  children?: React.ReactNode
 }
 
 function Radio({
-  id = randomIdGenerator(),
+  id = generateUID(),
   disabled,
   value,
   label,
@@ -156,6 +156,7 @@ function Radio({
   description,
   name,
   checked,
+  className,
   onChange,
   onBlur,
   hidden = false,
@@ -163,6 +164,7 @@ function Radio({
   align = 'vertical',
   optionalLabel,
   addOnBefore,
+  children,
 }: InputProps) {
   const __styles = styleHandler('radio')
 
@@ -196,6 +198,7 @@ function Radio({
           activeId === markupId ? true : checked ? true : checked === false ? false : undefined
 
         let classes = [
+          className,
           __styles.variants[type].container.base,
           // __styles.variants[type].container.align[align],
           type === 'list' && !hidden && __styles.variants[type].container.size[size],
@@ -245,38 +248,50 @@ function Radio({
               onBlur={handleBlurEvent}
             />
             {addOnBefore}
-            <div
-              className={[
-                __styles.label.base,
-                __styles.label[size],
-                __styles.variants[type].container.align[align],
-              ].join(' ')}
-            >
-              {beforeLabel && (
-                <span
-                  className={[__styles.label_before.base, __styles.label_before[size]].join(' ')}
+            {children || (
+              <>
+                <div
+                  className={[
+                    __styles.label.base,
+                    __styles.label[size],
+                    __styles.variants[type].container.align[align],
+                  ].join(' ')}
                 >
-                  {beforeLabel}
-                </span>
-              )}
-              <span>{label}</span>
-              {afterLabel && (
-                <span className={[__styles.label_after.base, __styles.label_after[size]].join(' ')}>
-                  {afterLabel}
-                </span>
-              )}
-              {description && (
-                <p className={[__styles.description.base, __styles.description[size]].join(' ')}>
-                  {description}
-                </p>
-              )}
-            </div>
-            {optionalLabel && (
-              <div
-                className={[__styles.optionalLabel.base, __styles.optionalLabel[size]].join(' ')}
-              >
-                {optionalLabel}
-              </div>
+                  {beforeLabel && (
+                    <div
+                      className={[__styles.label_before.base, __styles.label_before[size]].join(
+                        ' '
+                      )}
+                    >
+                      {beforeLabel}
+                    </div>
+                  )}
+                  <div>{label}</div>
+                  {afterLabel && (
+                    <div
+                      className={[__styles.label_after.base, __styles.label_after[size]].join(' ')}
+                    >
+                      {afterLabel}
+                    </div>
+                  )}
+                  {description && (
+                    <div
+                      className={[__styles.description.base, __styles.description[size]].join(' ')}
+                    >
+                      {description}
+                    </div>
+                  )}
+                </div>
+                {optionalLabel && (
+                  <div
+                    className={[__styles.optionalLabel.base, __styles.optionalLabel[size]].join(
+                      ' '
+                    )}
+                  >
+                    {optionalLabel}
+                  </div>
+                )}
+              </>
             )}
           </label>
         )

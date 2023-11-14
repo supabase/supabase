@@ -1,10 +1,15 @@
 import { useState } from 'react'
-import { BarChart, Bar, XAxis, Tooltip, Legend, Cell, TooltipProps } from 'recharts'
+import { Bar, BarChart, Cell, Legend, Tooltip, XAxis } from 'recharts'
 import ChartHeader from './ChartHeader'
-import { CHART_COLORS, STACK_COLORS, DateTimeFormats } from './Charts.constants'
+import {
+  CHART_COLORS,
+  DateTimeFormats,
+  DEFAULT_STACK_COLORS,
+  genStackColorScales,
+  ValidStackColor,
+} from './Charts.constants'
 import { CommonChartProps } from './Charts.types'
-import { timestampFormatter, useChartSize, useStacked } from './Charts.utils'
-import { precisionFormatter } from './Charts.utils'
+import { precisionFormatter, timestampFormatter, useChartSize, useStacked } from './Charts.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
 interface Props extends CommonChartProps<any> {
   xAxisKey: string
@@ -16,6 +21,7 @@ interface Props extends CommonChartProps<any> {
   displayDateInUtc?: boolean
   hideLegend?: boolean
   hideHeader?: boolean
+  stackColors?: ValidStackColor[]
 }
 const StackedBarChart: React.FC<Props> = ({
   size,
@@ -33,6 +39,7 @@ const StackedBarChart: React.FC<Props> = ({
   displayDateInUtc,
   hideLegend = false,
   hideHeader = false,
+  stackColors = DEFAULT_STACK_COLORS,
 }) => {
   const { Container } = useChartSize(size)
   const { dataKeys, stackedData, percentagesStackedData } = useStacked({
@@ -43,7 +50,8 @@ const StackedBarChart: React.FC<Props> = ({
     variant,
   })
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
-  if (!data || data.length === 0) return <NoDataPlaceholder />
+  if (!data || data.length === 0) return <NoDataPlaceholder size={size} />
+  const stackColorScales = genStackColorScales(stackColors)
   return (
     <div className="w-full">
       {!hideHeader && (
@@ -84,7 +92,7 @@ const StackedBarChart: React.FC<Props> = ({
             dataKey={xAxisKey}
             interval={data.length - 2}
             angle={0}
-            tick={{ fontSize: '0px' }}
+            tick={false}
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
           />
@@ -94,7 +102,7 @@ const StackedBarChart: React.FC<Props> = ({
               dataKey={datum}
               type="monotone"
               legendType="circle"
-              fill={STACK_COLORS[stackIndex].base}
+              fill={stackColorScales[stackIndex].base}
               stackId={1}
               animationDuration={300}
               maxBarSize={48}
@@ -115,14 +123,14 @@ const StackedBarChart: React.FC<Props> = ({
                 ? (label) => timestampFormatter(label, customDateFormat, displayDateInUtc)
                 : undefined
             }
-            formatter={(value: number, name: string, props: any) => {
+            formatter={(value, name, props) => {
               const suffix = format || ''
               if (variant === 'percentages' && percentagesStackedData) {
                 const index = percentagesStackedData.findIndex(
                   (pStack) => pStack === props.payload!
                 )
                 const val = stackedData[index][name]
-                const percentage = precisionFormatter(value * 100, 1) + '%'
+                const percentage = precisionFormatter(Number(value) * 100, 1) + '%'
                 return `${percentage} (${val}${suffix})`
               }
               return String(value) + suffix
@@ -135,7 +143,7 @@ const StackedBarChart: React.FC<Props> = ({
         </BarChart>
       </Container>
       {stackedData && stackedData[0] && (
-        <div className="text-scale-900 -mt-5 flex items-center justify-between text-xs">
+        <div className="text-foreground-lighter -mt-5 flex items-center justify-between text-xs">
           <span>
             {timestampFormatter(
               stackedData[0][xAxisKey] as string,

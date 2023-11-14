@@ -1,5 +1,9 @@
-import { boolean, number, object, string } from 'yup'
+import { boolean, number, object, string, date, ValidationError } from 'yup'
 import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
+
+const parseBase64URL = (b64url: string) => {
+  return atob(b64url.replace(/[-]/g, '+').replace(/[_]/g, '/'))
+}
 
 const JSON_SCHEMA_VERSION = 'http://json-schema.org/draft-07/schema#'
 
@@ -26,7 +30,7 @@ const PROVIDER_EMAIL = {
     },
     SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: {
       title: 'Secure password change',
-      description: `Users will need to be recently logged in to change their password.
+      description: `Users will need to be recently logged in to change their password without requiring reauthentication.
       If disabled, a user can change their password at any time.`,
       type: 'boolean',
     },
@@ -77,21 +81,17 @@ const PROVIDER_PHONE = {
         { label: 'Messagebird', value: 'messagebird', icon: 'messagebird-icon.svg' },
         { label: 'Textlocal', value: 'textlocal', icon: 'textlocal-icon.png' },
         { label: 'Vonage', value: 'vonage', icon: 'vonage-icon.svg' },
+        { label: 'Twilio Verify', value: 'twilio_verify', icon: 'twilio-icon.svg' },
       ],
-    },
-    RATE_LIMIT_SMS_SENT: {
-      type: 'number',
-      title: 'Rate limit for sending SMS messages',
-      description: 'How many SMS messages can be sent per hour',
     },
 
     // Twilio
     SMS_TWILIO_ACCOUNT_SID: {
       type: 'string',
-      title: 'Twilio Account Sid',
+      title: 'Twilio Account SID',
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'twilio',
+        matches: ['twilio'],
       },
     },
     SMS_TWILIO_AUTH_TOKEN: {
@@ -100,15 +100,50 @@ const PROVIDER_PHONE = {
       isSecret: true,
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'twilio',
+        matches: ['twilio'],
       },
     },
     SMS_TWILIO_MESSAGE_SERVICE_SID: {
       type: 'string',
-      title: 'Twilio Message Service Sid',
+      title: 'Twilio Message Service SID',
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'twilio',
+        matches: ['twilio'],
+      },
+    },
+    SMS_TWILIO_CONTENT_SID: {
+      type: 'string',
+      title: 'Twilio Content SID (Optional, For WhatsApp Only)',
+      show: {
+        key: 'SMS_PROVIDER',
+        matches: ['twilio'],
+      },
+    },
+
+    // Twilio Verify
+    SMS_TWILIO_VERIFY_ACCOUNT_SID: {
+      type: 'string',
+      title: 'Twilio Account SID',
+      show: {
+        key: 'SMS_PROVIDER',
+        matches: ['twilio_verify'],
+      },
+    },
+    SMS_TWILIO_VERIFY_AUTH_TOKEN: {
+      type: 'string',
+      title: 'Twilio Auth Token',
+      isSecret: true,
+      show: {
+        key: 'SMS_PROVIDER',
+        matches: ['twilio_verify'],
+      },
+    },
+    SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: {
+      type: 'string',
+      title: 'Twilio Verify Service SID',
+      show: {
+        key: 'SMS_PROVIDER',
+        matches: ['twilio_verify'],
       },
     },
 
@@ -118,7 +153,7 @@ const PROVIDER_PHONE = {
       title: 'Messagebird Access Key',
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'messagebird',
+        matches: ['messagebird'],
       },
     },
     SMS_MESSAGEBIRD_ORIGINATOR: {
@@ -126,7 +161,7 @@ const PROVIDER_PHONE = {
       title: 'Messagebird Originator',
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'messagebird',
+        matches: ['messagebird'],
       },
     },
 
@@ -136,7 +171,7 @@ const PROVIDER_PHONE = {
       title: 'Textlocal API Key',
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'textlocal',
+        matches: ['textlocal'],
       },
     },
     SMS_TEXTLOCAL_SENDER: {
@@ -144,7 +179,7 @@ const PROVIDER_PHONE = {
       title: 'Textlocal Sender',
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'textlocal',
+        matches: ['textlocal'],
       },
     },
 
@@ -154,7 +189,7 @@ const PROVIDER_PHONE = {
       title: 'Vonage API Key',
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'vonage',
+        matches: ['vonage'],
       },
     },
     SMS_VONAGE_API_SECRET: {
@@ -162,7 +197,7 @@ const PROVIDER_PHONE = {
       title: 'Vonage API Secret',
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'vonage',
+        matches: ['vonage'],
       },
     },
     // [TODO] verify what this is?
@@ -171,7 +206,7 @@ const PROVIDER_PHONE = {
       title: 'Vonage From',
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'vonage',
+        matches: ['vonage'],
       },
     },
 
@@ -187,17 +222,44 @@ const PROVIDER_PHONE = {
       type: 'number',
       description: 'Duration before an SMS OTP expires',
       units: 'seconds',
+      show: {
+        key: 'SMS_PROVIDER',
+        matches: ['twilio', 'messagebird', 'textlocal', 'vonage'],
+      },
     },
     SMS_OTP_LENGTH: {
       title: 'SMS OTP Length',
       type: 'number',
       description: 'Number of digits in OTP',
       units: 'digits',
+      show: {
+        key: 'SMS_PROVIDER',
+        matches: ['twilio', 'messagebird', 'textlocal', 'vonage'],
+      },
     },
     SMS_TEMPLATE: {
       title: 'SMS Message',
       type: 'string',
       description: 'To format the OTP code use `{{ .Code }}`',
+      show: {
+        key: 'SMS_PROVIDER',
+        matches: ['twilio', 'messagebird', 'textlocal', 'vonage'],
+      },
+    },
+    SMS_TEST_OTP: {
+      type: 'string',
+      title: 'Test Phone Numbers and OTPs',
+      description:
+        'Register phone number and OTP combinations for testing as a comma separated list of <phone number>=<otp> pairs. Example: `18005550123=789012`',
+    },
+    SMS_TEST_OTP_VALID_UNTIL: {
+      type: 'datetime',
+      title: 'Test OTPs Valid Until',
+      description:
+        "Test phone number and OTP combinations won't be active past this date and time (local time zone).",
+      show: {
+        key: 'SMS_TEST_OTP',
+      },
     },
   },
   validationSchema: object().shape({
@@ -226,6 +288,32 @@ const PROVIDER_PHONE = {
       then: (schema) => schema.required('Twilio Message Service SID is required'),
       otherwise: (schema) => schema,
     }),
+
+    // Twilio Verify
+    SMS_TWILIO_VERIFY_ACCOUNT_SID: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
+      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
+        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio-verify'
+      },
+      then: (schema) => schema.required('Twilio Verify Account SID is required'),
+      otherwise: (schema) => schema,
+    }),
+    SMS_TWILIO_VERIFY_AUTH_TOKEN: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
+      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
+        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio-verify'
+      },
+      then: (schema) => schema.required('Twilio Verify Auth Token is required'),
+      otherwise: (schema) => schema,
+    }),
+    SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: string().when(
+      ['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'],
+      {
+        is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
+          return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio-verify'
+        },
+        then: (schema) => schema.required('Twilio Verify Service SID is required'),
+        otherwise: (schema) => schema,
+      }
+    ),
 
     // Messagebird
     SMS_MESSAGEBIRD_ACCESS_KEY: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
@@ -286,6 +374,20 @@ const PROVIDER_PHONE = {
     SMS_OTP_EXP: number().min(0, 'Must be more than 0').required('This is required'),
     SMS_OTP_LENGTH: number().min(6, 'Must be 6 or more in length').required('This is required'),
     SMS_TEMPLATE: string().required('SMS template is required.'),
+    SMS_TEST_OTP: string()
+      .matches(
+        /^\s*([0-9]{1,15}=[0-9]+)(\s*,\s*[0-9]{1,15}=[0-9]+)*\s*$/g,
+        'Must be a comma-separated list of <phone number>=<OTP> pairs. Phone numbers should be in international format, without spaces, dashes or the + prefix. Example: 123456789=987654'
+      )
+      .trim()
+      .transform((value: string) => value.replace(/\s+/g, '')),
+    SMS_TEST_OTP_VALID_UNTIL: string().when(['SMS_TEST_OTP'], {
+      is: (SMS_TEST_OTP: string | null) => {
+        return !!SMS_TEST_OTP
+      },
+      then: (schema) => schema.required('You must provide a valid until date.'),
+      otherwise: (schema) => schema.transform((value: string) => ''),
+    }),
   }),
   misc: {
     iconKey: 'phone-icon4',
@@ -300,80 +402,138 @@ const EXTERNAL_PROVIDER_APPLE = {
   title: 'Apple',
   properties: {
     EXTERNAL_APPLE_ENABLED: {
-      title: 'Enable Apple provider',
-      description: 'This will enable Apple login for your application',
+      title: 'Enable Sign in with Apple',
+      description:
+        'Enables Sign in with Apple on the web using OAuth or natively within iOS, macOS, watchOS or tvOS apps.',
       type: 'boolean',
     },
     EXTERNAL_APPLE_CLIENT_ID: {
-      /**
-       * to do: change docs
-       */
-      title: 'Services ID',
-      description: `
-Client identifier when authenticating or validating users.
+      title: 'Service ID (for OAuth)',
+      description: `Client identifier used in the OAuth flow on the web.
 [Learn more](https://developer.apple.com/documentation/sign_in_with_apple/configuring_your_environment_for_sign_in_with_apple)`,
       type: 'string',
     },
-    EXTERNAL_IOS_BUNDLE_ID: {
-      /**
-       * to do: change docs
-       */
-      title: 'IOS Bundle ID',
-      description: `The iOS app's unique identifier. [Learn more](https://developer.apple.com/documentation/appstoreconnectapi/bundle_ids)`,
-      type: 'string',
-    },
     EXTERNAL_APPLE_SECRET: {
-      /**
-       * to do: change docs
-       */
-      title: 'Secret key',
-      description: `
-The secret key is a JWT token that must be generated.
+      title: 'Secret Key (for OAuth)',
+      description: `Secret key used in the OAuth flow.
 [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#generate-a-client_secret)`,
       type: 'string',
       isSecret: true,
     },
-  },
-  validationSchema: object().shape(
-    {
-      EXTERNAL_APPLE_ENABLED: boolean().required(),
-      EXTERNAL_APPLE_SECRET: string().when(['EXTERNAL_APPLE_ENABLED'], {
-        is: true,
-        then: (schema) => schema.required('Secret key is required'),
-        otherwise: (schema) => schema,
-      }),
-      EXTERNAL_APPLE_CLIENT_ID: string().when(
-        ['EXTERNAL_APPLE_ENABLED', 'EXTERNAL_IOS_BUNDLE_ID'],
-        {
-          is: (EXTERNAL_APPLE_ENABLED: boolean, EXTERNAL_IOS_BUNDLE_ID: string) => {
-            return EXTERNAL_APPLE_ENABLED && !EXTERNAL_IOS_BUNDLE_ID
-          },
-          then: (schema) => schema.required('Either the Services ID or iOS Bundle ID is required'),
-          otherwise: (schema) => schema,
-        }
-      ),
-      EXTERNAL_IOS_BUNDLE_ID: string().when(
-        ['EXTERNAL_APPLE_ENABLED', 'EXTERNAL_APPLE_CLIENT_ID'],
-        {
-          is: (EXTERNAL_APPLE_ENABLED: boolean, EXTERNAL_APPLE_CLIENT_ID: string) => {
-            return EXTERNAL_APPLE_ENABLED && !EXTERNAL_APPLE_CLIENT_ID
-          },
-          then: (schema) => schema.required('Either the Services ID or iOS Bundle ID is required'),
-          otherwise: (schema) => schema,
-        }
-      ),
+    EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS: {
+      title: 'Authorized Client IDs (iOS, macOS, watchOS, tvOS bundle IDs or service IDs)',
+      description: `Comma separated list of allowed Apple app bundle IDs for native sign in, or service IDs for Sign in with Apple JS. [Learn more](https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_js)`,
+      type: 'string',
     },
-    // this is necessary for the "either or" validation on EXTERNAL_APPLE_CLIENT_ID and EXTERNAL_IOS_BUNDLE_ID
-    [['EXTERNAL_APPLE_CLIENT_ID', 'EXTERNAL_IOS_BUNDLE_ID']]
-  ),
+  },
+  validationSchema: object().shape({
+    EXTERNAL_APPLE_ENABLED: boolean().required(),
+    EXTERNAL_APPLE_SECRET: string()
+      .when(['EXTERNAL_APPLE_ENABLED', 'EXTERNAL_APPLE_CLIENT_ID'], {
+        is: (EXTERNAL_APPLE_ENABLED: boolean, EXTERNAL_APPLE_CLIENT_ID: string) => {
+          return EXTERNAL_APPLE_ENABLED && !!EXTERNAL_APPLE_CLIENT_ID
+        },
+        then: (schema) =>
+          schema
+            .required('Secret key is required when using the OAuth flow.')
+            .matches(/^[a-z0-9_-]+([.][a-z0-9_-]+){2}$/i, 'Secret key should be a JWT.')
+            .test({
+              message: 'Secret key is not a correctly generated JWT.',
+              test: (value?: string): boolean => {
+                if (!value) {
+                  return true
+                }
+                try {
+                  const parts = value.split('.').map((value) => parseBase64URL(value))
+                  const header = JSON.parse(parts[0])
+                  const body = JSON.parse(parts[1])
+                  return (
+                    typeof header === 'object' &&
+                    typeof body === 'object' &&
+                    header &&
+                    body &&
+                    header.alg === 'ES256' &&
+                    body.aud === 'https://appleid.apple.com'
+                  )
+                } catch (e: any) {
+                  console.log(e)
+                  return false
+                }
+
+                return true
+              },
+            })
+            .test({
+              message: 'Secret key expires in less than 7 days!',
+              test: (value?: string) => {
+                if (!value) {
+                  return true
+                }
+                try {
+                  const parts = value.split('.').map((value) => parseBase64URL(value))
+                  const body = JSON.parse(parts[1])
+                  return Date.now() > body.exp - 7 * 24 * 60 * 60 * 1000
+                } catch (e: any) {
+                  console.log(e)
+                  return false
+                }
+
+                return true
+              },
+            }),
+      })
+      .when(
+        [
+          'EXTERNAL_APPLE_ENABLED',
+          'EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS',
+          'EXTERNAL_APPLE_CLIENT_ID',
+        ],
+        {
+          is: (
+            EXTERNAL_APPLE_ENABLED: boolean,
+            EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS: string,
+            EXTERNAL_APPLE_CLIENT_ID: string
+          ) => {
+            return (
+              EXTERNAL_APPLE_ENABLED &&
+              !!EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS &&
+              !EXTERNAL_APPLE_CLIENT_ID
+            )
+          },
+          then: (schema) =>
+            schema.matches(
+              /^$/,
+              'Secret Key should only be set if Service ID for OAuth is provided.'
+            ),
+        }
+      ),
+    EXTERNAL_APPLE_CLIENT_ID: string().matches(
+      /^[a-z0-9.-]+$/i,
+      'Invalid characters. Apple recommends a reverse-domain name style string (e.g. com.example.app).'
+    ),
+    EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS: string()
+      .matches(
+        /^([.a-z0-9-]+(,\s*[.a-z0-9-]+)*,*\s*)?$/i,
+        'Invalid characters. Apple recommends a reverse-domain name style string (e.g. com.example.app). You must only use explicit bundle IDs, asterisks (*) are not allowed.'
+      )
+      .when(['EXTERNAL_APPLE_ENABLED', 'EXTERNAL_APPLE_CLIENT_ID'], {
+        is: (EXTERNAL_APPLE_ENABLED: boolean, EXTERNAL_APPLE_CLIENT_ID: string) => {
+          return EXTERNAL_APPLE_ENABLED && !EXTERNAL_APPLE_CLIENT_ID
+        },
+        then: (schema) =>
+          schema.required(
+            'At least one Authorized Client ID is required when not using the OAuth flow.'
+          ),
+      }),
+  }),
   misc: {
     iconKey: 'apple-icon',
     requiresRedirect: true,
-    helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
+    helper: `Register this callback URL when using Sign in with Apple on the web in the Apple Developer Center.
             [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
     alert: {
-      title: `Apple secrets will self expire every 6 months`,
-      description: `You will need to regenerate before the 6 months elapses otherwise your users using Apple Login will no longer be able to log back in.`,
+      title: `Apple OAuth secret keys expire every 6 months`,
+      description: `A new secret should be generated every 6 months, otherwise users on the web will not be able to sign in.`,
     },
   },
 }
@@ -415,7 +575,7 @@ const EXTERNAL_PROVIDER_AZURE = {
     }),
     EXTERNAL_AZURE_SECRET: string().when('EXTERNAL_AZURE_ENABLED', {
       is: true,
-      then: (schema) => schema.required('Secret ID is required'),
+      then: (schema) => schema.required('Secret Value is required'),
       otherwise: (schema) => schema,
     }),
     EXTERNAL_AZURE_URL: string().matches(urlRegex, 'Must be a valid URL').optional(),
@@ -540,6 +700,44 @@ const EXTERNAL_PROVIDER_FACEBOOK = {
   },
 }
 
+const EXTERNAL_PROVIDER_FIGMA = {
+  $schema: JSON_SCHEMA_VERSION,
+  type: 'object',
+  title: 'Figma',
+  properties: {
+    EXTERNAL_FIGMA_ENABLED: {
+      title: 'Figma enabled',
+      type: 'boolean',
+    },
+    EXTERNAL_FIGMA_CLIENT_ID: {
+      title: 'Client ID',
+      type: 'string',
+    },
+    EXTERNAL_FIGMA_SECRET: {
+      title: 'Client Secret',
+      type: 'string',
+      isSecret: true,
+    },
+  },
+  validationSchema: object().shape({
+    EXTERNAL_FIGMA_ENABLED: boolean().required(),
+    EXTERNAL_FIGMA_CLIENT_ID: string().when('EXTERNAL_FIGMA_ENABLED', {
+      is: true,
+      then: (schema) => schema.required('Client ID is required'),
+      otherwise: (schema) => schema,
+    }),
+    EXTERNAL_FIGMA_SECRET: string().when('EXTERNAL_FIGMA_ENABLED', {
+      is: true,
+      then: (schema) => schema.required('Client Secret is required'),
+      otherwise: (schema) => schema,
+    }),
+  }),
+  misc: {
+    iconKey: 'figma-icon',
+    requiresRedirect: true,
+  },
+}
+
 const EXTERNAL_PROVIDER_GITHUB = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
@@ -630,36 +828,140 @@ const EXTERNAL_PROVIDER_GOOGLE = {
   title: 'Google',
   properties: {
     EXTERNAL_GOOGLE_ENABLED: {
-      title: 'Google enabled',
+      title: 'Enable Sign in with Google',
+      description:
+        'Enables Sign in with Google on the web using OAuth or One Tap, or in Android apps or Chrome extensions.',
+      type: 'boolean',
+    },
+    EXTERNAL_GOOGLE_CLIENT_ID: {
+      title: 'Client ID (for OAuth)',
+      description: 'Client ID to use with the OAuth flow on the web.',
+      type: 'string',
+    },
+    EXTERNAL_GOOGLE_SECRET: {
+      title: 'Client Secret (for OAuth)',
+      description: 'Client Secret to use with the OAuth flow on the web.',
+      type: 'string',
+      isSecret: true,
+    },
+    EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS: {
+      title: 'Authorized Client IDs (for Android, One Tap, and Chrome extensions)',
+      description:
+        'Comma separated list of client IDs of Android apps, One Tap or Chrome extensions that are allowed to log in to your project.',
+      type: 'string',
+    },
+    EXTERNAL_GOOGLE_SKIP_NONCE_CHECK: {
+      title: 'Skip nonce checks',
+      description:
+        "Allows ID tokens with any nonce to be accepted, which is less secure. Useful in situations where you don't have access to the nonce used to issue the ID token, such with iOS.",
+      type: 'boolean',
+    },
+  },
+  validationSchema: object().shape({
+    EXTERNAL_GOOGLE_ENABLED: boolean().required(),
+    EXTERNAL_GOOGLE_SECRET: string()
+      .when(['EXTERNAL_GOOGLE_ENABLED', 'EXTERNAL_GOOGLE_CLIENT_ID'], {
+        is: (EXTERNAL_GOOGLE_ENABLED: boolean, EXTERNAL_GOOGLE_CLIENT_ID: string) => {
+          return EXTERNAL_GOOGLE_ENABLED && !!EXTERNAL_GOOGLE_CLIENT_ID
+        },
+        then: (schema) =>
+          schema
+            .matches(
+              /^[a-z0-9.\/_-]*$/i,
+              'Invalid characters. Google OAuth Client Secrets usually contain letters, numbers, dots, dashes and underscores.'
+            )
+            .required('Client Secret is required when using the OAuth flow.'),
+      })
+      .when(
+        [
+          'EXTERNAL_GOOGLE_ENABLED',
+          'EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS',
+          'EXTERNAL_GOOGLE_CLIENT_ID',
+        ],
+        {
+          is: (
+            EXTERNAL_GOOGLE_ENABLED: boolean,
+            EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS: string,
+            EXTERNAL_GOOGLE_CLIENT_ID: string
+          ) => {
+            return (
+              EXTERNAL_GOOGLE_ENABLED &&
+              !!EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS &&
+              !EXTERNAL_GOOGLE_CLIENT_ID
+            )
+          },
+          then: (schema) =>
+            schema.matches(
+              /^$/,
+              'Client Secret should only be set when Client ID for OAuth is set.'
+            ),
+        }
+      ),
+    EXTERNAL_GOOGLE_CLIENT_ID: string().matches(
+      /^([a-z0-9-]+([.][a-z0-9-]+)+)?$/i,
+      'Invalid characters. Google OAuth Client IDs are usually a domain-name (e.g. 01234567890-abcdefghijklmnopqrstuvwxyz012345.apps.googleusercontent.com).'
+    ),
+    EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS: string()
+      .matches(
+        /^([a-z0-9-]+([.][a-z0-9-]+)*(,\s*[a-z0-9-]+([.][a-z0-9-]+)*)*,*\s*)?$/i,
+        'Invalid characters. Google Client IDs are usually a domain-name style string (e.g. com.example.com.app or *.apps.googleusercontent.com).'
+      )
+
+      .when(['EXTERNAL_GOOGLE_ENABLED', 'EXTERNAL_GOOGLE_CLIENT_ID'], {
+        is: (EXTERNAL_GOOGLE_ENABLED: boolean, EXTERNAL_GOOGLE_CLIENT_ID: string) => {
+          return EXTERNAL_GOOGLE_ENABLED && !EXTERNAL_GOOGLE_CLIENT_ID
+        },
+        then: (schema) =>
+          schema.required(
+            'At least one Authorized Client ID is required when not using the OAuth flow.'
+          ),
+      }),
+    EXTERNAL_GOOGLE_SKIP_NONCE_CHECK: boolean().required(),
+  }),
+  misc: {
+    iconKey: 'google-icon',
+    requiresRedirect: true,
+    helper: `Register this callback URL when using Sign-in with Google on the web using OAuth.
+            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-google#configure-your-services-id)`,
+  },
+}
+
+const EXTERNAL_PROVIDER_KAKAO = {
+  $schema: JSON_SCHEMA_VERSION,
+  type: 'object',
+  title: 'Kakao',
+  properties: {
+    EXTERNAL_KAKAO_ENABLED: {
+      title: 'Kakao enabled',
       type: 'boolean',
     },
     // [TODO] Update docs
-    EXTERNAL_GOOGLE_CLIENT_ID: {
-      title: 'Client ID',
+    EXTERNAL_KAKAO_CLIENT_ID: {
+      title: 'REST API Key',
       type: 'string',
     },
     // [TODO] Update docs
-    EXTERNAL_GOOGLE_SECRET: {
-      title: 'Client Secret',
+    EXTERNAL_KAKAO_SECRET: {
+      title: 'Client Secret Code',
       type: 'string',
       isSecret: true,
     },
   },
   validationSchema: object().shape({
-    EXTERNAL_GOOGLE_ENABLED: boolean().required(),
-    EXTERNAL_GOOGLE_CLIENT_ID: string().when('EXTERNAL_GOOGLE_ENABLED', {
+    EXTERNAL_KAKAO_ENABLED: boolean().required(),
+    EXTERNAL_KAKAO_CLIENT_ID: string().when('EXTERNAL_KAKAO_ENABLED', {
       is: true,
-      then: (schema) => schema.required('Client ID is required'),
+      then: (schema) => schema.required('REST API Key is required'),
       otherwise: (schema) => schema,
     }),
-    EXTERNAL_GOOGLE_SECRET: string().when('EXTERNAL_GOOGLE_ENABLED', {
+    EXTERNAL_KAKAO_SECRET: string().when('EXTERNAL_KAKAO_ENABLED', {
       is: true,
-      then: (schema) => schema.required('Client Secret is required'),
+      then: (schema) => schema.required('Client Secret Code is required'),
       otherwise: (schema) => schema,
     }),
   }),
   misc: {
-    iconKey: 'google-icon',
+    iconKey: 'kakao-icon',
     requiresRedirect: true,
   },
 }
@@ -717,10 +1019,10 @@ const EXTERNAL_PROVIDER_KEYCLOAK = {
 const EXTERNAL_PROVIDER_LINKEDIN = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
-  title: 'LinkedIn',
+  title: 'LinkedIn (Deprecated)',
   properties: {
     EXTERNAL_LINKEDIN_ENABLED: {
-      title: 'Linkedin enabled',
+      title: 'Linkedin (Deprecated) enabled',
       type: 'boolean',
     },
     // [TODO] Update docs
@@ -743,6 +1045,44 @@ const EXTERNAL_PROVIDER_LINKEDIN = {
       otherwise: (schema) => schema,
     }),
     EXTERNAL_LINKEDIN_SECRET: string().when('EXTERNAL_LINKEDIN_ENABLED', {
+      is: true,
+      then: (schema) => schema.required('API Secret Key is required'),
+      otherwise: (schema) => schema,
+    }),
+  }),
+  misc: {
+    iconKey: 'linkedin-icon',
+    requiresRedirect: true,
+  },
+}
+
+const EXTERNAL_PROVIDER_LINKEDIN_OIDC = {
+  $schema: JSON_SCHEMA_VERSION,
+  type: 'object',
+  title: 'LinkedIn (OIDC)',
+  properties: {
+    EXTERNAL_LINKEDIN_OIDC_ENABLED: {
+      title: 'LinkedIn enabled',
+      type: 'boolean',
+    },
+    EXTERNAL_LINKEDIN_OIDC_CLIENT_ID: {
+      title: 'API Key',
+      type: 'string',
+    },
+    EXTERNAL_LINKEDIN_OIDC_SECRET: {
+      title: 'API Secret Key',
+      type: 'string',
+      isSecret: true,
+    },
+  },
+  validationSchema: object().shape({
+    EXTERNAL_LINKEDIN_OIDC_ENABLED: boolean().required(),
+    EXTERNAL_LINKEDIN_OIDC_CLIENT_ID: string().when('EXTERNAL_LINKEDIN_OIDC_ENABLED', {
+      is: true,
+      then: (schema) => schema.required('API Key is required'),
+      otherwise: (schema) => schema,
+    }),
+    EXTERNAL_LINKEDIN_OIDC_SECRET: string().when('EXTERNAL_LINKEDIN_OIDC_ENABLED', {
       is: true,
       then: (schema) => schema.required('API Secret Key is required'),
       otherwise: (schema) => schema,
@@ -1060,11 +1400,14 @@ export const PROVIDERS_SCHEMAS = [
   EXTERNAL_PROVIDER_BITBUCKET,
   EXTERNAL_PROVIDER_DISCORD,
   EXTERNAL_PROVIDER_FACEBOOK,
+  EXTERNAL_PROVIDER_FIGMA,
   EXTERNAL_PROVIDER_GITHUB,
   EXTERNAL_PROVIDER_GITLAB,
   EXTERNAL_PROVIDER_GOOGLE,
+  EXTERNAL_PROVIDER_KAKAO,
   EXTERNAL_PROVIDER_KEYCLOAK,
   EXTERNAL_PROVIDER_LINKEDIN,
+  EXTERNAL_PROVIDER_LINKEDIN_OIDC,
   EXTERNAL_PROVIDER_NOTION,
   EXTERNAL_PROVIDER_TWITCH,
   EXTERNAL_PROVIDER_TWITTER,

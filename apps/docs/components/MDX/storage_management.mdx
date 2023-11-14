@@ -7,11 +7,11 @@ triggers. Note that it is not sufficient to delete the objects from the
 `storage.objects` table because that would orphan and leak the actual storage objects in
 the S3 backend. Instead, invoke the storage API within Postgres via the `http` extension.
 
-Enable the [http extension for the `extensions` schema](https://app.supabase.com/project/_/database/extensions) in the Dashboard.
+Enable the [http extension for the `extensions` schema](https://supabase.com/dashboard/project/_/database/extensions) in the Dashboard.
 Then, define the following SQL functions in the SQL Editor to delete
 storage objects via the API:
 
-```SQL
+```sql
 create or replace function delete_storage_object(bucket text, object text, out status int, out content text)
 returns record
 language 'plpgsql'
@@ -52,7 +52,7 @@ $$;
 Next, add a trigger that removes any obsolete avatar whenever the
 profile is updated or deleted:
 
-```SQL
+```sql
 create or replace function delete_old_avatar()
 returns trigger
 language 'plpgsql'
@@ -61,13 +61,16 @@ as $$
 declare
   status int;
   content text;
+  avatar_name text;
 begin
   if coalesce(old.avatar_url, '') <> ''
       and (tg_op = 'DELETE' or (old.avatar_url <> new.avatar_url)) then
+    -- extract avatar name
+    avatar_name := old.avatar_url;
     select
       into status, content
       result.status, result.content
-      from public.delete_avatar(old.avatar_url) as result;
+      from public.delete_avatar(avatar_name) as result;
     if status <> 200 then
       raise warning 'Could not delete avatar: % %', status, content;
     end if;
@@ -89,7 +92,7 @@ Finally, delete the `public.profile` row before a user is deleted.
 If this step is omitted, you won't be able to delete users without
 first manually deleting their avatar image.
 
-```SQL
+```sql
 create or replace function delete_old_profile()
 returns trigger
 language 'plpgsql'

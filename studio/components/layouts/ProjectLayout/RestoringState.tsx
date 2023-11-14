@@ -1,16 +1,20 @@
+import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import Link from 'next/link'
-import { FC, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button, IconAlertCircle, IconCheckCircle, IconLoader } from 'ui'
 
+import { getProjectDetail, invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { useStore } from 'hooks'
-import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { getWithTimeout } from 'lib/common/fetch'
+import { API_URL, PROJECT_STATUS } from 'lib/constants'
+import { useProjectContext } from './ProjectContext'
 
-interface Props {}
-
-const RestoringState: FC<Props> = ({}) => {
-  const { app, ui, meta } = useStore()
-  const project = ui.selectedProject
+const RestoringState = () => {
+  const { ref } = useParams()
+  const { meta } = useStore()
+  const queryClient = useQueryClient()
+  const { project } = useProjectContext()
   const checkServerInterval = useRef<number>()
 
   const [loading, setLoading] = useState(false)
@@ -41,27 +45,31 @@ const RestoringState: FC<Props> = ({}) => {
   }
 
   const onConfirm = async () => {
+    if (!project) return console.error('Project is required')
+
     setLoading(true)
-    await app.projects.fetchDetail(project?.ref ?? '', (project) => meta.setProjectDetails(project))
+    const projectDetail = await getProjectDetail({ ref: project?.ref })
+    if (projectDetail) meta.setProjectDetails(projectDetail)
+    if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
   }
 
   return (
     <div className="flex items-center justify-center h-full">
-      <div className="bg-scale-300 border border-scale-400 rounded-md w-3/4 lg:w-1/2">
+      <div className="bg-surface-100 border border-overlay rounded-md w-3/4 lg:w-1/2">
         {isCompleted ? (
           <div className="space-y-6 pt-6">
             <div className="flex px-8 space-x-8">
               <div className="mt-1">
-                <IconCheckCircle className="text-brand-900" size={18} strokeWidth={2} />
+                <IconCheckCircle className="text-brand" size={18} strokeWidth={2} />
               </div>
               <div className="space-y-1">
                 <p>Restoration complete!</p>
-                <p className="text-sm text-scale-1100">
+                <p className="text-sm text-foreground-light">
                   Your project has been successfully restored and is now back online.
                 </p>
               </div>
             </div>
-            <div className="border-t border-scale-400 flex items-center justify-end py-4 px-8">
+            <div className="border-t border-overlay flex items-center justify-end py-4 px-8">
               <Button disabled={loading} loading={loading} onClick={onConfirm}>
                 Return to project
               </Button>
@@ -75,21 +83,21 @@ const RestoringState: FC<Props> = ({}) => {
               </div>
               <div className="space-y-1">
                 <p>Something went wrong while restoring your project</p>
-                <p className="text-sm text-scale-1100">
+                <p className="text-sm text-foreground-light">
                   Our engineers have already been notified of this, do hang tight while we are
                   investigating into the issue.
                 </p>
               </div>
             </div>
             {isFailed && (
-              <div className="border-t border-scale-400 flex items-center justify-end py-4 px-8">
-                <Link
-                  href={`/support/new?category=Database_unresponsive&ref=${project?.ref}&subject=Restoration%20failed%20for%20project`}
-                >
-                  <a>
-                    <Button type="default">Contact support</Button>
-                  </a>
-                </Link>
+              <div className="border-t border-overlay flex items-center justify-end py-4 px-8">
+                <Button asChild type="default">
+                  <Link
+                    href={`/support/new?category=Database_unresponsive&ref=${project?.ref}&subject=Restoration%20failed%20for%20project`}
+                  >
+                    Contact support
+                  </Link>
+                </Button>
               </div>
             )}
           </div>
@@ -101,7 +109,7 @@ const RestoringState: FC<Props> = ({}) => {
               </div>
               <div className="space-y-1">
                 <p>Restoration in progress</p>
-                <p className="text-sm text-scale-1100">
+                <p className="text-sm text-foreground-light">
                   Restoration can take from a few minutes up to several hours depending on the size
                   of your database. Your project will be offline while the restoration is running.
                 </p>

@@ -1,3 +1,4 @@
+import { OAuthScope } from '@supabase/shared-types/out/constants'
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
 import { API_ADMIN_URL } from 'lib/constants'
@@ -11,7 +12,9 @@ export type ApiAuthorizationVariables = {
 export type ApiAuthorizationResponse = {
   name: string
   website: string
+  icon: string | null
   domain: string
+  scopes: OAuthScope[]
   expires_at: string
   approved_at: string | null
   approved_organization_slug?: string

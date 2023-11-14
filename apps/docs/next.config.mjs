@@ -1,47 +1,34 @@
+// @ts-check
 import nextMdx from '@next/mdx'
 import remarkGfm from 'remark-gfm'
 import rehypeSlug from 'rehype-slug'
+import { remarkCodeHike } from '@code-hike/mdx'
 
-//import theme from 'shiki/themes/nord.json' assert { type: 'json' }
-
-import withTM from 'next-transpile-modules'
 import withYaml from 'next-plugin-yaml'
 import configureBundleAnalyzer from '@next/bundle-analyzer'
+
+import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 
 const withBundleAnalyzer = configureBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 })
 
-// import admonitions from 'remark-admonitions'
-
-// import { remarkCodeHike } from '@code-hike/mdx'
-// import codeHikeTheme from './codeHikeTheme.js'
-
-/**
- * Rewrites and redirects are handled by
- * apps/www nextjs config
- *
- * Do not add them in this config
- */
-
 const withMDX = nextMdx({
   extension: /\.mdx?$/,
   options: {
     remarkPlugins: [
-      // [
-      //   remarkCodeHike,
-      //   {
-      //     theme: codeHikeTheme,
-      //     autoImport: false,
-      //     lineNumbers: true,
-      //     showCopyButton: true,
-      //   },
-      // ],
+      [
+        remarkCodeHike,
+        {
+          theme: codeHikeTheme,
+          lineNumbers: true,
+          showCopyButton: true,
+        },
+      ],
       remarkGfm,
     ],
     rehypePlugins: [rehypeSlug],
-    // This is required for `MDXProvider` component
-    // providerImportSource: '@mdx-js/react',
+    providerImportSource: '@mdx-js/react',
   },
 })
 
@@ -57,20 +44,23 @@ const nextConfig = {
     domains: [
       'avatars.githubusercontent.com',
       'github.com',
+      'supabase.github.io',
       'user-images.githubusercontent.com',
       'raw.githubusercontent.com',
       'weweb-changelog.ghost.io',
       'img.youtube.com',
+      'archbee-image-uploads.s3.amazonaws.com',
+      'obuldanrptloktxcffvn.supabase.co',
     ],
   },
-  experimental: {
-    mdxRs: true,
-    modularizeImports: {
-      lodash: {
-        transform: 'lodash/{{member}}',
-      },
+  // TODO: @next/mdx ^13.0.2 only supports experimental mdxRs flag. next ^13.0.2 will stop warning about this being unsupported.
+  // mdxRs: true,
+  modularizeImports: {
+    lodash: {
+      transform: 'lodash/{{member}}',
     },
   },
+  transpilePackages: ['ui', 'common', 'mermaid', 'mdx-mermaid', 'dayjs', 'shared-data'],
   async headers() {
     return [
       {
@@ -92,11 +82,38 @@ const nextConfig = {
       },
     ]
   },
+
+  /**
+   * Doc rewrites and redirects are
+   * handled by the `www` nextjs config:
+   *
+   * ./apps/www/lib/redirects.js
+   *
+   * Only add dev/preview specific redirects
+   * in this config.
+   */
   async redirects() {
     return [
+      // Redirect root to docs base path in dev/preview envs
       {
         source: '/',
         destination: '/docs',
+        basePath: false,
+        permanent: false,
+      },
+
+      // Redirect dashboard links in dev/preview envs
+      {
+        source: '/dashboard/:path*',
+        destination: 'https://supabase.com/dashboard/:path*',
+        basePath: false,
+        permanent: false,
+      },
+
+      // Redirect blog links in dev/preview envs
+      {
+        source: '/blog/:path*',
+        destination: 'https://supabase.com/blog/:path*',
         basePath: false,
         permanent: false,
       },
@@ -105,12 +122,8 @@ const nextConfig = {
 }
 
 const configExport = () => {
-  const plugins = [
-    withTM(['ui', 'common', '@supabase/auth-helpers-nextjs']),
-    withMDX,
-    withYaml,
-    withBundleAnalyzer,
-  ]
+  const plugins = [withMDX, withYaml, withBundleAnalyzer]
+  // @ts-ignore
   return plugins.reduce((acc, next) => next(acc), nextConfig)
 }
 

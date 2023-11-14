@@ -13,7 +13,7 @@
       "flags": {},
       "children": [
         {
-          "id": 195,
+          "id": 202,
           "name": "SupabaseClientOptions",
           "kind": 16777216,
           "kindString": "Reference",
@@ -25,10 +25,10 @@
               "character": 14
             }
           ],
-          "target": 61
+          "target": 60
         },
         {
-          "id": 105,
+          "id": 106,
           "name": "SupabaseClient",
           "kind": 128,
           "kindString": "Class",
@@ -39,7 +39,7 @@
           },
           "children": [
             {
-              "id": 106,
+              "id": 107,
               "name": "constructor",
               "kind": 512,
               "kindString": "Constructor",
@@ -53,7 +53,7 @@
               ],
               "signatures": [
                 {
-                  "id": 107,
+                  "id": 108,
                   "name": "new SupabaseClient",
                   "kind": 16384,
                   "kindString": "Constructor signature",
@@ -63,7 +63,7 @@
                   },
                   "typeParameter": [
                     {
-                      "id": 108,
+                      "id": 109,
                       "name": "Database",
                       "kind": 131072,
                       "kindString": "Type parameter",
@@ -74,7 +74,7 @@
                       }
                     },
                     {
-                      "id": 109,
+                      "id": 110,
                       "name": "SchemaName",
                       "kind": 131072,
                       "kindString": "Type parameter",
@@ -94,7 +94,7 @@
                           "operator": "keyof",
                           "target": {
                             "type": "reference",
-                            "id": 108,
+                            "id": 109,
                             "name": "Database"
                           }
                         },
@@ -114,7 +114,7 @@
                               "operator": "keyof",
                               "target": {
                                 "type": "reference",
-                                "id": 108,
+                                "id": 109,
                                 "name": "Database"
                               }
                             }
@@ -123,14 +123,14 @@
                       }
                     },
                     {
-                      "id": 110,
+                      "id": 111,
                       "name": "Schema",
                       "kind": 131072,
                       "kindString": "Type parameter",
                       "flags": {},
                       "type": {
                         "type": "reference",
-                        "id": 98,
+                        "id": 99,
                         "name": "GenericSchema"
                       },
                       "default": {
@@ -139,18 +139,18 @@
                           "type": "indexedAccess",
                           "indexType": {
                             "type": "reference",
-                            "id": 109,
+                            "id": 110,
                             "name": "SchemaName"
                           },
                           "objectType": {
                             "type": "reference",
-                            "id": 108,
+                            "id": 109,
                             "name": "Database"
                           }
                         },
                         "extendsType": {
                           "type": "reference",
-                          "id": 98,
+                          "id": 99,
                           "name": "GenericSchema"
                         },
                         "trueType": {
@@ -173,7 +173,7 @@
                   ],
                   "parameters": [
                     {
-                      "id": 111,
+                      "id": 112,
                       "name": "supabaseUrl",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -187,7 +187,7 @@
                       }
                     },
                     {
-                      "id": 112,
+                      "id": 113,
                       "name": "supabaseKey",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -201,7 +201,7 @@
                       }
                     },
                     {
-                      "id": 113,
+                      "id": 114,
                       "name": "options",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -210,17 +210,17 @@
                       },
                       "type": {
                         "type": "reference",
-                        "id": 61,
+                        "id": 60,
                         "typeArguments": [
                           {
                             "type": "reference",
-                            "id": 109,
+                            "id": 110,
                             "name": "SchemaName"
                           }
                         ],
                         "name": "SupabaseClientOptions",
                         "dereferenced": {
-                          "id": 61,
+                          "id": 60,
                           "name": "SupabaseClientOptions",
                           "kind": 4194304,
                           "kindString": "Type alias",
@@ -234,7 +234,7 @@
                           ],
                           "typeParameter": [
                             {
-                              "id": 79,
+                              "id": 80,
                               "name": "SchemaName",
                               "kind": 131072,
                               "kindString": "Type parameter",
@@ -244,14 +244,14 @@
                           "type": {
                             "type": "reflection",
                             "declaration": {
-                              "id": 62,
+                              "id": 61,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
                               "flags": {},
                               "children": [
                                 {
-                                  "id": 66,
+                                  "id": 65,
                                   "name": "auth",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -268,14 +268,14 @@
                                   "type": {
                                     "type": "reflection",
                                     "declaration": {
-                                      "id": 67,
+                                      "id": 66,
                                       "name": "__type",
                                       "kind": 65536,
                                       "kindString": "Type literal",
                                       "flags": {},
                                       "children": [
                                         {
-                                          "id": 68,
+                                          "id": 67,
                                           "name": "autoRefreshToken",
                                           "kind": 1024,
                                           "kindString": "Property",
@@ -298,7 +298,38 @@
                                           }
                                         },
                                         {
-                                          "id": 71,
+                                          "id": 73,
+                                          "name": "debug",
+                                          "kind": 1024,
+                                          "kindString": "Property",
+                                          "flags": {
+                                            "isOptional": true
+                                          },
+                                          "comment": {
+                                            "shortText": "If debug messages for authentication client are emitted. Can be used to inspect the behavior of the library."
+                                          },
+                                          "sources": [
+                                            {
+                                              "fileName": "src/lib/types.ts",
+                                              "line": 46,
+                                              "character": 4
+                                            }
+                                          ],
+                                          "type": {
+                                            "type": "indexedAccess",
+                                            "indexType": {
+                                              "type": "literal",
+                                              "value": "debug"
+                                            },
+                                            "objectType": {
+                                              "type": "reference",
+                                              "id": 58,
+                                              "name": "SupabaseAuthClientOptions"
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "id": 70,
                                           "name": "detectSessionInUrl",
                                           "kind": 1024,
                                           "kindString": "Property",
@@ -321,7 +352,7 @@
                                           }
                                         },
                                         {
-                                          "id": 73,
+                                          "id": 72,
                                           "name": "flowType",
                                           "kind": 1024,
                                           "kindString": "Property",
@@ -346,13 +377,50 @@
                                             },
                                             "objectType": {
                                               "type": "reference",
-                                              "id": 59,
+                                              "id": 58,
                                               "name": "SupabaseAuthClientOptions"
                                             }
                                           }
                                         },
                                         {
-                                          "id": 70,
+                                          "id": 74,
+                                          "name": "lock",
+                                          "kind": 1024,
+                                          "kindString": "Property",
+                                          "flags": {
+                                            "isOptional": true
+                                          },
+                                          "comment": {
+                                            "shortText": "Provide your own locking mechanism based on the environment. By default no locking is done at this time.",
+                                            "tags": [
+                                              {
+                                                "tag": "experimental",
+                                                "text": "\n"
+                                              }
+                                            ]
+                                          },
+                                          "sources": [
+                                            {
+                                              "fileName": "src/lib/types.ts",
+                                              "line": 52,
+                                              "character": 4
+                                            }
+                                          ],
+                                          "type": {
+                                            "type": "indexedAccess",
+                                            "indexType": {
+                                              "type": "literal",
+                                              "value": "lock"
+                                            },
+                                            "objectType": {
+                                              "type": "reference",
+                                              "id": 58,
+                                              "name": "SupabaseAuthClientOptions"
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "id": 69,
                                           "name": "persistSession",
                                           "kind": 1024,
                                           "kindString": "Property",
@@ -375,7 +443,7 @@
                                           }
                                         },
                                         {
-                                          "id": 72,
+                                          "id": 71,
                                           "name": "storage",
                                           "kind": 1024,
                                           "kindString": "Property",
@@ -400,13 +468,13 @@
                                             },
                                             "objectType": {
                                               "type": "reference",
-                                              "id": 59,
+                                              "id": 58,
                                               "name": "SupabaseAuthClientOptions"
                                             }
                                           }
                                         },
                                         {
-                                          "id": 69,
+                                          "id": 68,
                                           "name": "storageKey",
                                           "kind": 1024,
                                           "kindString": "Property",
@@ -433,7 +501,7 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [68, 71, 73, 70, 72, 69]
+                                          "children": [67, 73, 70, 72, 74, 69, 71, 68]
                                         }
                                       ],
                                       "sources": [
@@ -447,7 +515,7 @@
                                   }
                                 },
                                 {
-                                  "id": 63,
+                                  "id": 62,
                                   "name": "db",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -467,14 +535,14 @@
                                   "type": {
                                     "type": "reflection",
                                     "declaration": {
-                                      "id": 64,
+                                      "id": 63,
                                       "name": "__type",
                                       "kind": 65536,
                                       "kindString": "Type literal",
                                       "flags": {},
                                       "children": [
                                         {
-                                          "id": 65,
+                                          "id": 64,
                                           "name": "schema",
                                           "kind": 1024,
                                           "kindString": "Property",
@@ -490,7 +558,7 @@
                                           ],
                                           "type": {
                                             "type": "reference",
-                                            "id": 79,
+                                            "id": 80,
                                             "name": "SchemaName",
                                             "dereferenced": {}
                                           }
@@ -500,7 +568,7 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [65]
+                                          "children": [64]
                                         }
                                       ],
                                       "sources": [
@@ -514,7 +582,7 @@
                                   }
                                 },
                                 {
-                                  "id": 75,
+                                  "id": 76,
                                   "name": "global",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -524,21 +592,21 @@
                                   "sources": [
                                     {
                                       "fileName": "src/lib/types.ts",
-                                      "line": 48,
+                                      "line": 58,
                                       "character": 2
                                     }
                                   ],
                                   "type": {
                                     "type": "reflection",
                                     "declaration": {
-                                      "id": 76,
+                                      "id": 77,
                                       "name": "__type",
                                       "kind": 65536,
                                       "kindString": "Type literal",
                                       "flags": {},
                                       "children": [
                                         {
-                                          "id": 77,
+                                          "id": 78,
                                           "name": "fetch",
                                           "kind": 1024,
                                           "kindString": "Property",
@@ -551,16 +619,16 @@
                                           "sources": [
                                             {
                                               "fileName": "src/lib/types.ts",
-                                              "line": 52,
+                                              "line": 62,
                                               "character": 4
                                             }
                                           ],
                                           "type": {
                                             "type": "reference",
-                                            "id": 60,
+                                            "id": 59,
                                             "name": "Fetch",
                                             "dereferenced": {
-                                              "id": 60,
+                                              "id": 59,
                                               "name": "Fetch",
                                               "kind": 4194304,
                                               "kindString": "Type alias",
@@ -586,7 +654,7 @@
                                           }
                                         },
                                         {
-                                          "id": 78,
+                                          "id": 79,
                                           "name": "headers",
                                           "kind": 1024,
                                           "kindString": "Property",
@@ -599,7 +667,7 @@
                                           "sources": [
                                             {
                                               "fileName": "src/lib/types.ts",
-                                              "line": 56,
+                                              "line": 66,
                                               "character": 4
                                             }
                                           ],
@@ -625,13 +693,13 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [77, 78]
+                                          "children": [78, 79]
                                         }
                                       ],
                                       "sources": [
                                         {
                                           "fileName": "src/lib/types.ts",
-                                          "line": 48,
+                                          "line": 58,
                                           "character": 11
                                         }
                                       ]
@@ -639,7 +707,7 @@
                                   }
                                 },
                                 {
-                                  "id": 74,
+                                  "id": 75,
                                   "name": "realtime",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -652,7 +720,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/lib/types.ts",
-                                      "line": 47,
+                                      "line": 57,
                                       "character": 2
                                     }
                                   ],
@@ -668,7 +736,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [66, 63, 75, 74]
+                                  "children": [65, 62, 76, 75]
                                 }
                               ],
                               "sources": [
@@ -686,21 +754,21 @@
                   ],
                   "type": {
                     "type": "reference",
-                    "id": 105,
+                    "id": 106,
                     "typeArguments": [
                       {
                         "type": "reference",
-                        "id": 108,
+                        "id": 109,
                         "name": "Database"
                       },
                       {
                         "type": "reference",
-                        "id": 109,
+                        "id": 110,
                         "name": "SchemaName"
                       },
                       {
                         "type": "reference",
-                        "id": 110,
+                        "id": 111,
                         "name": "Schema"
                       }
                     ],
@@ -710,7 +778,7 @@
               ]
             },
             {
-              "id": 114,
+              "id": 115,
               "name": "auth",
               "kind": 1024,
               "kindString": "Property",
@@ -731,7 +799,7 @@
               }
             },
             {
-              "id": 117,
+              "id": 118,
               "name": "authUrl",
               "kind": 1024,
               "kindString": "Property",
@@ -751,12 +819,13 @@
               }
             },
             {
-              "id": 127,
+              "id": 128,
               "name": "changedAccessToken",
               "kind": 1024,
               "kindString": "Property",
               "flags": {
-                "isProtected": true
+                "isProtected": true,
+                "isOptional": true
               },
               "sources": [
                 {
@@ -766,21 +835,12 @@
                 }
               ],
               "type": {
-                "type": "union",
-                "types": [
-                  {
-                    "type": "intrinsic",
-                    "name": "undefined"
-                  },
-                  {
-                    "type": "intrinsic",
-                    "name": "string"
-                  }
-                ]
+                "type": "intrinsic",
+                "name": "string"
               }
             },
             {
-              "id": 122,
+              "id": 123,
               "name": "fetch",
               "kind": 1024,
               "kindString": "Property",
@@ -798,21 +858,21 @@
               "type": {
                 "type": "reflection",
                 "declaration": {
-                  "id": 123,
+                  "id": 124,
                   "name": "__type",
                   "kind": 65536,
                   "kindString": "Type literal",
                   "flags": {},
                   "signatures": [
                     {
-                      "id": 124,
+                      "id": 125,
                       "name": "__type",
                       "kind": 4096,
                       "kindString": "Call signature",
                       "flags": {},
                       "parameters": [
                         {
-                          "id": 125,
+                          "id": 126,
                           "name": "input",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -836,7 +896,7 @@
                           }
                         },
                         {
-                          "id": 126,
+                          "id": 127,
                           "name": "init",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -871,7 +931,7 @@
               }
             },
             {
-              "id": 119,
+              "id": 120,
               "name": "functionsUrl",
               "kind": 1024,
               "kindString": "Property",
@@ -891,7 +951,7 @@
               }
             },
             {
-              "id": 128,
+              "id": 129,
               "name": "headers",
               "kind": 1024,
               "kindString": "Property",
@@ -908,20 +968,20 @@
               "type": {
                 "type": "reflection",
                 "declaration": {
-                  "id": 129,
+                  "id": 130,
                   "name": "__type",
                   "kind": 65536,
                   "kindString": "Type literal",
                   "flags": {},
                   "indexSignature": {
-                    "id": 130,
+                    "id": 131,
                     "name": "__index",
                     "kind": 8192,
                     "kindString": "Index signature",
                     "flags": {},
                     "parameters": [
                       {
-                        "id": 131,
+                        "id": 132,
                         "name": "key",
                         "kind": 32768,
                         "flags": {},
@@ -940,7 +1000,7 @@
               }
             },
             {
-              "id": 115,
+              "id": 116,
               "name": "realtime",
               "kind": 1024,
               "kindString": "Property",
@@ -960,7 +1020,7 @@
               }
             },
             {
-              "id": 116,
+              "id": 117,
               "name": "realtimeUrl",
               "kind": 1024,
               "kindString": "Property",
@@ -980,7 +1040,7 @@
               }
             },
             {
-              "id": 120,
+              "id": 121,
               "name": "rest",
               "kind": 1024,
               "kindString": "Property",
@@ -999,12 +1059,12 @@
                 "typeArguments": [
                   {
                     "type": "reference",
-                    "id": 108,
+                    "id": 109,
                     "name": "Database"
                   },
                   {
                     "type": "reference",
-                    "id": 109,
+                    "id": 110,
                     "name": "SchemaName"
                   },
                   {
@@ -1013,12 +1073,12 @@
                       "type": "indexedAccess",
                       "indexType": {
                         "type": "reference",
-                        "id": 109,
+                        "id": 110,
                         "name": "SchemaName"
                       },
                       "objectType": {
                         "type": "reference",
-                        "id": 108,
+                        "id": 109,
                         "name": "Database"
                       }
                     },
@@ -1051,7 +1111,7 @@
               }
             },
             {
-              "id": 121,
+              "id": 122,
               "name": "storageKey",
               "kind": 1024,
               "kindString": "Property",
@@ -1071,7 +1131,7 @@
               }
             },
             {
-              "id": 118,
+              "id": 119,
               "name": "storageUrl",
               "kind": 1024,
               "kindString": "Property",
@@ -1091,7 +1151,7 @@
               }
             },
             {
-              "id": 133,
+              "id": 134,
               "name": "supabaseKey",
               "kind": 1024,
               "kindString": "Property",
@@ -1104,7 +1164,7 @@
               }
             },
             {
-              "id": 132,
+              "id": 133,
               "name": "supabaseUrl",
               "kind": 1024,
               "kindString": "Property",
@@ -1117,7 +1177,7 @@
               }
             },
             {
-              "id": 134,
+              "id": 135,
               "name": "functions",
               "kind": 262144,
               "kindString": "Accessor",
@@ -1125,13 +1185,13 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 138,
+                  "line": 132,
                   "character": 6
                 }
               ],
               "getSignature": [
                 {
-                  "id": 135,
+                  "id": 136,
                   "name": "functions",
                   "kind": 524288,
                   "kindString": "Get signature",
@@ -1149,7 +1209,7 @@
               ]
             },
             {
-              "id": 136,
+              "id": 137,
               "name": "storage",
               "kind": 262144,
               "kindString": "Accessor",
@@ -1157,13 +1217,13 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 148,
+                  "line": 142,
                   "character": 6
                 }
               ],
               "getSignature": [
                 {
-                  "id": 137,
+                  "id": 138,
                   "name": "storage",
                   "kind": 524288,
                   "kindString": "Get signature",
@@ -1181,7 +1241,7 @@
               ]
             },
             {
-              "id": 170,
+              "id": 177,
               "name": "_getAccessToken",
               "kind": 2048,
               "kindString": "Method",
@@ -1191,13 +1251,13 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 235,
+                  "line": 259,
                   "character": 16
                 }
               ],
               "signatures": [
                 {
-                  "id": 171,
+                  "id": 178,
                   "name": "_getAccessToken",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -1227,7 +1287,7 @@
               ]
             },
             {
-              "id": 187,
+              "id": 194,
               "name": "_handleTokenChanged",
               "kind": 2048,
               "kindString": "Method",
@@ -1237,20 +1297,20 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 284,
+                  "line": 310,
                   "character": 10
                 }
               ],
               "signatures": [
                 {
-                  "id": 188,
+                  "id": 195,
                   "name": "_handleTokenChanged",
                   "kind": 4096,
                   "kindString": "Call signature",
                   "flags": {},
                   "parameters": [
                     {
-                      "id": 189,
+                      "id": 196,
                       "name": "event",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -1263,27 +1323,7 @@
                       }
                     },
                     {
-                      "id": 190,
-                      "name": "token",
-                      "kind": 32768,
-                      "kindString": "Parameter",
-                      "flags": {},
-                      "type": {
-                        "type": "union",
-                        "types": [
-                          {
-                            "type": "intrinsic",
-                            "name": "undefined"
-                          },
-                          {
-                            "type": "intrinsic",
-                            "name": "string"
-                          }
-                        ]
-                      }
-                    },
-                    {
-                      "id": 191,
+                      "id": 197,
                       "name": "source",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -1301,6 +1341,19 @@
                           }
                         ]
                       }
+                    },
+                    {
+                      "id": 198,
+                      "name": "token",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {
+                        "isOptional": true
+                      },
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
                     }
                   ],
                   "type": {
@@ -1311,7 +1364,7 @@
               ]
             },
             {
-              "id": 181,
+              "id": 188,
               "name": "_initRealtimeClient",
               "kind": 2048,
               "kindString": "Method",
@@ -1321,20 +1374,20 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 270,
+                  "line": 296,
                   "character": 10
                 }
               ],
               "signatures": [
                 {
-                  "id": 182,
+                  "id": 189,
                   "name": "_initRealtimeClient",
                   "kind": 4096,
                   "kindString": "Call signature",
                   "flags": {},
                   "parameters": [
                     {
-                      "id": 183,
+                      "id": 190,
                       "name": "options",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -1357,7 +1410,7 @@
               ]
             },
             {
-              "id": 172,
+              "id": 179,
               "name": "_initSupabaseAuthClient",
               "kind": 2048,
               "kindString": "Method",
@@ -1367,30 +1420,30 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 241,
+                  "line": 265,
                   "character": 10
                 }
               ],
               "signatures": [
                 {
-                  "id": 173,
+                  "id": 180,
                   "name": "_initSupabaseAuthClient",
                   "kind": 4096,
                   "kindString": "Call signature",
                   "flags": {},
                   "parameters": [
                     {
-                      "id": 174,
+                      "id": 181,
                       "name": "__namedParameters",
                       "kind": 32768,
                       "kindString": "Parameter",
                       "flags": {},
                       "type": {
                         "type": "reference",
-                        "id": 59,
+                        "id": 58,
                         "name": "SupabaseAuthClientOptions",
                         "dereferenced": {
-                          "id": 59,
+                          "id": 58,
                           "name": "SupabaseAuthClientOptions",
                           "kind": 256,
                           "kindString": "Interface",
@@ -1412,7 +1465,7 @@
                       }
                     },
                     {
-                      "id": 175,
+                      "id": 182,
                       "name": "headers",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -1437,7 +1490,7 @@
                       }
                     },
                     {
-                      "id": 176,
+                      "id": 183,
                       "name": "fetch",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -1447,21 +1500,21 @@
                       "type": {
                         "type": "reflection",
                         "declaration": {
-                          "id": 177,
+                          "id": 184,
                           "name": "__type",
                           "kind": 65536,
                           "kindString": "Type literal",
                           "flags": {},
                           "signatures": [
                             {
-                              "id": 178,
+                              "id": 185,
                               "name": "__type",
                               "kind": 4096,
                               "kindString": "Call signature",
                               "flags": {},
                               "parameters": [
                                 {
-                                  "id": 179,
+                                  "id": 186,
                                   "name": "input",
                                   "kind": 32768,
                                   "kindString": "Parameter",
@@ -1485,7 +1538,7 @@
                                   }
                                 },
                                 {
-                                  "id": 180,
+                                  "id": 187,
                                   "name": "init",
                                   "kind": 32768,
                                   "kindString": "Parameter",
@@ -1528,7 +1581,7 @@
               ]
             },
             {
-              "id": 184,
+              "id": 191,
               "name": "_listenForAuthEvents",
               "kind": 2048,
               "kindString": "Method",
@@ -1538,13 +1591,13 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 277,
+                  "line": 303,
                   "character": 10
                 }
               ],
               "signatures": [
                 {
-                  "id": 185,
+                  "id": 192,
                   "name": "_listenForAuthEvents",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -1552,7 +1605,7 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 186,
+                      "id": 193,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
@@ -1563,7 +1616,7 @@
               ]
             },
             {
-              "id": 159,
+              "id": 166,
               "name": "channel",
               "kind": 2048,
               "kindString": "Method",
@@ -1571,13 +1624,13 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 207,
+                  "line": 231,
                   "character": 2
                 }
               ],
               "signatures": [
                 {
-                  "id": 160,
+                  "id": 167,
                   "name": "channel",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -1587,7 +1640,7 @@
                   },
                   "parameters": [
                     {
-                      "id": 161,
+                      "id": 168,
                       "name": "name",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -1601,7 +1654,7 @@
                       }
                     },
                     {
-                      "id": 162,
+                      "id": 169,
                       "name": "opts",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -1628,7 +1681,7 @@
               ]
             },
             {
-              "id": 138,
+              "id": 139,
               "name": "from",
               "kind": 2048,
               "kindString": "Method",
@@ -1636,23 +1689,23 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 157,
+                  "line": 146,
                   "character": 2
                 }
               ],
               "signatures": [
                 {
-                  "id": 139,
+                  "id": 140,
                   "name": "from",
                   "kind": 4096,
                   "kindString": "Call signature",
                   "flags": {},
                   "comment": {
-                    "shortText": "Perform a table operation."
+                    "shortText": "Perform a query on a table or a view."
                   },
                   "typeParameter": [
                     {
-                      "id": 140,
+                      "id": 141,
                       "name": "TableName",
                       "kind": 131072,
                       "kindString": "Type parameter",
@@ -1663,28 +1716,31 @@
                       }
                     },
                     {
-                      "id": 141,
+                      "id": 142,
                       "name": "Table",
                       "kind": 131072,
                       "kindString": "Type parameter",
                       "flags": {},
                       "type": {
                         "type": "reference",
-                        "id": 80,
+                        "id": 81,
                         "name": "GenericTable"
                       }
                     }
                   ],
                   "parameters": [
                     {
-                      "id": 142,
+                      "id": 143,
                       "name": "relation",
                       "kind": 32768,
                       "kindString": "Parameter",
                       "flags": {},
+                      "comment": {
+                        "shortText": "The table or view name to query\n"
+                      },
                       "type": {
                         "type": "reference",
-                        "id": 140,
+                        "id": 141,
                         "name": "TableName",
                         "dereferenced": {}
                       }
@@ -1695,13 +1751,41 @@
                     "typeArguments": [
                       {
                         "type": "reference",
-                        "id": 110,
+                        "id": 111,
                         "name": "Schema"
                       },
                       {
                         "type": "reference",
-                        "id": 141,
+                        "id": 142,
                         "name": "Table"
+                      },
+                      {
+                        "type": "conditional",
+                        "checkType": {
+                          "type": "reference",
+                          "id": 142,
+                          "name": "Table"
+                        },
+                        "extendsType": {
+                          "type": "reflection",
+                          "declaration": {
+                            "id": 144,
+                            "name": "__type",
+                            "kind": 65536,
+                            "kindString": "Type literal",
+                            "flags": {}
+                          }
+                        },
+                        "trueType": {
+                          "type": "reference",
+                          "qualifiedName": "R",
+                          "package": "@supabase/postgrest-js",
+                          "name": "R"
+                        },
+                        "falseType": {
+                          "type": "intrinsic",
+                          "name": "unknown"
+                        }
                       }
                     ],
                     "qualifiedName": "PostgrestQueryBuilder",
@@ -1710,14 +1794,17 @@
                   }
                 },
                 {
-                  "id": 143,
+                  "id": 145,
                   "name": "from",
                   "kind": 4096,
                   "kindString": "Call signature",
                   "flags": {},
+                  "comment": {
+                    "shortText": "Perform a query on a table or a view."
+                  },
                   "typeParameter": [
                     {
-                      "id": 144,
+                      "id": 146,
                       "name": "ViewName",
                       "kind": 131072,
                       "kindString": "Type parameter",
@@ -1728,28 +1815,31 @@
                       }
                     },
                     {
-                      "id": 145,
+                      "id": 147,
                       "name": "View",
                       "kind": 131072,
                       "kindString": "Type parameter",
                       "flags": {},
                       "type": {
                         "type": "reference",
-                        "id": 93,
+                        "id": 94,
                         "name": "GenericView"
                       }
                     }
                   ],
                   "parameters": [
                     {
-                      "id": 146,
+                      "id": 148,
                       "name": "relation",
                       "kind": 32768,
                       "kindString": "Parameter",
                       "flags": {},
+                      "comment": {
+                        "shortText": "The table or view name to query\n"
+                      },
                       "type": {
                         "type": "reference",
-                        "id": 144,
+                        "id": 146,
                         "name": "ViewName",
                         "dereferenced": {}
                       }
@@ -1760,13 +1850,41 @@
                     "typeArguments": [
                       {
                         "type": "reference",
-                        "id": 110,
+                        "id": 111,
                         "name": "Schema"
                       },
                       {
                         "type": "reference",
-                        "id": 145,
+                        "id": 147,
                         "name": "View"
+                      },
+                      {
+                        "type": "conditional",
+                        "checkType": {
+                          "type": "reference",
+                          "id": 147,
+                          "name": "View"
+                        },
+                        "extendsType": {
+                          "type": "reflection",
+                          "declaration": {
+                            "id": 149,
+                            "name": "__type",
+                            "kind": 65536,
+                            "kindString": "Type literal",
+                            "flags": {}
+                          }
+                        },
+                        "trueType": {
+                          "type": "reference",
+                          "qualifiedName": "R",
+                          "package": "@supabase/postgrest-js",
+                          "name": "R"
+                        },
+                        "falseType": {
+                          "type": "intrinsic",
+                          "name": "unknown"
+                        }
                       }
                     ],
                     "qualifiedName": "PostgrestQueryBuilder",
@@ -1775,18 +1893,24 @@
                   }
                 },
                 {
-                  "id": 147,
+                  "id": 150,
                   "name": "from",
                   "kind": 4096,
                   "kindString": "Call signature",
                   "flags": {},
+                  "comment": {
+                    "shortText": "Perform a query on a table or a view."
+                  },
                   "parameters": [
                     {
-                      "id": 148,
+                      "id": 151,
                       "name": "relation",
                       "kind": 32768,
                       "kindString": "Parameter",
                       "flags": {},
+                      "comment": {
+                        "shortText": "The table or view name to query\n"
+                      },
                       "type": {
                         "type": "intrinsic",
                         "name": "string"
@@ -1798,12 +1922,16 @@
                     "typeArguments": [
                       {
                         "type": "reference",
-                        "id": 110,
+                        "id": 111,
                         "name": "Schema"
                       },
                       {
                         "type": "intrinsic",
                         "name": "any"
+                      },
+                      {
+                        "type": "intrinsic",
+                        "name": "unknown"
                       }
                     ],
                     "qualifiedName": "PostgrestQueryBuilder",
@@ -1814,7 +1942,7 @@
               ]
             },
             {
-              "id": 163,
+              "id": 170,
               "name": "getChannels",
               "kind": 2048,
               "kindString": "Method",
@@ -1822,13 +1950,13 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 214,
+                  "line": 238,
                   "character": 2
                 }
               ],
               "signatures": [
                 {
-                  "id": 164,
+                  "id": 171,
                   "name": "getChannels",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -1849,7 +1977,7 @@
               ]
             },
             {
-              "id": 168,
+              "id": 175,
               "name": "removeAllChannels",
               "kind": 2048,
               "kindString": "Method",
@@ -1857,13 +1985,13 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 231,
+                  "line": 255,
                   "character": 2
                 }
               ],
               "signatures": [
                 {
-                  "id": 169,
+                  "id": 176,
                   "name": "removeAllChannels",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -1903,7 +2031,7 @@
               ]
             },
             {
-              "id": 165,
+              "id": 172,
               "name": "removeChannel",
               "kind": 2048,
               "kindString": "Method",
@@ -1911,13 +2039,13 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 224,
+                  "line": 248,
                   "character": 2
                 }
               ],
               "signatures": [
                 {
-                  "id": 166,
+                  "id": 173,
                   "name": "removeChannel",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -1927,7 +2055,7 @@
                   },
                   "parameters": [
                     {
-                      "id": 167,
+                      "id": 174,
                       "name": "channel",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -1972,7 +2100,7 @@
               ]
             },
             {
-              "id": 149,
+              "id": 156,
               "name": "rpc",
               "kind": 2048,
               "kindString": "Method",
@@ -1980,13 +2108,13 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 178,
+                  "line": 202,
                   "character": 2
                 }
               ],
               "signatures": [
                 {
-                  "id": 150,
+                  "id": 157,
                   "name": "rpc",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -1996,7 +2124,7 @@
                   },
                   "typeParameter": [
                     {
-                      "id": 151,
+                      "id": 158,
                       "name": "FunctionName",
                       "kind": 131072,
                       "kindString": "Type parameter",
@@ -2007,43 +2135,43 @@
                       }
                     },
                     {
-                      "id": 152,
+                      "id": 159,
                       "name": "Function_",
                       "kind": 131072,
                       "kindString": "Type parameter",
                       "flags": {},
                       "type": {
                         "type": "reference",
-                        "id": 94,
+                        "id": 95,
                         "name": "GenericFunction"
                       }
                     }
                   ],
                   "parameters": [
                     {
-                      "id": 153,
+                      "id": 160,
                       "name": "fn",
                       "kind": 32768,
                       "kindString": "Parameter",
                       "flags": {},
                       "comment": {
-                        "shortText": "The function name to call."
+                        "shortText": "The function name to call"
                       },
                       "type": {
                         "type": "reference",
-                        "id": 151,
+                        "id": 158,
                         "name": "FunctionName",
                         "dereferenced": {}
                       }
                     },
                     {
-                      "id": 154,
+                      "id": 161,
                       "name": "args",
                       "kind": 32768,
                       "kindString": "Parameter",
                       "flags": {},
                       "comment": {
-                        "shortText": "The parameters to pass to the function call."
+                        "shortText": "The arguments to pass to the function call"
                       },
                       "type": {
                         "type": "indexedAccess",
@@ -2053,31 +2181,34 @@
                         },
                         "objectType": {
                           "type": "reference",
-                          "id": 152,
+                          "id": 159,
                           "name": "Function_"
                         }
                       },
                       "defaultValue": "{}"
                     },
                     {
-                      "id": 155,
+                      "id": 162,
                       "name": "options",
                       "kind": 32768,
                       "kindString": "Parameter",
                       "flags": {
                         "isOptional": true
                       },
+                      "comment": {
+                        "shortText": "Named parameters"
+                      },
                       "type": {
                         "type": "reflection",
                         "declaration": {
-                          "id": 156,
+                          "id": 163,
                           "name": "__type",
                           "kind": 65536,
                           "kindString": "Type literal",
                           "flags": {},
                           "children": [
                             {
-                              "id": 158,
+                              "id": 165,
                               "name": "count",
                               "kind": 1024,
                               "kindString": "Property",
@@ -2085,12 +2216,12 @@
                                 "isOptional": true
                               },
                               "comment": {
-                                "shortText": "Count algorithm to use to count rows in a table.\n\n"
+                                "shortText": "Count algorithm to use to count rows returned by the\nfunction. Only applicable for [set-returning\nfunctions](https://www.postgresql.org/docs/current/functions-srf.html).\n\n`\"exact\"`: Exact but slow count algorithm. Performs a `COUNT(*)` under the\nhood.\n\n`\"planned\"`: Approximated but fast count algorithm. Uses the Postgres\nstatistics under the hood.\n\n`\"estimated\"`: Uses exact count for low numbers and planned count for high\nnumbers.\n"
                               },
                               "sources": [
                                 {
                                   "fileName": "src/SupabaseClient.ts",
-                                  "line": 186,
+                                  "line": 210,
                                   "character": 6
                                 }
                               ],
@@ -2113,7 +2244,7 @@
                               }
                             },
                             {
-                              "id": 157,
+                              "id": 164,
                               "name": "head",
                               "kind": 1024,
                               "kindString": "Property",
@@ -2121,12 +2252,12 @@
                                 "isOptional": true
                               },
                               "comment": {
-                                "shortText": "When set to true, no data will be returned."
+                                "shortText": "When set to `true`, `data` will not be returned.\nUseful if you only need the count."
                               },
                               "sources": [
                                 {
                                   "fileName": "src/SupabaseClient.ts",
-                                  "line": 185,
+                                  "line": 209,
                                   "character": 6
                                 }
                               ],
@@ -2140,7 +2271,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [158, 157]
+                              "children": [165, 164]
                             }
                           ]
                         }
@@ -2152,7 +2283,7 @@
                     "typeArguments": [
                       {
                         "type": "reference",
-                        "id": 110,
+                        "id": 111,
                         "name": "Schema"
                       },
                       {
@@ -2165,7 +2296,7 @@
                           },
                           "objectType": {
                             "type": "reference",
-                            "id": 152,
+                            "id": 159,
                             "name": "Function_"
                           }
                         },
@@ -2241,12 +2372,128 @@
                         },
                         "objectType": {
                           "type": "reference",
-                          "id": 152,
+                          "id": 159,
                           "name": "Function_"
                         }
+                      },
+                      {
+                        "type": "intrinsic",
+                        "name": "unknown"
                       }
                     ],
                     "qualifiedName": "PostgrestFilterBuilder",
+                    "package": "@supabase/postgrest-js",
+                    "name": "default"
+                  }
+                }
+              ]
+            },
+            {
+              "id": 152,
+              "name": "schema",
+              "kind": 2048,
+              "kindString": "Method",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "src/SupabaseClient.ts",
+                  "line": 171,
+                  "character": 2
+                }
+              ],
+              "signatures": [
+                {
+                  "id": 153,
+                  "name": "schema",
+                  "kind": 4096,
+                  "kindString": "Call signature",
+                  "flags": {},
+                  "comment": {
+                    "shortText": "Perform a query on a schema distinct from the default schema supplied via\nthe `options.db.schema` constructor parameter.",
+                    "text": "The schema needs to be on the list of exposed schemas inside Supabase.\n"
+                  },
+                  "typeParameter": [
+                    {
+                      "id": 154,
+                      "name": "DynamicSchema",
+                      "kind": 131072,
+                      "kindString": "Type parameter",
+                      "flags": {},
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
+                    }
+                  ],
+                  "parameters": [
+                    {
+                      "id": 155,
+                      "name": "schema",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {},
+                      "comment": {
+                        "shortText": "The name of the schema to query\n"
+                      },
+                      "type": {
+                        "type": "reference",
+                        "id": 154,
+                        "name": "DynamicSchema",
+                        "dereferenced": {}
+                      }
+                    }
+                  ],
+                  "type": {
+                    "type": "reference",
+                    "typeArguments": [
+                      {
+                        "type": "reference",
+                        "id": 109,
+                        "name": "Database"
+                      },
+                      {
+                        "type": "reference",
+                        "id": 154,
+                        "name": "DynamicSchema"
+                      },
+                      {
+                        "type": "conditional",
+                        "checkType": {
+                          "type": "indexedAccess",
+                          "indexType": {
+                            "type": "reference",
+                            "id": 154,
+                            "name": "DynamicSchema"
+                          },
+                          "objectType": {
+                            "type": "reference",
+                            "id": 109,
+                            "name": "Database"
+                          }
+                        },
+                        "extendsType": {
+                          "type": "reference",
+                          "id": 99,
+                          "name": "GenericSchema"
+                        },
+                        "trueType": {
+                          "type": "indexedAccess",
+                          "indexType": {
+                            "type": "intrinsic",
+                            "name": "any"
+                          },
+                          "objectType": {
+                            "type": "intrinsic",
+                            "name": "any"
+                          }
+                        },
+                        "falseType": {
+                          "type": "intrinsic",
+                          "name": "any"
+                        }
+                      }
+                    ],
+                    "qualifiedName": "PostgrestClient",
                     "package": "@supabase/postgrest-js",
                     "name": "default"
                   }
@@ -2258,22 +2505,22 @@
             {
               "title": "Constructors",
               "kind": 512,
-              "children": [106]
+              "children": [107]
             },
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [114, 117, 127, 122, 119, 128, 115, 116, 120, 121, 118, 133, 132]
+              "children": [115, 118, 128, 123, 120, 129, 116, 117, 121, 122, 119, 134, 133]
             },
             {
               "title": "Accessors",
               "kind": 262144,
-              "children": [134, 136]
+              "children": [135, 137]
             },
             {
               "title": "Methods",
               "kind": 2048,
-              "children": [170, 187, 181, 172, 184, 159, 138, 163, 168, 165, 149]
+              "children": [177, 194, 188, 179, 191, 166, 139, 170, 175, 172, 156, 152]
             }
           ],
           "sources": [
@@ -2285,7 +2532,7 @@
           ],
           "typeParameter": [
             {
-              "id": 192,
+              "id": 199,
               "name": "Database",
               "kind": 131072,
               "kindString": "Type parameter",
@@ -2296,7 +2543,7 @@
               }
             },
             {
-              "id": 193,
+              "id": 200,
               "name": "SchemaName",
               "kind": 131072,
               "kindString": "Type parameter",
@@ -2313,7 +2560,7 @@
                     "operator": "keyof",
                     "target": {
                       "type": "reference",
-                      "id": 108,
+                      "id": 109,
                       "name": "Database"
                     }
                   }
@@ -2330,7 +2577,7 @@
                   "operator": "keyof",
                   "target": {
                     "type": "reference",
-                    "id": 108,
+                    "id": 109,
                     "name": "Database"
                   }
                 },
@@ -2350,7 +2597,7 @@
                       "operator": "keyof",
                       "target": {
                         "type": "reference",
-                        "id": 108,
+                        "id": 109,
                         "name": "Database"
                       }
                     }
@@ -2359,14 +2606,14 @@
               }
             },
             {
-              "id": 194,
+              "id": 201,
               "name": "Schema",
               "kind": 131072,
               "kindString": "Type parameter",
               "flags": {},
               "type": {
                 "type": "reference",
-                "id": 98,
+                "id": 99,
                 "name": "GenericSchema"
               },
               "default": {
@@ -2375,30 +2622,30 @@
                   "type": "indexedAccess",
                   "indexType": {
                     "type": "reference",
-                    "id": 109,
+                    "id": 110,
                     "name": "SchemaName"
                   },
                   "objectType": {
                     "type": "reference",
-                    "id": 108,
+                    "id": 109,
                     "name": "Database"
                   }
                 },
                 "extendsType": {
                   "type": "reference",
-                  "id": 98,
+                  "id": 99,
                   "name": "GenericSchema"
                 },
                 "trueType": {
                   "type": "indexedAccess",
                   "indexType": {
                     "type": "reference",
-                    "id": 109,
+                    "id": 110,
                     "name": "SchemaName"
                   },
                   "objectType": {
                     "type": "reference",
-                    "id": 108,
+                    "id": 109,
                     "name": "Database"
                   }
                 },
@@ -2502,7 +2749,7 @@
                   "flags": {},
                   "type": {
                     "type": "reference",
-                    "id": 98,
+                    "id": 99,
                     "name": "GenericSchema"
                   },
                   "default": {
@@ -2522,7 +2769,7 @@
                     },
                     "extendsType": {
                       "type": "reference",
-                      "id": 98,
+                      "id": 99,
                       "name": "GenericSchema"
                     },
                     "trueType": {
@@ -2576,7 +2823,7 @@
                   },
                   "type": {
                     "type": "reference",
-                    "id": 61,
+                    "id": 60,
                     "typeArguments": [
                       {
                         "type": "reference",
@@ -2586,7 +2833,7 @@
                     ],
                     "name": "SupabaseClientOptions",
                     "dereferenced": {
-                      "id": 61,
+                      "id": 60,
                       "name": "SupabaseClientOptions",
                       "kind": 4194304,
                       "kindString": "Type alias",
@@ -2600,7 +2847,7 @@
                       ],
                       "typeParameter": [
                         {
-                          "id": 79,
+                          "id": 80,
                           "name": "SchemaName",
                           "kind": 131072,
                           "kindString": "Type parameter",
@@ -2610,14 +2857,14 @@
                       "type": {
                         "type": "reflection",
                         "declaration": {
-                          "id": 62,
+                          "id": 61,
                           "name": "__type",
                           "kind": 65536,
                           "kindString": "Type literal",
                           "flags": {},
                           "children": [
                             {
-                              "id": 66,
+                              "id": 65,
                               "name": "auth",
                               "kind": 1024,
                               "kindString": "Property",
@@ -2634,14 +2881,14 @@
                               "type": {
                                 "type": "reflection",
                                 "declaration": {
-                                  "id": 67,
+                                  "id": 66,
                                   "name": "__type",
                                   "kind": 65536,
                                   "kindString": "Type literal",
                                   "flags": {},
                                   "children": [
                                     {
-                                      "id": 68,
+                                      "id": 67,
                                       "name": "autoRefreshToken",
                                       "kind": 1024,
                                       "kindString": "Property",
@@ -2664,7 +2911,38 @@
                                       }
                                     },
                                     {
-                                      "id": 71,
+                                      "id": 73,
+                                      "name": "debug",
+                                      "kind": 1024,
+                                      "kindString": "Property",
+                                      "flags": {
+                                        "isOptional": true
+                                      },
+                                      "comment": {
+                                        "shortText": "If debug messages for authentication client are emitted. Can be used to inspect the behavior of the library."
+                                      },
+                                      "sources": [
+                                        {
+                                          "fileName": "src/lib/types.ts",
+                                          "line": 46,
+                                          "character": 4
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "indexedAccess",
+                                        "indexType": {
+                                          "type": "literal",
+                                          "value": "debug"
+                                        },
+                                        "objectType": {
+                                          "type": "reference",
+                                          "id": 58,
+                                          "name": "SupabaseAuthClientOptions"
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "id": 70,
                                       "name": "detectSessionInUrl",
                                       "kind": 1024,
                                       "kindString": "Property",
@@ -2687,7 +2965,7 @@
                                       }
                                     },
                                     {
-                                      "id": 73,
+                                      "id": 72,
                                       "name": "flowType",
                                       "kind": 1024,
                                       "kindString": "Property",
@@ -2712,13 +2990,50 @@
                                         },
                                         "objectType": {
                                           "type": "reference",
-                                          "id": 59,
+                                          "id": 58,
                                           "name": "SupabaseAuthClientOptions"
                                         }
                                       }
                                     },
                                     {
-                                      "id": 70,
+                                      "id": 74,
+                                      "name": "lock",
+                                      "kind": 1024,
+                                      "kindString": "Property",
+                                      "flags": {
+                                        "isOptional": true
+                                      },
+                                      "comment": {
+                                        "shortText": "Provide your own locking mechanism based on the environment. By default no locking is done at this time.",
+                                        "tags": [
+                                          {
+                                            "tag": "experimental",
+                                            "text": "\n"
+                                          }
+                                        ]
+                                      },
+                                      "sources": [
+                                        {
+                                          "fileName": "src/lib/types.ts",
+                                          "line": 52,
+                                          "character": 4
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "indexedAccess",
+                                        "indexType": {
+                                          "type": "literal",
+                                          "value": "lock"
+                                        },
+                                        "objectType": {
+                                          "type": "reference",
+                                          "id": 58,
+                                          "name": "SupabaseAuthClientOptions"
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "id": 69,
                                       "name": "persistSession",
                                       "kind": 1024,
                                       "kindString": "Property",
@@ -2741,7 +3056,7 @@
                                       }
                                     },
                                     {
-                                      "id": 72,
+                                      "id": 71,
                                       "name": "storage",
                                       "kind": 1024,
                                       "kindString": "Property",
@@ -2766,13 +3081,13 @@
                                         },
                                         "objectType": {
                                           "type": "reference",
-                                          "id": 59,
+                                          "id": 58,
                                           "name": "SupabaseAuthClientOptions"
                                         }
                                       }
                                     },
                                     {
-                                      "id": 69,
+                                      "id": 68,
                                       "name": "storageKey",
                                       "kind": 1024,
                                       "kindString": "Property",
@@ -2799,7 +3114,7 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [68, 71, 73, 70, 72, 69]
+                                      "children": [67, 73, 70, 72, 74, 69, 71, 68]
                                     }
                                   ],
                                   "sources": [
@@ -2813,7 +3128,7 @@
                               }
                             },
                             {
-                              "id": 63,
+                              "id": 62,
                               "name": "db",
                               "kind": 1024,
                               "kindString": "Property",
@@ -2833,14 +3148,14 @@
                               "type": {
                                 "type": "reflection",
                                 "declaration": {
-                                  "id": 64,
+                                  "id": 63,
                                   "name": "__type",
                                   "kind": 65536,
                                   "kindString": "Type literal",
                                   "flags": {},
                                   "children": [
                                     {
-                                      "id": 65,
+                                      "id": 64,
                                       "name": "schema",
                                       "kind": 1024,
                                       "kindString": "Property",
@@ -2856,7 +3171,7 @@
                                       ],
                                       "type": {
                                         "type": "reference",
-                                        "id": 79,
+                                        "id": 80,
                                         "name": "SchemaName",
                                         "dereferenced": {}
                                       }
@@ -2866,7 +3181,7 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [65]
+                                      "children": [64]
                                     }
                                   ],
                                   "sources": [
@@ -2880,7 +3195,7 @@
                               }
                             },
                             {
-                              "id": 75,
+                              "id": 76,
                               "name": "global",
                               "kind": 1024,
                               "kindString": "Property",
@@ -2890,21 +3205,21 @@
                               "sources": [
                                 {
                                   "fileName": "src/lib/types.ts",
-                                  "line": 48,
+                                  "line": 58,
                                   "character": 2
                                 }
                               ],
                               "type": {
                                 "type": "reflection",
                                 "declaration": {
-                                  "id": 76,
+                                  "id": 77,
                                   "name": "__type",
                                   "kind": 65536,
                                   "kindString": "Type literal",
                                   "flags": {},
                                   "children": [
                                     {
-                                      "id": 77,
+                                      "id": 78,
                                       "name": "fetch",
                                       "kind": 1024,
                                       "kindString": "Property",
@@ -2917,16 +3232,16 @@
                                       "sources": [
                                         {
                                           "fileName": "src/lib/types.ts",
-                                          "line": 52,
+                                          "line": 62,
                                           "character": 4
                                         }
                                       ],
                                       "type": {
                                         "type": "reference",
-                                        "id": 60,
+                                        "id": 59,
                                         "name": "Fetch",
                                         "dereferenced": {
-                                          "id": 60,
+                                          "id": 59,
                                           "name": "Fetch",
                                           "kind": 4194304,
                                           "kindString": "Type alias",
@@ -2952,7 +3267,7 @@
                                       }
                                     },
                                     {
-                                      "id": 78,
+                                      "id": 79,
                                       "name": "headers",
                                       "kind": 1024,
                                       "kindString": "Property",
@@ -2965,7 +3280,7 @@
                                       "sources": [
                                         {
                                           "fileName": "src/lib/types.ts",
-                                          "line": 56,
+                                          "line": 66,
                                           "character": 4
                                         }
                                       ],
@@ -2991,13 +3306,13 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [77, 78]
+                                      "children": [78, 79]
                                     }
                                   ],
                                   "sources": [
                                     {
                                       "fileName": "src/lib/types.ts",
-                                      "line": 48,
+                                      "line": 58,
                                       "character": 11
                                     }
                                   ]
@@ -3005,7 +3320,7 @@
                               }
                             },
                             {
-                              "id": 74,
+                              "id": 75,
                               "name": "realtime",
                               "kind": 1024,
                               "kindString": "Property",
@@ -3018,7 +3333,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/lib/types.ts",
-                                  "line": 47,
+                                  "line": 57,
                                   "character": 2
                                 }
                               ],
@@ -3034,7 +3349,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [66, 63, 75, 74]
+                              "children": [65, 62, 76, 75]
                             }
                           ],
                           "sources": [
@@ -3052,7 +3367,7 @@
               ],
               "type": {
                 "type": "reference",
-                "id": 105,
+                "id": 106,
                 "typeArguments": [
                   {
                     "type": "reference",
@@ -3080,12 +3395,12 @@
         {
           "title": "References",
           "kind": 16777216,
-          "children": [195]
+          "children": [202]
         },
         {
           "title": "Classes",
           "kind": 128,
-          "children": [105]
+          "children": [106]
         },
         {
           "title": "Functions",
@@ -3119,7 +3434,7 @@
           "sources": [
             {
               "fileName": "src/lib/constants.ts",
-              "line": 3,
+              "line": 14,
               "character": 13
             }
           ],
@@ -3141,7 +3456,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/constants.ts",
-                      "line": 3,
+                      "line": 14,
                       "character": 33
                     }
                   ],
@@ -3187,7 +3502,7 @@
       "flags": {},
       "children": [
         {
-          "id": 29,
+          "id": 28,
           "name": "fetchWithAuth",
           "kind": 64,
           "kindString": "Function",
@@ -3195,20 +3510,20 @@
           "sources": [
             {
               "fileName": "src/lib/fetch.ts",
-              "line": 25,
+              "line": 26,
               "character": 13
             }
           ],
           "signatures": [
             {
-              "id": 30,
+              "id": 29,
               "name": "fetchWithAuth",
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
               "parameters": [
                 {
-                  "id": 31,
+                  "id": 30,
                   "name": "supabaseKey",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -3219,7 +3534,7 @@
                   }
                 },
                 {
-                  "id": 32,
+                  "id": 31,
                   "name": "getAccessToken",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -3227,14 +3542,14 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 33,
+                      "id": 32,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "signatures": [
                         {
-                          "id": 34,
+                          "id": 33,
                           "name": "__type",
                           "kind": 4096,
                           "kindString": "Call signature",
@@ -3266,7 +3581,7 @@
                   }
                 },
                 {
-                  "id": 35,
+                  "id": 34,
                   "name": "customFetch",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -3276,21 +3591,21 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 36,
+                      "id": 35,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "signatures": [
                         {
-                          "id": 37,
+                          "id": 36,
                           "name": "__type",
                           "kind": 4096,
                           "kindString": "Call signature",
                           "flags": {},
                           "parameters": [
                             {
-                              "id": 38,
+                              "id": 37,
                               "name": "input",
                               "kind": 32768,
                               "kindString": "Parameter",
@@ -3314,7 +3629,7 @@
                               }
                             },
                             {
-                              "id": 39,
+                              "id": 38,
                               "name": "init",
                               "kind": 32768,
                               "kindString": "Parameter",
@@ -3352,21 +3667,21 @@
               "type": {
                 "type": "reflection",
                 "declaration": {
-                  "id": 40,
+                  "id": 39,
                   "name": "__type",
                   "kind": 65536,
                   "kindString": "Type literal",
                   "flags": {},
                   "signatures": [
                     {
-                      "id": 41,
+                      "id": 40,
                       "name": "__type",
                       "kind": 4096,
                       "kindString": "Call signature",
                       "flags": {},
                       "parameters": [
                         {
-                          "id": 42,
+                          "id": 41,
                           "name": "input",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -3390,7 +3705,7 @@
                           }
                         },
                         {
-                          "id": 43,
+                          "id": 42,
                           "name": "init",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -3435,7 +3750,7 @@
           "sources": [
             {
               "fileName": "src/lib/fetch.ts",
-              "line": 5,
+              "line": 6,
               "character": 13
             }
           ],
@@ -3617,7 +3932,7 @@
           "sources": [
             {
               "fileName": "src/lib/fetch.ts",
-              "line": 17,
+              "line": 18,
               "character": 13
             }
           ],
@@ -3629,14 +3944,8 @@
               "kindString": "Call signature",
               "flags": {},
               "type": {
-                "type": "reflection",
-                "declaration": {
-                  "id": 28,
-                  "name": "__type",
-                  "kind": 65536,
-                  "kindString": "Type literal",
-                  "flags": {}
-                }
+                "type": "intrinsic",
+                "name": "any"
               }
             }
           ]
@@ -3646,26 +3955,26 @@
         {
           "title": "Functions",
           "kind": 64,
-          "children": [29, 15, 26]
+          "children": [28, 15, 26]
         }
       ],
       "sources": [
         {
           "fileName": "src/lib/fetch.ts",
-          "line": 1,
+          "line": 2,
           "character": 0
         }
       ]
     },
     {
-      "id": 44,
+      "id": 43,
       "name": "lib/helpers",
       "kind": 2,
       "kindString": "Module",
       "flags": {},
       "children": [
         {
-          "id": 50,
+          "id": 49,
           "name": "applySettingDefaults",
           "kind": 64,
           "kindString": "Function",
@@ -3679,14 +3988,14 @@
           ],
           "signatures": [
             {
-              "id": 51,
+              "id": 50,
               "name": "applySettingDefaults",
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
               "typeParameter": [
                 {
-                  "id": 52,
+                  "id": 51,
                   "name": "Database",
                   "kind": 131072,
                   "kindString": "Type parameter",
@@ -3697,7 +4006,7 @@
                   }
                 },
                 {
-                  "id": 53,
+                  "id": 52,
                   "name": "SchemaName",
                   "kind": 131072,
                   "kindString": "Type parameter",
@@ -3717,7 +4026,7 @@
                       "operator": "keyof",
                       "target": {
                         "type": "reference",
-                        "id": 52,
+                        "id": 51,
                         "name": "Database"
                       }
                     },
@@ -3737,7 +4046,7 @@
                           "operator": "keyof",
                           "target": {
                             "type": "reference",
-                            "id": 52,
+                            "id": 51,
                             "name": "Database"
                           }
                         }
@@ -3748,24 +4057,24 @@
               ],
               "parameters": [
                 {
-                  "id": 54,
+                  "id": 53,
                   "name": "options",
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
                   "type": {
                     "type": "reference",
-                    "id": 61,
+                    "id": 60,
                     "typeArguments": [
                       {
                         "type": "reference",
-                        "id": 53,
+                        "id": 52,
                         "name": "SchemaName"
                       }
                     ],
                     "name": "SupabaseClientOptions",
                     "dereferenced": {
-                      "id": 61,
+                      "id": 60,
                       "name": "SupabaseClientOptions",
                       "kind": 4194304,
                       "kindString": "Type alias",
@@ -3779,7 +4088,7 @@
                       ],
                       "typeParameter": [
                         {
-                          "id": 79,
+                          "id": 80,
                           "name": "SchemaName",
                           "kind": 131072,
                           "kindString": "Type parameter",
@@ -3789,14 +4098,14 @@
                       "type": {
                         "type": "reflection",
                         "declaration": {
-                          "id": 62,
+                          "id": 61,
                           "name": "__type",
                           "kind": 65536,
                           "kindString": "Type literal",
                           "flags": {},
                           "children": [
                             {
-                              "id": 66,
+                              "id": 65,
                               "name": "auth",
                               "kind": 1024,
                               "kindString": "Property",
@@ -3813,14 +4122,14 @@
                               "type": {
                                 "type": "reflection",
                                 "declaration": {
-                                  "id": 67,
+                                  "id": 66,
                                   "name": "__type",
                                   "kind": 65536,
                                   "kindString": "Type literal",
                                   "flags": {},
                                   "children": [
                                     {
-                                      "id": 68,
+                                      "id": 67,
                                       "name": "autoRefreshToken",
                                       "kind": 1024,
                                       "kindString": "Property",
@@ -3843,7 +4152,38 @@
                                       }
                                     },
                                     {
-                                      "id": 71,
+                                      "id": 73,
+                                      "name": "debug",
+                                      "kind": 1024,
+                                      "kindString": "Property",
+                                      "flags": {
+                                        "isOptional": true
+                                      },
+                                      "comment": {
+                                        "shortText": "If debug messages for authentication client are emitted. Can be used to inspect the behavior of the library."
+                                      },
+                                      "sources": [
+                                        {
+                                          "fileName": "src/lib/types.ts",
+                                          "line": 46,
+                                          "character": 4
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "indexedAccess",
+                                        "indexType": {
+                                          "type": "literal",
+                                          "value": "debug"
+                                        },
+                                        "objectType": {
+                                          "type": "reference",
+                                          "id": 58,
+                                          "name": "SupabaseAuthClientOptions"
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "id": 70,
                                       "name": "detectSessionInUrl",
                                       "kind": 1024,
                                       "kindString": "Property",
@@ -3866,7 +4206,7 @@
                                       }
                                     },
                                     {
-                                      "id": 73,
+                                      "id": 72,
                                       "name": "flowType",
                                       "kind": 1024,
                                       "kindString": "Property",
@@ -3891,13 +4231,50 @@
                                         },
                                         "objectType": {
                                           "type": "reference",
-                                          "id": 59,
+                                          "id": 58,
                                           "name": "SupabaseAuthClientOptions"
                                         }
                                       }
                                     },
                                     {
-                                      "id": 70,
+                                      "id": 74,
+                                      "name": "lock",
+                                      "kind": 1024,
+                                      "kindString": "Property",
+                                      "flags": {
+                                        "isOptional": true
+                                      },
+                                      "comment": {
+                                        "shortText": "Provide your own locking mechanism based on the environment. By default no locking is done at this time.",
+                                        "tags": [
+                                          {
+                                            "tag": "experimental",
+                                            "text": "\n"
+                                          }
+                                        ]
+                                      },
+                                      "sources": [
+                                        {
+                                          "fileName": "src/lib/types.ts",
+                                          "line": 52,
+                                          "character": 4
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "indexedAccess",
+                                        "indexType": {
+                                          "type": "literal",
+                                          "value": "lock"
+                                        },
+                                        "objectType": {
+                                          "type": "reference",
+                                          "id": 58,
+                                          "name": "SupabaseAuthClientOptions"
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "id": 69,
                                       "name": "persistSession",
                                       "kind": 1024,
                                       "kindString": "Property",
@@ -3920,7 +4297,7 @@
                                       }
                                     },
                                     {
-                                      "id": 72,
+                                      "id": 71,
                                       "name": "storage",
                                       "kind": 1024,
                                       "kindString": "Property",
@@ -3945,13 +4322,13 @@
                                         },
                                         "objectType": {
                                           "type": "reference",
-                                          "id": 59,
+                                          "id": 58,
                                           "name": "SupabaseAuthClientOptions"
                                         }
                                       }
                                     },
                                     {
-                                      "id": 69,
+                                      "id": 68,
                                       "name": "storageKey",
                                       "kind": 1024,
                                       "kindString": "Property",
@@ -3978,7 +4355,7 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [68, 71, 73, 70, 72, 69]
+                                      "children": [67, 73, 70, 72, 74, 69, 71, 68]
                                     }
                                   ],
                                   "sources": [
@@ -3992,7 +4369,7 @@
                               }
                             },
                             {
-                              "id": 63,
+                              "id": 62,
                               "name": "db",
                               "kind": 1024,
                               "kindString": "Property",
@@ -4012,14 +4389,14 @@
                               "type": {
                                 "type": "reflection",
                                 "declaration": {
-                                  "id": 64,
+                                  "id": 63,
                                   "name": "__type",
                                   "kind": 65536,
                                   "kindString": "Type literal",
                                   "flags": {},
                                   "children": [
                                     {
-                                      "id": 65,
+                                      "id": 64,
                                       "name": "schema",
                                       "kind": 1024,
                                       "kindString": "Property",
@@ -4035,7 +4412,7 @@
                                       ],
                                       "type": {
                                         "type": "reference",
-                                        "id": 79,
+                                        "id": 80,
                                         "name": "SchemaName",
                                         "dereferenced": {}
                                       }
@@ -4045,7 +4422,7 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [65]
+                                      "children": [64]
                                     }
                                   ],
                                   "sources": [
@@ -4059,7 +4436,7 @@
                               }
                             },
                             {
-                              "id": 75,
+                              "id": 76,
                               "name": "global",
                               "kind": 1024,
                               "kindString": "Property",
@@ -4069,21 +4446,21 @@
                               "sources": [
                                 {
                                   "fileName": "src/lib/types.ts",
-                                  "line": 48,
+                                  "line": 58,
                                   "character": 2
                                 }
                               ],
                               "type": {
                                 "type": "reflection",
                                 "declaration": {
-                                  "id": 76,
+                                  "id": 77,
                                   "name": "__type",
                                   "kind": 65536,
                                   "kindString": "Type literal",
                                   "flags": {},
                                   "children": [
                                     {
-                                      "id": 77,
+                                      "id": 78,
                                       "name": "fetch",
                                       "kind": 1024,
                                       "kindString": "Property",
@@ -4096,16 +4473,16 @@
                                       "sources": [
                                         {
                                           "fileName": "src/lib/types.ts",
-                                          "line": 52,
+                                          "line": 62,
                                           "character": 4
                                         }
                                       ],
                                       "type": {
                                         "type": "reference",
-                                        "id": 60,
+                                        "id": 59,
                                         "name": "Fetch",
                                         "dereferenced": {
-                                          "id": 60,
+                                          "id": 59,
                                           "name": "Fetch",
                                           "kind": 4194304,
                                           "kindString": "Type alias",
@@ -4131,7 +4508,7 @@
                                       }
                                     },
                                     {
-                                      "id": 78,
+                                      "id": 79,
                                       "name": "headers",
                                       "kind": 1024,
                                       "kindString": "Property",
@@ -4144,7 +4521,7 @@
                                       "sources": [
                                         {
                                           "fileName": "src/lib/types.ts",
-                                          "line": 56,
+                                          "line": 66,
                                           "character": 4
                                         }
                                       ],
@@ -4170,13 +4547,13 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [77, 78]
+                                      "children": [78, 79]
                                     }
                                   ],
                                   "sources": [
                                     {
                                       "fileName": "src/lib/types.ts",
-                                      "line": 48,
+                                      "line": 58,
                                       "character": 11
                                     }
                                   ]
@@ -4184,7 +4561,7 @@
                               }
                             },
                             {
-                              "id": 74,
+                              "id": 75,
                               "name": "realtime",
                               "kind": 1024,
                               "kindString": "Property",
@@ -4197,7 +4574,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/lib/types.ts",
-                                  "line": 47,
+                                  "line": 57,
                                   "character": 2
                                 }
                               ],
@@ -4213,7 +4590,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [66, 63, 75, 74]
+                              "children": [65, 62, 76, 75]
                             }
                           ],
                           "sources": [
@@ -4229,14 +4606,14 @@
                   }
                 },
                 {
-                  "id": 55,
+                  "id": 54,
                   "name": "defaults",
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
                   "type": {
                     "type": "reference",
-                    "id": 61,
+                    "id": 60,
                     "typeArguments": [
                       {
                         "type": "intrinsic",
@@ -4245,7 +4622,7 @@
                     ],
                     "name": "SupabaseClientOptions",
                     "dereferenced": {
-                      "id": 61,
+                      "id": 60,
                       "name": "SupabaseClientOptions",
                       "kind": 4194304,
                       "kindString": "Type alias",
@@ -4259,7 +4636,7 @@
                       ],
                       "typeParameter": [
                         {
-                          "id": 79,
+                          "id": 80,
                           "name": "SchemaName",
                           "kind": 131072,
                           "kindString": "Type parameter",
@@ -4269,14 +4646,14 @@
                       "type": {
                         "type": "reflection",
                         "declaration": {
-                          "id": 62,
+                          "id": 61,
                           "name": "__type",
                           "kind": 65536,
                           "kindString": "Type literal",
                           "flags": {},
                           "children": [
                             {
-                              "id": 66,
+                              "id": 65,
                               "name": "auth",
                               "kind": 1024,
                               "kindString": "Property",
@@ -4293,14 +4670,14 @@
                               "type": {
                                 "type": "reflection",
                                 "declaration": {
-                                  "id": 67,
+                                  "id": 66,
                                   "name": "__type",
                                   "kind": 65536,
                                   "kindString": "Type literal",
                                   "flags": {},
                                   "children": [
                                     {
-                                      "id": 68,
+                                      "id": 67,
                                       "name": "autoRefreshToken",
                                       "kind": 1024,
                                       "kindString": "Property",
@@ -4323,7 +4700,38 @@
                                       }
                                     },
                                     {
-                                      "id": 71,
+                                      "id": 73,
+                                      "name": "debug",
+                                      "kind": 1024,
+                                      "kindString": "Property",
+                                      "flags": {
+                                        "isOptional": true
+                                      },
+                                      "comment": {
+                                        "shortText": "If debug messages for authentication client are emitted. Can be used to inspect the behavior of the library."
+                                      },
+                                      "sources": [
+                                        {
+                                          "fileName": "src/lib/types.ts",
+                                          "line": 46,
+                                          "character": 4
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "indexedAccess",
+                                        "indexType": {
+                                          "type": "literal",
+                                          "value": "debug"
+                                        },
+                                        "objectType": {
+                                          "type": "reference",
+                                          "id": 58,
+                                          "name": "SupabaseAuthClientOptions"
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "id": 70,
                                       "name": "detectSessionInUrl",
                                       "kind": 1024,
                                       "kindString": "Property",
@@ -4346,7 +4754,7 @@
                                       }
                                     },
                                     {
-                                      "id": 73,
+                                      "id": 72,
                                       "name": "flowType",
                                       "kind": 1024,
                                       "kindString": "Property",
@@ -4371,13 +4779,50 @@
                                         },
                                         "objectType": {
                                           "type": "reference",
-                                          "id": 59,
+                                          "id": 58,
                                           "name": "SupabaseAuthClientOptions"
                                         }
                                       }
                                     },
                                     {
-                                      "id": 70,
+                                      "id": 74,
+                                      "name": "lock",
+                                      "kind": 1024,
+                                      "kindString": "Property",
+                                      "flags": {
+                                        "isOptional": true
+                                      },
+                                      "comment": {
+                                        "shortText": "Provide your own locking mechanism based on the environment. By default no locking is done at this time.",
+                                        "tags": [
+                                          {
+                                            "tag": "experimental",
+                                            "text": "\n"
+                                          }
+                                        ]
+                                      },
+                                      "sources": [
+                                        {
+                                          "fileName": "src/lib/types.ts",
+                                          "line": 52,
+                                          "character": 4
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "indexedAccess",
+                                        "indexType": {
+                                          "type": "literal",
+                                          "value": "lock"
+                                        },
+                                        "objectType": {
+                                          "type": "reference",
+                                          "id": 58,
+                                          "name": "SupabaseAuthClientOptions"
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "id": 69,
                                       "name": "persistSession",
                                       "kind": 1024,
                                       "kindString": "Property",
@@ -4400,7 +4845,7 @@
                                       }
                                     },
                                     {
-                                      "id": 72,
+                                      "id": 71,
                                       "name": "storage",
                                       "kind": 1024,
                                       "kindString": "Property",
@@ -4425,13 +4870,13 @@
                                         },
                                         "objectType": {
                                           "type": "reference",
-                                          "id": 59,
+                                          "id": 58,
                                           "name": "SupabaseAuthClientOptions"
                                         }
                                       }
                                     },
                                     {
-                                      "id": 69,
+                                      "id": 68,
                                       "name": "storageKey",
                                       "kind": 1024,
                                       "kindString": "Property",
@@ -4458,7 +4903,7 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [68, 71, 73, 70, 72, 69]
+                                      "children": [67, 73, 70, 72, 74, 69, 71, 68]
                                     }
                                   ],
                                   "sources": [
@@ -4472,7 +4917,7 @@
                               }
                             },
                             {
-                              "id": 63,
+                              "id": 62,
                               "name": "db",
                               "kind": 1024,
                               "kindString": "Property",
@@ -4492,14 +4937,14 @@
                               "type": {
                                 "type": "reflection",
                                 "declaration": {
-                                  "id": 64,
+                                  "id": 63,
                                   "name": "__type",
                                   "kind": 65536,
                                   "kindString": "Type literal",
                                   "flags": {},
                                   "children": [
                                     {
-                                      "id": 65,
+                                      "id": 64,
                                       "name": "schema",
                                       "kind": 1024,
                                       "kindString": "Property",
@@ -4515,7 +4960,7 @@
                                       ],
                                       "type": {
                                         "type": "reference",
-                                        "id": 79,
+                                        "id": 80,
                                         "name": "SchemaName",
                                         "dereferenced": {}
                                       }
@@ -4525,7 +4970,7 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [65]
+                                      "children": [64]
                                     }
                                   ],
                                   "sources": [
@@ -4539,7 +4984,7 @@
                               }
                             },
                             {
-                              "id": 75,
+                              "id": 76,
                               "name": "global",
                               "kind": 1024,
                               "kindString": "Property",
@@ -4549,21 +4994,21 @@
                               "sources": [
                                 {
                                   "fileName": "src/lib/types.ts",
-                                  "line": 48,
+                                  "line": 58,
                                   "character": 2
                                 }
                               ],
                               "type": {
                                 "type": "reflection",
                                 "declaration": {
-                                  "id": 76,
+                                  "id": 77,
                                   "name": "__type",
                                   "kind": 65536,
                                   "kindString": "Type literal",
                                   "flags": {},
                                   "children": [
                                     {
-                                      "id": 77,
+                                      "id": 78,
                                       "name": "fetch",
                                       "kind": 1024,
                                       "kindString": "Property",
@@ -4576,16 +5021,16 @@
                                       "sources": [
                                         {
                                           "fileName": "src/lib/types.ts",
-                                          "line": 52,
+                                          "line": 62,
                                           "character": 4
                                         }
                                       ],
                                       "type": {
                                         "type": "reference",
-                                        "id": 60,
+                                        "id": 59,
                                         "name": "Fetch",
                                         "dereferenced": {
-                                          "id": 60,
+                                          "id": 59,
                                           "name": "Fetch",
                                           "kind": 4194304,
                                           "kindString": "Type alias",
@@ -4611,7 +5056,7 @@
                                       }
                                     },
                                     {
-                                      "id": 78,
+                                      "id": 79,
                                       "name": "headers",
                                       "kind": 1024,
                                       "kindString": "Property",
@@ -4624,7 +5069,7 @@
                                       "sources": [
                                         {
                                           "fileName": "src/lib/types.ts",
-                                          "line": 56,
+                                          "line": 66,
                                           "character": 4
                                         }
                                       ],
@@ -4650,13 +5095,13 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [77, 78]
+                                      "children": [78, 79]
                                     }
                                   ],
                                   "sources": [
                                     {
                                       "fileName": "src/lib/types.ts",
-                                      "line": 48,
+                                      "line": 58,
                                       "character": 11
                                     }
                                   ]
@@ -4664,7 +5109,7 @@
                               }
                             },
                             {
-                              "id": 74,
+                              "id": 75,
                               "name": "realtime",
                               "kind": 1024,
                               "kindString": "Property",
@@ -4677,7 +5122,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/lib/types.ts",
-                                  "line": 47,
+                                  "line": 57,
                                   "character": 2
                                 }
                               ],
@@ -4693,7 +5138,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [66, 63, 75, 74]
+                              "children": [65, 62, 76, 75]
                             }
                           ],
                           "sources": [
@@ -4711,11 +5156,11 @@
               ],
               "type": {
                 "type": "reference",
-                "id": 61,
+                "id": 60,
                 "typeArguments": [
                   {
                     "type": "reference",
-                    "id": 53,
+                    "id": 52,
                     "name": "SchemaName"
                   }
                 ],
@@ -4725,7 +5170,7 @@
           ]
         },
         {
-          "id": 56,
+          "id": 55,
           "name": "isBrowser",
           "kind": 64,
           "kindString": "Function",
@@ -4739,7 +5184,7 @@
           ],
           "signatures": [
             {
-              "id": 57,
+              "id": 56,
               "name": "isBrowser",
               "kind": 4096,
               "kindString": "Call signature",
@@ -4752,7 +5197,7 @@
           ]
         },
         {
-          "id": 47,
+          "id": 46,
           "name": "stripTrailingSlash",
           "kind": 64,
           "kindString": "Function",
@@ -4766,14 +5211,14 @@
           ],
           "signatures": [
             {
-              "id": 48,
+              "id": 47,
               "name": "stripTrailingSlash",
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
               "parameters": [
                 {
-                  "id": 49,
+                  "id": 48,
                   "name": "url",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -4792,7 +5237,7 @@
           ]
         },
         {
-          "id": 45,
+          "id": 44,
           "name": "uuid",
           "kind": 64,
           "kindString": "Function",
@@ -4806,7 +5251,7 @@
           ],
           "signatures": [
             {
-              "id": 46,
+              "id": 45,
               "name": "uuid",
               "kind": 4096,
               "kindString": "Call signature",
@@ -4823,7 +5268,7 @@
         {
           "title": "Functions",
           "kind": 64,
-          "children": [50, 56, 47, 45]
+          "children": [49, 55, 46, 44]
         }
       ],
       "sources": [
@@ -4835,14 +5280,14 @@
       ]
     },
     {
-      "id": 58,
+      "id": 57,
       "name": "lib/types",
       "kind": 2,
       "kindString": "Module",
       "flags": {},
       "children": [
         {
-          "id": 59,
+          "id": 58,
           "name": "SupabaseAuthClientOptions",
           "kind": 256,
           "kindString": "Interface",
@@ -4862,7 +5307,7 @@
           ]
         },
         {
-          "id": 60,
+          "id": 59,
           "name": "Fetch",
           "kind": 4194304,
           "kindString": "Type alias",
@@ -4886,7 +5331,7 @@
           }
         },
         {
-          "id": 94,
+          "id": 95,
           "name": "GenericFunction",
           "kind": 4194304,
           "kindString": "Type alias",
@@ -4894,21 +5339,21 @@
           "sources": [
             {
               "fileName": "src/lib/types.ts",
-              "line": 78,
+              "line": 88,
               "character": 12
             }
           ],
           "type": {
             "type": "reflection",
             "declaration": {
-              "id": 95,
+              "id": 96,
               "name": "__type",
               "kind": 65536,
               "kindString": "Type literal",
               "flags": {},
               "children": [
                 {
-                  "id": 96,
+                  "id": 97,
                   "name": "Args",
                   "kind": 1024,
                   "kindString": "Property",
@@ -4916,7 +5361,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 79,
+                      "line": 89,
                       "character": 2
                     }
                   ],
@@ -4938,7 +5383,7 @@
                   }
                 },
                 {
-                  "id": 97,
+                  "id": 98,
                   "name": "Returns",
                   "kind": 1024,
                   "kindString": "Property",
@@ -4946,7 +5391,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 80,
+                      "line": 90,
                       "character": 2
                     }
                   ],
@@ -4960,13 +5405,13 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [96, 97]
+                  "children": [97, 98]
                 }
               ],
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 78,
+                  "line": 88,
                   "character": 30
                 }
               ]
@@ -4974,7 +5419,7 @@
           }
         },
         {
-          "id": 90,
+          "id": 91,
           "name": "GenericNonUpdatableView",
           "kind": 4194304,
           "kindString": "Type alias",
@@ -4982,22 +5427,285 @@
           "sources": [
             {
               "fileName": "src/lib/types.ts",
-              "line": 72,
+              "line": 82,
               "character": 12
             }
           ],
           "type": {
             "type": "reflection",
             "declaration": {
-              "id": 91,
+              "id": 92,
               "name": "__type",
               "kind": 65536,
               "kindString": "Type literal",
               "flags": {},
               "children": [
                 {
-                  "id": 92,
+                  "id": 93,
                   "name": "Row",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {},
+                  "sources": [
+                    {
+                      "fileName": "src/lib/types.ts",
+                      "line": 83,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "reference",
+                    "typeArguments": [
+                      {
+                        "type": "intrinsic",
+                        "name": "string"
+                      },
+                      {
+                        "type": "intrinsic",
+                        "name": "unknown"
+                      }
+                    ],
+                    "qualifiedName": "Record",
+                    "package": "typescript",
+                    "name": "Record"
+                  }
+                }
+              ],
+              "groups": [
+                {
+                  "title": "Properties",
+                  "kind": 1024,
+                  "children": [93]
+                }
+              ],
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 82,
+                  "character": 38
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": 99,
+          "name": "GenericSchema",
+          "kind": 4194304,
+          "kindString": "Type alias",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/lib/types.ts",
+              "line": 93,
+              "character": 12
+            }
+          ],
+          "type": {
+            "type": "reflection",
+            "declaration": {
+              "id": 100,
+              "name": "__type",
+              "kind": 65536,
+              "kindString": "Type literal",
+              "flags": {},
+              "children": [
+                {
+                  "id": 103,
+                  "name": "Functions",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {},
+                  "sources": [
+                    {
+                      "fileName": "src/lib/types.ts",
+                      "line": 96,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "reference",
+                    "typeArguments": [
+                      {
+                        "type": "intrinsic",
+                        "name": "string"
+                      },
+                      {
+                        "type": "reference",
+                        "id": 95,
+                        "name": "GenericFunction"
+                      }
+                    ],
+                    "qualifiedName": "Record",
+                    "package": "typescript",
+                    "name": "Record"
+                  }
+                },
+                {
+                  "id": 101,
+                  "name": "Tables",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {},
+                  "sources": [
+                    {
+                      "fileName": "src/lib/types.ts",
+                      "line": 94,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "reference",
+                    "typeArguments": [
+                      {
+                        "type": "intrinsic",
+                        "name": "string"
+                      },
+                      {
+                        "type": "reference",
+                        "id": 81,
+                        "name": "GenericTable"
+                      }
+                    ],
+                    "qualifiedName": "Record",
+                    "package": "typescript",
+                    "name": "Record"
+                  }
+                },
+                {
+                  "id": 102,
+                  "name": "Views",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {},
+                  "sources": [
+                    {
+                      "fileName": "src/lib/types.ts",
+                      "line": 95,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "reference",
+                    "typeArguments": [
+                      {
+                        "type": "intrinsic",
+                        "name": "string"
+                      },
+                      {
+                        "type": "reference",
+                        "id": 94,
+                        "name": "GenericView"
+                      }
+                    ],
+                    "qualifiedName": "Record",
+                    "package": "typescript",
+                    "name": "Record"
+                  }
+                }
+              ],
+              "groups": [
+                {
+                  "title": "Properties",
+                  "kind": 1024,
+                  "children": [103, 101, 102]
+                }
+              ],
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 93,
+                  "character": 28
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": 81,
+          "name": "GenericTable",
+          "kind": 4194304,
+          "kindString": "Type alias",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/lib/types.ts",
+              "line": 70,
+              "character": 12
+            }
+          ],
+          "type": {
+            "type": "reflection",
+            "declaration": {
+              "id": 82,
+              "name": "__type",
+              "kind": 65536,
+              "kindString": "Type literal",
+              "flags": {},
+              "children": [
+                {
+                  "id": 84,
+                  "name": "Insert",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {},
+                  "sources": [
+                    {
+                      "fileName": "src/lib/types.ts",
+                      "line": 72,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "reference",
+                    "typeArguments": [
+                      {
+                        "type": "intrinsic",
+                        "name": "string"
+                      },
+                      {
+                        "type": "intrinsic",
+                        "name": "unknown"
+                      }
+                    ],
+                    "qualifiedName": "Record",
+                    "package": "typescript",
+                    "name": "Record"
+                  }
+                },
+                {
+                  "id": 83,
+                  "name": "Row",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {},
+                  "sources": [
+                    {
+                      "fileName": "src/lib/types.ts",
+                      "line": 71,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "reference",
+                    "typeArguments": [
+                      {
+                        "type": "intrinsic",
+                        "name": "string"
+                      },
+                      {
+                        "type": "intrinsic",
+                        "name": "unknown"
+                      }
+                    ],
+                    "qualifiedName": "Record",
+                    "package": "typescript",
+                    "name": "Record"
+                  }
+                },
+                {
+                  "id": 85,
+                  "name": "Update",
                   "kind": 1024,
                   "kindString": "Property",
                   "flags": {},
@@ -5030,276 +5738,13 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [92]
+                  "children": [84, 83, 85]
                 }
               ],
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 72,
-                  "character": 38
-                }
-              ]
-            }
-          }
-        },
-        {
-          "id": 98,
-          "name": "GenericSchema",
-          "kind": 4194304,
-          "kindString": "Type alias",
-          "flags": {},
-          "sources": [
-            {
-              "fileName": "src/lib/types.ts",
-              "line": 83,
-              "character": 12
-            }
-          ],
-          "type": {
-            "type": "reflection",
-            "declaration": {
-              "id": 99,
-              "name": "__type",
-              "kind": 65536,
-              "kindString": "Type literal",
-              "flags": {},
-              "children": [
-                {
-                  "id": 102,
-                  "name": "Functions",
-                  "kind": 1024,
-                  "kindString": "Property",
-                  "flags": {},
-                  "sources": [
-                    {
-                      "fileName": "src/lib/types.ts",
-                      "line": 86,
-                      "character": 2
-                    }
-                  ],
-                  "type": {
-                    "type": "reference",
-                    "typeArguments": [
-                      {
-                        "type": "intrinsic",
-                        "name": "string"
-                      },
-                      {
-                        "type": "reference",
-                        "id": 94,
-                        "name": "GenericFunction"
-                      }
-                    ],
-                    "qualifiedName": "Record",
-                    "package": "typescript",
-                    "name": "Record"
-                  }
-                },
-                {
-                  "id": 100,
-                  "name": "Tables",
-                  "kind": 1024,
-                  "kindString": "Property",
-                  "flags": {},
-                  "sources": [
-                    {
-                      "fileName": "src/lib/types.ts",
-                      "line": 84,
-                      "character": 2
-                    }
-                  ],
-                  "type": {
-                    "type": "reference",
-                    "typeArguments": [
-                      {
-                        "type": "intrinsic",
-                        "name": "string"
-                      },
-                      {
-                        "type": "reference",
-                        "id": 80,
-                        "name": "GenericTable"
-                      }
-                    ],
-                    "qualifiedName": "Record",
-                    "package": "typescript",
-                    "name": "Record"
-                  }
-                },
-                {
-                  "id": 101,
-                  "name": "Views",
-                  "kind": 1024,
-                  "kindString": "Property",
-                  "flags": {},
-                  "sources": [
-                    {
-                      "fileName": "src/lib/types.ts",
-                      "line": 85,
-                      "character": 2
-                    }
-                  ],
-                  "type": {
-                    "type": "reference",
-                    "typeArguments": [
-                      {
-                        "type": "intrinsic",
-                        "name": "string"
-                      },
-                      {
-                        "type": "reference",
-                        "id": 93,
-                        "name": "GenericView"
-                      }
-                    ],
-                    "qualifiedName": "Record",
-                    "package": "typescript",
-                    "name": "Record"
-                  }
-                }
-              ],
-              "groups": [
-                {
-                  "title": "Properties",
-                  "kind": 1024,
-                  "children": [102, 100, 101]
-                }
-              ],
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 83,
-                  "character": 28
-                }
-              ]
-            }
-          }
-        },
-        {
-          "id": 80,
-          "name": "GenericTable",
-          "kind": 4194304,
-          "kindString": "Type alias",
-          "flags": {},
-          "sources": [
-            {
-              "fileName": "src/lib/types.ts",
-              "line": 60,
-              "character": 12
-            }
-          ],
-          "type": {
-            "type": "reflection",
-            "declaration": {
-              "id": 81,
-              "name": "__type",
-              "kind": 65536,
-              "kindString": "Type literal",
-              "flags": {},
-              "children": [
-                {
-                  "id": 83,
-                  "name": "Insert",
-                  "kind": 1024,
-                  "kindString": "Property",
-                  "flags": {},
-                  "sources": [
-                    {
-                      "fileName": "src/lib/types.ts",
-                      "line": 62,
-                      "character": 2
-                    }
-                  ],
-                  "type": {
-                    "type": "reference",
-                    "typeArguments": [
-                      {
-                        "type": "intrinsic",
-                        "name": "string"
-                      },
-                      {
-                        "type": "intrinsic",
-                        "name": "unknown"
-                      }
-                    ],
-                    "qualifiedName": "Record",
-                    "package": "typescript",
-                    "name": "Record"
-                  }
-                },
-                {
-                  "id": 82,
-                  "name": "Row",
-                  "kind": 1024,
-                  "kindString": "Property",
-                  "flags": {},
-                  "sources": [
-                    {
-                      "fileName": "src/lib/types.ts",
-                      "line": 61,
-                      "character": 2
-                    }
-                  ],
-                  "type": {
-                    "type": "reference",
-                    "typeArguments": [
-                      {
-                        "type": "intrinsic",
-                        "name": "string"
-                      },
-                      {
-                        "type": "intrinsic",
-                        "name": "unknown"
-                      }
-                    ],
-                    "qualifiedName": "Record",
-                    "package": "typescript",
-                    "name": "Record"
-                  }
-                },
-                {
-                  "id": 84,
-                  "name": "Update",
-                  "kind": 1024,
-                  "kindString": "Property",
-                  "flags": {},
-                  "sources": [
-                    {
-                      "fileName": "src/lib/types.ts",
-                      "line": 63,
-                      "character": 2
-                    }
-                  ],
-                  "type": {
-                    "type": "reference",
-                    "typeArguments": [
-                      {
-                        "type": "intrinsic",
-                        "name": "string"
-                      },
-                      {
-                        "type": "intrinsic",
-                        "name": "unknown"
-                      }
-                    ],
-                    "qualifiedName": "Record",
-                    "package": "typescript",
-                    "name": "Record"
-                  }
-                }
-              ],
-              "groups": [
-                {
-                  "title": "Properties",
-                  "kind": 1024,
-                  "children": [83, 82, 84]
-                }
-              ],
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 60,
+                  "line": 70,
                   "character": 27
                 }
               ]
@@ -5307,138 +5752,8 @@
           }
         },
         {
-          "id": 85,
+          "id": 86,
           "name": "GenericUpdatableView",
-          "kind": 4194304,
-          "kindString": "Type alias",
-          "flags": {},
-          "sources": [
-            {
-              "fileName": "src/lib/types.ts",
-              "line": 66,
-              "character": 12
-            }
-          ],
-          "type": {
-            "type": "reflection",
-            "declaration": {
-              "id": 86,
-              "name": "__type",
-              "kind": 65536,
-              "kindString": "Type literal",
-              "flags": {},
-              "children": [
-                {
-                  "id": 88,
-                  "name": "Insert",
-                  "kind": 1024,
-                  "kindString": "Property",
-                  "flags": {},
-                  "sources": [
-                    {
-                      "fileName": "src/lib/types.ts",
-                      "line": 68,
-                      "character": 2
-                    }
-                  ],
-                  "type": {
-                    "type": "reference",
-                    "typeArguments": [
-                      {
-                        "type": "intrinsic",
-                        "name": "string"
-                      },
-                      {
-                        "type": "intrinsic",
-                        "name": "unknown"
-                      }
-                    ],
-                    "qualifiedName": "Record",
-                    "package": "typescript",
-                    "name": "Record"
-                  }
-                },
-                {
-                  "id": 87,
-                  "name": "Row",
-                  "kind": 1024,
-                  "kindString": "Property",
-                  "flags": {},
-                  "sources": [
-                    {
-                      "fileName": "src/lib/types.ts",
-                      "line": 67,
-                      "character": 2
-                    }
-                  ],
-                  "type": {
-                    "type": "reference",
-                    "typeArguments": [
-                      {
-                        "type": "intrinsic",
-                        "name": "string"
-                      },
-                      {
-                        "type": "intrinsic",
-                        "name": "unknown"
-                      }
-                    ],
-                    "qualifiedName": "Record",
-                    "package": "typescript",
-                    "name": "Record"
-                  }
-                },
-                {
-                  "id": 89,
-                  "name": "Update",
-                  "kind": 1024,
-                  "kindString": "Property",
-                  "flags": {},
-                  "sources": [
-                    {
-                      "fileName": "src/lib/types.ts",
-                      "line": 69,
-                      "character": 2
-                    }
-                  ],
-                  "type": {
-                    "type": "reference",
-                    "typeArguments": [
-                      {
-                        "type": "intrinsic",
-                        "name": "string"
-                      },
-                      {
-                        "type": "intrinsic",
-                        "name": "unknown"
-                      }
-                    ],
-                    "qualifiedName": "Record",
-                    "package": "typescript",
-                    "name": "Record"
-                  }
-                }
-              ],
-              "groups": [
-                {
-                  "title": "Properties",
-                  "kind": 1024,
-                  "children": [88, 87, 89]
-                }
-              ],
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 66,
-                  "character": 35
-                }
-              ]
-            }
-          }
-        },
-        {
-          "id": 93,
-          "name": "GenericView",
           "kind": 4194304,
           "kindString": "Type alias",
           "flags": {},
@@ -5450,10 +5765,140 @@
             }
           ],
           "type": {
+            "type": "reflection",
+            "declaration": {
+              "id": 87,
+              "name": "__type",
+              "kind": 65536,
+              "kindString": "Type literal",
+              "flags": {},
+              "children": [
+                {
+                  "id": 89,
+                  "name": "Insert",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {},
+                  "sources": [
+                    {
+                      "fileName": "src/lib/types.ts",
+                      "line": 78,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "reference",
+                    "typeArguments": [
+                      {
+                        "type": "intrinsic",
+                        "name": "string"
+                      },
+                      {
+                        "type": "intrinsic",
+                        "name": "unknown"
+                      }
+                    ],
+                    "qualifiedName": "Record",
+                    "package": "typescript",
+                    "name": "Record"
+                  }
+                },
+                {
+                  "id": 88,
+                  "name": "Row",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {},
+                  "sources": [
+                    {
+                      "fileName": "src/lib/types.ts",
+                      "line": 77,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "reference",
+                    "typeArguments": [
+                      {
+                        "type": "intrinsic",
+                        "name": "string"
+                      },
+                      {
+                        "type": "intrinsic",
+                        "name": "unknown"
+                      }
+                    ],
+                    "qualifiedName": "Record",
+                    "package": "typescript",
+                    "name": "Record"
+                  }
+                },
+                {
+                  "id": 90,
+                  "name": "Update",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {},
+                  "sources": [
+                    {
+                      "fileName": "src/lib/types.ts",
+                      "line": 79,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "reference",
+                    "typeArguments": [
+                      {
+                        "type": "intrinsic",
+                        "name": "string"
+                      },
+                      {
+                        "type": "intrinsic",
+                        "name": "unknown"
+                      }
+                    ],
+                    "qualifiedName": "Record",
+                    "package": "typescript",
+                    "name": "Record"
+                  }
+                }
+              ],
+              "groups": [
+                {
+                  "title": "Properties",
+                  "kind": 1024,
+                  "children": [89, 88, 90]
+                }
+              ],
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 76,
+                  "character": 35
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": 94,
+          "name": "GenericView",
+          "kind": 4194304,
+          "kindString": "Type alias",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/lib/types.ts",
+              "line": 86,
+              "character": 12
+            }
+          ],
+          "type": {
             "type": "union",
             "types": [
               {
-                "id": 85,
+                "id": 86,
                 "name": "GenericUpdatableView",
                 "kind": 4194304,
                 "kindString": "Type alias",
@@ -5461,21 +5906,21 @@
                 "sources": [
                   {
                     "fileName": "src/lib/types.ts",
-                    "line": 66,
+                    "line": 76,
                     "character": 12
                   }
                 ],
                 "type": {
                   "type": "reflection",
                   "declaration": {
-                    "id": 86,
+                    "id": 87,
                     "name": "__type",
                     "kind": 65536,
                     "kindString": "Type literal",
                     "flags": {},
                     "children": [
                       {
-                        "id": 88,
+                        "id": 89,
                         "name": "Insert",
                         "kind": 1024,
                         "kindString": "Property",
@@ -5483,7 +5928,7 @@
                         "sources": [
                           {
                             "fileName": "src/lib/types.ts",
-                            "line": 68,
+                            "line": 78,
                             "character": 2
                           }
                         ],
@@ -5505,7 +5950,7 @@
                         }
                       },
                       {
-                        "id": 87,
+                        "id": 88,
                         "name": "Row",
                         "kind": 1024,
                         "kindString": "Property",
@@ -5513,7 +5958,7 @@
                         "sources": [
                           {
                             "fileName": "src/lib/types.ts",
-                            "line": 67,
+                            "line": 77,
                             "character": 2
                           }
                         ],
@@ -5535,7 +5980,7 @@
                         }
                       },
                       {
-                        "id": 89,
+                        "id": 90,
                         "name": "Update",
                         "kind": 1024,
                         "kindString": "Property",
@@ -5543,7 +5988,7 @@
                         "sources": [
                           {
                             "fileName": "src/lib/types.ts",
-                            "line": 69,
+                            "line": 79,
                             "character": 2
                           }
                         ],
@@ -5569,13 +6014,13 @@
                       {
                         "title": "Properties",
                         "kind": 1024,
-                        "children": [88, 87, 89]
+                        "children": [89, 88, 90]
                       }
                     ],
                     "sources": [
                       {
                         "fileName": "src/lib/types.ts",
-                        "line": 66,
+                        "line": 76,
                         "character": 35
                       }
                     ]
@@ -5583,7 +6028,7 @@
                 }
               },
               {
-                "id": 90,
+                "id": 91,
                 "name": "GenericNonUpdatableView",
                 "kind": 4194304,
                 "kindString": "Type alias",
@@ -5591,21 +6036,21 @@
                 "sources": [
                   {
                     "fileName": "src/lib/types.ts",
-                    "line": 72,
+                    "line": 82,
                     "character": 12
                   }
                 ],
                 "type": {
                   "type": "reflection",
                   "declaration": {
-                    "id": 91,
+                    "id": 92,
                     "name": "__type",
                     "kind": 65536,
                     "kindString": "Type literal",
                     "flags": {},
                     "children": [
                       {
-                        "id": 92,
+                        "id": 93,
                         "name": "Row",
                         "kind": 1024,
                         "kindString": "Property",
@@ -5613,7 +6058,7 @@
                         "sources": [
                           {
                             "fileName": "src/lib/types.ts",
-                            "line": 73,
+                            "line": 83,
                             "character": 2
                           }
                         ],
@@ -5639,13 +6084,13 @@
                       {
                         "title": "Properties",
                         "kind": 1024,
-                        "children": [92]
+                        "children": [93]
                       }
                     ],
                     "sources": [
                       {
                         "fileName": "src/lib/types.ts",
-                        "line": 72,
+                        "line": 82,
                         "character": 38
                       }
                     ]
@@ -5656,7 +6101,7 @@
           }
         },
         {
-          "id": 61,
+          "id": 60,
           "name": "SupabaseClientOptions",
           "kind": 4194304,
           "kindString": "Type alias",
@@ -5670,7 +6115,7 @@
           ],
           "typeParameter": [
             {
-              "id": 79,
+              "id": 80,
               "name": "SchemaName",
               "kind": 131072,
               "kindString": "Type parameter",
@@ -5680,14 +6125,14 @@
           "type": {
             "type": "reflection",
             "declaration": {
-              "id": 62,
+              "id": 61,
               "name": "__type",
               "kind": 65536,
               "kindString": "Type literal",
               "flags": {},
               "children": [
                 {
-                  "id": 66,
+                  "id": 65,
                   "name": "auth",
                   "kind": 1024,
                   "kindString": "Property",
@@ -5704,14 +6149,14 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 67,
+                      "id": 66,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "children": [
                         {
-                          "id": 68,
+                          "id": 67,
                           "name": "autoRefreshToken",
                           "kind": 1024,
                           "kindString": "Property",
@@ -5734,7 +6179,38 @@
                           }
                         },
                         {
-                          "id": 71,
+                          "id": 73,
+                          "name": "debug",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "If debug messages for authentication client are emitted. Can be used to inspect the behavior of the library."
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 46,
+                              "character": 4
+                            }
+                          ],
+                          "type": {
+                            "type": "indexedAccess",
+                            "indexType": {
+                              "type": "literal",
+                              "value": "debug"
+                            },
+                            "objectType": {
+                              "type": "reference",
+                              "id": 58,
+                              "name": "SupabaseAuthClientOptions"
+                            }
+                          }
+                        },
+                        {
+                          "id": 70,
                           "name": "detectSessionInUrl",
                           "kind": 1024,
                           "kindString": "Property",
@@ -5757,7 +6233,7 @@
                           }
                         },
                         {
-                          "id": 73,
+                          "id": 72,
                           "name": "flowType",
                           "kind": 1024,
                           "kindString": "Property",
@@ -5782,13 +6258,50 @@
                             },
                             "objectType": {
                               "type": "reference",
-                              "id": 59,
+                              "id": 58,
                               "name": "SupabaseAuthClientOptions"
                             }
                           }
                         },
                         {
-                          "id": 70,
+                          "id": 74,
+                          "name": "lock",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "Provide your own locking mechanism based on the environment. By default no locking is done at this time.",
+                            "tags": [
+                              {
+                                "tag": "experimental",
+                                "text": "\n"
+                              }
+                            ]
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 52,
+                              "character": 4
+                            }
+                          ],
+                          "type": {
+                            "type": "indexedAccess",
+                            "indexType": {
+                              "type": "literal",
+                              "value": "lock"
+                            },
+                            "objectType": {
+                              "type": "reference",
+                              "id": 58,
+                              "name": "SupabaseAuthClientOptions"
+                            }
+                          }
+                        },
+                        {
+                          "id": 69,
                           "name": "persistSession",
                           "kind": 1024,
                           "kindString": "Property",
@@ -5811,7 +6324,7 @@
                           }
                         },
                         {
-                          "id": 72,
+                          "id": 71,
                           "name": "storage",
                           "kind": 1024,
                           "kindString": "Property",
@@ -5836,13 +6349,13 @@
                             },
                             "objectType": {
                               "type": "reference",
-                              "id": 59,
+                              "id": 58,
                               "name": "SupabaseAuthClientOptions"
                             }
                           }
                         },
                         {
-                          "id": 69,
+                          "id": 68,
                           "name": "storageKey",
                           "kind": 1024,
                           "kindString": "Property",
@@ -5869,7 +6382,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [68, 71, 73, 70, 72, 69]
+                          "children": [67, 73, 70, 72, 74, 69, 71, 68]
                         }
                       ],
                       "sources": [
@@ -5883,7 +6396,7 @@
                   }
                 },
                 {
-                  "id": 63,
+                  "id": 62,
                   "name": "db",
                   "kind": 1024,
                   "kindString": "Property",
@@ -5903,14 +6416,14 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 64,
+                      "id": 63,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "children": [
                         {
-                          "id": 65,
+                          "id": 64,
                           "name": "schema",
                           "kind": 1024,
                           "kindString": "Property",
@@ -5926,7 +6439,7 @@
                           ],
                           "type": {
                             "type": "reference",
-                            "id": 79,
+                            "id": 80,
                             "name": "SchemaName",
                             "dereferenced": {}
                           }
@@ -5936,7 +6449,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [65]
+                          "children": [64]
                         }
                       ],
                       "sources": [
@@ -5950,7 +6463,7 @@
                   }
                 },
                 {
-                  "id": 75,
+                  "id": 76,
                   "name": "global",
                   "kind": 1024,
                   "kindString": "Property",
@@ -5960,21 +6473,21 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 48,
+                      "line": 58,
                       "character": 2
                     }
                   ],
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 76,
+                      "id": 77,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "children": [
                         {
-                          "id": 77,
+                          "id": 78,
                           "name": "fetch",
                           "kind": 1024,
                           "kindString": "Property",
@@ -5987,16 +6500,16 @@
                           "sources": [
                             {
                               "fileName": "src/lib/types.ts",
-                              "line": 52,
+                              "line": 62,
                               "character": 4
                             }
                           ],
                           "type": {
                             "type": "reference",
-                            "id": 60,
+                            "id": 59,
                             "name": "Fetch",
                             "dereferenced": {
-                              "id": 60,
+                              "id": 59,
                               "name": "Fetch",
                               "kind": 4194304,
                               "kindString": "Type alias",
@@ -6022,7 +6535,7 @@
                           }
                         },
                         {
-                          "id": 78,
+                          "id": 79,
                           "name": "headers",
                           "kind": 1024,
                           "kindString": "Property",
@@ -6035,7 +6548,7 @@
                           "sources": [
                             {
                               "fileName": "src/lib/types.ts",
-                              "line": 56,
+                              "line": 66,
                               "character": 4
                             }
                           ],
@@ -6061,13 +6574,13 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [77, 78]
+                          "children": [78, 79]
                         }
                       ],
                       "sources": [
                         {
                           "fileName": "src/lib/types.ts",
-                          "line": 48,
+                          "line": 58,
                           "character": 11
                         }
                       ]
@@ -6075,7 +6588,7 @@
                   }
                 },
                 {
-                  "id": 74,
+                  "id": 75,
                   "name": "realtime",
                   "kind": 1024,
                   "kindString": "Property",
@@ -6088,7 +6601,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 47,
+                      "line": 57,
                       "character": 2
                     }
                   ],
@@ -6104,7 +6617,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [66, 63, 75, 74]
+                  "children": [65, 62, 76, 75]
                 }
               ],
               "sources": [
@@ -6122,12 +6635,12 @@
         {
           "title": "Interfaces",
           "kind": 256,
-          "children": [59]
+          "children": [58]
         },
         {
           "title": "Type Aliases",
           "kind": 4194304,
-          "children": [60, 94, 90, 98, 80, 85, 93, 61]
+          "children": [59, 95, 91, 99, 81, 86, 94, 60]
         }
       ],
       "sources": [
@@ -6139,14 +6652,14 @@
       ]
     },
     {
-      "id": 103,
+      "id": 104,
       "name": "lib/version",
       "kind": 2,
       "kindString": "Module",
       "flags": {},
       "children": [
         {
-          "id": 104,
+          "id": 105,
           "name": "version",
           "kind": 32,
           "kindString": "Variable",
@@ -6171,7 +6684,7 @@
         {
           "title": "Variables",
           "kind": 32,
-          "children": [104]
+          "children": [105]
         }
       ],
       "sources": [
@@ -6187,7 +6700,7 @@
     {
       "title": "Modules",
       "kind": 2,
-      "children": [1, 10, 14, 44, 58, 103]
+      "children": [1, 10, 14, 43, 57, 104]
     }
   ]
 }

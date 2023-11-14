@@ -10,8 +10,9 @@ export const meta = {
 ![Supabase User Management example](/docs/img/ionic-demos/ionic-angular-account.png)
 
 <Admonition type="note">
-  If you get stuck while working through this guide, refer to the [full example on
-  GitHub](https://github.com/mhartington/supabase-ionic-react).
+
+If you get stuck while working through this guide, refer to the [full example on GitHub](https://github.com/mhartington/supabase-ionic-react).
+
 </Admonition>
 
 <ProjectSetup />
@@ -40,7 +41,7 @@ npm install @supabase/supabase-js
 And finally we want to save the environment variables in a `.env`.
 All we need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
 
-```bash title=.env
+```bash .env
 REACT_APP_SUPABASE_URL=YOUR_SUPABASE_URL
 REACT_APP_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 ```
@@ -48,7 +49,7 @@ REACT_APP_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 Now that we have the API credentials in place, let's create a helper file to initialize the Supabase client. These variables will be exposed
 on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
-```js title=src/supabaseClient.js
+```js src/supabaseClient.js
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL
@@ -61,7 +62,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 Let's set up a React component to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
 
-```jsx title=/src/pages/Login.tsx
+```jsx /src/pages/Login.tsx
 import { useState } from 'react';
 import {
   IonButton,
@@ -140,7 +141,7 @@ After a user is signed in we can allow them to edit their profile details and ma
 
 Let's create a new component for that called `Account.tsx`.
 
-```jsx title=src/pages/Account.tsx
+```jsx src/pages/Account.tsx
 import {
   IonButton,
   IonContent,
@@ -176,7 +177,7 @@ export function AccountPage() {
     await showLoading();
     try {
       const user = supabase.auth.user();
-      let { data, error, status } = await supabase
+      const { data, error, status } = await supabase
         .from('profiles')
         .select(`username, website, avatar_url`)
         .eq('id', user!.id)
@@ -219,7 +220,7 @@ export function AccountPage() {
         updated_at: new Date(),
       };
 
-      let { error } = await supabase.from('profiles').upsert(updates, {
+      const { error } = await supabase.from('profiles').upsert(updates, {
         returning: 'minimal', // Don't return the value after inserting
       });
 
@@ -294,7 +295,7 @@ export function AccountPage() {
 
 Now that we have all the components in place, let's update `App.tsx`:
 
-```jsx title=src/App.tsx
+```jsx src/App.tsx
 import { Redirect, Route } from 'react-router-dom'
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react'
 import { IonReactRouter } from '@ionic/react-router'
@@ -370,7 +371,7 @@ Ionic PWA elements is a companion package that will polyfill certain browser API
 
 With those packages installed we can update our `index.tsx` to include an additional bootstapping call for the Ionic PWA Elements.
 
-```ts title=src/index.tsx
+```ts src/index.tsx
 import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './App'
@@ -393,7 +394,7 @@ reportWebVitals()
 
 Then create an **AvatarComponent**.
 
-```jsx title=src/components/Avatar.tsx
+```jsx src/components/Avatar.tsx
 import { IonIcon } from '@ionic/react';
 import { person } from 'ionicons/icons';
 import { Camera, CameraResultType } from '@capacitor/camera';
@@ -430,7 +431,7 @@ export function Avatar({
       const fileName = `${Math.random()}-${new Date().getTime()}.${
         photo.format
       }`;
-      let { error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(fileName, file);
       if (uploadError) {
@@ -476,7 +477,7 @@ export function Avatar({
 
 And then we can add the widget to the Account page:
 
-```jsx title=src/pages/Account.tsx
+```jsx src/pages/Account.tsx
 // Import the new component
 
 import { Avatar } from '../components/Avatar';

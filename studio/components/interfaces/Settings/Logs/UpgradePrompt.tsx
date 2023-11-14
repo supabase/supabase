@@ -1,9 +1,9 @@
 import { Button, Modal } from 'ui'
 
-import { TIER_QUERY_LIMITS } from '.'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useFlag } from 'hooks'
+import { TIER_QUERY_LIMITS } from '.'
+import { useSelectedOrganization } from 'hooks'
 
 interface Props {
   show: boolean
@@ -11,10 +11,7 @@ interface Props {
 }
 
 const UpgradePrompt: React.FC<Props> = ({ show, setShowUpgradePrompt }) => {
-  const router = useRouter()
-  const { ref } = router.query
-
-  const teamTierEnabled = useFlag('teamTier')
+  const organization = useSelectedOrganization()
 
   return (
     <Modal
@@ -32,10 +29,10 @@ const UpgradePrompt: React.FC<Props> = ({ show, setShowUpgradePrompt }) => {
               Logs can be retained up to a duration of 3 months depending on the plan that your
               project is on.
             </p>
-            <div className="border-scale-600 bg-scale-500 rounded border">
+            <div className="border-control bg-surface-300 rounded border">
               <div className="flex items-center px-4 pt-2 pb-1">
-                <p className="text-scale-1100 w-[40%] text-sm">Plan</p>
-                <p className="text-scale-1100 w-[60%] text-sm">Retention duration</p>
+                <p className="text-foreground-light w-[40%] text-sm">Plan</p>
+                <p className="text-foreground-light w-[60%] text-sm">Retention duration</p>
               </div>
               <div className="py-1">
                 <div className="flex items-center px-4 py-1">
@@ -46,12 +43,10 @@ const UpgradePrompt: React.FC<Props> = ({ show, setShowUpgradePrompt }) => {
                   <p className="w-[40%] text-sm">Pro</p>
                   <p className="w-[60%] text-sm">{TIER_QUERY_LIMITS.PRO.text}</p>
                 </div>
-                {teamTierEnabled && (
-                  <div className="flex items-center px-4 py-1">
-                    <p className="w-[40%] text-sm">Team</p>
-                    <p className="w-[60%] text-sm">{TIER_QUERY_LIMITS.TEAM.text}</p>
-                  </div>
-                )}
+                <div className="flex items-center px-4 py-1">
+                  <p className="w-[40%] text-sm">Team</p>
+                  <p className="w-[60%] text-sm">{TIER_QUERY_LIMITS.TEAM.text}</p>
+                </div>
                 <div className="flex items-center px-4 py-1">
                   <p className="w-[40%] text-sm">Enterprise</p>
                   <p className="w-[60%] text-sm">{TIER_QUERY_LIMITS.ENTERPRISE.text}</p>
@@ -66,11 +61,11 @@ const UpgradePrompt: React.FC<Props> = ({ show, setShowUpgradePrompt }) => {
             <Button type="default" onClick={() => setShowUpgradePrompt(false)}>
               Close
             </Button>
-            <Link href={`/project/${ref}/settings/billing/subscription`} passHref>
-              <a>
-                <Button size="tiny">Upgrade</Button>
-              </a>
-            </Link>
+            <Button asChild size="tiny">
+              <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
+                Upgrade
+              </Link>
+            </Button>
           </div>
         </Modal.Content>
       </div>

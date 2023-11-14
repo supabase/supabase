@@ -16,6 +16,7 @@ import {
 import { SSE } from 'sse.js'
 
 import {
+  AiIconAnimation,
   Button,
   IconAlertTriangle,
   IconCornerDownLeft,
@@ -30,7 +31,7 @@ import { AiWarning } from './Command.alerts'
 import { useCommandMenu } from './CommandMenuProvider'
 
 import ReactMarkdown from 'react-markdown'
-import { cn } from './../../utils/cn'
+import { cn } from './../../lib/utils'
 import remarkGfm from 'remark-gfm'
 
 const questions = [
@@ -382,6 +383,9 @@ const AiCommand = () => {
     }
   }, [])
 
+  // Detect an IME composition (so that we can ignore Enter keypress)
+  const [isImeComposing, setIsImeComposing] = useState(false)
+
   return (
     <div onClick={(e) => e.stopPropagation()}>
       <div className={cn('relative mb-[145px] py-4 max-h-[720px] overflow-auto')}>
@@ -392,25 +396,30 @@ const AiCommand = () => {
                 <div key={index} className="flex gap-6 mx-4 [overflow-anchor:none] mb-6">
                   <div
                     className="
-                  w-7 h-7 bg-scale-200 rounded-full border border-scale-400 flex items-center justify-center text-scale-1000 first-letter:
-                  ring-scale-200
+                  w-7 h-7 bg-background rounded-full border border-muted flex items-center justify-center text-foreground-lighter first-letter:
+                  ring-background
                   ring-1
                   shadow-sm
               "
                   >
                     <IconUser strokeWidth={1.5} size={16} />
                   </div>
-                  <div className="prose text-scale-1000">{message.content}</div>
+                  <div className="prose text-foreground-lighter">{message.content}</div>
                 </div>
               )
             case MessageRole.Assistant:
               return (
                 <div key={index} className="px-4 [overflow-anchor:none] mb-6">
                   <div className="flex gap-6 [overflow-anchor:none] mb-6">
-                    <AiIconChat />
+                    <AiIconChat
+                      loading={
+                        message.status === MessageStatus.Pending ||
+                        message.status === MessageStatus.InProgress
+                      }
+                    />
                     <>
                       {message.status === MessageStatus.Pending ? (
-                        <div className="bg-scale-700 h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
+                        <div className="bg-border-strong h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
                       ) : (
                         <ReactMarkdown
                           remarkPlugins={[remarkGfm]}
@@ -439,7 +448,7 @@ const AiCommand = () => {
         })}
 
         {messages.length === 0 && !hasError && (
-          <CommandGroup heading="Examples" forceMount>
+          <CommandGroup heading="Examples">
             {questions.map((question) => {
               const key = question.replace(/\s+/g, '_')
               return (
@@ -450,10 +459,9 @@ const AiCommand = () => {
                       handleSubmit(question)
                     }
                   }}
-                  forceMount
                   key={key}
                 >
-                  <AiIcon />
+                  <AiIconAnimation />
                   {question}
                 </CommandItem>
               )
@@ -463,10 +471,10 @@ const AiCommand = () => {
         {hasError && (
           <div className="p-6 flex flex-col items-center gap-6 mt-4">
             <IconAlertTriangle className="text-amber-900" strokeWidth={1.5} size={21} />
-            <p className="text-lg text-scale-1200 text-center">
+            <p className="text-lg text-foreground text-center">
               Sorry, looks like Clippy is having a hard time!
             </p>
-            <p className="text-sm text-scale-900 text-center">Please try again in a bit.</p>
+            <p className="text-sm text-foreground-muted text-center">Please try again in a bit.</p>
             <Button size="tiny" type="secondary" onClick={handleReset}>
               Try again?
             </Button>
@@ -475,10 +483,10 @@ const AiCommand = () => {
 
         <div className="[overflow-anchor:auto] h-px w-full"></div>
       </div>
-      <div className="absolute bottom-0 w-full bg-scale-200 py-3">
+      <div className="absolute bottom-0 w-full bg-background py-3">
         {messages.length > 0 && !hasError && <AiWarning className="mb-3 mx-3" />}
         <Input
-          className="bg-scale-100 rounded mx-3 [&_input]:pr-32 md:[&_input]:pr-40"
+          className="bg-alternative rounded mx-3 [&_input]:pr-32 md:[&_input]:pr-40"
           inputRef={inputRef}
           autoFocus
           placeholder={
@@ -493,8 +501,8 @@ const AiCommand = () => {
                     search ? 'opacity-100' : 'opacity-0'
                   }`}
                 >
-                  <span className="text-scale-1100">Submit message</span>
-                  <div className="hidden text-scale-1100 md:flex items-center justify-center h-6 w-6 rounded bg-scale-500">
+                  <span className="text-foreground-light">Submit message</span>
+                  <div className="hidden text-foreground-light md:flex items-center justify-center h-6 w-6 rounded bg-overlay-hover">
                     <IconCornerDownLeft size={12} strokeWidth={1.5} />
                   </div>
                 </div>
@@ -506,17 +514,15 @@ const AiCommand = () => {
               setSearch(e.target.value)
             }
           }}
+          onCompositionStart={() => setIsImeComposing(true)}
+          onCompositionEnd={() => setIsImeComposing(false)}
           onKeyDown={(e) => {
             switch (e.key) {
               case 'Enter':
-                if (!search) {
+                if (!search || isLoading || isResponding || isImeComposing) {
                   return
                 }
-                if (isLoading || isResponding) {
-                  return
-                }
-                handleSubmit(search)
-                return
+                return handleSubmit(search)
               default:
                 return
             }

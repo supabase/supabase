@@ -1,30 +1,36 @@
-import { useEffect, useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import dayjs from 'dayjs'
 import { groupBy, isNull } from 'lodash'
 import { toJS } from 'mobx'
-import dayjs from 'dayjs'
+import { useEffect, useState } from 'react'
 import {
   Badge,
   Button,
-  Dropdown,
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuPortal,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuSub,
+  DropdownMenuTrigger,
   IconArrowRight,
-  IconChevronRight,
   IconHome,
   IconPlus,
   IconSave,
   IconSettings,
 } from 'ui'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
-import { uuidv4 } from 'lib/helpers'
-import { METRIC_CATEGORIES, METRICS, TIME_PERIODS_REPORTS } from 'lib/constants'
-import { useProjectContentStore } from 'stores/projectContentStore'
-import { useProfileQuery } from 'data/profile/profile-query'
-import Loading from 'components/ui/Loading'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
+import Loading from 'components/ui/Loading'
 import NoPermission from 'components/ui/NoPermission'
+import { useCheckPermissions, useIsFeatureEnabled } from 'hooks'
+import { METRICS, METRIC_CATEGORIES, TIME_PERIODS_REPORTS } from 'lib/constants'
+import { uuidv4 } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
+import { useProjectContentStore } from 'stores/projectContentStore'
 import GridResize from './GridResize'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
 
@@ -33,7 +39,12 @@ const DEFAULT_CHART_ROW_COUNT = 4
 
 const Reports = () => {
   const { id, ref } = useParams()
-  const { data: profile } = useProfileQuery()
+  const { profile } = useProfile()
+
+  const { projectAuthAll: authEnabled, projectStorageAll: storageEnabled } = useIsFeatureEnabled([
+    'project_auth:all',
+    'project_storage:all',
+  ])
 
   const [report, setReport] = useState<any>()
 
@@ -46,7 +57,7 @@ const Reports = () => {
   const [endDate, setEndDate] = useState<any>(null)
 
   const contentStore = useProjectContentStore(ref)
-  const canReadReport = checkPermissions(PermissionAction.READ, 'user_content', {
+  const canReadReport = useCheckPermissions(PermissionAction.READ, 'user_content', {
     resource: {
       type: 'report',
       visibility: report?.visibility,
@@ -54,7 +65,7 @@ const Reports = () => {
     },
     subject: { id: profile?.id },
   })
-  const canUpdateReport = checkPermissions(PermissionAction.UPDATE, 'user_content', {
+  const canUpdateReport = useCheckPermissions(PermissionAction.UPDATE, 'user_content', {
     resource: {
       type: 'report',
       visibility: report?.visibility,
@@ -262,40 +273,40 @@ const Reports = () => {
     })
   }
 
+  const metricCategories = Object.values(METRIC_CATEGORIES).filter(({ key }) => {
+    if (key === 'api_auth') return authEnabled
+    if (key === 'api_storage') return storageEnabled
+    return true
+  })
+
   const MetricOptions = () => {
     return (
       <>
-        {Object.values(METRIC_CATEGORIES).map((cat) => {
+        {metricCategories.map((cat) => {
           return (
-            <>
-              <Dropdown
-                isNested
-                overlay={
-                  <>
-                    {METRICS.filter((metric) => metric?.category?.key === cat.key).map((metric) => {
-                      return (
-                        <Dropdown.Checkbox
-                          key={metric.key}
-                          checked={config.layout?.some((x: any) => x.attribute === metric.key)}
-                          onChange={(e) => handleChartSelection({ metric, value: e })}
-                        >
-                          <div className="flex flex-col space-y-0">
-                            <span>{metric.label}</span>
-                          </div>
-                        </Dropdown.Checkbox>
-                      )
-                    })}
-                  </>
-                }
-              >
-                <Dropdown.TriggerItem icon={cat.icon ? cat.icon : <IconHome size="tiny" />}>
-                  {cat.label}
-                  <Dropdown.RightSlot>
-                    <IconChevronRight size={14} />
-                  </Dropdown.RightSlot>
-                </Dropdown.TriggerItem>
-              </Dropdown>
-            </>
+            <DropdownMenuSub key={cat.key}>
+              <DropdownMenuSubTrigger className="space-x-2">
+                {cat.icon ? cat.icon : <IconHome size="tiny" />}
+                <p>{cat.label}</p>
+              </DropdownMenuSubTrigger>
+              <DropdownMenuPortal>
+                <DropdownMenuSubContent>
+                  {METRICS.filter((metric) => metric?.category?.key === cat.key).map((metric) => {
+                    return (
+                      <DropdownMenuCheckboxItem
+                        key={metric.key}
+                        checked={config.layout?.some((x: any) => x.attribute === metric.key)}
+                        onCheckedChange={(e) => handleChartSelection({ metric, value: e })}
+                      >
+                        <div className="flex flex-col space-y-0">
+                          <span>{metric.label}</span>
+                        </div>
+                      </DropdownMenuCheckboxItem>
+                    )
+                  })}
+                </DropdownMenuSubContent>
+              </DropdownMenuPortal>
+            </DropdownMenuSub>
           )
         })}
       </>
@@ -304,7 +315,7 @@ const Reports = () => {
 
   return (
     <div className="mx-6 flex flex-col space-y-4" style={{ maxHeight: '100%' }}>
-      <h1 className="text-xl text-scale-1200">Reports</h1>
+      <h1 className="text-xl text-foreground">Reports</h1>
 
       <div className="mb-4 flex items-center justify-between space-x-3">
         <div className="flex items-center space-x-3">
@@ -317,13 +328,13 @@ const Reports = () => {
 
           {startDate && endDate && (
             <div className="hidden items-center space-x-1 lg:flex ">
-              <span className="text-sm text-scale-1100">
+              <span className="text-sm text-foreground-light">
                 {dayjs(startDate).format('MMM D, YYYY')}
               </span>
-              <span className="text-scale-900">
+              <span className="text-foreground-lighter">
                 <IconArrowRight size={12} />
               </span>
-              <span className="text-sm text-scale-1100">
+              <span className="text-sm text-foreground-light">
                 {dayjs(endDate).format('MMM D, YYYY')}
               </span>
             </div>
@@ -349,15 +360,20 @@ const Reports = () => {
           )}
 
           {canUpdateReport ? (
-            <Dropdown side="bottom" align="end" overlay={<MetricOptions />}>
-              <Button as="span" type="default" iconRight={<IconSettings />}>
-                Add / Remove charts
-              </Button>
-            </Dropdown>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Button asChild type="default" iconRight={<IconSettings />}>
+                  <span>Add / Remove charts</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="bottom" align="end">
+                <MetricOptions />
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
             <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
-                <Button disabled as="span" type="default" iconRight={<IconSettings />}>
+              <Tooltip.Trigger asChild>
+                <Button disabled type="default" iconRight={<IconSettings />}>
                   Add / Remove charts
                 </Button>
               </Tooltip.Trigger>
@@ -366,11 +382,11 @@ const Reports = () => {
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200',
+                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                      'border border-background',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">
+                    <span className="text-xs text-foreground">
                       You need additional permissions to update this project's report
                     </span>
                   </div>
@@ -384,13 +400,20 @@ const Reports = () => {
       {config.layout.length <= 0 ? (
         <div className="flex min-h-full items-center justify-center rounded border-2 border-dashed p-16 dark:border-dark">
           {canUpdateReport ? (
-            <Dropdown side="bottom" align="center" overlay={<MetricOptions />}>
-              <Button as="span" type="default" iconRight={<IconPlus />}>
-                {config.layout.length <= 0 ? 'Add your first chart' : 'Add another chart'}
-              </Button>
-            </Dropdown>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Button asChild type="default" iconRight={<IconPlus />}>
+                  <span>
+                    {config.layout.length <= 0 ? 'Add your first chart' : 'Add another chart'}
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="bottom" align="center">
+                <MetricOptions />
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
-            <p className="text-sm text-scale-1000">No charts set up yet in report</p>
+            <p className="text-sm text-foreground-light">No charts set up yet in report</p>
           )}
         </div>
       ) : (

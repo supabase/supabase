@@ -1,22 +1,28 @@
 # To be run in the root of the turbo monorepo
-# NOTE: It's highly raccomended to use the new builder, Buildkit. https://docs.docker.com/build/buildkit/
+# NOTE: It's highly recommended to use the new builder, Buildkit. https://docs.docker.com/build/buildkit/
 ## USAGE:
-# Build:        docker buildx build --target production -t supabase/studio:latest .
+# Build:        docker build . -f studio/Dockerfile --target production -t studio:latest
 # Run:          docker run -p 3000:3000 supabase/studio
 # Deploy:       docker push supabase/studio:latest
 # Clean build:
-#    docker buildx build --target production --no-cache -t supabase/studio:latest .
 #    docker builder prune
+#    docker build . -f studio/Dockerfile --target production -t studio:latest --no-cache
 
-FROM node:16-slim as base
+FROM node:18-slim as base
+
+# Fixes issues with Sentry CLI and SSL certificates during build
+RUN apt-get update -qq && \
+    apt-get install -y ca-certificates && \
+    rm -rf /var/lib/apt/lists/* && \
+    update-ca-certificates
 
 WORKDIR /app
 
 # Prune unneeded dependencies with turbo (from apps/ for example)
 FROM base as turbo
 COPY . .
-# Upstream bug: https://github.com/vercel/turbo/issues/3570
-RUN npx turbo@1.7.0 prune --scope=studio --docker
+
+RUN npx turbo@1.10.3 prune --scope=studio --docker
 
 # Install dev dependencies (only if needed)
 FROM base as deps
@@ -39,14 +45,15 @@ ENTRYPOINT ["docker-entrypoint.sh"]
 EXPOSE 8082
 CMD ["npm", "run", "dev:studio"]
 
-# Compile NextJS
+# Compile Next.js
 FROM dev as builder
+
 RUN npx turbo run build --scope=studio --include-dependencies --no-deps
 
 # Copy only compiled code and dependencies
 FROM base as production
 COPY --from=builder /app/studio/public ./studio/public
-COPY --from=builder /app/studio/.next/standalone/app ./
+COPY --from=builder /app/studio/.next/standalone ./
 COPY --from=builder /app/studio/.next/static ./studio/.next/static
 EXPOSE 3000
 ENTRYPOINT ["docker-entrypoint.sh"]

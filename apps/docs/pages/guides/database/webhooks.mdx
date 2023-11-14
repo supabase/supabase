@@ -4,23 +4,20 @@ export const meta = {
   id: 'webhooks',
   title: 'Database Webhooks',
   description: 'Trigger external payloads on database events.',
-  video: 'https://www.youtube.com/v/codAs9-NeHM',
+  subtitle: 'Trigger external payloads on database events.',
+  tocVideo: 'codAs9-NeHM',
 }
 
 Database Webhooks allow you to send real-time data from your database to another system whenever a table event occurs.
 
 You can hook into three table events: `INSERT`, `UPDATE`, and `DELETE`. All events are fired _after_ a database row is changed.
 
+## Webhooks vs Triggers
+
 Database Webhooks are very similar to triggers, and that's because Database Webhooks are just a convenience wrapper around triggers
 using the [pg_net](/docs/guides/database/extensions/pgnet) extension. This extension is asynchronous, and therefore will not block your database changes for long-running network requests.
 
 This video demonstrates how you can create a new customer in Stripe each time a row is inserted into a `profiles` table:
-
-<Admonition type="note">
-
-Database Webhooks were previously known as Function Hooks.
-
-</Admonition>
 
 <div className="video-container">
   <iframe
@@ -33,10 +30,24 @@ Database Webhooks were previously known as Function Hooks.
 
 ## Creating a webhook
 
-1. Create a new [Database Webhook](https://app.supabase.com/project/_/database/hooks) in the Dashboard.
+1. Create a new [Database Webhook](https://supabase.com/dashboard/project/_/database/hooks) in the Dashboard.
 1. Give your Webhook a name.
 1. Select the table you want to hook into.
 1. Select one or more events (table inserts, updates, or deletes) you want to hook into.
+
+Since webhooks are just database triggers, you can also create one from SQL statement directly.
+
+```sql
+create trigger "my_webhook" after insert
+on "public"."my_table" for each row
+execute function "supabase_functions"."http_request"(
+  'http://localhost:3000',
+  'POST',
+  '{"Content-Type":"application/json"}',
+  '{}',
+  '1000'
+);
+```
 
 We currently support HTTP webhooks. These are sent as a `POST` request with a JSON payload.
 
@@ -67,6 +78,10 @@ type DeletePayload = {
   old_record: TableRecord<T>
 }
 ```
+
+## Monitoring
+
+Logging history of webhook calls is available under the `net` schema of your database. For more info, see the [GitHub Repo](https://github.com/supabase/pg_net).
 
 ## Resources
 

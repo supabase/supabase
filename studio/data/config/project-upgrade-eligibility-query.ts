@@ -4,6 +4,7 @@ import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query
 import { get } from 'lib/common/fetch'
 import { API_ADMIN_URL } from 'lib/constants'
 import { configKeys } from './keys'
+import { ResponseError } from 'types'
 
 export type ProjectUpgradeEligibilityVariables = { projectRef?: string }
 export type ProjectUpgradeEligibilityResponse = {
@@ -13,6 +14,9 @@ export type ProjectUpgradeEligibilityResponse = {
   target_upgrade_versions: { postgres_version: number; app_version: string }[]
   requires_manual_intervention: string | null
   potential_breaking_changes: string[]
+  duration_estimate_hours: number
+  legacy_auth_custom_roles: string[]
+  extension_dependent_objects: string[]
 }
 
 export async function getProjectUpgradeEligibility(
@@ -29,7 +33,7 @@ export async function getProjectUpgradeEligibility(
 }
 
 export type ProjectUpgradeEligibilityData = Awaited<ReturnType<typeof getProjectUpgradeEligibility>>
-export type ProjectUpgradeEligibilityError = unknown
+export type ProjectUpgradeEligibilityError = ResponseError
 
 export const useProjectUpgradeEligibilityQuery = <TData = ProjectUpgradeEligibilityData>(
   { projectRef }: ProjectUpgradeEligibilityVariables,

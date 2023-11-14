@@ -1,37 +1,44 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
 import dayjs from 'dayjs'
-import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Button, IconAlertCircle } from 'ui'
-import * as Tooltip from '@radix-ui/react-tooltip'
 
-import { checkPermissions, useStore } from 'hooks'
-import { Timezone } from './PITR.types'
-import { FormPanel } from 'components/ui/Forms'
-import TimezoneSelection from './TimezoneSelection'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
+import { FormPanel } from 'components/ui/Forms'
+import { useBackupsQuery } from 'data/database/backups-query'
+import { useCheckPermissions } from 'hooks'
+import { Timezone } from './PITR.types'
+import TimezoneSelection from './TimezoneSelection'
 
-interface Props {
+interface PITRStatusProps {
   selectedTimezone: Timezone
   onUpdateTimezone: (timezone: Timezone) => void
   onSetConfiguration: () => void
 }
 
-const PITRStatus: FC<Props> = ({ selectedTimezone, onUpdateTimezone, onSetConfiguration }) => {
-  const { backups } = useStore()
+const PITRStatus = ({
+  selectedTimezone,
+  onUpdateTimezone,
+  onSetConfiguration,
+}: PITRStatusProps) => {
+  const { ref } = useParams()
+  const { data: backups } = useBackupsQuery({ projectRef: ref })
+
   const { earliestPhysicalBackupDateUnix, latestPhysicalBackupDateUnix } =
-    backups?.configuration?.physicalBackupData ?? {}
+    backups?.physicalBackupData ?? {}
 
   const earliestAvailableBackup = dayjs
-    .unix(earliestPhysicalBackupDateUnix)
+    .unix(earliestPhysicalBackupDateUnix ?? 0)
     .tz(selectedTimezone?.utc[0])
     .format('DD MMM YYYY, HH:mm:ss')
 
   const latestAvailableBackup = dayjs
-    .unix(latestPhysicalBackupDateUnix)
+    .unix(latestPhysicalBackupDateUnix ?? 0)
     .tz(selectedTimezone?.utc[0])
     .format('DD MMM YYYY, HH:mm:ss')
 
-  const canTriggerPhysicalBackup = checkPermissions(
+  const canTriggerPhysicalBackup = useCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_job.walg.prepare_restore'
   )
@@ -43,8 +50,8 @@ const PITRStatus: FC<Props> = ({ selectedTimezone, onUpdateTimezone, onSetConfig
         footer={
           <div className="flex items-center justify-between p-6">
             <div className="flex items-center space-x-4">
-              <IconAlertCircle className="text-scale-1100" size={18} strokeWidth={1.5} />
-              <span className="text-scale-1000 text-sm">
+              <IconAlertCircle className="text-foreground-light" size={18} strokeWidth={1.5} />
+              <span className="text-foreground-light text-sm">
                 You'll be able to pick the right date and time when you begin
               </span>
             </div>
@@ -60,11 +67,11 @@ const PITRStatus: FC<Props> = ({ selectedTimezone, onUpdateTimezone, onSetConfig
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                        'border border-scale-200',
+                        'rounded bg-alternative py-1 px-2 leading-none shadow',
+                        'border border-background',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text-foreground">
                         You need additional permissions to trigger a PITR recovery
                       </span>
                     </div>
@@ -85,11 +92,11 @@ const PITRStatus: FC<Props> = ({ selectedTimezone, onUpdateTimezone, onSetConfig
           </div>
           <div className="flex items-center space-x-20">
             <div className="space-y-2">
-              <p className="text-sm text-scale-1100">Database restore available from</p>
+              <p className="text-sm text-foreground-light">Database restore available from</p>
               <p className="text-2xl">{earliestAvailableBackup}</p>
             </div>
             <div className="space-y-2">
-              <p className="text-sm text-scale-1100">Latest restore available at</p>
+              <p className="text-sm text-foreground-light">Latest restore available at</p>
               <p className="text-2xl">{latestAvailableBackup}</p>
             </div>
           </div>

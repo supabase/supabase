@@ -1,34 +1,33 @@
 import Link from 'next/link'
-import { FC, ReactNode } from 'react'
-import { useStore, withAuth } from 'hooks'
-import { observer } from 'mobx-react-lite'
-import { IconX } from 'ui'
+import { PropsWithChildren } from 'react'
 
 import BaseLayout from 'components/layouts'
+import { useSelectedOrganization, useSelectedProject, withAuth } from 'hooks'
+import { IconX } from 'ui'
 
-interface Props {
-  children: ReactNode
-}
+export interface BillingLayoutProps {}
 
-const BillingLayout: FC<Props> = ({ children }) => {
-  const { ui } = useStore()
+const BillingLayout = ({ children }: PropsWithChildren<BillingLayoutProps>) => {
+  const selectedOrganization = useSelectedOrganization()
+  const selectedProject = useSelectedProject()
 
   return (
     <BaseLayout hideHeader hideIconBar>
       <div className="flex h-full w-full flex-col">
         {/* Header */}
         <div className="flex items-center space-x-4 border-b py-4 px-5 dark:border-dark">
-          <Link href={`/project/${ui.selectedProject?.ref}/settings/billing/subscription`} passHref>
-            <a className="text-scale-900 transition-colors hover:text-scale-1200">
-              <IconX size={16} strokeWidth={1.5} />
-            </a>
+          <Link
+            href={`/org/${selectedOrganization?.slug}/billing`}
+            className="text-foreground-lighter transition-colors hover:text-foreground"
+          >
+            <IconX size={16} strokeWidth={1.5} />
           </Link>
           <div className="flex items-center space-x-6">
-            <h1 className="text-sm text-scale-1200">Customize your plan</h1>
-            <div className="h-6 w-px bg-scale-600"></div>
+            <h1 className="text-sm text-foreground">Customize your plan</h1>
+            <div className="h-6 w-px bg-selection"></div>
             <div className="flex items-center space-x-3">
-              <p className="text-sm text-scale-1100">{ui.selectedOrganization?.name}</p>
-              <span className="text-scale-800">
+              <p className="text-sm text-foreground-light">{selectedOrganization?.name}</p>
+              <span className="text-border-stronger">
                 <svg
                   viewBox="0 0 24 24"
                   width="16"
@@ -43,7 +42,7 @@ const BillingLayout: FC<Props> = ({ children }) => {
                   <path d="M16 3.549L7.12 20.600"></path>
                 </svg>
               </span>
-              <p className="text-sm text-scale-1100">{ui.selectedProject?.name}</p>
+              <p className="text-sm text-foreground-light">{selectedProject?.name}</p>
             </div>
           </div>
         </div>
@@ -55,4 +54,4 @@ const BillingLayout: FC<Props> = ({ children }) => {
   )
 }
 
-export default withAuth(observer(BillingLayout))
+export default withAuth(BillingLayout)

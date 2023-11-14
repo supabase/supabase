@@ -423,14 +423,6 @@ export const ALL_TIMEZONES = [
     utc: ['America/Noronha', 'Atlantic/South_Georgia', 'Etc/GMT+2'],
   },
   {
-    value: 'Mid-Atlantic Standard Time',
-    abbr: 'MDT',
-    offset: -1,
-    isdst: true,
-    text: '(UTC-02:00) Mid-Atlantic - Old',
-    utc: [],
-  },
-  {
     value: 'Azores Standard Time',
     abbr: 'ADT',
     offset: 0,

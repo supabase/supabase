@@ -1,51 +1,58 @@
-import React, { FC } from 'react'
-import { isNil } from 'lodash'
-import { Select } from 'ui'
 import type { PostgresType } from '@supabase/postgres-meta'
+import { noop } from 'lodash'
+import { Select } from 'ui'
 
-import InputWithSuggestions from './InputWithSuggestions'
 import { POSTGRES_DATA_TYPES } from '../SidePanelEditor.constants'
 import { ColumnField } from '../SidePanelEditor.types'
-import { Suggestion } from './ColumnEditor.types'
-import { getSelectedEnumValues } from './ColumnEditor.utils'
 import { typeExpressionSuggestions } from './ColumnEditor.constants'
+import { Suggestion } from './ColumnEditor.types'
+import InputWithSuggestions from './InputWithSuggestions'
 
-interface Props {
+interface ColumnDefaultValueProps {
   columnFields: ColumnField
   enumTypes: PostgresType[]
   onUpdateField: (changes: Partial<ColumnField>) => void
 }
 
-const ColumnDefaultValue: FC<Props> = ({
+const ColumnDefaultValue = ({
   columnFields,
   enumTypes = [],
-  onUpdateField = () => {},
-}) => {
+  onUpdateField = noop,
+}: ColumnDefaultValueProps) => {
   const suggestions: Suggestion[] = typeExpressionSuggestions?.[columnFields.format] ?? []
 
   // If selected column type is a user-defined enum, show a dropdown list of options
-  const isUserDefinedEnum: boolean =
-    isNil(columnFields.format) && !POSTGRES_DATA_TYPES.includes(columnFields.format)
+  const isEnum: boolean =
+    !POSTGRES_DATA_TYPES.includes(columnFields.format) &&
+    enumTypes.some((type) => type.name === columnFields.format)
 
-  if (isUserDefinedEnum) {
-    const enumValues = getSelectedEnumValues(columnFields.format, enumTypes)
-    return (
-      <Select
-        label="Default Value"
-        layout="horizontal"
-        value={columnFields.defaultValue ?? ''}
-        onChange={(event: any) => onUpdateField({ defaultValue: event.target.value })}
-      >
-        <Select.Option key="empty-enum" value="">
-          ---
-        </Select.Option>
-        {enumValues.map((value: string) => (
-          <Select.Option key={value} value={value}>
-            {value}
+  if (isEnum) {
+    const enumType = enumTypes.find((type) => type.name === columnFields.format)
+    const enumValues = enumType?.enums ?? []
+    const originalDefaultValue = columnFields?.defaultValue ?? ''
+    const formattedValue = originalDefaultValue.includes('::')
+      ? originalDefaultValue.split('::')[0].slice(1, -1)
+      : originalDefaultValue
+
+    if (enumType !== undefined) {
+      return (
+        <Select
+          label="Default Value"
+          layout="vertical"
+          value={formattedValue}
+          onChange={(event: any) => onUpdateField({ defaultValue: event.target.value })}
+        >
+          <Select.Option key="empty-enum" value="">
+            NULL
           </Select.Option>
-        ))}
-      </Select>
-    )
+          {enumValues.map((value: string) => (
+            <Select.Option key={value} value={value}>
+              {value}
+            </Select.Option>
+          ))}
+        </Select>
+      )
+    }
   }
 
   return (
@@ -59,7 +66,6 @@ const ColumnDefaultValue: FC<Props> = ({
           : 'NULL'
       }
       value={columnFields?.defaultValue ?? ''}
-      format={columnFields?.format}
       suggestions={suggestions}
       suggestionsHeader="Suggested expressions"
       suggestionsTooltip="Suggested expressions"

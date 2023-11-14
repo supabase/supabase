@@ -199,6 +199,9 @@ serve(async (req) => {
             - Prefer splitting your response into multiple paragraphs.
           `}
           ${oneLine`
+            - Respond using the same language as the question.
+          `}
+          ${oneLine`
             - Output as markdown.
           `}
           ${oneLine`

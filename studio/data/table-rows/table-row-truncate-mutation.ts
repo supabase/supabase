@@ -1,7 +1,10 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
+
 import { Query, SupaTable } from 'components/grid'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
+import { ResponseError } from 'types'
 
 export type TableRowTruncateVariables = {
   projectRef: string
@@ -31,22 +34,28 @@ type TableRowTruncateData = Awaited<ReturnType<typeof truncateTableRow>>
 
 export const useTableRowTruncateMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
-  UseMutationOptions<TableRowTruncateData, unknown, TableRowTruncateVariables>,
+  UseMutationOptions<TableRowTruncateData, ResponseError, TableRowTruncateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<TableRowTruncateData, unknown, TableRowTruncateVariables>(
+  return useMutation<TableRowTruncateData, ResponseError, TableRowTruncateVariables>(
     (vars) => truncateTableRow(vars),
     {
       async onSuccess(data, variables, context) {
         const { projectRef, table } = variables
-
         await queryClient.invalidateQueries(sqlKeys.query(projectRef, [table.schema, table.name]))
-
         await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to truncate table row: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
       },
       ...options,
     }

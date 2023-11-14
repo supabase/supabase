@@ -16,7 +16,7 @@ const defaultRouterMock = () => {
 useRouter.mockReturnValue(defaultRouterMock())
 
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
-import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { fireEvent, waitFor, screen, act } from '@testing-library/react'
 import { render } from '../../helpers'
 import userEvent from '@testing-library/user-event'
@@ -37,6 +37,31 @@ beforeEach(() => {
   useParams.mockReturnValue(routerReturnValue.query)
 })
 
+// in the event that log metadata is not available, fall back to default renderer
+// generate test cases for each query type
+const defaultRendererFallbacksCases = [
+  'api',
+  'database',
+  'auth',
+  'pgbouncer',
+  'postgrest',
+  'storage',
+  'realtime',
+].map((queryType) => ({
+  testName: 'fallback to default render',
+  queryType,
+  tableName: undefined,
+  tableLog: logDataFixture({
+    event_message: 'some message',
+    metadata: undefined,
+  }),
+  selectionLog: logDataFixture({
+    metadata: undefined,
+  }),
+  tableTexts: [/some message/],
+  selectionTexts: [/some message/],
+}))
+
 test.each([
   {
     queryType: 'api',
@@ -53,6 +78,7 @@ test.each([
     tableTexts: [/POST/, /some\-path/, /400/],
     selectionTexts: [/POST/, /Timestamp/, RegExp(`${new Date().getFullYear()}.+`, 'g')],
   },
+
   {
     queryType: 'database',
     tableName: undefined,
@@ -87,33 +113,36 @@ test.each([
     queryType: 'auth',
     tableName: undefined,
     tableLog: logDataFixture({
-      event_message: JSON.stringify({
-        msg: 'some message',
-        path: '/auth-path',
-        level: 'info',
-        status: 300,
-      }),
+      event_message: 'some event_message',
+      level: 'info',
+      path: '/auth-path',
+      msg: 'some metadata_msg',
+      level: 'info',
+      status: 300,
+      metadata: undefined,
     }),
     selectionLog: logDataFixture({
-      event_message: JSON.stringify({
-        msg: 'some message',
+      event_message: 'some event_message',
+      metadata: {
+        msg: 'some metadata_msg',
         path: '/auth-path',
         level: 'info',
         status: 300,
-      }),
+      },
     }),
-    tableTexts: [/auth\-path/, /some message/, /INFO/],
+    tableTexts: [/auth\-path/, /some metadata_msg/, /INFO/],
     selectionTexts: [
       /auth\-path/,
-      /some message/,
+      /some metadata_msg/,
       /INFO/,
       /300/,
       /Timestamp/,
       RegExp(`${new Date().getFullYear()}.+`, 'g'),
     ],
   },
+  ...defaultRendererFallbacksCases,
   // these all use teh default selection/table renderers
-  ...['pgbouncer', 'postgrest', 'storage', 'realtime'].map((queryType) => ({
+  ...['pgbouncer', 'postgrest', 'storage', 'realtime', 'supavisor'].map((queryType) => ({
     queryType,
     tableName: undefined,
     tableLog: logDataFixture({
@@ -127,7 +156,7 @@ test.each([
     selectionTexts: [/some/, /nested/, /value/, RegExp(`${new Date().getFullYear()}.+`, 'g')],
   })),
 ])(
-  'selection $queryType $tableName , can display log data and metadata',
+  'selection $queryType $queryType, $tableName , can display log data and metadata $testName',
   async ({ queryType, tableName, tableLog, selectionLog, tableTexts, selectionTexts }) => {
     get.mockImplementation((url) => {
       // counts
@@ -215,7 +244,7 @@ test('Search will trigger a log refresh', async () => {
 test('poll count for new messages', async () => {
   get.mockImplementation((url) => {
     if (url.includes('count')) {
-      return { result: [{ count: 125 }] }
+      return { result: [{ count: 999 }] }
     }
     return {
       result: [logDataFixture({ id: 'some-uuid123' })],
@@ -224,12 +253,30 @@ test('poll count for new messages', async () => {
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
   await waitFor(() => screen.queryByText(/some-uuid123/) === null)
   // should display new logs count
-  await waitFor(() => screen.getByText(/125/))
+  await waitFor(() => screen.getByText(/999/))
 
   userEvent.click(screen.getByText(/Refresh/))
-  await waitFor(() => screen.queryByText(/125/) === null)
+  await waitFor(() => screen.queryByText(/999/) === null)
   await screen.findByText(/some-uuid123/)
 })
+
+test('stop polling for new count on error', async () => {
+  get.mockImplementation((url) => {
+    if (url.includes('count')) {
+      return { result: [{ count: 999 }] }
+    }
+    return {
+      error: [{ message: 'some logflare error' }],
+    }
+  })
+  render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
+  await waitFor(() => screen.queryByText(/some-uuid123/) === null)
+  // should display error
+  await screen.findByText(/some logflare error/)
+  // should not load refresh counts if no data from main query
+  await expect(screen.findByText(/999/)).rejects.toThrowError()
+})
+
 test('log event chart', async () => {
   get.mockImplementation((url) => {
     // truncate
@@ -449,13 +496,12 @@ test('filters accept filterOverride', async () => {
   })
 })
 
-describe.each(['FREE', 'PRO', 'TEAM', 'ENTERPRISE'])('upgrade modal for %s', (key) => {
+describe.each(['free', 'pro', 'team', 'enterprise'])('upgrade modal for %s', (key) => {
   beforeEach(() => {
-    useProjectSubscriptionQuery.mockReturnValue({
+    useOrgSubscriptionQuery.mockReturnValue({
       data: {
-        tier: {
-          supabase_prod_id: `tier_${key.toLocaleLowerCase()}`,
-          key,
+        plan: {
+          id: key,
         },
       },
     })
@@ -472,5 +518,36 @@ describe.each(['FREE', 'PRO', 'TEAM', 'ENTERPRISE'])('upgrade modal for %s', (ke
     useParams.mockReturnValue(router.query)
     render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
     await screen.findByText('Log retention') // assert modal title is present
+  })
+})
+
+test('datepicker onChange will set the query params for outbound api request', async () => {
+  useOrgSubscriptionQuery.mockReturnValue({
+    data: {
+      plan: {
+        id: 'enterprise',
+      },
+    },
+  })
+  get.mockImplementation((url) => {
+    return { result: [] }
+  })
+  render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
+  // renders time locally
+  userEvent.click(await screen.findByText('Custom'))
+  // inputs with local time
+  const toHH = await screen.findByDisplayValue('23')
+  userEvent.clear(toHH)
+  userEvent.type(toHH, '12')
+
+  userEvent.click(await screen.findByText('20'), { selector: '.react-datepicker__day' })
+  userEvent.click(await screen.findByText('21'), { selector: '.react-datepicker__day' })
+  userEvent.click(await screen.findByText('Apply'))
+
+  await waitFor(() => {
+    expect(get).toHaveBeenCalledWith(
+      expect.stringMatching(/.+select.+event_message.+iso_timestamp_end=/),
+      expect.anything()
+    )
   })
 })

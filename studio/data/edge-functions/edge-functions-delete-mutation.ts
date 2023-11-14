@@ -1,6 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
+
 import { delete_ } from 'lib/common/fetch'
 import { API_ADMIN_URL } from 'lib/constants'
+import { ResponseError } from 'types'
 import { edgeFunctionsKeys } from './keys'
 
 export type EdgeFunctionsDeleteVariables = {
@@ -23,14 +26,15 @@ type EdgeFunctionsDeleteData = Awaited<ReturnType<typeof deleteEdgeFunction>>
 
 export const useEdgeFunctionDeleteMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
-  UseMutationOptions<EdgeFunctionsDeleteData, unknown, EdgeFunctionsDeleteVariables>,
+  UseMutationOptions<EdgeFunctionsDeleteData, ResponseError, EdgeFunctionsDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<EdgeFunctionsDeleteData, unknown, EdgeFunctionsDeleteVariables>(
+  return useMutation<EdgeFunctionsDeleteData, ResponseError, EdgeFunctionsDeleteVariables>(
     (vars) => deleteEdgeFunction(vars),
     {
       async onSuccess(data, variables, context) {
@@ -39,6 +43,13 @@ export const useEdgeFunctionDeleteMutation = ({
           refetchType: 'all',
         })
         await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to delete edge function: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
       },
       ...options,
     }

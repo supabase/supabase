@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+@import './../../../packages/ui/build/css/source/global.css';
+@import './../../../packages/ui/build/css/themes/dark.css';
+@import './../../../packages/ui/build/css/themes/light.css';
+
 @font-face {
   font-family: 'custom-font';
   src: url(../../../packages/common/assets/fonts/CustomFont-Book.woff2) format('woff2'),
@@ -25,14 +29,14 @@
 }
 
 body {
-  @apply bg-scale-200 dark:bg-[#1c1c1c] #{!important};
+  @apply bg-background;
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 ::selection {
-  background-color: #6ee7b7;
+  background-color: #6ee7b7 !important;
   color: #333 !important;
 }
 
@@ -72,12 +76,16 @@ article h1 {
 }
 
 .p:not(.prose *):not(.overwrite) {
-  @apply text-scale-1100;
+  @apply text-foreground-light;
   margin-bottom: 16px;
 }
 
 .small:not(.prose *):not(.overwrite) {
-  @apply text-scale-900 text-xs;
+  @apply text-foreground-muted text-xs;
+}
+
+.prose :where(p):not(:where([class~='not-prose'] *)) {
+  white-space: pre-line;
 }
 
 code[class*='language-'],
@@ -117,7 +125,7 @@ pre[class*='language-'] {
 
 .method-list-item-validation {
   code {
-    @apply text-xs bg-scale-300 rounded;
+    @apply text-xs bg-control rounded;
     padding: 1px 6px;
   }
 }
@@ -127,7 +135,7 @@ pre[class*='language-'] {
 }
 
 .method-list-group .method-list-group {
-  @apply border border-scale-400 rounded-md;
+  @apply border border-overlay rounded-md;
   margin-bottom: 20px;
   max-width: 600px;
 }
@@ -161,7 +169,7 @@ pre[class*='language-'] {
 
 // ToC styles
 .toc__menu-item--active {
-  color: var(--colors-brand9) !important;
+  color: hsl(var(--brand-default)) !important;
 }
 
 .video-container {
@@ -201,7 +209,7 @@ h4 code {
 
 // code inside admonitions
 .admonition-content p code {
-  @apply bg-scale-300;
+  @apply bg-control;
   word-break: keep-all !important;
   white-space: nowrap !important;
 }
@@ -273,4 +281,10 @@ div[role='tablist'] {
   width: 100% !important;
   position: relative !important;
   height: unset !important;
+}
+
+/* dat.GUI */
+
+.dg.ac {
+  z-index: 9999 !important;
 }

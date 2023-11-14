@@ -1,23 +1,24 @@
-import { FC } from 'react'
+import { noop } from 'lodash'
 import { IconEdit, IconGrid, Modal } from 'ui'
+
 import CardButton from 'components/ui/CardButton'
 
-interface Props {
+interface PolicySelectionProps {
   description: string
   onViewTemplates: () => void
   onViewEditor: () => void
 }
 
-const PolicySelection: FC<Props> = ({
+const PolicySelection = ({
   description = '',
-  onViewTemplates = () => {},
-  onViewEditor = () => {},
-}) => {
+  onViewTemplates = noop,
+  onViewEditor = noop,
+}: PolicySelectionProps) => {
   return (
     <Modal.Content>
       <div className="space-y-6 py-8">
         <div>
-          <p className="text-sm text-scale-1100">{description}</p>
+          <p className="text-sm text-foreground-light">{description}</p>
         </div>
         <div className="grid grid-cols-1 gap-2 lg:grid-cols-1">
           <CardButton
@@ -29,7 +30,7 @@ const PolicySelection: FC<Props> = ({
                   className="
                   flex h-8 w-8 items-center
                   justify-center
-                  rounded bg-scale-1200 text-scale-100  
+                  rounded bg-foreground text-background  
                 "
                 >
                   <IconGrid size={14} strokeWidth={2} />
@@ -47,7 +48,7 @@ const PolicySelection: FC<Props> = ({
                   className="
                   flex h-8 w-8 items-center
                   justify-center
-                  rounded bg-scale-1200 text-scale-100  
+                  rounded bg-foreground text-background  
                 "
                 >
                   <IconEdit size={14} strokeWidth={2} />
@@ -57,12 +58,12 @@ const PolicySelection: FC<Props> = ({
             onClick={onViewEditor}
           />
         </div>
-        <p className="text-sm text-scale-1100">
+        <p className="text-sm text-foreground-light">
           Not sure what policies are? Check out our resources{' '}
           <a
             target="_blank"
             rel="noreferrer"
-            className="text-brand-900 transition-colors hover:text-brand-1200"
+            className="text-brand transition-colors hover:text-brand-600"
             href="https://supabase.com/docs/guides/auth#policies"
           >
             here

@@ -1,8 +1,5 @@
-import dayjs from 'dayjs'
-import { Project } from 'types'
 import {
   Action,
-  ActionReason,
   ActionType,
   ExtensionsUpgrade,
   Notification,
@@ -11,14 +8,13 @@ import {
   ServiceUpgrade,
   ViolatedLimit,
 } from '@supabase/shared-types/out/notifications'
-import { IconArrowRight, IconExternalLink } from 'ui'
+import { Markdown } from 'components/interfaces/Markdown'
+import dayjs from 'dayjs'
 import Link from 'next/link'
+import { Project } from 'types'
+import { Button, IconArrowRight, IconExternalLink } from 'ui'
 
-export const formatNotificationText = (
-  project: Project,
-  notification: Notification,
-  ownerReassignStatus?: any
-) => {
+export const formatNotificationText = (project: Project, notification: Notification) => {
   const projectName = project.name
 
   if (notification.data.name === NotificationName.ProjectExceedingTierLimit) {
@@ -89,28 +85,12 @@ export const formatNotificationText = (
       )
     } else if (upgrade_type === 'schema-migration') {
       const { version_to } = additional
-      if (ownerReassignStatus?.desired === 'unmigrated') {
-        return (
-          <p className="text-sm">
-            The schema migration "{version_to}" will be applied for project "{projectName}" within a
-            few days. You may opt to apply the changes now, or it'll be done so automatically.
-          </p>
-        )
-      } else if (ownerReassignStatus?.desired === 'temp_role') {
-        return (
-          <p className="text-sm">
-            The schema migration "{version_to}" will be finalized for project "{projectName}" within
-            a few days. You may opt to finalize the changes now, or it'll be done so automatically.
-          </p>
-        )
-      } else {
-        return (
-          <p className="text-sm">
-            The schema migration "{version_to}" has been successfully applied for project "
-            {projectName}".
-          </p>
-        )
-      }
+      return (
+        <p className="text-sm">
+          The schema migration "{version_to}" has been successfully applied for project "
+          {projectName}".
+        </p>
+      )
     }
   } else if (notification.data.name === NotificationName.ProjectUpdateCompleted) {
     const { upgrades } = notification.data
@@ -128,14 +108,12 @@ export const formatNotificationText = (
                 <p className="text-sm">{upgrade.version_to}</p>
                 {upgrade.changelog_link && (
                   <div className="!ml-4">
-                    <Link href={upgrade.changelog_link}>
-                      <a target="_blank" rel="noreferrer">
-                        <IconExternalLink
-                          className="cursor-pointer text-scale-1000 hover:text-scale-1200 transition"
-                          size={12}
-                          strokeWidth={2}
-                        />
-                      </a>
+                    <Link href={upgrade.changelog_link} target="_blank" rel="noreferrer">
+                      <IconExternalLink
+                        className="cursor-pointer text-foreground-light hover:text-foreground transition"
+                        size={12}
+                        strokeWidth={2}
+                      />
                     </Link>
                   </div>
                 )}
@@ -146,7 +124,26 @@ export const formatNotificationText = (
       </div>
     )
   } else if (notification.data.name === NotificationName.ProjectInformational) {
-    return <p className="text-sm">{notification.data.message}</p>
+    const buttons = notification.data.linked_buttons ?? []
+    return (
+      <>
+        <Markdown content={notification.data.message} className="text-foreground" />
+        {buttons.map((button, index) => {
+          return (
+            <a href={button.url} key={index} target="_blank">
+              <Button
+                asChild
+                type="default"
+                className="mr-2 mt-2 mb-2"
+                icon={<IconExternalLink size={12} strokeWidth={2} />}
+              >
+                <span>{button.text}</span>
+              </Button>
+            </a>
+          )
+        })}
+      </>
+    )
   } else {
     return (
       <p className="text-sm">
@@ -157,10 +154,7 @@ export const formatNotificationText = (
   }
 }
 
-export const formatNotificationCTAText = (
-  availableActions: Action[],
-  ownerReassignStatus?: any
-) => {
+export const formatNotificationCTAText = (availableActions: Action[]) => {
   const [action] = availableActions
   if (!action) return <p className="text-sm"></p>
 
@@ -173,43 +167,13 @@ export const formatNotificationCTAText = (
       return <p className="text-sm">Restart your connection pooler to get the latest updates.</p>
     case ActionType.MigratePostgresSchema:
       if (action.deadline) {
-        if (ownerReassignStatus?.desired === 'migrated') {
-          return (
-            <p className="text-sm space-x-1">
-              This patch was applied on{' '}
-              {dayjs(new Date(ownerReassignStatus.migrated_at ?? action.deadline)).format(
-                'DD MMM YYYY, HH:mma'
-              )}
-            </p>
-          )
-        } else if (ownerReassignStatus?.desired === 'temp_role') {
-          if (action.reason === ActionReason.Finalize) {
-            return (
-              <p className="text-sm space-x-1">
-                This patch will be automatically applied after{' '}
-                {dayjs(new Date(action.deadline)).format('DD MMM YYYY, HH:mma')}
-              </p>
-            )
-          } else {
-            return (
-              <p className="text-sm space-x-1">
-                This patch was applied on{' '}
-                {dayjs(new Date(ownerReassignStatus.modified_at)).format('DD MMM YYYY, HH:mma')}
-              </p>
-            )
-          }
-        } else {
-          return (
-            <p className="text-sm space-x-1">
-              This patch will be automatically applied after{' '}
-              {dayjs(new Date(action.deadline)).format('DD MMM YYYY, HH:mma')}
-            </p>
-          )
-        }
-      } else {
-        return ''
+        return (
+          <p className="text-sm space-x-1">
+            This patch will be automatically applied after{' '}
+            {dayjs(new Date(action.deadline)).format('DD MMM YYYY, HH:mma')}
+          </p>
+        )
       }
-
     default:
       return ''
   }

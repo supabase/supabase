@@ -1,23 +1,43 @@
-import { Member, Role } from 'types'
-import { checkPermissions } from 'hooks'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { doPermissionsCheck, useGetPermissions } from 'hooks'
+import { Member, Permission, Role } from 'types'
 
-export const getRolesManagementPermissions = (
-  roles: Role[]
+export const useGetRolesManagementPermissions = (
+  orgId?: number,
+  roles?: Role[],
+  permissions?: Permission[]
 ): { rolesAddable: Number[]; rolesRemovable: Number[] } => {
+  const { permissions: allPermissions, organizationId } = useGetPermissions(
+    permissions,
+    orgId,
+    permissions !== undefined && orgId !== undefined
+  )
+
   const rolesAddable: Number[] = []
   const rolesRemovable: Number[] = []
-  if (!roles) return { rolesAddable, rolesRemovable }
+  if (!roles || !orgId) return { rolesAddable, rolesRemovable }
 
   roles.forEach((role: Role) => {
-    const canAdd = checkPermissions(PermissionAction.CREATE, 'auth.subject_roles', {
-      resource: { role_id: role.id },
-    })
+    const canAdd = doPermissionsCheck(
+      allPermissions,
+      PermissionAction.CREATE,
+      'auth.subject_roles',
+      {
+        resource: { role_id: role.id },
+      },
+      organizationId
+    )
     if (canAdd) rolesAddable.push(role.id)
 
-    const canRemove = checkPermissions(PermissionAction.DELETE, 'auth.subject_roles', {
-      resource: { role_id: role.id },
-    })
+    const canRemove = doPermissionsCheck(
+      allPermissions,
+      PermissionAction.DELETE,
+      'auth.subject_roles',
+      {
+        resource: { role_id: role.id },
+      },
+      organizationId
+    )
     if (canRemove) rolesRemovable.push(role.id)
   })
 

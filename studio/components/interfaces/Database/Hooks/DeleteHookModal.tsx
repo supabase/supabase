@@ -1,10 +1,9 @@
-import { useState } from 'react'
-import { observer } from 'mobx-react-lite'
-import { useStore } from 'hooks'
-import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useDatabaseTriggerDeleteMutation } from 'data/database-triggers/database-trigger-delete-mutation'
 import { PostgresTrigger } from '@supabase/postgres-meta'
+
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
+import { useDatabaseTriggerDeleteMutation } from 'data/database-triggers/database-trigger-delete-mutation'
+import { useStore } from 'hooks'
 
 interface DeleteHookModalProps {
   visible: boolean
@@ -14,11 +13,17 @@ interface DeleteHookModalProps {
 
 const DeleteHookModal = ({ selectedHook, visible, onClose }: DeleteHookModalProps) => {
   const { ui } = useStore()
-  const [loading, setLoading] = useState(false)
   const { id, name, schema } = selectedHook ?? {}
 
   const { project } = useProjectContext()
-  const { mutateAsync: deleteDatabaseTrigger } = useDatabaseTriggerDeleteMutation()
+  const { mutate: deleteDatabaseTrigger, isLoading: isDeleting } = useDatabaseTriggerDeleteMutation(
+    {
+      onSuccess: () => {
+        ui.setNotification({ category: 'success', message: `Successfully deleted ${name}` })
+        onClose()
+      },
+    }
+  )
 
   async function handleDelete() {
     if (!project) {
@@ -28,23 +33,11 @@ const DeleteHookModal = ({ selectedHook, visible, onClose }: DeleteHookModalProp
       return ui.setNotification({ category: 'error', message: 'Unable find selected hook' })
     }
 
-    try {
-      setLoading(true)
-      await deleteDatabaseTrigger({
-        id,
-        projectRef: project.ref,
-        connectionString: project.connectionString,
-      })
-      ui.setNotification({ category: 'success', message: `Successfully deleted ${name}` })
-      onClose()
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to delete ${name}: ${error.message}`,
-      })
-    } finally {
-      setLoading(false)
-    }
+    deleteDatabaseTrigger({
+      id,
+      projectRef: project.ref,
+      connectionString: project.connectionString,
+    })
   }
 
   return (
@@ -54,7 +47,7 @@ const DeleteHookModal = ({ selectedHook, visible, onClose }: DeleteHookModalProp
       onCancel={() => onClose()}
       onConfirm={handleDelete}
       title="Delete database webhook"
-      loading={loading}
+      loading={isDeleting}
       confirmLabel={`Delete ${name}`}
       confirmPlaceholder="Type in name of webhook"
       confirmString={name || ''}
@@ -64,4 +57,4 @@ const DeleteHookModal = ({ selectedHook, visible, onClose }: DeleteHookModalProp
   )
 }
 
-export default observer(DeleteHookModal)
+export default DeleteHookModal

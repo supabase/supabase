@@ -1,54 +1,71 @@
-import dayjs from 'dayjs'
-import { FC, Fragment, useState } from 'react'
-import { useRouter } from 'next/router'
-import { Alert, Button, IconBell, Popover, IconArrowRight } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import {
+  ActionType,
   Notification,
   NotificationStatus,
-  ActionType,
+  PostgresqlUpgradeData,
 } from '@supabase/shared-types/out/notifications'
+import { useQueryClient } from '@tanstack/react-query'
+import dayjs from 'dayjs'
+import { useRouter } from 'next/router'
+import { Fragment, useState } from 'react'
+import { Button, IconArrowRight, IconBell, IconInbox, Popover } from 'ui'
 
-import { Project } from 'types'
-import { useStore } from 'hooks'
-import { delete_, patch, post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import NotificationRow from './NotificationRow'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useNotificationsQuery } from 'data/notifications/notifications-query'
+import { useNotificationsUpdateMutation } from 'data/notifications/notifications-update-mutation'
+import { getProjectDetail } from 'data/projects/project-detail-query'
+import { useProjectRestartServicesMutation } from 'data/projects/project-restart-services-mutation'
+import { setProjectPostgrestStatus } from 'data/projects/projects-query'
+import { useStore } from 'hooks'
+import { delete_, post } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
+import { Project } from 'types'
+import NotificationRow from './NotificationRow'
 
-interface Props {}
+interface NotificationsPopoverProps {
+  alt?: boolean
+}
 
-const NotificationsPopover: FC<Props> = () => {
+const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
+  const queryClient = useQueryClient()
   const router = useRouter()
-  const { app, meta, ui } = useStore()
-  const { data: notifications, refetch } = useNotificationsQuery()
+  const { meta, ui } = useStore()
+  const { data: notifications } = useNotificationsQuery()
+  const { mutate: updateNotifications } = useNotificationsUpdateMutation({
+    onError: () => console.error('Failed to update notifications'),
+  })
 
   const [projectToRestart, setProjectToRestart] = useState<Project>()
   const [projectToApplyMigration, setProjectToApplyMigration] = useState<Project>()
   const [projectToRollbackMigration, setProjectToRollbackMigration] = useState<Project>()
-  const [projectToFinalizeMigration, setProjectToFinalizeMigration] = useState<Project>()
-
   const [targetNotification, setTargetNotification] = useState<Notification>()
 
-  if (!notifications) return <></>
+  const { mutate: restartProjectServices } = useProjectRestartServicesMutation({
+    onSuccess: (res, variables) => {
+      setProjectToRestart(undefined)
+      setTargetNotification(undefined)
 
-  const hasNewNotifications = notifications?.some(
-    (notification) => notification.notification_status === NotificationStatus.New
-  )
+      setProjectPostgrestStatus(queryClient, variables.ref, 'OFFLINE')
+      ui.setNotification({ category: 'success', message: `Restarting services` })
+      router.push(`/project/${variables.ref}`)
+    },
+  })
+
+  const newNotifications =
+    notifications?.filter(
+      (notification) => notification.notification_status === NotificationStatus.New
+    ) ?? []
+  const hasNewNotifications = newNotifications.length > 0
 
   const onOpenChange = async (open: boolean) => {
-    // TODO(alaister): move this to a mutation
+    // Mark notifications as seen
     if (!open) {
-      // Mark notifications as seen
-      const notificationIds = notifications
-        .filter((notification) => notification.notification_status === NotificationStatus.New)
-        .map((notification) => notification.id)
-      if (notificationIds.length > 0) {
-        const { error } = await patch(`${API_URL}/notifications`, { ids: notificationIds })
-        if (error) console.error('Failed to update notifications', error)
-        refetch()
-      }
+      const notificationIds =
+        notifications
+          ?.filter((notification) => notification.notification_status === NotificationStatus.New)
+          .map((notification) => notification.id) ?? []
+      if (notificationIds.length > 0) updateNotifications({ ids: notificationIds })
     }
   }
 
@@ -57,7 +74,7 @@ const NotificationsPopover: FC<Props> = () => {
 
     const { id } = targetNotification
 
-    const { id: projectId, ref, region } = projectToRestart
+    const { ref, region } = projectToRestart
     const serviceNamesByActionName: Record<string, string> = {
       [ActionType.PgBouncerRestart]: 'pgbouncer',
       [ActionType.SchedulePostgresRestart]: 'postgresql',
@@ -67,44 +84,23 @@ const NotificationsPopover: FC<Props> = () => {
       .map((action) => action.action_type)
       .filter((actionName) => Object.keys(serviceNamesByActionName).indexOf(actionName) !== -1)
       .map((actionName) => serviceNamesByActionName[actionName])
-    const { error } = await post(`${API_URL}/projects/${ref}/restart-services`, {
-      restartRequest: {
-        region,
-        source_notification_id: id,
-        services: services,
-      },
-    })
 
-    if (error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to restart project: ${error.message}`,
-        error,
-      })
-    } else {
-      app.onProjectPostgrestStatusUpdated(projectId, 'OFFLINE')
-      ui.setNotification({ category: 'success', message: `Restarting services` })
-      router.push(`/project/${ref}`)
-    }
-
-    setProjectToRestart(undefined)
-    setTargetNotification(undefined)
+    restartProjectServices({ ref, region, services: services as any, source_notification_id: id })
   }
-
-  // [Joshen/Qiao] These are all very specific to the upcoming security patch
-  // https://github.com/supabase/supabase/discussions/9314
-  // We probably need to revisit this again when we're planning to push out the next wave of
-  // notifications. Ideally, we should allow these to be more flexible and configurable
-  // Perhaps the URLs could come from the notification themselves if the actions
-  // require an external API call, then we just need one method instead of individual ones like this
 
   const onConfirmProjectApplyMigration = async () => {
     if (!projectToApplyMigration) return
-    const res = await post(`${API_URL}/database/${projectToApplyMigration.ref}/owner-reassign`, {})
+
+    const data = targetNotification?.data as PostgresqlUpgradeData
+    const { resource } = data.additional as any
+    if (!resource) return
+
+    // [Joshen] Leaving this as an exception for RQ due to dynamic URL
+    const res = await post(`${API_URL}/database/${projectToApplyMigration.ref}/${resource}`, {})
     if (!res.error) {
-      await app.projects.fetchDetail(projectToApplyMigration.ref, (project) =>
-        meta.setProjectDetails(project)
-      )
+      const project = await getProjectDetail({ ref: projectToApplyMigration.ref })
+      if (project) meta.setProjectDetails(project)
+
       ui.setNotification({
         category: 'success',
         message: `Successfully applied migration for project "${projectToApplyMigration.name}"`,
@@ -121,14 +117,20 @@ const NotificationsPopover: FC<Props> = () => {
 
   const onConfirmProjectRollbackMigration = async () => {
     if (!projectToRollbackMigration) return
+
+    const data = targetNotification?.data as PostgresqlUpgradeData
+    const { resource } = data.additional as any
+    if (!resource) return
+
+    // [Joshen] Leaving this as an exception for RQ due to dynamic URL
     const res = await delete_(
-      `${API_URL}/database/${projectToRollbackMigration.ref}/owner-reassign`,
+      `${API_URL}/database/${projectToRollbackMigration.ref}/${resource}`,
       {}
     )
     if (!res.error) {
-      await app.projects.fetchDetail(projectToRollbackMigration.ref, (project) =>
-        meta.setProjectDetails(project)
-      )
+      const project = await getProjectDetail({ ref: projectToRollbackMigration.ref })
+      if (project) meta.setProjectDetails(project)
+
       ui.setNotification({
         category: 'success',
         message: `Successfully rolled back migration for project "${projectToRollbackMigration.name}"`,
@@ -143,29 +145,7 @@ const NotificationsPopover: FC<Props> = () => {
     setProjectToRollbackMigration(undefined)
   }
 
-  const onConfirmProjectFinalizeMigration = async () => {
-    if (!projectToFinalizeMigration) return
-    const res = await patch(
-      `${API_URL}/database/${projectToFinalizeMigration.ref}/owner-reassign`,
-      {}
-    )
-    if (!res.error) {
-      await app.projects.fetchDetail(projectToFinalizeMigration.ref, (project) =>
-        meta.setProjectDetails(project)
-      )
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully finalized migration for project "${projectToFinalizeMigration.name}"`,
-      })
-    } else {
-      ui.setNotification({
-        error: res.error,
-        category: 'error',
-        message: `Failed to finalize migration: ${res.error.message}`,
-      })
-    }
-    setProjectToFinalizeMigration(undefined)
-  }
+  if (!notifications || !Array.isArray(notifications)) return null
 
   return (
     <>
@@ -177,10 +157,10 @@ const NotificationsPopover: FC<Props> = () => {
         onOpenChange={onOpenChange}
         overlay={
           <div className="w-[400px] lg:w-[700px]">
-            <div className="flex items-center justify-between border-b border-gray-500 bg-gray-400 px-4 py-2">
+            <div className="flex items-center justify-between border-b border-default bg-surface-200 px-4 py-2">
               <p className="text-sm">Notifications</p>
               {/* Area for improvement: Paginate notifications and show in a side panel */}
-              {/* <p className="text-scale-1000 hover:text-scale-1200 cursor-pointer text-sm transition">
+              {/* <p className="text-foreground-light hover:text-foreground cursor-pointer text-sm transition">
               See all{' '}
               {notifications.length > MAX_NOTIFICATIONS_TO_SHOW && `(${notifications.length})`}
             </p> */}
@@ -188,7 +168,7 @@ const NotificationsPopover: FC<Props> = () => {
             <div className="max-h-[380px] overflow-y-auto py-2">
               {notifications.length === 0 ? (
                 <div className="py-2 px-4">
-                  <p className="text-sm text-scale-1000">No notifications available</p>
+                  <p className="text-sm text-foreground-light">No notifications available</p>
                 </div>
               ) : (
                 <>
@@ -208,10 +188,6 @@ const NotificationsPopover: FC<Props> = () => {
                           setProjectToRollbackMigration(project)
                           setTargetNotification(notification)
                         }}
-                        onSelectFinalizeMigration={(project, notification) => {
-                          setProjectToFinalizeMigration(project)
-                          setTargetNotification(notification)
-                        }}
                       />
                       {i !== notifications.length - 1 && <Popover.Separator />}
                     </Fragment>
@@ -223,20 +199,50 @@ const NotificationsPopover: FC<Props> = () => {
         }
       >
         <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger>
-            <div className="relative flex">
-              <Button
-                as="span"
-                id="notification-button"
-                type="default"
-                icon={<IconBell size={16} strokeWidth={1.5} className="text-scale-1200" />}
-              />
+          <Tooltip.Trigger asChild>
+            <div className="relative flex items-center">
               {hasNewNotifications && (
-                <div className="absolute -top-1 -right-1 z-50 flex h-3 w-3 items-center justify-center">
-                  <div className="h-full w-full animate-ping rounded-full bg-green-800 opacity-60"></div>
-                  <div className="z-60 absolute top-0 right-0 h-full w-full rounded-full bg-green-900 opacity-80"></div>
-                </div>
+                <>
+                  {alt ? null : (
+                    <div className="absolute -top-1 -right-1 z-50 flex h-3 w-3 items-center justify-center">
+                      <div className="h-full w-full animate-ping rounded-full bg-green-800 opacity-60"></div>
+                      <div className="z-60 absolute top-0 right-0 h-full w-full rounded-full bg-green-900 opacity-80"></div>
+                    </div>
+                  )}
+                </>
               )}
+              <Button
+                asChild
+                id="notification-button"
+                type={alt ? 'text' : 'default'}
+                className={alt ? 'px-1' : ''}
+                icon={
+                  hasNewNotifications ? (
+                    <div className="-mr-3.5 z-10 h-4 w-4 flex items-center justify-center rounded-full bg-black dark:bg-white">
+                      <p className="text-xs text-background-alternative">
+                        {newNotifications.length}
+                      </p>
+                    </div>
+                  ) : alt ? (
+                    <IconInbox size={18} strokeWidth={1.5} className="text-foreground-light" />
+                  ) : (
+                    <IconBell size={16} strokeWidth={1.5} className="text-foreground" />
+                  )
+                }
+                iconRight={
+                  hasNewNotifications ? (
+                    <>
+                      {alt ? (
+                        <IconInbox size={18} strokeWidth={1.5} className="text-foreground-light" />
+                      ) : (
+                        <IconBell size={16} strokeWidth={1.5} className="text-foreground" />
+                      )}
+                    </>
+                  ) : null
+                }
+              >
+                <span></span>
+              </Button>
             </div>
           </Tooltip.Trigger>
           <Tooltip.Portal>
@@ -244,11 +250,11 @@ const NotificationsPopover: FC<Props> = () => {
               <Tooltip.Arrow className="radix-tooltip-arrow" />
               <div
                 className={[
-                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                  'border border-scale-200 flex items-center space-x-1',
+                  'rounded bg-alternative py-1 px-2 leading-none shadow',
+                  'border border-background flex items-center space-x-1',
                 ].join(' ')}
               >
-                <span className="text-xs text-scale-1200">Notifications</span>
+                <span className="text-xs text-foreground">Notifications</span>
               </div>
             </Tooltip.Content>
           </Tooltip.Portal>
@@ -271,7 +277,7 @@ const NotificationsPopover: FC<Props> = () => {
         title={`Apply schema migration for "${projectToApplyMigration?.name}"`}
         // @ts-ignore
         description={
-          <div className="text-scale-1200 space-y-2">
+          <div className="text-foreground space-y-2">
             <div className="space-y-1">
               <p>The following schema migration will be applied to the project</p>
               <ol className="list-disc pl-6">
@@ -304,7 +310,7 @@ const NotificationsPopover: FC<Props> = () => {
         title={`Rollback schema migration for "${projectToRollbackMigration?.name}"`}
         // @ts-ignore
         description={
-          <div className="text-scale-1200 space-y-2">
+          <div className="text-foreground space-y-2">
             <div className="space-y-1">
               <p>The following schema migration will be rolled back for the project</p>
               <ol className="list-disc pl-6">
@@ -330,34 +336,6 @@ const NotificationsPopover: FC<Props> = () => {
         buttonLoadingLabel="Confirm"
         onSelectCancel={() => setProjectToRollbackMigration(undefined)}
         onSelectConfirm={onConfirmProjectRollbackMigration}
-      />
-      <ConfirmModal
-        danger
-        size="small"
-        visible={projectToFinalizeMigration !== undefined}
-        title={`Finalize schema migration for "${projectToFinalizeMigration?.name}"`}
-        // @ts-ignore
-        description={
-          <div className="text-scale-1200 space-y-4">
-            <Alert withIcon variant="warning" title="This action canot be undone" />
-            <div className="space-y-1">
-              <p>The following schema migration will be finalized for the project</p>
-              <ol className="list-disc pl-6">
-                <li>
-                  <div className="flex items-center space-x-1">
-                    <p>{(targetNotification?.data as any)?.additional?.name}</p>
-                    <IconArrowRight size={12} strokeWidth={2} />
-                    <p>{(targetNotification?.data as any)?.additional?.version_to}</p>
-                  </div>
-                </li>
-              </ol>
-            </div>
-          </div>
-        }
-        buttonLabel="Confirm"
-        buttonLoadingLabel="Confirm"
-        onSelectCancel={() => setProjectToFinalizeMigration(undefined)}
-        onSelectConfirm={onConfirmProjectFinalizeMigration}
       />
     </>
   )

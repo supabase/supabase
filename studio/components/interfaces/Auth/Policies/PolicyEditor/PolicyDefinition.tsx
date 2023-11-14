@@ -1,11 +1,12 @@
-import { FC, useEffect } from 'react'
-import { IconHelpCircle } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { noop } from 'lodash'
+import { useEffect } from 'react'
+import { IconHelpCircle } from 'ui'
 
-import { usePrevious } from 'hooks'
 import SqlEditor from 'components/ui/SqlEditor'
+import { usePrevious } from 'hooks'
 
-interface Props {
+interface PolicyDefinitionProps {
   operation: string
   definition: string
   check: string
@@ -13,13 +14,13 @@ interface Props {
   onUpdatePolicyCheck: (check: string | undefined) => void
 }
 
-const PolicyDefinition: FC<Props> = ({
+const PolicyDefinition = ({
   operation = '',
   definition = '',
   check = '',
-  onUpdatePolicyUsing,
-  onUpdatePolicyCheck,
-}) => {
+  onUpdatePolicyUsing = noop,
+  onUpdatePolicyCheck = noop,
+}: PolicyDefinitionProps) => {
   const showUsing = (operation: string) =>
     ['SELECT', 'UPDATE', 'DELETE', 'ALL'].includes(operation) || !operation
   const showCheck = (operation: string) => ['INSERT', 'UPDATE', 'ALL'].includes(operation)
@@ -36,33 +37,33 @@ const PolicyDefinition: FC<Props> = ({
         <div className="flex space-x-12">
           <div className="flex w-1/3 flex-col space-y-2">
             <div className="flex items-center space-x-2">
-              <label className="text-base text-scale-1100" htmlFor="policy-name">
+              <label className="text-base text-foreground-light" htmlFor="policy-name">
                 USING expression
               </label>
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger>
-                  <IconHelpCircle className="text-scale-1100" size={16} strokeWidth={1.5} />
+                  <IconHelpCircle className="text-foreground-light" size={16} strokeWidth={1.5} />
                 </Tooltip.Trigger>
                 <Tooltip.Portal>
                   <Tooltip.Content side="bottom">
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                        'w-[300px] space-y-2 border border-scale-200',
+                        'rounded bg-alternative py-1 px-2 leading-none shadow',
+                        'w-[300px] space-y-2 border border-background',
                       ].join(' ')}
                     >
-                      <p className="text-xs text-scale-1200">
+                      <p className="text-xs text-foreground">
                         This expression will be added to queries that refer to the table if
                         row-level security is enabled.
                       </p>
-                      <p className="text-xs text-scale-1200">
+                      <p className="text-xs text-foreground">
                         Rows for which the expression returns true will be visible. Any rows for
                         which the expression returns false or null will not be visible to the user
                         (in a SELECT), and will not be available for modification (in an UPDATE or
                         DELETE).
                       </p>
-                      <p className="text-xs text-scale-1200">
+                      <p className="text-xs text-foreground">
                         Such rows are silently suppressed - no error is reported.
                       </p>
                     </div>
@@ -70,7 +71,7 @@ const PolicyDefinition: FC<Props> = ({
                 </Tooltip.Portal>
               </Tooltip.Root>
             </div>
-            <p className="text-sm text-scale-900">
+            <p className="text-sm text-foreground-lighter">
               Provide a SQL conditional expression that returns a boolean.
             </p>
           </div>
@@ -83,32 +84,32 @@ const PolicyDefinition: FC<Props> = ({
         <div className="flex space-x-12">
           <div className="flex w-1/3 flex-col space-y-2">
             <div className="flex items-center space-x-2">
-              <label className="text-base text-scale-1100" htmlFor="policy-name">
+              <label className="text-base text-foreground-light" htmlFor="policy-name">
                 WITH CHECK expression
               </label>
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger>
-                  <IconHelpCircle className="text-scale-1100" size={16} strokeWidth={1.5} />
+                  <IconHelpCircle className="text-foreground-light" size={16} strokeWidth={1.5} />
                 </Tooltip.Trigger>
                 <Tooltip.Portal>
                   <Tooltip.Content side="bottom">
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                        'w-[300px] space-y-2 border border-scale-200',
+                        'rounded bg-alternative py-1 px-2 leading-none shadow',
+                        'w-[300px] space-y-2 border border-background',
                       ].join(' ')}
                     >
-                      <p className="text-xs text-scale-1200">
+                      <p className="text-xs text-foreground">
                         This expression will be used in INSERT and UPDATE queries against the table
                         if row-level security is enabled.
                       </p>
-                      <p className="text-xs text-scale-1200">
+                      <p className="text-xs text-foreground">
                         Only rows for which the expression evaluates to true will be allowed. An
                         error will be thrown if the expression evaluates to false or null for any of
                         the records inserted or any of the records that result from the update.
                       </p>
-                      <p className="text-xs text-scale-1200">
+                      <p className="text-xs text-foreground">
                         Note that this expression is evaluated against the proposed new contents of
                         the row, not the original contents.
                       </p>
@@ -117,7 +118,7 @@ const PolicyDefinition: FC<Props> = ({
                 </Tooltip.Portal>
               </Tooltip.Root>
             </div>
-            <p className="text-sm text-scale-900">
+            <p className="text-sm text-foreground-lighter">
               Provide a SQL conditional expression that returns a boolean.
             </p>
           </div>

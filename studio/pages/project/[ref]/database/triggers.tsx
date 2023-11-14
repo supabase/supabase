@@ -1,33 +1,26 @@
-import { useEffect, useState } from 'react'
-import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { observer } from 'mobx-react-lite'
+import { useEffect, useState } from 'react'
 
-import { NextPageWithLayout } from 'types'
-import { checkPermissions, useStore } from 'hooks'
-import { DatabaseLayout } from 'components/layouts'
 import { CreateTrigger, DeleteTrigger } from 'components/interfaces/Database'
 import TriggersList from 'components/interfaces/Database/Triggers/TriggersList/TriggersList'
+import { DatabaseLayout } from 'components/layouts'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
+import { useCheckPermissions, useStore } from 'hooks'
+import { NextPageWithLayout } from 'types'
 
 const TriggersPage: NextPageWithLayout = () => {
   const { meta, ui } = useStore()
-
-  const [filterString, setFilterString] = useState<string>('')
   const [selectedTrigger, setSelectedTrigger] = useState<any>()
   const [showCreateTriggerForm, setShowCreateTriggerForm] = useState<boolean>(false)
   const [showDeleteTriggerForm, setShowDeleteTriggerForm] = useState<boolean>(false)
 
-  const canReadTriggers = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'triggers')
+  const canReadTriggers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'triggers')
 
   useEffect(() => {
-    if (ui.selectedProject?.ref) {
-      fetchTriggers()
-    }
-  }, [ui.selectedProject?.ref])
-
-  const fetchTriggers = async () => {
-    meta.triggers.load()
-  }
+    if (ui.selectedProjectRef) meta.triggers.load()
+  }, [ui.selectedProjectRef])
 
   const createTrigger = () => {
     setSelectedTrigger(undefined)
@@ -50,13 +43,18 @@ const TriggersPage: NextPageWithLayout = () => {
 
   return (
     <>
-      <TriggersList
-        filterString={filterString}
-        setFilterString={setFilterString}
-        createTrigger={createTrigger}
-        editTrigger={editTrigger}
-        deleteTrigger={deleteTrigger}
-      />
+      <ScaffoldContainer>
+        <ScaffoldSection>
+          <div className="col-span-12">
+            <h3 className="mb-4 text-xl text-foreground">Database Triggers</h3>
+            <TriggersList
+              createTrigger={createTrigger}
+              editTrigger={editTrigger}
+              deleteTrigger={deleteTrigger}
+            />
+          </div>
+        </ScaffoldSection>
+      </ScaffoldContainer>
       <CreateTrigger
         trigger={selectedTrigger}
         visible={showCreateTriggerForm}

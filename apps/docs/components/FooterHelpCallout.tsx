@@ -5,7 +5,7 @@ export type FooterHelpCalloutType = 'default' | 'postgres'
 const content = {
   default: {
     title: 'Need some help?',
-    description: `Not to worry, our specialist engineers are here to help. Submit a support ticket through the [Dashboard](https://app.supabase.com/support/new).`,
+    description: `Not to worry, our specialist engineers are here to help. Submit a support ticket through the [Dashboard](https://supabase.com/dashboard/support/new).`,
   },
   postgres: {
     title: 'Looking for Serverless Postgres?',
@@ -26,12 +26,12 @@ const FooterHelpCallout = ({
         className="
         min-w-full 
         px-8 py-6 
-        bg-scale-300 dark:bg-whiteA-200 
+        bg-background
         rounded 
-        text-sm text-scale-900
+        text-sm text-foreground-muted
       "
       >
-        <h5 className="text-sm text-scale-1100 m-0">{content[footerHelpType].title}</h5>
+        <h5 className="text-sm text-foreground-light m-0">{content[footerHelpType].title}</h5>
         <ReactMarkdown>{content[footerHelpType].description}</ReactMarkdown>
       </div>
     </div>

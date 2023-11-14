@@ -22,7 +22,7 @@ export const Default = (args: any) => (
           <Button type="default" size="tiny">
             Clear
           </Button>
-          <h5 className="text-sm text-scale-1200">Filter</h5>
+          <h5 className="text-sm text-foreground">Filter</h5>
           <Button type="primary">Save</Button>
         </div>
       }
@@ -59,8 +59,8 @@ export const Default = (args: any) => (
         </>,
       ]}
     >
-      <Button as="span" type="default" iconRight={<IconChevronDown />}>
-        Click for Popover
+      <Button asChild type="default" iconRight={<IconChevronDown />}>
+        <span>Click for Popover</span>
       </Button>
     </Popover>
   </div>

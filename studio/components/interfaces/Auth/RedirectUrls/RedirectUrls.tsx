@@ -1,38 +1,63 @@
-import { useState } from 'react'
-import { object, string } from 'yup'
-import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, Form, Input, Modal } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { observer } from 'mobx-react-lite'
+import { useMemo, useState } from 'react'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  Form,
+  IconAlertCircle,
+  IconExternalLink,
+  Input,
+  Modal,
+} from 'ui'
+import { object, string } from 'yup'
 
-import { checkPermissions, useStore } from 'hooks'
+import { useParams } from 'common'
 import { FormHeader } from 'components/ui/Forms'
+import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useCheckPermissions, useStore } from 'hooks'
 import { urlRegex } from '../Auth.constants'
 import RedirectUrlList from './RedirectUrlList'
+import ValueContainer from './ValueContainer'
+import Link from 'next/link'
 
 const RedirectUrls = () => {
-  const { authConfig, ui } = useStore()
+  const { ui } = useStore()
+  const { ref: projectRef } = useParams()
+  const {
+    data: authConfig,
+    error: authConfigError,
+    isLoading,
+    isError,
+    isSuccess,
+  } = useAuthConfigQuery({ projectRef })
+  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
-  const URI_ALLOW_LIST_ARRAY = authConfig.config.URI_ALLOW_LIST
-    ? authConfig.config.URI_ALLOW_LIST.split(/\s*[,]+\s*/).filter((url: string) => url)
-    : []
+  const URI_ALLOW_LIST_ARRAY = useMemo(() => {
+    return authConfig?.URI_ALLOW_LIST
+      ? authConfig.URI_ALLOW_LIST.split(/\s*[,]+\s*/).filter((url: string) => url)
+      : []
+  }, [authConfig?.URI_ALLOW_LIST])
 
   const [open, setOpen] = useState(false)
-  const [isDeleting, setIsDeleting] = useState(false)
   const [selectedUrlToDelete, setSelectedUrlToDelete] = useState<string>()
 
-  const canUpdateConfig = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const newUrlSchema = object({
     url: string().matches(urlRegex, 'URL is not valid').required(),
   })
 
-  const onAddNewUrl = async (values: any, { setSubmitting }: any) => {
+  const onAddNewUrl = async (values: any) => {
     if (!values.url) {
       return
     }
 
-    setSubmitting(true)
     const payload = URI_ALLOW_LIST_ARRAY
     // remove any trailing commas
     payload.push(values.url.replace(/,\s*$/, ''))
@@ -44,48 +69,49 @@ const RedirectUrls = () => {
         message: 'Too many redirect URLs, please remove some or try to use wildcards',
         category: 'error',
       })
-
-      setSubmitting(false)
       return
     }
 
-    const { error } = await authConfig.update({ URI_ALLOW_LIST: payloadString })
-    if (!error) {
-      setOpen(false)
-      ui.setNotification({ category: 'success', message: 'Successfully added URL' })
-    } else {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to update URL: ${error?.message}`,
-      })
-    }
-
-    setSubmitting(false)
+    updateAuthConfig(
+      { projectRef: projectRef!, config: { URI_ALLOW_LIST: payloadString } },
+      {
+        onError: (error) => {
+          ui.setNotification({
+            error,
+            category: 'error',
+            message: `Failed to update URL: ${error?.message}`,
+          })
+        },
+        onSuccess: () => {
+          setOpen(false)
+          ui.setNotification({ category: 'success', message: 'Successfully added URL' })
+        },
+      }
+    )
   }
 
   const onConfirmDeleteUrl = async (url?: string) => {
     if (!url) return
 
-    setIsDeleting(true)
-
     // Remove selectedUrl from array and update
     const payload = URI_ALLOW_LIST_ARRAY.filter((e: string) => e !== url)
 
-    const { error } = await authConfig.update({ URI_ALLOW_LIST: payload.toString() })
-
-    if (!error) {
-      setSelectedUrlToDelete(undefined)
-      ui.setNotification({ category: 'success', message: 'Successfully removed URL' })
-    } else {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to remove URL: ${error?.message}`,
-      })
-    }
-
-    setIsDeleting(false)
+    updateAuthConfig(
+      { projectRef: projectRef!, config: { URI_ALLOW_LIST: payload.toString() } },
+      {
+        onError: (error) => {
+          ui.setNotification({
+            error,
+            category: 'error',
+            message: `Failed to remove URL: ${error?.message}`,
+          })
+        },
+        onSuccess: () => {
+          setSelectedUrlToDelete(undefined)
+          ui.setNotification({ category: 'success', message: 'Successfully removed URL' })
+        },
+      }
+    )
   }
 
   return (
@@ -95,32 +121,66 @@ const RedirectUrls = () => {
           title="Redirect URLs"
           description={`URLs that auth providers are permitted to redirect to post authentication. Wildcards are allowed, for example, https://*.domain.com`}
         />
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger>
-            <Button disabled={!canUpdateConfig} onClick={() => setOpen(true)}>
-              Add URL
-            </Button>
-          </Tooltip.Trigger>
-          {!canUpdateConfig && (
-            <Tooltip.Portal>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-scale-1200">
-                    You need additional permissions to update redirect URLs
-                  </span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          )}
-        </Tooltip.Root>
+        <div className="flex items-center gap-2 mb-6 ml-12">
+          <Button asChild type="default" icon={<IconExternalLink />}>
+            <Link
+              href="https://supabase.com/docs/guides/auth/concepts/redirect-urls"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Documentation
+            </Link>
+          </Button>
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger asChild>
+              <Button disabled={!canUpdateConfig} onClick={() => setOpen(true)}>
+                Add URL
+              </Button>
+            </Tooltip.Trigger>
+            {!canUpdateConfig && (
+              <Tooltip.Portal>
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                      'border border-background',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-foreground">
+                      You need additional permissions to update redirect URLs
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            )}
+          </Tooltip.Root>
+        </div>
       </div>
-      <RedirectUrlList canUpdate={canUpdateConfig} onSelectUrlToDelete={setSelectedUrlToDelete} />
+      {isLoading && (
+        <>
+          <ValueContainer>
+            <HorizontalShimmerWithIcon />
+          </ValueContainer>
+          <ValueContainer>
+            <HorizontalShimmerWithIcon />
+          </ValueContainer>
+        </>
+      )}
+      {isError && (
+        <Alert_Shadcn_ variant="destructive">
+          <IconAlertCircle strokeWidth={2} />
+          <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
+          <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
+        </Alert_Shadcn_>
+      )}
+      {isSuccess && (
+        <RedirectUrlList
+          URI_ALLOW_LIST_ARRAY={URI_ALLOW_LIST_ARRAY}
+          canUpdate={canUpdateConfig}
+          onSelectUrlToDelete={setSelectedUrlToDelete}
+        />
+      )}
       <Modal
         hideFooter
         size="small"
@@ -135,11 +195,11 @@ const RedirectUrls = () => {
           validationSchema={newUrlSchema}
           onSubmit={onAddNewUrl}
         >
-          {({ isSubmitting }: { isSubmitting: boolean }) => {
+          {() => {
             return (
               <div className="mb-4 space-y-4 pt-4">
                 <div className="px-5">
-                  <p className="text-sm text-scale-1100">
+                  <p className="text-sm text-foreground-light">
                     This will add a URL to a list of allowed URLs that can interact with your
                     Authentication services for this project.
                   </p>
@@ -155,8 +215,8 @@ const RedirectUrls = () => {
                     form="new-redirect-url-form"
                     htmlType="submit"
                     size="medium"
-                    disabled={isSubmitting}
-                    loading={isSubmitting}
+                    disabled={isUpdatingConfig}
+                    loading={isUpdatingConfig}
                   >
                     Add URL
                   </Button>
@@ -175,11 +235,11 @@ const RedirectUrls = () => {
       >
         <div className="mb-4 space-y-4 pt-4">
           <div className="px-5">
-            <p className="mb-2 text-sm text-scale-1100">
+            <p className="mb-2 text-sm text-foreground-light">
               Are you sure you want to remove{' '}
-              <span className="text-scale-1200">{selectedUrlToDelete}</span>?
+              <span className="text-foreground">{selectedUrlToDelete}</span>?
             </p>
-            <p className="text-scale-1100 text-sm">
+            <p className="text-foreground-light text-sm">
               This URL will no longer work with your authentication configuration.
             </p>
           </div>
@@ -197,10 +257,10 @@ const RedirectUrls = () => {
               block
               size="medium"
               type="warning"
-              loading={isDeleting}
+              loading={isUpdatingConfig}
               onClick={() => onConfirmDeleteUrl(selectedUrlToDelete)}
             >
-              {isDeleting ? 'Removing...' : 'Remove URL'}
+              {isUpdatingConfig ? 'Removing...' : 'Remove URL'}
             </Button>
           </div>
         </div>

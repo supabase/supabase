@@ -1,5 +1,3 @@
-import { FC } from 'react'
-
 /**
  * Render keyMap
  *
@@ -13,7 +11,7 @@ const customKeyChars: any = {
   enter: '↵',
 }
 
-const KeyMap: FC<any> = ({ keyMap }) => {
+const KeyMap = ({ keyMap }: any) => {
   if (!keyMap) return null
 
   const keys = keyMap.split('+')

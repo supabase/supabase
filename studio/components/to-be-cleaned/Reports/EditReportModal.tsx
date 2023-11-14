@@ -1,13 +1,13 @@
-import React, { FC, useState, useEffect } from 'react'
-import { useRouter } from 'next/router'
-import { observer } from 'mobx-react-lite'
 import { toJS } from 'mobx'
+import { observer } from 'mobx-react-lite'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 import { Input, Modal } from 'ui'
 
 import { useStore } from 'hooks'
 import { useProjectContentStore } from 'stores/projectContentStore'
 
-const EditModal: FC<any> = () => {
+const EditModal = () => {
   const router = useRouter()
   const { id, ref } = router.query
 

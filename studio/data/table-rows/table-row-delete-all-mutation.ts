@@ -1,7 +1,10 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
+
 import { Filter, Query, SupaTable } from 'components/grid'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
+import { ResponseError } from 'types'
 import { formatFilterValue } from './utils'
 
 export type TableRowDeleteAllVariables = {
@@ -47,22 +50,28 @@ type TableRowDeleteAllData = Awaited<ReturnType<typeof deleteAllTableRow>>
  */
 export const useTableRowDeleteAllMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
-  UseMutationOptions<TableRowDeleteAllData, unknown, TableRowDeleteAllVariables>,
+  UseMutationOptions<TableRowDeleteAllData, ResponseError, TableRowDeleteAllVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<TableRowDeleteAllData, unknown, TableRowDeleteAllVariables>(
+  return useMutation<TableRowDeleteAllData, ResponseError, TableRowDeleteAllVariables>(
     (vars) => deleteAllTableRow(vars),
     {
       async onSuccess(data, variables, context) {
         const { projectRef, table } = variables
-
         await queryClient.invalidateQueries(sqlKeys.query(projectRef, [table.schema, table.name]))
-
         await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to delete all table rows: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
       },
       ...options,
     }

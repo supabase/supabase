@@ -13,7 +13,7 @@ To enable Spotify Auth for your project, you need to set up a Spotify OAuth appl
 Setting up Spotify logins for your application consists of 3 parts:
 
 - Create and configure a Spotify Project and App on the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/).
-- Add your Spotify `API Key` and `API Secret Key` to your [Supabase Project](https://app.supabase.com).
+- Add your Spotify `API Key` and `API Secret Key` to your [Supabase Project](https://supabase.com/dashboard).
 - Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
 
 ## Access your Spotify Developer account
@@ -52,6 +52,15 @@ Under `Redirect URIs`:
 
 ## Add login code to your client app
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
 When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `spotify` as the `provider`:
 
 ```js
@@ -62,17 +71,54 @@ async function signInWithSpotify() {
 }
 ```
 
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+When your user signs in, call [loginWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Spotify` as the `Provider`:
+
+```kotlin
+suspend fun signInWithSpotify() {
+	supabase.gotrue.loginWith(Spotify)
+}
+```
+
+</TabPanel>
+</Tabs>
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
 When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```js
-async function signout() {
+async function signOut() {
   const { error } = await supabase.auth.signOut()
 }
 ```
 
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```kotlin
+suspend fun signOut() {
+	supabase.gotrue.logout()
+}
+```
+
+</TabPanel>
+</Tabs>
+
 ## Resources
 
-- [Supabase Account - Free Tier OK](https://supabase.com)
+- [Supabase Account - Free Plan OK](https://supabase.com)
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
 - [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/)
 

@@ -2,8 +2,15 @@ import { Project } from 'types'
 import { ProductMenuGroup, ProductMenuGroupItem } from 'components/ui/ProductMenu/ProductMenu.types'
 import { IS_PLATFORM } from 'lib/constants'
 
-export const generateLogsMenu = (project?: Project): ProductMenuGroup[] => {
+export const generateLogsMenu = (
+  project?: Project,
+  features?: { auth?: boolean; storage?: boolean; realtime?: boolean }
+): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
+
+  const authEnabled = features?.auth ?? true
+  const storageEnabled = features?.storage ?? true
+  const realtimeEnabled = features?.realtime ?? true
 
   return [
     {
@@ -44,31 +51,37 @@ export const generateLogsMenu = (project?: Project): ProductMenuGroup[] => {
         },
         IS_PLATFORM
           ? {
-              name: 'PgBouncer',
-              key: 'pgbouncer-logs',
-              url: `/project/${ref}/logs/pgbouncer-logs`,
+              name: 'Pooler',
+              key: 'pooler-logs',
+              url: `/project/${ref}/logs/pooler-logs`,
               items: [],
             }
           : null,
         ,
-        {
-          name: 'Auth',
-          key: 'auth-logs',
-          url: `/project/${ref}/logs/auth-logs`,
-          items: [],
-        },
-        {
-          name: 'Storage',
-          key: 'storage-logs',
-          url: `/project/${ref}/logs/storage-logs`,
-          items: [],
-        },
-        {
-          name: 'Realtime',
-          key: 'realtime-logs',
-          url: `/project/${ref}/logs/realtime-logs`,
-          items: [],
-        },
+        authEnabled
+          ? {
+              name: 'Auth',
+              key: 'auth-logs',
+              url: `/project/${ref}/logs/auth-logs`,
+              items: [],
+            }
+          : null,
+        storageEnabled
+          ? {
+              name: 'Storage',
+              key: 'storage-logs',
+              url: `/project/${ref}/logs/storage-logs`,
+              items: [],
+            }
+          : null,
+        realtimeEnabled
+          ? {
+              name: 'Realtime',
+              key: 'realtime-logs',
+              url: `/project/${ref}/logs/realtime-logs`,
+              items: [],
+            }
+          : null,
       ].filter((item) => item) as ProductMenuGroupItem[],
     },
   ]
