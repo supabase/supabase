@@ -95,7 +95,7 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
           </div>
         </Panel.Content>
 
-        <div className="w-full border-t border-scale-400" />
+        <div className="w-full border-t border-muted" />
 
         <Panel.Content className="w-full">
           <div className="flex items-center justify-between">

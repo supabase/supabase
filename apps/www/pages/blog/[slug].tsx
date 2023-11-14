@@ -139,10 +139,10 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
     return (
       <Link href={`${post.path}`} as={`${post.path}`}>
         <div className={className}>
-          <div className="border-scale-500 hover:bg-scale-100 dark:hover:bg-scale-300 cursor-pointer rounded border p-6 transition">
+          <div className="hover:bg-control cursor-pointer rounded border p-6 transition">
             <div className="space-y-4">
               <div>
-                <p className="text-light text-sm">{label}</p>
+                <p className="text-foreground-lighter text-sm">{label}</p>
               </div>
               <div>
                 <h4 className="text-foreground text-lg">{post.title}</h4>
@@ -242,7 +242,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
               <p>
                 <Link
                   href={'/blog'}
-                  className="text-light hover:text-foreground flex cursor-pointer items-center text-sm transition"
+                  className="text-foreground-lighter hover:text-foreground flex cursor-pointer items-center text-sm transition"
                 >
                   <IconChevronLeft style={{ padding: 0 }} />
                   Back
@@ -286,7 +286,9 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                                   <span className="text-foreground mb-0 text-sm">
                                     {author.author}
                                   </span>
-                                  <span className="text-light mb-0 text-xs">{author.position}</span>
+                                  <span className="text-foreground-lighter mb-0 text-xs">
+                                    {author.position}
+                                  </span>
                                 </div>
                               </div>
                             </Link>
@@ -330,7 +332,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                   </article>
                   {isLaunchWeek7 && <BlogLinks />}
                   <div className="block lg:hidden py-8">
-                    <div className="text-light dark:text-lighter text-sm">Share this article</div>
+                    <div className="text-foreground-lighter text-sm">Share this article</div>
                     <ShareArticleActions title={props.blog.title} slug={props.blog.slug} />
                   </div>
                   <div className="grid gap-8 py-8 lg:grid-cols-1">
@@ -358,7 +360,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                             <div>
                               <div className="cursor-pointer">
                                 <div className="flex gap-2">
-                                  {/* <div className="text-light">
+                                  {/* <div className="text-foreground-lighter">
                                     <IconFile size={'small'} style={{ minWidth: '1.2rem' }} />
                                   </div> */}
                                   <span className="text-light hover:text-gray-1200 text-sm">

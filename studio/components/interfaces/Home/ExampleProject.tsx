@@ -18,9 +18,8 @@ const ExampleProject = ({ framework, title, description, url }: ExampleProjectPr
       <div
         className={[
           'group relative',
-          'border bg-panel-header-light  hover:bg-panel-border-light dark:bg-panel-header-dark dark:hover:bg-panel-border-dark',
-          'border-panel-border-light hover:border-panel-border-hover-light  dark:border-panel-border-dark',
-          'flex h-32 flex-row rounded-md p-4 hover:border-gray-300 dark:hover:border-panel-border-hover-dark',
+          'border bg-surface-100 border-overlay',
+          'flex h-32 flex-row rounded-md p-4 hover:bg-overlay-hover',
           'transition duration-150 ease-in-out',
         ].join(' ')}
       >

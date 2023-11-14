@@ -72,7 +72,7 @@ const UpgradingState = () => {
           <h1 className="text-3xl">{project?.name}</h1>
         </div>
         <div className="w-full mx-auto mt-8 mb-16 max-w-7xl">
-          <div className="flex h-[500px] items-center justify-center rounded border border-scale-400 bg-scale-300 p-8">
+          <div className="flex h-[500px] items-center justify-center rounded border border-muted bg-surface-100 p-8">
             {isCompleted ? (
               <div className="grid gap-4">
                 <div className="relative mx-auto max-w-[300px]">
@@ -184,7 +184,7 @@ const UpgradingState = () => {
                                 <IconCheck size={12} className="text-white" strokeWidth={3} />
                               </div>
                             ) : (
-                              <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-scale-600" />
+                              <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-overlay-hover" />
                             )}
                             <p
                               className={`text-sm ${
@@ -219,8 +219,8 @@ const UpgradingState = () => {
                           <Tooltip.Arrow className="radix-tooltip-arrow" />
                           <div
                             className={[
-                              'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                              'border border-scale-200 ', //border
+                              'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                              'border border-background', //border
                             ].join(' ')}
                           >
                             <span className="text-xs text-foreground">{initiatedAt}</span>

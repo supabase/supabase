@@ -7,6 +7,7 @@ import EnableBranchingButton from 'components/layouts/AppLayout/EnableBranchingB
 import OrganizationDropdown from 'components/layouts/AppLayout/OrganizationDropdown'
 import ProjectDropdown from 'components/layouts/AppLayout/ProjectDropdown'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useFlag, useSelectedOrganization, useSelectedProject } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
@@ -15,7 +16,6 @@ import BreadcrumbsView from './BreadcrumbsView'
 import FeedbackDropdown from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopover from './NotificationsPopover'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
   const { ref: projectRef } = useParams()
@@ -51,7 +51,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
   return (
     <div
       className={`flex h-12 max-h-12 items-center justify-between py-2 px-5 ${
-        headerBorder ? 'border-b border-scale-500' : ''
+        headerBorder ? 'border-b border-default' : ''
       }`}
     >
       <div className="-ml-2 flex items-center text-sm">
@@ -62,7 +62,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
 
             {projectRef && (
               <>
-                <span className="text-scale-800 dark:text-scale-700">
+                <span className="text-border-stronger dark:text-border-strong">
                   <svg
                     viewBox="0 0 24 24"
                     width="16"
@@ -92,7 +92,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
 
             {selectedProject && enableBranchManagement && (
               <>
-                <span className="text-scale-800 dark:text-scale-700">
+                <span className="text-border-stronger dark:text-border-strong">
                   <svg
                     viewBox="0 0 24 24"
                     width="16"

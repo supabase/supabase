@@ -48,7 +48,7 @@ const Step: FC<PropsWithChildren<IStep>> = ({ children, title, step }) => {
           w-full
           h-full
           py-1
-          bg-scale-400
+          bg-overlay
         "
         ></div>
       </div>
@@ -62,9 +62,9 @@ const Step: FC<PropsWithChildren<IStep>> = ({ children, title, step }) => {
       >
         <div className="flex items-center gap-6">
           <div
-            className="border bg-white dark:bg-scale-400
-          border-scale-600 flex items-center justify-center rounded-full
-          w-6 h-6 text-xs text-scale-1200 font-normal font-mono
+            className="border bg-surface-100
+          border-control flex items-center justify-center rounded-full
+          w-6 h-6 text-xs text-foreground font-normal font-mono
           dropshadow-sm
           "
           >
@@ -80,7 +80,7 @@ const Step: FC<PropsWithChildren<IStep>> = ({ children, title, step }) => {
 const Details: FC<PropsWithChildren<IDetails>> = ({ children, title, fullWidth = false }) => {
   return (
     <div className={cn(fullWidth ? 'col-span-12' : 'col-span-5', 'ml-12', 'lg:ml-0')}>
-      <h3 className="mt-0 text-scale-1200 text-base">{title}</h3>
+      <h3 className="mt-0 text-foreground text-base">{title}</h3>
       {children}
     </div>
   )
