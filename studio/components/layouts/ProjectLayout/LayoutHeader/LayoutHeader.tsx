@@ -7,6 +7,7 @@ import EnableBranchingButton from 'components/layouts/AppLayout/EnableBranchingB
 import OrganizationDropdown from 'components/layouts/AppLayout/OrganizationDropdown'
 import ProjectDropdown from 'components/layouts/AppLayout/ProjectDropdown'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useFlag, useSelectedOrganization, useSelectedProject } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
@@ -15,7 +16,6 @@ import BreadcrumbsView from './BreadcrumbsView'
 import FeedbackDropdown from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopover from './NotificationsPopover'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
   const { ref: projectRef } = useParams()
