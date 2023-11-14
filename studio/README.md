@@ -33,6 +33,9 @@ Project settings are managed outside of the Dashboard. If you use docker compose
 
 ### Developer Quickstart
 
+> [!NOTE]  
+> **Supabase internal use:** To develop on Studio locally with the backend services, see the instructions in the [internal `infrastructure` repo](https://github.com/supabase/infrastructure/blob/develop/docs/contributing.md).
+
 ```bash
 # You'll need to be on Node v18
 # in /studio
