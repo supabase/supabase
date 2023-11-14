@@ -1,4 +1,4 @@
-# supabase.io
+# supabase.com
 
 ## Overview
 
