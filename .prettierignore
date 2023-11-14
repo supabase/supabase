@@ -13,3 +13,4 @@ examples/slack-clone/nextjs-slack-clone/full-schema.sql
 apps/docs/pages/guides/auth/*.mdx
 apps/docs/pages/guides/integrations/*.mdx
 apps/studio/public
+apps/**/.turbo
