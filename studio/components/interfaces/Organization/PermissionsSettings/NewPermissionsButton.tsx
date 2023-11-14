@@ -1,12 +1,12 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { useEffect, useState } from 'react'
-import { useParams } from 'common/hooks'
-import { Button, Checkbox, Form, Input, Listbox, Modal } from 'ui'
-import { useStore } from 'hooks'
-import { Role } from 'types'
-import { boolean, object, string } from 'yup'
 import { isNil } from 'lodash'
+import { useState } from 'react'
+import { boolean, object, string } from 'yup'
+
+import { useParams } from 'common/hooks'
 import { useOrganizationRolePermissionCreateMutation } from 'data/organizations/organization-role-permission-create-mutation'
+import { useStore } from 'hooks'
+import { Button, Checkbox, Form, Input, Modal } from 'ui'
 
 export interface NewPermissionsButtonProps {
   roleId: number

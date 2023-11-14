@@ -1,19 +1,20 @@
+import { useState } from 'react'
+
 import { useParams } from 'common/hooks'
-import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import {
+  ScaffoldActionsContainer,
   ScaffoldActionsGroup,
   ScaffoldContainerLegacy,
   ScaffoldFilterAndContent,
-  ScaffoldActionsContainer,
   ScaffoldSectionContent,
 } from 'components/layouts/Scaffold'
-import NewRoleButton from './NewRoleButton'
-import RolesView from './RolesView'
-import { useState } from 'react'
+import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { Role } from 'types'
-import NewPermissionsButton from './NewPermissionsButton'
-import RolePermissionsView from './RolePermissionsView'
 import { Button } from 'ui'
+import NewPermissionsButton from './NewPermissionsButton'
+import NewRoleButton from './NewRoleButton'
+import RolePermissionsView from './RolePermissionsView'
+import RolesView from './RolesView'
 
 const PermissionsSettings = () => {
   const { slug } = useParams()

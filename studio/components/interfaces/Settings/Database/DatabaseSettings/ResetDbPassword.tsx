@@ -4,17 +4,19 @@ import { useParams } from 'common'
 import generator from 'generate-password'
 import { debounce } from 'lodash'
 import { useEffect, useRef, useState } from 'react'
-import { Button, Input, Modal } from 'ui'
 
-import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
+import {
+  useIsProjectActive,
+  useProjectContext,
+} from 'components/layouts/ProjectLayout/ProjectContext'
 import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useDatabasePasswordResetMutation } from 'data/database/database-password-reset-mutation'
 import { getProjectDetail } from 'data/projects/project-detail-query'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useCheckPermissions, useStore } from 'hooks'
 import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
 import { passwordStrength } from 'lib/helpers'
+import { Button, Input, Modal } from 'ui'
 
 const ResetDbPassword = ({ disabled = false }) => {
   const { ref } = useParams()

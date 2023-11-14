@@ -1,12 +1,13 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { isNil } from 'lodash'
 import { useEffect, useState } from 'react'
+import { object, string } from 'yup'
+
 import { useParams } from 'common/hooks'
-import { Button, Form, Input, Listbox, Modal } from 'ui'
+import { useOrganizationRoleCreateMutation } from 'data/organizations/organization-role-create-mutation'
 import { useStore } from 'hooks'
 import { Role } from 'types'
-import { object, string } from 'yup'
-import { useOrganizationRoleCreateMutation } from 'data/organizations/organization-role-create-mutation'
-import { isNil } from 'lodash'
+import { Button, Form, Input, Listbox, Modal } from 'ui'
 
 export interface NewRoleButtonProps {
   roles: Role[]
@@ -104,6 +105,9 @@ const NewRoleButton = ({ roles = [] }: NewRoleButtonProps) => {
       >
         <Form validationSchema={schema} initialValues={initialValues} onSubmit={onCreateRole}>
           {({ resetForm }: any) => {
+            // [Alaister] although this "technically" is breaking the rules of React hooks
+            // it won't error because the hooks are always rendered in the same order
+            // eslint-disable-next-line react-hooks/rules-of-hooks
             useEffect(() => {
               // Catches 'roles' when its available and then adds a default value for role select
               if (eligibleBaseRoles) {

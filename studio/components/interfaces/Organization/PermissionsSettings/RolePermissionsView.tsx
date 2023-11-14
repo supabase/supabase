@@ -4,11 +4,10 @@ import { Fragment } from 'react'
 import { useParams } from 'common/hooks'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
-import { useSelectedOrganization, useStore } from 'hooks'
-import { useProfile } from 'lib/profile'
-import { BasePermission, Role } from 'types'
-import { Button, Loading } from 'ui'
 import { useOrganizationRolePermissionsQuery } from 'data/organizations/organization-role-permissions-query'
+import { useStore } from 'hooks'
+import { BasePermission } from 'types'
+import { Button, Loading } from 'ui'
 
 interface RolePermissionsViewProps {
   roleId: number
