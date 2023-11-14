@@ -4320,6 +4320,7 @@ functions:
           ```
         hideCodeBlock: true
         isSpotlight: true
+
   - id: csv
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.csv'
     title: csv()
@@ -4358,6 +4359,7 @@ functions:
           By default, the data is returned in JSON format, but can also be returned as Comma Separated Values.
         hideCodeBlock: true
         isSpotlight: true
+
   - id: returns
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.returns'
     title: returns()
@@ -4378,55 +4380,17 @@ functions:
         hideCodeBlock: true
         isSpotlight: true
 
-  - id: using-explain
+  - id: explain
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.explain'
     title: Using Explain
     description: |
-      For debugging slow queries, you can get the [PostgreSQL EXPLAIN execution plan](https://www.postgresql.org/docs/current/sql-explain.html) of a query
+      For debugging slow queries, you can get the [Postgres `EXPLAIN` execution plan](https://www.postgresql.org/docs/current/sql-explain.html) of a query
       using the `explain()` method. This works on any query, even for `rpc()` or writes.
 
       Explain is not enabled by default as it can reveal sensitive information about your database.
       It's best to only enable this for testing environments but if you wish to enable it for production you can provide additional protection by using a `pre-request` function.
 
-      To enable it:
-
-      ```sql
-      alter role authenticator set pgrst.db_plan_enabled to 'true';
-      notify pgrst, 'reload config';
-      ```
-
-      To only allow `explain()` from a fixed IP address you can do the following. Use this if you plan on enabling `explain()` on a production environment.
-
-      ```sql
-      create or replace function filter_plan_requests()
-      returns void as $$
-      declare
-        headers   json := current_setting('request.headers', true)::json;
-        client_ip text := coalesce(headers->>'cf-connecting-ip', '');
-        accept    text := coalesce(headers->>'accept', '');
-        your_ip   text := '123.123.123.123'; -- replace this by your ip
-      begin
-        if accept like 'application/vnd.pgrst.plan%' and client_ip != your_ip then
-          raise insufficient_privilege using
-            message = 'Not allowed to use application/vnd.pgrst.plan';
-        end if;
-      end; $$ language plpgsql;
-
-      alter role authenticator set pgrst.db_pre_request to 'filter_plan_requests';
-      notify pgrst, 'reload config';
-      ```
-
-      Once you're done using `explain()`, you can disable it with:
-
-      ```sql
-      alter role authenticator set pgrst.db_plan_enabled to 'false';
-      -- if you used the above pre-request
-      alter role authenticator set pgrst.db_pre_request to '';
-
-      notify pgrst, 'reload config';
-      ```
-  - id: explain
-    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.explain'
-    title: explain()
+      Follow the [Performance Debugging Guide](/docs/guides/api/rest/debugging-performance) to enable the functionality on your project.
     examples:
       - id: get-execution-plan
         name: Get the execution plan

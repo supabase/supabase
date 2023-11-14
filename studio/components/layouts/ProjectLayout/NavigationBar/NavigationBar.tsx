@@ -37,6 +37,7 @@ import {
   generateToolRoutes,
 } from './NavigationBar.utils'
 import NavigationIconButton from './NavigationIconButton'
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 const NavigationBar = () => {
   const os = detectOS()
@@ -50,6 +51,7 @@ const NavigationBar = () => {
   const navLayoutV2 = useFlag('navigationLayoutV2')
   const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
   const showFeaturePreviews = useFlag('featurePreviews')
+  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
 
   const {
     projectAuthAll: authEnabled,
@@ -119,7 +121,7 @@ const NavigationBar = () => {
         ))}
         <div className="h-px w-full bg-border"></div>
         {otherRoutes.map((route) => {
-          if (route.key === 'api') {
+          if (route.key === 'api' && isNewAPIDocsEnabled) {
             return (
               <Tooltip.Root delayDuration={0} key={route.key}>
                 <Tooltip.Trigger asChild>
@@ -177,12 +179,13 @@ const NavigationBar = () => {
                 </Button>
               </Tooltip.Trigger>
               <Tooltip.Portal>
-                <Tooltip.Content side="right">
+                <Tooltip.Content side="right" sideOffset={5}>
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'rounded  py-1 px-2 leading-none shadow',
-                      'border border-background flex items-center space-x-1',
+                      'bg-alternative shadow-lg shadow-background-surface-100	py-1.5 px-3 rounded leading-none', // background
+                      'border border-default', // border
+                      'flex items-center gap-1', // layout
                     ].join(' ')}
                   >
                     {os === 'macos' ? (

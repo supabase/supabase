@@ -29,48 +29,83 @@ const nextConfig = {
   output: 'standalone',
   async redirects() {
     return [
-      {
-        source: '/',
-        has: [
-          {
-            type: 'query',
-            key: 'next',
-            value: 'new-project',
-          },
-        ],
-        destination: '/new/new-project',
-        permanent: false,
-      },
-      {
-        source: '/',
-        destination: '/projects',
-        permanent: false,
-      },
-      {
-        source: '/register',
-        destination: '/sign-up',
-        permanent: false,
-      },
-      {
-        source: '/signup',
-        destination: '/sign-up',
-        permanent: false,
-      },
-      {
-        source: '/signin',
-        destination: '/sign-in',
-        permanent: false,
-      },
-      {
-        source: '/login',
-        destination: '/sign-in',
-        permanent: false,
-      },
-      {
-        source: '/log-in',
-        destination: '/sign-in',
-        permanent: false,
-      },
+      ...(process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
+        ? [
+            {
+              source: '/',
+              has: [
+                {
+                  type: 'query',
+                  key: 'next',
+                  value: 'new-project',
+                },
+              ],
+              destination: '/new/new-project',
+              permanent: false,
+            },
+            {
+              source: '/',
+              destination: '/projects',
+              permanent: false,
+            },
+            {
+              source: '/register',
+              destination: '/sign-up',
+              permanent: false,
+            },
+            {
+              source: '/signup',
+              destination: '/sign-up',
+              permanent: false,
+            },
+            {
+              source: '/signin',
+              destination: '/sign-in',
+              permanent: false,
+            },
+            {
+              source: '/login',
+              destination: '/sign-in',
+              permanent: false,
+            },
+            {
+              source: '/log-in',
+              destination: '/sign-in',
+              permanent: false,
+            },
+          ]
+        : [
+            {
+              source: '/',
+              destination: '/project/default',
+              permanent: false,
+            },
+            {
+              source: '/register',
+              destination: '/project/default',
+              permanent: false,
+            },
+            {
+              source: '/signup',
+              destination: '/project/default',
+              permanent: false,
+            },
+            {
+              source: '/signin',
+              destination: '/project/default',
+              permanent: false,
+            },
+            {
+              source: '/login',
+              destination: '/project/default',
+              permanent: false,
+            },
+            {
+              source: '/log-in',
+              destination: '/project/default',
+              permanent: false,
+            },
+          ]),
       {
         source: '/project/:ref/auth',
         destination: '/project/:ref/auth/users',
@@ -79,6 +114,11 @@ const nextConfig = {
       {
         source: '/project/:ref/database',
         destination: '/project/:ref/database/tables',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/database/graphiql',
+        destination: '/project/:ref/api/graphiql',
         permanent: true,
       },
       {

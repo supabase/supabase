@@ -372,6 +372,14 @@
             "product": "database",
             "parent": "modifiers",
             "type": "function"
+          },
+          {
+            "id": "explain",
+            "title": "Using explain",
+            "slug": "explain",
+            "product": "database",
+            "parent": "modifiers",
+            "type": "function"
           }
         ]
       }
