@@ -10,7 +10,7 @@ const ReadOnlyBadge = ({ id }: ReadOnlyBadgeProps) => {
   const snippet = snap.snippets[id]
   const isSnippetOwner = user?.user_metadata?.user_name === snippet?.snippet?.owner?.username
 
-  return <>{isSnippetOwner ? <Badge color="gray">Read-only</Badge> : null}</>
+  return <>{isSnippetOwner ? null : <Badge color="gray">Read-only</Badge>}</>
 }
 
 export default ReadOnlyBadge
