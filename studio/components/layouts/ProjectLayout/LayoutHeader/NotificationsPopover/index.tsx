@@ -157,7 +157,7 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
         onOpenChange={onOpenChange}
         overlay={
           <div className="w-[400px] lg:w-[700px]">
-            <div className="flex items-center justify-between border-b border-gray-500 bg-gray-400 px-4 py-2">
+            <div className="flex items-center justify-between border-b border-default bg-surface-200 px-4 py-2">
               <p className="text-sm">Notifications</p>
               {/* Area for improvement: Paginate notifications and show in a side panel */}
               {/* <p className="text-foreground-light hover:text-foreground cursor-pointer text-sm transition">
@@ -219,7 +219,9 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
                 icon={
                   hasNewNotifications ? (
                     <div className="-mr-3.5 z-10 h-4 w-4 flex items-center justify-center rounded-full bg-black dark:bg-white">
-                      <p className="text-xs text-scale-100">{newNotifications.length}</p>
+                      <p className="text-xs text-background-alternative">
+                        {newNotifications.length}
+                      </p>
                     </div>
                   ) : alt ? (
                     <IconInbox size={18} strokeWidth={1.5} className="text-foreground-light" />
@@ -248,8 +250,8 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
               <Tooltip.Arrow className="radix-tooltip-arrow" />
               <div
                 className={[
-                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                  'border border-scale-200 flex items-center space-x-1',
+                  'rounded bg-alternative py-1 px-2 leading-none shadow',
+                  'border border-background flex items-center space-x-1',
                 ].join(' ')}
               >
                 <span className="text-xs text-foreground">Notifications</span>

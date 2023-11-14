@@ -13,9 +13,10 @@ import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
 
 export type StorageSettingsProps = {
   projectRef: string | undefined
+  organizationSlug: string | undefined
 }
 
-const StorageSettings = ({ projectRef }: StorageSettingsProps) => {
+const StorageSettings = ({ projectRef, organizationSlug }: StorageSettingsProps) => {
   const { data, error } = useProjectStorageConfigQuery({ projectRef }, { enabled: IS_PLATFORM })
 
   if (error || data?.error) {
@@ -34,10 +35,10 @@ const StorageSettings = ({ projectRef }: StorageSettingsProps) => {
     )
   }
 
-  return <StorageConfig config={data} projectRef={projectRef} />
+  return <StorageConfig config={data} projectRef={projectRef} organizationSlug={organizationSlug} />
 }
 
-const StorageConfig = ({ config, projectRef }: any) => {
+const StorageConfig = ({ config, projectRef, organizationSlug }: any) => {
   const { fileSizeLimit, isFreeTier } = config
   const { value, unit } = convertFromBytes(fileSizeLimit)
 
@@ -116,12 +117,12 @@ const StorageConfig = ({ config, projectRef }: any) => {
               <div className="space-y-20">
                 <div
                   className={[
-                    'bg-scale-100 dark:bg-scale-300',
-                    'overflow-hidden border-scale-400',
+                    'bg-surface-100',
+                    'overflow-hidden border-muted',
                     'rounded-md border shadow',
                   ].join(' ')}
                 >
-                  <div className="flex flex-col gap-0 divide-y divide-scale-400">
+                  <div className="flex flex-col gap-0 divide-y divide-border-muted">
                     <div className="grid grid-cols-12 gap-6 px-8 py-8 lg:gap-12">
                       <div className="relative flex flex-col col-span-12 gap-6 lg:col-span-4">
                         <p className="text-sm">Upload file size limit</p>
@@ -177,13 +178,14 @@ const StorageConfig = ({ config, projectRef }: any) => {
                     <div className="px-6 pb-6">
                       <UpgradeToPro
                         icon={<IconClock size="large" />}
+                        organizationSlug={organizationSlug}
                         primaryText="Free Plan has a fixed upload file size limit of 50 MB."
                         projectRef={projectRef}
                         secondaryText="Upgrade to the Pro plan for a configurable upload file size limit of up to 5 GB."
                       />
                     </div>
                   )}
-                  <div className="border-t border-scale-400" />
+                  <div className="border-t border-overlay" />
                   <div className="flex justify-between px-8 py-4">
                     <div className="flex items-center justify-between w-full gap-2">
                       {!canUpdateStorageSettings ? (

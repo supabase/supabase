@@ -34,18 +34,14 @@
     "perf:meta": "ab -t 5 -c 20 -T application/json http://localhost:5555/tables",
     "generate:types": "supabase gen types typescript --local > ./supabase/functions/common/database-types.ts"
   },
-  "overrides": {
-    "@code-hike/mdx": {
-      "@code-hike/lighter": "^0.6.7"
-    }
-  },
   "devDependencies": {
-    "eslint": "^8.41.0",
+    "eslint": "^8.45.0",
     "eslint-config-custom": "*",
     "prettier": "^2.8.8",
     "prettier-plugin-sql-cst": "^0.5.0",
+    "sass": "^1.68.0",
     "supabase": "^1.45.2",
-    "turbo": "^1.10.13"
+    "turbo": "^1.10.16"
   },
   "repository": {
     "type": "git",
@@ -53,7 +49,7 @@
   },
   "engines": {
     "npm": ">=9.0.0 <10.0.0",
-    "node": ">=18.0.0 <19.0.0"
+    "node": ">=18.0.0 <21"
   },
   "keywords": [
     "postgres",
@@ -65,8 +61,5 @@
   ],
   "volta": {
     "node": "18.17.1"
-  },
-  "dependencies": {
-    "next-themes": "^0.2.1"
   }
 }

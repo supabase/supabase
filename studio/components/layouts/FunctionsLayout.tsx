@@ -6,11 +6,11 @@ import { PropsWithChildren } from 'react'
 import { Button, IconCode, IconExternalLink } from 'ui'
 
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import APIDocsButton from 'components/ui/APIDocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useCheckPermissions, withAuth } from 'hooks'
-import { useAppStateSnapshot } from 'state/app-state'
 import FunctionsNav from '../interfaces/Functions/FunctionsNav'
 import ProjectLayout from './'
 
@@ -19,7 +19,6 @@ interface FunctionsLayoutProps {
 }
 
 const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutProps>) => {
-  const snap = useAppStateSnapshot()
   const { functionSlug, ref } = useParams()
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { data: functions, isLoading } = useEdgeFunctionsQuery({ projectRef: ref })
@@ -111,40 +110,28 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
                     )}
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Link href={`/project/${ref}/settings/functions`}>
-                      <a>
-                        <Button type="default">Manage secrets</Button>
-                      </a>
-                    </Link>
+                    <Button asChild type="default">
+                      <Link href={`/project/${ref}/settings/functions`}>Manage secrets</Link>
+                    </Button>
                     {isNewAPIDocsEnabled && (
-                      <Button
-                        size="tiny"
-                        className="mx-2 translate-y-[1px]"
-                        type="default"
-                        icon={<IconCode size={14} strokeWidth={2} />}
-                        onClick={() => {
-                          snap.setActiveDocsSection(
-                            functionSlug !== undefined
-                              ? ['edge-functions', functionSlug]
-                              : ['edge-functions']
-                          )
-                          snap.setShowProjectApiDocs(true)
-                        }}
-                      >
-                        API
-                      </Button>
+                      <APIDocsButton
+                        section={
+                          functionSlug !== undefined
+                            ? ['edge-functions', functionSlug]
+                            : ['edge-functions']
+                        }
+                      />
                     )}
-                    <Link href="https://supabase.com/docs/guides/functions">
-                      <a target="_link">
-                        <Button
-                          type="default"
-                          className="translate-y-[1px]"
-                          icon={<IconExternalLink size={14} strokeWidth={1.5} />}
-                        >
-                          Documentation
-                        </Button>
-                      </a>
-                    </Link>
+                    <Button
+                      asChild
+                      type="default"
+                      className="translate-y-[1px]"
+                      icon={<IconExternalLink size={14} strokeWidth={1.5} />}
+                    >
+                      <Link href="https://supabase.com/docs/guides/functions" target="_link">
+                        Documentation
+                      </Link>
+                    </Button>
                   </div>
                 </div>
               </div>

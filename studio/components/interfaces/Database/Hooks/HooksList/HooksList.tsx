@@ -83,16 +83,19 @@ const HooksList = ({
                 size="small"
                 icon={<IconSearch size="tiny" />}
                 value={filterString}
+                className="w-64"
                 onChange={(e) => setFilterString(e.target.value)}
               />
               <div className="flex items-center space-x-2">
-                <Link href="https://supabase.com/docs/guides/database/webhooks">
-                  <a target="_blank" rel="noreferrer">
-                    <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                      Documentation
-                    </Button>
-                  </a>
-                </Link>
+                <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                  <Link
+                    href="https://supabase.com/docs/guides/database/webhooks"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Documentation
+                  </Link>
+                </Button>
                 <Tooltip.Root delayDuration={0}>
                   <Tooltip.Trigger>
                     <Button disabled={!canCreateWebhooks} onClick={() => createHook()}>
@@ -105,8 +108,8 @@ const HooksList = ({
                         <Tooltip.Arrow className="radix-tooltip-arrow" />
                         <div
                           className={[
-                            'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                            'border border-scale-200',
+                            'rounded bg-alternative py-1 px-2 leading-none shadow',
+                            'border border-background',
                           ].join(' ')}
                         >
                           <span className="text-xs text-foreground">

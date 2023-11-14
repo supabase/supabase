@@ -16,7 +16,7 @@ import {
 } from 'ui'
 
 import { useParams } from 'common'
-import { SpendCapModal } from 'components/interfaces/BillingV2'
+import SpendCapModal from 'components/interfaces/Billing/SpendCapModal'
 import InformationBox from 'components/ui/InformationBox'
 import Panel from 'components/ui/Panel'
 import { useOrganizationCreateMutation } from 'data/organizations/organization-create-mutation'
@@ -112,7 +112,6 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
         tier: 'tier_' + dbTier.toLowerCase(),
         ...(orgKind == 'COMPANY' ? { size: orgSize } : {}),
         payment_method: paymentMethodId,
-        V2: true,
       })
     } catch (error) {
       setNewOrgLoading(false)
@@ -379,13 +378,15 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
                     subscriptions per project.{' '}
                   </p>
                   <div>
-                    <Link href="https://supabase.com/docs/guides/platform/org-based-billing">
-                      <a target="_blank" rel="noreferrer">
-                        <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                          Documentation
-                        </Button>
-                      </a>
-                    </Link>
+                    <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                      <Link
+                        href="https://supabase.com/docs/guides/platform/org-based-billing"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Documentation
+                      </Link>
+                    </Button>
                   </div>
                 </div>
               }

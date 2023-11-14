@@ -13,7 +13,7 @@ import {
   Popover,
 } from 'ui'
 
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions, useIsFeatureEnabled } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import Link from 'next/link'
@@ -62,8 +62,23 @@ const LogsQueryPanel = ({
     subject: { id: profile?.id },
   })
 
+  const {
+    projectAuthAll: authEnabled,
+    projectStorageAll: storageEnabled,
+    projectEdgeFunctionAll: edgeFunctionsEnabled,
+  } = useIsFeatureEnabled(['project_auth:all', 'project_storage:all', 'project_edge_function:all'])
+
+  const logsTableNames = Object.entries(LogsTableName)
+    .filter(([key]) => {
+      if (key === 'AUTH') return authEnabled
+      if (key === 'STORAGE') return storageEnabled
+      if (key === 'FN_EDGE') return edgeFunctionsEnabled
+      return true
+    })
+    .map(([, value]) => value)
+
   return (
-    <div className="rounded rounded-bl-none rounded-br-none border border-panel-border-light bg-panel-header-light dark:border-panel-border-dark dark:bg-panel-header-dark">
+    <div className="rounded rounded-bl-none rounded-br-none border border-overlay bg-surface-100">
       <div className="flex w-full items-center justify-between px-5 py-2">
         <div className="flex w-full flex-row items-center justify-between gap-x-4">
           <div className="flex items-center gap-2">
@@ -74,7 +89,7 @@ const LogsQueryPanel = ({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent side="bottom" align="start">
-                {Object.values(LogsTableName)
+                {logsTableNames
                   .sort((a, b) => a.localeCompare(b))
                   .map((source) => (
                     <DropdownMenuItem key={source} onClick={() => onSelectSource(source)}>
@@ -166,8 +181,8 @@ const LogsQueryPanel = ({
                           <Tooltip.Arrow className="radix-tooltip-arrow" />
                           <div
                             className={[
-                              'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                              'border border-scale-200',
+                              'rounded bg-alternative py-1 px-2 leading-none shadow',
+                              'border border-background',
                             ].join(' ')}
                           >
                             <span className="text-xs text-foreground">

@@ -1,25 +1,31 @@
+import { Column } from 'react-data-grid'
+import { LogData } from '../Logs.types'
 import {
   ResponseCodeFormatter,
   RowLayout,
   TextFormatter,
   TimestampLocalFormatter,
 } from '../LogsFormatters'
-import DefaultPreviewColumnRenderer from './DefaultPreviewColumnRenderer'
+import { defaultRenderCell } from './DefaultPreviewColumnRenderer'
 
-export default [
+const columns: Column<LogData>[] = [
   {
-    formatter: (data: any) => {
-      if (!data.row.status_code && !data.row.method) {
-        return DefaultPreviewColumnRenderer[0].formatter(data)
+    name: 'functions-edge-first-column',
+    key: 'functions-edge-first-column',
+    renderCell: (props) => {
+      if (!props.row.status_code && !props.row.method) {
+        return defaultRenderCell(props)
       }
       return (
         <RowLayout>
-          <TimestampLocalFormatter value={data.row.timestamp!} />
-          <ResponseCodeFormatter row={data} value={data.row.status_code} />
-          <TextFormatter value={data.row.method} />
-          <TextFormatter value={data.row.id} />
+          <TimestampLocalFormatter value={props.row.timestamp!} />
+          <ResponseCodeFormatter row={props} value={props.row.status_code} />
+          <TextFormatter value={props.row.method as string} />
+          <TextFormatter value={props.row.id} />
         </RowLayout>
       )
     },
   },
 ]
+
+export default columns

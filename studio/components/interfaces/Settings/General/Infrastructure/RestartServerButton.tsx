@@ -107,7 +107,7 @@ const RestartServerButton = () => {
             </Button>
             {canRestartProject && isProjectActive && (
               <DropdownMenu>
-                <DropdownMenuTrigger>
+                <DropdownMenuTrigger asChild>
                   <Button
                     type="default"
                     className="rounded-l-none px-[4px] py-[5px]"
@@ -142,8 +142,8 @@ const RestartServerButton = () => {
               <Tooltip.Arrow className="radix-tooltip-arrow" />
               <div
                 className={[
-                  'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                  'border border-scale-200 ', //border
+                  'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                  'border border-background', //border
                 ].join(' ')}
               >
                 <span className="text-xs text-foreground">

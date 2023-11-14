@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import { useStore } from 'hooks'
+import { useIsFeatureEnabled, useStore } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Alert, Badge, Button, Checkbox, IconBookOpen, Input, Modal, SidePanel } from 'ui'
@@ -58,6 +58,8 @@ const TableEditor = ({
   const { ui, meta } = useStore()
   const { project } = useProjectContext()
   const isNewRecord = isUndefined(table)
+
+  const realtimeEnabled = useIsFeatureEnabled('realtime:all')
 
   const enumTypes = meta.types.list((type: PostgresType) => !EXCLUDED_SCHEMAS.includes(type.schema))
 
@@ -251,13 +253,15 @@ const TableEditor = ({
                   <p className="mt-3">You can create policies after you create this table.</p>
                 )}
                 <p className="mt-4">
-                  <Link href="https://supabase.com/docs/guides/auth/row-level-security">
-                    <a target="_blank" rel="noreferrer">
-                      <Button type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
-                        RLS Documentation
-                      </Button>
-                    </a>
-                  </Link>
+                  <Button asChild type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
+                    <Link
+                      href="https://supabase.com/docs/guides/auth/row-level-security"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      RLS Documentation
+                    </Link>
+                  </Button>
                 </p>
               </Alert>
             ) : (
@@ -272,24 +276,30 @@ const TableEditor = ({
                   publicly writable and readable
                 </p>
                 <p className="mt-4">
-                  <Link href="https://supabase.com/docs/guides/auth/row-level-security">
-                    <a target="_blank" rel="noreferrer">
-                      <Button type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
-                        RLS Documentation
-                      </Button>
-                    </a>
-                  </Link>
+                  <Button asChild type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
+                    <Link
+                      href="https://supabase.com/docs/guides/auth/row-level-security"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      RLS Documentation
+                    </Link>
+                  </Button>
                 </p>
               </Alert>
             )}
-            <Checkbox
-              id="enable-realtime"
-              label="Enable Realtime"
-              description="Broadcast changes on this table to authorized subscribers"
-              checked={tableFields.isRealtimeEnabled}
-              onChange={() => onUpdateField({ isRealtimeEnabled: !tableFields.isRealtimeEnabled })}
-              size="medium"
-            />
+            {realtimeEnabled && (
+              <Checkbox
+                id="enable-realtime"
+                label="Enable Realtime"
+                description="Broadcast changes on this table to authorized subscribers"
+                checked={tableFields.isRealtimeEnabled}
+                onChange={() =>
+                  onUpdateField({ isRealtimeEnabled: !tableFields.isRealtimeEnabled })
+                }
+                size="medium"
+              />
+            )}
           </div>
         </SidePanel.Content>
         <SidePanel.Separator />

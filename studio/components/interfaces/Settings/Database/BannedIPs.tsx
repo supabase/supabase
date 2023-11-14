@@ -64,17 +64,18 @@ const BannedIPs = () => {
     <div id="banned-ips">
       <div className="flex items-center justify-between">
         <FormHeader
-          title="Banned IPs"
-          description="We monitor unsuccessful logins and block IPs for security"
+          title="Network Bans"
+          description="List of IP addresses that are temporarily blocked if their traffic pattern looks abusive"
         />
         <div className="flex items-center space-x-2 mb-6">
-          <Link href="https://supabase.com/docs/reference/cli/supabase-network-bans">
-            <a target="_blank">
-              <Button type="default" icon={<IconExternalLink />}>
-                Documentation
-              </Button>
-            </a>
-          </Link>
+          <Button asChild type="default" icon={<IconExternalLink />}>
+            <Link
+              href="https://supabase.com/docs/reference/cli/supabase-network-bans"
+              target="_blank"
+            >
+              Documentation
+            </Link>
+          </Button>
         </div>
       </div>
       <FormPanel>
@@ -82,7 +83,7 @@ const BannedIPs = () => {
           ipList.banned_ipv4_addresses.map((ip) => (
             <div key={ip} className="px-8 py-4 flex items-center justify-between">
               <div className="flex items-center space-x-5">
-                <IconGlobe size={16} className="text-scale-1000" />
+                <IconGlobe size={16} className="text-foreground-lighter" />
                 <p className="text-sm font-mono">{ip}</p>
               </div>
               <div>
@@ -93,7 +94,7 @@ const BannedIPs = () => {
             </div>
           ))
         ) : (
-          <p className="text-scale-1100 text-sm px-8 py-4">
+          <p className="text-foreground-light text-sm px-8 py-4">
             There are no banned IP addresses for your project.
           </p>
         )}

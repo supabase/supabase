@@ -184,7 +184,7 @@ const ColumnManagement = ({
             icon={<IconKey className="text-white" size="large" />}
             title="Composite primary key selected"
             description="The columns that you've selected will be grouped as a primary key, and will serve
-            as the unique identifier for the rows in your table"
+          as the unique identifier for the rows in your table"
           />
         )}
 
@@ -206,8 +206,8 @@ const ColumnManagement = ({
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                        'border border-scale-200 ', //border
+                        'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                        'border border-background', //border
                       ].join(' ')}
                     >
                       <span className="text-xs text-foreground">
@@ -236,8 +236,8 @@ const ColumnManagement = ({
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                        'border border-scale-200 ', //border
+                        'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                        'border border-background', //border
                       ].join(' ')}
                     >
                       <span className="text-xs text-foreground">
@@ -266,7 +266,7 @@ const ColumnManagement = ({
                 {(droppableProvided: DroppableProvided) => (
                   <div
                     ref={droppableProvided.innerRef}
-                    className={`space-y-2 rounded-md bg-gray-400 px-3 py-2 ${
+                    className={`space-y-2 rounded-md bg-surface-200 px-3 py-2 ${
                       isNewRecord ? '' : '-mx-3'
                     }`}
                   >
@@ -340,17 +340,20 @@ const ColumnManagement = ({
               Add column
             </Button>
           )}
-          <Link href="https://supabase.com/docs/guides/database/tables#data-types">
-            <a target="_blank" rel="noreferrer">
-              <Button
-                type="text"
-                className="text-foreground-light hover:text-foreground"
-                icon={<IconExternalLink size={12} strokeWidth={2} />}
-              >
-                Learn more about data types
-              </Button>
-            </a>
-          </Link>
+          <Button
+            asChild
+            type="text"
+            className="text-foreground-light hover:text-foreground"
+            icon={<IconExternalLink size={12} strokeWidth={2} />}
+          >
+            <Link
+              href="https://supabase.com/docs/guides/database/tables#data-types"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Learn more about data types
+            </Link>
+          </Button>
         </div>
       </div>
       <ForeignKeySelector

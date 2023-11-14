@@ -1,4 +1,4 @@
-import { ReactNode, useRef, useState } from 'react'
+import { ReactNode, useEffect, useRef, useState } from 'react'
 import { toast } from 'react-hot-toast'
 import {
   Button,
@@ -79,9 +79,18 @@ const ProjectLinker = ({
   const [supabaseProjectRef, setSupabaseProjectRef] = useState<string | undefined>(
     defaultSupabaseProjectRef
   )
+  useEffect(() => {
+    if (defaultSupabaseProjectRef !== undefined && supabaseProjectRef === undefined)
+      setSupabaseProjectRef(defaultSupabaseProjectRef)
+  }, [defaultSupabaseProjectRef, supabaseProjectRef])
+
   const [foreignProjectId, setForeignProjectId] = useState<string | undefined>(
     defaultForeignProjectId
   )
+  useEffect(() => {
+    if (defaultForeignProjectId !== undefined && foreignProjectId === undefined)
+      setForeignProjectId(defaultForeignProjectId)
+  }, [defaultForeignProjectId, foreignProjectId])
 
   // create a flat array of foreign project ids. ie, ["prj_MlkO6AiLG5ofS9ojKrkS3PhhlY3f", ..]
   const flatInstalledConnectionsIds = new Set(installedConnections.map((x) => x.foreign_project_id))
@@ -156,7 +165,7 @@ const ProjectLinker = ({
         ) : noSupabaseProjects || noForeignProjects ? (
           <div className="text-center">
             <h5 className="text-foreground">No {missingEntity} Projects found</h5>
-            <p className="text-light text-sm">
+            <p className="text-foreground-light text-sm">
               You will need to create a {missingEntity} Project to link to a {oppositeMissingEntity}{' '}
               Project.
               <br />
@@ -200,7 +209,9 @@ const ProjectLinker = ({
                       ) : null
                     }
                   >
-                    {selectedSupabaseProject ? selectedSupabaseProject.name : 'Choose Project'}
+                    {selectedSupabaseProject
+                      ? selectedSupabaseProject.name
+                      : 'Choose Supabase Project'}
                   </Button>
                 </PopoverTrigger_Shadcn_>
                 <PopoverContent_Shadcn_
@@ -210,7 +221,7 @@ const ProjectLinker = ({
                   style={{ width: supabaseProjectsComboBoxRef.current?.offsetWidth }}
                 >
                   <Command_Shadcn_>
-                    <CommandInput_Shadcn_ placeholder="Search organization..." />
+                    <CommandInput_Shadcn_ placeholder="Search for a project" />
                     <CommandList_Shadcn_ className="!max-h-[170px]">
                       <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
                       <CommandGroup_Shadcn_>
@@ -242,7 +253,7 @@ const ProjectLinker = ({
                 </PopoverContent_Shadcn_>
               </Popover_Shadcn_>
             </Panel>
-            <div className="border border-scale-1000 h-px w-16 border-dashed self-end mb-5"></div>
+            <div className="border border-foreground-lighter h-px w-16 border-dashed self-end mb-5"></div>
             <Panel>
               <div className="bg-black shadow rounded p-1 w-12 h-12 flex justify-center items-center">
                 {integrationIcon}
@@ -282,7 +293,7 @@ const ProjectLinker = ({
                   style={{ width: foreignProjectsComboBoxRef.current?.offsetWidth }}
                 >
                   <Command_Shadcn_>
-                    <CommandInput_Shadcn_ placeholder="Search organization..." />
+                    <CommandInput_Shadcn_ placeholder="Search for a project" />
                     <CommandList_Shadcn_ className="!max-h-[170px]">
                       <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
                       <CommandGroup_Shadcn_>
