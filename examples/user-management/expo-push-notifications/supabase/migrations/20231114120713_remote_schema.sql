@@ -28,6 +28,3 @@ to authenticated
 using ((auth.uid() = id));
 
 
-CREATE TRIGGER "send push notification" AFTER INSERT ON public.notifications FOR EACH ROW EXECUTE FUNCTION supabase_functions.http_request('https://bqeuunydbomjvynieund.supabase.co/functions/v1/push', 'POST', '{"Content-type":"application/json","Authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxZXV1bnlkYm9tanZ5bmlldW5kIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5ODExNjg3MywiZXhwIjoyMDEzNjkyODczfQ.1aTtEHnTLiwPH5khg7jWq-rkXFOxpSpW55rxTl2G9kU"}', '{}', '1000');
-
-
