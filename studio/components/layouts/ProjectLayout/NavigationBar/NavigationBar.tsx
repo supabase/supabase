@@ -26,7 +26,6 @@ import {
   useCommandMenu,
 } from 'ui'
 
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
@@ -38,6 +37,7 @@ import {
   generateToolRoutes,
 } from './NavigationBar.utils'
 import NavigationIconButton from './NavigationIconButton'
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 const NavigationBar = () => {
   const os = detectOS()
@@ -57,7 +57,14 @@ const NavigationBar = () => {
     projectAuthAll: authEnabled,
     projectEdgeFunctionAll: edgeFunctionsEnabled,
     projectStorageAll: storageEnabled,
-  } = useIsFeatureEnabled(['project_auth:all', 'project_edge_function:all', 'project_storage:all'])
+    realtimeAll: realtimeEnabled,
+  } = useIsFeatureEnabled([
+    'project_auth:all',
+    'project_edge_function:all',
+    'project_storage:all',
+    'realtime:all',
+  ])
+  const realtimeFlagEnabled = useFlag('realtimeDashboard')
 
   const activeRoute = router.pathname.split('/')[3]
   const toolRoutes = generateToolRoutes(projectRef, project, supabaseAIEnabled)
@@ -65,26 +72,25 @@ const NavigationBar = () => {
     auth: authEnabled,
     edgeFunctions: edgeFunctionsEnabled,
     storage: storageEnabled,
+    realtime: realtimeEnabled && realtimeFlagEnabled,
   })
-  const otherRoutes = generateOtherRoutes(projectRef, project, isNewAPIDocsEnabled)
+  const otherRoutes = generateOtherRoutes(projectRef, project)
 
   return (
     <div
       className={[
         'flex w-14 flex-col justify-between overflow-y-hidden p-2',
-        'border-r bg-body border-scale-500',
+        'border-r bg-background border-default',
       ].join(' ')}
     >
       <ul className="flex flex-col space-y-2">
         {(!navLayoutV2 || !IS_PLATFORM) && (
-          <Link href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}>
-            <a className="block">
-              <img
-                src={`${router.basePath}/img/supabase-logo.svg`}
-                alt="Supabase"
-                className="mx-auto h-[40px] w-6 cursor-pointer rounded"
-              />
-            </a>
+          <Link href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`} className="block">
+            <img
+              src={`${router.basePath}/img/supabase-logo.svg`}
+              alt="Supabase"
+              className="mx-auto h-[40px] w-6 cursor-pointer rounded"
+            />
           </Link>
         )}
         <NavigationIconButton
@@ -96,7 +102,7 @@ const NavigationBar = () => {
             link: `/project/${projectRef}`,
           }}
         />
-        <div className="bg-scale-500 h-px w-full" />
+        <div className="bg-border h-px w-full" />
         {toolRoutes.map((route) => (
           <NavigationIconButton
             key={route.key}
@@ -104,7 +110,7 @@ const NavigationBar = () => {
             isActive={activeRoute === route.key}
           />
         ))}
-        <div className="bg-scale-500 h-px w-full"></div>
+        <div className="bg-border h-px w-full"></div>
 
         {productRoutes.map((route) => (
           <NavigationIconButton
@@ -113,46 +119,51 @@ const NavigationBar = () => {
             isActive={activeRoute === route.key}
           />
         ))}
-        <div className="h-px w-full bg-scale-500"></div>
-        {otherRoutes.map((route) => (
-          <NavigationIconButton
-            key={route.key}
-            route={route}
-            isActive={activeRoute === route.key}
-          />
-        ))}
+        <div className="h-px w-full bg-border"></div>
+        {otherRoutes.map((route) => {
+          if (route.key === 'api' && isNewAPIDocsEnabled) {
+            return (
+              <Tooltip.Root delayDuration={0} key={route.key}>
+                <Tooltip.Trigger asChild>
+                  <Button
+                    type="text"
+                    size="tiny"
+                    onClick={() => snap.setShowProjectApiDocs(true)}
+                    className="border-none"
+                  >
+                    <div className="py-[7px]">
+                      <IconFileText size={18} strokeWidth={2} className="text-foreground-lighter" />
+                    </div>
+                  </Button>
+                </Tooltip.Trigger>
+                <Tooltip.Portal>
+                  <Tooltip.Content side="right">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'bg-alternative shadow-lg shadow-background-surface-100	py-1.5 px-3 rounded leading-none', // background
+                        'border border-default', //border
+                      ].join(' ')}
+                    >
+                      <span className="text-foreground text-xs">Project API Docs</span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              </Tooltip.Root>
+            )
+          } else {
+            return (
+              <NavigationIconButton
+                key={route.key}
+                route={route}
+                isActive={activeRoute === route.key}
+              />
+            )
+          }
+        })}
       </ul>
       {!navLayoutV2 && (
         <ul className="flex flex-col space-y-4 items-center">
-          {isNewAPIDocsEnabled && (
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger asChild>
-                <Button
-                  type="text"
-                  size="tiny"
-                  onClick={() => snap.setShowProjectApiDocs(true)}
-                  className="border-none"
-                >
-                  <div className="py-1">
-                    <IconFileText size={18} strokeWidth={2} className="text-foreground-lighter" />
-                  </div>
-                </Button>
-              </Tooltip.Trigger>
-              <Tooltip.Portal>
-                <Tooltip.Content side="right">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded py-1 px-2 leading-none shadow text-xs',
-                      'border border-scale-200 flex items-center space-x-1',
-                    ].join(' ')}
-                  >
-                    Project API Docs
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            </Tooltip.Root>
-          )}
           {IS_PLATFORM && (
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger asChild>
@@ -168,12 +179,13 @@ const NavigationBar = () => {
                 </Button>
               </Tooltip.Trigger>
               <Tooltip.Portal>
-                <Tooltip.Content side="right">
+                <Tooltip.Content side="right" sideOffset={5}>
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'rounded  py-1 px-2 leading-none shadow',
-                      'border border-scale-200 flex items-center space-x-1',
+                      'bg-alternative shadow-lg shadow-background-surface-100	py-1.5 px-3 rounded leading-none', // background
+                      'border border-default', // border
+                      'flex items-center gap-1', // layout
                     ].join(' ')}
                   >
                     {os === 'macos' ? (
@@ -198,12 +210,12 @@ const NavigationBar = () => {
             <DropdownMenuContent side="right" align="start">
               {IS_PLATFORM && (
                 <>
-                  <Link href="/account/me">
-                    <DropdownMenuItem key="header" className="space-x-2">
+                  <DropdownMenuItem key="header" className="space-x-2" asChild>
+                    <Link href="/account/me">
                       <IconSettings size={14} strokeWidth={1.5} />
                       <p>Account preferences</p>
-                    </DropdownMenuItem>
-                  </Link>
+                    </Link>
+                  </DropdownMenuItem>
                   {showFeaturePreviews && (
                     <DropdownMenuItem
                       key="header"

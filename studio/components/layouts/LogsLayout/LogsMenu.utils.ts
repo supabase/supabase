@@ -4,12 +4,13 @@ import { IS_PLATFORM } from 'lib/constants'
 
 export const generateLogsMenu = (
   project?: Project,
-  features?: { auth?: boolean; storage?: boolean }
+  features?: { auth?: boolean; storage?: boolean; realtime?: boolean }
 ): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
 
   const authEnabled = features?.auth ?? true
   const storageEnabled = features?.storage ?? true
+  const realtimeEnabled = features?.realtime ?? true
 
   return [
     {
@@ -73,12 +74,14 @@ export const generateLogsMenu = (
               items: [],
             }
           : null,
-        {
-          name: 'Realtime',
-          key: 'realtime-logs',
-          url: `/project/${ref}/logs/realtime-logs`,
-          items: [],
-        },
+        realtimeEnabled
+          ? {
+              name: 'Realtime',
+              key: 'realtime-logs',
+              url: `/project/${ref}/logs/realtime-logs`,
+              items: [],
+            }
+          : null,
       ].filter((item) => item) as ProductMenuGroupItem[],
     },
   ]

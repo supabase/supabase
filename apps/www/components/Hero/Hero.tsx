@@ -34,7 +34,7 @@ const Hero = () => {
                     <AnnouncementBadge />
                   </div> */}
                   <h1 className="text-foreground text-4xl sm:text-5xl sm:leading-none lg:text-7xl">
-                    <span className="block text-[#F4FFFA00] bg-clip-text bg-gradient-to-b from-scale-1200 to-scale-1200 dark:to-scale-1100">
+                    <span className="block text-[#F4FFFA00] bg-clip-text bg-gradient-to-b from-foreground to-foreground-light">
                       Build in a weekend
                     </span>
                     <span className="text-transparent bg-clip-text bg-gradient-to-br from-[#3ECF8E] via-[#3ECF8E] to-[#3ecfb2] block md:ml-0">
@@ -49,30 +49,24 @@ const Hero = () => {
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Link
-                    href="https://supabase.com/dashboard"
-                    as="https://supabase.com/dashboard"
-                    passHref
-                  >
-                    <a
+                  <Button asChild size="medium" className="text-white">
+                    <Link
+                      href="https://supabase.com/dashboard"
+                      as="https://supabase.com/dashboard"
                       onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_startProject'])}
-                      tabIndex={-1}
                     >
-                      <Button size="medium" className="text-white">
-                        Start your project
-                      </Button>
-                    </a>
-                  </Link>
-                  <Link href="/docs" as="/docs" passHref>
-                    <a
+                      Start your project
+                    </Link>
+                  </Button>
+                  <Button asChild size="medium" type="default" icon={<IconBookOpen />}>
+                    <Link
+                      href="/docs"
+                      as="/docs"
                       onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_documentation'])}
-                      tabIndex={-1}
                     >
-                      <Button size="medium" type="default" icon={<IconBookOpen />}>
-                        Documentation
-                      </Button>
-                    </a>
-                  </Link>
+                      Documentation
+                    </Link>
+                  </Button>
                 </div>
 
                 <HeroFrameworks className="mt-4 lg:mt-6" />

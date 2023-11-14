@@ -34,8 +34,8 @@ const AllowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
           <Tooltip.Arrow className="radix-tooltip-arrow" />
           <div
             className={[
-              'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-              'border border-scale-200 w-[250px]',
+              'rounded bg-alternative py-1 px-2 leading-none shadow',
+              'border border-background w-[250px]',
             ].join(' ')}
           >
             <span className="text-xs text-foreground">
@@ -61,8 +61,8 @@ const DisallowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
           <Tooltip.Arrow className="radix-tooltip-arrow" />
           <div
             className={[
-              'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-              'border border-scale-200 w-[250px]',
+              'rounded bg-alternative py-1 px-2 leading-none shadow',
+              'border border-background w-[250px]',
             ].join(' ')}
           >
             <span className="text-xs text-foreground">
@@ -110,13 +110,15 @@ const NetworkRestrictions = ({}) => {
             description="Allow specific IP ranges to have access to your database."
           />
           <div className="flex items-center space-x-2 mb-6">
-            <Link href="https://supabase.com/docs/guides/platform/network-restrictions">
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" icon={<IconExternalLink />}>
-                  Documentation
-                </Button>
-              </a>
-            </Link>
+            <Button asChild type="default" icon={<IconExternalLink />}>
+              <Link
+                href="https://supabase.com/docs/guides/platform/network-restrictions"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Documentation
+              </Link>
+            </Button>
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger>
                 <Button
@@ -132,8 +134,8 @@ const NetworkRestrictions = ({}) => {
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                        'border border-scale-200 w-[250px]',
+                        'rounded bg-alternative py-1 px-2 leading-none shadow',
+                        'border border-background w-[250px]',
                       ].join(' ')}
                     >
                       <span className="text-xs text-foreground">

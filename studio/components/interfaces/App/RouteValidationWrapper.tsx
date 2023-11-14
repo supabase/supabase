@@ -7,15 +7,17 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useFlag, useStore, useLatest } from 'hooks'
 import { DEFAULT_HOME, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useAppStateSnapshot } from 'state/app-state'
 
 // Ideally these could all be within a _middleware when we use Next 12
 const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
   const { ui } = useStore()
   const router = useRouter()
-  const { ref, slug } = useParams()
+  const { ref, slug, id } = useParams()
   const navLayoutV2 = useFlag('navigationLayoutV2')
 
   const isLoggedIn = useIsLoggedIn()
+  const snap = useAppStateSnapshot()
 
   /**
    * Array of urls/routes that should be ignored
@@ -108,6 +110,17 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
       }
     }
   }, [ref, projectsInitialized])
+
+  useEffect(() => {
+    if (ref !== undefined && id !== undefined) {
+      if (router.pathname.endsWith('/sql/[id]') && id !== 'new') {
+        snap.setDashboardHistory(ref, 'sql', id)
+      }
+      if (router.pathname.endsWith('/editor/[id]')) {
+        snap.setDashboardHistory(ref, 'editor', id)
+      }
+    }
+  }, [ref, id])
 
   return <>{children}</>
 }

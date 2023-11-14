@@ -7,7 +7,7 @@ function ExampleCard(props: any) {
     <>
       <div
         className="bg-surface-100
-          border-border
+          border-default
           flex
           h-40
           flex-col
@@ -20,7 +20,7 @@ function ExampleCard(props: any) {
           <h4 className="h6">{props.title}</h4>
           <p className="p text-sm">{props.description}</p>
           <div className="flex items-center">
-            <div className="relative border border-border inline !w-6 !h-6 rounded-full overflow-hidden">
+            <div className="relative border border-default inline !w-6 !h-6 rounded-full overflow-hidden">
               <Image
                 src={props.author_img}
                 alt={props.author + ' GitHub profile picture'}
@@ -37,22 +37,22 @@ function ExampleCard(props: any) {
         <div
           className="
           bg-surface-200
-          border-border flex
+          border-default flex
           flex-col justify-between rounded rounded-t-none
           border
           border-b border-r border-l
           border-t-0 p-5"
         >
-          <Link href={props.repo_url} as={props.repo_url} passHref>
-            <a
-              className="text-light hover:text-foreground flex flex-row items-center text-sm"
-              target="_blank"
-            >
-              <span>{props.repo_name}</span>
-              <span className="ml-1 inline-block">
-                <IconGitHub size={14} />
-              </span>
-            </a>
+          <Link
+            href={props.repo_url}
+            as={props.repo_url}
+            className="text-foreground-light hover:text-foreground flex flex-row items-center text-sm"
+            target="_blank"
+          >
+            <span>{props.repo_name}</span>
+            <span className="ml-1 inline-block">
+              <IconGitHub size={14} />
+            </span>
           </Link>
 
           <div className="mt-3 flex items-stretch gap-2 h-[26px]">
@@ -62,22 +62,18 @@ function ExampleCard(props: any) {
               </a>
             )}
             {props.demo_url && (
-              <Link href={props.demo_url} as={props.demo_url}>
-                <a target="_blank" tabIndex={-1}>
-                  <Button size="tiny" type="default" iconRight={<IconArrowUpRight />}>
-                    Launch Demo
-                  </Button>
-                </a>
-              </Link>
+              <Button asChild size="tiny" type="default" iconRight={<IconArrowUpRight />}>
+                <Link href={props.demo_url} as={props.demo_url} target="_blank" tabIndex={-1}>
+                  Launch Demo
+                </Link>
+              </Button>
             )}
             {!props.demo_url && (
-              <Link href={props.repo_url} as={props.repo_url}>
-                <a target="_blank" tabIndex={-1}>
-                  <Button size="tiny" type="default" iconRight={<IconArrowUpRight />}>
-                    View Code
-                  </Button>
-                </a>
-              </Link>
+              <Button asChild size="tiny" type="default" iconRight={<IconArrowUpRight />}>
+                <Link href={props.repo_url} as={props.repo_url} target="_blank" tabIndex={-1}>
+                  View Code
+                </Link>
+              </Button>
             )}
           </div>
         </div>

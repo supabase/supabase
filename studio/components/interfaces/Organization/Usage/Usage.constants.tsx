@@ -1,11 +1,11 @@
-import { USAGE_APPROACHING_THRESHOLD } from 'components/interfaces/BillingV2/Billing.constants'
+import { USAGE_APPROACHING_THRESHOLD } from 'components/interfaces/Billing/Billing.constants'
 import { EgressType, PricingMetric } from 'data/analytics/org-daily-stats-query'
 import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
 import { OrgUsageResponse } from 'data/usage/org-usage-query'
 import { Alert } from 'ui'
 
 export const COLOR_MAP = {
-  white: { bar: 'fill-scale-1200', marker: 'bg-scale-1200' },
+  white: { bar: 'fill-foreground', marker: 'bg-foreground' },
   green: { bar: 'fill-green-1000', marker: 'bg-green-1000' },
   blue: { bar: 'fill-blue-1000', marker: 'bg-blue-1000' },
   yellow: { bar: 'fill-amber-1000', marker: 'bg-amber-1000' },

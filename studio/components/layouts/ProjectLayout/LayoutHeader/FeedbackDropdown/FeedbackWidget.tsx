@@ -156,7 +156,7 @@ const FeedbackWidget = ({
                   const blobUrl = URL.createObjectURL(blob)
                   window.open(blobUrl, '_blank')
                 }}
-                className="cursor-pointer rounded h-[26px] w-[30px] border border-scale-600 relative bg-cover bg-center bg-no-repeat"
+                className="cursor-pointer rounded h-[26px] w-[30px] border border-control relative bg-cover bg-center bg-no-repeat"
               >
                 <button
                   className={[
@@ -223,11 +223,9 @@ const FeedbackWidget = ({
         <p className="text-xs text-foreground-light">
           Have a technical issue? Contact{' '}
           <Link href="/support/new">
-            <a>
-              <span className="cursor-pointer text-brand transition-colors hover:text-brand-600">
-                Supabase support
-              </span>
-            </a>
+            <span className="cursor-pointer text-brand transition-colors hover:text-brand-600">
+              Supabase support
+            </span>
           </Link>{' '}
           or{' '}
           <a href="https://supabase.com/docs" target="_blank" rel="noreferrer">

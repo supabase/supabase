@@ -46,7 +46,7 @@ function FunctionsUsecases(props: Props) {
                 key={`featureHighlighted-${i}`}
                 className={
                   'bg-background hover:bg-surface-100 hover:border group rounded-md border px-6 py-4 text-left transition-all' +
-                  (active ? ' dark:bg-scale-400 border-foreground-lighter bg-white' : '')
+                  (active ? ' bg-surface-200 border-foreground-lighter' : '')
                 }
                 // onClick={() => setCurrentSelection(feat.highlightLines)}
                 onClick={() => handleApiSwiperNavChange(i)}
@@ -54,7 +54,9 @@ function FunctionsUsecases(props: Props) {
                 <div
                   className={
                     'transition-colors ' +
-                    (active ? ' text-foreground' : ' text-light group-hover:text-foreground')
+                    (active
+                      ? ' text-foreground'
+                      : ' text-foreground-light group-hover:text-foreground')
                   }
                 >
                   {feat.title}
@@ -62,7 +64,9 @@ function FunctionsUsecases(props: Props) {
                 <div
                   className={
                     'text-sm transition-colors ' +
-                    (active ? ' text-light' : ' text-light group-hover:text-light ')
+                    (active
+                      ? ' text-foreground-light'
+                      : ' text-foreground-light group-hover:text-foreground-light ')
                   }
                 >
                   {/*
@@ -73,13 +77,17 @@ function FunctionsUsecases(props: Props) {
             )
           })}
           {props.documentation_link && (
-            <Link href={props.documentation_link} as={props.documentation_link}>
-              <a>
-                <Button size="small" className="mt-4" type="default" icon={<IconArrowUpRight />}>
-                  Explore documentation
-                </Button>
-              </a>
-            </Link>
+            <Button
+              asChild
+              size="small"
+              className="mt-4"
+              type="default"
+              icon={<IconArrowUpRight />}
+            >
+              <Link href={props.documentation_link} as={props.documentation_link}>
+                Explore documentation
+              </Link>
+            </Button>
           )}
         </div>
       </div>

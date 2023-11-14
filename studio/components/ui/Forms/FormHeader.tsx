@@ -26,11 +26,11 @@ const FormHeader = ({
         )}
       </div>
       {docsUrl !== undefined && (
-        <Link passHref href="/">
-          <Button asChild type="default" icon={<IconExternalLink />}>
-            <a>Documentation</a>
-          </Button>
-        </Link>
+        <Button asChild type="default" icon={<IconExternalLink />}>
+          <Link href={docsUrl} target="_blank" rel="noreferrer">
+            Documentation
+          </Link>
+        </Button>
       )}
     </div>
   )

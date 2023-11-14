@@ -1,22 +1,28 @@
-import type {
-  PostgresColumn,
-  PostgresExtension,
-  PostgresTable,
-  PostgresType,
-} from '@supabase/postgres-meta'
+import type { PostgresColumn, PostgresTable, PostgresType } from '@supabase/postgres-meta'
+import { useParams } from 'common'
 import { isEmpty, noop } from 'lodash'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  Checkbox,
+  IconAlertCircle,
+  IconExternalLink,
+  IconPlus,
+  Input,
+  SidePanel,
+  Toggle,
+} from 'ui'
 
-import { useParams } from 'common'
 import { Dictionary } from 'components/grid'
-import { EncryptionKeySelector } from 'components/interfaces/Settings/Vault'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useStore } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { Button, Checkbox, IconExternalLink, IconPlus, Input, SidePanel, Toggle } from 'ui'
 import { ForeignKeySelector } from '..'
 import ActionBar from '../ActionBar'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
@@ -50,9 +56,6 @@ export interface ColumnEditorProps {
     isNewRecord: boolean,
     configuration: {
       columnId: string | undefined
-      isEncrypted: boolean
-      keyId?: string
-      keyName?: string
     },
     resolve: any
   ) => void
@@ -84,11 +87,6 @@ const ColumnEditor = ({
 
   const keys = vault.listKeys()
   const enumTypes = meta.types.list((type: PostgresType) => !EXCLUDED_SCHEMAS.includes(type.schema))
-
-  const [pgsodiumExtension] = meta.extensions.list(
-    (ext: PostgresExtension) => ext.name.toLowerCase() === 'pgsodium'
-  )
-  const isPgSodiumInstalled = pgsodiumExtension?.installed_version !== null
 
   const isNewRecord = column === undefined
   const originalForeignKey = column
@@ -166,12 +164,7 @@ const ColumnEditor = ({
         const foreignKey = columnFields.foreignKey
           ? { ...columnFields.foreignKey, source_column_name: columnFields.name }
           : undefined
-        const configuration = {
-          columnId: column?.id,
-          isEncrypted: columnFields.isEncrypted,
-          keyId: columnFields.keyId,
-          keyName: columnFields.keyName,
-        }
+        const configuration = { columnId: column?.id }
         saveChanges(payload, foreignKey, isNewRecord, configuration, resolve)
       } else {
         resolve()
@@ -243,30 +236,30 @@ const ColumnEditor = ({
             className="lg:!col-span-4"
             description={
               <div className="space-y-2">
-                <Link href={`/project/${ref}/database/types`} passHref>
-                  <Button
-                    asChild
-                    type="default"
-                    size="tiny"
-                    icon={<IconPlus size={14} strokeWidth={2} />}
+                <Button
+                  asChild
+                  type="default"
+                  size="tiny"
+                  icon={<IconPlus size={14} strokeWidth={2} />}
+                >
+                  <Link href={`/project/${ref}/database/types`} target="_blank" rel="noreferrer">
+                    Create enum types
+                  </Link>
+                </Button>
+                <Button
+                  asChild
+                  type="default"
+                  size="tiny"
+                  icon={<IconExternalLink size={14} strokeWidth={2} />}
+                >
+                  <Link
+                    href="https://supabase.com/docs/guides/database/tables#data-types"
+                    target="_blank"
+                    rel="noreferrer"
                   >
-                    <a target="_blank" rel="noreferrer">
-                      Create enum types
-                    </a>
-                  </Button>
-                </Link>
-                <Link href="https://supabase.com/docs/guides/database/tables#data-types" passHref>
-                  <Button
-                    asChild
-                    type="default"
-                    size="tiny"
-                    icon={<IconExternalLink size={14} strokeWidth={2} />}
-                  >
-                    <a target="_blank" rel="noreferrer">
-                      About data types
-                    </a>
-                  </Button>
-                </Link>
+                    About data types
+                  </Link>
+                </Button>
               </div>
             }
           >
@@ -357,6 +350,7 @@ const ColumnEditor = ({
           />
         </FormSectionContent>
       </FormSection>
+
       {isNewRecord && (
         <>
           <SidePanel.Separator />
@@ -364,47 +358,33 @@ const ColumnEditor = ({
             header={<FormSectionLabel className="lg:!col-span-4">Security</FormSectionLabel>}
           >
             <FormSectionContent loading={false} className="lg:!col-span-8">
-              <Toggle
-                label="Encrypt Column"
-                error={errors?.isEncrypted}
-                disabled={!isPgSodiumInstalled}
-                // @ts-ignore
-                descriptionText={
-                  <div className="space-y-2">
-                    <p>
-                      Encrypt the column's data with pgsodium's Transparent Column Encryption (TCE).
-                      Decrypted values will be stored within the "decrypted_{selectedTable.name}"
-                      view.
-                    </p>
-                    {!isPgSodiumInstalled ? (
-                      <p>
-                        You will need to{' '}
-                        <Link href={`/project/${ref}/database/extensions?filter=pgsodium`}>
-                          <a className="text-brand-300 hover:text-brand transition">install</a>
-                        </Link>{' '}
-                        the extension <code className="text-xs">pgsodium</code> first before being
-                        able to encrypt your column.
-                      </p>
-                    ) : (
-                      <p>
-                        Note: Only columns of <code className="text-xs">text</code> type can be
-                        encrypted.
-                      </p>
-                    )}
-                  </div>
-                }
-                checked={columnFields.isEncrypted}
-                onChange={() => onUpdateField({ isEncrypted: !columnFields.isEncrypted })}
-              />
-              {columnFields.isEncrypted && (
-                <EncryptionKeySelector
-                  label="Select a key to encrypt your column with"
-                  error={errors?.keyName}
-                  selectedKeyId={columnFields.keyId}
-                  onSelectKey={(id) => onUpdateField({ keyId: id })}
-                  onUpdateDescription={(name) => onUpdateField({ keyName: name })}
-                />
-              )}
+              <Alert_Shadcn_>
+                <IconAlertCircle />
+                <AlertTitle_Shadcn_>
+                  Column encryption has been removed from the GUI
+                </AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>
+                  <p className="!leading-normal">
+                    You may still encrypt new columns through the SQL editor using{' '}
+                    <Link
+                      href={`/project/${ref}/database/extensions?filter=pgsodium`}
+                      className="text-brand hover:underline"
+                    >
+                      pgsodium's
+                    </Link>{' '}
+                    Transparent Column Encryption (TCE).
+                  </p>
+                  <Button asChild type="default" icon={<IconExternalLink />} className="mt-2">
+                    <Link
+                      target="_blank"
+                      rel="noreferrer"
+                      href="https://github.com/orgs/supabase/discussions/18849"
+                    >
+                      Learn more
+                    </Link>
+                  </Button>
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
             </FormSectionContent>
           </FormSection>
         </>

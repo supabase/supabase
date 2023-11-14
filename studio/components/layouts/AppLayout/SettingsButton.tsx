@@ -9,20 +9,18 @@ const SettingsButton = () => {
 
   return (
     <Tooltip.Root delayDuration={0}>
-      <Link href={slug ? `/org/${slug}/general` : '/'} passHref>
-        <Tooltip.Trigger type="button" asChild className="px-1">
-          <a id="organization-settings">
-            <IconSettings size={18} strokeWidth={1.5} className="text-foreground-light" />
-          </a>
-        </Tooltip.Trigger>
-      </Link>
+      <Tooltip.Trigger type="button" asChild className="px-1">
+        <Link id="organization-settings" href={slug ? `/org/${slug}/general` : '/'}>
+          <IconSettings size={18} strokeWidth={1.5} className="text-foreground-light" />
+        </Link>
+      </Tooltip.Trigger>
       <Tooltip.Portal>
         <Tooltip.Content side="bottom">
           <Tooltip.Arrow className="radix-tooltip-arrow" />
           <div
             className={[
-              'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-              'border border-scale-200',
+              'rounded bg-alternative py-1 px-2 leading-none shadow',
+              'border border-background',
             ].join(' ')}
           >
             <span className="text-xs text-foreground">Organization settings</span>

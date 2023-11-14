@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { ResponseError } from 'types'
 import {
-  Alert,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
@@ -28,7 +27,7 @@ const AlertError = ({ ref, subject, error, className }: AlertErrorProps) => {
 
   return (
     <Alert_Shadcn_ className={className} variant="warning" title={subject}>
-      <IconAlertCircle className="h-4 w-4" />
+      <IconAlertCircle className="h-4 w-4" color="bg-warning-300" strokeWidth={2} />
       <AlertTitle_Shadcn_>{subject}</AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_ className="flex flex-col gap-3">
         <div>
@@ -39,11 +38,9 @@ const AlertError = ({ ref, subject, error, className }: AlertErrorProps) => {
           </p>
         </div>
         <div>
-          <Link key="contact-support" href={href} passHref>
-            <Button type="warning" asChild>
-              <a>Contact support</a>
-            </Button>
-          </Link>
+          <Button asChild type="warning">
+            <Link href={href}>Contact support</Link>
+          </Button>
         </div>
       </AlertDescription_Shadcn_>
     </Alert_Shadcn_>
