@@ -129,10 +129,14 @@ const NavigationBar = () => {
                     type="text"
                     size="tiny"
                     onClick={() => snap.setShowProjectApiDocs(true)}
-                    className="border-none"
+                    className="border-none group"
                   >
                     <div className="py-[7px]">
-                      <IconFileText size={18} strokeWidth={2} className="text-foreground-lighter" />
+                      <IconFileText
+                        size={18}
+                        strokeWidth={2}
+                        className="transition text-foreground-lighter group-hover:text-foreground"
+                      />
                     </div>
                   </Button>
                 </Tooltip.Trigger>
