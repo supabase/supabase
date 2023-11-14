@@ -22,6 +22,7 @@ import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useOpenAPISpecQuery } from 'data/open-api/api-spec-query'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useAppStateSnapshot } from 'state/app-state'
+import { useIsAPIDocsSidePanelEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { navigateToSection } from './Content/Content.utils'
 import { DOCS_RESOURCE_CONTENT } from './ProjectAPIDocs.constants'
 
@@ -29,6 +30,7 @@ const SecondLevelNav = () => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
   const [open, setOpen] = useState(false)
+  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
 
   const { data } = useOpenAPISpecQuery({ projectRef: ref })
   const tables = data?.tables ?? []
@@ -74,12 +76,14 @@ const SecondLevelNav = () => {
   return (
     <div className="py-4">
       <div className="px-4 flex items-center space-x-2 mb-2">
-        <Button
-          type="text"
-          icon={<IconChevronLeft />}
-          className="px-1"
-          onClick={() => snap.setActiveDocsSection([snap.activeDocsSection[0]])}
-        />
+        {isNewAPIDocsEnabled && (
+          <Button
+            type="text"
+            icon={<IconChevronLeft />}
+            className="px-1"
+            onClick={() => snap.setActiveDocsSection([snap.activeDocsSection[0]])}
+          />
+        )}
         <p className="text-sm text-foreground-light capitalize">{content[section].title}</p>
       </div>
 
