@@ -497,7 +497,15 @@ export const auth = {
       url: undefined,
       items: [
         { name: 'Email Login', url: '/guides/auth/auth-email' },
-        { name: 'Magic Link Login', url: '/guides/auth/auth-magic-link' },
+        {
+          name: 'Passwordless Login',
+          url: '/guides/auth/passwordless-login',
+          items: [
+            { name: 'Email Magic Link', url: '/guides/auth/passwordless-login/auth-magic-link' },
+            { name: 'Email OTP', url: '/guides/auth/passwordless-login/auth-email-otp' },
+            { name: 'Phone OTP', url: '/guides/auth/phone-login' },
+          ],
+        },
         {
           name: 'Phone Login',
           url: '/guides/auth/phone-login',
