@@ -1,22 +1,60 @@
-import { useRouter } from 'next/router'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useRouter } from 'next/router'
 import { Button } from 'ui'
 import { useTheme } from 'next-themes'
 import { API_URL } from 'lib/constants'
+import { useEffect, useState } from 'react'
+import { useIsLoggedIn } from 'common'
+import { useProjectByFlyExtensionIdMutation } from 'data/projects/project-by-fly-extension-id-mutation'
+import { useOrganizationByFlyOrgIdMutation } from 'data/organizations/organization-by-fly-organization-id-mutation'
 
 const SignInFlyTos = () => {
+  const [loading, setLoading] = useState(true)
+  const isLoggedIn = useIsLoggedIn()
   const router = useRouter()
   const {
     isReady,
-    query: { extension_id, organization_id },
+    query: { fly_extension_id, fly_organization_id },
   } = router
   const { resolvedTheme } = useTheme()
+  const { mutateAsync: getProjectByFlyExtensionId } = useProjectByFlyExtensionIdMutation({
+    onSuccess: (res) => {
+      router.replace(`/project/${res.ref}`)
+    },
+    onError: (_) => {
+      setLoading(false)
+    },
+  })
+  const { mutateAsync: getOrgByFlyOrgId } = useOrganizationByFlyOrgIdMutation({
+    onSuccess: (_) => {
+      router.replace('/projects')
+    },
+    onError: (_) => {
+      setLoading(false)
+    },
+  })
+
+  useEffect(() => {
+    if (!isReady) {
+      return
+    }
+    if (!isLoggedIn) {
+      setLoading(false)
+      return
+    }
+
+    fly_extension_id
+      ? getProjectByFlyExtensionId({ flyExtensionId: fly_extension_id as string })
+      : fly_organization_id
+      ? getOrgByFlyOrgId({ flyOrganizationId: fly_organization_id as string })
+      : setLoading(false)
+  }, [isReady])
 
   const onSignInWithFly = async () => {
-    window.location.href = extension_id
-      ? `${API_URL}/tos/fly?extension_id=${extension_id}`
-      : `${API_URL}/tos/fly?organization_id=${organization_id}`
+    window.location.href = fly_extension_id
+      ? `${API_URL}/tos/fly?extension_id=${fly_extension_id}`
+      : `${API_URL}/tos/fly?organization_id=${fly_organization_id}`
   }
 
   return (
@@ -46,16 +84,20 @@ const SignInFlyTos = () => {
       <div className="flex w-[320px] flex-col items-center justify-center space-y-3">
         <h4 className="text-lg">Continue to Supabase Dashboard</h4>
       </div>
-      <div className="flex flex-col items-center space-x-4 space-y-4">
-        <Button onClick={onSignInWithFly} disabled={!extension_id && !organization_id}>
-          Login with Fly.io
-        </Button>
-        {isReady && !extension_id && !organization_id && (
-          <p className="text-red-900 text-sm">
-            An extension ID or organization ID is required to login
-          </p>
-        )}
-      </div>
+      {loading ? (
+        <p className="text-sm">Checking your access rights...</p>
+      ) : (
+        <div className="flex flex-col items-center space-x-4 space-y-4">
+          <Button onClick={onSignInWithFly} disabled={!fly_extension_id && !fly_organization_id}>
+            Login with Fly.io
+          </Button>
+          {isReady && !fly_extension_id && !fly_organization_id && (
+            <p className="text-red-900 text-sm">
+              A fly extension ID or organization ID is required to login
+            </p>
+          )}
+        </div>
+      )}
       <div className="sm:text-center">
         <p className="text-xs text-foreground-lighter sm:mx-auto sm:max-w-sm">
           By continuing, you agree to Supabase's{' '}
