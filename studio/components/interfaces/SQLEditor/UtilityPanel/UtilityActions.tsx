@@ -23,6 +23,7 @@ import SavingIndicator from './SavingIndicator'
 import SizeToggleButton from './SizeToggleButton'
 import { MOCK_DATABASES } from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { useState } from 'react'
+import DatabaseSelector from 'components/ui/DatabaseSelector'
 
 export type UtilityActionsProps = {
   id: string
@@ -81,64 +82,10 @@ const UtilityActions = ({
       </Tooltip.Root>
 
       <div className="flex items-center justify-between gap-x-2 mx-2">
-        <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-          <PopoverTrigger_Shadcn_ asChild>
-            <div className="flex items-center space-x-2 cursor-pointer">
-              <Button
-                type="default"
-                className="pr-2"
-                iconRight={
-                  <IconChevronDown className="text-foreground-light" strokeWidth={2} size={12} />
-                }
-              >
-                Source:{' '}
-                <span className="capitalize">
-                  {(selectedDatabase?.type ?? '').split('_').join(' ').toLowerCase()}
-                  {selectedDatabase?.type === 'PRIMARY' && ' database'}
-                </span>{' '}
-                {selectedDatabase?.type === 'READ_REPLICA' && (
-                  <span>(ID: {selectedDatabase?.id})</span>
-                )}
-              </Button>
-            </div>
-          </PopoverTrigger_Shadcn_>
-          <PopoverContent_Shadcn_ className="p-0 w-48" side="bottom" align="end">
-            <Command_Shadcn_>
-              <CommandList_Shadcn_>
-                <CommandGroup_Shadcn_>
-                  <ScrollArea className={(databases || []).length > 7 ? 'h-[210px]' : ''}>
-                    {databases?.map((database) => {
-                      return (
-                        <CommandItem_Shadcn_
-                          key={database.id}
-                          value={database.id.toString()}
-                          className="cursor-pointer w-full"
-                          onSelect={() => {
-                            setSelectedDatabaseId(database.id.toString())
-                            setOpen(false)
-                          }}
-                          onClick={() => {
-                            setSelectedDatabaseId(database.id.toString())
-                            setOpen(false)
-                          }}
-                        >
-                          <div className="w-full flex items-center justify-between">
-                            <p>
-                              {database.type === 'PRIMARY'
-                                ? 'Primary database'
-                                : `Read replica (ID: ${database.id})`}
-                            </p>
-                            {database.id.toString() === selectedDatabaseId && <IconCheck />}
-                          </div>
-                        </CommandItem_Shadcn_>
-                      )
-                    })}
-                  </ScrollArea>
-                </CommandGroup_Shadcn_>
-              </CommandList_Shadcn_>
-            </Command_Shadcn_>
-          </PopoverContent_Shadcn_>
-        </Popover_Shadcn_>
+        <DatabaseSelector
+          selectedDatabaseId={selectedDatabaseId}
+          onChangeDatabaseId={setSelectedDatabaseId}
+        />
 
         <Button
           onClick={() => executeQuery()}
