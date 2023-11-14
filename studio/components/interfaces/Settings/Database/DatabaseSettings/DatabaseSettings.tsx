@@ -1,18 +1,29 @@
 import { useParams, useTelemetryProps } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
+  CommandGroup_Shadcn_,
+  CommandItem_Shadcn_,
+  CommandList_Shadcn_,
+  Command_Shadcn_,
   IconAlertTriangle,
+  IconCheck,
+  IconChevronDown,
   IconExternalLink,
   Input,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+  ScrollArea,
   Tabs,
 } from 'ui'
 
+import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
@@ -21,16 +32,21 @@ import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useSelectedOrganization } from 'hooks'
 import { pluckObjectFields } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
+import { MOCK_DATABASES } from '../../Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import ConfirmDisableReadOnlyModeModal from './ConfirmDisableReadOnlyModal'
 import ResetDbPassword from './ResetDbPassword'
-import AlertError from 'components/ui/AlertError'
 
 const DatabaseSettings = () => {
   const router = useRouter()
-  const { ref: projectRef } = useParams()
+  const { ref: projectRef, connectionString } = useParams()
   const telemetryProps = useTelemetryProps()
   const organization = useSelectedOrganization()
   const selectedOrganization = useSelectedOrganization()
+
+  const connectionStringsRef = useRef<HTMLDivElement>(null)
+
+  const [open, setOpen] = useState(false)
+  const [selectedDatabaseId, setSelectedDatabaseId] = useState<string>('1')
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 
   const { data, error, isLoading, isError, isSuccess } = useProjectSettingsQuery({ projectRef })
@@ -43,7 +59,13 @@ const DatabaseSettings = () => {
 
   const { project } = data ?? {}
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
-  const connectionInfo = pluckObjectFields(project, DB_FIELDS)
+  const connectionInfo =
+    project !== undefined
+      ? pluckObjectFields(project, DB_FIELDS)
+      : { db_user: '', db_host: '', db_port: '', db_name: '' }
+
+  const databases = MOCK_DATABASES
+  const selectedDatabase = databases.find((db) => db.id.toString() === selectedDatabaseId)
 
   const handleCopy = (labelValue?: string) =>
     Telemetry.sendEvent(
@@ -67,6 +89,13 @@ const DatabaseSettings = () => {
     `psql -h ${connectionInfo.db_host} -p ` +
     `${connectionInfo.db_port.toString()} -d ${connectionInfo.db_name} ` +
     `-U ${connectionInfo.db_user}`
+
+  useEffect(() => {
+    if (connectionString !== undefined && connectionStringsRef.current !== undefined) {
+      setSelectedDatabaseId(connectionString)
+      connectionStringsRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    }
+  }, [connectionString])
 
   return (
     <>
@@ -214,9 +243,72 @@ const DatabaseSettings = () => {
         <section className="space-y-6">
           <Panel
             title={
-              <h5 key="panel-title" className="mb-0">
-                Connection string
-              </h5>
+              <div ref={connectionStringsRef} className="w-full flex items-center justify-between">
+                <h5 key="panel-title" className="mb-0">
+                  Connection string
+                </h5>
+                <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
+                  <PopoverTrigger_Shadcn_ asChild>
+                    <div className="flex items-center space-x-2 cursor-pointer">
+                      <Button
+                        type="default"
+                        className="pr-2"
+                        iconRight={
+                          <IconChevronDown
+                            className="text-foreground-light"
+                            strokeWidth={2}
+                            size={12}
+                          />
+                        }
+                      >
+                        Database:{' '}
+                        <span className="capitalize">
+                          {(selectedDatabase?.type ?? '').split('_').join(' ').toLowerCase()}
+                        </span>{' '}
+                        {selectedDatabase?.type === 'READ_REPLICA' && (
+                          <span>(ID: {selectedDatabase?.id})</span>
+                        )}
+                      </Button>
+                    </div>
+                  </PopoverTrigger_Shadcn_>
+                  <PopoverContent_Shadcn_ className="p-0 w-48" side="bottom" align="end">
+                    <Command_Shadcn_>
+                      <CommandList_Shadcn_>
+                        <CommandGroup_Shadcn_>
+                          <ScrollArea className={(databases || []).length > 7 ? 'h-[210px]' : ''}>
+                            {databases?.map((database) => {
+                              return (
+                                <CommandItem_Shadcn_
+                                  key={database.id}
+                                  value={database.id.toString()}
+                                  className="cursor-pointer w-full"
+                                  onSelect={() => {
+                                    setSelectedDatabaseId(database.id.toString())
+                                    setOpen(false)
+                                  }}
+                                  onClick={() => {
+                                    setSelectedDatabaseId(database.id.toString())
+                                    setOpen(false)
+                                  }}
+                                >
+                                  <div className="w-full flex items-center justify-between">
+                                    <p>
+                                      {database.type === 'PRIMARY'
+                                        ? 'Primary database'
+                                        : `Read replica (ID: ${database.id})`}
+                                    </p>
+                                    {database.id.toString() === selectedDatabaseId && <IconCheck />}
+                                  </div>
+                                </CommandItem_Shadcn_>
+                              )
+                            })}
+                          </ScrollArea>
+                        </CommandGroup_Shadcn_>
+                      </CommandList_Shadcn_>
+                    </Command_Shadcn_>
+                  </PopoverContent_Shadcn_>
+                </Popover_Shadcn_>
+              </div>
             }
             className="!m-0"
           >
@@ -345,6 +437,7 @@ const DatabaseSettings = () => {
           </Panel>
         </section>
       </div>
+
       <ConfirmDisableReadOnlyModeModal
         visible={showConfirmationModal}
         onClose={() => setShowConfirmationModal(false)}
