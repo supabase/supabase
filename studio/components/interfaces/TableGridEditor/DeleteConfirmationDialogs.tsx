@@ -18,6 +18,7 @@ import { useStore, useUrlState } from 'hooks'
 import { TableLike } from 'hooks/misc/useTable'
 import { noop } from 'lib/void'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { getImpersonatedUser } from 'state/user-impersonation-state'
 
 export type DeleteConfirmationDialogsProps = {
   projectRef?: string
@@ -207,6 +208,7 @@ const DeleteConfirmationDialogs = ({
           projectRef: project.ref,
           connectionString: project.connectionString,
           table: selectedTable as any,
+          impersonatedUser: getImpersonatedUser(),
         })
       } else {
         deleteAllRows({
@@ -214,6 +216,7 @@ const DeleteConfirmationDialogs = ({
           connectionString: project.connectionString,
           table: selectedTable as any,
           filters,
+          impersonatedUser: getImpersonatedUser(),
         })
       }
     } else {
@@ -222,6 +225,7 @@ const DeleteConfirmationDialogs = ({
         connectionString: project.connectionString,
         table: selectedTable as any,
         rows: selectedRowsToDelete as SupaRow[],
+        impersonatedUser: getImpersonatedUser(),
       })
     }
   }

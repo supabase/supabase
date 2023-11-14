@@ -33,6 +33,7 @@ import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { EMPTY_ARR } from 'lib/void'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { getImpersonatedUser } from 'state/user-impersonation-state'
 import { SchemaView } from 'types'
 import GridHeaderActions from './GridHeaderActions'
 import NotFoundState from './NotFoundState'
@@ -294,6 +295,7 @@ const TableGridEditor = ({
       configuration,
       payload: updatedData,
       enumArrayColumns,
+      impersonatedUser: getImpersonatedUser(),
     })
   }
 

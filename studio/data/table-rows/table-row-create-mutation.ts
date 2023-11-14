@@ -2,8 +2,10 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'react-hot-toast'
 
 import { Query, SupaTable } from 'components/grid'
+import { User } from 'data/auth/users-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
+import { wrapWithUserImpersonation } from 'lib/user-impersonation'
 import { ResponseError } from 'types'
 
 export type TableRowCreateVariables = {
@@ -12,6 +14,7 @@ export type TableRowCreateVariables = {
   table: SupaTable
   payload: any
   enumArrayColumns: string[]
+  impersonatedUser?: User | null
 }
 
 export function getTableRowCreateSql({
@@ -31,8 +34,12 @@ export async function createTableRow({
   table,
   payload,
   enumArrayColumns,
+  impersonatedUser,
 }: TableRowCreateVariables) {
-  const sql = getTableRowCreateSql({ table, payload, enumArrayColumns })
+  const sql = wrapWithUserImpersonation(
+    getTableRowCreateSql({ table, payload, enumArrayColumns }),
+    impersonatedUser
+  )
   const { result } = await executeSql({ projectRef, connectionString, sql })
   return result
 }

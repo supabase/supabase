@@ -31,6 +31,7 @@ import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useFormatQueryMutation } from 'data/sql/format-sql-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { isError } from 'data/utils/error-check'
 import {
   useFlag,
@@ -44,7 +45,9 @@ import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import Telemetry from 'lib/telemetry'
+import { wrapWithUserImpersonation } from 'lib/user-impersonation'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { getImpersonatedUser } from 'state/user-impersonation-state'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
 import AISettingsModal from './AISettingsModal'
@@ -63,7 +66,6 @@ import {
   getDiffTypeDropdownLabel,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -311,7 +313,7 @@ const SQLEditor = () => {
         execute({
           projectRef: project.ref,
           connectionString: project.connectionString,
-          sql,
+          sql: wrapWithUserImpersonation(sql, getImpersonatedUser()),
         })
       }
     },

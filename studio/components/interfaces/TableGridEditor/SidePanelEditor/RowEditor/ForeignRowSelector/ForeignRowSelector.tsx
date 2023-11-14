@@ -13,6 +13,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useTableQuery } from 'data/tables/table-query'
+import { useUserImpersonationStateSnapshot } from 'state/user-impersonation-state'
 import ActionBar from '../../ActionBar'
 import { useEncryptedColumns } from './ForeignRowSelector.utils'
 import Pagination from './Pagination'
@@ -69,6 +70,8 @@ const ForeignRowSelector = ({
   const rowsPerPage = 100
   const [page, setPage] = useState(1)
 
+  const userImpersonationState = useUserImpersonationStateSnapshot()
+
   const { data, isLoading, isSuccess, isError, isRefetching } = useTableRowsQuery(
     {
       queryKey: [schemaName, tableName],
@@ -79,6 +82,7 @@ const ForeignRowSelector = ({
       filters,
       page,
       limit: rowsPerPage,
+      impersonatedUser: userImpersonationState.user,
     },
     {
       keepPreviousData: true,

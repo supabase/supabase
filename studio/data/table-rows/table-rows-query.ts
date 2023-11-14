@@ -1,5 +1,7 @@
 import { QueryKey, UseQueryOptions } from '@tanstack/react-query'
 import { Filter, Query, Sort, SupaRow, SupaTable } from 'components/grid'
+import { User } from 'data/auth/users-query'
+import { wrapWithUserImpersonation } from 'lib/user-impersonation'
 import { useCallback } from 'react'
 import {
   ExecuteSqlData,
@@ -16,9 +18,11 @@ type GetTableRowsArgs = {
   sorts?: Sort[]
   limit?: number
   page?: number
+  impersonatedUser?: User | null
 }
 
 // [Joshen] From components/grid/services/row/SqlRowService.ts, we should remove the logic from SqlRowService eventually
+// (currently used in csv export)
 export const fetchAllTableRows = async ({
   projectRef,
   connectionString,
@@ -135,17 +139,21 @@ export type TableRowsData = TableRows
 export type TableRowsError = unknown
 
 export const useTableRowsQuery = <TData extends TableRowsData = TableRowsData>(
-  { projectRef, connectionString, queryKey, table, ...args }: TableRowsVariables,
+  { projectRef, connectionString, queryKey, table, impersonatedUser, ...args }: TableRowsVariables,
   options: UseQueryOptions<ExecuteSqlData, TableRowsError, TData> = {}
 ) =>
   useExecuteSqlQuery(
     {
       projectRef,
       connectionString,
-      sql: getTableRowsSqlQuery({ table, ...args }),
+      sql: wrapWithUserImpersonation(getTableRowsSqlQuery({ table, ...args }), impersonatedUser),
       queryKey: [
         ...(queryKey ?? []),
-        { table: { name: table?.name, schema: table?.schema }, ...args },
+        {
+          table: { name: table?.name, schema: table?.schema },
+          impersonatedUserId: impersonatedUser?.id,
+          ...args,
+        },
       ],
     },
     {

@@ -1,12 +1,16 @@
 import { QueryKey, UseQueryOptions } from '@tanstack/react-query'
-import { Filter, Query, SupaTable } from 'components/grid'
 import { useCallback } from 'react'
+
+import { Filter, Query, SupaTable } from 'components/grid'
+import { User } from 'data/auth/users-query'
+import { wrapWithUserImpersonation } from 'lib/user-impersonation'
 import { ExecuteSqlData, useExecuteSqlPrefetch, useExecuteSqlQuery } from '../sql/execute-sql-query'
 import { formatFilterValue } from './utils'
 
 type GetTableRowsCountArgs = {
   table?: SupaTable
   filters?: Filter[]
+  impersonatedUser?: User | null
 }
 
 export const getTableRowsCountSqlQuery = ({ table, filters = [] }: GetTableRowsCountArgs) => {
@@ -43,17 +47,31 @@ export type TableRowsCountData = TableRowsCount
 export type TableRowsCountError = unknown
 
 export const useTableRowsCountQuery = <TData extends TableRowsCountData = TableRowsCountData>(
-  { projectRef, connectionString, queryKey, table, ...args }: TableRowsCountVariables,
+  {
+    projectRef,
+    connectionString,
+    queryKey,
+    table,
+    impersonatedUser,
+    ...args
+  }: TableRowsCountVariables,
   options: UseQueryOptions<ExecuteSqlData, TableRowsCountError, TData> = {}
 ) =>
   useExecuteSqlQuery(
     {
       projectRef,
       connectionString,
-      sql: getTableRowsCountSqlQuery({ table, ...args }),
+      sql: wrapWithUserImpersonation(
+        getTableRowsCountSqlQuery({ table, ...args }),
+        impersonatedUser
+      ),
       queryKey: [
         ...(queryKey ?? []),
-        { table: { name: table?.name, schema: table?.schema }, ...args },
+        {
+          table: { name: table?.name, schema: table?.schema },
+          impersonatedUserId: impersonatedUser?.id,
+          ...args,
+        },
       ],
     },
     {

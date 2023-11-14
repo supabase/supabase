@@ -25,6 +25,7 @@ import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useCheckPermissions, useStore, useUrlState } from 'hooks'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { useUserImpersonationStateSnapshot } from 'state/user-impersonation-state'
 import RLSBannerWarning from './RLSBannerWarning'
 import RefreshButton from './RefreshButton'
 import FilterDropdown from './filter'
@@ -234,6 +235,8 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
 
+  const userImpersonationState = useUserImpersonationStateSnapshot()
+
   const [isExporting, setIsExporting] = useState(false)
 
   const { data } = useTableRowsQuery({
@@ -245,6 +248,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
     filters,
     page: state.page,
     limit: state.rowsPerPage,
+    impersonatedUser: userImpersonationState.user,
   })
 
   const { data: countData } = useTableRowsCountQuery(
@@ -254,6 +258,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
       connectionString: project?.connectionString,
       table,
       filters,
+      impersonatedUser: userImpersonationState.user,
     },
     { keepPreviousData: true }
   )

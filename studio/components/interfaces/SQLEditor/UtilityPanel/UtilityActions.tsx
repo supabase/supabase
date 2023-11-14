@@ -3,6 +3,7 @@ import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
 import { Button, IconAlignLeft, IconCommand, IconCornerDownLeft } from 'ui'
 
+import { UserImpersonationSelector } from 'components/interfaces/UserImpersonationSelector'
 import FavoriteButton from './FavoriteButton'
 import SavingIndicator from './SavingIndicator'
 import SizeToggleButton from './SizeToggleButton'
@@ -51,6 +52,9 @@ const UtilityActions = ({
           </Tooltip.Content>
         </Tooltip.Portal>
       </Tooltip.Root>
+      <div className="mx-2">
+        <UserImpersonationSelector />
+      </div>
       <Button
         onClick={() => executeQuery()}
         disabled={isDisabled || isExecuting}

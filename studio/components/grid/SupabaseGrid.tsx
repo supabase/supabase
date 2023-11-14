@@ -1,5 +1,5 @@
-import { DataGridHandle } from 'react-data-grid'
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import { DataGridHandle } from 'react-data-grid'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { createPortal } from 'react-dom'
@@ -7,6 +7,7 @@ import { createPortal } from 'react-dom'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useUrlState } from 'hooks'
+import { useUserImpersonationStateSnapshot } from 'state/user-impersonation-state'
 import {
   cleanupProps,
   formatFilterURLParams,
@@ -64,6 +65,8 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>(
     const sorts = formatSortURLParams(sort as string[])
     const filters = formatFilterURLParams(filter as string[])
 
+    const userImpersonationState = useUserImpersonationStateSnapshot()
+
     const { project } = useProjectContext()
     const { data, error, isSuccess, isError, isLoading, isRefetching } = useTableRowsQuery(
       {
@@ -75,6 +78,7 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>(
         filters,
         page: state.page,
         limit: state.rowsPerPage,
+        impersonatedUser: userImpersonationState.user,
       },
       {
         keepPreviousData: true,

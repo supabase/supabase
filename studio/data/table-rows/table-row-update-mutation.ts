@@ -2,8 +2,10 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'react-hot-toast'
 
 import { Query, SupaTable } from 'components/grid'
+import { User } from 'data/auth/users-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
+import { wrapWithUserImpersonation } from 'lib/user-impersonation'
 import { ResponseError } from 'types'
 
 export type TableRowUpdateVariables = {
@@ -13,6 +15,7 @@ export type TableRowUpdateVariables = {
   configuration: { identifiers: any }
   payload: any
   enumArrayColumns: string[]
+  impersonatedUser?: User | null
 }
 
 export function getTableRowUpdateSql({
@@ -35,8 +38,12 @@ export async function updateTableRow({
   payload,
   configuration,
   enumArrayColumns,
+  impersonatedUser,
 }: TableRowUpdateVariables) {
-  const sql = getTableRowUpdateSql({ table, configuration, payload, enumArrayColumns })
+  const sql = wrapWithUserImpersonation(
+    getTableRowUpdateSql({ table, configuration, payload, enumArrayColumns }),
+    impersonatedUser
+  )
 
   const { result } = await executeSql({ projectRef, connectionString, sql })
 

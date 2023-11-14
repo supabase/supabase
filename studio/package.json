@@ -37,6 +37,7 @@
     "@supabase/supabase-js": "^2.38.2",
     "@tanstack/react-query": "^4.35.7",
     "@tanstack/react-query-devtools": "^4.35.7",
+    "@uidotdev/usehooks": "^2.4.1",
     "@zip.js/zip.js": "^2.7.29",
     "ajv": "^8.6.3",
     "analytics-node": "^3.5.0",

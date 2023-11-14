@@ -2,8 +2,10 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'react-hot-toast'
 
 import { Filter, Query, SupaTable } from 'components/grid'
+import { User } from 'data/auth/users-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
+import { wrapWithUserImpersonation } from 'lib/user-impersonation'
 import { ResponseError } from 'types'
 import { formatFilterValue } from './utils'
 
@@ -12,6 +14,7 @@ export type TableRowDeleteAllVariables = {
   connectionString?: string
   table: SupaTable
   filters: Filter[]
+  impersonatedUser?: User | null
 }
 
 export function getTableRowDeleteAllSql({
@@ -35,8 +38,12 @@ export async function deleteAllTableRow({
   connectionString,
   table,
   filters,
+  impersonatedUser,
 }: TableRowDeleteAllVariables) {
-  const sql = getTableRowDeleteAllSql({ table, filters })
+  const sql = wrapWithUserImpersonation(
+    getTableRowDeleteAllSql({ table, filters }),
+    impersonatedUser
+  )
 
   const { result } = await executeSql({ projectRef, connectionString, sql })
 
