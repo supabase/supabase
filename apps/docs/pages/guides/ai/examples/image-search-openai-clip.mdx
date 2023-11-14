@@ -83,8 +83,8 @@ def seed():
     # create vector store client
     vx = vecs.create_client(DB_CONNECTION)
 
-    # create a collection of vectors with 512 dimensions
-    images = vx.create_collection(name="image_vectors", dimension=512)
+    # create a collection of vectors with 3 dimensions
+    images = vx.get_or_create_collection(name="image_vectors", dimension=512)
 
     # Load CLIP model
     model = SentenceTransformer('clip-ViT-B-32')
