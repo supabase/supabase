@@ -21,7 +21,7 @@ interface DatabaseSelectorProps {
 
 const DatabaseSelector = ({ selectedDatabaseId, onChangeDatabaseId }: DatabaseSelectorProps) => {
   const [open, setOpen] = useState(false)
-  const databases = MOCK_DATABASES
+  const databases = MOCK_DATABASES.sort((a, b) => (a.id > b.id ? 1 : -1))
   const selectedDatabase = databases.find((db) => db.id.toString() === selectedDatabaseId)
 
   return (

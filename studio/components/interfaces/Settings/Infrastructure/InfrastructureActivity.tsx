@@ -29,11 +29,14 @@ import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useSelectedOrganization } from 'hooks'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants'
 import { INFRA_ACTIVITY_METRICS } from './Infrastructure.constants'
+import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { MOCK_DATABASES } from './InfrastructureConfiguration/InstanceConfiguration.constants'
 
 const InfrastructureActivity = () => {
   const { ref: projectRef } = useParams()
   const organization = useSelectedOrganization()
   const [dateRange, setDateRange] = useState<any>()
+  const [selectedDatabaseId, setSelectedDatabaseId] = useState<string>('1')
 
   const { data: subscription, isLoading: isLoadingSubscription } = useOrgSubscriptionQuery({
     orgSlug: organization?.slug,
@@ -182,7 +185,11 @@ const InfrastructureActivity = () => {
         </div>
       </ScaffoldContainer>
       <ScaffoldContainer className="sticky top-0 py-6 border-b bg-background z-10">
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center gap-x-4">
+          <DatabaseSelector
+            selectedDatabaseId={selectedDatabaseId}
+            onChangeDatabaseId={setSelectedDatabaseId}
+          />
           {!isLoadingSubscription && (
             <>
               <DateRangePicker
