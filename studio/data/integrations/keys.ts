@@ -29,16 +29,8 @@ export const integrationKeys = {
   githubPullRequestsList: (
     organization_integration_id: string | undefined,
     repo_owner: string,
-    repo_name: string,
-    target: string | undefined
-  ) => [
-    'organizations',
-    organization_integration_id,
-    'pull-requests',
-    repo_owner,
-    repo_name,
-    target,
-  ],
+    repo_name: string
+  ) => ['organizations', organization_integration_id, 'pull-requests', repo_owner, repo_name],
   githubConnectionsList: (organization_integration_id: string | undefined) =>
     ['organizations', organization_integration_id, 'github-connections'] as const,
 }

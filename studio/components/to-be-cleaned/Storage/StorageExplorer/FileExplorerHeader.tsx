@@ -38,6 +38,7 @@ import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import APIDocsButton from 'components/ui/APIDocsButton'
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 const VIEW_OPTIONS = [
   { key: STORAGE_VIEWS.COLUMNS, name: 'As columns' },
@@ -140,8 +141,8 @@ const FileExplorerHeader = ({
   onFilesUpload = noop,
 }: FileExplorerHeader) => {
   const debounceDuration = 300
-  const appSnap = useAppStateSnapshot()
   const snap = useStorageExplorerStateSnapshot()
+  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
 
   const [pathString, setPathString] = useState('')
   const [searchString, setSearchString] = useState('')
@@ -514,11 +515,14 @@ const FileExplorerHeader = ({
           )}
         </div>
 
-        <div className="h-6 border-r border-control" />
-
-        <div className="mx-2">
-          <APIDocsButton section={['storage', selectedBucket.name]} />
-        </div>
+        {isNewAPIDocsEnabled && (
+          <>
+            <div className="h-6 border-r border-control" />
+            <div className="mx-2">
+              <APIDocsButton section={['storage', selectedBucket.name]} />
+            </div>
+          </>
+        )}
       </div>
     </div>
   )
