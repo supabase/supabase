@@ -1,19 +1,19 @@
-import { partition } from 'lodash'
-import { useState, useEffect } from 'react'
-import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PostgresRole } from '@supabase/postgres-meta'
-import { Button, Input, IconPlus, IconSearch, IconX, Badge } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { partition } from 'lodash'
+import { observer } from 'mobx-react-lite'
+import { useEffect, useState } from 'react'
+import { Badge, Button, IconPlus, IconSearch, IconX, Input } from 'ui'
 
-import { useCheckPermissions, useStore } from 'hooks'
-import SparkBar from 'components/ui/SparkBar'
 import { FormHeader } from 'components/ui/Forms'
-import RoleRow from './RoleRow'
-import { SUPABASE_ROLES } from './Roles.constants'
+import NoSearchResults from 'components/ui/NoSearchResults'
+import SparkBar from 'components/ui/SparkBar'
+import { useCheckPermissions, useStore } from 'hooks'
 import CreateRolePanel from './CreateRolePanel'
 import DeleteRoleModal from './DeleteRoleModal'
-import NoSearchResults from 'components/ui/NoSearchResults'
+import RoleRow from './RoleRow'
+import { SUPABASE_ROLES } from './Roles.constants'
 
 const RolesList = ({}) => {
   const { meta } = useStore()
@@ -84,25 +84,25 @@ const RolesList = ({}) => {
                 )
               }
             />
-            <div className="flex items-center border border-scale-700 rounded-full w-min h-[34px]">
+            <div className="flex items-center border border-strong rounded-full w-min h-[34px]">
               <button
                 className={[
                   'text-xs w-[90px] h-full text-center rounded-l-full flex items-center justify-center transition',
                   filterType === 'all'
-                    ? 'bg-scale-500 text-scale-1200'
-                    : 'hover:bg-scale-400 text-scale-1100',
+                    ? 'bg-overlay-hover text-foreground'
+                    : 'hover:bg-surface-200 text-foreground-light',
                 ].join(' ')}
                 onClick={() => setFilterType('all')}
               >
                 All roles
               </button>
-              <div className="h-full w-[1px] border-r border-scale-700"></div>
+              <div className="h-full w-[1px] border-r border-strong"></div>
               <button
                 className={[
                   'text-xs w-[90px] h-full text-center rounded-r-full flex items-center justify-center transition',
                   filterType === 'active'
-                    ? 'bg-scale-500 text-scale-1200'
-                    : 'hover:bg-scale-400 text-scale-1100',
+                    ? 'bg-overlay-hover text-foreground'
+                    : 'hover:bg-surface-200 text-foreground-light',
                 ].join(' ')}
                 onClick={() => setFilterType('active')}
               >
@@ -136,13 +136,13 @@ const RolesList = ({}) => {
                 <Tooltip.Arrow className="radix-tooltip-arrow" />
                 <div
                   className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200 space-y-1',
+                    'rounded bg-alternative py-1 px-2 leading-none shadow',
+                    'border border-background space-y-1',
                   ].join(' ')}
                 >
-                  <p className="text-xs text-scale-1100 pr-2">Connections by roles:</p>
+                  <p className="text-xs text-foreground-light pr-2">Connections by roles:</p>
                   {rolesWithActiveConnections.map((role: PostgresRole) => (
-                    <div key={role.id} className="text-xs text-scale-1200">
+                    <div key={role.id} className="text-xs text-foreground">
                       {role.name}: {role.active_connections}
                     </div>
                   ))}
@@ -165,8 +165,8 @@ const RolesList = ({}) => {
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200 text-xs',
+                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                      'border border-background text-xs',
                     ].join(' ')}
                   >
                     You need additional permissions to add a new role
@@ -180,8 +180,8 @@ const RolesList = ({}) => {
         <div className="space-y-4">
           <div>
             {supabaseRoles.length > 0 && (
-              <div className="bg-scale-100 dark:bg-scale-200 border border-scale-300 dark:border-scale-500 px-6 py-3 rounded-t flex items-center space-x-4">
-                <p className="text-sm text-scale-1100">Roles managed by Supabase</p>
+              <div className="bg-surface-100 border border-default px-6 py-3 rounded-t flex items-center space-x-4">
+                <p className="text-sm text-foreground-light">Roles managed by Supabase</p>
                 <Badge color="green">Protected</Badge>
               </div>
             )}
@@ -197,8 +197,8 @@ const RolesList = ({}) => {
 
           <div>
             {otherRoles.length > 0 && (
-              <div className="bg-scale-100 dark:bg-scale-200 border border-scale-300 dark:border-scale-500 px-6 py-3 rounded-t">
-                <p className="text-sm text-scale-1100">Other database roles</p>
+              <div className="bg-surface-100 border border-default px-6 py-3 rounded-t">
+                <p className="text-sm text-foreground-light">Other database roles</p>
               </div>
             )}
             {otherRoles.map((role: PostgresRole, i: number) => (

@@ -1,9 +1,6 @@
-import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
-
 import PostTypes from '~/types/post'
 import { getSortedPosts } from '~/lib/posts'
-import { useTheme } from 'common'
 import content from '~/data/home/content'
 import Layout from '~/components/Layouts/Default'
 import Hero from '~/components/Hero/Hero'
@@ -19,21 +16,9 @@ const CTABanner = dynamic(() => import('components/CTABanner/index'))
 const CustomerStories = dynamic(() => import('components/CustomerStories'))
 const TwitterSocialSection = dynamic(() => import('~/components/TwitterSocialSection'))
 
-type Props = { customerStories: PostTypes[] }
+type Props = { customerStories: PostTypes[]; blogPosts: PostTypes[] }
 
 const Index = ({ customerStories }: Props) => {
-  const { isDarkMode, toggleTheme } = useTheme()
-  const [initialDarkMode] = useState(isDarkMode)
-
-  useEffect(() => {
-    toggleTheme(true)
-    document.body.className = 'dark'
-    return () => {
-      document.body.className = ''
-      toggleTheme(initialDarkMode)
-    }
-  }, [])
-
   return (
     <Layout>
       <Hero />

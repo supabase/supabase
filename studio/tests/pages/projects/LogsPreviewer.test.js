@@ -16,7 +16,7 @@ const defaultRouterMock = () => {
 useRouter.mockReturnValue(defaultRouterMock())
 
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { fireEvent, waitFor, screen, act } from '@testing-library/react'
 import { render } from '../../helpers'
 import userEvent from '@testing-library/user-event'
@@ -40,9 +40,15 @@ beforeEach(() => {
 // in the event that log metadata is not available, fall back to default renderer
 // generate test cases for each query type
 const defaultRendererFallbacksCases = [
-  'api', 'database', 'auth', 'pgbouncer', 'postgrest', 'storage', 'realtime'
+  'api',
+  'database',
+  'auth',
+  'pgbouncer',
+  'postgrest',
+  'storage',
+  'realtime',
 ].map((queryType) => ({
-  testName: "fallback to default render",
+  testName: 'fallback to default render',
   queryType,
   tableName: undefined,
   tableLog: logDataFixture({
@@ -104,7 +110,6 @@ test.each([
     ],
   },
   {
-
     queryType: 'auth',
     tableName: undefined,
     tableLog: logDataFixture({
@@ -137,7 +142,7 @@ test.each([
   },
   ...defaultRendererFallbacksCases,
   // these all use teh default selection/table renderers
-  ...['pgbouncer', 'postgrest', 'storage', 'realtime', "supavisor"].map((queryType) => ({
+  ...['pgbouncer', 'postgrest', 'storage', 'realtime', 'supavisor'].map((queryType) => ({
     queryType,
     tableName: undefined,
     tableLog: logDataFixture({
@@ -254,6 +259,24 @@ test('poll count for new messages', async () => {
   await waitFor(() => screen.queryByText(/999/) === null)
   await screen.findByText(/some-uuid123/)
 })
+
+test('stop polling for new count on error', async () => {
+  get.mockImplementation((url) => {
+    if (url.includes('count')) {
+      return { result: [{ count: 999 }] }
+    }
+    return {
+      error: [{ message: 'some logflare error' }],
+    }
+  })
+  render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
+  await waitFor(() => screen.queryByText(/some-uuid123/) === null)
+  // should display error
+  await screen.findByText(/some logflare error/)
+  // should not load refresh counts if no data from main query
+  await expect(screen.findByText(/999/)).rejects.toThrowError()
+})
+
 test('log event chart', async () => {
   get.mockImplementation((url) => {
     // truncate
@@ -475,7 +498,7 @@ test('filters accept filterOverride', async () => {
 
 describe.each(['free', 'pro', 'team', 'enterprise'])('upgrade modal for %s', (key) => {
   beforeEach(() => {
-    useProjectSubscriptionV2Query.mockReturnValue({
+    useOrgSubscriptionQuery.mockReturnValue({
       data: {
         plan: {
           id: key,
@@ -499,7 +522,7 @@ describe.each(['free', 'pro', 'team', 'enterprise'])('upgrade modal for %s', (ke
 })
 
 test('datepicker onChange will set the query params for outbound api request', async () => {
-  useProjectSubscriptionV2Query.mockReturnValue({
+  useOrgSubscriptionQuery.mockReturnValue({
     data: {
       plan: {
         id: 'enterprise',

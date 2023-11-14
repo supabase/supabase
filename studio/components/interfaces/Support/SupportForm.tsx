@@ -26,7 +26,6 @@ import { getProjectAuthConfig } from 'data/auth/auth-config-query'
 import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useFlag, useStore } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
 import { detectBrowser } from 'lib/helpers'
@@ -35,6 +34,7 @@ import { Project } from 'types'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
 import { CATEGORY_OPTIONS, SERVICE_OPTIONS, SEVERITY_OPTIONS } from './Support.constants'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
@@ -110,10 +110,9 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
         })?.slug
       : organizations?.[0]?.slug
 
-  const { data: subscription, isLoading: isLoadingSubscription } = useProjectSubscriptionV2Query(
-    { projectRef: selectedProjectRef },
-    { enabled: selectedProjectRef !== 'no-project' }
-  )
+  const { data: subscription, isLoading: isLoadingSubscription } = useOrgSubscriptionQuery({
+    orgSlug: selectedOrganizationSlug,
+  })
 
   useEffect(() => {
     if (!uploadedFiles) return
@@ -325,7 +324,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                     <div className="space-y-2">
                       <p className="text-sm prose">Which project is affected?</p>
                       <div className="border rounded-md px-4 py-2 flex items-center space-x-2">
-                        <IconAlertCircle strokeWidth={2} className="text-scale-1000" />
+                        <IconAlertCircle strokeWidth={2} className="text-foreground-light" />
                         <p className="text-sm prose">Failed to retrieve projects</p>
                       </div>
                     </div>
@@ -363,7 +362,6 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                           key={`option-${option.value}`}
                           label={option.label}
                           value={option.value}
-                          disabled={option.value === 'Critical' && isFreeProject}
                         >
                           <span>{option.label}</span>
                           <span className="block text-xs opacity-50">{option.description}</span>
@@ -374,14 +372,14 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                 </div>
 
                 {values.projectRef !== 'no-project' && subscription && isSuccessProjects ? (
-                  <p className="text-sm text-scale-1000 mt-2">
+                  <p className="text-sm text-foreground-light mt-2">
                     This project is on the{' '}
-                    <span className="text-scale-1100">{subscription.plan.name} plan</span>
+                    <span className="text-foreground-light">{subscription.plan.name} plan</span>
                   </p>
                 ) : isLoadingSubscription && selectedProjectRef !== 'no-project' ? (
                   <div className="flex items-center space-x-2 mt-2">
                     <IconLoader size={14} className="animate-spin" />
-                    <p className="text-sm text-scale-1000">Checking project's plan</p>
+                    <p className="text-sm text-foreground-light">Checking project's plan</p>
                   </div>
                 ) : (
                   <></>
@@ -403,7 +401,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                     <div className="space-y-2">
                       <p className="text-sm prose">Which organization is affected?</p>
                       <div className="border rounded-md px-4 py-2 flex items-center space-x-2">
-                        <IconAlertCircle strokeWidth={2} className="text-scale-1000" />
+                        <IconAlertCircle strokeWidth={2} className="text-foreground-light" />
                         <p className="text-sm prose">Failed to retrieve organizations</p>
                       </div>
                     </div>
@@ -444,20 +442,22 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                         Enhanced SLAs for support are available on our Enterprise Plan.
                       </p>
                       <div className="flex items-center space-x-2">
-                        <Link
-                          href={`/project/${values.projectRef}/settings/billing/subscription?panel=subscriptionPlan`}
-                        >
-                          <a>
-                            <Button>Upgrade project</Button>
-                          </a>
-                        </Link>
-                        <Link href="https://supabase.com/contact/enterprise">
-                          <a target="_blank" rel="noreferrer">
-                            <Button type="default" icon={<IconExternalLink size={14} />}>
-                              Enquire about Enterprise
-                            </Button>
-                          </a>
-                        </Link>
+                        <Button asChild>
+                          <Link
+                            href={`/org/${values.organizationSlug}/billing?panel=subscriptionPlan`}
+                          >
+                            Upgrade project
+                          </Link>
+                        </Button>
+                        <Button asChild type="default" icon={<IconExternalLink size={14} />}>
+                          <Link
+                            href="https://supabase.com/contact/enterprise"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Enquire about Enterprise
+                          </Link>
+                        </Button>
                       </div>
                     </div>
                   }
@@ -472,7 +472,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                 {['Performance'].includes(values.category) && isFreeProject ? (
                   <DisabledStateForFreeTier
                     category={selectedCategory?.label ?? ''}
-                    projectRef={values.projectRef}
+                    organizationSlug={selectedOrganizationSlug ?? ''}
                   />
                 ) : (
                   <>
@@ -489,15 +489,12 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                               <Link
                                 key="gh-discussions"
                                 href={`https://github.com/orgs/supabase/discussions?discussions_q=${values.subject}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="flex items-center space-x-2 text-foreground-light underline hover:text-foreground transition"
                               >
-                                <a
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="flex items-center space-x-2 text-scale-1000 underline hover:text-scale-1100 transition"
-                                >
-                                  Github discussions
-                                  <IconExternalLink size={14} strokeWidth={2} className="ml-1" />
-                                </a>
+                                Github discussions
+                                <IconExternalLink size={14} strokeWidth={2} className="ml-1" />
                               </Link>
                               <span> for a quick answer</span>
                             </p>
@@ -539,7 +536,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                     {selectedLibrary !== undefined && (
                       <div className="px-6 space-y-4 !mt-4">
                         <div className="space-y-2">
-                          <p className="text-sm text-scale-1100">
+                          <p className="text-sm text-foreground-light">
                             Found an issue or a bug? Try searching our Github issues or submit a new
                             one.
                           </p>
@@ -553,52 +550,54 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                             return (
                               <div
                                 key={library.name}
-                                className="w-[230px] min-w-[230px] min-h-[128px] rounded border border-scale-600 bg-scale-300 space-y-3 px-4 py-3"
+                                className="w-[230px] min-w-[230px] min-h-[128px] rounded border border-control bg-surface-100 space-y-3 px-4 py-3"
                               >
                                 <div className="space-y-1">
                                   <p className="text-sm">{library.name}</p>
-                                  <p className="text-sm text-scale-1100">
+                                  <p className="text-sm text-foreground-light">
                                     For issues regarding the {libraryLanguage} client library
                                   </p>
                                 </div>
                                 <div>
-                                  <Link href={library.url}>
-                                    <a target="_blank" rel="noreferrer">
-                                      <Button
-                                        type="default"
-                                        icon={<IconExternalLink size={14} strokeWidth={1.5} />}
-                                      >
-                                        View Github issues
-                                      </Button>
-                                    </a>
-                                  </Link>
+                                  <Button
+                                    asChild
+                                    type="default"
+                                    icon={<IconExternalLink size={14} strokeWidth={1.5} />}
+                                  >
+                                    <Link href={library.url} target="_blank" rel="noreferrer">
+                                      View Github issues
+                                    </Link>
+                                  </Button>
                                 </div>
                               </div>
                             )
                           })}
                           <div
                             className={[
-                              'px-4 py-3 rounded border border-scale-600 bg-scale-300',
+                              'px-4 py-3 rounded border border-control bg-surface-100',
                               'w-[230px] min-w-[230px] min-h-[128px] flex flex-col justify-between space-y-3',
                             ].join(' ')}
                           >
                             <div className="space-y-1">
                               <p className="text-sm">supabase</p>
-                              <p className="text-sm text-scale-1100">
+                              <p className="text-sm text-foreground-light">
                                 For any issues about our API
                               </p>
                             </div>
                             <div>
-                              <Link href="https://github.com/supabase/supabase">
-                                <a target="_blank" rel="noreferrer">
-                                  <Button
-                                    type="default"
-                                    icon={<IconExternalLink size={14} strokeWidth={1.5} />}
-                                  >
-                                    View Github issues
-                                  </Button>
-                                </a>
-                              </Link>
+                              <Button
+                                asChild
+                                type="default"
+                                icon={<IconExternalLink size={14} strokeWidth={1.5} />}
+                              >
+                                <Link
+                                  href="https://github.com/supabase/supabase"
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  View Github issues
+                                </Link>
+                              </Button>
                             </div>
                           </div>
                         </div>
@@ -607,7 +606,9 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
 
                     {values.category !== 'Login_issues' && (
                       <div className="px-6 space-y-2">
-                        <p className="text-sm text-scale-1100">Which services are affected?</p>
+                        <p className="text-sm text-foreground-light">
+                          Which services are affected?
+                        </p>
                         <MultiSelect
                           options={SERVICE_OPTIONS}
                           value={selectedServices}
@@ -639,8 +640,8 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                     )}
                     <div className="space-y-4 px-6">
                       <div className="space-y-1">
-                        <p className="block text-sm text-scale-1100">Attachments</p>
-                        <p className="block text-sm text-scale-1000">
+                        <p className="block text-sm text-foreground-light">Attachments</p>
+                        <p className="block text-sm text-foreground-light">
                           Upload up to {MAX_ATTACHMENTS} screenshots that might be relevant to the
                           issue that you're facing
                         </p>
@@ -677,7 +678,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                         {uploadedFiles.length < MAX_ATTACHMENTS && (
                           <div
                             className={[
-                              'border border-scale-800 opacity-50 transition hover:opacity-100',
+                              'border border-stronger opacity-50 transition hover:opacity-100',
                               'group flex h-14 w-14 cursor-pointer items-center justify-center rounded',
                             ].join(' ')}
                             onClick={() => {
@@ -691,11 +692,11 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                     </div>
                     <div className="px-6">
                       <div className="flex items-center space-x-1 justify-end block text-sm mt-0 mb-2">
-                        <p className="text-scale-1000">We will contact you at</p>
-                        <p className="text-scale-1200 font-medium">{respondToEmail}</p>
+                        <p className="text-foreground-light">We will contact you at</p>
+                        <p className="text-foreground font-medium">{respondToEmail}</p>
                       </div>
                       <div className="flex items-center space-x-1 justify-end block text-sm mt-0 mb-2">
-                        <p className="text-scale-1000">
+                        <p className="text-foreground-light">
                           Please ensure you haven't blocked Hubspot in your emails
                         </p>
                       </div>

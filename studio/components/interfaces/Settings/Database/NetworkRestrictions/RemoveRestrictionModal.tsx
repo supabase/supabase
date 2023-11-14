@@ -56,7 +56,7 @@ const RemoveRestrictionModal = ({
     >
       <Modal.Content>
         <div className="py-6 space-y-4">
-          <p className="text-sm text-scale-1100">
+          <p className="text-sm text-foreground-light">
             The IPv4 address <code className="text-xs">{selectedRestriction}</code> will be removed
             from your list of network restrictions
             {isRemovingOnlyRestriction

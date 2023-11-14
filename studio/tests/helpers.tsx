@@ -47,7 +47,7 @@ export const clickDropdown = (elem: HTMLElement) => {
  * A custom render function for react testing library
  * https://testing-library.com/docs/react-testing-library/setup/#custom-render
  */
-const ReactQueryTestConfig: React.FC = ({ children }) => {
+const ReactQueryTestConfig: React.FC<React.PropsWithChildren> = ({ children }) => {
   const [rootStore] = useState(() => new RootStore())
 
   const [queryClient] = useState(

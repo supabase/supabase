@@ -61,11 +61,11 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
       <div className="flex flex-col items-start">
         <Panel.Content>
           <div className="flex flex-col gap-2">
-            <h4 className="text-scale-1200">
+            <h4 className="text-foreground">
               Setup complete! Press activate to enable the custom domain{' '}
               <code className="text-sm">{customDomain.hostname}</code> for this project.
             </h4>
-            <span className="text-sm text-scale-1100">
+            <span className="text-sm text-foreground-light">
               We recommend that you schedule a downtime window of 20 - 30 minutes for your
               application, as you will need to update any services that need to know about your
               custom domain (e.g client side code or OAuth providers)
@@ -73,7 +73,7 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
           </div>
           <div className="mt-4">
             <Alert_Shadcn_>
-              <IconAlertCircle className="text-scale-1100" strokeWidth={1.5} />
+              <IconAlertCircle className="text-foreground-light" strokeWidth={1.5} />
               <AlertTitle_Shadcn_>
                 Do remember to restore the original CNAME record from the first step before
                 activating
@@ -95,17 +95,19 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
           </div>
         </Panel.Content>
 
-        <div className="w-full border-t border-scale-400" />
+        <div className="w-full border-t border-muted" />
 
         <Panel.Content className="w-full">
           <div className="flex items-center justify-between">
-            <Link href="https://supabase.com/docs/guides/platform/custom-domains">
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" icon={<IconExternalLink />}>
-                  Documentation
-                </Button>
-              </a>
-            </Link>
+            <Button asChild type="default" icon={<IconExternalLink />}>
+              <Link
+                href="https://supabase.com/docs/guides/platform/custom-domains"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Documentation
+              </Link>
+            </Button>
             <div className="flex items-center space-x-2">
               <Button
                 type="default"

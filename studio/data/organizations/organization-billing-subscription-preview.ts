@@ -16,6 +16,25 @@ export type OrganizationBillingSubscriptionPreviewResponse = {
     quantity: number
     total_price: number
   }[]
+  number_of_projects?: number
+  plan_change_type?: 'downgrade' | 'none' | 'upgrade'
+  active_projects?: {
+    status:
+      | 'INACTIVE'
+      | 'ACTIVE_HEALTHY'
+      | 'ACTIVE_UNHEALTHY'
+      | 'COMING_UP'
+      | 'UNKNOWN'
+      | 'GOING_DOWN'
+      | 'INIT_FAILED'
+      | 'REMOVED'
+      | 'RESTORING'
+      | 'UPGRADING'
+    instance_size: string
+    name: string
+    ref: string
+  }[]
+  billed_via_partner?: boolean
 }
 
 export async function previewOrganizationBillingSubscription({

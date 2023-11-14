@@ -9,7 +9,11 @@ import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { uuidv4 } from 'lib/helpers'
 import {
   Button,
-  Dropdown,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   IconChevronDown,
   IconPlus,
   IconTrash,
@@ -87,14 +91,12 @@ const HTTPRequestFields = ({
             />
           ) : type === 'supabase_function' && edgeFunctions.length === 0 ? (
             <div className="space-y-1">
-              <p className="text-sm text-scale-1100">Select which edge function to trigger</p>
-              <div className="px-4 py-4 border rounded bg-scale-500 border-scale-700 flex items-center justify-between space-x-4">
+              <p className="text-sm text-foreground-light">Select which edge function to trigger</p>
+              <div className="px-4 py-4 border rounded bg-surface-300 border-strong flex items-center justify-between space-x-4">
                 <p className="text-sm">No edge functions created yet</p>
-                <Link href={`/project/${ref}/functions`}>
-                  <a>
-                    <Button>Create an edge function</Button>
-                  </a>
-                </Link>
+                <Button asChild>
+                  <Link href={`/project/${ref}/functions`}>Create an edge function</Link>
+                </Button>
               </div>
               {errors.http_url && <p className="text-sm text-red-900">{errors.http_url}</p>}
             </div>
@@ -103,7 +105,7 @@ const HTTPRequestFields = ({
               {edgeFunctions.map((fn) => {
                 const restUrl = selectedProject?.restUrl
                 const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
-                const functionUrl = `https://${ref}.functions.supabase.${restUrlTld}/${fn.slug}`
+                const functionUrl = `https://${ref}.supabase.${restUrlTld}/functions/v1/${fn.slug}`
 
                 return (
                   <Listbox.Option key={fn.id} id={functionUrl} value={functionUrl} label={fn.name}>
@@ -119,7 +121,7 @@ const HTTPRequestFields = ({
             label="Timeout"
             labelOptional="Between 1000ms to 5000ms"
             type="number"
-            actions={<p className="text-light pr-2">ms</p>}
+            actions={<p className="text-foreground-light pr-2">ms</p>}
           />
         </FormSectionContent>
       </FormSection>
@@ -165,11 +167,16 @@ const HTTPRequestFields = ({
                 Add a new header
               </Button>
               {type === 'supabase_function' && (
-                <Dropdown
-                  align="end"
-                  side="bottom"
-                  overlay={[
-                    <Dropdown.Item
+                <DropdownMenu>
+                  <DropdownMenuTrigger>
+                    <Button
+                      type="default"
+                      className="rounded-l-none px-[4px] py-[5px]"
+                      icon={<IconChevronDown />}
+                    />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" side="bottom">
+                    <DropdownMenuItem
                       key="add-auth-header"
                       onClick={() =>
                         onAddHeader({
@@ -180,14 +187,14 @@ const HTTPRequestFields = ({
                       }
                     >
                       <div className="space-y-1">
-                        <p className="block text-scale-1200">Add auth header with service key</p>
-                        <p className="text-scale-1000">
+                        <p className="block text-foreground">Add auth header with service key</p>
+                        <p className="text-foreground-light">
                           Required if your edge function enforces JWT verification
                         </p>
                       </div>
-                    </Dropdown.Item>,
-                    <Dropdown.Separator key="separator" />,
-                    <Dropdown.Item
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
                       key="add-source-header"
                       onClick={() =>
                         onAddHeader({
@@ -198,20 +205,14 @@ const HTTPRequestFields = ({
                       }
                     >
                       <div className="space-y-1">
-                        <p className="block text-scale-1200">Add custom source header</p>
-                        <p className="text-scale-1000">
+                        <p className="block text-foreground">Add custom source header</p>
+                        <p className="text-foreground-light">
                           Useful to verify that the edge function was triggered from this webhook
                         </p>
                       </div>
-                    </Dropdown.Item>,
-                  ]}
-                >
-                  <Button
-                    type="default"
-                    className="rounded-l-none px-[4px] py-[5px]"
-                    icon={<IconChevronDown />}
-                  />
-                </Dropdown>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
             </div>
           </div>

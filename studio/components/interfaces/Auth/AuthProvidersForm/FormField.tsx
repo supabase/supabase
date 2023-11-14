@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
-import ReactMarkdown from 'react-markdown'
-import dayjs from 'dayjs'
-import { Button, IconEye, IconEyeOff, Input, InputNumber, Listbox, Toggle } from 'ui'
 import { DatePicker } from 'components/ui/DatePicker'
+import dayjs from 'dayjs'
+import { useEffect, useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import { Button, IconEye, IconEyeOff, Input, InputNumber, Listbox, Toggle } from 'ui'
 
 import { BASE_PATH } from 'lib/constants'
 import { Enum } from './AuthProvidersForm.types'
@@ -121,7 +121,7 @@ const FormField = ({ name, properties, formValues, disabled = false }: FormField
                 onClick={() => setHidden(!hidden)}
               />
             ) : (
-              <span className="mr-3 text-scale-900">
+              <span className="mr-3 text-foreground-lighter">
                 {properties.units ? (
                   <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
                     {properties.units}
@@ -156,7 +156,7 @@ const FormField = ({ name, properties, formValues, disabled = false }: FormField
             ) : null
           }
           actions={
-            <span className="mr-3 text-scale-900">
+            <span className="mr-3 text-foreground-lighter">
               {properties.units ? (
                 <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
                   {properties.units}

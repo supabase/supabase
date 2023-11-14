@@ -1,10 +1,18 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { observer } from 'mobx-react-lite'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { Fragment } from 'react'
-import { Button, Dropdown, IconPlus } from 'ui'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  IconPlus,
+} from 'ui'
 
 import { useParams } from 'common/hooks'
 import { useCheckPermissions } from 'hooks'
@@ -32,11 +40,11 @@ const WrapperDropdown = ({ buttonText = 'Add wrapper', align = 'end' }: WrapperD
             <Tooltip.Arrow className="radix-tooltip-arrow" />
             <div
               className={[
-                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                'border border-scale-200',
+                'rounded bg-alternative py-1 px-2 leading-none shadow',
+                'border border-background',
               ].join(' ')}
             >
-              <span className="text-xs text-scale-1200">
+              <span className="text-xs text-foreground">
                 You need additional permissions to add wrappers
               </span>
             </div>
@@ -47,43 +55,33 @@ const WrapperDropdown = ({ buttonText = 'Add wrapper', align = 'end' }: WrapperD
   }
 
   return (
-    <Dropdown
-      side="bottom"
-      align={align}
-      size="small"
-      overlay={
-        <>
-          {WRAPPERS.map((wrapper, idx) => (
-            <Fragment key={idx}>
+    <DropdownMenu>
+      <DropdownMenuTrigger>
+        <Button type="primary" icon={<IconPlus strokeWidth={1.5} />}>
+          {buttonText}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent side="bottom" align={align}>
+        {WRAPPERS.map((wrapper, idx) => (
+          <Fragment key={idx}>
+            <DropdownMenuItem key={wrapper.name} className="space-x-2" asChild>
               <Link
                 href={`/project/${ref}/database/wrappers/new?type=${wrapper.name.toLowerCase()}`}
               >
-                <a>
-                  <Dropdown.Item
-                    key={wrapper.name}
-                    icon={
-                      <Image
-                        src={wrapper.icon}
-                        width={20}
-                        height={20}
-                        alt={`${wrapper.name} wrapper icon`}
-                      />
-                    }
-                  >
-                    {wrapper.label}
-                  </Dropdown.Item>
-                </a>
+                <Image
+                  src={wrapper.icon}
+                  width={20}
+                  height={20}
+                  alt={`${wrapper.name} wrapper icon`}
+                />
+                <p>{wrapper.label}</p>
               </Link>
-              {idx !== WRAPPERS.length - 1 && <Dropdown.Separator />}
-            </Fragment>
-          ))}
-        </>
-      }
-    >
-      <Button type="primary" icon={<IconPlus strokeWidth={1.5} />}>
-        {buttonText}
-      </Button>
-    </Dropdown>
+            </DropdownMenuItem>
+            {idx !== WRAPPERS.length - 1 && <DropdownMenuSeparator />}
+          </Fragment>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
 

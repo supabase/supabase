@@ -25,8 +25,8 @@ html,
 body,
 #__next,
 .main {
-  @apply bg-scale-200;
-  @apply text-scale-1200;
+  @apply bg-background;
+  @apply text-foreground;
   height: 100%;
   padding: 0;
   margin: 0;
@@ -40,7 +40,7 @@ body,
 
 .form-group .form-text,
 .Form .form-text {
-  @apply text-scale-900;
+  @apply text-foreground-lighter;
 }
 
 .form-group input,
@@ -68,15 +68,15 @@ input.form-control,
   @apply rounded-md;
   @apply shadow-sm;
   @apply transition-all;
-  @apply text-scale-1200;
+  @apply text-foreground;
   @apply border;
   @apply focus:shadow-md;
 
-  @apply focus:border-scale-900;
-  @apply focus:ring-scale-400;
+  @apply focus:border-stronger;
+  @apply focus:ring-border-overlay;
 
-  @apply bg-scale-200 dark:bg-scale-200;
-  @apply border-scale-700 border;
+  @apply bg-background;
+  @apply border-strong border;
 
   @apply outline-none;
   @apply focus:ring-2 focus:ring-current;
@@ -131,11 +131,11 @@ input[type='submit']:hover {
 }
 
 input::placeholder {
-  @apply text-scale-900;
+  @apply text-foreground-lighter;
 }
 
 .form-group input::placeholder {
-  @apply text-scale-900;
+  @apply text-foreground-lighter;
 }
 
 .billing-input-fixed {

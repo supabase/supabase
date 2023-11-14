@@ -1,7 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { Button, Collapsible, IconChevronUp, IconEdit, IconExternalLink, IconTrash } from 'ui'
 
@@ -34,12 +34,12 @@ const WrapperRow = ({
         open={isOpen}
         onOpenChange={() => onOpen(wrapperMeta.name)}
         className={[
-          'bg-scale-100 dark:bg-scale-300 ',
-          'hover:bg-scale-200 dark:hover:bg-scale-500',
-          'data-open:bg-scale-200 dark:data-open:bg-scale-500',
-          'border-scale-300',
-          'dark:border-scale-500 hover:border-scale-500',
-          'dark:hover:border-scale-700 data-open:border-scale-700',
+          'bg-surface-100',
+          'hover:bg-overlay-hover',
+          'data-open:bg-selection',
+          'border-default',
+          'hover:border-strong',
+          'data-open:border-strong',
           'col-span-12 mx-auto',
           '-space-y-px overflow-hidden',
           'transition border shadow hover:z-50',
@@ -50,11 +50,11 @@ const WrapperRow = ({
         <Collapsible.Trigger asChild>
           <button
             type="button"
-            className="flex items-center justify-between w-full px-6 py-3 rounded group text-scale-1200"
+            className="flex items-center justify-between w-full px-6 py-3 rounded group text-foreground"
           >
             <div className="flex items-center gap-3">
               <IconChevronUp
-                className="transition text-scale-800 data-open-parent:rotate-0 data-closed-parent:rotate-180"
+                className="transition text-border-stronger data-open-parent:rotate-0 data-closed-parent:rotate-180"
                 strokeWidth={2}
                 width={14}
               />
@@ -67,14 +67,14 @@ const WrapperRow = ({
               <span className="text-sm capitalize">{wrapperMeta.label}</span>
             </div>
             <div className="flex items-center gap-3">
-              <div className="px-3 py-1 text-xs border rounded-md border-scale-500 bg-scale-100 text-scale-1200 dark:border-scale-700 dark:bg-scale-300">
+              <div className="px-3 py-1 text-xs border rounded-md border-strong bg-surface-100 text-foreground">
                 {wrappers.length} wrapper{wrappers.length > 1 ? 's' : ''}
               </div>
             </div>
           </button>
         </Collapsible.Trigger>
         <Collapsible.Content>
-          <div className="border-t group border-scale-500 bg-scale-100 text-scale-1200 dark:bg-scale-300 divide-y">
+          <div className="border-t group border-strong bg-surface-100 text-foreground divide-y">
             {wrappers.map((wrapper) => {
               const serverOptions = Object.fromEntries(
                 wrapper.server_options.map((option: any) => option.split('='))
@@ -93,7 +93,7 @@ const WrapperRow = ({
                     {visibleMetadata.map((metadata) => (
                       <div
                         key={metadata.name}
-                        className="flex items-center space-x-2 text-sm text-scale-1000"
+                        className="flex items-center space-x-2 text-sm text-foreground-light"
                       >
                         <p>{metadata.label}:</p>
                         <p>{serverOptions[metadata.name]}</p>
@@ -101,47 +101,43 @@ const WrapperRow = ({
                     ))}
                     {encryptedMetadata.map((metadata) => (
                       <div key={metadata.name} className="flex items-center space-x-2 text-sm">
-                        <p className="text-scale-1000">{metadata.label}:</p>
+                        <p className="text-foreground-light">{metadata.label}:</p>
                         <Link
                           href={`/project/${ref}/settings/vault/secrets?search=${wrapper.name}_${metadata.name}`}
+                          className="transition text-foreground-light hover:text-foreground flex items-center space-x-2"
                         >
-                          <a className="transition text-scale-1000 hover:text-scale-1100 flex items-center space-x-2">
-                            <span>Encrypted in Vault</span>
-                            <IconExternalLink size={14} strokeWidth={1.5} />
-                          </a>
+                          <span>Encrypted in Vault</span>
+                          <IconExternalLink size={14} strokeWidth={1.5} />
                         </Link>
                       </div>
                     ))}
                     <div className="!mt-3 space-y-1">
-                      <p className="text-sm text-scale-1100">
-                        Foreign tables: ({wrapper.tables.length})
+                      <p className="text-sm text-foreground-light">
+                        Foreign tables{wrapper.tables && `: (${wrapper.tables.length})`}
                       </p>
                       <div className="flex flex-wrap gap-2">
-                        {wrapper.tables.map((table: any) => (
-                          <Link key={table.id} href={`/project/${ref}/editor/${table.id}`}>
-                            <a>
-                              <div
-                                key={table.id}
-                                className="text-sm border rounded px-2 py-1 transition bg-scale-400 hover:bg-scale-500"
-                              >
+                        {wrapper.tables ? (
+                          wrapper.tables.map((table: any) => (
+                            <Link key={table.id} href={`/project/${ref}/editor/${table.id}`}>
+                              <div className="text-sm border rounded px-2 py-1 transition bg-surface-200 hover:bg-overlay-hover">
                                 {table.name}
                               </div>
-                            </a>
-                          </Link>
-                        ))}
+                            </Link>
+                          ))
+                        ) : (
+                          <p className="text-sm text-foreground-light">No tables available</p>
+                        )}
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
                     {canManageWrappers ? (
                       <Link href={`/project/${ref}/database/wrappers/${wrapper.id}`}>
-                        <a>
-                          <Button
-                            type="default"
-                            icon={<IconEdit strokeWidth={1.5} />}
-                            className="py-2"
-                          />
-                        </a>
+                        <Button
+                          type="default"
+                          icon={<IconEdit strokeWidth={1.5} />}
+                          className="py-2"
+                        />
                       </Link>
                     ) : (
                       <Tooltip.Root delayDuration={0}>
@@ -159,11 +155,11 @@ const WrapperRow = ({
                               <Tooltip.Arrow className="radix-tooltip-arrow" />
                               <div
                                 className={[
-                                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                  'border border-scale-200',
+                                  'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                  'border border-background',
                                 ].join(' ')}
                               >
-                                <span className="text-xs text-scale-1200">
+                                <span className="text-xs text-foreground">
                                   You need additional permissions to edit wrappers
                                 </span>
                               </div>
@@ -188,11 +184,11 @@ const WrapperRow = ({
                             <Tooltip.Arrow className="radix-tooltip-arrow" />
                             <div
                               className={[
-                                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                'border border-scale-200',
+                                'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                'border border-background',
                               ].join(' ')}
                             >
-                              <span className="text-xs text-scale-1200">
+                              <span className="text-xs text-foreground">
                                 You need additional permissions to add wrappers
                               </span>
                             </div>

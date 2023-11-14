@@ -163,12 +163,12 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
                 onOpenChange={() => setShowConfiguration(!showConfiguration)}
               >
                 <Collapsible.Trigger asChild>
-                  <div className="w-full cursor-pointer py-3 px-5 flex items-center justify-between border-t border-scale-500">
+                  <div className="w-full cursor-pointer py-3 px-5 flex items-center justify-between border-t border-default">
                     <p className="text-sm">Additional configuration</p>
                     <IconChevronDown
                       size={18}
                       strokeWidth={2}
-                      className={clsx('text-scale-1100', showConfiguration && 'rotate-180')}
+                      className={clsx('text-foreground-light', showConfiguration && 'rotate-180')}
                     />
                   </div>
                 </Collapsible.Trigger>
@@ -218,12 +218,13 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
                           </div>
                           {IS_PLATFORM && (
                             <div className="col-span-12">
-                              <p className="text-scale-1000 text-sm">
+                              <p className="text-foreground-light text-sm">
                                 Note: The{' '}
-                                <Link href={`/project/${ref}/settings/storage`}>
-                                  <a className="text-brand opacity-80 hover:opacity-100 transition">
-                                    global upload limit
-                                  </a>
+                                <Link
+                                  href={`/project/${ref}/settings/storage`}
+                                  className="text-brand opacity-80 hover:opacity-100 transition"
+                                >
+                                  global upload limit
                                 </Link>{' '}
                                 takes precedence over this value ({formattedGlobalUploadLimit})
                               </p>
@@ -237,14 +238,14 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
                       name="allowed_mime_types"
                       layout="vertical"
                       label="Allowed MIME types"
-                      placeholder="e.g image/jpg, image/png, audio/mpeg, video/mp4, etc"
+                      placeholder="e.g image/jpeg, image/png, audio/mpeg, video/mp4, etc"
                       labelOptional="Comma separated values"
                       descriptionText="Leave the field blank to allow any MIME type to be uploaded"
                     />
                   </div>
                 </Collapsible.Content>
               </Collapsible>
-              <div className="w-full border-t border-scale-500 !mt-0" />
+              <div className="w-full border-t border-default !mt-0" />
               <Modal.Content>
                 <div className="flex items-center space-x-2 justify-end">
                   <Button type="default" disabled={isUpdating} onClick={() => onClose()}>

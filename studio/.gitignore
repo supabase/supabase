@@ -33,3 +33,7 @@ yarn-error.log*
 .env.production.local
 
 .vercel
+
+/public/dashboard
+# Sentry Auth Token
+.sentryclirc

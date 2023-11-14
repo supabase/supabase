@@ -5,9 +5,9 @@ import { IconChevronRight } from 'ui'
 
 import { useFlag, withAuth } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
+import { Organization, Project } from 'types'
 import FeedbackDropdown from './ProjectLayout/LayoutHeader/FeedbackDropdown'
 import HelpPopover from './ProjectLayout/LayoutHeader/HelpPopover'
-import { Organization, Project } from 'types'
 
 interface WizardLayoutProps {
   organization: Organization | null | undefined
@@ -47,25 +47,23 @@ const Header = ({ organization, project }: WizardLayoutProps) => {
           <div className="flex items-center text-sm">
             <div className="flex items-center space-x-2">
               <Link href="/projects">
-                <a>
-                  <img
-                    src={`${BASE_PATH}/img/supabase-logo.svg`}
-                    alt="Supabase"
-                    className="rounded border p-1 hover:border-white dark:border-dark"
-                    style={{ height: 24 }}
-                  />
-                </a>
+                <img
+                  src={`${BASE_PATH}/img/supabase-logo.svg`}
+                  alt="Supabase"
+                  className="rounded border p-1 hover:border-white dark:border-dark"
+                  style={{ height: 24 }}
+                />
               </Link>
-              <IconChevronRight size="small" className="text-scale-1100" />
+              <IconChevronRight size="small" className="text-foreground-light" />
               <p className="text-sm">
                 {organization ? `Organization: ${organization.name}` : 'Create an organization'}
               </p>
-              <IconChevronRight size="small" className="text-scale-1100" />
-              <p className={`text-sm ${stepNumber < 1 ? 'text-scale-1100' : ''}`}>
+              <IconChevronRight size="small" className="text-foreground-light" />
+              <p className={`text-sm ${stepNumber < 1 ? 'text-foreground-light' : ''}`}>
                 {project ? project.name : 'Create a new project'}
               </p>
-              <IconChevronRight size="small" className="text-scale-1100" />
-              <p className={`text-sm ${stepNumber < 2 ? 'text-scale-1100' : ''}`}>
+              <IconChevronRight size="small" className="text-foreground-light" />
+              <p className={`text-sm ${stepNumber < 2 ? 'text-foreground-light' : ''}`}>
                 {project ? project.name : 'Extend your database'}
               </p>
             </div>

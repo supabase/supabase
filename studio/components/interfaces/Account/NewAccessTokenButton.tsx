@@ -1,7 +1,19 @@
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Alert, Button, Dropdown, Form, IconChevronDown, IconExternalLink, Input, Modal } from 'ui'
+import {
+  Alert,
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  Form,
+  IconChevronDown,
+  IconExternalLink,
+  Input,
+  Modal,
+} from 'ui'
 
 import { useAccessTokenCreateMutation } from 'data/access-tokens/access-tokens-create-mutation'
 
@@ -44,11 +56,19 @@ const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonPr
             >
               Generate new token
             </Button>
-            <Dropdown
-              align="end"
-              side="bottom"
-              overlay={[
-                <Dropdown.Item
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  asChild
+                  type="primary"
+                  className="rounded-l-none px-[4px] py-[5px]"
+                  icon={<IconChevronDown />}
+                >
+                  <span></span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" side="bottom">
+                <DropdownMenuItem
                   key="experimental-token"
                   onClick={() => {
                     setTokenScope('V0')
@@ -56,20 +76,11 @@ const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonPr
                   }}
                 >
                   <div className="space-y-1">
-                    <p className="block text-scale-1200">Generate token for experimental API</p>
+                    <p className="block text-foreground">Generate token for experimental API</p>
                   </div>
-                </Dropdown.Item>,
-              ]}
-            >
-              <Button
-                asChild
-                type="primary"
-                className="rounded-l-none px-[4px] py-[5px]"
-                icon={<IconChevronDown />}
-              >
-                <span></span>
-              </Button>
-            </Dropdown>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>
@@ -82,7 +93,7 @@ const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonPr
         onCancel={() => setIsOpen(!isOpen)}
         header={
           <div className="flex items-baseline gap-2">
-            <h5 className="text-sm text-scale-1200">
+            <h5 className="text-sm text-foreground">
               {tokenScope === 'V0' ? 'Generate token for experimental API' : 'Generate New Token'}
             </h5>
           </div>
@@ -108,13 +119,15 @@ const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonPr
                       such, be very careful when using this API.
                     </p>
                     <div className="mt-4">
-                      <Link href="https://api.supabase.com/api/v0">
-                        <a target="_blank" rel="noreferrer">
-                          <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                            Experimental API documentation
-                          </Button>
-                        </a>
-                      </Link>
+                      <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                        <Link
+                          href="https://api.supabase.com/api/v0"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Experimental API documentation
+                        </Link>
+                      </Button>
                     </div>
                   </Alert>
                 </Modal.Content>

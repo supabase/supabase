@@ -12,8 +12,8 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useMfaChallengeAndVerifyMutation } from 'data/profile/mfa-challenge-and-verify-mutation'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import { useStore } from 'hooks'
-import { usePushNext } from 'hooks/misc/useAutoAuthRedirect'
 import { useSignOut } from 'lib/auth'
+import { getReturnToPath } from 'lib/gotrue'
 
 const signInSchema = object({
   code: string().required('MFA Code is required'),
@@ -21,7 +21,6 @@ const signInSchema = object({
 
 const SignInMfaForm = () => {
   const { ui } = useStore()
-  const pushNext = usePushNext()
   const queryClient = useQueryClient()
   const router = useRouter()
   const {
@@ -48,13 +47,13 @@ const SignInMfaForm = () => {
     if (isSuccessFactors) {
       // if the user wanders into this page and he has no MFA setup, send the user to the next screen
       if (factors.totp.length === 0) {
-        queryClient.resetQueries().then(() => pushNext())
+        queryClient.resetQueries().then(() => router.push(getReturnToPath()))
       }
       if (factors.totp.length > 0) {
         setSelectedFactor(factors.totp[0])
       }
     }
-  }, [factors?.totp, isSuccessFactors, pushNext, queryClient])
+  }, [factors?.totp, isSuccessFactors, router, queryClient])
 
   const onSignIn = async ({ code }: { code: string }) => {
     const toastId = ui.setNotification({
@@ -74,7 +73,7 @@ const SignInMfaForm = () => {
 
             await queryClient.resetQueries()
 
-            await pushNext()
+            router.push(getReturnToPath())
           },
           onError: (error) => {
             ui.setNotification({
@@ -154,13 +153,13 @@ const SignInMfaForm = () => {
 
       <div className="my-8">
         <div className="text-sm">
-          <span className="text-scale-1000">Unable to sign in?</span>{' '}
+          <span className="text-foreground-light">Unable to sign in?</span>{' '}
         </div>
         <ul className="list-disc pl-6">
           {factors?.totp.length === 2 && (
             <li>
               <a
-                className="text-sm text-scale-1100 hover:text-scale-1200 cursor-pointer"
+                className="text-sm text-foreground-light hover:text-foreground cursor-pointer"
                 onClick={() =>
                   setSelectedFactor(factors.totp.find((f) => f.id !== selectedFactor?.id)!)
                 }
@@ -171,16 +170,12 @@ const SignInMfaForm = () => {
           )}
           <li>
             <Link
-              passHref
               href="/support/new?subject=Unable+to+sign+in+via+MFA&category=Login_issues"
+              target="_blank"
+              rel="noreferrer"
+              className="text-sm transition text-foreground-light hover:text-foreground"
             >
-              <a
-                target="_blank"
-                rel="noreferrer"
-                className="text-sm transition text-scale-1100 hover:text-scale-1200"
-              >
-                Reach out to us via support
-              </a>
+              Reach out to us via support
             </Link>
           </li>
         </ul>

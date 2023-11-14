@@ -1,15 +1,14 @@
 import dayjs from 'dayjs'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import React from 'react'
 
 import { Markdown } from 'components/interfaces/Markdown'
 import { Integration, IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { BASE_PATH } from 'lib/constants'
-import { Badge, Button, IconArrowRight, IconExternalLink, IconGitHub, IconSquare, cn } from 'ui'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
 import Link from 'next/link'
-import { BooleanFormatter } from 'components/grid/components/formatter'
+import { Badge, Button, cn, IconArrowRight, IconExternalLink, IconGitHub } from 'ui'
 
 const ICON_STROKE_WIDTH = 2
 const ICON_SIZE = 14
@@ -93,7 +92,7 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
           </div>
           <div className="flex flex-col gap-0">
             <div className="flex items-center gap-2">
-              <span className="text text-sm font-medium">
+              <span className="text-foreground text-sm font-medium">
                 {integration.metadata?.account.name ||
                   (integration.metadata !== undefined &&
                     'gitHubConnectionOwner' in integration.metadata &&
@@ -105,26 +104,25 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
               </Badge>
             </div>
             <div className="flex flex-col gap-0">
-              <span className="text-lighter text-xs">
+              <span className="text-foreground-lighter text-xs">
                 Created {dayjs(integration.inserted_at).fromNow()}
               </span>
-              <span className="text-lighter text-xs">
+              <span className="text-foreground-lighter text-xs">
                 Added by {integration?.added_by?.primary_email}
               </span>
             </div>
           </div>
         </div>
 
-        <Link
-          href={getIntegrationConfigurationUrl(integration)}
-          target="_blank"
-          rel="noopener noreferrer"
-          passHref
-        >
-          <Button type="default" asChild iconRight={<IconExternalLink />}>
-            <a>Manage</a>
-          </Button>
-        </Link>
+        <Button asChild type="default" iconRight={<IconExternalLink />}>
+          <Link
+            href={getIntegrationConfigurationUrl(integration)}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Manage
+          </Link>
+        </Button>
       </li>
     )
   }
@@ -151,14 +149,10 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
         ref={ref}
         key={connection.id}
         {...props}
-        className={cn(
-          showNode && 'pl-8 ml-6 border-l border-scale-600 dark:border-scale-400',
-          'pb-2',
-          'relative'
-        )}
+        className={cn(showNode && 'pl-8 ml-6 border-l border-muted', 'pb-2', 'relative')}
       >
         {showNode && (
-          <div className="absolute w-8 rounded-bl-full border-b border-l border-scale-600 dark:border-scale-400 h-10 -left-px"></div>
+          <div className="absolute w-8 rounded-bl-full border-b border-l border-muted h-10 -left-px"></div>
         )}
         <div
           className={cn(
@@ -173,7 +167,7 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
             <div className="flex gap-2 items-center">
               <HandleIcon type={'Supabase'} />
               <span className="text-sm">{project?.name}</span>
-              <IconArrowRight size={14} className="text-scale-900" strokeWidth={1.5} />
+              <IconArrowRight size={14} className="text-foreground-lighter" strokeWidth={1.5} />
               {!connection?.metadata?.framework ? (
                 <div className="bg-black text-white w-4 h-4 rounded flex items-center justify-center">
                   <HandleIcon type={type} className={'!w-2.5'} />
@@ -186,14 +180,14 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
                   alt={`icon`}
                 />
               )}
-              <span className="text-sm">{connection.metadata?.name}</span>
+              <span className="text-sm truncate">{connection.metadata?.name}</span>
             </div>
 
             <div className="flex flex-col gap-0">
-              <span className="text-scale-900 text-xs">
+              <span className="text-foreground-lighter text-xs">
                 Connected {dayjs(connection?.inserted_at).fromNow()}
               </span>
-              <span className="text-scale-900 text-xs">
+              <span className="text-foreground-lighter text-xs">
                 Added by {connection?.added_by?.primary_email}
               </span>
             </div>
@@ -224,12 +218,12 @@ const IntegrationConnectionOption = React.forwardRef<HTMLLIElement, IntegrationC
           <div className="flex gap-2 items-center">
             <HandleIcon type={'Supabase'} />
             <span className="text-sm">{project?.name}</span>
-            <IconArrowRight size={14} className="text-scale-900" strokeWidth={1.5} />
+            <IconArrowRight size={14} className="text-foreground-lighter" strokeWidth={1.5} />
             <HandleIcon type={type} />
             <span className="text-sm">{connection.metadata.name}</span>
           </div>
 
-          <span className="text-lighter text-xs">
+          <span className="text-foreground-lighter text-xs">
             Connected {dayjs(connection.inserted_at).fromNow()}
           </span>
         </div>
@@ -242,8 +236,12 @@ const IntegrationConnectionOption = React.forwardRef<HTMLLIElement, IntegrationC
 
 const EmptyIntegrationConnection = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & { showNode?: boolean }
->(({ className, showNode = true, ...props }, ref) => {
+  React.HTMLAttributes<HTMLDivElement> & {
+    showNode?: boolean
+    orgSlug?: string
+    onClick: () => void
+  }
+>(({ className, showNode = true, orgSlug = '_', onClick, ...props }, ref) => {
   return (
     <div
       ref={ref}
@@ -257,17 +255,19 @@ const EmptyIntegrationConnection = React.forwardRef<
       )}
     >
       {showNode && (
-        <div className="absolute w-8 rounded-bl-full border-b border-l border-scale-600 dark:border-scale-400 h-10 -left-px"></div>
+        <div className="absolute w-8 rounded-bl-full border-b border-l border-muted h-10 -left-px"></div>
       )}
       <div
         className={cn(
           'w-full',
-          'border border-dashed bg-scale-300 dark:bg-scale-100 border-scale-600 dark:border-scale-400',
+          'border border-dashed bg-surface-100 border-overlay',
           '',
           'flex h-20 px-10 rounded-lg justify-center items-center'
         )}
       >
-        <Button type="default">Add new project connection</Button>
+        <Button type="default" onClick={() => onClick()}>
+          Add new project connection
+        </Button>
       </div>
     </div>
   )
@@ -286,13 +286,13 @@ const IntegrationConnectionHeader = React.forwardRef<HTMLDivElement, Integration
         {...props}
         ref={ref}
         className={cn(
-          showNode && 'border-l border-scale-600 dark:border-scale-400 ml-6 pl-8',
+          showNode && 'border-l border-muted ml-6 pl-8',
           'pt-6 pb-3',
           'prose text-sm',
           className
         )}
       >
-        {props.title && <h5 className="text">{props.title}</h5>}
+        {props.title && <h5 className="text-foreground">{props.title}</h5>}
         <Markdown content={markdown} className="" />
       </div>
     )

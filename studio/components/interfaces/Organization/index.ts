@@ -1,25 +1,25 @@
+import AuditLogs from './AuditLogs/AuditLogs'
 import BillingSettings from './BillingSettings/BillingSettings'
-import BillingSettingsV2 from './BillingSettingsV2/BillingSettings'
+import Documents from './Documents/Documents'
 import GeneralSettings from './GeneralSettings/GeneralSettings'
 import IntegrationSettings from './IntegrationSettings/IntegrationSettings'
 import InvoicesSettings from './InvoicesSettings/InvoicesSettings'
 import NewOrgForm from './NewOrg/NewOrgForm'
-import Usage from './Usage/Usage'
-import AuditLogs from './AuditLogs/AuditLogs'
 import OAuthApps from './OAuthApps/OAuthApps'
-import TeamSettings from './TeamSettings/TeamSettings'
 import PermissionsSettings from './PermissionsSettings/PermissionsSettings'
+import TeamSettings from './TeamSettings/TeamSettings'
+import Usage from './Usage/Usage'
 
 export {
+  AuditLogs,
   BillingSettings,
-  BillingSettingsV2,
+  Documents,
   GeneralSettings,
   IntegrationSettings,
   InvoicesSettings,
   NewOrgForm,
   OAuthApps,
-  AuditLogs,
+  PermissionsSettings,
   TeamSettings,
   Usage,
-  PermissionsSettings,
 }

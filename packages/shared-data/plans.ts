@@ -3,7 +3,6 @@ export interface PricingInformation {
   name: string
   nameBadge?: string
   costUnit?: string
-  costUnitOrg?: string
   href: string
   priceLabel?: string
   priceMonthly: number | string
@@ -21,7 +20,6 @@ export const plans: PricingInformation[] = [
     name: 'Free',
     nameBadge: '',
     costUnit: '/ month / org',
-    costUnitOrg: '/ month / org',
     href: 'https://supabase.com/dashboard/new?plan=free',
     priceLabel: '',
     priceMonthly: 0,
@@ -50,7 +48,6 @@ export const plans: PricingInformation[] = [
     name: 'Pro',
     nameBadge: '',
     costUnit: '/ month / org',
-    costUnitOrg: '/ month / org',
     href: 'https://supabase.com/dashboard/new?plan=pro',
     priceLabel: 'From',
     warning: 'Usage-based plan',
@@ -79,7 +76,6 @@ export const plans: PricingInformation[] = [
     name: 'Team',
     nameBadge: 'New',
     costUnit: '/ month / org',
-    costUnitOrg: '/ month / org',
     href: 'https://supabase.com/dashboard/new?plan=team',
     priceLabel: 'From',
     warning: 'Usage-based plan',
@@ -90,7 +86,7 @@ export const plans: PricingInformation[] = [
       'Daily backups stored for 14 days',
       'Standardised Security Questionnaire',
       'SOC2',
-      'HIPAA',
+      'HIPAA available as paid add-on',
       'SSO for Supabase Dashboard',
       'Priority email support & SLAs',
       '28-day log retention',

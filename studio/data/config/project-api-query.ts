@@ -3,6 +3,7 @@ import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { configKeys } from './keys'
+import { ResponseError } from 'types'
 
 export type ProjectApiVariables = {
   projectRef?: string
@@ -77,7 +78,7 @@ export async function getProjectApi({ projectRef }: ProjectApiVariables, signal?
 }
 
 export type ProjectApiData = Awaited<ReturnType<typeof getProjectApi>>
-export type ProjectApiError = unknown
+export type ProjectApiError = ResponseError
 
 export const useProjectApiQuery = <TData = ProjectApiData>(
   { projectRef }: ProjectApiVariables,

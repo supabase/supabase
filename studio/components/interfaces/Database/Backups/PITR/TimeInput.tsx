@@ -84,17 +84,13 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
       <div
         className={[
           'flex items-center justify-between transition',
-          'rounded-md bg-scaleA-200 border px-3.5 py-2 w-[200px]',
+          'rounded-md bg-background border px-3.5 py-2 w-[200px]',
           `${
-            isFocused
-              ? 'border-scale-900'
-              : error === undefined
-              ? 'border-scale-700'
-              : 'border-red-800'
+            isFocused ? 'border-stronger' : error === undefined ? 'border-strong' : 'border-red-800'
           }`,
         ].join(' ')}
       >
-        <IconClock className="text-scale-1100" size={18} strokeWidth={1.5} />
+        <IconClock className="text-foreground-light" size={18} strokeWidth={1.5} />
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger className="w-1/4" tabIndex={-1}>
             <input
@@ -115,11 +111,11 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
               <Tooltip.Arrow className="radix-tooltip-arrow" />
               <div
                 className={[
-                  'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                  'border-scale-200 border',
+                  'bg-alternative rounded py-1 px-2 leading-none shadow',
+                  'border-background border',
                 ].join(' ')}
               >
-                <span className="text-scale-1200 text-xs">Hours (HH)</span>
+                <span className="text-foreground text-xs">Hours (HH)</span>
               </div>
             </Tooltip.Content>
           </Tooltip.Portal>
@@ -145,11 +141,11 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
               <Tooltip.Arrow className="radix-tooltip-arrow" />
               <div
                 className={[
-                  'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                  'border-scale-200 border',
+                  'bg-alternative rounded py-1 px-2 leading-none shadow',
+                  'border-background border',
                 ].join(' ')}
               >
-                <span className="text-scale-1200 text-xs">Minutes (MM)</span>
+                <span className="text-foreground text-xs">Minutes (MM)</span>
               </div>
             </Tooltip.Content>
           </Tooltip.Portal>
@@ -175,11 +171,11 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
               <Tooltip.Arrow className="radix-tooltip-arrow" />
               <div
                 className={[
-                  'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                  'border-scale-200 border',
+                  'bg-alternative rounded py-1 px-2 leading-none shadow',
+                  'border-background border',
                 ].join(' ')}
               >
-                <span className="text-scale-1200 text-xs">Seconds (SS)</span>
+                <span className="text-foreground text-xs">Seconds (SS)</span>
               </div>
             </Tooltip.Content>
           </Tooltip.Portal>

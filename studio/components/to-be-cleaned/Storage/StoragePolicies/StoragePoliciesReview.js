@@ -1,6 +1,6 @@
-import { Button, Modal } from 'ui'
-import { useState } from 'react'
 import SqlEditor from 'components/ui/SqlEditor'
+import { useState } from 'react'
+import { Button, Modal } from 'ui'
 
 const ReviewEmptyState = () => {
   return (
@@ -27,7 +27,7 @@ const StoragePoliciesReview = ({
         <div className="space-y-6 py-8">
           <div className="flex items-center justify-between space-y-8 space-x-4">
             <div className="flex flex-col">
-              <p className="text-sm text-scale-1100">
+              <p className="text-sm text-foreground-light">
                 These are the SQL statements that will be used to create your policies. The suffix
                 appended to the end of your policy name (<code>[hashString]_[number]</code>) just
                 functions as a unique identifier for each of your policies.

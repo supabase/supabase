@@ -1,4 +1,5 @@
 {
+  "$schema": "https://turbo.build/schema.json",
   "pipeline": {
     "build": {
       "dependsOn": ["^build"],
@@ -16,7 +17,7 @@
     },
     "docs#build": {
       "dependsOn": ["^build"],
-      "env": ["SUPABASE_SERVICE_ROLE_KEY", "OPENAI_KEY", "ALGOLIA_SEARCH_ADMIN_KEY"],
+      "env": ["SUPABASE_SERVICE_ROLE_KEY", "OPENAI_KEY"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
     "studio#build": {
@@ -51,6 +52,9 @@
     },
     "test": {
       "cache": false
+    },
+    "typecheck": {
+      "outputs": ["**/node_modules/.cache/tsbuildinfo.json"]
     }
   }
 }

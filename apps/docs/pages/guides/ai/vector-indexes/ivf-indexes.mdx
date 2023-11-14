@@ -50,8 +50,6 @@ create index on items using ivfflat (column_name vector_cosine_ops) with (lists 
 
 Currently vectors with up to 2,000 dimensions can be indexed.
 
-If you are using the `vecs` Python library, follow the instructions in [Managing collections](/docs/guides/ai/managing-collections#create-an-index) to create indexes.
-
 ## How does IVFFlat work?
 
 IVF stands for 'inverted file indexes'. It works by clustering your vectors in order to reduce the similarity search scope. Rather than comparing a vector to every other vector, the vector is only compared against vectors within the same cell cluster (or nearby clusters, depending on your configuration).

@@ -44,7 +44,7 @@ const StorageMenu = () => {
                 block
                 type="default"
                 icon={
-                  <div className="text-scale-900">
+                  <div className="text-foreground-lighter">
                     <IconEdit size={14} />
                   </div>
                 }
@@ -61,11 +61,11 @@ const StorageMenu = () => {
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200',
+                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                      'border border-background',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">
+                    <span className="text-xs text-foreground">
                       You need additional permissions to create buckets
                     </span>
                   </div>
@@ -104,7 +104,7 @@ const StorageMenu = () => {
                       </Alert>
                     </div>
                   )}
-                  {buckets.map((bucket: any, idx: number) => {
+                  {buckets.map((bucket, idx: number) => {
                     const isSelected = bucketId === bucket.id
                     return (
                       <BucketRow
@@ -121,10 +121,10 @@ const StorageMenu = () => {
               )}
             </div>
           </div>
-          <div className="h-px w-full bg-scale-500"></div>
+          <div className="h-px w-full bg-border"></div>
           <div className="">
             <Menu.Group title="Configuration" />
-            <Link href={`/project/${ref}/storage/policies`}>
+            <Link href={`/project/${ref}/storage/policies`} legacyBehavior>
               <Menu.Item rounded active={page === 'policies'}>
                 <p className="truncate">Policies</p>
               </Menu.Item>
