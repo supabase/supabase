@@ -157,7 +157,7 @@ const menus: Menu[] = [
     id: 'reference_kotlin_v0',
     path: '/reference/kotlin',
     commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_kt_v0.yml',
+    specFile: 'supabase_kt_v1.yml',
     type: 'reference',
   },
   {

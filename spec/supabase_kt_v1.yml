@@ -7,7 +7,7 @@ info:
 
     Supabase Kotlin.
 
-  specUrl: https://github.com/supabase/supabase/edit/master/spec/supabase_kt_v0.yml
+  specUrl: https://github.com/supabase/supabase/edit/master/spec/supabase_kt_v1.yml
   slugPrefix: '/'
   libraries:
     - name: 'Kotlin'

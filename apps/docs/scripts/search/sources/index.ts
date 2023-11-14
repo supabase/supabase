@@ -72,7 +72,7 @@ export async function fetchSources() {
     'kt-lib',
     '/reference/kotlin',
     { title: 'Kotlin Reference' },
-    '../../spec/supabase_kt_v0.yml',
+    '../../spec/supabase_kt_v1.yml',
     '../../spec/common-client-libs-sections.json'
   )
 

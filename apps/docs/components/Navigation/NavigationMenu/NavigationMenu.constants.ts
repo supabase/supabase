@@ -208,7 +208,7 @@ export const REFERENCES: References = {
   kotlin: {
     name: 'Kotlin',
     library: 'supabase-kt',
-    versions: ['v0'],
+    versions: ['v1'],
     icon: '/docs/img/libraries/kotlin-icon.svg',
   },
   cli: {
