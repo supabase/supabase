@@ -2,18 +2,18 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
-import { InvoiceStatusBadge } from 'components/interfaces/BillingV2'
-import { InvoiceStatus } from 'components/interfaces/BillingV2/Invoices.types'
+import { InvoiceStatus } from 'components/interfaces/Billing/Invoices.types'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
+import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { getInvoice } from 'data/invoices/invoice-query'
 import { useInvoicesCountQuery } from 'data/invoices/invoices-count-query'
 import { useInvoicesQuery } from 'data/invoices/invoices-query'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
-import { Button, IconChevronLeft, IconChevronRight, IconDownload, IconFileText, Loading } from 'ui'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import AlertError from 'components/ui/AlertError'
+import { Button, IconChevronLeft, IconChevronRight, IconDownload, IconFileText } from 'ui'
+import InvoiceStatusBadge from 'components/interfaces/Billing/InvoiceStatusBadge'
 
 const PAGE_LIMIT = 10
 
@@ -81,7 +81,7 @@ const InvoicesSettings = () => {
             invoices.length === 0 ? (
               <Table.tr>
                 <Table.td colSpan={6} className="p-3 py-12 text-center">
-                  <p className="text-scale-1000">
+                  <p className="text-foreground-light">
                     {isLoading ? 'Checking for invoices' : 'No invoices for this organization yet'}
                   </p>
                 </Table.td>
@@ -109,11 +109,15 @@ const InvoicesSettings = () => {
                       <Table.td className="align-right">
                         <div className="flex items-center justify-end space-x-2">
                           {[InvoiceStatus.UNCOLLECTIBLE, InvoiceStatus.OPEN].includes(x.status) && (
-                            <Link href={`https://redirect.revops.supabase.com/pay-invoice/${x.id}`}>
-                              <a target="_blank" rel="noreferrer">
-                                <Button>Pay Now</Button>
-                              </a>
-                            </Link>
+                            <Button asChild>
+                              <Link
+                                href={`https://redirect.revops.supabase.com/pay-invoice/${x.id}`}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                Pay Now
+                              </Link>
+                            </Button>
                           )}
 
                           <Button

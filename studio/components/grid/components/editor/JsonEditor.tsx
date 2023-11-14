@@ -1,23 +1,26 @@
-import { IconMaximize, Popover } from 'ui'
-import { useState, useCallback } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { EditorProps } from '@supabase/react-data-grid'
+import { RenderEditCellProps } from 'react-data-grid'
+import { useCallback, useState } from 'react'
+import { IconMaximize, Popover } from 'ui'
 
-import { useTrackedState } from 'components/grid/store'
 import { BlockKeys, MonacoEditor, NullValue } from 'components/grid/components/common'
+import { useTrackedState } from 'components/grid/store'
 import { tryParseJson } from 'lib/helpers'
 import { isNil } from 'lodash'
 
-interface JsonEditorProps<TRow, TSummaryRow = unknown> extends EditorProps<TRow, TSummaryRow> {
+interface JsonEditorProps<TRow, TSummaryRow = unknown>
+  extends RenderEditCellProps<TRow, TSummaryRow> {
+  isEditable: boolean
   onExpandEditor: (column: string, row: TRow) => void
 }
 
-export function JsonEditor<TRow, TSummaryRow = unknown>({
+export const JsonEditor = <TRow, TSummaryRow = unknown>({
   row,
   column,
+  isEditable = true,
   onRowChange,
   onExpandEditor,
-}: JsonEditorProps<TRow, TSummaryRow>) {
+}: JsonEditorProps<TRow, TSummaryRow>) => {
   const state = useTrackedState()
 
   const gridColumn = state.gridColumns.find((x) => x.name == column.key)
@@ -28,15 +31,17 @@ export function JsonEditor<TRow, TSummaryRow = unknown>({
   const [value, setValue] = useState<string | null>(jsonString)
 
   const cancelChanges = useCallback(() => {
-    onRowChange(row, true)
+    if (isEditable) onRowChange(row, true)
     setIsPopoverOpen(false)
   }, [])
 
   const saveChanges = useCallback((newValue: string | null) => {
-    commitChange(newValue)
+    if (newValue !== value) commitChange(newValue)
   }, [])
 
   const onChange = (_value: string | undefined) => {
+    if (!isEditable) return
+
     if (!_value || _value == '') setValue(null)
     else setValue(_value)
   }
@@ -50,6 +55,8 @@ export function JsonEditor<TRow, TSummaryRow = unknown>({
   }
 
   const commitChange = (newValue: string | null) => {
+    if (!isEditable) return
+
     if (!newValue) {
       onRowChange({ ...row, [column.key]: null }, true)
       setIsPopoverOpen(false)
@@ -76,29 +83,34 @@ export function JsonEditor<TRow, TSummaryRow = unknown>({
             width={`${gridColumn?.width || column.width}px`}
             value={value ?? ''}
             language="json"
+            readOnly={!isEditable}
             onChange={onChange}
           />
-          <div className="flex items-start justify-between p-2 bg-scale-400 space-x-2">
-            <div className="space-y-1">
-              <div className="flex items-center space-x-2">
-                <div className="px-1.5 py-[2.5px] rounded bg-scale-600 border border-scale-700 flex items-center justify-center">
-                  <span className="text-[10px]">⏎</span>
+          <div className="flex items-start justify-between p-2 bg-surface-200 space-x-2">
+            {isEditable ? (
+              <div className="space-y-1">
+                <div className="flex items-center space-x-2">
+                  <div className="px-1.5 py-[2.5px] rounded bg-selection border border-strong flex items-center justify-center">
+                    <span className="text-[10px]">⏎</span>
+                  </div>
+                  <p className="text-xs text-foreground-light">Save changes</p>
                 </div>
-                <p className="text-xs text-scale-1100">Save changes</p>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="px-1 py-[2.5px] rounded bg-scale-600 border border-scale-700 flex items-center justify-center">
-                  <span className="text-[10px]">Esc</span>
+                <div className="flex items-center space-x-2">
+                  <div className="px-1 py-[2.5px] rounded bg-selection border border-strong flex items-center justify-center">
+                    <span className="text-[10px]">Esc</span>
+                  </div>
+                  <p className="text-xs text-foreground-light">Cancel changes</p>
                 </div>
-                <p className="text-xs text-scale-1100">Cancel changes</p>
               </div>
-            </div>
+            ) : (
+              <div />
+            )}
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger>
                 <div
                   className={[
-                    'border border-scale-700 rounded p-1 flex items-center justify-center',
-                    'transition cursor-pointer bg-scale-600 hover:bg-scale-700',
+                    'border border-strong rounded p-1 flex items-center justify-center',
+                    'transition cursor-pointer bg-selection hover:bg-border-strong',
                   ].join(' ')}
                   onClick={() => onSelectExpand()}
                 >
@@ -110,11 +122,11 @@ export function JsonEditor<TRow, TSummaryRow = unknown>({
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200',
+                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                      'border border-background',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">Expand editor</span>
+                    <span className="text-xs text-foreground">Expand editor</span>
                   </div>
                 </Tooltip.Content>
               </Tooltip.Portal>

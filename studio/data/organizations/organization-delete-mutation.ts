@@ -4,6 +4,7 @@ import { toast } from 'react-hot-toast'
 import { del } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { organizationKeys } from './keys'
+import { permissionKeys } from 'data/permissions/keys'
 
 export type OrganizationDeleteVariables = {
   slug: string
@@ -33,7 +34,10 @@ export const useOrganizationDeleteMutation = ({
     (vars) => deleteOrganization(vars),
     {
       async onSuccess(data, variables, context) {
-        await queryClient.invalidateQueries(organizationKeys.list())
+        await Promise.all([
+          queryClient.invalidateQueries(organizationKeys.list()),
+          queryClient.invalidateQueries(permissionKeys.list()),
+        ])
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

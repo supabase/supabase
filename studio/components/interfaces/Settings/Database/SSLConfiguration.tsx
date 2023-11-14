@@ -1,10 +1,11 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Alert, Button, IconDownload, IconExternalLink, IconLoader, Toggle } from 'ui'
 
-import { useParams } from 'common/hooks'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   FormHeader,
   FormPanel,
@@ -15,13 +16,12 @@ import {
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useSSLEnforcementQuery } from 'data/ssl-enforcement/ssl-enforcement-query'
 import { useSSLEnforcementUpdateMutation } from 'data/ssl-enforcement/ssl-enforcement-update-mutation'
-import { useCheckPermissions, useFlag, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 
 const SSLConfiguration = () => {
   const { ui } = useStore()
   const { ref } = useParams()
   const [isEnforced, setIsEnforced] = useState(false)
-  const sslEnforcement = useFlag('sslEnforcement')
 
   const { data: projectSettings } = useProjectSettingsQuery({ projectRef: ref })
   const {
@@ -50,7 +50,12 @@ const SSLConfiguration = () => {
     }
   )
 
-  const canUpdateSSLEnforcement = useCheckPermissions(PermissionAction.UPDATE, 'projects')
+  const { project } = useProjectContext()
+  const canUpdateSSLEnforcement = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: {
+      project_id: project?.id,
+    },
+  })
   const initialIsEnforced = isSuccess
     ? sslEnforcementConfiguration.appliedSuccessfully &&
       sslEnforcementConfiguration.currentConfig.database
@@ -75,96 +80,95 @@ const SSLConfiguration = () => {
   }
 
   return (
-    <div>
+    <div id="ssl-configuration">
       <div className="flex items-center justify-between">
         <FormHeader title="SSL Configuration" description="" />
         <div className="flex items-center space-x-2 mb-6">
-          <Link href="https://supabase.com/docs/guides/platform/ssl-enforcement">
-            <a target="_blank">
-              <Button type="default" icon={<IconExternalLink />}>
-                Documentation
-              </Button>
-            </a>
-          </Link>
+          <Button asChild type="default" icon={<IconExternalLink />}>
+            <Link href="https://supabase.com/docs/guides/platform/ssl-enforcement" target="_blank">
+              Documentation
+            </Link>
+          </Button>
         </div>
       </div>
       <FormPanel>
-        {sslEnforcement && (
-          <FormSection
-            header={
-              <FormSectionLabel
-                className="lg:col-span-7"
-                description={
-                  <div className="space-y-4">
-                    <p className="text-sm text-scale-1000">
-                      Reject non-SSL connections to your database
-                    </p>
-                    {isSuccess && !sslEnforcementConfiguration?.appliedSuccessfully && (
-                      <Alert
-                        withIcon
-                        variant="warning"
-                        title="SSL enforcement was not updated successfully"
+        <FormSection
+          header={
+            <FormSectionLabel
+              className="lg:col-span-7"
+              description={
+                <div className="space-y-4">
+                  <p className="text-sm text-foreground-light">
+                    Reject non-SSL connections to your database
+                  </p>
+                  {isSuccess && !sslEnforcementConfiguration?.appliedSuccessfully && (
+                    <Alert
+                      withIcon
+                      variant="warning"
+                      title="SSL enforcement was not updated successfully"
+                    >
+                      Please try updating again, or contact{' '}
+                      <Link
+                        href="/support/new"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="underline"
                       >
-                        Please try updating again, or contact{' '}
-                        <Link href="/support/new">
-                          <a target="_blank" rel="noreferrer" className="underline">
-                            support
-                          </a>
-                        </Link>{' '}
-                        if this error persists
-                      </Alert>
-                    )}
-                  </div>
-                }
-              >
-                Enforce SSL on incoming connections
-              </FormSectionLabel>
-            }
-          >
-            <FormSectionContent loading={false} className="lg:!col-span-5">
-              <div className="flex items-center justify-end mt-2.5 space-x-2">
-                {(isLoading || isSubmitting) && (
-                  <IconLoader className="animate-spin" strokeWidth={1.5} size={16} />
-                )}
-                <Tooltip.Root delayDuration={0}>
-                  <Tooltip.Trigger>
-                    <Toggle
-                      checked={isEnforced}
-                      disabled={
-                        isLoading ||
-                        isSubmitting ||
-                        !canUpdateSSLEnforcement ||
-                        !hasAccessToSSLEnforcement
-                      }
-                      onChange={toggleSSLEnforcement}
-                    />
-                  </Tooltip.Trigger>
-                  {(!canUpdateSSLEnforcement || !hasAccessToSSLEnforcement) && (
-                    <Tooltip.Portal>
-                      <Tooltip.Content align="center" side="bottom">
-                        <Tooltip.Arrow className="radix-tooltip-arrow" />
-                        <div
-                          className={[
-                            'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                            'border border-scale-200 w-[250px]',
-                          ].join(' ')}
-                        >
-                          <span className="text-xs text-scale-1200 text-center flex items-center justify-center">
-                            {!canUpdateSSLEnforcement
-                              ? 'You need additional permissions to update SSL enforcement for your project'
-                              : !hasAccessToSSLEnforcement
-                              ? 'Your project does not have access to SSL enforcement'
-                              : ''}
-                          </span>
-                        </div>
-                      </Tooltip.Content>
-                    </Tooltip.Portal>
+                        support
+                      </Link>{' '}
+                      if this error persists
+                    </Alert>
                   )}
-                </Tooltip.Root>
-              </div>
-            </FormSectionContent>
-          </FormSection>
-        )}
+                </div>
+              }
+            >
+              Enforce SSL on incoming connections
+            </FormSectionLabel>
+          }
+        >
+          <FormSectionContent loading={false} className="lg:!col-span-5">
+            <div className="flex items-center justify-end mt-2.5 space-x-2">
+              {(isLoading || isSubmitting) && (
+                <IconLoader className="animate-spin" strokeWidth={1.5} size={16} />
+              )}
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger>
+                  <Toggle
+                    checked={isEnforced}
+                    disabled={
+                      isLoading ||
+                      isSubmitting ||
+                      !canUpdateSSLEnforcement ||
+                      !hasAccessToSSLEnforcement
+                    }
+                    onChange={toggleSSLEnforcement}
+                  />
+                </Tooltip.Trigger>
+                {(!canUpdateSSLEnforcement || !hasAccessToSSLEnforcement) && (
+                  <Tooltip.Portal>
+                    <Tooltip.Content align="center" side="bottom">
+                      <Tooltip.Arrow className="radix-tooltip-arrow" />
+                      <div
+                        className={[
+                          'rounded bg-alternative py-1 px-2 leading-none shadow',
+                          'border border-background w-[250px]',
+                        ].join(' ')}
+                      >
+                        <span className="text-xs text-foreground text-center flex items-center justify-center">
+                          {!canUpdateSSLEnforcement
+                            ? 'You need additional permissions to update SSL enforcement for your project'
+                            : !hasAccessToSSLEnforcement
+                            ? 'Your project does not have access to SSL enforcement'
+                            : ''}
+                        </span>
+                      </div>
+                    </Tooltip.Content>
+                  </Tooltip.Portal>
+                )}
+              </Tooltip.Root>
+            </div>
+          </FormSectionContent>
+        </FormSection>
 
         <div className="grid grid-cols-1 items-center lg:grid-cols-2 p-8">
           <div className="space-y-2">
@@ -193,11 +197,11 @@ const SSLConfiguration = () => {
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                        'border border-scale-200 w-[250px]',
+                        'rounded bg-alternative py-1 px-2 leading-none shadow',
+                        'border border-background w-[250px]',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text-foreground">
                         Projects before 15:08 (GMT+08), 29th April 2021 do not have SSL certificates
                         installed
                       </span>

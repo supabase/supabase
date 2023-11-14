@@ -1,5 +1,5 @@
 import { Application, Router } from 'https://deno.land/x/oak@v11.1.0/mod.ts'
-import { Session, CookieStore } from 'https://deno.land/x/oak_sessions@v4.1.9/mod.ts'
+import { CookieStore, Session } from 'https://deno.land/x/oak_sessions@v4.1.9/mod.ts'
 import { OAuth2Client } from 'https://deno.land/x/oauth2_client@v1.0.2/mod.ts'
 import { SupabaseManagementAPI } from 'https://esm.sh/supabase-management-js@0.1.2'
 

@@ -1,15 +1,14 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { Notification, NotificationStatus } from '@supabase/shared-types/out/notifications'
 import dayjs from 'dayjs'
-import { Button, IconArchive, IconX } from 'ui'
+import { Button, IconX } from 'ui'
 
 import { useNotificationsDismissMutation } from 'data/notifications/notifications-dismiss-mutation'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useStore } from 'hooks'
-import { API_URL } from 'lib/constants'
 import { Project } from 'types'
 import NotificationActions from './NotificationActions'
 import { formatNotificationCTAText, formatNotificationText } from './NotificationRows.utils'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 
 export interface NotificationRowProps {
   notification: Notification
@@ -26,7 +25,9 @@ const NotificationRow = ({
 }: NotificationRowProps) => {
   const { ui } = useStore()
   const { data: projects } = useProjectsQuery()
+  const { data: organizations } = useOrganizationsQuery()
   const project = projects?.find((project) => project.id === notification.project_id)
+  const organization = organizations?.find((org) => org.id === project?.organization_id)
 
   const insertedAt = dayjs(notification.inserted_at).format('DD MMM YYYY, HH:mma')
   const changelogLink = (notification.data as any).changelog_link
@@ -50,7 +51,7 @@ const NotificationRow = ({
     dismissNotifications({ ids: [notificationId] })
   }
 
-  if (!project) return null
+  if (!project || !organization) return null
 
   return (
     <div className="flex py-2">
@@ -64,7 +65,7 @@ const NotificationRow = ({
           <div className="w-9/10 space-y-2">
             {formatNotificationText(project, notification)}
             {formatNotificationCTAText(availableActions)}
-            <p className="text-scale-1100 text-sm !mt-2">{insertedAt}</p>
+            <p className="text-foreground-light text-sm !mt-2">{insertedAt}</p>
           </div>
           <div className="w-1/10 flex justify-end">
             <div>
@@ -76,7 +77,7 @@ const NotificationRow = ({
                   <IconX
                     size={14}
                     strokeWidth={2}
-                    className="text-scale-1100 group-hover:text-scale-1200 transition"
+                    className="text-foreground-light group-hover:text-foreground transition"
                   />
                 }
                 onClick={() => dismissNotification(notification.id)}
@@ -88,6 +89,7 @@ const NotificationRow = ({
           <div className="flex items-center">
             <NotificationActions
               project={project}
+              organization={organization}
               changelogLink={changelogLink}
               availableActions={availableActions}
               onSelectRestartProject={() => onSelectRestartProject(project, notification)}

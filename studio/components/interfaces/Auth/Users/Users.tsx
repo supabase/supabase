@@ -1,46 +1,39 @@
-import { observer } from 'mobx-react-lite'
-import { useContext, useEffect } from 'react'
+import { useParams } from 'common'
+import { useState } from 'react'
 import { Button, IconRefreshCw, IconSearch, IconX, Input, Listbox } from 'ui'
 
-import { PageContext } from 'pages/project/[ref]/auth/users'
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import APIDocsButton from 'components/ui/APIDocsButton'
+import { useUsersQuery } from 'data/auth/users-query'
 import AddUserDropdown from './AddUserDropdown'
 import UsersList from './UsersList'
 
 const Users = () => {
-  const PageState: any = useContext(PageContext)
+  const { project } = useProjectContext()
+  const { ref: projectRef } = useParams()
+  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
 
-  useEffect(() => {
-    PageState.fetchData(1)
-  }, [])
+  const [page, setPage] = useState(1)
+  const [search, setSearch] = useState('')
+  const [filterKeywords, setFilterKeywords] = useState('')
+  const [filterVerified, setFilterVerified] = useState<'verified' | 'unverified'>()
 
-  function onFilterChange(e: any) {
-    PageState.filterInputValue = e.target.value
-  }
+  const { data, isLoading, isSuccess, refetch, isRefetching } = useUsersQuery({
+    projectRef,
+    page,
+    keywords: filterKeywords,
+    verified: filterVerified,
+  })
 
   function onVerifiedFilterChange(e: any) {
-    PageState.filterVerified = e
-    onSearchUser()
-  }
-
-  function onFilterKeyPress(e: any) {
-    // enter key
-    if (e.keyCode == 13) onSearchUser()
-  }
-
-  function onSearchUser() {
-    PageState.filterKeywords = PageState.filterInputValue
-    PageState.filterVerified = PageState.filterVerified
-    PageState.fetchData(1)
+    setFilterVerified(e)
   }
 
   function clearSearch() {
-    PageState.filterInputValue = ''
-    PageState.filterKeywords = ''
-    PageState.fetchData(1)
-  }
-
-  function refreshUsers() {
-    PageState.fetchData(1)
+    setSearch('')
+    setFilterKeywords('')
+    setFilterVerified(undefined)
   }
 
   return (
@@ -49,16 +42,18 @@ const Users = () => {
         <div className="relative flex space-x-4">
           <Input
             size="small"
-            value={PageState.filterInputValue}
-            onChange={onFilterChange}
-            onKeyDown={onFilterKeyPress}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.keyCode == 13) setFilterKeywords(search)
+            }}
             className="min-w-[275px]"
             name="email"
             id="email"
             placeholder="Search by email or phone number"
             icon={<IconSearch size="tiny" />}
             actions={[
-              PageState.filterInputValue && (
+              search && (
                 <Button
                   size="tiny"
                   type="text"
@@ -70,7 +65,7 @@ const Users = () => {
           />
           <Listbox
             size="small"
-            value={PageState.filterVerified}
+            value={filterVerified}
             onChange={onVerifiedFilterChange}
             name="verified"
             id="verified"
@@ -88,23 +83,32 @@ const Users = () => {
           </Listbox>
         </div>
         <div className="mt-4 flex items-center gap-2 md:mt-0">
+          {isNewAPIDocsEnabled && <APIDocsButton section={['user-management']} />}
           <Button
             size="tiny"
             icon={<IconRefreshCw />}
             type="default"
-            loading={PageState.usersLoading}
-            onClick={refreshUsers}
+            loading={isLoading || isRefetching}
+            onClick={() => refetch()}
           >
             Reload
           </Button>
-
-          <AddUserDropdown projectKpsVersion={PageState?.projectKpsVersion} />
+          <AddUserDropdown projectKpsVersion={project?.kpsVersion} />
         </div>
       </div>
       <section className="thin-scrollbars mt-4 overflow-visible px-6">
         <div className="section-block--body relative overflow-x-auto rounded">
           <div className="inline-block min-w-full align-middle">
-            <UsersList />
+            <UsersList
+              page={page}
+              setPage={setPage}
+              keywords={filterKeywords}
+              verified={filterVerified}
+              total={data?.total ?? 0}
+              users={data?.users ?? []}
+              isLoading={isLoading}
+              isSuccess={isSuccess}
+            />
           </div>
         </div>
       </section>
@@ -112,4 +116,4 @@ const Users = () => {
   )
 }
 
-export default observer(Users)
+export default Users

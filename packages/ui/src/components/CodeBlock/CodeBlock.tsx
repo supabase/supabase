@@ -1,5 +1,4 @@
-import * as React from 'react'
-import { Children, FC } from 'react'
+import { Children } from 'react'
 import * as CopyToClipboard from 'react-copy-to-clipboard'
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { monokaiCustomTheme } from './CodeBlock.utils'
@@ -16,7 +15,7 @@ import json from 'react-syntax-highlighter/dist/cjs/languages/hljs/json'
 import kotlin from 'react-syntax-highlighter/dist/cjs/languages/hljs/kotlin'
 
 import { useState } from 'react'
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 
 export interface CodeBlockProps {
   title?: string
@@ -39,8 +38,8 @@ export const CodeBlock = ({
   hideCopy = false,
   hideLineNumbers = false,
 }: CodeBlockProps) => {
-  const { isDarkMode } = useTheme()
-  const monokaiTheme = monokaiCustomTheme(isDarkMode)
+  const { theme } = useTheme()
+  const monokaiTheme = monokaiCustomTheme(theme === 'dark')
 
   const [copied, setCopied] = useState(false)
 
@@ -85,7 +84,7 @@ export const CodeBlock = ({
   return (
     <>
       {title && (
-        <div className="rounded-t-md bg-scale-300 py-2 px-4 border-b border-scale-500 text-blue-1100 font-sans">
+        <div className="rounded-t-md bg-surface-100 py-2 px-4 border-b border-default text-blue-1100 font-sans">
           {title.replace(/%20/g, ' ')}
         </div>
       )}
@@ -98,7 +97,7 @@ export const CodeBlock = ({
             // @ts-ignore
             style={monokaiTheme}
             className={[
-              'code-block border p-4 w-full !my-0 !bg-scale-300',
+              'code-block border p-4 w-full !my-0 !bg-surface-100',
               `${!title ? '!rounded-md' : '!rounded-t-none !rounded-b-md'}`,
               `${!showLineNumbers ? 'pl-6' : ''}`,
               className,
@@ -111,7 +110,7 @@ export const CodeBlock = ({
             lineProps={(lineNumber) => {
               if (linesToHighlight.includes(lineNumber)) {
                 return {
-                  style: { display: 'block', backgroundColor: 'var(--colors-scale6)' },
+                  style: { display: 'block', backgroundColor: 'hsl(var(--background-selection))' },
                 }
               }
               return {}
@@ -137,7 +136,7 @@ export const CodeBlock = ({
             <div
               className={[
                 'absolute right-2',
-                `${isDarkMode ? 'dark' : ''}`,
+                `${theme === 'dark' ? 'dark' : ''}`,
                 `${!title ? 'top-2' : 'top-[3.25rem]'}`,
               ].join(' ')}
             >

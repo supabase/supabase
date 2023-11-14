@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import { useState } from 'react'
-import { SidePanel, Button, IconChevronDown, Collapsible } from 'ui'
+import { Button, Collapsible, IconChevronDown, SidePanel } from 'ui'
 import { SpreadsheetData } from './SpreadsheetImport.types'
 
 interface SpreadSheetImportConfigurationProps {
@@ -28,7 +28,7 @@ const SpreadsheetImportConfiguration = ({
                 <IconChevronDown
                   size={18}
                   strokeWidth={2}
-                  className={clsx('text-scale-1100', expandConfiguration && 'rotate-180')}
+                  className={clsx('text-foreground-light', expandConfiguration && 'rotate-180')}
                 />
               }
               className="px-1"
@@ -41,8 +41,8 @@ const SpreadsheetImportConfiguration = ({
         <SidePanel.Content>
           <div className="py-2 space-y-3">
             <div>
-              <p className="text-sm text-scale-1100">Select which columns to import</p>
-              <p className="text-sm text-scale-1000">
+              <p className="text-sm text-foreground-light">Select which columns to import</p>
+              <p className="text-sm text-foreground-light">
                 By default, all columns are selected to be imported from your CSV
               </p>
             </div>

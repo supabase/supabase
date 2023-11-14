@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
 import { useEffect } from 'react'
 import {
@@ -9,9 +10,8 @@ import {
   IconAlertCircle,
   Input,
 } from 'ui'
-import { boolean, number, object, string } from 'yup'
+import { object, string } from 'yup'
 
-import { useParams } from 'common'
 import {
   FormActions,
   FormHeader,
@@ -24,20 +24,7 @@ import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutati
 import { useCheckPermissions, useStore } from 'hooks'
 
 const schema = object({
-  DISABLE_SIGNUP: boolean().required(),
   SITE_URL: string().required('Must have a Site URL'),
-  JWT_EXP: number()
-    .max(604800, 'Must be less than 604800')
-    .required('Must have a JWT expiry value'),
-  REFRESH_TOKEN_ROTATION_ENABLED: boolean().required(),
-  SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: number()
-    .min(0, 'Must be a value more than 0')
-    .required('Must have a Reuse Interval value'),
-  SECURITY_CAPTCHA_ENABLED: boolean().required(),
-  SECURITY_CAPTCHA_SECRET: string().when('SECURITY_CAPTCHA_ENABLED', {
-    is: true,
-    then: string().required('Must have a Captcha secret'),
-  }),
 })
 
 const SiteUrl = observer(() => {
@@ -55,21 +42,10 @@ const SiteUrl = observer(() => {
   const formId = 'auth-config-general-form'
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
-  const INITIAL_VALUES = {
-    DISABLE_SIGNUP: authConfig?.DISABLE_SIGNUP,
-    JWT_EXP: authConfig?.JWT_EXP,
-    SITE_URL: authConfig?.SITE_URL,
-    REFRESH_TOKEN_ROTATION_ENABLED: authConfig?.REFRESH_TOKEN_ROTATION_ENABLED || false,
-    SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: authConfig?.SECURITY_REFRESH_TOKEN_REUSE_INTERVAL,
-    SECURITY_CAPTCHA_ENABLED: authConfig?.SECURITY_CAPTCHA_ENABLED || false,
-    SECURITY_CAPTCHA_PROVIDER: authConfig?.SECURITY_CAPTCHA_PROVIDER || 'hcaptcha',
-    SECURITY_CAPTCHA_SECRET: authConfig?.SECURITY_CAPTCHA_SECRET || '',
-  }
+  const INITIAL_VALUES = { SITE_URL: authConfig?.SITE_URL }
 
   const onSubmit = (values: any, { resetForm }: any) => {
     const payload = { ...values }
-    payload.DISABLE_SIGNUP = !values.DISABLE_SIGNUP
-
     updateAuthConfig(
       { projectRef: projectRef!, config: payload },
       {

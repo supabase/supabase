@@ -1,6 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -18,7 +19,6 @@ import {
   Toggle,
 } from 'ui'
 
-import { useParams } from 'common/hooks'
 import {
   FormActions,
   FormHeader,
@@ -29,6 +29,7 @@ import {
 } from 'components/ui/Forms'
 import Panel from 'components/ui/Panel'
 import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from 'data/edge-functions/edge-functions-delete-mutation'
 import { useEdgeFunctionUpdateMutation } from 'data/edge-functions/edge-functions-update-mutation'
@@ -44,6 +45,7 @@ const EdgeFunctionDetails = () => {
   const [showInstructions, setShowInstructions] = useState(false)
 
   const { data: settings } = useProjectApiQuery({ projectRef })
+  const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
   const { mutateAsync: updateEdgeFunction, isLoading: isUpdating } = useEdgeFunctionUpdateMutation()
   const { mutate: deleteEdgeFunction, isLoading: isDeleting } = useEdgeFunctionDeleteMutation({
@@ -66,7 +68,10 @@ const EdgeFunctionDetails = () => {
     : '[YOUR ANON KEY]'
 
   const endpoint = apiService?.app_config.endpoint ?? ''
-  const functionUrl = `${apiService?.protocol}://${endpoint}/functions/v1/${selectedFunction?.slug}`
+  const functionUrl =
+    customDomainData?.customDomain?.status === 'active'
+      ? `${apiService?.protocol}://${customDomainData.customDomain.hostname}/functions/v1/${selectedFunction?.slug}`
+      : `${apiService?.protocol}://${endpoint}/functions/v1/${selectedFunction?.slug}`
 
   const { managementCommands, secretCommands, invokeCommands } = generateCLICommands(
     selectedFunction,
@@ -177,7 +182,7 @@ const EdgeFunctionDetails = () => {
                         label="Enforce JWT Verification"
                         descriptionText="Require a valid JWT in the authorization header when invoking the function"
                       />
-                      <div className="space-y-1 border rounded border-scale-500 bg-scale-400 px-4 py-4">
+                      <div className="space-y-1 border rounded border-default bg-surface-200 px-4 py-4">
                         <div className="flex items-center space-x-2">
                           <p className="text-sm">
                             Import maps are{' '}
@@ -187,18 +192,24 @@ const EdgeFunctionDetails = () => {
                             for this function
                           </p>
                         </div>
-                        <p className="text-sm text-scale-1000">
+                        <p className="text-sm text-foreground-light">
                           Import maps allow the use of bare specifiers in functions instead of
                           explicit import URLs
                         </p>
                         <div className="!mt-4">
-                          <Link href="https://supabase.com/docs/guides/functions/import-maps">
-                            <a target="_blank" rel="noreferrer">
-                              <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                                More about import maps
-                              </Button>
-                            </a>
-                          </Link>
+                          <Button
+                            asChild
+                            type="default"
+                            icon={<IconExternalLink strokeWidth={1.5} />}
+                          >
+                            <Link
+                              href="https://supabase.com/docs/guides/functions/import-maps"
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              More about import maps
+                            </Link>
+                          </Button>
                         </div>
                       </div>
                     </FormSectionContent>
@@ -210,12 +221,12 @@ const EdgeFunctionDetails = () => {
         </Form>
 
         <div
-          className="space-y-6 rounded border bg-scale-100 px-6 py-4 drop-shadow-sm dark:bg-scale-300 transition-all overflow-hidden"
+          className="space-y-6 rounded border bg-surface-100 px-6 py-4 drop-shadow-sm transition-all overflow-hidden"
           style={{ maxHeight: showInstructions ? 800 : 66 }}
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded border bg-scale-1200 p-2 text-scale-100 dark:bg-scale-100 dark:text-scale-1200">
+              <div className="flex h-8 w-8 items-center justify-center rounded border bg-foreground p-2 text-background">
                 <IconTerminal strokeWidth={2} />
               </div>
               <h4>Command line access</h4>
@@ -266,11 +277,11 @@ const EdgeFunctionDetails = () => {
                         <Tooltip.Arrow className="radix-tooltip-arrow" />
                         <div
                           className={[
-                            'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                            'border border-scale-200',
+                            'rounded bg-alternative py-1 px-2 leading-none shadow',
+                            'border border-background',
                           ].join(' ')}
                         >
-                          <span className="text-xs text-scale-1200">
+                          <span className="text-xs text-foreground">
                             You need additional permissions to delete an edge function
                           </span>
                         </div>

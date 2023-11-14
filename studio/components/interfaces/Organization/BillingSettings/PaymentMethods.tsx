@@ -6,7 +6,10 @@ import {
   Alert,
   Badge,
   Button,
-  Dropdown,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   IconCreditCard,
   IconMoreHorizontal,
   IconPlus,
@@ -15,7 +18,6 @@ import {
   Modal,
 } from 'ui'
 
-import { AddNewPaymentMethodModal } from 'components/interfaces/BillingV2'
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import Panel from 'components/ui/Panel'
@@ -27,6 +29,7 @@ import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organizat
 import { useCheckPermissions, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { getURL } from 'lib/helpers'
+import AddNewPaymentMethodModal from 'components/interfaces/Billing/Payment/AddNewPaymentMethodModal'
 
 const PaymentMethods = () => {
   const { ui } = useStore()
@@ -135,7 +138,7 @@ const PaymentMethods = () => {
             footer={
               <div className="flex w-full justify-between">
                 {!canUpdatePaymentMethods ? (
-                  <p className="text-sm text-scale-1000">
+                  <p className="text-sm text-foreground-light">
                     You need additional permissions to manage this organization's payment methods
                   </p>
                 ) : (
@@ -199,11 +202,11 @@ const PaymentMethods = () => {
                                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                                     <div
                                       className={[
-                                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                                        'w-48 border border-scale-200 text-center', //border
+                                        'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                                        'w-48 border border-background text-center', //border
                                       ].join(' ')}
                                     >
-                                      <span className="text-xs text-scale-1200">
+                                      <span className="text-xs text-foreground">
                                         Your default payment method cannot be deleted
                                       </span>
                                     </div>
@@ -211,30 +214,30 @@ const PaymentMethods = () => {
                                 </Tooltip.Portal>
                               </Tooltip.Root>
                             ) : (
-                              <Dropdown
-                                size="tiny"
-                                overlay={[
-                                  <Dropdown.Item
+                              <DropdownMenu>
+                                <DropdownMenuTrigger>
+                                  <Button
+                                    type="outline"
+                                    icon={<IconMoreHorizontal />}
+                                    loading={isLoadingPaymentMethods}
+                                    className="hover:border-gray-500"
+                                  />
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                  <DropdownMenuItem
                                     key="make-default"
                                     onClick={() => setSelectedMethodForDefault(paymentMethod)}
                                   >
-                                    Make default
-                                  </Dropdown.Item>,
-                                  <Dropdown.Item
+                                    <p>Make default</p>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
                                     key="delete-method"
                                     onClick={() => setSelectedMethodToDelete(paymentMethod)}
                                   >
-                                    Delete
-                                  </Dropdown.Item>,
-                                ]}
-                              >
-                                <Button
-                                  type="outline"
-                                  icon={<IconMoreHorizontal />}
-                                  loading={isLoadingPaymentMethods}
-                                  className="hover:border-gray-500"
-                                />
-                              </Dropdown>
+                                    <p>Delete</p>
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             )}
                           </>
                         )}

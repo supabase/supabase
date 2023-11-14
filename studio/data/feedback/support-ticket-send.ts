@@ -15,6 +15,8 @@ export type sendSupportTicketVariables = {
   affectedServices?: string
   browserInformation?: string
   allowSupportAccess: boolean
+  siteUrl?: string
+  additionalRedirectUrls?: string
 }
 
 export async function sendSupportTicket({
@@ -28,6 +30,8 @@ export async function sendSupportTicket({
   affectedServices,
   browserInformation,
   allowSupportAccess,
+  siteUrl,
+  additionalRedirectUrls,
 }: sendSupportTicketVariables) {
   const { data, error } = await post('/platform/feedback/send', {
     body: {
@@ -40,8 +44,8 @@ export async function sendSupportTicket({
       library,
       verified: true,
       tags: ['dashboard-support-form'],
-      siteUrl: '',
-      additionalRedirectUrls: '',
+      siteUrl,
+      additionalRedirectUrls,
       affectedServices,
       browserInformation,
       allowSupportAccess,

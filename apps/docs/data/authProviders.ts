@@ -68,6 +68,7 @@ const authProviders = [
     platform: true,
     selfHosted: true,
     authType: 'social',
+    hasLightIcon: true,
   },
   {
     name: 'GitLab',
@@ -168,11 +169,22 @@ const authProviders = [
     platform: true,
     selfHosted: true,
     authType: 'social',
+    hasLightIcon: true,
   },
   {
     name: 'Twitch',
     logo: '/docs/img/icons/twitch-icon',
     href: '/guides/auth/social-login/auth-twitch',
+    official: true,
+    supporter: 'Supabase',
+    platform: true,
+    selfHosted: true,
+    authType: 'social',
+  },
+  {
+    name: 'WorkOS',
+    logo: '/docs/img/icons/workos-icon',
+    href: '/guides/auth/social-login/auth-workos',
     official: true,
     supporter: 'Supabase',
     platform: true,
@@ -208,6 +220,7 @@ const authProviders = [
     platform: true,
     selfHosted: true,
     authType: 'phone',
+    hasLightIcon: true,
   },
 ]
 

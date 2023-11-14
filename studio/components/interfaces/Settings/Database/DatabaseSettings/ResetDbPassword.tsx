@@ -14,13 +14,19 @@ import { getProjectDetail } from 'data/projects/project-detail-query'
 import { useCheckPermissions, useStore } from 'hooks'
 import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
 import { passwordStrength } from 'lib/helpers'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 const ResetDbPassword = ({ disabled = false }) => {
   const { ref } = useParams()
   const { ui, meta } = useStore()
 
   const isProjectActive = useIsProjectActive()
-  const canResetDbPassword = useCheckPermissions(PermissionAction.UPDATE, 'projects')
+  const { project } = useProjectContext()
+  const canResetDbPassword = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: {
+      project_id: project?.id,
+    },
+  })
 
   const [showResetDbPass, setShowResetDbPass] = useState<boolean>(false)
 
@@ -94,7 +100,10 @@ const ResetDbPassword = ({ disabled = false }) => {
     <>
       <Panel className="!m-0">
         <Panel.Content>
-          <div className="grid grid-cols-1 items-center lg:grid-cols-3">
+          <div
+            className="grid grid-cols-1 items-center lg:grid-cols-3 scroll-mt-6"
+            id="database-password"
+          >
             <div className="col-span-2 space-y-1">
               <p className="block">Database password</p>
               <p className="text-sm opacity-50">
@@ -118,11 +127,11 @@ const ResetDbPassword = ({ disabled = false }) => {
                       <Tooltip.Arrow className="radix-tooltip-arrow" />
                       <div
                         className={[
-                          'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                          'border border-scale-200 ', //border
+                          'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                          'border border-background', //border
                         ].join(' ')}
                       >
-                        <span className="text-xs text-scale-1200">
+                        <span className="text-xs text-foreground">
                           {!canResetDbPassword
                             ? 'You need additional permissions to reset the database password'
                             : !isProjectActive
@@ -140,7 +149,7 @@ const ResetDbPassword = ({ disabled = false }) => {
       </Panel>
       <Modal
         hideFooter
-        header={<h5 className="text-sm text-scale-1200">Reset database password</h5>}
+        header={<h5 className="text-sm text-foreground">Reset database password</h5>}
         confirmText="Reset password"
         size="medium"
         visible={showResetDbPass}

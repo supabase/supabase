@@ -1,5 +1,3 @@
-import dayjs from 'dayjs'
-import { Project } from 'types'
 import {
   Action,
   ActionType,
@@ -10,8 +8,11 @@ import {
   ServiceUpgrade,
   ViolatedLimit,
 } from '@supabase/shared-types/out/notifications'
-import { IconArrowRight, IconExternalLink, Button } from 'ui'
+import { Markdown } from 'components/interfaces/Markdown'
+import dayjs from 'dayjs'
 import Link from 'next/link'
+import { Project } from 'types'
+import { Button, IconArrowRight, IconExternalLink } from 'ui'
 
 export const formatNotificationText = (project: Project, notification: Notification) => {
   const projectName = project.name
@@ -107,14 +108,12 @@ export const formatNotificationText = (project: Project, notification: Notificat
                 <p className="text-sm">{upgrade.version_to}</p>
                 {upgrade.changelog_link && (
                   <div className="!ml-4">
-                    <Link href={upgrade.changelog_link}>
-                      <a target="_blank" rel="noreferrer">
-                        <IconExternalLink
-                          className="cursor-pointer text-scale-1000 hover:text-scale-1200 transition"
-                          size={12}
-                          strokeWidth={2}
-                        />
-                      </a>
+                    <Link href={upgrade.changelog_link} target="_blank" rel="noreferrer">
+                      <IconExternalLink
+                        className="cursor-pointer text-foreground-light hover:text-foreground transition"
+                        size={12}
+                        strokeWidth={2}
+                      />
                     </Link>
                   </div>
                 )}
@@ -128,7 +127,7 @@ export const formatNotificationText = (project: Project, notification: Notificat
     const buttons = notification.data.linked_buttons ?? []
     return (
       <>
-        <p className="text-sm">{notification.data.message}</p>{' '}
+        <Markdown content={notification.data.message} className="text-foreground" />
         {buttons.map((button, index) => {
           return (
             <a href={button.url} key={index} target="_blank">

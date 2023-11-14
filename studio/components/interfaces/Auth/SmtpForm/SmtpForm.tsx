@@ -30,6 +30,7 @@ import {
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useCheckPermissions, useStore } from 'hooks'
+import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
 import { urlRegex } from './../Auth.constants'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
@@ -231,23 +232,7 @@ const SmtpForm = () => {
                 )
               ) : (
                 <div className="mx-8 mb-8 -mt-4">
-                  <Alert_Shadcn_ variant="warning">
-                    <IconAlertTriangle strokeWidth={2} />
-                    <AlertTitle_Shadcn_>Built-in email service is rate-limited!</AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_>
-                      You're using the built-in email service. The service has rate limits and it's
-                      not meant to be used for production apps. Check the{' '}
-                      <a
-                        href="https://supabase.com/docs/guides/platform/going-into-prod#auth-rate-limits"
-                        className="underline"
-                        target="_blank"
-                      >
-                        documentation
-                      </a>{' '}
-                      for an up-to-date information on the current rate limits. Please use a custom
-                      SMTP server if you're planning on having large number of users.
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
+                  <EmailRateLimitsAlert />
                 </div>
               )}
 
@@ -282,7 +267,7 @@ const SmtpForm = () => {
                 header={
                   <FormSectionLabel>
                     <span>SMTP Provider Settings</span>
-                    <p className="my-4 text-scale-900">
+                    <p className="my-4 text-foreground-lighter">
                       Your SMTP Credentials will always be encrypted in our database.
                     </p>
                   </FormSectionLabel>
@@ -321,16 +306,7 @@ const SmtpForm = () => {
                     name="SMTP_MAX_FREQUENCY"
                     label="Minimum interval between emails being sent"
                     descriptionText="How long between each email can a new email be sent via your SMTP server."
-                    actions={<span className="mr-3 text-scale-900">seconds</span>}
-                    disabled={!canUpdateConfig}
-                  />
-                  <InputNumber
-                    name="RATE_LIMIT_EMAIL_SENT"
-                    id="RATE_LIMIT_EMAIL_SENT"
-                    min={0}
-                    label="Rate limit for sending emails"
-                    descriptionText="How many emails can be sent per hour."
-                    actions={<span className="mr-3 text-scale-900">emails per hour</span>}
+                    actions={<span className="mr-3 text-foreground-lighter">seconds</span>}
                     disabled={!canUpdateConfig}
                   />
                   <Input

@@ -2,6 +2,7 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'react-hot-toast'
 
 import { post } from 'data/fetchers'
+import { permissionKeys } from 'data/permissions/keys'
 import { ResponseError } from 'types'
 import { organizationKeys } from './keys'
 
@@ -54,7 +55,10 @@ export const useOrganizationCreateMutation = ({
     (vars) => createOrganization(vars),
     {
       async onSuccess(data, variables, context) {
-        await queryClient.invalidateQueries(organizationKeys.list())
+        await Promise.all([
+          queryClient.invalidateQueries(organizationKeys.list()),
+          queryClient.invalidateQueries(permissionKeys.list()),
+        ])
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

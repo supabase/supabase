@@ -37,13 +37,13 @@ const SpreadSheetFileUpload = ({
   return (
     <div className="space-y-4">
       <div>
-        <p className="mb-2 text-sm text-scale-1100">
+        <p className="mb-2 text-sm text-foreground-light">
           Upload a CSV or TSV file. The first row should be the headers of the table, and your
           headers should not include any special characters other than hyphens (
           <span className="text-code">-</span>) or underscores (<span className="text-code">_</span>
           ).
         </p>
-        <p className="text-sm text-scale-1000">
+        <p className="text-sm text-foreground-light">
           Tip: Datetime columns should be formatted as YYYY-MM-DD HH:mm:ss
         </p>
       </div>
@@ -65,7 +65,7 @@ const SpreadSheetFileUpload = ({
         <div className="flex h-28 flex-col items-center justify-center space-y-2 rounded-md border border-dashed dark:border-gray-700">
           <div className="flex items-center space-x-2">
             <IconFileText size={14} strokeWidth={1.5} />
-            <p className="text-sm text-scale-1200">{uploadedFile.name}</p>
+            <p className="text-sm text-foreground">{uploadedFile.name}</p>
           </div>
           {parseProgress === 100 ? (
             <Button type="outline" onClick={removeUploadedFile}>

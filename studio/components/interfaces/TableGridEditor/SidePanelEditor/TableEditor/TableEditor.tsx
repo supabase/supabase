@@ -2,12 +2,14 @@ import type { PostgresTable, PostgresType } from '@supabase/postgres-meta'
 import { isEmpty, isUndefined, noop } from 'lodash'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Alert, Badge, Button, Checkbox, IconBookOpen, Input, Modal, SidePanel } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import { useStore } from 'hooks'
+import { useIsFeatureEnabled, useStore } from 'hooks'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { Alert, Badge, Button, Checkbox, IconBookOpen, Input, Modal, SidePanel } from 'ui'
 import { SpreadsheetImport } from '../'
 import ActionBar from '../ActionBar'
 import { ColumnField, CreateTablePayload, UpdateTablePayload } from '../SidePanelEditor.types'
@@ -23,9 +25,8 @@ import {
   validateFields,
 } from './TableEditor.utils'
 
-interface TableEditorProps {
+export interface TableEditorProps {
   table?: PostgresTable
-  selectedSchema: string
   isDuplicating: boolean
   visible: boolean
   closePanel: () => void
@@ -47,20 +48,20 @@ interface TableEditorProps {
 
 const TableEditor = ({
   table,
-  selectedSchema,
   isDuplicating,
   visible = false,
   closePanel = noop,
   saveChanges = noop,
   updateEditorDirty = noop,
 }: TableEditorProps) => {
+  const snap = useTableEditorStateSnapshot()
   const { ui, meta } = useStore()
   const { project } = useProjectContext()
   const isNewRecord = isUndefined(table)
 
-  const enumTypes = meta.types.list(
-    (type: PostgresType) => !meta.excludedSchemas.includes(type.schema)
-  )
+  const realtimeEnabled = useIsFeatureEnabled('realtime:all')
+
+  const enumTypes = meta.types.list((type: PostgresType) => !EXCLUDED_SCHEMAS.includes(type.schema))
 
   const publications = meta.publications.list()
   const realtimePublication = publications.find(
@@ -135,7 +136,7 @@ const TableEditor = ({
       if (isEmpty(errors)) {
         const payload: CreateTablePayload | UpdateTablePayload = {
           name: tableFields.name,
-          schema: selectedSchema,
+          schema: snap.selectedSchemaName,
           comment: tableFields.comment,
           ...(!isNewRecord && { rls_enabled: tableFields.isRLSEnabled }),
         }
@@ -170,8 +171,9 @@ const TableEditor = ({
       size="large"
       key="TableEditor"
       visible={visible}
-      // @ts-ignore
-      header={<HeaderTitle schema={selectedSchema} table={table} isDuplicating={isDuplicating} />}
+      header={
+        <HeaderTitle schema={snap.selectedSchemaName} table={table} isDuplicating={isDuplicating} />
+      }
       className={`transition-all duration-100 ease-in ${isImportingSpreadsheet ? ' mr-32' : ''}`}
       onCancel={closePanel}
       onConfirm={() => (resolve: () => void) => onSaveChanges(resolve)}
@@ -251,13 +253,15 @@ const TableEditor = ({
                   <p className="mt-3">You can create policies after you create this table.</p>
                 )}
                 <p className="mt-4">
-                  <Link href="https://supabase.com/docs/guides/auth/row-level-security">
-                    <a target="_blank" rel="noreferrer">
-                      <Button type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
-                        RLS Documentation
-                      </Button>
-                    </a>
-                  </Link>
+                  <Button asChild type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
+                    <Link
+                      href="https://supabase.com/docs/guides/auth/row-level-security"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      RLS Documentation
+                    </Link>
+                  </Button>
                 </p>
               </Alert>
             ) : (
@@ -272,24 +276,30 @@ const TableEditor = ({
                   publicly writable and readable
                 </p>
                 <p className="mt-4">
-                  <Link href="https://supabase.com/docs/guides/auth/row-level-security">
-                    <a target="_blank" rel="noreferrer">
-                      <Button type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
-                        RLS Documentation
-                      </Button>
-                    </a>
-                  </Link>
+                  <Button asChild type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
+                    <Link
+                      href="https://supabase.com/docs/guides/auth/row-level-security"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      RLS Documentation
+                    </Link>
+                  </Button>
                 </p>
               </Alert>
             )}
-            <Checkbox
-              id="enable-realtime"
-              label="Enable Realtime"
-              description="Broadcast changes on this table to authorized subscribers"
-              checked={tableFields.isRealtimeEnabled}
-              onChange={() => onUpdateField({ isRealtimeEnabled: !tableFields.isRealtimeEnabled })}
-              size="medium"
-            />
+            {realtimeEnabled && (
+              <Checkbox
+                id="enable-realtime"
+                label="Enable Realtime"
+                description="Broadcast changes on this table to authorized subscribers"
+                checked={tableFields.isRealtimeEnabled}
+                onChange={() =>
+                  onUpdateField({ isRealtimeEnabled: !tableFields.isRealtimeEnabled })
+                }
+                size="medium"
+              />
+            )}
           </div>
         </SidePanel.Content>
         <SidePanel.Separator />
@@ -297,7 +307,7 @@ const TableEditor = ({
           <div className="space-y-10 py-6">
             {!isDuplicating && (
               <ColumnManagement
-                table={{ name: tableFields.name, schema: selectedSchema }}
+                table={{ name: tableFields.name, schema: snap.selectedSchemaName }}
                 columns={tableFields?.columns}
                 enumTypes={enumTypes}
                 isNewRecord={isNewRecord}

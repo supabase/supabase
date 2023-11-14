@@ -1,8 +1,7 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { groupBy } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
-import { Badge, Button, IconPlus } from 'ui'
+import { Button, IconPlus } from 'ui'
 
 import AlertError from 'components/ui/AlertError'
 import {
@@ -12,19 +11,21 @@ import {
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useCheckPermissions } from 'hooks'
+import { ResourceWarning, useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { IS_PLATFORM } from 'lib/constants'
 import { makeRandomString } from 'lib/helpers'
 import { Organization, Project, ResponseError } from 'types'
 import ProjectCard from './ProjectCard'
 import ShimmeringCard from './ShimmeringCard'
+import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
+import { useSelectedOrganization } from 'hooks'
 
 export interface ProjectListProps {
   rewriteHref?: (projectRef: string) => string
 }
 
 const ProjectList = ({ rewriteHref }: ProjectListProps) => {
-  const { data: organizations } = useOrganizationsQuery()
+  const { data: organizations, isSuccess } = useOrganizationsQuery()
   const {
     data: allProjects,
     isLoading: isLoadingProjects,
@@ -36,11 +37,12 @@ const ProjectList = ({ rewriteHref }: ProjectListProps) => {
     isError: isErrorPermissions,
     error: permissionsError,
   } = usePermissionsQuery()
+  const { data: resourceWarnings } = useResourceWarningsQuery()
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({ enabled: IS_PLATFORM })
   const projectsByOrg = groupBy(allProjects, 'organization_id')
   const isLoadingPermissions = IS_PLATFORM ? _isLoadingPermissions : false
 
-  return (
+  return isSuccess && organizations && organizations?.length > 0 ? (
     <>
       {organizations?.map((organization) => {
         return (
@@ -51,6 +53,7 @@ const ProjectList = ({ rewriteHref }: ProjectListProps) => {
             overdueInvoices={(allOverdueInvoices ?? []).filter(
               (it) => it.organization_id === organization.id
             )}
+            resourceWarnings={resourceWarnings ?? []}
             rewriteHref={rewriteHref}
             isLoadingPermissions={isLoadingPermissions}
             isErrorPermissions={isErrorPermissions}
@@ -62,6 +65,8 @@ const ProjectList = ({ rewriteHref }: ProjectListProps) => {
         )
       })}
     </>
+  ) : (
+    <NoProjectsState slug={''} />
   )
 }
 
@@ -71,6 +76,7 @@ type OrganizationProjectsProps = {
   organization: Organization
   projects: Project[]
   overdueInvoices: OverdueInvoicesResponse[]
+  resourceWarnings: ResourceWarning[]
   isLoadingPermissions: boolean
   isErrorPermissions: boolean
   permissionsError: ResponseError | null
@@ -81,9 +87,10 @@ type OrganizationProjectsProps = {
 }
 
 const OrganizationProjects = ({
-  organization: { id, name, slug, subscription_id },
+  organization: { name, slug, subscription_id },
   projects,
   overdueInvoices,
+  resourceWarnings,
   isLoadingPermissions,
   isErrorPermissions,
   permissionsError,
@@ -92,8 +99,16 @@ const OrganizationProjects = ({
   projectsError,
   rewriteHref,
 }: OrganizationProjectsProps) => {
+  const organization = useSelectedOrganization()
   const isEmpty = !projects || projects.length === 0
-  const canReadProjects = useCheckPermissions(PermissionAction.READ, 'projects', undefined, id)
+
+  const { data: integrations } = useOrgIntegrationsQuery({ orgSlug: organization?.slug })
+  const githubConnections = integrations
+    ?.filter((integration) => integration.integration.name === 'GitHub')
+    .flatMap((integration) => integration.connections)
+  const vercelConnections = integrations
+    ?.filter((integration) => integration.integration.name === 'Vercel')
+    .flatMap((integration) => integration.connections)
 
   return (
     <div className="space-y-3" key={makeRandomString(5)}>
@@ -102,11 +117,9 @@ const OrganizationProjects = ({
 
         {!!overdueInvoices.length && (
           <div>
-            <Link href={`/org/${slug}/invoices`}>
-              <a>
-                <Button type="danger">Outstanding Invoices</Button>
-              </a>
-            </Link>
+            <Button asChild type="danger">
+              <Link href={`/org/${slug}/invoices`}>Outstanding Invoices</Link>
+            </Button>
           </div>
         )}
       </div>
@@ -132,40 +145,44 @@ const OrganizationProjects = ({
                 error={projectsError}
               />
             </div>
-          ) : !canReadProjects ? (
-            <div className="col-span-4 space-y-4 rounded-lg border-2 border-dashed border-gray-300 py-8 px-6 text-center">
-              <div className="space-y-1">
-                <p>You need additional permissions to view projects from this organization</p>
-                <p className="text-sm text-scale-1100">
-                  Contact your organization owner or administrator for assistance.
-                </p>
-              </div>
-            </div>
           ) : isEmpty ? (
-            <div className="col-span-4 space-y-4 rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
-              <div className="space-y-1">
-                <p>No projects</p>
-                <p className="text-sm text-scale-1100">Get started by creating a new project.</p>
-              </div>
-              <div>
-                <Link href={`/new/${slug}`}>
-                  <a>
-                    <Button icon={<IconPlus />}>New Project</Button>
-                  </a>
-                </Link>
-              </div>
-            </div>
+            <NoProjectsState slug={slug} />
           ) : (
             projects?.map((project) => (
               <ProjectCard
                 key={makeRandomString(5)}
                 project={project}
                 rewriteHref={rewriteHref ? rewriteHref(project.ref) : undefined}
+                resourceWarnings={resourceWarnings.find(
+                  (resourceWarning) => resourceWarning.project === project.ref
+                )}
+                githubIntegration={githubConnections?.find(
+                  (connection) => connection.supabase_project_ref === project.ref
+                )}
+                vercelIntegration={vercelConnections?.find(
+                  (connection) => connection.supabase_project_ref === project.ref
+                )}
               />
             ))
           )}
         </ul>
       )}
+    </div>
+  )
+}
+
+const NoProjectsState = ({ slug }: { slug: string }) => {
+  return (
+    <div className="col-span-4 space-y-4 rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
+      <div className="space-y-1">
+        <p>No projects</p>
+        <p className="text-sm text-foreground-light">Get started by creating a new project.</p>
+      </div>
+      <div>
+        <Button asChild icon={<IconPlus />}>
+          <Link href={`/new/${slug}`}>New Project</Link>
+        </Button>
+      </div>
     </div>
   )
 }

@@ -1,19 +1,19 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Button, IconExternalLink } from 'ui'
-import { observer } from 'mobx-react-lite'
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
+import { useTheme } from 'next-themes'
 import { useCheckPermissions, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import { BASE_PATH } from 'lib/constants'
-import { useTheme } from 'common'
 
 const WrappersDisabledState = () => {
   const { ui, meta } = useStore()
   const { ref } = useParams()
-  const { isDarkMode } = useTheme()
+  const { resolvedTheme } = useTheme()
   const wrappersExtension = meta.extensions.byId('wrappers')
   const vaultExtension = meta.extensions.byId('supabase_vault')
   const isNotAvailable = wrappersExtension === undefined || vaultExtension === undefined
@@ -67,19 +67,20 @@ const WrappersDisabledState = () => {
   return (
     <div>
       <div
-        className="w-full px-12 py-12 bg-white bg-no-repeat border rounded dark:bg-scale-200 border-scale-500"
+        className="w-full px-12 py-12 bg-no-repeat border rounded bg-background border-default"
         style={{
           backgroundSize: '45%',
           backgroundPosition: '105% 40%',
-          backgroundImage: isDarkMode
-            ? `url("${BASE_PATH}/img/wrappers-dark.png")`
-            : `url("${BASE_PATH}/img/wrappers-light.png")`,
+          backgroundImage:
+            resolvedTheme === 'dark'
+              ? `url("${BASE_PATH}/img/wrappers-dark.png")`
+              : `url("${BASE_PATH}/img/wrappers-light.png")`,
         }}
       >
         <div className="w-3/5 space-y-8">
           <div className="space-y-2">
             <h4 className="text-lg">Supabase Wrappers</h4>
-            <p className="text-sm text-scale-1100">
+            <p className="text-sm text-foreground-light">
               Supabase Wrappers is a framework for building Postgres Foreign Data Wrappers (FDW)
               which connect Postgres to external systems. Query your data warehouse or third-party
               APIs directly from your database.
@@ -87,44 +88,50 @@ const WrappersDisabledState = () => {
           </div>
           {isNotAvailable ? (
             <div className="space-y-4">
-              <div className="rounded border border-scale-500 px-4 py-2 flex items-center justify-between">
+              <div className="rounded border border-default px-4 py-2 flex items-center justify-between">
                 <div>
-                  <p className="text-scale-1100 text-sm">
+                  <p className="text-foreground-light text-sm">
                     Wrappers is not available for this project yet.
                   </p>
-                  <p className="text-scale-1000 text-sm">
+                  <p className="text-foreground-light text-sm">
                     Do reach out to us if you're interested!
                   </p>
                 </div>
                 <div>
-                  <Link
-                    href={`/support/new?ref=${ref}&category=sales&subject=Request%20for%20access%20to%20wrappers`}
-                  >
-                    <a target="_blank" rel="noreferrer">
-                      <Button type="primary">Contact us</Button>
-                    </a>
-                  </Link>
+                  <Button asChild type="primary">
+                    <Link
+                      href={`/support/new?ref=${ref}&category=sales&subject=Request%20for%20access%20to%20wrappers`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Contact us
+                    </Link>
+                  </Button>
                 </div>
               </div>
               <div className="flex items-center space-x-2 my-1 ml-[1px]">
-                <Link href="https://supabase.com/docs/guides/database/extensions/wrappers/overview">
-                  <a target="_blank" rel="noreferrer">
-                    <Button type="default" icon={<IconExternalLink />}>
-                      About Wrappers
-                    </Button>
-                  </a>
-                </Link>
+                <Button asChild type="default" icon={<IconExternalLink />}>
+                  <Link
+                    href="https://supabase.com/docs/guides/database/extensions/wrappers/overview"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    About Wrappers
+                  </Link>
+                </Button>
               </div>
             </div>
           ) : (
             <div className="flex items-center space-x-2">
-              <Link href="https://supabase.com/docs/guides/database/extensions/wrappers/overview">
-                <a target="_blank" rel="noreferrer">
-                  <Button type="default" icon={<IconExternalLink />}>
-                    About Wrappers
-                  </Button>
-                </a>
-              </Link>
+              <Button asChild type="default" icon={<IconExternalLink />}>
+                <Link
+                  href="https://supabase.com/docs/guides/database/extensions/wrappers/overview"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  About Wrappers
+                </Link>
+              </Button>
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger>
                   <Button
@@ -142,11 +149,11 @@ const WrappersDisabledState = () => {
                       <Tooltip.Arrow className="radix-tooltip-arrow" />
                       <div
                         className={[
-                          'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                          'border border-scale-200',
+                          'rounded bg-alternative py-1 px-2 leading-none shadow',
+                          'border border-background',
                         ].join(' ')}
                       >
-                        <span className="text-xs text-scale-1200">
+                        <span className="text-xs text-foreground">
                           You need additional permissions to enable Wrappers for this project
                         </span>
                       </div>

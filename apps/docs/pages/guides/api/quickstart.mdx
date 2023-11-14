@@ -29,6 +29,7 @@ We'll create a database table called `todos` for storing tasks. This creates a c
         size="small"
         type="underlined"
         defaultActiveId="sql"
+        queryGroup="database-method"
       >
       <TabPanel id="sql" label="SQL">
 
@@ -148,6 +149,7 @@ We provide a number of [Client Libraries](https://github.com/supabase/supabase#c
   size="small"
   type="underlined"
   defaultActiveId="js"
+  queryGroup="language"
 >
 <TabPanel id="js" label="JavaScript">
 
@@ -167,63 +169,6 @@ final data = await supabase.from('todos').select('*');
 
 ```python
 response = supabase.table('todos').select("*").execute()
-```
-
-</TabPanel>
-</Tabs>
-
-### GraphQL
-
-Every table can be accessed through the GraphQL API by switching `/rest/v1` with `/graphql/v1`.
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="urql"
->
-<TabPanel id="urql" label="urql">
-
-```javascript
-import { createClient, useQuery } from 'urql'
-
-const URL = '<SUPABASE_URL>/graphql/v1'
-const ANON_KEY = '<SUPABASE_ANON_KEY>'
-
-// Prepare API key and Authorization header
-const headers = {
-  apikey: `${ANON_KEY}`,
-  authorization: `Bearer ${ANON_KEY}`,
-}
-
-const client = createClient({
-  url: URL,
-  fetchOptions: function createFetchOptions() {
-    return { headers }
-  },
-})
-
-// Prepare our GraphQL query
-const TodosQuery = `
-  query {
-    todosCollection {
-      edges {
-        node {
-          id
-          task
-        }
-      }
-    }
-  }
-`
-
-// Query for the data (React)
-const [result, reexecuteQuery] = useQuery({
-  query: TodosQuery,
-})
-
-// Read the result
-const { data, fetching, error } = result
 ```
 
 </TabPanel>

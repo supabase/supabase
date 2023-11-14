@@ -10,7 +10,13 @@ export const PG_META_URL = IS_PLATFORM
   : process.env.STUDIO_PG_META_URL
 export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
+/**
+ * @deprecated use DATETIME_FORMAT
+ */
 export const DATE_FORMAT = 'YYYY-MM-DDTHH:mm:ssZ'
+
+// should be used for all dayjs formattings shown to the user. Includes timezone info.
+export const DATETIME_FORMAT = 'DD MMM YYYY, HH:mm:ss (ZZ)'
 
 // Keyboard Shortcuts Related
 export const SHORTCUT_KEYS = {
@@ -89,4 +95,15 @@ export const USAGE_APPROACHING_THRESHOLD = 0.75
 
 export const LOCAL_STORAGE_KEYS = {
   RECENTLY_VISITED_ORGANIZATION: 'supabase-organization',
+  TELEMETRY_CONSENT: 'supabase-consent',
+  UI_PREVIEW_NAVIGATION_LAYOUT: 'supabase-ui-preview-nav-layout',
+  UI_PREVIEW_API_SIDE_PANEL: 'supabase-ui-api-side-panel',
+  DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
 }
+
+export const OPT_IN_TAGS = {
+  AI_SQL: 'AI_SQL_GENERATOR_OPT_IN',
+  PREVIEW_BRANCHES: 'PREVIEW_BRANCHES_OPT_IN',
+}
+
+export const GB = 1024 * 1024 * 1024

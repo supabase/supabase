@@ -86,7 +86,7 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
       size="medium"
       visible={selectedSecret !== undefined}
       onCancel={onClose}
-      header={<h5 className="text-sm text-scale-1200">Edit secret</h5>}
+      header={<h5 className="text-sm text-foreground">Edit secret</h5>}
     >
       <Form
         id="add-new-secret-form"

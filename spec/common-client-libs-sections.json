@@ -14,7 +14,7 @@
       "reference_javascript_v1",
       "reference_dart_v0",
       "reference_python_v2",
-      "reference_swift_v0"
+      "reference_swift_v1"
     ]
   },
   {
@@ -34,7 +34,7 @@
       "reference_dart_v1",
       "reference_python_v2",
       "reference_csharp_v0",
-      "reference_swift_v0",
+      "reference_swift_v1",
       "reference_kotlin_v0"
     ]
   },
@@ -48,7 +48,7 @@
       "reference_dart_v1",
       "reference_python_v2",
       "reference_csharp_v0",
-      "reference_swift_v0",
+      "reference_swift_v1",
       "reference_kotlin_v0"
     ]
   },
@@ -372,6 +372,14 @@
             "product": "database",
             "parent": "modifiers",
             "type": "function"
+          },
+          {
+            "id": "explain",
+            "title": "Using explain",
+            "slug": "explain",
+            "product": "database",
+            "parent": "modifiers",
+            "type": "function"
           }
         ]
       }
@@ -468,13 +476,6 @@
         "id": "reset-password-for-email",
         "title": "Send a password reset request",
         "slug": "auth-resetpasswordforemail",
-        "product": "auth",
-        "type": "function"
-      },
-      {
-        "id": "session",
-        "title": "Retrieve a session",
-        "slug": "auth-session",
         "product": "auth",
         "type": "function"
       },
@@ -792,6 +793,13 @@
         "slug": "getchannels",
         "product": "realtime",
         "type": "function"
+      },
+      {
+        "id": "broadcast-message",
+        "title": "Broadcast a message",
+        "slug": "broadcastmessage",
+        "product": "realtime",
+        "type": "function"
       }
     ]
   },
@@ -935,7 +943,7 @@
       "reference_dart_v0",
       "reference_python_v2",
       "reference_csharp_v0",
-      "reference_swift_v0",
+      "reference_swift_v1",
       "reference_kotlin_v0"
     ],
     "items": [

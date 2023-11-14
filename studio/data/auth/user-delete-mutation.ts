@@ -1,10 +1,11 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 
-import { User } from 'components/interfaces/Auth/Users/Users.types'
 import { delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { ResponseError } from 'types'
+import { User } from './users-query'
+import { authKeys } from './keys'
 
 export type UserDeleteVariables = {
   projectRef: string
@@ -27,11 +28,13 @@ export const useUserDeleteMutation = ({
   UseMutationOptions<UserDeleteData, ResponseError, UserDeleteVariables>,
   'mutationFn'
 > = {}) => {
+  const queryClient = useQueryClient()
   return useMutation<UserDeleteData, ResponseError, UserDeleteVariables>(
     (vars) => deleteUser(vars),
     {
       async onSuccess(data, variables, context) {
-        // [Joshen] If we need to invalidate any queries
+        const { projectRef } = variables
+        await queryClient.invalidateQueries(authKeys.users(projectRef))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

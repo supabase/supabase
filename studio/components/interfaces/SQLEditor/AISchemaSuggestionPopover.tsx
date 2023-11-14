@@ -1,7 +1,7 @@
 import * as Popover from '@radix-ui/react-popover'
 import { motion } from 'framer-motion'
 import { useLocalStorageQuery, useSelectedOrganization, useSelectedProject } from 'hooks'
-import { IS_PLATFORM } from 'lib/constants'
+import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { Button, IconInfo } from 'ui'
 
@@ -16,8 +16,7 @@ const AISchemaSuggestionPopover = ({
   onClickSettings,
 }: PropsWithChildren<AISchemaSuggestionPopoverProps>) => {
   const selectedOrganization = useSelectedOrganization()
-  const isOptedInToAI =
-    selectedOrganization?.opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN') ?? false
+  const isOptedInToAI = selectedOrganization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
   const [hasEnabledAISchema] = useLocalStorageQuery('supabase_sql-editor-ai-schema', true)
   const [isDelayComplete, setIsDelayComplete] = useState(false)
   const [aiQueryCount] = useLocalStorageQuery('supabase_sql-editor-ai-query-count', 0)
@@ -64,8 +63,8 @@ const AISchemaSuggestionPopover = ({
             initial="hidden"
             animate="visible"
           >
-            <Popover.Arrow className="fill-scale-300 dark:fill-scale-500" />
-            <div className="flex flex-col gap-2 border border-scale-300 dark:border-scale-500 rounded-md p-4 bg-scale-300 shadow-xl">
+            <Popover.Arrow className="fill-background-surface-300" />
+            <div className="flex flex-col gap-2 border border-background-surface-100 dark:border-default rounded-md p-4 bg-surface-100 shadow-xl">
               <div className="flex flex-row items-center gap-4 max-w-md">
                 <IconInfo className="w-6 h-6" />
                 <p className="text-sm">
