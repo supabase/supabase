@@ -247,6 +247,7 @@ const DatabaseSettings = () => {
                 <h5 key="panel-title" className="mb-0">
                   Connection string
                 </h5>
+                {/* [Joshen] Possibly make this a reusable component, used in UtilityActions too */}
                 <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
                   <PopoverTrigger_Shadcn_ asChild>
                     <div className="flex items-center space-x-2 cursor-pointer">
@@ -264,6 +265,7 @@ const DatabaseSettings = () => {
                         Database:{' '}
                         <span className="capitalize">
                           {(selectedDatabase?.type ?? '').split('_').join(' ').toLowerCase()}
+                          {selectedDatabase?.type === 'PRIMARY' && ' database'}
                         </span>{' '}
                         {selectedDatabase?.type === 'READ_REPLICA' && (
                           <span>(ID: {selectedDatabase?.id})</span>
