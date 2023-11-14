@@ -112,7 +112,6 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
         tier: 'tier_' + dbTier.toLowerCase(),
         ...(orgKind == 'COMPANY' ? { size: orgSize } : {}),
         payment_method: paymentMethodId,
-        V2: true,
       })
     } catch (error) {
       setNewOrgLoading(false)

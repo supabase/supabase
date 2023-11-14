@@ -12,16 +12,24 @@ export type OrganizationCreateVariables = {
   size?: string
   tier?: string
   payment_method?: string
-  V2?: boolean
 }
 
-export async function createOrganization({ name, V2 = false }: OrganizationCreateVariables) {
+export async function createOrganization({
+  name,
+  kind,
+  size,
+  tier,
+  payment_method,
+}: OrganizationCreateVariables) {
   const { data, error } = await post('/platform/organizations', {
-    // @ts-ignore [Joshen] Generated API spec is wrong?
     body: {
       name,
+      // @ts-ignore [Joshen] Generated API spec is wrong
+      kind,
+      size,
+      tier,
+      payment_method,
     },
-    ...(V2 ? { headers: { Version: '2' } } : {}),
   })
 
   if (error) throw error

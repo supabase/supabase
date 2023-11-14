@@ -111,7 +111,7 @@ const CreateOrganization = observer(({}) => {
       <Button
         disabled={isCreating || orgName === ''}
         loading={isCreating}
-        onClick={() => createOrganization({ name: orgName })}
+        onClick={() => createOrganization({ name: orgName, tier: 'tier_free' })}
       >
         Create organization
       </Button>
