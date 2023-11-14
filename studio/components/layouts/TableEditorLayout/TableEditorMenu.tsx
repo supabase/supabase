@@ -4,41 +4,28 @@ import { useParams } from 'common'
 import { partition } from 'lodash'
 import { useMemo, useState } from 'react'
 import {
-  Alert,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Command_Shadcn_,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuRadioGroup_Shadcn_,
-  DropdownMenuRadioItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
-  IconCheck,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
   IconChevronsDown,
-  IconCode,
   IconEdit,
   IconLoader,
-  IconPlus,
   IconRefreshCw,
   IconSearch,
   IconX,
   Input,
   Menu,
-  Modal,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-  ScrollArea,
 } from 'ui'
 
+import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import InfiniteList from 'components/ui/InfiniteList'
+import SchemaSelector from 'components/ui/SchemaSelector'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
 import { useCheckPermissions, useLocalStorage } from 'hooks'
@@ -51,7 +38,6 @@ const TableEditorMenu = () => {
   const { id } = useParams()
   const snap = useTableEditorStateSnapshot()
 
-  const [open, setOpen] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [searchText, setSearchText] = useState<string>('')
   const [sort, setSort] = useLocalStorage<'alphabetical' | 'grouped-alphabetical'>(
@@ -88,14 +74,7 @@ const TableEditorMenu = () => {
     [data?.pages]
   )
 
-  const {
-    data: schemas,
-    isLoading: isSchemasLoading,
-    isSuccess: isSchemasSuccess,
-    isError: isSchemasError,
-    error: schemasError,
-    refetch: refetchSchemas,
-  } = useSchemasQuery({
+  const { data: schemas } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -107,7 +86,7 @@ const TableEditorMenu = () => {
     await refetch()
   }
 
-  const [protectedSchemas, openSchemas] = partition(
+  const [protectedSchemas] = partition(
     (schemas ?? []).sort((a, b) => a.name.localeCompare(b.name)),
     (schema) => EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
   )
@@ -119,112 +98,15 @@ const TableEditorMenu = () => {
         className="pt-5 flex flex-col flex-grow space-y-4 h-full"
         style={{ maxHeight: 'calc(100vh - 48px)' }}
       >
-        {/* Schema selection dropdown */}
-        <div className="mx-4">
-          {isSchemasLoading && (
-            <Button
-              type="outline"
-              className="w-full [&>span]:w-full"
-              icon={<IconLoader className="animate-spin" size={12} />}
-            >
-              <div>
-                <div className="w-full flex space-x-3 py-0.5">
-                  <p className="text-xs text-light">Loading schemas...</p>
-                </div>
-              </div>
-            </Button>
-          )}
-
-          {isSchemasError && (
-            <Alert variant="warning" title="Failed to load schemas" className="!px-3 !py-3">
-              <p className="mb-2">Error: {schemasError.message}</p>
-              <Button type="default" size="tiny" onClick={() => refetchSchemas()}>
-                Reload schemas
-              </Button>
-            </Alert>
-          )}
-
-          {isSchemasSuccess && (
-            <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-              <PopoverTrigger_Shadcn_ asChild>
-                <Button
-                  asChild
-                  type="outline"
-                  className="w-full [&>span]:w-full"
-                  iconRight={
-                    <IconCode
-                      className="text-foreground-light rotate-90"
-                      strokeWidth={2}
-                      size={12}
-                    />
-                  }
-                >
-                  <div>
-                    <div className="w-full flex space-x-3 py-0.5">
-                      <p className="text-xs text-light">schema</p>
-                      <p className="text-xs">{snap.selectedSchemaName}</p>
-                    </div>
-                  </div>
-                </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ className="p-0 w-64" side="bottom" align="start">
-                <Command_Shadcn_>
-                  <CommandInput_Shadcn_ placeholder="Find schema..." />
-                  <CommandList_Shadcn_>
-                    <CommandEmpty_Shadcn_>No schemas found</CommandEmpty_Shadcn_>
-                    <CommandGroup_Shadcn_>
-                      <ScrollArea className={(schemas || []).length > 7 ? 'h-[210px]' : ''}>
-                        {schemas?.map((schema) => (
-                          <CommandItem_Shadcn_
-                            asChild
-                            key={schema.id}
-                            className="cursor-pointer flex items-center space-x-2 w-full"
-                            onSelect={() => {
-                              setSearchText('')
-                              snap.setSelectedSchemaName(schema.name)
-                              setOpen(false)
-                            }}
-                            onClick={() => {
-                              setSearchText('')
-                              snap.setSelectedSchemaName(schema.name)
-                              setOpen(false)
-                            }}
-                          >
-                            <div className="w-full flex items-center justify-between">
-                              <p>{schema.name}</p>
-                              {schema.name === snap.selectedSchemaName && (
-                                <IconCheck className="text-brand" strokeWidth={2} />
-                              )}
-                            </div>
-                          </CommandItem_Shadcn_>
-                        ))}
-                      </ScrollArea>
-                    </CommandGroup_Shadcn_>
-                    <CommandGroup_Shadcn_ className="border-t">
-                      <CommandItem_Shadcn_
-                        asChild
-                        className="cursor-pointer flex items-center space-x-2 w-full"
-                        onSelect={() => {
-                          snap.onAddSchema()
-                          setOpen(false)
-                        }}
-                        onClick={() => {
-                          snap.onAddSchema()
-                          setOpen(false)
-                        }}
-                      >
-                        <div className="flex items-center space-x-2">
-                          <IconPlus />
-                          <p>Create a new schema</p>
-                        </div>
-                      </CommandItem_Shadcn_>
-                    </CommandGroup_Shadcn_>
-                  </CommandList_Shadcn_>
-                </Command_Shadcn_>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
-          )}
-        </div>
+        <SchemaSelector
+          className="mx-4"
+          selectedSchemaName={snap.selectedSchemaName}
+          onSelectSchema={(name: string) => {
+            setSearchText('')
+            snap.setSelectedSchemaName(name)
+          }}
+          onSelectCreateSchema={() => snap.onAddSchema()}
+        />
 
         <div className="space-y-1 mx-4">
           {!isLocked ? (
@@ -253,8 +135,8 @@ const TableEditorMenu = () => {
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                        'border border-scale-200',
+                        'rounded bg-alternative py-1 px-2 leading-none shadow',
+                        'border border-background',
                       ].join(' ')}
                     >
                       <span className="text-xs text-foreground">
@@ -317,14 +199,14 @@ const TableEditorMenu = () => {
             <p className="text-sm text-foreground-light">Loading entities...</p>
           </div>
         ) : searchText.length === 0 && (entityTypes?.length ?? 0) === 0 ? (
-          <div className="mx-4 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
+          <div className="mx-4 space-y-1 rounded-md border border-muted bg-surface-100 py-3 px-4">
             <p className="text-xs">No entities available</p>
             <p className="text-xs text-foreground-light">
               This schema has no entities available yet
             </p>
           </div>
         ) : searchText.length > 0 && (entityTypes?.length ?? 0) === 0 ? (
-          <div className="mx-4 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
+          <div className="mx-4 space-y-1 rounded-md border border-muted bg-surface-100 py-3 px-4">
             <p className="text-xs">No results found</p>
             <p className="text-xs text-foreground-light">
               There are no entities that match your search
@@ -349,8 +231,8 @@ const TableEditorMenu = () => {
                     </div>
 
                     <div className="flex gap-3 items-center">
-                      <DropdownMenu_Shadcn_>
-                        <DropdownMenuTrigger_Shadcn_>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger>
                           <Tooltip.Root delayDuration={0}>
                             <Tooltip.Trigger asChild>
                               <div className="text-foreground-lighter transition-colors hover:text-foreground">
@@ -362,8 +244,8 @@ const TableEditorMenu = () => {
                                 <Tooltip.Arrow className="radix-tooltip-arrow" />
                                 <div
                                   className={[
-                                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                    'border border-scale-200',
+                                    'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                    'border border-background',
                                   ].join(' ')}
                                 >
                                   <span className="text-xs">Sort By</span>
@@ -371,24 +253,24 @@ const TableEditorMenu = () => {
                               </Tooltip.Content>
                             </Tooltip.Portal>
                           </Tooltip.Root>
-                        </DropdownMenuTrigger_Shadcn_>
-                        <DropdownMenuContent_Shadcn_ side="bottom" align="start" className="w-48">
-                          <DropdownMenuRadioGroup_Shadcn_
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent side="bottom" align="start" className="w-48">
+                          <DropdownMenuRadioGroup
                             value={sort}
                             onValueChange={(value: any) => setSort(value)}
                           >
-                            <DropdownMenuRadioItem_Shadcn_ key="alphabetical" value="alphabetical">
+                            <DropdownMenuRadioItem key="alphabetical" value="alphabetical">
                               Alphabetical
-                            </DropdownMenuRadioItem_Shadcn_>
-                            <DropdownMenuRadioItem_Shadcn_
+                            </DropdownMenuRadioItem>
+                            <DropdownMenuRadioItem
                               key="grouped-alphabetical"
                               value="grouped-alphabetical"
                             >
                               Entity Type
-                            </DropdownMenuRadioItem_Shadcn_>
-                          </DropdownMenuRadioGroup_Shadcn_>
-                        </DropdownMenuContent_Shadcn_>
-                      </DropdownMenu_Shadcn_>
+                            </DropdownMenuRadioItem>
+                          </DropdownMenuRadioGroup>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
 
                       <button
                         className="cursor-pointer text-foreground-lighter transition-colors hover:text-foreground"
@@ -420,41 +302,7 @@ const TableEditorMenu = () => {
         )}
       </div>
 
-      <Modal
-        size="medium"
-        visible={showModal}
-        header="Schemas managed by Supabase"
-        customFooter={
-          <div className="flex items-center justify-end space-x-2">
-            <Button type="default" onClick={() => setShowModal(false)}>
-              Understood
-            </Button>
-          </div>
-        }
-        onCancel={() => setShowModal(false)}
-      >
-        <Modal.Content className="py-4 space-y-2">
-          <p className="text-sm">
-            The following schemas are managed by Supabase and are currently protected from write
-            access through the Table Editor.
-          </p>
-          <div className="flex flex-wrap gap-1">
-            {EXCLUDED_SCHEMAS.map((schema) => (
-              <code key={schema} className="text-xs">
-                {schema}
-              </code>
-            ))}
-          </div>
-          <p className="text-sm !mt-4">
-            These schemas are critical to the functionality of your Supabase project and hence we
-            highly recommend not altering them.
-          </p>
-          <p className="text-sm">
-            You can, however, still interact with those schemas through the SQL Editor although we
-            advise you only do so if you know what you are doing.
-          </p>
-        </Modal.Content>
-      </Modal>
+      <ProtectedSchemaModal visible={showModal} onClose={() => setShowModal(false)} />
     </>
   )
 }

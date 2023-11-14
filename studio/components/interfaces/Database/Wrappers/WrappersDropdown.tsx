@@ -1,16 +1,16 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { observer } from 'mobx-react-lite'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { Fragment } from 'react'
 import {
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   IconPlus,
 } from 'ui'
 
@@ -40,8 +40,8 @@ const WrapperDropdown = ({ buttonText = 'Add wrapper', align = 'end' }: WrapperD
             <Tooltip.Arrow className="radix-tooltip-arrow" />
             <div
               className={[
-                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                'border border-scale-200',
+                'rounded bg-alternative py-1 px-2 leading-none shadow',
+                'border border-background',
               ].join(' ')}
             >
               <span className="text-xs text-foreground">
@@ -55,33 +55,33 @@ const WrapperDropdown = ({ buttonText = 'Add wrapper', align = 'end' }: WrapperD
   }
 
   return (
-    <DropdownMenu_Shadcn_>
-      <DropdownMenuTrigger_Shadcn_>
+    <DropdownMenu>
+      <DropdownMenuTrigger>
         <Button type="primary" icon={<IconPlus strokeWidth={1.5} />}>
           {buttonText}
         </Button>
-      </DropdownMenuTrigger_Shadcn_>
-      <DropdownMenuContent_Shadcn_ side="bottom" align={align}>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent side="bottom" align={align}>
         {WRAPPERS.map((wrapper, idx) => (
           <Fragment key={idx}>
-            <Link href={`/project/${ref}/database/wrappers/new?type=${wrapper.name.toLowerCase()}`}>
-              <a>
-                <DropdownMenuItem_Shadcn_ key={wrapper.name} className="space-x-2">
-                  <Image
-                    src={wrapper.icon}
-                    width={20}
-                    height={20}
-                    alt={`${wrapper.name} wrapper icon`}
-                  />
-                  <p>{wrapper.label}</p>
-                </DropdownMenuItem_Shadcn_>
-              </a>
-            </Link>
-            {idx !== WRAPPERS.length - 1 && <DropdownMenuSeparator_Shadcn_ />}
+            <DropdownMenuItem key={wrapper.name} className="space-x-2" asChild>
+              <Link
+                href={`/project/${ref}/database/wrappers/new?type=${wrapper.name.toLowerCase()}`}
+              >
+                <Image
+                  src={wrapper.icon}
+                  width={20}
+                  height={20}
+                  alt={`${wrapper.name} wrapper icon`}
+                />
+                <p>{wrapper.label}</p>
+              </Link>
+            </DropdownMenuItem>
+            {idx !== WRAPPERS.length - 1 && <DropdownMenuSeparator />}
           </Fragment>
         ))}
-      </DropdownMenuContent_Shadcn_>
-    </DropdownMenu_Shadcn_>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
 

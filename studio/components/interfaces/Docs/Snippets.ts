@@ -28,7 +28,6 @@ const snippets = {
       language: 'js',
       code: `
 import { createClient } from '@supabase/supabase-js'
-
 const supabaseUrl = '${endpoint}'
 const supabaseKey = process.env.SUPABASE_KEY
 const supabase = createClient(supabaseUrl, supabaseKey)`,
@@ -38,7 +37,6 @@ const supabase = createClient(supabaseUrl, supabaseKey)`,
       code: `
 import os
 from supabase import create_client, Client
-
 url: str = '${endpoint}'
 key: str = os.environ.get("SUPABASE_KEY")
 supabase: Client = create_client(url, key)
@@ -49,7 +47,6 @@ supabase: Client = create_client(url, key)
       code: `
 const supabaseUrl = '${endpoint}';
 const supabaseKey = String.fromEnvironment('SUPABASE_KEY');
-
 Future<void> main() async {
   await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
   runApp(MyApp());
@@ -89,7 +86,6 @@ curl '${endpoint}/rest/v1/' \\
       language: 'js',
       code: `
 const SUPABASE_URL = "${endpoint}"
-
 const supabase = createClient(SUPABASE_URL, process.env.${keyName || 'SUPABASE_KEY'});
 `,
     },
@@ -140,7 +136,6 @@ curl -X POST '${endpoint}/rest/v1/rpc/${rpcName}' \\${bashParams}
         code: `
 let { data, error } = await supabase
   .rpc('${rpcName}'${jsParams})
-
 if (error) console.error(error)
 else console.log(data)
 `,
@@ -359,7 +354,6 @@ curl '${endpoint}/rest/v1/${resourceId}?id=eq.1&select=*' \\
 let { data: ${resourceId}, error } = await supabase
   .from('${resourceId}')
   .select("*")
-
   // Filters
   .eq('column', 'Equal to')
   .gt('column', 'Greater than')
@@ -371,11 +365,9 @@ let { data: ${resourceId}, error } = await supabase
   .is('column', null)
   .in('column', ['Array', 'Values'])
   .neq('column', 'Not equal to')
-
   // Arrays
   .cs('array_column', ['array', 'contains'])
   .cd('array_column', ['contained', 'by'])
-
 `,
     },
   }),

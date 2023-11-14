@@ -54,7 +54,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
   /**
    * Supabase projects available
    */
-  const { data: supabaseProjectsData } = useProjectsQuery({
+  const { data: supabaseProjectsData, isLoading: isLoadingSupabaseProjects } = useProjectsQuery({
     enabled: organizationIntegrationId !== undefined,
   })
 
@@ -67,7 +67,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
     [selectedOrganization?.id, supabaseProjectsData]
   )
 
-  const { data: githubProjectsData } = useGitHubReposQuery(
+  const { data: githubProjectsData, isLoading: isLoadingGitHubRepos } = useGitHubReposQuery(
     {
       integrationId: organizationIntegrationId,
     },
@@ -116,7 +116,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
       hideFooter
       onCancel={() => sidePanelStateSnapshot.setGithubConnectionsOpen(false)}
     >
-      <div className="py-10 flex flex-col gap-6 bg-body h-full">
+      <div className="py-10 flex flex-col gap-6 bg-background h-full">
         <SidePanel.Content>
           <Markdown
             content={`
@@ -136,6 +136,8 @@ Check the details below before proceeding
             onCreateConnections={createGithubConnection}
             installedConnections={selectedIntegration?.connections}
             isLoading={isCreatingConnection}
+            loadingForeignProjects={isLoadingGitHubRepos}
+            loadingSupabaseProjects={isLoadingSupabaseProjects}
             integrationIcon={GITHUB_ICON}
             choosePrompt="Choose GitHub Repo"
           />

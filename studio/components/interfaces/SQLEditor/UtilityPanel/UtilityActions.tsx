@@ -12,6 +12,7 @@ export type UtilityActionsProps = {
   id: string
   isExecuting?: boolean
   isDisabled?: boolean
+  hasSelection: boolean
   prettifyQuery: () => void
   executeQuery: () => void
 }
@@ -20,6 +21,7 @@ const UtilityActions = ({
   id,
   isExecuting = false,
   isDisabled = false,
+  hasSelection,
   prettifyQuery,
   executeQuery,
 }: UtilityActionsProps) => {
@@ -44,8 +46,8 @@ const UtilityActions = ({
             <Tooltip.Arrow className="radix-tooltip-arrow" />
             <div
               className={[
-                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                'border border-scale-200',
+                'rounded bg-alternative py-1 px-2 leading-none shadow',
+                'border border-background',
               ].join(' ')}
             >
               <span className="text-xs text-foreground">Prettify SQL</span>
@@ -71,7 +73,7 @@ const UtilityActions = ({
           </div>
         }
       >
-        RUN
+        {hasSelection ? 'Run selected' : 'Run'}
       </Button>
     </>
   )

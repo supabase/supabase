@@ -2,10 +2,10 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useCheckPermissions } from 'hooks'
 import {
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   IconKey,
 } from 'ui'
 
@@ -43,9 +43,9 @@ const LangSelector = ({
           onClick={() => setSelectedLang('js')}
           className={`${
             selectedLang == 'js'
-              ? 'bg-scale-300 font-medium text-foreground dark:bg-scale-200'
-              : 'bg-scale-100 text-foreground-lighter dark:bg-scale-100'
-          } relative inline-flex items-center border-r border-scale-200 p-1 px-2 text-sm transition hover:text-foreground focus:outline-none`}
+              ? 'bg-surface-100 font-medium text-foreground'
+              : 'bg-alternative text-foreground-lighter'
+          } relative inline-flex items-center border-r border-background p-1 px-2 text-sm transition hover:text-foreground focus:outline-none`}
         >
           JavaScript
         </button>
@@ -54,9 +54,9 @@ const LangSelector = ({
           onClick={() => setSelectedLang('bash')}
           className={`${
             selectedLang == 'bash'
-              ? 'bg-scale-300 font-medium text-foreground dark:bg-scale-200'
-              : 'bg-scale-100 text-foreground-lighter dark:bg-scale-100'
-          } relative inline-flex items-center border-r border-scale-200 p-1 px-2 text-sm transition hover:text-foreground focus:outline-none`}
+              ? 'bg-surface-100 font-medium text-foreground'
+              : 'bg-alternative text-foreground-lighter'
+          } relative inline-flex items-center border-r border-background p-1 px-2 text-sm transition hover:text-foreground focus:outline-none`}
         >
           Bash
         </button>
@@ -66,17 +66,17 @@ const LangSelector = ({
               <IconKey size={12} strokeWidth={1.5} />
               <span>Project API key :</span>
             </div>
-            <DropdownMenu_Shadcn_>
-              <DropdownMenuTrigger_Shadcn_>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
                 <Button type="default">{showApiKey.name}</Button>
-              </DropdownMenuTrigger_Shadcn_>
-              <DropdownMenuContent_Shadcn_ align="end" side="bottom">
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" side="bottom">
                 <>
-                  <DropdownMenuItem_Shadcn_ key="hide" onClick={() => setShowApiKey(DEFAULT_KEY)}>
+                  <DropdownMenuItem key="hide" onClick={() => setShowApiKey(DEFAULT_KEY)}>
                     hide
-                  </DropdownMenuItem_Shadcn_>
+                  </DropdownMenuItem>
                   {apiKey && (
-                    <DropdownMenuItem_Shadcn_
+                    <DropdownMenuItem
                       key="anon"
                       onClick={() =>
                         setShowApiKey({
@@ -86,10 +86,10 @@ const LangSelector = ({
                       }
                     >
                       <p>anon (public)</p>
-                    </DropdownMenuItem_Shadcn_>
+                    </DropdownMenuItem>
                   )}
                   {canReadServiceKey && (
-                    <DropdownMenuItem_Shadcn_
+                    <DropdownMenuItem
                       key="service"
                       onClick={() =>
                         setShowApiKey({
@@ -99,11 +99,11 @@ const LangSelector = ({
                       }
                     >
                       <p>service_role (secret)</p>
-                    </DropdownMenuItem_Shadcn_>
+                    </DropdownMenuItem>
                   )}
                 </>
-              </DropdownMenuContent_Shadcn_>
-            </DropdownMenu_Shadcn_>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         )}
       </div>

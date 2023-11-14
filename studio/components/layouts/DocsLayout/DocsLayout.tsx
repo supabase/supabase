@@ -4,18 +4,23 @@ import { ReactElement, useEffect } from 'react'
 
 import Error from 'components/ui/Error'
 import ProductMenu from 'components/ui/ProductMenu'
-import { useSelectedProject, useStore, withAuth } from 'hooks'
+import { useIsFeatureEnabled, useSelectedProject, useStore, withAuth } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
 import ProjectLayout from '../'
 import { generateDocsMenu } from './DocsLayout.utils'
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 function DocsLayout({ title, children }: { title: string; children: ReactElement }) {
   const router = useRouter()
   const { ui, meta } = useStore()
   const { data, isLoading, error } = meta.openApi
   const selectedProject = useSelectedProject()
-
   const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
+
+  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
+  const hideMenu = isNewAPIDocsEnabled && router.pathname.endsWith('/graphiql')
+
+  const { projectAuthAll: authEnabled } = useIsFeatureEnabled(['project_auth:all'])
 
   const getPage = () => {
     if (router.pathname.endsWith('graphiql')) return 'graphiql'
@@ -29,7 +34,7 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
     if (ui.selectedProjectRef && !isPaused) {
       meta.openApi.load()
     }
-  }, [ui.selectedProjectRef])
+  }, [ui.selectedProjectRef, isPaused])
 
   if (error) {
     return (
@@ -49,10 +54,12 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
       isLoading={isLoading}
       product="API Docs"
       productMenu={
-        <ProductMenu
-          page={getPage()}
-          menu={generateDocsMenu(projectRef, tableNames, functionNames)}
-        />
+        !hideMenu && (
+          <ProductMenu
+            page={getPage()}
+            menu={generateDocsMenu(projectRef, tableNames, functionNames, { authEnabled })}
+          />
+        )
       }
     >
       {children}

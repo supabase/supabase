@@ -19,6 +19,7 @@ import ProjectPausedState from './ProjectPausedState'
 import RestoringState from './RestoringState'
 import UpgradingState from './UpgradingState'
 import Connecting from 'components/ui/Loading/Loading'
+import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -27,9 +28,6 @@ const routesToIgnoreProjectDetailsRequest = [
   '/project/[ref]/settings/database',
   '/project/[ref]/settings/storage',
   '/project/[ref]/settings/infrastructure',
-  '/project/[ref]/settings/billing/subscription',
-  '/project/[ref]/settings/billing/usage',
-  '/project/[ref]/settings/billing/invoices',
 ]
 
 const routesToIgnoreDBConnection = ['/project/[ref]/branches']
@@ -39,9 +37,6 @@ const routesToIgnorePostgrestConnection = [
   '/project/[ref]/settings/general',
   '/project/[ref]/settings/database',
   '/project/[ref]/settings/infrastructure',
-  '/project/[ref]/settings/billing/subscription',
-  '/project/[ref]/settings/billing/usage',
-  '/project/[ref]/settings/billing/invoices',
 ]
 
 export interface ProjectLayoutProps {
@@ -72,7 +67,6 @@ const ProjectLayout = ({
   const organizationName = selectedOrganization?.name
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
-  const showResourceExhaustionWarnings = useFlag('resourceExhaustionWarnings')
 
   const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
   const ignorePausedState =
@@ -115,7 +109,7 @@ const ProjectLayout = ({
               </div>
             ) : (
               <ContentWrapper isLoading={isLoading}>
-                {showResourceExhaustionWarnings && <ResourceExhaustionWarningBanner />}
+                <ResourceExhaustionWarningBanner />
                 {children}
               </ContentWrapper>
             )}
@@ -123,6 +117,7 @@ const ProjectLayout = ({
         </div>
 
         <EnableBranchingModal />
+        <ProjectAPIDocs />
       </ProjectContextProvider>
     </AppLayout>
   )
@@ -234,7 +229,6 @@ export const ProjectLayoutNonBlocking = ({
   const showPausedState = isPaused && !ignorePausedState
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
-  const showResourceExhaustionWarnings = useFlag('resourceExhaustionWarnings')
 
   return (
     <AppLayout>
@@ -263,7 +257,7 @@ export const ProjectLayoutNonBlocking = ({
               </div>
             ) : (
               <>
-                {showResourceExhaustionWarnings && <ResourceExhaustionWarningBanner />}
+                <ResourceExhaustionWarningBanner />
                 {children}
               </>
             )}
@@ -271,6 +265,7 @@ export const ProjectLayoutNonBlocking = ({
         </div>
 
         <EnableBranchingModal />
+        <ProjectAPIDocs />
       </ProjectContextProvider>
     </AppLayout>
   )

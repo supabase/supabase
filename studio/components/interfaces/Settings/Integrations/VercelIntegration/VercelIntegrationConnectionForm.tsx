@@ -4,6 +4,7 @@ import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
+  cn,
   FormControl_Shadcn_,
   FormDescription_Shadcn_,
   FormField_Shadcn_,
@@ -12,7 +13,6 @@ import {
   Form_Shadcn_,
   IconClock,
   Switch,
-  cn,
 } from 'ui'
 import * as z from 'zod'
 
@@ -110,7 +110,7 @@ const VercelIntegrationConnectionForm = ({
         <div>
           {/* {isUpdatingVercelConnection && 'isUpdatingVercelConnection'} */}
           <div className="flex flex-col gap-6 px-8 py-8">
-            <h5 className="text text-sm">Vercel Production deployments </h5>
+            <h5 className="text-foreground text-sm">Vercel Production deployments </h5>
             <FormField_Shadcn_
               control={form.control}
               name="environmentVariablesProduction"
@@ -120,7 +120,7 @@ const VercelIntegrationConnectionForm = ({
                     <FormLabel_Shadcn_ className="!text">
                       Sync environment variables for Vercel Production deployments
                     </FormLabel_Shadcn_>
-                    <FormDescription_Shadcn_ className="text-xs text-lighter">
+                    <FormDescription_Shadcn_ className="text-xs text-foreground-lighter">
                       Deploy Edge Functions when merged into Production Branch
                     </FormDescription_Shadcn_>
                   </div>
@@ -147,7 +147,7 @@ const VercelIntegrationConnectionForm = ({
                     <FormLabel_Shadcn_ className="!text">
                       Auto update Auth Redirect URIs for Vercel Production Deployments
                     </FormLabel_Shadcn_>
-                    <FormDescription_Shadcn_ className="text-xs text-lighter">
+                    <FormDescription_Shadcn_ className="text-xs text-foreground-lighter">
                       Deploy Edge Functions when merged into Production Branch
                     </FormDescription_Shadcn_>
                   </div>
@@ -167,7 +167,7 @@ const VercelIntegrationConnectionForm = ({
           </div>
           <ScaffoldDivider />
           <div className="flex flex-col gap-6 px-8 py-8">
-            <h5 className="text text-sm">Vercel Preview deployments </h5>
+            <h5 className="text-foreground text-sm">Vercel Preview deployments </h5>
             <FormField_Shadcn_
               control={form.control}
               name="environmentVariablesPreview"
@@ -177,7 +177,7 @@ const VercelIntegrationConnectionForm = ({
                     <FormLabel_Shadcn_ className="!text">
                       Sync environment variables for Vercel Preview Deployments
                     </FormLabel_Shadcn_>
-                    <FormDescription_Shadcn_ className="text-xs text-lighter">
+                    <FormDescription_Shadcn_ className="text-xs text-foreground-lighter">
                       Preview deployments will be able to connect to Supabase Database Preview
                       branches
                     </FormDescription_Shadcn_>
@@ -204,7 +204,7 @@ const VercelIntegrationConnectionForm = ({
                     <FormLabel_Shadcn_ className="!text">
                       Auto update Auth Redirect URIs for Vercel Preview Deployments
                     </FormLabel_Shadcn_>
-                    <FormDescription_Shadcn_ className="text-xs text-lighter">
+                    <FormDescription_Shadcn_ className="text-xs text-foreground-lighter">
                       Deploy Edge Functions when merged into Production Branch
                     </FormDescription_Shadcn_>
                   </div>

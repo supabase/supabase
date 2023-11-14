@@ -11,7 +11,7 @@ const BreadcrumbsView = ({ defaultValue: breadcrumbs }: BreadcrumbsViewProps) =>
       {breadcrumbs?.length
         ? breadcrumbs.map((breadcrumb: any) => (
             <Fragment key={breadcrumb.key}>
-              <span className="text-scale-800 dark:text-scale-700">
+              <span className="text-border-stronger dark:text-border-strong">
                 <svg
                   viewBox="0 0 24 24"
                   width="16"

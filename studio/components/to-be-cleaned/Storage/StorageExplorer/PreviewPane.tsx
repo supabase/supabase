@@ -7,10 +7,10 @@ import { isEmpty } from 'lodash'
 import SVG from 'react-inlinesvg'
 import {
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   IconAlertCircle,
   IconChevronDown,
   IconClipboard,
@@ -137,7 +137,7 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
         <div
           className="
         h-full border-l
-        border-panel-border-light bg-panel-header-light p-4 dark:border-panel-border-dark dark:bg-panel-header-dark"
+        border-overlay bg-surface-100 p-4"
           style={{ width }}
         >
           {/* Preview Header */}
@@ -151,7 +151,7 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
           </div>
 
           {/* Preview Thumbnail*/}
-          <div className="my-4 border border-panel-border-light dark:border-panel-border-dark">
+          <div className="my-4 border border-overlay">
             <div className="flex h-56 w-full items-center 2xl:h-72">
               <PreviewFile mimeType={mimeType} previewUrl={file.previewUrl} />
             </div>
@@ -190,7 +190,7 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
             </div>
 
             {/* Actions */}
-            <div className="flex space-x-2 border-b border-panel-border-light pb-4 dark:border-panel-border-dark">
+            <div className="flex space-x-2 border-b border-overlay pb-4">
               <Button
                 type="default"
                 icon={<IconDownload size={16} strokeWidth={2} />}
@@ -209,8 +209,8 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                   Get URL
                 </Button>
               ) : (
-                <DropdownMenu_Shadcn_>
-                  <DropdownMenuTrigger_Shadcn_>
+                <DropdownMenu>
+                  <DropdownMenuTrigger>
                     <Button
                       type="outline"
                       icon={<IconClipboard size={16} strokeWidth={2} />}
@@ -219,40 +219,40 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                     >
                       Get URL
                     </Button>
-                  </DropdownMenuTrigger_Shadcn_>
-                  <DropdownMenuContent_Shadcn_ side="bottom" align="center">
-                    <DropdownMenuItem_Shadcn_
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent side="bottom" align="center">
+                    <DropdownMenuItem
                       key="expires-one-week"
                       onClick={async () =>
                         onCopyUrl(file.name, await getFileUrl(file, URL_EXPIRY_DURATION.WEEK))
                       }
                     >
                       Expire in 1 week
-                    </DropdownMenuItem_Shadcn_>
-                    <DropdownMenuItem_Shadcn_
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
                       key="expires-one-month"
                       onClick={async () =>
                         onCopyUrl(file.name, await getFileUrl(file, URL_EXPIRY_DURATION.MONTH))
                       }
                     >
                       Expire in 1 month
-                    </DropdownMenuItem_Shadcn_>
-                    <DropdownMenuItem_Shadcn_
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
                       key="expires-one-year"
                       onClick={async () =>
                         onCopyUrl(file.name, await getFileUrl(file, URL_EXPIRY_DURATION.YEAR))
                       }
                     >
                       Expire in 1 year
-                    </DropdownMenuItem_Shadcn_>
-                    <DropdownMenuItem_Shadcn_
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
                       key="custom-expiry"
                       onClick={() => setSelectedFileCustomExpiry(file)}
                     >
                       Custom expiry
-                    </DropdownMenuItem_Shadcn_>
-                  </DropdownMenuContent_Shadcn_>
-                </DropdownMenu_Shadcn_>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
             </div>
             <Tooltip.Root delayDuration={0}>
@@ -273,8 +273,8 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                        'border border-scale-200',
+                        'rounded bg-alternative py-1 px-2 leading-none shadow',
+                        'border border-background',
                       ].join(' ')}
                     >
                       <span className="text-xs text-foreground">
