@@ -11,6 +11,7 @@ export type UtilityActionsProps = {
   id: string
   isExecuting?: boolean
   isDisabled?: boolean
+  hasSelection: boolean
   prettifyQuery: () => void
   executeQuery: () => void
 }
@@ -19,6 +20,7 @@ const UtilityActions = ({
   id,
   isExecuting = false,
   isDisabled = false,
+  hasSelection,
   prettifyQuery,
   executeQuery,
 }: UtilityActionsProps) => {
@@ -69,7 +71,7 @@ const UtilityActions = ({
           </div>
         }
       >
-        RUN
+        {hasSelection ? 'Run selected' : 'Run'}
       </Button>
     </>
   )

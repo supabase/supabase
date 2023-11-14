@@ -15,11 +15,12 @@ import { createSqlSnippetSkeleton } from './SQLEditor.utils'
 
 export type MonacoEditorProps = {
   id: string
+  className?: string
   editorRef: MutableRefObject<IStandaloneCodeEditor | null>
   monacoRef: MutableRefObject<Monaco | null>
   autoFocus?: boolean
   executeQuery: () => void
-  className?: string
+  onHasSelection: (value: boolean) => void
 }
 
 const MonacoEditor = ({
@@ -29,6 +30,7 @@ const MonacoEditor = ({
   autoFocus = true,
   className,
   executeQuery,
+  onHasSelection,
 }: MonacoEditorProps) => {
   const { ref, content } = useParams()
   const router = useRouter()
@@ -59,6 +61,13 @@ const MonacoEditor = ({
       run: () => {
         executeQueryRef.current()
       },
+    })
+
+    editor.onDidChangeCursorSelection(({ selection }) => {
+      const noSelection =
+        selection.startLineNumber === selection.endLineNumber &&
+        selection.startColumn === selection.endColumn
+      onHasSelection(!noSelection)
     })
 
     // add margin above first line

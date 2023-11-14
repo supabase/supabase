@@ -163,7 +163,7 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
         <p className="m-0 border-0 px-6 py-4 text-sm text-foreground-light">
-          Click <code>RUN</code> to execute your query.
+          Click <code>Run</code> to execute your query.
         </p>
       </div>
     )
