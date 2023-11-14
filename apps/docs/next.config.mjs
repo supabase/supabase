@@ -34,6 +34,20 @@ const withMDX = nextMdx({
 
 /** @type {import('next').NextConfig} nextConfig */
 const nextConfig = {
+  outputFileTracing: true,
+  experimental: {
+    // Storybook 7.5 upgrade seems to causes dev deps to be included in build output, removing it here
+    outputFileTracingExcludes: {
+      '*': [
+        './node_modules/@swc/core-linux-x64-gnu',
+        './node_modules/@swc/core-linux-x64-musl',
+        './node_modules/esbuild/**/*',
+        './node_modules/webpack/**/*',
+        './node_modules/rollup/**/*',
+      ],
+    },
+  },
+
   // Append the default value with md extensions
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
   // reactStrictMode: true,

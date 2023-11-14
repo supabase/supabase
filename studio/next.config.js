@@ -27,6 +27,19 @@ const csp = [
 const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
   output: 'standalone',
+  outputFileTracing: true,
+  experimental: {
+    // Storybook 7.5 upgrade seems to causes dev deps to be included in build output, removing it here
+    outputFileTracingExcludes: {
+      '*': [
+        './node_modules/@swc/core-linux-x64-gnu',
+        './node_modules/@swc/core-linux-x64-musl',
+        './node_modules/esbuild/**/*',
+        './node_modules/webpack/**/*',
+        './node_modules/rollup/**/*',
+      ],
+    },
+  },
   async redirects() {
     return [
       ...(process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
