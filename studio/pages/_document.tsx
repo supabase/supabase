@@ -1,4 +1,6 @@
-import Document, { DocumentContext, Html, Head, Main, NextScript } from 'next/document'
+/* eslint-disable @next/next/no-css-tags */
+import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import Document, { DocumentContext, Head, Html, Main, NextScript } from 'next/document'
 
 class MyDocument extends Document {
   static async getInitialProps(ctx: DocumentContext) {
@@ -16,11 +18,15 @@ class MyDocument extends Document {
             rel="stylesheet"
             type="text/css"
             data-name="vs/editor/editor.main"
-            href="https://cdn.jsdelivr.net/npm/monaco-editor@0.37.0/min/vs/editor/editor.main.css"
+            href={
+              IS_PLATFORM
+                ? 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.37.0/min/vs/editor/editor.main.css'
+                : `${BASE_PATH}/monaco-editor/editor/editor.main.css`
+            }
           />
-          <link rel="stylesheet" type="text/css" href="/css/fonts.css" />
+          <link rel="stylesheet" type="text/css" href={`${BASE_PATH}/css/fonts.css`} />
         </Head>
-        <body className="dark">
+        <body>
           <Main />
           <NextScript />
         </body>

@@ -27,15 +27,10 @@ export const FLY_REGIONS = {
 } as const
 
 export const AWS_REGIONS_DEFAULT =
-  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.WEST_US
+  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.EAST_US
 
 // TO DO, change default to US region for prod
 export const FLY_REGIONS_DEFAULT = FLY_REGIONS.SOUTHEAST_ASIA
-
-export const PRICING_TIER_LABELS = {
-  FREE: 'Free',
-  PRO: 'Pro',
-}
 
 export const PRICING_TIER_LABELS_ORG = {
   FREE: 'Free - $0/month',
@@ -50,9 +45,6 @@ export const PRICING_TIER_PRODUCT_IDS = {
   TEAM: 'tier_team',
   ENTERPRISE: 'tier_enterprise',
 }
-
-export const PRICING_TIER_FREE_KEY = 'FREE'
-export const PRICING_TIER_DEFAULT_KEY = 'FREE'
 
 export const DEFAULT_PROVIDER: CloudProvider =
   process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? 'FLY' : 'AWS'

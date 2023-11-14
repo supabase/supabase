@@ -4,13 +4,10 @@ import { useEffect, useState } from 'react'
 
 import { useParams } from 'common/hooks'
 import { ReportsLayout } from 'components/layouts'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { createReport } from 'components/to-be-cleaned/Reports/Reports.utils'
 import Loading from 'components/ui/Loading'
 import { useCheckPermissions, useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import { useProjectContentStore } from 'stores/projectContentStore'
 import { NextPageWithLayout } from 'types'
@@ -23,19 +20,12 @@ export const UserReportPage: NextPageWithLayout = () => {
 
   const { profile } = useProfile()
   const { ui } = useStore()
-  const { project } = useProjectContext()
 
   const contentStore = useProjectContentStore(ref)
   const canCreateReport = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'report', owner_id: profile?.id },
     subject: { id: profile?.id },
   })
-
-  useEffect(() => {
-    if (project && project.status === PROJECT_STATUS.INACTIVE) {
-      post(`${API_URL}/projects/${ref}/restore`, {})
-    }
-  }, [project])
 
   async function loadReports() {
     await contentStore.load()
@@ -73,8 +63,8 @@ export const UserReportPage: NextPageWithLayout = () => {
           disabled={!canCreateReport}
           disabledMessage="You need additional permissions to create a report"
         >
-          <p className="text-scale-1100 text-sm">Create custom reports for your projects.</p>
-          <p className="text-scale-1100 text-sm">
+          <p className="text-foreground-light text-sm">Create custom reports for your projects.</p>
+          <p className="text-foreground-light text-sm">
             Get a high level overview of your network traffic, user actions, and infrastructure
             health.
           </p>

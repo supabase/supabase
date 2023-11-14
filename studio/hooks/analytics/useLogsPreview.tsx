@@ -15,7 +15,7 @@ import {
   LogsTableName,
   PREVIEWER_DATEPICKER_HELPERS,
 } from 'components/interfaces/Settings/Logs'
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react'
 import { API_URL } from 'lib/constants'
 import { get, isResponseOk } from 'lib/common/fetch'
 import dayjs from 'dayjs'
@@ -97,7 +97,24 @@ function useLogsPreview(
     }
   )
 
-  let logData: LogData[] = []
+  // memoize all this calculations stuff
+  const { logData, error, oldestTimestamp } = useMemo(() => {
+    let logData: LogData[] = []
+
+    let error: null | string | object = rqError ? (rqError as any).message : null
+    data?.pages.forEach((response) => {
+      if (isResponseOk(response) && response.result) {
+        logData = [...logData, ...response.result]
+      }
+      if (!error && response && response.error) {
+        error = response.error
+      }
+    })
+
+    const oldestTimestamp = logData[logData.length - 1]?.timestamp
+
+    return { logData, error, oldestTimestamp }
+  }, [data?.pages])
 
   const countUrl = () => {
     return `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams({
@@ -117,7 +134,10 @@ function useLogsPreview(
     ({ signal }) => get<Count>(countUrl(), { signal }),
     {
       refetchOnWindowFocus: false,
-      refetchInterval: 5000,
+      // refresh each minute only
+      refetchInterval: 60000,
+      // only enable if no errors are found and data has already been loaded
+      enabled: !error && data && data.pages.length > 0 ? true : false,
     }
   )
 
@@ -125,14 +145,14 @@ function useLogsPreview(
 
   // chart data
 
-  const chartQuery = genChartQuery(table, params, filters)
-  const chartUrl = () => {
+  const chartQuery = useMemo(() => genChartQuery(table, params, filters), [params, filters])
+  const chartUrl = useMemo(() => {
     return `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams({
       iso_timestamp_end: params.iso_timestamp_end,
       project: params.project,
       sql: chartQuery,
     } as any)}`
-  }
+  }, [params, chartQuery])
 
   const { data: eventChartResponse, refetch: refreshEventChart } = useQuery(
     [
@@ -141,7 +161,7 @@ function useLogsPreview(
       'logs-chart',
       { iso_timestamp_end: params.iso_timestamp_end, project: params.project, sql: chartQuery },
     ],
-    ({ signal }) => get<EventChart>(chartUrl(), { signal }),
+    ({ signal }) => get<EventChart>(chartUrl, { signal }),
     { refetchOnWindowFocus: false }
   )
 
@@ -152,18 +172,6 @@ function useLogsPreview(
     refreshEventChart()
     refetch()
   }
-
-  let error: null | string | object = rqError ? (rqError as any).message : null
-  data?.pages.forEach((response) => {
-    if (isResponseOk(response) && response.result) {
-      logData = [...logData, ...response.result]
-    }
-    if (!error && response && response.error) {
-      error = response.error
-    }
-  })
-
-  const oldestTimestamp = logData[logData.length - 1]?.timestamp
 
   const handleSetFilters: LogsPreviewHook['setFilters'] = (newFilters) => {
     if (typeof newFilters === 'function') {

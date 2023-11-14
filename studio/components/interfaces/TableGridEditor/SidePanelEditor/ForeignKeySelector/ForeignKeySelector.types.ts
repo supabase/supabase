@@ -3,4 +3,5 @@ export interface ForeignKey {
   table: string
   column?: string
   deletionAction: string
+  updateAction: string
 }

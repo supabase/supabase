@@ -4,6 +4,8 @@ description: Using the PostGIS extension to build a cross-platform application w
 author: simon_grimm
 image: 2023-02-28-geoqueries-postgis/postgis-ionic-angular.png
 thumb: 2023-02-28-geoqueries-postgis/postgis-ionic-angular.png
+categories:
+  - engineering
 tags:
   - ionic
   - postgis
@@ -25,7 +27,7 @@ In this tutorial you will learn to:
 - Store and retrieve geolocation data
 - Use [database functions](https://supabase.com/docs/guides/database/functions) for geo-queries with PostGIS
 - Display a [Capacitor Google Map](https://capacitorjs.com/docs/apis/google-maps) with a marker
-- Upload files to Supabase Storage and use [image transformations](https://supabase.com/docs/guides/storage/image-transformations)
+- Upload files to Supabase Storage and use [image transformations](https://supabase.com/docs/guides/storage/serving/image-transformations)
 
 Since there are quite some code snippets we need I've put together the [full source code on Github](https://github.com/saimon24/supabase-postgis-ionic-angular) so you can easily run the project yourself!
 
@@ -127,10 +129,10 @@ Those are some powerful calculations, and we can easily use them through the Pos
 ```sql
 -- create database function to find nearby stores
 create or replace function nearby_stores(lat float, long float)
-returns setof record
+returns table (id public.stores.id%TYPE, name public.stores.name%TYPE, description public.stores.description%TYPE, lat float, long float, dist_meters float)
 language sql
 as $$
-  select id, name, description, st_astext(location) as location, st_distance(location, st_point(long, lat)::geography) as dist_meters
+  select id, name, description, st_y(location::geometry) as lat, st_x(location::geometry) as long, st_distance(location, st_point(long, lat)::geography) as dist_meters
   from public.stores
   order by location <-> st_point(long, lat)::geography;
 $$;
@@ -138,10 +140,10 @@ $$;
 
 -- create database function to find stores in a specific box
 create or replace function stores_in_view(min_lat float, min_long float, max_lat float, max_long float)
-returns setof record
+returns table (id public.stores.id%TYPE, name public.stores.name%TYPE, lat float, long float)
 language sql
 as $$
-	select id, name, ST_Y(location::geometry) as lat, ST_X(location::geometry) as long, st_astext(location) as location
+	select id, name, ST_Y(location::geometry) as lat, ST_X(location::geometry) as long
 	from public.stores
 	where location && ST_SetSRID(ST_MakeBox2D(ST_Point(min_long, min_lat), ST_Point(max_long, max_lat)),4326)
 $$;
@@ -899,7 +901,7 @@ To wrap this up, let's take a look at one more cool Supabase feature.
 
 We have the marker and store ID, so we can simply load the information from our Supabase database.
 
-Now a store might have an image, and while we download the image from our storage bucket we can use [image transformations](https://supabase.com/docs/guides/storage/image-transformations) to get an image exactly in the right dimensions to save time and bandwidth!
+Now a store might have an image, and while we download the image from our storage bucket we can use [image transformations](https://supabase.com/docs/guides/storage/serving/image-transformations) to get an image exactly in the right dimensions to save time and bandwidth!
 
 For this, add two new functions to our **src/app/services/stores.service.ts**:
 

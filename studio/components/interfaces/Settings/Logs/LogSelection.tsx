@@ -1,24 +1,23 @@
-import { FC } from 'react'
-import { Button, Divider, IconX } from 'ui'
+import { Button, IconX } from 'ui'
 
-import { LogData, QueryType } from './Logs.types'
-
-import DatabaseApiSelectionRender from './LogSelectionRenderers/DatabaseApiSelectionRender'
-import DatabasePostgresSelectionRender from './LogSelectionRenderers/DatabasePostgresSelectionRender'
-import FunctionInvocationSelectionRender from './LogSelectionRenderers/FunctionInvocationSelectionRender'
-import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSelectionRender'
-import DefaultExplorerSelectionRenderer from './LogSelectionRenderers/DefaultExplorerSelectionRenderer'
-import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
+import CopyButton from 'components/ui/CopyButton'
+import Connecting from 'components/ui/Loading/Loading'
+import useSingleLog from 'hooks/analytics/useSingleLog'
+import { useMemo } from 'react'
 import {
   isDefaultLogPreviewFormat,
   isUnixMicro,
   LogsEndpointParams,
   unixMicroToIsoTimestamp,
 } from '.'
-import useSingleLog from 'hooks/analytics/useSingleLog'
-import Connecting from 'components/ui/Loading/Loading'
-import CopyButton from 'components/ui/CopyButton'
+import { LogData, QueryType } from './Logs.types'
 import AuthSelectionRenderer from './LogSelectionRenderers/AuthSelectionRenderer'
+import DatabaseApiSelectionRender from './LogSelectionRenderers/DatabaseApiSelectionRender'
+import DatabasePostgresSelectionRender from './LogSelectionRenderers/DatabasePostgresSelectionRender'
+import DefaultExplorerSelectionRenderer from './LogSelectionRenderers/DefaultExplorerSelectionRenderer'
+import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
+import FunctionInvocationSelectionRender from './LogSelectionRenderers/FunctionInvocationSelectionRender'
+import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSelectionRender'
 
 export interface LogSelectionProps {
   log: LogData | null
@@ -28,13 +27,13 @@ export interface LogSelectionProps {
   params: Partial<LogsEndpointParams>
 }
 
-const LogSelection: FC<LogSelectionProps> = ({
+const LogSelection = ({
   projectRef,
   log: partialLog,
   onClose,
   queryType,
   params = {},
-}) => {
+}: LogSelectionProps) => {
   const { logData: fullLog, isLoading } = useSingleLog(
     projectRef,
     queryType,
@@ -45,22 +44,27 @@ const LogSelection: FC<LogSelectionProps> = ({
     switch (queryType) {
       case 'api':
         if (!fullLog) return null
+        if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />
         return <DatabaseApiSelectionRender log={fullLog} />
 
       case 'database':
         if (!fullLog) return null
+        if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />
         return <DatabasePostgresSelectionRender log={fullLog} />
 
       case 'fn_edge':
         if (!fullLog) return null
+        if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />
         return <FunctionInvocationSelectionRender log={fullLog} />
 
       case 'functions':
         if (!fullLog) return null
+        if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />
         return <FunctionLogsSelectionRender log={fullLog} />
 
       case 'auth':
         if (!fullLog) return null
+        if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />
         return <AuthSelectionRenderer log={fullLog} />
 
       default:
@@ -75,9 +79,8 @@ const LogSelection: FC<LogSelectionProps> = ({
     }
   }
 
-  const selectionText = () => {
-    if (!fullLog) return ''
-    if (queryType) {
+  const selectionText = useMemo(() => {
+    if (fullLog && queryType) {
       return `Log ID
 ${fullLog.id}\n
 Log Timestamp (UTC)
@@ -89,21 +92,21 @@ ${JSON.stringify(fullLog.metadata, null, 2)}
 `
     }
 
-    return JSON.stringify(fullLog, null, 2)
-  }
+    return JSON.stringify(fullLog || partialLog, null, 2)
+  }, [fullLog])
 
   return (
     <div
       className={[
         'relative flex h-full flex-grow flex-col border border-l',
-        'border-panel-border-light dark:border-panel-border-dark',
-        'overflow-y-scroll bg-gray-200',
+        'border-overlay',
+        'overflow-y-scroll bg-background',
       ].join(' ')}
     >
       <div
         className={
           `absolute flex
-          h-full w-full flex-col items-center justify-center gap-2 overflow-y-scroll bg-scale-200 text-center opacity-0 transition-all ` +
+          h-full w-full flex-col items-center justify-center gap-2 overflow-y-scroll bg-background text-center opacity-0 transition-all ` +
           (partialLog ? 'z-0 opacity-0' : 'z-10 opacity-100')
         }
       >
@@ -123,8 +126,8 @@ ${JSON.stringify(fullLog.metadata, null, 2)}
             (partialLog || isLoading ? 'mt-0 scale-95 opacity-0' : 'mt-8 scale-100 opacity-100')
           }
         >
-          <div className="relative flex h-4 w-32 items-center rounded border border-scale-600 px-2 dark:border-scale-400">
-            <div className="h-0.5 w-2/3 rounded-full bg-scale-600 dark:bg-scale-500"></div>
+          <div className="relative flex h-4 w-32 items-center rounded border border-control px-2">
+            <div className="h-0.5 w-2/3 rounded-full bg-surface-300"></div>
             <div className="absolute right-1 -bottom-4">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -143,32 +146,32 @@ ${JSON.stringify(fullLog.metadata, null, 2)}
             </div>
           </div>
           <div className="flex flex-col gap-1">
-            <h3 className="text-sm text-scale-1200">Select an Event</h3>
-            <p className="text-xs text-scale-900">
+            <h3 className="text-sm text-foreground">Select an Event</h3>
+            <p className="text-xs text-foreground-lighter">
               Select an Event to view the code snippet (pretty view) or complete JSON payload (raw
               view).
             </p>
           </div>
         </div>
       </div>
-      <div className="relative h-px flex-grow bg-scale-300">
+      <div className="relative h-px flex-grow bg-surface-100">
         <div className="pt-4 px-4 flex flex-col gap-4">
           <div className="flex flex-row justify-between items-center">
             <div className={`transition ${!isLoading ? 'opacity-100' : 'opacity-0'}`}>
-              <CopyButton text={selectionText()} type="default" title="Copy log to clipboard" />
+              <CopyButton text={selectionText} type="default" title="Copy log to clipboard" />
             </div>
             <Button
               type="text"
-              className="cursor-pointer transition hover:text-scale-1200 h-8 w-8 px-0 py-0 flex items-center justify-center"
+              className="cursor-pointer transition hover:text-foreground h-8 w-8 px-0 py-0 flex items-center justify-center"
               onClick={onClose}
             >
-              <IconX size={14} strokeWidth={2} className="text-scale-900" />
+              <IconX size={14} strokeWidth={2} className="text-foreground-lighter" />
             </Button>
           </div>
-          <div className="h-px w-full bg-scale-600 rounded " />
+          <div className="h-px w-full bg-selection rounded " />
         </div>
         {isLoading && <Connecting />}
-        <div className="flex flex-col space-y-6 bg-scale-300 py-4">
+        <div className="flex flex-col space-y-6 bg-surface-100 py-4">
           {!isLoading && <Formatter />}
         </div>
       </div>

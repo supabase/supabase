@@ -1,51 +1,17 @@
-import Editor, { useMonaco } from '@monaco-editor/react'
-import { useTheme } from 'common'
-import { FC, useEffect, useRef } from 'react'
+import Editor, { OnChange, OnMount } from '@monaco-editor/react'
+import { noop } from 'lodash'
 
-interface Props {
-  queryId?: string
-  defaultValue: string
+// [Joshen] Should just use CodeEditor instead of declaring Editor here so that all the mount logic is consistent
+
+interface JsonEditorProps {
+  value: string
   readOnly?: boolean
-  onInputChange: (value: any) => void
+  onInputChange: OnChange
 }
 
-const JsonEditor: FC<Props> = ({
-  queryId = '',
-  defaultValue = '',
-  readOnly = false,
-  onInputChange = () => {},
-}) => {
-  const monaco = useMonaco()
-  const editorRef = useRef()
-  const { isDarkMode } = useTheme()
-
-  useEffect(() => {
-    if (monaco) {
-      // Supabase theming (Can't seem to get it to work for now)
-      monaco.editor.defineTheme('supabase', {
-        base: 'vs-dark', // can also be vs-dark or hc-black
-        inherit: true, // can also be false to completely replace the builtin rules
-        rules: [
-          // @ts-ignore
-          { background: isDarkMode ? '1f1f1f' : '30313f' },
-          { token: 'string.sql', foreground: '24b47e' },
-          { token: 'comment', foreground: '666666' },
-          { token: 'predefined.sql', foreground: 'D4D4D4' },
-        ],
-        colors: {
-          'editor.background': isDarkMode ? '#1f1f1f' : '#30313f',
-          // 'editorGutter.background': '#30313f',
-          // 'editorLineNumber.foreground': '#555671',
-        },
-      })
-    }
-  }, [isDarkMode, monaco])
-
-  const onMount = (editor: any, monaco: any) => {
-    editorRef.current = editor
-
-    // Add margin above first line
-    editor.changeViewZones((accessor: any) => {
+const JsonEditor = ({ value = '', readOnly = false, onInputChange = noop }: JsonEditorProps) => {
+  const onMount: OnMount = (editor) => {
+    editor.changeViewZones((accessor) => {
       accessor.addZone({
         afterLineNumber: 0,
         heightInPx: 4,
@@ -59,10 +25,9 @@ const JsonEditor: FC<Props> = ({
   return (
     <Editor
       className="monaco-editor"
-      theme="vs-dark"
+      theme="supabase"
       defaultLanguage="json"
-      defaultValue={defaultValue}
-      path={queryId}
+      value={value}
       loading={<Loading />}
       options={{
         readOnly,

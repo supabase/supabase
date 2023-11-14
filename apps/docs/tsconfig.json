@@ -21,6 +21,12 @@
     "jsx": "preserve",
     "module": "esnext"
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "pages/guides/append-test.js"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "pages/guides/append-test.js",
+    "jest.config.mjs"
+  ],
   "exclude": ["node_modules"]
 }

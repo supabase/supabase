@@ -1,22 +1,34 @@
+import { Column } from 'react-data-grid'
+import { LogData } from '../Logs.types'
 import {
   RowLayout,
   SeverityFormatter,
   TextFormatter,
   TimestampLocalFormatter,
 } from '../LogsFormatters'
+import { defaultRenderCell } from './DefaultPreviewColumnRenderer'
 
-export default [
+const columns: Column<LogData>[] = [
   {
-    formatter: (data: any) => (
-      <RowLayout>
-        <TimestampLocalFormatter value={data.row.timestamp!} />
-        {data.row.event_type === 'uncaughtException' ? (
-          <SeverityFormatter value={data.row.event_type} uppercase={false} />
-        ) : (
-          <SeverityFormatter value={data.row.level} />
-        )}
-        <TextFormatter className="w-full" value={data.row.event_message} />
-      </RowLayout>
-    ),
+    name: 'functions-logs-first-column',
+    key: 'functions-logs-first-column',
+    renderCell: (props) => {
+      if (!props.row.event_type && !props.row.level) {
+        return defaultRenderCell(props)
+      }
+      return (
+        <RowLayout>
+          <TimestampLocalFormatter value={props.row.timestamp!} />
+          {props.row.event_type === 'uncaughtException' ? (
+            <SeverityFormatter value={props.row.event_type} uppercase={false} />
+          ) : (
+            <SeverityFormatter value={props.row.level as string} />
+          )}
+          <TextFormatter className="w-full" value={props.row.event_message} />
+        </RowLayout>
+      )
+    },
   },
 ]
+
+export default columns

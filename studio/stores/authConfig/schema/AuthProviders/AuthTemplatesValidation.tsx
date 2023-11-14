@@ -22,7 +22,8 @@ export const CONFIRMATION: FormSchema = {
 - \`{{ .Token }}\` : The 6-digit numeric email OTP 
 - \`{{ .TokenHash }}\` : The hashed token used in the URL
 - \`{{ .SiteURL }}\` : The URL of the site
-- \`{{ .Email }}\` : The users email address
+- \`{{ .Email }}\` : The user's email address
+- \`{{ .Data }}\` : The user's \`user_metadata\`
 `,
     },
   },
@@ -55,7 +56,8 @@ export const INVITE: FormSchema = {
 - \`{{ .Token }}\` : The 6-digit numeric email OTP 
 - \`{{ .TokenHash }}\` : The hashed token used in the URL
 - \`{{ .SiteURL }}\` : The URL of the site
-- \`{{ .Email }}\` : The users email address
+- \`{{ .Email }}\` : The user's email address
+- \`{{ .Data }}\` : The user's \`user_metadata\`
 `,
     },
   },
@@ -88,7 +90,8 @@ export const MAGIC_LINK: FormSchema = {
 - \`{{ .Token }}\` : The 6-digit numeric email OTP 
 - \`{{ .TokenHash }}\` : The hashed token used in the URL
 - \`{{ .SiteURL }}\` : The URL of the site
-- \`{{ .Email }}\` : The users email address
+- \`{{ .Email }}\` : The user's email address
+- \`{{ .Data }}\` : The user's \`user_metadata\`
 `,
     },
   },
@@ -121,8 +124,9 @@ export const EMAIL_CHANGE: FormSchema = {
 - \`{{ .Token }}\` : The 6-digit numeric email OTP 
 - \`{{ .TokenHash }}\` : The hashed token used in the URL
 - \`{{ .SiteURL }}\` : The URL of the site
-- \`{{ .Email }}\` : The original users email address
-- \`{{ .NewEmail }}\` : The users new email address
+- \`{{ .Email }}\` : The original user's email address
+- \`{{ .NewEmail }}\` : The user's new email address
+- \`{{ .Data }}\` : The user's \`user_metadata\`
 `,
     },
   },
@@ -155,7 +159,8 @@ export const RECOVERY: FormSchema = {
 - \`{{ .Token }}\` : The 6-digit numeric email OTP 
 - \`{{ .TokenHash }}\` : The hashed token used in the URL
 - \`{{ .SiteURL }}\` : The URL of the site
-- \`{{ .Email }}\` : The users email address
+- \`{{ .Email }}\` : The user's email address
+- \`{{ .Data }}\` : The user's \`user_metadata\`
 `,
     },
   },

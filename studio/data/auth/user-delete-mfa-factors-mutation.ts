@@ -1,7 +1,6 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 
-import { User } from 'components/interfaces/Auth/Users/Users.types'
 import { delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { ResponseError } from 'types'

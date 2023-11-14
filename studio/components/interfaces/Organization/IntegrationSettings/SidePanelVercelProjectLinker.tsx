@@ -9,9 +9,10 @@ import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-or
 import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations/integrations-vercel-connections-create-mutation'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useSelectedOrganization } from 'hooks'
+import { useSelectedOrganization, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { EMPTY_ARR } from 'lib/void'
+import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { SidePanel } from 'ui'
 
 const VERCEL_ICON = (
@@ -20,18 +21,11 @@ const VERCEL_ICON = (
   </svg>
 )
 
-export type SidePanelVercelProjectLinkerProps = {
-  isOpen?: boolean
-  onClose?: () => void
-  organizationIntegrationId?: string
-}
-
-const SidePanelVercelProjectLinker = ({
-  isOpen = false,
-  onClose,
-  organizationIntegrationId,
-}: SidePanelVercelProjectLinkerProps) => {
+const SidePanelVercelProjectLinker = () => {
+  const { ui } = useStore()
   const selectedOrganization = useSelectedOrganization()
+  const sidePanelStateSnapshot = useSidePanelsStateSnapshot()
+  const organizationIntegrationId = sidePanelStateSnapshot.vercelConnectionsIntegrationId
 
   const { data: integrationData } = useOrgIntegrationsQuery({
     orgSlug: selectedOrganization?.slug,
@@ -93,13 +87,21 @@ const SidePanelVercelProjectLinker = ({
 
   const { mutate: createConnections, isLoading: isCreatingConnection } =
     useIntegrationVercelConnectionsCreateMutation({
-      onSuccess() {
-        onClose?.()
+      async onSuccess({ env_sync_error: envSyncError }) {
+        if (envSyncError) {
+          ui.setNotification({
+            category: 'error',
+            message: `Failed to sync environment variables: ${envSyncError.message}`,
+            description: 'Please try re-syncing manually from settings.',
+          })
+        }
+
+        sidePanelStateSnapshot.setVercelConnectionsOpen(false)
       },
     })
 
   const onCreateConnections = useCallback(
-    (vars) => {
+    (vars: any) => {
       createConnections({
         ...vars,
         connection: {
@@ -120,13 +122,13 @@ const SidePanelVercelProjectLinker = ({
 
   return (
     <SidePanel
-      header={'Add GitHub repository'}
+      header={'Add new Vercel Project Connection'}
       size="large"
-      visible={isOpen}
+      visible={sidePanelStateSnapshot.vercelConnectionsOpen}
       hideFooter
-      onCancel={() => onClose?.()}
+      onCancel={() => sidePanelStateSnapshot.setVercelConnectionsOpen(false)}
     >
-      <div className="py-10 flex flex-col gap-6 bg-body h-full">
+      <div className="py-10 flex flex-col gap-6 bg-background h-full">
         <SidePanel.Content>
           <Markdown
             content={`
@@ -153,10 +155,7 @@ Check the details below before proceeding
 The following environment variables will be added:
 
 ${ENV_VAR_RAW_KEYS.map((x) => {
-  return `
-  \n
-  - \`${x}\`
-`
+  return `\n - \`${x}\``
 })}
 `}
           />

@@ -1,21 +1,17 @@
-import { FC } from 'react'
-
-import { useSelectedProject } from 'hooks'
-import Panel from 'components/ui/Panel'
-
-import TransferProjectButton from './TransferProjectButton'
-import { FormHeader } from 'components/ui/Forms'
 import { IconTruck } from 'ui'
 
-interface Props {}
+import { FormHeader } from 'components/ui/Forms'
+import Panel from 'components/ui/Panel'
+import { useSelectedProject } from 'hooks'
+import TransferProjectButton from './TransferProjectButton'
 
-const TransferProjectPanel: FC<Props> = ({}) => {
+const TransferProjectPanel = () => {
   const project = useSelectedProject()
 
   if (project === undefined) return <></>
 
   return (
-    <section>
+    <section id="transfer-project">
       <FormHeader
         title="Transfer Project"
         description="Transfer your project to a different organization with no downtime."
@@ -27,7 +23,7 @@ const TransferProjectPanel: FC<Props> = ({}) => {
               <IconTruck className="mt-1" />
               <div className="space-y-1 xl:max-w-lg">
                 <p className="text-sm">Transfer project to another organization</p>
-                <p className="text-sm text-scale-1100">
+                <p className="text-sm text-foreground-light">
                   To transfer projects, the owner must be a member of both the source and target
                   organizations.
                 </p>

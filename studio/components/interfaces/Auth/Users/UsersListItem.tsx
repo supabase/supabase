@@ -1,20 +1,18 @@
-import { FC } from 'react'
-import { observer } from 'mobx-react-lite'
 import { Badge } from 'ui'
 
-import Table from 'components/to-be-cleaned/Table'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
+import Table from 'components/to-be-cleaned/Table'
+import { User } from 'data/auth/users-query'
 import UserDropdown from './UserDropdown'
 import { getDateFromIsoString } from './Users.utils'
-import { User } from './Users.types'
 
-interface Props {
+interface UserListItemProps {
   user: User
   canRemoveUser: boolean
   canRemoveMFAFactors: boolean
 }
 
-const UserListItem: FC<Props> = ({ user, canRemoveUser, canRemoveMFAFactors }) => {
+const UserListItem = ({ user, canRemoveUser, canRemoveMFAFactors }: UserListItemProps) => {
   const isUserConfirmed = user.email_confirmed_at || user.phone_confirmed_at
   const createdAt = getDateFromIsoString(user.created_at)
   const lastSignedIn = getDateFromIsoString(user.last_sign_in_at)
@@ -23,19 +21,17 @@ const UserListItem: FC<Props> = ({ user, canRemoveUser, canRemoveMFAFactors }) =
     <Table.tr className="relative" key={user.id}>
       <Table.td className="whitespace-nowrap">
         <div className="flex items-center gap-2">
-          <span className="text-sm text-scale-1200">{!user.email ? '-' : user.email}</span>
+          <span className="text-sm text-foreground">{!user.email ? '-' : user.email}</span>
         </div>
       </Table.td>
       <Table.td className="whitespace-nowrap">
-        <span className="text-scale-1200">{!user.phone ? '-' : user.phone}</span>
+        <span className="text-foreground">{!user.phone ? '-' : user.phone}</span>
       </Table.td>
       <Table.td className="table-cell">
-        <span className="capitalize text-scale-1200">
-          {user?.raw_app_meta_data?.provider || user?.app_metadata?.provider}
-        </span>
+        <span className="capitalize text-foreground">{user?.raw_app_meta_data?.provider}</span>
       </Table.td>
       <Table.td className="table-cell">
-        <span className="text-scale-1200">{createdAt?.format('DD MMM, YYYY HH:mm')}</span>
+        <span className="text-foreground">{createdAt?.format('DD MMM, YYYY HH:mm')}</span>
       </Table.td>
       <Table.td className="table-cell">
         {!isUserConfirmed ? (
@@ -54,7 +50,7 @@ const UserListItem: FC<Props> = ({ user, canRemoveUser, canRemoveMFAFactors }) =
           <div>...</div>
         </div>
       </Table.td>
-      <Table.td className="text-right">
+      <Table.td className="table-cell">
         <UserDropdown
           user={user}
           canRemoveUser={canRemoveUser}
@@ -65,4 +61,4 @@ const UserListItem: FC<Props> = ({ user, canRemoveUser, canRemoveMFAFactors }) =
   )
 }
 
-export default observer(UserListItem)
+export default UserListItem

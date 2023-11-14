@@ -10,7 +10,7 @@ export type BranchDeleteVariables = {
   projectRef: string
 }
 
-export async function deleteBranch({ id }: BranchDeleteVariables) {
+export async function deleteBranch({ id }: Pick<BranchDeleteVariables, 'id'>) {
   const { data, error } = await del('/v1/branches/{branch_id}', {
     params: { path: { branch_id: id } },
   })

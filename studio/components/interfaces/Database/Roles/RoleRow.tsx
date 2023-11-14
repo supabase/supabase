@@ -1,28 +1,31 @@
-import { FC, useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PostgresRole } from '@supabase/postgres-meta'
+import { useState } from 'react'
 import {
   Button,
-  Form,
-  Dropdown,
-  IconChevronUp,
-  Toggle,
   Collapsible,
-  IconTrash,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  Form,
+  IconChevronUp,
   IconHelpCircle,
   IconMoreVertical,
+  IconTrash,
+  Toggle,
 } from 'ui'
 
 import { useStore } from 'hooks'
 import { ROLE_PERMISSIONS } from './Roles.constants'
 
-interface Props {
+interface RoleRowProps {
   role: PostgresRole
   disabled?: boolean
   onSelectDelete: (role: PostgresRole) => void
 }
 
-const RoleRow: FC<Props> = ({ role, disabled = false, onSelectDelete }) => {
+const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
   const { ui, meta } = useStore()
   const [isExpanded, setIsExpanded] = useState(false)
 
@@ -68,11 +71,11 @@ const RoleRow: FC<Props> = ({ role, disabled = false, onSelectDelete }) => {
       }}
       onSubmit={onSaveChanges}
       className={[
-        'bg-scale-100 dark:bg-scale-300',
-        'hover:bg-scale-200 dark:hover:bg-scale-500',
-        'data-open:bg-scale-200 dark:data-open:bg-scale-500',
-        'border-scale-300 dark:border-scale-500 hover:border-scale-500',
-        'dark:hover:border-scale-700 data-open:border-scale-700',
+        'bg-surface-100',
+        'hover:bg-overlay-hover',
+        'data-open:bg-selection',
+        'border-default hover:border-strong',
+        'data-open:border-strong',
         'data-open:pb-px col-span-12 mx-auto',
         '-space-y-px overflow-hidden',
         'border border-t-0 first:border-t first:!mt-0 hover:border-t hover:-mt-[1px] shadow transition hover:z-50',
@@ -89,7 +92,7 @@ const RoleRow: FC<Props> = ({ role, disabled = false, onSelectDelete }) => {
               <button
                 id="collapsible-trigger"
                 type="button"
-                className="group flex w-full items-center justify-between rounded py-3 px-6 text-scale-1200"
+                className="group flex w-full items-center justify-between rounded py-3 px-6 text-foreground"
                 onClick={(event: any) => {
                   if (event.target.id === 'collapsible-trigger') setIsExpanded(!isExpanded)
                 }}
@@ -97,7 +100,7 @@ const RoleRow: FC<Props> = ({ role, disabled = false, onSelectDelete }) => {
                 <div className="flex items-start space-x-3">
                   <IconChevronUp
                     id="collapsible-trigger"
-                    className="text-scale-800 transition data-open-parent:rotate-0 data-closed-parent:rotate-180"
+                    className="text-border-stronger transition data-open-parent:rotate-0 data-closed-parent:rotate-180"
                     strokeWidth={2}
                     width={14}
                   />
@@ -105,7 +108,7 @@ const RoleRow: FC<Props> = ({ role, disabled = false, onSelectDelete }) => {
                     <p className="text-left text-sm" id="collapsible-trigger">
                       {role.name}
                     </p>
-                    <p className="text-left text-sm text-scale-1000" id="collapsible-trigger">
+                    <p className="text-left text-sm text-foreground-light" id="collapsible-trigger">
                       (ID: {role.id})
                     </p>
                   </div>
@@ -122,41 +125,37 @@ const RoleRow: FC<Props> = ({ role, disabled = false, onSelectDelete }) => {
                   <p
                     id="collapsible-trigger"
                     className={`text-sm ${
-                      role.active_connections > 0 ? 'text-scale-1100' : 'text-scale-1000'
+                      role.active_connections > 0 ? 'text-foreground' : 'text-foreground-light'
                     }`}
                   >
                     {role.active_connections} connections
                   </p>
                   {!disabled && (
-                    <Dropdown
-                      side="bottom"
-                      className="w-[120px]"
-                      overlay={
-                        <>
-                          <Dropdown.Item
-                            icon={
-                              <IconTrash className="text-red-800" size="tiny" strokeWidth={2} />
-                            }
-                            onClick={(event: any) => {
-                              event.stopPropagation()
-                              onSelectDelete(role)
-                            }}
-                          >
-                            Delete
-                          </Dropdown.Item>
-                        </>
-                      }
-                    >
-                      <Button asChild type="default" className="px-1" icon={<IconMoreVertical />}>
-                        <span></span>
-                      </Button>
-                    </Dropdown>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger>
+                        <Button asChild type="default" className="px-1" icon={<IconMoreVertical />}>
+                          <span></span>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent side="bottom" className="w-[120px]">
+                        <DropdownMenuItem
+                          className="space-x-2"
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            onSelectDelete(role)
+                          }}
+                        >
+                          <IconTrash className="text-red-800" size="tiny" strokeWidth={2} />
+                          <p>Delete</p>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   )}
                 </div>
               </button>
             </Collapsible.Trigger>
             <Collapsible.Content>
-              <div className="group border-t border-scale-500 bg-scale-100 py-6 px-20 text-scale-1200 dark:bg-scale-300">
+              <div className="group border-t border-default bg-surface-100 py-6 px-20 text-foreground">
                 <div className="py-4 space-y-[9px]">
                   {Object.keys(ROLE_PERMISSIONS).map((permission) => (
                     <Toggle
@@ -186,8 +185,8 @@ const RoleRow: FC<Props> = ({ role, disabled = false, onSelectDelete }) => {
                                 <Tooltip.Arrow className="radix-tooltip-arrow" />
                                 <div
                                   className={[
-                                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                    'border border-scale-200 space-y-1',
+                                    'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                    'border border-background space-y-1',
                                   ].join(' ')}
                                 >
                                   <span className="text-xs">

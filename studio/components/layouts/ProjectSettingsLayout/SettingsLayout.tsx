@@ -1,4 +1,11 @@
-import { useFlag, useSelectedOrganization, useSelectedProject, useStore, withAuth } from 'hooks'
+import {
+  useFlag,
+  useIsFeatureEnabled,
+  useSelectedOrganization,
+  useSelectedProject,
+  useStore,
+  withAuth,
+} from 'hooks'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
@@ -18,7 +25,6 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
   const { ui, meta } = useStore()
   const project = useSelectedProject()
   const organization = useSelectedOrganization()
-  const isOrgBilling = !!organization?.subscription_id
 
   // billing pages live under /billing/invoices and /billing/subscription, etc
   // so we need to pass the [5]th part of the url to the menu
@@ -26,8 +32,24 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
     ? router.pathname.split('/')[5]
     : router.pathname.split('/')[4]
 
-  const isVaultEnabled = useFlag('vaultExtension')
-  const menuRoutes = generateSettingsMenu(ref, project, isVaultEnabled, isOrgBilling)
+  const {
+    projectAuthAll: authEnabled,
+    projectEdgeFunctionAll: edgeFunctionsEnabled,
+    projectStorageAll: storageEnabled,
+    billingInvoices: invoicesEnabled,
+  } = useIsFeatureEnabled([
+    'project_auth:all',
+    'project_edge_function:all',
+    'project_storage:all',
+    'billing:invoices',
+  ])
+
+  const menuRoutes = generateSettingsMenu(ref, project, organization, {
+    auth: authEnabled,
+    edgeFunctions: edgeFunctionsEnabled,
+    storage: storageEnabled,
+    invoices: invoicesEnabled,
+  })
 
   useEffect(() => {
     if (ui.selectedProjectRef) {

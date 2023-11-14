@@ -1,6 +1,5 @@
 import SignInSSOForm from 'components/interfaces/SignIn/SignInSSOForm'
 import { SignInLayout } from 'components/layouts'
-import Link from 'next/link'
 import { NextPageWithLayout } from 'types'
 
 const SignInSSOPage: NextPageWithLayout = () => {
@@ -12,11 +11,11 @@ const SignInSSOPage: NextPageWithLayout = () => {
 
       <div className="my-8 self-center text-sm">
         <div>
-          <span className="text-scale-1000">Interested in SSO?</span>{' '}
+          <span className="text-foreground-light">Interested in SSO?</span>{' '}
           <a
             href="https://supabase.com/contact/enterprise"
             rel="noopener noreferrer"
-            className="underline text-scale-1200 hover:text-scale-1100 transition"
+            className="underline text-foreground hover:text-foreground-light transition"
           >
             Let Us Know
           </a>

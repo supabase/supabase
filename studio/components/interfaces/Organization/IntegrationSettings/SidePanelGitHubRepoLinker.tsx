@@ -9,6 +9,9 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization } from 'hooks'
 import { EMPTY_ARR } from 'lib/void'
 import { SidePanel } from 'ui'
+import { useIntegrationsGitHubInstalledConnectionDeleteMutation } from 'data/integrations/integrations-github-connection-delete-mutation'
+import { IntegrationConnectionsCreateVariables } from 'data/integrations/integrations.types'
+import { useSidePanelsStateSnapshot } from 'state/side-panels'
 
 const GITHUB_ICON = (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 98 96" className="w-6">
@@ -22,17 +25,14 @@ const GITHUB_ICON = (
 )
 
 export type SidePanelGitHubRepoLinkerProps = {
-  isOpen?: boolean
-  onClose?: () => void
-  organizationIntegrationId?: string
+  projectRef?: string
 }
 
-const SidePanelGitHubRepoLinker = ({
-  isOpen = false,
-  onClose,
-  organizationIntegrationId,
-}: SidePanelGitHubRepoLinkerProps) => {
+const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProps) => {
   const selectedOrganization = useSelectedOrganization()
+  const sidePanelStateSnapshot = useSidePanelsStateSnapshot()
+
+  const organizationIntegrationId = sidePanelStateSnapshot.githubConnectionsIntegrationId
 
   const { data: integrationData } = useOrgIntegrationsQuery({
     orgSlug: selectedOrganization?.slug,
@@ -40,6 +40,9 @@ const SidePanelGitHubRepoLinker = ({
   const githubIntegrations = integrationData?.filter(
     (integration) => integration.integration.name === 'GitHub'
   ) // github
+  const existingProjectGithubConnection = githubIntegrations?.[0]?.connections.find(
+    (connection) => connection.supabase_project_ref === projectRef
+  )
 
   /**
    * Find the right integration
@@ -51,7 +54,7 @@ const SidePanelGitHubRepoLinker = ({
   /**
    * Supabase projects available
    */
-  const { data: supabaseProjectsData } = useProjectsQuery({
+  const { data: supabaseProjectsData, isLoading: isLoadingSupabaseProjects } = useProjectsQuery({
     enabled: organizationIntegrationId !== undefined,
   })
 
@@ -64,7 +67,7 @@ const SidePanelGitHubRepoLinker = ({
     [selectedOrganization?.id, supabaseProjectsData]
   )
 
-  const { data: githubProjectsData } = useGitHubReposQuery(
+  const { data: githubProjectsData, isLoading: isLoadingGitHubRepos } = useGitHubReposQuery(
     {
       integrationId: organizationIntegrationId,
     },
@@ -83,19 +86,37 @@ const SidePanelGitHubRepoLinker = ({
   const { mutate: createConnections, isLoading: isCreatingConnection } =
     useIntegrationGitHubConnectionsCreateMutation({
       onSuccess() {
-        onClose?.()
+        sidePanelStateSnapshot.setGithubConnectionsOpen(false)
       },
     })
+
+  const { mutate: deleteGitHubConnection } =
+    useIntegrationsGitHubInstalledConnectionDeleteMutation()
+
+  const createGithubConnection = (variables: IntegrationConnectionsCreateVariables) => {
+    const existingProjectGithubConnection = githubIntegrations?.[0].connections.find(
+      (connection) => connection.supabase_project_ref === variables.connection.supabase_project_ref
+    )
+    if (existingProjectGithubConnection !== undefined && selectedOrganization !== undefined) {
+      deleteGitHubConnection({
+        connectionId: existingProjectGithubConnection.id,
+        integrationId: existingProjectGithubConnection.organization_integration_id,
+        orgSlug: selectedOrganization.slug,
+      })
+    }
+
+    createConnections(variables)
+  }
 
   return (
     <SidePanel
       header={'Add GitHub repository'}
       size="large"
-      visible={isOpen}
+      visible={sidePanelStateSnapshot.githubConnectionsOpen}
       hideFooter
-      onCancel={() => onClose?.()}
+      onCancel={() => sidePanelStateSnapshot.setGithubConnectionsOpen(false)}
     >
-      <div className="py-10 flex flex-col gap-6 bg-body h-full">
+      <div className="py-10 flex flex-col gap-6 bg-background h-full">
         <SidePanel.Content>
           <Markdown
             content={`
@@ -107,12 +128,16 @@ Check the details below before proceeding
         </SidePanel.Content>
         <SidePanel.Content className="flex flex-col gap-2">
           <ProjectLinker
+            defaultSupabaseProjectRef={projectRef}
+            defaultForeignProjectId={existingProjectGithubConnection?.foreign_project_id}
             organizationIntegrationId={selectedIntegration?.id}
             foreignProjects={githubRepos}
             supabaseProjects={supabaseProjects}
-            onCreateConnections={createConnections}
+            onCreateConnections={createGithubConnection}
             installedConnections={selectedIntegration?.connections}
             isLoading={isCreatingConnection}
+            loadingForeignProjects={isLoadingGitHubRepos}
+            loadingSupabaseProjects={isLoadingSupabaseProjects}
             integrationIcon={GITHUB_ICON}
             choosePrompt="Choose GitHub Repo"
           />

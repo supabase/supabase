@@ -1,22 +1,22 @@
+import { isEmpty, noop } from 'lodash'
+import { useState } from 'react'
 import { Button } from 'ui'
-import { FC, useState } from 'react'
-import { isEmpty } from 'lodash'
 
-import TemplatesList from './TemplatesList'
-import TemplatePreview from './TemplatePreview'
 import { PolicyTemplate } from './PolicyTemplates.constants'
+import TemplatePreview from './TemplatePreview'
+import TemplatesList from './TemplatesList'
 
-interface Props {
+interface PolicyTemplatesProps {
   templates: PolicyTemplate[]
   templatesNote: string
   onUseTemplate: (template: PolicyTemplate) => void
 }
 
-const PolicyTemplates: FC<Props> = ({
+const PolicyTemplates = ({
   templates = [],
   templatesNote = '',
-  onUseTemplate = () => {},
-}) => {
+  onUseTemplate = noop,
+}: PolicyTemplatesProps) => {
   const [selectedTemplate, setSelectedTemplate] = useState(templates[0])
   return (
     <div>
@@ -30,7 +30,7 @@ const PolicyTemplates: FC<Props> = ({
         <TemplatePreview selectedTemplate={selectedTemplate} />
       </div>
       <div className="flex w-full items-center justify-end gap-3 border-t px-6 py-4 dark:border-dark">
-        <span className="text-sm text-scale-900">
+        <span className="text-sm text-foreground-lighter">
           This will override any existing code you've written
         </span>
         <Button

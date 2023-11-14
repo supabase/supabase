@@ -1,4 +1,4 @@
-import { useFlag, useStore } from 'hooks'
+import { useStore } from 'hooks'
 import { useEffect, useState } from 'react'
 
 export interface UseEncryptedColumnsArgs {
@@ -7,16 +7,14 @@ export interface UseEncryptedColumnsArgs {
 }
 
 export function useEncryptedColumns({ schemaName, tableName }: UseEncryptedColumnsArgs) {
-  const isVaultEnabled = useFlag('vaultExtension')
   const { vault } = useStore()
-
   const [encryptedColumns, setEncryptedColumns] = useState<string[]>([])
 
   useEffect(() => {
     let isMounted = true
 
     const getEncryptedColumns = async () => {
-      if (schemaName !== undefined && tableName !== undefined && isVaultEnabled) {
+      if (schemaName !== undefined && tableName !== undefined) {
         const columns = await vault.listEncryptedColumns(schemaName, tableName)
 
         if (isMounted) {
@@ -30,7 +28,7 @@ export function useEncryptedColumns({ schemaName, tableName }: UseEncryptedColum
     return () => {
       isMounted = false
     }
-  }, [schemaName, tableName, isVaultEnabled])
+  }, [schemaName, tableName])
 
   return encryptedColumns
 }

@@ -1,18 +1,18 @@
-import { FC, useState } from 'react'
-import { observer } from 'mobx-react-lite'
-import { Badge, Toggle } from 'ui'
 import type { PostgresPublication, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { observer } from 'mobx-react-lite'
+import { useState } from 'react'
+import { Badge, Toggle } from 'ui'
 
-import { useCheckPermissions, useStore } from 'hooks'
 import Table from 'components/to-be-cleaned/Table'
+import { useCheckPermissions, useStore } from 'hooks'
 
-interface Props {
+interface PublicationsTableItemProps {
   table: PostgresTable
   selectedPublication: PostgresPublication
 }
 
-const PublicationsTableItem: FC<Props> = ({ table, selectedPublication }) => {
+const PublicationsTableItem = ({ table, selectedPublication }: PublicationsTableItemProps) => {
   const { ui, meta } = useStore()
   const enabledForAllTables = selectedPublication.tables == null
 

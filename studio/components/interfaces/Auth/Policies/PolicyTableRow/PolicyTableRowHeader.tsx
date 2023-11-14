@@ -1,25 +1,26 @@
-import Link from 'next/link'
-import { FC } from 'react'
-import { useRouter } from 'next/router'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Badge, Button, IconLock } from 'ui'
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { noop } from 'lodash'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { Badge, Button, IconLock } from 'ui'
+
 import { useCheckPermissions } from 'hooks'
 
-interface Props {
+interface PolicyTableRowHeaderProps {
   table: PostgresTable
   isLocked: boolean
   onSelectToggleRLS: (table: PostgresTable) => void
   onSelectCreatePolicy: (table: PostgresTable) => void
 }
 
-const PolicyTableRowHeader: FC<Props> = ({
+const PolicyTableRowHeader = ({
   table,
   isLocked,
-  onSelectToggleRLS = () => {},
-  onSelectCreatePolicy = () => {},
-}) => {
+  onSelectToggleRLS = noop,
+  onSelectCreatePolicy = noop,
+}: PolicyTableRowHeaderProps) => {
   const router = useRouter()
   const { ref } = router.query
   const canToggleRLS = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
@@ -29,13 +30,11 @@ const PolicyTableRowHeader: FC<Props> = ({
     <div id={table.id.toString()} className="flex w-full items-center justify-between">
       <div className="flex space-x-4 text-left">
         <Link href={`/project/${ref}/editor/${table.id}`}>
-          <a>
-            <h4 className="m-0">{table.name}</h4>
-          </a>
+          <h4 className="m-0">{table.name}</h4>
         </Link>
         {isLocked ? (
           <Badge color="scale">
-            <span className="flex gap-2 items-center text-xs uppercase text-scale-900">
+            <span className="flex gap-2 items-center text-xs uppercase text-foreground-lighter">
               <IconLock width={12} /> Locked
             </span>
           </Badge>
@@ -65,11 +64,11 @@ const PolicyTableRowHeader: FC<Props> = ({
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                        'border border-scale-200',
+                        'rounded bg-alternative py-1 px-2 leading-none shadow',
+                        'border border-background',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text-foreground">
                         You need additional permissions to create RLS policies
                       </span>
                     </div>
@@ -93,11 +92,11 @@ const PolicyTableRowHeader: FC<Props> = ({
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                        'border border-scale-200',
+                        'rounded bg-alternative py-1 px-2 leading-none shadow',
+                        'border border-background',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text-foreground">
                         You need additional permissions to toggle RLS
                       </span>
                     </div>

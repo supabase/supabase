@@ -1,13 +1,12 @@
-import { FC } from 'react'
-import { isEmpty } from 'lodash'
 import SqlEditor from 'components/ui/SqlEditor'
+import { isEmpty } from 'lodash'
 import { PolicyTemplate } from './PolicyTemplates.constants'
 
-interface Props {
+interface TemplatePreviewProps {
   selectedTemplate: PolicyTemplate
 }
 
-const TemplatePreview: FC<Props> = ({ selectedTemplate }) => {
+const TemplatePreview = ({ selectedTemplate }: TemplatePreviewProps) => {
   const { id, templateName, description, statement } = selectedTemplate
   return (
     <div className="space-y-8" style={{ width: '70%' }}>
@@ -16,12 +15,12 @@ const TemplatePreview: FC<Props> = ({ selectedTemplate }) => {
           <div className="my-5 h-full space-y-6 px-6">
             <div className="space-y-2">
               <div className="flex flex-col space-y-2">
-                <h3 className="text-scale-1200 text-base">{templateName}</h3>
-                <p className="text-scale-1100 text-sm">{description}</p>
+                <h3 className="text-foreground text-base">{templateName}</h3>
+                <p className="text-foreground-light text-sm">{description}</p>
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-scale-1100 text-sm">Policy SQL template:</label>
+              <label className="text-foreground-light text-sm">Policy SQL template:</label>
               <div className="h-64">
                 <SqlEditor readOnly queryId={id} defaultValue={statement} />
               </div>

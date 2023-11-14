@@ -1,23 +1,22 @@
-import { FC, useState } from 'react'
-import { Alert, Button, Form, Input, Modal } from 'ui'
+import { useParams } from 'common'
+import { Alert, Button, Modal } from 'ui'
 
-import { useStore } from 'hooks'
-import { useParams } from 'common/hooks'
 import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
+import { useStore } from 'hooks'
 
-interface Props {
+interface RemoveRestrictionModalProps {
   visible: boolean
   restrictedIps: string[]
   selectedRestriction?: string
   onClose: () => void
 }
 
-const RemoveRestrictionModal: FC<Props> = ({
+const RemoveRestrictionModal = ({
   visible,
   restrictedIps,
   selectedRestriction,
   onClose,
-}) => {
+}: RemoveRestrictionModalProps) => {
   const { ui } = useStore()
   const { ref } = useParams()
   const { mutate: applyNetworkRestrictions, isLoading: isApplying } =
@@ -57,7 +56,7 @@ const RemoveRestrictionModal: FC<Props> = ({
     >
       <Modal.Content>
         <div className="py-6 space-y-4">
-          <p className="text-sm text-scale-1100">
+          <p className="text-sm text-foreground-light">
             The IPv4 address <code className="text-xs">{selectedRestriction}</code> will be removed
             from your list of network restrictions
             {isRemovingOnlyRestriction

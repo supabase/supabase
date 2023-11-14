@@ -1,13 +1,13 @@
-import { createContext, useContext, useState } from 'react'
-import { useRouter } from 'next/router'
-import { observer, useLocalObservable } from 'mobx-react-lite'
-import { uniqBy, map as lodashMap } from 'lodash'
 import { Transition } from '@headlessui/react'
-import { Button, IconChevronDown, IconHelpCircle, IconTerminal, SidePanel } from 'ui'
 import { Dictionary } from 'components/grid'
-import SqlEditor from 'components/ui/SqlEditor'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import InformationBox from 'components/ui/InformationBox'
+import SqlEditor from 'components/ui/SqlEditor'
+import { map as lodashMap, uniqBy } from 'lodash'
+import { observer, useLocalObservable } from 'mobx-react-lite'
+import { useRouter } from 'next/router'
+import { createContext, useContext, useState } from 'react'
+import { Button, IconChevronDown, IconHelpCircle, IconTerminal, SidePanel } from 'ui'
 
 interface IChooseFunctionFormStore {
   functionSchemas: string[]
@@ -112,7 +112,7 @@ const NoFunctionsState = ({}) => {
         router.push(`/project/${ref}/database/functions`)
       }}
     >
-      <p className="text-sm text-scale-1100">
+      <p className="text-sm text-foreground-light">
         You will need to create a trigger based function before you can add it to your trigger.
       </p>
     </ProductEmptyState>
@@ -130,7 +130,7 @@ const SchemaFunctionGroup = observer(({ schema, selectFunction }: SchemaFunction
   return (
     <div className="space-y-4">
       <div className="sticky top-0 flex items-center space-x-1 px-6 backdrop-blur backdrop-filter">
-        <h5 className="text-scale-1000">schema</h5>
+        <h5 className="text-foreground-light">schema</h5>
         <h5>{schema}</h5>
       </div>
       <div className="space-y-0 divide-y border-t border-b dark:divide-dark dark:border-dark">
@@ -159,12 +159,12 @@ const Function = ({ id, completeStatement, name, onClick }: FunctionProps) => {
   const [visible, setVisible] = useState(false)
   return (
     <div
-      className="cursor-pointer rounded p-3 px-6 hover:bg-scale-200 dark:hover:bg-scale-200"
+      className="cursor-pointer rounded p-3 px-6 hover:bg-background"
       onClick={() => onClick(id)}
     >
       <div className="flex items-center justify-between space-x-3">
         <div className="flex items-center space-x-3">
-          <div className="flex items-center justify-center rounded bg-scale-1200 p-1 text-scale-100 ">
+          <div className="flex items-center justify-center rounded bg-foreground p-1 text-background">
             <IconTerminal strokeWidth={2} size={14} />
           </div>
           <p className="mb-0 text-sm">{name}</p>

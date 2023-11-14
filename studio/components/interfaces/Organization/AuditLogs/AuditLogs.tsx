@@ -1,25 +1,36 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import dayjs from 'dayjs'
-import Image from 'next/image'
-import { useState } from 'react'
+import Image from 'next/legacy/image'
+import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
+import { FilterPopover, LogDetailsPanel } from 'components/interfaces/AuditLogs'
+import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { DatePicker } from 'components/ui/DatePicker'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import {
-  OrganizationAuditLog,
+  AuditLog,
   useOrganizationAuditLogsQuery,
 } from 'data/organizations/organization-audit-logs-query'
 import { useOrganizationDetailQuery } from 'data/organizations/organization-detail-query'
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { Alert, Button, IconArrowDown, IconArrowUp, IconRefreshCw, IconUser } from 'ui'
-import FilterPopover from './FilterPopover'
-import LogDetailsPanel from './LogDetailsPanel'
-import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
+import Link from 'next/link'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconAlertTriangle,
+  IconArrowDown,
+  IconArrowUp,
+  IconRefreshCw,
+  IconUser,
+} from 'ui'
 
 // [Joshen considerations]
 // - Maybe fix the height of the table to the remaining height of the viewport, so that the search input is always visible
@@ -35,7 +46,7 @@ const AuditLogs = () => {
     from: currentTime.subtract(1, 'day').toISOString(),
     to: currentTime.toISOString(),
   })
-  const [selectedLog, setSelectedLog] = useState<OrganizationAuditLog>()
+  const [selectedLog, setSelectedLog] = useState<AuditLog>()
   const [filters, setFilters] = useState<{ users: string[]; projects: string[] }>({
     users: [], // gotrue_id[]
     projects: [], // project_ref[]
@@ -46,11 +57,40 @@ const AuditLogs = () => {
   const { data: detailData } = useOrganizationDetailQuery({ slug })
   const { data: rolesData } = useOrganizationRolesQuery({ slug })
   const { data, error, isLoading, isSuccess, isError, isRefetching, refetch } =
-    useOrganizationAuditLogsQuery({
-      slug,
-      iso_timestamp_start: dateRange.from,
-      iso_timestamp_end: dateRange.to,
-    })
+    useOrganizationAuditLogsQuery(
+      {
+        slug,
+        iso_timestamp_start: dateRange.from,
+        iso_timestamp_end: dateRange.to,
+      },
+      {
+        retry(_failureCount, error) {
+          if (error.message.endsWith('upgrade to team or enterprise plan to access audit logs.')) {
+            return false
+          }
+          return true
+        },
+        retryOnMount: false,
+        refetchOnWindowFocus: false,
+      }
+    )
+
+  // This feature depends on the subscription tier of the user. Free user can view logs up to 1 day
+  // in the past. The API limits the logs to maximum of 1 day and 5 minutes so when the page is
+  // viewed for more than 5 minutes, the call parameters needs to be updated. This also works with
+  // higher tiers (7 days of logs).The user will see a loading shimmer.
+  useEffect(() => {
+    const duration = dayjs(dateRange.from).diff(dayjs(dateRange.to))
+    const interval = setInterval(() => {
+      const currentTime = dayjs().utc().set('millisecond', 0)
+      setDateRange({
+        from: currentTime.add(duration).toISOString(),
+        to: currentTime.toISOString(),
+      })
+    }, 5 * 60000)
+
+    return () => clearInterval(interval)
+  }, [dateRange.from, dateRange.to])
 
   const members = detailData?.members ?? []
   const roles = rolesData?.roles ?? []
@@ -78,6 +118,8 @@ const AuditLogs = () => {
       }
     })
 
+  const currentOrganization = organizations?.find((o) => o.slug === slug)
+
   return (
     <>
       <ScaffoldContainerLegacy>
@@ -95,7 +137,9 @@ const AuditLogs = () => {
               />
               <FilterPopover
                 name="Projects"
-                options={projects ?? []}
+                options={
+                  projects?.filter((p) => p.organization_id === currentOrganization?.id) ?? []
+                }
                 labelKey="name"
                 valueKey="ref"
                 activeOptions={filters.projects}
@@ -145,7 +189,7 @@ const AuditLogs = () => {
               />
               {isSuccess && (
                 <>
-                  <div className="h-[20px] border-r border-scale-700 !ml-4 !mr-2" />
+                  <div className="h-[20px] border-r border-strong !ml-4 !mr-2" />
                   <p className="prose text-xs">Viewing {sortedLogs.length} logs in total</p>
                 </>
               )}
@@ -168,18 +212,50 @@ const AuditLogs = () => {
             </div>
           )}
 
-          {isError && <AlertError error={error} subject="Failed to retrieve audit logs" />}
+          {isError ? (
+            error.message.endsWith('upgrade to team or enterprise plan to access audit logs.') ? (
+              <Alert_Shadcn_
+                variant="default"
+                title="Organization Audit Logs are not available on Free or Pro plans"
+              >
+                <IconAlertTriangle className="h-4 w-4 mt-3" />
+                <div className="flex flex-row pt-3 pb-2">
+                  <div className="grow">
+                    <AlertTitle_Shadcn_>
+                      Organization Audit Logs are not available on Free or Pro plans
+                    </AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_ className="flex flex-row justify-between gap-3">
+                      <p>
+                        Upgrade to Team or Enterprise to view up to 28 days of Audit Logs for your
+                        organization.
+                      </p>
+                    </AlertDescription_Shadcn_>
+                  </div>
+
+                  <div className="flex items-center">
+                    <Button type="primary" asChild>
+                      <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
+                        Upgrade subscription
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              </Alert_Shadcn_>
+            ) : (
+              <AlertError error={error} subject="Failed to retrieve audit logs" />
+            )
+          ) : null}
 
           {isSuccess && (
             <>
               {logs.length === 0 ? (
-                <div className="bg-scale-100 dark:bg-scale-300 border rounded p-4 flex items-center justify-between">
+                <div className="bg-surface-100 border rounded p-4 flex items-center justify-between">
                   <p className="prose text-sm">
                     Your organization does not have any audit logs available yet
                   </p>
                 </div>
               ) : logs.length > 0 && sortedLogs.length === 0 ? (
-                <div className="bg-scale-100 dark:bg-scale-300 border rounded p-4 flex items-center justify-between">
+                <div className="bg-surface-100 border rounded p-4 flex items-center justify-between">
                   <p className="prose text-sm">No audit logs found based on the filters applied</p>
                 </div>
               ) : (
@@ -199,7 +275,7 @@ const AuditLogs = () => {
                         <p>Date</p>
 
                         <Tooltip.Root delayDuration={0}>
-                          <Tooltip.Trigger>
+                          <Tooltip.Trigger asChild>
                             <Button
                               type="text"
                               className="px-1"
@@ -214,21 +290,19 @@ const AuditLogs = () => {
                             />
                           </Tooltip.Trigger>
                           <Tooltip.Portal>
-                            <Tooltip.Portal>
-                              <Tooltip.Content side="right">
-                                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                <div
-                                  className={[
-                                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                    'border border-scale-200',
-                                  ].join(' ')}
-                                >
-                                  <span className="text-xs text-scale-1200">
-                                    {dateSortDesc ? 'Sort latest first' : 'Sort earliest first'}
-                                  </span>
-                                </div>
-                              </Tooltip.Content>
-                            </Tooltip.Portal>
+                            <Tooltip.Content side="right">
+                              <Tooltip.Arrow className="radix-tooltip-arrow" />
+                              <div
+                                className={[
+                                  'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                  'border border-background',
+                                ].join(' ')}
+                              >
+                                <span className="text-xs text-foreground">
+                                  {dateSortDesc ? 'Sort latest first' : 'Sort earliest first'}
+                                </span>
+                              </div>
+                            </Tooltip.Content>
                           </Tooltip.Portal>
                         </Tooltip.Root>
                       </div>
@@ -249,11 +323,11 @@ const AuditLogs = () => {
                       const hasStatusCode = log.action.metadata[0]?.status !== undefined
                       const userIcon =
                         user === undefined ? (
-                          <div className="flex h-[30px] w-[30px] flex items-center justify-center border-2 rounded-full border-scale-700">
+                          <div className="flex h-[30px] w-[30px] items-center justify-center border-2 rounded-full border-strong">
                             <p>?</p>
                           </div>
                         ) : user?.invited_id || user?.username === user?.primary_email ? (
-                          <div className="flex h-[30px] w-[30px] flex items-center justify-center border-2 rounded-full border-scale-700">
+                          <div className="flex h-[30px] w-[30px] items-center justify-center border-2 rounded-full border-strong">
                             <IconUser size={18} strokeWidth={2} />
                           </div>
                         ) : (
@@ -270,35 +344,37 @@ const AuditLogs = () => {
                         <Table.tr
                           key={log.occurred_at}
                           onClick={() => setSelectedLog(log)}
-                          className="cursor-pointer hover:!bg-scale-100 transition duration-100"
+                          className="cursor-pointer hover:!bg-alternative transition duration-100"
                         >
                           <Table.td>
                             <div className="flex items-center space-x-4">
                               <div>{userIcon}</div>
                               <div>
-                                <p className="text-scale-1100">{user?.username ?? 'Unknown'}</p>
+                                <p className="text-foreground-light">{user?.username ?? '-'}</p>
                                 {role && (
-                                  <p className="mt-0.5 text-xs text-scale-1000">{role?.name}</p>
+                                  <p className="mt-0.5 text-xs text-foreground-light">
+                                    {role?.name}
+                                  </p>
                                 )}
                               </div>
                             </div>
                           </Table.td>
-                          <Table.td>
+                          <Table.td className="max-w-[250px]">
                             <div className="flex items-center space-x-2">
                               {hasStatusCode && (
-                                <p className="bg-scale-400 rounded px-1 flex items-center justify-center text-xs font-mono border">
+                                <p className="bg-surface-200 rounded px-1 flex items-center justify-center text-xs font-mono border">
                                   {log.action.metadata[0].status}
                                 </p>
                               )}
-                              <p className="max-w-[170px] truncate" title={log.action.name}>
+                              <p className="truncate" title={log.action.name}>
                                 {log.action.name}
                               </p>
                             </div>
                           </Table.td>
                           <Table.td>
                             <p
-                              className="text-scale-1100 max-w-[230px] truncate"
-                              title={project?.name ?? organization?.name ?? 'Unknown'}
+                              className="text-foreground-light max-w-[230px] truncate"
+                              title={project?.name ?? organization?.name ?? '-'}
                             >
                               {project?.name
                                 ? 'Project: '
@@ -308,7 +384,7 @@ const AuditLogs = () => {
                               {project?.name ?? organization?.name ?? 'Unknown'}
                             </p>
                             <p
-                              className="text-scale-1000 text-xs mt-0.5 truncate"
+                              className="text-foreground-light text-xs mt-0.5 truncate"
                               title={
                                 log.target.metadata.project_ref ?? log.target.metadata.org_slug
                               }

@@ -1,32 +1,34 @@
-import { FC, useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { SidePanel } from 'ui'
 
-import { useStore } from 'hooks'
-import JsonEditor from './JsonCodeEditor'
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'
-import DrilldownViewer from './DrilldownViewer'
-import ActionBar from '../../ActionBar'
+import { useStore } from 'hooks'
 import { minifyJSON, prettifyJSON, tryParseJson } from 'lib/helpers'
+import ActionBar from '../../ActionBar'
+import DrilldownViewer from './DrilldownViewer'
+import JsonEditor from './JsonCodeEditor'
 
-type JsonEditProps = {
+interface JsonEditProps {
   column: string
   jsonString: string
   visible: boolean
   backButtonLabel?: string
   applyButtonLabel?: string
+  readOnly?: boolean
   closePanel: () => void
-  onSaveJSON: (value: string | number) => void
+  onSaveJSON: (value: string | number | null) => void
 }
 
-const JsonEdit: FC<JsonEditProps> = ({
+const JsonEdit = ({
   column,
   jsonString,
   visible,
   backButtonLabel,
   applyButtonLabel,
+  readOnly = false,
   closePanel,
   onSaveJSON,
-}) => {
+}: JsonEditProps) => {
   const { ui } = useStore()
   const [view, setView] = useState<'edit' | 'view'>('edit')
   const [jsonStr, setJsonStr] = useState('')
@@ -52,7 +54,7 @@ const JsonEdit: FC<JsonEditProps> = ({
     }
   }
 
-  function onInputChange(value: any) {
+  function onInputChange(value: string | undefined) {
     setJsonStr(value ?? '')
   }
 
@@ -67,7 +69,7 @@ const JsonEdit: FC<JsonEditProps> = ({
         <div className="flex items-center justify-between">
           {view === 'edit' ? (
             <p>
-              Editing JSON Field: <code>{column}</code>
+              {readOnly ? 'Viewing' : 'Editing'} JSON Field: <code>{column}</code>
             </p>
           ) : (
             <p>
@@ -86,10 +88,11 @@ const JsonEdit: FC<JsonEditProps> = ({
       onCancel={closePanel}
       customFooter={
         <ActionBar
+          hideApply={readOnly}
           closePanel={closePanel}
           backButtonLabel={backButtonLabel}
           applyButtonLabel={applyButtonLabel}
-          applyFunction={validateJSON}
+          applyFunction={readOnly ? undefined : validateJSON}
         />
       }
     >
@@ -98,7 +101,12 @@ const JsonEdit: FC<JsonEditProps> = ({
           <div className="mt-4 flex flex-auto flex-col space-y-4">
             {view === 'edit' ? (
               <div className="h-[500px] w-full flex-grow border dark:border-dark">
-                <JsonEditor onInputChange={onInputChange} defaultValue={jsonStr.toString()} />
+                <JsonEditor
+                  key={jsonString}
+                  readOnly={readOnly}
+                  onInputChange={onInputChange}
+                  value={jsonStr.toString()}
+                />
               </div>
             ) : (
               <DrilldownViewer jsonData={tryParseJson(jsonStr)} />

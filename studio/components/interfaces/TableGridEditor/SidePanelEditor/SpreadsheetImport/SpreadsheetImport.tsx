@@ -1,24 +1,28 @@
-import { useCallback, useState, FC, useEffect } from 'react'
-import { debounce, includes, noop } from 'lodash'
-import { SidePanel, Tabs } from 'ui'
+import Link from 'next/link'
 import { PostgresTable } from '@supabase/postgres-meta'
+import { debounce, includes, noop } from 'lodash'
+import { useCallback, useEffect, useState } from 'react'
+import { Button, IconExternalLink, SidePanel, Tabs } from 'ui'
 
 import { useStore } from 'hooks'
 import ActionBar from '../ActionBar'
-import SpreadSheetTextInput from './SpreadSheetTextInput'
+import { ImportContent } from '../TableEditor/TableEditor.types'
 import SpreadSheetFileUpload from './SpreadSheetFileUpload'
+import SpreadsheetImportConfiguration from './SpreadSheetImportConfiguration'
+import SpreadSheetTextInput from './SpreadSheetTextInput'
+import { EMPTY_SPREADSHEET_DATA, UPLOAD_FILE_TYPES } from './SpreadsheetImport.constants'
 import { SpreadsheetData } from './SpreadsheetImport.types'
 import {
   acceptedFileExtension,
   parseSpreadsheet,
   parseSpreadsheetText,
 } from './SpreadsheetImport.utils'
-import { UPLOAD_FILE_TYPES, EMPTY_SPREADSHEET_DATA } from './SpreadsheetImport.constants'
-import { ImportContent } from '../TableEditor/TableEditor.types'
-import SpreadsheetImportConfiguration from './SpreadSheetImportConfiguration'
 import SpreadsheetImportPreview from './SpreadsheetImportPreview'
+import toast from 'react-hot-toast'
 
-interface Props {
+const MAX_CSV_SIZE = 1024 * 1024 * 100 // 100 MB
+
+interface SpreadsheetImportProps {
   debounceDuration?: number
   headers?: string[]
   rows?: any[]
@@ -29,7 +33,7 @@ interface Props {
   updateEditorDirty?: (value: boolean) => void
 }
 
-const SpreadsheetImport: FC<Props> = ({
+const SpreadsheetImport = ({
   visible = false,
   debounceDuration = 250,
   headers = [],
@@ -38,7 +42,7 @@ const SpreadsheetImport: FC<Props> = ({
   saveContent,
   closePanel,
   updateEditorDirty = noop,
-}) => {
+}: SpreadsheetImportProps) => {
   const { ui } = useStore()
 
   useEffect(() => {
@@ -74,6 +78,27 @@ const SpreadsheetImport: FC<Props> = ({
     setParseProgress(0)
     event.persist()
     const [file] = event.target.files || event.dataTransfer.files
+
+    if (file.size > MAX_CSV_SIZE) {
+      event.target.value = ''
+      return toast(
+        <div className="space-y-1">
+          <p>The dashboard currently only supports importing of CSVs below 100MB.</p>
+          <p>For bulk data loading, we recommend doing so directly through the database.</p>
+          <Button asChild type="default" icon={<IconExternalLink />} className="!mt-2">
+            <Link
+              href="https://supabase.com/docs/guides/database/tables#bulk-data-loading"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Learn more
+            </Link>
+          </Button>
+        </div>,
+        { duration: Infinity }
+      )
+    }
+
     if (!file || !includes(UPLOAD_FILE_TYPES, file?.type) || !acceptedFileExtension(file)) {
       ui.setNotification({
         category: 'info',

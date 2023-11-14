@@ -13,6 +13,7 @@ FROM node:18-slim as base
 # Fixes issues with Sentry CLI and SSL certificates during build
 RUN apt-get update -qq && \
     apt-get install -y ca-certificates && \
+    rm -rf /var/lib/apt/lists/* && \
     update-ca-certificates
 
 WORKDIR /app
@@ -44,7 +45,7 @@ ENTRYPOINT ["docker-entrypoint.sh"]
 EXPOSE 8082
 CMD ["npm", "run", "dev:studio"]
 
-# Compile NextJS
+# Compile Next.js
 FROM dev as builder
 
 RUN npx turbo run build --scope=studio --include-dependencies --no-deps
@@ -52,7 +53,7 @@ RUN npx turbo run build --scope=studio --include-dependencies --no-deps
 # Copy only compiled code and dependencies
 FROM base as production
 COPY --from=builder /app/studio/public ./studio/public
-COPY --from=builder /app/studio/.next/standalone/app ./
+COPY --from=builder /app/studio/.next/standalone ./
 COPY --from=builder /app/studio/.next/static ./studio/.next/static
 EXPOSE 3000
 ENTRYPOINT ["docker-entrypoint.sh"]

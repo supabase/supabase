@@ -22,6 +22,7 @@ import SocialProviderSettingsSupabase from './MDX/social_provider_settings_supab
 import SocialProviderSetup from './MDX/social_provider_setup.mdx'
 import StorageManagement from './MDX/storage_management.mdx'
 import KotlinProjectSetup from './MDX/kotlin_project_setup.mdx'
+import MigrationWarnings from './MDX/migration_warnings.mdx'
 import { CH } from '@code-hike/mdx/components'
 import RefHeaderSection from './reference/RefHeaderSection'
 
@@ -37,7 +38,7 @@ import {
   IconMenuHome,
   IconMenuGettingStarted,
   IconMenuDatabase,
-  IconMenuServerlessApis,
+  IconMenuRestApis,
   IconMenuAuth,
   IconMenuEdgeFunctions,
   IconMenuRealtime,
@@ -72,6 +73,7 @@ const components = {
   DatabaseSetup,
   ProjectSetup,
   KotlinProjectSetup,
+  MigrationWarnings,
   SocialProviderSetup,
   SocialProviderSettingsSupabase,
   StepHikeCompact,
@@ -95,6 +97,11 @@ const components = {
       {props.children}
     </Heading>
   ),
+  h4: (props: any) => (
+    <Heading tag="h4" {...props}>
+      {props.children}
+    </Heading>
+  ),
   RefSubLayout,
   RefHeaderSection: (props: any) => <RefHeaderSection {...props} />,
   CliGlobalFlagsHandler: () => <CliGlobalFlagsHandler />,
@@ -104,7 +111,7 @@ const components = {
   IconMenuHome,
   IconMenuGettingStarted,
   IconMenuDatabase,
-  IconMenuServerlessApis,
+  IconMenuRestApis,
   IconMenuAuth,
   IconMenuEdgeFunctions,
   IconMenuRealtime,

@@ -1,12 +1,12 @@
-import { FC } from 'react'
 import { IconAlertCircle } from 'ui'
+
 import InformationBox from 'components/ui/InformationBox'
 
-interface Props {
+interface DisabledWarningDueToIncidentProps {
   title: string
 }
 
-const DisabledWarningDueToIncident: FC<Props> = ({ title }) => {
+const DisabledWarningDueToIncident = ({ title }: DisabledWarningDueToIncidentProps) => {
   return (
     <InformationBox
       icon={<IconAlertCircle size={20} strokeWidth={1.5} />}

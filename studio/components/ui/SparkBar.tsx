@@ -1,7 +1,6 @@
 import clsx from 'clsx'
-import { FC, ReactNode } from 'react'
 
-interface Props {
+interface SparkBarProps {
   value: number
   max?: number
   type?: 'horizontal' | 'vertical'
@@ -14,7 +13,7 @@ interface Props {
   borderClass?: string
 }
 
-const SparkBar: FC<Props> = ({
+const SparkBar = ({
   max = 100,
   value = 0,
   barClass = '',
@@ -25,7 +24,7 @@ const SparkBar: FC<Props> = ({
   labelBottomClass = 'tabular-nums',
   labelTop = '',
   labelTopClass = '',
-}) => {
+}: SparkBarProps) => {
   if (type === 'horizontal') {
     const width = Number((value / max) * 100)
     const widthCss = `${width}%`
@@ -37,19 +36,19 @@ const SparkBar: FC<Props> = ({
           <div className="flex align-baseline justify-between pb-1 space-x-8">
             <p
               className={clsx(
-                'text-scale-1200 text-sm truncate capitalize-sentence',
+                'text-foreground text-sm truncate capitalize-sentence',
                 labelTop.length > 0 && 'max-w-[75%]',
                 labelBottomClass
               )}
             >
               {labelBottom}
             </p>
-            <p className={clsx('text-scale-1100 text-sm', labelTopClass)}>{labelTop}</p>
+            <p className={clsx('text-foreground-light text-sm', labelTopClass)}>{labelTop}</p>
           </div>
         )}
         <div
           className={`relative rounded h-1 overflow-hidden w-full border p-0 ${
-            bgClass ? bgClass : 'bg-gray-100 dark:bg-gray-600'
+            bgClass ? bgClass : 'bg-overlay-hover'
           } ${borderClass ? borderClass : 'border-none'}`}
         >
           <div

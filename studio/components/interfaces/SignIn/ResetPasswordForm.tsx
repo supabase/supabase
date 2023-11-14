@@ -23,6 +23,9 @@ const ResetPasswordForm = () => {
         message: `Password saved successfully!`,
       })
 
+      // logout all other sessions after changing password
+      await auth.signOut({ scope: 'others' })
+
       await router.push('/projects')
     } else {
       ui.setNotification({

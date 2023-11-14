@@ -25,7 +25,7 @@ const pageMap = [
   {
     slug: 'generating-types',
     meta: {
-      title: 'Generate types from your database',
+      title: 'Generate types using GitHub Actions',
       description: 'End-to-end type safety across client, server, and database.',
       subtitle: 'End-to-end type safety across client, server, and database.',
       tocVideo: 'VSNgAIObBdw',
@@ -33,11 +33,22 @@ const pageMap = [
     remoteFile: 'generating-types.md',
   },
   {
-    slug: 'api',
+    slug: 'testing',
     meta: {
-      title: 'GraphQL API',
+      title: 'Automated testing using GitHub Actions',
+      description: 'Run your tests when you or your team make changes.',
+      subtitle: 'Run your tests when you or your team make changes.',
     },
-    remoteFile: 'api.md',
+    remoteFile: 'testing.md',
+  },
+  {
+    slug: 'backups',
+    meta: {
+      title: 'Automated backups using GitHub Actions',
+      description: 'Backup your database on a regular basis.',
+      subtitle: 'Backup your database on a regular basis.',
+    },
+    remoteFile: 'backups.md',
   },
 ]
 

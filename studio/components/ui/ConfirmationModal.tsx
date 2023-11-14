@@ -4,23 +4,27 @@ import { Button, Modal } from 'ui'
 export interface ConfirmationModalProps {
   visible: boolean
   danger?: boolean
+  loading?: boolean
   header: string | JSX.Element
   description?: string
   size?: 'small' | 'tiny' | 'medium' | 'large'
   buttonLabel: string
   buttonLoadingLabel?: string
+  buttonDisabled?: boolean
   onSelectCancel: () => void
   onSelectConfirm: () => void
 }
 
 const ConfirmationModal = ({
   visible = false,
+  loading: loading_ = false,
   danger = false,
   header = '',
   description = '',
   size = 'small',
   buttonLabel = '',
   buttonLoadingLabel = '',
+  buttonDisabled = false,
   onSelectCancel = () => {},
   onSelectConfirm = () => {},
   children,
@@ -30,6 +34,10 @@ const ConfirmationModal = ({
       setLoading(false)
     }
   }, [visible])
+
+  useEffect(() => {
+    setLoading(loading_)
+  }, [loading_])
 
   const [loading, setLoading] = useState(false)
 
@@ -56,7 +64,7 @@ const ConfirmationModal = ({
           <Button
             type={danger ? 'danger' : 'primary'}
             loading={loading}
-            disabled={loading}
+            disabled={loading || buttonDisabled}
             onClick={onConfirm}
           >
             {loading ? buttonLoadingLabel : buttonLabel}

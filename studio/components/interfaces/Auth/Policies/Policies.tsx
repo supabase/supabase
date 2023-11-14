@@ -1,29 +1,32 @@
-import { useState, FC } from 'react'
-import { isEmpty } from 'lodash'
-import { IconHelpCircle } from 'ui'
-import { useRouter } from 'next/router'
-import { observer } from 'mobx-react-lite'
-import { useStore } from 'hooks'
+import type { PostgresRole, PostgresTable } from '@supabase/postgres-meta'
 import { useParams } from 'common/hooks'
 import { PolicyEditorModal, PolicyTableRow } from 'components/interfaces/Auth/Policies'
-import type { PostgresRole, PostgresTable } from '@supabase/postgres-meta'
+import { useStore } from 'hooks'
+import { isEmpty } from 'lodash'
+import { observer } from 'mobx-react-lite'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { IconHelpCircle } from 'ui'
 
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import InformationBox from 'components/ui/InformationBox'
+import { useQueryClient } from '@tanstack/react-query'
+import { tableKeys } from 'data/tables/keys'
 
-interface Props {
+interface PoliciesProps {
   tables: PostgresTable[]
   hasTables: boolean
   isLocked: boolean
 }
 
-const Policies: FC<Props> = ({ tables, hasTables, isLocked }) => {
+const Policies = ({ tables, hasTables, isLocked }: PoliciesProps) => {
   const router = useRouter()
   const { ref } = useParams()
 
   const { ui, meta } = useStore()
+  const queryClient = useQueryClient()
   const roles = meta.roles.list((role: PostgresRole) => !meta.roles.systemRoles.includes(role.name))
 
   const [selectedSchemaAndTable, setSelectedSchemaAndTable] = useState<any>({})
@@ -72,11 +75,13 @@ const Policies: FC<Props> = ({ tables, hasTables, isLocked }) => {
 
     const res: any = await meta.tables.update(payload.id, payload)
     if (res.error) {
-      ui.setNotification({
+      return ui.setNotification({
         category: 'error',
         message: `Failed to toggle RLS: ${res.error.message}`,
       })
     }
+
+    await queryClient.invalidateQueries(tableKeys.list(ref, selectedTableToToggleRLS.schema))
     closeConfirmModal()
   }
 
@@ -161,7 +166,7 @@ const Policies: FC<Props> = ({ tables, hasTables, isLocked }) => {
                   </div>
                 }
               />
-              <p className="text-sm text-scale-1100">
+              <p className="text-sm text-foreground-light">
                 Create a table in this schema first before creating a policy.
               </p>
             </div>

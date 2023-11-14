@@ -10,11 +10,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   switch (method) {
     case 'GET':
-      if (process.env.NEXT_PUBLIC_ENABLE_LOGS !== 'true') {
-        return res
-          .status(400)
-          .json({ error: { message: '[analytics] is not enabled in supabase/config.toml' } })
-      }
       const missingEnvVars = [
         process.env.LOGFLARE_API_KEY ? null : 'LOGFLARE_API_KEY',
         process.env.LOGFLARE_URL ? null : 'LOGFLARE_URL',
@@ -39,7 +34,7 @@ const proxyRequest = async (req: NextApiRequest) => {
   const payload = { ...toForward, project_tier: 'ENTERPRISE' }
   const search = '?' + new URLSearchParams(payload as any).toString()
   const apiKey = process.env.LOGFLARE_API_KEY
-  const url = `${PROJECT_ANALYTICS_URL}endpoints/query/name/${name}${search}`
+  const url = `${PROJECT_ANALYTICS_URL}endpoints/query/${name}${search}`
   const result = await get(url, {
     headers: {
       'x-api-key': apiKey,

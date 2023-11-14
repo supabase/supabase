@@ -1,31 +1,63 @@
-import { FC, useState, useEffect, useCallback, useRef } from 'react'
-import { compact, debounce, isEqual } from 'lodash'
-import {
-  Button,
-  Dropdown,
-  Input,
-  IconChevronLeft,
-  IconChevronRight,
-  IconRefreshCw,
-  IconColumns,
-  IconChevronsDown,
-  IconSearch,
-  IconFolderPlus,
-  IconUpload,
-  IconX,
-  IconEdit2,
-  IconLoader,
-  IconChevronsUp,
-  IconList,
-} from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { compact, debounce, isEqual, noop } from 'lodash'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuSeparator,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  IconChevronLeft,
+  IconChevronRight,
+  IconChevronsDown,
+  IconChevronsUp,
+  IconCode,
+  IconColumns,
+  IconEdit2,
+  IconFolderPlus,
+  IconList,
+  IconLoader,
+  IconRefreshCw,
+  IconSearch,
+  IconUpload,
+  IconX,
+  Input,
+  IconCheck,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuRadioItem,
+} from 'ui'
 
 import { useCheckPermissions } from 'hooks'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import { STORAGE_VIEWS, STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER } from '../Storage.constants'
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
+import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
+import { useAppStateSnapshot } from 'state/app-state'
+import APIDocsButton from 'components/ui/APIDocsButton'
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
-const HeaderPathEdit = ({ loading, breadcrumbs, togglePathEdit }: any) => {
+const VIEW_OPTIONS = [
+  { key: STORAGE_VIEWS.COLUMNS, name: 'As columns' },
+  { key: STORAGE_VIEWS.LIST, name: 'As list' },
+]
+
+const SORT_BY_OPTIONS = [
+  { key: STORAGE_SORT_BY.NAME, name: 'Name' },
+  { key: STORAGE_SORT_BY.CREATED_AT, name: 'Time created' },
+  { key: STORAGE_SORT_BY.UPDATED_AT, name: 'Time modified' },
+  { key: STORAGE_SORT_BY.LAST_ACCESSED_AT, name: 'Time last accessed' },
+]
+
+const SORT_ORDER_OPTIONS = [
+  { key: STORAGE_SORT_BY_ORDER.ASC, name: 'Ascending' },
+  { key: STORAGE_SORT_BY_ORDER.DESC, name: 'Descending' },
+]
+
+const HeaderPathEdit = ({ loading, isSearching, breadcrumbs, togglePathEdit }: any) => {
   return (
     <div
       className={`group ${!loading ? 'cursor-pointer' : ''}`}
@@ -39,18 +71,20 @@ const HeaderPathEdit = ({ loading, breadcrumbs, togglePathEdit }: any) => {
       ) : (
         <div className="flex cursor-pointer items-center">
           <p className="ml-3 text-sm truncate">{breadcrumbs[breadcrumbs.length - 1] || ''}</p>
-          <div className="ml-3 flex items-center space-x-2 opacity-0 transition group-hover:opacity-100">
-            <Button type="text" icon={<IconEdit2 />}>
-              Navigate
-            </Button>
-          </div>
+          {!isSearching && (
+            <div className="ml-3 flex items-center space-x-2 opacity-0 transition group-hover:opacity-100">
+              <Button type="text" icon={<IconEdit2 />}>
+                Navigate
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>
   )
 }
 
-const HeaderBreadcrumbs = ({ loading, breadcrumbs, selectBreadcrumb }: any) => {
+const HeaderBreadcrumbs = ({ loading, isSearching, breadcrumbs, selectBreadcrumb }: any) => {
   // Max 5 crumbs, otherwise replace middle segment with ellipsis and only
   // have the first 2 and last 2 crumbs visible
   const ellipsis = '...'
@@ -77,7 +111,7 @@ const HeaderBreadcrumbs = ({ loading, breadcrumbs, selectBreadcrumb }: any) => {
       <p className="ml-3 text-sm">{loading.message}</p>
     </div>
   ) : (
-    <div className="ml-3 flex items-center">
+    <div className={`ml-3 flex items-center ${isSearching && 'max-w-[140px] overflow-x-auto'}`}>
       {formattedBreadcrumbs.map((crumb: any, idx: number) => (
         <div className="flex items-center" key={crumb.name}>
           {idx !== 0 && <IconChevronRight size={10} strokeWidth={2} className="mx-3" />}
@@ -95,27 +129,27 @@ const HeaderBreadcrumbs = ({ loading, breadcrumbs, selectBreadcrumb }: any) => {
   )
 }
 
-interface Props {
-  isSearching: boolean
+interface FileExplorerHeader {
   itemSearchString: string
-  setIsSearching: (value: boolean) => void
   setItemSearchString: (value: string) => void
   onFilesUpload: (event: any, columnIndex: number) => void
 }
 
-const FileExplorerHeader: FC<Props> = ({
+const FileExplorerHeader = ({
   itemSearchString = '',
-  setItemSearchString = () => {},
-  onFilesUpload = () => {},
-}) => {
+  setItemSearchString = noop,
+  onFilesUpload = noop,
+}: FileExplorerHeader) => {
   const debounceDuration = 300
+  const snap = useStorageExplorerStateSnapshot()
+  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
+
   const [pathString, setPathString] = useState('')
   const [searchString, setSearchString] = useState('')
   const [loading, setLoading] = useState({ isLoading: false, message: '' })
 
   const [isEditingPath, setIsEditingPath] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(false)
-  const [isSearching, setIsSearching] = useState(false)
 
   const uploadButtonRef: any = useRef(null)
   const previousBreadcrumbs: any = useRef(null)
@@ -132,11 +166,13 @@ const FileExplorerHeader: FC<Props> = ({
     popColumn,
     popColumnAtIndex,
     popOpenedFolders,
+    popOpenedFoldersAtIndex,
     fetchFoldersByPath,
     refetchAllOpenedFolders,
     addNewFolderPlaceholder,
     clearOpenedFolders,
     closeFilePreview,
+    selectedBucket,
   } = storageExplorerStore
 
   const breadcrumbs = columns.map((column: any) => column.name)
@@ -179,7 +215,7 @@ const FileExplorerHeader: FC<Props> = ({
   const togglePathEdit = () => {
     setIsEditingPath(true)
     setPathString(breadcrumbs.slice(1).join('/'))
-    if (isSearching) onCancelSearch()
+    if (snap.isSearching) onCancelSearch()
   }
 
   const onUpdatePathString = (event: any) => {
@@ -217,12 +253,12 @@ const FileExplorerHeader: FC<Props> = ({
   // Searching for column view requires much more thinking
   const toggleSearch = () => {
     setIsEditingPath(false)
-    setIsSearching(true)
+    snap.setIsSearching(true)
   }
 
   const onCancelSearch = () => {
     setSearchString('')
-    setIsSearching(false)
+    snap.setIsSearching(false)
     setItemSearchString('')
   }
 
@@ -230,6 +266,7 @@ const FileExplorerHeader: FC<Props> = ({
 
   const selectBreadcrumb = (columnIndex: number) => {
     popColumnAtIndex(columnIndex)
+    popOpenedFoldersAtIndex(columnIndex - 1)
   }
 
   const refreshData = async () => {
@@ -241,9 +278,9 @@ const FileExplorerHeader: FC<Props> = ({
   return (
     <div
       className="
-    flex h-[40px]
+    flex h-[40px] pl-2
     items-center justify-between
-    rounded-t-md border-b border-panel-border-light bg-panel-header-light px-2 dark:border-panel-border-dark dark:bg-panel-header-dark"
+    rounded-t-md border-b border-overlay bg-surface-100"
     >
       {/* Navigation */}
       <div className={`flex items-center ${isEditingPath ? 'w-1/2' : ''}`}>
@@ -252,7 +289,7 @@ const FileExplorerHeader: FC<Props> = ({
             icon={<IconChevronLeft size={16} strokeWidth={2} />}
             size="tiny"
             type="text"
-            className={breadcrumbs.length > 1 ? 'opacity-100' : 'opacity-25'}
+            className={`${breadcrumbs.length > 1 ? 'opacity-100' : 'opacity-25'} px-1`}
             disabled={backDisabled}
             onClick={() => {
               setIsEditingPath(false)
@@ -293,12 +330,14 @@ const FileExplorerHeader: FC<Props> = ({
         ) : view === STORAGE_VIEWS.COLUMNS ? (
           <HeaderPathEdit
             loading={loading}
+            isSearching={snap.isSearching}
             breadcrumbs={breadcrumbs}
             togglePathEdit={togglePathEdit}
           />
         ) : (
           <HeaderBreadcrumbs
             loading={loading}
+            isSearching={snap.isSearching}
             breadcrumbs={breadcrumbs}
             selectBreadcrumb={selectBreadcrumb}
           />
@@ -306,10 +345,9 @@ const FileExplorerHeader: FC<Props> = ({
       </div>
 
       {/* Actions */}
-      <div className="flex items-center space-x-4">
-        <div className="flex items-center space-x-1">
+      <div className="flex items-center">
+        <div className="flex items-center space-x-1 px-2">
           <Button
-            className="mr-2"
             size="tiny"
             icon={<IconRefreshCw />}
             type="text"
@@ -318,81 +356,68 @@ const FileExplorerHeader: FC<Props> = ({
           >
             Reload
           </Button>
-          <Dropdown
-            overlay={[
-              <Dropdown.RadioGroup key="viewOptions" value={view} onChange={setView}>
-                <Dropdown.Radio value={STORAGE_VIEWS.COLUMNS}>Columns</Dropdown.Radio>
-                <Dropdown.Radio value={STORAGE_VIEWS.LIST}>List</Dropdown.Radio>
-              </Dropdown.RadioGroup>,
-            ]}
-          >
-            <Button
-              asChild
-              icon={
-                view === 'LIST' ? (
-                  <IconList size={16} strokeWidth={2} />
-                ) : (
-                  <IconColumns size={16} strokeWidth={2} />
-                )
-              }
-              type="text"
-              disabled={breadcrumbs.length === 0}
-              onChange={setView}
-            >
-              <span>View as</span>
-            </Button>
-          </Dropdown>
-          <Dropdown
-            overlay={[
-              <Dropdown.RadioGroup key="sortOptions" value={sortBy} onChange={setSortBy}>
-                <Dropdown.Radio value={STORAGE_SORT_BY.NAME}>Name</Dropdown.Radio>
-                <Dropdown.Radio value={STORAGE_SORT_BY.CREATED_AT}>Time created</Dropdown.Radio>
-                <Dropdown.Radio value={STORAGE_SORT_BY.UPDATED_AT}>Time modified</Dropdown.Radio>
-                <Dropdown.Radio value={STORAGE_SORT_BY.LAST_ACCESSED_AT}>
-                  Time last accessed
-                </Dropdown.Radio>
-              </Dropdown.RadioGroup>,
-            ]}
-          >
-            <Button
-              asChild
-              icon={<IconChevronsDown size={16} strokeWidth={2} />}
-              type="text"
-              disabled={breadcrumbs.length === 0}
-            >
-              <span>Sort by</span>
-            </Button>
-          </Dropdown>
-          <Dropdown
-            overlay={[
-              <Dropdown.RadioGroup
-                key="sortOrderOptions"
-                value={sortByOrder}
-                onChange={setSortByOrder}
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="text"
+                icon={
+                  view === 'LIST' ? (
+                    <IconList size={16} strokeWidth={2} />
+                  ) : (
+                    <IconColumns size={16} strokeWidth={2} />
+                  )
+                }
               >
-                <Dropdown.Radio value={STORAGE_SORT_BY_ORDER.ASC}>Ascending</Dropdown.Radio>
-                <Dropdown.Radio value={STORAGE_SORT_BY_ORDER.DESC}>Descending</Dropdown.Radio>
-              </Dropdown.RadioGroup>,
-            ]}
-          >
-            <Button
-              asChild
-              icon={
-                sortByOrder === STORAGE_SORT_BY_ORDER.DESC ? (
-                  <IconChevronsDown size={16} strokeWidth={2} />
-                ) : (
-                  <IconChevronsUp size={16} strokeWidth={2} />
-                )
-              }
-              type="text"
-              disabled={breadcrumbs.length === 0}
-            >
-              <span>Sort Order</span>
-            </Button>
-          </Dropdown>
+                View
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40 min-w-0">
+              {VIEW_OPTIONS.map((option) => (
+                <DropdownMenuItem key={option.key} onClick={() => setView(option.key)}>
+                  <div className="flex items-center justify-between w-full">
+                    <p>{option.name}</p>
+                    {view === option.key && <IconCheck className="text-brand" strokeWidth={2} />}
+                  </div>
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>Sort by</DropdownMenuSubTrigger>
+                <DropdownMenuSubContent className="w-44">
+                  {SORT_BY_OPTIONS.map((option) => (
+                    <DropdownMenuItem key={option.key} onClick={() => setSortBy(option.key)}>
+                      <div className="flex items-center justify-between w-full">
+                        <p>{option.name}</p>
+                        {sortBy === option.key && (
+                          <IconCheck className="text-brand" strokeWidth={2} />
+                        )}
+                      </div>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>Sort order</DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  {SORT_ORDER_OPTIONS.map((option) => (
+                    <DropdownMenuItem key={option.key} onClick={() => setSortByOrder(option.key)}>
+                      <div className="flex items-center justify-between w-full">
+                        <p>{option.name}</p>
+                        {sortByOrder === option.key && (
+                          <IconCheck className="text-brand" strokeWidth={2} />
+                        )}
+                      </div>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-        <div className="h-6 border-r border-panel-border-light dark:border-panel-border-dark" />
-        <div className="flex items-center space-x-1">
+
+        <div className="h-6 border-r border-control" />
+        <div className="flex items-center space-x-1 px-2">
           <div className="hidden">
             {/* @ts-ignore */}
             <input ref={uploadButtonRef} type="file" multiple onChange={onFilesUpload} />
@@ -414,11 +439,11 @@ const FileExplorerHeader: FC<Props> = ({
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200',
+                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                      'border border-background',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">
+                    <span className="text-xs text-foreground">
                       You need additional permissions to upload files
                     </span>
                   </div>
@@ -443,11 +468,11 @@ const FileExplorerHeader: FC<Props> = ({
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200',
+                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                      'border border-background',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">
+                    <span className="text-xs text-foreground">
                       You need additional permissions to create folders
                     </span>
                   </div>
@@ -457,39 +482,44 @@ const FileExplorerHeader: FC<Props> = ({
           </Tooltip.Root>
         </div>
 
-        {/* Search: Disabled for now */}
-        {view === STORAGE_VIEWS.LIST && (
+        <div className="h-6 border-r border-control" />
+        <div className="flex items-center px-2">
+          {snap.isSearching ? (
+            <Input
+              size="tiny"
+              autoFocus
+              className="w-52"
+              icon={<IconSearch size={'tiny'} strokeWidth={2} />}
+              actions={[
+                <IconX
+                  key="close"
+                  className="mx-2 cursor-pointer text-foreground"
+                  size="tiny"
+                  strokeWidth={2}
+                  onClick={onCancelSearch}
+                />,
+              ]}
+              placeholder="Search for a file or folder"
+              type="text"
+              value={searchString}
+              onChange={onSearchInputUpdate}
+            />
+          ) : (
+            <Button
+              icon={<IconSearch size={16} strokeWidth={2} />}
+              size="tiny"
+              type="text"
+              className="px-1"
+              onClick={toggleSearch}
+            />
+          )}
+        </div>
+
+        {isNewAPIDocsEnabled && (
           <>
-            <div className="h-6 border-r border-panel-border-light dark:border-panel-border-dark" />
-            <div className="flex items-center">
-              {isSearching ? (
-                <Input
-                  size="tiny"
-                  autoFocus
-                  className="w-52"
-                  icon={<IconSearch size={'tiny'} strokeWidth={2} />}
-                  actions={[
-                    <IconX
-                      key="close"
-                      className="mx-2 cursor-pointer text-scale-1200"
-                      size="tiny"
-                      strokeWidth={2}
-                      onClick={onCancelSearch}
-                    />,
-                  ]}
-                  placeholder="Search for a file or folder"
-                  type="text"
-                  value={searchString}
-                  onChange={onSearchInputUpdate}
-                />
-              ) : (
-                <Button
-                  icon={<IconSearch size={16} strokeWidth={2} />}
-                  size="tiny"
-                  type="text"
-                  onClick={toggleSearch}
-                />
-              )}
+            <div className="h-6 border-r border-control" />
+            <div className="mx-2">
+              <APIDocsButton section={['storage', selectedBucket.name]} />
             </div>
           </>
         )}

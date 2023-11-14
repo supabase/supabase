@@ -4,6 +4,7 @@ import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { databaseTriggerKeys } from './keys'
+import { ResponseError } from 'types'
 
 export type DatabaseTriggersVariables = {
   projectRef?: string
@@ -29,7 +30,7 @@ export async function getDatabaseTriggers(
 }
 
 export type DatabaseTriggersData = Awaited<ReturnType<typeof getDatabaseTriggers>>
-export type DatabaseTriggersError = unknown
+export type DatabaseTriggersError = ResponseError
 
 export const useDatabaseHooks = <TData = DatabaseTriggersData>(
   { projectRef, connectionString }: DatabaseTriggersVariables,
@@ -45,7 +46,9 @@ export const useDatabaseHooks = <TData = DatabaseTriggersData>(
       // @ts-ignore
       select(data) {
         return (data as PostgresTrigger[]).filter(
-          (trigger) => trigger.function_schema === 'supabase_functions' && (trigger.schema !== 'net' || trigger.function_args.length === 0)
+          (trigger) =>
+            trigger.function_schema === 'supabase_functions' &&
+            (trigger.schema !== 'net' || trigger.function_args.length === 0)
         )
       },
       enabled:

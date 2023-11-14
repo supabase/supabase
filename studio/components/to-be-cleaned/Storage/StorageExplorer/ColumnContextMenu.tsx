@@ -1,29 +1,28 @@
-import { FC } from 'react'
 import { compact, uniqBy } from 'lodash'
-import { Menu, Item, Separator, Submenu } from 'react-contexify'
+import { Item, Menu, Separator, Submenu } from 'react-contexify'
 import 'react-contexify/dist/ReactContexify.css'
-
 import {
-  STORAGE_VIEWS,
-  STORAGE_SORT_BY,
-  STORAGE_SORT_BY_ORDER,
-  STORAGE_ROW_TYPES,
-} from '../Storage.constants'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import {
-  IconEye,
   IconChevronRight,
-  IconFolderPlus,
-  IconClipboard,
-  IconChevronsUp,
   IconChevronsDown,
+  IconChevronsUp,
+  IconClipboard,
+  IconEye,
+  IconFolderPlus,
 } from 'ui'
 
-interface Props {
+import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import {
+  STORAGE_ROW_TYPES,
+  STORAGE_SORT_BY,
+  STORAGE_SORT_BY_ORDER,
+  STORAGE_VIEWS,
+} from '../Storage.constants'
+
+interface ColumnContextMenuProps {
   id: string
 }
 
-const ColumnContextMenu: FC<Props> = ({ id = '' }) => {
+const ColumnContextMenu = ({ id = '' }: ColumnContextMenuProps) => {
   const storageExplorerStore = useStorageStore()
   const {
     columns,

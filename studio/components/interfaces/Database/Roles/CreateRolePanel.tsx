@@ -1,15 +1,17 @@
-import { FC, useRef, useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Form, IconHelpCircle, Input, SidePanel, Button, Toggle } from 'ui'
-import { ROLE_PERMISSIONS } from './Roles.constants'
-import { FormSection, FormSectionLabel, FormSectionContent } from 'components/ui/Forms'
+import { useRef, useState } from 'react'
+import { Button, Form, IconHelpCircle, Input, SidePanel, Toggle } from 'ui'
+
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
 import { useStore } from 'hooks'
-interface Props {
+import { ROLE_PERMISSIONS } from './Roles.constants'
+
+interface CreateRolePanelProps {
   visible: boolean
   onClose: () => void
 }
 
-const CreateRolePanel: FC<Props> = ({ visible, onClose }) => {
+const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
   const formId = 'create-new-role'
   const submitRef: any = useRef()
   const { ui, meta } = useStore()
@@ -59,7 +61,7 @@ const CreateRolePanel: FC<Props> = ({ visible, onClose }) => {
       loading={false}
       onCancel={onClose}
       customFooter={
-        <div className="flex w-full justify-end space-x-3 border-t border-scale-500 px-3 py-4">
+        <div className="flex w-full justify-end space-x-3 border-t border-default px-3 py-4">
           <Button
             size="tiny"
             type="default"
@@ -135,8 +137,8 @@ const CreateRolePanel: FC<Props> = ({ visible, onClose }) => {
                                 <Tooltip.Arrow className="radix-tooltip-arrow" />
                                 <div
                                   className={[
-                                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                    'border border-scale-200 space-y-1',
+                                    'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                    'border border-background space-y-1',
                                   ].join(' ')}
                                 >
                                   <span className="text-xs">

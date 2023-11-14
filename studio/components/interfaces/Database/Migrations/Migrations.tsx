@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -10,7 +11,7 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { DatabaseMigration, useMigrationsQuery } from 'data/database/migrations-query'
 import MigrationsEmptyState from './MigrationsEmptyState'
 
-const Wrappers = () => {
+const Migrations = () => {
   const [search, setSearch] = useState('')
   const [selectedMigration, setSelectedMigration] = useState<DatabaseMigration>()
 
@@ -22,26 +23,30 @@ const Wrappers = () => {
   const migrations =
     search.length === 0
       ? data?.result ?? []
-      : data?.result.filter((migration) => migration.version.includes(search)) ?? []
+      : data?.result.filter(
+          (migration) => migration.version.includes(search) || migration.name?.includes(search)
+        ) ?? []
 
   return (
     <>
       <div>
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="mb-2 text-xl text-scale-1200">Migrations</h3>
-            <div className="text-sm text-scale-900">
+            <h3 className="mb-1 text-xl text-foreground">Database Migrations</h3>
+            <div className="text-sm text-foreground-lighter">
               History of migrations that have been run on your database
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <Link href="https://supabase.com/docs/guides/getting-started/local-development#database-migrations">
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                  Documentation
-                </Button>
-              </a>
-            </Link>
+            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+              <Link
+                href="https://supabase.com/docs/guides/getting-started/local-development#database-migrations"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Documentation
+              </Link>
+            </Button>
           </div>
         </div>
 
@@ -60,16 +65,13 @@ const Wrappers = () => {
               variant="warning"
               title="Failed to retrieve migration history for database"
               actions={[
-                <Link
-                  key="contact-support"
-                  href={`/support/new?ref=${project?.ref}&category=dashboard_bug&subject=Unable%20to%20view%20database%20migrations`}
-                >
-                  <a>
-                    <Button type="default" className="ml-4">
-                      Contact support
-                    </Button>
-                  </a>
-                </Link>,
+                <Button key="contact-support" asChild type="default" className="ml-4">
+                  <Link
+                    href={`/support/new?ref=${project?.ref}&category=dashboard_bug&subject=Unable%20to%20view%20database%20migrations`}
+                  >
+                    Contact support
+                  </Link>
+                </Button>,
               ]}
             >
               <p className="mb-1">
@@ -96,29 +98,50 @@ const Wrappers = () => {
                   </div>
                   <Table
                     head={[
-                      <Table.th key="version">Version</Table.th>,
+                      <Table.th key="version" style={{ width: '180px' }}>
+                        Version
+                      </Table.th>,
+                      <Table.th key="version">Name</Table.th>,
+                      <Table.th key="version">Inserted at (UTC)</Table.th>,
                       <Table.th key="buttons"></Table.th>,
                     ]}
                     body={
                       migrations.length > 0 ? (
-                        migrations.map((migration) => (
-                          <Table.tr key={migration.version}>
-                            <Table.td>{migration.version}</Table.td>
-                            <Table.td align="right">
-                              <Button
-                                type="default"
-                                onClick={() => setSelectedMigration(migration)}
+                        migrations.map((migration) => {
+                          // [Joshen] LEFT OFF HERE
+                          const insertedAt = dayjs(migration.version, 'YYYYMMDDHHmmss').format(
+                            'DD MMM YYYY, HH:mm:ss'
+                          )
+
+                          return (
+                            <Table.tr key={migration.version}>
+                              <Table.td>{migration.version}</Table.td>
+                              <Table.td
+                                className={
+                                  (migration?.name ?? '').length === 0
+                                    ? '!text-foreground-lighter'
+                                    : ''
+                                }
                               >
-                                View migration SQL
-                              </Button>
-                            </Table.td>
-                          </Table.tr>
-                        ))
+                                {migration?.name ?? 'Name not available'}
+                              </Table.td>
+                              <Table.td>{insertedAt}</Table.td>
+                              <Table.td align="right">
+                                <Button
+                                  type="default"
+                                  onClick={() => setSelectedMigration(migration)}
+                                >
+                                  View migration SQL
+                                </Button>
+                              </Table.td>
+                            </Table.tr>
+                          )
+                        })
                       ) : (
                         <Table.tr>
-                          <Table.td>
-                            <p className="text-sm text-scale-1200">No results found</p>
-                            <p className="text-sm text-scale-1100">
+                          <Table.td colSpan={3}>
+                            <p className="text-sm text-foreground">No results found</p>
+                            <p className="text-sm text-foreground-light">
                               Your search for "{search}" did not return any results
                             </p>
                           </Table.td>
@@ -161,4 +184,4 @@ const Wrappers = () => {
   )
 }
 
-export default observer(Wrappers)
+export default observer(Migrations)

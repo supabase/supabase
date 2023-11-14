@@ -1,16 +1,16 @@
-import dayjs from 'dayjs'
-import { FC, useState } from 'react'
-import { Button, IconChevronRight, IconMaximize2, IconPlay } from 'ui'
-import Table from 'components/to-be-cleaned/Table'
 import { useRouter } from 'next/router'
-import SqlSnippetCode from './Logs.SqlSnippetCode'
-import { timestampLocalFormatter, TimestampLocalFormatter } from './LogsFormatters'
+import { useState } from 'react'
+import { Button, IconChevronRight, IconPlay } from 'ui'
 
-interface Props {
+import Table from 'components/to-be-cleaned/Table'
+import SqlSnippetCode from './Logs.SqlSnippetCode'
+import { timestampLocalFormatter } from './LogsFormatters'
+
+interface SavedQueriesItemProps {
   item: any
 }
 
-const SavedQueriesItem: FC<Props> = ({ item }: Props) => {
+const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
   const [expand, setExpand] = useState<boolean>(false)
 
   const router = useRouter()
@@ -26,21 +26,17 @@ const SavedQueriesItem: FC<Props> = ({ item }: Props) => {
                 <IconChevronRight strokeWidth={2} size={14} />
               </div>
             </button>
-            <span className="text-sm text-scale-1200">{item.name}</span>
+            <span className="text-sm text-foreground">{item.name}</span>
           </div>
         </Table.td>
         <Table.td className="">
-          <span className="text-scale-1100">{item.description}</span>
+          <span className="text-foreground-light">{item.description}</span>
         </Table.td>
         <Table.td className="">
-          <span className="text-scale-1100">
-            {timestampLocalFormatter(item.inserted_at)}
-          </span>
+          <span className="text-foreground-light">{timestampLocalFormatter(item.inserted_at)}</span>
         </Table.td>
         <Table.td className="">
-          <span className="text-scale-1100">
-            {timestampLocalFormatter(item.updated_at)}
-          </span>
+          <span className="text-foreground-light">{timestampLocalFormatter(item.updated_at)}</span>
         </Table.td>
         <Table.td className=" text-right">
           <Button
@@ -57,7 +53,7 @@ const SavedQueriesItem: FC<Props> = ({ item }: Props) => {
       <Table.td
         className={`${
           expand ? ' h-auto opacity-100' : 'h-0 opacity-0'
-        } expanded-row-content border-l border-r bg-scale-100 !pt-0 !pb-0 transition-all`}
+        } expanded-row-content border-l border-r bg-alternative !pt-0 !pb-0 transition-all`}
         colSpan={5}
       >
         {expand && <SqlSnippetCode>{item.content.sql}</SqlSnippetCode>}

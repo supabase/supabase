@@ -6,12 +6,15 @@ import { useParams } from 'common'
 import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import AlertError from 'components/ui/AlertError'
+import InformationBox from 'components/ui/InformationBox'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useSelectedOrganization } from 'hooks'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants'
-import { Listbox } from 'ui'
+import Link from 'next/link'
+import { Alert, Button, IconExternalLink, IconInfo, Listbox } from 'ui'
 import Activity from './Activity'
 import Bandwidth from './Bandwidth'
 import SizeAndCounts from './SizeAndCounts'
@@ -30,6 +33,9 @@ const Usage = () => {
     isError: isErrorSubscription,
     isSuccess: isSuccessSubscription,
   } = useOrgSubscriptionQuery({ orgSlug: slug })
+
+  const { data: usage } = useOrgUsageQuery({ orgSlug: slug })
+
   const orgProjects = projects?.filter((project) => project.organization_id === organization?.id)
 
   useEffect(() => {
@@ -82,9 +88,20 @@ const Usage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dateRange, subscription])
 
+  const selectedProject = selectedProjectRef
+    ? orgProjects?.find((it) => it.ref === selectedProjectRef)
+    : undefined
+
+  const hasExceededAnyLimits = Boolean(
+    usage?.usages.find(
+      (metric) =>
+        !metric.unlimited && metric.capped && metric.usage > (metric?.pricing_free_units ?? 0)
+    )
+  )
+
   return (
     <>
-      <ScaffoldContainer className="sticky top-0 border-b bg-scale-200 z-10 overflow-hidden">
+      <ScaffoldContainer className="sticky top-0 border-b bg-background z-10 overflow-hidden">
         <div className="py-4 flex items-center space-x-4">
           {isLoadingSubscription && <ShimmeringLoader className="w-[250px]" />}
 
@@ -99,14 +116,12 @@ const Usage = () => {
           {isSuccessSubscription && (
             <>
               <DateRangePicker
-                id="billingCycle"
-                name="billingCycle"
                 onChange={setDateRange}
                 value={TIME_PERIODS_BILLING[0].key}
                 options={[...TIME_PERIODS_BILLING, ...TIME_PERIODS_REPORTS]}
                 loading={isLoadingSubscription}
                 currentBillingPeriodStart={subscription?.current_period_start}
-                className="!w-[200px]"
+                currentBillingPeriodEnd={subscription?.current_period_end}
               />
 
               <Listbox
@@ -122,8 +137,8 @@ const Usage = () => {
                 <Listbox.Option
                   key="all-projects"
                   id="all-projects"
-                  value="all-projects"
                   label="All projects"
+                  value="all-projects"
                 >
                   All projects
                 </Listbox.Option>
@@ -143,7 +158,7 @@ const Usage = () => {
                 <p className={clsx('text-sm transition', isLoadingSubscription && 'opacity-50')}>
                   Organization is on the {subscription.plan.name} plan
                 </p>
-                <p className="text-sm text-scale-1000">
+                <p className="text-sm text-foreground-light">
                   {billingCycleStart.format('DD MMM YYYY')} -{' '}
                   {billingCycleEnd.format('DD MMM YYYY')}
                 </p>
@@ -152,6 +167,66 @@ const Usage = () => {
           )}
         </div>
       </ScaffoldContainer>
+
+      {!selectedProject && subscription && hasExceededAnyLimits && (
+        <ScaffoldContainer className="mt-5">
+          <Alert
+            withIcon
+            variant="danger"
+            title="Your organization's usage has exceeded its included quota"
+            actions={[
+              <Button key="upgrade-button" asChild type="default" className="ml-8">
+                <Link
+                  href={`/org/${slug}/billing?panel=${
+                    subscription.plan.id === 'free' ? 'subscriptionPlan' : 'costControl'
+                  }`}
+                >
+                  {subscription.plan.id === 'free' ? 'Upgrade plan' : 'Change spend cap'}
+                </Link>
+              </Button>,
+            ]}
+          >
+            Your projects can become unresponsive or enter read only mode.{' '}
+            {subscription.plan.id === 'free'
+              ? 'Please upgrade to the Pro plan to ensure that your projects remain available.'
+              : 'Please disable spend cap to ensure that your projects remain available.'}
+          </Alert>
+        </ScaffoldContainer>
+      )}
+
+      {selectedProjectRef && (
+        <ScaffoldContainer className="mt-5">
+          <InformationBox
+            title="Usage filtered by project"
+            description={
+              <div className="space-y-3">
+                <p>
+                  You are currently viewing usage for the "
+                  {selectedProject?.name || selectedProjectRef}" project. Since your organization is
+                  using the new organization-based billing, the included quota is for your whole
+                  organization and not just this project. For billing purposes, we sum up usage from
+                  all your projects. To view your usage quota, set the project filter above back to
+                  "All Projects".
+                </p>
+                <div>
+                  <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                    <Link
+                      href="https://supabase.com/docs/guides/platform/org-based-billing"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Documentation
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            }
+            defaultVisibility
+            hideCollapse
+            icon={<IconInfo />}
+          />
+        </ScaffoldContainer>
+      )}
 
       <Bandwidth
         orgSlug={slug as string}

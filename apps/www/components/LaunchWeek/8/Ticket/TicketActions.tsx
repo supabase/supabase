@@ -20,8 +20,8 @@ export default function TicketActions({
   ticketGenerationState,
   setTicketGenerationState,
 }: Props) {
-  const [imgReady, setImgReady] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [_imgReady, setImgReady] = useState(false)
+  const [_loading, setLoading] = useState(false)
   const downloadLink = useRef<HTMLAnchorElement>()
   const link = `${SITE_URL}/tickets/${username}?lw=8${golden ? `&golden=true` : ''}`
   const permalink = encodeURIComponent(link)
@@ -30,7 +30,7 @@ export default function TicketActions({
   const { userData, supabase } = useConfData()
   const tweetUrl = `https://twitter.com/intent/tweet?url=${permalink}&via=supabase&text=${encodedText}`
   const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${permalink}`
-  const downloadUrl = `https://obuldanrptloktxcffvn.functions.supabase.co/lw8-ticket?username=${encodeURIComponent(
+  const downloadUrl = `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lw8-ticket?username=${encodeURIComponent(
     username
   )}`
   const params = useParams()
@@ -68,9 +68,9 @@ export default function TicketActions({
     <div className="grid gap-1 grid-cols-1 sm:grid-cols-3">
       {!sharePage ? (
         <>
-          <div className="rounded bg-[#E6E8EB] text-scale-500 py-1 px-3 border border-[#3e3e3e] text-xs mb-1">
+          <div className="rounded bg-[#E6E8EB] text-background-surface-300 py-1 px-3 border border-[#3e3e3e] text-xs mb-1">
             <div className="flex items-center justify-center gap-2">
-              <div className="text-scale-300">
+              <div className="text-background-surface-100">
                 <IconCheckCircle size={10} strokeWidth={1.5} />
               </div>
               Connect with GitHub
@@ -79,12 +79,12 @@ export default function TicketActions({
           <button
             onClick={() => handleShare('twitter')}
             className={[
-              `flex items-center justify-center gap-2 rounded text-scale-500 py-1 px-3 border border-[#3e3e3e] text-xs mb-1 transition-all ease-out hover:text-scale-100 hover:bg-[#dfe1e3]`,
-              userData.sharedOnTwitter ? 'bg-[#E6E8EB] text-scale-500' : 'text-white',
+              `flex items-center justify-center gap-2 rounded text-background-surface-300 py-1 px-3 border border-[#3e3e3e] text-xs mb-1 transition-all ease-out hover:text-background-alternative hover:bg-[#dfe1e3]`,
+              userData.sharedOnTwitter ? 'bg-[#E6E8EB] text-background-surface-300' : 'text-white',
             ].join(' ')}
           >
             {userData.sharedOnTwitter && (
-              <div className="text-scale-900">
+              <div className="text-muted">
                 <IconCheckCircle size={10} strokeWidth={1.5} />
               </div>
             )}
@@ -93,12 +93,12 @@ export default function TicketActions({
           <button
             onClick={() => handleShare('linkedin')}
             className={[
-              `flex items-center justify-center gap-2 rounded text-scale-500 py-1 px-3 border border-[#3e3e3e] text-xs mb-1 transition-all ease-out hover:text-scale-100 hover:bg-[#dfe1e3]`,
-              userData.sharedOnLinkedIn ? 'bg-[#E6E8EB] text-scale-500' : 'text-white',
+              `flex items-center justify-center gap-2 rounded text-background-surface-300 py-1 px-3 border border-[#3e3e3e] text-xs mb-1 transition-all ease-out hover:text-background-alternative hover:bg-[#dfe1e3]`,
+              userData.sharedOnLinkedIn ? 'bg-[#E6E8EB] text-background-surface-300' : 'text-white',
             ].join(' ')}
           >
             {userData.sharedOnLinkedIn && (
-              <div className="text-scale-900">
+              <div className="text-muted">
                 <IconCheckCircle size={10} strokeWidth={1.5} />
               </div>
             )}

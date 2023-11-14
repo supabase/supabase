@@ -2,18 +2,23 @@ import { useParams } from 'common'
 import { useFlag, withAuth } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { PropsWithChildren, ReactNode, forwardRef } from 'react'
-import { IconX, cn } from 'ui'
+import { IconX, cn, LoadingLine, IconBook, IconLifeBuoy } from 'ui'
 import { ScaffoldContainer } from '../Scaffold'
+import Link from 'next/link'
 
 export type IntegrationWindowLayoutProps = {
   title: string
   integrationIcon: ReactNode
+  loading?: boolean
+  docsHref?: string
 }
 
 const IntegrationWindowLayout = ({
   title,
   integrationIcon,
   children,
+  loading = false,
+  docsHref,
 }: PropsWithChildren<IntegrationWindowLayoutProps>) => {
   const ongoingIncident = useFlag('ongoingIncident')
   const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
@@ -21,8 +26,30 @@ const IntegrationWindowLayout = ({
   return (
     <div className="flex w-full flex-col" style={{ height: maxHeight, maxHeight }}>
       <Header title={title} integrationIcon={integrationIcon} />
-
-      {children}
+      <LoadingLine loading={loading} />
+      <main className="overflow-auto flex flex-col h-full bg">{children}</main>
+      <ScaffoldContainer className="bg-background flex flex-row gap-6 py-6 border-t">
+        {docsHref && (
+          <Link
+            href={docsHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-xs text-foreground-light hover:text"
+          >
+            <IconBook size={16} />
+            Docs
+          </Link>
+        )}
+        <Link
+          href={'https://supabase.com/support'}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 text-xs text-light hover:text"
+        >
+          <IconLifeBuoy size={16} />
+          Support
+        </Link>
+      </ScaffoldContainer>
     </div>
   )
 }
@@ -47,7 +74,7 @@ const Header = ({ title, integrationIcon }: HeaderProps) => {
             <div className="bg-white shadow border rounded p-1 w-8 h-8 flex justify-center items-center">
               <img src={`${BASE_PATH}/img/supabase-logo.svg`} alt="Supabase" className="w-4" />
             </div>
-            <IconX className="text-scale-800" strokeWidth={2} size={16} />
+            <IconX className="text-border-stronger" strokeWidth={2} size={16} />
             {integrationIcon}
           </div>
           <span className="text-sm" title={title}>

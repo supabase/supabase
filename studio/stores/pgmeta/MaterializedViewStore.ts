@@ -39,12 +39,11 @@ export default class MaterializedViewStore extends PostgresMetaInterface<Postgre
     if (columnsResponse.error) throw columnsResponse.error
 
     // merge 2 response to create the final array
-    const columnsByTableId = (columnsResponse as PostgresColumn[])
-      .reduce((acc, curr) => {
-        acc[curr.table_id] ??= []
-        acc[curr.table_id].push(curr)
-        return acc
-      }, {} as Record<string, PostgresColumn[]>)
+    const columnsByTableId = (columnsResponse as PostgresColumn[]).reduce((acc, curr) => {
+      acc[curr.table_id] ??= []
+      acc[curr.table_id].push(curr)
+      return acc
+    }, {} as Record<string, PostgresColumn[]>)
     const materializedViews: PostgresMaterializedView[] = []
     materializedViewsResponse.forEach((materializedView: PostgresMaterializedView) => {
       const columns = columnsByTableId[materializedView.id]

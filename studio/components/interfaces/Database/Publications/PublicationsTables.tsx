@@ -1,22 +1,26 @@
-import { FC, useState } from 'react'
-import { observer } from 'mobx-react-lite'
-import { Button, Input, IconChevronLeft, IconSearch, IconAlertCircle } from 'ui'
 import type { PostgresPublication } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useState } from 'react'
 
-import { useCheckPermissions, useStore } from 'hooks'
-import PublicationsTableItem from './PublicationsTableItem'
-import Table from 'components/to-be-cleaned/Table'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
+import Table from 'components/to-be-cleaned/Table'
+import AlertError from 'components/ui/AlertError'
 import InformationBox from 'components/ui/InformationBox'
+import Connecting from 'components/ui/Loading/Loading'
+import { useTablesQuery } from 'data/tables/tables-query'
+import { useCheckPermissions } from 'hooks'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { Button, IconAlertCircle, IconChevronLeft, IconSearch, Input } from 'ui'
+import PublicationsTableItem from './PublicationsTableItem'
 
-interface Props {
+interface PublicationsTablesProps {
   selectedPublication: PostgresPublication
   onSelectBack: () => void
 }
 
-const PublicationsTables: FC<Props> = ({ selectedPublication, onSelectBack }) => {
-  const { meta } = useStore()
+const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsTablesProps) => {
+  const { project } = useProjectContext()
   const [filterString, setFilterString] = useState<string>('')
 
   const canUpdatePublications = useCheckPermissions(
@@ -24,20 +28,34 @@ const PublicationsTables: FC<Props> = ({ selectedPublication, onSelectBack }) =>
     'publications'
   )
 
-  const tables =
-    filterString.length === 0
-      ? meta.tables.list((table: any) => !meta.excludedSchemas.includes(table.schema))
-      : meta.tables.list(
-          (table: any) =>
-            !meta.excludedSchemas.includes(table.schema) && table.name.includes(filterString)
+  const {
+    data: tables,
+    isLoading,
+    isSuccess,
+    isError,
+    error,
+  } = useTablesQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      select(tables) {
+        return tables.filter((table) =>
+          filterString.length === 0
+            ? !EXCLUDED_SCHEMAS.includes(table.schema)
+            : !EXCLUDED_SCHEMAS.includes(table.schema) && table.name.includes(filterString)
         )
+      },
+    }
+  )
 
   // const publication = selectedPublication
   // const enabledForAllTables = publication.tables == null
 
   // const toggleReplicationForAllTables = async (publication: any, disable: boolean) => {
   //   const toggle = disable ? 'disable' : 'enable'
-  //   confirmAlert({
+  //   ConfirmAlert({
   //     title: 'Confirm',
   //     type: 'warn',
   //     message: `Are you sure you want to ${toggle} replication for all tables in ${publication.name}?`,
@@ -83,26 +101,35 @@ const PublicationsTables: FC<Props> = ({ selectedPublication, onSelectBack }) =>
           {!canUpdatePublications && (
             <div className="w-[500px]">
               <InformationBox
-                icon={<IconAlertCircle className="text-scale-1100" strokeWidth={2} />}
+                icon={<IconAlertCircle className="text-foreground-light" strokeWidth={2} />}
                 title="You need additional permissions to update database replications"
               />
             </div>
           )}
         </div>
       </div>
-      {tables.length === 0 ? (
-        <NoSearchResults />
-      ) : (
-        <div>
-          <Table
-            head={[
-              <Table.th key="header-name">Name</Table.th>,
-              <Table.th key="header-schema">Schema</Table.th>,
-              <Table.th key="header-desc" className="hidden text-left lg:table-cell">
-                Description
-              </Table.th>,
-              <Table.th key="header-all">
-                {/* Temporarily disable All tables toggle for publications. See https://github.com/supabase/supabase/pull/7233.
+      {isLoading && (
+        <div className="mt-8">
+          <Connecting />
+        </div>
+      )}
+
+      {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
+
+      {isSuccess &&
+        (tables.length === 0 ? (
+          <NoSearchResults />
+        ) : (
+          <div>
+            <Table
+              head={[
+                <Table.th key="header-name">Name</Table.th>,
+                <Table.th key="header-schema">Schema</Table.th>,
+                <Table.th key="header-desc" className="hidden text-left lg:table-cell">
+                  Description
+                </Table.th>,
+                <Table.th key="header-all">
+                  {/* Temporarily disable All tables toggle for publications. See https://github.com/supabase/supabase/pull/7233.
               <div className="flex flex-row space-x-3 items-center justify-end">
                 <div className="text-xs leading-4 font-medium text-gray-400 text-right ">
                   All Tables
@@ -116,20 +143,20 @@ const PublicationsTables: FC<Props> = ({ selectedPublication, onSelectBack }) =>
                   onChange={() => toggleReplicationForAllTables(publication, enabledForAllTables)}
                 />
               </div> */}
-              </Table.th>,
-            ]}
-            body={tables.map((table: any, i: number) => (
-              <PublicationsTableItem
-                key={table.id}
-                table={table}
-                selectedPublication={selectedPublication}
-              />
-            ))}
-          />
-        </div>
-      )}
+                </Table.th>,
+              ]}
+              body={tables.map((table: any, i: number) => (
+                <PublicationsTableItem
+                  key={table.id}
+                  table={table}
+                  selectedPublication={selectedPublication}
+                />
+              ))}
+            />
+          </div>
+        ))}
     </>
   )
 }
 
-export default observer(PublicationsTables)
+export default PublicationsTables

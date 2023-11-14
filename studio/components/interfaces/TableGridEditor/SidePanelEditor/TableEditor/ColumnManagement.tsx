@@ -1,27 +1,26 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
+import type { PostgresColumn, PostgresTable, PostgresType } from '@supabase/postgres-meta'
+import { isEmpty, noop, partition } from 'lodash'
 import Link from 'next/link'
-import { FC, useState } from 'react'
-import { partition, isEmpty } from 'lodash'
-import { Alert, Button, IconEdit, IconHelpCircle, IconKey, IconTrash, IconExternalLink } from 'ui'
-
-import type { PostgresTable, PostgresColumn, PostgresType } from '@supabase/postgres-meta'
+import { useState } from 'react'
 import {
   DragDropContext,
-  Droppable,
   Draggable,
-  DroppableProvided,
   DraggableProvided,
+  Droppable,
+  DroppableProvided,
 } from 'react-beautiful-dnd'
-import * as Tooltip from '@radix-ui/react-tooltip'
+import { Alert, Button, IconEdit, IconExternalLink, IconHelpCircle, IconKey, IconTrash } from 'ui'
 
-import Column from './Column'
 import InformationBox from 'components/ui/InformationBox'
-import ForeignKeySelector from '../ForeignKeySelector/ForeignKeySelector'
-import { ImportContent } from './TableEditor.types'
 import { generateColumnField } from '../ColumnEditor/ColumnEditor.utils'
-import { ColumnField, ExtendedPostgresRelationship } from '../SidePanelEditor.types'
+import ForeignKeySelector from '../ForeignKeySelector/ForeignKeySelector'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
+import { ColumnField, ExtendedPostgresRelationship } from '../SidePanelEditor.types'
+import Column from './Column'
+import { ImportContent } from './TableEditor.types'
 
-interface Props {
+interface ColumnManagementProps {
   table?: Partial<PostgresTable>
   columns?: ColumnField[]
   enumTypes: PostgresType[]
@@ -32,16 +31,16 @@ interface Props {
   onClearImportContent: () => void
 }
 
-const ColumnManagement: FC<Props> = ({
+const ColumnManagement = ({
   table,
   columns = [],
   enumTypes = [],
   importContent,
   isNewRecord,
-  onColumnsUpdated = () => {},
-  onSelectImportData = () => {},
-  onClearImportContent = () => {},
-}) => {
+  onColumnsUpdated = noop,
+  onSelectImportData = noop,
+  onClearImportContent = noop,
+}: ColumnManagementProps) => {
   const [selectedColumnToEditRelation, setSelectedColumnToEditRelation] = useState<ColumnField>()
 
   const hasImportContent = !isEmpty(importContent)
@@ -54,6 +53,7 @@ const ColumnManagement: FC<Props> = ({
     table: PostgresTable
     column: PostgresColumn
     deletionAction: string
+    updateAction: string
   }) => {
     if (selectedColumnToEditRelation !== undefined) {
       onUpdateColumn(selectedColumnToEditRelation, {
@@ -69,6 +69,7 @@ const ColumnManagement: FC<Props> = ({
                 target_table_name: foreignKeyConfiguration.table.name,
                 target_column_name: foreignKeyConfiguration.column.name,
                 deletion_action: foreignKeyConfiguration.deletionAction,
+                update_action: foreignKeyConfiguration.updateAction,
               }
             : undefined,
         ...(foreignKeyConfiguration !== undefined && {
@@ -163,7 +164,7 @@ const ColumnManagement: FC<Props> = ({
         </div>
 
         {hasImportContent && (
-          <p className="text-sm text-scale-1000 my-2">
+          <p className="text-sm text-foreground-light my-2">
             Your table will be created with {importContent?.rowCount?.toLocaleString()} rows and the
             following {columns.length} columns.
           </p>
@@ -183,7 +184,7 @@ const ColumnManagement: FC<Props> = ({
             icon={<IconKey className="text-white" size="large" />}
             title="Composite primary key selected"
             description="The columns that you've selected will be grouped as a primary key, and will serve
-            as the unique identifier for the rows in your table"
+          as the unique identifier for the rows in your table"
           />
         )}
 
@@ -193,10 +194,10 @@ const ColumnManagement: FC<Props> = ({
             {/* Drag handle */}
             {isNewRecord && <div className="w-[5%]" />}
             <div className="w-[25%] flex items-center space-x-2">
-              <h5 className="text-xs text-scale-900">Name</h5>
+              <h5 className="text-xs text-foreground-lighter">Name</h5>
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger>
-                  <h5 className="text-xs text-scale-900">
+                  <h5 className="text-xs text-foreground-lighter">
                     <IconHelpCircle size={15} strokeWidth={1.5} />
                   </h5>
                 </Tooltip.Trigger>
@@ -205,11 +206,11 @@ const ColumnManagement: FC<Props> = ({
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                        'border border-scale-200 ', //border
+                        'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                        'border border-background', //border
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text-foreground">
                         Recommended to use lowercase and use an underscore to separate words e.g.
                         column_name
                       </span>
@@ -219,14 +220,14 @@ const ColumnManagement: FC<Props> = ({
               </Tooltip.Root>
             </div>
             <div className="w-[25%]">
-              <h5 className="text-xs text-scale-900">Type</h5>
+              <h5 className="text-xs text-foreground-lighter">Type</h5>
             </div>
             <div className={`${isNewRecord ? 'w-[25%]' : 'w-[30%]'} flex items-center space-x-2`}>
-              <h5 className="text-xs text-scale-900">Default Value</h5>
+              <h5 className="text-xs text-foreground-lighter">Default Value</h5>
 
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger>
-                  <h5 className="text-xs text-scale-900">
+                  <h5 className="text-xs text-foreground-lighter">
                     <IconHelpCircle size={15} strokeWidth={1.5} />
                   </h5>
                 </Tooltip.Trigger>
@@ -235,11 +236,11 @@ const ColumnManagement: FC<Props> = ({
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                        'border border-scale-200 ', //border
+                        'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                        'border border-background', //border
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text-foreground">
                         Can either be a literal or an expression. When using an expression wrap your
                         expression in brackets, e.g. (gen_random_uuid())
                       </span>
@@ -249,7 +250,7 @@ const ColumnManagement: FC<Props> = ({
               </Tooltip.Root>
             </div>
             <div className="w-[10%]">
-              <h5 className="text-xs text-scale-900">Primary</h5>
+              <h5 className="text-xs text-foreground-lighter">Primary</h5>
             </div>
             {/* Empty space */}
             <div className={`${hasImportContent ? 'w-[10%]' : 'w-0'}`} />
@@ -265,7 +266,7 @@ const ColumnManagement: FC<Props> = ({
                 {(droppableProvided: DroppableProvided) => (
                   <div
                     ref={droppableProvided.innerRef}
-                    className={`space-y-2 rounded-md bg-gray-400 px-3 py-2 ${
+                    className={`space-y-2 rounded-md bg-surface-200 px-3 py-2 ${
                       isNewRecord ? '' : '-mx-3'
                     }`}
                   >
@@ -339,17 +340,20 @@ const ColumnManagement: FC<Props> = ({
               Add column
             </Button>
           )}
-          <Link href="https://supabase.com/docs/guides/database/tables#data-types">
-            <a target="_blank" rel="noreferrer">
-              <Button
-                type="text"
-                className="text-scale-1000 hover:text-scale-1200"
-                icon={<IconExternalLink size={12} strokeWidth={2} />}
-              >
-                Learn more about data types
-              </Button>
-            </a>
-          </Link>
+          <Button
+            asChild
+            type="text"
+            className="text-foreground-light hover:text-foreground"
+            icon={<IconExternalLink size={12} strokeWidth={2} />}
+          >
+            <Link
+              href="https://supabase.com/docs/guides/database/tables#data-types"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Learn more about data types
+            </Link>
+          </Button>
         </div>
       </div>
       <ForeignKeySelector

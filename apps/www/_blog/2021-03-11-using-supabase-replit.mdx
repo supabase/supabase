@@ -8,6 +8,8 @@ author_image_url: https://github.com/awalias.png
 authorURL: https://github.com/awalias
 image: replit-og.jpg
 thumb: replit-og.jpg
+categories:
+  - engineering
 tags:
   - replit
   - node-js
@@ -77,7 +79,7 @@ supabase.
 // or...
 // async/await syntax
 const main = async() => {
-  let { data, error } = supabase
+  const { data, error } = supabase
     .from('countries')
     .select('*')
     .limit(5)

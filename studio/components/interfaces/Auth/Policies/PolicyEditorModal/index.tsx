@@ -1,31 +1,30 @@
-import { Modal } from 'ui'
-import { FC, useState, useEffect } from 'react'
-import { isEmpty } from 'lodash'
 import type { PostgresRole } from '@supabase/postgres-meta'
+import { isEmpty, noop } from 'lodash'
+import { useEffect, useState } from 'react'
+import { Modal } from 'ui'
 
+import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useStore } from 'hooks'
-import PolicyEditorModalTitle from './PolicyEditorModalTitle'
-import { getGeneralPolicyTemplates } from './PolicyEditorModal.constants'
-
-import PolicyEditor from '../PolicyEditor'
-import PolicyReview from '../PolicyReview'
-import PolicyTemplates from '../PolicyTemplates'
-import PolicySelection from '../PolicySelection'
-import {
-  createSQLPolicy,
-  createPayloadForCreatePolicy,
-  createPayloadForUpdatePolicy,
-} from '../Policies.utils'
 import { POLICY_MODAL_VIEWS } from '../Policies.constants'
 import {
   PolicyFormField,
   PostgresPolicyCreatePayload,
   PostgresPolicyUpdatePayload,
 } from '../Policies.types'
+import {
+  createPayloadForCreatePolicy,
+  createPayloadForUpdatePolicy,
+  createSQLPolicy,
+} from '../Policies.utils'
+import PolicyEditor from '../PolicyEditor'
+import PolicyReview from '../PolicyReview'
+import PolicySelection from '../PolicySelection'
+import PolicyTemplates from '../PolicyTemplates'
 import { PolicyTemplate } from '../PolicyTemplates/PolicyTemplates.constants'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { getGeneralPolicyTemplates } from './PolicyEditorModal.constants'
+import PolicyEditorModalTitle from './PolicyEditorModalTitle'
 
-interface Props {
+interface PolicyEditorModalProps {
   visible: boolean
   roles?: PostgresRole[]
   schema: string
@@ -37,17 +36,17 @@ interface Props {
   onSaveSuccess: () => void
 }
 
-const PolicyEditorModal: FC<Props> = ({
+const PolicyEditorModal = ({
   visible = false,
   roles = [],
   schema = '',
   table = '',
   selectedPolicyToEdit = {},
-  onSelectCancel = () => {},
-  onCreatePolicy = () => {},
-  onUpdatePolicy = () => {},
-  onSaveSuccess = () => {},
-}) => {
+  onSelectCancel = noop,
+  onCreatePolicy = () => false,
+  onUpdatePolicy = () => false,
+  onSaveSuccess = noop,
+}: PolicyEditorModalProps) => {
   const { ui } = useStore()
 
   const newPolicyTemplate: PolicyFormField = {
@@ -195,8 +194,8 @@ const PolicyEditorModal: FC<Props> = ({
       <div className="">
         <ConfirmationModal
           visible={isClosingPolicyEditorModal}
-          header="Confirm to close"
-          buttonLabel="Confirm"
+          header="Discard changes"
+          buttonLabel="Discard"
           onSelectCancel={() => setIsClosingPolicyEditorModal(false)}
           onSelectConfirm={() => {
             onSelectCancel()
@@ -205,7 +204,7 @@ const PolicyEditorModal: FC<Props> = ({
           }}
         >
           <Modal.Content>
-            <p className="py-4 text-sm text-scale-1100">
+            <p className="py-4 text-sm text-foreground-light">
               There are unsaved changes. Are you sure you want to close the editor? Your changes
               will be lost.
             </p>

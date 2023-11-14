@@ -2,7 +2,7 @@ import minify from 'pg-minify'
 
 // https://www.postgresql.org/docs/current/catalog-pg-constraint.html
 
-export enum FOREIGN_KEY_DELETION_ACTION {
+export enum FOREIGN_KEY_CASCADE_ACTION {
   NO_ACTION = 'a',
   RESTRICT = 'r',
   CASCADE = 'c',
@@ -24,22 +24,8 @@ export enum CONSTRAINT_TYPE {
 
 export const CREATE_PG_GET_TABLEDEF_SQL = minify(
   /* SQL */ `
-    do $$ 
-    <<first_block>>
-    DECLARE
-        cnt int;
-    BEGIN
-      SELECT count(*) into cnt
-      FROM pg_catalog.pg_type t LEFT JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace WHERE (t.typrelid = 0 OR (SELECT c.relkind = 'c' FROM pg_catalog.pg_class c WHERE c.oid = t.typrelid)) 
-      AND NOT EXISTS(SELECT 1 FROM pg_catalog.pg_type el WHERE el.oid = t.typelem AND el.typarray = t.oid)
-      AND n.nspname <> 'pg_catalog' AND n.nspname <> 'information_schema' AND pg_catalog.pg_type_is_visible(t.oid)
-      -- AND pg_catalog.format_type(t.oid, NULL) in ('tabledef_fkeys','tabledef_trigs', 'tabledefs');
-      AND pg_catalog.format_type(t.oid, NULL) in ('tabledefs');
-      IF cnt = 0 THEN
-        RAISE INFO 'Creating custom types.';
-        CREATE TYPE pg_temp.tabledefs AS ENUM ('PKEY_INTERNAL','PKEY_EXTERNAL','FKEYS_INTERNAL', 'FKEYS_EXTERNAL', 'FKEYS_COMMENTED', 'FKEYS_NONE', 'INCLUDE_TRIGGERS', 'NO_TRIGGERS');
-      END IF;
-    end first_block $$;
+    DROP TYPE IF EXISTS pg_temp.tabledefs CASCADE;
+    CREATE TYPE pg_temp.tabledefs AS ENUM ('PKEY_INTERNAL','PKEY_EXTERNAL','FKEYS_INTERNAL', 'FKEYS_EXTERNAL', 'FKEYS_COMMENTED', 'FKEYS_NONE', 'INCLUDE_TRIGGERS', 'NO_TRIGGERS');
     
     -- DROP FUNCTION pg_temp.pg_get_coldef(text,text,text,boolean);
     CREATE OR REPLACE FUNCTION pg_temp.pg_get_coldef(
@@ -83,7 +69,7 @@ export const CREATE_PG_GET_TABLEDEF_SQL = minify(
     AS
     $$
       DECLARE
-        v_qualified text;
+        v_qualified text := '';
         v_table_ddl text;
         v_table_oid int;
         v_colrec record;
@@ -92,6 +78,8 @@ export const CREATE_PG_GET_TABLEDEF_SQL = minify(
         v_indexrec record;
         v_primary boolean := False;
         v_constraint_name text;
+        v_constraint_def  text;
+        v_pkey_def        text := '';
         v_fkey_defs text;
         v_trigger text := '';
         v_partition_key text := '';
@@ -111,12 +99,14 @@ export const CREATE_PG_GET_TABLEDEF_SQL = minify(
         constraintelement text;
         bSkip boolean;
         bVerbose boolean := False;
+        v_cnt1   integer;
+        v_cnt2   integer;
     
         -- assume defaults for ENUMs at the getgo	
         pkcnt            int := 0;
         fkcnt            int := 0;
         trigcnt          int := 0;
-        pktype           tabledefs := 'PKEY_INTERNAL';	  
+        pktype           tabledefs := 'PKEY_INTERNAL';
         fktype           tabledefs := 'FKEYS_INTERNAL';
         trigtype         tabledefs := 'NO_TRIGGERS';
         arglen           integer;
@@ -133,9 +123,11 @@ export const CREATE_PG_GET_TABLEDEF_SQL = minify(
         v_diag6          text;
       
       BEGIN
-        v_qualified = in_schema || '.' || in_table;
-      
+        SET client_min_messages = 'notice';
         IF _verbose THEN bVerbose = True; END IF;
+        
+        -- v17 fix: handle case-sensitive  
+        -- v_qualified = in_schema || '.' || in_table;
       
         arglen := array_length($4, 1);
         IF arglen IS NULL THEN
@@ -154,9 +146,9 @@ export const CREATE_PG_GET_TABLEDEF_SQL = minify(
                 ELSEIF avarg = 'INCLUDE_TRIGGERS' OR avarg = 'NO_TRIGGERS' THEN
                     trigcnt = trigcnt + 1;
                     trigtype = avarg;
-                ELSEIF avarg = 'PKEY_INTERNAL' OR avarg = 'PKEY_EXTERNAL' THEN
+                ELSEIF avarg = 'PKEY_EXTERNAL' THEN
                     pkcnt = pkcnt + 1;
-                    pktype = avarg;				
+                    pktype = avarg;				                
                 END IF;
             END LOOP;
             IF fkcnt > 1 THEN 
@@ -170,7 +162,7 @@ export const CREATE_PG_GET_TABLEDEF_SQL = minify(
                 RETURN '';			
             END IF;		   		   
         END IF;
-      
+    
         SELECT c.oid, (select setting from pg_settings where name = 'server_version_num') INTO v_table_oid, v_pgversion FROM pg_catalog.pg_class c LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
         WHERE c.relkind in ('r','p') AND c.relname = in_table AND n.nspname = in_schema;
           
@@ -226,16 +218,38 @@ export const CREATE_PG_GET_TABLEDEF_SQL = minify(
           END IF;
         END IF;
         IF bPartition THEN
+          --Issue#17 fix for case-sensitive tables
+          -- SELECT count(*) INTO v_cnt1 FROM information_schema.tables t WHERE EXISTS (SELECT REGEXP_MATCHES(s.table_name, '([A-Z]+)','g') FROM information_schema.tables s 
+          -- WHERE t.table_schema=s.table_schema AND t.table_name=s.table_name AND t.table_schema = quote_ident(in_schema) AND t.table_name = quote_ident(in_table) AND t.table_type = 'BASE TABLE');      
+          SELECT count(*) INTO v_cnt1 FROM information_schema.tables t WHERE EXISTS (SELECT REGEXP_MATCHES(s.table_name, '([A-Z]+)','g') FROM information_schema.tables s 
+          WHERE t.table_schema=s.table_schema AND t.table_name=s.table_name AND t.table_schema = in_schema AND t.table_name = in_table AND t.table_type = 'BASE TABLE');      		  
+          
+          --Issue#19 put double-quotes around SQL keyword column names
+          SELECT COUNT(*) INTO v_cnt2 FROM pg_get_keywords() WHERE word = v_colrec.column_name AND catcode = 'R';
+          
           IF bInheritance THEN
             -- inheritance-based
-            v_table_ddl := 'CREATE TABLE ' || in_schema || '.' || in_table || '( '|| E'\\n';
+            IF v_cnt1 > 0 OR v_cnt2 > 0 THEN
+              v_table_ddl := 'CREATE TABLE ' || in_schema || '."' || in_table || '"( '|| E'\\n';        
+            ELSE
+              v_table_ddl := 'CREATE TABLE ' || in_schema || '.' || in_table || '( '|| E'\\n';                
+            END IF;
+    
             -- Jump to constraints section to add the check constraints
           ELSE
             -- declarative-based
             IF v_relopts <> '' THEN
-              v_table_ddl := 'CREATE TABLE ' || in_schema || '.' || in_table || ' PARTITION OF ' || in_schema || '.' || v_parent || ' ' || v_partbound || v_relopts || ' ' || v_tablespace || '; ' || E'\\n';
+              IF v_cnt1 > 0 OR v_cnt2 > 0 THEN
+                v_table_ddl := 'CREATE TABLE ' || in_schema || '."' || in_table || '" PARTITION OF ' || in_schema || '.' || v_parent || ' ' || v_partbound || v_relopts || ' ' || v_tablespace || '; ' || E'\\n';
+              ELSE
+                v_table_ddl := 'CREATE TABLE ' || in_schema || '.' || in_table || ' PARTITION OF ' || in_schema || '.' || v_parent || ' ' || v_partbound || v_relopts || ' ' || v_tablespace || '; ' || E'\\n';
+              END IF;
             ELSE
-              v_table_ddl := 'CREATE TABLE ' || in_schema || '.' || in_table || ' PARTITION OF ' || in_schema || '.' || v_parent || ' ' || v_partbound || ' ' || v_tablespace || '; ' || E'\\n';
+              IF v_cnt1 > 0 OR v_cnt2 > 0 THEN
+                v_table_ddl := 'CREATE TABLE ' || in_schema || '."' || in_table || '" PARTITION OF ' || in_schema || '.' || v_parent || ' ' || v_partbound || ' ' || v_tablespace || '; ' || E'\\n';
+              ELSE
+                v_table_ddl := 'CREATE TABLE ' || in_schema || '.' || in_table || ' PARTITION OF ' || in_schema || '.' || v_parent || ' ' || v_partbound || ' ' || v_tablespace || '; ' || E'\\n';
+              END IF;
             END IF;
             -- Jump to constraints and index section to add the check constraints and indexes and perhaps FKeys
           END IF;
@@ -256,32 +270,64 @@ export const CREATE_PG_GET_TABLEDEF_SQL = minify(
         
         -- start the create definition for regular tables unless we are in progress creating an inheritance-based child table
         IF NOT bPartition THEN
-          v_table_ddl := 'CREATE ' || v_temp || ' TABLE ' || in_schema || '.' || in_table || ' (' || E'\\n';
+          --Issue#17 fix for case-sensitive tables
+          -- SELECT count(*) INTO v_cnt1 FROM information_schema.tables t WHERE EXISTS (SELECT REGEXP_MATCHES(s.table_name, '([A-Z]+)','g') FROM information_schema.tables s 
+          -- WHERE t.table_schema=s.table_schema AND t.table_name=s.table_name AND t.table_schema = quote_ident(in_schema) AND t.table_name = quote_ident(in_table) AND t.table_type = 'BASE TABLE');   
+          SELECT count(*) INTO v_cnt1 FROM information_schema.tables t WHERE EXISTS (SELECT REGEXP_MATCHES(s.table_name, '([A-Z]+)','g') FROM information_schema.tables s 
+          WHERE t.table_schema=s.table_schema AND t.table_name=s.table_name AND t.table_schema = in_schema AND t.table_name = in_table AND t.table_type = 'BASE TABLE');         
+          IF v_cnt1 > 0 THEN
+            v_table_ddl := 'CREATE ' || v_temp || ' TABLE ' || in_schema || '."' || in_table || '" (' || E'\\n';
+          ELSE
+            v_table_ddl := 'CREATE ' || v_temp || ' TABLE ' || in_schema || '.' || in_table || ' (' || E'\\n';
+          END IF;
         END IF;
         -- RAISE INFO 'DEBUG2: tabledef so far: %', v_table_ddl;    
         -- define all of the columns in the table unless we are in progress creating an inheritance-based child table
         IF NOT bPartition THEN
           FOR v_colrec IN
-            SELECT c.column_name, c.data_type, c.udt_name, c.character_maximum_length, c.is_nullable, c.column_default, c.numeric_precision, c.numeric_scale, c.is_identity, c.identity_generation        
+            SELECT c.column_name, c.data_type, c.udt_name, c.udt_schema, c.character_maximum_length, c.is_nullable, c.column_default, c.numeric_precision, c.numeric_scale, c.is_identity, c.identity_generation        
             FROM information_schema.columns c WHERE (table_schema, table_name) = (in_schema, in_table) ORDER BY ordinal_position
           LOOP
-            SELECT CASE WHEN pg_get_serial_sequence(v_qualified, v_colrec.column_name) IS NOT NULL THEN True ELSE False END into bSerial;
+            IF bVerbose THEN RAISE INFO '(col loop) name=% type=% udt_name=% udt_schema=%', v_colrec.column_name, v_colrec.data_type, v_colrec.udt_name, v_colrec.udt_schema; END IF;  
+            -- v17 fix: handle case-sensitive for pg_get_serial_sequence that requires SQL Identifier handling
+            -- SELECT CASE WHEN pg_get_serial_sequence(v_qualified, v_colrec.column_name) IS NOT NULL THEN True ELSE False END into bSerial;
+            SELECT CASE WHEN pg_get_serial_sequence(quote_ident(in_schema) || '.' || quote_ident(in_table), v_colrec.column_name) IS NOT NULL THEN True ELSE False END into bSerial;
             IF bVerbose THEN
-              SELECT pg_get_serial_sequence(v_qualified, v_colrec.column_name) into v_temp;
+              -- v17 fix: handle case-sensitive for pg_get_serial_sequence that requires SQL Identifier handling
+              -- SELECT pg_get_serial_sequence(v_qualified, v_colrec.column_name) into v_temp;
+              SELECT pg_get_serial_sequence(quote_ident(in_schema) || '.' || quote_ident(in_table), v_colrec.column_name) into v_temp;
               IF v_temp IS NULL THEN v_temp = 'NA'; END IF;
               SELECT pg_temp.pg_get_coldef(in_schema, in_table,v_colrec.column_name) INTO v_diag1;
-              -- RAISE NOTICE 'DEBUG table: %  Column: %  datatype: %  Serial=%  serialval=%  coldef=%', v_qualified, v_colrec.column_name, v_colrec.data_type, bSerial, v_temp, v_diag1;
-              -- RAISE NOTICE 'DEBUG tabledef: %', v_table_ddl;
+              --RAISE NOTICE 'DEBUG table: %  Column: %  datatype: %  Serial=%  serialval=%  coldef=%', v_qualified, v_colrec.column_name, v_colrec.data_type, bSerial, v_temp, v_diag1;
+              --RAISE NOTICE 'DEBUG tabledef: %', v_table_ddl;
             END IF;
             
-            v_table_ddl := v_table_ddl || '  ' -- note: two char spacer to start, to indent the column
-              || v_colrec.column_name || ' ' || 
+            --Issue#17 put double-quotes around case-sensitive column names
+            SELECT COUNT(*) INTO v_cnt1 FROM information_schema.columns t WHERE EXISTS (SELECT REGEXP_MATCHES(s.column_name, '([A-Z]+)','g') FROM information_schema.columns s 
+            WHERE t.table_schema=s.table_schema and t.table_name=s.table_name and t.column_name=s.column_name AND t.table_schema = quote_ident(in_schema) AND column_name = v_colrec.column_name);         
+    
+            --Issue#19 put double-quotes around SQL keyword column names         
+            SELECT COUNT(*) INTO v_cnt2 FROM pg_get_keywords() WHERE word = v_colrec.column_name AND catcode = 'R';
+            
+            IF v_cnt1 > 0 OR v_cnt2 > 0 THEN
+              v_table_ddl := v_table_ddl || '  "' || v_colrec.column_name || '" ';
+            ELSE
+              v_table_ddl := v_table_ddl || '  ' || v_colrec.column_name || ' ';
+            END IF;
+            
+            v_table_ddl := v_table_ddl ||
             CASE WHEN v_colrec.udt_name in ('geometry', 'box2d', 'box2df', 'box3d', 'geography', 'geometry_dump', 'gidx', 'spheroid', 'valid_detail')
-            THEN v_colrec.udt_name WHEN v_colrec.data_type = 'USER-DEFINED' THEN in_schema || '.' || v_colrec.udt_name 
-            -- Issue#6 fix: handle arrays
-            WHEN v_colrec.data_type = 'ARRAY' THEN pg_temp.pg_get_coldef(in_schema, in_table,v_colrec.column_name) 
-            -- Issue#8 fix: handle serial. Note: NOT NULL is implied so no need to declare it explicitly
-            WHEN pg_get_serial_sequence(v_qualified, v_colrec.column_name) IS NOT NULL THEN pg_temp.pg_get_coldef(in_schema, in_table,v_colrec.column_name)  
+              THEN v_colrec.udt_name 
+            WHEN v_colrec.data_type = 'USER-DEFINED' 
+              THEN v_colrec.udt_schema || '.' || v_colrec.udt_name 
+            WHEN v_colrec.data_type = 'ARRAY' 
+                -- Issue#6 fix: handle arrays
+              THEN pg_temp.pg_get_coldef(in_schema, in_table,v_colrec.column_name) 
+            -- v17 fix: handle case-sensitive for pg_get_serial_sequence that requires SQL Identifier handling
+            -- WHEN pg_get_serial_sequence(v_qualified, v_colrec.column_name) IS NOT NULL 
+            WHEN pg_get_serial_sequence(quote_ident(in_schema) || '.' || quote_ident(in_table), v_colrec.column_name) IS NOT NULL
+              -- Issue#8 fix: handle serial. Note: NOT NULL is implied so no need to declare it explicitly
+              THEN pg_temp.pg_get_coldef(in_schema, in_table,v_colrec.column_name)  
             ELSE v_colrec.data_type END 
             || CASE WHEN v_colrec.is_identity = 'YES' THEN CASE WHEN v_colrec.identity_generation = 'ALWAYS' THEN ' GENERATED ALWAYS AS IDENTITY' ELSE ' GENERATED BY DEFAULT AS IDENTITY' END ELSE '' END
             || CASE WHEN v_colrec.character_maximum_length IS NOT NULL THEN ('(' || v_colrec.character_maximum_length || ')') 
@@ -311,23 +357,36 @@ export const CREATE_PG_GET_TABLEDEF_SQL = minify(
             LOOP
             IF v_constraintrec.type_rank = 1 THEN
                 v_primary := True;
-                v_constraint_name := v_constraintrec.constraint_name;
+                IF pkcnt = 0 THEN
+                    v_constraint_name := v_constraintrec.constraint_name;
+                    v_constraint_def  := v_constraintrec.constraint_definition;
+                ELSE
+                  -- Issue#16 handle external PG def
+                  v_constraint_name := v_constraintrec.constraint_name;
+                  SELECT 'ALTER TABLE ONLY ' || in_schema || '.' || c.relname || ' ADD CONSTRAINT ' || r.conname || ' ' || pg_catalog.pg_get_constraintdef(r.oid, true) || ';' INTO v_pkey_def 
+                  FROM pg_catalog.pg_constraint r, pg_class c, pg_namespace n where r.conrelid = c.oid and  r.contype = 'p' and n.oid = r.connamespace and n.nspname = in_schema AND c.relname = in_table;              
+                END IF;
                 IF bPartition THEN
                   continue;
-              END IF;
+                END IF;
+            ELSE
+                v_constraint_name := v_constraintrec.constraint_name;
+                v_constraint_def  := v_constraintrec.constraint_definition;
             END IF;
-            -- if bVerbose THEN RAISE INFO 'DEBUG4: constraint name= %', v_constraintrec.constraint_name; END IF;
+            if bVerbose THEN RAISE INFO 'DEBUG4: constraint name=% constraint_def=%', v_constraint_name,v_constraint_def; END IF;
             constraintarr := constraintarr || v_constraintrec.constraint_name:: text;
       
             IF fktype <> 'FKEYS_INTERNAL' AND v_constraintrec.constraint_type = 'f' THEN
                 continue;
             END IF;
-      
-            v_table_ddl := v_table_ddl || '  ' -- note: two char spacer to start, to indent the column
-              || 'CONSTRAINT' || ' '
-              || v_constraintrec.constraint_name || ' '
-              || v_constraintrec.constraint_definition
-              || ',' || E'\\n';
+            
+            IF pkcnt = 0 THEN
+              v_table_ddl := v_table_ddl || '  ' -- note: two char spacer to start, to indent the column
+                || 'CONSTRAINT' || ' '
+                || v_constraint_name || ' '
+                || v_constraint_def
+                || ',' || E'\\n';
+            END IF;
           END LOOP;
         
         ELSE
@@ -349,23 +408,37 @@ export const CREATE_PG_GET_TABLEDEF_SQL = minify(
             LOOP
             IF v_constraintrec.type_rank = 1 THEN
                 v_primary := True;
-                v_constraint_name := v_constraintrec.constraint_name;
+                IF pkcnt = 0 THEN
+                    v_constraint_name := v_constraintrec.constraint_name;
+                    v_constraint_def  := v_constraintrec.constraint_definition;
+                ELSE
+                  -- Issue#16 handle external PG def
+                  v_constraint_name := v_constraintrec.constraint_name;
+                  SELECT 'ALTER TABLE ONLY ' || in_schema || '.' || c.relname || ' ADD CONSTRAINT ' || r.conname || ' ' || pg_catalog.pg_get_constraintdef(r.oid, true) || ';' INTO v_pkey_def 
+                  FROM pg_catalog.pg_constraint r, pg_class c, pg_namespace n where r.conrelid = c.oid and  r.contype = 'p' and n.oid = r.connamespace and n.nspname = in_schema AND c.relname = in_table;              
+                END IF;
                 IF bPartition THEN
                   continue;
-              END IF;
+                END IF;           
+            ELSE
+                v_constraint_name := v_constraintrec.constraint_name;
+                v_constraint_def  := v_constraintrec.constraint_definition;
             END IF;
-            -- if bVerbose THEN RAISE INFO 'DEBUG4: constraint name= %', v_constraintrec.constraint_name; END IF;
+            -- SELECT 'ALTER TABLE ONLY ' || c.relname || ' ADD CONSTRAINT ' || r.conname || ' ' || pg_catalog.pg_get_constraintdef(r.oid, true) || ';' as pkeyddl FROM pg_catalog.pg_constraint r, pg_class c, pg_namespace n where r.conrelid = c.oid and  r.contype = 'p' and n.oid = r.connamespace and n.nspname = 'sample' AND c.relname = 'extensions_table';
+            if bVerbose THEN RAISE INFO 'DEBUG4: constraint name=% constraint_def=%', v_constraint_name,v_constraint_def; END IF;
             constraintarr := constraintarr || v_constraintrec.constraint_name:: text;
       
             IF fktype <> 'FKEYS_INTERNAL' AND v_constraintrec.constraint_type = 'f' THEN
                 continue;
             END IF;
       
-            v_table_ddl := v_table_ddl || '  ' -- note: two char spacer to start, to indent the column
-              || 'CONSTRAINT' || ' '
-              || v_constraintrec.constraint_name || ' '
-              || v_constraintrec.constraint_definition
-              || ',' || E'\\n';
+            IF pkcnt = 0 THEN
+              v_table_ddl := v_table_ddl || '  ' -- note: two char spacer to start, to indent the column
+                || 'CONSTRAINT' || ' '
+                || v_constraint_name || ' '
+                || v_constraint_def
+                || ',' || E'\\n';
+            END IF;
           END LOOP;
         END IF;      
         IF bVerbose THEN RAISE INFO '(3)tabledef so far: %', v_table_ddl; END IF;
@@ -411,6 +484,13 @@ export const CREATE_PG_GET_TABLEDEF_SQL = minify(
         -- v_table_ddl := v_table_ddl || ') ' || v_relopts || ' ' || v_tablespace || E';\\n';  
         -- END IF;
         -- RAISE NOTICE 'ddlsofar3: %', v_table_ddl;
+    
+        -- Issue#16 create the external PKEY def if indicated
+        IF v_pkey_def <> '' THEN
+            v_table_ddl := v_table_ddl || v_pkey_def || E'\\n';    
+        END IF;
+      
+        IF bVerbose THEN RAISE INFO '(6)tabledef so far: %', v_table_ddl; END IF;
       
         -- create indexes
         FOR v_indexrec IN
@@ -441,7 +521,7 @@ export const CREATE_PG_GET_TABLEDEF_SQL = minify(
           END IF;
           
         END LOOP;
-        IF bVerbose THEN RAISE INFO '(6)tabledef so far: %', v_table_ddl; END IF;
+        IF bVerbose THEN RAISE INFO '(7)tabledef so far: %', v_table_ddl; END IF;
         
         -- Handle external foreign key defs here if applicable. 
         IF fktype = 'FKEYS_EXTERNAL' THEN
@@ -472,7 +552,7 @@ export const CREATE_PG_GET_TABLEDEF_SQL = minify(
               v_table_ddl := v_table_ddl || v_fkey_defs;
           END IF;
         END IF;
-        IF bVerbose THEN RAISE INFO '(7)tabledef so far: %', v_table_ddl; END IF;
+        IF bVerbose THEN RAISE INFO '(8)tabledef so far: %', v_table_ddl; END IF;
       
         IF trigtype = 'INCLUDE_TRIGGERS' THEN
           -- Issue#14: handle multiple triggers for a table
@@ -485,6 +565,9 @@ export const CREATE_PG_GET_TABLEDEF_SQL = minify(
               IF bVerbose THEN RAISE INFO 'triggerdef = %', v_trigrec.triggerdef; END IF;
           END LOOP;       	    
         END IF;
+      
+        -- add empty line
+        v_table_ddl := v_table_ddl || E'\\n';
     
         RETURN v_table_ddl;
       

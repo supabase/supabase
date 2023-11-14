@@ -1,13 +1,13 @@
-import { useState } from 'react'
-import { BarChart as RechartBarChart, XAxis, Tooltip, Bar, Cell, BarProps } from 'recharts'
-import dayjs from 'dayjs'
 import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
-import ChartHeader from './ChartHeader'
-import { Datum, CommonChartProps } from './Charts.types'
+import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import ChartNoData from './NoDataPlaceholder'
-import { numberFormatter, useChartSize } from './Charts.utils'
+import { useState } from 'react'
+import { Bar, BarChart as RechartBarChart, Cell, Tooltip, XAxis } from 'recharts'
 import { CategoricalChartState } from 'recharts/types/chart/generateCategoricalChart'
+import ChartHeader from './ChartHeader'
+import { CommonChartProps, Datum } from './Charts.types'
+import { numberFormatter, useChartSize } from './Charts.utils'
+import ChartNoData from './NoDataPlaceholder'
 dayjs.extend(utc)
 
 export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
@@ -121,7 +121,7 @@ const BarChart = ({
         </RechartBarChart>
       </Container>
       {data && (
-        <div className="text-scale-900 -mt-9 flex items-center justify-between text-xs">
+        <div className="text-foreground-lighter -mt-9 flex items-center justify-between text-xs">
           <span>{day(data[0][xAxisKey]).format(customDateFormat)}</span>
           <span>{day(data[data?.length - 1]?.[xAxisKey]).format(customDateFormat)}</span>
         </div>

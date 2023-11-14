@@ -1,20 +1,22 @@
-import { FC } from 'react'
+import Link from 'next/link'
 import { Button, IconAlertCircle } from 'ui'
+
 import InformationBox from 'components/ui/InformationBox'
 import { MemberWithFreeProjectLimit } from 'data/organizations/free-project-limit-check-query'
-import Link from 'next/link'
 
-interface Props {
+interface FreeProjectLimitWarningProps {
   membersExceededLimit: MemberWithFreeProjectLimit[]
-  orgLevelBilling: boolean
   orgSlug: string
 }
 
-const FreeProjectLimitWarning: FC<Props> = ({ membersExceededLimit, orgLevelBilling, orgSlug }) => {
+const FreeProjectLimitWarning = ({
+  membersExceededLimit,
+  orgSlug,
+}: FreeProjectLimitWarningProps) => {
   return (
     <div>
       <InformationBox
-        icon={<IconAlertCircle className="text-scale-1200" size="large" strokeWidth={1.5} />}
+        icon={<IconAlertCircle className="text-foreground" size="large" strokeWidth={1.5} />}
         defaultVisibility={true}
         hideCollapse
         title="The organization has members who have exceeded their free project limits"
@@ -37,15 +39,11 @@ const FreeProjectLimitWarning: FC<Props> = ({ membersExceededLimit, orgLevelBill
               projects before you're able to create a free project within this organization.
             </p>
 
-            {orgLevelBilling && (
-              <div>
-                <Link href={`/org/${orgSlug}/billing?panel=subscriptionPlan`} passHref>
-                  <a target="_blank">
-                    <Button type="primary">Upgrade plan</Button>
-                  </a>
-                </Link>
-              </div>
-            )}
+            <div>
+              <Button asChild type="primary">
+                <Link href={`/org/${orgSlug}/billing?panel=subscriptionPlan`}>Upgrade plan</Link>
+              </Button>
+            </div>
           </div>
         }
       />

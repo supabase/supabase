@@ -1,18 +1,22 @@
-import { FC, useEffect, useContext, createContext, FormEvent, useState } from 'react'
-import { isEmpty, mapValues, has, filter, keyBy, isUndefined, partition, isNull } from 'lodash'
-import { observer, useLocalObservable } from 'mobx-react-lite'
-import { Button, Input, SidePanel, IconTrash, Radio, IconPlus, Toggle, Modal, Listbox } from 'ui'
-import { Dictionary } from 'components/grid'
+import { filter, has, isEmpty, isNull, isUndefined, keyBy, mapValues, partition } from 'lodash'
 import { makeAutoObservable } from 'mobx'
+import { observer, useLocalObservable } from 'mobx-react-lite'
+import { createContext, FormEvent, useContext, useEffect, useState } from 'react'
+import { Button, IconPlus, IconTrash, Input, Listbox, Modal, Radio, SidePanel, Toggle } from 'ui'
 
-import { useStore } from 'hooks'
+import { Dictionary } from 'components/grid'
+import { Function } from 'components/interfaces/Functions/Functions.types'
+import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
 import Panel from 'components/ui/Panel'
 import SqlEditor from 'components/ui/SqlEditor'
-import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { useSchemasQuery } from 'data/database/schemas-query'
+import { useStore } from 'hooks'
 import { isResponseOk } from 'lib/common/fetch'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { SupaResponse } from 'types'
-import { Function } from 'components/interfaces/Functions/Functions.types'
+import { convertArgumentTypes, convertConfigParams, hasWhitespace } from './Functions.utils'
 
 // [Refactor] Remove local state, just use the Form component
 
@@ -85,37 +89,6 @@ class CreateFunctionFormState {
     this.schema = state.schema
     this.securityDefiner = state.securityDefiner
   }
-}
-
-/**
- * convert argument_types = "a integer, b integer"
- * to args = {value: [{name:'a', type:'integer'}, {name:'b', type:'integer'}]}
- */
-function convertArgumentTypes(value: string) {
-  const items = value?.split(',')
-  if (isEmpty(value) || !items || items?.length == 0) return { value: [] }
-  const temp = items.map((x) => {
-    const str = x.trim()
-    const space = str.indexOf(' ')
-    const name = str.slice(0, space !== 1 ? space : 0)
-    const type = str.slice(space + 1)
-    return { name, type }
-  })
-  return { value: temp }
-}
-
-/**
- * convert config_params =  {search_path: "auth, public"}
- * to {value: [{name: 'search_path', value: 'auth, public'}]}
- */
-function convertConfigParams(value: Dictionary<any>) {
-  const temp = []
-  if (value) {
-    for (var key in value) {
-      temp.push({ name: key, value: value[key] })
-    }
-  }
-  return { value: temp }
 }
 
 interface ICreateFunctionStore {
@@ -281,34 +254,32 @@ class CreateFunctionStore implements ICreateFunctionStore {
   }
 }
 
-function hasWhitespace(value: string) {
-  return /\s/.test(value)
-}
-
 const CreateFunctionContext = createContext<ICreateFunctionStore | null>(null)
 
-type CreateFunctionProps = {
+interface CreateFunctionProps {
   func: any
   visible: boolean
   setVisible: (value: boolean) => void
-} & any
+}
 
-const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) => {
+const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
   const { ui, meta } = useStore()
+  const { project } = useProjectContext()
   const _localState = useLocalObservable(() => new CreateFunctionStore())
-  _localState.meta = meta as any
 
   const [isClosingPanel, setIsClosingPanel] = useState<boolean>(false)
 
-  useEffect(() => {
-    const fetchSchemas = async () => {
-      await (_localState!.meta as any).schemas.load()
-      const schemas = (_localState!.meta as any).schemas.list()
-      _localState.setSchemas(schemas)
+  useSchemasQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      onSuccess(schemas) {
+        _localState.setSchemas(schemas)
+      },
     }
-
-    fetchSchemas()
-  }, [])
+  )
 
   useEffect(() => {
     _localState.formState.reset(func)
@@ -322,8 +293,8 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
 
         const body = _localState.formState.requestBody
         const response: SupaResponse<Function> = body.id
-          ? await (_localState!.meta as any).functions.update(body.id, body)
-          : await (_localState!.meta as any).functions.create(body)
+          ? await (meta as any).functions.update(body.id, body)
+          : await (meta as any).functions.create(body)
 
         if (!isResponseOk(response)) {
           ui.setNotification({
@@ -410,7 +381,7 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
                 <SidePanel.Separator />
                 <SidePanel.Content>
                   <Panel>
-                    <div className={`space-y-8 rounded bg-scale-200 py-4`}>
+                    <div className={`space-y-8 rounded bg-background py-4`}>
                       <div className={`px-6`}>
                         <Toggle
                           onChange={() => _localState.toggleAdvancedVisible()}
@@ -447,8 +418,8 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
         </CreateFunctionContext.Provider>
         <ConfirmationModal
           visible={isClosingPanel}
-          header="Confirm to close"
-          buttonLabel="Confirm"
+          header="Discard changes"
+          buttonLabel="Discard"
           onSelectCancel={() => setIsClosingPanel(false)}
           onSelectConfirm={() => {
             setIsClosingPanel(false)
@@ -456,7 +427,7 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
           }}
         >
           <Modal.Content>
-            <p className="py-4 text-sm text-scale-1100">
+            <p className="py-4 text-sm text-foreground-light">
               There are unsaved changes. Are you sure you want to close the panel? Your changes will
               be lost.
             </p>
@@ -469,7 +440,7 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
 
 export default observer(CreateFunction)
 
-const InputName: FC = observer(({}) => {
+const InputName = observer(({}) => {
   const _localState = useContext(CreateFunctionContext)
   return (
     <Input
@@ -491,11 +462,11 @@ const InputName: FC = observer(({}) => {
   )
 })
 
-type InputMultiArgumentsProps = {
+interface InputMultiArgumentsProps {
   readonly?: boolean
 }
 
-const InputMultiArguments: FC<InputMultiArgumentsProps> = observer(({ readonly }) => {
+const InputMultiArguments = observer(({ readonly }: InputMultiArgumentsProps) => {
   const _localState = useContext(CreateFunctionContext)
 
   function onAddArgument() {
@@ -509,14 +480,14 @@ const InputMultiArguments: FC<InputMultiArgumentsProps> = observer(({ readonly }
   return (
     <div>
       <div className="flex flex-col">
-        <h5 className="text-base text-scale-1200">Arguments</h5>
-        <p className="text-sm text-scale-1100">
+        <h5 className="text-base text-foreground">Arguments</h5>
+        <p className="text-sm text-foreground-light">
           Arguments can be referenced in the function body using either names or numbers.
         </p>
       </div>
       <div className="space-y-2 pt-4">
         {readonly && isEmpty(_localState!.formState.args.value) && (
-          <span className="text-scale-900">No argument for this function</span>
+          <span className="text-foreground-lighter">No argument for this function</span>
         )}
         {_localState!.formState.args.value.map(
           (x: { name: string; type: string; error?: string }, idx: number) => (
@@ -542,14 +513,14 @@ const InputMultiArguments: FC<InputMultiArgumentsProps> = observer(({ readonly }
   )
 })
 
-type InputArgumentProps = {
+interface InputArgumentProps {
   idx: number
   name: string
   type: string
   error?: string
   readonly?: boolean
 }
-const InputArgument: FC<InputArgumentProps> = observer(({ idx, name, type, error, readonly }) => {
+const InputArgument = observer(({ idx, name, type, error, readonly }: InputArgumentProps) => {
   const _localState = useContext(CreateFunctionContext)
 
   function onNameChange(e: FormEvent<HTMLInputElement>) {
@@ -591,23 +562,27 @@ const InputArgument: FC<InputArgumentProps> = observer(({ idx, name, type, error
         error={error}
         disabled={readonly}
       />
-      <Listbox
-        id={`type-${idx}`}
-        className="flex-1"
-        value={type}
-        size="small"
-        onChange={onTypeChange}
-        disabled={readonly}
-      >
-        <Listbox.Option value="integer" label="integer">
-          integer
-        </Listbox.Option>
-        {POSTGRES_DATA_TYPES.map((x: string) => (
-          <Listbox.Option key={x} value={x} label={x}>
-            {x}
+      {readonly ? (
+        <Input disabled readOnly id={`type-${idx}`} size="small" value={type} className="flex-1" />
+      ) : (
+        <Listbox
+          id={`type-${idx}`}
+          className="flex-1"
+          value={type}
+          size="small"
+          onChange={onTypeChange}
+          disabled={readonly}
+        >
+          <Listbox.Option value="integer" label="integer">
+            integer
           </Listbox.Option>
-        ))}
-      </Listbox>
+          {POSTGRES_DATA_TYPES.map((x: string) => (
+            <Listbox.Option key={x} value={x} label={x}>
+              {x}
+            </Listbox.Option>
+          ))}
+        </Listbox>
+      )}
       {!readonly && (
         <Button type="danger" icon={<IconTrash size="tiny" />} onClick={onDelete} size="small" />
       )}
@@ -615,7 +590,7 @@ const InputArgument: FC<InputArgumentProps> = observer(({ idx, name, type, error
   )
 })
 
-const InputMultiConfigParams: FC = observer(({}) => {
+const InputMultiConfigParams = observer(({}) => {
   const _localState = useContext(CreateFunctionContext)
 
   function onAddArgument() {
@@ -629,7 +604,7 @@ const InputMultiConfigParams: FC = observer(({}) => {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h5 className="text-base text-scale-1200">Config Params</h5>
+        <h5 className="text-base text-foreground">Config Params</h5>
       </div>
       <div className="space-y-2 pt-4">
         {_localState!.formState.configParams.value.map(
@@ -656,13 +631,13 @@ const InputMultiConfigParams: FC = observer(({}) => {
   )
 })
 
-type InputConfigParamProps = {
+interface InputConfigParamProps {
   idx: number
   name: string
   value: string
   error?: { name?: string; value?: string }
 }
-const InputConfigParam: FC<InputConfigParamProps> = observer(({ idx, name, value, error }) => {
+const InputConfigParam = observer(({ idx, name, value, error }: InputConfigParamProps) => {
   const _localState = useContext(CreateFunctionContext)
 
   function onNameChange(e: FormEvent<HTMLInputElement>) {
@@ -718,22 +693,22 @@ const InputConfigParam: FC<InputConfigParamProps> = observer(({ idx, name, value
   )
 })
 
-const InputDefinition: FC = observer(({}) => {
+const InputDefinition = observer(({}) => {
   const _localState = useContext(CreateFunctionContext)
   return (
     <div className="space-y-4">
       <div className="flex flex-col">
-        <h5 className="text-base text-scale-1200">Definition</h5>
-        <p className="text-sm text-scale-1100">
+        <h5 className="text-base text-foreground">Definition</h5>
+        <p className="text-sm text-foreground-light">
           The language below should be written in `{_localState!.formState.language.value}`.
         </p>
         {!_localState?.isEditing && (
-          <p className="text-sm text-scale-1100">
+          <p className="text-sm text-foreground-light">
             Change the language in the Advanced Settings below.
           </p>
         )}
       </div>
-      <div className="h-40 border dark:border-dark">
+      <div className="h-60 resize-y border dark:border-dark">
         <SqlEditor
           defaultValue={_localState!.formState.definition.value}
           onInputChange={(value: string | undefined) => {
@@ -749,8 +724,15 @@ const InputDefinition: FC = observer(({}) => {
   )
 })
 
-const SelectSchema: FC = observer(({}) => {
+const SelectSchema = observer(({}) => {
   const _localState = useContext(CreateFunctionContext)
+
+  const { project } = useProjectContext()
+  const { data } = useSchemasQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const schemas = data?.filter((schema) => !EXCLUDED_SCHEMAS.includes(schema.name)) ?? []
 
   return (
     <Listbox
@@ -763,7 +745,7 @@ const SelectSchema: FC = observer(({}) => {
       descriptionText="Tables made in the table editor will be in 'public'"
       onChange={(value) => _localState!.onFormChange({ key: 'schema', value })}
     >
-      {_localState!.schemas.map((x) => (
+      {schemas.map((x) => (
         <Listbox.Option key={x.name} label={x.name} value={x.name}>
           {x.name}
         </Listbox.Option>
@@ -772,7 +754,7 @@ const SelectSchema: FC = observer(({}) => {
   )
 })
 
-const SelectLanguage: FC = observer(({}) => {
+const SelectLanguage = observer(({}) => {
   const { meta } = useStore()
   const _localState = useContext(CreateFunctionContext)
 
@@ -810,7 +792,7 @@ const SelectLanguage: FC = observer(({}) => {
   )
 })
 
-const SelectReturnType: FC = observer(({}) => {
+const SelectReturnType = observer(({}) => {
   const _localState = useContext(CreateFunctionContext)
 
   return (
@@ -843,7 +825,7 @@ const SelectReturnType: FC = observer(({}) => {
   )
 })
 
-const SelectBehavior: FC = observer(({}) => {
+const SelectBehavior = observer(({}) => {
   const _localState = useContext(CreateFunctionContext)
 
   return (
@@ -868,7 +850,7 @@ const SelectBehavior: FC = observer(({}) => {
   )
 })
 
-const RadioSecurity: FC = observer(({}) => {
+const RadioSecurity = observer(({}) => {
   const _localState = useContext(CreateFunctionContext)
 
   return (

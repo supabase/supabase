@@ -1,15 +1,14 @@
-import { FC } from 'react'
 import type { PostgresRole } from '@supabase/postgres-meta'
 
 import MultiSelect from 'components/ui/MultiSelect'
 
-interface Props {
+interface PolicyRolesProps {
   roles: PostgresRole[]
   selectedRoles: string[]
   onUpdateSelectedRoles: (roles: string[]) => void
 }
 
-const PolicyRoles: FC<Props> = ({ roles, selectedRoles, onUpdateSelectedRoles }) => {
+const PolicyRoles = ({ roles, selectedRoles, onUpdateSelectedRoles }: PolicyRolesProps) => {
   // @ts-ignore
   const formattedRoles = roles.map((role) => {
     return {
@@ -23,10 +22,10 @@ const PolicyRoles: FC<Props> = ({ roles, selectedRoles, onUpdateSelectedRoles })
   return (
     <div className="flex space-x-12">
       <div className="flex w-1/3 flex-col space-y-2">
-        <label className="text-scale-1100 text-base" htmlFor="policy-name">
+        <label className="text-foreground-light text-base" htmlFor="policy-name">
           Target roles
         </label>
-        <p className="text-scale-900 text-sm">Apply policy to the selected roles</p>
+        <p className="text-foreground-lighter text-sm">Apply policy to the selected roles</p>
       </div>
       <div className="relative w-2/3">
         <MultiSelect

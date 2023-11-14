@@ -1,0 +1,63 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'storage-errors-codes',
+  title: 'Error Codes',
+  description: 'Supabase Error Codes',
+  sidebar_label: 'Debugging',
+}
+
+Here's a list of the most common error codes and their potential resolutions:
+
+## 404 not_found
+
+Indicates that the resource is not found or you don't have the correct permission to access it
+**Resolution:**
+
+- Add a RLS policy to grant permission to the resource. See our [Access Control docs](/docs/guides/storage/uploads/access-control) for more information.
+- Ensure you include the user `Authorization` header
+- Verify the object exists
+
+## 409 already_exists
+
+Indicates that the resource already exists.
+**Resolution:**
+
+- Use the `upsert` functionality in order to overwrite the file. Find out more [here](/docs/guides/storage/uploads/standard-uploads#overwriting-files).
+
+## 403 unauthorized
+
+You don't have permission to action this request
+**Resolution:**
+
+- Add RLS policy to grant permission. See our [Access Control docs](/docs/guides/storage/uploads/access-control) for more information.
+- Ensure you include the user `Authorization` header
+
+## 429 Too many requests
+
+This problem typically arises when a large number of clients are concurrently interacting with the Storage service, and the pooler has reached its `max_clients` limit.
+
+**Resolution:**
+
+- Increase the max_clients limits of the pooler.
+- Upgrade to a bigger project compute instance [here](https://supabase.com/dashboard/project/_/settings/addons).
+
+## 544 database_timeout
+
+This problem arises when a high number of clients are concurrently using the Storage service, and Postgres doesn't have enough available connections to efficiently handle requests to Storage.
+
+**Resolution:**
+
+- Increase the pool_size limits of the pooler.
+- Upgrade to a bigger project compute instance [here](https://supabase.com/dashboard/project/_/settings/addons).
+
+## 500 internal_server_error
+
+This issue occurs where there is a unhandled error.
+**Resolution:**
+
+- File a support ticket to Storage team [here](https://supabase.com/dashboard/support/new)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

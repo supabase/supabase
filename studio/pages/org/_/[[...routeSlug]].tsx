@@ -14,14 +14,12 @@ const Header = () => {
     <div className="dark:border-dark border-b p-3">
       <div className="flex items-center space-x-2">
         <Link href="/projects">
-          <a>
-            <img
-              src={`${BASE_PATH}/img/supabase-logo.svg`}
-              alt="Supabase"
-              className="dark:border-dark rounded border p-1 hover:border-white"
-              style={{ height: 24 }}
-            />
-          </a>
+          <img
+            src={`${BASE_PATH}/img/supabase-logo.svg`}
+            alt="Supabase"
+            className="dark:border-dark rounded border p-1 hover:border-white"
+            style={{ height: 24 }}
+          />
         </Link>
       </div>
     </div>
@@ -72,16 +70,14 @@ const GenericOrganizationPage: NextPage = () => {
             <div className="col-span-4 space-y-4 rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
               <div className="space-y-1">
                 <p>You are not part of any organizations yet</p>
-                <p className="text-sm text-scale-1100">
+                <p className="text-sm text-foreground-light">
                   Get started by creating a new organization.
                 </p>
               </div>
               <div>
-                <Link href={`/new`}>
-                  <a>
-                    <Button icon={<IconPlus />}>New organization</Button>
-                  </a>
-                </Link>
+                <Button asChild icon={<IconPlus />}>
+                  <Link href="/new">New organization</Link>
+                </Button>
               </div>
             </div>
           ) : (
@@ -102,7 +98,7 @@ const GenericOrganizationPage: NextPage = () => {
                     }
                     footer={
                       <div className="flex items-end justify-between">
-                        <span className="text-sm lowercase text-scale-1000">
+                        <span className="text-sm lowercase text-foreground-light">
                           {organization.slug}
                         </span>
                       </div>
