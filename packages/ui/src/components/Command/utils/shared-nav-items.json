@@ -255,6 +255,10 @@
     {
       "label": "Vue",
       "url": "https://supabase.com/docs/guides/getting-started/quickstarts/vue"
+    },
+    {
+      "label": "Angular",
+      "url": "https://supabase.com/docs/guides/getting-started/quickstarts/angular"
     }
   ],
   "docsGeneral": [

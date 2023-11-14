@@ -35,6 +35,12 @@ export const frameworks = {
     docs: '/docs/reference/python/introduction',
     gaEvent: 'www_hp_hero_frameworks_python',
   },
+  angular: {
+    name: 'Angular',
+    icon: '/images/logos/frameworks/angular.svg',
+    docs: '/docs/guides/getting-started/quickstarts/angular',
+    gaEvent: 'www_hp_hero_frameworks_angular',
+  },
   vue: {
     name: 'Vue',
     icon: '/images/logos/frameworks/vue.svg',
