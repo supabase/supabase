@@ -111,6 +111,7 @@ const SQLEditor = () => {
   const [debugSolution, setDebugSolution] = useState<string>()
   const [sqlDiff, setSqlDiff] = useState<ContentDiff>()
   const [pendingTitle, setPendingTitle] = useState<string>()
+  const [hasSelection, setHasSelection] = useState<boolean>(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
 
@@ -950,6 +951,7 @@ const SQLEditor = () => {
                     editorRef={editorRef}
                     monacoRef={monacoRef}
                     executeQuery={executeQuery}
+                    onHasSelection={setHasSelection}
                   />
                 </motion.div>
               </>
@@ -963,6 +965,7 @@ const SQLEditor = () => {
                 id={id}
                 isExecuting={isExecuting}
                 isDisabled={isDiffOpen}
+                hasSelection={hasSelection}
                 prettifyQuery={prettifyQuery}
                 executeQuery={executeQuery}
               />
