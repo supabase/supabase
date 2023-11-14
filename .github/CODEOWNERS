@@ -1,6 +1,7 @@
 /packages/shared-data/pricing.ts @roryw10 @kevcodez
 /packages/shared-data/plans.ts @roryw10 @kevcodez
 
+/apps/docs/pages/ @supabase/developers
 /studio/ @supabase/Dashboard
 /apps/www/ @supabase/Website
 /docker/ @supabase/cli

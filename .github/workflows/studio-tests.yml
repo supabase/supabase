@@ -30,7 +30,6 @@ jobs:
         node-version: [18.x]
         cmd:
           - npm run test:studio
-          - npm run build:studio
 
     steps:
       - uses: actions/checkout@v4

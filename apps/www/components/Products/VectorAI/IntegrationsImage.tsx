@@ -6,20 +6,28 @@ import { INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
 import { useBreakpoint } from 'common'
 
 const IntegrationsImage = () => {
+  const ref = useRef(null)
   const { resolvedTheme } = useTheme()
   const isMobile = useBreakpoint(767)
-  const ref = useRef(null)
-  const isInView = useInView(ref, { margin: '-25%', once: true })
+  const isInView = useInView(ref, { margin: '-15%', once: true })
 
   const initial = INITIAL_BOTTOM
   const animate = getAnimation({})
 
-  console.log('ismobile', isMobile)
-
   const image =
     resolvedTheme === 'dark'
-      ? `/images/product/vector/vector-tools-dark${isMobile ? '-mobile' : ''}.svg`
-      : `/images/product/vector/vector-tools-light${isMobile ? '-mobile' : ''}.svg`
+      ? `/images/product/vector/vector-tools-dark${isMobile ? '-mobile' : ''}.png`
+      : `/images/product/vector/vector-tools-light${isMobile ? '-mobile' : ''}.png`
+
+  const ResolvedImage = () => (
+    <Image
+      src={image}
+      alt="Diagram of Machine Learning tools that integrate with Supabase Vector"
+      layout="fill"
+      objectFit="contain"
+      quality={100}
+    />
+  )
 
   return (
     <LazyMotion features={domAnimation}>
@@ -29,12 +37,7 @@ const IntegrationsImage = () => {
         animate={isInView ? animate : initial}
         className="relative w-full h-full"
       >
-        <Image
-          src={image}
-          alt="Diagram of Machine Learning tools that integrate with Supabase Vector"
-          layout="fill"
-          objectFit="contain"
-        />
+        <ResolvedImage />
       </m.div>
     </LazyMotion>
   )

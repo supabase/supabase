@@ -1,16 +1,16 @@
-import dayjs from 'dayjs'
-import { find, isUndefined, compact, isEqual, omitBy, isNull, isString } from 'lodash'
-import { Dictionary } from 'components/grid'
 import type { PostgresTable } from '@supabase/postgres-meta'
+import { Dictionary } from 'components/grid'
+import dayjs from 'dayjs'
+import { compact, find, isEqual, isNull, isString, isUndefined, omitBy } from 'lodash'
 
 import { minifyJSON, tryParseJson } from 'lib/helpers'
-import { RowField } from './RowEditor.types'
 import {
   DATETIME_TYPES,
-  TIME_TYPES,
-  TIMESTAMP_TYPES,
   TEXT_TYPES,
+  TIMESTAMP_TYPES,
+  TIME_TYPES,
 } from '../SidePanelEditor.constants'
+import { RowField } from './RowEditor.types'
 
 export const generateRowFields = (
   row: Dictionary<any> | undefined,
@@ -25,7 +25,7 @@ export const generateRowFields = (
       isUndefined(row) && TEXT_TYPES.includes(column.format)
         ? null
         : isUndefined(row) && column.format === 'bool' && !column.is_nullable
-        ? 'true'
+        ? column.default_value
         : isUndefined(row) && column.format === 'bool' && column.is_nullable
         ? 'null'
         : isUndefined(row)

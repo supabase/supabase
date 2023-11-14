@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Button, IconPlus } from 'ui'
 
-import NoProjectsOnPaidOrgInfo from 'components/interfaces/BillingV2/NoProjectsOnPaidOrgInfo'
+import NoProjectsOnPaidOrgInfo from 'components/interfaces/Billing/NoProjectsOnPaidOrgInfo'
 import ProjectCard from 'components/interfaces/Home/ProjectList/ProjectCard'
 import ShimmeringCard from 'components/interfaces/Home/ProjectList/ShimmeringCard'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
@@ -30,6 +30,9 @@ const ProjectsPage: NextPageWithLayout = () => {
   const githubConnections = integrations
     ?.filter((integration) => integration.integration.name === 'GitHub')
     .flatMap((integration) => integration.connections)
+  const vercelConnections = integrations
+    ?.filter((integration) => integration.integration.name === 'Vercel')
+    .flatMap((integration) => integration.connections)
 
   return (
     <ScaffoldContainer className="h-full overflow-y-auto">
@@ -38,13 +41,9 @@ const ProjectsPage: NextPageWithLayout = () => {
           <NoProjectsOnPaidOrgInfo organization={organization} />
 
           <div>
-            <Link href={`/new/${organization?.slug}`}>
-              <a>
-                <Button size="medium" type="default" iconRight={<IconPlus />}>
-                  New project
-                </Button>
-              </a>
-            </Link>
+            <Button asChild size="medium" type="default" iconRight={<IconPlus />}>
+              <Link href={`/new/${organization?.slug}`}>New project</Link>
+            </Button>
           </div>
           <div className="space-y-4">
             <h4 className="text-lg">Projects</h4>
@@ -68,11 +67,9 @@ const ProjectsPage: NextPageWithLayout = () => {
                       </p>
                     </div>
                     <div>
-                      <Link href={`/new/${organization?.slug}`}>
-                        <a>
-                          <Button icon={<IconPlus />}>New Project</Button>
-                        </a>
-                      </Link>
+                      <Button asChild icon={<IconPlus />}>
+                        <Link href={`/new/${organization?.slug}`}>New Project</Link>
+                      </Button>
                     </div>
                   </div>
                 ) : (
@@ -82,6 +79,9 @@ const ProjectsPage: NextPageWithLayout = () => {
                         key={project.ref}
                         project={project}
                         githubIntegration={githubConnections?.find(
+                          (connection) => connection.supabase_project_ref === project.ref
+                        )}
+                        vercelIntegration={vercelConnections?.find(
                           (connection) => connection.supabase_project_ref === project.ref
                         )}
                       />
