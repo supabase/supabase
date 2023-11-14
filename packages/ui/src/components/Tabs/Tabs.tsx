@@ -93,8 +93,6 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
   if (scrollable) listClasses.push(__styles.scrollable)
   if (wrappable) listClasses.push(__styles.wrappable)
   if (listClassNames) listClasses.push(listClassNames)
-  console.log(wrappable)
-  console.log(listClasses)
 
   return (
     <TabsPrimitive.Root value={active} className={__styles.base}>
