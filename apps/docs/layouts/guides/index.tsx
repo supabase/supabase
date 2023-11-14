@@ -77,7 +77,7 @@ const Layout: FC<Props> = (props) => {
   return (
     <>
       <Head>
-        <title>{props.meta?.title} | Supabase Docs</title>
+        <title>{`${props.meta?.title} | Supabase Docs`}</title>
         <meta name="description" content={props.meta?.description} />
         <meta property="og:image" content={ogImageUrl} />
         <meta name="twitter:image" content={ogImageUrl} />
