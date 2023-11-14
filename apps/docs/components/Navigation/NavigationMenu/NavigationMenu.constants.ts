@@ -875,6 +875,10 @@ export const functions: NavMenuConstant = {
       items: [
         { name: 'CORS support for invoking from the browser', url: '/guides/functions/cors' },
         { name: 'Scheduling Functions', url: '/guides/functions/schedule-functions' },
+        {
+          name: 'Sending Push Notifications',
+          url: '/guides/functions/examples/push-notifications',
+        },
         { name: 'Generating OG images ', url: '/guides/functions/examples/og-image' },
         {
           name: 'CAPTCHA support with Cloudflare Turnstile',
@@ -899,6 +903,10 @@ export const functions: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Dart Edge on Supabase', url: '/guides/functions/dart-edge' },
+        {
+          name: 'Expo Push Notifications',
+          url: '/guides/functions/examples/push-notifications',
+        },
         { name: 'Browserless.io', url: '/guides/functions/examples/screenshots' },
         { name: 'Hugging Face', url: '/guides/ai/examples/huggingface-image-captioning' },
         { name: 'OpenAI API', url: '/guides/ai/examples/openai' },
