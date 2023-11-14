@@ -15,8 +15,8 @@ test('static elements', async () => {
   await screen.findByText(/Some chart/)
 })
 
-test("append", async ()=>{
-  const appendable = ()=> "some text"
+test('append', async () => {
+  const appendable = () => 'some text'
   render(<ReportWidget data={[]} renderer={() => null} append={appendable} />)
   await screen.findByText(/some text/)
 })

@@ -42,11 +42,6 @@ export const Sparkline = () => (
   </div>
 )
 
-const ExampleName: React.FC = ({ children }) => (
-  <h1
-    className="font-bold text-scale-
-  1100"
-  >
-    {children}
-  </h1>
+const ExampleName: React.FC<React.PropsWithChildren> = ({ children }) => (
+  <h1 className="font-bold text-light">{children}</h1>
 )

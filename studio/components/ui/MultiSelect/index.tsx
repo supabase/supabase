@@ -134,8 +134,8 @@ export default function MultiSelect({
       <div
         className={[
           'form-control form-control--multi-select',
-          'border border-scale-700 bg-scaleA-200',
-          'multi-select relative block w-full w-full space-x-1 overflow-auto rounded',
+          'border border-strong bg-background',
+          'multi-select relative block w-full space-x-1 overflow-auto rounded',
           `${error !== undefined ? 'border-red-800 bg-red-100' : ''}`,
         ].join(' ')}
         ref={ref}
@@ -175,7 +175,7 @@ export default function MultiSelect({
                 }
               })}
               <div className="absolute inset-y-0 right-0 pl-3 pr-2 flex space-x-1 items-center cursor-pointer ">
-                <IconChevronDown size={16} strokeWidth={2} className="text-scale-900" />
+                <IconChevronDown size={16} strokeWidth={2} className="text-foreground-lighter" />
               </div>
             </div>
           </PopoverTrigger_Shadcn_>
@@ -211,7 +211,7 @@ export default function MultiSelect({
                       className={[
                         'text-typography-body-light dark:text-typography-body-dark',
                         'group flex cursor-pointer items-center justify-between transition',
-                        'space-x-1 rounded bg-transparent p-2 px-4 text-sm hover:bg-gray-600',
+                        'space-x-1 rounded bg-transparent p-2 px-4 text-sm hover:bg-overlay-hover',
                         `${active ? ' dark:bg-green-600 dark:bg-opacity-25' : ''}`,
                       ].join(' ')}
                     >

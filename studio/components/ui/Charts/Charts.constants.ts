@@ -3,8 +3,8 @@
 
 // For ChartHandler
 export const CHART_COLORS = {
-  TICK: 'var(--colors-scale6)',
-  AXIS: 'var(--colors-scale6)',
+  TICK: 'hsl(var(--background-overlay-hover))',
+  AXIS: 'hsl(var(--background-overlay-hover))',
   GREEN_1: 'hsl(var(--brand-default))', // #3ECF8E
   GREEN_2: 'hsl(var(--brand-500))',
 }
@@ -38,7 +38,13 @@ export const genStackColorScales = (colors: ValidStackColor[]) =>
     }
   })
 
-export const DEFAULT_STACK_COLORS : ValidStackColor[] = ['brand', 'slate', 'blue', 'yellow', 'indigo']
+export const DEFAULT_STACK_COLORS: ValidStackColor[] = [
+  'brand',
+  'slate',
+  'blue',
+  'yellow',
+  'indigo',
+]
 
 export enum DateTimeFormats {
   FULL = 'MMM D, YYYY, hh:mma',

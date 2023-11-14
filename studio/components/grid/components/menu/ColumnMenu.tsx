@@ -1,12 +1,12 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { CalculatedColumn } from '@supabase/react-data-grid'
+import { CalculatedColumn } from 'react-data-grid'
 import {
   Button,
   Divider,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   IconChevronDown,
   IconEdit,
   IconLock,
@@ -50,14 +50,10 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
         {state.editable && onEditColumn !== undefined && (
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger asChild className={`${isEncrypted ? 'opacity-50' : ''}`}>
-              <DropdownMenuItem_Shadcn_
-                className="space-x-2"
-                onClick={onEditColumn}
-                disabled={isEncrypted}
-              >
+              <DropdownMenuItem className="space-x-2" onClick={onEditColumn} disabled={isEncrypted}>
                 <IconEdit size="tiny" />
-                <p className="text">Edit column</p>
-              </DropdownMenuItem_Shadcn_>
+                <p>Edit column</p>
+              </DropdownMenuItem>
             </Tooltip.Trigger>
             {isEncrypted && (
               <Tooltip.Portal>
@@ -65,8 +61,8 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200',
+                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                      'border border-background',
                     ].join(' ')}
                   >
                     <span className="text-xs text-foreground">
@@ -78,29 +74,29 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
             )}
           </Tooltip.Root>
         )}
-        <DropdownMenuItem_Shadcn_
+        <DropdownMenuItem
           className="space-x-2"
           onClick={column.frozen ? onUnfreezeColumn : onFreezeColumn}
         >
           {column.frozen ? (
             <>
               <IconUnlock size="tiny" />
-              <p className="text">Unfreeze column</p>
+              <p>Unfreeze column</p>
             </>
           ) : (
             <>
               <IconLock size="tiny" />
-              <p className="text">Freeze column</p>
+              <p>Freeze column</p>
             </>
           )}
-        </DropdownMenuItem_Shadcn_>
+        </DropdownMenuItem>
         {state.editable && onDeleteColumn !== undefined && (
           <>
             <Divider light />
-            <DropdownMenuItem_Shadcn_ className="space-x-2" onClick={onDeleteColumn}>
+            <DropdownMenuItem className="space-x-2" onClick={onDeleteColumn}>
               <IconTrash size="tiny" stroke="red" />
-              <p className="text">Delete column</p>
-            </DropdownMenuItem_Shadcn_>
+              <p>Delete column</p>
+            </DropdownMenuItem>
           </>
         )}
       </>
@@ -109,8 +105,8 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
 
   return (
     <>
-      <DropdownMenu_Shadcn_>
-        <DropdownMenuTrigger_Shadcn_>
+      <DropdownMenu>
+        <DropdownMenuTrigger>
           <Button
             asChild
             className="opacity-50 flex"
@@ -120,11 +116,11 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
           >
             <span></span>
           </Button>
-        </DropdownMenuTrigger_Shadcn_>
-        <DropdownMenuContent_Shadcn_ align="end" side="bottom">
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" side="bottom">
           {renderMenu()}
-        </DropdownMenuContent_Shadcn_>
-      </DropdownMenu_Shadcn_>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </>
   )
 }

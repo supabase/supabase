@@ -1,5 +1,5 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import SVG from 'react-inlinesvg'
@@ -40,7 +40,7 @@ const HelpPopover = ({ alt = false }: HelpPopoverProps) => {
                   <IconHelpCircle
                     size={alt ? 18 : 16}
                     strokeWidth={1.5}
-                    className={alt ? 'text-foreground-light' : 'text-scale-900'}
+                    className={alt ? 'text-foreground-light' : 'text-foreground-lighter'}
                   />
                 }
               >
@@ -55,8 +55,8 @@ const HelpPopover = ({ alt = false }: HelpPopoverProps) => {
               <Tooltip.Arrow className="radix-tooltip-arrow" />
               <div
                 className={[
-                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                  'space-y-2 border border-scale-200',
+                  'rounded bg-alternative py-1 px-2 leading-none shadow',
+                  'space-y-2 border border-background',
                 ].join(' ')}
               >
                 <p className="text-xs text-foreground">Help</p>
@@ -68,43 +68,39 @@ const HelpPopover = ({ alt = false }: HelpPopoverProps) => {
       <PopoverContent_Shadcn_ className="w-[400px] space-y-4 p-0 py-5" align="end" side="bottom">
         <div className="mb-5 space-y-4 px-5">
           <h5 className="text-foreground">Need help with your project?</h5>
-          <p className="text-sm text-scale-900">
+          <p className="text-sm text-foreground-lighter">
             For issues with your project hosted on supabase.com, or other inquiries about our hosted
             services.
           </p>
           <div className="space-x-1">
-            <Link passHref href="https://supabase.com/docs/guides/platform/troubleshooting">
-              <Button asChild type="default" icon={<IconTool />}>
-                <a target="_blank" rel="noreferrer">
-                  Troubleshooting
-                </a>
-              </Button>
-            </Link>
-            <Link passHref href="https://supabase.com/docs/">
-              <Button asChild type="text" size="tiny" icon={<IconBookOpen />}>
-                <a target="_blank" rel="noreferrer">
-                  Docs
-                </a>
-              </Button>
-            </Link>
-            <Link passHref href="https://status.supabase.com/">
-              <Button asChild type="text" size="tiny" icon={<IconActivity />}>
-                <a target="_blank" rel="noreferrer">
-                  Supabase Status
-                </a>
-              </Button>
-            </Link>
+            <Button asChild type="default" icon={<IconTool />}>
+              <Link
+                href="https://supabase.com/docs/guides/platform/troubleshooting"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Troubleshooting
+              </Link>
+            </Button>
+            <Button asChild type="text" size="tiny" icon={<IconBookOpen />}>
+              <Link href="https://supabase.com/docs/" target="_blank" rel="noreferrer">
+                Docs
+              </Link>
+            </Button>
+            <Button asChild type="text" size="tiny" icon={<IconActivity />}>
+              <Link href="https://status.supabase.com/" target="_blank" rel="noreferrer">
+                Supabase Status
+              </Link>
+            </Button>
           </div>
-          <p className="text-sm text-scale-900">
+          <p className="text-sm text-foreground-lighter">
             Expected response time is based on your billing plan. Pro and Pay as You Go plans are
             prioritized.
           </p>
           <div>
-            <Link passHref href={supportUrl}>
-              <Button asChild type="default" icon={<IconMail />}>
-                <a>Contact Support</a>
-              </Button>
-            </Link>
+            <Button asChild type="default" icon={<IconMail />}>
+              <Link href={supportUrl}>Contact Support</Link>
+            </Button>
           </div>
         </div>
         <Popover.Separator />
@@ -112,7 +108,7 @@ const HelpPopover = ({ alt = false }: HelpPopoverProps) => {
           <div className="mb-4 px-5">
             <h5 className={'mb-2'}>Reach out to the community</h5>
 
-            <p className="text-sm text-scale-900">
+            <p className="text-sm text-foreground-lighter">
               For other support, including questions on our client libraries, advice, or best
               practices.
             </p>

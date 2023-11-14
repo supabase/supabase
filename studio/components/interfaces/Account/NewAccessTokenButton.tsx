@@ -4,10 +4,10 @@ import { useState } from 'react'
 import {
   Alert,
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   Form,
   IconChevronDown,
   IconExternalLink,
@@ -56,8 +56,8 @@ const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonPr
             >
               Generate new token
             </Button>
-            <DropdownMenu_Shadcn_>
-              <DropdownMenuTrigger_Shadcn_ asChild>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
                 <Button
                   asChild
                   type="primary"
@@ -66,9 +66,9 @@ const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonPr
                 >
                   <span></span>
                 </Button>
-              </DropdownMenuTrigger_Shadcn_>
-              <DropdownMenuContent_Shadcn_ align="end" side="bottom">
-                <DropdownMenuItem_Shadcn_
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" side="bottom">
+                <DropdownMenuItem
                   key="experimental-token"
                   onClick={() => {
                     setTokenScope('V0')
@@ -78,9 +78,9 @@ const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonPr
                   <div className="space-y-1">
                     <p className="block text-foreground">Generate token for experimental API</p>
                   </div>
-                </DropdownMenuItem_Shadcn_>
-              </DropdownMenuContent_Shadcn_>
-            </DropdownMenu_Shadcn_>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>
@@ -119,13 +119,15 @@ const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonPr
                       such, be very careful when using this API.
                     </p>
                     <div className="mt-4">
-                      <Link href="https://api.supabase.com/api/v0">
-                        <a target="_blank" rel="noreferrer">
-                          <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                            Experimental API documentation
-                          </Button>
-                        </a>
-                      </Link>
+                      <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                        <Link
+                          href="https://api.supabase.com/api/v0"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Experimental API documentation
+                        </Link>
+                      </Button>
                     </div>
                   </Alert>
                 </Modal.Content>

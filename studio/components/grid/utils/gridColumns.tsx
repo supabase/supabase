@@ -1,9 +1,10 @@
 import * as React from 'react'
-import { CalculatedColumn } from '@supabase/react-data-grid'
+import { CalculatedColumn } from 'react-data-grid'
 import { ColumnType, SupaColumn, SupaRow, SupaTable } from '../types'
 import {
   isArrayColumn,
   isBoolColumn,
+  isCiTextColumn,
   isDateColumn,
   isDateTimeColumn,
   isEnumColumn,
@@ -66,8 +67,8 @@ export function getGridColumns(
       minWidth: COLUMN_MIN_WIDTH,
       frozen: x.isPrimaryKey || false,
       isLastFrozenColumn: false,
-      rowGroup: false,
-      headerRenderer: (props) => (
+      // rowGroup: false,
+      renderHeaderCell: (props) => (
         <ColumnHeader
           {...props}
           columnType={columnType}
@@ -77,10 +78,16 @@ export function getGridColumns(
           foreignKey={x.foreignKey}
         />
       ),
-      editor: options
+      renderEditCell: options
         ? getColumnEditor(x, columnType, options?.editable ?? false, options.onExpandJSONEditor)
         : undefined,
-      formatter: getColumnFormatter(x, columnType),
+      renderCell: getColumnFormatter(x, columnType),
+
+      // [Next 18 Refactor] Double check if this is correct
+      parent: undefined,
+      level: 0,
+      maxWidth: undefined,
+      draggable: false,
     }
 
     return columnDefinition
@@ -146,6 +153,7 @@ function getColumnEditor(
     case 'number': {
       return NumberEditor
     }
+    case 'citext':
     case 'text': {
       // eslint-disable-next-line react/display-name
       return (p: any) => (
@@ -190,6 +198,8 @@ function getColumnType(columnDef: SupaColumn): ColumnType {
     return 'json'
   } else if (isTextColumn(columnDef.dataType)) {
     return 'text'
+  } else if (isCiTextColumn(columnDef.format)) {
+    return 'citext'
   } else if (isDateColumn(columnDef.format)) {
     return 'date'
   } else if (isTimeColumn(columnDef.format)) {

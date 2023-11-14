@@ -18,17 +18,20 @@ import {
 } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
+import CodeEditor from 'components/ui/CodeEditor'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { DatabaseIndex, useIndexesQuery } from 'data/database/indexes-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import Table from 'components/to-be-cleaned/Table'
-import CodeEditor from 'components/ui/CodeEditor'
-import CreateIndexSidePanel from './CreateIndexSidePanel'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useStore } from 'hooks'
-import MonacoEditor from 'components/interfaces/SQLEditor/MonacoEditor'
+import CreateIndexSidePanel from './CreateIndexSidePanel'
+import SchemaSelector from 'components/ui/SchemaSelector'
+import { partition } from 'lodash'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
 
 const Indexes = () => {
   const { ui } = useStore()
@@ -76,6 +79,12 @@ const Indexes = () => {
     },
   })
 
+  const [protectedSchemas] = partition(schemas ?? [], (schema) =>
+    EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
+  )
+  const schema = schemas?.find((schema) => schema.name === selectedSchema)
+  const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
+
   const sortedIndexes = (allIndexes?.result ?? []).sort(
     (a, b) => a.table.localeCompare(b.table) || a.name.localeCompare(b.name)
   )
@@ -97,143 +106,145 @@ const Indexes = () => {
     <>
       <div className="pb-8">
         <div className="flex items-center justify-between mb-6">
-          <div>
-            <h3 className="mb-1 text-xl text-foreground">Database Indexes</h3>
-            <div className="text-sm text-scale-900">
+          <div className="space-y-1">
+            <h3 className="text-xl text-foreground">Database Indexes</h3>
+            <div className="text-sm text-foreground-lighter">
               Improve query performance against your database
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <Link href="https://supabase.com/docs/guides/database/query-optimization">
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                  Documentation
-                </Button>
-              </a>
-            </Link>
-            <Link href="https://supabase.com/docs/guides/database/extensions/index_advisor">
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                  Optimization with index_advisor
-                </Button>
-              </a>
-            </Link>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-2">
-            {isLoadingSchemas && <ShimmeringLoader className="w-[260px]" />}
-            {isErrorSchemas && (
-              <div className="w-[260px] text-light text-sm border px-3 py-1.5 rounded flex items-center space-x-2">
-                <IconAlertCircle strokeWidth={2} size={16} />
-                <p>Failed to load schemas</p>
-              </div>
-            )}
-            {isSuccessSchemas && (
-              <Listbox
-                size="small"
-                value={selectedSchema}
-                onChange={setSelectedSchema}
-                className="w-[260px]"
+            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+              <Link
+                href="https://supabase.com/docs/guides/database/query-optimization"
+                target="_blank"
+                rel="noreferrer"
               >
-                {(schemas ?? []).map((schema) => (
-                  <Listbox.Option
-                    key={schema.name}
-                    value={schema.name}
-                    label={schema.name}
-                    addOnBefore={() => <span className="text-scale-900">schema</span>}
-                  >
-                    {schema.name}
-                  </Listbox.Option>
-                ))}
-              </Listbox>
-            )}
-            <Input
-              size="small"
-              value={search}
-              className="w-[250px]"
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search for an index"
-              icon={<IconSearch size={14} />}
-            />
+                Documentation
+              </Link>
+            </Button>
+            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+              <Link
+                href="https://supabase.com/docs/guides/database/extensions/index_advisor"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Optimization with index_advisor
+              </Link>
+            </Button>
           </div>
-          <Button
-            type="primary"
-            onClick={() => setShowCreateIndex(true)}
-            disabled={!isSuccessSchemas}
-          >
-            Create index
-          </Button>
         </div>
 
-        {isLoadingIndexes && <GenericSkeletonLoader />}
+        <div className="flex flex-col gap-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              {isLoadingSchemas && <ShimmeringLoader className="w-[260px]" />}
+              {isErrorSchemas && (
+                <div className="w-[260px] text-foreground-light text-sm border px-3 py-1.5 rounded flex items-center space-x-2">
+                  <IconAlertCircle strokeWidth={2} size={16} />
+                  <p>Failed to load schemas</p>
+                </div>
+              )}
+              {isSuccessSchemas && (
+                <SchemaSelector
+                  className="w-[260px]"
+                  size="small"
+                  showError={false}
+                  selectedSchemaName={selectedSchema}
+                  onSelectSchema={setSelectedSchema}
+                />
+              )}
+              <Input
+                size="small"
+                value={search}
+                className="w-64"
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search for an index"
+                icon={<IconSearch size={14} />}
+              />
+            </div>
+            {!isLocked && (
+              <Button
+                type="primary"
+                onClick={() => setShowCreateIndex(true)}
+                disabled={!isSuccessSchemas}
+              >
+                Create index
+              </Button>
+            )}
+          </div>
 
-        {isErrorIndexes && (
-          <AlertError error={indexesError as any} subject="Failed to retrieve database indexes" />
-        )}
+          {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="indexes" />}
 
-        {isSuccessIndexes && (
-          <Table
-            head={[
-              <Table.th key="schema">Schema</Table.th>,
-              <Table.th key="table">Table</Table.th>,
-              <Table.th key="name">Name</Table.th>,
-              <Table.th key="buttons"></Table.th>,
-            ]}
-            body={
-              <>
-                {sortedIndexes.length === 0 && search.length === 0 && (
-                  <Table.tr>
-                    <Table.td colSpan={4}>
-                      <p className="text-sm text-foreground">No indexes created yet</p>
-                      <p className="text-sm text-light">
-                        There are no indexes found in the schema "{selectedSchema}"
-                      </p>
-                    </Table.td>
-                  </Table.tr>
-                )}
-                {sortedIndexes.length === 0 && search.length > 0 && (
-                  <Table.tr>
-                    <Table.td colSpan={4}>
-                      <p className="text-sm text-foreground">No results found</p>
-                      <p className="text-sm text-light">
-                        Your search for "{search}" did not return any results
-                      </p>
-                    </Table.td>
-                  </Table.tr>
-                )}
-                {indexes.length > 0 &&
-                  indexes.map((index) => (
-                    <Table.tr key={index.name}>
-                      <Table.td>
-                        <p title={index.schema}>{index.schema}</p>
-                      </Table.td>
-                      <Table.td>
-                        <p title={index.table}>{index.table}</p>
-                      </Table.td>
-                      <Table.td>
-                        <p title={index.name}>{index.name}</p>
-                      </Table.td>
-                      <Table.td>
-                        <div className="flex justify-end items-center space-x-2">
-                          <Button type="default" onClick={() => setSelectedIndex(index)}>
-                            View definition
-                          </Button>
-                          <Button
-                            type="text"
-                            className="px-1"
-                            icon={<IconTrash />}
-                            onClick={() => setSelectedIndexToDelete(index)}
-                          />
-                        </div>
+          {isLoadingIndexes && <GenericSkeletonLoader />}
+
+          {isErrorIndexes && (
+            <AlertError error={indexesError as any} subject="Failed to retrieve database indexes" />
+          )}
+
+          {isSuccessIndexes && (
+            <Table
+              head={[
+                <Table.th key="schema">Schema</Table.th>,
+                <Table.th key="table">Table</Table.th>,
+                <Table.th key="name">Name</Table.th>,
+                <Table.th key="buttons"></Table.th>,
+              ]}
+              body={
+                <>
+                  {sortedIndexes.length === 0 && search.length === 0 && (
+                    <Table.tr>
+                      <Table.td colSpan={4}>
+                        <p className="text-sm text-foreground">No indexes created yet</p>
+                        <p className="text-sm text-foreground-light">
+                          There are no indexes found in the schema "{selectedSchema}"
+                        </p>
                       </Table.td>
                     </Table.tr>
-                  ))}
-              </>
-            }
-          />
-        )}
+                  )}
+                  {sortedIndexes.length === 0 && search.length > 0 && (
+                    <Table.tr>
+                      <Table.td colSpan={4}>
+                        <p className="text-sm text-foreground">No results found</p>
+                        <p className="text-sm text-foreground-light">
+                          Your search for "{search}" did not return any results
+                        </p>
+                      </Table.td>
+                    </Table.tr>
+                  )}
+                  {indexes.length > 0 &&
+                    indexes.map((index) => (
+                      <Table.tr key={index.name}>
+                        <Table.td>
+                          <p title={index.schema}>{index.schema}</p>
+                        </Table.td>
+                        <Table.td>
+                          <p title={index.table}>{index.table}</p>
+                        </Table.td>
+                        <Table.td>
+                          <p title={index.name}>{index.name}</p>
+                        </Table.td>
+                        <Table.td>
+                          <div className="flex justify-end items-center space-x-2">
+                            <Button type="default" onClick={() => setSelectedIndex(index)}>
+                              View definition
+                            </Button>
+                            {!isLocked && (
+                              <Button
+                                type="text"
+                                className="px-1"
+                                icon={<IconTrash />}
+                                onClick={() => setSelectedIndexToDelete(index)}
+                              />
+                            )}
+                          </div>
+                        </Table.td>
+                      </Table.tr>
+                    ))}
+                </>
+              }
+            />
+          )}
+        </div>
       </div>
 
       <SidePanel
@@ -292,7 +303,7 @@ const Indexes = () => {
               <li className="flex gap-3">
                 <div>
                   <strong className="text-sm">Before deleting this index, consider:</strong>
-                  <ul className="space-y-2 mt-2 text-sm text-light">
+                  <ul className="space-y-2 mt-2 text-sm text-foreground-light">
                     <li className="list-disc ml-6">This index is no longer in use</li>
                     <li className="list-disc ml-6">
                       The table which the index is on is not currently in use, as dropping an index

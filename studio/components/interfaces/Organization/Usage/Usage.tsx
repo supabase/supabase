@@ -101,7 +101,7 @@ const Usage = () => {
 
   return (
     <>
-      <ScaffoldContainer className="sticky top-0 border-b bg-scale-200 z-10 overflow-hidden">
+      <ScaffoldContainer className="sticky top-0 border-b bg-background z-10 overflow-hidden">
         <div className="py-4 flex items-center space-x-4">
           {isLoadingSubscription && <ShimmeringLoader className="w-[250px]" />}
 
@@ -121,6 +121,7 @@ const Usage = () => {
                 options={[...TIME_PERIODS_BILLING, ...TIME_PERIODS_REPORTS]}
                 loading={isLoadingSubscription}
                 currentBillingPeriodStart={subscription?.current_period_start}
+                currentBillingPeriodEnd={subscription?.current_period_end}
               />
 
               <Listbox
@@ -174,16 +175,15 @@ const Usage = () => {
             variant="danger"
             title="Your organization's usage has exceeded its included quota"
             actions={[
-              <Link
-                key="upgrade-button"
-                href={`/org/${slug}/billing?panel=${
-                  subscription.plan.id === 'free' ? 'subscriptionPlan' : 'costControl'
-                }`}
-              >
-                <Button asChild key="upgrade-button" type="default" className="ml-8">
-                  <a>{subscription.plan.id === 'free' ? 'Upgrade plan' : 'Change spend cap'}</a>
-                </Button>
-              </Link>,
+              <Button key="upgrade-button" asChild type="default" className="ml-8">
+                <Link
+                  href={`/org/${slug}/billing?panel=${
+                    subscription.plan.id === 'free' ? 'subscriptionPlan' : 'costControl'
+                  }`}
+                >
+                  {subscription.plan.id === 'free' ? 'Upgrade plan' : 'Change spend cap'}
+                </Link>
+              </Button>,
             ]}
           >
             Your projects can become unresponsive or enter read only mode.{' '}
@@ -209,13 +209,15 @@ const Usage = () => {
                   "All Projects".
                 </p>
                 <div>
-                  <Link href="https://supabase.com/docs/guides/platform/org-based-billing">
-                    <a target="_blank" rel="noreferrer">
-                      <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                        Documentation
-                      </Button>
-                    </a>
-                  </Link>
+                  <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                    <Link
+                      href="https://supabase.com/docs/guides/platform/org-based-billing"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Documentation
+                    </Link>
+                  </Button>
                 </div>
               </div>
             }

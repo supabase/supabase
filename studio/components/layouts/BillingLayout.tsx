@@ -16,17 +16,18 @@ const BillingLayout = ({ children }: PropsWithChildren<BillingLayoutProps>) => {
       <div className="flex h-full w-full flex-col">
         {/* Header */}
         <div className="flex items-center space-x-4 border-b py-4 px-5 dark:border-dark">
-          <Link href={`/project/${selectedProject?.ref}/settings/billing/subscription`} passHref>
-            <a className="text-scale-900 transition-colors hover:text-foreground">
-              <IconX size={16} strokeWidth={1.5} />
-            </a>
+          <Link
+            href={`/org/${selectedOrganization?.slug}/billing`}
+            className="text-foreground-lighter transition-colors hover:text-foreground"
+          >
+            <IconX size={16} strokeWidth={1.5} />
           </Link>
           <div className="flex items-center space-x-6">
             <h1 className="text-sm text-foreground">Customize your plan</h1>
-            <div className="h-6 w-px bg-scale-600"></div>
+            <div className="h-6 w-px bg-selection"></div>
             <div className="flex items-center space-x-3">
               <p className="text-sm text-foreground-light">{selectedOrganization?.name}</p>
-              <span className="text-scale-800">
+              <span className="text-border-stronger">
                 <svg
                   viewBox="0 0 24 24"
                   width="16"

@@ -1,26 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import generator from 'generate-password'
-import { debounce, isUndefined } from 'lodash'
-import { observer } from 'mobx-react-lite'
+import { debounce } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useRef, useState } from 'react'
-import {
-  Alert,
-  Button,
-  IconExternalLink,
-  IconHelpCircle,
-  IconInfo,
-  IconUsers,
-  Input,
-  Listbox,
-  Toggle,
-} from 'ui'
+import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 
-import { SpendCapModal } from 'components/interfaces/BillingV2'
 import {
-  EmptyPaymentMethodWarning,
   FreeProjectLimitWarning,
   NotOrganizationOwnerWarning,
 } from 'components/interfaces/Organization/NewProject'
@@ -30,7 +16,6 @@ import InformationBox from 'components/ui/InformationBox'
 import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
-import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import {
   ProjectCreateVariables,
@@ -45,15 +30,12 @@ import {
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
   DEFAULT_PROVIDER,
   FLY_REGIONS,
-  PRICING_TIER_DEFAULT_KEY,
-  PRICING_TIER_FREE_KEY,
-  PRICING_TIER_LABELS,
-  PRICING_TIER_PRODUCT_IDS,
   PROVIDERS,
   Region,
 } from 'lib/constants'
 import { passwordStrength, pluckObjectFields } from 'lib/helpers'
 import { NextPageWithLayout } from 'types'
+import { Button, IconExternalLink, IconInfo, IconUsers, Input, Listbox } from 'ui'
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
@@ -71,28 +53,16 @@ const Wizard: NextPageWithLayout = () => {
 
   const [dbPass, setDbPass] = useState('')
   const [dbRegion, setDbRegion] = useState(PROVIDERS[cloudProvider].default_region)
-  const [dbPricingTierKey, setDbPricingTierKey] = useState(PRICING_TIER_DEFAULT_KEY)
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(0)
-  const [showSpendCapHelperModal, setShowSpendCapHelperModal] = useState(false)
-  const [isSpendCapEnabled, setIsSpendCapEnabled] = useState(true)
 
   const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
   const currentOrg = organizations?.find((o: any) => o.slug === slug)
-  const billedViaOrg = Boolean(currentOrg?.subscription_id)
 
-  const { data: paymentMethods, refetch: refetchPaymentMethods } =
-    useOrganizationPaymentMethodsQuery({ slug })
+  const { data: orgSubscription } = useOrgSubscriptionQuery({ orgSlug: slug })
 
-  const { data: orgSubscription } = useOrgSubscriptionQuery(
-    { orgSlug: slug },
-    { enabled: billedViaOrg }
-  )
-
-  const { data: allProjects } = useProjectsQuery({
-    enabled: currentOrg?.subscription_id != undefined,
-  })
+  const { data: allProjects } = useProjectsQuery({})
 
   const {
     mutate: createProject,
@@ -113,52 +83,52 @@ const Wizard: NextPageWithLayout = () => {
   )
 
   const isAdmin = useCheckPermissions(PermissionAction.CREATE, 'projects')
-  const isInvalidSlug = isUndefined(currentOrg)
+  const isInvalidSlug = isOrganizationsSuccess && currentOrg === undefined
   const isEmptyOrganizations = (organizations?.length ?? 0) <= 0 && isOrganizationsSuccess
-  const isEmptyPaymentMethod = paymentMethods ? !paymentMethods.length : false
-  const isSelectFreeTier = dbPricingTierKey === PRICING_TIER_FREE_KEY
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
 
   const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
 
   const freePlanWithExceedingLimits =
-    ((isSelectFreeTier && !billedViaOrg) || orgSubscription?.plan?.id === 'free') &&
-    hasMembersExceedingFreeTierLimit
+    orgSubscription?.plan?.id === 'free' && hasMembersExceedingFreeTierLimit
 
   const canCreateProject = isAdmin && !freePlanWithExceedingLimits
 
   const canSubmit =
     projectName !== '' &&
     passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH &&
-    dbRegion !== undefined &&
-    dbPricingTierKey !== ''
+    dbRegion !== undefined
 
   const delayedCheckPasswordStrength = useRef(
     debounce((value) => checkPasswordStrength(value), 300)
   ).current
 
-  /*
-   * Handle no org
-   * redirect to new org route
-   */
-  if (isEmptyOrganizations) {
-    router.push(`/new`)
-  }
+  useEffect(() => {
+    /*
+     * Handle no org
+     * redirect to new org route
+     */
+    if (isEmptyOrganizations) {
+      router.push(`/new`)
+    }
+  }, [isEmptyOrganizations, router])
 
-  /*
-   * Redirect to first org if the slug doesn't match an org slug
-   * this is mainly to capture the /project/new url, which is redirected from database.new
-   */
-  if (isInvalidSlug && (organizations?.length ?? 0) > 0) {
-    router.push(`/new/${organizations?.[0].slug}`)
-  }
+  useEffect(() => {
+    /*
+     * Redirect to first org if the slug doesn't match an org slug
+     * this is mainly to capture the /new/new-project url, which is redirected from database.new
+     */
+    if (isInvalidSlug && (organizations?.length ?? 0) > 0) {
+      router.push(`/new/${organizations?.[0].slug}`)
+    }
+  }, [isInvalidSlug, organizations])
 
   useEffect(() => {
     // User added a new payment method
     if (router.query.setup_intent && router.query.redirect_status) {
       ui.setNotification({ category: 'success', message: 'Successfully added new payment method' })
     }
-  }, [])
+  }, [router.query.redirect_status, router.query.setup_intent, ui])
 
   function onProjectNameChange(e: any) {
     e.target.value = e.target.value.replace(/\./g, '')
@@ -185,10 +155,6 @@ const Wizard: NextPageWithLayout = () => {
     }
   }
 
-  function onDbPricingPlanChange(value: string) {
-    setDbPricingTierKey(value)
-  }
-
   async function checkPasswordStrength(value: any) {
     const { message, warning, strength } = await passwordStrength(value)
     setPasswordStrengthScore(strength)
@@ -199,14 +165,13 @@ const Wizard: NextPageWithLayout = () => {
   const onClickNext = async () => {
     if (!currentOrg) return console.error('Unable to retrieve current organization')
 
-    const dbTier = dbPricingTierKey === 'PRO' && !isSpendCapEnabled ? 'PAYG' : dbPricingTierKey
     const data: ProjectCreateVariables = {
       cloudProvider,
       organizationId: currentOrg.id,
       name: projectName.trim(),
       dbPass: dbPass,
       dbRegion: dbRegion,
-      dbPricingTierId: (PRICING_TIER_PRODUCT_IDS as any)[dbTier],
+      dbPricingTierId: 'tier_free', // gets ignored due to org billing subscription anyway
     }
     if (postgresVersion) {
       if (!postgresVersion.match(/1[2-9]\..*/)) {
@@ -271,7 +236,9 @@ const Wizard: NextPageWithLayout = () => {
           </Button>
           <div className="items-center space-x-3">
             {!projectCreationDisabled && (
-              <span className="text-xs text-scale-900">You can rename your project later</span>
+              <span className="text-xs text-foreground-lighter">
+                You can rename your project later
+              </span>
             )}
             <Button
               onClick={onClickNext}
@@ -286,7 +253,7 @@ const Wizard: NextPageWithLayout = () => {
     >
       <>
         <Panel.Content className="pt-0 pb-6">
-          <p className="text-sm text-scale-900">
+          <p className="text-sm text-foreground-lighter">
             Your project will have its own dedicated instance and full postgres database.
             <br />
             An API will be set up so you can easily interact with your new database.
@@ -460,229 +427,77 @@ const Wizard: NextPageWithLayout = () => {
               </>
             )}
 
-            {billedViaOrg && (
-              <Panel.Content>
-                <InformationBox
-                  icon={<IconInfo size="large" strokeWidth={1.5} />}
-                  defaultVisibility={true}
-                  hideCollapse
-                  title="Billed via organization"
-                  description={
-                    <div className="space-y-3">
-                      <p className="text-sm leading-normal">
-                        This organization uses the new organization-based billing and is on the{' '}
-                        <span className="text-brand">{orgSubscription?.plan?.name} plan</span>.
-                      </p>
+            <Panel.Content>
+              <InformationBox
+                icon={<IconInfo size="large" strokeWidth={1.5} />}
+                defaultVisibility={true}
+                hideCollapse
+                title="Billed via organization"
+                description={
+                  <div className="space-y-3">
+                    <p className="text-sm leading-normal">
+                      This organization uses the new organization-based billing and is on the{' '}
+                      <span className="text-brand">{orgSubscription?.plan?.name} plan</span>.
+                    </p>
 
-                      {/* Show info when launching a new project in a paid org that has no project yet */}
-                      {orgSubscription?.plan?.id !== 'free' && orgProjectCount === 0 && (
-                        <div>
-                          <p>
-                            As this is the first project you're launching in this organization, it
-                            comes with no additional compute costs.
-                          </p>
-                        </div>
-                      )}
+                    {/* Show info when launching a new project in a paid org that has no project yet */}
+                    {orgSubscription?.plan?.id !== 'free' && orgProjectCount === 0 && (
+                      <div>
+                        <p>
+                          As this is the first project you're launching in this organization, it
+                          comes with no additional compute costs.
+                        </p>
+                      </div>
+                    )}
 
-                      {/* Show info when launching a new project in a paid org that already has at least one project */}
-                      {orgSubscription?.plan?.id !== 'free' && orgProjectCount > 0 && (
-                        <div>
-                          <p>
-                            Launching another project incurs additional compute costs, starting at
-                            $0.01344 per hour (~$10/month). You can also create a new organization
-                            under the free plan in case you have not exceeded your 2 free project
-                            limit.
-                          </p>
-                        </div>
-                      )}
+                    {/* Show info when launching a new project in a paid org that already has at least one project */}
+                    {orgSubscription?.plan?.id !== 'free' && orgProjectCount > 0 && (
+                      <div>
+                        <p>
+                          Launching another project incurs additional compute costs, starting at
+                          $0.01344 per hour (~$10/month). You can also create a new organization
+                          under the free plan in case you have not exceeded your 2 free project
+                          limit.
+                        </p>
+                      </div>
+                    )}
 
-                      <div className="space-x-3">
-                        <Link href="https://supabase.com/blog/organization-based-billing" passHref>
-                          <Button
-                            asChild
-                            type="default"
-                            icon={<IconExternalLink strokeWidth={1.5} />}
-                          >
-                            <a target="_blank" rel="noreferrer">
-                              Announcement
-                            </a>
-                          </Button>
+                    <div className="space-x-3">
+                      <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                        <Link
+                          href="https://supabase.com/blog/organization-based-billing"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Announcement
                         </Link>
+                      </Button>
+                      <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                         <Link
                           href="https://supabase.com/docs/guides/platform/org-based-billing"
-                          passHref
+                          target="_blank"
+                          rel="noreferrer"
                         >
-                          <Button
-                            asChild
-                            type="default"
-                            icon={<IconExternalLink strokeWidth={1.5} />}
-                          >
-                            <a target="_blank" rel="noreferrer">
-                              Documentation
-                            </a>
-                          </Button>
+                          Documentation
                         </Link>
-                      </div>
+                      </Button>
                     </div>
-                  }
-                />
-              </Panel.Content>
-            )}
+                  </div>
+                }
+              />
+            </Panel.Content>
 
             {isAdmin && (
               <Panel.Content>
-                {!billedViaOrg && (
-                  <Listbox
-                    label="Pricing Plan"
-                    layout="horizontal"
-                    value={dbPricingTierKey}
-                    onChange={onDbPricingPlanChange}
-                    descriptionText={
-                      <>
-                        Select a plan that suits your needs.&nbsp;
-                        <a
-                          className="underline"
-                          target="_blank"
-                          rel="noreferrer"
-                          href="https://supabase.com/pricing"
-                        >
-                          More details
-                        </a>
-                        {!isSelectFreeTier && !isEmptyPaymentMethod && (
-                          <Alert
-                            title="Your payment method will be charged"
-                            variant="warning"
-                            withIcon
-                            className="mt-3"
-                          >
-                            <p>
-                              By creating a new Pro Project, there will be an immediate charge of
-                              $25 once the project has been created.
-                            </p>
-                          </Alert>
-                        )}
-                      </>
-                    }
-                  >
-                    {Object.entries(PRICING_TIER_LABELS).map(([k, v]) => {
-                      const label = `${v}${k === 'PRO' ? ' - $25/month' : ' - $0/month'}`
-                      return (
-                        <Listbox.Option key={k} label={label} value={k}>
-                          {label}
-                        </Listbox.Option>
-                      )
-                    })}
-                  </Listbox>
-                )}
-
                 {freePlanWithExceedingLimits && slug && (
-                  <div className={billedViaOrg ? '' : 'mt-4'}>
+                  <div className="mt-4">
                     <FreeProjectLimitWarning
                       membersExceededLimit={membersExceededLimit || []}
-                      orgLevelBilling={billedViaOrg}
                       orgSlug={slug}
                     />
                   </div>
                 )}
-
-                {!billedViaOrg && !isSelectFreeTier && isEmptyPaymentMethod && (
-                  <EmptyPaymentMethodWarning onPaymentMethodAdded={() => refetchPaymentMethods()} />
-                )}
               </Panel.Content>
-            )}
-
-            {!billedViaOrg && (
-              <Panel.Content>
-                <InformationBox
-                  icon={<IconInfo size="large" strokeWidth={1.5} />}
-                  defaultVisibility={true}
-                  hideCollapse
-                  title="We're upgrading our billing system"
-                  description={
-                    <div className="space-y-3">
-                      <p className="text-sm leading-normal">
-                        This organization uses the legacy project-based billing. We’ve recently made
-                        some big improvements to our billing system. To migrate to the new
-                        organization-based billing, head over to your{' '}
-                        <Link href={`/org/${slug}/billing`}>
-                          <a className="text-sm text-green-900 transition hover:text-green-1000">
-                            organization billing settings
-                          </a>
-                        </Link>
-                        .
-                      </p>
-
-                      <div className="space-x-3">
-                        <Link href="https://supabase.com/blog/organization-based-billing" passHref>
-                          <Button
-                            asChild
-                            type="default"
-                            icon={<IconExternalLink strokeWidth={1.5} />}
-                          >
-                            <a target="_blank" rel="noreferrer">
-                              Announcement
-                            </a>
-                          </Button>
-                        </Link>
-                        <Link
-                          href="https://supabase.com/docs/guides/platform/org-based-billing"
-                          passHref
-                        >
-                          <Button
-                            asChild
-                            type="default"
-                            icon={<IconExternalLink strokeWidth={1.5} />}
-                          >
-                            <a target="_blank" rel="noreferrer">
-                              Documentation
-                            </a>
-                          </Button>
-                        </Link>
-                      </div>
-                    </div>
-                  }
-                />
-              </Panel.Content>
-            )}
-
-            {!billedViaOrg && !isSelectFreeTier && (
-              <>
-                <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
-                  <Toggle
-                    id="project-name"
-                    layout="horizontal"
-                    label={
-                      <div className="flex space-x-4">
-                        <span>Spend Cap</span>
-                        <IconHelpCircle
-                          size={16}
-                          strokeWidth={1.5}
-                          className="transition opacity-50 cursor-pointer hover:opacity-100"
-                          onClick={() => setShowSpendCapHelperModal(true)}
-                        />
-                      </div>
-                    }
-                    placeholder="Project name"
-                    checked={isSpendCapEnabled}
-                    onChange={() => setIsSpendCapEnabled(!isSpendCapEnabled)}
-                    descriptionText={
-                      <div>
-                        <p>
-                          By default, Pro projects have spend caps to control costs. When enabled,
-                          usage is limited to the plan's quota, with restrictions when limits are
-                          exceeded. To scale beyond Pro limits without restrictions, disable the
-                          spend cap and pay for over-usage beyond the quota.
-                        </p>
-                      </div>
-                    }
-                  />
-                </Panel.Content>
-
-                <SpendCapModal
-                  visible={showSpendCapHelperModal}
-                  onHide={() => setShowSpendCapHelperModal(false)}
-                />
-              </>
             )}
           </>
         )}
@@ -691,11 +506,11 @@ const Wizard: NextPageWithLayout = () => {
   )
 }
 
-const PageLayout = withAuth(({ children }) => {
+const PageLayout = withAuth(({ children }: PropsWithChildren) => {
   const { slug } = useParams()
 
   const { data: organizations } = useOrganizationsQuery()
-  const currentOrg = organizations?.find((o: any) => o.slug === slug)
+  const currentOrg = organizations?.find((o) => o.slug === slug)
 
   return (
     <WizardLayoutWithoutAuth organization={currentOrg} project={null}>
@@ -706,4 +521,4 @@ const PageLayout = withAuth(({ children }) => {
 
 Wizard.getLayout = (page) => <PageLayout>{page}</PageLayout>
 
-export default observer(Wizard)
+export default Wizard

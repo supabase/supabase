@@ -263,7 +263,7 @@ const ForeignKeySelector = ({
                   <div className="flex items-center gap-2">
                     {/* For aria searching to target the table name instead of schema */}
                     <span className="hidden">{table.name}</span>
-                    <span className="text-scale-900">{table.schema}</span>
+                    <span className="text-foreground-lighter">{table.schema}</span>
                     <span className="text-foreground">{table.name}</span>
                   </div>
                 </Listbox.Option>
@@ -309,7 +309,7 @@ const ForeignKeySelector = ({
                     <Listbox.Option key={column.id} value={column.id} label={column.name}>
                       <div className="flex items-center gap-2">
                         <span className="text-foreground">{column.name}</span>
-                        <span className="text-scale-900">{column.format}</span>
+                        <span className="text-foreground-lighter">{column.format}</span>
                       </div>
                     </Listbox.Option>
                   ))}

@@ -470,7 +470,7 @@ const SelectEnabledMode = observer(({}) => {
         label="Origin"
       >
         Origin
-        <span className="block text-scale-900">This is a default behaviour</span>
+        <span className="block text-foreground-lighter">This is a default behaviour</span>
       </Listbox.Option>
       <Listbox.Option
         addOnBefore={({ active, selected }: any) => {
@@ -482,7 +482,7 @@ const SelectEnabledMode = observer(({}) => {
         label="Replica"
       >
         Replica
-        <span className="block text-scale-900">
+        <span className="block text-foreground-lighter">
           Will only fire if the session is in “replica” mode
         </span>
       </Listbox.Option>
@@ -496,7 +496,7 @@ const SelectEnabledMode = observer(({}) => {
         label="Always"
       >
         Always
-        <span className="block text-scale-900">
+        <span className="block text-foreground-lighter">
           Will fire regardless of the current replication role
         </span>
       </Listbox.Option>
@@ -510,7 +510,7 @@ const SelectEnabledMode = observer(({}) => {
         label="Disabled"
       >
         Disabled
-        <span className="block text-scale-900">Will not fire</span>
+        <span className="block text-foreground-lighter">Will not fire</span>
       </Listbox.Option>
     </Listbox>
   )
@@ -535,11 +535,11 @@ const SelectOrientation = observer(({}) => {
     >
       <Listbox.Option value="ROW" label="Row">
         Row
-        <span className="block text-scale-900">fires once for each processed row</span>
+        <span className="block text-foreground-lighter">fires once for each processed row</span>
       </Listbox.Option>
       <Listbox.Option value="STATEMENT" label="Statement">
         Statement
-        <span className="block text-scale-900">fires once for each statement</span>
+        <span className="block text-foreground-lighter">fires once for each statement</span>
       </Listbox.Option>
     </Listbox>
   )
@@ -583,7 +583,7 @@ const ListboxTable = observer(({}) => {
             value={x.id}
             label={x.name}
             addOnBefore={() => (
-              <div className="flex items-center justify-center rounded bg-scale-1200 p-1 text-scale-100 ">
+              <div className="flex items-center justify-center rounded bg-foreground p-1 text-background">
                 <SVG
                   src={`${BASE_PATH}/img/table-editor.svg`}
                   style={{ width: `16px`, height: `16px`, strokeWidth: '1px' }}
@@ -596,7 +596,7 @@ const ListboxTable = observer(({}) => {
           >
             <div className="flex flex-row items-center space-x-1">
               <p className="text-sm text-foreground-light">{x.schema}</p>
-              <p className="text">{x.name}</p>
+              <p className="text-foreground">{x.name}</p>
             </div>
           </Listbox.Option>
         )
@@ -674,14 +674,14 @@ const ListboxActivation = observer(({}) => {
         value={'BEFORE'}
         label={'Before the event'}
         addOnBefore={() => (
-          <div className="flex items-center justify-center rounded bg-scale-1200 p-1 text-scale-100 ">
+          <div className="flex items-center justify-center rounded bg-foreground p-1 text-background">
             <IconPauseCircle strokeWidth={2} size="small" />
           </div>
         )}
       >
         <div className="flex flex-col">
           <span>{'before'}</span>
-          <span className="block text-scale-900">
+          <span className="block text-foreground-lighter">
             Trigger fires before the operation is attempted
           </span>
         </div>
@@ -691,14 +691,14 @@ const ListboxActivation = observer(({}) => {
         value={'AFTER'}
         label={'After the event'}
         addOnBefore={() => (
-          <div className="flex items-center justify-center rounded bg-green-1200 p-1 text-scale-100 ">
+          <div className="flex items-center justify-center rounded bg-green-1200 p-1 text-background">
             <IconPlayCircle strokeWidth={2} size="small" />
           </div>
         )}
       >
         <div className="flex flex-col">
           <span>{'after'}</span>
-          <span className="block text-scale-900">
+          <span className="block text-foreground-lighter">
             Trigger fires after the operation has completed
           </span>
         </div>
@@ -735,11 +735,10 @@ const FunctionEmpty = observer(({}) => {
       className={[
         'relative w-full',
         'rounded',
-        'border border-scale-600',
-        'bg-scale-200 px-5 py-1',
+        'border border-default',
+        'bg-surface-200 px-5 py-1',
         'shadow-sm transition-all',
-        'hover:border-scale-700 hover:bg-scale-300',
-        'dark:bg-scale-400 dark:hover:bg-scale-500',
+        'hover:border-strong hover:bg-overlay-hover',
       ].join(' ')}
     >
       <FormEmptyBox
@@ -760,12 +759,12 @@ const FunctionWithArguments = observer(({}) => {
           'relative w-full',
           'flex items-center justify-between',
           'space-x-3 px-5 py-4',
-          'border border-scale-200 dark:border-scale-500',
+          'border border-default',
           'rounded shadow-sm transition-shadow',
         ].join(' ')}
       >
         <div className="flex items-center gap-2">
-          <div className="flex h-6 w-6 items-center justify-center rounded bg-scale-1200 text-scale-100 focus-within:bg-opacity-10">
+          <div className="flex h-6 w-6 items-center justify-center rounded bg-foreground text-background focus-within:bg-opacity-10">
             <IconTerminal size="small" strokeWidth={2} width={14} />
           </div>
           <div className="flex items-center gap-2">

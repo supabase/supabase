@@ -1,14 +1,14 @@
-import { Modal, IconChevronLeft } from 'ui'
 import { pull } from 'lodash'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { IconChevronLeft, Modal } from 'ui'
 
 import { useStore } from 'hooks'
-import { STORAGE_POLICY_TEMPLATES } from './StoragePolicies.constants'
 import {
+  applyBucketIdToTemplateDefinition,
   createPayloadsForAddPolicy,
   createSQLPolicies,
-  applyBucketIdToTemplateDefinition,
 } from '../Storage.utils'
+import { STORAGE_POLICY_TEMPLATES } from './StoragePolicies.constants'
 
 import {
   PolicySelection,
@@ -181,7 +181,7 @@ const StoragePoliciesEditPolicyModal = ({
           <div className="flex items-center space-x-3">
             <span
               onClick={onSelectBackFromTemplates}
-              className="cursor-pointer text-scale-900 transition-colors hover:text-foreground"
+              className="cursor-pointer text-foreground-lighter transition-colors hover:text-foreground"
             >
               <IconChevronLeft strokeWidth={2} size={14} />
             </span>

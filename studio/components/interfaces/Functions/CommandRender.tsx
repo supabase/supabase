@@ -1,5 +1,5 @@
-import { IconCheck, IconClipboard } from 'ui'
 import { useState } from 'react'
+import { IconCheck, IconClipboard } from 'ui'
 
 const CommandRender = ({ commands }: any) => {
   return (
@@ -17,15 +17,15 @@ const Command = ({ item }: any) => {
   const [isCopied, setIsCopied] = useState(false)
   return (
     <div className="space-y-1">
-      <span className="font-mono text-sm text-scale-900">{`> ${item.comment}`}</span>
+      <span className="font-mono text-sm text-foreground-lighter">{`> ${item.comment}`}</span>
       <div className="flex items-center gap-2">
         <div className="flex gap-2 font-mono text-sm font-normal text-foreground">
-          <span className="text-scale-900">$</span>
+          <span className="text-foreground-lighter">$</span>
           <span>
             <span className="">{item.jsx ? item.jsx() : null} </span>
             <button
               type="button"
-              className="text-scale-900 hover:text-foreground"
+              className="text-foreground-lighter hover:text-foreground"
               onClick={() => {
                 function onCopy(value: any) {
                   setIsCopied(true)

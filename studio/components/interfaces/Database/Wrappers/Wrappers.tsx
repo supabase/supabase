@@ -44,24 +44,26 @@ const Wrappers = () => {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h3 className="mb-1 text-xl text-foreground">Foreign Data Wrappers</h3>
-            <div className="text-sm text-scale-900">
+            <div className="text-sm text-foreground-lighter">
               Query your data warehouse directly from your database, or third-party APIs using SQL.
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <Link href="https://supabase.com/docs/guides/database/extensions/wrappers/overview">
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                  Documentation
-                </Button>
-              </a>
-            </Link>
+            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+              <Link
+                href="https://supabase.com/docs/guides/database/extensions/wrappers/overview"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Documentation
+              </Link>
+            </Button>
             {isWrappersEnabled && <WrappersDropdown />}
           </div>
         </div>
 
         {isLoadingExtensions || isLoading ? (
-          <div className="p-12 space-y-2 border rounded border-scale-500">
+          <div className="p-12 space-y-2 border rounded border-default">
             <GenericSkeletonLoader />
           </div>
         ) : isWrappersEnabled ? (
@@ -69,7 +71,7 @@ const Wrappers = () => {
             {wrappers.length === 0 ? (
               <div
                 className={[
-                  'border rounded border-scale-500 px-20 py-16',
+                  'border rounded border-default px-20 py-16',
                   'flex flex-col items-center justify-center space-y-4',
                 ].join(' ')}
               >

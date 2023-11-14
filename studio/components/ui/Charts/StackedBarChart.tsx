@@ -1,10 +1,15 @@
 import { useState } from 'react'
-import { BarChart, Bar, XAxis, Tooltip, Legend, Cell, TooltipProps } from 'recharts'
+import { Bar, BarChart, Cell, Legend, Tooltip, XAxis } from 'recharts'
 import ChartHeader from './ChartHeader'
-import { CHART_COLORS, DateTimeFormats, DEFAULT_STACK_COLORS, genStackColorScales, ValidStackColor } from './Charts.constants'
+import {
+  CHART_COLORS,
+  DateTimeFormats,
+  DEFAULT_STACK_COLORS,
+  genStackColorScales,
+  ValidStackColor,
+} from './Charts.constants'
 import { CommonChartProps } from './Charts.types'
-import { timestampFormatter, useChartSize, useStacked } from './Charts.utils'
-import { precisionFormatter } from './Charts.utils'
+import { precisionFormatter, timestampFormatter, useChartSize, useStacked } from './Charts.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
 interface Props extends CommonChartProps<any> {
   xAxisKey: string
@@ -34,7 +39,7 @@ const StackedBarChart: React.FC<Props> = ({
   displayDateInUtc,
   hideLegend = false,
   hideHeader = false,
-  stackColors = DEFAULT_STACK_COLORS
+  stackColors = DEFAULT_STACK_COLORS,
 }) => {
   const { Container } = useChartSize(size)
   const { dataKeys, stackedData, percentagesStackedData } = useStacked({
@@ -138,7 +143,7 @@ const StackedBarChart: React.FC<Props> = ({
         </BarChart>
       </Container>
       {stackedData && stackedData[0] && (
-        <div className="text-scale-900 -mt-5 flex items-center justify-between text-xs">
+        <div className="text-foreground-lighter -mt-5 flex items-center justify-between text-xs">
           <span>
             {timestampFormatter(
               stackedData[0][xAxisKey] as string,

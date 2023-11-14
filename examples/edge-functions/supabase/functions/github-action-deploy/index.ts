@@ -2,11 +2,9 @@
 // https://deno.land/manual/getting_started/setup_your_environment
 // This enables autocomplete, go to definition, etc.
 
-import { serve } from 'std/server'
-
 console.log('Hello from Functions!')
 
-serve((_req) => {
+Deno.serve((_req) => {
   const data = {
     message: `I was deployed via GitHub Actions!`,
   }

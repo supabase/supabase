@@ -5,8 +5,8 @@ import { ChangeEvent, useRef, useState } from 'react'
 
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
-import { VercelIntegrationLayout } from 'components/layouts'
-import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
+import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
+import { ScaffoldColumn, ScaffoldContainer } from 'components/layouts/Scaffold'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
@@ -19,57 +19,39 @@ import { useSelectedOrganization, useStore } from 'hooks'
 import { AWS_REGIONS, DEFAULT_MINIMUM_PASSWORD_STRENGTH, PROVIDERS } from 'lib/constants'
 import { passwordStrength } from 'lib/helpers'
 import { getInitialMigrationSQLFromGitHubRepo } from 'lib/integration-utils'
+import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
 import { NextPageWithLayout } from 'types'
-import { Alert, Button, Checkbox, IconBook, IconLifeBuoy, Input, Listbox, LoadingLine } from 'ui'
+import { Alert, Button, Checkbox, Input, Listbox } from 'ui'
 
 const VercelIntegration: NextPageWithLayout = () => {
-  const [loading, setLoading] = useState<boolean>(false)
-
   return (
     <>
-      <main className="overflow-auto flex flex-col h-full">
-        <LoadingLine loading={loading} />
-
-        <>
-          <ScaffoldContainer className="max-w-md flex flex-col gap-6 grow py-8">
+      <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
+        <ScaffoldColumn className="mx-auto w-full max-w-md">
+          <header>
             <h1 className="text-xl text-foreground">New project</h1>
-            <>
-              <Markdown content={`Choose the Supabase organization you wish to install in`} />
-              <CreateProject loading={loading} setLoading={setLoading} />
-            </>
-          </ScaffoldContainer>
-          <ScaffoldContainer className="flex flex-col gap-6 py-3">
-            <Alert withIcon variant="info" title="You can uninstall this Integration at any time.">
-              <Markdown
-                content={`You can remove this integration at any time via Vercel or the Supabase dashboard.`}
-              />
-            </Alert>
-          </ScaffoldContainer>
-        </>
-
-        <ScaffoldDivider />
-      </main>
-      <ScaffoldContainer className="bg-body flex flex-row gap-6 py-6 border-t">
-        <div className="flex items-center gap-2 text-xs text-scale-900">
-          <IconBook size={16} /> Docs
-        </div>
-        <div className="flex items-center gap-2 text-xs text-scale-900">
-          <IconLifeBuoy size={16} /> Support
-        </div>
+            <Markdown
+              className="text-foreground-light"
+              content={`Choose the Supabase organization you wish to install in`}
+            />
+          </header>
+          <CreateProject />
+          <Alert withIcon variant="info" title="You can uninstall this Integration at any time.">
+            <Markdown
+              content={`You can remove this integration at any time via Vercel or the Supabase dashboard.`}
+            />
+          </Alert>
+        </ScaffoldColumn>
       </ScaffoldContainer>
     </>
   )
 }
 
-VercelIntegration.getLayout = (page) => <VercelIntegrationLayout>{page}</VercelIntegrationLayout>
+VercelIntegration.getLayout = (page) => (
+  <VercelIntegrationWindowLayout>{page}</VercelIntegrationWindowLayout>
+)
 
-const CreateProject = ({
-  loading,
-  setLoading,
-}: {
-  loading: boolean
-  setLoading: (e: boolean) => void
-}) => {
+const CreateProject = () => {
   const router = useRouter()
   const { ui } = useStore()
   const selectedOrganization = useSelectedOrganization()
@@ -79,6 +61,8 @@ const CreateProject = ({
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(-1)
   const [shouldRunMigrations, setShouldRunMigrations] = useState(true)
   const [dbRegion, setDbRegion] = useState(PROVIDERS.AWS.default_region)
+
+  const snapshot = useIntegrationInstallationSnapshot()
 
   const delayedCheckPasswordStrength = useRef(
     debounce((value: string) => checkPasswordStrength(value), 300)
@@ -161,7 +145,7 @@ const CreateProject = ({
     },
     onError: (error) => {
       ui.setNotification({ error, category: 'error', message: error.message })
-      setLoading(false)
+      snapshot.setLoading(false)
     },
   })
 
@@ -173,7 +157,7 @@ const CreateProject = ({
     if (!configurationId) return console.error('No configurationId ID set')
     if (!organization) return console.error('No organization ID set')
 
-    setLoading(true)
+    snapshot.setLoading(true)
 
     let dbSql: string | undefined
     if (shouldRunMigrations) {
@@ -251,7 +235,7 @@ const CreateProject = ({
           return
         }
 
-        setLoading(false)
+        snapshot.setLoading(false)
 
         if (next) {
           window.location.href = next
@@ -338,8 +322,8 @@ const CreateProject = ({
         <Button
           size="medium"
           className="self-end"
-          disabled={loading}
-          loading={loading}
+          disabled={snapshot.loading}
+          loading={snapshot.loading}
           onClick={onCreateProject}
         >
           Create Project

@@ -1,20 +1,19 @@
 import dayjs from 'dayjs'
-import { Loading } from 'ui'
 import { useState } from 'react'
 import {
-  BarChart as RechartBarChart,
-  Area,
   Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
+  BarChart as RechartBarChart,
   Cell,
   ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
 } from 'recharts'
+import { Loading } from 'ui'
 
-import { formatBytes } from 'lib/helpers'
-import EmptyState from 'components/ui/Charts/EmptyState'
 import { CHART_COLORS } from 'components/ui/Charts/Charts.constants'
+import EmptyState from 'components/ui/Charts/EmptyState'
+import { formatBytes } from 'lib/helpers'
 
 function dataCheck(data: any, attribute: any) {
   const hasData = data && data.find((record: any) => record[attribute])
@@ -81,7 +80,7 @@ const Header = ({
   const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
 
   const chartTitle = (
-    <h3 className={'text-scale-900 ' + (minimalHeader ? 'text-xs' : 'text-sm')}>
+    <h3 className={'text-foreground-lighter ' + (minimalHeader ? 'text-xs' : 'text-sm')}>
       {label ?? attribute}
     </h3>
   )
@@ -96,7 +95,7 @@ const Header = ({
     </h5>
   )
   const date = (
-    <h5 className="text-xs text-scale-900">
+    <h5 className="text-xs text-foreground-lighter">
       {focus ? (
         data && data[focus] && day(data[focus].period_start).format(FOCUS_FORMAT)
       ) : (
@@ -249,7 +248,7 @@ export function BarChart({
                 </RechartBarChart>
               </ResponsiveContainer>
               {data && (
-                <div className="-mt-5 flex items-center justify-between text-xs text-scale-900">
+                <div className="-mt-5 flex items-center justify-between text-xs text-foreground-lighter">
                   <span>
                     {day(data[0].period_start).format(
                       customDateFormat ? customDateFormat : DATE_FORMAT__WITH_TIME

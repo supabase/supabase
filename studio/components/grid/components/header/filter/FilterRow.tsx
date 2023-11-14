@@ -1,8 +1,8 @@
-import { memo, KeyboardEvent } from 'react'
-import { Button, Input, IconChevronDown, IconX } from 'ui'
+import { KeyboardEvent, memo } from 'react'
+import { Button, IconChevronDown, IconX, Input } from 'ui'
 
-import { Filter, FilterOperator, SupaTable } from 'components/grid/types'
 import { DropdownControl } from 'components/grid/components/common'
+import { Filter, FilterOperator, SupaTable } from 'components/grid/types'
 import { FilterOperatorOptions } from './Filter.constants'
 
 export interface FilterRowProps {
@@ -39,7 +39,7 @@ const FilterRow = ({ table, filter, filterIdx, onChange, onDelete, onKeyDown }: 
           asChild
           type="outline"
           icon={
-            <div className="text-scale-900">
+            <div className="text-foreground-lighter">
               <IconChevronDown strokeWidth={1.5} size={14} />
             </div>
           }
@@ -62,7 +62,7 @@ const FilterRow = ({ table, filter, filterIdx, onChange, onDelete, onKeyDown }: 
           asChild
           type="outline"
           icon={
-            <div className="text-scale-900">
+            <div className="text-foreground-lighter">
               <IconChevronDown strokeWidth={1.5} size={14} />
             </div>
           }

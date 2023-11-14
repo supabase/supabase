@@ -16,7 +16,7 @@ const PolicyAllowedOperation = ({
         <label className="text-base text-foreground-light" htmlFor="allowed-operation">
           Allowed operation
         </label>
-        <p className="text-sm text-scale-900">Select an operation for this policy</p>
+        <p className="text-sm text-foreground-lighter">Select an operation for this policy</p>
       </div>
       <div className="w-2/3">
         <div className="flex items-center space-x-8">

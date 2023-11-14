@@ -48,10 +48,11 @@ const UpgradingState = () => {
   const isFailed = status === DatabaseUpgradeStatus.Failed
   const isCompleted = status === DatabaseUpgradeStatus.Upgraded
 
-  const initiatedAt = dayjs(initiated_at ?? 0).format('DD MMM YYYY HH:mm:ss (ZZ)')
-  const initiatedAtUTC = dayjs(initiated_at ?? 0)
-    .utc()
-    .format('DD MMM YYYY HH:mm:ss')
+  const initiatedAtUTC = dayjs.utc(initiated_at ?? 0).format('DD MMM YYYY HH:mm:ss')
+  const initiatedAt = dayjs
+    .utc(initiated_at ?? 0)
+    .local()
+    .format('DD MMM YYYY HH:mm:ss (ZZ)')
 
   const refetchProjectDetails = async () => {
     setLoading(true)
@@ -71,7 +72,7 @@ const UpgradingState = () => {
           <h1 className="text-3xl">{project?.name}</h1>
         </div>
         <div className="w-full mx-auto mt-8 mb-16 max-w-7xl">
-          <div className="flex h-[500px] items-center justify-center rounded border border-scale-400 bg-scale-300 p-8">
+          <div className="flex h-[500px] items-center justify-center rounded border border-muted bg-surface-100 p-8">
             {isCompleted ? (
               <div className="grid gap-4">
                 <div className="relative mx-auto max-w-[300px]">
@@ -103,13 +104,15 @@ const UpgradingState = () => {
                   </p>
                 </div>
                 <div className="flex items-center mx-auto space-x-2">
-                  <Link
-                    href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
-                  >
-                    <a target="_blank" rel="noreferrer">
-                      <Button type="default">Contact support</Button>
-                    </a>
-                  </Link>
+                  <Button asChild type="default">
+                    <Link
+                      href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Contact support
+                    </Link>
+                  </Button>
                   <Button loading={loading} disabled={loading} onClick={refetchProjectDetails}>
                     Return to project
                   </Button>
@@ -121,7 +124,7 @@ const UpgradingState = () => {
                   <div className="absolute flex items-center justify-center w-full h-full">
                     <IconSettings className="animate-spin" size={20} strokeWidth={2} />
                   </div>
-                  <IconCircle className="text-scale-900" size={50} strokeWidth={1.5} />
+                  <IconCircle className="text-foreground-lighter" size={50} strokeWidth={1.5} />
                 </div>
                 <div className="space-y-2">
                   <p className="text-center">Upgrading in progress</p>
@@ -177,11 +180,11 @@ const UpgradingState = () => {
                                 />
                               </div>
                             ) : isCompleted ? (
-                              <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-brand-300 border-brand-400">
-                                <IconCheck size={12} className="text-white" strokeWidth={2} />
+                              <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-brand border-brand">
+                                <IconCheck size={12} className="text-white" strokeWidth={3} />
                               </div>
                             ) : (
-                              <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-scale-600" />
+                              <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-overlay-hover" />
                             )}
                             <p
                               className={`text-sm ${
@@ -216,8 +219,8 @@ const UpgradingState = () => {
                           <Tooltip.Arrow className="radix-tooltip-arrow" />
                           <div
                             className={[
-                              'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                              'border border-scale-200 ', //border
+                              'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                              'border border-background', //border
                             ].join(' ')}
                           >
                             <span className="text-xs text-foreground">{initiatedAt}</span>

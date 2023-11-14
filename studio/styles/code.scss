@@ -16,13 +16,13 @@
 
   .token.imports,
   .token.property-access {
-    @apply text-scale-900 #{!important};
+    @apply text-foreground-lighter #{!important};
   }
 
   .token.keyword.module,
   .token.function {
     font-style: normal !important;
-    @apply text-scale-900 #{!important};
+    @apply text-foreground-lighter #{!important};
   }
 
   .token.plain,
@@ -56,7 +56,7 @@
 
   .token.comment {
     font-style: normal !important;
-    @apply text-scale-900 #{!important};
+    @apply text-foreground-lighter #{!important};
   }
 
   .token.number {

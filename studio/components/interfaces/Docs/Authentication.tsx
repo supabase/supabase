@@ -25,7 +25,7 @@ const Authentication = ({ autoApiService, selectedLang, showApiKey }: Authentica
     <>
       <h2 className="doc-heading">Authentication</h2>
       <div className="doc-section">
-        <article className="text ">
+        <article className="code-column text-foreground">
           <p>Supabase works through a mixture of JWT and Key auth.</p>
           <p>
             If no <code>Authorization</code> header is included, the API will assume that you are
@@ -41,7 +41,7 @@ const Authentication = ({ autoApiService, selectedLang, showApiKey }: Authentica
 
       <h2 className="doc-heading">Client API Keys</h2>
       <div className="doc-section ">
-        <article className="text ">
+        <article className="code-column text-foreground">
           <p>
             Client keys allow "anonymous access" to your database, until the user has logged in.
             After logging in the keys will switch to the user's own login token.
@@ -53,9 +53,7 @@ const Authentication = ({ autoApiService, selectedLang, showApiKey }: Authentica
           <p>
             We have provided you a Client Key to get started. You will soon be able to add as many
             keys as you like. You can find the <code>anon</code> key in the{' '}
-            <Link href={`/project/${autoApiService.project.ref}/settings/api`}>
-              <a>API Settings</a>
-            </Link>{' '}
+            <Link href={`/project/${autoApiService.project.ref}/settings/api`}>API Settings</Link>{' '}
             page.
           </p>
         </article>
@@ -75,7 +73,7 @@ const Authentication = ({ autoApiService, selectedLang, showApiKey }: Authentica
 
       <h2 className="doc-heading">Service Keys</h2>
       <div className="doc-section ">
-        <article className="text ">
+        <article className="code-column text-foreground">
           <p>
             Service keys have FULL access to your data, bypassing any security policies. Be VERY
             careful where you expose these keys. They should only be used on a server and never on a
@@ -87,9 +85,7 @@ const Authentication = ({ autoApiService, selectedLang, showApiKey }: Authentica
           <p>
             We have provided you with a Service Key to get started. Soon you will be able to add as
             many keys as you like. You can find the <code>service_role</code> in the{' '}
-            <Link href={`/project/${autoApiService.project.ref}/settings/api`}>
-              <a>API Settings</a>
-            </Link>{' '}
+            <Link href={`/project/${autoApiService.project.ref}/settings/api`}>API Settings</Link>{' '}
             page.
           </p>
         </article>

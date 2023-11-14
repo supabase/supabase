@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { EditorProps } from '@supabase/react-data-grid'
+import { RenderEditCellProps } from 'react-data-grid'
 
 function autoFocusAndSelect(input: HTMLInputElement | null) {
   input?.focus()
@@ -11,7 +11,7 @@ export function DateEditor<TRow, TSummaryRow = unknown>({
   column,
   onRowChange,
   onClose,
-}: EditorProps<TRow, TSummaryRow>) {
+}: RenderEditCellProps<TRow, TSummaryRow>) {
   const value = row[column.key as keyof TRow] as unknown as string
 
   function onChange(event: React.ChangeEvent<HTMLInputElement>) {

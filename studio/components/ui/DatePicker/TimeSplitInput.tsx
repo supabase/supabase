@@ -161,11 +161,11 @@ const TimeSplitInput = ({
     <div
       className={`
         flex h-7 items-center justify-center
-        gap-0 rounded border border-scale-700 bg-scale-100 text-xs text-foreground-light dark:bg-scaleA-300
-        ${focus && ' border-scale-800 outline outline-2 outline-scale-500'}
+        gap-0 rounded border border-strong bg-surface-100 text-xs text-foreground-light
+        ${focus && ' border-stronger outline outline-2 outline-border'}
     `}
     >
-      <div className="mr-1 text-scale-900">
+      <div className="mr-1 text-foreground-lighter">
         <IconClock size={14} strokeWidth={1.5} />
       </div>
 
@@ -190,7 +190,7 @@ const TimeSplitInput = ({
         "
         value={time.HH}
       />
-      <span className="text-scale-900">:</span>
+      <span className="text-foreground-lighter">:</span>
       <input
         type="text"
         onBlur={() => handleOnBlur()}
@@ -212,7 +212,7 @@ const TimeSplitInput = ({
         "
         value={time.mm}
       />
-      <span className="text-scale-900">:</span>
+      <span className="text-foreground-lighter">:</span>
       <input
         type="text"
         onBlur={() => handleOnBlur()}

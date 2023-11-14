@@ -44,7 +44,7 @@ const EdgeFunctionSecrets = () => {
     <>
       <div>
         <h3 className="mb-2 text-xl text-foreground">Edge Function Secrets Management</h3>
-        <div className="text-sm text-scale-900">
+        <div className="text-sm text-foreground-lighter">
           Manage the secrets for your project's edge functions
         </div>
       </div>
@@ -65,13 +65,19 @@ const EdgeFunctionSecrets = () => {
               icon={<IconSearch size="tiny" />}
             />
             <div className="flex items-center space-x-2">
-              <Link passHref href="https://supabase.com/docs/guides/functions/secrets">
-                <a target="_blank" rel="noreferrer">
-                  <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
-                    Documentation
-                  </Button>
-                </a>
-              </Link>
+              <Button
+                asChild
+                type="default"
+                icon={<IconExternalLink size={14} strokeWidth={1.5} />}
+              >
+                <Link
+                  href="https://supabase.com/docs/guides/functions/secrets"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Documentation
+                </Link>
+              </Button>
               <Button onClick={() => setShowCreateSecret(true)}>Add new secret</Button>
             </div>
           </div>
@@ -94,7 +100,7 @@ const EdgeFunctionSecrets = () => {
                 <Table.tr>
                   <Table.td colSpan={3}>
                     <p className="text-sm text-foreground">No results found</p>
-                    <p className="text-sm text-light">
+                    <p className="text-sm text-foreground-light">
                       Your search for "{searchString}" did not return any results
                     </p>
                   </Table.td>
@@ -103,7 +109,7 @@ const EdgeFunctionSecrets = () => {
                 <Table.tr>
                   <Table.td colSpan={3}>
                     <p className="text-sm text-foreground">No secrets created</p>
-                    <p className="text-sm text-light">
+                    <p className="text-sm text-foreground-light">
                       There are no secrets associated with your project yet
                     </p>
                   </Table.td>

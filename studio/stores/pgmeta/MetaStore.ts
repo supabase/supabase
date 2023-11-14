@@ -15,8 +15,8 @@ import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { timeout, tryParseJson } from 'lib/helpers'
 import { ResponseError } from 'types'
 
-import { IRootStore } from '../RootStore'
 import { IPostgresMetaInterface } from '../common/PostgresMetaInterface'
+import { IRootStore } from '../RootStore'
 import ColumnStore from './ColumnStore'
 import OpenApiStore, { IOpenApiStore } from './OpenApiStore'
 import TableStore, { ITableStore } from './TableStore'
@@ -96,8 +96,7 @@ export interface IMetaStore {
   createColumn: (
     payload: CreateColumnPayload,
     selectedTable: PostgresTable,
-    foreignKey?: ExtendedPostgresRelationship,
-    securityConfiguration?: { isEncrypted: boolean; keyId?: string; keyName?: string }
+    foreignKey?: ExtendedPostgresRelationship
   ) => any
   updateColumn: (
     id: string,
@@ -391,8 +390,7 @@ export default class MetaStore implements IMetaStore {
   async createColumn(
     payload: CreateColumnPayload,
     selectedTable: PostgresTable,
-    foreignKey?: ExtendedPostgresRelationship,
-    securityConfiguration?: { isEncrypted: boolean; keyId?: string; keyName?: string }
+    foreignKey?: ExtendedPostgresRelationship
   ) {
     const toastId = this.rootStore.ui.setNotification({
       category: 'loading',
@@ -435,24 +433,6 @@ export default class MetaStore implements IMetaStore {
         if (relation.error) throw relation.error
       }
 
-      const { isEncrypted, keyId, keyName } = securityConfiguration || {}
-      if (isEncrypted) {
-        this.rootStore.ui.setNotification({
-          id: toastId,
-          category: 'loading',
-          message: 'Encrypting column...',
-        })
-        let encryptionKey = keyId
-        if (keyId === 'create-new') {
-          const addKeyRes = await this.rootStore.vault.addKey(keyName)
-          if (addKeyRes.error) throw addKeyRes.error
-          else encryptionKey = addKeyRes[0].id
-        }
-        if (encryptionKey !== undefined) {
-          const encryptColumnRes = await this.rootStore.vault.encryptColumn(column, encryptionKey)
-          if (encryptColumnRes.error) throw encryptColumnRes.error
-        }
-      }
       this.rootStore.ui.setNotification({
         id: toastId,
         category: 'success',
@@ -904,6 +884,9 @@ export default class MetaStore implements IMetaStore {
                 (column?.format ?? '').includes('json')
               ) {
                 formattedRow[header] = tryParseJson(row[header])
+              } else if (row[header] === '') {
+                // if the cell is empty string, convert it to NULL
+                formattedRow[header] = null
               } else {
                 formattedRow[header] = row[header]
               }

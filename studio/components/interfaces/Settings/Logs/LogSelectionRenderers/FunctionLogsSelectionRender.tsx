@@ -1,4 +1,3 @@
-import dayjs from 'dayjs'
 import { LOGS_TAILWIND_CLASSES } from '../Logs.constants'
 import {
   jsonSyntaxHighlight,
@@ -13,7 +12,7 @@ const FunctionLogsSelectionRender = ({ log }: any) => {
   return (
     <>
       <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding}`}>
-        <span className="text-scale-900 text-sm col-span-4">Event message</span>
+        <span className="text-foreground-lighter text-sm col-span-4">Event message</span>
         <div className="text-xs text-wrap font-mono text-foreground mt-2 whitespace-pre-wrap overflow-x-auto">
           {log.event_message}
         </div>

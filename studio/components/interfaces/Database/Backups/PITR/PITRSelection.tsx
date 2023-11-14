@@ -156,8 +156,8 @@ const PITRSelection = () => {
                           <Tooltip.Arrow className="radix-tooltip-arrow" />
                           <div
                             className={[
-                              'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                              'border-scale-200 border w-48 text-center',
+                              'bg-alternative rounded py-1 px-2 leading-none shadow',
+                              'border-background border w-48 text-center',
                             ].join(' ')}
                           >
                             <span className="text-foreground text-xs">
@@ -220,7 +220,7 @@ const PITRSelection = () => {
                     )}
                   />
                   <div className="flex items-center space-x-2">
-                    <div className="border w-4 h-4 border-scale-800 bg-brand-600" />
+                    <div className="border w-4 h-4 border-stronger bg-overlay-hover" />
                     <p className="text-xs text-foreground-light">Point in time back up available</p>
                   </div>
                 </div>
@@ -348,11 +348,13 @@ const PITRSelection = () => {
             </div>
             <div className="py-2 flex flex-col gap-3">
               <div>
-                <p className="text-sm font-mono text-scale-900">{selectedTimezone?.text}</p>
+                <p className="text-sm font-mono text-foreground-lighter">
+                  {selectedTimezone?.text}
+                </p>
                 <p className="text-2xl">{recoveryTimeString}</p>
               </div>
               <div>
-                <p className="text-sm font-mono text-scale-900">(UTC+00:00)</p>
+                <p className="text-sm font-mono text-foreground-lighter">(UTC+00:00)</p>
                 <p className="text-2xl">{recoveryTimeStringUtc}</p>
               </div>
             </div>

@@ -200,7 +200,7 @@ export const PgbouncerConfig = ({ projectRef, bouncerInfo, connectionInfo }: Con
   }
 
   return (
-    <div>
+    <div id="connection-pooling">
       <SchemaFormPanel
         title="Connection Pooling Custom Configuration"
         schema={formSchema}
@@ -223,7 +223,7 @@ export const PgbouncerConfig = ({ projectRef, bouncerInfo, connectionInfo }: Con
                 errorMessage="You must select one of the two options"
               />
               <div className="!mt-1 flex" style={{ marginLeft: 'calc(33% + 0.5rem)' }}>
-                <p className="text-sm text-scale-900">
+                <p className="text-sm text-foreground-lighter">
                   Specify when a connection can be returned to the pool. To find out the most
                   suitable mode for your use case,{' '}
                   <a
@@ -243,10 +243,10 @@ export const PgbouncerConfig = ({ projectRef, bouncerInfo, connectionInfo }: Con
                   <AutoField name="ignore_startup_parameters" />
                   <Divider light />
                   <AutoField name="max_client_conn" />
-                  <Divider light />
-                  <AutoField name="default_pool_size" />
                 </>
               )}
+              <Divider light />
+              <AutoField name="default_pool_size" />
             </>
           )}
           <Divider light />

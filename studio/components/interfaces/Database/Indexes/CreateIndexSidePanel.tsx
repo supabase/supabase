@@ -51,6 +51,7 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
     isLoading: isLoadingTableColumns,
     isSuccess: isSuccessTableColumns,
   } = useTableColumnsQuery({
+    schema: selectedSchema,
     table: selectedEntity,
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -209,18 +210,17 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
             <SidePanel.Content>
               <div className="flex items-center justify-between">
                 <p className="text-sm">Preview of SQL statement</p>
-                <Link
-                  passHref
-                  href={
-                    project !== undefined
-                      ? `/project/${project.ref}/sql/new?content=${generatedSQL}`
-                      : '/'
-                  }
-                >
-                  <a>
-                    <Button type="default">Open in SQL Editor</Button>
-                  </a>
-                </Link>
+                <Button asChild type="default">
+                  <Link
+                    href={
+                      project !== undefined
+                        ? `/project/${project.ref}/sql/new?content=${generatedSQL}`
+                        : '/'
+                    }
+                  >
+                    Open in SQL Editor
+                  </Link>
+                </Button>
               </div>
             </SidePanel.Content>
             <div className="h-[200px] !mt-2">

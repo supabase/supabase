@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Collapsible, Form, IconChevronRight, Input, Toggle } from 'ui'
 
-import NoProjectsOnPaidOrgInfo from 'components/interfaces/BillingV2/NoProjectsOnPaidOrgInfo'
+import NoProjectsOnPaidOrgInfo from 'components/interfaces/Billing/NoProjectsOnPaidOrgInfo'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import {
   FormActions,
@@ -18,7 +18,7 @@ import {
 } from 'components/ui/Forms'
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useIsFeatureEnabled, useSelectedOrganization, useStore } from 'hooks'
 import { OPT_IN_TAGS } from 'lib/constants'
 import OrganizationDeletePanel from './OrganizationDeletePanel'
 
@@ -33,6 +33,8 @@ const GeneralSettings = () => {
   const formId = 'org-general-settings'
   const isOptedIntoAi = opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL)
   const initialValues = { name: name ?? '', isOptedIntoAi }
+
+  const organizationDeletionEnabled = useIsFeatureEnabled('organizations:delete')
 
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
   const canDeleteOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
@@ -167,14 +169,13 @@ const GeneralSettings = () => {
                           <p>
                             For more information about how we use personal information, please see
                             our{' '}
-                            <Link href="https://supabase.com/privacy">
-                              <a
-                                target="_blank"
-                                rel="noreferrer"
-                                className="text-brand border-b border-brand"
-                              >
-                                privacy policy
-                              </a>
+                            <Link
+                              href="https://supabase.com/privacy"
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-brand border-b border-brand"
+                            >
+                              privacy policy
                             </Link>
                             .
                           </p>
@@ -189,7 +190,7 @@ const GeneralSettings = () => {
         }}
       </Form>
 
-      {canDeleteOrganization && <OrganizationDeletePanel />}
+      {organizationDeletionEnabled && canDeleteOrganization && <OrganizationDeletePanel />}
     </ScaffoldContainerLegacy>
   )
 }

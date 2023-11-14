@@ -1,14 +1,13 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useTheme } from 'common'
-import { useFlag } from 'hooks'
-import { usePushNext } from 'hooks/misc/useAutoAuthRedirect'
-import { BASE_PATH } from 'lib/constants'
-import { auth, buildPathWithParams, getAccessToken } from 'lib/gotrue'
-import { observer } from 'mobx-react-lite'
-import Image from 'next/image'
+import { useTheme } from 'next-themes'
+import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
+
+import { useFlag } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
+import { auth, buildPathWithParams, getAccessToken, getReturnToPath } from 'lib/gotrue'
 import { tweets } from 'shared-data'
 import { Button, IconFileText } from 'ui'
 
@@ -27,9 +26,8 @@ const SignInLayout = ({
   children,
 }: PropsWithChildren<SignInLayoutProps>) => {
   const router = useRouter()
-  const pushNext = usePushNext()
   const queryClient = useQueryClient()
-  const { isDarkMode } = useTheme()
+  const { resolvedTheme } = useTheme()
   const ongoingIncident = useFlag('ongoingIncident')
 
   // This useEffect redirects the user to MFA if they're already halfway signed in
@@ -64,7 +62,7 @@ const SignInLayout = ({
           }
 
           await queryClient.resetQueries()
-          await pushNext()
+          router.push(getReturnToPath())
         } else {
           // if the user doesn't have a token, he needs to go back to the sign-in page
           const redirectTo = buildPathWithParams('/sign-in')
@@ -90,7 +88,7 @@ const SignInLayout = ({
 
   return (
     <>
-      <div className="flex flex-col flex-1 bg-scale-100">
+      <div className="flex flex-col flex-1 bg-alternative">
         <div
           className={`absolute top-0 w-full px-8 mx-auto sm:px-6 lg:px-8 ${
             ongoingIncident ? 'pt-16' : 'pt-6'
@@ -100,36 +98,32 @@ const SignInLayout = ({
             <div className="flex items-center flex-grow flex-shrink-0 lg:flex-grow-0">
               <div className="flex items-center justify-between w-full md:w-auto">
                 <Link href={logoLinkToMarketingSite ? 'https://supabase.com' : '/projects'}>
-                  <a>
-                    <Image
-                      src={
-                        isDarkMode
-                          ? `${BASE_PATH}/img/supabase-dark.svg`
-                          : `${BASE_PATH}/img/supabase-light.svg`
-                      }
-                      alt="Supabase Logo"
-                      height={24}
-                      width={120}
-                    />
-                  </a>
+                  <Image
+                    src={
+                      resolvedTheme === 'dark'
+                        ? `${BASE_PATH}/img/supabase-dark.svg`
+                        : `${BASE_PATH}/img/supabase-light.svg`
+                    }
+                    alt="Supabase Logo"
+                    height={24}
+                    width={120}
+                  />
                 </Link>
               </div>
             </div>
 
             <div className="items-center hidden space-x-3 md:ml-10 md:flex md:pr-4">
-              <Link href="https://supabase.com/docs">
-                <a target="_blank" rel="noreferrer">
-                  <Button type="default" icon={<IconFileText />}>
-                    Documentation
-                  </Button>
-                </a>
-              </Link>
+              <Button asChild type="default" icon={<IconFileText />}>
+                <Link href="https://supabase.com/docs" target="_blank" rel="noreferrer">
+                  Documentation
+                </Link>
+              </Button>
             </div>
           </nav>
         </div>
 
         <div className="flex flex-1">
-          <main className="flex flex-col items-center flex-1 flex-shrink-0 px-5 pt-16 pb-8 border-r shadow-lg bg-scale-200 border-scale-500">
+          <main className="flex flex-col items-center flex-1 flex-shrink-0 px-5 pt-16 pb-8 border-r shadow-lg bg-background border-default">
             <div className="flex-1 flex flex-col justify-center w-[330px] sm:w-[384px]">
               <div className="mb-10">
                 <h1 className="mt-8 mb-2 text-2xl lg:text-3xl">{heading}</h1>
@@ -141,14 +135,20 @@ const SignInLayout = ({
 
             {showDisclaimer && (
               <div className="sm:text-center">
-                <p className="text-xs text-scale-900 sm:mx-auto sm:max-w-sm">
+                <p className="text-xs text-foreground-lighter sm:mx-auto sm:max-w-sm">
                   By continuing, you agree to Supabase's{' '}
-                  <Link href="https://supabase.com/terms">
-                    <a className="underline hover:text-foreground-light">Terms of Service</a>
+                  <Link
+                    href="https://supabase.com/terms"
+                    className="underline hover:text-foreground-light"
+                  >
+                    Terms of Service
                   </Link>{' '}
                   and{' '}
-                  <Link href="https://supabase.com/privacy">
-                    <a className="underline hover:text-foreground-light">Privacy Policy</a>
+                  <Link
+                    href="https://supabase.com/privacy"
+                    className="underline hover:text-foreground-light"
+                  >
+                    Privacy Policy
                   </Link>
                   , and to receive periodic emails with updates.
                 </p>
@@ -160,7 +160,7 @@ const SignInLayout = ({
             {quote !== null && (
               <div className="relative flex flex-col gap-6">
                 <div className="absolute select-none -top-12 -left-11">
-                  <span className="text-[160px] leading-none text-scale-600">{'“'}</span>
+                  <span className="text-[160px] leading-none text-foreground-muted/30">{'“'}</span>
                 </div>
 
                 <blockquote className="z-10 max-w-lg text-3xl">{quote.text}</blockquote>
@@ -192,4 +192,4 @@ const SignInLayout = ({
   )
 }
 
-export default observer(SignInLayout)
+export default SignInLayout

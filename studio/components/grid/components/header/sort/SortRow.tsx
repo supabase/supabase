@@ -37,11 +37,11 @@ const SortRow = ({ table, index, columnName, sort, onDelete, onToggle, onDrag }:
         handlerId: monitor.getHandlerId(),
       }
     },
-    hover(item: DragItem, monitor: DropTargetMonitor) {
+    hover(item, monitor) {
       if (!ref.current) {
         return
       }
-      const dragIndex = item.index
+      const dragIndex = (item as DragItem).index
       const hoverIndex = index
 
       // Don't replace items with themselves
@@ -82,7 +82,7 @@ const SortRow = ({ table, index, columnName, sort, onDelete, onToggle, onDrag }:
       // Generally it's better to avoid mutations,
       // but it's good here for the sake of performance
       // to avoid expensive index searches.
-      item.index = hoverIndex
+      ;(item as DragItem).index = hoverIndex
     },
   })
 
@@ -103,17 +103,19 @@ const SortRow = ({ table, index, columnName, sort, onDelete, onToggle, onDrag }:
       style={{ opacity }}
       data-handler-id={handlerId}
     >
-      <span className="transition-color text-scale-900 hover:text-foreground-light">
+      <span className="transition-color text-foreground-lighter hover:text-foreground-light">
         <IconMenu strokeWidth={2} size={16} />
       </span>
       <div className="grow">
         <span className="flex grow items-center gap-1 truncate text-sm text-foreground">
-          <span className="text-xs text-scale-900">{index > 0 ? 'then by' : 'sort by'}</span>
+          <span className="text-xs text-foreground-lighter">
+            {index > 0 ? 'then by' : 'sort by'}
+          </span>
           {column.name}
         </span>
       </div>
       <div className="flex items-center gap-1">
-        <label className="text-xs text-scale-900">ascending:</label>
+        <label className="text-xs text-foreground-lighter">ascending:</label>
         <Toggle
           size="tiny"
           layout="flex"

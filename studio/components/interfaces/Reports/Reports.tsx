@@ -7,14 +7,14 @@ import { useEffect, useState } from 'react'
 import {
   Badge,
   Button,
-  DropdownMenuCheckboxItem_Shadcn_,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuPortal_Shadcn_,
-  DropdownMenuSubContent_Shadcn_,
-  DropdownMenuSubTrigger_Shadcn_,
-  DropdownMenuSub_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuPortal,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuSub,
+  DropdownMenuTrigger,
   IconArrowRight,
   IconHome,
   IconPlus,
@@ -26,7 +26,7 @@ import { useParams } from 'common/hooks'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import Loading from 'components/ui/Loading'
 import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions, useIsFeatureEnabled } from 'hooks'
 import { METRICS, METRIC_CATEGORIES, TIME_PERIODS_REPORTS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -40,6 +40,11 @@ const DEFAULT_CHART_ROW_COUNT = 4
 const Reports = () => {
   const { id, ref } = useParams()
   const { profile } = useProfile()
+
+  const { projectAuthAll: authEnabled, projectStorageAll: storageEnabled } = useIsFeatureEnabled([
+    'project_auth:all',
+    'project_storage:all',
+  ])
 
   const [report, setReport] = useState<any>()
 
@@ -268,21 +273,27 @@ const Reports = () => {
     })
   }
 
+  const metricCategories = Object.values(METRIC_CATEGORIES).filter(({ key }) => {
+    if (key === 'api_auth') return authEnabled
+    if (key === 'api_storage') return storageEnabled
+    return true
+  })
+
   const MetricOptions = () => {
     return (
       <>
-        {Object.values(METRIC_CATEGORIES).map((cat) => {
+        {metricCategories.map((cat) => {
           return (
-            <DropdownMenuSub_Shadcn_ key={cat.key}>
-              <DropdownMenuSubTrigger_Shadcn_ className="space-x-2">
+            <DropdownMenuSub key={cat.key}>
+              <DropdownMenuSubTrigger className="space-x-2">
                 {cat.icon ? cat.icon : <IconHome size="tiny" />}
                 <p>{cat.label}</p>
-              </DropdownMenuSubTrigger_Shadcn_>
-              <DropdownMenuPortal_Shadcn_>
-                <DropdownMenuSubContent_Shadcn_>
+              </DropdownMenuSubTrigger>
+              <DropdownMenuPortal>
+                <DropdownMenuSubContent>
                   {METRICS.filter((metric) => metric?.category?.key === cat.key).map((metric) => {
                     return (
-                      <DropdownMenuCheckboxItem_Shadcn_
+                      <DropdownMenuCheckboxItem
                         key={metric.key}
                         checked={config.layout?.some((x: any) => x.attribute === metric.key)}
                         onCheckedChange={(e) => handleChartSelection({ metric, value: e })}
@@ -290,12 +301,12 @@ const Reports = () => {
                         <div className="flex flex-col space-y-0">
                           <span>{metric.label}</span>
                         </div>
-                      </DropdownMenuCheckboxItem_Shadcn_>
+                      </DropdownMenuCheckboxItem>
                     )
                   })}
-                </DropdownMenuSubContent_Shadcn_>
-              </DropdownMenuPortal_Shadcn_>
-            </DropdownMenuSub_Shadcn_>
+                </DropdownMenuSubContent>
+              </DropdownMenuPortal>
+            </DropdownMenuSub>
           )
         })}
       </>
@@ -320,7 +331,7 @@ const Reports = () => {
               <span className="text-sm text-foreground-light">
                 {dayjs(startDate).format('MMM D, YYYY')}
               </span>
-              <span className="text-scale-900">
+              <span className="text-foreground-lighter">
                 <IconArrowRight size={12} />
               </span>
               <span className="text-sm text-foreground-light">
@@ -349,16 +360,16 @@ const Reports = () => {
           )}
 
           {canUpdateReport ? (
-            <DropdownMenu_Shadcn_>
-              <DropdownMenuTrigger_Shadcn_>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
                 <Button asChild type="default" iconRight={<IconSettings />}>
                   <span>Add / Remove charts</span>
                 </Button>
-              </DropdownMenuTrigger_Shadcn_>
-              <DropdownMenuContent_Shadcn_ side="bottom" align="end">
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="bottom" align="end">
                 <MetricOptions />
-              </DropdownMenuContent_Shadcn_>
-            </DropdownMenu_Shadcn_>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger asChild>
@@ -371,8 +382,8 @@ const Reports = () => {
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200',
+                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                      'border border-background',
                     ].join(' ')}
                   >
                     <span className="text-xs text-foreground">
@@ -389,18 +400,18 @@ const Reports = () => {
       {config.layout.length <= 0 ? (
         <div className="flex min-h-full items-center justify-center rounded border-2 border-dashed p-16 dark:border-dark">
           {canUpdateReport ? (
-            <DropdownMenu_Shadcn_>
-              <DropdownMenuTrigger_Shadcn_>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
                 <Button asChild type="default" iconRight={<IconPlus />}>
                   <span>
                     {config.layout.length <= 0 ? 'Add your first chart' : 'Add another chart'}
                   </span>
                 </Button>
-              </DropdownMenuTrigger_Shadcn_>
-              <DropdownMenuContent_Shadcn_ side="bottom" align="center">
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="bottom" align="center">
                 <MetricOptions />
-              </DropdownMenuContent_Shadcn_>
-            </DropdownMenu_Shadcn_>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
             <p className="text-sm text-foreground-light">No charts set up yet in report</p>
           )}

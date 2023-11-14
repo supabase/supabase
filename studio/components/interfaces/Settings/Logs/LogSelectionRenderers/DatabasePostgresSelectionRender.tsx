@@ -1,5 +1,4 @@
 import { Alert } from 'ui'
-import React from 'react'
 import { LOGS_TAILWIND_CLASSES } from '../Logs.constants'
 import LogsDivider from '../Logs.Divider'
 import {
@@ -18,7 +17,7 @@ const DatabasePostgresSelectionRender = ({ log }: any) => {
   return (
     <>
       <div className={LOGS_TAILWIND_CLASSES.log_selection_x_padding}>
-        <span className="col-span-4 text-sm text-scale-900">Event message</span>
+        <span className="col-span-4 text-sm text-foreground-lighter">Event message</span>
 
         <div className="text-wrap mt-2 overflow-x-auto whitespace-pre-wrap font-mono  text-xs text-foreground">
           {log.event_message}
