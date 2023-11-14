@@ -1,8 +1,8 @@
-import { Database, DatabaseBackup } from 'lucide-react'
-import { Handle, NodeProps, Position } from 'reactflow'
-
+import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { BASE_PATH } from 'lib/constants'
+import { Database, DatabaseBackup } from 'lucide-react'
+import Link from 'next/link'
+import { Handle, NodeProps, Position } from 'reactflow'
 import {
   Badge,
   Button,
@@ -12,6 +12,8 @@ import {
   DropdownMenuTrigger,
   IconMoreVertical,
 } from 'ui'
+
+import { BASE_PATH } from 'lib/constants'
 import { NODE_SEP, NODE_WIDTH, Region } from './InstanceConfiguration.constants'
 
 interface NodeData {
@@ -97,6 +99,7 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
     onSelectResizeReplica,
     onSelectDropReplica,
   } = data
+  const { ref } = useParams()
   const created = dayjs(inserted_at).format('DD MMM YYYY')
 
   return (
@@ -142,6 +145,11 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
               <Button type="text" icon={<IconMoreVertical />} className="px-1" />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="p-0 w-40" side="bottom" align="end">
+              <DropdownMenuItem className="gap-x-2">
+                <Link href={`/project/${ref}/settings/database?connectionString=${id}`}>
+                  View connection string
+                </Link>
+              </DropdownMenuItem>
               <DropdownMenuItem className="gap-x-2" onClick={() => onSelectRestartReplica()}>
                 Restart replica
               </DropdownMenuItem>

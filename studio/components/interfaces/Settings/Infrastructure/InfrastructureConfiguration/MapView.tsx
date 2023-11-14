@@ -1,5 +1,7 @@
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { partition, uniqBy } from 'lodash'
+import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import {
   ComposableMap,
@@ -9,8 +11,6 @@ import {
   Marker,
   ZoomableGroup,
 } from 'react-simple-maps'
-
-import { AWS_REGIONS_KEYS, BASE_PATH } from 'lib/constants'
 import {
   Badge,
   Button,
@@ -21,13 +21,14 @@ import {
   IconMoreVertical,
   ScrollArea,
 } from 'ui'
+
+import { AWS_REGIONS_KEYS, BASE_PATH } from 'lib/constants'
 import {
   AVAILABLE_REPLICA_REGIONS,
   DatabaseConfiguration,
   MOCK_DATABASES,
 } from './InstanceConfiguration.constants'
 import GeographyData from './MapData.json'
-import database from 'pages/project/[ref]/database'
 
 // [Joshen] Foresee that we'll skip this view for initial launch
 
@@ -44,6 +45,7 @@ const MapView = ({
   onSelectResizeReplica,
   onSelectDropReplica,
 }: MapViewProps) => {
+  const { ref } = useParams()
   const [mount, setMount] = useState(false)
   const [zoom, setZoom] = useState<number>(1)
   const [center, setCenter] = useState<[number, number]>([14, 7])
@@ -266,6 +268,13 @@ const MapView = ({
                             <Button type="text" icon={<IconMoreVertical />} className="px-1" />
                           </DropdownMenuTrigger>
                           <DropdownMenuContent className="p-0 w-40" side="bottom" align="end">
+                            <DropdownMenuItem className="gap-x-2">
+                              <Link
+                                href={`/project/${ref}/settings/database?connectionString=${database.id}`}
+                              >
+                                View connection string
+                              </Link>
+                            </DropdownMenuItem>
                             <DropdownMenuItem
                               className="gap-x-2"
                               onClick={() => onSelectRestartReplica(database)}
