@@ -1,7 +1,19 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { forwardRef, useCallback, useState } from 'react'
-import { Button, Dropdown, IconChevronDown, IconLoader, IconRefreshCw, IconTrash, Modal } from 'ui'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  IconChevronDown,
+  IconLoader,
+  IconRefreshCw,
+  IconTrash,
+  Modal,
+} from 'ui'
 
 import {
   IntegrationConnection,
@@ -57,61 +69,55 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
       <>
         <IntegrationConnection
           actions={
-            <Dropdown
+            <DropdownMenu
               open={dropdownVisible}
               onOpenChange={() => setDropdownVisible(!dropdownVisible)}
               modal={false}
-              side="bottom"
-              align="end"
-              size="medium"
-              overlay={
-                <>
-                  {props.type === 'Vercel' && (
-                    <>
-                      {router.pathname !== projectIntegrationUrl && (
+            >
+              <DropdownMenuTrigger>
+                <Button asChild iconRight={<IconChevronDown />} type="default">
+                  <span>Manage</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="bottom" align="end">
+                {props.type === 'Vercel' && (
+                  <>
+                    {router.pathname !== projectIntegrationUrl && (
+                      <DropdownMenuItem disabled={isSyncEnvLoading} asChild>
                         <Link
-                          passHref
                           href={projectIntegrationUrl.replace(
                             '[ref]',
                             props.connection.supabase_project_ref
                           )}
                         >
-                          <a>
-                            <Dropdown.Item disabled={isSyncEnvLoading}>
-                              View project configuration
-                            </Dropdown.Item>
-                          </a>
+                          View project configuration
                         </Link>
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuItem
+                      className="space-x-2"
+                      onSelect={(event) => {
+                        event.preventDefault()
+                        onReSyncEnvVars()
+                      }}
+                      disabled={isSyncEnvLoading}
+                    >
+                      {isSyncEnvLoading ? (
+                        <IconLoader className="animate-spin" size={14} />
+                      ) : (
+                        <IconRefreshCw size={14} />
                       )}
-                      <Dropdown.Item
-                        icon={
-                          isSyncEnvLoading ? (
-                            <IconLoader className="animate-spin" size={14} />
-                          ) : (
-                            <IconRefreshCw size={14} />
-                          )
-                        }
-                        onSelect={(event) => {
-                          event.preventDefault()
-                          onReSyncEnvVars()
-                        }}
-                        disabled={isSyncEnvLoading}
-                      >
-                        Resync environment variables
-                      </Dropdown.Item>
-                      <Dropdown.Separator />
-                    </>
-                  )}
-                  <Dropdown.Item icon={<IconTrash size={14} />} onSelect={() => setIsOpen(true)}>
-                    Delete connection
-                  </Dropdown.Item>
-                </>
-              }
-            >
-              <Button asChild iconRight={<IconChevronDown />} type="default">
-                <span>Manage</span>
-              </Button>
-            </Dropdown>
+                      <p>Resync environment variables</p>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
+                <DropdownMenuItem className="space-x-2" onSelect={() => setIsOpen(true)}>
+                  <IconTrash size={14} />
+                  <p>Delete connection</p>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           }
           {...props}
         />
@@ -125,7 +131,7 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
           onSelectConfirm={onConfirm}
         >
           <Modal.Content>
-            <p className="py-4 text-sm text-light">
+            <p className="py-4 text-sm text-foreground-light">
               {`This action cannot be undone. Are you sure you want to delete this connection?`}
             </p>
           </Modal.Content>

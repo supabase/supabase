@@ -31,9 +31,7 @@ const CardButton = ({
   loading = false,
 }: PropsWithChildren<CardButtonProps>) => {
   const LinkContainer = ({ children }: { children: React.ReactNode }) => (
-    <Link href={linkHref}>
-      <a>{children}</a>
-    </Link>
+    <Link href={linkHref}>{children}</Link>
   )
   const UrlContainer = ({ children }: { children: React.ReactNode }) => <a href={url}>{children}</a>
   const NonLinkContainer = ({ children }: { children: React.ReactNode }) => <div>{children}</div>
@@ -46,9 +44,9 @@ const CardButton = ({
   let containerClasses = [
     className,
     'group relative text-left',
-    'bg-panel-header-light dark:bg-panel-header-dark',
-    'border border-panel-border-light dark:border-panel-border-dark',
-    'rounded-md py-4 px-6 flex flex-row h-32',
+    'bg-surface-100',
+    'border border-surface',
+    'rounded-md p-5 flex flex-row h-32',
     'transition ease-in-out duration-150',
   ]
 
@@ -56,9 +54,8 @@ const CardButton = ({
     containerClasses = [
       ...containerClasses,
       'cursor-pointer',
-      'hover:bg-panel-border-light dark:hover:bg-panel-border-dark',
-      'hover:border-panel-border-hover-light',
-      'dark:hover:border-panel-border-hover-dark hover:border-gray-300',
+      'hover:bg-overlay-hover',
+      'hover:border-control',
     ]
   }
 
@@ -83,10 +80,10 @@ const CardButton = ({
       )}
       {icon && <ImageContainer>{icon}</ImageContainer>}
       <div className="flex h-full w-full flex-col space-y-2">
-        {typeof title === 'string' ? <h5 className="text-scale-1200">{title}</h5> : title}
+        {typeof title === 'string' ? <h5 className="text-foreground">{title}</h5> : title}
         {(children || description) && (
           <div className="flex w-full flex-1 flex-col">
-            <p className="text-sm text-scale-1100">{description}</p>
+            <p className="text-sm text-foreground-light">{description}</p>
             <div className="w-full">{children && children}</div>
           </div>
         )}
@@ -98,11 +95,11 @@ const CardButton = ({
           absolute
           right-4
           top-4
-          text-scale-900
+          text-foreground-lighter
           transition-all
           duration-200
           group-hover:right-3
-          group-hover:text-scale-1200
+          group-hover:text-foreground
         "
         >
           {loading ? <IconLoader className="animate-spin" /> : <IconChevronRight />}

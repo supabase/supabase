@@ -4,7 +4,7 @@ import CopyButton from 'components/ui/CopyButton'
 import { render } from 'tests/helpers'
 
 test('shows copied text', async () => {
-    const callback = jest.fn()
+  const callback = jest.fn()
   render(<CopyButton text="some text" onClick={callback} />)
   userEvent.click(await screen.findByText('Copy'))
   await screen.findByText('Copied')

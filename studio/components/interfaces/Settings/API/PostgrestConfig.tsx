@@ -115,7 +115,7 @@ const PostgrestConfig = () => {
               {isError ? (
                 <div className="flex items-center justify-center py-8 space-x-2">
                   <IconAlertCircle size={16} strokeWidth={1.5} />
-                  <p className="text-sm text-scale-1100">Failed to retrieve API settings</p>
+                  <p className="text-sm text-foreground-light">Failed to retrieve API settings</p>
                 </div>
               ) : (
                 <>

@@ -18,7 +18,7 @@ import ReactFlow, {
 } from 'reactflow'
 
 import { PostgresTable } from '@supabase/postgres-meta'
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTablesQuery } from 'data/tables/tables-query'
 import 'reactflow/dist/style.css'
@@ -229,13 +229,13 @@ function TableNode({ data, targetPosition, sourcePosition }: NodeProps<TableNode
         </div>
       ) : (
         <div className="rounded-lg overflow-hidden" style={{ width: NODE_WIDTH / 2 }}>
-          <header className="text-[0.5rem] leading-5 font-bold px-2 text-center bg-brand text-gray-300">
+          <header className="text-[0.5rem] leading-5 font-bold px-2 text-center bg-brand text-background-surface-100">
             {data.name}
           </header>
 
           {data.columns.map((column) => (
             <div
-              className="text-[8px] leading-5 relative flex flex-row justify-items-start odd:bg-scale-300 even:bg-scale-400"
+              className="text-[8px] leading-5 relative flex flex-row justify-items-start odd:bg-surface-100 even:bg-surface-200"
               key={column.id}
             >
               <div className="gap-[0.24rem] flex mx-2 align-middle basis-1/5 items-center justify-start">
@@ -269,7 +269,7 @@ function TableNode({ data, targetPosition, sourcePosition }: NodeProps<TableNode
                 <span
                   className={clsx(
                     column.isPrimary && 'pl-[6px]',
-                    'absolute top-0 left-0 right-0 pl-2 bg-scale-500 text-ellipsis overflow-hidden whitespace-nowrap opacity-0 hover:opacity-100'
+                    'absolute top-0 left-0 right-0 pl-2 bg-surface-300 text-ellipsis overflow-hidden whitespace-nowrap opacity-0 hover:opacity-100'
                   )}
                 >
                   {column.name}
@@ -301,11 +301,13 @@ function TableNode({ data, targetPosition, sourcePosition }: NodeProps<TableNode
 }
 
 const TablesGraph = ({ tables }: { tables: PostgresTable[] }) => {
-  const { isDarkMode } = useTheme()
-  const backgroundPatternColor = isDarkMode ? '#2e2e2e' : '#e6e8eb'
-  const edgeStrokeColor = isDarkMode ? '#ededed' : '#111318'
+  const { resolvedTheme } = useTheme()
+  const backgroundPatternColor = resolvedTheme === 'dark' ? '#2e2e2e' : '#e6e8eb'
+  const edgeStrokeColor = resolvedTheme === 'dark' ? '#ededed' : '#111318'
+
   const miniMapNodeColor = '#111318'
-  const miniMapMaskColor = isDarkMode ? 'rgb(17, 19, 24, .8)' : 'rgb(237, 237, 237, .8)'
+  const miniMapMaskColor =
+    resolvedTheme === 'dark' ? 'rgb(17, 19, 24, .8)' : 'rgb(237, 237, 237, .8)'
 
   const reactFlowInstance = useReactFlow()
   const nodeTypes = useMemo(
@@ -321,7 +323,7 @@ const TablesGraph = ({ tables }: { tables: PostgresTable[] }) => {
       reactFlowInstance.setEdges(edges)
       setTimeout(() => reactFlowInstance.fitView({})) // it needs to happen during next event tick
     })
-  }, [tables, isDarkMode])
+  }, [tables, resolvedTheme])
 
   return (
     <>
@@ -349,7 +351,7 @@ const TablesGraph = ({ tables }: { tables: PostgresTable[] }) => {
             zoomable
             nodeColor={miniMapNodeColor}
             maskColor={miniMapMaskColor}
-            className="border border-scale-600 rounded-md shadow-sm"
+            className="border border-control rounded-md shadow-sm"
           />
         </ReactFlow>
       </div>
@@ -374,14 +376,14 @@ const SchemaGraph = ({ schema }: { schema: string }) => {
     return (
       <div className="flex h-full w-full items-center justify-center space-x-2">
         <IconLoader className="animate-spin" size={14} />
-        <p className="text-sm text-scale-1000">Loading table...</p>
+        <p className="text-sm text-foreground-light">Loading table...</p>
       </div>
     )
   }
 
   if (isError) {
     return (
-      <div className="px-6 py-4 text-scale-1000">
+      <div className="px-6 py-4 text-foreground-light">
         <p>Error connecting to API</p>
         <p>{`${error?.message ?? 'Unknown error'}`}</p>
       </div>

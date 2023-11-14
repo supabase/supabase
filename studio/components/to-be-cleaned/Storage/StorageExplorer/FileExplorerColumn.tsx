@@ -1,22 +1,22 @@
-import { useState, useRef, useEffect } from 'react'
-import { get, noop, sum } from 'lodash'
-import { Checkbox, IconUpload } from 'ui'
 import { Transition } from '@headlessui/react'
+import { get, noop, sum } from 'lodash'
+import { useEffect, useRef, useState } from 'react'
 import { useContextMenu } from 'react-contexify'
+import { Checkbox, IconUpload } from 'ui'
 
 import InfiniteList from 'components/ui/InfiniteList'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import FileExplorerRow from './FileExplorerRow'
-import {
-  STORAGE_VIEWS,
-  STORAGE_ROW_TYPES,
-  STORAGE_ROW_STATUS,
-  CONTEXT_MENU_KEYS,
-} from '../Storage.constants'
-import { formatBytes } from 'lib/helpers'
 import { BASE_PATH } from 'lib/constants'
-import { StorageColumn } from '../Storage.types'
+import { formatBytes } from 'lib/helpers'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
+import {
+  CONTEXT_MENU_KEYS,
+  STORAGE_ROW_STATUS,
+  STORAGE_ROW_TYPES,
+  STORAGE_VIEWS,
+} from '../Storage.constants'
+import { StorageColumn } from '../Storage.types'
+import FileExplorerRow from './FileExplorerRow'
 
 const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }: any) => {
   return (
@@ -148,11 +148,7 @@ const FileExplorerColumn = ({
     <div
       ref={fileExplorerColumnRef}
       className={`
-        ${
-          fullWidth
-            ? 'w-full'
-            : 'w-64 border-r border-panel-border-light dark:border-panel-border-dark'
-        }
+        ${fullWidth ? 'w-full' : 'w-64 border-r border-overlay'}
         ${view === STORAGE_VIEWS.COLUMNS ? '' : ''}
         hide-scrollbar relative flex flex-shrink-0 flex-col overflow-auto
       `}
@@ -176,10 +172,10 @@ const FileExplorerColumn = ({
           {columnFiles.length > 0 ? (
             <>
               <SelectAllCheckbox />
-              <p className="text-sm text-scale-1100">Select all {columnFiles.length} files</p>
+              <p className="text-sm text-foreground-light">Select all {columnFiles.length} files</p>
             </>
           ) : (
-            <p className="text-sm text-scale-1100">No files available for selection</p>
+            <p className="text-sm text-foreground-light">No files available for selection</p>
           )}
         </div>
       )}
@@ -189,8 +185,8 @@ const FileExplorerColumn = ({
         <div
           className="
           sticky top-0
-          z-10 flex min-w-min items-center border-b border-panel-border-light bg-panel-footer-light px-2.5
-          py-2 dark:border-panel-border-dark dark:bg-panel-footer-dark
+          z-10 flex min-w-min items-center border-b border-overlay bg-surface-100 px-2.5
+          py-2
         "
         >
           <div className="flex w-[40%] min-w-[250px] items-center">
@@ -208,7 +204,7 @@ const FileExplorerColumn = ({
       {column.status === STORAGE_ROW_STATUS.LOADING && (
         <div
           className={`
-            ${fullWidth ? 'w-full' : 'w-64 border-r border-gray-500'}
+            ${fullWidth ? 'w-full' : 'w-64 border-r border-default'}
             px-2 py-1 my-1 flex flex-shrink-0 flex-col space-y-2 overflow-auto
           `}
         >
@@ -246,7 +242,7 @@ const FileExplorerColumn = ({
               className="opacity-75 pointer-events-none"
             />
             <p className="my-3 opacity-75">Drop your files here</p>
-            <p className="w-40 text-center text-sm text-scale-1100">
+            <p className="w-40 text-center text-sm text-foreground-light">
               Or upload them via the "Upload file" button above
             </p>
           </div>
@@ -257,8 +253,8 @@ const FileExplorerColumn = ({
         isEmpty &&
         column.status !== STORAGE_ROW_STATUS.LOADING && (
           <div className="h-full w-full flex flex-col items-center justify-center">
-            <p className="text-sm my-3 text-scale-1200">No results found in this folder</p>
-            <p className="w-40 text-center text-sm text-light">
+            <p className="text-sm my-3 text-foreground">No results found in this folder</p>
+            <p className="w-40 text-center text-sm text-foreground-light">
               Your search for "{itemSearchString}" did not return any results
             </p>
           </div>

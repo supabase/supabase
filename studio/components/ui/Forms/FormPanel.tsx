@@ -11,17 +11,16 @@ interface Props {
 const FormPanel = ({ children, header, footer }: Props) => (
   <div
     className="
-      bg-scale-100
-      dark:bg-scale-300
-      border-scale-400
+      bg-surface-100
+      border-default
       overflow-hidden 
       rounded-md border shadow"
   >
-    {header && <div className=" border-scale-400 border-b px-8 py-4">{header}</div>}
-    <div className="divide-scale-400 flex flex-col gap-0 divide-y">{children}</div>
+    {header && <div className="border-default border-b px-8 py-4">{header}</div>}
+    <div className="divide-border flex flex-col gap-0 divide-y">{children}</div>
     {footer && (
       <>
-        <div className="border-scale-400 border-t"></div>
+        <div className="border-default border-t"></div>
         {footer}
       </>
     )}

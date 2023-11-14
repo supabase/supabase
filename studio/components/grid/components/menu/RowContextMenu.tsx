@@ -1,56 +1,27 @@
 import { Item, ItemParams, Menu, PredicateParams, Separator } from 'react-contexify'
 import { IconClipboard, IconEdit, IconTrash } from 'ui'
 
-import { SupaRow, SupaTable } from 'components/grid/types'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
-import { useDispatch, useTrackedState } from '../../store'
+import { SupaRow } from 'components/grid/types'
+import { useCallback } from 'react'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { useTrackedState } from '../../store'
 import { copyToClipboard, formatClipboardValue } from '../../utils'
 
 export const ROW_CONTEXT_MENU_ID = 'row-context-menu-id'
 
 export type RowContextMenuProps = {
-  table: SupaTable
   rows: SupaRow[]
 }
 
-const RowContextMenu = ({ table, rows }: RowContextMenuProps) => {
+const RowContextMenu = ({ rows }: RowContextMenuProps) => {
   const state = useTrackedState()
-  const dispatch = useDispatch()
-
-  const { project } = useProjectContext()
-  const { mutate: deleteRows } = useTableRowDeleteMutation({
-    onSuccess: (res, variables) => {
-      dispatch({ type: 'REMOVE_ROWS', payload: { rowIdxs: [variables.rows[0].idx] } })
-      dispatch({
-        type: 'SELECTED_ROWS_CHANGE',
-        payload: { selectedRows: new Set() },
-      })
-    },
-    onError: (error) => {
-      if (state.onError) state.onError(error)
-    },
-  })
+  const snap = useTableEditorStateSnapshot()
 
   function onDeleteRow(p: ItemParams) {
-    confirmAlert({
-      title: 'Confirm to delete',
-      message: 'Are you sure you want to delete this row? This action cannot be undone.',
-      onAsyncConfirm: async () => {
-        const { props } = p
-        const { rowIdx } = props
-        const row = rows[rowIdx]
-        if (!row || !project) return
-
-        deleteRows({
-          projectRef: project.ref,
-          connectionString: project.connectionString,
-          table,
-          rows: [row],
-        })
-      },
-    })
+    const { props } = p
+    const { rowIdx } = props
+    const row = rows[rowIdx]
+    if (row) snap.onDeleteRows([row])
   }
 
   function onEditRowClick(p: ItemParams) {
@@ -66,23 +37,26 @@ const RowContextMenu = ({ table, rows }: RowContextMenuProps) => {
     return false
   }
 
-  function onCopyCellContent(p: ItemParams) {
-    const { props } = p
+  const onCopyCellContent = useCallback(
+    (p: ItemParams) => {
+      const { props } = p
 
-    if (!state.selectedCellPosition || !props) {
-      return
-    }
+      if (!state.selectedCellPosition || !props) {
+        return
+      }
 
-    const { rowIdx } = props
-    const row = rows[rowIdx]
+      const { rowIdx } = props
+      const row = rows[rowIdx]
 
-    const columnKey = state.gridColumns[state.selectedCellPosition?.idx as number].key
+      const columnKey = state.gridColumns[state.selectedCellPosition?.idx as number].key
 
-    const value = row[columnKey]
-    const text = formatClipboardValue(value)
+      const value = row[columnKey]
+      const text = formatClipboardValue(value)
 
-    copyToClipboard(text)
-  }
+      copyToClipboard(text)
+    },
+    [rows, state.gridColumns, state.selectedCellPosition]
+  )
 
   return (
     <>

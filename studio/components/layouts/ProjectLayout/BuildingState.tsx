@@ -52,7 +52,7 @@ const BuildingState = () => {
       <div className="mx-6 flex flex-col space-y-16">
         <div className=" flex flex-col gap-4">
           <div className="flex items-center space-x-3">
-            <h1 className="text-3xl text-scale-1200">{project?.name}</h1>
+            <h1 className="text-3xl text-foreground">{project?.name}</h1>
             <Badge color="brand">
               <div className="flex items-center gap-2">
                 <IconLoader className="animate-spin" size={12} />
@@ -65,31 +65,30 @@ const BuildingState = () => {
             </Badge>
           </div>
           <div>
-            <p className="text-sm text-scale-1100">
+            <p className="text-sm text-foreground-light">
               {' '}
               We are provisioning your database and API endpoints
             </p>
-            <p className="text-sm text-scale-1100"> This may take a few minutes</p>
+            <p className="text-sm text-foreground-light"> This may take a few minutes</p>
           </div>
         </div>
         <div>
           <div className=" grid grid-cols-12 gap-12">
             <div className="col-span-12 space-y-12 lg:col-span-4">
               <div>
-                <h4 className="text-base text-scale-1200">While you wait</h4>
+                <h4 className="text-base text-foreground">While you wait</h4>
 
                 <ChecklistItem
                   description={
-                    <p className="text-sm text-scale-1100">
+                    <p className="text-sm text-foreground-light">
                       Browse the Supabase{' '}
-                      <Link href="https://supabase.com/docs">
-                        <a
-                          className="mb-0 text-brand transition-colors hover:text-brand-600"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          documentation
-                        </a>
+                      <Link
+                        href="https://supabase.com/docs"
+                        className="mb-0 text-brand transition-colors hover:text-brand-600"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        documentation
                       </Link>
                       .
                     </p>
@@ -97,10 +96,10 @@ const BuildingState = () => {
                 />
               </div>
               <div>
-                <h4 className="text-base text-scale-1200">Not working?</h4>
+                <h4 className="text-base text-foreground">Not working?</h4>
                 <ChecklistItem
                   description={
-                    <p className="text-sm text-scale-1100">
+                    <p className="text-sm text-foreground-light">
                       Try refreshing after a couple of minutes.
                     </p>
                   }
@@ -109,15 +108,13 @@ const BuildingState = () => {
                   <ChecklistItem
                     description={
                       <>
-                        <p className="mb-4 text-sm text-scale-1100">
+                        <p className="mb-4 text-sm text-foreground-light">
                           If your dashboard hasn't connected within 2 minutes, you can open a
                           support ticket.
                         </p>
-                        <Link href="/support/new">
-                          <a>
-                            <Button type="default">Contact support team</Button>
-                          </a>
-                        </Link>
+                        <Button asChild type="default">
+                          <Link href="/support/new">Contact support team</Link>
+                        </Button>
                       </>
                     }
                   />
@@ -164,7 +161,7 @@ const ChecklistItem = ({ description }: any) => {
   return (
     <li className="my-3 flex flex-wrap space-x-3">
       <div className="mt-0.5">
-        <IconArrowRight className="text-scale-900" size="tiny" />
+        <IconArrowRight className="text-foreground-lighter" size="tiny" />
       </div>
       <div className="flex-1">{description}</div>
     </li>

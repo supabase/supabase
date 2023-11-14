@@ -1,14 +1,13 @@
 import { NextPage } from 'next'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Button } from 'ui'
-
+import { useTheme } from 'next-themes'
 import { BASE_PATH } from 'lib/constants'
-import { useTheme } from 'common'
 
 const Error404: NextPage = ({}) => {
-  const { isDarkMode } = useTheme()
+  const { resolvedTheme } = useTheme()
   const [show404, setShow404] = useState<boolean>(false)
 
   useEffect(() => {
@@ -24,18 +23,16 @@ const Error404: NextPage = ({}) => {
           <div className="flex flex-shrink-0 flex-grow items-center lg:flex-grow-0">
             <div className="flex w-full items-center justify-between md:w-auto">
               <Link href="/projects">
-                <a>
-                  <Image
-                    src={
-                      isDarkMode
-                        ? `${BASE_PATH}/img/supabase-dark.svg`
-                        : `${BASE_PATH}/img/supabase-light.svg`
-                    }
-                    alt="supabase"
-                    height={24}
-                    width={120}
-                  />
-                </a>
+                <Image
+                  src={
+                    resolvedTheme === 'dark'
+                      ? `${BASE_PATH}/img/supabase-dark.svg`
+                      : `${BASE_PATH}/img/supabase-light.svg`
+                  }
+                  alt="supabase"
+                  height={24}
+                  width={120}
+                />
               </Link>
             </div>
           </div>
@@ -55,14 +52,14 @@ const Error404: NextPage = ({}) => {
       >
         <div className="flex w-[380px] flex-col items-center justify-center space-y-3 text-center">
           <h3 className="text-xl">Looking for something? 🔍</h3>
-          <p className="text-scale-1100">We couldn't find the page that you're looking for!</p>
+          <p className="text-foreground-light">
+            We couldn't find the page that you're looking for!
+          </p>
         </div>
         <div className="flex items-center space-x-4">
-          <Link href="/projects">
-            <a>
-              <Button size="small">Head back</Button>
-            </a>
-          </Link>
+          <Button asChild size="small">
+            <Link href="/projects">Head back</Link>
+          </Button>
         </div>
       </div>
     </div>

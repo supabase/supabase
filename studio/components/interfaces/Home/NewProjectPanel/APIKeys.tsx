@@ -4,13 +4,29 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { IconAlertCircle, IconLoader, Input } from 'ui'
 
-import { useProjectApiQuery } from 'data/config/project-api-query'
-import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
-import { useCheckPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
-import Snippets from 'components/interfaces/Docs/Snippets'
-import Panel from 'components/ui/Panel'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
+import Panel from 'components/ui/Panel'
+import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
+import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useCheckPermissions } from 'hooks'
+
+const generateInitSnippet = (endpoint: string) => ({
+  js: `
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = '${endpoint}'
+const supabaseKey = process.env.SUPABASE_KEY
+const supabase = createClient(supabaseUrl, supabaseKey)`,
+  dart: `
+const supabaseUrl = '${endpoint}';
+const supabaseKey = String.fromEnvironment('SUPABASE_KEY');
+
+Future<void> main() async {
+  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
+  runApp(MyApp());
+}`,
+})
 
 const APIKeys = () => {
   const { ref: projectRef } = useParams()
@@ -50,16 +66,15 @@ const APIKeys = () => {
   const apiUrl = `${apiService?.protocol ?? 'https'}://${apiService?.endpoint ?? '-'}`
   const anonKey = apiKeys.find((key) => key.tags === 'anon')
 
-  const clientInitSnippet: any = Snippets.init(apiUrl)
-  const selectedLanguageSnippet =
-    clientInitSnippet[selectedLanguage.key]?.code ?? 'No snippet available'
+  const clientInitSnippet: any = generateInitSnippet(apiUrl)
+  const selectedLanguageSnippet = clientInitSnippet[selectedLanguage.key] ?? 'No snippet available'
 
   return (
     <Panel
       title={
         <div className="space-y-3">
           <h5 className="text-base">Project API</h5>
-          <p className="text-sm text-scale-1000">
+          <p className="text-sm text-foreground-light">
             Your API is secured behind an API gateway which requires an API Key for every request.
             <br />
             You can use the parameters below to use Supabase client libraries.
@@ -70,14 +85,14 @@ const APIKeys = () => {
       {isProjectSettingsError || isJwtSecretUpdateStatusError ? (
         <div className="flex items-center justify-center py-8 space-x-2">
           <IconAlertCircle size={16} strokeWidth={1.5} />
-          <p className="text-sm text-scale-1100">
+          <p className="text-sm text-foreground-light">
             {isProjectSettingsError ? 'Failed to retrieve API keys' : 'Failed to update JWT secret'}
           </p>
         </div>
       ) : isApiKeysEmpty || isProjectSettingsLoading || isJwtSecretUpdateStatusLoading ? (
         <div className="flex items-center justify-center py-8 space-x-2">
           <IconLoader className="animate-spin" size={16} strokeWidth={1.5} />
-          <p className="text-sm text-scale-1100">
+          <p className="text-sm text-foreground-light">
             {isProjectSettingsLoading || isApiKeysEmpty
               ? 'Retrieving API keys'
               : 'JWT secret is being updated'}
@@ -138,8 +153,11 @@ const APIKeys = () => {
                   This key is safe to use in a browser if you have enabled Row Level Security (RLS)
                   for your tables and configured policies. You may also use the service key which
                   can be found{' '}
-                  <Link href={`/project/${projectRef}/settings/api`}>
-                    <a className="transition text-brand hover:text-brand-600">here</a>
+                  <Link
+                    href={`/project/${projectRef}/settings/api`}
+                    className="transition text-brand hover:text-brand-600"
+                  >
+                    here
                   </Link>{' '}
                   to bypass RLS.
                 </p>
@@ -147,7 +165,7 @@ const APIKeys = () => {
             />
           </Panel.Content>
           <div className="border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
-            <div className="flex items-center bg-scale-200">
+            <div className="flex items-center bg-background">
               {availableLanguages.map((language) => {
                 const isSelected = selectedLanguage.key === language.key
                 return (
@@ -155,7 +173,7 @@ const APIKeys = () => {
                     key={language.key}
                     className={[
                       'px-3 py-1 text-sm cursor-pointer transition',
-                      `${!isSelected ? 'bg-scale-200 text-scale-1000' : 'bg-scale-300'}`,
+                      `${!isSelected ? 'bg-background text-foreground-light' : 'bg-surface-100'}`,
                     ].join(' ')}
                     onClick={() => setSelectedLanguage(language)}
                   >
@@ -164,7 +182,7 @@ const APIKeys = () => {
                 )
               })}
             </div>
-            <div className="bg-scale-300 px-4 py-6 min-h-[200px]">
+            <div className="bg-surface-100 px-4 py-6 min-h-[200px]">
               <SimpleCodeBlock className={selectedLanguage.key}>
                 {selectedLanguageSnippet}
               </SimpleCodeBlock>

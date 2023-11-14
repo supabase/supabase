@@ -45,7 +45,7 @@ export const TopCacheMissesRenderer = (
   }>
 ) => {
   if (props.data.length === 0) return null
-  const headerClasses = '!text-xs !py-2 p-0 font-bold !bg-scale-400'
+  const headerClasses = '!text-xs !py-2 p-0 font-bold !bg-surface-200'
   const cellClasses = '!text-xs !py-2'
 
   return (
@@ -65,9 +65,9 @@ export const TopCacheMissesRenderer = (
                 <Table.tr className="p-0">
                   <Table.td className={[cellClasses].join(' ')}>
                     <div className=" truncate max-w-sm lg:max-w-lg">
-                      <TextFormatter className="text-scale-1100" value={datum.path} />
+                      <TextFormatter className="text-foreground-light" value={datum.path} />
                       <TextFormatter
-                        className="max-w-sm text-scale-900 truncate "
+                        className="max-w-sm text-foreground-lighter truncate "
                         value={decodeURIComponent(datum.search || '')}
                       />
                     </div>

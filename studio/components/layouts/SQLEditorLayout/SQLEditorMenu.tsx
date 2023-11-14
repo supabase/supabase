@@ -3,14 +3,14 @@ import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
-import { Button, IconPlus, IconSearch, IconX, Input, Menu, cn } from 'ui'
+import { Button, cn, IconPlus, IconSearch, IconX, Input, Menu } from 'ui'
 
 import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { SqlSnippet, useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
-import { useCheckPermissions, useFlag, useSelectedProject, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedProject, useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
@@ -22,7 +22,6 @@ const SideBarContent = observer(() => {
   const router = useRouter()
   const { profile } = useProfile()
   const project = useSelectedProject()
-  const sharedSnippetsFeature = useFlag<boolean>('sharedSnippets')
 
   const [personalSnippetsFilterString, setPersonalSnippetsFilterString] = useState('')
   const [projectSnippetsFilterString, setProjectSnippetsFilterString] = useState('')
@@ -173,7 +172,7 @@ const SideBarContent = observer(() => {
                           'w-4',
                           'h-4',
                           'cursor-pointer',
-                          isFavoritesFilterOpen ? 'text-scale-1200' : 'text-scale-900'
+                          isFavoritesFilterOpen ? 'text-foreground' : 'text-foreground-lighter'
                         )}
                         onClick={() => {
                           setFavoritesFilterString('')
@@ -218,14 +217,14 @@ const SideBarContent = observer(() => {
                       })}
                     </div>
                   ) : (
-                    <div className="text text-sm h-32 border border-dashed flex flex-col gap-3 items-center justify-center px-3 mx-3 rounded">
-                      <span className="text-lighter">No queries found</span>
+                    <div className="text-foreground text-sm h-32 border border-dashed flex flex-col gap-3 items-center justify-center px-3 mx-3 rounded">
+                      <span className="text-foreground-lighter">No queries found</span>
                     </div>
                   )}
                 </div>
               )}
 
-              {sharedSnippetsFeature && projectSnippets.length >= 1 && (
+              {projectSnippets.length >= 1 && (
                 <div className="editor-product-menu">
                   <div className="flex flex-row justify-between">
                     <Menu.Group title="Project queries" />
@@ -240,7 +239,9 @@ const SideBarContent = observer(() => {
                           'w-4',
                           'h-4',
                           'cursor-pointer',
-                          isProjectSnippetsFilterOpen ? 'text-scale-1200' : 'text-scale-900'
+                          isProjectSnippetsFilterOpen
+                            ? 'text-foreground'
+                            : 'text-foreground-lighter'
                         )}
                         onClick={() => {
                           setProjectSnippetsFilterString('')
@@ -285,8 +286,8 @@ const SideBarContent = observer(() => {
                       })}
                     </div>
                   ) : (
-                    <div className="text text-sm h-32 border border-dashed flex flex-col gap-3 items-center justify-center px-3 mx-3 rounded">
-                      <span className="text-lighter">No queries found</span>
+                    <div className="text-foreground text-sm h-32 border border-dashed flex flex-col gap-3 items-center justify-center px-3 mx-3 rounded">
+                      <span className="text-foreground-lighter">No queries found</span>
                     </div>
                   )}
                 </div>
@@ -306,7 +307,7 @@ const SideBarContent = observer(() => {
                         'w-4',
                         'h-4',
                         'cursor-pointer',
-                        isPersonalSnippetsFilterOpen ? 'text-scale-1200' : 'text-scale-900'
+                        isPersonalSnippetsFilterOpen ? 'text-foreground' : 'text-foreground-lighter'
                       )}
                       onClick={() => {
                         setPersonalSnippetsFilterString('')
@@ -351,9 +352,9 @@ const SideBarContent = observer(() => {
                     })}
                   </div>
                 ) : (
-                  <div className="text text-sm h-32 border border-dashed flex flex-col gap-3 items-center justify-center px-3 mx-3 rounded">
+                  <div className="text-foreground text-sm h-32 border border-dashed flex flex-col gap-3 items-center justify-center px-3 mx-3 rounded">
                     {filteredFavoriteSnippets.length === 0 && (
-                      <span className="text-lighter">No queries found</span>
+                      <span className="text-foreground-lighter">No queries found</span>
                     )}
                     <Button type="default" onClick={() => handleNewQuery()}>
                       New Query

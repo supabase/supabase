@@ -10,8 +10,9 @@ export const meta = {
 ![Supabase User Management example](/docs/img/user-management-demo.png)
 
 <Admonition type="note">
-  If you get stuck while working through this guide, refer to the [full example on
-  GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/svelte-user-management).
+
+If you get stuck while working through this guide, refer to the [full example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/svelte-user-management).
+
 </Admonition>
 
 <ProjectSetup />
@@ -56,7 +57,9 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 ```
 
-And one optional step is to update the CSS file `src/app.css` to make the app look nice.
+### App Styling (Optional)
+
+An optional step is to update the CSS file `src/app.css` to make the app look nice.
 You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/svelte-user-management/src/app.css).
 
 ### Set up a Login component
@@ -65,7 +68,7 @@ Let's set up a Svelte component to manage logins and sign ups. We'll use Magic L
 
 ```html src/lib/Auth.svelte
 <script lang="ts">
-  import { supabase } from 'src/supabaseClient'
+  import { supabase } from '../supabaseClient'
 
   let loading = false
   let email = ''
@@ -173,7 +176,7 @@ Let's create a new component for that called `Account.svelte`.
         updated_at: new Date().toISOString(),
       }
 
-      let { error } = await supabase.from('profiles').upsert(updates)
+      const { error } = await supabase.from('profiles').upsert(updates)
 
       if (error) {
         throw error
@@ -306,7 +309,7 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
       const fileExt = file.name.split('.').pop()
       const filePath = `${Math.random()}.${fileExt}`
 
-      let { error } = await supabase.storage.from('avatars').upload(filePath, file)
+      const { error } = await supabase.storage.from('avatars').upload(filePath, file)
 
       if (error) {
         throw error

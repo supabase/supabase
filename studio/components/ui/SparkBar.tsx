@@ -36,19 +36,19 @@ const SparkBar = ({
           <div className="flex align-baseline justify-between pb-1 space-x-8">
             <p
               className={clsx(
-                'text-scale-1200 text-sm truncate capitalize-sentence',
+                'text-foreground text-sm truncate capitalize-sentence',
                 labelTop.length > 0 && 'max-w-[75%]',
                 labelBottomClass
               )}
             >
               {labelBottom}
             </p>
-            <p className={clsx('text-scale-1100 text-sm', labelTopClass)}>{labelTop}</p>
+            <p className={clsx('text-foreground-light text-sm', labelTopClass)}>{labelTop}</p>
           </div>
         )}
         <div
           className={`relative rounded h-1 overflow-hidden w-full border p-0 ${
-            bgClass ? bgClass : 'bg-gray-100 dark:bg-gray-600'
+            bgClass ? bgClass : 'bg-overlay-hover'
           } ${borderClass ? borderClass : 'border-none'}`}
         >
           <div

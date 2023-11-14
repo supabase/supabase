@@ -1,7 +1,7 @@
 import { groupBy } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
-import { Button, IconExternalLink, IconPlus, Modal } from 'ui'
+import { Button, IconPlus } from 'ui'
 
 import AlertError from 'components/ui/AlertError'
 import {
@@ -17,7 +17,8 @@ import { makeRandomString } from 'lib/helpers'
 import { Organization, Project, ResponseError } from 'types'
 import ProjectCard from './ProjectCard'
 import ShimmeringCard from './ShimmeringCard'
-import { useState } from 'react'
+import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
+import { useSelectedOrganization } from 'hooks'
 
 export interface ProjectListProps {
   rewriteHref?: (projectRef: string) => string
@@ -98,9 +99,16 @@ const OrganizationProjects = ({
   projectsError,
   rewriteHref,
 }: OrganizationProjectsProps) => {
+  const organization = useSelectedOrganization()
   const isEmpty = !projects || projects.length === 0
 
-  const [orgBillingMigrationModalVisible, setOrgBillingMigrationModalVisible] = useState(false)
+  const { data: integrations } = useOrgIntegrationsQuery({ orgSlug: organization?.slug })
+  const githubConnections = integrations
+    ?.filter((integration) => integration.integration.name === 'GitHub')
+    .flatMap((integration) => integration.connections)
+  const vercelConnections = integrations
+    ?.filter((integration) => integration.integration.name === 'Vercel')
+    .flatMap((integration) => integration.connections)
 
   return (
     <div className="space-y-3" key={makeRandomString(5)}>
@@ -109,18 +117,8 @@ const OrganizationProjects = ({
 
         {!!overdueInvoices.length && (
           <div>
-            <Link href={`/org/${slug}/invoices`}>
-              <a>
-                <Button type="danger">Outstanding Invoices</Button>
-              </a>
-            </Link>
-          </div>
-        )}
-
-        {!subscription_id && (
-          <div>
-            <Button onClick={() => setOrgBillingMigrationModalVisible(true)} type="warning">
-              Action Required
+            <Button asChild type="danger">
+              <Link href={`/org/${slug}/invoices`}>Outstanding Invoices</Link>
             </Button>
           </div>
         )}
@@ -158,53 +156,17 @@ const OrganizationProjects = ({
                 resourceWarnings={resourceWarnings.find(
                   (resourceWarning) => resourceWarning.project === project.ref
                 )}
+                githubIntegration={githubConnections?.find(
+                  (connection) => connection.supabase_project_ref === project.ref
+                )}
+                vercelIntegration={vercelConnections?.find(
+                  (connection) => connection.supabase_project_ref === project.ref
+                )}
               />
             ))
           )}
         </ul>
       )}
-
-      <Modal
-        closable
-        hideFooter
-        size="small"
-        visible={orgBillingMigrationModalVisible}
-        onCancel={() => setOrgBillingMigrationModalVisible(false)}
-        header="We're upgrading our billing system"
-      >
-        <Modal.Content className="py-4 space-y-4">
-          <div className="space-y-3">
-            <p className="text-sm leading-normal">
-              The organization "{name}" still uses the legacy project-based billing. We've recently
-              made some big improvements to our billing system and require your action. To migrate
-              to the new organization-based billing, head over to your{' '}
-              <Link href={`/org/${slug}/billing`} passHref>
-                <a className="text-sm text-green-900 transition hover:text-green-1000">
-                  organization billing settings
-                </a>
-              </Link>
-              .
-            </p>
-
-            <div className="space-x-3">
-              <Link href="https://supabase.com/blog/organization-based-billing" passHref>
-                <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                  <a target="_blank" rel="noreferrer">
-                    Announcement
-                  </a>
-                </Button>
-              </Link>
-              <Link href="https://supabase.com/docs/guides/platform/org-based-billing" passHref>
-                <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                  <a target="_blank" rel="noreferrer">
-                    Documentation
-                  </a>
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </Modal.Content>
-      </Modal>
     </div>
   )
 }
@@ -214,14 +176,12 @@ const NoProjectsState = ({ slug }: { slug: string }) => {
     <div className="col-span-4 space-y-4 rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
       <div className="space-y-1">
         <p>No projects</p>
-        <p className="text-sm text-scale-1100">Get started by creating a new project.</p>
+        <p className="text-sm text-foreground-light">Get started by creating a new project.</p>
       </div>
       <div>
-        <Link href={`/new/${slug}`}>
-          <a>
-            <Button icon={<IconPlus />}>New Project</Button>
-          </a>
-        </Link>
+        <Button asChild icon={<IconPlus />}>
+          <Link href={`/new/${slug}`}>New Project</Link>
+        </Button>
       </div>
     </div>
   )

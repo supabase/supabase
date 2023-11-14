@@ -8,8 +8,7 @@ import TextLink from '../TextLink'
 const CustomerStories = ({ customerStories }: any) => {
   const caseStudyThumbs = customerStories.map((blog: PostTypes, idx: number) => {
     return {
-      logo: blog.logo,
-      logoInverse: blog.logo_inverse,
+      logo: blog.logo_inverse,
       title: blog.title,
       link: blog.url,
     }
@@ -29,18 +28,20 @@ const CustomerStories = ({ customerStories }: any) => {
       </div>
       <div className="mx-auto mt-5 grid grid-cols-12 gap-8 lg:gap-12">
         {caseStudyThumbs.map((caseStudy: any, i: number) => (
-          <Link href={`${caseStudy.link}`} key={caseStudy.title} passHref>
-            <a className="col-span-12 md:col-span-4">
-              <GlassPanel
-                {...caseStudy}
-                background={true}
-                showIconBg={true}
-                showLink={true}
-                hasLightIcon
-              >
-                {caseStudy.description}
-              </GlassPanel>
-            </a>
+          <Link
+            href={`${caseStudy.link}`}
+            key={caseStudy.title}
+            className="col-span-12 md:col-span-4"
+          >
+            <GlassPanel
+              {...caseStudy}
+              background={true}
+              showIconBg={true}
+              showLink={true}
+              hasLightIcon
+            >
+              {caseStudy.description}
+            </GlassPanel>
           </Link>
         ))}
       </div>

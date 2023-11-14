@@ -1,8 +1,8 @@
-import { useState, useCallback } from 'react'
-import { EditorProps } from '@supabase/react-data-grid'
-import { useTrackedState } from '../../store'
-import { BlockKeys, MonacoEditor, NullValue, EmptyValue } from '../common'
+import { RenderEditCellProps } from 'react-data-grid'
+import { useCallback, useState } from 'react'
 import { Button, Popover } from 'ui'
+import { useTrackedState } from '../../store'
+import { BlockKeys, EmptyValue, MonacoEditor, NullValue } from '../common'
 
 export const TextEditor = <TRow, TSummaryRow = unknown>({
   row,
@@ -10,7 +10,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
   isNullable,
   isEditable,
   onRowChange,
-}: EditorProps<TRow, TSummaryRow> & { isNullable?: boolean; isEditable?: boolean }) => {
+}: RenderEditCellProps<TRow, TSummaryRow> & { isNullable?: boolean; isEditable?: boolean }) => {
   const state = useTrackedState()
   const [isPopoverOpen, setIsPopoverOpen] = useState(true)
   const gridColumn = state.gridColumns.find((x) => x.name == column.key)
@@ -50,19 +50,19 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
             onChange={onChange}
           />
           {isEditable && (
-            <div className="flex items-start justify-between p-2 bg-scale-400 space-x-2">
+            <div className="flex items-start justify-between p-2 bg-surface-200 space-x-2">
               <div className="space-y-1">
                 <div className="flex items-center space-x-2">
-                  <div className="px-1.5 py-[2.5px] rounded bg-scale-600 border border-scale-700 flex items-center justify-center">
+                  <div className="px-1.5 py-[2.5px] rounded bg-surface-300 border border-strong flex items-center justify-center">
                     <span className="text-[10px]">⏎</span>
                   </div>
-                  <p className="text-xs text-scale-1100">Save changes</p>
+                  <p className="text-xs text-foreground-light">Save changes</p>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <div className="px-1 py-[2.5px] rounded bg-scale-600 border border-scale-700 flex items-center justify-center">
+                  <div className="px-1 py-[2.5px] rounded bg-surface-300 border border-strong flex items-center justify-center">
                     <span className="text-[10px]">Esc</span>
                   </div>
-                  <p className="text-xs text-scale-1100">Cancel changes</p>
+                  <p className="text-xs text-foreground-light">Cancel changes</p>
                 </div>
               </div>
               <div className="space-y-1">

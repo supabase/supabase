@@ -5,7 +5,10 @@ import { observer } from 'mobx-react-lite'
 import {
   Badge,
   Button,
-  Dropdown,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   IconCheck,
   IconEdit3,
   IconMoreVertical,
@@ -44,8 +47,10 @@ const TriggerList = ({
     return (
       <Table.tr key={schema}>
         <Table.td colSpan={6}>
-          <p className="text-sm text-scale-1200">No triggers created yet</p>
-          <p className="text-sm text-light">There are no triggers found in the schema "{schema}"</p>
+          <p className="text-sm text-foreground">No triggers created yet</p>
+          <p className="text-sm text-foreground-light">
+            There are no triggers found in the schema "{schema}"
+          </p>
         </Table.td>
       </Table.tr>
     )
@@ -55,8 +60,8 @@ const TriggerList = ({
     return (
       <Table.tr key={schema}>
         <Table.td colSpan={5}>
-          <p className="text-sm text-scale-1200">No results found</p>
-          <p className="text-sm text-light">
+          <p className="text-sm text-foreground">No results found</p>
+          <p className="text-sm text-foreground-light">
             Your search for "{filterString}" did not return any results
           </p>
         </Table.td>
@@ -108,30 +113,23 @@ const TriggerList = ({
             {!isLocked && (
               <div className="flex items-center justify-end">
                 {canUpdateTriggers ? (
-                  <Dropdown
-                    side="bottom"
-                    align="end"
-                    overlay={
-                      <>
-                        <Dropdown.Item
-                          icon={<IconEdit3 size="tiny" />}
-                          onClick={() => editTrigger(x)}
-                        >
-                          Edit trigger
-                        </Dropdown.Item>
-                        <Dropdown.Item
-                          icon={<IconTrash stroke="red" size="tiny" />}
-                          onClick={() => deleteTrigger(x)}
-                        >
-                          Delete trigger
-                        </Dropdown.Item>
-                      </>
-                    }
-                  >
-                    <Button asChild type="default" icon={<IconMoreVertical />}>
-                      <span></span>
-                    </Button>
-                  </Dropdown>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger>
+                      <Button asChild type="default" className="px-1" icon={<IconMoreVertical />}>
+                        <span />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent side="bottom" align="end" className="w-36">
+                      <DropdownMenuItem className="space-x-2" onClick={() => editTrigger(x)}>
+                        <IconEdit3 size="tiny" />
+                        <p>Edit trigger</p>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="space-x-2" onClick={() => deleteTrigger(x)}>
+                        <IconTrash stroke="red" size="tiny" />
+                        <p>Delete trigger</p>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 ) : (
                   <Tooltip.Root delayDuration={0}>
                     <Tooltip.Trigger asChild>
@@ -142,11 +140,11 @@ const TriggerList = ({
                         <Tooltip.Arrow className="radix-tooltip-arrow" />
                         <div
                           className={[
-                            'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                            'border border-scale-200',
+                            'rounded bg-alternative py-1 px-2 leading-none shadow',
+                            'border border-background',
                           ].join(' ')}
                         >
-                          <span className="text-xs text-scale-1200">
+                          <span className="text-xs text-foreground">
                             You need additional permissions to update triggers
                           </span>
                         </div>

@@ -12,9 +12,9 @@ import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useBackupsQuery } from 'data/database/backups-query'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 import { NextPageWithLayout } from 'types'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 const DatabasePhysicalBackups: NextPageWithLayout = () => {
   const router = useRouter()
@@ -26,7 +26,7 @@ const DatabasePhysicalBackups: NextPageWithLayout = () => {
       <ScaffoldSection>
         <div className="col-span-12">
           <div className="space-y-6">
-            <h3 className="text-xl text-scale-1200">Database Backups</h3>
+            <h3 className="text-xl text-foreground">Database Backups</h3>
 
             <Tabs
               type="underlined"
@@ -56,6 +56,7 @@ DatabasePhysicalBackups.getLayout = (page) => (
 
 const PITR = observer(() => {
   const { project } = useProjectContext()
+  const organization = useSelectedOrganization()
   const {
     data: backups,
     error,
@@ -66,10 +67,7 @@ const PITR = observer(() => {
     projectRef: project?.ref,
   })
 
-  const { data: subscription } = useProjectSubscriptionV2Query(
-    { projectRef: project?.ref },
-    { enabled: project?.ref !== undefined }
-  )
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
   const ref = project?.ref ?? 'default'
   const plan = subscription?.plan?.id
@@ -92,6 +90,7 @@ const PITR = observer(() => {
             </>
           ) : (
             <UpgradeToPro
+              organizationSlug={organization!.slug}
               projectRef={ref}
               primaryText="Point in time recovery is a Pro plan add-on."
               secondaryText={

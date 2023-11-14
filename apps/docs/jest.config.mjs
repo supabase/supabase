@@ -6,7 +6,7 @@ const createJestConfig = nextJest({
 })
 
 const config = {
-  setupFilesAfterEnv: ['@testing-library/jest-dom/extend-expect'],
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testEnvironment: 'jsdom',
 }
 

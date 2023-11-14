@@ -7,12 +7,11 @@ import { FormHeader } from 'components/ui/Forms'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 
 const collapsibleClasses = [
-  'bg-scale-100 dark:bg-scale-300',
-  'hover:bg-scale-200 dark:hover:bg-scale-500',
-  'data-open:bg-scale-200 dark:data-open:bg-scale-500',
-  'border-scale-300',
-  'dark:border-scale-500 hover:border-scale-500',
-  'dark:hover:border-scale-700 data-open:border-scale-700',
+  'bg-surface-100',
+  'hover:bg-overlay-hover',
+  'data-open:bg-selection',
+  'border-default',
+  'hover:border-strong data-open:border-strong',
   'data-open:pb-px col-span-12 rounded',
   '-space-y-px overflow-hidden',
   'border shadow',
@@ -35,7 +34,7 @@ const Security: NextPageWithLayout = () => {
         <Collapsible.Trigger asChild>
           <button
             type="button"
-            className="group flex w-full items-center justify-between rounded py-3 px-6 text-scale-1200"
+            className="group flex w-full items-center justify-between rounded py-3 px-6 text-foreground"
           >
             <div className="flex flex-row gap-4 items-center py-1">
               <IconSmartphone strokeWidth={1.5} />
@@ -49,7 +48,7 @@ const Security: NextPageWithLayout = () => {
             ) : null}
           </button>
         </Collapsible.Trigger>
-        <Collapsible.Content className="group border-t border-scale-500 bg-scale-100 py-6 px-6 text-scale-1200 dark:bg-scale-300">
+        <Collapsible.Content className="group border-t border-default bg-surface-100 py-6 px-6 text-foreground">
           <TOTPFactors />
         </Collapsible.Content>
       </Collapsible>

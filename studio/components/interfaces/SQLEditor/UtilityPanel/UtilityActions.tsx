@@ -1,7 +1,7 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
 import { Button, IconAlignLeft, IconCommand, IconCornerDownLeft } from 'ui'
-import * as Tooltip from '@radix-ui/react-tooltip'
 
 import FavoriteButton from './FavoriteButton'
 import SavingIndicator from './SavingIndicator'
@@ -11,6 +11,7 @@ export type UtilityActionsProps = {
   id: string
   isExecuting?: boolean
   isDisabled?: boolean
+  hasSelection: boolean
   prettifyQuery: () => void
   executeQuery: () => void
 }
@@ -19,6 +20,7 @@ const UtilityActions = ({
   id,
   isExecuting = false,
   isDisabled = false,
+  hasSelection,
   prettifyQuery,
   executeQuery,
 }: UtilityActionsProps) => {
@@ -42,11 +44,11 @@ const UtilityActions = ({
             <Tooltip.Arrow className="radix-tooltip-arrow" />
             <div
               className={[
-                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                'border border-scale-200',
+                'rounded bg-alternative py-1 px-2 leading-none shadow',
+                'border border-background',
               ].join(' ')}
             >
-              <span className="text-xs text-scale-1200">Prettify SQL</span>
+              <span className="text-xs text-foreground">Prettify SQL</span>
             </div>
           </Tooltip.Content>
         </Tooltip.Portal>
@@ -63,13 +65,13 @@ const UtilityActions = ({
             {os === 'macos' ? (
               <IconCommand size={10} strokeWidth={1.5} />
             ) : (
-              <p className="text-xs text-scale-1100">CTRL</p>
+              <p className="text-xs text-foreground-light">CTRL</p>
             )}
             <IconCornerDownLeft size={10} strokeWidth={1.5} />
           </div>
         }
       >
-        RUN
+        {hasSelection ? 'Run selected' : 'Run'}
       </Button>
     </>
   )

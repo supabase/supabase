@@ -1,5 +1,6 @@
 import Editor from '@monaco-editor/react'
-import { useParams, useTheme } from 'common'
+import { useTheme } from 'next-themes'
+import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
 import { useMemo, useRef } from 'react'
 import { format } from 'sql-formatter'
@@ -22,7 +23,7 @@ const TableDefinition = ({ id }: TableDefinitionProps) => {
   const { ref } = useParams()
   const editorRef = useRef(null)
   const monacoRef = useRef(null)
-  const { isDarkMode } = useTheme()
+  const { resolvedTheme } = useTheme()
   const entityType = useEntityType(id)
   const { project } = useProjectContext()
 
@@ -101,18 +102,17 @@ const TableDefinition = ({ id }: TableDefinitionProps) => {
   }
 
   return (
-    <div className="flex-grow overflow-y-auto border-t border-scale-400 relative">
-      <Link
-        passHref
-        href={`/project/${ref}/sql/new?content=${encodeURIComponent(formattedDefinition ?? '')}`}
-      >
-        <Button asChild type="default" className="absolute top-2 right-5 z-10">
-          <a>Open in SQL Editor</a>
-        </Button>
-      </Link>
+    <div className="flex-grow overflow-y-auto border-t border-muted relative">
+      <Button asChild type="default" className="absolute top-2 right-5 z-10">
+        <Link
+          href={`/project/${ref}/sql/new?content=${encodeURIComponent(formattedDefinition ?? '')}`}
+        >
+          Open in SQL Editor
+        </Link>
+      </Button>
       <Editor
         className="monaco-editor"
-        theme={isDarkMode ? 'vs-dark' : 'vs'}
+        theme={resolvedTheme === 'dark' ? 'vs-dark' : 'vs'}
         onMount={handleEditorOnMount}
         defaultLanguage="pgsql"
         value={formattedDefinition}

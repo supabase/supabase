@@ -4,13 +4,13 @@
  * for http response codes
  */
 
-import { IconAlertCircle, IconInfo } from 'ui'
+import CopyButton from 'components/ui/CopyButton'
 import dayjs from 'dayjs'
 import React from 'react'
+import { IconAlertCircle, IconInfo } from 'ui'
 import { isUnixMicro, unixMicroToIsoTimestamp } from '.'
-import CopyButton from 'components/ui/CopyButton'
 
-export const RowLayout: React.FC = ({ children }) => (
+export const RowLayout: React.FC<React.PropsWithChildren> = ({ children }) => (
   <div className="flex h-full w-full items-center gap-4">{children}</div>
 )
 // renders a timestamp (either unix microsecond or iso timestamp)
@@ -31,8 +31,10 @@ export const SelectionDetailedRow = ({
 }) => {
   return (
     <div className="grid grid-cols-12 group">
-      <span className="text-scale-900 text-sm col-span-4 whitespace-pre-wrap">{label}</span>
-      <span className="text-scale-1200 text-sm col-span-6 whitespace-pre-wrap break-all">
+      <span className="text-foreground-lighter text-sm col-span-4 whitespace-pre-wrap">
+        {label}
+      </span>
+      <span className="text-foreground text-sm col-span-6 whitespace-pre-wrap break-all">
         {valueRender ?? value}
       </span>
       <CopyButton
@@ -58,7 +60,7 @@ export const ResponseCodeFormatter = ({ value }: any) => {
   if (!value) {
     return (
       <div>
-        <label className="text-xs text-scale-800">No data</label>
+        <label className="text-xs text-border-stronger">No data</label>
       </div>
     )
   }
@@ -71,12 +73,8 @@ export const ResponseCodeFormatter = ({ value }: any) => {
     case '2':
       return (
         <div className="flex h-full items-center">
-          <div
-            className="relative flex h-6 items-center justify-center rounded border bg-scale-500 px-2
-            py-1 text-center dark:bg-scale-400
-            "
-          >
-            <label className="block font-mono text-sm text-scale-900">{value}</label>
+          <div className="relative flex h-6 items-center justify-center rounded border bg-surface-200 px-2 py-1 text-center">
+            <label className="block font-mono text-sm text-foreground-lighter">{value}</label>
           </div>
         </div>
       )
@@ -119,12 +117,12 @@ export const ResponseCodeFormatter = ({ value }: any) => {
       return (
         <div className="flex h-full items-center">
           <div
-            className="relative flex h-6 items-center justify-center rounded bg-scale-300 px-2 py-1
+            className="relative flex h-6 items-center justify-center rounded bg-surface-100 px-2 py-1
             text-center
 
             "
           >
-            <label className="block font-mono text-sm text-scale-900">{value}</label>
+            <label className="block font-mono text-sm text-foreground-lighter">{value}</label>
           </div>
         </div>
       )
@@ -148,16 +146,17 @@ export const SeverityFormatter = ({
   if (!value) {
     return (
       <div>
-        <label className="text-xs text-scale-800">No data</label>
+        <label className="text-xs text-border-stronger">No data</label>
       </div>
     )
   }
 
   const uppercasedValue = value.toUpperCase()
   const text = uppercase ? uppercasedValue : value
-  const Layout: React.FC<{ className?: string }> = ({ className, children }) => (
-    <div className={`w-24 flex items-center h-full ${className}`}>{children}</div>
-  )
+  const Layout: React.FC<React.PropsWithChildren<{ className?: string }>> = ({
+    className,
+    children,
+  }) => <div className={`w-24 flex items-center h-full ${className}`}>{children}</div>
 
   switch (uppercasedValue) {
     case 'UNCAUGHTEXCEPTION':
@@ -213,8 +212,8 @@ export const SeverityFormatter = ({
     default:
       return (
         <Layout>
-          <div className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center bg-scale-300">
-            <label className="block font-mono text-sm text-scale-900">{text}</label>
+          <div className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center bg-surface-100">
+            <label className="block font-mono text-sm text-foreground-lighter">{text}</label>
           </div>
         </Layout>
       )
@@ -254,7 +253,11 @@ export const timestampLocalFormatter = (value: string | number) => {
  */
 
 export const HeaderFormmater = ({ value }: any) => {
-  return <div className="flex h-full items-center text-xs font-normal text-scale-900">{value}</div>
+  return (
+    <div className="flex h-full items-center text-xs font-normal text-foreground-lighter">
+      {value}
+    </div>
+  )
 }
 
 /*
@@ -274,7 +277,7 @@ export function jsonSyntaxHighlight(input: Object) {
       var cls = 'number text-tomato-900'
       if (/^"/.test(match)) {
         if (/:$/.test(match)) {
-          cls = 'key text-scale-1200'
+          cls = 'key text-foreground'
         } else {
           cls = 'string text-brand-600'
         }

@@ -1,6 +1,11 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useIsFeatureEnabled, useSelectedOrganization } from 'hooks'
 import {
   Badge,
   Button,
@@ -19,11 +24,6 @@ import {
   ScrollArea,
 } from 'ui'
 
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from 'hooks'
-
 interface OrganizationDropdownProps {
   isNewNav?: boolean
 }
@@ -33,13 +33,11 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
   const selectedOrganization = useSelectedOrganization()
   const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
 
+  const organizationCreationEnabled = useIsFeatureEnabled('organizations:create')
+
   const slug = selectedOrganization?.slug
   const orgName = selectedOrganization?.name
-  const isOrgBilling = !!selectedOrganization?.subscription_id
-  const { data: subscription, isSuccess } = useOrgSubscriptionQuery(
-    { orgSlug: slug },
-    { enabled: isOrgBilling }
-  )
+  const { data: subscription, isSuccess } = useOrgSubscriptionQuery({ orgSlug: slug })
 
   const [open, setOpen] = useState(false)
 
@@ -56,7 +54,7 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
               type="text"
               className="pr-2"
               iconRight={
-                <IconCode className="text-scale-1100 rotate-90" strokeWidth={2} size={12} />
+                <IconCode className="text-foreground-light rotate-90" strokeWidth={2} size={12} />
               }
             >
               <div className="flex items-center space-x-2">
@@ -80,45 +78,42 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
                       ? `/org/${org.slug}`
                       : `/org/${org.slug}/general`
                     return (
-                      <Link passHref href={href} key={org.slug}>
-                        <CommandItem_Shadcn_
-                          asChild
-                          value={org.name}
-                          className="cursor-pointer w-full flex items-center justify-between"
-                          onSelect={() => {
-                            setOpen(false)
-                            router.push(href)
-                          }}
-                          onClick={() => setOpen(false)}
-                        >
-                          <a>
-                            {org.name}
-                            {org.slug === slug && <IconCheck />}
-                          </a>
-                        </CommandItem_Shadcn_>
-                      </Link>
+                      <CommandItem_Shadcn_
+                        key={org.slug}
+                        value={`${org.name} - ${org.slug}`}
+                        className="cursor-pointer w-full"
+                        onSelect={() => {
+                          setOpen(false)
+                          router.push(href)
+                        }}
+                        onClick={() => setOpen(false)}
+                      >
+                        <Link href={href} className="w-full flex items-center justify-between">
+                          {org.name}
+                          {org.slug === slug && <IconCheck />}
+                        </Link>
+                      </CommandItem_Shadcn_>
                     )
                   })}
                 </ScrollArea>
               </CommandGroup_Shadcn_>
-              <CommandGroup_Shadcn_ className="border-t">
-                <Link passHref href="/new">
+              {organizationCreationEnabled && (
+                <CommandGroup_Shadcn_ className="border-t">
                   <CommandItem_Shadcn_
-                    asChild
-                    className="cursor-pointer flex items-center space-x-2 w-full"
+                    className="cursor-pointer w-full"
                     onSelect={(e) => {
                       setOpen(false)
                       router.push(`/new`)
                     }}
                     onClick={() => setOpen(false)}
                   >
-                    <a>
+                    <Link href="/new" className="flex items-center gap-2 w-full">
                       <IconPlus size={14} strokeWidth={1.5} />
                       <p>New organization</p>
-                    </a>
+                    </Link>
                   </CommandItem_Shadcn_>
-                </Link>
-              </CommandGroup_Shadcn_>
+                </CommandGroup_Shadcn_>
+              )}
             </CommandList_Shadcn_>
           </Command_Shadcn_>
         </PopoverContent_Shadcn_>

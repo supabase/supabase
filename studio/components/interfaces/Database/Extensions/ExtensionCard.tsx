@@ -1,14 +1,14 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
-import { Badge, IconExternalLink, IconLoader, Toggle } from 'ui'
 
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useCheckPermissions, useStore } from 'hooks'
 import { isResponseOk } from 'lib/common/fetch'
-import EnableExtensionModal from './EnableExtensionModal'
 import Link from 'next/link'
 import { extensions } from 'shared-data'
+import { Badge, IconExternalLink, IconLoader, Modal, Toggle } from 'ui'
+import EnableExtensionModal from './EnableExtensionModal'
 
 interface ExtensionCardProps {
   extension: any
@@ -31,60 +31,60 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
     return setShowConfirmEnableModal(true)
   }
 
+  const [isDisableModalOpen, setIsDisableModalOpen] = useState(false)
+  function openDisableModal() {
+    setIsDisableModalOpen(true)
+  }
+
   async function disableExtension() {
-    confirmAlert({
-      title: 'Confirm to disable extension',
-      message: `Are you sure you want to turn OFF "${extension.name}" extension?`,
-      onAsyncConfirm: async () => {
-        try {
-          setLoading(true)
-          const response = await meta.extensions.del(extension.name)
-          if (!isResponseOk(response)) {
-            throw response.error
-          } else {
-            ui.setNotification({
-              category: 'success',
-              message: `${extension.name.toUpperCase()} is off.`,
-            })
-          }
-        } catch (error: any) {
-          ui.setNotification({
-            category: 'error',
-            message: `Toggle ${extension.name.toUpperCase()} failed: ${error.message}`,
-          })
-        } finally {
-          // Need to reload them because the delete function
-          // removes the extension from the store
-          meta.extensions.load()
-          setLoading(false)
-        }
-      },
-    })
+    try {
+      setLoading(true)
+      const response = await meta.extensions.del(extension.name)
+      if (!isResponseOk(response)) {
+        throw response.error
+      }
+
+      ui.setNotification({
+        category: 'success',
+        message: `${extension.name.toUpperCase()} is off.`,
+      })
+      setIsDisableModalOpen(false)
+    } catch (error: any) {
+      ui.setNotification({
+        category: 'error',
+        message: `Toggle ${extension.name.toUpperCase()} failed: ${error.message}`,
+      })
+    } finally {
+      // Need to reload them because the delete function
+      // removes the extension from the store
+      meta.extensions.load()
+      setLoading(false)
+    }
   }
 
   return (
     <>
       <div
         className={[
-          'flex border-panel-border-light dark:border-panel-border-dark',
+          'flex border-overlay',
           'flex-col overflow-hidden rounded border shadow-sm',
         ].join(' ')}
       >
         <div
           className={[
-            'border-panel-border-light bg-panel-header-light dark:bg-panel-header-dark',
-            'flex justify-between w-full border-b py-3 px-4 dark:border-panel-border-dark',
+            'border-overlay bg-surface-100',
+            'flex justify-between w-full border-b py-3 px-4',
           ].join(' ')}
         >
           <div className="flex items-center gap-1 max-w-[85%]">
             <div className="flex items-center space-x-2 truncate">
               <h3
                 title={extension.name}
-                className="h-5 m-0 text-sm truncate cursor-pointer text-scale-1200"
+                className="h-5 m-0 text-sm truncate cursor-pointer text-foreground"
               >
                 {extension.name}
               </h3>
-              <p className="text-sm text-light">
+              <p className="text-sm text-foreground-light">
                 {extension?.installed_version ?? extension.default_version}
               </p>
             </div>
@@ -103,10 +103,11 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
                         }`
                     : extensions.find((item: any) => item.name === extension.name)?.link ?? ''
                 }
+                className="max-w-[85%] cursor-default zans"
+                target="_blank"
+                rel="noreferrer"
               >
-                <a className="max-w-[85%] cursor-default zans" target="_blank" rel="noreferrer">
-                  <IconExternalLink className="ml-2.5 cursor-pointer" size={14} />
-                </a>
+                <IconExternalLink className="ml-2.5 cursor-pointer" size={14} />
               </Link>
             ) : null}
           </div>
@@ -117,7 +118,7 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
               size="tiny"
               checked={isOn}
               disabled={!canUpdateExtensions}
-              onChange={() => (isOn ? disableExtension() : enableExtension())}
+              onChange={() => (isOn ? openDisableModal() : enableExtension())}
             />
           )}
         </div>
@@ -128,11 +129,11 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
           ].join(' ')}
         >
           <div className="py-3 px-4">
-            <p className="text-sm text-scale-1100 capitalize-sentence">{extension.comment}</p>
+            <p className="text-sm text-foreground-light capitalize-sentence">{extension.comment}</p>
           </div>
           {isOn && extension.schema && (
             <div className="py-3 px-4">
-              <div className="flex items-center flex-grow space-x-2 text-sm text-scale-1100">
+              <div className="flex items-center flex-grow space-x-2 text-sm text-foreground-light">
                 <span>Schema:</span>
                 <Badge color="scale">{`${extension.schema}`}</Badge>
               </div>
@@ -140,11 +141,27 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
           )}
         </div>
       </div>
+
       <EnableExtensionModal
         visible={showConfirmEnableModal}
         extension={extension}
         onCancel={() => setShowConfirmEnableModal(false)}
       />
+      <ConfirmationModal
+        visible={isDisableModalOpen}
+        header="Confirm to disable extension"
+        buttonLabel="Disable"
+        onSelectCancel={() => setIsDisableModalOpen(false)}
+        onSelectConfirm={() => {
+          disableExtension()
+        }}
+      >
+        <Modal.Content>
+          <p className="py-4 text-sm text-foreground-light">
+            Are you sure you want to turn OFF "{extension.name}" extension?
+          </p>
+        </Modal.Content>
+      </ConfirmationModal>
     </>
   )
 }
