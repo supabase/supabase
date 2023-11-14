@@ -52,9 +52,9 @@ button[aria-haspopup='menu']:focus-visible {
   animation: shimmer 2s infinite linear;
   background: linear-gradient(
     to right,
-    hsl(var(--background-surface-100)) 4%,
-    hsl(var(--background-surface-200)) 25%,
-    hsl(var(--background-surface-100)) 36%
+    hsl(var(--border-overlay)) 4%,
+    hsl(var(--background-selection)) 25%,
+    hsl(var(--border-overlay)) 36%
   );
   background-size: 1000px 100%;
 }
@@ -64,7 +64,7 @@ button[aria-haspopup='menu']:focus-visible {
   background: linear-gradient(
     to right,
     hsl(var(--background-surface-300)) 4%,
-    hsl(var(--background-overlay-hover)) 25%,
+    hsl(var(--background-selection)) 25%,
     hsl(var(--background-surface-300)) 36%
   );
   background-size: 1000px 100%;
