@@ -133,8 +133,12 @@ export interface paths {
   '/platform/organizations': {
     /** Gets user's organizations */
     get: operations['OrganizationsController_getOrganizations']
-    /** Creates an organization (v2) */
+    /** Creates an organization */
     post: operations['OrganizationsController_createOrganizationWithTier']
+  }
+  '/platform/organizations/fly/{fly_organization_id}': {
+    /** Gets organization linked to fly organization id */
+    get: operations['OrganizationsController_getOrganizationByFlyOrganizationId']
   }
   '/platform/organizations/{slug}': {
     /** Deletes organization */
@@ -443,6 +447,10 @@ export interface paths {
     /** Creates a project */
     post: operations['ProjectsController_createProject']
   }
+  '/platform/projects/fly/{fly_extension_id}': {
+    /** Gets project linked to fly extension id */
+    get: operations['ProjectsController_getProjectByFlyExtensionId']
+  }
   '/platform/projects/{ref}/content': {
     /** Gets project's content */
     get: operations['ContentController_getContent']
@@ -529,10 +537,6 @@ export interface paths {
      */
     post: operations['UpdateController_updateProject']
   }
-  '/platform/projects/{ref}/usage': {
-    /** Gets project's usage */
-    get: operations['UsageController_getUsageStatusConfig']
-  }
   '/platform/projects/{ref}/transfer/preview': {
     /** Previews transfering a project to a different organizations, shows eligibility and impact. */
     post: operations['ProjectTransferController_previewTransfer']
@@ -594,20 +598,6 @@ export interface paths {
   '/platform/projects/{ref}/billing/addons/{addon_variant}': {
     /** Removes project addon */
     delete: operations['ProjectAddonController_removeAddon']
-  }
-  '/platform/projects/{ref}/billing/subscription': {
-    /** Gets the current subscription */
-    get: operations['SubscriptionController_getSubscription']
-    /** Updates subscription */
-    put: operations['SubscriptionController_updateSubscription']
-  }
-  '/platform/projects/{ref}/billing/plans': {
-    /** Gets subscription plans */
-    get: operations['ProjectPlansController_getAvailablePlans']
-  }
-  '/platform/projects/{ref}/billing/invoices/upcoming': {
-    /** Gets the upcoming invoice */
-    get: operations['ProjectInvoicesController_getUpcomingInvoice']
   }
   '/platform/props/project/{ref}/api': {
     /**
@@ -876,10 +866,6 @@ export interface paths {
     /** Allows a project to obtain temporary credentials. */
     post: operations['AwsCredentialsController_getTemporaryCredentials']
   }
-  '/system/projects/{ref}/billing/subscription': {
-    /** Updates subscription */
-    put: operations['SubscriptionController_updateSubscription']
-  }
   '/system/projects/{ref}/billing/addons': {
     /** Updates project addon */
     post: operations['AddonsController_updateAddon']
@@ -887,18 +873,6 @@ export interface paths {
   '/system/projects/{ref}/billing/addons/{addon_variant}': {
     /** Removes project addon */
     delete: operations['AddonsController_removeAddon']
-  }
-  '/system/billing/migrate/org-level-billing': {
-    /** Migrates org to org-level billing. */
-    post: operations['BillingMigrationController_migrateToOrgLevelBilling']
-  }
-  '/system/billing/migrate/org-level-billing-preview': {
-    /** Previews the migration of the organization to the new org level billing. */
-    post: operations['BillingMigrationController_preview']
-  }
-  '/system/billing/migrate/org-level-billing-attach': {
-    /** Attaches subscription id to org and projects. */
-    put: operations['BillingMigrationController_attachSubscriptionId']
   }
   '/system/projects/{ref}/config/update-jwt/complete': {
     /** Handle update project jwt on completion */
@@ -1013,8 +987,12 @@ export interface paths {
   '/v0/organizations': {
     /** Gets user's organizations */
     get: operations['OrganizationsController_getOrganizations']
-    /** Creates an organization (v2) */
+    /** Creates an organization */
     post: operations['OrganizationsController_createOrganizationWithTier']
+  }
+  '/v0/organizations/fly/{fly_organization_id}': {
+    /** Gets organization linked to fly organization id */
+    get: operations['OrganizationsController_getOrganizationByFlyOrganizationId']
   }
   '/v0/organizations/{slug}': {
     /** Deletes organization */
@@ -1199,6 +1177,10 @@ export interface paths {
     /** Creates a project */
     post: operations['ProjectsController_createProject']
   }
+  '/v0/projects/fly/{fly_extension_id}': {
+    /** Gets project linked to fly extension id */
+    get: operations['ProjectsController_getProjectByFlyExtensionId']
+  }
   '/v0/projects/metrics': {
     /**
      * Get metrics
@@ -1285,10 +1267,6 @@ export interface paths {
     /** Gets project's status */
     get: operations['StatusController_getStatus']
   }
-  '/v0/projects/{ref}/usage': {
-    /** Gets project's usage */
-    get: operations['UsageController_getUsageStatusConfig']
-  }
   '/v0/projects/{ref}/analytics/endpoints/functions.inv-stats': {
     /** Gets a project's function invocation statistics */
     get: operations['FunctionLogsController_getStatus']
@@ -1342,20 +1320,6 @@ export interface paths {
   '/v0/projects/{ref}/billing/addons/{addon_variant}': {
     /** Removes project addon */
     delete: operations['ProjectAddonController_removeAddon']
-  }
-  '/v0/projects/{ref}/billing/subscription': {
-    /** Gets the current subscription */
-    get: operations['SubscriptionController_getSubscription']
-    /** Updates subscription */
-    put: operations['SubscriptionController_updateSubscription']
-  }
-  '/v0/projects/{ref}/billing/plans': {
-    /** Gets subscription plans */
-    get: operations['ProjectPlansController_getAvailablePlans']
-  }
-  '/v0/projects/{ref}/billing/invoices/upcoming': {
-    /** Gets the upcoming invoice */
-    get: operations['ProjectInvoicesController_getUpcomingInvoice']
   }
   '/v0/storage/{ref}/buckets/{id}': {
     /** Gets bucket */
@@ -2273,16 +2237,11 @@ export interface components {
       id: string
       name: string
     }
+    GetOrganizationByFlyOrganizationIdResponse: {
+      slug: string
+    }
     CreateOrganizationBody: {
       name: string
-    }
-    CreateOrganizationBodyV2: {
-      name: string
-      kind?: string
-      size?: string
-      /** @enum {string} */
-      tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
-      payment_method?: string
     }
     UpdateOrganizationBody: {
       name: string
@@ -3353,6 +3312,9 @@ export interface components {
       preview_branch_refs: string[]
       disk_volume_size_gb?: number
     }
+    GetProjectByFlyExtensionIdResponse: {
+      ref: string
+    }
     AmiSearchOptions: {
       search_tags?: Record<string, never>
     }
@@ -3367,7 +3329,8 @@ export interface components {
       /** @description Slug of your organization */
       organization_id: string
       /**
-       * @description Subscription plan
+       * @deprecated
+       * @description Subscription plan is now set on organization level and is ignored in this request
        * @example free
        * @enum {string}
        */
@@ -3595,26 +3558,6 @@ export interface components {
       jwt_secret?: string
       service_api_keys?: components['schemas']['ProjectServiceApiKeyResponse'][]
     }
-    UsageStatus: {
-      usage: number
-      limit: number
-      cost: number
-      available_in_plan: boolean
-    }
-    UsageStatusResponse: {
-      db_size: components['schemas']['UsageStatus']
-      storage_size: components['schemas']['UsageStatus']
-      db_egress: components['schemas']['UsageStatus']
-      storage_egress: components['schemas']['UsageStatus']
-      storage_image_render_count: components['schemas']['UsageStatus']
-      monthly_active_users: components['schemas']['UsageStatus']
-      monthly_active_sso_users: components['schemas']['UsageStatus']
-      func_invocations: components['schemas']['UsageStatus']
-      func_count: components['schemas']['UsageStatus']
-      realtime_message_count: components['schemas']['UsageStatus']
-      realtime_peak_connection: components['schemas']['UsageStatus']
-      disk_volume_size_gb: number
-    }
     TransferProjectBody: {
       target_organization_slug: string
     }
@@ -3776,11 +3719,6 @@ export interface components {
       addon_variant: string
       /** @enum {string} */
       addon_type: 'custom_domain' | 'compute_instance' | 'pitr'
-    }
-    UpdateSubscriptionV2Body: {
-      payment_method?: string
-      /** @enum {string} */
-      tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
     }
     ServiceApiKey: {
       api_key_encrypted?: string
@@ -4266,40 +4204,23 @@ export interface components {
       /** Format: date-time */
       expiry_time: string
     }
-    UpdateSubscriptionV2AdminBody: {
-      payment_method?: string
-      /** @enum {string} */
-      tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
-      price_id?: string
-    }
     UpdateAddonAdminBody: {
       addon_variant: string
       /** @enum {string} */
       addon_type: 'custom_domain' | 'compute_instance' | 'pitr'
       price_id?: string
     }
-    MigrateToOrgLevelBillingBody: {
-      org_slug: string
-      /** @enum {string} */
-      tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
-      custom_usage_fees?: components['schemas']['BillingUsageBasedPrice'][]
-      tier_price_id?: string
-      compute_credits?: number
-      payment_method_id?: string
-      existing_org_subscription_id?: string
-      dryRun?: boolean
-      force?: boolean
-      billing_cycle_anchor?: string
-    }
-    AttachSubscriptionIdBody: {
-      org_slug: string
-      subscription_id: string
-    }
     DatabaseResponse: {
       /** @description Database host */
       host: string
       /** @description Database version */
       version: string
+    }
+    UpdateSubscriptionV2AdminBody: {
+      payment_method?: string
+      /** @enum {string} */
+      tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
+      price_id?: string
     }
     GetMetricsBody: {
       /** @enum {string} */
@@ -4342,6 +4263,7 @@ export interface components {
     UpdateBranchBody: {
       branch_name?: string
       git_branch?: string
+      reset_on_push?: boolean
     }
     BranchResponse: {
       id: string
@@ -4351,6 +4273,7 @@ export interface components {
       is_default: boolean
       git_branch?: string
       pr_number?: number
+      reset_on_push: boolean
       created_at: string
       updated_at: string
     }
@@ -5537,11 +5460,11 @@ export interface operations {
       }
     }
   }
-  /** Creates an organization (v2) */
+  /** Creates an organization */
   OrganizationsController_createOrganizationWithTier: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateOrganizationBodyV2']
+        'application/json': components['schemas']['CreateOrganizationBody']
       }
     }
     responses: {
@@ -5553,6 +5476,21 @@ export interface operations {
       /** @description Unexpected error creating an organization */
       500: {
         content: never
+      }
+    }
+  }
+  /** Gets organization linked to fly organization id */
+  OrganizationsController_getOrganizationByFlyOrganizationId: {
+    parameters: {
+      path: {
+        fly_organization_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['GetOrganizationByFlyOrganizationIdResponse']
+        }
       }
     }
   }
@@ -6192,8 +6130,8 @@ export interface operations {
   SubscriptionController_getSubscription: {
     parameters: {
       path: {
-        /** @description Project ref */
-        ref: string
+        /** @description Organization slug */
+        slug: string
       }
     }
     responses: {
@@ -6215,13 +6153,13 @@ export interface operations {
   SubscriptionController_updateSubscription: {
     parameters: {
       path: {
-        /** @description Project ref */
-        ref: string
+        /** @description Organization slug */
+        slug: string
       }
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateSubscriptionV2Body']
+        'application/json': components['schemas']['UpdateSubscriptionBody']
       }
     }
     responses: {
@@ -6231,7 +6169,7 @@ export interface operations {
       403: {
         content: never
       }
-      /** @description Failed to update subscription */
+      /** @description Failed to update subscription change */
       500: {
         content: never
       }
@@ -8133,6 +8071,21 @@ export interface operations {
       }
     }
   }
+  /** Gets project linked to fly extension id */
+  ProjectsController_getProjectByFlyExtensionId: {
+    parameters: {
+      path: {
+        fly_extension_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['GetProjectByFlyExtensionIdResponse']
+        }
+      }
+    }
+  }
   /** Gets project's content */
   ContentController_getContent: {
     parameters: {
@@ -8666,26 +8619,6 @@ export interface operations {
       }
     }
   }
-  /** Gets project's usage */
-  UsageController_getUsageStatusConfig: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['UsageStatusResponse']
-        }
-      }
-      /** @description Failed to retrieve project's usage */
-      500: {
-        content: never
-      }
-    }
-  }
   /** Previews transfering a project to a different organizations, shows eligibility and impact. */
   ProjectTransferController_previewTransfer: {
     parameters: {
@@ -9122,52 +9055,6 @@ export interface operations {
         content: never
       }
       /** @description Failed to remove project addon */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Gets subscription plans */
-  ProjectPlansController_getAvailablePlans: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to get subscription plans */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Gets the upcoming invoice */
-  ProjectInvoicesController_getUpcomingInvoice: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to retrieve upcoming invoice */
       500: {
         content: never
       }
@@ -10191,7 +10078,7 @@ export interface operations {
   GitHubPullRequestController_getPullRequestsByNumber: {
     parameters: {
       query: {
-        pr_number: number
+        pr_number: number[]
       }
       path: {
         organization_integration_id: string
@@ -10235,25 +10122,6 @@ export interface operations {
       500: {
         content: never
       }
-    }
-  }
-  /** Create CLI login session */
-  CliLoginController_createCliLoginSession: {
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateCliLoginSessionBody']
-      }
-    }
-    responses: {
-      /** @description Failed to create CLI login session */
-      500: never
-    }
-  }
-  /** Retrieve CLI login session */
-  CliLoginController_getCliLoginSession: {
-    responses: {
-      /** @description Failed to retrieve CLI login session */
-      500: never
     }
   }
   /** Gets GoTrue template */
@@ -10649,57 +10517,6 @@ export interface operations {
         content: never
       }
       /** @description Failed to remove project addon */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Migrates org to org-level billing. */
-  BillingMigrationController_migrateToOrgLevelBilling: {
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['MigrateToOrgLevelBillingBody']
-      }
-    }
-    responses: {
-      201: {
-        content: never
-      }
-      /** @description Failed to migrate org. */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Previews the migration of the organization to the new org level billing. */
-  BillingMigrationController_preview: {
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['MigrateToOrgLevelBillingBody']
-      }
-    }
-    responses: {
-      201: {
-        content: never
-      }
-      /** @description Failed to preview org billing organization */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Attaches subscription id to org and projects. */
-  BillingMigrationController_attachSubscriptionId: {
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['AttachSubscriptionIdBody']
-      }
-    }
-    responses: {
-      200: {
-        content: never
-      }
-      /** @description Failed to preview org billing organization */
       500: {
         content: never
       }
