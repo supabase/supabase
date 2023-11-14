@@ -50,8 +50,7 @@ const nextConfig = {
       'weweb-changelog.ghost.io',
       'img.youtube.com',
       'archbee-image-uploads.s3.amazonaws.com',
-      'obuldanrptloktxcffvn.supabase.co',
-      'prod-files-secure.s3.us-west-2.amazonaws.com',
+      'obuldanrptloktxcffvn.supabase.co'
     ],
   },
   // TODO: @next/mdx ^13.0.2 only supports experimental mdxRs flag. next ^13.0.2 will stop warning about this being unsupported.
