@@ -1,0 +1,123 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'auth-email-otp',
+  title: 'Login With Email OTP',
+  description: 'Use Supabase to authenticate your users using one-time password emails.',
+}
+
+Email one-time passwords (OTP) are a form of passwordless login where users key in a six digit code sent to their email address to log in to their accounts. By default, a user can only request an OTP once every 60 seconds and they expire after 24 hours.
+
+## Setting up Email OTP
+
+To set up email OTP for your Supabase app:
+
+- Enable the email provider in your [Supabase Project](/dashboard/project/_/auth/providers)
+- The Site URL represents the default URL that the user will be redirected to after clicking on the email signup confirmation link.
+- If a user has not signed up yet, signing in with an OTP will automatically sign up the user. To prevent users from signing up this way, you can set the `shouldCreateUser` option to `false`.
+- Navigate to the [email template settings](/dashboard/project/_/auth/templates) and modify the template to include the `{{ .Token }}` variable, for example:
+
+```html
+<h2>One time login code</h2>
+
+<p>Please enter this code: {{ .Token }}</p>
+```
+
+## Signing in a user with email OTP
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+When your user signs in, call [signInWithOtp()](/docs/reference/javascript/auth-signinwithotp) with their email address:
+
+```js
+const { data, error } = await supabase.auth.signInWithOtp({
+  email: 'example@email.com',
+  options: {
+    // set this to false if you do not want the user to be automatically signed up
+    shouldCreateUser: false,
+  },
+})
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+When your user signs in, call [signInWithOtp()](/docs/reference/dart/auth-signinwithotp) with their email address:
+
+```dart
+Future<void> signInWithEmailOtp() async {
+  final AuthResponse res = await supabase.auth.signInWithOtp(email: 'example@email.com');
+}
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+When your user signs in, call [sendOtpTo()](/docs/reference/kotlin/auth-signinwithotp) with their email address:
+
+```kotlin
+suspend fun signInWithEmailOtp() {
+	supabase.gotrue.sendOtpTo(Email) {
+		email = "example@email.com"
+	}
+}
+```
+
+</TabPanel>
+</Tabs>
+
+If the request was successful, you receive a response with `error: null` and a `data` object where both `user` and `session` are null. In this case you can let the user know to check their email inbox.
+
+```json
+{
+  "data": {
+    "user": null,
+    "session": null
+  },
+  "error": null
+}
+```
+
+## Verify OTP to create session
+
+Provide an input field for the user to key in the one-time code. To verify the code and complete the user's sign in, call [verifyOtp()](/docs/reference/javascript/auth-verifyotp) with their email address, the code, and `type: "email"`:
+
+```js
+const {
+  data: { session },
+  error,
+} = await supabase.auth.verifyOtp({
+  email,
+  token: '123456',
+  type: 'email',
+})
+```
+
+If successful the user will now be logged in and you should receive a valid session like:
+
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNjI3MjkxNTc3LCJzdWIiOiJmYTA2NTQ1Zi1kYmI1LTQxY2EtYjk1NC1kOGUyOTg4YzcxOTEiLCJlbWFpbCI6IiIsInBob25lIjoiNjU4NzUyMjAyOSIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6InBob25lIn0sInVzZXJfbWV0YWRhdGEiOnt9LCJyb2xlIjoiYXV0aGVudGljYXRlZCJ9.1BqRi0NbS_yr1f6hnr4q3s1ylMR3c1vkiJ4e_N55dhM",
+  "token_type": "bearer",
+  "expires_in": 3600,
+  "refresh_token": "LSp8LglPPvf0DxGMSj-vaQ",
+  "user": {...}
+}
+```
+
+## Resources
+
+- [Supabase Account - Free Plan OK](https://supabase.com)
+- [Phone SMS & WhatsApp OTP](/docs/guides/auth/phone-login)
+- [Supabase JS Client](https://github.com/supabase/supabase-js)
+- [Supabase Flutter Client](https://github.com/supabase/supabase-flutter)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
