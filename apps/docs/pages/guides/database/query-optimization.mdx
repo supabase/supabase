@@ -90,7 +90,7 @@ explain select * from customers where sign_up_date > 25;
 
 ### Use Appropriate Index Types
 
-Postgres offers various index types like [B-tree, Hash, GIN, etc](https://www.Postgres.org/docs/current/indexes-types.html). Select the type that best suits your data and query pattern. Using the right index type can make a significant difference. For example, using a BRIN index on a field that always increases and lives within a table that updates infrequently - like `created_at` on an `orders` table - routinely results in indexes that are +10x smaller than the equivalent default B-tree index. That translates into better scalability.
+Postgres offers various index types like [B-tree, Hash, GIN, etc](https://www.postgresql.org/docs/current/indexes-types.html). Select the type that best suits your data and query pattern. Using the right index type can make a significant difference. For example, using a BRIN index on a field that always increases and lives within a table that updates infrequently - like `created_at` on an `orders` table - routinely results in indexes that are +10x smaller than the equivalent default B-tree index. That translates into better scalability.
 
 ```sql
 create index idx_orders_created_at ON customers using brin(created_at);
