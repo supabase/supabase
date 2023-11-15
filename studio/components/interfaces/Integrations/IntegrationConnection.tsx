@@ -25,11 +25,12 @@ import { IntegrationProjectConnection } from 'data/integrations/integrations.typ
 import { useStore } from 'hooks'
 
 interface IntegrationConnectionItemProps extends IntegrationConnectionProps {
+  disabled?: boolean
   onDeleteConnection: (connection: IntegrationProjectConnection) => void | Promise<void>
 }
 
 const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectionItemProps>(
-  ({ onDeleteConnection, ...props }, ref) => {
+  ({ disabled, onDeleteConnection, ...props }, ref) => {
     const { ui } = useStore()
     const [isOpen, setIsOpen] = useState(false)
     const [dropdownVisible, setDropdownVisible] = useState(false)
@@ -69,55 +70,61 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
       <>
         <IntegrationConnection
           actions={
-            <DropdownMenu
-              open={dropdownVisible}
-              onOpenChange={() => setDropdownVisible(!dropdownVisible)}
-              modal={false}
-            >
-              <DropdownMenuTrigger>
-                <Button asChild iconRight={<IconChevronDown />} type="default">
-                  <span>Manage</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="bottom" align="end">
-                {props.type === 'Vercel' && (
-                  <>
-                    {router.pathname !== projectIntegrationUrl && (
-                      <DropdownMenuItem disabled={isSyncEnvLoading} asChild>
-                        <Link
-                          href={projectIntegrationUrl.replace(
-                            '[ref]',
-                            props.connection.supabase_project_ref
-                          )}
-                        >
-                          View project configuration
-                        </Link>
-                      </DropdownMenuItem>
-                    )}
-                    <DropdownMenuItem
-                      className="space-x-2"
-                      onSelect={(event) => {
-                        event.preventDefault()
-                        onReSyncEnvVars()
-                      }}
-                      disabled={isSyncEnvLoading}
-                    >
-                      {isSyncEnvLoading ? (
-                        <IconLoader className="animate-spin" size={14} />
-                      ) : (
-                        <IconRefreshCw size={14} />
+            disabled ? (
+              <Button asChild disabled iconRight={<IconChevronDown />} type="default">
+                <span>Manage</span>
+              </Button>
+            ) : (
+              <DropdownMenu
+                open={dropdownVisible}
+                onOpenChange={() => setDropdownVisible(!dropdownVisible)}
+                modal={false}
+              >
+                <DropdownMenuTrigger>
+                  <Button asChild iconRight={<IconChevronDown />} type="default">
+                    <span>Manage</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="bottom" align="end">
+                  {props.type === 'Vercel' && (
+                    <>
+                      {router.pathname !== projectIntegrationUrl && (
+                        <DropdownMenuItem disabled={isSyncEnvLoading} asChild>
+                          <Link
+                            href={projectIntegrationUrl.replace(
+                              '[ref]',
+                              props.connection.supabase_project_ref
+                            )}
+                          >
+                            View project configuration
+                          </Link>
+                        </DropdownMenuItem>
                       )}
-                      <p>Resync environment variables</p>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                  </>
-                )}
-                <DropdownMenuItem className="space-x-2" onSelect={() => setIsOpen(true)}>
-                  <IconTrash size={14} />
-                  <p>Delete connection</p>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                      <DropdownMenuItem
+                        className="space-x-2"
+                        onSelect={(event) => {
+                          event.preventDefault()
+                          onReSyncEnvVars()
+                        }}
+                        disabled={isSyncEnvLoading}
+                      >
+                        {isSyncEnvLoading ? (
+                          <IconLoader className="animate-spin" size={14} />
+                        ) : (
+                          <IconRefreshCw size={14} />
+                        )}
+                        <p>Resync environment variables</p>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                    </>
+                  )}
+                  <DropdownMenuItem className="space-x-2" onSelect={() => setIsOpen(true)}>
+                    <IconTrash size={14} />
+                    <p>Delete connection</p>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )
           }
           {...props}
         />

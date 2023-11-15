@@ -75,7 +75,7 @@ interface BranchRowProps {
   isMain?: boolean
   pullRequest?: GitHubPullRequest
   generateCreatePullRequestURL?: (branchName?: string) => string
-  onSelectDeleteBranch?: () => void
+  onSelectDeleteBranch: () => void
 }
 
 export const BranchRow = ({
@@ -89,9 +89,9 @@ export const BranchRow = ({
   const { ref } = useParams()
   const isActive = ref === branch?.project_ref
 
-  const daysFromNow = dayjs().diff(dayjs(branch.created_at), 'day')
-  const formattedTimeFromNow = dayjs(branch.created_at).fromNow()
-  const formattedCreatedAt = dayjs(branch.created_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
+  const daysFromNow = dayjs().diff(dayjs(branch.updated_at), 'day')
+  const formattedTimeFromNow = dayjs(branch.updated_at).fromNow()
+  const formattedUpdatedAt = dayjs(branch.updated_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
 
   const createPullRequestURL =
     generateCreatePullRequestURL?.(branch.git_branch) ?? 'https://github.com'
@@ -102,13 +102,16 @@ export const BranchRow = ({
         <Button
           asChild
           type="default"
+          className="max-w-[300px]"
           icon={isMain && <IconShield strokeWidth={2} className="text-amber-900" />}
         >
-          <Link href={`/project/${branch.project_ref}/branches`}>{branch.name}</Link>
+          <Link href={`/project/${branch.project_ref}/branches`} title={branch.name}>
+            {branch.name}
+          </Link>
         </Button>
         {isActive && <Badge color="slate">Current</Badge>}
         <p className="text-xs text-foreground-lighter">
-          {daysFromNow > 1 ? `Created on ${formattedCreatedAt}` : `Created ${formattedTimeFromNow}`}
+          {daysFromNow > 1 ? `Updated on ${formattedUpdatedAt}` : `Updated ${formattedTimeFromNow}`}
         </p>
       </div>
       <div className="flex items-center gap-x-8">

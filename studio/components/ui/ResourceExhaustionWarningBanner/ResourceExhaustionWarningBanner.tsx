@@ -11,14 +11,12 @@ import {
 } from 'ui'
 
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
-import { useSelectedOrganization } from 'hooks'
 import { RESOURCE_WARNING_MESSAGES } from './ResourceExhaustionWarningBanner.constants'
 import { getWarningContent } from './ResourceExhaustionWarningBanner.utils'
 
 const ResourceExhaustionWarningBanner = () => {
   const { ref } = useParams()
   const router = useRouter()
-  const organization = useSelectedOrganization()
   const { data: resourceWarnings } = useResourceWarningsQuery()
   const projectResourceWarnings = (resourceWarnings ?? [])?.find(
     (warning) => warning.project === ref
@@ -45,23 +43,24 @@ const ResourceExhaustionWarningBanner = () => {
       : false
   const isCritical = activeWarnings.includes('is_readonly_mode_enabled') || hasCriticalWarning
 
+  const warningContent =
+    projectResourceWarnings !== undefined
+      ? getWarningContent(projectResourceWarnings, activeWarnings[0], 'bannerContent')
+      : undefined
+
   const title =
     activeWarnings.length > 1
       ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.bannerContent[
           hasCriticalWarning ? 'critical' : 'warning'
         ].title
-      : projectResourceWarnings !== undefined
-      ? getWarningContent(projectResourceWarnings, activeWarnings[0], 'bannerContent')?.title
-      : null
+      : warningContent?.title
 
   const description =
     activeWarnings.length > 1
       ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.bannerContent[
           hasCriticalWarning ? 'critical' : 'warning'
         ].description
-      : projectResourceWarnings !== undefined
-      ? getWarningContent(projectResourceWarnings, activeWarnings[0], 'bannerContent')?.description
-      : null
+      : warningContent?.description
 
   const learnMoreUrl =
     activeWarnings.length > 1
@@ -96,6 +95,7 @@ const ResourceExhaustionWarningBanner = () => {
   // Don't show banner if no warnings, or on usage/infra page
   if (
     activeWarnings.length === 0 ||
+    warningContent === undefined ||
     ((router.pathname.endsWith('/usage') || router.pathname.endsWith('/infrastructure')) &&
       !activeWarnings.includes('is_readonly_mode_enabled')) ||
     (activeWarnings.includes('is_readonly_mode_enabled') &&

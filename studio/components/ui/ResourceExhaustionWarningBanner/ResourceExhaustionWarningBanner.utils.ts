@@ -13,7 +13,7 @@ export const getWarningContent = (
   const severity = resourceWarnings[metric as keyof typeof resourceWarnings]
   if (typeof severity !== 'string') return undefined
 
-  return RESOURCE_WARNING_MESSAGES[metric as keyof typeof RESOURCE_WARNING_MESSAGES][contentType][
-    severity as 'warning' | 'critical'
-  ]
+  return RESOURCE_WARNING_MESSAGES[metric as keyof typeof RESOURCE_WARNING_MESSAGES]?.[
+    contentType
+  ]?.[severity as 'warning' | 'critical']
 }
