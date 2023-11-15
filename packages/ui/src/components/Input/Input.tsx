@@ -198,13 +198,13 @@ function Input({
 export interface TextAreaProps
   extends Omit<React.InputHTMLAttributes<HTMLTextAreaElement>, 'size' | 'onCopy'> {
   textAreaClassName?: string
-  descriptionText?: string
+  descriptionText?: string | React.ReactNode | undefined
   error?: string
   icon?: any
   label?: string | React.ReactNode
   afterLabel?: string
   beforeLabel?: string
-  labelOptional?: string
+  labelOptional?: string | React.ReactNode
   layout?: 'horizontal' | 'vertical'
   rows?: number
   limit?: number

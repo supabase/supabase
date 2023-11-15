@@ -38,7 +38,7 @@ async function signUpNewUser() {
     email: 'example@email.com',
     password: 'example-password',
     options: {
-      redirectTo: 'https//example.com/welcome'
+      emailRedirectTo: 'https//example.com/welcome'
     }
   })
 }
@@ -134,10 +134,7 @@ When your user signs in, call [signInWithPassword()](/docs/reference/javascript/
 async function signInWithEmail() {
   const { data, error } = await supabase.auth.signInWithPassword({
     email: 'example@email.com',
-    password: 'example-password',
-    options: {
-      redirectTo: 'https//example.com/welcome'
-    }
+    password: 'example-password'
   })
 }
 ```
