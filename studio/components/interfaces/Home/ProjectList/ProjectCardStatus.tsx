@@ -31,6 +31,10 @@ export const ProjectCardStatus = ({
     (x) => resourceWarnings?.[x as keyof typeof resourceWarnings] === 'critical'
   )
   const isCritical = activeWarnings.includes('is_readonly_mode_enabled') || hasCriticalWarning
+  const warningContent =
+    resourceWarnings !== undefined
+      ? getWarningContent(resourceWarnings, activeWarnings[0], 'cardContent')
+      : undefined
 
   const getTitle = () => {
     if (projectStatus === 'isPaused') return 'Project is paused'
@@ -45,7 +49,7 @@ export const ProjectCardStatus = ({
       ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.cardContent[
           hasCriticalWarning ? 'critical' : 'warning'
         ].title
-      : getWarningContent(resourceWarnings, activeWarnings[0], 'cardContent')?.title
+      : warningContent?.title
   }
 
   const getDescription = () => {
@@ -61,7 +65,7 @@ export const ProjectCardStatus = ({
       ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.cardContent[
           hasCriticalWarning ? 'critical' : 'warning'
         ].description
-      : getWarningContent(resourceWarnings, activeWarnings[0], 'cardContent')?.description
+      : warningContent?.description
   }
 
   const alertTitle = getTitle()
@@ -72,7 +76,12 @@ export const ProjectCardStatus = ({
     ? 'default'
     : 'warning'
 
-  if (activeWarnings.length === 0 && projectStatus === 'isHealthy') return null
+  if (
+    (activeWarnings.length === 0 && projectStatus === 'isHealthy') ||
+    warningContent === undefined
+  ) {
+    return null
+  }
 
   return (
     <Alert_Shadcn_
