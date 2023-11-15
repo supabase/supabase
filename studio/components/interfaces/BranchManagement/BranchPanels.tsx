@@ -102,9 +102,12 @@ export const BranchRow = ({
         <Button
           asChild
           type="default"
+          className="max-w-[300px]"
           icon={isMain && <IconShield strokeWidth={2} className="text-amber-900" />}
         >
-          <Link href={`/project/${branch.project_ref}/branches`}>{branch.name}</Link>
+          <Link href={`/project/${branch.project_ref}/branches`} title={branch.name}>
+            {branch.name}
+          </Link>
         </Button>
         {isActive && <Badge color="slate">Current</Badge>}
         <p className="text-xs text-foreground-lighter">
