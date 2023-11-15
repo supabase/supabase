@@ -202,13 +202,13 @@ export const REFERENCES: References = {
   swift: {
     name: 'Swift',
     library: 'supabase-swift',
-    versions: ['v0'],
+    versions: ['v1'],
     icon: '/docs/img/libraries/swift-icon.svg',
   },
   kotlin: {
     name: 'Kotlin',
     library: 'supabase-kt',
-    versions: ['v0'],
+    versions: ['v1'],
     icon: '/docs/img/libraries/kotlin-icon.svg',
   },
   cli: {
@@ -497,7 +497,15 @@ export const auth = {
       url: undefined,
       items: [
         { name: 'Email Login', url: '/guides/auth/auth-email' },
-        { name: 'Magic Link Login', url: '/guides/auth/auth-magic-link' },
+        {
+          name: 'Passwordless Login',
+          url: '/guides/auth/passwordless-login',
+          items: [
+            { name: 'Email Magic Link', url: '/guides/auth/passwordless-login/auth-magic-link' },
+            { name: 'Email OTP', url: '/guides/auth/passwordless-login/auth-email-otp' },
+            { name: 'Phone OTP', url: '/guides/auth/phone-login' },
+          ],
+        },
         {
           name: 'Phone Login',
           url: '/guides/auth/phone-login',
@@ -791,15 +799,18 @@ export const api: NavMenuConstant = {
       name: 'Guides',
       url: '/guides/api',
       items: [
-        { name: 'Creating API routes', url: '/guides/api/creating-routes', items: [] },
-        { name: 'How API Keys work', url: '/guides/api/api-keys', items: [] },
-        { name: 'Securing your API', url: '/guides/api/securing-your-api', items: [] },
+        { name: 'Creating API routes', url: '/guides/api/creating-routes' },
+        { name: 'How API Keys work', url: '/guides/api/api-keys' },
+        { name: 'Securing your API', url: '/guides/api/securing-your-api' },
+        {
+          name: 'Debugging performance issues',
+          url: '/guides/api/rest/debugging-performance',
+        },
         {
           name: 'Querying joins and nested tables',
           url: '/guides/api/joins-and-nesting',
-          items: [],
         },
-        { name: 'Using custom schemas', url: '/guides/api/using-custom-schemas', items: [] },
+        { name: 'Using custom schemas', url: '/guides/api/using-custom-schemas' },
       ],
     },
   ],
@@ -1253,6 +1264,7 @@ export const platform: NavMenuConstant = {
         { name: 'Performance Tuning', url: '/guides/platform/performance' },
         { name: 'Permissions', url: '/guides/platform/permissions' },
         { name: 'SSL Enforcement', url: '/guides/platform/ssl-enforcement' },
+        { name: 'Branching', url: '/guides/platform/branching' },
       ],
     },
     {
