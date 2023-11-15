@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { Bar, BarChart, Cell, Legend, Tooltip, XAxis } from 'recharts'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 import ChartHeader from './ChartHeader'
 import {
   CHART_COLORS,
@@ -9,8 +11,16 @@ import {
   ValidStackColor,
 } from './Charts.constants'
 import { CommonChartProps } from './Charts.types'
-import { precisionFormatter, timestampFormatter, useChartSize, useStacked } from './Charts.utils'
+import {
+  numberFormatter,
+  precisionFormatter,
+  timestampFormatter,
+  useChartSize,
+  useStacked,
+} from './Charts.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
+dayjs.extend(utc)
+
 interface Props extends CommonChartProps<any> {
   xAxisKey: string
   yAxisKey: string
@@ -31,8 +41,11 @@ const StackedBarChart: React.FC<Props> = ({
   yAxisKey,
   customDateFormat = DateTimeFormats.FULL,
   title,
+  highlightedValue,
+  highlightedLabel,
   format,
   minimalHeader = false,
+  valuePrecision,
   onBarClick,
   variant,
   xAxisFormatAsDate = true,
@@ -50,6 +63,18 @@ const StackedBarChart: React.FC<Props> = ({
     variant,
   })
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
+
+  const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
+  const resolvedHighlightedLabel =
+    (focusDataIndex !== null &&
+      data &&
+      data[focusDataIndex] !== undefined &&
+      day(data[focusDataIndex][xAxisKey]).format(customDateFormat)) ||
+    highlightedLabel
+
+  const resolvedHighlightedValue =
+    focusDataIndex !== null ? data[focusDataIndex]?.[yAxisKey] : highlightedValue
+
   if (!data || data.length === 0) return <NoDataPlaceholder size={size} />
   const stackColorScales = genStackColorScales(stackColors)
   return (
@@ -60,6 +85,12 @@ const StackedBarChart: React.FC<Props> = ({
           format={format}
           customDateFormat={customDateFormat}
           minimalHeader={minimalHeader}
+          highlightedValue={
+            typeof resolvedHighlightedValue === 'number'
+              ? numberFormatter(resolvedHighlightedValue, valuePrecision)
+              : resolvedHighlightedValue
+          }
+          highlightedLabel={resolvedHighlightedLabel}
         />
       )}
       <Container>
@@ -137,7 +168,11 @@ const StackedBarChart: React.FC<Props> = ({
             }}
             cursor={false}
             labelClassName="text-white"
-            contentStyle={{ backgroundColor: '#444444', borderColor: '#444444', fontSize: '12px' }}
+            contentStyle={{
+              backgroundColor: '#444444',
+              borderColor: '#444444',
+              fontSize: '12px',
+            }}
             wrapperClassName="bg-gray-600 rounded min-w-md"
           />
         </BarChart>
