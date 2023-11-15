@@ -1,5 +1,4 @@
 import solutions from '../Solutions'
-// import { frameworks } from '../frameworks'
 
 export default {
   heroSection: {
@@ -32,5 +31,42 @@ export default {
   },
   productsSection: {
     products: { ...solutions },
+  },
+  integrations: {
+    label: 'Integrations',
+    title: (
+      <>
+        Power your project <br />
+        with the tools you love
+      </>
+    ),
+    cta: {
+      label: 'View all integrations',
+      link: '/partners/integrations',
+    },
+    experts: {
+      paragraph: (
+        <>
+          Need a different integration? <br className="md:hidden" />
+          Find a Supabase Expert to help build your next idea.
+        </>
+      ),
+      cta: {
+        label: 'Find an expert',
+        link: '/partners/experts',
+      },
+    },
+    featuredIntegrations: [
+      'clerk',
+      'cloudflare-workers',
+      'flutterflow',
+      'n8n',
+      'prisma',
+      'resend',
+      'retool',
+      'onesignal',
+      'vercel',
+      'zuplo',
+    ],
   },
 }
