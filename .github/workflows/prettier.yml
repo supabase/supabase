@@ -17,9 +17,7 @@ jobs:
       - name: Check out repo
         uses: actions/checkout@v4
         with:
-          sparse-checkout: |
-            apps
-            studio
+          sparse-checkout: apps
       - name: Setup node
         uses: actions/setup-node@v3
         with:
