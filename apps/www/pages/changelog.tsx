@@ -8,6 +8,7 @@ import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { createAppAuth } from '@octokit/auth-app'
 import { Octokit } from '@octokit/core'
+import { Octokit as OctokitRest } from '@octokit/rest'
 import { paginateGraphql } from '@octokit/plugin-paginate-graphql'
 import { GetServerSideProps } from 'next'
 import Link from 'next/link'
@@ -22,7 +23,15 @@ export type Discussion = {
   url: string
   title: string
   body: string
-  databaseId: number
+}
+
+type Entry = {
+  id: string
+  title: string
+  url: string
+  created_at: string
+  source: MDXRemoteSerializeResult
+  type: string
 }
 
 export type DiscussionsResponse = {
@@ -35,28 +44,59 @@ export type DiscussionsResponse = {
   }
 }
 
+/**
+ * [Terry]
+ * this page powers supabase.com/changelog
+ * this page used to just be a feed of the releases endpoint
+ * (https://api.github.com/repos/supabase/supabase/releases) (rest api)
+ * but is now a blend of that legacy relases and the new Changelog category of the Discussions
+ * https://github.com/orgs/supabase/discussions/categories/changelog (graphql api)
+ * We should use the Changelog Discussions category for all future changelog entries and stop using releases
+ */
+
 export const getServerSideProps: GetServerSideProps = async ({ res, query }) => {
-  res.setHeader('Cache-Control', 'public, max-age=3600, stale-while-revalidate=3600')
-  const pageNumber = Number(query.page) ?? 1
+  // refresh every 15 minutes
+  res.setHeader('Cache-Control', 'public, max-age=900, stale-while-revalidate=900')
   const next = query.next ?? (null as string | null)
+  const restPage = query.restPage ? Number(query.restPage) : 1
 
-  const response = await fetch('https://api.github.com/repos/supabase/supabase/releases')
-  const restApiData = await response.json()
+  const octokitRest = new OctokitRest({
+    auth: process.env.GITHUB_CHANGELOG_APP_REST_KEY,
+  })
 
+  // uses the rest api
+  async function fetchGitHubReleases() {
+    try {
+      const response = await octokitRest.repos.listReleases({
+        owner: 'supabase',
+        repo: 'supabase',
+        per_page: 10,
+        page: restPage,
+      })
+
+      return response.data
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const releases = await fetchGitHubReleases()
+
+  // uses the graphql api
   async function fetchDiscussions(owner: string, repo: string, categoryId: string, cursor: string) {
     const octokit = new ExtendedOctokit({
       authStrategy: createAppAuth,
       auth: {
-        appId: process.env.SEARCH_GITHUB_APP_ID,
-        installationId: process.env.SEARCH_GITHUB_APP_INSTALLATION_ID,
-        privateKey: process.env.SEARCH_GITHUB_APP_PRIVATE_KEY,
+        appId: process.env.GITHUB_CHANGELOG_APP_ID,
+        installationId: process.env.GITHUB_CHANGELOG_APP_INSTALLATION_ID,
+        privateKey: process.env.GITHUB_CHANGELOG_APP_PRIVATE_KEY,
       },
     })
 
     const query = `
       query troubleshootDiscussions($cursor: String, $owner: String!, $repo: String!, $categoryId: ID!) {
         repository(owner: $owner, name: $repo) {
-          discussions(first: 25, after: $cursor, categoryId: $categoryId, orderBy: { field: CREATED_AT, direction: DESC }) {
+          discussions(first: 10, after: $cursor, categoryId: $categoryId, orderBy: { field: CREATED_AT, direction: DESC }) {
             totalCount
             pageInfo {
               hasPreviousPage
@@ -114,7 +154,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
   }
 
   // Process discussions
-  const discussionsRender = await Promise.all(
+  const formattedDiscussions = await Promise.all(
     discussions.map(async (item: any): Promise<any> => {
       const discussionsMdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
 
@@ -123,36 +163,38 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
         source: discussionsMdxSource,
         type: 'discussion',
         created_at: item.createdAt,
-        //labels: item.labels.nodes ?? [],
+        url: item.url,
       }
     })
   )
 
-  // Process restApiData
-  const restApiDataRender = await Promise.all(
-    restApiData.map(async (item: any): Promise<any> => {
-      const restApiDataMdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
+  // Process releases
+  const formattedReleases = await Promise.all(
+    releases
+      ? releases.map(async (item: any): Promise<any> => {
+          const releasesMdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
 
-      return {
-        ...item,
-        source: restApiDataMdxSource,
-        type: 'restData',
-        created_at: item.created_at,
-        title: item.name ?? '',
-      }
-    })
+          return {
+            ...item,
+            source: releasesMdxSource,
+            type: 'release',
+            created_at: item.created_at,
+            title: item.name ?? '',
+            url: item.html_url ?? '',
+          }
+        })
+      : []
   )
 
-  // Combine discussionsRender and restApiDataRender into a single array
-  const combinedRenderArray = discussionsRender.concat(restApiDataRender)
-  //const combinedRenderArray = discussionsRender
+  // Combine discussionsRender and releasesRender into a single array
+  const combinedRenderArray = formattedDiscussions.concat(formattedReleases)
 
-  // Sort the combinedRenderArray by the created_at field in each entry
-  combinedRenderArray.sort((a: any, b: any) => {
-    const dateA = new Date(a.created_at)
-    const dateB = new Date(b.created_at)
-    if (!isNaN(dateA.getTime()) && !isNaN(dateB.getTime())) {
-      return dateB.getTime() - dateA.getTime() // sort desc
+  const sortedCombinedRenderArray = combinedRenderArray.sort((a, b) => {
+    const dateA = dayjs(a.created_at)
+    const dateB = dayjs(b.created_at)
+
+    if (dateA.isValid() && dateB.isValid()) {
+      return dateB.diff(dateA) // Sort in descending order (most recent first)
     } else {
       return 0
     }
@@ -160,14 +202,20 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
 
   return {
     props: {
-      changelog: combinedRenderArray,
-      pageNumber,
+      changelog: sortedCombinedRenderArray,
       pageInfo: pageInfo,
+      restPage: Number(restPage),
     },
   }
 }
 
-function ChangelogPage({ changelog, pageInfo }: any) {
+interface ChangelogPageProps {
+  changelog: Entry[]
+  pageInfo: any
+  restPage: number
+}
+
+function ChangelogPage({ changelog, pageInfo, restPage }: ChangelogPageProps) {
   const { endCursor: end, hasNextPage, hasPreviousPage } = pageInfo
 
   const TITLE = 'Changelog'
@@ -192,18 +240,17 @@ function ChangelogPage({ changelog, pageInfo }: any) {
             xl:px-20
           "
         >
-          {/* Title and description */}
           <div className="py-10">
             <h1 className="h1">Changelog</h1>
             <p className="text-foreground-lighter text-lg">New updates and product improvements</p>
           </div>
 
           {/* Content */}
-          <div className="lg:grid gap-24">
+          <div className="grid gap-12 lg:gap-36">
             {changelog.length > 0 &&
               changelog
-                .filter((entry: any) => !entry.title.includes('[d]'))
-                .map((entry: any, i: number) => {
+                .filter((entry: Entry) => !entry.title.includes('[d]'))
+                .map((entry: Entry, i: number) => {
                   return (
                     <div key={i} className="border-muted grid border-l lg:grid-cols-12 lg:gap-8">
                       <div
@@ -217,11 +264,11 @@ function ChangelogPage({ changelog, pageInfo }: any) {
                           <div className="flex w-full flex-col gap-1">
                             {entry.title && (
                               <Link href={entry.url}>
-                                <h3 className="text-foreground text-2xl">{entry.title}</h3>
+                                <h3 className="text-foreground text-2xl">{entry.title}</h3>{' '}
                               </Link>
                             )}
                             <p className="text-muted text-lg">
-                              {dayjs(entry.publishedAt).format('MMM D, YYYY')}
+                              {dayjs(entry.created_at).format('MMM D, YYYY')}
                             </p>
                           </div>
                         </div>
@@ -238,12 +285,15 @@ function ChangelogPage({ changelog, pageInfo }: any) {
           <div className="my-8 flex items-center gap-4">
             {hasPreviousPage && (
               <Link href={`/changelog`} className="flex items-center gap-2">
-                <ArrowLeftIcon width={16} /> Previous
+                <ArrowLeftIcon width={14} /> Previous
               </Link>
             )}
             {hasNextPage && (
-              <Link href={`/changelog?next=${end}`} className="flex items-center gap-2">
-                Next <ArrowRightIcon width={16} />
+              <Link
+                href={`/changelog?next=${end}&restPage=${restPage + 1}`}
+                className="flex items-center gap-2"
+              >
+                Next <ArrowRightIcon width={14} />
               </Link>
             )}
           </div>

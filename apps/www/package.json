@@ -18,6 +18,7 @@
     "@mdx-js/react": "^2.3.0",
     "@next/bundle-analyzer": "^13.5.3",
     "@next/mdx": "^13.5.3",
+    "@octokit/rest": "^20.0.2",
     "@react-three/fiber": "^7.0.29",
     "@supabase/auth-helpers-react": "^0.4.2",
     "@supabase/auth-ui-react": "^0.4.5",
