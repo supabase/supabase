@@ -63,7 +63,7 @@ Client libraries like python's [vecs](https://github.com/supabase/vecs) use this
 #!/usr/bin/env python3
 import vecs
 
-docs = vx.create_collection(name="docs", dimension=1536)
+docs = vx.get_or_create_collection(name="docs", dimension=1536)
 
 docs.upsert(vectors=[
   ('79409372-7556-4ccc-ab8f-5786a6cfa4f7', [100, 200, 300], { url: '/hello-world' })
@@ -71,7 +71,7 @@ docs.upsert(vectors=[
 
 ```
 
-automatically creates the unstructured SQL table during the call to `create_collection`.
+automatically creates the unstructured SQL table during the call to `get_or_create_collection`.
 
 Note that when working with client libraries that emit SQL DDL, like `create table ...`, you should add that SQL to your migrations when moving to production to maintain a single source of truth for your database's schema.
 
