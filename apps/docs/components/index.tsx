@@ -85,7 +85,7 @@ const components = {
       {props.children}
     </Alert>
   ),
-  Tabs,
+  Tabs: (props: any) => <Tabs wrappable {...props} />,
   TabPanel: (props: any) => <Tabs.Panel {...props}>{props.children}</Tabs.Panel>,
   h2: (props: any) => (
     <Heading tag="h2" {...props}>
