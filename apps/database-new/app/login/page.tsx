@@ -3,11 +3,7 @@ import { headers, cookies } from 'next/headers'
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 
-export default function Login({
-  searchParams,
-}: {
-  searchParams: { message: string }
-}) {
+export default function Login({ searchParams }: { searchParams: { message: string } }) {
   const signIn = async (formData: FormData) => {
     'use server'
 
@@ -98,9 +94,7 @@ export default function Login({
           placeholder="••••••••"
           required
         />
-        <button className="bg-green-700 rounded-md px-4 py-2 text-foreground mb-2">
-          Sign In
-        </button>
+        <button className="bg-green-700 rounded-md px-4 py-2 text-foreground mb-2">Sign In</button>
         <button
           formAction={signUp}
           className="border border-foreground/20 rounded-md px-4 py-2 text-foreground mb-2"
