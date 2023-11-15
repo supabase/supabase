@@ -49,7 +49,6 @@ const GitHubSection = () => {
   const githubIntegrations = data?.filter(
     (integration) => integration.integration.name === 'GitHub'
   )
-  console.log(githubIntegrations)
 
   const { mutate: deleteGitHubConnection } = useIntegrationsGitHubInstalledConnectionDeleteMutation(
     {
