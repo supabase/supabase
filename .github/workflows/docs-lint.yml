@@ -1,0 +1,26 @@
+name: Lint docs
+on:
+  pull_request:
+  # For testing, remove before merging
+  push:
+    branches:
+      - chore/docs-vale
+
+# Cancel old builds on new commit for same workflow + branch/PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  vale:
+    name: Run Vale on docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            .vale.ini
+            apps/docs
+      - uses: errata-ai/vale-action@reviewdog
+        with:
+          files: apps/docs
