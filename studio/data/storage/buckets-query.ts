@@ -1,8 +1,9 @@
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
+import { get } from 'data/fetchers'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { storageKeys } from './keys'
+import { ResponseError } from 'types'
 
 export type BucketsVariables = { projectRef?: string }
 
@@ -20,13 +21,17 @@ export type Bucket = {
 export async function getBuckets({ projectRef }: BucketsVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const response = await get(`${API_URL}/storage/${projectRef}/buckets`, { signal })
-  if (response.error) throw response.error
-  return response as Bucket[]
+  const { data, error } = await get('/platform/storage/{ref}/buckets', {
+    params: { path: { ref: projectRef } },
+    signal,
+  })
+
+  if (error) throw error
+  return data as Bucket[]
 }
 
 export type BucketsData = Awaited<ReturnType<typeof getBuckets>>
-export type BucketsError = unknown
+export type BucketsError = ResponseError
 
 export const useBucketsQuery = <TData = BucketsData>(
   { projectRef }: BucketsVariables,
@@ -35,17 +40,24 @@ export const useBucketsQuery = <TData = BucketsData>(
   useQuery<BucketsData, BucketsError, TData>(
     storageKeys.buckets(projectRef),
     ({ signal }) => getBuckets({ projectRef }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
-  )
+    {
+      enabled: enabled && typeof projectRef !== 'undefined',
+      ...options,
+      retry: (failureCount, error) => {
+        if (
+          typeof error === 'object' &&
+          error !== null &&
+          error.message.startsWith('Tenant config') &&
+          error.message.endsWith('not found')
+        ) {
+          return false
+        }
 
-export const useBucketsPrefetch = ({ projectRef }: BucketsVariables) => {
-  const client = useQueryClient()
+        if (failureCount < 3) {
+          return true
+        }
 
-  return useCallback(() => {
-    if (projectRef) {
-      client.prefetchQuery(storageKeys.buckets(projectRef), ({ signal }) =>
-        getBuckets({ projectRef }, signal)
-      )
+        return false
+      },
     }
-  }, [projectRef])
-}
+  )

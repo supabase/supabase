@@ -16,6 +16,7 @@ const ICON_SIZE = 14
 export interface IntegrationInstallationProps extends React.RefAttributes<HTMLLIElement> {
   title: string
   integration: Integration
+  disabled?: boolean
 }
 
 type HandleIconType = Integration['integration']['name'] | 'Supabase'
@@ -67,7 +68,7 @@ const Avatar = ({ src }: { src: string | undefined }) => {
 }
 
 const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInstallationProps>(
-  ({ title, integration, ...props }, ref) => {
+  ({ title, integration, disabled, ...props }, ref) => {
     const IntegrationIconBlock = () => {
       return (
         <div className="bg-black text-white w-8 h-8 rounded flex items-center justify-center">
@@ -114,14 +115,18 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
           </div>
         </div>
 
-        <Button asChild type="default" iconRight={<IconExternalLink />}>
-          <Link
-            href={getIntegrationConfigurationUrl(integration)}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Manage
-          </Link>
+        <Button asChild disabled={disabled} type="default" iconRight={<IconExternalLink />}>
+          {disabled ? (
+            <p>Manage</p>
+          ) : (
+            <Link
+              href={getIntegrationConfigurationUrl(integration)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Manage
+            </Link>
+          )}
         </Button>
       </li>
     )

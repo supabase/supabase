@@ -106,10 +106,7 @@ const Addons = () => {
             <AlertDescription_Shadcn_>
               Updating addons are not available while you're on a preview branch. To manage your
               addons, you may return to your{' '}
-              <Link
-                href={`/project/${parentProject.ref}/settings/general`}
-                className="text-brand-900"
-              >
+              <Link href={`/project/${parentProject.ref}/settings/general`} className="text-brand">
                 main branch
               </Link>
               .

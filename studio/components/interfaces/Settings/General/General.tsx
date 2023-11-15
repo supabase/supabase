@@ -66,10 +66,7 @@ const General = () => {
           <AlertDescription_Shadcn_>
             Certain settings are not available while you're on a preview branch. To adjust your
             project settings, you may return to your{' '}
-            <Link
-              href={`/project/${parentProject.ref}/settings/general`}
-              className="text-brand-900"
-            >
+            <Link href={`/project/${parentProject.ref}/settings/general`} className="text-brand">
               main branch
             </Link>
             .
