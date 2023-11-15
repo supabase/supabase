@@ -239,7 +239,7 @@ const PROVIDER_PHONE = {
     },
     SMS_TEMPLATE: {
       title: 'SMS Message',
-      type: 'string',
+      type: 'multiline-string',
       description: 'To format the OTP code use `{{ .Code }}`',
       show: {
         key: 'SMS_PROVIDER',

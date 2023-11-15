@@ -132,6 +132,49 @@ const FormField = ({ name, properties, formValues, disabled = false }: FormField
           }
         />
       )
+    case 'multiline-string':
+      return (
+        <Input.TextArea
+          size="small"
+          layout="vertical"
+          id={name}
+          name={name}
+          disabled={disabled}
+          type={hidden ? 'password' : 'text'}
+          label={properties.title}
+          labelOptional={
+            properties.descriptionOptional ? (
+              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                {properties.descriptionOptional}
+              </ReactMarkdown>
+            ) : undefined
+          }
+          descriptionText={
+            properties.description ? (
+              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                {properties.description}
+              </ReactMarkdown>
+            ) : null
+          }
+          actions={
+            !!properties.isSecret ? (
+              <Button
+                icon={hidden ? <IconEye /> : <IconEyeOff />}
+                type="default"
+                onClick={() => setHidden(!hidden)}
+              />
+            ) : (
+              <span className="mr-3 text-scale-900">
+                {properties.units ? (
+                  <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                    {properties.units}
+                  </ReactMarkdown>
+                ) : null}
+              </span>
+            )
+          }
+        />
+      )
     case 'number':
       return (
         <InputNumber
