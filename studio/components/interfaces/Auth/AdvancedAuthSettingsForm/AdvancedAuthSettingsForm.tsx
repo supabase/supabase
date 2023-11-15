@@ -157,7 +157,7 @@ const AdvancedAuthSettingsForm = observer(() => {
                       size="small"
                       min={0}
                       label="Refresh token reuse interval"
-                      descriptionText="Time interval where the same refresh token can be used multiple times to request for an access token. Rcommendation: 10 seconds."
+                      descriptionText="Time interval where the same refresh token can be used multiple times to request for an access token. Recommendation: 10 seconds."
                       actions={<span className="mr-3 text-foreground-lighter">seconds</span>}
                       disabled={!canUpdateConfig}
                     />
