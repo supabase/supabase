@@ -92,7 +92,7 @@ When your user signs in, call [loginWith(Provider)](/docs/reference/kotlin/auth-
 
 ```kotlin
 suspend fun signInWithSlack() {
-	supabase.auth.loginWith(Slack)
+	supabase.auth.signInWith(Slack)
 }
 ```
 
@@ -123,7 +123,7 @@ When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) t
 
 ```kotlin
 suspend fun signOut() {
-	supabase.auth.logout()
+	supabase.auth.signOut()
 }
 ```
 

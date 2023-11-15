@@ -85,7 +85,7 @@ When your user signs in, call [loginWith(Provider)](/docs/reference/kotlin/auth-
 
 ```kotlin
 suspend fun signInWithGithub() {
-	supabase.auth.loginWith(Github)
+	supabase.auth.signInWith(Github)
 }
 ```
 
@@ -116,7 +116,7 @@ When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) t
 
 ```kotlin
 suspend fun signOut() {
-	supabase.auth.logout()
+	supabase.auth.signOut()
 }
 ```
 

@@ -110,7 +110,7 @@ When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) t
 
 ```kotlin
 suspend fun logout() {
-	supabase.auth.logout()
+	supabase.auth.signOut()
 }
 ```
 
@@ -160,7 +160,7 @@ When your user signs in, call [loginWith(Email)](/docs/reference/kotlin/auth-sig
 
 ```kotlin
 suspend fun signInWithEmail() {
-	supabase.auth.loginWith(Email) {
+	supabase.auth.signInWith(Email) {
 		email = "example@email.com"
 		password = "example-password"
 	}
@@ -208,7 +208,7 @@ When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) t
 
 ```kotlin
 suspend fun logout() {
-	supabase.auth.logout()
+	supabase.auth.signOut()
 }
 ```
 

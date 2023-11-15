@@ -336,7 +336,7 @@ class AuthenticationRepositoryImpl @Inject constructor(
 ) : AuthenticationRepository {
     override suspend fun signIn(email: String, password: String): Boolean {
         return try {
-            auth.loginWith(Email) {
+            auth.signInWith(Email) {
                 this.email = email
                 this.password = password
             }
@@ -360,7 +360,7 @@ class AuthenticationRepositoryImpl @Inject constructor(
 
     override suspend fun signInWithGoogle(): Boolean {
         return try {
-            auth.loginWith(Google)
+            auth.signInWith(Google)
             true
         } catch (e: Exception) {
             false

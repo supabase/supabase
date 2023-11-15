@@ -270,7 +270,7 @@ const { user, error } = await supabase.auth.signInWithPassword({
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-supabase.auth.loginWith(Phone) {
+supabase.auth.signInWith(Phone) {
     phoneNumber = "+13334445555"
     password = "some-password"
 }
