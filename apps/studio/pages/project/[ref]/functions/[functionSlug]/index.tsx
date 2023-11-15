@@ -71,7 +71,7 @@ const PageLayout: NextPageWithLayout = () => {
   const id = selectedFunction?.id
   const resourceUsageMetricsEnabled = useFlag('enableResourceUsageMetricsForEdgeFunctions')
 
-  const { data: invStatsData, error: invStatsError } = useFunctionsInvStatsQuery(
+  const invStatsResult = useFunctionsInvStatsQuery(
     {
       projectRef,
       functionId: id,
@@ -80,7 +80,7 @@ const PageLayout: NextPageWithLayout = () => {
     { enabled: !resourceUsageMetricsEnabled }
   )
 
-  const { data: reqStatsData, error: reqStatsError } = useFunctionsReqStatsQuery(
+  const reqStatsResult = useFunctionsReqStatsQuery(
     {
       projectRef,
       functionId: id,
@@ -89,7 +89,7 @@ const PageLayout: NextPageWithLayout = () => {
     { enabled: resourceUsageMetricsEnabled }
   )
 
-  const { data: resourceUsageData, error: resourceUsageError } = useFunctionsResourceUsageQuery(
+  const resourceUsageResult = useFunctionsResourceUsageQuery(
     {
       projectRef,
       functionId: id,
@@ -98,26 +98,16 @@ const PageLayout: NextPageWithLayout = () => {
     { enabled: resourceUsageMetricsEnabled }
   )
 
-  const isInvStatsChartLoading = !invStatsData || (!invStatsData.result && !invStatsError)
-  const isReqStatsChartLoading = !reqStatsData || (!reqStatsData?.result && !reqStatsError)
-  const isResourceUsageChartLoading =
-    !resourceUsageData || (!resourceUsageData?.result && !resourceUsageError)
+  const reqStatsData = useMemo(() => {
+    const result = resourceUsageMetricsEnabled
+      ? reqStatsResult.data?.result
+      : invStatsResult.data?.result
+    return result || []
+  }, [invStatsResult.data, reqStatsResult.data, resourceUsageMetricsEnabled])
 
-  const normalizedReqStatsData = useMemo(() => {
-    const result = resourceUsageMetricsEnabled ? reqStatsData?.result : invStatsData?.result
-    return (result || []).map((d: any) => ({
-      ...d,
-      timestamp: isUnixMicro(d.timestamp) ? unixMicroToIsoTimestamp(d.timestamp) : d.timestamp,
-    }))
-  }, [invStatsData?.result, reqStatsData?.result, resourceUsageMetricsEnabled])
-
-  const normalizedResourceUsageData = useMemo(() => {
-    return (resourceUsageData?.result || []).map((d: any) => ({
-      avg_cpu_time_used: d.avg_cpu_time_used,
-      avg_memory_used: (d.avg_heap_memory_used + d.avg_external_memory_used) / (1024 * 1024),
-      timestamp: isUnixMicro(d.timestamp) ? unixMicroToIsoTimestamp(d.timestamp) : d.timestamp,
-    }))
-  }, [resourceUsageData?.result])
+  const resourceUsageData = useMemo(() => {
+    return resourceUsageResult.data?.result || []
+  }, [resourceUsageResult.data])
 
   const [startDate, endDate]: [Dayjs, Dayjs] = useMemo(() => {
     const start = dayjs()
@@ -129,7 +119,7 @@ const PageLayout: NextPageWithLayout = () => {
   }, [selectedInterval])
 
   const execTimeChartData = useFillTimeseriesSorted(
-    normalizedReqStatsData,
+    reqStatsData,
     'timestamp',
     ['avg_execution_time'],
     0,
@@ -138,7 +128,7 @@ const PageLayout: NextPageWithLayout = () => {
   )
 
   const invocationsChartData = useFillTimeseriesSorted(
-    normalizedReqStatsData,
+    reqStatsData,
     'timestamp',
     ['count', 'success_count', 'redirect_count', 'client_err_count', 'server_err_count'],
     0,
@@ -146,8 +136,8 @@ const PageLayout: NextPageWithLayout = () => {
     endDate.toISOString()
   )
 
-  const resourceChartData = useFillTimeseriesSorted(
-    normalizedResourceUsageData,
+  const resourceUsageChartData = useFillTimeseriesSorted(
+    resourceUsageData,
     'timestamp',
     ['avg_cpu_time_used', 'avg_memory_used'],
     0,
@@ -201,10 +191,10 @@ const PageLayout: NextPageWithLayout = () => {
             tooltip="Average execution time of function invocations"
             data={execTimeChartData}
             isLoading={
-              resourceUsageMetricsEnabled ? isReqStatsChartLoading : isInvStatsChartLoading
+              resourceUsageMetricsEnabled ? reqStatsResult.isLoading : invStatsResult.isLoading
             }
             renderer={(props) => {
-              const latest = normalizedReqStatsData[normalizedReqStatsData.length - 1]
+              const latest = props.data[props.data.length - 1]
               let highlightedValue
               if (latest) {
                 highlightedValue = latest['avg_execution_time']
@@ -226,37 +216,29 @@ const PageLayout: NextPageWithLayout = () => {
             <ReportWidget
               title="Invocations"
               data={invocationsChartData}
-              isLoading={isReqStatsChartLoading}
+              isLoading={reqStatsResult.isLoading}
               renderer={(props) => {
                 const data = props.data
                   .map((d: any) => [
                     {
                       status: '2xx',
                       count: d.success_count,
-                      timestamp: isUnixMicro(d.timestamp)
-                        ? unixMicroToIsoTimestamp(d.timestamp)
-                        : d.timestamp,
+                      timestamp: d.timestamp,
                     },
                     {
                       status: '3xx',
                       count: d.redirect_count,
-                      timestamp: isUnixMicro(d.timestamp)
-                        ? unixMicroToIsoTimestamp(d.timestamp)
-                        : d.timestamp,
+                      timestamp: d.timestamp,
                     },
                     {
                       status: '4xx',
                       count: d.client_err_count,
-                      timestamp: isUnixMicro(d.timestamp)
-                        ? unixMicroToIsoTimestamp(d.timestamp)
-                        : d.timestamp,
+                      timestamp: d.timestamp,
                     },
                     {
                       status: '5xx',
                       count: d.server_err_count,
-                      timestamp: isUnixMicro(d.timestamp)
-                        ? unixMicroToIsoTimestamp(d.timestamp)
-                        : d.timestamp,
+                      timestamp: d.timestamp,
                     },
                   ])
                   .flat()
@@ -284,7 +266,7 @@ const PageLayout: NextPageWithLayout = () => {
             <ReportWidget
               title="Invocations"
               data={invocationsChartData}
-              isLoading={isInvStatsChartLoading}
+              isLoading={invStatsResult.isLoading}
               renderer={(props) => (
                 <BarChart
                   className="w-full"
@@ -309,10 +291,10 @@ const PageLayout: NextPageWithLayout = () => {
               <ReportWidget
                 title="CPU time"
                 tooltip="Average CPU time usage for the function"
-                data={resourceChartData}
-                isLoading={isResourceUsageChartLoading}
+                data={resourceUsageChartData}
+                isLoading={resourceUsageResult.isLoading}
                 renderer={(props) => {
-                  const latest = normalizedResourceUsageData[normalizedResourceUsageData.length - 1]
+                  const latest = props.data[props.data.length - 1]
                   let highlightedValue
                   if (latest) {
                     highlightedValue = latest['avg_cpu_time_used']
@@ -333,10 +315,10 @@ const PageLayout: NextPageWithLayout = () => {
               <ReportWidget
                 title="Memory"
                 tooltip="Average memory usage for the function"
-                data={resourceChartData}
-                isLoading={isResourceUsageChartLoading}
+                data={resourceUsageChartData}
+                isLoading={resourceUsageResult.isLoading}
                 renderer={(props) => {
-                  const latest = normalizedResourceUsageData[normalizedResourceUsageData.length - 1]
+                  const latest = props.data[props.data.length - 1]
                   let highlightedValue
                   if (latest) {
                     highlightedValue = latest['avg_memory_used']
