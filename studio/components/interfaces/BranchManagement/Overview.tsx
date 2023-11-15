@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { noop } from 'lodash'
 import { Button, IconChevronRight } from 'ui'
 
 import { Branch } from 'data/branches/branches-query'
@@ -38,7 +38,7 @@ const Overview = ({
       <BranchManagementSection header="Production branch">
         {isLoading && <BranchRowLoader />}
         {isSuccess && mainBranch !== undefined && (
-          <BranchRow isMain branch={mainBranch} repo={repo} />
+          <BranchRow isMain branch={mainBranch} repo={repo} onSelectDeleteBranch={noop} />
         )}
       </BranchManagementSection>
 

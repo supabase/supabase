@@ -68,7 +68,10 @@ const BranchManagement = () => {
     isError: isErrorBranches,
     isSuccess: isSuccessBranches,
   } = useBranchesQuery({ projectRef })
-  const [[mainBranch], previewBranches] = partition(branches, (branch) => branch.is_default)
+  const [[mainBranch], previewBranchesUnsorted] = partition(branches, (branch) => branch.is_default)
+  const previewBranches = previewBranchesUnsorted.sort((a, b) =>
+    new Date(a.updated_at) < new Date(b.updated_at) ? 1 : -1
+  )
   const branchesWithPRs = previewBranches.filter((branch) => branch.pr_number !== undefined)
   const prNumbers =
     branches !== undefined
@@ -289,6 +292,7 @@ const BranchManagement = () => {
                                   branch={branch}
                                   pullRequest={pullRequest}
                                   generateCreatePullRequestURL={generateCreatePullRequestURL}
+                                  onSelectDeleteBranch={() => setSelectedBranchToDelete(branch)}
                                 />
                               )
                             })
@@ -328,6 +332,7 @@ const BranchManagement = () => {
                               branch={branch}
                               pullRequest={pullRequest}
                               generateCreatePullRequestURL={generateCreatePullRequestURL}
+                              onSelectDeleteBranch={() => setSelectedBranchToDelete(branch)}
                             />
                           )
                         })}
