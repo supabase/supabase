@@ -150,11 +150,20 @@ const uiConfig = ui({
             // the following are typography overrides
             // examples can be seen here —> https://github.com/tailwindlabs/tailwindcss-typography/blob/master/src/styles.js
             // reset all header font weights
-            'h1, h2, h3, h4, h5': {
+            h4: {
+              // override font size
+              fontSize: '1.15em',
+            },
+            h5: {
+              // h5 not included in --tw-prose-headings
+              color: theme('colors.scale[1200]'),
+            },
+            'h1, h2, h3, h4, h5, h6': {
               fontWeight: '400',
             },
-            h2: {
-              fontWeight: '400',
+            'article h2, article h3, article h4, article h5, article h6': {
+              marginTop: '2em',
+              marginBottom: '1em',
             },
             p: {
               fontWeight: '400',
@@ -185,8 +194,14 @@ const uiConfig = ui({
               paddingLeft: '1rem',
               counterReset: 'item',
               listStyleType: 'none',
+              marginBottom: '3rem',
             },
-            'ol>li': { display: 'block', position: 'relative', paddingLeft: '1rem' },
+            'ol>li': {
+              display: 'block',
+              position: 'relative',
+              paddingLeft: '1rem',
+              marginBottom: '2rem',
+            },
             'ol>li::before': {
               position: 'absolute',
               top: '0.25rem',
@@ -237,16 +252,23 @@ const uiConfig = ui({
               textUnderlineOffset: '4px',
             },
             'a:hover': {
-              textDecorationColor: 'hsl(var(--brand-default))',
+              textDecorationColor: 'hsl(var(--colors-scale12))',
             },
             figcaption: {
               color: 'hsl(var(--foreground-muted))',
+              fontFamily: 'Office Code Pro, monospace',
             },
             'figure.quote-figure p:first-child': {
               marginTop: '0 !important',
             },
             'figure.quote-figure p:last-child': {
               marginBottom: '0 !important',
+            },
+            figure: {
+              margin: '3rem 0',
+            },
+            'figure img': {
+              margin: '0 !important',
             },
           },
         },
