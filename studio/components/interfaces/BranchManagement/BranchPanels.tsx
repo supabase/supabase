@@ -75,7 +75,7 @@ interface BranchRowProps {
   isMain?: boolean
   pullRequest?: GitHubPullRequest
   generateCreatePullRequestURL?: (branchName?: string) => string
-  onSelectDeleteBranch?: () => void
+  onSelectDeleteBranch: () => void
 }
 
 export const BranchRow = ({

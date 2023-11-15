@@ -289,6 +289,7 @@ const BranchManagement = () => {
                                   branch={branch}
                                   pullRequest={pullRequest}
                                   generateCreatePullRequestURL={generateCreatePullRequestURL}
+                                  onSelectDeleteBranch={() => setSelectedBranchToDelete(branch)}
                                 />
                               )
                             })
@@ -328,6 +329,7 @@ const BranchManagement = () => {
                               branch={branch}
                               pullRequest={pullRequest}
                               generateCreatePullRequestURL={generateCreatePullRequestURL}
+                              onSelectDeleteBranch={() => setSelectedBranchToDelete(branch)}
                             />
                           )
                         })}
