@@ -34,6 +34,8 @@ const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
   const { data } = useOrgIntegrationsQuery({ orgSlug: org?.slug })
   const sidePanelsStateSnapshot = useSidePanelsStateSnapshot()
 
+  const isBranch = project?.parent_project_ref !== undefined
+
   const { mutate: deleteVercelConnection } = useIntegrationsVercelInstalledConnectionDeleteMutation(
     {
       onSuccess: () => {
@@ -195,10 +197,14 @@ You can change the scope of the access for Supabase by configuring
             </div>
           ) : (
             <div>
-              <Button asChild type="default" iconRight={<IconExternalLink />}>
-                <Link href={integrationUrl} target="_blank">
-                  Install Vercel Integration
-                </Link>
+              <Button asChild type="default" disabled={isBranch} iconRight={<IconExternalLink />}>
+                {isBranch ? (
+                  <p>Install Vercel Integration</p>
+                ) : (
+                  <Link href={integrationUrl} target="_blank" rel="noreferrer">
+                    Install Vercel Integration
+                  </Link>
+                )}
               </Button>
             </div>
           )}

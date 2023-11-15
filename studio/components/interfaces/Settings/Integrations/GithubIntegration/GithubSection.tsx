@@ -1,6 +1,6 @@
+import { useParams } from 'common'
 import { useCallback } from 'react'
 
-import { useParams } from 'common'
 import { IntegrationConnectionItem } from 'components/interfaces/Integrations/IntegrationConnection'
 import {
   IntegrationConnectionHeader,
@@ -16,7 +16,7 @@ import {
 import { useIntegrationsGitHubInstalledConnectionDeleteMutation } from 'data/integrations/integrations-github-connection-delete-mutation'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { IntegrationName, IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { useSelectedOrganization, useStore } from 'hooks'
+import { useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
 import { pluralize } from 'lib/helpers'
 import { IntegrationImageHandler } from '../IntegrationsSettings'
 import GitHubIntegrationConnectionForm from './GitHubIntegrationConnectionForm'
@@ -39,9 +39,12 @@ These connections will be part of a GitHub workflow that is currently in develop
 
 const GitHubSection = () => {
   const { ui } = useStore()
+  const project = useSelectedProject()
   const org = useSelectedOrganization()
   const { data } = useOrgIntegrationsQuery({ orgSlug: org?.slug })
   const { ref: projectRef } = useParams()
+
+  const isBranch = project?.parent_project_ref !== undefined
 
   const githubIntegrations = data?.filter(
     (integration) => integration.integration.name === 'GitHub'
@@ -81,24 +84,22 @@ const GitHubSection = () => {
           {githubIntegrations &&
             githubIntegrations.length > 0 &&
             githubIntegrations.map((integration, i) => {
-              const ConnectionHeaderTitle = `${integration.connections.length} project ${pluralize(
-                integration.connections.length,
-                'connection'
-              )} `
-
               const connections = integration.connections.filter((connection) =>
-                projectRef ? connection.supabase_project_ref === projectRef : true
+                isBranch
+                  ? connection.supabase_project_ref === project.parent_project_ref
+                  : connection.supabase_project_ref === projectRef
               )
 
               return (
                 <div key={integration.id}>
-                  <IntegrationInstallation title={'GitHub'} integration={integration} />
+                  <IntegrationInstallation
+                    title={'GitHub'}
+                    integration={integration}
+                    disabled={isBranch}
+                  />
                   {connections.length > 0 ? (
                     <>
-                      <IntegrationConnectionHeader
-                      // title={ConnectionHeaderTitle}
-                      // markdown={`Repository connections for GitHub`}
-                      />
+                      <IntegrationConnectionHeader />
                       <ul className="flex flex-col">
                         {connections.map((connection) => (
                           <div
@@ -107,6 +108,7 @@ const GitHubSection = () => {
                           >
                             <IntegrationConnectionItem
                               showNode={false}
+                              disabled={isBranch}
                               key={connection.id}
                               connection={connection}
                               type={'GitHub' as IntegrationName}
