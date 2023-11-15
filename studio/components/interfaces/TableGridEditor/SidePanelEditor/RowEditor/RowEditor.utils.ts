@@ -1,16 +1,16 @@
-import dayjs from 'dayjs'
-import { find, isUndefined, compact, isEqual, omitBy, isNull, isString } from 'lodash'
-import { Dictionary } from 'components/grid'
 import type { PostgresTable } from '@supabase/postgres-meta'
+import { Dictionary } from 'components/grid'
+import dayjs from 'dayjs'
+import { compact, find, isEqual, isNull, isString, isUndefined, omitBy } from 'lodash'
 
 import { minifyJSON, tryParseJson } from 'lib/helpers'
-import { RowField } from './RowEditor.types'
 import {
   DATETIME_TYPES,
-  TIME_TYPES,
-  TIMESTAMP_TYPES,
   TEXT_TYPES,
+  TIMESTAMP_TYPES,
+  TIME_TYPES,
 } from '../SidePanelEditor.constants'
+import { RowField } from './RowEditor.types'
 
 export const generateRowFields = (
   row: Dictionary<any> | undefined,
@@ -25,7 +25,7 @@ export const generateRowFields = (
       isUndefined(row) && TEXT_TYPES.includes(column.format)
         ? null
         : isUndefined(row) && column.format === 'bool' && !column.is_nullable
-        ? 'true'
+        ? column.default_value
         : isUndefined(row) && column.format === 'bool' && column.is_nullable
         ? 'null'
         : isUndefined(row)
@@ -198,9 +198,18 @@ export const generateUpdateRowPayload = (originalRow: any, field: RowField[]) =>
   const payload = {} as any
   const properties = Object.keys(rowObject)
   properties.forEach((property) => {
-    if (!isEqual(originalRow[property], rowObject[property])) {
+    const type = field.find((x) => x.name === property)?.format
+    if (type !== undefined && DATETIME_TYPES.includes(type)) {
+      // Just to ensure that the value are in the correct and consistent format for value comparison
+      const originalFormatted = convertPostgresDatetimeToInputDatetime(type, originalRow[property])
+      const originalFormattedOut = convertInputDatetimeToPostgresDatetime(type, originalFormatted)
+      if (originalFormattedOut !== rowObject[property]) {
+        payload[property] = rowObject[property]
+      }
+    } else if (!isEqual(originalRow[property], rowObject[property])) {
       payload[property] = rowObject[property]
     }
   })
+
   return payload
 }

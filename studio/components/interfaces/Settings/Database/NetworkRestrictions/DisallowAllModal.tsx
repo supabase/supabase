@@ -30,15 +30,15 @@ const DisallowAllModal = ({ visible, onClose }: DisallowAllModalProps) => {
     >
       <Modal.Content>
         <div className="py-6 space-y-4">
-          <p className="text-sm text-scale-1100">
+          <p className="text-sm text-foreground-light">
             This will prevent any external IP addresses from accessing your project's database. Are
             you sure?
           </p>
           <InformationBox
             defaultVisibility
             hideCollapse
-            title="Note: Restrictions only apply to your database and PgBouncer"
-            description="They do not currently apply to APIs offered over HTTPS, such as PostgREST, Storage, or Authentication"
+            title="Note: Restrictions only apply to direct connections to your database and PgBouncer"
+            description="They do not currently apply to Supavisor and to APIs offered over HTTPS, such as PostgREST, Storage, or Authentication"
           />
         </div>
       </Modal.Content>

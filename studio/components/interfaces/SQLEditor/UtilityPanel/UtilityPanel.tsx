@@ -6,20 +6,31 @@ export type UtilityPanelProps = {
   id: string
   isExecuting?: boolean
   isDisabled?: boolean
+  hasSelection: boolean
+  prettifyQuery: () => void
   executeQuery: () => void
 }
 
-const UtilityPanel = ({ id, isExecuting, isDisabled, executeQuery }: UtilityPanelProps) => {
+const UtilityPanel = ({
+  id,
+  isExecuting,
+  isDisabled,
+  hasSelection,
+  prettifyQuery,
+  executeQuery,
+}: UtilityPanelProps) => {
   return (
     <>
-      <div className="flex justify-between overflow-visible px-6 py-2">
-        <ResultsDropdown id={id} />
+      <div className="flex justify-between overflow-visible px-6 py-2 border-b">
+        <ResultsDropdown id={id} isExecuting={isExecuting} />
 
         <div className="inline-flex items-center justify-end">
           <UtilityActions
             id={id}
             isExecuting={isExecuting}
             isDisabled={isDisabled}
+            hasSelection={hasSelection}
+            prettifyQuery={prettifyQuery}
             executeQuery={executeQuery}
           />
         </div>

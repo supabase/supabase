@@ -59,6 +59,7 @@ export interface Field {
 
 export interface ExtendedPostgresRelationship extends PostgresRelationship {
   deletion_action: string
+  update_action: string
 }
 
 export interface ColumnField {

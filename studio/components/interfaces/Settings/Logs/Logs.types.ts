@@ -85,6 +85,7 @@ export type QueryType =
   | 'auth'
   | 'realtime'
   | 'storage'
+  | 'supavisor'
   | 'pgbouncer'
   | 'postgrest'
 

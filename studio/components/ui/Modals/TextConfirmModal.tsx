@@ -68,7 +68,7 @@ const TextConfirmModal = ({
               )}
               {text !== undefined && (
                 <Modal.Content>
-                  <p className="mb-2 block text-sm">{text}</p>
+                  <p className="mb-2 block text-sm break-all">{text}</p>
                 </Modal.Content>
               )}
               <Modal.Separator />
@@ -77,7 +77,8 @@ const TextConfirmModal = ({
                   id="confirmValue"
                   label={
                     <span>
-                      Type <span className="text-scale-1200">{confirmString}</span> to confirm.
+                      Type <span className="text-foreground break-all">{confirmString}</span> to
+                      confirm.
                     </span>
                   }
                   placeholder={confirmPlaceholder}

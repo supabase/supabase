@@ -3,7 +3,7 @@ import { IconClock } from 'ui'
 
 import { format } from 'date-fns'
 
-import { TimeType, Time, TimeSplitInputProps } from './DatePicker.types'
+import { TimeSplitInputProps, TimeType } from './DatePicker.types'
 
 const TimeSplitInput = ({
   type,
@@ -161,11 +161,11 @@ const TimeSplitInput = ({
     <div
       className={`
         flex h-7 items-center justify-center
-        gap-0 rounded border border-scale-700 bg-scale-100 text-xs text-scale-1100 dark:bg-scaleA-300
-        ${focus && ' border-scale-800 outline outline-2 outline-scale-500'}
+        gap-0 rounded border border-strong bg-surface-100 text-xs text-foreground-light
+        ${focus && ' border-stronger outline outline-2 outline-border'}
     `}
     >
-      <div className="mr-1 text-scale-900">
+      <div className="mr-1 text-foreground-lighter">
         <IconClock size={14} strokeWidth={1.5} />
       </div>
 
@@ -183,14 +183,14 @@ const TimeSplitInput = ({
             border-none
             bg-transparent
             p-0 text-center text-xs
-            text-scale-1200
+            text-foreground
             outline-none
             ring-0
             focus:ring-0
         "
         value={time.HH}
       />
-      <span className="text-scale-900">:</span>
+      <span className="text-foreground-lighter">:</span>
       <input
         type="text"
         onBlur={() => handleOnBlur()}
@@ -205,14 +205,14 @@ const TimeSplitInput = ({
             border-none
             bg-transparent
             p-0 text-center text-xs
-            text-scale-1200
+            text-foreground
             outline-none
             ring-0
             focus:ring-0
         "
         value={time.mm}
       />
-      <span className="text-scale-900">:</span>
+      <span className="text-foreground-lighter">:</span>
       <input
         type="text"
         onBlur={() => handleOnBlur()}
@@ -227,7 +227,7 @@ const TimeSplitInput = ({
             border-none
             bg-transparent
             p-0 text-center text-xs
-            text-scale-1200
+            text-foreground
             outline-none
             ring-0
             focus:ring-0

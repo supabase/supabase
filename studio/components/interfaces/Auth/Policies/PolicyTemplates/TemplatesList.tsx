@@ -28,8 +28,7 @@ const TemplatesList = ({
             <div
               key={i}
               className={
-                'border-b border-scale-400 hover:bg-scale-400 ' +
-                (active ? 'bg-scale-300 dark:bg-scale-500' : '')
+                'border-b border-overlay hover:bg-surface-200 ' + (active ? 'bg-surface-300' : '')
               }
             >
               <Menu.Item
@@ -46,7 +45,7 @@ const TemplatesList = ({
     </div>
     {templatesNote && (
       <div className="px-4 py-2">
-        <p className="text-xs text-scale-900">{templatesNote}</p>
+        <p className="text-xs text-foreground-lighter">{templatesNote}</p>
       </div>
     )}
   </div>

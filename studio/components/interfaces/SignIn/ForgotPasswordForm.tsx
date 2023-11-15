@@ -1,11 +1,12 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
-import { useStore } from 'hooks'
-import { isResponseOk, post } from 'lib/common/fetch'
-import { API_URL, BASE_PATH } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
 import { Button, Form, Input } from 'ui'
 import { object, string } from 'yup'
+
+import { useResetPasswordMutation } from 'data/misc/reset-password-mutation'
+import { useStore } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
 
 const forgotPasswordSchema = object({
   email: string().email('Must be a valid email').required('Email is required'),
@@ -18,46 +19,41 @@ const ForgotPasswordForm = () => {
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const captchaRef = useRef<HCaptcha>(null)
 
-  const onForgotPassword = async ({ email }: { email: string }) => {
-    const toastId = ui.setNotification({
-      category: 'loading',
-      message: `Sending password reset email...`,
-    })
+  const { mutate: resetPassword, isLoading } = useResetPasswordMutation({
+    onSuccess: async () => {
+      ui.setNotification({
+        category: 'success',
+        message: `If you registered using your email and password, you will receive a password reset email.`,
+      })
+      await router.push('/sign-in')
+    },
+    onError: (error) => {
+      setCaptchaToken(null)
+      captchaRef.current?.resetCaptcha()
 
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to send reset email: ${error.message}`,
+      })
+    },
+  })
+
+  const onForgotPassword = async ({ email }: { email: string }) => {
     let token = captchaToken
     if (!token) {
       const captchaResponse = await captchaRef.current?.execute({ async: true })
       token = captchaResponse?.response ?? null
     }
 
-    const response = await post<void>(`${API_URL}/reset-password`, {
+    resetPassword({
       email,
-      hcaptchaToken: token ?? undefined,
+      hcaptchaToken: token,
       redirectTo: `${
         process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
           ? location.origin
           : process.env.NEXT_PUBLIC_SITE_URL
       }${BASE_PATH}/reset-password`,
     })
-
-    if (isResponseOk(response)) {
-      ui.setNotification({
-        id: toastId,
-        category: 'success',
-        message: `If you registered using your email and password, you will receive a password reset email.`,
-      })
-
-      await router.push('/sign-in')
-    } else {
-      setCaptchaToken(null)
-      captchaRef.current?.resetCaptcha()
-
-      ui.setNotification({
-        id: toastId,
-        category: 'error',
-        message: `Failed to send reset email: ${response.error.message}`,
-      })
-    }
   }
 
   return (
@@ -68,7 +64,7 @@ const ForgotPasswordForm = () => {
       validationSchema={forgotPasswordSchema}
       onSubmit={onForgotPassword}
     >
-      {({ isSubmitting }: { isSubmitting: boolean }) => {
+      {() => {
         return (
           <div className="flex flex-col pt-4 space-y-4">
             <Input
@@ -77,7 +73,7 @@ const ForgotPasswordForm = () => {
               type="email"
               label="Email"
               placeholder="you@example.com"
-              disabled={isSubmitting}
+              disabled={isLoading}
               autoComplete="email"
             />
 
@@ -102,8 +98,8 @@ const ForgotPasswordForm = () => {
               form="forgot-password-form"
               htmlType="submit"
               size="medium"
-              disabled={isSubmitting}
-              loading={isSubmitting}
+              disabled={isLoading}
+              loading={isLoading}
             >
               Send Reset Email
             </Button>

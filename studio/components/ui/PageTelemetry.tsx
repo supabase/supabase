@@ -1,21 +1,33 @@
-import { useParams, useTelemetryProps } from 'common'
+import { useIsLoggedIn, useParams, useTelemetryProps } from 'common'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 
 import { useSelectedOrganization } from 'hooks'
 import { post } from 'lib/common/fetch'
-import { API_URL, IS_PLATFORM } from 'lib/constants'
+import { API_URL, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useAppStateSnapshot } from 'state/app-state'
 
 const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
   const router = useRouter()
   const { ref } = useParams()
   const telemetryProps = useTelemetryProps()
   const selectedOrganization = useSelectedOrganization()
+  const snap = useAppStateSnapshot()
+
+  useEffect(() => {
+    const consent =
+      typeof window !== 'undefined'
+        ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
+        : null
+    if (consent !== null) snap.setIsOptedInTelemetry(consent === 'true')
+  }, [])
+
+  const isLoggedIn = useIsLoggedIn()
 
   useEffect(() => {
     function handleRouteChange(url: string) {
-      handlePageTelemetry(url)
+      if (snap.isOptedInTelemetry) handlePageTelemetry(url)
     }
 
     // Listen for page changes after a navigation or when the query changes
@@ -23,16 +35,16 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
     return () => {
       router.events.off('routeChangeComplete', handleRouteChange)
     }
-  }, [router])
+  }, [router, snap.isOptedInTelemetry])
 
   useEffect(() => {
     // Send page telemetry on first page load
     // Waiting for router ready before sending page_view
     // if not the path will be dynamic route instead of the browser url
-    if (router.isReady) {
+    if (router.isReady && snap.isOptedInTelemetry) {
       handlePageTelemetry(router.asPath)
     }
-  }, [router.isReady])
+  }, [router.isReady, snap.isOptedInTelemetry])
 
   /**
    * send page_view event
@@ -59,14 +71,16 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
         },
       })
 
-      post(`${API_URL}/telemetry/pageview`, {
-        ...(ref && { projectRef: ref }),
-        ...(selectedOrganization && { orgSlug: selectedOrganization.slug }),
-        referrer: referrer,
-        title: document.title,
-        path: router.route,
-        location: router.asPath,
-      })
+      if (isLoggedIn) {
+        post(`${API_URL}/telemetry/pageview`, {
+          ...(ref && { projectRef: ref }),
+          ...(selectedOrganization && { orgSlug: selectedOrganization.slug }),
+          referrer: referrer,
+          title: document.title,
+          path: router.route,
+          location: router.asPath,
+        })
+      }
     }
   }
 

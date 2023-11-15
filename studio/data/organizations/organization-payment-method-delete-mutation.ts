@@ -11,7 +11,7 @@ export type OrganizationPaymentMethodDeleteVariables = {
   cardId: string
 }
 
-export async function deleteOrganizationMember({
+export async function deletePaymentMethod({
   slug,
   cardId,
 }: OrganizationPaymentMethodDeleteVariables) {
@@ -20,7 +20,7 @@ export async function deleteOrganizationMember({
   return response
 }
 
-type OrganizationPaymentMethodDeleteData = Awaited<ReturnType<typeof deleteOrganizationMember>>
+type OrganizationPaymentMethodDeleteData = Awaited<ReturnType<typeof deletePaymentMethod>>
 
 export const useOrganizationPaymentMethodDeleteMutation = ({
   onSuccess,
@@ -40,7 +40,7 @@ export const useOrganizationPaymentMethodDeleteMutation = ({
     OrganizationPaymentMethodDeleteData,
     ResponseError,
     OrganizationPaymentMethodDeleteVariables
-  >((vars) => deleteOrganizationMember(vars), {
+  >((vars) => deletePaymentMethod(vars), {
     async onSuccess(data, variables, context) {
       const { slug } = variables
       await queryClient.invalidateQueries(organizationKeys.paymentMethods(slug))

@@ -1,29 +1,29 @@
-import React, { useEffect, useState } from 'react'
+import { useParams } from 'common'
 import { useRouter } from 'next/router'
-import { IconRewind, Button } from 'ui'
+import { PropsWithChildren, useEffect, useState } from 'react'
+import { Button, IconRewind } from 'ui'
 
 import {
+  Filters,
+  LogEventChart,
+  LogSearchCallback,
   LogTable,
   LogTemplate,
-  TEMPLATES,
-  LogSearchCallback,
   LogsTableName,
   QueryType,
-  LogEventChart,
-  Filters,
+  TEMPLATES,
   ensureNoTimestampConflict,
   maybeShowUpgradePrompt,
 } from 'components/interfaces/Settings/Logs'
-import useLogsPreview from 'hooks/analytics/useLogsPreview'
 import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilterPanel'
-
-import { LOGS_TABLES } from './Logs.constants'
-import ShimmerLine from 'components/ui/ShimmerLine'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
+import ShimmerLine from 'components/ui/ShimmerLine'
+import useLogsPreview from 'hooks/analytics/useLogsPreview'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
+import { LOGS_TABLES } from './Logs.constants'
 import UpgradePrompt from './UpgradePrompt'
-import { useParams } from 'common/hooks'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { useSelectedOrganization } from 'hooks'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 /**
  * Acts as a container component for the entire log display
@@ -35,24 +35,26 @@ import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscr
  * - `s` for search query.
  * - `te` for timestamp start value.
  */
-interface Props {
+interface LogsPreviewerProps {
   projectRef: string
   queryType: QueryType
   filterOverride?: Filters
   condensedLayout?: boolean
   tableName?: LogsTableName
 }
-export const LogsPreviewer: React.FC<Props> = ({
+export const LogsPreviewer = ({
   projectRef,
   queryType,
   filterOverride,
   condensedLayout = false,
   tableName,
-}) => {
+  children,
+}: PropsWithChildren<LogsPreviewerProps>) => {
   const router = useRouter()
   const { s, ite, its } = useParams()
   const [showChart, setShowChart] = useState(true)
-  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
+  const organization = useSelectedOrganization()
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
   const table = !tableName ? LOGS_TABLES[queryType] : tableName
 
@@ -166,9 +168,6 @@ export const LogsPreviewer: React.FC<Props> = ({
         csvData={logData}
         isLoading={isLoading}
         newCount={newCount}
-        templates={TEMPLATES.filter(
-          (template) => queryType && template.for?.includes(queryType) && template.mode === 'simple'
-        )}
         onRefresh={handleRefresh}
         onSearch={handleSearch}
         defaultSearchValue={filters.search_query as string}
@@ -191,6 +190,7 @@ export const LogsPreviewer: React.FC<Props> = ({
         isShowingEventChart={showChart}
         onToggleEventChart={() => setShowChart(!showChart)}
       />
+      {children}
       <div
         className={
           'transition-all duration-500 ' +
@@ -240,10 +240,7 @@ export const LogsPreviewer: React.FC<Props> = ({
               Load older
             </Button>
             <div className="flex flex-row justify-end mt-2">
-              <UpgradePrompt
-                show={showUpgradePrompt}
-                setShowUpgradePrompt={setShowUpgradePrompt}
-              />
+              <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
             </div>
           </div>
         )}

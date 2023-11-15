@@ -1,4 +1,4 @@
-import { CalculatedColumn, HeaderRendererProps } from '@supabase/react-data-grid'
+import { CalculatedColumn, RenderHeaderCellProps } from 'react-data-grid'
 
 export interface Dictionary<T> {
   [Key: string]: T
@@ -52,6 +52,7 @@ export type ColumnType =
   | 'number'
   | 'primary_key'
   | 'text'
+  | 'citext'
   | 'time'
   | 'unknown'
 
@@ -62,7 +63,7 @@ export interface GridForeignKey {
   deletionAction?: string
 }
 
-export interface ColumnHeaderProps<R> extends HeaderRendererProps<R> {
+export interface ColumnHeaderProps<R> extends RenderHeaderCellProps<R> {
   columnType: ColumnType
   isPrimaryKey: boolean | undefined
   isEncrypted: boolean | undefined

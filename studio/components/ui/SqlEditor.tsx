@@ -4,6 +4,8 @@ import { useEffect, useRef } from 'react'
 
 import { useStore } from 'hooks'
 
+// [Joshen] We should deprecate this and use CodeEditor instead
+
 interface SqlEditorProps {
   contextmenu?: boolean
   defaultValue?: string
@@ -27,19 +29,6 @@ const SqlEditor = ({
 
   useEffect(() => {
     if (monaco) {
-      // Supabase theming (Can't seem to get it to work for now)
-      monaco.editor.defineTheme('supabase', {
-        base: 'vs-dark',
-        inherit: true,
-        colors: {},
-        rules: [
-          { token: '', background: '4a5568' },
-          { token: 'string.sql', foreground: '24b47e' },
-          { token: 'comment', foreground: '666666' },
-          { token: 'predefined.sql', foreground: 'D4D4D4' },
-        ],
-      })
-
       // Enable pgsql format
       const formatprovider = monaco.languages.registerDocumentFormattingEditProvider('pgsql', {
         async provideDocumentFormattingEdits(model: any) {

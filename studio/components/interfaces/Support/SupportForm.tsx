@@ -1,6 +1,8 @@
+import { useParams } from 'common'
 import { CLIENT_LIBRARIES } from 'common/constants'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import {
   Button,
@@ -16,24 +18,23 @@ import {
   Listbox,
 } from 'ui'
 
-import { useParams } from 'common'
 import Divider from 'components/ui/Divider'
 import InformationBox from 'components/ui/InformationBox'
 import MultiSelect from 'components/ui/MultiSelect'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { getProjectAuthConfig } from 'data/auth/auth-config-query'
+import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useFlag, useStore } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
-import { get, isResponseOk, post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { Project } from 'types'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
 import { CATEGORY_OPTIONS, SERVICE_OPTIONS, SEVERITY_OPTIONS } from './Support.constants'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
@@ -44,10 +45,12 @@ export interface SupportFormProps {
 
 const SupportForm = ({ setSentCategory }: SupportFormProps) => {
   const { ui } = useStore()
+  const { isReady } = useRouter()
   const { ref, subject, category, message } = useParams()
 
   const uploadButtonRef = useRef()
   const enableFreeSupport = useFlag('enableFreeSupport')
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [uploadedDataUrls, setUploadedDataUrls] = useState<string[]>([])
   const [selectedServices, setSelectedServices] = useState<string[]>([])
@@ -68,6 +71,21 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
     isSuccess: isSuccessProjects,
   } = useProjectsQuery()
 
+  const { mutate: submitSupportTicket } = useSendSupportTicketMutation({
+    onSuccess: (res, variables) => {
+      ui.setNotification({ category: 'success', message: 'Support request sent. Thank you!' })
+      setSentCategory(variables.category)
+    },
+    onError: (error) => {
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to submit support ticket: ${error.message}`,
+      })
+      setIsSubmitting(false)
+    },
+  })
+
   const projectDefaults: Partial<Project>[] = [{ ref: 'no-project', name: 'No specific project' }]
 
   const projects = [...(allProjects ?? []), ...projectDefaults]
@@ -76,12 +94,14 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
     if (option.value.toLowerCase() === ((category as string) ?? '').toLowerCase()) return option
   })
 
-  const selectedProjectRef =
+  const [selectedProjectRef, setSelectedProjectRef] = useState(
     selectedProjectFromUrl !== undefined
       ? selectedProjectFromUrl.ref
       : projects.length > 0
       ? projects[0].ref
       : 'no-project'
+  )
+
   const selectedOrganizationSlug =
     selectedProjectRef !== 'no-project'
       ? organizations?.find((org) => {
@@ -90,10 +110,9 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
         })?.slug
       : organizations?.[0]?.slug
 
-  const { data: subscription, isLoading: isLoadingSubscription } = useProjectSubscriptionV2Query(
-    { projectRef: selectedProjectRef },
-    { enabled: selectedProjectRef !== 'no-project' }
-  )
+  const { data: subscription, isLoading: isLoadingSubscription } = useOrgSubscriptionQuery({
+    orgSlug: selectedOrganizationSlug,
+  })
 
   useEffect(() => {
     if (!uploadedFiles) return
@@ -158,8 +177,8 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
     return errors
   }
 
-  const onSubmit = async (values: any, { setSubmitting }: any) => {
-    setSubmitting(true)
+  const onSubmit = async (values: any) => {
+    setIsSubmitting(true)
     const attachments =
       uploadedFiles.length > 0 ? await uploadAttachments(values.projectRef, uploadedFiles) : []
     const selectedLibrary = CLIENT_LIBRARIES.find((library) => library.language === values.library)
@@ -180,30 +199,20 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
     }
 
     if (values.projectRef !== 'no-project') {
-      const URL = `${API_URL}/auth/${values.projectRef}/config`
-      const authConfig = await get(URL)
-      if (!authConfig.error) {
+      try {
+        const authConfig = await getProjectAuthConfig({ projectRef: values.projectRef })
         payload.siteUrl = authConfig.SITE_URL
         payload.additionalRedirectUrls = authConfig.URI_ALLOW_LIST
+      } finally {
       }
     }
 
-    const response = await post<void>(`${API_URL}/feedback/send`, payload)
-    if (!isResponseOk(response)) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to submit support ticket: ${response.error.message}`,
-      })
-      setSubmitting(false)
-    } else {
-      ui.setNotification({ category: 'success', message: 'Support request sent. Thank you!' })
-      setSentCategory(values.category)
-    }
+    submitSupportTicket(payload)
   }
 
   return (
     <Form id="support-form" initialValues={initialValues} validate={onValidate} onSubmit={onSubmit}>
-      {({ isSubmitting, resetForm, values }: any) => {
+      {({ resetForm, values }: any) => {
         const selectedCategory = CATEGORY_OPTIONS.find(
           (category) => category.value === values.category
         )
@@ -259,6 +268,22 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
           }
         }, [isSuccessProjects, isSuccessOrganizations])
 
+        // Populate fields when router is ready, required when navigating to
+        // support form on a refresh browser session
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        useEffect(() => {
+          if (isReady) {
+            const updatedValues = {
+              ...initialValues,
+              projectRef: ref ?? initialValues.projectRef,
+              subject: subject ?? initialValues.subject,
+              category: selectedCategoryFromUrl?.value ?? initialValues.category,
+              message: message ?? initialValues.message,
+            }
+            resetForm({ values: updatedValues, initialValues: updatedValues })
+          }
+        }, [isReady])
+
         return (
           <div className="space-y-8 w-[620px]">
             <div className="px-6">
@@ -286,114 +311,124 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
               </Listbox>
             </div>
 
-            <div className="px-6">
-              <div className="grid grid-cols-2 gap-4">
-                {isLoadingProjects && (
-                  <div className="space-y-2">
-                    <p className="text-sm prose">Which project is affected?</p>
-                    <ShimmeringLoader className="!py-[19px]" />
-                  </div>
-                )}
-                {isErrorProjects && (
-                  <div className="space-y-2">
-                    <p className="text-sm prose">Which project is affected?</p>
-                    <div className="border rounded-md px-4 py-2 flex items-center space-x-2">
-                      <IconAlertCircle strokeWidth={2} className="text-scale-1000" />
-                      <p className="text-sm prose">Failed to retrieve projects</p>
-                    </div>
-                  </div>
-                )}
-                {isSuccessProjects && (
-                  <Listbox id="projectRef" layout="vertical" label="Which project is affected?">
-                    {projects.map((option) => {
-                      const organization = organizations?.find(
-                        (x) => x.id === option.organization_id
-                      )
-                      return (
-                        <Listbox.Option
-                          key={`option-${option.ref}`}
-                          label={option.name || ''}
-                          value={option.ref}
-                        >
-                          <span>{option.name}</span>
-                          <span className="block text-xs opacity-50">{organization?.name}</span>
-                        </Listbox.Option>
-                      )
-                    })}
-                  </Listbox>
-                )}
-                <Listbox id="severity" layout="vertical" label="Severity">
-                  {SEVERITY_OPTIONS.map((option: any) => {
-                    return (
-                      <Listbox.Option
-                        key={`option-${option.value}`}
-                        label={option.label}
-                        value={option.value}
-                        disabled={option.value === 'Critical' && isFreeProject}
-                      >
-                        <span>{option.label}</span>
-                        <span className="block text-xs opacity-50">{option.description}</span>
-                      </Listbox.Option>
-                    )
-                  })}
-                </Listbox>
-              </div>
-
-              {values.projectRef !== 'no-project' && subscription && isSuccessProjects ? (
-                <p className="text-sm text-scale-1000 mt-2">
-                  This project is on the{' '}
-                  <span className="text-scale-1100">{subscription.plan.name} plan</span>
-                </p>
-              ) : isLoadingSubscription ? (
-                <div className="flex items-center space-x-2 mt-2">
-                  <IconLoader size={14} className="animate-spin" />
-                  <p className="text-sm text-scale-1000">Checking project's plan</p>
-                </div>
-              ) : (
-                <></>
-              )}
-            </div>
-
-            {isSuccessProjects && values.projectRef === 'no-project' && (
+            {values.category !== 'Login_issues' && (
               <div className="px-6">
-                {isLoadingOrganizations && (
-                  <div className="space-y-2">
-                    <p className="text-sm prose">Which organization is affected?</p>
-                    <ShimmeringLoader className="!py-[19px]" />
-                  </div>
-                )}
-                {isErrorOrganizations && (
-                  <div className="space-y-2">
-                    <p className="text-sm prose">Which organization is affected?</p>
-                    <div className="border rounded-md px-4 py-2 flex items-center space-x-2">
-                      <IconAlertCircle strokeWidth={2} className="text-scale-1000" />
-                      <p className="text-sm prose">Failed to retrieve organizations</p>
+                <div className="grid grid-cols-2 gap-4">
+                  {isLoadingProjects && (
+                    <div className="space-y-2">
+                      <p className="text-sm prose">Which project is affected?</p>
+                      <ShimmeringLoader className="!py-[19px]" />
                     </div>
-                  </div>
-                )}
-                {isSuccessOrganizations && (
-                  <Listbox
-                    id="organizationSlug"
-                    layout="vertical"
-                    label="Which organization is affected?"
-                  >
-                    {organizations?.map((option) => {
+                  )}
+                  {isErrorProjects && (
+                    <div className="space-y-2">
+                      <p className="text-sm prose">Which project is affected?</p>
+                      <div className="border rounded-md px-4 py-2 flex items-center space-x-2">
+                        <IconAlertCircle strokeWidth={2} className="text-foreground-light" />
+                        <p className="text-sm prose">Failed to retrieve projects</p>
+                      </div>
+                    </div>
+                  )}
+                  {isSuccessProjects && (
+                    <Listbox
+                      id="projectRef"
+                      layout="vertical"
+                      label="Which project is affected?"
+                      onChange={(val) => {
+                        setSelectedProjectRef(val)
+                      }}
+                    >
+                      {projects.map((option) => {
+                        const organization = organizations?.find(
+                          (x) => x.id === option.organization_id
+                        )
+                        return (
+                          <Listbox.Option
+                            key={`option-${option.ref}`}
+                            label={option.name || ''}
+                            value={option.ref}
+                          >
+                            <span>{option.name}</span>
+                            <span className="block text-xs opacity-50">{organization?.name}</span>
+                          </Listbox.Option>
+                        )
+                      })}
+                    </Listbox>
+                  )}
+                  <Listbox id="severity" layout="vertical" label="Severity">
+                    {SEVERITY_OPTIONS.map((option: any) => {
                       return (
                         <Listbox.Option
-                          key={`option-${option.slug}`}
-                          label={option.name || ''}
-                          value={option.slug}
+                          key={`option-${option.value}`}
+                          label={option.label}
+                          value={option.value}
                         >
-                          <span>{option.name}</span>
+                          <span>{option.label}</span>
+                          <span className="block text-xs opacity-50">{option.description}</span>
                         </Listbox.Option>
                       )
                     })}
                   </Listbox>
+                </div>
+
+                {values.projectRef !== 'no-project' && subscription && isSuccessProjects ? (
+                  <p className="text-sm text-foreground-light mt-2">
+                    This project is on the{' '}
+                    <span className="text-foreground-light">{subscription.plan.name} plan</span>
+                  </p>
+                ) : isLoadingSubscription && selectedProjectRef !== 'no-project' ? (
+                  <div className="flex items-center space-x-2 mt-2">
+                    <IconLoader size={14} className="animate-spin" />
+                    <p className="text-sm text-foreground-light">Checking project's plan</p>
+                  </div>
+                ) : (
+                  <></>
                 )}
               </div>
             )}
 
-            {subscription?.plan.id === 'free' && (
+            {isSuccessProjects &&
+              values.projectRef === 'no-project' &&
+              values.category !== 'Login_issues' && (
+                <div className="px-6">
+                  {isLoadingOrganizations && (
+                    <div className="space-y-2">
+                      <p className="text-sm prose">Which organization is affected?</p>
+                      <ShimmeringLoader className="!py-[19px]" />
+                    </div>
+                  )}
+                  {isErrorOrganizations && (
+                    <div className="space-y-2">
+                      <p className="text-sm prose">Which organization is affected?</p>
+                      <div className="border rounded-md px-4 py-2 flex items-center space-x-2">
+                        <IconAlertCircle strokeWidth={2} className="text-foreground-light" />
+                        <p className="text-sm prose">Failed to retrieve organizations</p>
+                      </div>
+                    </div>
+                  )}
+                  {isSuccessOrganizations && (
+                    <Listbox
+                      id="organizationSlug"
+                      layout="vertical"
+                      label="Which organization is affected?"
+                    >
+                      {organizations?.map((option) => {
+                        return (
+                          <Listbox.Option
+                            key={`option-${option.slug}`}
+                            label={option.name || ''}
+                            value={option.slug}
+                          >
+                            <span>{option.name}</span>
+                          </Listbox.Option>
+                        )
+                      })}
+                    </Listbox>
+                  )}
+                </div>
+              )}
+
+            {subscription?.plan.id === 'free' && values.category !== 'Login_issues' && (
               <div className="px-6">
                 <InformationBox
                   icon={<IconAlertCircle strokeWidth={2} />}
@@ -407,20 +442,22 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                         Enhanced SLAs for support are available on our Enterprise Plan.
                       </p>
                       <div className="flex items-center space-x-2">
-                        <Link
-                          href={`/project/${values.projectRef}/settings/billing/subscription?panel=subscriptionPlan`}
-                        >
-                          <a>
-                            <Button>Upgrade project</Button>
-                          </a>
-                        </Link>
-                        <Link href="https://supabase.com/contact/enterprise">
-                          <a target="_blank" rel="noreferrer">
-                            <Button type="default" icon={<IconExternalLink size={14} />}>
-                              Enquire about Enterprise
-                            </Button>
-                          </a>
-                        </Link>
+                        <Button asChild>
+                          <Link
+                            href={`/org/${values.organizationSlug}/billing?panel=subscriptionPlan`}
+                          >
+                            Upgrade project
+                          </Link>
+                        </Button>
+                        <Button asChild type="default" icon={<IconExternalLink size={14} />}>
+                          <Link
+                            href="https://supabase.com/contact/enterprise"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Enquire about Enterprise
+                          </Link>
+                        </Button>
                       </div>
                     </div>
                   }
@@ -435,7 +472,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                 {['Performance'].includes(values.category) && isFreeProject ? (
                   <DisabledStateForFreeTier
                     category={selectedCategory?.label ?? ''}
-                    projectRef={values.projectRef}
+                    organizationSlug={selectedOrganizationSlug ?? ''}
                   />
                 ) : (
                   <>
@@ -452,15 +489,12 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                               <Link
                                 key="gh-discussions"
                                 href={`https://github.com/orgs/supabase/discussions?discussions_q=${values.subject}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="flex items-center space-x-2 text-foreground-light underline hover:text-foreground transition"
                               >
-                                <a
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="flex items-center space-x-2 text-scale-1000 underline hover:text-scale-1100 transition"
-                                >
-                                  Github discussions
-                                  <IconExternalLink size={14} strokeWidth={2} className="ml-1" />
-                                </a>
+                                Github discussions
+                                <IconExternalLink size={14} strokeWidth={2} className="ml-1" />
                               </Link>
                               <span> for a quick answer</span>
                             </p>
@@ -502,7 +536,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                     {selectedLibrary !== undefined && (
                       <div className="px-6 space-y-4 !mt-4">
                         <div className="space-y-2">
-                          <p className="text-sm text-scale-1100">
+                          <p className="text-sm text-foreground-light">
                             Found an issue or a bug? Try searching our Github issues or submit a new
                             one.
                           </p>
@@ -516,68 +550,74 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                             return (
                               <div
                                 key={library.name}
-                                className="w-[230px] min-w-[230px] min-h-[128px] rounded border border-scale-600 bg-scale-300 space-y-3 px-4 py-3"
+                                className="w-[230px] min-w-[230px] min-h-[128px] rounded border border-control bg-surface-100 space-y-3 px-4 py-3"
                               >
                                 <div className="space-y-1">
                                   <p className="text-sm">{library.name}</p>
-                                  <p className="text-sm text-scale-1100">
+                                  <p className="text-sm text-foreground-light">
                                     For issues regarding the {libraryLanguage} client library
                                   </p>
                                 </div>
                                 <div>
-                                  <Link href={library.url}>
-                                    <a target="_blank" rel="noreferrer">
-                                      <Button
-                                        type="default"
-                                        icon={<IconExternalLink size={14} strokeWidth={1.5} />}
-                                      >
-                                        View Github issues
-                                      </Button>
-                                    </a>
-                                  </Link>
+                                  <Button
+                                    asChild
+                                    type="default"
+                                    icon={<IconExternalLink size={14} strokeWidth={1.5} />}
+                                  >
+                                    <Link href={library.url} target="_blank" rel="noreferrer">
+                                      View Github issues
+                                    </Link>
+                                  </Button>
                                 </div>
                               </div>
                             )
                           })}
                           <div
                             className={[
-                              'px-4 py-3 rounded border border-scale-600 bg-scale-300',
+                              'px-4 py-3 rounded border border-control bg-surface-100',
                               'w-[230px] min-w-[230px] min-h-[128px] flex flex-col justify-between space-y-3',
                             ].join(' ')}
                           >
                             <div className="space-y-1">
                               <p className="text-sm">supabase</p>
-                              <p className="text-sm text-scale-1100">
+                              <p className="text-sm text-foreground-light">
                                 For any issues about our API
                               </p>
                             </div>
                             <div>
-                              <Link href="https://github.com/supabase/supabase">
-                                <a target="_blank" rel="noreferrer">
-                                  <Button
-                                    type="default"
-                                    icon={<IconExternalLink size={14} strokeWidth={1.5} />}
-                                  >
-                                    View Github issues
-                                  </Button>
-                                </a>
-                              </Link>
+                              <Button
+                                asChild
+                                type="default"
+                                icon={<IconExternalLink size={14} strokeWidth={1.5} />}
+                              >
+                                <Link
+                                  href="https://github.com/supabase/supabase"
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  View Github issues
+                                </Link>
+                              </Button>
                             </div>
                           </div>
                         </div>
                       </div>
                     )}
 
-                    <div className="px-6 space-y-2">
-                      <p className="text-sm text-scale-1100">Which services are affected?</p>
-                      <MultiSelect
-                        options={SERVICE_OPTIONS}
-                        value={selectedServices}
-                        placeholder="No particular service"
-                        searchPlaceholder="Search for a service"
-                        onChange={setSelectedServices}
-                      />
-                    </div>
+                    {values.category !== 'Login_issues' && (
+                      <div className="px-6 space-y-2">
+                        <p className="text-sm text-foreground-light">
+                          Which services are affected?
+                        </p>
+                        <MultiSelect
+                          options={SERVICE_OPTIONS}
+                          value={selectedServices}
+                          placeholder="No particular service"
+                          searchPlaceholder="Search for a service"
+                          onChange={setSelectedServices}
+                        />
+                      </div>
+                    )}
                     <div className="text-area-text-sm px-6">
                       <Input.TextArea
                         id="message"
@@ -600,8 +640,8 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                     )}
                     <div className="space-y-4 px-6">
                       <div className="space-y-1">
-                        <p className="block text-sm text-scale-1100">Attachments</p>
-                        <p className="block text-sm text-scale-1000">
+                        <p className="block text-sm text-foreground-light">Attachments</p>
+                        <p className="block text-sm text-foreground-light">
                           Upload up to {MAX_ATTACHMENTS} screenshots that might be relevant to the
                           issue that you're facing
                         </p>
@@ -638,7 +678,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                         {uploadedFiles.length < MAX_ATTACHMENTS && (
                           <div
                             className={[
-                              'border border-scale-800 opacity-50 transition hover:opacity-100',
+                              'border border-stronger opacity-50 transition hover:opacity-100',
                               'group flex h-14 w-14 cursor-pointer items-center justify-center rounded',
                             ].join(' ')}
                             onClick={() => {
@@ -652,11 +692,13 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                     </div>
                     <div className="px-6">
                       <div className="flex items-center space-x-1 justify-end block text-sm mt-0 mb-2">
-                        <p className="text-scale-1000">We will contact you at</p>
-                        <p className="text-scale-1200 font-medium">{respondToEmail}</p>
+                        <p className="text-foreground-light">We will contact you at</p>
+                        <p className="text-foreground font-medium">{respondToEmail}</p>
                       </div>
                       <div className="flex items-center space-x-1 justify-end block text-sm mt-0 mb-2">
-                        <p className="text-scale-1000">Please ensure you haven't blocked Hubspot in your emails</p>
+                        <p className="text-foreground-light">
+                          Please ensure you haven't blocked Hubspot in your emails
+                        </p>
                       </div>
                       <div className="flex justify-end">
                         <Button

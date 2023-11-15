@@ -111,7 +111,7 @@ export const CardDemo = ({ className, ...props }: CardProps) => {
           <BellRing />
           <div className="flex-1 space-y-1">
             <p className="text-sm font-medium leading-none">Push Notifications</p>
-            <p className="text-sm text-muted-foreground">Send notifications to device.</p>
+            <p className="text-sm text-foreground-muted">Send notifications to device.</p>
           </div>
           <Switch />
         </div>
@@ -124,7 +124,7 @@ export const CardDemo = ({ className, ...props }: CardProps) => {
               <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
               <div className="space-y-1">
                 <p className="text-sm font-medium leading-none">{notification.title}</p>
-                <p className="text-sm text-muted-foreground">{notification.description}</p>
+                <p className="text-sm text-foreground-muted">{notification.description}</p>
               </div>
             </div>
           ))}

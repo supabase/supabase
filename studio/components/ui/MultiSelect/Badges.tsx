@@ -22,7 +22,7 @@ export const BadgeSelected = ({
   <div
     className={[
       'text-typography-body-light dark:text-typography-body-dark',
-      'flex items-center space-x-2 rounded bg-gray-500',
+      'flex items-center space-x-2 rounded bg-surface-300',
       'py-0.5 px-2 text-sm',
     ].join(' ')}
     onClick={(e: any) => e.preventDefault()}
@@ -33,6 +33,7 @@ export const BadgeSelected = ({
       className="cursor-pointer opacity-50 transition hover:opacity-100"
       onClick={(e: any) => {
         e.preventDefault()
+        e.stopPropagation()
         handleRemove()
       }}
     />

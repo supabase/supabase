@@ -7,12 +7,37 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/storage-caching',
-    destination: '/docs/guides/storage/cdn',
+    destination: '/docs/guides/storage/cdn/fundamentals',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/cdn',
+    destination: '/docs/guides/storage/cdn/fundamentals',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/uploads',
+    destination: '/docs/guides/storage/uploads/standard-uploads',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/image-transformations',
+    destination: '/docs/guides/storage/serving/image-transformations',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/access-control',
+    destination: 'docs/guides/storage/security/access-control',
   },
   {
     permanent: true,
     source: '/database/Database',
     destination: '/database',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/column-encryption',
+    destination: '/docs/guides/database/extensions/pgsodium',
   },
   {
     permanent: true,
@@ -737,11 +762,6 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/blog/2021/02/09/case-study-roboflow',
-    destination: '/customers/roboflow',
-  },
-  {
-    permanent: true,
     source: '/blog/2021/02/27/cracking-postgres-interview',
     destination: '/blog/cracking-postgres-interview',
   },
@@ -1170,37 +1190,47 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-branch-list',
-    destination: '/docs/reference/supabase-db',
+    destination: '/docs/reference/supabase-branches-list',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-branch-create',
-    destination: '/docs/reference/supabase-db',
+    destination: '/docs/reference/supabase-branches-create',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-branch-delete',
-    destination: '/docs/reference/supabase-db',
+    destination: '/docs/reference/supabase-branches-delete',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-switch',
-    destination: '/docs/reference/supabase-db',
+    destination: '/docs/reference/supabase-branches-create',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-changes',
-    destination: '/docs/reference/supabase-db',
+    destination: '/docs/reference/supabase-db-diff',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-commit',
-    destination: '/docs/reference/supabase-db',
+    destination: '/docs/reference/supabase-db-pull',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-remote-set',
-    destination: '/docs/reference/supabase-db',
+    destination: '/docs/reference/supabase-link',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/cli/supabase-db-remote-changes',
+    destination: '/docs/reference/supabase-db-diff',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/cli/supabase-db-remote-commit',
+    destination: '/docs/reference/supabase-db-pull',
   },
 
   {
@@ -1705,7 +1735,12 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/with-expo',
-    destination: '/docs/guides/getting-started/tutorials/with-expo',
+    destination: '/docs/guides/getting-started/tutorials/with-expo-react-native',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/tutorials/with-expo',
+    destination: '/docs/guides/getting-started/tutorials/with-expo-react-native',
   },
   {
     permanent: true,
@@ -1849,6 +1884,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/supasquad',
+    destination: '/open-source/contributing/supasquad',
+  },
+  {
+    permanent: true,
     source: '/contact/enterprise',
     destination: 'https://forms.supabase.com/enterprise',
   },
@@ -1945,11 +1985,6 @@ module.exports = [
     permanent: true,
     source: '/blog/case-study-xendit',
     destination: '/customers/xendit',
-  },
-  {
-    permanent: true,
-    source: '/blog/case-study-roboflow',
-    destination: '/customers',
   },
   {
     permanent: true,
@@ -2258,4 +2293,54 @@ module.exports = [
     destination: '/docs/guides/platform/oauth-apps/build-a-supabase-integration',
   },
   { permanent: true, source: '/docs/reference/cli/config', destination: '/docs/guides/cli/config' },
+  {
+    permanent: true,
+    source: '/docs/guides/database/timeouts',
+    destination: '/docs/guides/database/postgres/configuration',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/managing-timezones',
+    destination: '/docs/guides/database/postgres/configuration',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/managing-passwords',
+    destination: '/docs/guides/database/postgres/roles#passwords',
+  },
+  {
+    permanent: true,
+    source: '/blog/pgvector-v0-5-0-hnsw',
+    destination: '/blog/increase-performance-pgvector-hnsw',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/ai/managing-indexes',
+    destination: '/docs/guides/ai/vector-indexes',
+  },
+  {
+    permanent: true,
+    source: '/blog/supabase-ai-content-storm',
+    destination: 'https://dev.to/supabase/ai-ignites-the-rain-content-storm-is-back-kdl',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/functions/global-deployments',
+    destination: '/docs/guides/functions/regional-invocation',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/functions/typescript-support',
+    destination: '/docs/guides/functions',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/functions/troubleshooting',
+    destination: '/docs/guides/functions/debugging',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-magic-link',
+    destination: '/docs/guides/auth/passwordless-login/auth-magic-link',
+  },
 ]

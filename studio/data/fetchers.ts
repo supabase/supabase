@@ -1,5 +1,5 @@
-import { API_URL } from 'lib/constants'
-import { auth } from 'lib/gotrue'
+import { API_URL, IS_PLATFORM } from 'lib/constants'
+import { getAccessToken } from 'lib/gotrue'
 import { uuidv4 } from 'lib/helpers'
 import createClient from 'openapi-fetch'
 import { paths } from './api' // generated from openapi-typescript
@@ -27,17 +27,6 @@ const {
   headers: DEFAULT_HEADERS,
 })
 
-export async function getAccessToken() {
-  // ignore if server-side
-  if (typeof window === 'undefined') return undefined
-
-  const {
-    data: { session },
-  } = await auth.getSession()
-
-  return session?.access_token
-}
-
 export async function constructHeaders(headersInit?: HeadersInit | undefined) {
   const requestId = uuidv4()
   const headers = new Headers(headersInit)
@@ -55,6 +44,12 @@ export async function constructHeaders(headersInit?: HeadersInit | undefined) {
 export const get: typeof _get = async (url, init) => {
   const headers = await constructHeaders(init?.headers)
 
+  // on self-hosted, we don't have a /platform prefix
+  if (!IS_PLATFORM && url.startsWith('/platform')) {
+    // @ts-ignore
+    url = url.replace('/platform', '')
+  }
+
   return await _get(url, {
     ...init,
     headers,
@@ -63,6 +58,12 @@ export const get: typeof _get = async (url, init) => {
 
 export const post: typeof _post = async (url, init) => {
   const headers = await constructHeaders(init?.headers)
+
+  // on self-hosted, we don't have a /platform prefix
+  if (!IS_PLATFORM && url.startsWith('/platform')) {
+    // @ts-ignore
+    url = url.replace('/platform', '')
+  }
 
   return await _post(url, {
     ...init,
@@ -73,6 +74,12 @@ export const post: typeof _post = async (url, init) => {
 export const put: typeof _put = async (url, init) => {
   const headers = await constructHeaders(init?.headers)
 
+  // on self-hosted, we don't have a /platform prefix
+  if (!IS_PLATFORM && url.startsWith('/platform')) {
+    // @ts-ignore
+    url = url.replace('/platform', '')
+  }
+
   return await _put(url, {
     ...init,
     headers,
@@ -81,6 +88,12 @@ export const put: typeof _put = async (url, init) => {
 
 export const patch: typeof _patch = async (url, init) => {
   const headers = await constructHeaders(init?.headers)
+
+  // on self-hosted, we don't have a /platform prefix
+  if (!IS_PLATFORM && url.startsWith('/platform')) {
+    // @ts-ignore
+    url = url.replace('/platform', '')
+  }
 
   return await _patch(url, {
     ...init,
@@ -91,6 +104,12 @@ export const patch: typeof _patch = async (url, init) => {
 export const del: typeof _del = async (url, init) => {
   const headers = await constructHeaders(init?.headers)
 
+  // on self-hosted, we don't have a /platform prefix
+  if (!IS_PLATFORM && url.startsWith('/platform')) {
+    // @ts-ignore
+    url = url.replace('/platform', '')
+  }
+
   return await _del(url, {
     ...init,
     headers,
@@ -99,6 +118,12 @@ export const del: typeof _del = async (url, init) => {
 
 export const head: typeof _head = async (url, init) => {
   const headers = await constructHeaders(init?.headers)
+
+  // on self-hosted, we don't have a /platform prefix
+  if (!IS_PLATFORM && url.startsWith('/platform')) {
+    // @ts-ignore
+    url = url.replace('/platform', '')
+  }
 
   return await _head(url, {
     ...init,

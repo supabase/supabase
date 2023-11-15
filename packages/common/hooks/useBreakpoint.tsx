@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useWindowSize } from 'react-use'
-
-export const isBrowser = typeof window !== 'undefined'
+import { isBrowser } from '../helpers'
 
 export function useBreakpoint(breakpoint = 768) {
   if (!isBrowser) return

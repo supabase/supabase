@@ -4,7 +4,6 @@ import remarkGfm from 'remark-gfm'
 import rehypeSlug from 'rehype-slug'
 import { remarkCodeHike } from '@code-hike/mdx'
 
-import withTM from 'next-transpile-modules'
 import withYaml from 'next-plugin-yaml'
 import configureBundleAnalyzer from '@next/bundle-analyzer'
 
@@ -13,13 +12,6 @@ import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 const withBundleAnalyzer = configureBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 })
-
-/**
- * Rewrites and redirects are handled by
- * apps/www nextjs config
- *
- * Do not add them in this config
- */
 
 const withMDX = nextMdx({
   extension: /\.mdx?$/,
@@ -42,6 +34,20 @@ const withMDX = nextMdx({
 
 /** @type {import('next').NextConfig} nextConfig */
 const nextConfig = {
+  outputFileTracing: true,
+  experimental: {
+    // Storybook 7.5 upgrade seems to causes dev deps to be included in build output, removing it here
+    outputFileTracingExcludes: {
+      '*': [
+        './node_modules/@swc/core-linux-x64-gnu',
+        './node_modules/@swc/core-linux-x64-musl',
+        './node_modules/esbuild/**/*',
+        './node_modules/webpack/**/*',
+        './node_modules/rollup/**/*',
+      ],
+    },
+  },
+
   // Append the default value with md extensions
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
   // reactStrictMode: true,
@@ -52,6 +58,7 @@ const nextConfig = {
     domains: [
       'avatars.githubusercontent.com',
       'github.com',
+      'supabase.github.io',
       'user-images.githubusercontent.com',
       'raw.githubusercontent.com',
       'weweb-changelog.ghost.io',
@@ -60,15 +67,14 @@ const nextConfig = {
       'obuldanrptloktxcffvn.supabase.co',
     ],
   },
-  experimental: {
-    // TODO: @next/mdx ^13.0.2 only supports experimental mdxRs flag. next ^13.0.2 will stop warning about this being unsupported.
-    // mdxRs: true,
-    modularizeImports: {
-      lodash: {
-        transform: 'lodash/{{member}}',
-      },
+  // TODO: @next/mdx ^13.0.2 only supports experimental mdxRs flag. next ^13.0.2 will stop warning about this being unsupported.
+  // mdxRs: true,
+  modularizeImports: {
+    lodash: {
+      transform: 'lodash/{{member}}',
     },
   },
+  transpilePackages: ['ui', 'common', 'mermaid', 'mdx-mermaid', 'dayjs', 'shared-data'],
   async headers() {
     return [
       {
@@ -90,11 +96,38 @@ const nextConfig = {
       },
     ]
   },
+
+  /**
+   * Doc rewrites and redirects are
+   * handled by the `www` nextjs config:
+   *
+   * ./apps/www/lib/redirects.js
+   *
+   * Only add dev/preview specific redirects
+   * in this config.
+   */
   async redirects() {
     return [
+      // Redirect root to docs base path in dev/preview envs
       {
         source: '/',
         destination: '/docs',
+        basePath: false,
+        permanent: false,
+      },
+
+      // Redirect dashboard links in dev/preview envs
+      {
+        source: '/dashboard/:path*',
+        destination: 'https://supabase.com/dashboard/:path*',
+        basePath: false,
+        permanent: false,
+      },
+
+      // Redirect blog links in dev/preview envs
+      {
+        source: '/blog/:path*',
+        destination: 'https://supabase.com/blog/:path*',
         basePath: false,
         permanent: false,
       },
@@ -103,20 +136,8 @@ const nextConfig = {
 }
 
 const configExport = () => {
-  const plugins = [
-    withTM([
-      'ui',
-      'common',
-      '@supabase/auth-helpers-nextjs',
-      'mermaid',
-      'mdx-mermaid',
-      'dayjs',
-      'shared-data',
-    ]),
-    withMDX,
-    withYaml,
-    withBundleAnalyzer,
-  ]
+  const plugins = [withMDX, withYaml, withBundleAnalyzer]
+  // @ts-ignore
   return plugins.reduce((acc, next) => next(acc), nextConfig)
 }
 

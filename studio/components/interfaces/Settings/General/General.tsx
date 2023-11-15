@@ -35,10 +35,13 @@ const General = () => {
   const parentProject = useProjectByRef(project?.parent_project_ref)
   const isBranch = parentProject !== undefined
 
-  const isOrgBilling = !!organization?.subscription_id
   const formId = 'project-general-settings'
   const initialValues = { name: project?.name ?? '', ref: project?.ref ?? '' }
-  const canUpdateProject = useCheckPermissions(PermissionAction.UPDATE, 'projects')
+  const canUpdateProject = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: {
+      project_id: project?.id,
+    },
+  })
   const { mutateAsync: updateProject, isLoading: isUpdating } = useProjectUpdateMutation()
 
   const onSubmit = async (values: any, { resetForm }: any) => {
@@ -63,8 +66,11 @@ const General = () => {
           <AlertDescription_Shadcn_>
             Certain settings are not available while you're on a preview branch. To adjust your
             project settings, you may return to your{' '}
-            <Link passHref href={`/project/${parentProject.ref}/settings/general`}>
-              <a className="text-brand-900">main branch</a>
+            <Link
+              href={`/project/${parentProject.ref}/settings/general`}
+              className="text-brand-900"
+            >
+              main branch
             </Link>
             .
           </AlertDescription_Shadcn_>
@@ -112,31 +118,34 @@ const General = () => {
           }}
         </Form>
       )}
-      {!isBranch && isOrgBilling && (
+      {!isBranch && (
         <>
-          <div className="mt-6">
+          <div className="mt-6" id="restart-project">
             <FormPanel>
               <div className="flex w-full items-center justify-between px-8 py-4">
                 <div>
                   <p className="text-sm">Restart project</p>
                   <div className="max-w-[420px]">
-                    <p className="text-sm text-scale-1100">
+                    <p className="text-sm text-foreground-light">
                       Your project will not be available for a few minutes.
                     </p>
                   </div>
                 </div>
-                {project && <RestartServerButton />}
+                <RestartServerButton />
               </div>
-              <div className="flex w-full items-center justify-between px-8 py-4">
+              <div
+                className="flex w-full items-center justify-between px-8 py-4"
+                id="pause-project"
+              >
                 <div>
                   <p className="text-sm">Pause project</p>
                   <div className="max-w-[420px]">
-                    <p className="text-sm text-scale-1100">
+                    <p className="text-sm text-foreground-light">
                       Your project will not be accessible while it is paused.
                     </p>
                   </div>
                 </div>
-                {project && <PauseProjectButton />}
+                <PauseProjectButton />
               </div>
             </FormPanel>
           </div>
@@ -148,16 +157,18 @@ const General = () => {
                     <IconBarChart2 strokeWidth={2} />
                     <div>
                       <p className="text-sm">Project usage statistics has been moved</p>
-                      <p className="text-scale-1000 text-sm">
+                      <p className="text-foreground-light text-sm">
                         You may view your project's usage under your organization's settings
                       </p>
                     </div>
                   </div>
-                  <Link href={`/org/${organization.slug}/usage?projectRef=${project?.ref}`}>
-                    <a>
-                      <Button type="default">View project usage</Button>
-                    </a>
-                  </Link>
+                  <div>
+                    <Button asChild type="default">
+                      <Link href={`/org/${organization?.slug}/usage?projectRef=${project?.ref}`}>
+                        View project usage
+                      </Link>
+                    </Button>
+                  </div>
                 </div>
               </Panel.Content>
             </Panel>

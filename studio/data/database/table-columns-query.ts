@@ -10,8 +10,19 @@ export type TableColumn = {
   columns: any[]
 }
 
-export const getTableColumnsQuery = () => {
+export const getTableColumnsQuery = (table?: string, schema?: string) => {
+  const conditions = []
+  if (table) {
+    conditions.push(`tablename = '${table}'`)
+  }
+  if (schema) {
+    conditions.push(`schemaname = '${schema}'`)
+  }
+
+  const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+
   const sql = /* SQL */ `
+  
   SELECT
     tbl.schemaname,
     tbl.tablename,
@@ -67,6 +78,7 @@ export const getTableColumnsQuery = () => {
       AND NOT a.attisdropped
       AND has_column_privilege(tbl.quoted_name, a.attname, 'SELECT, INSERT, UPDATE, REFERENCES')
     )
+  ${whereClause}
   GROUP BY schemaname, tablename, quoted_name, is_table;
 `.trim()
 
@@ -76,37 +88,24 @@ export const getTableColumnsQuery = () => {
 export type TableColumnsVariables = {
   projectRef?: string
   connectionString?: string
+  table?: string
+  schema?: string
 }
 
 export type TableColumnsData = { result: TableColumn[] }
 export type TableColumnsError = unknown
 
 export const useTableColumnsQuery = <TData extends TableColumnsData = TableColumnsData>(
-  { projectRef, connectionString }: TableColumnsVariables,
+  { projectRef, connectionString, table, schema }: TableColumnsVariables,
   options: UseQueryOptions<ExecuteSqlData, TableColumnsError, TData> = {}
 ) => {
   return useExecuteSqlQuery(
     {
       projectRef,
       connectionString,
-      sql: getTableColumnsQuery(),
-      queryKey: ['table-columns'],
+      sql: getTableColumnsQuery(table, schema),
+      queryKey: ['table-columns', schema, table],
     },
     options
-  )
-}
-
-export const useTableColumnsPrefetch = () => {
-  const prefetch = useExecuteSqlPrefetch()
-
-  return useCallback(
-    ({ projectRef, connectionString }: TableColumnsVariables) =>
-      prefetch({
-        projectRef,
-        connectionString,
-        sql: getTableColumnsQuery(),
-        queryKey: ['table-columns'],
-      }),
-    [prefetch]
   )
 }

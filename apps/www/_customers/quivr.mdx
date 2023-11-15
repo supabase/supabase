@@ -1,0 +1,78 @@
+---
+name: Quivr
+title: Quivr launch 5,000 Vector databases on Supabase.
+# Use meta_title to add a custom meta title. Otherwise it defaults to '{name} | Supabase Customer Stories':
+meta_title: Quivr launch 5,000 Vector databases on Supabase.
+description: Learn how one of the most popular Generative AI projects uses Supabase as their Vector Store.
+# Use meta_description to add a custom meta description. Otherwise it defaults to {description}:
+meta_description: Learn how one of the most popular Generative AI projects uses Supabase as their Vector Store.
+author: rory_wilding
+author_title: Supabase
+author_url: https://github.com/kiwicopple
+author_image_url: https://avatars2.githubusercontent.com/u/10214025?s=400&u=c6775be2ae667e2acae3ccd347fed62bb3f5b3e7&v=4
+authorURL: https://github.com/kiwicopple
+logo: /images/customers/logos/quivr.png
+logo_inverse: /images/customers/logos/light/quivr.png
+og_image: /images/customers/og/quivr.jpg
+tags:
+  - supabase
+date: '2023-09-05'
+company_url: https://quivr.app
+stats: []
+misc:
+  [
+    { label: 'Use case', text: 'Generative AI' },
+    { label: 'Solutions', text: 'Supabase Vector, Supabase Auth' },
+  ]
+about: "Quivr is an open source 'second brain'. It's like a private ChatGPT, personalized with your own data: you upload your documents and you can then search and ask questions using generative AI."
+---
+
+## The challenge: Building a second brain
+
+In May of 2023, [Stan Girard's](https://twitter.com/_StanGirard) started building small prototypes that allowed him to “chat with documents”. After 2 weeks of research, he settled on an idea - build a “second brain” where a user could dump all their digital knowledge (audio, URLs, text, and code) into a vector store and query it with GPT4.
+
+He built the first version in a single afternoon, pushed it to GitHub, and then [tweeted about it](https://twitter.com/_StanGirard/status/1657021618571313155?s=20). One viral tweet later, and [Quivr](https://github.com/StanGirard/quivr) was born.
+
+## Choosing a vector database
+
+A critical piece of the tech stack was the vector store. Stan needed a place to store millions of embeddings. After comparing between Supabase, Pinecone, and Chroma, he settled on [Supabase Vector](https://supabase.com/vector), our open source vector offering for developing AI applications. The decision was driven largely by his familiarity with Postgres, and the tight integration with Vercel.
+
+<Quote img="stan-girard-avatar.jpeg" caption="Stan Girard, Founder of Quivr.">
+  <p>
+    Supabase Vector powered by pgvector allowed us to create a simple and efficient product. We are
+    storing over 1.6 million embeddings and the performance and results are great. Open source
+    develop can easily contribute thanks to the SQL syntax known by millions of developers.
+  </p>
+</Quote>
+
+## Building an open source community
+
+It didn't take long for the Quivr community to grow. After the viral launch, the [Quivr repo](https://github.com/StanGirard/quivr) stayed at number 1 on [GitHub Trending](https://github.com/trending) for 4 days. Today, it has over 22,000 GitHub stars and 67 contributors. Supabase has been a key part of the open source stack since the beginning.
+
+<Quote img="stan-girard-avatar.jpeg" caption="Stan Girard, Founder of Quivr.">
+  <p>
+    Because Supabase is open source, the possibility of running it locally made it a better choice
+    compared with other products like Auth0. Since Auth is integrated with the Vector database it
+    made Quivr much simpler. Features like Storage and Edge Functions allowed us to expand Quivr's
+    functionality while keeping the project simple.
+  </p>
+</Quote>
+
+## Launching 5000 databases
+
+One of the most pivotal growth events was getting picked up by [an influential YouTuber](https://www.youtube.com/watch?v=rFEbz93G9U8). His 11-minute overview of Quivr launched over 2000 Quivr projects on Supabase in one week. There are now 5,100 Quivr databases on Supabase, making it one of the most influential communities on the Supabase platform.
+
+## Launching a hosted product
+
+Stan also launched a [hosted version of Quivr](https://www.quivr.app/), for users to sign up and get started immediately, without requiring any self-hosting infrastructure. Quivr's open source success has translated through their hosted platform, with 17,000 signups in just over 2 months, with 200 new users joining every day. The hosted database provides embedding storage for 1.6 million vectors and similarity search for over 100,000 files.
+
+With 500 daily active users, the [Quivr.app](http://Quivr.app) is becoming the preferred way for users to create a second brain.
+
+## Tech Stack
+
+- Backend: Fast API + Langchain, hosted on AWS Fargate
+- Frontend: Next.js, hosted on Vercel
+- Database: Supabase Vector, using pgvector
+- LLM: OpenAI, Anthropic, Nomic
+- Semantic search using GPT For ALL, Anthropic, and OpenAI
+- Auth: Supabase Auth

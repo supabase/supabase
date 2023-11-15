@@ -1,4 +1,6 @@
+import clsx from 'clsx'
 import { DataPoint } from 'data/analytics/constants'
+import dayjs from 'dayjs'
 import {
   Bar,
   CartesianGrid,
@@ -9,9 +11,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import dayjs from 'dayjs'
-import clsx from 'clsx'
-import { COLOR_MAP, Attribute } from './Usage.constants'
+import { Attribute, COLOR_MAP } from './Usage.constants'
 import { MultiAttributeTooltipContent, SingleAttributeTooltipContent } from './UsageChartTooltips'
 
 // [Joshen] This BarChart is specifically for usage, hence not a reusable component, and not
@@ -45,7 +45,11 @@ const UsageBarChart = ({
     <div className="w-full h-[200px]">
       <ResponsiveContainer width="100%" height={200}>
         <ComposedChart data={data} margin={{ top: 0, right: 0, left: yLeftMargin, bottom: 0 }}>
-          <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-scale-800" />
+          <CartesianGrid
+            vertical={false}
+            strokeDasharray="3 3"
+            className="stroke-border-stronger"
+          />
           <XAxis dataKey="periodStartFormatted" />
           <YAxis
             width={40}
@@ -63,7 +67,7 @@ const UsageBarChart = ({
                 return (
                   <div
                     className={clsx(
-                      'border bg-scale-300 rounded-md px-2 py-2',
+                      'border bg-surface-100 rounded-md px-2 py-2',
                       attributes.length > 1 && !isAfterToday ? 'w-[250px]' : 'w-[170px]'
                     )}
                   >
@@ -83,7 +87,7 @@ const UsageBarChart = ({
                         isAfterToday={isAfterToday}
                       />
                     )}
-                    <p className="text-xs text-scale-1100 mt-1">
+                    <p className="text-xs text-foreground-light mt-1">
                       {dataPeriod.format('DD MMM YYYY')}
                     </p>
                   </div>

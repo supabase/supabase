@@ -3,6 +3,7 @@ import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { organizationKeys } from './keys'
+import { ResponseError } from 'types'
 
 export type OrganizationPaymentMethodsVariables = { slug?: string }
 export type OrganizationPaymentMethod = {
@@ -31,7 +32,7 @@ export type OrganizationPaymentMethod = {
   }
 }
 
-export async function getOrganizations(
+export async function getOrganizationPaymentMethods(
   { slug }: OrganizationPaymentMethodsVariables,
   signal?: AbortSignal
 ) {
@@ -43,8 +44,10 @@ export async function getOrganizations(
   return response.data as OrganizationPaymentMethod[]
 }
 
-export type OrganizationPaymentMethodsData = Awaited<ReturnType<typeof getOrganizations>>
-export type OrganizationPaymentMethodsError = unknown
+export type OrganizationPaymentMethodsData = Awaited<
+  ReturnType<typeof getOrganizationPaymentMethods>
+>
+export type OrganizationPaymentMethodsError = ResponseError
 
 export const useOrganizationPaymentMethodsQuery = <TData = OrganizationPaymentMethodsData>(
   { slug }: OrganizationPaymentMethodsVariables,
@@ -55,20 +58,6 @@ export const useOrganizationPaymentMethodsQuery = <TData = OrganizationPaymentMe
 ) =>
   useQuery<OrganizationPaymentMethodsData, OrganizationPaymentMethodsError, TData>(
     organizationKeys.paymentMethods(slug),
-    ({ signal }) => getOrganizations({ slug }, signal),
+    ({ signal }) => getOrganizationPaymentMethods({ slug }, signal),
     { enabled: enabled, ...options }
   )
-
-export const useOrganizationPaymentMethodsPrefetch = ({
-  slug,
-}: OrganizationPaymentMethodsVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(
-    () =>
-      client.prefetchQuery(organizationKeys.paymentMethods(slug), ({ signal }) =>
-        getOrganizations({ slug }, signal)
-      ),
-    []
-  )
-}

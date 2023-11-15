@@ -4,14 +4,13 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { Button, Input } from 'ui'
 
-import { CANCELLATION_REASONS } from 'components/interfaces/BillingV2/Billing.constants'
+import { CANCELLATION_REASONS } from 'components/interfaces/Billing/Billing.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send'
 import { useProjectDeleteMutation } from 'data/projects/project-delete-mutation'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { useCheckPermissions, useStore } from 'hooks'
-import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 export interface DeleteProjectButtonProps {
   type?: 'danger' | 'default'
@@ -21,9 +20,10 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
   const router = useRouter()
   const { ui } = useStore()
   const { project } = useProjectContext()
+  const organization = useSelectedOrganization()
 
   const projectRef = project?.ref
-  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const projectPlan = subscription?.plan?.id ?? 'free'
   const isFree = projectPlan === 'free'
 
@@ -42,7 +42,11 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
     }
   }, [isOpen])
 
-  const canDeleteProject = useCheckPermissions(PermissionAction.UPDATE, 'projects')
+  const canDeleteProject = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: {
+      project_id: project?.id,
+    },
+  })
 
   const toggle = () => {
     if (isSubmitting) return
@@ -101,11 +105,11 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
               <Tooltip.Arrow className="radix-tooltip-arrow" />
               <div
                 className={[
-                  'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                  'border border-scale-200 ', //border
+                  'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                  'border border-background', //border
                 ].join(' ')}
               >
-                <span className="text-xs text-scale-1200">
+                <span className="text-xs text-foreground">
                   You need additional permissions to delete this project
                 </span>
               </div>
@@ -143,7 +147,7 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
           <>
             <div className="space-y-1">
               <h4 className="text-base">We're sad that you're leaving.</h4>
-              <p className="text-sm text-scale-1100">
+              <p className="text-sm text-foreground-light">
                 We always strive to improve Supabase as much as we can. Please let us know the
                 reasons you are deleting your project so that we can improve in the future.
               </p>
@@ -160,8 +164,8 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
                         'pl-2 pr-3 text-center text-sm shadow-sm transition-all duration-100',
                         `${
                           active
-                            ? ` bg-scale-1200 text-scale-100 opacity-100 hover:bg-opacity-75`
-                            : ` bg-scale-700 text-scale-1200 opacity-25 hover:opacity-50`
+                            ? ` bg-foreground text-background opacity-100 hover:bg-opacity-75`
+                            : ` bg-border-strong text-foreground opacity-25 hover:opacity-50`
                         }`,
                       ].join(' ')}
                     >

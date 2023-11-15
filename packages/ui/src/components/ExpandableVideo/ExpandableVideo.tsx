@@ -89,7 +89,7 @@ export function ExpandableVideo({
           <div className="relative w-full">
             <button
               onClick={() => setExpandVideo(false)}
-              className="text-scale-1100 hover:text-scale-1200 absolute -top-8 right-0"
+              className="text-foreground-light hover:text-foreground absolute -top-8 right-0"
             >
               <p className="text-xs">Close</p>
             </button>
@@ -108,7 +108,7 @@ export function ExpandableVideo({
           if (onOpenCallback) onOpenCallback()
           setExpandVideo(true)
         }}
-        className={[triggerContainerClassName].join(' ')}
+        className={['w-full', triggerContainerClassName].join(' ').trim()}
       >
         {trigger ?? <CliccablePreview />}
       </button>

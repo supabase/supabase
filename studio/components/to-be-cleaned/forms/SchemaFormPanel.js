@@ -1,6 +1,5 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Button } from 'ui'
-import * as Tooltip from '@radix-ui/react-tooltip'
 import SchemaForm from './SchemaForm'
 
 export default function SchemaFormPanel({
@@ -21,6 +20,7 @@ export default function SchemaFormPanel({
   let formRef
   const [submitButtonLoading, setSubmitButtonLoading] = useState(false)
   const [hasChanged, setHasChanged] = useState(false)
+  const isLoading = loading !== undefined ? loading : submitButtonLoading
 
   function onClickCancel() {
     formRef.reset()
@@ -46,27 +46,28 @@ export default function SchemaFormPanel({
         className="
           flex h-12
           items-center overflow-hidden
-          border-b border-panel-border-light bg-panel-header-light
-          px-6 dark:border-panel-border-dark dark:bg-panel-header-dark"
+          border-b px-6
+          border-overlay bg-surface-100
+          "
       >
         <div className="flex-1 text-left">
           <h6>{title || ''}</h6>
         </div>
         {disabled && disabledMessage ? (
-          <p className="text-sm text-scale-1000">{disabledMessage}</p>
+          <p className="text-sm text-foreground-light">{disabledMessage}</p>
         ) : (
           <div
             className={`flex transition duration-150 ${
               hasChanged ? 'opacity-100' : 'cursor-default opacity-0'
             }`}
           >
-            <Button onClick={onClickCancel} type="default" disabled={!hasChanged}>
+            <Button onClick={onClickCancel} type="default" disabled={!hasChanged || isLoading}>
               {cancelLabel || 'Cancel'}
             </Button>
             <Button
               onClick={onClickSubmit}
-              loading={loading !== undefined ? loading : submitButtonLoading}
-              disabled={disabled || !hasChanged}
+              loading={isLoading}
+              disabled={disabled || !hasChanged || isLoading}
               type="primary"
               className="ml-2 hover:border-green-500"
             >
@@ -74,7 +75,7 @@ export default function SchemaFormPanel({
             </Button>
           </div>
         )}
-        <span className="text-sm text-scale-900">{message}</span>
+        <span className="text-sm text-foreground-lighter">{message}</span>
       </div>
 
       <div className="Form section-block--body px-6 py-3">

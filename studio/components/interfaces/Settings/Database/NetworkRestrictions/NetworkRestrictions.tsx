@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { Button, IconAlertCircle, IconExternalLink, IconGlobe, IconLock } from 'ui'
 
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormHeader, FormPanel } from 'components/ui/Forms'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -33,11 +34,11 @@ const AllowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
           <Tooltip.Arrow className="radix-tooltip-arrow" />
           <div
             className={[
-              'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-              'border border-scale-200 w-[250px]',
+              'rounded bg-alternative py-1 px-2 leading-none shadow',
+              'border border-background w-[250px]',
             ].join(' ')}
           >
-            <span className="text-xs text-scale-1200">
+            <span className="text-xs text-foreground">
               You need additional permissions to update network restrictions
             </span>
           </div>
@@ -60,11 +61,11 @@ const DisallowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
           <Tooltip.Arrow className="radix-tooltip-arrow" />
           <div
             className={[
-              'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-              'border border-scale-200 w-[250px]',
+              'rounded bg-alternative py-1 px-2 leading-none shadow',
+              'border border-background w-[250px]',
             ].join(' ')}
           >
-            <span className="text-xs text-scale-1200">
+            <span className="text-xs text-foreground">
               You need additional permissions to update network restrictions
             </span>
           </div>
@@ -76,14 +77,18 @@ const DisallowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
 
 const NetworkRestrictions = ({}) => {
   const { ref } = useParams()
-
+  const { project } = useProjectContext()
   const [isAddingAddress, setIsAddingAddress] = useState(false)
   const [isAllowingAll, setIsAllowingAll] = useState(false)
   const [isDisallowingAll, setIsDisallowingAll] = useState(false)
   const [selectedRestrictionToRemove, setSelectedRestrictionToRemove] = useState<string>()
   const { data, isLoading } = useNetworkRestrictionsQuery({ projectRef: ref })
 
-  const canUpdateNetworkRestrictions = useCheckPermissions(PermissionAction.UPDATE, 'projects')
+  const canUpdateNetworkRestrictions = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: {
+      project_id: project?.id,
+    },
+  })
 
   const hasAccessToRestrictions = data?.entitlement === 'allowed'
   const restrictedIps = data?.config?.dbAllowedCidrs ?? []
@@ -98,20 +103,22 @@ const NetworkRestrictions = ({}) => {
 
   return (
     <>
-      <section>
+      <section id="network-restrictions">
         <div className="flex items-center justify-between">
           <FormHeader
             title="Network Restrictions"
             description="Allow specific IP ranges to have access to your database."
           />
           <div className="flex items-center space-x-2 mb-6">
-            <Link href="https://supabase.com/docs/guides/platform/network-restrictions">
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" icon={<IconExternalLink />}>
-                  Documentation
-                </Button>
-              </a>
-            </Link>
+            <Button asChild type="default" icon={<IconExternalLink />}>
+              <Link
+                href="https://supabase.com/docs/guides/platform/network-restrictions"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Documentation
+              </Link>
+            </Button>
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger>
                 <Button
@@ -127,11 +134,11 @@ const NetworkRestrictions = ({}) => {
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                        'border border-scale-200 w-[250px]',
+                        'rounded bg-alternative py-1 px-2 leading-none shadow',
+                        'border border-background w-[250px]',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text-foreground">
                         You need additional permissions to update network restrictions
                       </span>
                     </div>
@@ -157,10 +164,10 @@ const NetworkRestrictions = ({}) => {
               <div className="flex items-center justify-between">
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2">
-                    <IconAlertCircle strokeWidth={1.5} className="text-scale-1000" />
+                    <IconAlertCircle strokeWidth={1.5} className="text-foreground-light" />
                     <p className="text-sm">Your network restrictions were not applied correctly</p>
                   </div>
-                  <p className="text-sm text-scale-1000">
+                  <p className="text-sm text-foreground-light">
                     Please try to add your network restrictions again
                   </p>
                 </div>
@@ -183,10 +190,10 @@ const NetworkRestrictions = ({}) => {
               <div className="px-8 py-8 flex items-center justify-between">
                 <div className="flex items-start space-x-4">
                   <div className="space-y-1">
-                    <p className="text-scale-1100 text-sm">
+                    <p className="text-foreground-light text-sm">
                       Your database can be accessed by all IP addresses
                     </p>
-                    <p className="text-scale-1000 text-sm">
+                    <p className="text-foreground-light text-sm">
                       You may start limiting access to your database by adding a network
                       restriction.
                     </p>
@@ -202,17 +209,17 @@ const NetworkRestrictions = ({}) => {
             ) : isDisallowedAll ? (
               <div className="px-8 py-8 flex items-center justify-between">
                 <div className="flex items-start space-x-4">
-                  <IconLock className="text-scale-1100" strokeWidth={1.5} />
+                  <IconLock className="text-foreground-light" strokeWidth={1.5} />
                   <div className="space-y-1">
-                    <p className="text-scale-1100 text-sm">
+                    <p className="text-foreground-light text-sm">
                       Your database <span className="text-amber-900 opacity-80">cannot</span> be
                       accessed externally
                     </p>
-                    <p className="text-scale-1000 text-sm">
+                    <p className="text-foreground-light text-sm">
                       All external IP addresses have been disallowed from accessing your project's
                       database.
                     </p>
-                    <p className="text-scale-1000 text-sm">
+                    <p className="text-foreground-light text-sm">
                       Note: Restrictions only apply to your database, and not to Supabase services
                     </p>
                   </div>
@@ -228,14 +235,14 @@ const NetworkRestrictions = ({}) => {
               <div className="divide-y">
                 <div className="px-8 py-3 flex items-center justify-between">
                   <div>
-                    <p className="text-scale-1100 text-sm">
+                    <p className="text-foreground-light text-sm">
                       Only the following IP addresses have access to your database
                     </p>
-                    <p className="text-scale-1000 text-sm">
+                    <p className="text-foreground-light text-sm">
                       You may remove all of them to allow all IP addresses to have access to your
                       database
                     </p>
-                    <p className="text-scale-1000 text-sm">
+                    <p className="text-foreground-light text-sm">
                       Note: Restrictions only apply to your database, and not to Supabase services
                     </p>
                   </div>
@@ -254,7 +261,7 @@ const NetworkRestrictions = ({}) => {
                   return (
                     <div key={ip} className="px-8 py-4 flex items-center justify-between">
                       <div className="flex items-center space-x-5">
-                        <IconGlobe size={16} className="text-scale-1000" />
+                        <IconGlobe size={16} className="text-foreground-light" />
                         <p className="text-sm font-mono">{ip}</p>
                       </div>
                       <Button type="default" onClick={() => setSelectedRestrictionToRemove(ip)}>

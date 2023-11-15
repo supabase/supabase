@@ -34,7 +34,9 @@ const AddRestrictionModal = ({
 
     // Validate CIDR block size
     const isOutOfCidrSizeRange = cidrBlockSize < 0 || cidrBlockSize > 32
-    if (isOutOfCidrSizeRange) errors.cidrBlockSize = 'Size has to be between 0 to 32'
+    if (cidrBlockSize.length === 0 || isOutOfCidrSizeRange) {
+      errors.cidrBlockSize = 'Size has to be between 0 to 32'
+    }
 
     // Validate IP address
     const isValid = Address4.isValid(ipAddress)
@@ -78,7 +80,7 @@ const AddRestrictionModal = ({
         validateOnBlur
         id={formId}
         className="!border-t-0"
-        initialValues={{ ipAddress: '', cidrBlockSize: undefined }}
+        initialValues={{ ipAddress: '', cidrBlockSize: 32 }}
         validate={validate}
         onSubmit={onSubmit}
       >
@@ -120,13 +122,13 @@ const AddRestrictionModal = ({
             <>
               <Modal.Content>
                 <div className="py-6 space-y-4">
-                  <p className="text-sm text-scale-1100">
+                  <p className="text-sm text-foreground-light">
                     This will add an IP address range to a list of allowed ranges that can access
                     your database. Only IPv4 addresses are supported at the moment.
                   </p>
                   <InformationBox
-                    title="Note: Restrictions only apply to your database and PgBouncer"
-                    description="They do not currently apply to Supabase services such as PostgREST, Storage, or Authentication"
+                    title="Note: Restrictions only apply to direct connections to your database and PgBouncer"
+                    description="They do not currently apply to Supavisor and to APIs offered over HTTPS, such as PostgREST, Storage, or Authentication"
                   />
                   <div className="flex space-x-4">
                     <div className="w-[55%]">
@@ -152,11 +154,11 @@ const AddRestrictionModal = ({
                                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                                   <div
                                     className={[
-                                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                      'border border-scale-200 w-[300px]',
+                                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                      'border border-background w-[300px]',
                                     ].join(' ')}
                                   >
-                                    <span className="text-xs text-scale-1200">
+                                    <span className="text-xs text-foreground">
                                       Classless inter-domain routing (CIDR) notation is the notation
                                       used to identify networks and hosts in the networks. The block
                                       size tells us how many bits we need to take for the network
@@ -171,7 +173,7 @@ const AddRestrictionModal = ({
                         id="cidrBlockSize"
                         name="cidrBlockSize"
                         type="number"
-                        placeholder="0"
+                        placeholder="32"
                         min={0}
                         max={32}
                       />
@@ -198,11 +200,11 @@ const AddRestrictionModal = ({
                       </code>{' '}
                       will be restricted
                     </p>
-                    <p className="text-sm text-scale-1000">
+                    <p className="text-sm text-foreground-light">
                       Selected address space: <code className="text-xs">{addressRange.start}</code>{' '}
                       to <code className="text-xs">{addressRange.end}</code>{' '}
                     </p>
-                    <p className="text-sm text-scale-1000">
+                    <p className="text-sm text-foreground-light">
                       Number of addresses: {availableAddresses}
                     </p>
                   </div>
@@ -211,7 +213,7 @@ const AddRestrictionModal = ({
                 <Modal.Content>
                   <div className="pt-2 pb-4">
                     <div className="h-[68px] flex items-center">
-                      <p className="text-sm text-scale-1000">
+                      <p className="text-sm text-foreground-light">
                         A summary of your restriction will be shown here after entering a valid IP
                         address and CIDR block size
                       </p>

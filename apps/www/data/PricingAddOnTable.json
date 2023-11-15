@@ -11,7 +11,7 @@
       {
         "columns": [
           { "key": "plan", "title": "Plan", "value": "Starter" },
-          { "key": "pricing", "title": "Pricing", "value": "$0" },
+          { "key": "pricing", "title": "Price USD", "value": "$10" },
           { "key": "cpu", "title": "CPU", "value": "2-core ARM" },
           { "key": "dedicated", "title": "Dedicated", "value": false },
           { "key": "memory", "title": "Memory", "value": "1 GB" },
@@ -36,7 +36,7 @@
       {
         "columns": [
           { "key": "plan", "title": "Plan", "value": "Small" },
-          { "key": "pricing", "title": "Pricing", "value": "$5" },
+          { "key": "pricing", "title": "Price USD", "value": "$15" },
           { "key": "cpu", "title": "CPU", "value": "2-core ARM" },
           { "key": "dedicated", "title": "Dedicated", "value": false },
           { "key": "memory", "title": "Memory", "value": "2 GB" },
@@ -61,7 +61,7 @@
       {
         "columns": [
           { "key": "plan", "title": "Plan", "value": "Medium" },
-          { "key": "pricing", "title": "Pricing", "value": "$50" },
+          { "key": "pricing", "title": "Price USD", "value": "$60" },
           { "key": "cpu", "title": "CPU", "value": "2-core ARM" },
           { "key": "dedicated", "title": "Dedicated", "value": false },
           { "key": "memory", "title": "Memory", "value": "4 GB" },
@@ -86,7 +86,7 @@
       {
         "columns": [
           { "key": "plan", "title": "Plan", "value": "Large" },
-          { "key": "pricing", "title": "Pricing", "value": "$100" },
+          { "key": "pricing", "title": "Price USD", "value": "$110" },
           { "key": "cpu", "title": "CPU", "value": "2-core ARM" },
           { "key": "dedicated", "title": "Dedicated", "value": true },
           { "key": "memory", "title": "Memory", "value": "8 GB" },
@@ -111,7 +111,7 @@
       {
         "columns": [
           { "key": "plan", "title": "Plan", "value": "XL" },
-          { "key": "pricing", "title": "Pricing", "value": "$200" },
+          { "key": "pricing", "title": "Price USD", "value": "$210" },
           { "key": "cpu", "title": "CPU", "value": "4-core ARM" },
           { "key": "dedicated", "title": "Dedicated", "value": true },
           { "key": "memory", "title": "Memory", "value": "16 GB" },
@@ -136,7 +136,7 @@
       {
         "columns": [
           { "key": "plan", "title": "Plan", "value": "2XL" },
-          { "key": "pricing", "title": "Pricing", "value": "$400" },
+          { "key": "pricing", "title": "Price USD", "value": "$410" },
           { "key": "cpu", "title": "CPU", "value": "8-core ARM" },
           { "key": "dedicated", "title": "Dedicated", "value": true },
           { "key": "memory", "title": "Memory", "value": "32 GB" },
@@ -161,7 +161,7 @@
       {
         "columns": [
           { "key": "plan", "title": "Plan", "value": "4XL" },
-          { "key": "pricing", "title": "Pricing", "value": "$950" },
+          { "key": "pricing", "title": "Price USD", "value": "$960" },
           { "key": "cpu", "title": "CPU", "value": "16-core ARM" },
           { "key": "dedicated", "title": "Dedicated", "value": true },
           { "key": "memory", "title": "Memory", "value": "64 GB" },
@@ -186,7 +186,7 @@
       {
         "columns": [
           { "key": "plan", "title": "Plan", "value": "8XL" },
-          { "key": "pricing", "title": "Pricing", "value": "$1,860" },
+          { "key": "pricing", "title": "Price USD", "value": "$1,870" },
           { "key": "cpu", "title": "CPU", "value": "32-core ARM" },
           { "key": "dedicated", "title": "Dedicated", "value": true },
           { "key": "memory", "title": "Memory", "value": "128 GB" },
@@ -211,7 +211,7 @@
       {
         "columns": [
           { "key": "plan", "title": "Plan", "value": "12XL" },
-          { "key": "pricing", "title": "Pricing", "value": "$2,790" },
+          { "key": "pricing", "title": "Price USD", "value": "$2,800" },
           { "key": "cpu", "title": "CPU", "value": "48-core ARM" },
           { "key": "dedicated", "title": "Dedicated", "value": true },
           { "key": "memory", "title": "Memory", "value": "192 GB" },
@@ -240,7 +240,7 @@
       {
         "columns": [
           { "key": "plan", "title": "Plan", "value": "16XL" },
-          { "key": "pricing", "title": "Pricing", "value": "$3,720" },
+          { "key": "pricing", "title": "Price USD", "value": "$3,730" },
           { "key": "cpu", "title": "CPU", "value": "64-core ARM" },
           { "key": "dedicated", "title": "Dedicated", "value": true },
           { "key": "memory", "title": "Memory", "value": "256 GB" },

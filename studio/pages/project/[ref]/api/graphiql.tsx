@@ -1,9 +1,10 @@
-import { Fetcher, createGraphiQLFetcher } from '@graphiql/toolkit'
+import '@graphiql/react/dist/style.css'
+import { createGraphiQLFetcher, Fetcher } from '@graphiql/toolkit'
+import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
+import { useTheme } from 'next-themes'
 import { useEffect, useMemo } from 'react'
 
-import { useTheme } from 'common'
-import { useParams } from 'common/hooks'
 import ExtensionCard from 'components/interfaces/Database/Extensions/ExtensionCard'
 import GraphiQL from 'components/interfaces/GraphQL/GraphiQL'
 import { DocsLayout } from 'components/layouts'
@@ -15,10 +16,10 @@ import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { NextPageWithLayout } from 'types'
 
 const GraphiQLPage: NextPageWithLayout = () => {
-  const { ref: projectRef } = useParams()
   const { ui, meta } = useStore()
-  const { isDarkMode } = useTheme()
-  const theme = isDarkMode ? 'dark' : 'light'
+  const { resolvedTheme } = useTheme()
+  const { ref: projectRef } = useParams()
+  const currentTheme = resolvedTheme === 'dark' ? 'dark' : 'light'
 
   const isExtensionsLoading = meta.extensions.isLoading
   const pgGraphqlExtension = meta.extensions.byId('pg_graphql')
@@ -34,7 +35,6 @@ const GraphiQLPage: NextPageWithLayout = () => {
   useEffect(() => {
     if (ui.selectedProjectRef) {
       // Schemas may be needed when enabling the GraphQL extension
-      meta.schemas.load()
       meta.extensions.load()
     }
   }, [ui.selectedProjectRef])
@@ -68,7 +68,7 @@ const GraphiQLPage: NextPageWithLayout = () => {
         <div className="w-full max-w-md">
           <div className="mb-6">
             <h1 className="mt-8 mb-2 text-2xl">Enable the GraphQL Extension</h1>
-            <h2 className="text-sm text-scale-1100">
+            <h2 className="text-sm text-foreground-light">
               Toggle the switch below to enable the GraphQL extension. You can then use the GraphQL
               API with your Supabase Database.
             </h2>
@@ -80,9 +80,8 @@ const GraphiQLPage: NextPageWithLayout = () => {
     )
   }
 
-  return <GraphiQL fetcher={fetcher} theme={theme} accessToken={anonKey} />
+  return <GraphiQL fetcher={fetcher} theme={currentTheme} accessToken={anonKey} />
 }
 
 GraphiQLPage.getLayout = (page) => <DocsLayout title="GraphiQL">{page}</DocsLayout>
-
 export default observer(GraphiQLPage)

@@ -1,13 +1,10 @@
-import { useEffect } from 'react'
+import { useParams } from 'common'
 
-import { useParams } from 'common/hooks'
 import { StorageLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import StorageBucketsError from 'components/layouts/StorageLayout/StorageBucketsError'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { useBucketsQuery } from 'data/storage/buckets-query'
-import { post } from 'lib/common/fetch'
-import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { NextPageWithLayout } from 'types'
 
 /**
@@ -16,14 +13,7 @@ import { NextPageWithLayout } from 'types'
 const PageLayout: NextPageWithLayout = () => {
   const { ref } = useParams()
   const { project } = useProjectContext()
-
   const { error, isError } = useBucketsQuery({ projectRef: ref })
-
-  useEffect(() => {
-    if (project && project.status === PROJECT_STATUS.INACTIVE) {
-      post(`${API_URL}/projects/${ref}/restore`, {})
-    }
-  }, [ref, project])
 
   if (!project) return <div></div>
 
@@ -36,10 +26,10 @@ const PageLayout: NextPageWithLayout = () => {
         infoButtonLabel="About storage"
         infoButtonUrl="https://supabase.com/docs/guides/storage"
       >
-        <p className="text-scale-1100 text-sm">
+        <p className="text-foreground-light text-sm">
           Create buckets to store and serve any type of digital content.
         </p>
-        <p className="text-scale-1100 text-sm">
+        <p className="text-foreground-light text-sm">
           Make your buckets private or public depending on your security preference.
         </p>
       </ProductEmptyState>

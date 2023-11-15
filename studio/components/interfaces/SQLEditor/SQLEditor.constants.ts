@@ -1232,6 +1232,69 @@ end;
 $$;
 `.trim(),
   },
+  {
+    id: 24,
+    type: 'template',
+    title: 'Install dbdev',
+    description: 'dbdev is a client for installing 3rd party packages into your database.',
+    sql: `
+create extension if not exists http with schema extensions;
+create extension if not exists pg_tle;
+select pgtle.uninstall_extension_if_exists('supabase-dbdev');
+drop extension if exists "supabase-dbdev";
+select
+    pgtle.install_extension(
+        'supabase-dbdev',
+        resp.contents ->> 'version',
+        'PostgreSQL package manager',
+        resp.contents ->> 'sql'
+    )
+from http(
+    (
+        'GET',
+        'https://api.database.dev/rest/v1/'
+        || 'package_versions?select=sql,version'
+        || '&package_name=eq.supabase-dbdev'
+        || '&order=version.desc'
+        || '&limit=1',
+        array[
+            ('apiKey', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhtdXB0cHBsZnZpaWZyYndtbXR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2ODAxMDczNzIsImV4cCI6MTk5NTY4MzM3Mn0.z2CN0mvO2No8wSi46Gw59DFGCTJrzM0AQKsu_5k134s')::http_header
+        ],
+        null,
+        null
+    )
+) x,
+lateral (
+    select
+        ((row_to_json(x) -> 'content') #>> '{}')::json -> 0
+) resp(contents);
+create extension "supabase-dbdev";
+select dbdev.install('supabase-dbdev');
+drop extension if exists "supabase-dbdev";
+create extension "supabase-dbdev";
+`.trim(),
+  },
+  {
+    id: 25,
+    type: 'template',
+    title: 'Large objects',
+    description: 'List large objects (tables/indexes) in your database.',
+    sql: `SELECT 
+    SCHEMA_NAME,
+    relname,
+    table_size
+  FROM
+    (SELECT 
+      pg_catalog.pg_namespace.nspname AS SCHEMA_NAME,
+      relname,
+      pg_relation_size(pg_catalog.pg_class.oid) AS table_size
+    FROM pg_catalog.pg_class
+    JOIN pg_catalog.pg_namespace ON relnamespace = pg_catalog.pg_namespace.oid
+    ) t
+  WHERE SCHEMA_NAME NOT LIKE 'pg_%'
+  ORDER BY table_size DESC
+  LIMIT 25`.trim(),
+  },
 ]
 
 export const SQL_SNIPPET_SCHEMA_VERSION = '1.0'
@@ -1256,4 +1319,4 @@ export const sqlAiDisclaimerComment = stripIndent`
 
 export const untitledSnippetTitle = 'Untitled query'
 
-export const destructiveSqlRegex = [/drop/i, /delete/i, /truncate/i]
+export const destructiveSqlRegex = [/^(.*;)?\s*(drop|delete|truncate)\s/is]

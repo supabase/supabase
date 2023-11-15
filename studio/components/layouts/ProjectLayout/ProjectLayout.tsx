@@ -1,14 +1,16 @@
+import { useParams } from 'common/hooks'
+import ResourceExhaustionWarningBanner from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
+import { useFlag, useSelectedOrganization, useSelectedProject, withAuth } from 'hooks'
+import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { Fragment, PropsWithChildren, ReactNode } from 'react'
-
-import { useParams } from 'common/hooks'
-import Connecting from 'components/ui/Loading'
-import { useFlag, useSelectedOrganization, useSelectedProject, withAuth } from 'hooks'
-import { PROJECT_STATUS, IS_PLATFORM } from 'lib/constants'
+import AppLayout from '../AppLayout/AppLayout'
+import EnableBranchingModal from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
 import LayoutHeader from './LayoutHeader'
+import LoadingState from './LoadingState'
 import NavigationBar from './NavigationBar/NavigationBar'
 import PausingState from './PausingState'
 import ProductMenuBar from './ProductMenuBar'
@@ -16,7 +18,8 @@ import { ProjectContextProvider } from './ProjectContext'
 import ProjectPausedState from './ProjectPausedState'
 import RestoringState from './RestoringState'
 import UpgradingState from './UpgradingState'
-import AppLayout from '../AppLayout/AppLayout'
+import Connecting from 'components/ui/Loading/Loading'
+import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -24,9 +27,7 @@ const routesToIgnoreProjectDetailsRequest = [
   '/project/[ref]/settings/general',
   '/project/[ref]/settings/database',
   '/project/[ref]/settings/storage',
-  '/project/[ref]/settings/billing/subscription',
-  '/project/[ref]/settings/billing/usage',
-  '/project/[ref]/settings/billing/invoices',
+  '/project/[ref]/settings/infrastructure',
 ]
 
 const routesToIgnoreDBConnection = ['/project/[ref]/branches']
@@ -35,9 +36,7 @@ const routesToIgnorePostgrestConnection = [
   '/project/[ref]/reports',
   '/project/[ref]/settings/general',
   '/project/[ref]/settings/database',
-  '/project/[ref]/settings/billing/subscription',
-  '/project/[ref]/settings/billing/usage',
-  '/project/[ref]/settings/billing/invoices',
+  '/project/[ref]/settings/infrastructure',
 ]
 
 export interface ProjectLayoutProps {
@@ -94,14 +93,12 @@ const ProjectLayout = ({
         <div className="flex h-full">
           {/* Left-most navigation side bar to access products */}
           {!hideIconBar && <NavigationBar />}
-
           {/* Product menu bar */}
           {!showPausedState && (
             <MenuBarWrapper isLoading={isLoading} productMenu={productMenu}>
               <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
             </MenuBarWrapper>
           )}
-
           <main className="flex flex-col flex-1 w-full overflow-x-hidden">
             {!navLayoutV2 && !hideHeader && IS_PLATFORM && <LayoutHeader />}
             {showPausedState ? (
@@ -111,10 +108,16 @@ const ProjectLayout = ({
                 </div>
               </div>
             ) : (
-              <ContentWrapper isLoading={isLoading}>{children}</ContentWrapper>
+              <ContentWrapper isLoading={isLoading}>
+                <ResourceExhaustionWarningBanner />
+                {children}
+              </ContentWrapper>
             )}
           </main>
         </div>
+
+        <EnableBranchingModal />
+        <ProjectAPIDocs />
       </ProjectContextProvider>
     </AppLayout>
   )
@@ -159,8 +162,8 @@ interface ContentWrapperProps {
  * [TODO] Next iteration should scrape long polling and just listen to the project's status
  */
 const ContentWrapper = ({ isLoading, children }: ContentWrapperProps) => {
-  const selectedProject = useSelectedProject()
   const router = useRouter()
+  const selectedProject = useSelectedProject()
 
   const requiresDbConnection: boolean =
     (!router.pathname.includes('/project/[ref]/settings') &&
@@ -182,7 +185,11 @@ const ContentWrapper = ({ isLoading, children }: ContentWrapperProps) => {
   return (
     <>
       {isLoading || (requiresProjectDetails && selectedProject === undefined) ? (
-        <Connecting />
+        router.pathname.endsWith('[ref]') ? (
+          <LoadingState />
+        ) : (
+          <Connecting />
+        )
       ) : isProjectUpgrading ? (
         <UpgradingState />
       ) : isProjectPausing ? (
@@ -192,7 +199,7 @@ const ContentWrapper = ({ isLoading, children }: ContentWrapperProps) => {
       ) : requiresDbConnection && isProjectRestoring ? (
         <RestoringState />
       ) : requiresDbConnection && isProjectBuilding ? (
-        <BuildingState project={selectedProject} />
+        <BuildingState />
       ) : (
         <Fragment key={selectedProject?.ref}>{children}</Fragment>
       )}
@@ -249,10 +256,16 @@ export const ProjectLayoutNonBlocking = ({
                 </div>
               </div>
             ) : (
-              children
+              <>
+                <ResourceExhaustionWarningBanner />
+                {children}
+              </>
             )}
           </main>
         </div>
+
+        <EnableBranchingModal />
+        <ProjectAPIDocs />
       </ProjectContextProvider>
     </AppLayout>
   )

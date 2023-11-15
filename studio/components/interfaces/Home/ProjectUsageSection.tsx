@@ -2,21 +2,18 @@ import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
 import { IconAlertCircle, IconLoader } from 'ui'
 
-import { NewProjectPanel, ProjectUsage } from 'components/interfaces/Home'
+import { NewProjectPanel } from 'components/interfaces/Home'
 import InformationBox from 'components/ui/InformationBox'
-import { ProjectUsageResponseUsageKeys, useProjectUsageQuery } from 'data/usage/project-usage-query'
+import ProjectUsage from './ProjectUsage'
+import { useProjectLogRequestsCountQuery } from 'data/analytics/project-log-requests-count-query'
 
 const ProjectUsageSection = observer(() => {
   const { ref: projectRef } = useParams()
-  const { data: usage, error: usageError, isLoading } = useProjectUsageQuery({ projectRef })
-
-  const usageColumns = [
-    'db_egress',
-    'storage_egress',
-    'monthly_active_users',
-    'realtime_message_count',
-    'func_invocations',
-  ]
+  const {
+    data: usage,
+    error: usageError,
+    isLoading,
+  } = useProjectLogRequestsCountQuery({ projectRef })
 
   if (usageError) {
     return (
@@ -29,11 +26,8 @@ const ProjectUsageSection = observer(() => {
     )
   }
 
-  const hasProjectData = usage
-    ? usageColumns
-        .map((key) => usage[key as ProjectUsageResponseUsageKeys].usage)
-        .some((usage) => (usage ?? 0) > 0)
-    : false
+  const hasProjectData =
+    usage?.result && usage.result.length > 0 ? usage.result[0].count > 0 : false
 
   return (
     <>
@@ -42,7 +36,7 @@ const ProjectUsageSection = observer(() => {
           <IconLoader className="animate-spin" size={14} />
           <p className="text-sm">Retrieving project usage statistics</p>
         </div>
-      ) : true ? (
+      ) : hasProjectData ? (
         <ProjectUsage />
       ) : (
         <NewProjectPanel />

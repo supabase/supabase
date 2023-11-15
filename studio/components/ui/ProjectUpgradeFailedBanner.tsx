@@ -6,11 +6,13 @@ import { useParams } from 'common/hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { useProjectUpgradingStatusQuery } from 'data/config/project-upgrade-status-query'
 import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
+import { useFlag } from 'hooks'
 
 // [Joshen] Think twice about the category though - it doesn't correspond
 
 const ProjectUpgradeFailedBanner = () => {
   const { ref } = useParams()
+  const showDbUpgrades = useFlag('databaseUpgrades')
   const { data } = useProjectUpgradingStatusQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { target_version, status, initiated_at, error } = data?.databaseUpgradeStatus ?? {}
 
@@ -20,7 +22,8 @@ const ProjectUpgradeFailedBanner = () => {
   const [showMessage, setShowMessage] = useState(!isAcknowledged)
 
   const isFailed = status === DatabaseUpgradeStatus.Failed
-  const initiatedAtUTC = dayjs(initiated_at ?? 0)
+  const initiatedAtUTC = dayjs
+    .utc(initiated_at ?? 0)
     .utc()
     .format('DD MMM YYYY HH:mm:ss')
 
@@ -32,7 +35,7 @@ const ProjectUpgradeFailedBanner = () => {
     localStorage.setItem(key, 'true')
   }
 
-  if (!isFailed || !showMessage) return null
+  if (!isFailed || !showMessage || !showDbUpgrades) return null
 
   return (
     <div className="max-w-7xl">
@@ -42,13 +45,15 @@ const ProjectUpgradeFailedBanner = () => {
         title={`Postgres version upgrade to ${target_version} was not successful (Initiated at ${initiatedAtUTC} UTC)`}
         actions={
           <div className="flex items-center h-full space-x-4">
-            <Link
-              href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
-            >
-              <a target="_blank" rel="noreferrer">
-                <Button type="default">Contact support</Button>
-              </a>
-            </Link>
+            <Button asChild type="default">
+              <Link
+                href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Contact support
+              </Link>
+            </Button>
             <Button
               type="text"
               className="px-1"

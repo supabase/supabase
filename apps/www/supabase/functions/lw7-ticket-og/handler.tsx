@@ -256,12 +256,12 @@ export async function handler(req: Request) {
       )
     if (storageError) throw new Error(`storageError: ${storageError.message}`)
     // Generate image for gallery
-    fetch('https://obuldanrptloktxcffvn.functions.supabase.co/lw7-ticket-gallery', {
+    fetch('https://obuldanrptloktxcffvn.supabase.co/functions/v1/lw7-ticket-gallery', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization:
-          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9idWxkYW5ycHRsb2t0eGNmZnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE2Njk3MjcwMTIsImV4cCI6MTk4NTMwMzAxMn0.SZLqryz_-stF8dgzeVXmzZWPOqdOrBwqJROlFES8v3I',
+          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9idWxkYW5ycHRsb2t0eGNmZnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTIyNjkzMjYsImV4cCI6MjAwNzg0NTMyNn0.1S6qpBbHtEmGuMsIx5UOhRiFd4YbVv-yLTrLk6tVGmM',
       },
       body: JSON.stringify({
         username,

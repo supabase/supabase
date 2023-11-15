@@ -4,46 +4,39 @@ import { useRouter } from 'next/router'
 import { Fragment } from 'react'
 import { Button, IconExternalLink } from 'ui'
 
-import { Project } from 'types'
-
-// [Joshen TODO] Remove all things about "ownerReassignStatus" after 5th November
-// double check with Qiao before we remove them.
+import { Organization, Project } from 'types'
 
 interface NotificationActionsProps {
   project: Project
+  organization: Organization
   changelogLink?: string
-  ownerReassignStatus?: any
   availableActions: Action[]
   onSelectRestartProject: () => void
   onSelectApplyMigration: () => void
   onSelectRollbackMigration: () => void
-  onSelectFinalizeMigration: () => void
 }
 
 const NotificationActions = ({
   project,
+  organization,
   changelogLink,
-  ownerReassignStatus,
   availableActions,
   onSelectRestartProject,
   onSelectApplyMigration,
   onSelectRollbackMigration,
-  onSelectFinalizeMigration,
 }: NotificationActionsProps) => {
   const router = useRouter()
 
-  const onSelectUpgradeProject = () => {
-    return router.push(
-      `/project/${project.ref}/settings/billing/subscription?panel=subscriptionPlan`
-    )
+  const onSelectUpgradePlan = () => {
+    return router.push(`/org/${organization.slug}/billing?panel=subscriptionPlan`)
   }
 
   const renderActionButton = (action: Action) => {
     switch (action.action_type) {
       case ActionType.UpgradeProjectToPro:
         return (
-          <Button type="default" onClick={onSelectUpgradeProject}>
-            Upgrade project
+          <Button type="default" onClick={onSelectUpgradePlan}>
+            Upgrade plan
           </Button>
         )
       case ActionType.SchedulePostgresRestart:
@@ -53,29 +46,17 @@ const NotificationActions = ({
           </Button>
         )
       case ActionType.MigratePostgresSchema:
-        if (action.reason === ActionReason.Finalize) {
+        if (action.reason === ActionReason.Rollback) {
           return (
-            ownerReassignStatus?.desired !== 'migrated' && (
-              <Button type="default" onClick={onSelectFinalizeMigration}>
-                Finalize
-              </Button>
-            )
-          )
-        } else if (action.reason === ActionReason.Rollback) {
-          return (
-            ownerReassignStatus?.desired === 'temp_role' && (
-              <Button type="default" onClick={onSelectRollbackMigration}>
-                Rollback
-              </Button>
-            )
+            <Button type="default" onClick={onSelectRollbackMigration}>
+              Rollback
+            </Button>
           )
         } else {
           return (
-            ownerReassignStatus?.desired === 'unmigrated' && (
-              <Button type="default" onClick={onSelectApplyMigration}>
-                Apply now
-              </Button>
-            )
+            <Button type="default" onClick={onSelectApplyMigration}>
+              Apply now
+            </Button>
           )
         }
     }
@@ -91,13 +72,11 @@ const NotificationActions = ({
         )
       })}
       {changelogLink && (
-        <Link href={changelogLink} passHref>
-          <Button asChild type="default" icon={<IconExternalLink size={12} strokeWidth={2} />}>
-            <a target="_blank" rel="noreferrer">
-              More info
-            </a>
-          </Button>
-        </Link>
+        <Button asChild type="default" icon={<IconExternalLink size={12} strokeWidth={2} />}>
+          <Link href={changelogLink} target="_blank" rel="noreferrer">
+            More info
+          </Link>
+        </Button>
       )}
     </div>
   )

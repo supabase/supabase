@@ -1,10 +1,20 @@
 import { BASE_PATH } from 'lib/constants'
 import { WrapperMeta } from './Wrappers.types'
 
+export const WRAPPER_HANDLERS = {
+  STRIPE: 'stripe_fdw_handler',
+  FIREBASE: 'firebase_fdw_handler',
+  S3: 's3_fdw_handler',
+  CLICK_HOUSE: 'click_house_fdw_handler',
+  BIG_QUERY: 'big_query_fdw_handler',
+  AIRTABLE: 'airtable_fdw_handler',
+  LOGFLARE: 'logflare_fdw_handler',
+}
+
 export const WRAPPERS: WrapperMeta[] = [
   {
     name: 'stripe_wrapper',
-    handlerName: 'stripe_fdw_handler',
+    handlerName: WRAPPER_HANDLERS.STRIPE,
     validatorName: 'stripe_fdw_validator',
     icon: `${BASE_PATH}/img/icons/stripe-icon.svg`,
     extensionName: 'StripeFdw',
@@ -416,7 +426,7 @@ export const WRAPPERS: WrapperMeta[] = [
   },
   {
     name: 'firebase_wrapper',
-    handlerName: 'firebase_fdw_handler',
+    handlerName: WRAPPER_HANDLERS.FIREBASE,
     validatorName: 'firebase_fdw_validator',
     icon: `${BASE_PATH}/img/icons/firebase-icon.svg`,
     extensionName: 'FirebaseFdw',
@@ -551,7 +561,7 @@ export const WRAPPERS: WrapperMeta[] = [
   },
   {
     name: 's3_wrapper',
-    handlerName: 's3_fdw_handler',
+    handlerName: WRAPPER_HANDLERS.S3,
     validatorName: 's3_fdw_validator',
     icon: `${BASE_PATH}/img/icons/s3-icon.svg`,
     extensionName: 'S3Fdw',
@@ -634,7 +644,7 @@ export const WRAPPERS: WrapperMeta[] = [
   },
   {
     name: 'clickhouse_wrapper',
-    handlerName: 'click_house_fdw_handler',
+    handlerName: WRAPPER_HANDLERS.CLICK_HOUSE,
     validatorName: 'click_house_fdw_validator',
     icon: `${BASE_PATH}/img/icons/clickhouse-icon.svg`,
     extensionName: 'ClickHouseFdw',
@@ -678,7 +688,7 @@ export const WRAPPERS: WrapperMeta[] = [
   },
   {
     name: 'bigquery_wrapper',
-    handlerName: 'big_query_fdw_handler',
+    handlerName: WRAPPER_HANDLERS.BIG_QUERY,
     validatorName: 'big_query_fdw_validator',
     icon: `${BASE_PATH}/img/icons/bigquery-icon.svg`,
     extensionName: 'BigQueryFdw',
@@ -750,52 +760,51 @@ export const WRAPPERS: WrapperMeta[] = [
       },
     ],
   },
-  // Commented out until the airtable is available in the postgres image
-  // {
-  //   name: 'airtable_wrapper',
-  //   handlerName: 'airtable_fdw_handler',
-  //   validatorName: 'airtable_fdw_validator',
-  //   icon: `${BASE_PATH}/img/icons/airtable-icon.svg`,
-  //   extensionName: 'airtableFdw',
-  //   label: 'Airtable',
-  //   docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/airtable',
-  //   server: {
-  //     options: [
-  //       {
-  //         name: 'api_key_id',
-  //         label: 'API Key ID',
-  //         required: true,
-  //         encrypted: true,
-  //         hidden: true,
-  //       },
-  //     ],
-  //   },
-  //   tables: [
-  //     {
-  //       label: 'Airtable Table',
-  //       description: 'Map to an Airtable Table',
-  //       options: [
-  //         {
-  //           name: 'base_id',
-  //           label: 'Base ID',
-  //           editable: true,
-  //           required: true,
-  //           type: 'text',
-  //         },
-  //         {
-  //           name: 'table_id',
-  //           label: 'Table ID',
-  //           editable: true,
-  //           required: true,
-  //           type: 'text',
-  //         },
-  //       ],
-  //     },
-  //   ],
-  // },
+  {
+    name: 'airtable_wrapper',
+    handlerName: WRAPPER_HANDLERS.AIRTABLE,
+    validatorName: 'airtable_fdw_validator',
+    icon: `${BASE_PATH}/img/icons/airtable-icon.svg`,
+    extensionName: 'airtableFdw',
+    label: 'Airtable',
+    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/airtable',
+    server: {
+      options: [
+        {
+          name: 'api_key_id',
+          label: 'API Key ID',
+          required: true,
+          encrypted: true,
+          hidden: true,
+        },
+      ],
+    },
+    tables: [
+      {
+        label: 'Airtable Table',
+        description: 'Map to an Airtable Table',
+        options: [
+          {
+            name: 'base_id',
+            label: 'Base ID',
+            editable: true,
+            required: true,
+            type: 'text',
+          },
+          {
+            name: 'table_id',
+            label: 'Table ID',
+            editable: true,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+    ],
+  },
   {
     name: 'logflare_wrapper',
-    handlerName: 'logflare_fdw_handler',
+    handlerName: WRAPPER_HANDLERS.LOGFLARE,
     validatorName: 'logflare_fdw_validator',
     icon: `${BASE_PATH}/img/icons/logflare-icon.svg`,
     extensionName: 'logflareFdw',

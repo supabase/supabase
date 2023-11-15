@@ -1,19 +1,18 @@
-import { Badge, Button, Checkbox, Input, Modal } from 'ui'
-import { get } from 'lodash'
+import { Badge, Button, Checkbox, IconExternalLink, Modal } from 'ui'
 
+import { PolicyName, PolicyRoles } from 'components/interfaces/Auth/Policies/PolicyEditor'
+import SqlEditor from 'components/ui/SqlEditor'
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from '../Storage.constants'
 import { deriveAllowedClientLibraryMethods } from '../Storage.utils'
-import SqlEditor from 'components/ui/SqlEditor'
-import { PolicyName, PolicyRoles } from 'components/interfaces/Auth/Policies/PolicyEditor'
 
 const PolicyDefinition = ({ definition = '', onUpdatePolicyDefinition = () => {} }) => {
   return (
     <div className="flex space-x-12">
       <div className="flex w-1/3 flex-col space-y-2">
-        <label className="text-base text-scale-1100" htmlFor="policy-name">
+        <label className="text-base text-foreground-light" htmlFor="policy-name">
           Policy definition
         </label>
-        <p className="text-sm text-scale-900">
+        <p className="text-sm text-foreground-lighter">
           Provide a SQL conditional expression that returns a boolean.
         </p>
       </div>
@@ -29,10 +28,10 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
   return (
     <div className="flex justify-between space-x-12">
       <div className="flex w-1/3 flex-col space-y-2">
-        <label className="text-base text-scale-1100" htmlFor="allowed-operation">
+        <label className="text-base text-foreground-light" htmlFor="allowed-operation">
           Allowed operation
         </label>
-        <p className="text-sm text-scale-900">
+        <p className="text-sm text-foreground-lighter">
           Based on the operations you have selected, you can use the highlighted functions in the{' '}
           <a
             href="https://supabase.com/docs/reference/javascript/storage-from-list"
@@ -84,12 +83,23 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
 
 const PolicyEditorFooter = ({ onViewTemplates = () => {}, onReviewPolicy = () => {} }) => (
   <div className="flex w-full items-center justify-end space-x-4 border-t px-6 py-3 dark:border-dark">
-    <Button type="default" onClick={onViewTemplates}>
-      View templates
+    <Button asChild type="link" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
+      <a
+        href="https://supabase.com/docs/guides/storage/access-control"
+        target="_blank"
+        rel="noreferrer"
+      >
+        Documentation
+      </a>
     </Button>
-    <Button type="primary" onClick={onReviewPolicy}>
-      Review
-    </Button>
+    <div className="flex w-full items-center justify-end gap-2">
+      <Button type="default" onClick={onViewTemplates}>
+        View templates
+      </Button>
+      <Button type="primary" onClick={onReviewPolicy}>
+        Review
+      </Button>
+    </div>
   </div>
 )
 

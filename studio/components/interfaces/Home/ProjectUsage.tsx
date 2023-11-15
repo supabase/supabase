@@ -7,7 +7,11 @@ import { useState } from 'react'
 import { ChartIntervals } from 'types'
 import {
   Button,
-  Dropdown,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
   IconArchive,
   IconChevronDown,
   IconDatabase,
@@ -20,6 +24,7 @@ import BarChart from 'components/ui/Charts/BarChart'
 import Panel from 'components/ui/Panel'
 import { UsageApiCounts, useProjectLogStatsQuery } from 'data/analytics/project-log-stats-query'
 import useFillTimeseriesSorted from 'hooks/analytics/useFillTimeseriesSorted'
+import { useIsFeatureEnabled } from 'hooks'
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {
@@ -36,6 +41,11 @@ const CHART_INTERVALS: ChartIntervals[] = [
 const ProjectUsage = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
+
+  const { projectAuthAll: authEnabled, projectStorageAll: storageEnabled } = useIsFeatureEnabled([
+    'project_auth:all',
+    'project_storage:all',
+  ])
 
   const [interval, setInterval] = useState<string>('hourly')
 
@@ -67,31 +77,34 @@ const ProjectUsage = () => {
     // TODO (ziinc): link to edge logs with correct filter applied
     _type: 'rest' | 'realtime' | 'storage' | 'auth'
   ) => {
-    const selected = dayjs(value?.timestamp).toISOString()
-    router.push(`/project/${projectRef}/logs/edge-logs?ite=${encodeURIComponent(selected)}`)
+    const unit = selectedInterval.startUnit
+    const selectedStart = dayjs(value?.timestamp)
+    const selectedEnd = selectedStart.add(1, unit)
+    router.push(
+      `/project/${projectRef}/logs/edge-logs?ite=${encodeURIComponent(selectedEnd.toISOString())}`
+    )
   }
 
   return (
     <div className="space-y-6">
       <div className="flex flex-row items-center gap-2">
-        <Dropdown
-          side="bottom"
-          align="start"
-          overlay={
-            <Dropdown.RadioGroup value={interval} onChange={setInterval}>
+        <DropdownMenu>
+          <DropdownMenuTrigger>
+            <Button asChild type="default" iconRight={<IconChevronDown />}>
+              <span>{selectedInterval.label}</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="bottom" align="start">
+            <DropdownMenuRadioGroup value={interval} onValueChange={setInterval}>
               {CHART_INTERVALS.map((i) => (
-                <Dropdown.Radio key={i.key} value={i.key}>
+                <DropdownMenuRadioItem key={i.key} value={i.key}>
                   {i.label}
-                </Dropdown.Radio>
+                </DropdownMenuRadioItem>
               ))}
-            </Dropdown.RadioGroup>
-          }
-        >
-          <Button asChild type="default" iconRight={<IconChevronDown />}>
-            <span>{selectedInterval.label}</span>
-          </Button>
-        </Dropdown>
-        <span className="text-xs text-scale-1000">
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <span className="text-xs text-foreground-light">
           Statistics for past {selectedInterval.label}
         </span>
       </div>
@@ -100,7 +113,7 @@ const ProjectUsage = () => {
           <Panel.Content className="space-y-4">
             <PanelHeader
               icon={
-                <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
+                <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
                   <IconDatabase strokeWidth={2} size={16} />
                 </div>
               }
@@ -121,60 +134,64 @@ const ProjectUsage = () => {
             </Loading>
           </Panel.Content>
         </Panel>
-        <Panel>
-          <Panel.Content className="space-y-4">
-            <PanelHeader
-              icon={
-                <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
-                  <IconKey strokeWidth={2} size={16} />
-                </div>
-              }
-              title="Auth"
-              href={`/project/${projectRef}/auth/users`}
-            />
-            <Loading active={isLoading}>
-              <BarChart
-                title="Auth Requests"
-                data={charts}
-                xAxisKey="timestamp"
-                yAxisKey="total_auth_requests"
-                onBarClick={(v: unknown) => handleBarClick(v as UsageApiCounts, 'auth')}
-                customDateFormat={datetimeFormat}
-                highlightedValue={sumBy(charts || [], 'total_auth_requests')}
+        {authEnabled && (
+          <Panel>
+            <Panel.Content className="space-y-4">
+              <PanelHeader
+                icon={
+                  <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
+                    <IconKey strokeWidth={2} size={16} />
+                  </div>
+                }
+                title="Auth"
+                href={`/project/${projectRef}/auth/users`}
               />
-            </Loading>
-          </Panel.Content>
-        </Panel>
-        <Panel>
-          <Panel.Content className="space-y-4">
-            <PanelHeader
-              icon={
-                <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
-                  <IconArchive strokeWidth={2} size={16} />
-                </div>
-              }
-              title="Storage"
-              href={`/project/${projectRef}/storage/buckets`}
-            />
+              <Loading active={isLoading}>
+                <BarChart
+                  title="Auth Requests"
+                  data={charts}
+                  xAxisKey="timestamp"
+                  yAxisKey="total_auth_requests"
+                  onBarClick={(v: unknown) => handleBarClick(v as UsageApiCounts, 'auth')}
+                  customDateFormat={datetimeFormat}
+                  highlightedValue={sumBy(charts || [], 'total_auth_requests')}
+                />
+              </Loading>
+            </Panel.Content>
+          </Panel>
+        )}
+        {storageEnabled && (
+          <Panel>
+            <Panel.Content className="space-y-4">
+              <PanelHeader
+                icon={
+                  <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
+                    <IconArchive strokeWidth={2} size={16} />
+                  </div>
+                }
+                title="Storage"
+                href={`/project/${projectRef}/storage/buckets`}
+              />
 
-            <Loading active={isLoading}>
-              <BarChart
-                title="Storage Requests"
-                data={charts}
-                xAxisKey="timestamp"
-                yAxisKey="total_storage_requests"
-                onBarClick={(v: unknown) => handleBarClick(v as UsageApiCounts, 'storage')}
-                customDateFormat={datetimeFormat}
-                highlightedValue={sumBy(charts, 'total_storage_requests')}
-              />
-            </Loading>
-          </Panel.Content>
-        </Panel>
+              <Loading active={isLoading}>
+                <BarChart
+                  title="Storage Requests"
+                  data={charts}
+                  xAxisKey="timestamp"
+                  yAxisKey="total_storage_requests"
+                  onBarClick={(v: unknown) => handleBarClick(v as UsageApiCounts, 'storage')}
+                  customDateFormat={datetimeFormat}
+                  highlightedValue={sumBy(charts, 'total_storage_requests')}
+                />
+              </Loading>
+            </Panel.Content>
+          </Panel>
+        )}
         <Panel>
           <Panel.Content className="space-y-4">
             <PanelHeader
               icon={
-                <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
+                <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
                   <IconZap strokeWidth={2} size={16} />
                 </div>
               }

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { IconCopy } from '../Icon/icons/IconCopy'
 import { Button } from '../Button'
+import { IconCopy } from '../Icon/icons/IconCopy'
 
 import { FormLayout } from '../../lib/Layout/FormLayout'
 
@@ -81,7 +81,11 @@ function Input({
   if (values && !value) value = values[id || name]
 
   function handleBlurEvent(e: React.FocusEvent<HTMLInputElement>) {
-    if (handleBlur) handleBlur(e)
+    if (handleBlur) {
+      setTimeout(() => {
+        handleBlur(e)
+      }, 100)
+    }
     if (onBlur) onBlur(e)
   }
 
@@ -267,7 +271,11 @@ function TextArea({
   if (values && !value) value = values[id || name]
 
   function handleBlurEvent(e: React.FocusEvent<HTMLTextAreaElement>) {
-    if (handleBlur) handleBlur(e)
+    if (handleBlur) {
+      setTimeout(() => {
+        handleBlur(e)
+      }, 100)
+    }
     if (onBlur) onBlur(e)
   }
 
@@ -329,9 +337,7 @@ function TextArea({
           className={classes.join(' ')}
           maxLength={limit}
           {...props}
-        >
-          {value}
-        </textarea>
+        />
         {copy || error || actions ? (
           <div className={__styles['textarea_actions_container']}>
             <div className={__styles['textarea_actions_container_items']}>

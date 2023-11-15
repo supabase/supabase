@@ -13,13 +13,22 @@ import {
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
-import { useFlag } from 'hooks'
-import { Alert, Badge, Button, IconPackage, Input } from 'ui'
+import { useFlag, useIsFeatureEnabled } from 'hooks'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Badge,
+  Button,
+  Input,
+} from 'ui'
 import ProjectUpgradeAlert from '../General/Infrastructure/ProjectUpgradeAlert'
 
 const InfrastructureInfo = () => {
   const { ref } = useParams()
   const { project } = useProjectContext()
+
+  const authEnabled = useIsFeatureEnabled('project_auth:all')
 
   const {
     data,
@@ -45,7 +54,7 @@ const InfrastructureInfo = () => {
         <div className="mx-auto flex flex-col gap-10 py-6">
           <div>
             <p className="text-xl">Infrastructure</p>
-            <p className="text-sm text-scale-1000">
+            <p className="text-sm text-foreground-light">
               General information regarding your server instance
             </p>
           </div>
@@ -56,7 +65,7 @@ const InfrastructureInfo = () => {
         <ScaffoldSection>
           <ScaffoldSectionDetail>
             <p>Configuration</p>
-            <p className="text-scale-1000 text-sm">Information on your server provider</p>
+            <p className="text-foreground-light text-sm">Information on your server provider</p>
           </ScaffoldSectionDetail>
           <ScaffoldSectionContent>
             <Input readOnly disabled value={project?.cloud_provider} label="Cloud provider" />
@@ -65,8 +74,10 @@ const InfrastructureInfo = () => {
         </ScaffoldSection>
         <ScaffoldSection className="!pt-0">
           <ScaffoldSectionDetail>
-            <p>Postgres</p>
-            <p className="text-scale-1000 text-sm">Information on your Postgres instance</p>
+            <p>Service Versions</p>
+            <p className="text-foreground-light text-sm">
+              Information on your provisioned instance
+            </p>
           </ScaffoldSectionDetail>
           <ScaffoldSectionContent>
             {isLoadingUpgradeEligibility && <GenericSkeletonLoader />}
@@ -75,11 +86,25 @@ const InfrastructureInfo = () => {
             )}
             {isSuccessUpgradeEligibility && (
               <>
+                {authEnabled && (
+                  <Input
+                    readOnly
+                    disabled
+                    label="GoTrue version"
+                    value={project?.serviceVersions?.gotrue ?? ''}
+                  />
+                )}
+                <Input
+                  readOnly
+                  disabled
+                  label="PostgREST version"
+                  value={project?.serviceVersions?.postgrest ?? ''}
+                />
                 <Input
                   readOnly
                   disabled
                   value={currentPgVersion}
-                  label="Current version"
+                  label="Postgres version"
                   actions={[
                     isOnLatestVersion && (
                       <Tooltip.Root key="tooltip-latest" delayDuration={0}>
@@ -93,11 +118,11 @@ const InfrastructureInfo = () => {
                             <Tooltip.Arrow className="radix-tooltip-arrow" />
                             <div
                               className={[
-                                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                'border border-scale-200 w-[200px]',
+                                'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                'border border-background w-[200px]',
                               ].join(' ')}
                             >
-                              <span className="text-xs text-scale-1200">
+                              <span className="text-xs text-foreground">
                                 Project is on the latest version of Postgres that Supabase supports
                               </span>
                             </div>
@@ -109,26 +134,69 @@ const InfrastructureInfo = () => {
                 />
                 {showDbUpgrades && data?.eligible && <ProjectUpgradeAlert />}
                 {showDbUpgrades && !data?.eligible && data?.requires_manual_intervention && (
-                  <Alert
-                    icon={<IconPackage className="text-scale-1100" strokeWidth={1.5} />}
-                    variant="neutral"
-                    title="A new version of Postgres is available for your project"
-                  >
-                    <p className="mb-3">
-                      Please reach out to us via our support form if you are keen to upgrade your
-                      Postgres version to the latest available ({latestPgVersion}).
-                    </p>
-                    <Link
-                      href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
-                    >
-                      <a target="_blank" rel="noreferrer">
-                        <Button size="tiny" type="default">
+                  <Alert_Shadcn_ title="A new version of Postgres is available for your project">
+                    <AlertTitle_Shadcn_>
+                      A new version of Postgres is available for your project
+                    </AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_>
+                      <p className="mb-3">
+                        Please reach out to us via our support form if you are keen to upgrade your
+                        Postgres version to the latest available ({latestPgVersion}).
+                      </p>
+                      <Button size="tiny" type="default" asChild>
+                        <Link
+                          href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
                           Contact support
-                        </Button>
-                      </a>
-                    </Link>
-                  </Alert>
+                        </Link>
+                      </Button>
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
                 )}
+                {showDbUpgrades &&
+                  !data?.eligible &&
+                  (data?.extension_dependent_objects || []).length > 0 && (
+                    <Alert_Shadcn_
+                      variant="warning"
+                      title="A new version of Postgres is available for your project"
+                    >
+                      <AlertTitle_Shadcn_>New version of Postgres available</AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                        <div>
+                          <p className="mb-1">
+                            This project cannot be upgraded due to the following extension dependent
+                            objects:
+                          </p>
+
+                          <ul className="pl-4">
+                            {(data?.extension_dependent_objects || []).map((obj) => (
+                              <li className="list-disc" key={obj}>
+                                {obj}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        <p>
+                          Once the above objects are exported and removed, you can proceed to
+                          upgrade your project, and re-import the objects after the upgrade
+                          operation is complete.
+                        </p>
+                        <div>
+                          <Button size="tiny" type="default" asChild>
+                            <Link
+                              href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats"
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              View docs
+                            </Link>
+                          </Button>
+                        </div>
+                      </AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
+                  )}
               </>
             )}
           </ScaffoldSectionContent>

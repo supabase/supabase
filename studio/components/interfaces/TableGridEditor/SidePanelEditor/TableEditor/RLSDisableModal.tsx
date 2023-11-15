@@ -1,11 +1,10 @@
 import Link from 'next/link'
-import React from 'react'
 import { Alert, Button, IconAlertOctagon, IconBookOpen, IconLock, IconShieldOff } from 'ui'
 
 export default function RLSDisableModalContent() {
   return (
     <div className="my-6">
-      <div className="text-sm text-scale-1100 grid gap-4">
+      <div className="text-sm text-foreground-light grid gap-4">
         <div className="grid gap-1">
           <Alert
             variant="warning"
@@ -45,13 +44,15 @@ export default function RLSDisableModalContent() {
 
         <div className="mt-3">
           <p className="mt-2">
-            <Link href="https://supabase.com/docs/guides/auth/row-level-security">
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
-                  RLS Documentation
-                </Button>
-              </a>
-            </Link>
+            <Button asChild type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
+              <Link
+                href="https://supabase.com/docs/guides/auth/row-level-security"
+                target="_blank"
+                rel="noreferrer"
+              >
+                RLS Documentation
+              </Link>
+            </Button>
           </p>
         </div>
       </div>

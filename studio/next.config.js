@@ -3,9 +3,6 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 })
 
-// this is required to use shared packages in the packages directory
-const withTM = require('next-transpile-modules')(['ui', 'common', 'shared-data'])
-
 // Required for nextjs standalone build
 const path = require('path')
 
@@ -30,38 +27,98 @@ const csp = [
 const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
   output: 'standalone',
+  outputFileTracing: true,
+  experimental: {
+    // Storybook 7.5 upgrade seems to causes dev deps to be included in build output, removing it here
+    outputFileTracingExcludes: {
+      '*': [
+        './node_modules/@swc/core-linux-x64-gnu',
+        './node_modules/@swc/core-linux-x64-musl',
+        './node_modules/esbuild/**/*',
+        './node_modules/webpack/**/*',
+        './node_modules/rollup/**/*',
+      ],
+    },
+  },
   async redirects() {
     return [
-      {
-        source: '/',
-        destination: '/sign-in',
-        permanent: false,
-      },
-      {
-        source: '/register',
-        destination: '/sign-up',
-        permanent: false,
-      },
-      {
-        source: '/signup',
-        destination: '/sign-up',
-        permanent: false,
-      },
-      {
-        source: '/signin',
-        destination: '/sign-in',
-        permanent: false,
-      },
-      {
-        source: '/login',
-        destination: '/sign-in',
-        permanent: false,
-      },
-      {
-        source: '/log-in',
-        destination: '/sign-in',
-        permanent: false,
-      },
+      ...(process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
+        ? [
+            {
+              source: '/',
+              has: [
+                {
+                  type: 'query',
+                  key: 'next',
+                  value: 'new-project',
+                },
+              ],
+              destination: '/new/new-project',
+              permanent: false,
+            },
+            {
+              source: '/',
+              destination: '/projects',
+              permanent: false,
+            },
+            {
+              source: '/register',
+              destination: '/sign-up',
+              permanent: false,
+            },
+            {
+              source: '/signup',
+              destination: '/sign-up',
+              permanent: false,
+            },
+            {
+              source: '/signin',
+              destination: '/sign-in',
+              permanent: false,
+            },
+            {
+              source: '/login',
+              destination: '/sign-in',
+              permanent: false,
+            },
+            {
+              source: '/log-in',
+              destination: '/sign-in',
+              permanent: false,
+            },
+          ]
+        : [
+            {
+              source: '/',
+              destination: '/project/default',
+              permanent: false,
+            },
+            {
+              source: '/register',
+              destination: '/project/default',
+              permanent: false,
+            },
+            {
+              source: '/signup',
+              destination: '/project/default',
+              permanent: false,
+            },
+            {
+              source: '/signin',
+              destination: '/project/default',
+              permanent: false,
+            },
+            {
+              source: '/login',
+              destination: '/project/default',
+              permanent: false,
+            },
+            {
+              source: '/log-in',
+              destination: '/project/default',
+              permanent: false,
+            },
+          ]),
       {
         source: '/project/:ref/auth',
         destination: '/project/:ref/auth/users',
@@ -70,6 +127,11 @@ const nextConfig = {
       {
         source: '/project/:ref/database',
         destination: '/project/:ref/database/tables',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/database/graphiql',
+        destination: '/project/:ref/api/graphiql',
         permanent: true,
       },
       {
@@ -88,8 +150,56 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: '/project/:ref/settings/billing',
-        destination: '/project/:ref/settings/billing/subscription',
+        source: '/project/:ref/settings/billing/subscription',
+        has: [
+          {
+            type: 'query',
+            key: 'panel',
+            value: 'subscriptionPlan',
+          },
+        ],
+        destination: '/org/_/billing?panel=subscriptionPlan',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/settings/billing/subscription',
+        has: [
+          {
+            type: 'query',
+            key: 'panel',
+            value: 'pitr',
+          },
+        ],
+        destination: '/project/:ref/settings/addons?panel=pitr',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/settings/billing/subscription',
+        has: [
+          {
+            type: 'query',
+            key: 'panel',
+            value: 'computeInstance',
+          },
+        ],
+        destination: '/project/:ref/settings/addons?panel=computeInstance',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/settings/billing/subscription',
+        has: [
+          {
+            type: 'query',
+            key: 'panel',
+            value: 'customDomain',
+          },
+        ],
+        destination: '/project/:ref/settings/addons?panel=customDomain',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/settings/billing/subscription',
+        destination: '/org/_/billing',
         permanent: true,
       },
       {
@@ -109,7 +219,12 @@ const nextConfig = {
       },
       {
         source: '/project/:ref/database/pgbouncer-logs',
-        destination: '/project/:ref/logs/pgbouncer-logs',
+        destination: '/project/:ref/logs/pooler-logs',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/logs/pgbouncer-logs',
+        destination: '/project/:ref/logs/pooler-logs',
         permanent: true,
       },
       {
@@ -144,27 +259,27 @@ const nextConfig = {
       },
       {
         source: '/project/:ref/settings/billing/update',
-        destination: '/project/:ref/settings/billing/subscription',
+        destination: '/org/_/billing',
         permanent: true,
       },
       {
         source: '/project/:ref/settings/billing/update/free',
-        destination: '/project/:ref/settings/billing/subscription',
+        destination: '/org/_/billing',
         permanent: true,
       },
       {
         source: '/project/:ref/settings/billing/update/pro',
-        destination: '/project/:ref/settings/billing/subscription',
+        destination: '/org/_/billing',
         permanent: true,
       },
       {
         source: '/project/:ref/settings/billing/update/team',
-        destination: '/project/:ref/settings/billing/subscription',
+        destination: '/org/_/billing',
         permanent: true,
       },
       {
         source: '/project/:ref/settings/billing/update/enterprise',
-        destination: '/project/:ref/settings/billing/subscription',
+        destination: '/org/_/billing',
         permanent: true,
       },
       {
@@ -172,6 +287,16 @@ const nextConfig = {
         destination: '/project/:ref/sql/new',
         permanent: true,
       },
+      ...(process.env.NEXT_PUBLIC_BASE_PATH?.length
+        ? [
+            {
+              source: '/',
+              destination: process.env.NEXT_PUBLIC_BASE_PATH,
+              basePath: false,
+              permanent: true,
+            },
+          ]
+        : []),
     ]
   },
   async headers() {
@@ -217,10 +342,7 @@ const nextConfig = {
       'vercel.com',
     ],
   },
-  // Ref: https://nextjs.org/docs/advanced-features/output-file-tracing#caveats
-  experimental: {
-    outputFileTracingRoot: path.join(__dirname, '../../'),
-  },
+  transpilePackages: ['ui', 'common', 'shared-data'],
   webpack(config) {
     config.module?.rules
       .find((rule) => rule.oneOf)
@@ -236,25 +358,34 @@ const nextConfig = {
   },
 }
 
-// Export all config
-const moduleExports = withTM(withBundleAnalyzer(nextConfig))
-
-const sentryWebpackPluginOptions = {
-  // Additional config options for the Sentry Webpack plugin. Keep in mind that
-  // the following options are set automatically, and overriding them is not
-  // recommended:
-  //   release, url, org, project, authToken, configFile, stripPrefix,
-  //   urlPrefix, include, ignore
-
-  silent: true, // Suppresses all logs
-
-  // For all available options, see:
-  // https://github.com/getsentry/sentry-webpack-plugin#options.
-}
-
+// module.exports = withBundleAnalyzer(nextConfig)
 // Make sure adding Sentry options is the last code to run before exporting, to
 // ensure that your source maps include changes from all other Webpack plugins
 module.exports =
   process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
-    ? withSentryConfig(moduleExports, sentryWebpackPluginOptions)
-    : withTM(nextConfig)
+    ? withSentryConfig(
+        withBundleAnalyzer(nextConfig),
+        {
+          silent: true,
+        },
+        {
+          // For all available options, see:
+          // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+
+          // Upload a larger set of source maps for prettier stack traces (increases build time)
+          widenClientFileUpload: true,
+
+          // Transpiles SDK to be compatible with IE11 (increases bundle size)
+          transpileClientSDK: false,
+
+          // Routes browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers (increases server load)
+          tunnelRoute: '/monitoring',
+
+          // Hides source maps from generated client bundles
+          hideSourceMaps: true,
+
+          // Automatically tree-shake Sentry logger statements to reduce bundle size
+          disableLogger: true,
+        }
+      )
+    : nextConfig

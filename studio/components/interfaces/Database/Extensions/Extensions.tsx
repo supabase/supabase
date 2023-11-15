@@ -3,7 +3,7 @@ import { isNull, partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Button, IconAlertCircle, IconBookOpen, IconSearch, Input } from 'ui'
+import { Button, IconAlertCircle, IconExternalLink, IconSearch, Input } from 'ui'
 
 import { useParams } from 'common/hooks'
 import InformationBox from 'components/ui/InformationBox'
@@ -39,31 +39,34 @@ const Extensions = () => {
   }, [filter])
 
   return (
-    <div className="p-4">
+    <>
       <div className="mb-4">
         <div className="flex items-center justify-between">
           <Input
             size="small"
-            placeholder={'Filter'}
+            placeholder="Search for an extension"
             value={filterString}
             onChange={(e) => setFilterString(e.target.value)}
+            className="w-64"
             icon={<IconSearch size="tiny" />}
           />
           {!canUpdateExtensions ? (
             <div className="w-[500px]">
               <InformationBox
-                icon={<IconAlertCircle className="text-scale-1100" strokeWidth={2} />}
+                icon={<IconAlertCircle className="text-foreground-light" strokeWidth={2} />}
                 title="You need additional permissions to update database extensions"
               />
             </div>
           ) : (
-            <Link passHref href="https://supabase.com/docs/guides/database/extensions">
-              <a target="_blank" rel="noreferrer">
-                <Button type="default" iconRight={<IconBookOpen />}>
-                  Learn more about extensions
-                </Button>
-              </a>
-            </Link>
+            <Button asChild type="default" icon={<IconExternalLink />}>
+              <Link
+                href="https://supabase.com/docs/guides/database/extensions"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Documentation
+              </Link>
+            </Button>
           )}
         </div>
       </div>
@@ -76,7 +79,7 @@ const Extensions = () => {
         {enabledExtensions.length > 0 && (
           <div className="space-y-4">
             <h4 className="text-lg">Enabled extensions</h4>
-            <div className="mb-4 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+            <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
               {enabledExtensions.map((extension) => (
                 <ExtensionCard key={extension.name} extension={extension} />
               ))}
@@ -87,7 +90,7 @@ const Extensions = () => {
         {disabledExtensions.length > 0 && (
           <div className="space-y-4">
             <h4 className="text-lg">Available extensions</h4>
-            <div className="mb-4 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+            <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
               {disabledExtensions.map((extension) => (
                 <ExtensionCard key={extension.name} extension={extension} />
               ))}
@@ -95,7 +98,7 @@ const Extensions = () => {
           </div>
         )}
       </div>
-    </div>
+    </>
   )
 }
 

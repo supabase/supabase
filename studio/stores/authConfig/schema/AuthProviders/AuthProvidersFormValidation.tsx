@@ -1,4 +1,4 @@
-import { boolean, number, object, string, ValidationError } from 'yup'
+import { boolean, number, object, string, date, ValidationError } from 'yup'
 import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
 
 const parseBase64URL = (b64url: string) => {
@@ -30,7 +30,7 @@ const PROVIDER_EMAIL = {
     },
     SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: {
       title: 'Secure password change',
-      description: `Users will need to be recently logged in to change their password.
+      description: `Users will need to be recently logged in to change their password without requiring reauthentication.
       If disabled, a user can change their password at any time.`,
       type: 'boolean',
     },
@@ -84,16 +84,11 @@ const PROVIDER_PHONE = {
         { label: 'Twilio Verify', value: 'twilio_verify', icon: 'twilio-icon.svg' },
       ],
     },
-    RATE_LIMIT_SMS_SENT: {
-      type: 'number',
-      title: 'Rate limit for sending SMS messages',
-      description: 'How many SMS messages can be sent per hour',
-    },
 
     // Twilio
     SMS_TWILIO_ACCOUNT_SID: {
       type: 'string',
-      title: 'Twilio Account Sid',
+      title: 'Twilio Account SID',
       show: {
         key: 'SMS_PROVIDER',
         matches: ['twilio'],
@@ -110,7 +105,15 @@ const PROVIDER_PHONE = {
     },
     SMS_TWILIO_MESSAGE_SERVICE_SID: {
       type: 'string',
-      title: 'Twilio Message Service Sid',
+      title: 'Twilio Message Service SID',
+      show: {
+        key: 'SMS_PROVIDER',
+        matches: ['twilio'],
+      },
+    },
+    SMS_TWILIO_CONTENT_SID: {
+      type: 'string',
+      title: 'Twilio Content SID (Optional, For WhatsApp Only)',
       show: {
         key: 'SMS_PROVIDER',
         matches: ['twilio'],
@@ -120,7 +123,7 @@ const PROVIDER_PHONE = {
     // Twilio Verify
     SMS_TWILIO_VERIFY_ACCOUNT_SID: {
       type: 'string',
-      title: 'Twilio Account Sid',
+      title: 'Twilio Account SID',
       show: {
         key: 'SMS_PROVIDER',
         matches: ['twilio_verify'],
@@ -137,7 +140,7 @@ const PROVIDER_PHONE = {
     },
     SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: {
       type: 'string',
-      title: 'Twilio Verify Service Sid',
+      title: 'Twilio Verify Service SID',
       show: {
         key: 'SMS_PROVIDER',
         matches: ['twilio_verify'],
@@ -241,6 +244,21 @@ const PROVIDER_PHONE = {
       show: {
         key: 'SMS_PROVIDER',
         matches: ['twilio', 'messagebird', 'textlocal', 'vonage'],
+      },
+    },
+    SMS_TEST_OTP: {
+      type: 'string',
+      title: 'Test Phone Numbers and OTPs',
+      description:
+        'Register phone number and OTP combinations for testing as a comma separated list of <phone number>=<otp> pairs. Example: `18005550123=789012`',
+    },
+    SMS_TEST_OTP_VALID_UNTIL: {
+      type: 'datetime',
+      title: 'Test OTPs Valid Until',
+      description:
+        "Test phone number and OTP combinations won't be active past this date and time (local time zone).",
+      show: {
+        key: 'SMS_TEST_OTP',
       },
     },
   },
@@ -356,6 +374,20 @@ const PROVIDER_PHONE = {
     SMS_OTP_EXP: number().min(0, 'Must be more than 0').required('This is required'),
     SMS_OTP_LENGTH: number().min(6, 'Must be 6 or more in length').required('This is required'),
     SMS_TEMPLATE: string().required('SMS template is required.'),
+    SMS_TEST_OTP: string()
+      .matches(
+        /^\s*([0-9]{1,15}=[0-9]+)(\s*,\s*[0-9]{1,15}=[0-9]+)*\s*$/g,
+        'Must be a comma-separated list of <phone number>=<OTP> pairs. Phone numbers should be in international format, without spaces, dashes or the + prefix. Example: 123456789=987654'
+      )
+      .trim()
+      .transform((value: string) => value.replace(/\s+/g, '')),
+    SMS_TEST_OTP_VALID_UNTIL: string().when(['SMS_TEST_OTP'], {
+      is: (SMS_TEST_OTP: string | null) => {
+        return !!SMS_TEST_OTP
+      },
+      then: (schema) => schema.required('You must provide a valid until date.'),
+      otherwise: (schema) => schema.transform((value: string) => ''),
+    }),
   }),
   misc: {
     iconKey: 'phone-icon4',
@@ -420,7 +452,6 @@ const EXTERNAL_PROVIDER_APPLE = {
                     typeof body === 'object' &&
                     header &&
                     body &&
-                    header.typ === 'JWT' &&
                     header.alg === 'ES256' &&
                     body.aud === 'https://appleid.apple.com'
                   )
@@ -544,7 +575,7 @@ const EXTERNAL_PROVIDER_AZURE = {
     }),
     EXTERNAL_AZURE_SECRET: string().when('EXTERNAL_AZURE_ENABLED', {
       is: true,
-      then: (schema) => schema.required('Secret ID is required'),
+      then: (schema) => schema.required('Secret Value is required'),
       otherwise: (schema) => schema,
     }),
     EXTERNAL_AZURE_URL: string().matches(urlRegex, 'Must be a valid URL').optional(),
@@ -819,6 +850,12 @@ const EXTERNAL_PROVIDER_GOOGLE = {
         'Comma separated list of client IDs of Android apps, One Tap or Chrome extensions that are allowed to log in to your project.',
       type: 'string',
     },
+    EXTERNAL_GOOGLE_SKIP_NONCE_CHECK: {
+      title: 'Skip nonce checks',
+      description:
+        "Allows ID tokens with any nonce to be accepted, which is less secure. Useful in situations where you don't have access to the nonce used to issue the ID token, such with iOS.",
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_GOOGLE_ENABLED: boolean().required(),
@@ -879,12 +916,13 @@ const EXTERNAL_PROVIDER_GOOGLE = {
             'At least one Authorized Client ID is required when not using the OAuth flow.'
           ),
       }),
+    EXTERNAL_GOOGLE_SKIP_NONCE_CHECK: boolean().required(),
   }),
   misc: {
     iconKey: 'google-icon',
     requiresRedirect: true,
     helper: `Register this callback URL when using Sign-in with Google on the web using OAuth.
-            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
+            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-google#configure-your-services-id)`,
   },
 }
 
@@ -981,10 +1019,10 @@ const EXTERNAL_PROVIDER_KEYCLOAK = {
 const EXTERNAL_PROVIDER_LINKEDIN = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
-  title: 'LinkedIn',
+  title: 'LinkedIn (Deprecated)',
   properties: {
     EXTERNAL_LINKEDIN_ENABLED: {
-      title: 'Linkedin enabled',
+      title: 'Linkedin (Deprecated) enabled',
       type: 'boolean',
     },
     // [TODO] Update docs
@@ -1007,6 +1045,44 @@ const EXTERNAL_PROVIDER_LINKEDIN = {
       otherwise: (schema) => schema,
     }),
     EXTERNAL_LINKEDIN_SECRET: string().when('EXTERNAL_LINKEDIN_ENABLED', {
+      is: true,
+      then: (schema) => schema.required('API Secret Key is required'),
+      otherwise: (schema) => schema,
+    }),
+  }),
+  misc: {
+    iconKey: 'linkedin-icon',
+    requiresRedirect: true,
+  },
+}
+
+const EXTERNAL_PROVIDER_LINKEDIN_OIDC = {
+  $schema: JSON_SCHEMA_VERSION,
+  type: 'object',
+  title: 'LinkedIn (OIDC)',
+  properties: {
+    EXTERNAL_LINKEDIN_OIDC_ENABLED: {
+      title: 'LinkedIn enabled',
+      type: 'boolean',
+    },
+    EXTERNAL_LINKEDIN_OIDC_CLIENT_ID: {
+      title: 'API Key',
+      type: 'string',
+    },
+    EXTERNAL_LINKEDIN_OIDC_SECRET: {
+      title: 'API Secret Key',
+      type: 'string',
+      isSecret: true,
+    },
+  },
+  validationSchema: object().shape({
+    EXTERNAL_LINKEDIN_OIDC_ENABLED: boolean().required(),
+    EXTERNAL_LINKEDIN_OIDC_CLIENT_ID: string().when('EXTERNAL_LINKEDIN_OIDC_ENABLED', {
+      is: true,
+      then: (schema) => schema.required('API Key is required'),
+      otherwise: (schema) => schema,
+    }),
+    EXTERNAL_LINKEDIN_OIDC_SECRET: string().when('EXTERNAL_LINKEDIN_OIDC_ENABLED', {
       is: true,
       then: (schema) => schema.required('API Secret Key is required'),
       otherwise: (schema) => schema,
@@ -1331,6 +1407,7 @@ export const PROVIDERS_SCHEMAS = [
   EXTERNAL_PROVIDER_KAKAO,
   EXTERNAL_PROVIDER_KEYCLOAK,
   EXTERNAL_PROVIDER_LINKEDIN,
+  EXTERNAL_PROVIDER_LINKEDIN_OIDC,
   EXTERNAL_PROVIDER_NOTION,
   EXTERNAL_PROVIDER_TWITCH,
   EXTERNAL_PROVIDER_TWITTER,

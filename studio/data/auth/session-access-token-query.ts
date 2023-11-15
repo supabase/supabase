@@ -2,15 +2,18 @@ import { useCallback } from 'react'
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
 
 import { authKeys } from './keys'
-import { auth } from 'lib/gotrue'
+import { auth, getAccessToken } from 'lib/gotrue'
 
 export async function getSessionAccessToken() {
   // ignore if server-side
   if (typeof window === 'undefined') return ''
-  const {
-    data: { session },
-  } = await auth.getSession()
-  return session?.access_token
+
+  try {
+    return await getAccessToken()
+  } catch (e: any) {
+    // ignore the error
+    return null
+  }
 }
 
 export type SessionAccessTokenData = Awaited<ReturnType<typeof getSessionAccessToken>>

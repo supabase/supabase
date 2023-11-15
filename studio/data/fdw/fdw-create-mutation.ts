@@ -101,11 +101,13 @@ export function getCreateFDWSql({
         options (
           ${Object.entries(newTable)
             .filter(
-              ([key]) =>
+              ([key, value]) =>
                 key !== 'table_name' &&
                 key !== 'schema_name' &&
                 key !== 'columns' &&
-                key !== 'index'
+                key !== 'index' &&
+                key !== 'is_new_schema' &&
+                Boolean(value)
             )
             .map(([key, value]) => `${key} '${value}'`)
             .join(',\n          ')}

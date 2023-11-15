@@ -93,7 +93,7 @@ const InviteMemberButton = ({
   return (
     <>
       <Tooltip.Root delayDuration={0}>
-        <Tooltip.Trigger>
+        <Tooltip.Trigger asChild>
           <Button disabled={!canInviteMembers} onClick={() => setIsOpen(true)}>
             Invite
           </Button>
@@ -104,11 +104,11 @@ const InviteMemberButton = ({
               <Tooltip.Arrow className="radix-tooltip-arrow" />
               <div
                 className={[
-                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                  'border border-scale-200',
+                  'rounded bg-alternative py-1 px-2 leading-none shadow',
+                  'border border-background',
                 ].join(' ')}
               >
-                <span className="text-xs text-scale-1200">
+                <span className="text-xs text-foreground">
                   You need additional permissions to invite a member to this organization
                 </span>
               </div>
