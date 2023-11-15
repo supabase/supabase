@@ -2,7 +2,7 @@ const config = require('config/tailwind.config')
 
 module.exports = config({
   content: [
-    './../packages/ui/src/**/*.{tsx,ts,js}',
+    './../../packages/ui/src/**/*.{tsx,ts,js}',
     './pages/**/*.{js,ts,jsx,tsx}',
     './components/**/*.{js,ts,jsx,tsx}',
     // purge styles from grid library

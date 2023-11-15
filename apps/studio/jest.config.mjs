@@ -16,7 +16,7 @@ const config = {
   maxWorkers: '50%',
   moduleNameMapper: {
     '\\.(css)$': '<rootDir>/__mocks__/styleMock.js',
-    '^@ui/(.*)$': '<rootDir>/../packages/ui/src/$1',
+    '^@ui/(.*)$': '<rootDir>/../../packages/ui/src/$1',
   },
 }
 
