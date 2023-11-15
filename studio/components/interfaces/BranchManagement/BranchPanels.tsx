@@ -89,9 +89,9 @@ export const BranchRow = ({
   const { ref } = useParams()
   const isActive = ref === branch?.project_ref
 
-  const daysFromNow = dayjs().diff(dayjs(branch.created_at), 'day')
-  const formattedTimeFromNow = dayjs(branch.created_at).fromNow()
-  const formattedCreatedAt = dayjs(branch.created_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
+  const daysFromNow = dayjs().diff(dayjs(branch.updated_at), 'day')
+  const formattedTimeFromNow = dayjs(branch.updated_at).fromNow()
+  const formattedUpdatedAt = dayjs(branch.updated_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
 
   const createPullRequestURL =
     generateCreatePullRequestURL?.(branch.git_branch) ?? 'https://github.com'
@@ -108,7 +108,7 @@ export const BranchRow = ({
         </Button>
         {isActive && <Badge color="slate">Current</Badge>}
         <p className="text-xs text-foreground-lighter">
-          {daysFromNow > 1 ? `Created on ${formattedCreatedAt}` : `Created ${formattedTimeFromNow}`}
+          {daysFromNow > 1 ? `Updated on ${formattedUpdatedAt}` : `Updated ${formattedTimeFromNow}`}
         </p>
       </div>
       <div className="flex items-center gap-x-8">
