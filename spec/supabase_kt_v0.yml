@@ -2316,32 +2316,32 @@ functions:
             //the url was opened automatically, if you don't want that, provide a custom redirect url
           ```
   - id: sign-out
-    title: 'logout()'
+    title: 'signOut()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signOut'
     notes: |
       Logs out the current user.
-      - In order to use the `logout()` method, the user needs to be signed in first.
+      - In order to use the `signOut()` method, the user needs to be signed in first.
     examples:
       - id: sign-out
         name: Sign out
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.auth.logout()
+          supabase.auth.signOut()
           ```
       - id: sign-out-all-sessions
         name: Sign out all sessions
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.auth.logout(LogoutScope.GLOBAL)
+          supabase.auth.signOut(SignOutScope.GLOBAL)
           ```
       - id: sign-out-others
         name: Sign out all sessions except the current
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.auth.logout(LogoutScope.OTHERS)
+          supabase.auth.signOut(SignOutScope.OTHERS)
           ```
   - id: verify-otp
     title: 'Verify OTPs'
