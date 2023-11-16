@@ -620,6 +620,7 @@ functions:
       - Passwordless sign-ins can be resent by calling the `signInWithOtp()` method again.
       - Password recovery emails can be resent by calling the `resetPassswordForEmail()` method again.
       - This method will only resend an email or phone OTP to the user if there was an initial signup, email change or phone change request being made.
+      - You can specify a redirect url when you resend an email link using the `emailRedirectTo` option.
     examples:
       - id: resend-email-signup-confirmation
         name: Resend an email signup confirmation
@@ -630,6 +631,9 @@ functions:
           const { data, error } = await supabase.auth.resend({
             type: 'signup',
             email: 'email@example.com'
+            options: {
+              emailRedirectTo: 'https://example.com/welcome'
+            }
           })
           ```
       - id: resend-phone-signup-confirmation
@@ -708,9 +712,9 @@ functions:
     title: 'onAuthStateChange()'
     $ref: '@supabase/gotrue-js.GoTrueClient.onAuthStateChange'
     notes: |
-      - Types of auth events: `SIGNED_IN`, `SIGNED_OUT`, `TOKEN_REFRESHED`, `USER_UPDATED`, `PASSWORD_RECOVERY`
-      - Currently, `onAuthStateChange()` does not work across tabs.
-      For instance, in the case of a password reset flow, the original tab which requested for the password reset link will not receive the `SIGNED_IN` and `PASSWORD_RECOVERY` event when the user clicks on the link.
+      - Types of auth events: `INITIAL_SESSION`, `SIGNED_IN`, `SIGNED_OUT`, `TOKEN_REFRESHED`, `USER_UPDATED`, `PASSWORD_RECOVERY`
+      - The `INITIAL_SESSION` can be used to allow you to invoke the callback function when `onAuthStateChange` is first called.
+      - Currently, `onAuthStateChange()` does not work across tabs. For instance, in the case of a password reset flow, the original tab which requested for the password reset link will not receive the `SIGNED_IN` and `PASSWORD_RECOVERY` event when the user clicks on the link.
 
     examples:
       - id: listen-to-auth-changes
@@ -1017,6 +1021,7 @@ functions:
     notes: |
       - Sends an invite link to the user's email address.
       - The `inviteUserByEmail()` method is typically used by administrators to invite users to join the application.
+      - Note that PKCE is not supported when using `inviteUserByEmail`. This is because the browser initiating the invite is often different from the browser acecpting the invite which makes it difficult to provide the security guarantees required of the PKCE flow.
     examples:
       - id: invite-a-user
         name: Invite a user
@@ -4315,6 +4320,7 @@ functions:
           ```
         hideCodeBlock: true
         isSpotlight: true
+
   - id: csv
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.csv'
     title: csv()
@@ -4353,6 +4359,7 @@ functions:
           By default, the data is returned in JSON format, but can also be returned as Comma Separated Values.
         hideCodeBlock: true
         isSpotlight: true
+
   - id: returns
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.returns'
     title: returns()
@@ -4370,6 +4377,51 @@ functions:
           ```
           let x: typeof data // MyType | null
           ```
+        hideCodeBlock: true
+        isSpotlight: true
+
+  - id: explain
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.explain'
+    title: Using Explain
+    description: |
+      For debugging slow queries, you can get the [Postgres `EXPLAIN` execution plan](https://www.postgresql.org/docs/current/sql-explain.html) of a query
+      using the `explain()` method. This works on any query, even for `rpc()` or writes.
+
+      Explain is not enabled by default as it can reveal sensitive information about your database.
+      It's best to only enable this for testing environments but if you wish to enable it for production you can provide additional protection by using a `pre-request` function.
+
+      Follow the [Performance Debugging Guide](/docs/guides/api/rest/debugging-performance) to enable the functionality on your project.
+    examples:
+      - id: get-execution-plan
+        name: Get the execution plan
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .explain()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```
+          Aggregate  (cost=33.34..33.36 rows=1 width=112)
+            ->  Limit  (cost=0.00..18.33 rows=1000 width=40)
+                  ->  Seq Scan on countries  (cost=0.00..22.00 rows=1200 width=40)
+          ```
+        description: |
+          By default, the data is returned in TEXT format, but can also be returned as JSON by using the `format` parameter.
         hideCodeBlock: true
         isSpotlight: true
 
@@ -4802,7 +4854,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: list-buckets
         name: List buckets
@@ -4821,7 +4873,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: get-bucket
         name: Get bucket
@@ -4840,7 +4892,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: `insert`
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: create-bucket
         name: Create bucket
@@ -4863,7 +4915,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
         - `objects` table permissions: `select` and `delete`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: empty-bucket
         name: Empty bucket
@@ -4881,7 +4933,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: `select` and `update`
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: update-bucket
         name: Update bucket
@@ -4904,7 +4956,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: `select` and `delete`
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: delete-bucket
         name: Delete bucket
@@ -4923,7 +4975,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: only `insert` when you are uploading new files and `select`, `insert` and `update` when you are upserting files
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
       - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Upload file using `ArrayBuffer` from base64 file data instead, see example below.
     examples:
       - id: upload-file
@@ -4961,7 +5013,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `update` and `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
       - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Update file using `ArrayBuffer` from base64 file data instead, see example below.
     examples:
       - id: update-file
@@ -4999,7 +5051,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `update` and `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: move-file
         name: Move file
@@ -5019,7 +5071,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `insert` and `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: copy-file
         name: Copy file
@@ -5039,7 +5091,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: create-signed-url
         name: Create Signed URL
@@ -5056,7 +5108,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          const { data } = supabase
+          const { data } = await supabase
             .storage
             .from('avatars')
             .createSignedUrl('folder/avatar1.png', 60, {
@@ -5071,7 +5123,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          const { data } = supabase
+          const { data } = await supabase
             .storage
             .from('avatars')
             .createSignedUrl('folder/avatar1.png', 60, {
@@ -5086,7 +5138,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: create-signed-urls
         name: Create Signed URLs
@@ -5106,7 +5158,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `insert`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: create-signed-upload-url
         name: Create Signed Upload URL
@@ -5126,7 +5178,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: upload-to-signed-url
         name: Upload to a signed URL
@@ -5147,7 +5199,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: returns-the-url-for-an-asset-in-a-public-bucket
         name: Returns the URL for an asset in a public bucket
@@ -5194,7 +5246,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: download-file
         name: Download file
@@ -5230,7 +5282,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `delete` and `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: delete-file
         name: Delete file
@@ -5250,7 +5302,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: list-files-in-a-bucket
         name: List files in a bucket

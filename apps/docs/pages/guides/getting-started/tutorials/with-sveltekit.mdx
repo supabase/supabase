@@ -10,8 +10,9 @@ export const meta = {
 ![Supabase User Management example](/docs/img/user-management-demo.png)
 
 <Admonition type="note">
-  If you get stuck while working through this guide, refer to the [full example on
-  GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/sveltekit-user-management).
+
+If you get stuck while working through this guide, refer to the [full example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/sveltekit-user-management).
+
 </Admonition>
 
 <ProjectSetup />
@@ -308,7 +309,8 @@ Create a new `src/routes/account/+page.svelte` file with the content below.
 ```svelte src/routes/account/+page.svelte
 <!-- src/routes/account/+page.svelte -->
 <script lang="ts">
-	import { enhance, type SubmitFunction } from '$app/forms'
+	import { enhance } from '$app/forms';
+	import type { SubmitFunction } from '@sveltejs/kit';
 
 	export let data
 	export let form

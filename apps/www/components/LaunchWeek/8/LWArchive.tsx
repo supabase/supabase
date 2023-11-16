@@ -17,7 +17,7 @@ const LWArchive = () => {
           href="/launch-week/6"
           className="relative h-[160px] group w-full rounded-md md:rounded-lg transition-transform bg-[#030A0C] flex items-center justify-center border border-[#111618] hover:border-brand-800 overflow-hidden"
         >
-          <span className="relative z-10 stroke-text inline-block text-transparent bg-clip-text bg-gradient-to-b from-scale-1200 to-scale-1000 text-7xl drop-shadow-lg">
+          <span className="relative z-10 stroke-text inline-block text-transparent bg-clip-text bg-gradient-to-b from-foreground to-foreground-lighter text-7xl drop-shadow-lg">
             6
           </span>
           <div className="absolute inset-0 grayscale group-hover:grayscale-0">
@@ -33,7 +33,7 @@ const LWArchive = () => {
           href="/launch-week/7"
           className="relative h-[160px] group w-full rounded-md md:rounded-lg transition-transform bg-[#030A0C] flex items-center justify-center border border-[#111718] hover:border-brand-1200 overflow-hidden"
         >
-          <span className="relative z-10 stroke-text inline-block text-transparent bg-clip-text bg-gradient-to-b from-scale-1200 to-scale-1000 text-7xl drop-shadow-lg">
+          <span className="relative z-10 stroke-text inline-block text-transparent bg-clip-text bg-gradient-to-b from-foreground to-foreground-lighter text-7xl drop-shadow-lg">
             7
           </span>
           <div className="absolute inset-0 grayscale group-hover:grayscale-0">

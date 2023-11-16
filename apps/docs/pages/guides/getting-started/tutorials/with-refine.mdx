@@ -10,8 +10,9 @@ export const meta = {
 ![Supabase User Management example](/docs/img/user-management-demo.png)
 
 <Admonition type="note">
-  If you get stuck while working through this guide, refer to the [full example on
-  GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/refine-user-management).
+
+If you get stuck while working through this guide, refer to the [full example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/refine-user-management).
+
 </Admonition>
 
 ## About refine
@@ -21,9 +22,9 @@ export const meta = {
 refine provides hassle-free integration with Supabase backend with its supplementary [`@refinedev/supabase`](https://github.com/refinedev/refine/tree/master/packages/supabase) package. It generates `authProvider` and `dataProvider` methods at project initialization, so we don't need to expend much effort to define them ourselves. We just need to choose Supabase as our backend service while creating the app with `create refine-app`.
 
 <Admonition type="note">
-  It is possible to customize the `authProvider` for Supabase and as we'll see below, it can be
-  tweaked from `src/authProvider.ts` file. In contrast, the Supabase `dataProvider` is part of
-  `node_modules` and therefore is not subject to modification.
+
+It is possible to customize the `authProvider` for Supabase and as we'll see below, it can be tweaked from `src/authProvider.ts` file. In contrast, the Supabase `dataProvider` is part of `node_modules` and therefore is not subject to modification.
+
 </Admonition>
 
 <ProjectSetup />
