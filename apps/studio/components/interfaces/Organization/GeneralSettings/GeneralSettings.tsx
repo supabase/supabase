@@ -112,6 +112,14 @@ const GeneralSettings = () => {
                     label="Organization name"
                     disabled={!canUpdateOrganization}
                   />
+                  <Input
+                    copy
+                    disabled
+                    id="slug"
+                    size="small"
+                    label="Organization slug"
+                    value={selectedOrganization?.slug}
+                  />
                   <div className="mt-4">
                     <Toggle
                       id="isOptedIntoAi"
