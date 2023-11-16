@@ -1,6 +1,6 @@
 # Expo React Native Push Notifications with Supabase Edge Functions
 
-[Expo](https://docs.expo.dev/push-notifications/overview/) makes implementing push notifications easy. All the hassle with device information and communicating with Firebase Cloud Messaging (FCM) or Apple Push Notification Service (APNs) is done behind the scenes. This allows you to treat Android and iOS notifications in the same way and save time both on the front-end and back-end.
+[Expo](https://docs.expo.dev/push-notifications/overview/) makes implementing push notifications easy. All the hassle with device information and communicating with Firebase Cloud Messaging (FCM) or Apple Push Notification Service (APNs) is done behind the scenes. This allows you to treat Android and iOS notifications in the same way and save time both on the frontend and backend.
 
 ## Supabase Setup
 
@@ -57,5 +57,5 @@ Navigate to the [Database Webhooks settings](https://supabase.com/dashboard/proj
 ## Send push notification
 
 1. Navigate to the [table editor](https://supabase.com/dashboard/project/_/editor) in your Supabase Dashboard.
-1. In your `notifications` table insert a new row.
+1. In your `notifications` table, insert a new row.
 1. Watch the magic happen 🪄
