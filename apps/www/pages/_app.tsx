@@ -1,7 +1,5 @@
 import '@code-hike/mdx/styles'
 import 'config/code-hike.scss'
-import '../../../packages/ui/build/css/themes/dark.css'
-import '../../../packages/ui/build/css/themes/light.css'
 import '../styles/index.css'
 
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
@@ -12,7 +10,7 @@ import { AppProps } from 'next/app'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import { CommandMenuProvider, PortalToast, useConsent } from 'ui'
+import { CommandMenuProvider, PortalToast, themes, useConsent } from 'ui'
 import Meta from '~/components/Favicons'
 import { post } from '~/lib/fetchWrapper'
 import supabase from '~/lib/supabase'
@@ -96,7 +94,8 @@ export default function App({ Component, pageProps }: AppProps) {
       <SessionContextProvider supabaseClient={supabase}>
         <AuthProvider>
           <ThemeProvider
-            attribute="class"
+            // attribute="class"
+            themes={themes.map((theme) => theme.value)}
             defaultTheme="system"
             enableSystem
             disableTransitionOnChange

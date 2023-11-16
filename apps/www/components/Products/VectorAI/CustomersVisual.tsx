@@ -8,7 +8,7 @@ const CustomersVisual = () => {
       <div
         className="absolute inset-0 mx-auto aspect-[5.13/1] h-full z-10"
         style={{
-          background: `radial-gradient(50% 50% at 50% 50%, transparent, hsl(var(--background-alternative))`,
+          background: `radial-gradient(50% 50% at 50% 50%, transparent, hsl(var(--background-alternative-default))`,
         }}
       />
       <m.svg
@@ -50,7 +50,7 @@ const CustomersVisual = () => {
             cy="151.574"
             rx="271.124"
             ry="82.5656"
-            fill="hsl(var(--background-alternative))"
+            fill="hsl(var(--background-alternative-default))"
           />
         </g>
         <path
@@ -231,7 +231,7 @@ const CustomersVisual = () => {
             rx="303.093"
             ry="68.9323"
             transform="matrix(1 -0.000779452 -0.000779452 -1 562 296.168)"
-            fill="hsl(var(--background-alternative))"
+            fill="hsl(var(--background-alternative-default))"
           />
         </g>
         {/* coordinates */}
@@ -504,7 +504,7 @@ const CustomersVisual = () => {
             gradientTransform="translate(862.32 54.7715) rotate(90) scale(193.44 193.44)"
           >
             <stop stopColor="hsl(var(--background-default))" />
-            <stop offset="1" stopColor="hsl(var(--background-alternative))" />
+            <stop offset="1" stopColor="hsl(var(--background-alternative-default))" />
           </radialGradient>
           <m.linearGradient
             animate={{
@@ -535,7 +535,7 @@ const CustomersVisual = () => {
             gradientUnits="userSpaceOnUse"
           >
             <stop stopColor="hsl(var(--brand-default))" />
-            <stop offset="1" stopColor="hsl(var(--background-alternative))" />
+            <stop offset="1" stopColor="hsl(var(--background-alternative-default))" />
           </linearGradient>
           <linearGradient
             id="paint7_linear_4353_100693"
@@ -547,7 +547,7 @@ const CustomersVisual = () => {
           >
             <stop
               offset="0.331593"
-              stopColor="hsl(var(--background-alternative))"
+              stopColor="hsl(var(--background-alternative-default))"
               stopOpacity="0"
             />
             <stop offset="0.594681" stopColor="hsl(var(--foreground-lighter))" />
@@ -561,9 +561,9 @@ const CustomersVisual = () => {
             y2="236.32"
             gradientUnits="userSpaceOnUse"
           >
-            <stop offset="0.0114691" stopColor="hsl(var(--background-alternative))" />
+            <stop offset="0.0114691" stopColor="hsl(var(--background-alternative-default))" />
             <stop offset="0.540433" stopColor="hsl(var(--brand-default))" />
-            <stop offset="1" stopColor="hsl(var(--background-alternative))" />
+            <stop offset="1" stopColor="hsl(var(--background-alternative-default))" />
           </linearGradient>
           <linearGradient
             id="paint9_linear_4353_100693"

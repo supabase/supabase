@@ -124,8 +124,8 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
         </div>
         <div
           className={[
-            'bg-panel-header-light dark:bg-panel-header-dark',
-            'bg-panel-secondary-light dark:bg-panel-secondary-dark flex h-full flex-col justify-between',
+            'bg-panel-header-light',
+            'bg-panel-secondary-light flex h-full flex-col justify-between',
           ].join(' ')}
         >
           <div className="py-3 px-4">
