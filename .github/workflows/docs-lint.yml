@@ -1,10 +1,8 @@
 name: Lint docs
-on:
-  pull_request:
-  # For testing, remove before merging
-  push:
-    branches:
-      - chore/docs-vale
+on: pull_request
+
+permissions:
+  contents: read
 
 # Cancel old builds on new commit for same workflow + branch/PR
 concurrency:
@@ -12,9 +10,44 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  check_modified:
+    # See https://github.com/orgs/community/discussions/25669
+    # Can't just use `paths` check on entire workflow if we want to make this a required check
+    name: Check for modified docs
+    runs-on: ubuntu-latest
+    outputs:
+      run_linter: ${{ steps.check_files.outputs.run_linter }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            .vale.ini
+            apps/docs
+          fetch-depth: 2
+      - name: Check modified files
+        id: check_files
+        run: |
+          echo "=============== List modified files ==============="
+          git diff --name-only HEAD^ HEAD
+
+          echo "=============== Check paths of modified files ==============="
+          git diff --name-only HEAD^ HEAD > files.txt
+          while read -r file
+          do
+            echo $file
+            if [[ $file = apps/docs/* ]] | [[ $file = .vale.ini ]] | [[ $file = .github/workflows/docs-lint.yml ]]; then
+              echo "Modified file related to docs linting"
+              echo "run_linter=true" >> "$GITHUB_OUTPUT"
+              break
+            else
+              echo "Skipping"
+            fi
+          done < files.txt
   vale:
     name: Run Vale on docs
     runs-on: ubuntu-latest
+    needs: check_modified
+    if: needs.check_modified.outputs.run_linter == 'true'
     steps:
       - uses: actions/checkout@v4
         with:
