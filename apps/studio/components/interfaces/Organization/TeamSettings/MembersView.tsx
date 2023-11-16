@@ -220,7 +220,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
 
                         <Table.td>
                           <div className="flex items-center justify-center">
-                            <IconCheck className="text-brand" strokeWidth={2} />
+                            {x.mfa_enabled && <IconCheck className="text-brand" strokeWidth={2} />}
                           </div>
                         </Table.td>
 

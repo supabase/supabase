@@ -13,6 +13,10 @@ type Member = components['schemas']['Member']
 export interface OrganizationMember extends Member {
   invited_at?: string
   invited_id?: number
+  // [Joshen] Proactively adding this to support showing if member has MFA enabled
+  // can be removed once infra API changes from the following PR is in
+  // https://github.com/supabase/infrastructure/pull/15725
+  mfa_enabled?: boolean
 }
 
 export async function getOrganizationMembers(
@@ -37,6 +41,7 @@ export async function getOrganizationMembers(
     const member = {
       invited_at: invite.invited_at,
       invited_id: invite.invited_id,
+      mfa_enabled: false,
       username: invite.invited_email.slice(0, 1),
       primary_email: invite.invited_email,
     }
