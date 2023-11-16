@@ -1,7 +1,7 @@
 import '@ui/layout/ai-icon-animation/ai-icon-animation-style.module.css'
 import './globals.css'
 
-import Providers from '@/components/providers'
+import { ReactQueryProvider, ThemeProvider } from '@/components/providers'
 
 import type { Metadata } from 'next'
 
@@ -19,7 +19,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className="dark">
       <body>
-        <Providers>{children}</Providers>
+        <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
+          <ReactQueryProvider>{children}</ReactQueryProvider>
+        </ThemeProvider>
       </body>
     </html>
   )
