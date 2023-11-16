@@ -1,3 +1,7 @@
+CLI
+[Cc]onfig
+Firestore
+OAuth
 Postgres
 Realtime
 Supabase
