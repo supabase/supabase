@@ -144,7 +144,7 @@ const uiConfig = ui({
             '--tw-prose-invert-counters': 'hsl(var(--background-surface-200))',
             '--tw-prose-invert-bullets': 'hsl(var(--background-selection))',
             '--tw-prose-invert-hr': 'hsl(var(--border-strong))',
-            '--tw-prose-invert-quotes': 'hsl(var(--background-alternative))',
+            '--tw-prose-invert-quotes': 'hsl(var(--background-alternative-default))',
             '--tw-prose-invert-quote-borders': 'hsl(var(--border-strong))',
             '--tw-prose-invert-captions': 'hsl(var(--background-surface-200))',
             // the following are typography overrides
@@ -341,7 +341,7 @@ const uiConfig = ui({
             '--tw-prose-invert-counters': 'hsl(var(--background-surface-200))',
             '--tw-prose-invert-bullets': 'hsl(var(--background-selection))',
             '--tw-prose-invert-hr': 'hsl(var(--border-strong))',
-            '--tw-prose-invert-quotes': 'hsl(var(--background-alternative))',
+            '--tw-prose-invert-quotes': 'hsl(var(--background-alternative-default))',
             '--tw-prose-invert-quote-borders': 'hsl(var(--border-strong))',
             '--tw-prose-invert-captions': 'hsl(var(--background-surface-200))',
             // the following are typography overrides

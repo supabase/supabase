@@ -290,7 +290,7 @@ const uiConfig = {
       colors: {
         ...colorClasses,
         'hi-contrast': `hsl(var(--foreground-default))`,
-        'lo-contrast': `hsl(var(--background-alternative))`,
+        'lo-contrast': `hsl(var(--background-alternative-default))`,
         warning: {
           default: 'red',
           100: '#342355',

@@ -31,7 +31,7 @@ const FunctionsVisual = () => {
   const planetBg = isDarkTheme ? 'hsl(var(--background-default))' : 'hsl(var(--border-muted))'
   const planetHighlight = isDarkTheme
     ? 'hsl(var(--foreground-muted))'
-    : 'hsl(var(--background-alternative))'
+    : 'hsl(var(--background-alternative-alternative))'
 
   return (
     <figure
