@@ -15,6 +15,7 @@ import dayjs, { Dayjs } from 'dayjs'
 import { useCheckPermissions, useFlag } from 'hooks'
 import useFillTimeseriesSorted from 'hooks/analytics/useFillTimeseriesSorted'
 import sumBy from 'lodash/sumBy'
+import meanBy from 'lodash/meanBy'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
@@ -194,11 +195,6 @@ const PageLayout: NextPageWithLayout = () => {
               resourceUsageMetricsEnabled ? reqStatsResult.isLoading : invStatsResult.isLoading
             }
             renderer={(props) => {
-              const latest = props.data[props.data.length - 1]
-              let highlightedValue
-              if (latest) {
-                highlightedValue = latest['avg_execution_time']
-              }
               return (
                 <AreaChart
                   className="w-full"
@@ -207,7 +203,7 @@ const PageLayout: NextPageWithLayout = () => {
                   yAxisKey="avg_execution_time"
                   data={props.data}
                   format="ms"
-                  highlightedValue={highlightedValue}
+                  highlightedValue={meanBy(props.data, 'avg_execution_time')}
                 />
               )
             }}
@@ -294,11 +290,6 @@ const PageLayout: NextPageWithLayout = () => {
                 data={resourceUsageChartData}
                 isLoading={resourceUsageResult.isLoading}
                 renderer={(props) => {
-                  const latest = props.data[props.data.length - 1]
-                  let highlightedValue
-                  if (latest) {
-                    highlightedValue = latest['avg_cpu_time_used']
-                  }
                   return (
                     <AreaChart
                       className="w-full"
@@ -307,7 +298,7 @@ const PageLayout: NextPageWithLayout = () => {
                       yAxisKey="avg_cpu_time_used"
                       data={props.data}
                       format="ms"
-                      highlightedValue={highlightedValue}
+                      highlightedValue={meanBy(props.data, 'avg_cpu_time_used')}
                     />
                   )
                 }}
@@ -318,11 +309,6 @@ const PageLayout: NextPageWithLayout = () => {
                 data={resourceUsageChartData}
                 isLoading={resourceUsageResult.isLoading}
                 renderer={(props) => {
-                  const latest = props.data[props.data.length - 1]
-                  let highlightedValue
-                  if (latest) {
-                    highlightedValue = latest['avg_memory_used']
-                  }
                   return (
                     <AreaChart
                       className="w-full"
@@ -331,7 +317,7 @@ const PageLayout: NextPageWithLayout = () => {
                       yAxisKey="avg_memory_used"
                       data={props.data}
                       format="MB"
-                      highlightedValue={highlightedValue}
+                      highlightedValue={meanBy(props.data, 'avg_memory_used')}
                     />
                   )
                 }}
