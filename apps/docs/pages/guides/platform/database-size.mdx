@@ -71,6 +71,12 @@ Due to provider restrictions, disk expansions can occur only once every six hour
 
 </Admonition>
 
+<Admonition type="info">
+
+A Supabase (or Postgres) update will "right-size" your disk based on the current size of the database. For example, if your database is 100GB in size, and you have a 200GB disk, a Supabase update will reduce the disk size to 120GB (1.2x the size of your database).
+
+</Admonition>
+
 The maximum Disk Storage Size for the Pro plan is 16TB. If you need more than this, [contact us](https://forms.supabase.com/enterprise) to learn more about the Enterprise plan.
 
 ### Free Plan Behavior
