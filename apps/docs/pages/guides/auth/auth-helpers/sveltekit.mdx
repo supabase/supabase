@@ -603,6 +603,7 @@ Edit your `/src/hooks.server.js` with the below:
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
 import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit'
 import { redirect, error } from '@sveltejs/kit'
+import { sequence } from '@sveltejs/kit/hooks';
 
 async function supabase ({ event, resolve }) => {
   event.locals.supabase = createSupabaseServerClient({
@@ -662,11 +663,9 @@ export const handle = sequence(supabase, authorization);
 ```ts src/hooks.server.ts
 // src/hooks.server.ts
 import { type Handle, redirect, error } from '@sveltejs/kit'
-
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
 import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit'
-import { redirect, error } from '@sveltejs/kit'
-import type { Handle } from '@sveltejs/kit'
+import { sequence } from '@sveltejs/kit/hooks';
 
 async function supabase ({ event, resolve }) => {
   event.locals.supabase = createSupabaseServerClient({
