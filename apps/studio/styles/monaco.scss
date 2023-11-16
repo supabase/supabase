@@ -4,7 +4,7 @@
 }
 
 .gutter {
-  @apply bg-gray-100 dark:bg-gray-600;
+  @apply bg-border-control;
   cursor: row-resize;
 }
 

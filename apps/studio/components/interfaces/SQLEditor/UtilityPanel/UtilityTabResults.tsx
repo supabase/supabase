@@ -64,7 +64,7 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
 
   if (isExecuting) {
     return (
-      <div className="bg-table-header-light dark:bg-table-header-dark">
+      <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
         <p className="m-0 border-0 px-6 py-4 font-mono text-sm">Running...</p>
       </div>
     )
@@ -74,7 +74,7 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
     )
 
     return (
-      <div className="bg-table-header-light dark:bg-table-header-dark">
+      <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
         <div className="flex flex-row justify-between items-start py-4 px-6">
           {isTimeout ? (
             <div className="flex flex-col gap-y-1">
@@ -161,7 +161,7 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
     )
   } else if (!result) {
     return (
-      <div className="bg-table-header-light dark:bg-table-header-dark">
+      <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
         <p className="m-0 border-0 px-6 py-4 text-sm text-foreground-light">
           Click <code>Run</code> to execute your query.
         </p>

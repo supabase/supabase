@@ -47,7 +47,7 @@ const EnterpriseCard = ({ plan, isCurrentPlan }: EnterpriseCardProps) => {
           {plan.features.map((feature) => (
             <li key={feature} className="flex items-center py-2 first:mt-0">
               <IconCheck className="text-brand h-4 w-4" aria-hidden="true" strokeWidth={3} />
-              <span className="dark:text-foreground mb-0 ml-3 ">{feature}</span>
+              <span className="text-foreground mb-0 ml-3 ">{feature}</span>
             </li>
           ))}
         </ul>

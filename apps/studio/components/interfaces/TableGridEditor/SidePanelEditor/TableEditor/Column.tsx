@@ -84,7 +84,7 @@ const Column = ({
             title={column.name}
             disabled={hasImportContent}
             placeholder="column_name"
-            className={`table-editor-columns-input bg-white dark:bg-transparent lg:gap-0 ${
+            className={`table-editor-columns-input bg-surface-100 lg:gap-0 ${
               hasImportContent ? 'opacity-50' : ''
             } rounded-md`}
             onChange={(event: any) => onUpdateColumn({ name: event.target.value })}
@@ -166,7 +166,7 @@ const Column = ({
             size="small"
             value={column.defaultValue ?? ''}
             disabled={column.format.includes('int') && column.isIdentity}
-            className={`rounded bg-white dark:bg-transparent lg:gap-0 ${
+            className={`rounded bg-surface-100 lg:gap-0 ${
               column.format.includes('int') && column.isIdentity ? 'opacity-50' : ''
             }`}
             suggestions={suggestions}

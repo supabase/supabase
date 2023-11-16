@@ -40,7 +40,7 @@ const GridResize = ({ startDate, endDate, interval, editableReport, setEditableR
             <div
               key={x.id}
               data-grid={{ ...x, minH: 4, maxH: 4, minW: 8 }}
-              className="react-grid-layout__report-item bg-surface-100 border-overlay group relative rounded border px-6 py-4 shadow-sm hover:border-green-900 dark:hover:border-green-900"
+              className="react-grid-layout__report-item bg-surface-100 border-overlay group relative rounded border px-6 py-4 shadow-sm hover:border-green-900"
             >
               <ChartHandler
                 startDate={startDate}

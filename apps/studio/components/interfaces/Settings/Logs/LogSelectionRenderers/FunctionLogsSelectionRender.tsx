@@ -17,7 +17,7 @@ const FunctionLogsSelectionRender = ({ log }: any) => {
           {log.event_message}
         </div>
       </div>
-      <div className="h-px w-full bg-panel-border-interior-light dark:bg-panel-border-interior-dark"></div>
+      <div className="h-px w-full bg-panel-border-interior-light [[data-theme*=dark]_&]:bg-panel-border-interior-dark"></div>
       <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding} space-y-2`}>
         <SelectionDetailedRow
           label="Severity"

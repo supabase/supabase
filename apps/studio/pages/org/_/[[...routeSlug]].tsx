@@ -11,13 +11,13 @@ import { Button, IconPlus } from 'ui'
 
 const Header = () => {
   return (
-    <div className="dark:border-dark border-b p-3">
+    <div className="border-default border-b p-3">
       <div className="flex items-center space-x-2">
         <Link href="/projects">
           <img
             src={`${BASE_PATH}/img/supabase-logo.svg`}
             alt="Supabase"
-            className="dark:border-dark rounded border p-1 hover:border-white"
+            className="border-default rounded border p-1 hover:border-white"
             style={{ height: 24 }}
           />
         </Link>

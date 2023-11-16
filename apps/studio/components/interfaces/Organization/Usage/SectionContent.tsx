@@ -38,9 +38,7 @@ const SectionContent = ({
                 </div>
                 {links && links.length && (
                   <div className="space-y-2">
-                    <p className="text-sm text-foreground dark:text-foreground-light mb-2">
-                      More information
-                    </p>
+                    <p className="text-sm text-foreground mb-2">More information</p>
                     {links.map((link) => (
                       <div key={link.url}>
                         <Link href={link.url} target="_blank" rel="noreferrer">

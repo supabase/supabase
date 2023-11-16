@@ -309,7 +309,7 @@ const FileExplorerRow = ({
 
   return (
     <div
-      className="h-full border-b dark:border-dark"
+      className="h-full border-b border-default"
       onContextMenu={(event) => {
         event.stopPropagation()
         item.type === STORAGE_ROW_TYPES.FILE
@@ -320,9 +320,9 @@ const FileExplorerRow = ({
       <div
         className={[
           'storage-row group flex h-full items-center px-2.5',
-          'hover:bg-panel-footer-light dark:hover:bg-panel-footer-dark',
+          'hover:bg-panel-footer-light [[data-theme*=dark]_&]:hover:bg-panel-footer-dark',
           `${isOpened ? 'bg-surface-200' : ''}`,
-          `${isPreviewed ? 'bg-green-500 hover:bg-green-500 dark:hover:bg-green-500' : ''}`,
+          `${isPreviewed ? 'bg-green-500 hover:bg-green-500' : ''}`,
           `${item.status !== STORAGE_ROW_STATUS.LOADING ? 'cursor-pointer' : ''}`,
         ].join(' ')}
         onClick={(event) => {

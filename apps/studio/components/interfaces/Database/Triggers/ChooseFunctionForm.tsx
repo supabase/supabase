@@ -133,7 +133,7 @@ const SchemaFunctionGroup = observer(({ schema, selectFunction }: SchemaFunction
         <h5 className="text-foreground-light">schema</h5>
         <h5>{schema}</h5>
       </div>
-      <div className="space-y-0 divide-y border-t border-b dark:divide-dark dark:border-dark">
+      <div className="space-y-0 divide-y border-t border-b border-default">
         {_functions.map((x) => (
           <Function
             id={x.id}
@@ -191,7 +191,7 @@ const Function = ({ id, completeStatement, name, onClick }: FunctionProps) => {
         leaveFrom="transform opacity-100"
         leaveTo="transform opacity-0"
       >
-        <div className="mt-4 h-64 border dark:border-dark">
+        <div className="mt-4 h-64 border border-default">
           <SqlEditor defaultValue={completeStatement} readOnly={true} contextmenu={false} />
         </div>
       </Transition>

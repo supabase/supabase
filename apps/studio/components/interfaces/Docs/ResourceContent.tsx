@@ -44,7 +44,7 @@ const ResourceContent = ({
   return (
     <>
       <h2 className="doc-section__table-name text-foreground mt-0 flex items-center px-6 gap-2">
-        <span className="bg-slate-300 dark:bg-slate-400 p-2 rounded-lg">
+        <span className="bg-slate-300 p-2 rounded-lg">
           <IconTable size="small" />
         </span>
         <span className="text-2xl font-bold">{resourceId}</span>

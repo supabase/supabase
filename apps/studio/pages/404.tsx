@@ -25,7 +25,7 @@ const Error404: NextPage = ({}) => {
               <Link href="/projects">
                 <Image
                   src={
-                    resolvedTheme === 'dark'
+                    resolvedTheme?.includes('dark')
                       ? `${BASE_PATH}/img/supabase-dark.svg`
                       : `${BASE_PATH}/img/supabase-light.svg`
                   }

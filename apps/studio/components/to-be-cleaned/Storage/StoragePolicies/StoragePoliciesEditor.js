@@ -82,7 +82,7 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
 }
 
 const PolicyEditorFooter = ({ onViewTemplates = () => {}, onReviewPolicy = () => {} }) => (
-  <div className="flex w-full items-center justify-end space-x-4 border-t px-6 py-3 dark:border-dark">
+  <div className="flex w-full items-center justify-end space-x-4 border-t px-6 py-3 border-default">
     <Button asChild type="link" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
       <a
         href="https://supabase.com/docs/guides/storage/access-control"

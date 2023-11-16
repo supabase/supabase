@@ -14,6 +14,7 @@ import {
   CollapsibleContent_Shadcn_,
   IconTriangle,
   cn,
+  ThemeImage,
 } from 'ui'
 import ImageFadeStack from '~/components/ImageFadeStack'
 import ZoomableImg from '~/components/ZoomableImg/ZoomableImg'
@@ -103,7 +104,7 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
               props.wide && 'wide',
             ].join(' ')}
           >
-            <Image fill className="m-0 object-cover" {...props} />
+            <ThemeImage fill className="m-0 object-cover" {...props} />
           </span>
         </ZoomableImg>
         {props.caption && (

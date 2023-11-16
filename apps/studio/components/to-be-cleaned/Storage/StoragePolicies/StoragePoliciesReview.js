@@ -50,7 +50,7 @@ const StoragePoliciesReview = ({
           </div>
         </div>
       </Modal.Content>
-      <div className="flex w-full items-center justify-end gap-2 border-t px-6 py-4 dark:border-dark">
+      <div className="flex w-full items-center justify-end gap-2 border-t px-6 py-4 border-default">
         <Button type="default" onClick={onSelectBack}>
           Back to edit
         </Button>

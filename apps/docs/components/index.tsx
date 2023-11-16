@@ -32,7 +32,7 @@ import CliGlobalFlagsHandler from '~/components/reference/enrichments/cli/CliGlo
 import Options from '~/components/Options'
 import Param from '~/components/Params'
 
-import { Admonition } from 'ui'
+import { Admonition, ThemeImage } from 'ui'
 import {
   IconMenuJavascript,
   IconMenuHome,
@@ -102,6 +102,7 @@ const components = {
       {props.children}
     </Heading>
   ),
+  Image: (props: any) => <ThemeImage fill className="object-contain" {...props} />,
   RefSubLayout,
   RefHeaderSection: (props: any) => <RefHeaderSection {...props} />,
   CliGlobalFlagsHandler: () => <CliGlobalFlagsHandler />,

@@ -59,13 +59,15 @@ const TopNavBar: FC = () => {
             <Image
               className="cursor-pointer"
               src={
-                resolvedTheme === 'dark' ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'
+                resolvedTheme?.includes('dark')
+                  ? '/docs/supabase-dark.svg'
+                  : '/docs/supabase-light.svg'
               }
               width={96}
               height={24}
               alt="Supabase Logo"
             />
-            <span className="font-mono text-sm font-medium text-brand">DOCS</span>
+            <span className="font-mono text-sm font-medium text-brand-link">DOCS</span>
           </Link>
         </div>
 

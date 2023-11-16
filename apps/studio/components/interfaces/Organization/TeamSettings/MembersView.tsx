@@ -305,10 +305,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                 }),
                 ...(searchString.length > 0 && filteredMembers.length === 0
                   ? [
-                      <Table.tr
-                        key="no-results"
-                        className="bg-panel-secondary-light dark:bg-panel-secondary-dark"
-                      >
+                      <Table.tr key="no-results" className="bg-panel-secondary-light">
                         <Table.td colSpan={12}>
                           <div className="flex items-center space-x-3 opacity-75">
                             <IconAlertCircle size={16} strokeWidth={2} />
@@ -320,10 +317,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                       </Table.tr>,
                     ]
                   : []),
-                <Table.tr
-                  key="footer"
-                  className="bg-panel-secondary-light dark:bg-panel-secondary-dark"
-                >
+                <Table.tr key="footer" className="bg-panel-secondary-light">
                   <Table.td colSpan={4}>
                     <p className="text-foreground-light">
                       {searchString ? `${filteredMembers.length} of ` : ''}

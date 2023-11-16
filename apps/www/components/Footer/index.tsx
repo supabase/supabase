@@ -20,7 +20,7 @@ const Footer = (props: Props) => {
   const { resolvedTheme } = useTheme()
   const { pathname } = useRouter()
 
-  const isLaunchWeekPage = pathname.includes('launch-week') || pathname === '/'
+  const forceDark = pathname.includes('launch-week') || pathname === '/'
 
   /**
    * Temporary fix for next-theme client side bug
@@ -43,7 +43,7 @@ const Footer = (props: Props) => {
         Footer
       </h2>
       <div className="w-full !py-0">
-        <SectionContainer className="grid grid-cols-2 md:flex items-center justify-between md:justify-center gap-8 md:gap-16 xl:gap-28 !py-6 md:!py-10 text-sm">
+        <SectionContainer className="grid grid-cols-2 md:flex items-center justify-between text-foreground md:justify-center gap-8 md:gap-16 xl:gap-28 !py-6 md:!py-10 text-sm">
           <div className="flex flex-col md:flex-row gap-2 md:items-center">
             We protect your data.
             <Link href="/security" className="text-brand hover:underline">
@@ -69,9 +69,9 @@ const Footer = (props: Props) => {
             <Link href="#" as="/" className="w-40">
               <Image
                 src={
-                  isLaunchWeekPage
+                  forceDark
                     ? supabaseLogoWordmarkDark
-                    : mounted && resolvedTheme === 'dark'
+                    : mounted && resolvedTheme?.includes('dark')
                     ? supabaseLogoWordmarkDark
                     : supabaseLogoWordmarkLight
                 }
@@ -164,7 +164,11 @@ const Footer = (props: Props) => {
         </div>
         <div className="border-default mt-32 flex justify-between border-t pt-8">
           <small className="small">&copy; Supabase Inc</small>
-          <ThemeToggle forceDark={isLaunchWeekPage} />
+          <div
+            className={cn(forceDark && '[&>button]:opacity-50 [&>button]:hover:cursor-not-allowed')}
+          >
+            <ThemeToggle forceDark={forceDark} />
+          </div>
         </div>
       </SectionContainer>
     </footer>

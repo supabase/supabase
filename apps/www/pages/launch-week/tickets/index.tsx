@@ -42,8 +42,8 @@ export default function TicketsPage({ users }: Props) {
   const DESCRIPTION = 'Supabase Launch Week 8 | 7–11 August 2023'
   const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/8/lw8-og.jpg`
 
-  const { theme, setTheme } = useTheme()
-  const [initialDarkMode] = useState(theme === 'dark')
+  const { resolvedTheme, setTheme } = useTheme()
+  const [initialDarkMode] = useState(resolvedTheme?.includes('dark'))
   const [isLoading, setIsLoading] = useState(false)
   const [offset, setOffset] = useState(1)
   const [isLast, setIsLast] = useState(false)

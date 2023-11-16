@@ -55,15 +55,12 @@ Each plan includes a quota for unified egress, which is applied to your entire o
 You can see a breakdown of the different types of egress on your [organization usage page](https://supabase.com/dashboard/org/_/usage).
 
 <div>
-  <img
+  <Image
     alt="Unified Egress"
-    className="dark:hidden w-full object-contain"
-    src="/docs/img/guides/platform/unified-egress--light.png"
-  />
-  <img
-    alt="Unified Egress"
-    className="hidden dark:block w-full object-contain"
-    src="/docs/img/guides/platform/unified-egress.png"
+    src={{
+      light: '/docs/img/guides/platform/unified-egress--light.png',
+      dark: '/docs/img/guides/platform/unified-egress.png',
+    }}
   />
 </div>
 
@@ -258,15 +255,13 @@ While we will roll out the new billing for all users during the next few weeks, 
 Head over to your [organization billing settings](https://supabase.com/dashboard/org/_/billing) to initiate the migration.
 
 <div>
-  <img
+  <Image
     alt="Self-Serve migration"
-    className="dark:hidden w-full object-contain"
-    src="/docs/img/guides/platform/org-billing-migration--light.png"
-  />
-  <img
-    alt="Self-Serve migration"
-    className="hidden dark:block w-full object-contain"
-    src="/docs/img/guides/platform/org-billing-migration.png"
+    className="w-full object-contain"
+    src={{
+      light: '/docs/img/database/partitions-light.png',
+      dark: '/docs/img/database/partitions-dark.png',
+    }}
   />
 </div>
 

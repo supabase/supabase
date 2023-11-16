@@ -65,7 +65,7 @@ const BackupItem = ({ index, backup, projectRef, onSelectBackup }: BackupItemPro
   return (
     <div
       className={`flex h-12 items-center justify-between px-6 ${
-        index ? 'border-t dark:border-dark' : ''
+        index ? 'border-t border-default' : ''
       }`}
     >
       <p className="text-sm text-foreground ">{generateBackupName(backup)}</p>

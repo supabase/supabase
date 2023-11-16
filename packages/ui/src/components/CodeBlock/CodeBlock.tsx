@@ -38,8 +38,9 @@ export const CodeBlock = ({
   hideCopy = false,
   hideLineNumbers = false,
 }: CodeBlockProps) => {
-  const { theme } = useTheme()
-  const monokaiTheme = monokaiCustomTheme(theme === 'dark')
+  const { resolvedTheme } = useTheme()
+  const isDarkTheme = resolvedTheme?.includes('dark')!
+  const monokaiTheme = monokaiCustomTheme(isDarkTheme)
 
   const [copied, setCopied] = useState(false)
 
@@ -136,7 +137,7 @@ export const CodeBlock = ({
             <div
               className={[
                 'absolute right-2',
-                `${theme === 'dark' ? 'dark' : ''}`,
+                `${isDarkTheme ? 'dark' : ''}`,
                 `${!title ? 'top-2' : 'top-[3.25rem]'}`,
               ].join(' ')}
             >

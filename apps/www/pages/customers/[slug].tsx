@@ -149,9 +149,9 @@ function CaseStudyPage(props: any) {
                                 object-contain
                                 m-0
 
-                                dark:brightness-200
-                                dark:contrast-0
-                                dark:filter
+                                [[data-theme*=dark]_&]:brightness-200
+                                [[data-theme*=dark]_&]:contrast-0
+                                [[data-theme*=dark]_&]:filter
                               "
                           />
                         </div>

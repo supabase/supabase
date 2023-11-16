@@ -194,7 +194,7 @@
   &--inner-wrapper {
     background: linear-gradient(
       90deg,
-      hsl(var(--background-alternative)) 50%,
+      hsl(var(--background-alternative-default)) 50%,
       hsl(var(--background-surface-100)) 50%
     );
     width: 100%;
@@ -359,7 +359,7 @@
 
 .radix-tooltip-arrow {
   polygon {
-    @apply fill-background-alternative dark:fill-background-alternative;
+    @apply fill-background-alternative [[data-theme*=dark]_&]:fill-background-alternative;
     // fill: #eeeeee;
   }
 }
@@ -376,7 +376,7 @@
 
 .thin-scrollbars {
   scrollbar-width: thin;
-  scrollbar-color: hsl(var(--foreground-muted)) hsl(var(--background-alternative));
+  scrollbar-color: hsl(var(--foreground-muted)) hsl(var(--background-alternative-default));
 
   .dark & {
     scrollbar-color: hsl(var(--foreground-lighter)) hsl(var(--background-surface-100));

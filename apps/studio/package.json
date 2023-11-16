@@ -160,7 +160,7 @@
     "prettier": "^2.8.8",
     "storybook-dark-mode": "^3.0.1",
     "superjson": "^1.12.3",
-    "tailwindcss": "^3.1.8",
+    "tailwindcss": "^3.3.5",
     "typescript": "^5.2.2"
   }
 }

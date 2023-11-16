@@ -1,9 +1,6 @@
-import '../../../packages/ui/build/css/themes/dark.css'
-import '../../../packages/ui/build/css/themes/light.css'
-
 import '@code-hike/mdx/styles'
 import 'config/code-hike.scss'
-import '../styles/main.scss?v=1.0.0'
+import '../styles/main.scss'
 import '../styles/new-docs.scss'
 import '../styles/prism-okaidia.scss'
 
@@ -161,12 +158,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     <>
       <Favicons />
       <AuthContainer>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
+        <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
           <CommandMenuProvider site="docs">
             <TabsProvider>
               <SiteLayout>

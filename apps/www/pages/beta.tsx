@@ -16,7 +16,7 @@ import Layout from '~/components/Layouts/Default'
 const site_title = `${APP_NAME} | We are now in Beta`
 
 // Dark text: text-dark-400
-// Light text: text-dark-300
+// Light text: text-foreground-light
 
 type Props = {
   darkMode: boolean
@@ -28,19 +28,17 @@ const NavFlyOutMenu = (props: any) => {
 
   return (
     <>
-      <div className="grid items-center grid-cols-12 col-span-12 border-b border-dashed border-dark-300 dark:border-dark-400 sm:border-r">
+      <div className="grid items-center grid-cols-12 col-span-12 border-b border-dashed border-default sm:border-r">
         {segments.flat().map((segment: any) => (
           <div
             key={segment.key}
             onClick={() => scrollTo(segment.key)}
             className={`
-              text-dark-300 dark:text-dark-400 dark:bg-dark-600 hover:bg-dark-100 dark:hover:bg-dark-500 border-dark-300 dark:border-dark-400 col-span-12 cursor-pointer border-t border-dashed
-              bg-white px-4 py-4 sm:border-l lg:col-span-4 lg:px-6 lg:py-10`}
+              text-foreground-light bg-surface-100 hover:bg-surface-200 border-default col-span-12 cursor-pointer border-t border-dashed
+              px-4 py-4 sm:border-l lg:col-span-4 lg:px-6 lg:py-10`}
           >
-            <p className="flex items-center text-black dark:text-white">
-              <span className="mr-2 font-mono text-xs text-dark-300 dark:text-dark-400">
-                0{segment.no}
-              </span>
+            <p className="flex items-center text-foreground">
+              <span className="mr-2 font-mono text-xs text-foreground-light">0{segment.no}</span>
               <span>{segment.name}</span>
             </p>
           </div>
@@ -53,12 +51,12 @@ const NavFlyOutMenu = (props: any) => {
 const VideoShot = (props: any) => {
   const { src } = props
   return (
-    <div className="p-2 rounded-xl bg-gradient-to-r from-green-400 via-violet-500 to-blue-500">
+    <div className="p-2 rounded-xl bg-gradient-to-b from-border-strong to-background-surface-300">
       <div className="rounded-md shadow-lg" style={{ height: 'fit-content' }}>
-        <div className="flex items-center justify-start w-full h-5 px-2 bg-dark-400 rounded-t-md">
-          <div className="w-2 h-2 mr-2 rounded-full bg-dark-500" />
-          <div className="w-2 h-2 mr-2 rounded-full bg-dark-500" />
-          <div className="w-2 h-2 mr-2 rounded-full bg-dark-500" />
+        <div className="flex items-center justify-start w-full h-5 px-2 bg-border-strong rounded-t-md">
+          <div className="w-2 h-2 mr-2 rounded-full bg-overlay" />
+          <div className="w-2 h-2 mr-2 rounded-full bg-overlay" />
+          <div className="w-2 h-2 mr-2 rounded-full bg-overlay" />
         </div>
         <video className="rounded-b-md" src={src} autoPlay loop muted playsInline>
           Your browser does not support the video tag
@@ -95,7 +93,7 @@ const SectionHeader = (props: any) => {
   return (
     <div className="col-span-12">
       <span className="block mb-3 font-mono text-3xl text-foreground">0{sectionNumber}</span>
-      <h3 className="text-6xl text-black dark:text-white">{header}</h3>
+      <h3 className="text-6xl text-foreground">{header}</h3>
     </div>
   )
 }
@@ -114,8 +112,8 @@ const Hero = (props: Props) => {
       }}
       className="py-16 bg-no-repeat bg-surface-100 lg:py-36"
     >
-      <div className="container grid items-center h-full grid-cols-12 gap-4 px-8 py-20 mx-auto text-dark-300 lg:px-28">
-        <div className="col-span-12 text-muted dark:text-white md:col-span-9 lg:col-span-8 xl:col-span-6">
+      <div className="container grid items-center h-full grid-cols-12 gap-4 px-8 py-20 mx-auto text-foreground-light lg:px-28">
+        <div className="col-span-12 text-foreground md:col-span-9 lg:col-span-8 xl:col-span-6">
           <p className="mb-10 text-4xl">Supabase is an open source Firebase alternative.</p>
           <p className="text-2xl">
             Today, we're moving to <span className="text-brand">Beta</span>
@@ -131,7 +129,7 @@ const Hero = (props: Props) => {
 
 const Introduction = () => {
   return (
-    <div className="container grid grid-cols-12 gap-4 px-8 py-20 mx-auto text-dark-300 lg:px-28">
+    <div className="container grid grid-cols-12 gap-4 px-8 py-20 mx-auto text-foreground-light lg:px-28">
       <div className="col-span-12 sm:col-span-9 xl:col-span-8">
         <p>
           <span className="block text-2xl text-foreground">
@@ -179,7 +177,7 @@ const Introduction = () => {
       </div>
 
       <div className="col-span-12 mb-10 text-base">
-        <p className="pb-2 border-b-2 border-dark-200 text-foreground-light dark:border-dark-400 w-60">
+        <p className="pb-2 border-b-2 border-default text-foreground-light w-60">
           Alpha Program in Numbers
         </p>
       </div>
@@ -219,11 +217,11 @@ const Introduction = () => {
 const TableOfContents = (props: any) => {
   const { scrollTo } = props
   return (
-    <div className="bg-surface-100 dark:text-dark-200">
+    <div className="bg-surface-100 text-foreground">
       <div className="container grid grid-cols-12 gap-4 px-8 py-20 mx-auto lg:px-28">
         <div className="col-span-12 mb-10 text-base">
-          <p className="text-2xl text-black dark:text-white">
-            Supabase <span className="text-brand dark:text-brand">Beta</span> is starting now.
+          <p className="text-2xl text-foreground">
+            Supabase <span className="text-brand">Beta</span> is starting now.
           </p>
         </div>
         <div className="grid grid-cols-12 col-span-12 gap-y-10">
@@ -241,7 +239,7 @@ const TableOfContents = (props: any) => {
                     onClick={() => scrollTo(chapter.key)}
                   >
                     <p className="font-mono text-xs text-foreground">{`0${chapter.no}`}</p>
-                    <p className="ml-4 text-base text-black transition border-b border-gray-400 hover:text-gray-1000 dark:hover:text-gray-1000 dark:text-white">
+                    <p className="ml-4 text-base text-black transition border-b border-default hover:text-foreground">
                       {chapter.name}
                     </p>
                   </div>
@@ -301,7 +299,7 @@ const Performance = () => {
         {PerformanceComparisonData.map((metric: any) => {
           const multiplier = (metric.stats[0].value / metric.stats[1].value).toFixed(1)
           return (
-            <div key={`${metric.key}`} className="mb-10 text-dark-400 dark:text-dark-300">
+            <div key={`${metric.key}`} className="mb-10 text-foreground-light">
               <p className="pb-2 mb-4 sm:w-36">{metric.title}</p>
               <div className="flex flex-col sm:flex-row sm:items-center">
                 <div className="w-full sm:w-5/6">
@@ -311,11 +309,7 @@ const Performance = () => {
                         {stat.name}
                       </p>
                       <Bar
-                        color={
-                          stat.name === 'Supabase'
-                            ? 'bg-brand dark:bg-brand-300'
-                            : 'bg-brand-300 dark:bg-brand-400'
-                        }
+                        color={stat.name === 'Supabase' ? 'bg-brand' : 'bg-brand-400'}
                         finalPercentage={Math.ceil((stat.value / maxValue) * 100)}
                       />
                       <p className="ml-2">{stat.value}/s</p>
@@ -323,7 +317,7 @@ const Performance = () => {
                   ))}
                 </div>
                 <div className="flex flex-col text-left sm:w-1/6 sm:text-right">
-                  <p className="text-6xl text-dark-700 dark:text-dark-100">{multiplier}x</p>
+                  <p className="text-6xl text-foreground-lighter">{multiplier}x</p>
                   <p className="-mt-2 text-sm">more {metric.key}s per second</p>
                 </div>
               </div>
@@ -336,7 +330,7 @@ const Performance = () => {
 
   return (
     <div id="performance" className="bg-background">
-      <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-300 gap-y-10 lg:px-28">
+      <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-foreground-light gap-y-10 lg:px-28">
         <SectionHeader sectionNumber={1} header="Performance" />
 
         <div className="grid items-center grid-cols-12 col-span-12 mb-10 text-foreground gap-x-2 lg:gap-x-8">
@@ -374,7 +368,7 @@ const Performance = () => {
               </a>{' '}
               team while they improved the performance of their auto-generated CRUD APIs.
             </p>
-            <p className="text-dark-400 dark:text-dark-300">
+            <p className="text-foreground-light">
               We're publishing the results of our benchmarks here and we'll continue to seek gains
               throughout our Beta program and beyond. Our{' '}
               <a
@@ -419,7 +413,7 @@ const Performance = () => {
 const Security = () => {
   return (
     <div id="security" className="bg-surface-100">
-      <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-200 gap-y-10 lg:px-28">
+      <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-foreground-light gap-y-10 lg:px-28">
         <SectionHeader sectionNumber={2} header="Security" />
 
         <div className="grid grid-cols-12 col-span-12 text-foreground gap-x-2 lg:gap-x-8">
@@ -479,7 +473,7 @@ const Security = () => {
 const Reliability = () => {
   return (
     <div id="reliability" className="bg-background">
-      <div className="container grid grid-cols-12 px-8 py-12 mx-auto text-dark-400 dark:text-dark-300 gap-y-10 lg:px-28 ">
+      <div className="container grid grid-cols-12 px-8 py-12 mx-auto text-foreground-light gap-y-10 lg:px-28 ">
         <SectionHeader sectionNumber={3} header="Reliability" />
 
         <div className="grid grid-cols-12 col-span-12 mb-10 text-foreground gap-x-2 lg:gap-x-8">
@@ -532,7 +526,7 @@ const NewFeaturesAndIntegrations = () => {
   const { basePath } = useRouter()
   return (
     <div id="newFeaturesAndIntegrations" className="bg-surface-100">
-      <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-200 gap-y-10 lg:px-28">
+      <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-foreground-light gap-y-10 lg:px-28">
         <SectionHeader sectionNumber={4} header="New Features & Integrations" />
 
         <div className="grid grid-cols-12 col-span-12 mb-10 text-foreground gap-x-2 lg:gap-x-8">
@@ -543,9 +537,7 @@ const NewFeaturesAndIntegrations = () => {
             </p>
             <ul className="">
               <li className="mb-10">
-                <p className="w-20 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
-                  Auth
-                </p>
+                <p className="w-20 pb-2 mb-2 border-b-2 border-default">Auth</p>
                 <p className="mb-5">
                   If you're new to Supabase, here's a few of the things you get when you choose us
                   as your backend. We provide{' '}
@@ -574,9 +566,7 @@ const NewFeaturesAndIntegrations = () => {
                 <VideoShot src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/tabAuthRules.mp4" />
               </li>
               <li className="mb-10">
-                <p className="w-20 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
-                  Realtime
-                </p>
+                <p className="w-20 pb-2 mb-2 border-b-2 border-default">Realtime</p>
                 <p>
                   You can{' '}
                   <a
@@ -592,9 +582,7 @@ const NewFeaturesAndIntegrations = () => {
                 </p>
               </li>
               <li className="mb-10">
-                <p className="w-24 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
-                  CRUD API
-                </p>
+                <p className="w-24 pb-2 mb-2 border-b-2 border-default">CRUD API</p>
                 <p>
                   You can use your database immediately, without an ORM or an API backend. We
                   support GraphQL-like{' '}
@@ -617,9 +605,7 @@ const NewFeaturesAndIntegrations = () => {
                 </p>
               </li>
               <li className="mb-10">
-                <p className="pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400 w-44">
-                  Quickstart Templates
-                </p>
+                <p className="pb-2 mb-2 border-b-2 border-default w-44">Quickstart Templates</p>
                 <p>
                   If you're unfamiliar with SQL, we provide a set of Quickstart Templates to get you
                   building quickly. Very soon you'll be able to deploy entire apps (front and back
@@ -627,9 +613,7 @@ const NewFeaturesAndIntegrations = () => {
                 </p>
               </li>
               <li className="mb-10">
-                <p className="w-24 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
-                  Table View
-                </p>
+                <p className="w-24 pb-2 mb-2 border-b-2 border-default">Table View</p>
                 <p className="mb-5">
                   View and edit your data like a spreadsheet from within the Supabase dashboard.
                   Build your schema, create complex relationships, and import and export to csv.
@@ -637,9 +621,7 @@ const NewFeaturesAndIntegrations = () => {
                 <VideoShot src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/tabTableEditor.mp4" />
               </li>
               <li>
-                <p className="w-24 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
-                  SQL Editor
-                </p>
+                <p className="w-24 pb-2 mb-2 border-b-2 border-default">SQL Editor</p>
                 <p className="mb-5">
                   No need to install third party SQL tools, you can run queries directly from the
                   Supabase Dashboard.
@@ -656,7 +638,7 @@ const NewFeaturesAndIntegrations = () => {
 
 const BetaPricing = () => (
   <div id="betaPricing" className="bg-background">
-    <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-300 gap-y-10 lg:px-28">
+    <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-foreground-light gap-y-10 lg:px-28">
       <SectionHeader sectionNumber={5} header="Beta Pricing" />
 
       <div className="grid grid-cols-12 col-span-12 mb-10 text-foreground gap-x-2 lg:gap-x-8">
@@ -724,7 +706,7 @@ const BetaPricing = () => (
 
 const OpenSource = () => (
   <div id="openSource" className="bg-surface-100">
-    <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-200 gap-y-10 lg:px-28">
+    <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-foreground-light gap-y-10 lg:px-28">
       <SectionHeader sectionNumber={6} header="Open Source" />
 
       <div className="grid grid-cols-12 col-span-12 mb-10 text-foreground gap-x-2 lg:gap-x-8">
@@ -791,7 +773,7 @@ const OpenSource = () => (
 
 const FundingPartners = () => (
   <div id="fundingPartners" className="bg-background">
-    <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-300 gap-y-10 lg:px-28">
+    <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-foreground-light gap-y-10 lg:px-28">
       <SectionHeader sectionNumber={7} header="Funding Partners" />
       <div className="grid grid-cols-12 col-span-12 mb-10 text-foreground gap-x-2 lg:gap-x-8">
         <div className="col-span-12 text-base sm:col-span-9 xl:col-span-7">
@@ -828,7 +810,7 @@ const FundingPartners = () => (
 
 const ScalingOurTeam = () => (
   <div id="scalingOurTeam" className="bg-surface-100">
-    <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-200 gap-y-10 lg:px-28">
+    <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-foreground-light gap-y-10 lg:px-28">
       <SectionHeader sectionNumber={8} header="Scaling Our Team" />
 
       <div className="grid grid-cols-12 col-span-12 mb-10 text-foreground gap-x-2 lg:gap-x-8">
@@ -865,7 +847,7 @@ const ScalingOurTeam = () => (
 
 const WhatsNext = () => (
   <div id="whatsNext" className="border-b-px bg-background border-muted">
-    <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-300 gap-y-10 lg:px-28">
+    <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-foreground-light gap-y-10 lg:px-28">
       <SectionHeader sectionNumber={9} header="What's Next" />
 
       <div className="grid grid-cols-12 col-span-12 mb-10 text-foreground gap-x-2 lg:gap-x-8">

@@ -63,7 +63,7 @@ export default function TicketProfile({
               styles.name,
               { [styles['name-blank']]: !username },
               { [styles['name-golden']]: golden }
-            )} dark:text-white text-center`}
+            )} text-foreground text-center`}
           >
             <div
               className={`${cn(styles.skeleton, styles.wrapper, {

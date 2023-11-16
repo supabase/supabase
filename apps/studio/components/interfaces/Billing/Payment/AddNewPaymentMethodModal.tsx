@@ -90,7 +90,7 @@ const AddNewPaymentMethodModal = ({
 
   const options = {
     clientSecret: intent ? intent.client_secret : '',
-    appearance: { theme: resolvedTheme === 'dark' ? 'night' : 'flat', labels: 'floating' },
+    appearance: { theme: resolvedTheme?.includes('dark') ? 'night' : 'flat', labels: 'floating' },
   } as any
 
   const onLocalCancel = () => {

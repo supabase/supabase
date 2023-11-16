@@ -77,13 +77,10 @@ With this setup the database is the bottleneck - 20,000 QPS was the maximum this
 <div>
   <Img
     alt="chart connections baseline light"
-    className="dark:hidden"
-    src="/images/blog/2023-08-11-supavisor-1-million/chart-baseline-light.png"
-  />
-  <Img
-    alt="chart connections baseline dark"
-    className="hidden dark:block"
-    src="/images/blog/2023-08-11-supavisor-1-million/chart-baseline-dark.png"
+    src={{
+      light: '/images/blog/2023-08-11-supavisor-1-million/chart-baseline-light.png',
+      dark: '/images/blog/2023-08-11-supavisor-1-million/chart-baseline-dark.png',
+    }}
   />
 </div>
 
@@ -101,13 +98,10 @@ The system showed no signs of instability or performance degradation. QPS remain
 <div>
   <Img
     alt="chart connections vertical scaling light"
-    className="dark:hidden"
-    src="/images/blog/2023-08-11-supavisor-1-million/chart-vertical-light.png"
-  />
-  <Img
-    alt="chart connections vertical scaling dark"
-    className="hidden dark:block"
-    src="/images/blog/2023-08-11-supavisor-1-million/chart-vertical-dark.png"
+    src={{
+      light: '/images/blog/2023-08-11-supavisor-1-million/chart-vertical-light.png',
+      dark: '/images/blog/2023-08-11-supavisor-1-million/chart-vertical-dark.png',
+    }}
   />
 </div>
 
@@ -116,13 +110,10 @@ We also monitored how the load was distributed over Supavisor instance's cores:
 <div>
   <Img
     alt="cpu load vertical scaling light"
-    className="dark:hidden"
-    src="/images/blog/2023-08-11-supavisor-1-million/cpu-vertical-light.png"
-  />
-  <Img
-    alt="cpu load vertical scaling dark"
-    className="hidden dark:block"
-    src="/images/blog/2023-08-11-supavisor-1-million/cpu-vertical-dark.png"
+    src={{
+      light: '/images/blog/2023-08-11-supavisor-1-million/cpu-vertical-light.png',
+      dark: '/images/blog/2023-08-11-supavisor-1-million/cpu-vertical-dark.png',
+    }}
   />
 </div>
 
@@ -147,13 +138,10 @@ This setup successfully handled:
 <div>
   <Img
     alt="chart connections 1 million light"
-    className="dark:hidden"
-    src="/images/blog/2023-08-11-supavisor-1-million/chart-1m-light.png"
-  />
-  <Img
-    alt="chart connections 1 million dark"
-    className="hidden dark:block"
-    src="/images/blog/2023-08-11-supavisor-1-million/chart-1m-dark.png"
+    src={{
+      light: '/images/blog/2023-08-11-supavisor-1-million/chart-1m-light.png',
+      dark: '/images/blog/2023-08-11-supavisor-1-million/chart-1m-dark.png',
+    }}
   />
 </div>
 
@@ -165,13 +153,10 @@ Within the cluster:
 <div>
   <Img
     alt="cpu load 1 million light"
-    className="dark:hidden"
-    src="/images/blog/2023-08-11-supavisor-1-million/cpu-1m-light.png"
-  />
-  <Img
-    alt="cpu load 1 million dark"
-    className="hidden dark:block"
-    src="/images/blog/2023-08-11-supavisor-1-million/cpu-1m-dark.png"
+    src={{
+      light: '/images/blog/2023-08-11-supavisor-1-million/cpu-1m-light.png',
+      dark: '/images/blog/2023-08-11-supavisor-1-million/cpu-1m-dark.png',
+    }}
   />
 </div>
 
@@ -209,13 +194,10 @@ We found with Supavisor median query duration was less than 2ms. And this includ
 <div>
   <Img
     alt="chart query duration for 5k qps light"
-    className="dark:hidden"
-    src="/images/blog/2023-08-11-supavisor-1-million/chart-5k-light.png"
-  />
-  <Img
-    alt="chart query duration for 5k qps dark"
-    className="hidden dark:block"
-    src="/images/blog/2023-08-11-supavisor-1-million/chart-5k-dark.png"
+    src={{
+      light: '/images/blog/2023-08-11-supavisor-1-million/chart-5k-light.png',
+      dark: '/images/blog/2023-08-11-supavisor-1-million/chart-5k-dark.png',
+    }}
   />
 </div>
 
@@ -232,13 +214,10 @@ We continued to scale up to 20,000QPS to assess the impact on query duration and
 <div>
   <Img
     alt="chart query duration for 20k qps light"
-    className="dark:hidden"
-    src="/images/blog/2023-08-11-supavisor-1-million/chart-20k-light.png"
-  />
-  <Img
-    alt="chart query duration for 20k qps dark"
-    className="hidden dark:block"
-    src="/images/blog/2023-08-11-supavisor-1-million/chart-20k-dark.png"
+    src={{
+      light: '/images/blog/2023-08-11-supavisor-1-million/chart-20k-light.png',
+      dark: '/images/blog/2023-08-11-supavisor-1-million/chart-20k-dark.png',
+    }}
   />
 </div>
 
@@ -310,14 +289,10 @@ We observed an additional 2ms required each query to be executed on the Supaviso
   <Img
     style={{ marginBottom: '0em' }}
     alt="chart query duration for 5k qps inserts with supavisor light"
-    className="dark:hidden"
-    src="/images/blog/2023-08-11-supavisor-1-million/chart-supavisor-duration-light.png"
-  />
-  <Img
-    style={{ marginBottom: '0em' }}
-    alt="chart query duration for 5k qps inserts with supavisor dark"
-    className="hidden dark:block"
-    src="/images/blog/2023-08-11-supavisor-1-million/chart-supavisor-duration-dark.png"
+    src={{
+      light: '/images/blog/2023-08-11-supavisor-1-million/chart-supavisor-duration-light.png',
+      dark: '/images/blog/2023-08-11-supavisor-1-million/chart-supavisor-duration-dark.png',
+    }}
   />
   <figcaption>Fig.1 - Query Duration with Supavisor</figcaption>
 </div>
@@ -326,14 +301,10 @@ We observed an additional 2ms required each query to be executed on the Supaviso
   <Img
     style={{ marginBottom: '0em' }}
     alt="chart query duration for 5k qps inserts with pgbouncer light"
-    className="dark:hidden"
-    src="/images/blog/2023-08-11-supavisor-1-million/chart-pgbouncer-duration-light.png"
-  />
-  <Img
-    style={{ marginBottom: '0em' }}
-    alt="chart query duration for 5k qps inserts with pgbouncer dark"
-    className="hidden dark:block"
-    src="/images/blog/2023-08-11-supavisor-1-million/chart-pgbouncer-duration-dark.png"
+    src={{
+      light: '/images/blog/2023-08-11-supavisor-1-million/chart-pgbouncer-duration-light.png',
+      dark: '/images/blog/2023-08-11-supavisor-1-million/chart-pgbouncer-duration-dark.png',
+    }}
   />
   <figcaption>Fig.2 - Query Duration with PgBouncer</figcaption>
 </div>

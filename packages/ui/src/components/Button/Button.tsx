@@ -30,9 +30,9 @@ const buttonVariants = cva(
     variants: {
       type: {
         primary: `
-            bg-brand-600 dark:bg-brand/70 hover:bg-brand-600/80 dark:hover:bg-brand
+            bg-brand-button hover:bg-brand-button/80
             text-white
-            border-brand dark:border-brand
+            border-brand
             focus-visible:outline-brand-600
             shadow-sm`,
         secondary: `
@@ -44,10 +44,8 @@ const buttonVariants = cva(
             shadow-sm`,
         default: `
             text-foreground
-            bg-surface-100 hover:bg-selection
-            dark:bg-surface-300 hover:dark:bg-selection
-            border-control hover:border-strong
-            dark:border-strong hover:dark:border-stronger
+            bg-button hover:bg-selection
+            border-button hover:border-button-hover
             focus-visible:outline-brand-600
             shadow-sm`,
         alternative: `
@@ -76,7 +74,7 @@ const buttonVariants = cva(
             border-transparent
             hover:bg-brand-400
             border-opacity-0
-            bg-opacity-0 dark:bg-opacity-0
+            bg-opacity-0
             shadow-none
             focus-visible:outline-border-strong`,
         text: `

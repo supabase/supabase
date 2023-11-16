@@ -14,7 +14,7 @@ const ProductMenuBar = ({ title, children }: PropsWithChildren<ProductMenuBarPro
       ].join(' ')}
     >
       <div
-        className="dark:border-dark flex max-h-12 items-center border-b px-6"
+        className="border-default flex max-h-12 items-center border-b px-6"
         style={{ minHeight: '3rem' }}
       >
         <h4 className="text-lg">{title}</h4>

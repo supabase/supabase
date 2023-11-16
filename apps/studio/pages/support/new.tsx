@@ -86,7 +86,7 @@ const SupportPage = () => {
             className={[
               'min-w-full space-y-12 rounded border bg-panel-body-light shadow-md',
               `${sentCategory === undefined ? 'py-8' : 'pt-8'}`,
-              'dark:border-dark dark:bg-panel-body-dark',
+              'border-default',
             ].join(' ')}
           >
             {sentCategory !== undefined ? (

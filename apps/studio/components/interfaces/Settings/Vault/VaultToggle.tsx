@@ -64,10 +64,9 @@ const VaultToggle = () => {
         style={{
           backgroundSize: isNotAvailable ? '50%' : '40%',
           backgroundPosition: '100% 24%',
-          backgroundImage:
-            resolvedTheme === 'dark'
-              ? `url("${BASE_PATH}/img/vault-dark.png")`
-              : `url("${BASE_PATH}/img/vault-light.png")`,
+          backgroundImage: resolvedTheme?.includes('dark')
+            ? `url("${BASE_PATH}/img/vault-dark.png")`
+            : `url("${BASE_PATH}/img/vault-light.png")`,
         }}
       >
         <div className="w-3/5 space-y-8">

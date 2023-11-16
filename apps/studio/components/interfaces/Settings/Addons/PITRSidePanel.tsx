@@ -208,7 +208,7 @@ const PITRSidePanel = () => {
                       )}
                       width={160}
                       height={96}
-                      src={resolvedTheme === 'dark' ? option.imageUrl : option.imageUrlLight}
+                      src={resolvedTheme?.includes('dark') ? option.imageUrl : option.imageUrlLight}
                     />
 
                     <p

@@ -10,17 +10,14 @@ const CTABanner = ({ darkerBg, className }: Props) => {
     <div
       className={[
         `bg-background grid grid-cols-12 items-center gap-4 border-t py-32 text-center px-16`,
-        darkerBg && 'dark:bg-dark-900',
+        darkerBg && 'bg-alternative',
         className,
       ].join(' ')}
     >
       <div className="col-span-12">
         <h2 className="h2">
           <span className="text-muted">Build in a weekend,</span>
-          <span className="text-foreground dark:text-white block sm:inline">
-            {' '}
-            scale to millions
-          </span>
+          <span className="text-foreground block sm:inline"> scale to millions</span>
         </h2>
       </div>
       <div className="col-span-12 mt-4">

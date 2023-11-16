@@ -167,10 +167,10 @@ const CostControl = ({}: CostControlProps) => {
                       src={
                         isUsageBillingEnabled
                           ? `${BASE_PATH}/img/spend-cap-off${
-                              resolvedTheme === 'dark' ? '' : '--light'
+                              resolvedTheme?.includes('dark') ? '' : '--light'
                             }.png?v=3`
                           : `${BASE_PATH}/img/spend-cap-on${
-                              resolvedTheme === 'dark' ? '' : '--light'
+                              resolvedTheme?.includes('dark') ? '' : '--light'
                             }.png?v=3`
                       }
                     />
