@@ -100,17 +100,10 @@ Deno.serve(async (req) => {
 Navigate to the [Database Webhooks settings](https://supabase.com/dashboard/project/_/database/hooks) in your Supabase Dashboard.
 
 1. Enable and create a new hook.
-1. Conditions to fire webhook:
-   1.1. Table: `notifications`
-   1.1. Events: `Insert`
+1. Conditions to fire webhook: Select the `notifications` table and tick the `Insert` event. 
 1. Webhook configuration: Supabase Edge Functions.
-1. Edge Function:
-   1.1. Method: `POST`
-   1.1. Select which edge function to trigger: `push`
-   1.1. Timeout: `1000`
-1. HTTP Headers:
-   1.1. Content-type: `application/json`
-   1.1. Click "Add new header" > "Add auth header with service key.
+1. Edge Function: Select the `push` edge function and leave the method as `POST` and timeout as `1000`. 
+1. HTTP Headers: Click "Add new header" > "Add auth header with service key and leave Content-type: `application/json`.
 1. Click "Create webhook".
 
 ## Send push notification
