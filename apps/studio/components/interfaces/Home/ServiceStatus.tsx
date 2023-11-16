@@ -23,7 +23,13 @@ const ServiceStatus = () => {
     projectAuthAll: authEnabled,
     projectEdgeFunctionAll: edgeFunctionsEnabled,
     realtimeAll: realtimeEnabled,
-  } = useIsFeatureEnabled(['project_auth:all', 'project_edge_function:all', 'realtime:all'])
+    projectStorageAll: storageEnabled,
+  } = useIsFeatureEnabled([
+    'project_auth:all',
+    'project_edge_function:all',
+    'realtime:all',
+    'project_storage:all',
+  ])
 
   const isBranch = project?.parentRef !== project?.ref
 
@@ -86,13 +92,17 @@ const ServiceStatus = () => {
           },
         ]
       : []),
-    {
-      name: 'Storage',
-      error: storageStatus?.error,
-      docsUrl: undefined,
-      isLoading,
-      isSuccess: storageStatus?.healthy,
-    },
+    ...(storageEnabled
+      ? [
+          {
+            name: 'Storage',
+            error: storageStatus?.error,
+            docsUrl: undefined,
+            isLoading,
+            isSuccess: storageStatus?.healthy,
+          },
+        ]
+      : []),
     ...(edgeFunctionsEnabled
       ? [
           {
