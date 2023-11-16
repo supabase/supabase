@@ -13,10 +13,6 @@ type OneOf<T extends any[]> = T extends [infer Only]
   : never
 
 export interface paths {
-  '/platform/login': {
-    /** Redirects to dashboard homepage */
-    get: operations['LoginController_redirectToDashboardHomepage']
-  }
   '/platform/notifications': {
     /** Get notifications */
     get: operations['NotificationsController_getNotificationsV2']
@@ -547,7 +543,15 @@ export interface paths {
   }
   '/platform/projects/{ref}/analytics/endpoints/functions.inv-stats': {
     /** Gets a project's function invocation statistics */
-    get: operations['FunctionLogsController_getStatus']
+    get: operations['FunctionInvocationLogsController_getStatus']
+  }
+  '/platform/projects/{ref}/analytics/endpoints/functions.req-stats': {
+    /** Gets a project's function request statistics */
+    get: operations['FunctionRequestLogsController_getStatus']
+  }
+  '/platform/projects/{ref}/analytics/endpoints/functions.resource-usage': {
+    /** Gets a project's function resource usage */
+    get: operations['FunctionResourceLogsController_getStatus']
   }
   '/platform/projects/{ref}/analytics/endpoints/logs.all': {
     /** Gets project's logs */
@@ -1269,7 +1273,15 @@ export interface paths {
   }
   '/v0/projects/{ref}/analytics/endpoints/functions.inv-stats': {
     /** Gets a project's function invocation statistics */
-    get: operations['FunctionLogsController_getStatus']
+    get: operations['FunctionInvocationLogsController_getStatus']
+  }
+  '/v0/projects/{ref}/analytics/endpoints/functions.req-stats': {
+    /** Gets a project's function request statistics */
+    get: operations['FunctionRequestLogsController_getStatus']
+  }
+  '/v0/projects/{ref}/analytics/endpoints/functions.resource-usage': {
+    /** Gets a project's function resource usage */
+    get: operations['FunctionResourceLogsController_getStatus']
   }
   '/v0/projects/{ref}/analytics/endpoints/logs.all': {
     /** Gets project's logs */
@@ -1691,11 +1703,19 @@ export interface components {
       ids: string[]
     }
     NotificationResponseV2: {
+      /** @enum {string} */
+      type:
+        | 'project.tier-limit-exceeded'
+        | 'postgresql.upgrade-available'
+        | 'postgresql.upgrade-completed'
+        | 'project.update-completed'
+        | 'project.informational'
+      /** @enum {string} */
+      status: 'new' | 'seen' | 'archived'
+      /** @enum {string} */
+      priority: 'Critical' | 'Warning' | 'Info'
       id: string
       inserted_at: string
-      type: Record<string, never>
-      status: Record<string, never>
-      priority: Record<string, never>
       name: string
       data: Record<string, never>
       meta: Record<string, never>
@@ -4147,6 +4167,11 @@ export interface components {
       branch: string
       label?: string
     }
+    CreateCliLoginSessionBody: {
+      session_id: string
+      public_key: string
+      token_name?: string
+    }
     FunctionResponse: {
       id: string
       slug: string
@@ -4745,14 +4770,6 @@ export type $defs = Record<string, never>
 export type external = Record<string, never>
 
 export interface operations {
-  /** Redirects to dashboard homepage */
-  LoginController_redirectToDashboardHomepage: {
-    responses: {
-      200: {
-        content: never
-      }
-    }
-  }
   /** Get notifications */
   NotificationsController_getNotificationsV2: {
     parameters: {
@@ -8666,7 +8683,7 @@ export interface operations {
     }
   }
   /** Gets a project's function invocation statistics */
-  FunctionLogsController_getStatus: {
+  FunctionInvocationLogsController_getStatus: {
     parameters: {
       query: {
         interval: '5min' | '15min' | '1hr' | '1day' | '7day'
@@ -8687,6 +8704,60 @@ export interface operations {
         content: never
       }
       /** @description Failed to get project's function invocation statistics */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets a project's function request statistics */
+  FunctionRequestLogsController_getStatus: {
+    parameters: {
+      query: {
+        interval: '5min' | '15min' | '1hr' | '1day' | '7day'
+        function_id: string
+      }
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['AnalyticsResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to get project's function request statistics */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets a project's function resource usage */
+  FunctionResourceLogsController_getStatus: {
+    parameters: {
+      query: {
+        interval: '5min' | '15min' | '1hr' | '1day' | '7day'
+        function_id: string
+      }
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['AnalyticsResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to get project's function resource usage */
       500: {
         content: never
       }
@@ -10119,6 +10190,40 @@ export interface operations {
         }
       }
       /** @description Failed to get github pull requests for a given repo */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Create CLI login session */
+  CliLoginController_createCliLoginSession: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateCliLoginSessionBody']
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to create CLI login session */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Retrieve CLI login session */
+  CliLoginController_getCliLoginSession: {
+    parameters: {
+      path: {
+        session_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to retrieve CLI login session */
       500: {
         content: never
       }

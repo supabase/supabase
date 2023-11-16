@@ -40,7 +40,7 @@ const FeedbackDropdown = ({ alt = false }: FeedbackDropdownProps) => {
         <Button
           asChild
           onClick={onOpen}
-          type="default"
+          type={alt ? 'outline' : 'default'}
           icon={
             alt ? null : (
               <IconMessageCircle size={16} strokeWidth={1.5} className="text-foreground-lighter" />

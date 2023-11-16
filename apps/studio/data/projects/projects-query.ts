@@ -5,6 +5,7 @@ import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { Project, ResponseError } from 'types'
 import { projectKeys } from './keys'
+import { components } from 'data/api'
 
 export type ProjectsVariables = {
   ref?: string
