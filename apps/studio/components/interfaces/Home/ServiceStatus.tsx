@@ -19,8 +19,11 @@ const ServiceStatus = () => {
   const project = useSelectedProject()
   const [open, setOpen] = useState(false)
 
-  const { projectAuthAll: authEnabled, projectEdgeFunctionAll: edgeFunctionsEnabled } =
-    useIsFeatureEnabled(['project_auth:all', 'project_edge_function:all'])
+  const {
+    projectAuthAll: authEnabled,
+    projectEdgeFunctionAll: edgeFunctionsEnabled,
+    realtimeAll: realtimeEnabled,
+  } = useIsFeatureEnabled(['project_auth:all', 'project_edge_function:all', 'realtime:all'])
 
   const isBranch = project?.parentRef !== project?.ref
 
@@ -40,23 +43,61 @@ const ServiceStatus = () => {
   const storageStatus = status?.find((service) => service.name === 'storage')
 
   // [Joshen] Need individual troubleshooting docs for each service eventually for users to self serve
-  const services = [
+  const services: {
+    name: string
+    error?: string
+    docsUrl?: string
+    isLoading: boolean
+    isSuccess?: boolean
+  }[] = [
     {
       name: 'Database',
-      docsUrls: undefined,
+      error: undefined,
+      docsUrl: undefined,
       isLoading: isLoadingPostgres,
       isSuccess: isSuccessPostgres,
     },
-    { name: 'PostgREST', docsUrls: undefined, isLoading, isSuccess: restStatus?.healthy },
+    {
+      name: 'PostgREST',
+      error: restStatus?.error,
+      docsUrl: undefined,
+      isLoading,
+      isSuccess: restStatus?.healthy,
+    },
     ...(authEnabled
-      ? [{ name: 'Auth', docsUrls: undefined, isLoading, isSuccess: authStatus?.healthy }]
+      ? [
+          {
+            name: 'Auth',
+            error: authStatus?.error,
+            docsUrl: undefined,
+            isLoading,
+            isSuccess: authStatus?.healthy,
+          },
+        ]
       : []),
-    { name: 'Realtime', docsUrls: undefined, isLoading, isSuccess: realtimeStatus?.healthy },
-    // { name: 'Storage', docsUrls: undefined, isLoading, isSuccess: storageStatus?.healthy },
+    ...(realtimeEnabled
+      ? [
+          {
+            name: 'Realtime',
+            error: realtimeStatus?.error,
+            docsUrl: undefined,
+            isLoading,
+            isSuccess: realtimeStatus?.healthy,
+          },
+        ]
+      : []),
+    {
+      name: 'Storage',
+      error: storageStatus?.error,
+      docsUrl: undefined,
+      isLoading,
+      isSuccess: storageStatus?.healthy,
+    },
     ...(edgeFunctionsEnabled
       ? [
           {
             name: 'Edge Functions',
+            error: undefined,
             docsUrl: 'https://supabase.com/docs/guides/functions/troubleshooting',
             isLoading,
             isSuccess: edgeFunctionsStatus?.healthy,
@@ -90,7 +131,7 @@ const ServiceStatus = () => {
         {services.map((service) => (
           <div
             key={service.name}
-            className="px-4 py-2 text-xs flex items-center justify-between border-b"
+            className="px-4 py-2 text-xs flex items-center justify-between border-b last:border-none"
           >
             <div>
               <p>{service.name}</p>
