@@ -584,8 +584,10 @@ If you try to submit a form with the action `?/createPost` without a valid sessi
 
 ### Protecting multiple routes
 
-To avoid writing the same auth logic in every single route you can use the handle hook to
-protect multiple routes at once.
+To avoid writing the same auth logic in every single route you can also use the handle hook to
+protect multiple routes at once. For this to work with your Supabase session, you need to use
+Sveltekit's [sequence helper](https://kit.svelte.dev/docs/modules#sveltejs-kit-hooks) function.
+Edit your `/src/hooks.server.js` with the below:
 
 <Tabs
   scrollable
@@ -598,9 +600,38 @@ protect multiple routes at once.
 
 ```js src/hooks.server.js
 // src/hooks.server.js
+import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
+import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit'
 import { redirect, error } from '@sveltejs/kit'
+import { sequence } from '@sveltejs/kit/hooks'
 
-export const handle = async ({ event, resolve }) => {
+async function supabase({ event, resolve }) {
+  event.locals.supabase = createSupabaseServerClient({
+    supabaseUrl: PUBLIC_SUPABASE_URL,
+    supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
+    event,
+  })
+
+  /**
+   * a little helper that is written for convenience so that instead
+   * of calling `const { data: { session } } = await supabase.auth.getSession()`
+   * you just call this `await getSession()`
+   */
+  event.locals.getSession = async () => {
+    const {
+      data: { session },
+    } = await event.locals.supabase.auth.getSession()
+    return session
+  }
+
+  return resolve(event, {
+    filterSerializedResponseHeaders(name) {
+      return name === 'content-range'
+    },
+  })
+}
+
+async function authorization({ event, resolve }) {
   // protect requests to all routes that start with /protected-routes
   if (event.url.pathname.startsWith('/protected-routes')) {
     const session = await event.locals.getSession()
@@ -621,6 +652,8 @@ export const handle = async ({ event, resolve }) => {
 
   return resolve(event)
 }
+
+export const handle = sequence(supabase, authorization)
 ```
 
 </TabPanel>
@@ -630,8 +663,37 @@ export const handle = async ({ event, resolve }) => {
 ```ts src/hooks.server.ts
 // src/hooks.server.ts
 import { type Handle, redirect, error } from '@sveltejs/kit'
+import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
+import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit'
+import { sequence } from '@sveltejs/kit/hooks'
 
-export const handle: Handle = async ({ event, resolve }) => {
+async function supabase({ event, resolve }) {
+  event.locals.supabase = createSupabaseServerClient({
+    supabaseUrl: PUBLIC_SUPABASE_URL,
+    supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
+    event,
+  })
+
+  /**
+   * a little helper that is written for convenience so that instead
+   * of calling `const { data: { session } } = await supabase.auth.getSession()`
+   * you just call this `await getSession()`
+   */
+  event.locals.getSession = async () => {
+    const {
+      data: { session },
+    } = await event.locals.supabase.auth.getSession()
+    return session
+  }
+
+  return resolve(event, {
+    filterSerializedResponseHeaders(name) {
+      return name === 'content-range'
+    },
+  })
+}
+
+async function authorization({ event, resolve }) {
   // protect requests to all routes that start with /protected-routes
   if (event.url.pathname.startsWith('/protected-routes')) {
     const session = await event.locals.getSession()
@@ -652,6 +714,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 
   return resolve(event)
 }
+
+export const handle: Handle = sequence(supabase, authorization)
 ```
 
 </TabPanel>
