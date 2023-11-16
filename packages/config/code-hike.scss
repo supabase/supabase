@@ -1,3 +1,4 @@
+[data-theme*='dark'],
 .dark {
   --ch-0: dark;
   --ch-1: #8b949e;
@@ -28,6 +29,7 @@
   --ch-25: #6e76811a;
 }
 
+[data-theme='light'],
 .light {
   --ch-0: light;
   --ch-1: #6e7781;
@@ -621,7 +623,7 @@
 .ch-codegroup {
   margin-top: 1.25em;
   margin-bottom: 1.25em;
-  border: 1px solid var(--colors-scale5); // @mildtomato
+  border: 1px solid hsl(var(--border-default)); // @mildtomato
   box-shadow: none;
 }
 .ch-inline-code > code {
@@ -655,7 +657,7 @@
   margin: 0 -0.15rem;
 }
 .ch-code-multiline-mark-border {
-  background: var(--colors-scale12) !important;
+  background: var(--foreground-default) !important;
   width: 3px;
   height: 100%;
   position: absolute;

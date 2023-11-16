@@ -169,10 +169,6 @@ export default function launchweek() {
             )}
           >
             <div className="flex justify-center">
-              {/* <img
-                src="/images/launchweek/launchweek-logo--light.svg"
-                className="flex w-40 dark:hidden lg:w-80"
-              /> */}
               <img
                 src="/images/launchweek/launchweek-logo--dark.svg"
                 className="w-40 flex lg:w-80"

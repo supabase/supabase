@@ -41,7 +41,7 @@ export const WizardLayoutWithoutAuth = observer(WizardLayout)
 const Header = ({ organization, project }: WizardLayoutProps) => {
   let stepNumber = organization ? 1 : project ? 2 : 0
   return (
-    <div className="border-b p-3 dark:border-dark">
+    <div className="border-b p-3 border-default">
       <div className="PageHeader">
         <div className="Breadcrumbs flex justify-between">
           <div className="flex items-center text-sm">
@@ -50,7 +50,7 @@ const Header = ({ organization, project }: WizardLayoutProps) => {
                 <img
                   src={`${BASE_PATH}/img/supabase-logo.svg`}
                   alt="Supabase"
-                  className="rounded border p-1 hover:border-white dark:border-dark"
+                  className="rounded border p-1 hover:border-white border-default"
                   style={{ height: 24 }}
                 />
               </Link>

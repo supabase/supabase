@@ -3,6 +3,7 @@ import { useState } from 'react'
 import {
   Badge,
   Button,
+  IconExternalLink,
   IconGitBranch,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -48,11 +49,15 @@ const BranchingWaitlistPopover = ({ isNewNav = false }: BranchingWaitlistPopover
               Join waitlist
             </Link>
           </Button>
-          {/* <Link passHref href={'/'}>
-            <a rel="noreferrer" target="_blank">
-              <Button type="default">View the docs</Button>
-            </a>
-          </Link> */}
+          <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+            <Link
+              target="_blank"
+              rel="noreferrer"
+              href="https://supabase.com/docs/guides/platform/branching"
+            >
+              View the docs
+            </Link>
+          </Button>
         </div>
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>

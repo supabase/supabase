@@ -112,7 +112,7 @@ const TableDefinition = ({ id }: TableDefinitionProps) => {
       </Button>
       <Editor
         className="monaco-editor"
-        theme={resolvedTheme === 'dark' ? 'vs-dark' : 'vs'}
+        theme={resolvedTheme?.includes('dark') ? 'vs-dark' : 'vs'}
         onMount={handleEditorOnMount}
         defaultLanguage="pgsql"
         value={formattedDefinition}

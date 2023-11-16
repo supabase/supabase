@@ -398,7 +398,7 @@ const Reports = () => {
       </div>
 
       {config.layout.length <= 0 ? (
-        <div className="flex min-h-full items-center justify-center rounded border-2 border-dashed p-16 dark:border-dark">
+        <div className="flex min-h-full items-center justify-center rounded border-2 border-dashed p-16 border-default">
           {canUpdateReport ? (
             <DropdownMenu>
               <DropdownMenuTrigger>
