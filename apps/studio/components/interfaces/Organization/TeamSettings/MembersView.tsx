@@ -1,20 +1,20 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
 import Image from 'next/legacy/image'
 import { Fragment, useState } from 'react'
+import { Badge, Button, IconAlertCircle, IconLoader, IconUser, Listbox, Loading, Modal } from 'ui'
 
-import { useParams } from 'common/hooks'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useOrganizationDetailQuery } from 'data/organizations/organization-detail-query'
 import { useOrganizationMemberUpdateMutation } from 'data/organizations/organization-member-update-mutation'
+import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useSelectedOrganization, useStore } from 'hooks'
 import { useProfile } from 'lib/profile'
 import { Member } from 'types'
-import { Badge, Button, IconAlertCircle, IconLoader, IconUser, Listbox, Loading, Modal } from 'ui'
 import { getUserDisplayName, isInviteExpired } from '../Organization.utils'
 import MemberActions from './MemberActions'
 import RolesHelperModal from './RolesHelperModal/RolesHelperModal'
@@ -37,12 +37,12 @@ const MembersView = ({ searchString }: MembersViewProps) => {
   const { profile } = useProfile()
   const { data: permissions } = usePermissionsQuery()
   const {
-    data: detailData,
-    error: detailError,
-    isLoading: isLoadingOrgDetails,
-    isError: isErrorOrgDetails,
-    isSuccess: isSuccessOrgDetails,
-  } = useOrganizationDetailQuery({ slug })
+    data: members,
+    error: membersError,
+    isLoading: isLoadingMembers,
+    isError: isErrorMembers,
+    isSuccess: isSuccessMembers,
+  } = useOrganizationMembersQuery({ slug })
   const {
     data: rolesData,
     error: rolesError,
@@ -67,8 +67,8 @@ const MembersView = ({ searchString }: MembersViewProps) => {
     },
   })
 
+  const allMembers = members ?? []
   const roles = rolesData?.roles ?? []
-  const members = detailData?.members ?? []
   const { rolesAddable, rolesRemovable } = useGetRolesManagementPermissions(
     selectedOrganization?.id,
     roles,
@@ -80,8 +80,8 @@ const MembersView = ({ searchString }: MembersViewProps) => {
 
   const filteredMembers = (
     !searchString
-      ? members
-      : members.filter((x: any) => {
+      ? allMembers
+      : allMembers.filter((x: any) => {
           if (x.invited_at) {
             return x.primary_email.includes(searchString)
           }
@@ -109,17 +109,17 @@ const MembersView = ({ searchString }: MembersViewProps) => {
 
   return (
     <>
-      {isLoadingOrgDetails && <GenericSkeletonLoader />}
+      {isLoadingMembers && <GenericSkeletonLoader />}
 
-      {isErrorOrgDetails && (
-        <AlertError error={detailError} subject="Failed to retrieve organization members" />
+      {isErrorMembers && (
+        <AlertError error={membersError} subject="Failed to retrieve organization members" />
       )}
 
       {isErrorRoles && (
         <AlertError error={rolesError} subject="Failed to retrieve organization roles" />
       )}
 
-      {isSuccessOrgDetails && (
+      {isSuccessMembers && (
         <div className="rounded w-full">
           <Loading active={!filteredMembers}>
             <Table
@@ -327,7 +327,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                   <Table.td colSpan={4}>
                     <p className="text-foreground-light">
                       {searchString ? `${filteredMembers.length} of ` : ''}
-                      {members.length || '0'} {members.length == 1 ? 'user' : 'users'}
+                      {allMembers.length || '0'} {allMembers.length == 1 ? 'user' : 'users'}
                     </p>
                   </Table.td>
                 </Table.tr>,
