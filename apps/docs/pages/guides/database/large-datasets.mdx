@@ -24,7 +24,7 @@ You have multiple options for importing your data into Supabase:
 Supabase dashboard provides a user-friendly way to import data. However, for very large datasets, this method may not be the most efficient choice, given the size limit is 100MB. It's generally better suited for smaller datasets and quick data imports. Consider using alternative methods like pgloader for large-scale data imports.
 
 1. Navigate to the relevant table in the [Table Editor.](/dashboard/project/_/editor)
-1. Click on “Insert” then choose "Import Data from CSV" and follow the on-screen instructions to upload your CSV file.
+2. Click on “Insert” then choose "Import Data from CSV" and follow the on-screen instructions to upload your CSV file.
 
 ### Option 2: Bulk Import using pgloader
 
@@ -34,34 +34,32 @@ You can use it in conjunction with Supabase by following these steps:
 
 1. Install pgloader on your local machine or a server. For more info, you can refer to the [official pgloader installation page](https://pgloader.readthedocs.io/en/latest/install.html).
 
-```jsx
-$ apt-get install pgloader
-```
+   ```bash
+   $ apt-get install pgloader
+   ```
 
 2. Create a configuration file that specifies the source data and the target Supabase database (e.g., config.load).
+   Here's an example configuration file:
 
-Here's an example configuration file:
+   ```sql
+   LOAD DATABASE
+       FROM sourcedb://USER:PASSWORD@HOST/SOURCE_DB
+       INTO postgres://postgres:password@db.xxxx.supabase.co:6543/postgres
+   ALTER SCHEMA 'public' OWNER TO 'postgres';
+   set wal_buffers = '64MB', max_wal_senders = 0, statement_timeout = 0, work_mem to '2GB';
+   ```
 
-```sql
-LOAD DATABASE
-    FROM sourcedb://USER:PASSWORD@HOST/SOURCE_DB
-    INTO postgres://postgres:password@db.xxxx.supabase.co:6543/postgres
-ALTER SCHEMA 'public' OWNER TO 'postgres';
-set wal_buffers = '64MB', max_wal_senders = 0, statement_timeout = 0, work_mem to '2GB';
-```
+   Customize the source and Supabase database URL and options to fit your specific use case:
 
-Customize the source and Supabase database URL and options to fit your specific use case:
-
-- `wal_buffers`: This parameter is set to '64MB' to allocate 64 megabytes of memory for write-ahead logging buffers. A larger value can help improve write performance by caching more data in memory before writing it to disk. This can be useful during data import operations to speed up the writing of transaction logs.
-- `max_wal_senders`: It is set to 0, to disable replication connections. This is done during the data import process to prevent replication-related conflicts and issues.
-- `statement_timeout`: The value is set to 0, which means it's disabled, allowing SQL statements to run without a time limit.
-- `work_mem`: It is set to '2GB', allocating 2 GB of memory for query operations. This enhances the performance of complex queries by allowing larger in-memory datasets.
+   - `wal_buffers`: This parameter is set to '64MB' to allocate 64 megabytes of memory for write-ahead logging buffers. A larger value can help improve write performance by caching more data in memory before writing it to disk. This can be useful during data import operations to speed up the writing of transaction logs.
+   - `max_wal_senders`: It is set to 0, to disable replication connections. This is done during the data import process to prevent replication-related conflicts and issues.
+   - `statement_timeout`: The value is set to 0, which means it's disabled, allowing SQL statements to run without a time limit.
+   - `work_mem`: It is set to '2GB', allocating 2 GB of memory for query operations. This enhances the performance of complex queries by allowing larger in-memory datasets.
 
 3. Run pgloader with the configuration file.
-
-```jsx
-pgloader config.load
-```
+   ```jsx
+   pgloader config.load
+   ```
 
 For databases using the Postgres engine, we recommend using the [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) and [psql](https://www.postgresql.org/docs/current/app-psql.html) command line tools.
 
@@ -82,7 +80,7 @@ Read more about [Rate Limiting, Resource Allocation, & Abuse Prevention.](/docs/
 
 ## Preparing to import data
 
-Before importing data, you should have a plan for timing, disk space, and more. Prepare your database in advance. 
+Before importing data, you should have a plan for timing, disk space, and more. Prepare your database in advance.
 
 ### 1. Statement Timeouts
 
