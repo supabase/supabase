@@ -100,7 +100,7 @@ const JsonEdit = ({
         <SidePanel.Content>
           <div className="mt-4 flex flex-auto flex-col space-y-4">
             {view === 'edit' ? (
-              <div className="h-[500px] w-full flex-grow border dark:border-dark">
+              <div className="h-[500px] w-full flex-grow border border-default">
                 <JsonEditor
                   key={jsonString}
                   readOnly={readOnly}

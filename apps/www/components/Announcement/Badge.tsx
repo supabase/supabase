@@ -51,13 +51,13 @@ const AnnouncementBadge = ({
           "
     >
       {badge && (
-        <Badge color="brandAlt" size="large" className="py-1">
+        <Badge color="brand" size="large" className="py-1">
           {badge}
         </Badge>
       )}
       <span className="text-foreground">{announcement}</span>
       {hasArrow && (
-        <ArrowNarrowRightIcon className="h-4 ml-2 -translate-x-1 transition-transform group-hover/announcement:translate-x-0" />
+        <ArrowNarrowRightIcon className="h-4 ml-2 -translate-x-1 text-foreground transition-transform group-hover/announcement:translate-x-0" />
       )}
       <div
         className="absolute inset-0 -z-10 bg-gradient-to-br

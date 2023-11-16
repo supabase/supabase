@@ -19,7 +19,7 @@ const GraphiQLPage: NextPageWithLayout = () => {
   const { ui, meta } = useStore()
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
-  const currentTheme = resolvedTheme === 'dark' ? 'dark' : 'light'
+  const currentTheme = resolvedTheme?.includes('dark') ? 'dark' : 'light'
 
   const isExtensionsLoading = meta.extensions.isLoading
   const pgGraphqlExtension = meta.extensions.byId('pg_graphql')

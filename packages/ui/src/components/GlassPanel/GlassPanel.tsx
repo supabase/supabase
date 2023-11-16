@@ -30,7 +30,7 @@ const GlassPanel = ({
   showIconBg = false,
 }: Props) => {
   const { resolvedTheme } = useTheme()
-  const showLogoInverse = logoInverse && resolvedTheme === 'dark'
+  const showLogoInverse = logoInverse && resolvedTheme?.includes('dark')
   const showLogo = !showLogoInverse && logo
 
   const IconBackground: React.FC<React.PropsWithChildren> = (props) => (
@@ -106,7 +106,9 @@ const GlassPanel = ({
               <img
                 className="w-5"
                 alt={title}
-                src={`${icon}${hasLightIcon && resolvedTheme !== 'dark' ? '-light' : ''}.svg`}
+                src={`${icon}${
+                  hasLightIcon && !resolvedTheme?.includes('dark') ? '-light' : ''
+                }.svg`}
               />
             </IconBackground>
           ) : (
