@@ -13,11 +13,11 @@ image: 2023-08-01-react-native-storage/react-native-storage.png
 thumb: 2023-08-01-react-native-storage/react-native-storage.png
 ---
 
-You can use supabase-js to implement authentication into your React Native apps as supabase-js is fully compatible with React Native. There are some nuances when it comes to authentication in native applications that you need to look out for. In this blogpost we'll discuss everything that's needed to get started with authentication in React Native applications.
+You can use supabase-js to implement authentication into your React Native apps as supabase-js is fully compatible with React Native. There are some nuances when it comes to authentication in native applications that you need to look out for. In this blogpost, we'll discuss everything that's needed to get started with authentication in React Native applications.
 
-Additionally, we'll look at native mobile specific login mechanism like "Sign in with Apple" and "Google One Tap sign-in", as well as SMS & WhatsApp based authentication.
+Additionally, we'll look at native mobile specific login mechanisms like "Sign in with Apple" and "Google One Tap sign-in", as well as SMS & WhatsApp based authentication.
 
-At the end of this blogpost you will have all the components needed to create the ideal authentication experience for your mobile app users.
+At the end of this blog post, you will have all the components needed to create the ideal authentication experience for your mobile app users.
 
 ## Prerequisites
 
@@ -33,7 +33,7 @@ Note: We're using Expo as that's the [recommended](https://reactnative.dev/docs/
 
 ## Set up supabase-js for React Native
 
-Using [`supabase-js`](/docs/reference/javascript/introduction?utm_source=blog&utm_medium=referral&utm_term=expo-react-native) is the most convenient way of leveraging the full power of the Supabase stack as it conveniently combines all the different services (database, auth, realtime, storage, edge functions) together.
+Using [`supabase-js`](/docs/reference/javascript/introduction) is the most convenient way of leveraging the full power of the Supabase stack as it conveniently combines all the different services (database, auth, realtime, storage, edge functions) together.
 
 ### Install supabase-js and dependencies
 
@@ -45,9 +45,9 @@ npx expo install @supabase/supabase-js @react-native-async-storage/async-storage
 
 ### Authentication storage
 
-By default, supabase-js uses the browser's `localStorage` mechanism to persist the user's session, but can be extended with platform sepcific storage implementations. In React Native we can build native mobile and web applications with the same code base, so we need a storage implementation that works for all these platforms: [react-native-async-storage](https://github.com/react-native-async-storage/async-storage#supported-platforms).
+By default, supabase-js uses the browser's `localStorage` mechanism to persist the user's session but can be extended with platform specific storage implementations. In React Native we can build native mobile and web applications with the same code base, so we need a storage implementation that works for all these platforms: [react-native-async-storage](https://github.com/react-native-async-storage/async-storage#supported-platforms).
 
-We need to pass an instance of `react-native-async-storage` to supabase-js to make sure authentication works reliable across all react native platforms:
+We need to pass an instance of `react-native-async-storage` to supabase-js to make sure authentication works reliably across all react native platforms:
 
 ```ts lib/supabase.ts
 import 'react-native-url-polyfill/auto'
@@ -166,7 +166,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 
 As you saw above, we specified `detectSessionInUrl: false` when initializing supabase-js. By default, in a web based environment, supabase-js will automatically detect OAuth and magic link redirects and create the user session.
 
-In native mobile apps however, OAuth callbacks require a bit more configuration and the set up of [deep linking](/docs/guides/auth/native-mobile-deep-linking?utm_source=blog&utm_medium=referral&utm_term=expo-react-native).
+In native mobile apps, however, OAuth callbacks require a bit more configuration and the setup of [deep linking](/docs/guides/auth/native-mobile-deep-linking).
 
 To link to your development build or standalone app, you need to specify a custom URL scheme for your app. You can register a scheme in your app config (app.json, app.config.js) by adding a string under the `scheme` key:
 
@@ -253,7 +253,7 @@ export default function Auth() {
 }
 ```
 
-For the best user experience it is recommended to use universal links which require a more elaborate setup. You can find the detailed setup instructions in the [Expo docs](https://docs.expo.dev/guides/deep-linking/).
+For the best user experience, it is recommended to use universal links which require a more elaborate setup. You can find the detailed setup instructions in the [Expo docs](https://docs.expo.dev/guides/deep-linking/).
 
 ## Native mobile login mechanisms
 
@@ -271,15 +271,15 @@ There are several benefits and reasons why you might want to add social login to
 
 ### Sign in with Apple
 
-Supabase Auth supports using [Sign in with Apple](https://developer.apple.com/sign-in-with-apple/) on the web and in native apps for iOS, macOS, watchOS or tvOS.
+Supabase Auth supports using [Sign in with Apple](https://developer.apple.com/sign-in-with-apple/) on the web and in native apps for iOS, macOS, watchOS, or tvOS.
 
-For detailed set up and implemenation instructions please refer to the [docs](https://supabase.com/docs/guides/auth/social-login/auth-apple?platform=react-native#using-native-sign-in-with-apple-in-expo) and the [video tutorial](https://youtu.be/-tpcZzTdvN0).
+For detailed setup and implementation instructions please refer to the [docs](https://supabase.com/docs/guides/auth/social-login/auth-apple) and the [video tutorial](https://youtu.be/-tpcZzTdvN0).
 
 ### Sign in with Google
 
-Supabase Auth supports Sign in with Google on the web, native Android applications and Chrome extensions.
+Supabase Auth supports Sign in with Google on the web, native Android applications, and Chrome extensions.
 
-For detailed set up and implemenation instructions please refer to the [docs](https://supabase.com/docs/guides/auth/social-login/auth-google?platform=react-native#using-native-sign-in-with-google-in-expo) and the [video tutorial](https://youtu.be/vojHmGUGUGc).
+For detailed set up and implemenation instructions please refer to the [docs](https://supabase.com/docs/guides/auth/social-login/auth-google) and the [video tutorial](https://youtu.be/vojHmGUGUGc).
 
 ## One time passwords
 
@@ -289,15 +289,15 @@ Supabase supports various forms of passwordless authentication:
 - [Email one-time password (OTP)](/docs/guides/auth/passwordless-login/auth-email-otp)
 - [SMS & WhatsApp one-time password (OTP)](/docs/guides/auth/phone-login) (watch the [video tutorial](https://youtu.be/Hca4CKE17I0?feature=shared))
 
-Passwordless login mechanism have similar benefits as the native mobile login options mentioned above.
+Passwordless login mechanisms have similar benefits as the native mobile login options mentioned above.
 
 ## Conclusion
 
-In this post, we learned various authentication mechanism we can use in React Native applications to provide a delightful experience for our users across native mobile and web.
+In this post, we learned various authentication mechanisms we can use in React Native applications to provide a delightful experience for our users across native mobile and web.
 
 ## More React Native and Supabase resources
 
 - [Watch our React Native video tutorials](https://youtube.com/playlist?list=PL5S4mPUpp4OsrbRTx21k34aACOgpqQGlx&si=Ez-0S4QhBxtayYsq)
-- [React Native file upload with Supabase Storage](/blog/react-native-storage?utm_source=blog&utm_medium=referral&utm_term=expo-react-native)
-- [Offline-first React Native Apps with WatermelonDB](/blog/react-native-offline-first-watermelon-db?utm_source=blog&utm_medium=referral&utm_term=expo-react-native)
-- [Send push notifications from edge functions](/docs/guides/functions/examples/push-notifications?utm_source=blog&utm_medium=referral&utm_term=expo-react-native)
+- [React Native file upload with Supabase Storage](/blog/react-native-storage)
+- [Offline-first React Native Apps with WatermelonDB](/blog/react-native-offline-first-watermelon-db)
+- [Send push notifications from edge functions](/docs/guides/functions/examples/push-notifications)
