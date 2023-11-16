@@ -114,7 +114,7 @@ const IconPanel = ({
       {tooltip && (
         <ReactTooltip
           effect="solid"
-          backgroundColor="hsl(var(--background-alternative))"
+          backgroundColor="hsl(var(--background-alternative-default))"
           textColor="hsl(var(--foreground-light))"
           className="!py-2 !px-4"
         />

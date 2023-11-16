@@ -108,7 +108,7 @@ const LayoutComparison = ({ components, props }: Props) => {
                               <Image
                                 src={author.author_image_url}
                                 alt="author avatar"
-                                className="dark:border-dark rounded-full border w-full"
+                                className="rounded-full border border-default w-full"
                                 fill
                                 style={{ objectFit: 'cover' }}
                               />
@@ -132,9 +132,7 @@ const LayoutComparison = ({ components, props }: Props) => {
               <MDXRemote {...content} components={components} />
             </div>
             <div className="py-16">
-              <div className="text-muted dark:text-foreground-lighter text-sm">
-                Share this article
-              </div>
+              <div className="text-foreground-lighter text-sm">Share this article</div>
               <div className="mt-4 flex items-center space-x-4">
                 <Link
                   href={`https://twitter.com/share?text=${props.blog.title}&url=https://supabase.com/blog/${props.blog.slug}`}

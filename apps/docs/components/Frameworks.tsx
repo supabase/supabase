@@ -110,7 +110,7 @@ const Frameworks = () => {
             layout="horizontal"
             to={x.href}
             title={x.name}
-            icon={resolvedTheme === 'dark' ? x.logo.dark : x.logo.light}
+            icon={resolvedTheme?.includes('dark') ? x.logo.dark : x.logo.light}
           />
         </div>
       ))}
