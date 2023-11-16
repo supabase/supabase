@@ -179,7 +179,7 @@ const Introduction = () => {
       </div>
 
       <div className="col-span-12 mb-10 text-base">
-        <p className="pb-2 border-b-2 border-dark-200 text-light dark:border-dark-400 w-60">
+        <p className="pb-2 border-b-2 border-dark-200 text-foreground-light dark:border-dark-400 w-60">
           Alpha Program in Numbers
         </p>
       </div>
@@ -194,7 +194,7 @@ const Introduction = () => {
             className="grid items-center grid-cols-8 col-span-6 gap-x-1 sm:col-span-4 sm:grid-cols-12 md:gap-x-0 xl:gap-x-6"
           >
             <div className="col-span-4 sm:col-span-4 md:col-span-3 xl:col-span-2">
-              <div className="flex items-center justify-center w-12 h-12 rounded-md bg-scale-1200 dark:bg-white">
+              <div className="flex items-center justify-center w-12 h-12 rounded-md bg-foreground">
                 {stat.icon}
               </div>
             </div>
@@ -207,7 +207,7 @@ const Introduction = () => {
               </p>
             </div>
             <div className="col-span-12 col-start-0 sm:col-span-9 sm:col-start-5 md:col-span-10 md:col-start-4 xl:col-start-3">
-              <p className="text-xs text-lighter lg:text-base">{stat.name}</p>
+              <p className="text-xs text-foreground-lighter lg:text-base">{stat.name}</p>
             </div>
           </div>
         ))}
@@ -864,7 +864,7 @@ const ScalingOurTeam = () => (
 )
 
 const WhatsNext = () => (
-  <div id="whatsNext" className="border-b-px bg-background dark:border-scale-600 border-gray-50">
+  <div id="whatsNext" className="border-b-px bg-background border-muted">
     <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-300 gap-y-10 lg:px-28">
       <SectionHeader sectionNumber={9} header="What's Next" />
 
@@ -990,7 +990,7 @@ const Beta = (props: Props) => {
       />
       <Container>
         <div className="sticky inset-0 z-50">
-          <div className="flex items-center justify-between px-5 py-5 shadow-lg bg-scale-1200 dark:bg-scale-300 xl:px-20">
+          <div className="flex items-center justify-between px-5 py-5 shadow-lg bg-surface-100 xl:px-20">
             <Link href="/">
               <Image src={`${basePath}/images/logo-dark.png`} height={24} width={120} alt="" />
             </Link>

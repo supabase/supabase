@@ -150,11 +150,20 @@ const uiConfig = ui({
             // the following are typography overrides
             // examples can be seen here —> https://github.com/tailwindlabs/tailwindcss-typography/blob/master/src/styles.js
             // reset all header font weights
-            'h1, h2, h3, h4, h5': {
+            h4: {
+              // override font size
+              fontSize: '1.15em',
+            },
+            h5: {
+              // h5 not included in --tw-prose-headings
+              color: theme('colors.scale[1200]'),
+            },
+            'h1, h2, h3, h4, h5, h6': {
               fontWeight: '400',
             },
-            h2: {
-              fontWeight: '400',
+            'article h2, article h3, article h4, article h5, article h6': {
+              marginTop: '2em',
+              marginBottom: '1em',
             },
             p: {
               fontWeight: '400',
@@ -178,15 +187,21 @@ const uiConfig = ui({
               height: '0.125rem',
               width: '0.5rem',
               borderRadius: '0.25rem',
-              backgroundColor: 'var(--colors-scale7)',
+              backgroundColor: 'hsl(var(--border-strong))',
               content: '""',
             },
             ol: {
               paddingLeft: '1rem',
               counterReset: 'item',
               listStyleType: 'none',
+              marginBottom: '3rem',
             },
-            'ol>li': { display: 'block', position: 'relative', paddingLeft: '1rem' },
+            'ol>li': {
+              display: 'block',
+              position: 'relative',
+              paddingLeft: '1rem',
+              marginBottom: '2rem',
+            },
             'ol>li::before': {
               position: 'absolute',
               top: '0.25rem',
@@ -194,19 +209,19 @@ const uiConfig = ui({
               height: '1.2rem',
               width: '1.2rem',
               borderRadius: '0.25rem',
-              backgroundColor: 'var(--colors-scale3)',
-              border: '1px solid var(--colors-scale5)',
+              backgroundColor: 'hsl(var(--background-surface-100))',
+              border: '1px solid hsl(var(--border-default))',
               content: 'counter(item) "  "',
               counterIncrement: 'item',
               fontSize: '12px',
-              color: 'var(--colors-scale9)',
+              color: 'hsl(var(--foreground-muted))',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
             },
 
             'p img': {
-              border: '1px solid var(--colors-scale4)',
+              border: '1px solid hsl(var(--border-muted))',
               borderRadius: '4px',
               overflow: 'hidden',
             },
@@ -230,23 +245,30 @@ const uiConfig = ui({
               transition: 'color 0.3s ease-in-out',
               paddingBottom: '2px',
               fontWeight: '400',
-              color: 'var(--colors-scale12)',
+              color: 'hsl(var(--colors-scale12))',
               textDecorationLine: 'underline',
-              textDecorationColor: 'hsl(var(--brand-400))',
+              textDecorationColor: 'hsl(var(--brand-500))',
               textDecorationThickness: '1px',
               textUnderlineOffset: '4px',
             },
             'a:hover': {
-              textDecorationColor: 'hsl(var(--brand-default))',
+              textDecorationColor: 'hsl(var(--colors-scale12))',
             },
             figcaption: {
-              color: 'var(--colors-scale9)',
+              color: 'hsl(var(--foreground-muted))',
+              fontFamily: 'Office Code Pro, monospace',
             },
             'figure.quote-figure p:first-child': {
               marginTop: '0 !important',
             },
             'figure.quote-figure p:last-child': {
               marginBottom: '0 !important',
+            },
+            figure: {
+              margin: '3rem 0',
+            },
+            'figure img': {
+              margin: '0 !important',
             },
           },
         },

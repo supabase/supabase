@@ -8,7 +8,9 @@
     "typecheck_CURRENTLY_IGNORED": "tsc --noEmit"
   },
   "dependencies": {
+    "@types/dat.gui": "^0.7.12",
     "config": "*",
+    "dat.gui": "^0.7.9",
     "lodash": "^4.17.21",
     "next-themes": "^0.2.1",
     "react-hot-toast": "^2.4.1",

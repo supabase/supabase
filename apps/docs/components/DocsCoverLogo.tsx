@@ -45,7 +45,7 @@ const DocsCoverLogo = () => {
             animate={pathMotionConfig.animate}
             transition={pathMotionConfig.transition as any}
             d="M125.25 191.383C167.828 191.383 202.344 156.867 202.344 114.289C202.344 71.7115 167.828 37.1953 125.25 37.1953C82.6724 37.1953 48.1562 71.7115 48.1562 114.289C48.1562 156.867 82.6724 191.383 125.25 191.383Z"
-            stroke="var(--colors-scale11)"
+            stroke="hsl(var(--foreground-light))"
             strokeOpacity="0.1"
             strokeWidth="0.7"
             strokeMiterlimit="10"
@@ -213,7 +213,7 @@ const DocsCoverLogo = () => {
             animate={pathMotionConfig.animate}
             transition={pathMotionConfig.transition as any}
             d="M218.024 169.846H32.498"
-            stroke="var(--colors-scale11)"
+            stroke="hsl(var(--foreground-light))"
             strokeOpacity="0.1"
             strokeWidth="0.7"
             strokeMiterlimit="10"
@@ -289,8 +289,8 @@ const DocsCoverLogo = () => {
               gradientUnits="userSpaceOnUse"
               gradientTransform="translate(125.451 114.82) rotate(90) scale(109.781 0.5)"
             >
-              <stop stopColor="var(--colors-scale11)" stopOpacity="0.5" />
-              <stop offset="1" stopColor="var(--colors-scale10)" stopOpacity="0" />
+              <stop stopColor="hsl(var(--foreground-light))" stopOpacity="0.5" />
+              <stop offset="1" stopColor="hsl(var(--foreground-lighter))" stopOpacity="0" />
             </radialGradient>
             <linearGradient
               id="paint1_linear_0_1"
@@ -300,8 +300,8 @@ const DocsCoverLogo = () => {
               y2="11.9994"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stopColor="var(--colors-scale11)" stopOpacity="0.5" />
-              <stop offset="1" stopColor="var(--colors-scale10)" stopOpacity="0" />
+              <stop stopColor="hsl(var(--foreground-light))" stopOpacity="0.5" />
+              <stop offset="1" stopColor="hsl(var(--foreground-lighter))" stopOpacity="0" />
             </linearGradient>
             <linearGradient
               id="paint2_linear_0_1"
@@ -311,8 +311,8 @@ const DocsCoverLogo = () => {
               y2="204.984"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stopColor="var(--colors-scale11)" stopOpacity="0.5" />
-              <stop offset="1" stopColor="var(--colors-scale10)" stopOpacity="0" />
+              <stop stopColor="hsl(var(--foreground-light))" stopOpacity="0.5" />
+              <stop offset="1" stopColor="hsl(var(--foreground-lighter))" stopOpacity="0" />
             </linearGradient>
             <linearGradient
               id="paint3_linear_0_1"
@@ -322,8 +322,8 @@ const DocsCoverLogo = () => {
               y2="13.9993"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stopColor="var(--colors-scale11)" stopOpacity="0.5" />
-              <stop offset="1" stopColor="var(--colors-scale10)" stopOpacity="0" />
+              <stop stopColor="hsl(var(--foreground-light))" stopOpacity="0.5" />
+              <stop offset="1" stopColor="hsl(var(--foreground-lighter))" stopOpacity="0" />
             </linearGradient>
             <linearGradient
               id="paint4_linear_0_1"
@@ -333,8 +333,8 @@ const DocsCoverLogo = () => {
               y2="204.984"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stopColor="var(--colors-scale11)" stopOpacity="0.5" />
-              <stop offset="1" stopColor="var(--colors-scale10)" stopOpacity="0" />
+              <stop stopColor="hsl(var(--foreground-light))" stopOpacity="0.5" />
+              <stop offset="1" stopColor="hsl(var(--foreground-lighter))" stopOpacity="0" />
             </linearGradient>
             <linearGradient
               id="paint5_linear_0_1"
@@ -344,9 +344,9 @@ const DocsCoverLogo = () => {
               y2="-7.94661"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stopColor="var(--colors-scale10)" stopOpacity="0" />
-              <stop offset="0.489583" stopColor="var(--colors-scale11)" stopOpacity="0.5" />
-              <stop offset="1" stopColor="var(--colors-scale10)" stopOpacity="0" />
+              <stop stopColor="hsl(var(--foreground-lighter))" stopOpacity="0" />
+              <stop offset="0.489583" stopColor="hsl(var(--foreground-light))" stopOpacity="0.5" />
+              <stop offset="1" stopColor="hsl(var(--foreground-lighter))" stopOpacity="0" />
             </linearGradient>
             <linearGradient
               id="paint6_linear_0_1"
@@ -356,9 +356,9 @@ const DocsCoverLogo = () => {
               y2="-3.99932"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stopColor="var(--colors-scale10)" stopOpacity="0" />
-              <stop offset="0.489583" stopColor="var(--colors-scale11)" stopOpacity="0.5" />
-              <stop offset="1" stopColor="var(--colors-scale10)" stopOpacity="0" />
+              <stop stopColor="hsl(var(--foreground-lighter))" stopOpacity="0" />
+              <stop offset="0.489583" stopColor="hsl(var(--foreground-light))" stopOpacity="0.5" />
+              <stop offset="1" stopColor="hsl(var(--foreground-lighter))" stopOpacity="0" />
             </linearGradient>
             <linearGradient
               id="paint7_linear_0_1"
@@ -368,9 +368,9 @@ const DocsCoverLogo = () => {
               y2="199.061"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stopColor="var(--colors-scale10)" stopOpacity="0.1" />
-              <stop offset="0.505208" stopColor="var(--colors-scale11)" stopOpacity="0.5" />
-              <stop offset="1" stopColor="var(--colors-scale10)" stopOpacity="0.1" />
+              <stop stopColor="hsl(var(--foreground-lighter))" stopOpacity="0.1" />
+              <stop offset="0.505208" stopColor="hsl(var(--foreground-light))" stopOpacity="0.5" />
+              <stop offset="1" stopColor="hsl(var(--foreground-lighter))" stopOpacity="0.1" />
             </linearGradient>
             <radialGradient
               id="paint8_radial_0_1"
@@ -380,8 +380,8 @@ const DocsCoverLogo = () => {
               gradientUnits="userSpaceOnUse"
               gradientTransform="translate(125.752 114.291) rotate(90) scale(109.271 0.5)"
             >
-              <stop stopColor="var(--colors-scale11)" stopOpacity="0.5" />
-              <stop offset="1" stopColor="var(--colors-scale10)" stopOpacity="0" />
+              <stop stopColor="hsl(var(--foreground-light))" stopOpacity="0.5" />
+              <stop offset="1" stopColor="hsl(var(--foreground-lighter))" stopOpacity="0" />
             </radialGradient>
             <linearGradient
               id="paint9_linear_0_1"
@@ -391,8 +391,8 @@ const DocsCoverLogo = () => {
               y2="6.31757"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stopColor="var(--colors-scale11)" stopOpacity="0.3" />
-              <stop offset="1" stopColor="var(--colors-scale10)" stopOpacity="0" />
+              <stop stopColor="hsl(var(--foreground-light))" stopOpacity="0.3" />
+              <stop offset="1" stopColor="hsl(var(--foreground-lighter))" stopOpacity="0" />
             </linearGradient>
             <linearGradient
               id="paint10_linear_0_1"
@@ -402,8 +402,8 @@ const DocsCoverLogo = () => {
               y2="200"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stopColor="var(--colors-scale11)" stopOpacity="0.3" />
-              <stop offset="1" stopColor="var(--colors-scale10)" stopOpacity="0" />
+              <stop stopColor="hsl(var(--foreground-light))" stopOpacity="0.3" />
+              <stop offset="1" stopColor="hsl(var(--foreground-lighter))" stopOpacity="0" />
             </linearGradient>
             <linearGradient
               id="paint11_linear_0_1"
@@ -413,9 +413,9 @@ const DocsCoverLogo = () => {
               y2="199.061"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stopColor="var(--colors-scale10)" stopOpacity="0.1" />
-              <stop offset="0.505208" stopColor="var(--colors-scale11)" stopOpacity="0.5" />
-              <stop offset="1" stopColor="var(--colors-scale10)" stopOpacity="0.1" />
+              <stop stopColor="hsl(var(--foreground-lighter))" stopOpacity="0.1" />
+              <stop offset="0.505208" stopColor="hsl(var(--foreground-light))" stopOpacity="0.5" />
+              <stop offset="1" stopColor="hsl(var(--foreground-lighter))" stopOpacity="0.1" />
             </linearGradient>
             <radialGradient
               id="paint12_radial_0_1"
@@ -425,8 +425,8 @@ const DocsCoverLogo = () => {
               gradientUnits="userSpaceOnUse"
               gradientTransform="translate(125.261 59.2344) rotate(90) scale(0.5 263.749)"
             >
-              <stop stopColor="var(--colors-scale11)" stopOpacity="0.5" />
-              <stop offset="1" stopColor="var(--colors-scale10)" stopOpacity="0" />
+              <stop stopColor="hsl(var(--foreground-light))" stopOpacity="0.5" />
+              <stop offset="1" stopColor="hsl(var(--foreground-lighter))" stopOpacity="0" />
             </radialGradient>
             <linearGradient
               id="paint13_linear_0_1"
@@ -436,9 +436,9 @@ const DocsCoverLogo = () => {
               y2="94.9749"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stopColor="var(--colors-scale10)" stopOpacity="0.5" />
-              <stop offset="0.505208" stopColor="var(--colors-scale11)" stopOpacity="0.5" />
-              <stop offset="1" stopColor="var(--colors-scale10)" stopOpacity="0.5" />
+              <stop stopColor="hsl(var(--foreground-lighter))" stopOpacity="0.5" />
+              <stop offset="0.505208" stopColor="hsl(var(--foreground-light))" stopOpacity="0.5" />
+              <stop offset="1" stopColor="hsl(var(--foreground-lighter))" stopOpacity="0.5" />
             </linearGradient>
             <linearGradient
               id="paint14_linear_0_1"
@@ -448,9 +448,9 @@ const DocsCoverLogo = () => {
               y2="131.43"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stopColor="var(--colors-scale10)" stopOpacity="0.5" />
-              <stop offset="0.505208" stopColor="var(--colors-scale11)" stopOpacity="0.5" />
-              <stop offset="1" stopColor="var(--colors-scale10)" stopOpacity="0.5" />
+              <stop stopColor="hsl(var(--foreground-lighter))" stopOpacity="0.5" />
+              <stop offset="0.505208" stopColor="hsl(var(--foreground-light))" stopOpacity="0.5" />
+              <stop offset="1" stopColor="hsl(var(--foreground-lighter))" stopOpacity="0.5" />
             </linearGradient>
             <linearGradient
               id="paint15_linear_0_1"
@@ -460,9 +460,9 @@ const DocsCoverLogo = () => {
               y2="1.99785"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stopColor="var(--colors-scale10)" stopOpacity="0.1" />
-              <stop offset="0.505208" stopColor="var(--colors-scale11)" stopOpacity="0.5" />
-              <stop offset="1" stopColor="var(--colors-scale10)" stopOpacity="0.1" />
+              <stop stopColor="hsl(var(--foreground-lighter))" stopOpacity="0.1" />
+              <stop offset="0.505208" stopColor="hsl(var(--foreground-light))" stopOpacity="0.5" />
+              <stop offset="1" stopColor="hsl(var(--foreground-lighter))" stopOpacity="0.1" />
             </linearGradient>
             <linearGradient
               id="paint16_linear_0_1"

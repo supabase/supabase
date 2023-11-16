@@ -1,6 +1,6 @@
+import React, { FC } from 'react'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
-import { FC } from 'react'
 
 interface Props {
   title: string
@@ -23,8 +23,8 @@ const ButtonCard: FC<Props> = ({
     <Link
       href={to}
       className={[
-        'h-full block shadow-none bg-scale-300 rounded transition',
-        'border border-transparent hover:border-scale-600',
+        'h-full block shadow-none bg-surface-100 rounded transition',
+        'border border-transparent hover:border-overlay',
       ].join(' ')}
     >
       {children ? (
@@ -43,7 +43,7 @@ const ButtonCard: FC<Props> = ({
           ) : (
             icon
           )}
-          <h3 className="my-0 text-base text-scale-1200">{title}</h3>
+          <h3 className="my-0 text-base text-foreground">{title}</h3>
           <p className="my-0 text-sm">{description}</p>
         </div>
       )}
