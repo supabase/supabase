@@ -74,9 +74,10 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
         page: restPage,
       })
 
-      return response.data
+      return response.data || []
     } catch (error) {
       console.error(error)
+      return []
     }
   }
 
@@ -170,31 +171,29 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
 
   // Process releases
   const formattedReleases = await Promise.all(
-    releases
-      ? releases.map(async (item: any): Promise<any> => {
-          const releasesMdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
+    releases.map(async (item: any): Promise<any> => {
+      const releasesMdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
 
-          return {
-            ...item,
-            source: releasesMdxSource,
-            type: 'release',
-            created_at: item.created_at,
-            title: item.name ?? '',
-            url: item.html_url ?? '',
-          }
-        })
-      : []
+      return {
+        ...item,
+        source: releasesMdxSource,
+        type: 'release',
+        created_at: item.created_at,
+        title: item.name ?? '',
+        url: item.html_url ?? '',
+      }
+    })
   )
 
-  // Combine discussionsRender and releasesRender into a single array
-  const combinedRenderArray = formattedDiscussions.concat(formattedReleases)
+  // Combine discussions and releases into a single array of entries
+  const combinedEntries = formattedDiscussions.concat(formattedReleases)
 
-  const sortedCombinedRenderArray = combinedRenderArray.sort((a, b) => {
+  const sortedCombinedEntries = combinedEntries.sort((a, b) => {
     const dateA = dayjs(a.created_at)
     const dateB = dayjs(b.created_at)
 
     if (dateA.isValid() && dateB.isValid()) {
-      return dateB.diff(dateA) // Sort in descending order (most recent first)
+      return dateB.diff(dateA)
     } else {
       return 0
     }
@@ -202,7 +201,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
 
   return {
     props: {
-      changelog: sortedCombinedRenderArray,
+      changelog: sortedCombinedEntries,
       pageInfo: pageInfo,
       restPage: Number(restPage),
     },
