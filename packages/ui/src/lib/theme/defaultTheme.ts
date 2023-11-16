@@ -408,6 +408,7 @@ export default {
       ...default__padding_and_text,
     },
     scrollable: `overflow-auto whitespace-nowrap no-scrollbar mask-fadeout-right`,
+    wrappable: `flex-wrap`,
     content: `focus:outline-none transition-height`,
   },
 
