@@ -13,7 +13,6 @@
     "excludes": [
       "reference_javascript_v1",
       "reference_dart_v0",
-      "reference_python_v2",
       "reference_swift_v1"
     ]
   },
@@ -369,6 +368,14 @@
             "id": "returns",
             "title": "Override type of successful response",
             "slug": "db-returns",
+            "product": "database",
+            "parent": "modifiers",
+            "type": "function"
+          },
+          {
+            "id": "explain",
+            "title": "Using explain",
+            "slug": "explain",
             "product": "database",
             "parent": "modifiers",
             "type": "function"
