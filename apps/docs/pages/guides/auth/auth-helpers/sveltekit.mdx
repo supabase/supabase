@@ -585,7 +585,7 @@ If you try to submit a form with the action `?/createPost` without a valid sessi
 ### Protecting multiple routes
 
 To avoid writing the same auth logic in every single route you can also use the handle hook to
-protect multiple routes at once. For this to work with your supabase session, you need to use
+protect multiple routes at once. For this to work with your Supabase session, you need to use
 Sveltekit's [sequence helper](https://kit.svelte.dev/docs/modules#sveltejs-kit-hooks) function.
 Edit your `/src/hooks.server.js` with the below:
 
@@ -605,7 +605,7 @@ import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit'
 import { redirect, error } from '@sveltejs/kit'
 import { sequence } from '@sveltejs/kit/hooks';
 
-async function supabase ({ event, resolve }) => {
+async function supabase ({ event, resolve }) {
   event.locals.supabase = createSupabaseServerClient({
     supabaseUrl: PUBLIC_SUPABASE_URL,
     supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
@@ -631,7 +631,7 @@ async function supabase ({ event, resolve }) => {
   })
 }
 
-async function authorization ({ event, resolve }) => {
+async function authorization ({ event, resolve }) {
   // protect requests to all routes that start with /protected-routes
   if (event.url.pathname.startsWith('/protected-routes')) {
     const session = await event.locals.getSession()
@@ -667,7 +667,7 @@ import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/publi
 import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit'
 import { sequence } from '@sveltejs/kit/hooks';
 
-async function supabase ({ event, resolve }) => {
+async function supabase ({ event, resolve }) {
   event.locals.supabase = createSupabaseServerClient({
     supabaseUrl: PUBLIC_SUPABASE_URL,
     supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
@@ -693,7 +693,7 @@ async function supabase ({ event, resolve }) => {
   })
 }
 
-async function authorization ({ event, resolve }) => {
+async function authorization ({ event, resolve }) {
   // protect requests to all routes that start with /protected-routes
   if (event.url.pathname.startsWith('/protected-routes')) {
     const session = await event.locals.getSession()
