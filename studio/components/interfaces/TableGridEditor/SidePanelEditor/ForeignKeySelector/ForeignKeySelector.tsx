@@ -257,7 +257,7 @@ const ForeignKeySelector = ({
               ---
             </Listbox.Option>
             {/* @ts-ignore */}
-            {sortBy(tables, ['schema']).map((table: PostgresTable) => {
+            {sortBy(tables, ['schema', 'name']).map((table: PostgresTable) => {
               return (
                 <Listbox.Option key={table.id} value={table.id} label={table.name}>
                   <div className="flex items-center gap-2">
