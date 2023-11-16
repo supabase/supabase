@@ -160,6 +160,106 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 })
 ```
 
+## Email and password authentication in React Native
+
+Once we've set up the storage mechanism, building an email and password sign in flow becomes pretty straight forward. Install [`react-native-elements`](https://reactnativeelements.com/) to get some nice cross platform button and input fields:
+
+```bash
+npm install react-native-elements
+```
+
+Set up a simple email form component:
+
+```tsx components/EmailForm.tsx
+import React, { useState } from 'react'
+import { Alert, StyleSheet, View } from 'react-native'
+import { supabase } from '../lib/supabase'
+import { Button, Input } from 'react-native-elements'
+
+export default function EmailForm() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  async function signInWithEmail() {
+    setLoading(true)
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password,
+    })
+
+    if (error) Alert.alert(error.message)
+    setLoading(false)
+  }
+
+  async function signUpWithEmail() {
+    setLoading(true)
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+    })
+
+    if (error) Alert.alert(error.message)
+    if (!session) Alert.alert('Please check your inbox for email verification!')
+    setLoading(false)
+  }
+
+  return (
+    <View style={styles.container}>
+      <View style={[styles.verticallySpaced, styles.mt20]}>
+        <Input
+          label="Email"
+          leftIcon={{ type: 'font-awesome', name: 'envelope' }}
+          onChangeText={(text) => setEmail(text)}
+          value={email}
+          placeholder="email@address.com"
+          autoCapitalize={'none'}
+        />
+      </View>
+      <View style={styles.verticallySpaced}>
+        <Input
+          label="Password"
+          leftIcon={{ type: 'font-awesome', name: 'lock' }}
+          onChangeText={(text) => setPassword(text)}
+          value={password}
+          secureTextEntry={true}
+          placeholder="Password"
+          autoCapitalize={'none'}
+        />
+      </View>
+      <View style={[styles.verticallySpaced, styles.mt20]}>
+        <Button title="Sign in" disabled={loading} onPress={() => signInWithEmail()} />
+      </View>
+      <View style={styles.verticallySpaced}>
+        <Button title="Sign up" disabled={loading} onPress={() => signUpWithEmail()} />
+      </View>
+    </View>
+  )
+}
+
+const styles = StyleSheet.create({
+  container: {
+    marginTop: 40,
+    padding: 12,
+  },
+  verticallySpaced: {
+    paddingTop: 4,
+    paddingBottom: 4,
+    alignSelf: 'stretch',
+  },
+  mt20: {
+    marginTop: 20,
+  },
+})
+```
+
+Note, by default Supabase Auth requires email verification before a session is created for the users. To support email verification you need to implement deep link handling which is outlined in the next section.
+
+While testing, you can disable email confirmation in your [project's email auth provider settings](/dashboard/project/_/auth/providers).
+
 ## OAuth, magic links and deep-linking
 
 As you saw above, we specified `detectSessionInUrl: false` when initializing supabase-js. By default, in a web based environment, supabase-js will automatically detect OAuth and magic link redirects and create the user session.
@@ -254,6 +354,8 @@ export default function Auth() {
 For the best user experience, it is recommended to use universal links which require a more elaborate setup. You can find the detailed setup instructions in the [Expo docs](https://docs.expo.dev/guides/deep-linking/).
 
 ## Native mobile login mechanisms
+
+![Sign in with Apple Demo](/images/blog/2023-11-16-react-native-authentication/sign_in_with_apple_google.gif)
 
 Some native mobile operating systems, like iOS and Android, offer a built-in identity provider for convenient user authentication.
 
