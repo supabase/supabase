@@ -1,11 +1,18 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+
 import { get } from 'data/fetchers'
-import { API_URL } from 'lib/constants'
-import { Member, ResponseError } from 'types'
+import { ResponseError } from 'types'
 import { organizationKeys } from './keys'
+import { components } from 'data/api'
 
 export type OrganizationMembersVariables = {
   slug?: string
+}
+
+type Member = components['schemas']['Member']
+export interface OrganizationMember extends Member {
+  invited_at?: string
+  invited_id?: number
 }
 
 export async function getOrganizationMembers(
@@ -28,7 +35,6 @@ export async function getOrganizationMembers(
   // Remap invite data to look like existing members data
   const invitedMembers = orgInvites.map((invite) => {
     const member = {
-      is_owner: false,
       invited_at: invite.invited_at,
       invited_id: invite.invited_id,
       username: invite.invited_email.slice(0, 1),
@@ -37,7 +43,7 @@ export async function getOrganizationMembers(
     return { ...member, role_ids: [invite.role_id] }
   })
 
-  return [...orgMembers, ...invitedMembers] as Member[]
+  return [...orgMembers, ...invitedMembers] as OrganizationMember[]
 }
 
 export type OrganizationMembersData = Awaited<ReturnType<typeof getOrganizationMembers>>

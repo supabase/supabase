@@ -3,24 +3,36 @@ import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
 import Image from 'next/legacy/image'
 import { Fragment, useState } from 'react'
-import { Badge, Button, IconAlertCircle, IconLoader, IconUser, Listbox, Loading, Modal } from 'ui'
+import {
+  Badge,
+  Button,
+  IconAlertCircle,
+  IconCheck,
+  IconLoader,
+  IconUser,
+  Listbox,
+  Loading,
+  Modal,
+} from 'ui'
 
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useOrganizationMemberUpdateMutation } from 'data/organizations/organization-member-update-mutation'
-import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
+import {
+  OrganizationMember,
+  useOrganizationMembersQuery,
+} from 'data/organizations/organization-members-query'
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useSelectedOrganization, useStore } from 'hooks'
 import { useProfile } from 'lib/profile'
-import { Member } from 'types'
 import { getUserDisplayName, isInviteExpired } from '../Organization.utils'
 import MemberActions from './MemberActions'
 import RolesHelperModal from './RolesHelperModal/RolesHelperModal'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 
-interface SelectedMember extends Member {
+interface SelectedMember extends OrganizationMember {
   oldRoleId: number
   newRoleId: number
 }
@@ -126,6 +138,9 @@ const MembersView = ({ searchString }: MembersViewProps) => {
               head={[
                 <Table.th key="header-user">User</Table.th>,
                 <Table.th key="header-status"></Table.th>,
+                <Table.th key="header-mfa" className="text-center">
+                  Enabled MFA
+                </Table.th>,
                 <Table.th key="header-role" className="flex items-center space-x-2">
                   <span>Role</span>
                   <RolesHelperModal />
@@ -133,7 +148,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                 <Table.th key="header-action"></Table.th>,
               ]}
               body={[
-                ...filteredMembers.map((x: Member, i: number) => {
+                ...filteredMembers.map((x, i: number) => {
                   const [memberRoleId] = x.role_ids ?? []
                   const role = (roles || []).find((role) => role.id === memberRoleId)
                   const memberIsUser = x.primary_email == profile?.primary_email
@@ -201,6 +216,12 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                               {isInviteExpired(x.invited_at) ? 'Expired' : 'Invited'}
                             </Badge>
                           )}
+                        </Table.td>
+
+                        <Table.td>
+                          <div className="flex items-center justify-center">
+                            <IconCheck className="text-brand" strokeWidth={2} />
+                          </div>
                         </Table.td>
 
                         <Table.td>
@@ -324,7 +345,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                   key="footer"
                   className="bg-panel-secondary-light dark:bg-panel-secondary-dark"
                 >
-                  <Table.td colSpan={4}>
+                  <Table.td colSpan={12}>
                     <p className="text-foreground-light">
                       {searchString ? `${filteredMembers.length} of ` : ''}
                       {allMembers.length || '0'} {allMembers.length == 1 ? 'user' : 'users'}
