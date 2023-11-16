@@ -3,7 +3,7 @@ import { PostgresTable } from '@/lib/types'
 import dagre from '@dagrejs/dagre'
 import { uniqBy } from 'lodash'
 import { Diamond, Fingerprint } from 'lucide-react'
-import { observer } from 'mobx-react-lite'
+import { useTheme } from 'next-themes'
 import { useEffect, useMemo } from 'react'
 import ReactFlow, {
   Background,
@@ -293,8 +293,7 @@ function TableNode({ data, targetPosition, sourcePosition }: NodeProps<TableNode
 }
 
 const TablesGraph = ({ className, tables }: { className?: string; tables: PostgresTable[] }) => {
-  const resolvedTheme = 'dark'
-  // const { resolvedTheme } = useTheme()
+  const { resolvedTheme } = useTheme()
   const backgroundPatternColor = resolvedTheme === 'dark' ? '#2e2e2e' : '#e6e8eb'
   const edgeStrokeColor = resolvedTheme === 'dark' ? '#ededed' : '#111318'
 
@@ -360,4 +359,4 @@ const SchemaGraph = ({ className, tables }: { className?: string; tables: Postgr
   )
 }
 
-export default observer(SchemaGraph)
+export default SchemaGraph

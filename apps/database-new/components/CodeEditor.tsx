@@ -15,8 +15,7 @@ export const CodeEditor = ({
 
   return (
     <div className={cn('flex flex-col h-full', className)}>
-      <Editor2 id="sqlche" language="pgsql" value={code} className="h-full" />
-      {/* <span className="whitespace-pre">{code}</span> */}
+      <Editor2 id="sql-editor" language="pgsql" value={code} className="h-full" />
     </div>
   )
 }
