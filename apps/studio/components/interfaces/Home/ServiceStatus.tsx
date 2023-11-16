@@ -110,50 +110,54 @@ const ServiceStatus = () => {
   const allServicesOperational = services.every((service) => service.isSuccess)
 
   return (
-    <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
-        <Button
-          type="default"
-          icon={
-            isLoadingChecks ? (
-              <IconLoader className="animate-spin" />
-            ) : allServicesOperational ? (
-              <div className="w-2 h-2 rounded-full bg-brand" />
-            ) : (
-              <div className="w-2 h-2 rounded-full bg-amber-900" />
-            )
-          }
-        >
-          {isBranch ? 'Preview Branch' : 'Project'} Status
-        </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="end">
-        {services.map((service) => (
-          <div
-            key={service.name}
-            className="px-4 py-2 text-xs flex items-center justify-between border-b last:border-none"
+    <div>
+      <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
+        <PopoverTrigger_Shadcn_ asChild>
+          <Button
+            type="default"
+            icon={
+              isLoadingChecks ? (
+                <IconLoader className="animate-spin" />
+              ) : (
+                <div
+                  className={`w-2 h-2 rounded-full ${
+                    allServicesOperational ? 'bg-brand' : 'bg-amber-900'
+                  }`}
+                />
+              )
+            }
           >
-            <div>
-              <p>{service.name}</p>
-              <p className="text-foreground-light">
-                {service.isLoading
-                  ? 'Checking status'
-                  : service.isSuccess
-                  ? 'No issues'
-                  : 'Unable to connect'}
-              </p>
+            {isBranch ? 'Preview Branch' : 'Project'} Status
+          </Button>
+        </PopoverTrigger_Shadcn_>
+        <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="end">
+          {services.map((service) => (
+            <div
+              key={service.name}
+              className="px-4 py-2 text-xs flex items-center justify-between border-b last:border-none"
+            >
+              <div>
+                <p>{service.name}</p>
+                <p className="text-foreground-light">
+                  {service.isLoading
+                    ? 'Checking status'
+                    : service.isSuccess
+                    ? 'No issues'
+                    : 'Unable to connect'}
+                </p>
+              </div>
+              {service.isLoading ? (
+                <IconLoader className="animate-spin" size="tiny" />
+              ) : service.isSuccess ? (
+                <CheckCircle2 className="text-brand" size={18} strokeWidth={1.5} />
+              ) : (
+                <AlertTriangle className="text-amber-900" size={18} strokeWidth={1.5} />
+              )}
             </div>
-            {service.isLoading ? (
-              <IconLoader className="animate-spin" size="tiny" />
-            ) : service.isSuccess ? (
-              <CheckCircle2 className="text-brand" size={18} strokeWidth={1.5} />
-            ) : (
-              <AlertTriangle className="text-amber-900" size={18} strokeWidth={1.5} />
-            )}
-          </div>
-        ))}
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+          ))}
+        </PopoverContent_Shadcn_>
+      </Popover_Shadcn_>
+    </div>
   )
 }
 
