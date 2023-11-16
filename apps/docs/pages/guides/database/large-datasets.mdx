@@ -10,7 +10,14 @@ export const meta = {
 
 Importing large datasets requires careful planning and execution to ensure the process is efficient, reliable, and doesn't disrupt your application. In this guide, we cover various best practices and techniques for importing datasets, and highlight common pitfalls to avoid.
 
-## You have multiple options for importing your data into Supabase
+## How to import data into Supabase
+
+You have multiple options for importing your data into Supabase:
+
+1. [CSV import via the Supabase dashboard](#option-1-csv-import-via-supabase-dashboard)
+2. [Bulk import using `pgloader`](#option-2-bulk-import-using-pgloader)
+3. [Using the Postgres `COPY` command](#option-3-using-postgres-copy-command)
+4. [Using the Supabase API](#option-4-using-the-supabase-api)
 
 ### Option 1: CSV Import via Supabase Dashboard
 
