@@ -18,11 +18,10 @@ import LW8CalloutsSection from '~/components/LaunchWeek/8/LW8CalloutsSection'
 import { useTheme } from 'next-themes'
 
 import 'swiper/swiper.min.css'
+import X from '../../components/LaunchWeek/X/X'
 
-const AnimatedParticles = dynamic(
-  () => import('~/components/LaunchWeek/8/AnimatedParticles/ParticlesCanvas')
-)
 const LW8Releases = dynamic(() => import('~/components/LaunchWeek/8/Releases'))
+const LWXTicketContainer = dynamic(() => import('~/components/LaunchWeek/X/Ticket/TicketContainer'))
 const LW8Meetups = dynamic(() => import('~/components/LaunchWeek/8/LW8Meetups'))
 const LWArchive = dynamic(() => import('~/components/LaunchWeek/8/LWArchive'))
 const LaunchWeekPrizeSection = dynamic(
@@ -68,6 +67,7 @@ export default function TicketHome({ users, meetups }: Props) {
   const [userData, setUserData] = useState<UserData>(defaultUserData)
   const [_, setPageState] = useState<PageState>('ticket')
 
+  console.log('lwx session', session)
   useEffect(() => {
     if (!supabase) {
       setSupabase(
@@ -80,11 +80,14 @@ export default function TicketHome({ users, meetups }: Props) {
   }, [])
 
   useEffect(() => {
+    console.log('supabase lwx page', supabase)
     if (supabase) {
       supabase.auth.getSession().then(({ data: { session } }) => setSession(session))
       const {
         data: { subscription },
       } = supabase.auth.onAuthStateChange((event, session) => {
+        console.log('onAuthStateChange event', event)
+        console.log('onAuthStateChange session', session)
         setSession(session)
       })
 
@@ -134,8 +137,15 @@ export default function TicketHome({ users, meetups }: Props) {
         }}
       >
         <DefaultLayout>
-          <SectionContainer>LWX</SectionContainer>
-          <CTABanner className="!bg-[#020405] border-t-0" />
+          <SectionContainer className="flex flex-col items-center gap-20">
+            <div className="flex flex-col items-center gap-6">
+              <X className="w-20 h-20" />
+              <div className="flex items-center justify-center font-mono uppercase">
+                Launch Week
+              </div>
+            </div>
+            <LWXTicketContainer supabase={supabase} user={userData} />
+          </SectionContainer>
         </DefaultLayout>
       </ConfDataContext.Provider>
     </>
