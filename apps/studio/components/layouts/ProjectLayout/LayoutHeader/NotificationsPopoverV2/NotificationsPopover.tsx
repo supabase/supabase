@@ -16,6 +16,7 @@ import AlertError from 'components/ui/AlertError'
 import InfiniteList from 'components/ui/InfiniteList'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useNotificationsV2Query } from 'data/notifications/notifications-v2-query'
+import { useNotificationsV2UpdateMutation } from 'data/notifications/notifications-v2-update-mutation'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import NotificationRow from './NotificationRow'
@@ -39,13 +40,17 @@ const NotificationsPopverV2 = () => {
   } = useNotificationsV2Query({
     archived: activeTab === 'archive',
   })
-  const notifications = useMemo(() => data?.pages.flatMap((page) => page) ?? [], [data?.pages])
+  const { mutate: updateNotification } = useNotificationsV2UpdateMutation()
 
-  // This probably needs to be fixed cause we won't be able to check the number if its paginated
+  const notifications = useMemo(() => data?.pages.flatMap((page) => page) ?? [], [data?.pages])
   const newNotifications = notifications.filter((notification) => notification.status === 'new')
   const hasNewNotifications = newNotifications.length > 0
-  const hasWarning = true // newNotifications.some((notification) => notification.priority === 'Warning')
-  const hasCritical = false // newNotifications.some((notification) => notification.priority === 'Critical')
+  const hasWarning = newNotifications.some((notification) => notification.priority === 'Warning')
+  const hasCritical = newNotifications.some((notification) => notification.priority === 'Critical')
+
+  const onArchiveNotification = (id: string) => {
+    updateNotification({ id, status: 'archived' })
+  }
 
   return (
     <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
@@ -157,6 +162,7 @@ const NotificationsPopverV2 = () => {
                   },
                   getProject: (id: number) => projects?.find((project) => project.id === id),
                   getOrganization: (id: number) => organizations?.find((org) => org.id === id),
+                  onArchiveNotification: (id: string) => onArchiveNotification(id),
                 }}
                 getItemSize={(idx: number) => rowHeights?.current?.[idx] ?? 56}
                 hasNextPage={hasNextPage}

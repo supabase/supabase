@@ -8,6 +8,7 @@ import { Button, IconAlertCircle, IconAlertTriangle, IconArchive } from 'ui'
 import { Markdown } from 'components/interfaces/Markdown'
 import { Notification, NotificationData } from 'data/notifications/notifications-v2-query'
 import { Organization, Project } from 'types'
+import { not } from 'ajv/dist/compile/codegen'
 
 interface NotificationRowProps {
   index: number
@@ -16,6 +17,7 @@ interface NotificationRowProps {
   setRowHeight: (idx: number, height: number) => void
   getProject: (id: number) => Project
   getOrganization: (id: number) => Organization
+  onArchiveNotification: (id: string) => void
 }
 
 const NotificationRow = ({
@@ -25,6 +27,7 @@ const NotificationRow = ({
   setRowHeight,
   getProject,
   getOrganization,
+  onArchiveNotification,
 }: NotificationRowProps) => {
   const ref = useRef<HTMLDivElement>(null)
   const { status, priority } = notification
@@ -110,9 +113,14 @@ const NotificationRow = ({
             {data.actions.map((action, idx) => {
               const key = `${notification.id}-action-${idx}`
               if (action.url !== undefined) {
+                const url = action.url.includes('[ref]')
+                  ? action.url.replace('[ref]', project?.ref ?? '_')
+                  : action.url.includes('[slug]')
+                  ? action.url.replace('[slug]', organization?.slug ?? '_')
+                  : action.url
                 return (
                   <Button key={key} type="outline">
-                    <Link href={action.url} target="_blank" rel="noreferrer">
+                    <Link href={url} target="_blank" rel="noreferrer">
                       {action.label}
                     </Link>
                   </Button>
@@ -149,24 +157,31 @@ const NotificationRow = ({
             className="rounded p-0.5 text-destructive-400 bg-destructive-600"
           />
         )}
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger asChild>
-            <Button type="outline" icon={<IconArchive />} className="px-1" />
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'border border-background',
-                ].join(' ')}
-              >
-                <span className="text-xs text-foreground">Archive</span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
+        {notification.status !== 'archived' && (
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger asChild>
+              <Button
+                type="outline"
+                icon={<IconArchive />}
+                className="px-1"
+                onClick={() => onArchiveNotification(notification.id)}
+              />
+            </Tooltip.Trigger>
+            <Tooltip.Portal>
+              <Tooltip.Content side="bottom">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'rounded bg-alternative py-1 px-2 leading-none shadow',
+                    'border border-background',
+                  ].join(' ')}
+                >
+                  <span className="text-xs text-foreground">Archive</span>
+                </div>
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          </Tooltip.Root>
+        )}
       </div>
     </div>
   )
