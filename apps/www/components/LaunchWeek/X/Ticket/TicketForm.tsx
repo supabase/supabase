@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { SITE_ORIGIN } from '~/lib/constants'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
-import ticketFormStyles from './ticket-form.module.css'
-import { Button, IconCheckCircle, IconLoader } from 'ui'
+import { Button, IconCheckCircle } from 'ui'
 import { SupabaseClient } from '@supabase/supabase-js'
 
 type FormState = 'default' | 'loading' | 'error'
@@ -122,18 +121,16 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
 
   return formState === 'error' ? (
     <div className="h-full">
-      <div>
-        <div>{errorMsg}</div>
-        <Button
-          type="secondary"
-          onClick={() => {
-            setFormState('default')
-            setTicketGenerationState('default')
-          }}
-        >
-          Try Again
-        </Button>
-      </div>
+      <div>{errorMsg}</div>
+      <Button
+        type="secondary"
+        onClick={() => {
+          setFormState('default')
+          setTicketGenerationState('default')
+        }}
+      >
+        Try Again
+      </Button>
     </div>
   ) : (
     <div className="flex flex-col h-full items-center justify-center relative z-20">
@@ -141,21 +138,10 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
         type="secondary"
         disabled={formState === 'loading' || Boolean(session)}
         onClick={handleGithubSignIn}
+        iconLeft={session && <IconCheckCircle />}
+        loading={formState === 'loading'}
       >
-        <span className={`flex items-center gap-2 ${username && 'text-muted'}`}>
-          {session ? (
-            <>
-              <IconCheckCircle />
-              Connect with GitHub
-            </>
-          ) : (
-            <span className="flex items-center gap-2">
-              {formState === 'loading' && <IconLoader size={14} className="animate-spin" />}
-              Connect with GitHub
-            </span>
-          )}
-        </span>
-        {session ? <span className={ticketFormStyles.checkIcon}></span> : null}
+        Connect with GitHub
       </Button>
     </div>
   )
