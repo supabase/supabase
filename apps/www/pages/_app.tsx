@@ -94,7 +94,6 @@ export default function App({ Component, pageProps }: AppProps) {
       <SessionContextProvider supabaseClient={supabase}>
         <AuthProvider>
           <ThemeProvider
-            // attribute="class"
             themes={themes.map((theme) => theme.value)}
             defaultTheme="system"
             enableSystem
