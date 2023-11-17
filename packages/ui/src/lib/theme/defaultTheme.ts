@@ -59,9 +59,8 @@ const defaults = {
 
 const utils = {
   border: {
-    hover:
-      'border-opacity-50 dark:border-opacity-50 hover:border-opacity-100 dark:hover:border-opacity-100',
-    fix: 'border-opacity-100 dark:border-opacity-100',
+    hover: 'border-opacity-50 hover:border-opacity-100',
+    fix: 'border-opacity-100',
   },
 }
 
@@ -217,7 +216,7 @@ export default {
     },
     dot: '-ml-0.5 mr-1.5 h-2 w-2 rounded-full',
     color: {
-      brand: 'bg-brand-500 text-brand-600 border border-brand-400',
+      brand: 'bg-brand-500 text-brand-600 border border-brand-500',
       brandAlt: 'bg-brand bg-opacity-100 text-background border border-brand',
       scale: 'bg-background text-foreground-light border border-strong',
       tomato: `bg-tomato-200 text-tomato-1100 border border-tomato-700`,
@@ -228,7 +227,7 @@ export default {
       violet: `bg-violet-200 text-violet-1100 border border-violet-700`,
       indigo: `bg-indigo-200 text-indigo-1100 border border-indigo-700`,
       blue: `bg-blue-200 text-blue-1100 border border-blue-700`,
-      green: `bg-green-200 text-green-1100 border border-green-700`,
+      green: `bg-opacity-10 bg-brand-500 text-brand-600 border border-brand-500`,
       grass: `bg-grass-200 text-grass-1100 border border-grass-700`,
       orange: `bg-orange-200 text-orange-1100 border border-orange-700`,
       yellow: `bg-yellow-200 text-yellow-1100 border border-yellow-700`,
@@ -253,13 +252,13 @@ export default {
     description: `text-xs`,
     variant: {
       danger: {
-        base: `bg-red-200 dark:bg-red-100 btext-red-1200 border-red-700`,
+        base: `bg-red-200 btext-red-1200 border-red-700`,
         icon: `text-red-900`,
         header: `text-red-1200`,
         description: `text-red-1100`,
       },
       warning: {
-        base: `bg-amber-200 dark:bg-amber-100 border-amber-700`,
+        base: `bg-amber-200 border-amber-700`,
         icon: `text-amber-900`,
         header: `text-amber-1200`,
         description: `text-amber-1100`,
@@ -271,7 +270,7 @@ export default {
         description: `text-foreground-light`,
       },
       success: {
-        base: `bg-brand-300 dark:bg-brand-100 border-brand-400`,
+        base: `bg-brand-300 border-brand-400`,
         icon: `text-brand`,
         header: `text-brand-600`,
         description: `text-brand-600`,
@@ -409,6 +408,7 @@ export default {
       ...default__padding_and_text,
     },
     scrollable: `overflow-auto whitespace-nowrap no-scrollbar mask-fadeout-right`,
+    wrappable: `flex-wrap`,
     content: `focus:outline-none transition-height`,
   },
 
