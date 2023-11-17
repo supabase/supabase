@@ -137,6 +137,7 @@ export default function Account({ session }) {
   const [avatar_url, setAvatarUrl] = useState(null)
 
   useEffect(() => {
+    let ignore = false
     async function getProfile() {
       setLoading(true)
       const { user } = session
@@ -147,18 +148,24 @@ export default function Account({ session }) {
         .eq('id', user.id)
         .single()
 
-      if (error) {
-        console.warn(error)
-      } else if (data) {
-        setUsername(data.username)
-        setWebsite(data.website)
-        setAvatarUrl(data.avatar_url)
+      if (!ignore) {
+        if (error) {
+          console.warn(error)
+        } else if (data) {
+          setUsername(data.username)
+          setWebsite(data.website)
+          setAvatarUrl(data.avatar_url)
+        }
       }
 
       setLoading(false)
     }
 
     getProfile()
+
+    return () => {
+      ignore = true
+    }
   }, [session])
 
   async function updateProfile(event, avatarUrl) {

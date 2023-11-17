@@ -64,7 +64,7 @@ const HomeLayout: FC<Props> = (props: Props) => {
       <HomePageCover meta={props.meta} />
       <LayoutMainContent>
         <div className={['relative transition-all ease-out', 'duration-150 '].join(' ')}>
-          <article className="prose dark:prose-dar max-w-none">
+          <article className="prose max-w-none">
             <MDXProvider components={components}>{props.children}</MDXProvider>
           </article>
         </div>

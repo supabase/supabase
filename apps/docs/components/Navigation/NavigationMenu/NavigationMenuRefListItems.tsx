@@ -151,7 +151,7 @@ const SideMenuTitle = ({ title }: { title: string }) => {
 }
 
 const Divider = () => {
-  return <div className="h-px w-full bg-blackA-300 dark:bg-whiteA-300 my-3"></div>
+  return <div className="h-px w-full bg-control my-3"></div>
 }
 
 interface NavigationMenuRefListItemsProps {

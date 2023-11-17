@@ -1,8 +1,7 @@
-import { Badge, IconCode, IconFastForward, IconGlobe, IconRefreshCcw, cn } from 'ui'
+import { Badge, IconCode, IconFastForward, IconGlobe, IconRefreshCcw, ThemeImage, cn } from 'ui'
 import UseCaseExamples from 'data/products/functions/usecase-examples'
 import Solutions from 'data/Solutions'
 import { NextSeo } from 'next-seo'
-import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import 'swiper/swiper.min.css'
@@ -114,24 +113,13 @@ function Database() {
           ]}
           subheader={[subtitle]}
           image={[
-            <div className="header--light block w-full" key="light">
-              <Image
-                src={`${basePath}/images/product/functions/functions-hero.png`}
-                alt="database header"
-                layout="responsive"
-                width="1680"
-                height="1116"
-              />
-            </div>,
-            <div className="header--dark mr-0 w-full dark:block" key="dark">
-              <Image
-                src={`${basePath}/images/product/functions/functions-hero.png`}
-                alt="database header"
-                layout="responsive"
-                width="1680"
-                height="1116"
-              />
-            </div>,
+            <ThemeImage
+              src={`${basePath}/images/product/functions/functions-hero.png`}
+              alt="edge functions header"
+              layout="responsive"
+              width="1680"
+              height="1116"
+            />,
           ]}
           documentation_url={'/docs/guides/functions'}
         />
