@@ -17,9 +17,9 @@ export default function TicketProfile({ user, ticketGenerationState, golden = fa
   const HAS_NO_META = !HAS_ROLE && !HAS_COMPANY && !HAS_LOCATION
 
   return (
-    <div className="relative z-10 flex gap-4 items-center px-2">
-      <div className="text-foreground-light text-sm md:text-base flex flex-col gap-2">
-        <p className="text-3xl sm:text-4xl">{name || username || 'Your Name'}</p>
+    <div className="relative z-10 flex gap-4 items-center">
+      <div className="text-foreground-light text-center items-center flex flex-col gap-1">
+        <p className="text-xl text-foreground leading-none">{name || username || 'Your Name'}</p>
         {HAS_NO_META && username && <p>@{username}</p>}
         <div>
           {HAS_ROLE && <span>{metadata?.role}</span>}

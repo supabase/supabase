@@ -1,4 +1,3 @@
-import styles from './ticket-visual.module.css'
 import TicketProfile from './TicketProfile'
 import TicketNumber from './TicketNumber'
 import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
@@ -7,6 +6,7 @@ import Image from 'next/image'
 import TicketForm from './TicketForm'
 import TicketFooter from './TicketFooter'
 import { cn } from 'ui'
+import X from '../X'
 
 type TicketGenerationState = 'default' | 'loading'
 type Props = {
@@ -42,28 +42,15 @@ export default function Ticket({
         )}
       >
         {username ? (
-          <div className="absolute inset-0 h-full px-4 pb-6 z-10 flex flex-col items-center justify-between w-full md:h-full flex-1 md:pb-0 md:pl-8 md:pr-[15%] overflow-hidden">
-            <TicketHeader golden={golden} />
-            <div className="flex-1 w-full h-full md:h-auto flex py-6 md:py-4 flex-col justify-center">
-              <TicketProfile
-                user={user}
-                ticketGenerationState={ticketGenerationState}
-                setTicketGenerationState={setTicketGenerationState}
-                golden={golden}
-              />
-            </div>
+          <div className="absolute inset-0 h-full p-6 z-10 flex flex-col items-center justify-between w-full md:h-full flex-1 overflow-hidden">
+            <TicketProfile
+              user={user}
+              ticketGenerationState={ticketGenerationState}
+              setTicketGenerationState={setTicketGenerationState}
+              golden={golden}
+            />
+            <X className="w-20 h-20 mb-4 opacity-10" />
             <TicketFooter />
-            <TicketNumber number={ticketNumber} golden={golden} />
-            <div className="absolute z-500 inset-0 overflow-hidden rounded-xl">
-              <Image
-                src={CURRENT_TICKET_BG}
-                alt="ticket background"
-                layout="fill"
-                objectFit="cover"
-                objectPosition="center"
-                quality={100}
-              />
-            </div>
           </div>
         ) : (
           <TicketForm

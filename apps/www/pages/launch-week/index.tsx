@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react'
-import { GetServerSideProps } from 'next'
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
-import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { createClient, Session, SupabaseClient } from '@supabase/supabase-js'
@@ -11,37 +9,12 @@ import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
 import DefaultLayout from '~/components/Layouts/Default'
 import { PageState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/8/LaunchWeekLogoHeader'
-import { Meetup } from '~/components/LaunchWeek/8/LW8Meetups'
-import LW8CalloutsSection from '~/components/LaunchWeek/8/LW8CalloutsSection'
 
-import { useTheme } from 'next-themes'
-
-import 'swiper/swiper.min.css'
 import X from '../../components/LaunchWeek/X/X'
 
-const LW8Releases = dynamic(() => import('~/components/LaunchWeek/8/Releases'))
 const LWXTicketContainer = dynamic(() => import('~/components/LaunchWeek/X/Ticket/TicketContainer'))
-const LW8Meetups = dynamic(() => import('~/components/LaunchWeek/8/LW8Meetups'))
-const LWArchive = dynamic(() => import('~/components/LaunchWeek/8/LWArchive'))
-const LaunchWeekPrizeSection = dynamic(
-  () => import('~/components/LaunchWeek/8/LaunchWeekPrizeSection')
-)
-const TicketBrickWall = dynamic(() => import('~/components/LaunchWeek/8/TicketBrickWall'))
-const CTABanner = dynamic(() => import('~/components/CTABanner'))
 
-interface Props {
-  users?: UserData[]
-  meetups?: Meetup[]
-}
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_MISC_USE_URL ?? 'http://localhost:54321',
-  // ANON KEY
-  process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!
-)
-
-export default function TicketHome({ users, meetups }: Props) {
+export default function TicketHome() {
   const { query } = useRouter()
 
   const TITLE = 'Supabase Launch Week X'
@@ -67,7 +40,6 @@ export default function TicketHome({ users, meetups }: Props) {
   const [userData, setUserData] = useState<UserData>(defaultUserData)
   const [_, setPageState] = useState<PageState>('ticket')
 
-  console.log('lwx session', session)
   useEffect(() => {
     if (!supabase) {
       setSupabase(
@@ -80,7 +52,6 @@ export default function TicketHome({ users, meetups }: Props) {
   }, [])
 
   useEffect(() => {
-    console.log('supabase lwx page', supabase)
     if (supabase) {
       supabase.auth.getSession().then(({ data: { session } }) => setSession(session))
       const {
@@ -138,10 +109,10 @@ export default function TicketHome({ users, meetups }: Props) {
       >
         <DefaultLayout>
           <SectionContainer className="flex flex-col items-center gap-20">
-            <div className="flex flex-col items-center gap-6">
+            <div className="flex flex-col items-center gap-6 text-light">
               <X className="w-20 h-20" />
               <div className="flex items-center justify-center font-mono uppercase">
-                Launch Week
+                Supabase Launch Week
               </div>
             </div>
             <LWXTicketContainer supabase={supabase} user={userData} />
@@ -150,21 +121,4 @@ export default function TicketHome({ users, meetups }: Props) {
       </ConfDataContext.Provider>
     </>
   )
-}
-
-export const getServerSideProps: GetServerSideProps = async () => {
-  // fetch users for the TicketBrickWall
-  const { data: users } = await supabaseAdmin!
-    .from('lwx_tickets_golden')
-    .select('username, golden')
-    .limit(17)
-
-  const { data: meetups } = await supabaseAdmin!.from('lw8_meetups').select('*')
-
-  return {
-    props: {
-      users,
-      meetups,
-    },
-  }
 }
