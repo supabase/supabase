@@ -50,7 +50,7 @@ const TwoOptionToggle = ({
         >
           <span
             className={clsx(
-              'capitalize hover:text-foreground dark:hover:text-foreground',
+              'capitalize hover:text-foreground',
               activeOption === option ? 'text-foreground' : 'text-foreground-light'
             )}
           >
