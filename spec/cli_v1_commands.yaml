@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.110.1
+  version: 1.112.0
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -1550,7 +1550,6 @@ commands:
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        required: true
         default_value: ''
   - id: supabase-inspect
     title: supabase inspect
