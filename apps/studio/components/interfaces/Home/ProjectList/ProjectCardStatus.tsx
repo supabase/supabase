@@ -77,8 +77,8 @@ export const ProjectCardStatus = ({
     : 'warning'
 
   if (
-    (activeWarnings.length === 0 && projectStatus === 'isHealthy') ||
-    warningContent === undefined
+    (activeWarnings.length === 0 || warningContent === undefined) &&
+    projectStatus === 'isHealthy'
   ) {
     return null
   }
@@ -112,7 +112,7 @@ export const ProjectCardStatus = ({
               <div
                 className={[
                   'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'border border-background',
+                  'border bg-background',
                 ].join(' ')}
               >
                 <span className="text-xs text-foreground">{alertDescription}</span>
