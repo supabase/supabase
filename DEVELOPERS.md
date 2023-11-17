@@ -54,9 +54,7 @@ To contribute code to [Supabase](https://supabase.com), you must fork the [Supab
    cd supabase
    ```
 
-### Running turborepo
-
-[Supabase](https://supabase.com) uses [Turborepo](https://turborepo.org/docs) to manage and run this monorepo.
+### Install dependencies
 
 1. Install the dependencies in the root of the repo.
 
@@ -71,11 +69,11 @@ To contribute code to [Supabase](https://supabase.com), you must fork the [Supab
 
 Then visit, and edit, any of the following sites:
 
-| Site                                                     | Directory      | Scope name | Description                             | Local development server   |
-| -------------------------------------------------------- | -------------- | ---------- | --------------------------------------- | -------------------------- |
-| [supabase.com](https://supabase.com)                     | `/apps/www`    | www        | The main website                        | http://localhost:3000      |
-| [supabase.com/dashboard](https://supabase.com/dashboard) | `/apps/studio` | studio     | Studio dashboard (also requires Docker) | http://localhost:8082      |
-| [supabase.com/docs](https://supabase.com/docs)           | `/apps/docs`   | docs       | Guides and Reference (Next.js based)    | http://localhost:3001/docs |
+| Site                                                     | Directory      | Scope name | Description                                   | Local development server   |
+| -------------------------------------------------------- | -------------- | ---------- | --------------------------------------------- | -------------------------- |
+| [supabase.com](https://supabase.com)                     | `/apps/www`    | www        | The main website                              | http://localhost:3000      |
+| [supabase.com/dashboard](https://supabase.com/dashboard) | `/apps/studio` | studio     | Studio dashboard (requires Docker, see below) | http://localhost:8082      |
+| [supabase.com/docs](https://supabase.com/docs)           | `/apps/docs`   | docs       | Guides and Reference (Next.js based)          | http://localhost:3001/docs |
 
 #### Running sites individually
 
@@ -112,13 +110,13 @@ You do not need to install `devDependencies` in each workspace. These can all be
 
 ## Running Docker
 
-To run Studio locally, you'll need to Docker.
+To run Studio locally, you'll need to setup Docker.
 
 #### Prerequsites
 
 First, make sure you have the Docker installed on your device. You can download and install it from [here](https://docs.docker.com/get-docker/).
 
-#### Getting Started
+#### Get Started
 
 1. Navigate to the `docker` directory in your forked repo
 
@@ -189,11 +187,3 @@ If you get stuck somewhere or have any questions, join our [Discord Community Se
 <a href="https://github.com/supabase/supabase/graphs/contributors">
    <img src="https://contributors.deno.dev/supabase/supabase?height=1200&width=1200&count=90" width="1200" height="1200" alt="contributors">
 </a>
-
-## Docker variants
-
-- This guide assumes Docker, but there are other options available:
-- [Docker Desktop](https://docs.docker.com/get-docker/) (macOS, Windows, Linux)
-- [Rancher Desktop](https://rancherdesktop.io/) (macOS, Windows, Linux)
-- [OrbStack](https://orbstack.dev/) (macOS)
-- [colima](https://github.com/abiosoft/colima) (macOS)
