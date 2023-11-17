@@ -71,7 +71,7 @@ docs = vecs.get_or_create_collection(name="docs", dimension=3)
 
 # query the collection filtering metadata for "year" = 2012
 docs.query(
-    query_vector=[0.4,0.5,0.6],      # required
+    data=[0.4,0.5,0.6],      # required
     limit=1,                         # number of records to return
     filters={"year": {"$eq": 2012}}, # metadata filters
 )
