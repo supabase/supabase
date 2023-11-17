@@ -63,7 +63,7 @@ When your user signs in, call [sendOtpTo()](/docs/reference/kotlin/auth-signinwi
 
 ```kotlin
 suspend fun signInWithEmailOtp() {
-	supabase.gotrue.sendOtpTo(Email) {
+	supabase.auth.signInWith(OTP) {
 		email = "example@email.com"
 	}
 }

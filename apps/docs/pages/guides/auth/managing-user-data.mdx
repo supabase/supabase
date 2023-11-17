@@ -118,7 +118,7 @@ val data = supabase.postgrest["profiles"].select(Columns.list("id", "username", 
 
 // After the user is logged in, this will only return
 // the logged-in user's data - in this case a single row
-supabase.auth.sendOtpTo(Email) {
+supabase.auth.signInWith(OTP) {
     this.email = email
 }
 val data = supabase.postgrest["profiles"].select(Columns.list("id", "username", "avatar_url", "website"))
