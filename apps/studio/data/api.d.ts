@@ -1759,6 +1759,8 @@ export interface components {
     }
     ProjectResourceWarningsResponse: {
       /** @enum {string|null} */
+      need_pitr: 'critical' | 'warning' | null
+      /** @enum {string|null} */
       disk_io_exhaustion: 'critical' | 'warning' | null
       /** @enum {string|null} */
       disk_space_exhaustion: 'critical' | 'warning' | null
@@ -1802,6 +1804,8 @@ export interface components {
       SECURITY_CAPTCHA_ENABLED: boolean
       SECURITY_CAPTCHA_PROVIDER: string
       SECURITY_CAPTCHA_SECRET: string
+      SESSIONS_TIMEBOX?: number
+      SESSIONS_INACTIVITY_TIMEOUT?: number
       RATE_LIMIT_EMAIL_SENT: number
       RATE_LIMIT_SMS_SENT: number
       RATE_LIMIT_VERIFY?: number
@@ -1932,6 +1936,8 @@ export interface components {
       SECURITY_CAPTCHA_ENABLED?: boolean
       SECURITY_CAPTCHA_PROVIDER?: string
       SECURITY_CAPTCHA_SECRET?: string
+      SESSIONS_TIMEBOX?: number | null
+      SESSIONS_INACTIVITY_TIMEOUT?: number | null
       RATE_LIMIT_EMAIL_SENT?: number
       RATE_LIMIT_SMS_SENT?: number
       RATE_LIMIT_VERIFY?: number
@@ -2063,6 +2069,8 @@ export interface components {
       SECURITY_CAPTCHA_ENABLED: boolean
       SECURITY_CAPTCHA_PROVIDER: string
       SECURITY_CAPTCHA_SECRET: string
+      SESSIONS_TIMEBOX?: number
+      SESSIONS_INACTIVITY_TIMEOUT?: number
       RATE_LIMIT_EMAIL_SENT: number
       RATE_LIMIT_SMS_SENT: number
       RATE_LIMIT_VERIFY?: number
@@ -2254,14 +2262,25 @@ export interface components {
       migrated_at: string | null
     }
     OrganizationResponse: {
-      id: string
+      id: number
+      slug: string
       name: string
+      billing_email: string
+      is_owner: boolean
+      stripe_customer_id: string
+      subscription_id?: string
+      opt_in_tags: string[]
     }
     GetOrganizationByFlyOrganizationIdResponse: {
       slug: string
     }
     CreateOrganizationBody: {
       name: string
+      kind?: string
+      size?: string
+      /** @enum {string} */
+      tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
+      payment_method?: string
     }
     UpdateOrganizationBody: {
       name: string
@@ -2483,9 +2502,10 @@ export interface components {
     }
     Member: {
       gotrue_id: string
-      primary_email: string
+      primary_email: string | null
       role_ids: number[]
       username: string
+      mfa_enabled: boolean
     }
     UpdateMemberBody: {
       role_id: number
@@ -3327,7 +3347,6 @@ export interface components {
       region: string
       status: string
       subscription_id: string
-      is_readonly_mode_enabled?: boolean
       is_branch_enabled: boolean
       preview_branch_refs: string[]
       disk_volume_size_gb?: number
@@ -3388,7 +3407,6 @@ export interface components {
       region: string
       status: string
       subscription_id: string
-      is_readonly_mode_enabled?: boolean
       is_branch_enabled: boolean
       preview_branch_refs: string[]
       disk_volume_size_gb?: number
@@ -4205,14 +4223,13 @@ export interface components {
         | 'ACTIVE_UNHEALTHY'
         | 'COMING_UP'
         | 'GOING_DOWN'
-        | 'INACTIVE'
         | 'INIT_FAILED'
         | 'REMOVED'
         | 'RESTORING'
         | 'UNKNOWN'
         | 'UPGRADING'
-        | 'PAUSING'
       reportingToken: string
+      databaseIdentifier: string
     }
     EventBody: {
       reportingToken: string
@@ -4578,11 +4595,19 @@ export interface components {
       entrypoint_path?: string
       import_map_path?: string
     }
+    OrganizationResponseV1: {
+      id: string
+      name: string
+    }
+    CreateOrganizationBodyV1: {
+      name: string
+    }
     V1OrganizationMemberResponse: {
       user_id: string
       user_name: string
       email?: string
       role_name: string
+      mfa_enabled: boolean
     }
     OAuthTokenBody: {
       /** @enum {string} */
@@ -5468,7 +5493,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['OrganizationResponse'][]
+          'application/json': components['schemas']['OrganizationResponseV1'][]
         }
       }
       /** @description Unexpected error listing organizations */
@@ -12059,13 +12084,13 @@ export interface operations {
   OrganizationsController_createOrganization: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateOrganizationBody']
+        'application/json': components['schemas']['CreateOrganizationBodyV1']
       }
     }
     responses: {
       201: {
         content: {
-          'application/json': components['schemas']['OrganizationResponse']
+          'application/json': components['schemas']['OrganizationResponseV1']
         }
       }
       /** @description Unexpected error creating an organization */

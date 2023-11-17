@@ -17,6 +17,7 @@ import {
 import { SlidersHorizontal } from 'lucide-react'
 import NotificationRow from './NotificationRow'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 
 const NotificationsPopverV2 = () => {
   const [open, setOpen] = useState(false)
@@ -24,6 +25,7 @@ const NotificationsPopverV2 = () => {
   const [activeTab, setActiveTab] = useState<'inbox' | 'archive'>('inbox')
 
   const { data: projects } = useProjectsQuery()
+  const { data: organizations } = useOrganizationsQuery()
   const { data, error, isLoading, isError, isSuccess } = useNotificationsV2Query({
     archived: false,
     offset: 0,
@@ -38,50 +40,6 @@ const NotificationsPopverV2 = () => {
   const hasCritical = false // newNotifications.some((notification) => notification.priority === 'Critical')
 
   console.log({ projects, notifications })
-
-  const MOCK_NOTIFICATIONS = [
-    {
-      id: 'f87746f9-4ccf-4a7b-9242-93f70b9aa373',
-      inserted_at: '2023-11-16T08:23:39.688501+00:00',
-      type: 'project.informational',
-      status: 'new',
-      priority: 'Warning',
-      name: 'deprecation.pgbouncer.20231016',
-      data: {
-        project_id: 1,
-        title: 'Database size limit approaching',
-        message:
-          'Using beyond 500MB in Database Size requires you to upgrade your subscription plan to at least Pro, otherwise your projects may experience downtime.',
-        actions: [
-          {
-            url: 'https://github.com/orgs/supabase/discussions/17817',
-            label: 'Learn More',
-          },
-        ],
-      },
-      meta: null,
-    },
-    {
-      id: 'f87746f9-4ccf-4a7b-9242-93f70b9aa374',
-      inserted_at: '2023-11-16T08:23:39.688501+00:00',
-      type: 'project.informational',
-      status: 'new',
-      priority: 'Info',
-      name: 'deprecation.pgbouncer.20231016',
-      data: {
-        title: 'Supavisor is now enabled',
-        message:
-          'Supavisor, our new connection pooler, is now enabled for your projects (Postgres 13 and above). PgBouncer and direct access via IPv4 addresses are deprecated and will be disabled on January 15th, 2024.',
-        linked_buttons: [
-          {
-            url: 'https://github.com/orgs/supabase/discussions/17817',
-            text: 'Learn More',
-          },
-        ],
-      },
-      meta: null,
-    },
-  ]
 
   return (
     <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
@@ -136,9 +94,9 @@ const NotificationsPopverV2 = () => {
           }
         />
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-96" side="bottom" align="end">
+      <PopoverContent_Shadcn_ className="p-0 w-[400px]" side="bottom" align="end">
         <div className="px-4">
-          <p className="pt-4 pb-2 text-sm">Notifications</p>
+          <p className="pt-4 pb-1 text-sm">Notifications</p>
           <div className="flex items-center">
             <Tabs
               size="medium"
@@ -164,31 +122,29 @@ const NotificationsPopverV2 = () => {
         </div>
         <div className="border-t divide-y">
           {activeTab === 'inbox' &&
-            MOCK_NOTIFICATIONS.map((notification) => {
+            notifications.map((notification) => {
               const { data } = notification
               const project =
                 data.project_id !== undefined
                   ? projects?.find((project) => project.id === data.project_id)
                   : undefined
+              const organization =
+                organizations?.find(
+                  (organization) => organization.id === project?.organization_id
+                ) ?? undefined
 
               return (
                 <NotificationRow
                   key={notification.id}
-                  data={data as NotificationData}
-                  priority={notification.priority as any}
+                  notification={notification}
                   project={project}
+                  organization={organization}
                 />
               )
             })}
           {activeTab === 'archive' &&
-            MOCK_NOTIFICATIONS.map((notification) => {
-              return (
-                <NotificationRow
-                  key={notification.id}
-                  priority={notification.priority as any}
-                  data={notification.data as NotificationData}
-                />
-              )
+            notifications.map((notification) => {
+              return <NotificationRow key={notification.id} notification={notification} />
             })}
         </div>
       </PopoverContent_Shadcn_>
