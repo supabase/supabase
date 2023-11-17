@@ -38,14 +38,15 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
         <div className="p-5">
           <div className="grid lg:flex gap-8">
             <div className="prose">
-              <div className="bg-brand-200 dark:bg-brand-200 rounded-xl w-12 h-12 flex justify-center items-center">
+              <div className="bg-brand-200 rounded-xl w-12 h-12 flex justify-center items-center">
                 <Image
                   width={24}
                   height={24}
                   className="w-6"
                   src={`${basePath}/images/pricing/compute-upgrade${
-                    resolvedTheme === 'dark' ? '-green' : '-light'
+                    resolvedTheme?.includes('dark') ? '-green' : '-light'
                   }.svg`}
+                  alt=""
                 />
               </div>
             </div>
@@ -64,17 +65,18 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
                 instance or parts of any other instance. Read more on{' '}
                 <Link
                   href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
-                  passHref
+                  target="_blank"
+                  className="transition text-brand hover:text-brand-600"
                 >
-                  <a target="_blank" className="transition text-brand hover:text-brand-600">
-                    usage-based billing for compute
-                  </a>
+                  usage-based billing for compute
                 </Link>{' '}
                 or{' '}
-                <Link href="https://supabase.com/docs/guides/platform/compute-add-ons" passHref>
-                  <a target="_blank" className="transition text-brand hover:text-brand-600">
-                    Compute Add-ons
-                  </a>
+                <Link
+                  href="https://supabase.com/docs/guides/platform/compute-add-ons"
+                  target="_blank"
+                  className="transition text-brand hover:text-brand-600"
+                >
+                  Compute Add-ons
                 </Link>
                 .
               </p>
@@ -97,7 +99,7 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
                 <Fragment key={`row-${i}`}>
                   {i === 0 && (
                     <tr className="">
-                      <td className="pb-1 bg-scale-700 px-3 py-1 -mr-1 border-l-4 border-scale-700">
+                      <td className="pb-1 bg-border-strong px-3 py-1 -mr-1 border-l-4 border-strong">
                         <span className="">First instance is free on paid plans</span>
                       </td>
                     </tr>
@@ -105,8 +107,8 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
                   <tr
                     key={i}
                     className={[
-                      i % 2 === 0 ? 'bg-scale-300 rounded-lg' : '',
-                      i === 0 ? 'border-4 border-scale-700' : '',
+                      i % 2 === 0 ? 'bg-surface-100 rounded-lg' : '',
+                      i === 0 ? 'border-4 border-strong' : '',
                     ].join(' ')}
                   >
                     {row.columns.map((column) => (

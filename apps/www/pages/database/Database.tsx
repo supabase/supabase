@@ -1,4 +1,4 @@
-import { Badge, Button, IconArrowUpRight, IconX, Tabs } from 'ui'
+import { Badge, Button, IconArrowUpRight, IconX, Tabs, ThemeImage } from 'ui'
 // data
 import ApiExamplesData from 'data/products/database/api-examples'
 import ExtensionsExamplesData from 'data/products/database/extensions-examples'
@@ -76,24 +76,16 @@ function Database() {
             'PostgreSQL is one of the worlds most scalable databases.',
           ]}
           image={[
-            <div className="header--light block w-full" key="light">
-              <Image
-                src={`${basePath}/images/product/database/header--light-2.png`}
-                alt="database header"
-                layout="responsive"
-                width="1680"
-                height="1116"
-              />
-            </div>,
-            <div className="header--dark mr-0 w-full dark:block" key="dark">
-              <Image
-                src={`${basePath}/images/product/database/header--dark-2.png`}
-                alt="database header"
-                layout="responsive"
-                width="1680"
-                height="1116"
-              />
-            </div>,
+            <ThemeImage
+              src={{
+                light: `${basePath}/images/product/database/header--light-2.png`,
+                dark: `${basePath}/images/product/database/header--dark-2.png`,
+              }}
+              alt="database header"
+              layout="responsive"
+              width="1680"
+              height="1116"
+            />,
           ]}
           documentation_url={'/docs/guides/database'}
         />
@@ -242,9 +234,7 @@ function Database() {
             footer={[
               <div className="grid grid-cols-12" key={0}>
                 <div className="col-span-12 mt-0 flex lg:col-span-6 xl:col-span-12 xl:mb-8">
-                  <p>
-                    <p className="text-light m-0">Libraries coming soon:</p>
-                  </p>
+                  <p className="text-foreground-light m-0">Libraries coming soon:</p>
                   <div className="ml-1 space-x-1">
                     <Badge dot={false}>Python</Badge>
                     <Badge dot={false}>Dart</Badge>
@@ -270,7 +260,7 @@ function Database() {
         <div className="relative">
           <div className="section--masked">
             <div className="section--bg-masked">
-              <div className="section--bg border-t border-b border-gray-100 dark:border-gray-600"></div>
+              <div className="section--bg border-t border-b border-control"></div>
             </div>
             <div className="section-container pt-12 pb-0">
               <FloatingIcons />
@@ -297,13 +287,9 @@ function Database() {
                 title="40+ preinstalled extensions"
                 text="We only show a few of the extensions supported by Supabase here, but we preinstall many more that you can use right away."
               />
-              <Link href="/docs/guides/database" passHref>
-                <a>
-                  <Button size="small" type="default" icon={<IconArrowUpRight />}>
-                    Explore documentation
-                  </Button>
-                </a>
-              </Link>
+              <Button asChild size="small" type="default" icon={<IconArrowUpRight />}>
+                <Link href="/docs/guides/database">Explore documentation</Link>
+              </Button>
             </div>
             <div className="col-span-12 mt-8 lg:col-span-6 lg:col-start-7 lg:mt-0">
               <SplitCodeBlockCarousel

@@ -60,16 +60,17 @@ export function PreLaunchTeaser() {
                   <Image
                     key={author.author_id + ' profile image'}
                     src={author.author_image_url}
-                    className="dark:border-dark rounded-lg border"
-                    width="54px"
-                    height="54px"
+                    className="rounded-lg border border-default"
+                    width={54}
+                    height={54}
+                    alt="Author profile image"
                   />
                 )
               })}
             </div>
             <div className="flex flex-col">
               <h4 className="text-foreground text-base">Founders Fireside Chat</h4>
-              <p className="text-light text-sm">
+              <p className="text-foreground-light text-sm">
                 Our two co-founders, Copple and Ant, discuss open source development and the future
                 of Supabase.
               </p>
@@ -77,19 +78,19 @@ export function PreLaunchTeaser() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <div className="text-light w-8">
+            <div className="text-foreground-light w-8">
               <NewspaperIcon strokeWidth={1} />
             </div>
             <div>
               <h3 className="text-foreground text-base">Supabase Series B</h3>
-              <p className="text-light text-sm">
+              <p className="text-foreground-light text-sm">
                 Supabase raised $80M in May, bringing our total funding to $116M.
               </p>
             </div>
             <div>
-              <Link href="/blog/supabase-series-b">
-                <Button type="default">Read more</Button>
-              </Link>
+              <Button asChild type="default">
+                <Link href="/blog/supabase-series-b">Read more</Link>
+              </Button>
             </div>
           </div>
         </div>
