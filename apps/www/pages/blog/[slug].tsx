@@ -240,7 +240,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
             <div className="hidden col-span-12 xl:block lg:col-span-2">
               {/* Back button */}
               <Link
-                href={'/blog'}
+                href="/blog"
                 className="text-foreground-lighter hover:text-foreground flex cursor-pointer items-center text-sm transition"
               >
                 <IconChevronLeft style={{ padding: 0 }} />
@@ -251,7 +251,9 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
               {/* Title and description */}
               <div className="mb-6 lg:mb-12 max-w-5xl space-y-8">
                 <div className="space-y-4">
-                  <p className="text-brand hidden lg:inline">Blog post</p>
+                  <Link href="/blog" className="text-brand hidden lg:inline">
+                    Blog
+                  </Link>
                   <h1 className="text-2xl sm:text-4xl">{props.blog.title}</h1>
                   <div className="text-light flex space-x-3 text-sm">
                     <p>{props.blog.date}</p>
