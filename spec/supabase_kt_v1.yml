@@ -2195,13 +2195,13 @@ functions:
           ```
 
   - id: sign-in-with-otp
-    title: 'sendOtpTo()'
+    title: 'signInWith(OTP)'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOtp'
     notes: |
       Sends a OTP to the user's email or phone number.
       - Requires either an email or phone number.
       - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
-      - If the user doesn't exist, `sendOtpTo()` will signup the user instead. To restrict this behavior, you can set `createUser` to `false`.
+      - If the user doesn't exist, `signInWith(OTP)` will signup the user instead. To restrict this behavior, you can set `createUser` to `false`.
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/reference/auth/config#site_url).
@@ -2215,7 +2215,7 @@ functions:
         description: The user will be sent an email which contains either a magiclink or a OTP or both. By default, a given user can only request a OTP once every 60 seconds.
         code: |
           ```kotlin
-          supabase.auth.sendOtpTo(Email) {
+          supabase.auth.signInWith(OTP) {
               email = "example@email.com"
           }
           ```
@@ -2225,7 +2225,7 @@ functions:
         description: The user will be sent a SMS which contains a OTP. By default, a given user can only request a OTP once every 60 seconds.
         code: |
           ```kotlin
-          supabase.auth.sendOtpTo(Phone) {
+          supabase.auth.signInWith(OTP) {
               phoneNumber = "+4912345679"
           }
           ```
@@ -2394,7 +2394,7 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueClient.resend'
     notes: |
       - Resends a signup confirmation, email change or phone change email to the user.
-      - Passwordless sign-ins can be resent by calling the `sendOtpTo()` method again.
+      - Passwordless sign-ins can be resent by calling the `signInWith(OTP)` method again.
       - Password recovery emails can be resent by calling the `sendRecoveryEmail()` method again.
       - This method will only resend an email or phone OTP to the user if there was an initial signup, email change or phone change request being made.
     examples:
@@ -3129,7 +3129,7 @@ functions:
           @Serializable
           data class Message(val content: String, val sender: String)
 
-          val channel = supabase.realtime.createChannel("channelId") {
+          val channel = supabase.channel("channelId") {
               //optional config
           }
 
@@ -3140,8 +3140,7 @@ functions:
               println(it)
           }
 
-          supabase.realtime.connect()
-          channel.join(blockUntilJoined = true)
+          channel.subscribe(blockUntilSubscribed = true)
 
           channel.broadcast(event = "message", Message("I joined!", "John"))
           ```
@@ -3153,7 +3152,7 @@ functions:
           data class PresenceState(val username: String)
 
           val connectedUsers = mutableSetOf<PresenceState>()
-          val channel = supabase.realtime.createChannel("channelId") {
+          val channel = supabase.channel("channelId") {
               //optional config
           }
 
@@ -3165,15 +3164,14 @@ functions:
               connectedUsers -= it.decodeLeavesAs<PresenceState>()
           }
 
-          supabase.realtime.connect()
-          channel.join(blockUntilJoined = true)
+          channel.subscribe(blockUntilSubscribed = true)
           //send own state
           channel.track(PresenceState(username = "John"))
       - id: listen-to-all-database-changes
         name: Listen to all database changes
         code: |
           ```kotlin
-          val channel = supabase.realtime.createChannel("channelId") {
+          val channel = supabase.channel("channelId") {
               //optional config
           }
           val changeFlow = channel.postgresChangeFlow<PostgresAction>(schema = "public")
@@ -3188,14 +3186,13 @@ functions:
               }
           }
 
-          supabase.realtime.connect()
-          channel.join()
+          channel.subscribe()
           ```
       - id: listen-to-a-specific-table
         name: Listen to a specific table
         code: |
           ```kotlin
-          val channel = supabase.realtime.createChannel("channelId") {
+          val channel = supabase.channel("channelId") {
               //optional config
           }
           val changeFlow = channel.postgresChangeFlow<PostgresAction>(schema = "public") {
@@ -3212,14 +3209,13 @@ functions:
               }
           }
 
-          supabase.realtime.connect()
-          channel.join()
+          channel.subscribe()
           ```
       - id: listen-to-inserts
         name: Listen to inserts
         code: |
           ```kotlin
-          val channel = supabase.realtime.createChannel("channelId") {
+          val channel = supabase.channel("channelId") {
               //optional config
           }
           val changeFlow = channel.postgresChangeFlow<PostgresAction.Insert>(schema = "public") {
@@ -3231,8 +3227,7 @@ functions:
               println(it.record)
           }
 
-          supabase.realtime.connect()
-          channel.join()
+          channel.subscribe()
           ```
       - id: listen-to-updates
         name: Listen to updates
@@ -3245,7 +3240,7 @@ functions:
           ```
         code: |
           ```kotlin
-          val channel = supabase.realtime.createChannel("channelId") {
+          val channel = supabase.channel("channelId") {
               //optional config
           }
           val changeFlow = channel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
@@ -3258,8 +3253,7 @@ functions:
               println(it.oldRecord)
           }
 
-          supabase.realtime.connect()
-          channel.join()
+          channel.subscribe()
           ```
       - id: listen-to-deletes
         name: Listen to deletes
@@ -3272,7 +3266,7 @@ functions:
           ```
         code: |
           ```kotlin
-          val channel = supabase.realtime.createChannel("channelId") {
+          val channel = supabase.channel("channelId") {
               //optional config
           }
           val changeFlow = channel.postgresChangeFlow<PostgresAction.Delete>(schema = "public") {
@@ -3284,15 +3278,14 @@ functions:
               println(it.oldRecord)
           }
 
-          supabase.realtime.connect()
-          channel.join()
+          channel.subscribe()
           ```
       - id: listening-to-row-level-changes
         name: Listen to row level changes
         description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
         code: |
           ```kotlin
-          val channel = supabase.realtime.createChannel("channelId") {
+          val channel = supabase.channel("channelId") {
              //optional config
           }
           val changeFlow = channel.postgresChangeFlow<PostgresAction.Delete>(schema = "public") {
@@ -3305,8 +3298,7 @@ functions:
               println(it.oldRecord)
           }
 
-          supabase.realtime.connect()
-          channel.join()
+          channel.subscribe()
           ```
 
   - id: remove-channel
@@ -3322,7 +3314,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val channel = supabase.realtime.createChannel("channelId") {
+          val channel = supabase.channel("channelId") {
               //optional config
           }
           //...
@@ -3333,11 +3325,11 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val channel = supabase.realtime.createChannel("channelId") {
+          val channel = supabase.channel("channelId") {
               //optional config
           }
           //...
-          channel.leave()
+          channel.unsubscribe()
           ```
   - id: remove-all-channels
     title: removeAllChannels()
