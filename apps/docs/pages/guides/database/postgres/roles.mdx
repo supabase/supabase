@@ -7,15 +7,11 @@ export const meta = {
   subtitle: 'Managing access to your Postgres database and configuring permissions.',
 }
 
-Postgres manages database access permissions using the concept of roles. Generally you wouldn't use these roles for your own application - they are mostly for configuring _system access_ to your database. If you want to confgure _application access_, then you should use [Row Level Security](/docs/guides/database/postgres/row-level-security).
+Postgres manages database access permissions using the concept of roles. Generally you wouldn't use these roles for your own application - they are mostly for configuring _system access_ to your database. If you want to configure _application access_, then you should use [Row Level Security](/docs/guides/database/postgres/row-level-security).
 
 ## Users vs Roles
 
 In PostgreSQL, roles can function as users or groups of users. Users are roles with login privileges, while groups (also known as role groups) are roles that don't have login privileges but can be used to manage permissions for multiple users.
-
-## Superuser roles
-
-The superuser role has unrestricted access to the database system. Typically these roles will be able to bypass all security measures (like Row Level Security). Be cautious when granting superuser privileges as it can potentially lead to security risks.
 
 ## Creating roles
 

@@ -1,20 +1,20 @@
 import { createClient } from '@supabase/supabase-js'
-import { Button } from 'ui'
+import { Button, ThemeImage } from 'ui'
 import { useState } from 'react'
 // Import Swiper React components
 import { useRouter } from 'next/router'
 import Image from 'next/image'
 
 import { ColorSwatchIcon, MenuIcon } from '@heroicons/react/outline'
-import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { useTheme } from 'next-themes'
 
-const supabase = createClient(
-  'https://rsnibhkhsbfnncjmwnkj.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYxNTIxNDE1MywiZXhwIjoxOTMwNzkwMTUzfQ.OQEbAaTfgDdLCCht251P2JRD3QDnui6nsU8N-tZA_Mc'
-)
-
 function AuthWidgetSection() {
+  const supabase = createClient(
+    'https://rsnibhkhsbfnncjmwnkj.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYxNTIxNDE1MywiZXhwIjoxOTMwNzkwMTUzfQ.OQEbAaTfgDdLCCht251P2JRD3QDnui6nsU8N-tZA_Mc'
+  )
   const { resolvedTheme } = useTheme()
   const { basePath } = useRouter()
   const [radius, setRadius] = useState('4px')
@@ -55,13 +55,13 @@ function AuthWidgetSection() {
 
   return (
     <div className="sbui-tabs--alt overflow-hidden">
-      <div className={`dark:bg-scale-200 bg-scale-100 relative border py-2 pb-16`}>
+      <div className="bg-background relative border py-2 pb-16">
         <div className="sm:py-18 gap container relative mx-auto grid grid-cols-12 px-6 py-16 md:gap-16 md:py-24 lg:gap-16 lg:px-16 lg:py-24 xl:px-20">
           <div className="relative z-10 col-span-12 mb-16 md:col-span-7 md:mb-0 lg:col-span-6">
             <div className="relative lg:mx-auto lg:max-w-md">
               <div className="glow-area transition-all"></div>
 
-              <div className="border-scale-400 dark:bg-scale-300 pointer-events-none relative rounded-xl border bg-white px-8 py-12 drop-shadow-sm">
+              <div className="border-overlay bg-surface-100 pointer-events-none relative rounded-xl border px-8 py-12 drop-shadow-sm">
                 <div className="mb-6 flex flex-col gap-6">
                   <div className="flex items-center gap-3">
                     <div
@@ -73,9 +73,9 @@ function AuthWidgetSection() {
                     >
                       <ColorSwatchIcon strokeWidth={1.5} />
                     </div>
-                    <h1 className="text-scale-1200 text-2xl">Acme Industries</h1>
+                    <h1 className="text-foreground text-2xl">Acme Industries</h1>
                   </div>
-                  <p className="text-scale-1100 text-auth-widget-test">
+                  <p className="text-foreground-light text-auth-widget-test">
                     Sign in today for Supa stuff
                   </p>
                 </div>
@@ -84,12 +84,9 @@ function AuthWidgetSection() {
                     <Auth
                       // @ts-ignore
                       socialLayout={layout}
-                      theme={resolvedTheme === 'dark' ? 'dark' : 'default'}
+                      theme={resolvedTheme?.includes('dark') ? 'dark' : 'default'}
                       providers={['google', 'facebook', 'twitter']}
                       supabaseClient={supabase}
-                      localization={{
-                        lang: 'en',
-                      }}
                       appearance={{
                         theme: ThemeSupa,
                         variables: {
@@ -116,17 +113,17 @@ function AuthWidgetSection() {
             <div className="prose !max-w-md">
               <h3 className="text-2xl">Auth UI</h3>
               <p className="!mb-0">Pre-built auth widgets to get started in minutes.</p>
-              <p className="text-scale-900 mt-0">
+              <p className="text-foreground-lighter mt-0">
                 Customizable authentication UI component with custom themes and extensible styles to
                 match your brand and aesthetic
               </p>
               <div className="mb-4 flex items-center space-x-2">
-                <div className="m-0 w-8 flex items-center">
+                <div className="relative m-0 w-8 aspect-square flex items-center">
                   <Image
                     src={`${basePath}/images/product/auth/react-icon.svg`}
                     alt="react icon"
-                    width="100%"
-                    height="100%"
+                    layout="fill"
+                    className="w-full m-0"
                   />
                 </div>
                 <small>React only. Other frameworks coming soon.</small>
@@ -135,7 +132,7 @@ function AuthWidgetSection() {
 
             <div className="grid gap-8 py-8 lg:grid-cols-2">
               <div className="flex flex-col gap-2">
-                <label className="text-scale-1200 text-base">Brand color</label>
+                <label className="text-foreground text-base">Brand color</label>
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() =>
@@ -146,9 +143,9 @@ function AuthWidgetSection() {
                       })
                     }
                     className={[
-                      'bg-brand-300 border-brand h-10 w-10 rounded-full border-2 transition hover:scale-105',
+                      'bg-surface-100 border-brand h-10 w-10 rounded-full border-2 transition hover:scale-105',
                       brandColor.brand === 'hsl(var(--brand-default))'
-                        ? ' !bg-brand ring-scale-400 border-scale-800 ring-2 drop-shadow-lg dark:ring-white'
+                        ? '!bg-brand ring-border-strong !border-foreground ring-2 ring-offset-2 ring-offset-transparent drop-shadow-lg'
                         : '',
                     ].join(' ')}
                   ></button>
@@ -161,9 +158,9 @@ function AuthWidgetSection() {
                       })
                     }
                     className={[
-                      'h-10 w-10 rounded-full border-2 border-orange-900 bg-orange-300 transition hover:scale-105 ',
+                      'h-10 w-10 rounded-full border-2 border-orange-900 bg-orange-600 transition hover:scale-105',
                       brandColor.brand === 'var(--colors-orange9)'
-                        ? ' ring-scale-400 border-scale-800 !bg-orange-900 ring-2 drop-shadow-lg dark:ring-white'
+                        ? 'ring-border-strong !border-foreground !bg-orange-900 ring-2 ring-offset-2 ring-offset-transparent drop-shadow-lg'
                         : '',
                     ].join(' ')}
                   ></button>
@@ -176,9 +173,9 @@ function AuthWidgetSection() {
                       })
                     }
                     className={[
-                      'border-crimson-900 bg-crimson-300 h-10 w-10 rounded-full border-2 transition hover:scale-105 ',
+                      'border-crimson-900 bg-crimson-500 h-10 w-10 rounded-full border-2 transition hover:scale-105',
                       brandColor.brand === 'var(--colors-crimson9)'
-                        ? ' ring-scale-400 border-scale-800 !bg-crimson-900 ring-2 drop-shadow-lg dark:ring-white'
+                        ? 'ring-border-strong !border-foreground !bg-crimson-900 ring-2 ring-offset-2 ring-offset-transparent drop-shadow-lg'
                         : '',
                     ].join(' ')}
                   ></button>
@@ -191,9 +188,9 @@ function AuthWidgetSection() {
                       })
                     }
                     className={[
-                      'h-10 w-10 rounded-full border-2 border-indigo-900 bg-indigo-300 transition hover:scale-105 ',
+                      'h-10 w-10 rounded-full border-2 border-indigo-900 bg-indigo-600 transition hover:scale-105',
                       brandColor.brand === 'var(--colors-indigo9)'
-                        ? ' ring-scale-400 border-scale-800 !bg-indigo-900 ring-2 drop-shadow-lg dark:ring-white'
+                        ? 'ring-border-strong !border-foreground !bg-indigo-900 ring-2 ring-offset-2 ring-offset-transparent drop-shadow-lg'
                         : '',
                     ].join(' ')}
                   ></button>
@@ -201,83 +198,68 @@ function AuthWidgetSection() {
               </div>
 
               <div className="flex flex-col gap-2">
-                <label className="text-scale-1200 text-base">Rounded corners</label>
+                <label className="text-foreground text-base">Rounded corners</label>
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => setRadius('4px')}
                     className={[
-                      'bg-scale-100 dark:bg-scale-400 border-scale-500 ring-scale-400 border-scale-800 flex h-10 w-10 items-center justify-center rounded-full border hover:scale-105',
+                      'bg-surface-100 ring-border-strong border-default flex h-10 w-10 items-center justify-center rounded-full border hover:scale-105',
                       radius === '4px'
-                        ? 'ring-scale-400 border-scale-800 border-2 ring-2 dark:ring-white'
+                        ? 'ring-border-strong !border-foreground border-2 ring-2 ring-offset-2 ring-offset-transparent'
                         : '',
                     ].join(' ')}
                   >
-                    <div className="m-0 w-4 items-center hidden text-red-900 dark:flex">
-                      <Image
-                        src="/images/auth-ui/small--light.svg"
+                    <div className="relative m-0 w-4 items-center justify-center text-red-900">
+                      <ThemeImage
+                        src={{
+                          light: '/images/auth-ui/small--dark.svg',
+                          dark: '/images/auth-ui/small--light.svg',
+                        }}
                         alt="react icon"
-                        width="100%"
-                        height="100%"
-                      />
-                    </div>
-                    <div className="m-0 w-4 items-center flex text-red-900 dark:hidden">
-                      <Image
-                        src="/images/auth-ui/small--dark.svg"
-                        alt="react icon"
-                        width="100%"
-                        height="100%"
+                        layout="fill"
+                        className="w-full h-full object-contain"
                       />
                     </div>
                   </button>
                   <button
                     onClick={() => setRadius('10px')}
                     className={[
-                      'bg-scale-100 dark:bg-scale-400 border-scale-500 flex h-10 w-10 items-center justify-center rounded-full  border transition hover:scale-105',
+                      'bg-surface-100 border-default flex h-10 w-10 items-center justify-center rounded-full  border transition hover:scale-105',
                       radius === '10px'
-                        ? 'ring-scale-400 border-scale-800 border-2 ring-2 dark:ring-white'
+                        ? 'ring-border-strong !border-foreground border-2 ring-2 ring-offset-2 ring-offset-transparent'
                         : '',
                     ].join(' ')}
                   >
-                    <div className="m-0 w-4 items-center hidden text-red-900 dark:flex">
-                      <Image
-                        src="/images/auth-ui/medium--light.svg"
+                    <div className="relative m-0 w-4 items-center justify-center text-red-900">
+                      <ThemeImage
+                        src={{
+                          light: '/images/auth-ui/medium--dark.svg',
+                          dark: '/images/auth-ui/medium--light.svg',
+                        }}
                         alt="react icon"
-                        width="100%"
-                        height="100%"
-                      />
-                    </div>
-                    <div className="m-0 w-4 items-center flex text-red-900 dark:hidden">
-                      <Image
-                        src="/images/auth-ui/medium--dark.svg"
-                        alt="react icon"
-                        width="100%"
-                        height="100%"
+                        layout="fill"
+                        className="w-full h-full object-contain"
                       />
                     </div>
                   </button>
                   <button
                     onClick={() => setRadius('32px')}
                     className={[
-                      'bg-scale-100 dark:bg-scale-400 border-scale-500 flex h-10 w-10 items-center justify-center rounded-full  border transition hover:scale-105',
+                      'bg-surface-100 border-default flex h-10 w-10 items-center justify-center rounded-full  border transition hover:scale-105',
                       radius === '32px'
-                        ? 'ring-scale-400 border-scale-800 border-2 ring-2 dark:ring-white'
+                        ? 'ring-border-strong !border-foreground border-2 ring-2 ring-offset-2 ring-offset-transparent'
                         : '',
                     ].join(' ')}
                   >
-                    <div className="m-0 w-4 items-center flex text-red-900 dark:hidden">
-                      <Image
-                        src="/images/auth-ui/large--light.svg"
+                    <div className="relative m-0 w-4 items-center justify-center flex text-red-900">
+                      <ThemeImage
+                        src={{
+                          light: '/images/auth-ui/large--light.svg',
+                          dark: '/images/auth-ui/large--dark.svg',
+                        }}
                         alt="react icon"
-                        width="100%"
-                        height="100%"
-                      />
-                    </div>
-                    <div className="m-0 w-4 items-center hidden text-red-900 dark:flex">
-                      <Image
-                        src="/images/auth-ui/large--dark.svg"
-                        alt="react icon"
-                        width="100%"
-                        height="100%"
+                        layout="fill"
+                        className="w-full h-full object-contain"
                       />
                     </div>
                   </button>
@@ -285,29 +267,29 @@ function AuthWidgetSection() {
               </div>
 
               <div className="flex flex-col gap-2">
-                <label className="text-scale-1200 text-base">Social Auth Layout</label>
+                <label className="text-foreground text-base">Social Auth Layout</label>
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => setLayout('horizontal')}
                     className={[
-                      'dark:bg-scale-400 bg-scale-100 dark:border-scale-500 border-scale-500 flex h-10 w-10 items-center justify-center rounded-full border transition hover:scale-105 ',
+                      'bg-surface-100 border-control flex h-10 w-10 items-center justify-center rounded-full border transition hover:scale-105',
                       layout === 'horizontal'
-                        ? 'ring-scale-400 border-scale-800 border-2 ring-2 dark:ring-white'
+                        ? 'ring-border-strong !border-foreground border-2 ring-2 ring-offset-2 ring-offset-transparent'
                         : '',
                     ].join(' ')}
                   >
-                    <MenuIcon className="text-scale-900 dark:text-scale-1100 w-6 rotate-90" />
+                    <MenuIcon className="text-foreground w-6 rotate-90" />
                   </button>{' '}
                   <button
                     onClick={() => setLayout('vertical')}
                     className={[
-                      'dark:bg-scale-400 bg-scale-100 dark:border-scale-500 border-scale-500 flex h-10 w-10 items-center justify-center rounded-full border transition hover:scale-105 ',
+                      'bg-surface-100 border-control flex h-10 w-10 items-center justify-center rounded-full border transition hover:scale-105',
                       layout === 'vertical'
-                        ? 'ring-scale-400 border-scale-800 border-2 ring-2 dark:ring-white'
+                        ? 'ring-border-strong !border-foreground border-2 ring-2 ring-offset-2 ring-offset-transparent'
                         : '',
                     ].join(' ')}
                   >
-                    <MenuIcon className="text-scale-900 dark:text-scale-1100 w-6" />
+                    <MenuIcon className="text-foreground w-6" />
                   </button>
                 </div>
               </div>

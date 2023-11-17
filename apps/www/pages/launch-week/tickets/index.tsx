@@ -42,8 +42,8 @@ export default function TicketsPage({ users }: Props) {
   const DESCRIPTION = 'Supabase Launch Week 8 | 7–11 August 2023'
   const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/8/lw8-og.jpg`
 
-  const { theme, setTheme } = useTheme()
-  const [initialDarkMode] = useState(theme === 'dark')
+  const { resolvedTheme, setTheme } = useTheme()
+  const [initialDarkMode] = useState(resolvedTheme?.includes('dark'))
   const [isLoading, setIsLoading] = useState(false)
   const [offset, setOffset] = useState(1)
   const [isLast, setIsLast] = useState(false)
@@ -133,13 +133,9 @@ export default function TicketsPage({ users }: Props) {
                   winners.
                 </p>
                 <div className="mt-1">
-                  <Link href="/launch-week">
-                    <a>
-                      <Button type="outline" size="medium">
-                        Go to Launch Week 8
-                      </Button>
-                    </a>
-                  </Link>
+                  <Button asChild type="outline" size="medium">
+                    <Link href="/launch-week">Go to Launch Week 8</Link>
+                  </Button>
                 </div>
               </motion.div>
             </div>
@@ -160,6 +156,7 @@ export default function TicketsPage({ users }: Props) {
               objectPosition="top"
               priority
               draggable={false}
+              alt=""
             />
           </div>
         </div>
