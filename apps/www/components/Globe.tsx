@@ -18,7 +18,7 @@ const Globe = () => {
       height: width * 2,
       phi: 0,
       theta: 0.3,
-      dark: resolvedTheme === 'dark' ? 1 : 0,
+      dark: resolvedTheme?.includes('dark') ? 1 : 0,
       diffuse: 3,
       scale: 1,
       opacity: 0.8,

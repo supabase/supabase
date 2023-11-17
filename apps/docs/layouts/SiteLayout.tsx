@@ -98,9 +98,9 @@ const levelsData = {
     icon: '/docs/img/icons/menu/reference-python',
     name: 'Python Reference v2.0',
   },
-  reference_swift_v0: {
+  reference_swift_v1: {
     icon: '/docs/img/icons/menu/reference-swift',
-    name: 'Swift Reference v0.0',
+    name: 'Swift Reference v1.0',
   },
   reference_kotlin_v0: {
     icon: '/docs/img/icons/menu/reference-kotlin',
@@ -238,12 +238,14 @@ const HeaderLogo = memo(function HeaderLogo() {
     <Link href="/" className="px-10 flex items-center gap-2">
       <Image
         className="cursor-pointer"
-        src={resolvedTheme === 'dark' ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'}
+        src={
+          resolvedTheme?.includes('dark') ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'
+        }
         width={96}
         height={24}
         alt="Supabase Logo"
       />
-      <span className="font-mono text-sm font-medium text-brand">DOCS</span>
+      <span className="font-mono text-sm font-medium text-brand-link">DOCS</span>
     </Link>
   )
 })

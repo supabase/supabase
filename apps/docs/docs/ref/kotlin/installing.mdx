@@ -264,7 +264,7 @@ By default, [KotlinX Serialization](https://github.com/Kotlin/kotlinx.serializat
             </TabPanel>
         </Tabs>
         ```kotlin
-        val client = createSupabaseClient(supabaseUrl, supabaseKey) {
+        val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
             //Already the default serializer
         }
         ```
@@ -312,7 +312,7 @@ By default, [KotlinX Serialization](https://github.com/Kotlin/kotlinx.serializat
             </TabPanel>
         </Tabs>
         ```kotlin
-        val client = createSupabaseClient(supabaseUrl, supabaseKey) {
+        val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
             defaultSerializer = MoshiSerializer()
         }
         ```
@@ -361,7 +361,7 @@ By default, [KotlinX Serialization](https://github.com/Kotlin/kotlinx.serializat
             </TabPanel>
         </Tabs>
         ```kotlin
-        val client = createSupabaseClient(supabaseUrl, supabaseKey) {
+        val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
             defaultSerializer = JacksonSerializer()
         }
         ```
@@ -392,7 +392,7 @@ By default, [KotlinX Serialization](https://github.com/Kotlin/kotlinx.serializat
         ```
 
         ```kotlin
-        val client = createSupabaseClient(supabaseUrl, supabaseKey) {
+        val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
             defaultSerializer = CustomSerializer()
         }
         ```

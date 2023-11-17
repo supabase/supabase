@@ -1,5 +1,13 @@
 import { createClient } from '@supabase/supabase-js'
-import { Button, IconArrowUpRight, IconBriefcase, IconEye, IconLink, IconShield } from 'ui'
+import {
+  Button,
+  IconArrowUpRight,
+  IconBriefcase,
+  IconEye,
+  IconLink,
+  IconShield,
+  ThemeImage,
+} from 'ui'
 import ApiExamples from 'data/products/auth/auth-api-examples'
 import AuthSqlRulesExamples from 'data/products/auth/auth-sql-rules-examples'
 import Solutions from 'data/Solutions'
@@ -64,24 +72,16 @@ function AuthPage() {
             "Including PostgreSQL's policy engine, for fine-grained access rules.",
           ]}
           image={[
-            <div className="header--light block w-full" key="light">
-              <Image
-                src={`${basePath}/images/product/auth/header--light.png`}
-                alt="auth header"
-                layout="responsive"
-                width="1372"
-                height="1074"
-              />
-            </div>,
-            <div className="header--dark mr-0 w-full dark:block" key="dark">
-              <Image
-                src={`${basePath}/images/product/auth/header--dark.png`}
-                alt="auth header"
-                layout="responsive"
-                width="1372"
-                height="1074"
-              />
-            </div>,
+            <ThemeImage
+              src={{
+                light: `${basePath}/images/product/auth/header--light.png`,
+                dark: `${basePath}/images/product/auth/header--dark.png`,
+              }}
+              alt="auth header"
+              layout="responsive"
+              width="1372"
+              height="1074"
+            />,
           ]}
           documentation_url={'/docs/guides/auth'}
         />
@@ -97,7 +97,7 @@ function AuthPage() {
                       viewBox="0 0 32.58 31.77"
                       width={21}
                       height={21}
-                      className="text-gray-800 dark:text-white"
+                      className="text-foreground-light"
                     >
                       <path
                         fill="currentColor"
@@ -193,7 +193,7 @@ function AuthPage() {
         <div className="relative">
           <div className="section--masked">
             <div className="section--bg-masked">
-              <div className="section--bg border-t border-b border-gray-100 dark:border-gray-600"></div>
+              <div className="section--bg border-t border-b border-control"></div>
             </div>
             <div className="section-container pt-12 pb-0">
               <FloatingIcons />
