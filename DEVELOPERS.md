@@ -141,7 +141,7 @@ First, make sure you have the Docker application installed on your device. You c
 3. Run docker
 
    ```sh
-   docker-compose up
+   docker compose up
    ```
 
 This command initializes the containers specified in the docker-compose.yml file. It might take a few moments to complete, depending on your computer and internet connection.
