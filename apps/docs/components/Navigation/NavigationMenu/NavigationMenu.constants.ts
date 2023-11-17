@@ -490,6 +490,7 @@ export const auth = {
       items: [
         { name: 'Next.js', url: '/guides/auth/quickstarts/nextjs', items: [] },
         { name: 'React', url: '/guides/auth/quickstarts/react', items: [] },
+        { name: 'React Native', url: '/guides/auth/quickstarts/react-native', items: [] },
       ],
     },
     {
@@ -622,6 +623,7 @@ export const database: NavMenuConstant = {
         { name: 'Managing database triggers', url: '/guides/database/postgres/triggers' },
         { name: 'Managing database webhooks', url: '/guides/database/webhooks' },
         { name: 'Using Full Text Search', url: '/guides/database/full-text-search' },
+        { name: 'Importing large datasets', url: '/guides/database/large-datasets' },
       ],
     },
     {
@@ -883,6 +885,10 @@ export const functions: NavMenuConstant = {
       items: [
         { name: 'CORS support for invoking from the browser', url: '/guides/functions/cors' },
         { name: 'Scheduling Functions', url: '/guides/functions/schedule-functions' },
+        {
+          name: 'Sending Push Notifications',
+          url: '/guides/functions/examples/push-notifications',
+        },
         { name: 'Generating OG images ', url: '/guides/functions/examples/og-image' },
         {
           name: 'CAPTCHA support with Cloudflare Turnstile',
@@ -1264,6 +1270,7 @@ export const platform: NavMenuConstant = {
         { name: 'Performance Tuning', url: '/guides/platform/performance' },
         { name: 'Permissions', url: '/guides/platform/permissions' },
         { name: 'SSL Enforcement', url: '/guides/platform/ssl-enforcement' },
+        { name: 'Branching', url: '/guides/platform/branching' },
       ],
     },
     {

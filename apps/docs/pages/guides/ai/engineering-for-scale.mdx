@@ -17,15 +17,12 @@ For small workloads, it's typical to store your data in a single database.
 If you've used [Vecs](/docs/guides/ai/vecs-python-client) to create 3 different collections, you can expose collections to your web or mobile application using [views](/docs/guides/database/tables#views):
 
 <div>
-  <img
+  <Image
     alt="single database"
-    className="dark:hidden"
-    src="/docs/img/ai/scaling/engineering-for-scale--single-database--light.png"
-  />
-  <img
-    alt="single database"
-    className="hidden dark:block"
-    src="/docs/img/ai/scaling/engineering-for-scale--single-database--dark.png"
+    src={{
+      light: '/docs/img/ai/scaling/engineering-for-scale--single-database--light.png',
+      dark: '/docs/img/ai/scaling/engineering-for-scale--single-database--dark.png',
+    }}
   />
 </div>
 
@@ -56,15 +53,12 @@ const { data, error } = await supabase
 As you move into production, we recommend splitting your collections into separate projects. This is because it allows your vector stores to scale independently of your production data. Vectors typically grow faster than operational data, and they have different resource requirements. Running them on separate databases removes the single-point-of-failure.
 
 <div>
-  <img
+  <Image
     alt="With secondaries"
-    className="dark:hidden"
-    src="/docs/img/ai/scaling/engineering-for-scale--with-secondaries--light.png"
-  />
-  <img
-    alt="With secondaries"
-    className="hidden dark:block"
-    src="/docs/img/ai/scaling/engineering-for-scale--with-secondaries--dark.png"
+    src={{
+      light: '/docs/img/ai/scaling/engineering-for-scale--with-secondaries--light.png',
+      dark: '/docs/img/ai/scaling/engineering-for-scale--with-secondaries--dark.png',
+    }}
   />
 </div>
 
@@ -143,15 +137,12 @@ const { data, error } = await supabase
 This diagram provides an example architecture that allows you to access the collections either with our client libraries or using Vecs. You can add as many secondary databases as you need (in this example we only show one):
 
 <div>
-  <img
+  <Image
     alt="multi database"
-    className="dark:hidden"
-    src="/docs/img/ai/scaling/engineering-for-scale--multi-database--light.png"
-  />
-  <img
-    alt="multi database"
-    className="hidden dark:block"
-    src="/docs/img/ai/scaling/engineering-for-scale--multi-database--dark.png"
+    src={{
+      light: '/docs/img/ai/scaling/engineering-for-scale--multi-database--light.png',
+      dark: '/docs/img/ai/scaling/engineering-for-scale--multi-database--dark.png',
+    }}
   />
 </div>
 

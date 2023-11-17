@@ -1,11 +1,10 @@
-import { Badge, Button, IconArrowUpRight, IconShuffle, IconWifi, IconX, Space } from 'ui'
+import { Button, IconArrowUpRight, IconShuffle, IconWifi, IconX, ThemeImage } from 'ui'
 import ApiExamples from 'data/products/storage/api-examples'
 import DashboardViewData from 'data/products/storage/dashboard-carousel.json'
 import StoragePermissionsData from 'data/products/storage/permissions-examples'
 import Solutions from 'data/Solutions'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
-import Image from 'next/image'
 import Link from 'next/link'
 import ImageCarousel from '~/components/Carousels/ImageCarousel'
 import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
@@ -57,24 +56,16 @@ function StoragePage() {
             'With custom policies and permissions that are familiar and easy to implement.',
           ]}
           image={[
-            <div className="header--light block w-full" key="light">
-              <Image
-                src={`${basePath}/images/product/storage/header--light.png`}
-                alt="storage header"
-                layout="responsive"
-                width="1386"
-                height="1067"
-              />
-            </div>,
-            <div className="header--dark mr-0 w-full dark:block" key="dark">
-              <Image
-                src={`${basePath}/images/product/storage/header--dark.png`}
-                alt="storage header"
-                layout="responsive"
-                width="1386"
-                height="1067"
-              />
-            </div>,
+            <ThemeImage
+              src={{
+                light: `${basePath}/images/product/storage/header--light.png`,
+                dark: `${basePath}/images/product/storage/header--dark.png`,
+              }}
+              alt="storage header"
+              layout="responsive"
+              width="1386"
+              height="1067"
+            />,
           ]}
           documentation_url={'/docs/guides/storage'}
         />
@@ -220,7 +211,7 @@ function StoragePage() {
         <div className="relative">
           <div className="section--masked">
             <div className="section--bg-masked">
-              <div className="section--bg border-t border-gray-100 dark:border-gray-600"></div>
+              <div className="section--bg border-t border-control"></div>
             </div>
             <div className="section-container pt-12 pb-0">
               {/* <FloatingIcons /> */}

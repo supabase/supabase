@@ -30,7 +30,7 @@ const Footer = () => (
             <p>{text}</p>
             <Link
               href={url}
-              className="text-brand hover:underline"
+              className="text-brand-link hover:underline"
               target="_blank"
               rel="noreferrer noopener"
             >

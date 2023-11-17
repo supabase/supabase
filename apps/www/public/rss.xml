@@ -5,9 +5,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Tue, 31 Oct 2023 23:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Sun, 05 Nov 2023 23:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/beta-update-october-2023</guid>
+  <title>Supabase Beta October 2023</title>
+  <link>https://supabase.com/blog/beta-update-october-2023</link>
+  <description>Brand-new features, community content, and (more importantly) the date for our next Launch Week.</description>
+  <pubDate>Sun, 05 Nov 2023 23:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/supabase-is-now-compatible-with-nextjs-14</guid>
   <title>Supabase is now compatible with Next.js 14</title>
   <link>https://supabase.com/blog/supabase-is-now-compatible-with-nextjs-14</link>
