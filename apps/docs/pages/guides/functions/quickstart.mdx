@@ -42,6 +42,23 @@ This creates a function stub in your `supabase` folder:
     └── config.toml
 ```
 
+## How to write the code
+
+The generated function uses native [Deno.serve](https://docs.deno.com/runtime/manual/runtime/http_server_apis) to handle requests. It gives you access to `Request` and `Response` objects.
+
+Here's the generated Hello World Edge Function, that accepts a name in the `Request` and responds with a greeting:
+
+```tsx
+Deno.serve(async (req) => {
+  const { name } = await req.json()
+  const data = {
+    message: `Hello ${name}!`,
+  }
+
+  return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } })
+})
+```
+
 ## Running Edge Functions locally
 
 You can run your Edge Function locally using [`supabase functions serve`](/docs/reference/cli/usage#supabase-functions-serve):
