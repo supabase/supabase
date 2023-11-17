@@ -1,24 +1,53 @@
+import Link from 'next/link'
+import { useEffect, useRef } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, IconAlertCircle, IconArchive } from 'ui'
+import { Button, IconAlertCircle, IconAlertTriangle, IconArchive } from 'ui'
 
 import { Markdown } from 'components/interfaces/Markdown'
 import { Notification, NotificationData } from 'data/notifications/notifications-v2-query'
 import { Organization, Project } from 'types'
-import Link from 'next/link'
+import clsx from 'clsx'
 
 interface NotificationRowProps {
-  notification: Notification
-  project?: Project
-  organization?: Organization
+  index: number
+  listRef: any
+  item: Notification
+  setRowHeight: (idx: number, height: number) => void
+  getProject: (id: number) => Project
+  getOrganization: (id: number) => Organization
 }
 
-const NotificationRow = ({ notification, project, organization }: NotificationRowProps) => {
+const NotificationRow = ({
+  index,
+  listRef,
+  item: notification,
+  setRowHeight,
+  getProject,
+  getOrganization,
+}: NotificationRowProps) => {
+  const ref = useRef<HTMLDivElement>(null)
   const { status, priority } = notification
   // @ts-ignore
   const data = notification.data as NotificationData
+  const project = data.project_id !== undefined ? getProject(data.project_id) : undefined
+  const organization = project !== undefined ? getOrganization(project.organization_id) : undefined
+
+  useEffect(() => {
+    if (ref.current) {
+      listRef.current.resetAfterIndex(0)
+      setRowHeight(index, ref.current.clientHeight)
+    }
+  }, [ref])
 
   return (
-    <div className={`p-4 flex justify-between gap-x-3 ${status !== 'new' ? 'bg-background' : ''}`}>
+    <div
+      ref={ref}
+      className={clsx(
+        `p-4 flex justify-between gap-x-3`,
+        index !== 0 ? 'border-t' : '',
+        status !== 'new' ? 'bg-background' : ''
+      )}
+    >
       <div className="flex flex-col gap-y-2">
         {(project !== undefined || organization !== undefined) && (
           <div className="flex items-center">
@@ -67,14 +96,14 @@ const NotificationRow = ({ notification, project, organization }: NotificationRo
         {priority === 'Warning' && (
           <IconAlertCircle
             size={22}
-            strokeWidth={3}
+            strokeWidth={2}
             className="rounded p-0.5 text-warning-400 bg-warning-600"
           />
         )}
         {priority === 'Critical' && (
-          <IconAlertCircle
+          <IconAlertTriangle
             size={22}
-            strokeWidth={3}
+            strokeWidth={2}
             className="rounded p-0.5 text-destructive-400 bg-destructive-600"
           />
         )}

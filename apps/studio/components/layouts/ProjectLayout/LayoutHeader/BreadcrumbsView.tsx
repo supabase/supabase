@@ -6,7 +6,6 @@ interface BreadcrumbsViewProps {
 }
 
 const BreadcrumbsView = ({ defaultValue: breadcrumbs }: BreadcrumbsViewProps) => {
-  console.log({ breadcrumbs })
   return (
     <>
       {breadcrumbs?.length

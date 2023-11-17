@@ -1,15 +1,16 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
 import { get } from 'data/fetchers'
-import { NotificationName } from '@supabase/shared-types/out/notifications'
 
+import { components } from 'data/api'
 import { ResponseError } from 'types'
 import { notificationKeys } from './keys'
-import { components } from 'data/api'
+
+const NOTIFICATIONS_PAGE_LIMIT = 10
 
 export type NotificationVariables = {
   archived: boolean
-  offset: number
-  limit: number
+  page: number
+  limit?: number
 }
 
 export type Notification = components['schemas']['NotificationResponseV2']
@@ -29,8 +30,9 @@ export type NotificationData = {
 }
 
 export async function getNotifications(options: NotificationVariables, signal?: AbortSignal) {
+  const { archived, page = 0, limit = NOTIFICATIONS_PAGE_LIMIT } = options
   const { data, error } = await get('/platform/notifications', {
-    params: { query: options },
+    params: { query: { archived, offset: page * limit, limit } },
     headers: { Version: '2' },
     signal,
   })
@@ -44,12 +46,27 @@ export type NotificationsData = Awaited<ReturnType<typeof getNotifications>>
 export type NotificationsError = ResponseError
 
 export const useNotificationsV2Query = <TData = NotificationsData>(
-  vars: NotificationVariables,
-  options: UseQueryOptions<NotificationsData, NotificationsError, TData> = {}
+  { archived, limit = NOTIFICATIONS_PAGE_LIMIT }: Omit<NotificationVariables, 'page'>,
+  {
+    enabled = true,
+    ...options
+  }: UseInfiniteQueryOptions<NotificationsData, NotificationsError, TData> = {}
 ) => {
-  return useQuery<NotificationsData, NotificationsError, TData>(
-    notificationKeys.listV2(vars),
-    ({ signal }) => getNotifications(vars, signal),
-    options
+  return useInfiniteQuery<NotificationsData, NotificationsError, TData>(
+    notificationKeys.listV2({ archived, limit }),
+    ({ signal, pageParam }) => getNotifications({ archived, limit, page: pageParam }, signal),
+    {
+      enabled: enabled,
+      getNextPageParam(lastPage, pages) {
+        const page = pages.length
+
+        if (lastPage.length < limit) {
+          return undefined
+        }
+
+        return page
+      },
+      ...options,
+    }
   )
 }

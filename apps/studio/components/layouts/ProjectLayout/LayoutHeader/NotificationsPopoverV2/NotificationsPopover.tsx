@@ -1,8 +1,9 @@
 import clsx from 'clsx'
-import { useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import {
   Button,
   IconAlertCircle,
+  IconAlertTriangle,
   IconInbox,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -10,36 +11,42 @@ import {
   Tabs,
 } from 'ui'
 
-import {
-  NotificationData,
-  useNotificationsV2Query,
-} from 'data/notifications/notifications-v2-query'
+import AlertError from 'components/ui/AlertError'
+import InfiniteList from 'components/ui/InfiniteList'
+import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useNotificationsV2Query } from 'data/notifications/notifications-v2-query'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useProjectsQuery } from 'data/projects/projects-query'
 import { SlidersHorizontal } from 'lucide-react'
 import NotificationRow from './NotificationRow'
-import { useProjectsQuery } from 'data/projects/projects-query'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 
 const NotificationsPopverV2 = () => {
+  const rowHeights = useRef<{ [key: number]: number }>({})
   const [open, setOpen] = useState(false)
-  const [status, setStatus] = useState<'archived' | 'new'>()
   const [activeTab, setActiveTab] = useState<'inbox' | 'archive'>('inbox')
 
   const { data: projects } = useProjectsQuery()
   const { data: organizations } = useOrganizationsQuery()
-  const { data, error, isLoading, isError, isSuccess } = useNotificationsV2Query({
-    archived: false,
-    offset: 0,
-    limit: 10,
+  const {
+    data,
+    error,
+    isLoading,
+    isError,
+    isSuccess,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = useNotificationsV2Query({
+    archived: activeTab === 'archive',
   })
-  const notifications = data ?? []
+  // const notifications = data ?? []
+  const notifications = useMemo(() => data?.pages.flatMap((page) => page) ?? [], [data?.pages])
 
   // This probably needs to be fixed cause we won't be able to check the number if its paginated
   const newNotifications = notifications.filter((notification) => notification.status === 'new')
   const hasNewNotifications = newNotifications.length > 0
   const hasWarning = true // newNotifications.some((notification) => notification.priority === 'Warning')
   const hasCritical = false // newNotifications.some((notification) => notification.priority === 'Critical')
-
-  console.log({ projects, notifications })
 
   return (
     <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
@@ -57,7 +64,7 @@ const NotificationsPopverV2 = () => {
           )}
           icon={
             hasCritical ? (
-              <IconAlertCircle
+              <IconAlertTriangle
                 size={16}
                 strokeWidth={3}
                 className={clsx(
@@ -94,7 +101,7 @@ const NotificationsPopverV2 = () => {
           }
         />
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-[400px]" side="bottom" align="end">
+      <PopoverContent_Shadcn_ className="p-0 w-[400px] overflow-hidden" side="bottom" align="end">
         <div className="px-4">
           <p className="pt-4 pb-1 text-sm">Notifications</p>
           <div className="flex items-center">
@@ -104,7 +111,9 @@ const NotificationsPopverV2 = () => {
               baseClassNames="!space-y-0"
               listClassNames="[&>button>span]:text-xs"
               activeId={activeTab}
-              onChange={setActiveTab}
+              onChange={(tab: any) => {
+                setActiveTab(tab)
+              }}
             >
               <Tabs.Panel
                 id="inbox"
@@ -115,37 +124,48 @@ const NotificationsPopverV2 = () => {
                   </div>
                 }
               />
-              <Tabs.Panel id="archive" label="Archive" />
+              <Tabs.Panel id="archive" label="Archived" />
             </Tabs>
             <Button type="text" icon={<SlidersHorizontal size={14} />} className="px-1" />
           </div>
         </div>
-        <div className="border-t divide-y">
-          {activeTab === 'inbox' &&
-            notifications.map((notification) => {
-              const { data } = notification
-              const project =
-                data.project_id !== undefined
-                  ? projects?.find((project) => project.id === data.project_id)
-                  : undefined
-              const organization =
-                organizations?.find(
-                  (organization) => organization.id === project?.organization_id
-                ) ?? undefined
-
-              return (
-                <NotificationRow
-                  key={notification.id}
-                  notification={notification}
-                  project={project}
-                  organization={organization}
-                />
-              )
-            })}
-          {activeTab === 'archive' &&
-            notifications.map((notification) => {
-              return <NotificationRow key={notification.id} notification={notification} />
-            })}
+        <div className="border-t">
+          {isLoading && (
+            <div className="p-4">
+              <GenericSkeletonLoader />
+            </div>
+          )}
+          {isError && (
+            <div className="p-4">
+              <AlertError subject="Failed to retrieve notifications" error={error} />
+            </div>
+          )}
+          {isSuccess && (
+            <div className="flex flex-1 h-[400px]">
+              <InfiniteList
+                items={notifications}
+                ItemComponent={NotificationRow}
+                LoaderComponent={
+                  <div className="p-4">
+                    <ShimmeringLoader />
+                  </div>
+                }
+                itemProps={{
+                  setRowHeight: (idx: number, height: number) => {
+                    if (rowHeights.current) {
+                      rowHeights.current = { ...rowHeights.current, [idx]: height }
+                    }
+                  },
+                  getProject: (id: number) => projects?.find((project) => project.id === id),
+                  getOrganization: (id: number) => organizations?.find((org) => org.id === id),
+                }}
+                getItemSize={(idx: number) => rowHeights?.current?.[idx] ?? 56}
+                hasNextPage={hasNextPage}
+                isLoadingNextPage={isFetchingNextPage}
+                onLoadNextPage={() => fetchNextPage()}
+              />
+            </div>
+          )}
         </div>
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>

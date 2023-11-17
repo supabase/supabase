@@ -1,11 +1,11 @@
-import { CSSProperties, memo } from 'react'
 import memoize from 'memoize-one'
-import { areEqual, VariableSizeList } from 'react-window'
+import { CSSProperties, ReactNode, memo, useRef } from 'react'
 import AutoSizer from 'react-virtualized-auto-sizer'
+import { VariableSizeList, areEqual } from 'react-window'
 import InfiniteLoader from 'react-window-infinite-loader'
 
-import { propsAreEqual } from 'lib/helpers'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { propsAreEqual } from 'lib/helpers'
 
 /**
  * Note that the loading more logic of this component works best with a cursor-based
@@ -17,26 +17,11 @@ const createItemData = memoize((items, itemProps) => ({ items, ...itemProps }))
 
 export interface ItemProps {
   data: any
+  listRef: any
   index: number
   style: CSSProperties
+  LoaderComponent?: ReactNode
 }
-
-const Item = memo(({ data, index, style }: ItemProps) => {
-  const { items, itemProps, ItemComponent } = data
-  const item = index < items.length ? items[index] : undefined
-
-  return item ? (
-    <div style={style}>
-      <ItemComponent index={index} item={item} {...itemProps} />
-    </div>
-  ) : (
-    <div className="space-y-1 my-1" style={style}>
-      <ShimmeringLoader />
-      <ShimmeringLoader />
-      <ShimmeringLoader />
-    </div>
-  )
-}, areEqual)
 
 export interface InfiniteListProps<T> {
   items?: T[]
@@ -46,7 +31,28 @@ export interface InfiniteListProps<T> {
   getItemSize?: (index: number) => number
   onLoadNextPage?: () => void
   ItemComponent?: any
+  LoaderComponent?: ReactNode
 }
+
+// eslint-disable-next-line react/display-name
+const Item = memo(({ listRef, LoaderComponent, data, index, style }: ItemProps) => {
+  const { items, itemProps, ItemComponent } = data
+  const item = index < items.length ? items[index] : undefined
+
+  return item ? (
+    <div style={style}>
+      <ItemComponent index={index} item={item} listRef={listRef} {...itemProps} />
+    </div>
+  ) : LoaderComponent !== undefined ? (
+    <div style={style}>{LoaderComponent}</div>
+  ) : (
+    <div className="space-y-1 my-1" style={style}>
+      <ShimmeringLoader />
+      <ShimmeringLoader />
+      <ShimmeringLoader />
+    </div>
+  )
+}, areEqual)
 
 function InfiniteList<T>({
   items = [],
@@ -56,7 +62,10 @@ function InfiniteList<T>({
   getItemSize = () => 40,
   onLoadNextPage = () => {},
   ItemComponent = () => null,
+  LoaderComponent,
 }: InfiniteListProps<T>) {
+  const listRef = useRef<any>()
+
   // Only load 1 page of items at a time
   // Pass an empty callback to InfiniteLoader in case it asks to load more than once
   const loadMoreItems = isLoadingNextPage ? () => {} : onLoadNextPage
@@ -81,7 +90,10 @@ function InfiniteList<T>({
             >
               {({ onItemsRendered, ref }) => (
                 <VariableSizeList
-                  ref={ref}
+                  ref={(refy) => {
+                    ref(refy)
+                    listRef.current = refy
+                  }}
                   height={height ?? 0}
                   width={width ?? 0}
                   itemCount={itemCount}
@@ -89,7 +101,9 @@ function InfiniteList<T>({
                   itemSize={getItemSize}
                   onItemsRendered={onItemsRendered}
                 >
-                  {Item}
+                  {(props) => (
+                    <Item listRef={listRef} LoaderComponent={LoaderComponent} {...props} />
+                  )}
                 </VariableSizeList>
               )}
             </InfiniteLoader>
