@@ -28,7 +28,7 @@ const Error500: NextPage = () => {
               <Link href="/projects">
                 <Image
                   src={
-                    resolvedTheme === 'dark'
+                    resolvedTheme?.includes('dark')
                       ? `${router.basePath}/img/supabase-dark.svg`
                       : `${router.basePath}/img/supabase-light.svg`
                   }

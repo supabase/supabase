@@ -21,7 +21,7 @@ const TableEditorPage: NextPageWithLayout = () => {
       <TableGridEditor
         isLoadingSelectedTable={isLoading}
         selectedTable={selectedTable}
-        theme={resolvedTheme === 'dark' ? 'dark' : 'light'}
+        theme={resolvedTheme?.includes('dark') ? 'dark' : 'light'}
       />
       <DeleteConfirmationDialogs
         projectRef={projectRef}

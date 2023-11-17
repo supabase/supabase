@@ -165,7 +165,7 @@ export const StyledArticleBadge = ({
       ' '
     )}
   >
-    <div className="!bg-transparent rounded-full !py-1 !px-4 w-full inset-[1px] text-sm border-none dark:from-white dark:to-[#6453C5] dark:border-none">
+    <div className="!bg-transparent rounded-full !py-1 !px-4 w-full inset-[1px] text-sm border-none from-foreground to-[#6453C5]">
       <span className="text-sm text-[#F4FFFA80] bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#7E7AAD]">
         {children}
       </span>

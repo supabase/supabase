@@ -201,9 +201,20 @@ const BranchManagement = () => {
                     icon={<IconSearch size={14} strokeWidth={2} />}
                   />
                 </div>
-                <Button type="primary" onClick={() => setShowCreateBranch(true)}>
-                  Create branch
-                </Button>
+                <div className="flex items-center justify-between space-x-2">
+                  <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                    <Link
+                      target="_blank"
+                      rel="noreferrer"
+                      href="https://supabase.com/docs/guides/platform/branching"
+                    >
+                      Documentation
+                    </Link>
+                  </Button>
+                  <Button type="primary" onClick={() => setShowCreateBranch(true)}>
+                    Create branch
+                  </Button>
+                </div>
               </div>
 
               {isErrorIntegrations && (

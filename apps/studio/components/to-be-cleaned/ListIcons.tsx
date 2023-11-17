@@ -15,7 +15,7 @@ export const vercelIcon = (
 )
 
 export const databaseIcon = (
-  <div className="flex items-center justify-center rounded bg-green-500 p-1 dark:text-typography-body-dark ">
+  <div className="flex items-center justify-center rounded bg-green-500 p-1 [[data-theme*=dark]_&]:text-typography-body-dark ">
     {/* <SVG
       src={'/icons/feather/database.svg'}
       style={{ width: `12px`, height: `12px`, strokeWidth: '2px' }}
