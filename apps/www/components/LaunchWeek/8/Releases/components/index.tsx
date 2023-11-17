@@ -165,7 +165,7 @@ export const StyledArticleBadge = ({
       ' '
     )}
   >
-    <div className="!bg-transparent rounded-full !py-1 !px-4 w-full inset-[1px] text-sm border-none dark:from-white dark:to-[#6453C5] dark:border-none">
+    <div className="!bg-transparent rounded-full !py-1 !px-4 w-full inset-[1px] text-sm border-none from-foreground to-[#6453C5]">
       <span className="text-sm text-[#F4FFFA80] bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#7E7AAD]">
         {children}
       </span>
@@ -197,7 +197,7 @@ export const AccordionHeader = ({
 }) => (
   <div
     className={[
-      'h-[79px] hover:cursor-default flex flex-1 items-center scroll-mt-20 text-scale-900',
+      'h-[79px] hover:cursor-default flex flex-1 items-center scroll-mt-20 text-muted',
     ].join(' ')}
   >
     <div
@@ -271,8 +271,8 @@ export const VideoPreviewTrigger = ({
   title?: string
   thumbnail: string
 }) => (
-  <div className="flex items-center h-full gap-3 text-xs group/vid text-scale-1100 hover:text-scale-1200 transition-colors">
-    <div className="relative h-10 !aspect-video flex items-center justify-center rounded overflow-hidden border border-scale-1000 opacity-80 group-hover/vid:opacity-100 transition-colors">
+  <div className="flex items-center h-full gap-3 text-xs group/vid text-foreground-light hover:text-foreground transition-colors">
+    <div className="relative h-10 !aspect-video flex items-center justify-center rounded overflow-hidden border border-foreground-lighter opacity-80 group-hover/vid:opacity-100 transition-colors">
       <div className="absolute z-10 w-2.5 h-2.5 text-white opacity-100">
         <svg viewBox="0 0 81 91" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
@@ -291,7 +291,7 @@ export const MultistepSectionHeader = ({ title, blog }: any) => {
   return (
     <div className="flex flex-1 flex-col sm:flex-row py-8">
       <div className="flex gap-4 w-full items-center justify-between md:justify-start">
-        {title && <span className="text-scale-1200 text-lg mt-3 sm:mt-0">{title}</span>}
+        {title && <span className="text-foreground text-lg mt-3 sm:mt-0">{title}</span>}
         {!!blog && (
           <ChipLink href={blog} className="!w-auto !text-left !justify-between !flex-none">
             Blog post
@@ -321,24 +321,23 @@ export const ChipLink = ({
   uiOnly ? (
     <span
       className={[
-        'flex flex-auto justify-center sm:justify-between w-full text-center sm:text-left min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444460] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191990] hover:border-scale-800 backdrop-blur-xl rounded-full text-sm py-2 px-3 sm:pr-2',
+        'flex flex-auto justify-center sm:justify-between w-full text-center sm:text-left min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444460] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191990] hover:border-stronger backdrop-blur-xl rounded-full text-sm py-2 px-3 sm:pr-2',
         className,
       ].join(' ')}
     >
       {children}
     </span>
   ) : !!href ? (
-    <Link href={href}>
-      <a
-        target={target ?? '_self'}
-        rel="noopener"
-        className={[
-          'flex flex-auto justify-center sm:justify-between w-full text-center sm:text-left min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444460] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191990] hover:border-scale-800 backdrop-blur-xl rounded-full text-sm py-2 px-3 sm:pr-2',
-          className,
-        ].join(' ')}
-      >
-        {children}
-      </a>
+    <Link
+      href={href}
+      target={target ?? '_self'}
+      rel="noopener"
+      className={[
+        'flex flex-auto justify-center sm:justify-between w-full text-center sm:text-left min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444460] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191990] hover:border-stronger backdrop-blur-xl rounded-full text-sm py-2 px-3 sm:pr-2',
+        className,
+      ].join(' ')}
+    >
+      {children}
     </Link>
   ) : null
 

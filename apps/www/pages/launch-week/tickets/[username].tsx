@@ -41,8 +41,8 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
 
   const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
   const [session, setSession] = useState<Session | null>(null)
-  const { theme, setTheme } = useTheme()
-  const [initialDarkMode] = useState(theme === 'dark')
+  const { resolvedTheme, setTheme } = useTheme()
+  const [initialDarkMode] = useState(resolvedTheme?.includes('dark'))
 
   const [pageState, setPageState] = useState<PageState>('ticket')
 
@@ -111,6 +111,7 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
                     objectPosition="top"
                     priority
                     draggable={false}
+                    alt="Launch Week 8 gradient background"
                   />
                 </div>
               </div>

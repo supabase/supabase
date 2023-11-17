@@ -79,7 +79,7 @@ supabase.
 // or...
 // async/await syntax
 const main = async() => {
-  let { data, error } = supabase
+  const { data, error } = supabase
     .from('countries')
     .select('*')
     .limit(5)

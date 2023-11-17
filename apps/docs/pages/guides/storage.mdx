@@ -22,11 +22,9 @@ Check out all of the Storage [templates and examples](https://github.com/supabas
   {examples.map((x) => (
     <div className="col-span-12" key={x.href}>
       <Link href={x.href} passHref>
-        <a>
-          <GlassPanel icon={'/docs/img/icons/github-icon'} hasLightIcon={true} title={x.name}>
-            {x.description}
-          </GlassPanel>
-        </a>
+        <GlassPanel icon={'/docs/img/icons/github-icon'} hasLightIcon={true} title={x.name}>
+          {x.description}
+        </GlassPanel>
       </Link>
     </div>
   ))}
@@ -49,9 +47,7 @@ Find the source code and documentation in the Supabase GitHub repository.
   {integrations.map((x) => (
     <div className="col-span-6" key={x.href}>
       <Link href={x.href} passHref>
-        <a>
-          <GlassPanel title={x.name}>{x.description}</GlassPanel>
-        </a>
+        <GlassPanel title={x.name}>{x.description}</GlassPanel>
       </Link>
     </div>
   ))}
