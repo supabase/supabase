@@ -185,7 +185,7 @@ const Partners = () => {
                   className="group flex flex-col items-center text-center gap-4 px-8 py-6"
                   key={i}
                 >
-                  <div className="bg-brand-300 [[data-theme*=dark]_&]:bg-brand-500 text-brand-1200 group-hover:text-brand-800 [[data-theme*=dark]_&]:group-hover:text-brand-1000 flex h-12 w-12 items-center justify-center rounded-md border border-brand transition-all group-hover:scale-105">
+                  <div className="bg-brand-300 dark:bg-brand-500 text-brand-1200 group-hover:text-brand-800 dark:group-hover:text-brand-1000 flex h-12 w-12 items-center justify-center rounded-md border border-brand transition-all group-hover:scale-105">
                     {item.icon ? item.icon : <IconCode strokeWidth={2} />}
                   </div>
 

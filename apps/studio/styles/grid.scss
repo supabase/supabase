@@ -85,7 +85,7 @@
 }
 
 .rdg-header-row .rdg-cell p {
-  @apply text-typography-body-light [[data-theme*=dark]_&]:text-typography-body-dark;
+  @apply text-typography-body-light dark:text-typography-body-dark;
 }
 .rdg-header-row .rdg-cell .react-contextmenu-wrapper {
   @apply flex h-full items-center px-2 transition duration-100 ease-in-out;
@@ -114,8 +114,8 @@
 */
 
 .rdg-row {
-  @apply bg-table-body-light [[data-theme*=dark]_&]:bg-table-body-dark transition-colors;
-  @apply hover:bg-table-header-light [[data-theme*=dark]_&]:hover:bg-table-header-dark;
+  @apply bg-table-body-light dark:bg-table-body-dark transition-colors;
+  @apply hover:bg-table-header-light dark:hover:bg-table-header-dark;
 }
 
 /* edit button */

@@ -77,7 +77,7 @@ const DisplayApiSettings = () => {
             key={x.api_key}
             className={
               i >= 1 &&
-              'border-t border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark'
+              'border-t border-panel-border-interior-light dark:border-panel-border-interior-dark'
             }
           >
             <Input

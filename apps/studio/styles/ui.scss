@@ -359,7 +359,7 @@
 
 .radix-tooltip-arrow {
   polygon {
-    @apply fill-background-alternative [[data-theme*=dark]_&]:fill-background-alternative;
+    @apply fill-background-alternative dark:fill-background-alternative;
     // fill: #eeeeee;
   }
 }

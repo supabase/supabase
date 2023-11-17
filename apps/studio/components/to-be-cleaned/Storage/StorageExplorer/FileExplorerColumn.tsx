@@ -164,7 +164,7 @@ const FileExplorerColumn = ({
       {/* Checkbox selection for select all */}
       {view === STORAGE_VIEWS.COLUMNS && (
         <div
-          className={`sticky top-0 z-10 mb-0 flex items-center bg-table-header-light px-2.5 [[data-theme*=dark]_&]:bg-table-header-dark ${
+          className={`sticky top-0 z-10 mb-0 flex items-center bg-table-header-light px-2.5 dark:bg-table-header-dark ${
             haveSelectedItems ? 'h-10 py-3 opacity-100' : 'h-0 py-0 opacity-0'
           } transition-all duration-200`}
           onClick={(event) => event.stopPropagation()}
@@ -273,7 +273,7 @@ const FileExplorerColumn = ({
         <div
           className="
           sticky bottom-0
-          z-10 flex min-w-min items-center bg-panel-footer-light px-2.5 py-2 [[data-theme*=dark]_&]:bg-panel-footer-dark
+          z-10 flex min-w-min items-center bg-panel-footer-light px-2.5 py-2 dark:bg-panel-footer-dark
         "
         >
           <p className="text-sm">
