@@ -318,6 +318,10 @@ export const gettingstarted: NavMenuConstant = {
           name: 'Ionic Angular',
           url: '/guides/getting-started/tutorials/with-ionic-angular',
         },
+        {
+          name: 'Swift',
+          url: '/guides/getting-started/tutorials/with-swift',
+        },
       ],
     },
   ],
