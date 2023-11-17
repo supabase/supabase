@@ -31,24 +31,17 @@ function GithubExamples() {
             Supported by a network of early advocates, contributors, and champions.
           </p>
           <div className="flex items-center justify-center gap-2 py-4">
-            <Link href="/docs/guides/auth/overview" passHref>
-              <a>
-                <Button size="small" type="default" icon={<IconBookOpen size={12} />}>
-                  View guides
-                </Button>
-              </a>
-            </Link>
-            <Link
-              href="https://github.com/supabase/supabase/tree/master/examples"
-              as="https://github.com/supabase/supabase/tree/master/examples"
-              passHref
-            >
-              <a>
-                <Button size="small" type="default" icon={<IconGitHub size={12} />}>
-                  Official GitHub library
-                </Button>
-              </a>
-            </Link>
+            <Button asChild size="small" type="default" icon={<IconBookOpen size={12} />}>
+              <Link href="/docs/guides/auth/overview">View guides</Link>
+            </Button>
+            <Button asChild size="small" type="default" icon={<IconGitHub size={12} />}>
+              <Link
+                href="https://github.com/supabase/supabase/tree/master/examples"
+                as="https://github.com/supabase/supabase/tree/master/examples"
+              >
+                Official GitHub library
+              </Link>
+            </Button>
           </div>
         </div>
       </div>

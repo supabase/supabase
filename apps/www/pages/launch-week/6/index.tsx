@@ -34,7 +34,7 @@ const constellation = [
 ]
 
 export default function launchweek() {
-  const { theme, setTheme } = useTheme()
+  const { resolvedTheme } = useTheme()
   const title = 'Launch Week 6'
   const description = 'Supabase Launch Week 6 | 12-18 Dec 2022'
   const liveDay = null
@@ -169,16 +169,14 @@ export default function launchweek() {
             )}
           >
             <div className="flex justify-center">
-              {/* <img
-                src="/images/launchweek/launchweek-logo--light.svg"
-                className="flex w-40 dark:hidden lg:w-80"
-              /> */}
               <img
                 src="/images/launchweek/launchweek-logo--dark.svg"
                 className="w-40 flex lg:w-80"
               />
             </div>
-            <p className="text-scale-1100 text-sm text-center">Dec 12 – 16 at 6 AM PT | 9 AM ET</p>
+            <p className="text-foreground-light text-sm text-center">
+              Dec 12 – 16 at 6 AM PT | 9 AM ET
+            </p>
           </div>
         </SectionContainer>
         <div
@@ -309,9 +307,7 @@ export default function launchweek() {
                     <div
                       className="absolute group-hover/day1:scale-105 opacity-60 group-hover/day1:opacity-100 w-full h-full -z-10 transition-all duration-500"
                       style={{
-                        background: `radial-gradient(650px 150px at 50% 100%, ${
-                          theme === 'dark' ? '#103633' : '#b8e8e7'
-                        }, transparent)`,
+                        background: `radial-gradient(650px 150px at 50% 100%, #103633, transparent)`,
                       }}
                     ></div>
                     <div
@@ -355,9 +351,7 @@ export default function launchweek() {
                       <div
                         className="top-0 absolute group-hover/2:scale-105 opacity-60 group-hover/2:opacity-100 w-full h-full -z-10 transition-all duration-500"
                         style={{
-                          background: `radial-gradient(90% 130px at 80% 0px, ${
-                            theme === 'dark' ? '#103633' : '#b8e8e7'
-                          }, transparent)`,
+                          background: `radial-gradient(90% 130px at 80% 0px, #103633, transparent)`,
                         }}
                       ></div>
                       <div className="flex items-center justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-white">
@@ -374,9 +368,7 @@ export default function launchweek() {
                       <div
                         className="top-0 absolute group-hover/3:scale-105 opacity-60 group-hover/3:opacity-100 w-full h-full -z-10 transition-all duration-500"
                         style={{
-                          background: `radial-gradient(90% 130px at 50% 0px, ${
-                            theme === 'dark' ? '#103633' : '#b8e8e7'
-                          }, transparent)`,
+                          background: `radial-gradient(90% 130px at 50% 0px, #103633, transparent)`,
                         }}
                       ></div>
                       <div className="flex flex-col items-center gap-2 min-w-[300px]">
@@ -413,11 +405,7 @@ export default function launchweek() {
                     >
                       <div className="absolute top-0 right-0 w-full h-full -z-20 ">
                         <Image
-                          src={
-                            theme === 'dark'
-                              ? '/images/launchweek/mfa-dark.png'
-                              : '/images/launchweek/mfa-light.png'
-                          }
+                          src={'/images/launchweek/mfa-dark.png'}
                           layout="fill"
                           objectFit="cover"
                           quality={100}
@@ -426,11 +414,7 @@ export default function launchweek() {
                       </div>
                       <div className="absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover:opacity-100 duration-500 transition-all">
                         <Image
-                          src={
-                            // isDarkMode
-                            '/images/launchweek/mfa-dark-hover.png'
-                            // : '/images/launchweek/mfa-light-hover.png'
-                          }
+                          src={'/images/launchweek/mfa-dark-hover.png'}
                           layout="fill"
                           objectFit="cover"
                           quality={100}
@@ -472,11 +456,7 @@ export default function launchweek() {
                         className={`absolute top-0 right-0 w-full h-full -z-20 ${styles.wrappers}`}
                       >
                         <Image
-                          src={
-                            theme === 'dark'
-                              ? '/images/launchweek/wrappers-visual.svg'
-                              : '/images/launchweek/wrappers-visual-light.svg'
-                          }
+                          src={'/images/launchweek/wrappers-visual.svg'}
                           layout="fill"
                           objectFit="cover"
                           quality={100}
@@ -488,11 +468,7 @@ export default function launchweek() {
                         className={`absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover/day4:opacity-100 duration-500 transition-all ${styles.wrappers}`}
                       >
                         <Image
-                          src={
-                            theme === 'dark'
-                              ? '/images/launchweek/wrappers-visual-hover.svg'
-                              : '/images/launchweek/wrappers-visual-hover-light.svg'
-                          }
+                          src={'/images/launchweek/wrappers-visual-hover.svg'}
                           layout="fill"
                           objectFit="cover"
                           quality={100}
@@ -539,11 +515,7 @@ export default function launchweek() {
                           className={`absolute top-0 right-0 w-full h-full -z-20 ${styles.wrappers}`}
                         >
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/vault-visual.svg'
-                                : '/images/launchweek/vault-visual-light.svg'
-                            }
+                            src={'/images/launchweek/vault-visual.svg'}
                             layout="fill"
                             objectFit="cover"
                             quality={100}
@@ -555,11 +527,7 @@ export default function launchweek() {
                           className={`absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover/day5step1:opacity-100 duration-500 transition-all ${styles.wrappers}`}
                         >
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/vault-visual-hover.svg'
-                                : '/images/launchweek/vault-visual-hover-light.svg'
-                            }
+                            src={'/images/launchweek/vault-visual-hover.svg'}
                             layout="fill"
                             objectFit="cover"
                             quality={100}
@@ -579,11 +547,7 @@ export default function launchweek() {
                       >
                         <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/TCE-visual.svg'
-                                : '/images/launchweek/TCE-visual-light.svg'
-                            }
+                            src={'/images/launchweek/TCE-visual.svg'}
                             layout="fill"
                             objectFit="cover"
                             quality={100}
@@ -595,11 +559,7 @@ export default function launchweek() {
                           className={`absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover/day5step2:opacity-100 duration-500 transition-all`}
                         >
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/TCE-visual-hover.svg'
-                                : '/images/launchweek/TCE-visual-hover-light.svg'
-                            }
+                            src={'/images/launchweek/TCE-visual-hover.svg'}
                             layout="fill"
                             objectFit="cover"
                             quality={100}
@@ -624,11 +584,7 @@ export default function launchweek() {
                           className={`absolute top-0 right-0 w-full h-full -z-20 ${styles.community_wrappers}`}
                         >
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/community-visual.svg'
-                                : '/images/launchweek/community-visual-light.svg'
-                            }
+                            src={'/images/launchweek/community-visual.svg'}
                             layout="fill"
                             objectFit="cover"
                             quality={100}
@@ -640,11 +596,7 @@ export default function launchweek() {
                           className={`absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover/community:opacity-100 duration-500 transition-all ${styles.community_wrappers}`}
                         >
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/community-visual-hover.svg'
-                                : '/images/launchweek/community-visual-light-hover.svg'
-                            }
+                            src={'/images/launchweek/community-visual-hover.svg'}
                             layout="fill"
                             objectFit="cover"
                             quality={100}
@@ -729,11 +681,7 @@ export default function launchweek() {
                       >
                         <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/PgGraphql-visual.svg'
-                                : '/images/launchweek/PgGraphql-visual-light.svg'
-                            }
+                            src={'/images/launchweek/PgGraphql-visual.svg'}
                             layout="fill"
                             objectFit="cover"
                             quality={100}
@@ -745,11 +693,7 @@ export default function launchweek() {
                           className={`absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover/day5step2:opacity-100 duration-500 transition-all`}
                         >
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/PgGraphql-visual-hover.svg'
-                                : '/images/launchweek/PgGraphql-visual-hover-light.svg'
-                            }
+                            src={'/images/launchweek/PgGraphql-visual-hover.svg'}
                             layout="fill"
                             objectFit="cover"
                             quality={100}
@@ -772,11 +716,7 @@ export default function launchweek() {
                       >
                         <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/custom-domains-visual.svg'
-                                : '/images/launchweek/custom-domains-visual-light.svg'
-                            }
+                            src={'/images/launchweek/custom-domains-visual.svg'}
                             layout="fill"
                             objectFit="cover"
                             quality={100}
@@ -788,11 +728,7 @@ export default function launchweek() {
                           className={`absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover/day5step2:opacity-100 duration-500 transition-all`}
                         >
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/custom-domains-visual-hover.svg'
-                                : '/images/launchweek/custom-domains-visual-hover-light.svg'
-                            }
+                            src={'/images/launchweek/custom-domains-visual-hover.svg'}
                             layout="fill"
                             objectFit="cover"
                             quality={100}
@@ -815,11 +751,7 @@ export default function launchweek() {
                       >
                         <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/PITR-visual.svg'
-                                : '/images/launchweek/PITR-visual-light.svg'
-                            }
+                            src={'/images/launchweek/PITR-visual.svg'}
                             layout="fill"
                             objectFit="cover"
                             quality={100}
@@ -831,11 +763,7 @@ export default function launchweek() {
                           className={`absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover/day5step2:opacity-100 duration-500 transition-all`}
                         >
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/PITR-visual-hover.svg'
-                                : '/images/launchweek/PITR-visual-hover-light.svg'
-                            }
+                            src={'/images/launchweek/PITR-visual-hover.svg'}
                             layout="fill"
                             objectFit="cover"
                             quality={100}
@@ -858,11 +786,7 @@ export default function launchweek() {
                       >
                         <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/pg_crdt-visual.svg'
-                                : '/images/launchweek/pg_crdt-visual-light.svg'
-                            }
+                            src={'/images/launchweek/pg_crdt-visual.svg'}
                             layout="fill"
                             objectFit="cover"
                             quality={100}
@@ -874,11 +798,7 @@ export default function launchweek() {
                           className={`absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover/day5step2:opacity-100 duration-500 transition-all`}
                         >
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/pg_crdt-visual-hover.svg'
-                                : '/images/launchweek/pg_crdt-visual-hover-light.svg'
-                            }
+                            src={'/images/launchweek/pg_crdt-visual-hover.svg'}
                             layout="fill"
                             objectFit="cover"
                             quality={100}
@@ -901,11 +821,7 @@ export default function launchweek() {
                       >
                         <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/postgres-visual.svg'
-                                : '/images/launchweek/postgres-visual-light.svg'
-                            }
+                            src={'/images/launchweek/postgres-visual.svg'}
                             layout="fill"
                             objectFit="cover"
                             quality={100}
@@ -917,11 +833,7 @@ export default function launchweek() {
                           className={`absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover/day5step2:opacity-100 duration-500 transition-all`}
                         >
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/postgres-visual-hover.svg'
-                                : '/images/launchweek/postgres-visual-hover-light.svg'
-                            }
+                            src={'/images/launchweek/postgres-visual-hover.svg'}
                             layout="fill"
                             objectFit="cover"
                             quality={100}
@@ -944,11 +856,7 @@ export default function launchweek() {
                       >
                         <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/PostgREST11-visual.svg'
-                                : '/images/launchweek/PostgREST11-visual-light.svg'
-                            }
+                            src={'/images/launchweek/PostgREST11-visual.svg'}
                             layout="fill"
                             objectFit="cover"
                             quality={100}
@@ -960,11 +868,7 @@ export default function launchweek() {
                           className={`absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover/day5step2:opacity-100 duration-500 transition-all`}
                         >
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/PostgREST11-visual-hover.svg'
-                                : '/images/launchweek/PostgREST11-visual-hover-light.svg'
-                            }
+                            src={'/images/launchweek/PostgREST11-visual-hover.svg'}
                             layout="fill"
                             objectFit="cover"
                             quality={100}
@@ -1079,7 +983,7 @@ export default function launchweek() {
                 rel="noopener noreferrer"
                 className="self-end mb-4"
               >
-                <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 bg-[#121212] w-fit relative max-w-[250px]">
+                <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 bg-background w-fit relative max-w-[250px]">
                   <img
                     src="/images/launchweek/link.svg"
                     className="absolute top-[16px] right-[10px] text-brand"
@@ -1094,7 +998,7 @@ export default function launchweek() {
                 rel="noopener noreferrer"
                 className="mb-4 w-fit"
               >
-                <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 bg-[#121212] w-fit relative max-w-[250px]">
+                <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 bg-background w-fit relative max-w-[250px]">
                   <img
                     src="/images/launchweek/link.svg"
                     className="absolute top-[16px] right-[10px] text-brand"
@@ -1109,7 +1013,7 @@ export default function launchweek() {
                 rel="noopener noreferrer"
                 className="self-end mb-4"
               >
-                <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 bg-[#121212] w-fit relative max-w-[250px]">
+                <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 bg-background w-fit relative max-w-[250px]">
                   <img
                     src="/images/launchweek/link.svg"
                     className="absolute top-[16px] right-[10px] text-brand"
@@ -1124,7 +1028,7 @@ export default function launchweek() {
                 rel="noopener noreferrer"
                 className="mb-4 w-fit"
               >
-                <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 bg-[#121212] w-fit relative max-w-[250px]">
+                <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 bg-background w-fit relative max-w-[250px]">
                   <img
                     src="/images/launchweek/link.svg"
                     className="absolute top-[16px] right-[10px] text-brand"
@@ -1139,7 +1043,7 @@ export default function launchweek() {
                 rel="noopener noreferrer"
                 className="self-end"
               >
-                <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 bg-[#121212] w-fit relative max-w-[250px]">
+                <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 bg-background w-fit relative max-w-[250px]">
                   <img
                     src="/images/launchweek/link.svg"
                     className="absolute top-[16px] right-[10px] text-brand"

@@ -17,9 +17,9 @@ Supabase provides several options for programmatically connecting to your Postgr
 
 Supabase provides auto-updating [APIs](/docs/guides/database/api). This is the easiest way to get started if you are managing data (fetching, inserting, updating). We provide several types of API to suit your preferences:
 
-- [REST](/docs/guides/api#rest-api-overview): interact with your database through a REST interface.
-- [GraphQL](/docs/guides/api#graphql-api-overview): interact with your database through a GraphQL interface.
-- [Realtime](/docs/guides/api#realtime-api-overview): listen to database changes over websockets.
+- [REST](/docs/guides/api): interact with your database through a REST interface.
+- [GraphQL](/docs/guides/graphql/api): interact with your database through a GraphQL interface.
+- [Realtime](/docs/guides/realtime#realtime-api): listen to database changes over websockets.
 
 ## Direct connections
 
@@ -55,7 +55,11 @@ Every Supabase project comes with PgBouncer for connection pooling. A connection
 
 <Admonition type="note">
 
-Supavisor is currently in beta and is slowly being made available to all projects. [Contact support](https://supabase.com/dashboard/support/new) if you'd like to request early access.
+PgBouncer is being deprecated in favor of Supavisor. Supavisor is available on all new and existing projects.
+
+On 15th January 2024 PgBouncer will be disabled. Additionally, your Supabase database domain (db.projectref.supabase.co) will start resolving to an IPv6 address. No changes are required if your network supports communicating via IPv6. Otherwise, update your applications to use Supavisor which will continue to support IPv4 connections.
+
+[Full details here](https://github.com/orgs/supabase/discussions/17817).
 
 </Admonition>
 
@@ -124,7 +128,7 @@ This is the most granular option. Connections are returned to the pool after eve
 
     <StepHikeCompact.Details title="Install">
 
-    Install Drizzle and releated dependencies.
+    Install Drizzle and related dependencies.
 
     </StepHikeCompact.Details>
 
@@ -179,7 +183,9 @@ This is the most granular option. Connections are returned to the pool after eve
     import { users } from './schema'
 
     const connectionString = process.env.DATABASE_URL
-    const client = postgres(connectionString)
+
+    // Disable prefetch as it is not supported for "Transaction" pool mode
+    const client = postgres(connectionString, { prepare: false })
     const db = drizzle(client);
 
     const allUsers = await db.select().from(users);
@@ -283,7 +289,7 @@ psql "sslmode=verify-full sslrootcert=$HOME/Downloads/prod-supabase.cer host=db.
 
     <StepHikeCompact.Details title="Install">
 
-    Install Postgres.js and releated dependencies.
+    Install Postgres.js and related dependencies.
 
     </StepHikeCompact.Details>
 

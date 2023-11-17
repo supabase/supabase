@@ -235,104 +235,66 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
 
     ## Using Native Sign in with Google in Flutter
 
-    Unlike the OAuth flow which requires the use of a web browser, the native Sign in with Google flow on Android uses the [operating system's built-in functionalities](https://developers.google.com/android/reference/com/google/android/gms/auth/api/identity/package-summary) to prompt the user for consent. Note that native sign-in has been rebranded as _One Tap sign-in on Android_ by Google, which you should not confuse with _One Tap sign in for web_, as mentioned below.
+    Native Google sign in with Supabase is done through the [google_sign_in](https://pub.dev/packages/google_sign_in) package for iOS and Android. Follow the instructions on the [google_sign_in](https://pub.dev/packages/google_sign_in) package for plugin specific settings.
 
     When the user provides consent, Google issues an identity token (commonly abbreviated as ID token) that is then sent to your project's Supabase Auth server. When valid, a new user session is started by issuing an access and refresh token from Supabase Auth.
 
-    If you are building a Flutter app, you can use the [flutter_appauth](https://pub.dev/packages/flutter_appauth) package to sign a user into your Supabase project:
+    Follow the code sample below to implement native Google sign in with Supabase in your Flutter app.
 
     ```dart
-    import 'dart:convert';
-    import 'dart:math';
-    import 'package:crypto/crypto.dart';
-    import 'package:flutter_appauth/flutter_appauth.dart';
+    import 'package:google_sign_in/google_sign_in.dart';
     import 'package:supabase_flutter/supabase_flutter.dart';
 
-    /// Function to generate a random 16 character string.
-    String _generateRandomString() {
-      final random = Random.secure();
-      return base64Url.encode(List<int>.generate(16, (_) => random.nextInt(256)));
-    }
+    ...
 
-    Future<AuthResponse> signInWithGoogle() {
-      // Just a random string
-      final rawNonce = _generateRandomString();
-      final hashedNonce =
-          sha256.convert(utf8.encode(rawNonce)).toString();
-
-      /// TODO: update the client ID with your own
+    Future<AuthResponse> _googleSignIn() async {
+      /// TODO: update the Web client ID with your own.
       ///
-      /// Client ID that you registered with Google Cloud.
-      /// You will have two different values for iOS and Android.
-      const clientId = 'YOUR_CLIENT_ID_HERE';
+      /// Web Client ID that you registered with Google Cloud.
+      const webClientId = 'my-web.apps.googleusercontent.com';
 
-      /// reverse DNS form of the client ID + `:/` is set as the redirect URL
-      final redirectUrl = '${clientId.split('.').reversed.join('.')}:/';
+      /// TODO: update the iOS client ID with your own.
+      ///
+      /// iOS Client ID that you registered with Google Cloud.
+      const iosClientId = 'my-ios.apps.googleusercontent.com';
 
-      /// Fixed value for google login
-      const discoveryUrl =
-          'https://accounts.google.com/.well-known/openid-configuration';
+      // Google sign in on Android will work without providing the Android
+      // Client ID registered on Google Cloud.
 
-      final appAuth = FlutterAppAuth();
-
-      // authorize the user by opening the consent page
-      final result = await appAuth.authorize(
-        AuthorizationRequest(
-          clientId,
-          redirectUrl,
-          discoveryUrl: discoveryUrl,
-          nonce: hashedNonce,
-          scopes: [
-            'openid',
-            'email',
-          ],
-        ),
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        clientId: iosClientId,
+        serverClientId: webClientId,
       );
+      final googleUser = await googleSignIn.signIn();
+      final googleAuth = await googleUser!.authentication;
+      final accessToken = googleAuth.accessToken;
+      final idToken = googleAuth.idToken;
 
-      if (result == null) {
-        throw 'Could not find AuthorizationResponse after authorizing';
+      if (accessToken == null) {
+        throw 'No Access Token found.';
       }
-
-      // Request the access and id token to google
-      final tokenResult = await appAuth.token(
-        TokenRequest(
-          clientId,
-          redirectUrl,
-          authorizationCode: result.authorizationCode,
-          discoveryUrl: discoveryUrl,
-          codeVerifier: result.codeVerifier,
-          nonce: result.nonce,
-          scopes: [
-            'openid',
-            'email',
-          ],
-        ),
-      );
-
-      final idToken = tokenResult?.idToken;
-
       if (idToken == null) {
-        throw 'Could not find idToken from the token response';
+        throw 'No ID Token found.';
       }
 
       return supabase.auth.signInWithIdToken(
         provider: Provider.google,
         idToken: idToken,
-        accessToken: tokenResponse?.accessToken,
-        nonce: rawNonce,
+        accessToken: accessToken,
       );
     }
+    ...
     ```
 
     ### Configuration [#flutter-configuration-native-app]
 
-    1. Configure OAuth credentials for your Google Cloud project in the [Credentials](https://console.cloud.google.com/apis/credentials) page of the console. When creating a new OAuth client ID, choose _Android_ or _iOS_ depending on the mobile operating system your app is built for.
+    1. Configure OAuth credentials for your Google Cloud project in the [Credentials](https://console.cloud.google.com/apis/credentials) page of the console. When creating a new OAuth client ID, choose _Android_ or _iOS_ depending on the mobile operating system your app is built for. Also create a web client ID.
 
-    - For Android, use the instructions on screen to provide the SHA-1 certificate fingerprint used to sign your Android app.
+    - For Android, use the instructions on screen to provide the SHA-1 certificate fingerprint used to sign your Android app. You also need to create a web client ID to perform Google sign in on Android.
     - For iOS, use the instructions on screen to provide the app Bundle ID, and App Store ID and Team ID if the app is already published on the Apple AppStore.
 
     2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. In particular, make sure you have set up links to your app's privacy policy and terms of service.
-    3. Finally, add the client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Authorized Client IDs_.
+    3. Finally, add the web client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Authorized Client IDs_. You do not need to add the Android or iOS client ID here. If you need iOS support, enable the `Skip nonce check` option.
 
     Note that you do not have to configure the OAuth flow in the Supabase Dashboard in order to use native sign in.
 
@@ -386,8 +348,8 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
 
     1. Configure OAuth credentials for your Google Cloud project in the [Credentials](https://console.cloud.google.com/apis/credentials) page of the console. When creating a new OAuth client ID, choose _Android_ or _iOS_ depending on the mobile operating system your app is built for.
 
-    - For Android, use the instructions on screen to provide the SHA-1 certificate fingerprint used to sign your Android app.
-    - For iOS, use the instructions on screen to provide the app Bundle ID, and App Store ID and Team ID if the app is already published on the Apple AppStore.
+      - For Android, use the instructions on screen to provide the SHA-1 certificate fingerprint used to sign your Android app.
+      - For iOS, use the instructions on screen to provide the app Bundle ID, and App Store ID and Team ID if the app is already published on the Apple AppStore.
 
     2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. In particular, make sure you have set up links to your app's privacy policy and terms of service.
     3. Finally, add the client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Authorized Client IDs_.
