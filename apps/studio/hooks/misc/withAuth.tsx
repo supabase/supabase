@@ -74,12 +74,7 @@ export function withAuth<T>(
       }
     }, [session, isLoading, router, aalData, isFinishedLoading, isLoggedIn])
 
-    const selectedProject = useSelectedProject()
-    useEffect(() => {
-      if (selectedProject) {
-        rootStore.setProject(selectedProject)
-      }
-    }, [selectedProject])
+
 
     const InnerComponent = WrappedComponent as any
 
