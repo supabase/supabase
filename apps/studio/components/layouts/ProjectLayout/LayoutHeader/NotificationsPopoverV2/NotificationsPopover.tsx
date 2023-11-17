@@ -1,4 +1,5 @@
 import clsx from 'clsx'
+import { SlidersHorizontal } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
 import {
   Button,
@@ -17,7 +18,6 @@ import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/Shimmerin
 import { useNotificationsV2Query } from 'data/notifications/notifications-v2-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { SlidersHorizontal } from 'lucide-react'
 import NotificationRow from './NotificationRow'
 
 const NotificationsPopverV2 = () => {
@@ -39,7 +39,6 @@ const NotificationsPopverV2 = () => {
   } = useNotificationsV2Query({
     archived: activeTab === 'archive',
   })
-  // const notifications = data ?? []
   const notifications = useMemo(() => data?.pages.flatMap((page) => page) ?? [], [data?.pages])
 
   // This probably needs to be fixed cause we won't be able to check the number if its paginated
@@ -101,7 +100,7 @@ const NotificationsPopverV2 = () => {
           }
         />
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-[400px] overflow-hidden" side="bottom" align="end">
+      <PopoverContent_Shadcn_ className="p-0 w-[450px] overflow-hidden" side="bottom" align="end">
         <div className="px-4">
           <p className="pt-4 pb-1 text-sm">Notifications</p>
           <div className="flex items-center">
