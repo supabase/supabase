@@ -77,8 +77,8 @@ export const ProjectCardStatus = ({
     : 'warning'
 
   if (
-    (activeWarnings.length === 0 && projectStatus === 'isHealthy') ||
-    warningContent === undefined
+    (activeWarnings.length === 0 || warningContent === undefined) &&
+    projectStatus === 'isHealthy'
   ) {
     return null
   }
