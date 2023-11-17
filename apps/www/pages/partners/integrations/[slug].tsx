@@ -15,7 +15,7 @@ import { Admonition, Button, ExpandableVideo, IconChevronLeft, IconExternalLink 
 import ImageModal from '~/components/ImageModal'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import supabase from '~/lib/supabase'
+import supabase from '~/lib/supabaseMisc'
 import { Partner } from '~/types/partners'
 import Error404 from '../../404'
 
@@ -49,6 +49,11 @@ function Partner({
   const [focusedImage, setFocusedImage] = useState<string | null>(null)
 
   if (!partner) return <Error404 />
+
+  const videoThumbnail = partner.video
+    ? `http://img.youtube.com/vi/${partner.video}/0.jpg`
+    : undefined
+
   return (
     <>
       <NextSeo
@@ -85,13 +90,14 @@ function Partner({
       ) : null}
       <DefaultLayout>
         <SectionContainer>
-          <div className="col-span-12 mx-auto mb-2 max-w-5xl space-y-12 lg:col-span-2">
+          <div className="col-span-12 mx-auto mb-2 max-w-5xl space-y-10 lg:col-span-2">
             {/* Back button */}
-            <Link href="/partners/integrations">
-              <a className="text-scale-1200 hover:text-scale-1000 flex cursor-pointer items-center transition-colors">
-                <IconChevronLeft style={{ padding: 0 }} />
-                Back
-              </a>
+            <Link
+              href="/partners/integrations"
+              className="text-foreground hover:text-foreground-lighter flex cursor-pointer items-center transition-colors"
+            >
+              <IconChevronLeft style={{ padding: 0 }} />
+              Back
             </Link>
 
             <div className="flex items-center space-x-4">
@@ -99,7 +105,7 @@ function Partner({
                 layout="fixed"
                 width={56}
                 height={56}
-                className="bg-scale-400 flex-shrink-f0 h-14 w-14 rounded-full"
+                className="bg-surface-200 flex-shrink-f0 h-14 w-14 rounded-full"
                 src={partner.logo}
                 alt={partner.title}
               />
@@ -109,58 +115,68 @@ function Partner({
             </div>
 
             <div
-              className="bg-scale-300 py-6"
+              className="bg-gradient-to-t from-background-alternative to-background border-b p-6 [&_.swiper-container]:overflow-visible"
               style={{ marginLeft: 'calc(50% - 50vw)', marginRight: 'calc(50% - 50vw)' }}
             >
-              <Swiper
-                initialSlide={0}
-                spaceBetween={0}
-                slidesPerView={4}
-                speed={300}
-                // slidesOffsetBefore={300}
-                centerInsufficientSlides={true}
-                breakpoints={{
-                  320: {
-                    slidesPerView: 1,
-                  },
-                  720: {
-                    slidesPerView: 2,
-                  },
-                  920: {
-                    slidesPerView: 3,
-                  },
-                  1024: {
-                    slidesPerView: 4,
-                  },
-                  1280: {
-                    slidesPerView: 5,
-                  },
-                }}
-              >
-                {partner.images?.map((image: any, i: number) => {
-                  return (
-                    <SwiperSlide key={i}>
-                      <div className="relative ml-3 mr-3 block cursor-move overflow-hidden rounded-md">
-                        <Image
-                          layout="responsive"
-                          objectFit="contain"
-                          width={1460}
-                          height={960}
-                          src={image}
-                          alt={partner.title}
-                          onClick={() => setFocusedImage(image)}
-                        />
-                      </div>
-                    </SwiperSlide>
-                  )
-                })}
-              </Swiper>
+              <SectionContainer className="!py-0 !px-3 lg:!px-12 xl:!p-0 mx-auto max-w-5xl">
+                <Swiper
+                  initialSlide={0}
+                  spaceBetween={20}
+                  slidesPerView={4}
+                  speed={300}
+                  grabCursor
+                  centeredSlides={false}
+                  centerInsufficientSlides={false}
+                  breakpoints={{
+                    320: {
+                      slidesPerView: 1.25,
+                      centeredSlides: false,
+                      spaceBetween: 10,
+                    },
+                    720: {
+                      slidesPerView: 2,
+                      centeredSlides: false,
+                      spaceBetween: 10,
+                    },
+                    920: {
+                      slidesPerView: 3,
+                      centeredSlides: false,
+                    },
+                    1024: {
+                      slidesPerView: 4,
+                    },
+                    1280: {
+                      slidesPerView: 5,
+                    },
+                  }}
+                >
+                  {partner.images?.map((image: any, i: number) => {
+                    return (
+                      <SwiperSlide key={i}>
+                        <div className="relative block overflow-hidden rounded-md">
+                          <Image
+                            layout="responsive"
+                            objectFit="contain"
+                            placeholder="blur"
+                            blurDataURL="/images/blur.png"
+                            width={1460}
+                            height={960}
+                            src={image}
+                            alt={partner.title}
+                            onClick={() => setFocusedImage(image)}
+                          />
+                        </div>
+                      </SwiperSlide>
+                    )
+                  })}
+                </Swiper>
+              </SectionContainer>
             </div>
 
             <div className="grid lg:grid-cols-8 lg:space-x-12">
-              <div className="lg:col-span-5">
+              <div className="lg:col-span-5 overflow-hidden">
                 <h2
-                  className="text-scale-1200"
+                  className="text-foreground"
                   style={{ fontSize: '1.5rem', marginBottom: '1rem' }}
                 >
                   Overview
@@ -171,10 +187,10 @@ function Partner({
                 </div>
               </div>
 
-              <div className="lg:col-span-3 order-first lg:order-last pt-16 lg:pt-0">
+              <div className="lg:col-span-3 order-first lg:order-last">
                 <div className="sticky top-20">
                   <h2
-                    className="text-scale-1200"
+                    className="text-foreground"
                     style={{ fontSize: '1.5rem', marginBottom: '1rem' }}
                   >
                     Details
@@ -183,37 +199,39 @@ function Partner({
                   {partner.video && (
                     <div className="mb-6">
                       <ExpandableVideo
-                        imgUrl=""
                         videoId={partner.video}
+                        imgUrl={videoThumbnail}
                         imgOverlayText="Watch an introductory video"
+                        triggerContainerClassName="w-full"
                       />
                     </div>
                   )}
 
-                  <div className="text-scale-1200 divide-y">
+                  <div className="text-foreground divide-y">
                     {partner.type === 'technology' && (
                       <div className="flex items-center justify-between py-2">
-                        <span className="text-scale-900">Developer</span>
-                        <span className="text-scale-1200">{partner.developer}</span>
+                        <span className="text-foreground-lighter">Developer</span>
+                        <span className="text-foreground">{partner.developer}</span>
                       </div>
                     )}
 
                     <div className="flex items-center justify-between py-2">
-                      <span className="text-scale-900">Category</span>
-                      <Link href={`/partners/integrations#${partner.category.toLowerCase()}`}>
-                        <a className="text-brand hover:text-brand-300 transition-colors">
-                          {partner.category}
-                        </a>
+                      <span className="text-lighter">Category</span>
+                      <Link
+                        href={`/partners/integrations#${partner.category.toLowerCase()}`}
+                        className="text-brand hover:underline transition-colors"
+                      >
+                        {partner.category}
                       </Link>
                     </div>
 
                     <div className="flex items-center justify-between py-2">
-                      <span className="text-scale-900">Website</span>
+                      <span className="text-foreground-lighter">Website</span>
                       <a
                         href={partner.website}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-brand hover:text-brand-300 transition-colors"
+                        className="text-brand hover:underline transition-colors"
                       >
                         {new URL(partner.website).host}
                       </a>
@@ -221,12 +239,12 @@ function Partner({
 
                     {partner.type === 'technology' && partner.docs && (
                       <div className="flex items-center justify-between py-2">
-                        <span className="text-scale-900">Documentation</span>
+                        <span className="text-foreground-lighter">Documentation</span>
                         <a
                           href={partner.docs}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-brand hover:text-brand-300 transition-colors"
+                          className="text-brand hover:underline transition-colors"
                         >
                           <span className="flex items-center space-x-1">
                             <span>Learn</span>
@@ -240,7 +258,7 @@ function Partner({
               </div>
             </div>
             {partner.call_to_action_link && (
-              <div className="bg-scale-100 dark:bg-scale-300 hover:border-scale-600 hover:dark:border-scale-700 border-scale-300 dark:border-scale-400 rounded-2xl border p-10 drop-shadow-sm max-w-5xl mx-auto mt-12">
+              <div className="bg-background hover:border-default-control border-default rounded-2xl border p-10 drop-shadow-sm max-w-5xl mx-auto mt-12">
                 <div className="flex flex-row justify-between">
                   <h1 className="text-2xl font-medium self-center">
                     Get started with {partner.title} and Supabase.

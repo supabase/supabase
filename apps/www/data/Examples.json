@@ -41,7 +41,7 @@
   {
     "type": "example",
     "products": ["database"],
-    "title": "Expo Starter",
+    "title": "Expo React Native Starter",
     "description": "Template bottom tabs with auth flow (Typescript)",
     "author": "codingki",
     "author_url": "https://github.com/codingki",
@@ -106,8 +106,8 @@
   {
     "type": "example",
     "products": ["database"],
-    "title": "NextJS todo list app",
-    "description": "NextJS todo list example",
+    "title": "Next.js todo list app",
+    "description": "Next.js todo list example",
     "author": "supabase",
     "author_url": "https://github.com/supabase",
     "author_img": "https://avatars.githubusercontent.com/u/54469796",

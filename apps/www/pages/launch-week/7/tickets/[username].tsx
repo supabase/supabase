@@ -14,7 +14,7 @@ import TicketBrickWall from '~/components/LaunchWeek/7/LaunchSection/TicketBrick
 import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import LW7BgGraphic from '~/components/LaunchWeek/7/LW7BgGraphic'
 import CTABanner from '~/components/CTABanner'
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 
 interface Props {
   user: UserData
@@ -23,21 +23,19 @@ interface Props {
 }
 
 const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'http://localhost:54321',
-  process.env.SUPABASE_SERVICE_ROLE_SECRET ??
-    process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_SECRET ??
-    ''
+  process.env.NEXT_PUBLIC_MISC_USE_URL ?? 'http://localhost:54321',
+  process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!
 )
 
 export default function UsernamePage({ user, users, ogImageUrl }: Props) {
-  const { isDarkMode } = useTheme()
+  const { resolvedTheme } = useTheme()
   const { username, ticketNumber, name, golden, referrals, bg_image_id } = user
   const TITLE = `${name ? name + '’s' : 'Get your'} #SupaLaunchWeek Ticket`
   const DESCRIPTION = 'Supabase Launch Week 7 | 10–14 April 2023 | Generate your ticket. Win swag.'
   const OG_URL = `${SITE_URL}/tickets/${username}`
 
   const [supabase] = useState(() =>
-    createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+    createClient(process.env.NEXT_PUBLIC_MISC_USE_URL!, process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!)
   )
 
   if (!ticketNumber) {
@@ -48,7 +46,7 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
     document.body.className = '!dark bg-[#1C1C1C]'
 
     return () => {
-      document.body.className = isDarkMode ? 'dark' : 'light'
+      document.body.className = resolvedTheme?.includes('dark') ? 'dark' : 'light'
     }
   }, [])
 
@@ -134,7 +132,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     golden = user?.golden ?? false
     bg_image_id = user?.bg_image_id ?? 1
     referrals = user?.referrals ?? 0
-    ogImageUrl = `https://obuldanrptloktxcffvn.functions.supabase.co/lw7-ticket-og?username=${encodeURIComponent(
+    ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lw7-ticket-og?username=${encodeURIComponent(
       username ?? ''
     )}${golden ? '&golden=true' : ''}`
   }

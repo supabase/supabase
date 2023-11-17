@@ -1,14 +1,13 @@
-import { useTheme } from 'common/Providers'
-import Image from 'next/image'
+import { useTheme } from 'next-themes'
+import Image from 'next/legacy/image'
 import Link from 'next/link'
 import NavigationMenu from '~/components/Navigation/NavigationMenu/NavigationMenu'
-import TopNavBarRef from '~/components/Navigation/NavigationMenu/TopNavBarRef'
+import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
 
 import Head from 'next/head'
-import { PropsWithChildren, memo } from 'react'
+import { PropsWithChildren, memo, useEffect } from 'react'
 import Footer from '~/components/Navigation/Footer'
 import { menuState, useMenuLevelId, useMenuMobileOpen } from '~/hooks/useMenuState'
-import { Announcement, LW8CountdownBanner } from 'ui'
 
 const levelsData = {
   home: {
@@ -24,8 +23,12 @@ const levelsData = {
     name: 'Database',
   },
   api: {
-    icon: '/docs/img/icons/menu/database',
-    name: 'Serverless APIs',
+    icon: '/docs/img/icons/menu/rest',
+    name: 'REST API',
+  },
+  graphql: {
+    icon: '/docs/img/icons/menu/graphql',
+    name: 'GraphQL',
   },
   auth: {
     icon: '/docs/img/icons/menu/auth',
@@ -95,9 +98,9 @@ const levelsData = {
     icon: '/docs/img/icons/menu/reference-python',
     name: 'Python Reference v2.0',
   },
-  reference_swift_v0: {
+  reference_swift_v1: {
     icon: '/docs/img/icons/menu/reference-swift',
-    name: 'Swift Reference v0.0',
+    name: 'Swift Reference v1.0',
   },
   reference_kotlin_v0: {
     icon: '/docs/img/icons/menu/reference-kotlin',
@@ -159,13 +162,13 @@ const MobileHeader = memo(function MobileHeader() {
         >
           <span
             className={[
-              'transition-all ease-out block w-4 h-px bg-scale-900 group-hover:bg-scale-1200',
+              'transition-all ease-out block w-4 h-px bg-foreground-muted group-hover:bg-foreground',
               !mobileMenuOpen ? 'w-4' : 'absolute rotate-45 top-[6px]',
             ].join(' ')}
           ></span>
           <span
             className={[
-              'transition-all ease-out block h-px bg-scale-900 group-hover:bg-scale-1200',
+              'transition-all ease-out block h-px bg-foreground-muted group-hover:bg-foreground',
               !mobileMenuOpen ? 'w-3 group-hover:w-4' : 'absolute w-4 -rotate-45 top-[2px]',
             ].join(' ')}
           ></span>
@@ -183,7 +186,7 @@ const MobileHeader = memo(function MobileHeader() {
       <span
         className={[
           'transition-all duration-200',
-          'text-scale-1200',
+          'text-foreground',
           mobileMenuOpen ? 'text-xs' : 'text-sm',
         ].join(' ')}
       >
@@ -199,6 +202,19 @@ const MobileHeader = memo(function MobileHeader() {
 
 const MobileMenuBackdrop = memo(function MobileMenuBackdrop() {
   const mobileMenuOpen = useMenuMobileOpen()
+
+  useEffect(() => {
+    window.addEventListener('resize', (e: UIEvent) => {
+      const w = e.target as Window
+      if (mobileMenuOpen && w.innerWidth >= 1024) {
+        menuState.setMenuMobileOpen(!mobileMenuOpen)
+      }
+    })
+    return () => {
+      window.removeEventListener('resize', () => {})
+    }
+  }, [mobileMenuOpen])
+
   return (
     <div
       className={[
@@ -206,7 +222,7 @@ const MobileMenuBackdrop = memo(function MobileMenuBackdrop() {
         'left-0',
         'right-0',
         'z-10',
-        'backdrop-blur-sm backdrop-filter bg-white-1200 dark:bg-scale-200/90',
+        'backdrop-blur-sm backdrop-filter bg-alternative/90',
         mobileMenuOpen ? 'absolute h-full w-full top-0 left-0' : 'hidden h-0',
         // always hide on desktop
         'lg:hidden',
@@ -217,24 +233,24 @@ const MobileMenuBackdrop = memo(function MobileMenuBackdrop() {
 })
 
 const HeaderLogo = memo(function HeaderLogo() {
-  const { isDarkMode } = useTheme()
+  const { resolvedTheme } = useTheme()
   return (
-    <Link href="/">
-      <a className="px-10 flex items-center gap-2">
-        <Image
-          className="cursor-pointer"
-          src={isDarkMode ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'}
-          width={96}
-          height={24}
-          alt="Supabase Logo"
-        />
-        <span className="font-mono text-sm font-medium text-brand">DOCS</span>
-      </a>
+    <Link href="/" className="px-10 flex items-center gap-2">
+      <Image
+        className="cursor-pointer"
+        src={
+          resolvedTheme?.includes('dark') ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'
+        }
+        width={96}
+        height={24}
+        alt="Supabase Logo"
+      />
+      <span className="font-mono text-sm font-medium text-brand-link">DOCS</span>
     </Link>
   )
 })
 
-const Container = memo(function Container(props) {
+const Container = memo(function Container(props: PropsWithChildren) {
   const mobileMenuOpen = useMenuMobileOpen()
 
   return (
@@ -244,7 +260,7 @@ const Container = memo(function Container(props) {
       className={[
         // 'overflow-x-auto',
         'w-full h-screen transition-all ease-out',
-        'absolute lg:relative',
+        // 'absolute lg:relative',
         mobileMenuOpen
           ? '!w-auto ml-[75%] sm:ml-[50%] md:ml-[33%] overflow-hidden'
           : 'overflow-auto',
@@ -281,7 +297,7 @@ const NavContainer = memo(function NavContainer() {
           'relative',
           'w-auto',
           'border-r overflow-auto h-screen',
-          'backdrop-blur backdrop-filter bg-white-1200 dark:bg-scale-200',
+          'backdrop-blur backdrop-filter bg-background',
           'flex flex-col',
         ].join(' ')}
       >
@@ -291,13 +307,13 @@ const NavContainer = memo(function NavContainer() {
               <div
                 className={[
                   'hidden lg:flex lg:height-auto',
-                  'pt-8 bg-scale-200 flex-col gap-8',
+                  'pt-8 bg-background flex-col gap-8',
                 ].join(' ')}
               >
                 <HeaderLogo />
               </div>
-              <div className="h-4 bg-scale-200 w-full"></div>
-              <div className="bg-gradient-to-b from-scale-200 to-transparent h-4 w-full"></div>
+              <div className="h-4 bg-background w-full"></div>
+              <div className="bg-gradient-to-b from-background to-transparent h-4 w-full"></div>
             </div>
           </div>
         </div>
@@ -307,7 +323,7 @@ const NavContainer = memo(function NavContainer() {
             'absolute left-0 right-0 h-screen',
             'px-5 pl-5 py-16',
             'top-[0px]',
-            'bg-scale-200',
+            'bg-background',
             // desktop styles
             'lg:relative lg:top-0 lg:left-0 lg:pb-10 lg:px-10 lg:pt-0 lg:flex',
             'lg:opacity-100 lg:visible',
@@ -327,20 +343,17 @@ const SiteLayout = ({ children }: PropsWithChildren<{}>) => {
         <title>Supabase Docs</title>
       </Head>
       <main>
-        <Announcement>
-          <LW8CountdownBanner />
-        </Announcement>
         <div className="flex flex-row h-screen">
           <NavContainer />
           <Container>
             <div className={['lg:sticky top-0 z-10 overflow-hidden'].join(' ')}>
-              <TopNavBarRef />
+              <TopNavBar />
             </div>
             <div
               className={[
                 'sticky transition-all top-0',
                 'z-10',
-                'backdrop-blur backdrop-filter bg-white-1200 dark:bg-scale-200',
+                'backdrop-blur backdrop-filter bg-background',
               ].join(' ')}
             >
               <div className={['lg:hidden', 'px-5 ', 'border-b z-10'].join(' ')}>

@@ -3,6 +3,7 @@ import Typography from '../Typography'
 import { MenuContextProvider, useMenuContext } from './MenuContext'
 
 import styleHandler from '../../lib/theme/styleHandler'
+import { cn } from '@ui/lib/utils'
 
 interface MenuProps {
   children: React.ReactNode
@@ -79,16 +80,15 @@ export function Item({
   }
 
   return (
-    <li role="menuitem" className="outline-none">
-      <a
-        style={style}
-        className={classes.join(' ')}
-        onClick={onClick}
-        aria-current={active ? 'page' : undefined}
-      >
-        {icon && <div className={`${iconClasses.join(' ')} min-w-fit`}>{icon}</div>}
-        <span className={contentClasses.join(' ')}>{children}</span>
-      </a>
+    <li
+      role="menuitem"
+      className={cn('outline-none', classes)}
+      style={style}
+      onClick={onClick}
+      aria-current={active ? 'page' : undefined}
+    >
+      {icon && <div className={`${iconClasses.join(' ')} min-w-fit`}>{icon}</div>}
+      <span className={contentClasses.join(' ')}>{children}</span>
     </li>
   )
 }

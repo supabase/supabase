@@ -4,6 +4,7 @@ module.exports = config({
   content: [
     '../../packages/ui/src/**/*.{tsx,ts,js}',
     './pages/**/*.{tsx,mdx}',
+    './lib/mdx/mdxComponents.tsx',
     './components/**/*.tsx',
     './layouts/**/*.tsx',
     './src/**/*.{ts,tsx,mdx}',

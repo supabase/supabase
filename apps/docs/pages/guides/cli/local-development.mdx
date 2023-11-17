@@ -29,15 +29,19 @@ The Dashboard provides a wide range of features for setting up your project: cre
 
 ## Log in to the Supabase CLI
 
-```bash
+Log in if you are planning to deploy your project to the Supabase Platform. This step is optional and is not required to use the Supabase CLI.
+
+<CH.Code>
+
+```bash Terminal
 supabase login
 ```
 
-<Admonition type="note">
+```bash NPX
+npx supabase login
+```
 
-If you installed the Supabase CLI via NPM, you will need to run `npx supabase login` instead.
-
-</Admonition>
+</CH.Code>
 
 ## Initialize your project
 
@@ -62,7 +66,20 @@ git init
 supabase init
 ```
 
-Make sure Docker is running. The [start](/docs/reference/cli/usage#supabase-start) command uses Docker to start the Supabase [services](/docs/guides/getting-started/architecture).
+Make sure Docker is running.
+
+<Admonition type="note">
+
+There are a number of different projects available to download Docker from:
+
+- [Docker Desktop](https://docs.docker.com/get-docker/) (macOS, Windows, Linux)
+- [Rancher Desktop](https://rancherdesktop.io/) (macOS, Windows, Linux)
+- [OrbStack](https://orbstack.dev/) (macOS)
+- [colima](https://github.com/abiosoft/colima) (macOS)
+
+</Admonition>
+
+The [start](/docs/reference/cli/usage#supabase-start) command uses Docker to start the Supabase [services](/docs/guides/getting-started/architecture).
 This command may take a while to run if this is the first time using the CLI.
 
 ```bash
@@ -84,7 +101,7 @@ service_role key: eyJh......
 
 ```
 
-You can use the [`supabase stop`](/docs/reference/cli/usage#supabase-stop) command at any time to stop all services and reset your local database. Use `supabase stop --backup` to stop all services without resetting your local database.
+You can use the [`supabase stop`](/docs/reference/cli/usage#supabase-stop) command at any time to stop all services (without resetting your local database). Use `supabase stop --no-backup` to stop all services and reset your local database.
 
 ## Access your project's services
 
@@ -95,6 +112,7 @@ You can now visit your local Dashboard at [http://localhost:54323](http://localh
   size="small"
   type="underlined"
   defaultActiveId="postgres"
+  queryGroup="access-method"
 >
 <TabPanel id="postgres" label="Postgres">
 
@@ -364,13 +382,23 @@ Associate your project with your remote project using [`supabase link`](/docs/re
 supabase link --project-ref <project-id>
 # You can get <project-id> from your project's dashboard URL: https://supabase.com/dashboard/project/<project-id>
 
-supabase db remote commit
+supabase db pull
 # Capture any changes that you have made to your remote database before you went through the steps above
 # If you have not made any changes to the remote database, skip this step
 ```
 
-`supabase/migrations` is now populated with a migration in `..._remote_commit.sql`.
+`supabase/migrations` is now populated with a migration in `<timestamp>_remote_schema.sql`.
 This migration captures any changes required for your local database to match the schema of your remote Supabase project.
+
+Review the generated migration file and once happy, apply the changes to your local instance:
+
+```bash
+# To apply the new migration to your local database:
+supabase migration up
+
+# To reset your local database completely:
+supabase db reset
+```
 
 <Admonition type="note">
 
@@ -420,42 +448,30 @@ For these changes to take effect, you need to run `supabase stop` and `supabase 
 If you have additional triggers or RLS policies defined on your `auth` schema, you can pull them as a migration file locally.
 
 ```bash
-supabase db remote commit --schema auth
+supabase db pull --schema auth
 ```
 
-### Enabling Local Logging
+### Sync Storage buckets
 
-Local logs rely on the Supabase Analytics Server. This can be enabled via the CLI configuration, and requires a Google Cloud project and BigQuery access.
-
-<Admonition type="note">
-  The Google Cloud project must have billing enabled. The dataset created and managed by Analytics
-  will be within the US. Read more about this requirement
-  [here](https://supabase.com/docs/reference/self-hosting-analytics/introduction#bigquery).
-</Admonition>
-
-Requirements:
-
-1. Google Cloud project number
-2. Google Cloud project ID
-3. Google Cloud Service Account Key, obtained through [Google Cloud IAM dashboard](https://console.cloud.google.com/iam-admin/iam), with BigQuery Admin role assigned to the service account.
-
-Once you have these 3 items, follow these steps:
-
-First, update your project's `supabase/config.toml`:
+Your RLS policies on storage buckets can be pulled locally by specifying `storage` schema. For example,
 
 ```bash
-[analytics]
-enabled = true
-gcp_project_number = "123456"
-gcp_project_id = "my-project-id"
-gcp_jwt_path = "supabase/gcloud.json"
+supabase db pull --schema storage
 ```
 
-Next, place your service account key (a JSON file) at the corresponding path and ensure that it is correctly named.
+The buckets and objects themselves are rows in the storage schema so they won't be pulled automatically.
 
-Last, start your local stack using `supabase start`
+### Local Logging
 
-This will switch the logging drivers and will direct logs to the Analytics server. You will be able to view and query your logs via the Studio Logs Explorer and Logs UI.
+Local logs rely on the Supabase Analytics Server, and are available in the Studio automatically.
+
+<Admonition type="note">
+
+For advanced logs analysis using the Logs Explorer, it is advised to use the BigQuery backend instead of the default Postgres backend. Read about the steps [here](/docs/reference/self-hosting-analytics/introduction#bigquery).
+
+</Admonition>
+
+Logs will be directed to the Analytics server instead of the docker logging driver. All logs will be stored in the local database under the `_analytics` schema.
 
 ## Limitations and considerations
 

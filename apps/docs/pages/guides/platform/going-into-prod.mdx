@@ -20,6 +20,8 @@ After developing your project and deciding it's Production Ready, you should run
 - Enable replication on tables containing sensitive data by enabling Row Level Security (RLS) and setting row security policies:
   - Go to the Authentication > Policies page in the Supabase Dashboard to enable RLS and create security policies.
   - Go to the Database > Replication page in the Supabase Dashboard to manage replication tables.
+- Turn on [SSL Enforcement](/docs/guides/platform/ssl-enforcement)
+- Enable [Network Restrictions](/docs/guides/platform/network-restrictions) for your database.
 - Enable 2FA on GitHub. Since your GitHub account gives you administrative rights to your Supabase project, you should protect it with a strong password and 2FA using a U2F key or a TOTP app.
 - Ensure email confirmations are enabled in the `Settings > Auth` page.
 - Use a custom SMTP server for auth emails so that your users can see that the mails are coming from a trusted domain (preferably the same domain that your app is hosted on). Grab SMTP credentials from any major email provider such as SendGrid, AWS SES, etc.
@@ -34,8 +36,8 @@ After developing your project and deciding it's Production Ready, you should run
 - Perform load testing (preferably on a staging env)
   - Tools like [k6](https://k6.io/) can simulate traffic from many different users.
 - Upgrade your database if you require more resources. If you need anything beyond what is listed, contact enterprise@supabase.io.
-- If you are expecting a surge in traffic (for a big launch) [contact support](https://supabase.com/dashboard/support/new) with more details about your launch. We'll keep an eye on your project.
-- If you expect your database size to be > 4 GB, [enable](https://supabase.com/dashboard/project/_/settings/billing/subscription?panel=pitr) the Point in Time Recovery (PITR) addon. Daily backups can take up resources from your database when the backup is in progress. PITR is more resource efficient, since only the changes to the database are backed up.
+- If you are expecting a surge in traffic (for a big launch) and are on a teams or enterprise plan, [contact support](https://supabase.com/dashboard/support/new) with more details about your launch and we'll help keep an eye on your project.
+- If you expect your database size to be > 4 GB, [enable](https://supabase.com/dashboard/project/_/settings/addons?panel=pitr) the Point in Time Recovery (PITR) addon. Daily backups can take up resources from your database when the backup is in progress. PITR is more resource efficient, since only the changes to the database are backed up.
 
 ## Availability
 
@@ -58,7 +60,7 @@ After developing your project and deciding it's Production Ready, you should run
 
 ### Auth Rate Limits
 
-- The table below shows the rate limit quotas on the following authentication endpoints:
+- The table below shows the rate limit quotas on the following authentication endpoints. You can configure the auth rate limits for your project [here](/dashboard/project/_/auth/rate-limits).
 
 | Endpoint                                         | Path                                                           | Limited By               | Rate Limit                                                                                                                                 |
 | ------------------------------------------------ | -------------------------------------------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -68,7 +70,7 @@ After developing your project and deciding it's Production Ready, you should run
 | Signup confirmation request                      | `/auth/v1/signup`                                              | Last request             | Defaults to 60 seconds window before a new request is allowed. Is customizable.                                                            |
 | Password Reset Request                           | `/auth/v1/recover`                                             | Last request             | Defaults to 60 seconds window before a new request is allowed. Is customizable.                                                            |
 | Verification requests                            | `/auth/v1/verify`                                              | IP Address               | 360 requests per hour (with bursts up to 30 requests)                                                                                      |
-| Token refresh requests                           | `/auth/v1/token`                                               | IP Address               | 360 requests per hour (with bursts up to 30 requests)                                                                                      |
+| Token refresh requests                           | `/auth/v1/token`                                               | IP Address               | 1800 requests per hour (with bursts up to 30 requests)                                                                                     |
 | Create or Verify an MFA challenge                | `/auth/v1/factors/:id/challenge` `/auth/v1/factors/:id/verify` | IP Address               | 15 requests per minute (with bursts up to 30 requests)                                                                                     |
 
 ### Realtime Quotas

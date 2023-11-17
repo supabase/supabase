@@ -9,7 +9,7 @@ import { createClient } from '@supabase/supabase-js'
 import { debounce } from 'lodash'
 
 import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -22,15 +22,13 @@ interface Props {
 }
 
 const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'http://localhost:54321',
-  process.env.SUPABASE_SERVICE_ROLE_SECRET ??
-    process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_SECRET ??
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9idWxkYW5ycHRsb2t0eGNmZnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE2Njk3MjcwMTIsImV4cCI6MTk4NTMwMzAxMn0.SZLqryz_-stF8dgzeVXmzZWPOqdOrBwqJROlFES8v3I'
+  process.env.NEXT_PUBLIC_MISC_USE_URL ?? 'http://localhost:54321',
+  process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!
 )
 
 const generateOgs = async (users: UserData[]) => {
   users?.map(async (user) => {
-    const ogImageUrl = `https://obuldanrptloktxcffvn.functions.supabase.co/lw8-ticket-og?username=${encodeURIComponent(
+    const ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lw8-ticket-og?username=${encodeURIComponent(
       user.username ?? ''
     )}${!!user.golden ? '&golden=true' : ''}`
     return await fetch(ogImageUrl)
@@ -44,8 +42,8 @@ export default function TicketsPage({ users }: Props) {
   const DESCRIPTION = 'Supabase Launch Week 8 | 7–11 August 2023'
   const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/8/lw8-og.jpg`
 
-  const { isDarkMode, toggleTheme } = useTheme()
-  const [initialDarkMode] = useState(isDarkMode)
+  const { resolvedTheme, setTheme } = useTheme()
+  const [initialDarkMode] = useState(resolvedTheme?.includes('dark'))
   const [isLoading, setIsLoading] = useState(false)
   const [offset, setOffset] = useState(1)
   const [isLast, setIsLast] = useState(false)
@@ -94,11 +92,11 @@ export default function TicketsPage({ users }: Props) {
   }, [])
 
   useEffect(() => {
-    toggleTheme(true)
+    setTheme('dark')
     document.body.className = 'dark bg-[#020405]'
     return () => {
       document.body.className = ''
-      toggleTheme(initialDarkMode)
+      setTheme('dark')
     }
   }, [])
 
@@ -135,13 +133,9 @@ export default function TicketsPage({ users }: Props) {
                   winners.
                 </p>
                 <div className="mt-1">
-                  <Link href="/launch-week">
-                    <a>
-                      <Button type="outline" size="medium">
-                        Go to Launch Week 8
-                      </Button>
-                    </a>
-                  </Link>
+                  <Button asChild type="outline" size="medium">
+                    <Link href="/launch-week">Go to Launch Week 8</Link>
+                  </Button>
                 </div>
               </motion.div>
             </div>
@@ -162,6 +156,7 @@ export default function TicketsPage({ users }: Props) {
               objectPosition="top"
               priority
               draggable={false}
+              alt=""
             />
           </div>
         </div>

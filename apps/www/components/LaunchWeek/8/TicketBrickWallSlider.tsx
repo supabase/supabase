@@ -51,26 +51,28 @@ export function TicketBrickWallSlider({ users, reverse, speed = 50000, animate }
         >
           {users.map((user, i) => (
             <SwiperSlide key={user.username}>
-              <Link href={`/launch-week/tickets/${user.username}`} key={user.username}>
-                <a className="relative !w-[230px] md:w-[450px] !h-[200px] rounded-md md:rounded-lg transition-transform">
-                  <div className="relative w-full pt-[50%] transform rounded-md md:rounded-lg overflow-hidden bg-gradient-to-b from-[#22282a] to-[#030A0C]">
-                    <div className="absolute inset-[1px] w-[calc(100%-2px)] h-[calc(100%-2px)] rounded-md md:rounded-lg overflow-hidden p-[1px]">
-                      <Image
-                        src={
-                          getOgUrl(user.username!, !!user.golden) ??
-                          '/images/launchweek/8/lw8-ticket-empty.jpg'
-                        }
-                        alt={user.username}
-                        layout="fill"
-                        objectFit="cover"
-                        objectPosition="center"
-                        placeholder="blur"
-                        blurDataURL="/images/launchweek/8/lw8-ticket-empty.jpg"
-                        className="absolute inset-[1px] rounded-md md:rounded-lg"
-                      />
-                    </div>
+              <Link
+                href={`/launch-week/tickets/${user.username}`}
+                key={user.username}
+                className="relative !w-[230px] md:w-[450px] !h-[200px] rounded-md md:rounded-lg transition-transform"
+              >
+                <div className="relative w-full pt-[50%] transform rounded-md md:rounded-lg overflow-hidden bg-gradient-to-b from-[#22282a] to-[#030A0C]">
+                  <div className="absolute inset-[1px] w-[calc(100%-2px)] h-[calc(100%-2px)] rounded-md md:rounded-lg overflow-hidden p-[1px]">
+                    <Image
+                      src={
+                        getOgUrl(user.username!, !!user.golden) ??
+                        '/images/launchweek/8/lw8-ticket-empty.jpg'
+                      }
+                      alt={user.username ?? ''}
+                      layout="fill"
+                      objectFit="cover"
+                      objectPosition="center"
+                      placeholder="blur"
+                      blurDataURL="/images/launchweek/8/lw8-ticket-empty.jpg"
+                      className="absolute inset-[1px] rounded-md md:rounded-lg"
+                    />
                   </div>
-                </a>
+                </div>
               </Link>
             </SwiperSlide>
           ))}

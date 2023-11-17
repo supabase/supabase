@@ -2,7 +2,7 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   id: 'json',
-  title: 'Analyzing efficiency and performance from the terminal',
+  title: 'Debugging and monitoring',
   description:
     'Inspecting your Postgres database for common issues around disk, query performance, index, locks, and more using the terminal.',
 }
@@ -37,7 +37,7 @@ Most inspection commands are Postgres agnostic. You can run inspection routines 
 For example you can connect to your local Postgres instance:
 
 ```
-supabase --db-url postgresql://postgres:postgres@localhost:5432/postgres db bloat
+supabase --db-url postgresql://postgres:postgres@localhost:5432/postgres inspect db bloat
 ```
 
 ### Connect to a Supabase instance
