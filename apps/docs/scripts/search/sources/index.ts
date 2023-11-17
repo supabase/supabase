@@ -12,7 +12,7 @@ import {
   OpenApiReferenceLoader,
   OpenApiReferenceSource,
 } from './reference-doc'
-import { walk } from './util'
+import { walk } from '../../utils/walk'
 
 const ignoredFiles = ['pages/404.mdx']
 

@@ -9,6 +9,7 @@
     "build:analyze": "ANALYZE=true next build",
     "start": "next start",
     "lint": "next lint",
+    "lint:prose": "tsx scripts/lint/index.ts",
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "build:sitemap": "node ./internals/generate-sitemap.mjs",
