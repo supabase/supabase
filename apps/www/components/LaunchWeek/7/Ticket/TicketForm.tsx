@@ -57,7 +57,7 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
           new Image().src = `https://github.com/${username}.png`
 
           // Prefetch the twitter share URL to eagerly generate the page
-          fetch(`/launch-week/tickets/${username}`).catch((_) => {})
+          fetch(`/launch-week/7/tickets/${username}`).catch((_) => {})
           // Prefetch ticket og image.
           fetch(
             `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lw7-ticket-og?username=${encodeURIComponent(

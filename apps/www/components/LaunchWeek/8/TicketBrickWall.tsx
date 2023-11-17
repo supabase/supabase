@@ -41,7 +41,7 @@ export default function TicketBrickWall({ users }: Props) {
             onClick={() => window.scrollTo(0, 0)}
             className="text-white"
           >
-            <Link href="/launch-week/tickets">View all tickets</Link>
+            <Link href="/launch-week/8/tickets">View all tickets</Link>
           </Button>
         </div>
       </div>

@@ -15,8 +15,6 @@ import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/8/LaunchWeekLogoHe
 import { Meetup } from '~/components/LaunchWeek/8/LW8Meetups'
 import LW8CalloutsSection from '~/components/LaunchWeek/8/LW8CalloutsSection'
 
-import { useTheme } from 'next-themes'
-
 import 'swiper/swiper.min.css'
 
 const AnimatedParticles = dynamic(
@@ -45,8 +43,8 @@ const supabaseAdmin = createClient(
 export default function TicketHome({ users, meetups }: Props) {
   const { query } = useRouter()
 
-  const TITLE = 'Supabase Launch Week X'
-  const DESCRIPTION = 'Supabase Launch Week X | 11-15 December 2023'
+  const TITLE = 'Supabase Launch Week 8'
+  const DESCRIPTION = 'Supabase Launch Week 8 | 7–11 August 2023'
   const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/8/lw8-og.jpg`
 
   const ticketNumber = query.ticketNumber?.toString()
@@ -134,7 +132,62 @@ export default function TicketHome({ users, meetups }: Props) {
         }}
       >
         <DefaultLayout>
-          <SectionContainer>LWX</SectionContainer>
+          <div className="-mt-[65px]">
+            <div className="relative">
+              <div className="relative z-10">
+                <SectionContainer className="relative flex flex-col justify-around items-center min-h-[500px] !py-4 md:!py-8 lg:!pb-0 gap-2 md:gap-4 !px-0 !mx-auto">
+                  <div className="absolute bottom-0 z-10 w-full flex flex-col items-center justify-end gap-4 px-6">
+                    <LaunchWeekLogoHeader />
+                  </div>
+                  <div className="absolute inset-0 z-0 flex items-center justify-center">
+                    <AnimatedParticles />
+                    <Image
+                      src="/images/launchweek/8/stars.svg"
+                      alt="starts background"
+                      layout="fill"
+                      objectFit="cover"
+                      className="opacity-70 pointer-events-none"
+                      draggable={false}
+                    />
+                  </div>
+                </SectionContainer>
+              </div>
+              <div className="absolute w-full aspect-[1/1] md:aspect-[1.5/1] lg:aspect-[2.5/1] inset-0 z-0">
+                <Image
+                  src="/images/launchweek/8/LW8-gradient.png"
+                  layout="fill"
+                  objectFit="cover"
+                  objectPosition="top"
+                  priority
+                  draggable={false}
+                  alt="Launch Week 8 gradient background"
+                />
+              </div>
+            </div>
+
+            <div id="twitter-spaces">
+              <SectionContainer className="!pt-10 lg:!pt-14 !pb-0" id="hackathon">
+                <LW8CalloutsSection />
+              </SectionContainer>
+            </div>
+
+            <SectionContainer className="!pt-0">
+              <LW8Releases />
+            </SectionContainer>
+
+            <SectionContainer id="meetups" className="!pt-0">
+              <LW8Meetups meetups={meetups} />
+            </SectionContainer>
+
+            <SectionContainer id="archive">
+              <LWArchive />
+            </SectionContainer>
+
+            <SectionContainer className="!px-4 w-full">
+              <LaunchWeekPrizeSection />
+            </SectionContainer>
+            {users && <TicketBrickWall users={users.slice(0, 17)} />}
+          </div>
           <CTABanner className="!bg-[#020405] border-t-0" />
         </DefaultLayout>
       </ConfDataContext.Provider>
@@ -145,7 +198,7 @@ export default function TicketHome({ users, meetups }: Props) {
 export const getServerSideProps: GetServerSideProps = async () => {
   // fetch users for the TicketBrickWall
   const { data: users } = await supabaseAdmin!
-    .from('lwx_tickets_golden')
+    .from('lw8_tickets_golden')
     .select('username, golden')
     .limit(17)
 

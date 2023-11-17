@@ -38,8 +38,8 @@ const generateOgs = async (users: UserData[]) => {
 export default function TicketsPage({ users }: Props) {
   const ref = useRef(null)
   const PAGE_COUNT = 20
-  const TITLE = '#SupaLaunchWeek X Tickets'
-  const DESCRIPTION = 'Supabase Launch Week X | 11-15 December 2023'
+  const TITLE = '#SupaLaunchWeek Tickets'
+  const DESCRIPTION = 'Supabase Launch Week 8 | 7–11 August 2023'
   const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/8/lw8-og.jpg`
 
   const { resolvedTheme, setTheme } = useTheme()
@@ -126,15 +126,15 @@ export default function TicketsPage({ users }: Props) {
                 viewport={{ once: true, margin: '-150px' }}
                 transition={{ type: 'spring', bounce: 0, delay: 0.2 }}
               >
-                <h2 className="text-4xl">Launch Week X tickets</h2>
+                <h2 className="text-4xl">Launch Week 8 tickets</h2>
                 <p className="text-[#9296AA]">
-                  Join us on December 15th for Launch Week X's final day{' '}
+                  Join us on August 11th for Launch Week 8's final day{' '}
                   <br className="hidden md:inline-block" /> and find out if you are one of the lucky
                   winners.
                 </p>
                 <div className="mt-1">
                   <Button asChild type="outline" size="medium">
-                    <Link href="/launch-week">Go to Launch Week X</Link>
+                    <Link href="/launch-week">Go to Launch Week 8</Link>
                   </Button>
                 </div>
               </motion.div>
@@ -148,6 +148,17 @@ export default function TicketsPage({ users }: Props) {
               />
             </div>
           </SectionContainer>
+          <div className="absolute w-full aspect-[1/1] md:aspect-[1.5/1] lg:aspect-[2.5/1] inset-0 z-0 pointer-events-none">
+            <Image
+              src="/images/launchweek/8/LW8-gradient.png"
+              layout="fill"
+              objectFit="cover"
+              objectPosition="top"
+              priority
+              draggable={false}
+              alt=""
+            />
+          </div>
         </div>
         <CTABanner className="!bg-[#020405] border-t-0" />
       </DefaultLayout>
@@ -157,7 +168,7 @@ export default function TicketsPage({ users }: Props) {
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const { data: users } = await supabaseAdmin!
-    .from('lwx_tickets_golden')
+    .from('lw8_tickets_golden')
     .select('*')
     .order('createdAt', { ascending: false })
     .limit(20)

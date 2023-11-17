@@ -36,7 +36,7 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
 
   const TITLE = `${name ? name + '’s' : 'Get your'} #SupaLaunchWeek Ticket`
   const DESCRIPTION =
-    'Supabase Launch Week X | 11-15 December 2023 | Generate your ticket & win awesome swag.'
+    'Supabase Launch Week 8 | 7–11 August 2023 | Generate your ticket & win awesome swag.'
   const OG_URL = `${SITE_URL}/tickets/${username}`
 
   const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
@@ -103,6 +103,17 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
                     )}
                   </div>
                 </SectionContainer>
+                <div className="absolute w-full aspect-[1/1] md:aspect-[1.5/1] lg:aspect-[2.5/1] inset-0 z-0 pointer-events-none">
+                  <Image
+                    src="/images/launchweek/8/LW8-gradient.png"
+                    layout="fill"
+                    objectFit="cover"
+                    objectPosition="top"
+                    priority
+                    draggable={false}
+                    alt="Launch Week 8 gradient background"
+                  />
+                </div>
               </div>
             </div>
             <SectionContainer className="">
