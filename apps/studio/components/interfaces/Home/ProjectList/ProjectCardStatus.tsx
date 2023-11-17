@@ -112,7 +112,7 @@ export const ProjectCardStatus = ({
               <div
                 className={[
                   'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'border border-background',
+                  'border bg-background',
                 ].join(' ')}
               >
                 <span className="text-xs text-foreground">{alertDescription}</span>
