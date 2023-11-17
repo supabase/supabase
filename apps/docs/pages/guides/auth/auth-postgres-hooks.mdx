@@ -1,0 +1,59 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'auth-postgres-hooks',
+  title: 'Auth Hooks (Postgres)',
+  description: 'Use Supabase Postgres Functions to customize your authentication flow',
+}
+
+
+What are Auth Hooks?
+
+Auth Hooks are PostgreSQL functions that can be used to alter the default Supabase Auth behaviour. These are synchronous functions which are executed along an Auth flow. Developers can use hooks to write custom behaviour when there are no built in ways of achieving the desired behaviour.
+
+Some examples of modifications you could make are:
+
+- Reducing costs by using a non-native SMS provider
+- Rewarding paid users by adding custom claims or metadata to distinguish between user groups
+- Tracking origin of user signups by introducing metadata
+- Supporting legacy systems by integrating with identity credentials from external authentication systems
+
+
+Hooks are used at specific points along an Auth flow known as extensibility points and can perform custom behaviour via functions which conform to the function signature specified by Supabase. PostgreSQL Hooks come bundled with the database and are available on Free Plan and up.
+
+<Mermaid
+ chart={`flowchart TD
+    subgraph Supabase Auth
+    Start[Event Occurs] --> DecisionA{Is a Hook defined?}
+
+    ValidityCheck --Yes-->EndFlow[End  Flow]
+    ValidityCheck --No-->Error(Return Error)
+
+    DecisionA -- No ---->H[Continue with Supabase Default Behaviour]
+    H--> ValidityCheck{Is response valid?}
+    DecisionA --Yes--->ValidateInput((Validate Inputs))
+        ValidateOutput -->EndFlow
+    end
+
+
+
+    subgraph Auth Hook
+    ValidateInput ---->CallHook[Execute PostgreSQL Function]
+
+    CallHook ---> ValidateOutput((Validate Outputs))
+    end`}
+    />
+
+
+
+## Use Cases
+
+We provide four extensibility points designed to fit a few commonly requested use cases.
+
+### Custom SMS Sender
+
+### Before Sign Up
+
+### Custom JWT Claims
+
+### MFA Verification
