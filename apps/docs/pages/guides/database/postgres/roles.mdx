@@ -26,7 +26,7 @@ create role "role_name";
 Roles and users are essentially the same in Postgres, however if you want to use password-logins for a specific role, then you can use `WITH LOGIN PASSWORD`:
 
 ```sql
-create role "role_name" with login 'extremely_secure_password';
+create role "role_name" with login password 'extremely_secure_password';
 ```
 
 ## Passwords
