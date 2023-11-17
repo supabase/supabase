@@ -27,7 +27,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useSelectedOrganization } from 'hooks'
-import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants'
+import { IS_PLATFORM, TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants'
 import { INFRA_ACTIVITY_METRICS } from './Infrastructure.constants'
 
 const InfrastructureActivity = () => {
@@ -40,7 +40,7 @@ const InfrastructureActivity = () => {
   })
   const isFreePlan = subscription?.plan?.id === 'free'
 
-  const { data: resourceWarnings } = useResourceWarningsQuery()
+  const { data: resourceWarnings } = useResourceWarningsQuery({ enabled: IS_PLATFORM })
   const projectResourceWarnings = resourceWarnings?.find((x) => x.project === projectRef)
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })

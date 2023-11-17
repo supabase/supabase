@@ -23,6 +23,7 @@ import Telemetry from 'lib/telemetry'
 import ConfirmDisableReadOnlyModeModal from './ConfirmDisableReadOnlyModal'
 import ResetDbPassword from './ResetDbPassword'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { IS_PLATFORM } from 'lib/constants'
 
 const DatabaseSettings = () => {
   const router = useRouter()
@@ -34,7 +35,7 @@ const DatabaseSettings = () => {
 
   const { data, isLoading, isError } = useProjectSettingsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const { data: resourceWarnings } = useResourceWarningsQuery()
+  const { data: resourceWarnings } = useResourceWarningsQuery({ enabled: IS_PLATFORM })
 
   const isReadOnlyMode =
     (resourceWarnings ?? [])?.find((warning) => warning.project === projectRef)

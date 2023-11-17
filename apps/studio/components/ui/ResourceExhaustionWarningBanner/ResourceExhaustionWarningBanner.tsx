@@ -13,11 +13,12 @@ import {
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { RESOURCE_WARNING_MESSAGES } from './ResourceExhaustionWarningBanner.constants'
 import { getWarningContent } from './ResourceExhaustionWarningBanner.utils'
+import { IS_PLATFORM } from 'lib/constants'
 
 const ResourceExhaustionWarningBanner = () => {
   const { ref } = useParams()
   const router = useRouter()
-  const { data: resourceWarnings } = useResourceWarningsQuery()
+  const { data: resourceWarnings } = useResourceWarningsQuery({ enabled: IS_PLATFORM })
   const projectResourceWarnings = (resourceWarnings ?? [])?.find(
     (warning) => warning.project === ref
   )
