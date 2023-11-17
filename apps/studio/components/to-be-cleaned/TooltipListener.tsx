@@ -28,7 +28,7 @@ export default function TooltipListener({
   const tooltipId = `tooltip-${makeRandomString(5)}`
   const tooltip = document.createElement('div')
   tooltip.id = tooltipId
-  tooltip.className = `tooltips ${position} absolute p-2 m-1 bg-black border border-solid dark:border-dark rounded-lg rounded text-center ${className} z-50`
+  tooltip.className = `tooltips ${position} absolute p-2 m-1 bg-black border border-solid border-default rounded-lg rounded text-center ${className} z-50`
   tooltip.innerHTML = `<span class="title ${
     nowrap ? 'nowrap' : ''
   }">${title}</span> ${renderToString(

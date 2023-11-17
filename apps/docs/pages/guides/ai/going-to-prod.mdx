@@ -31,15 +31,12 @@ On the other hand, if you need to scale your application, you will need to [crea
 `pgvector` supports two types of indexes: HNSW and IVFFlat. We recommend using [HNSW](/docs/guides/ai/vector-indexes/hnsw-indexes) because of its [performance](https://supabase.com/blog/increase-performance-pgvector-hnsw#hnsw-performance-1536-dimensions) and [robustness against changing data](/docs/guides/ai/vector-indexes/hnsw-indexes#when-should-you-create-hnsw-indexes).
 
 <div>
-  <img
-    alt="dbpedia embeddings comparing ivfflat and hnsw queries-per-second using the 4XL compute addon (light)"
-    className="dark:hidden"
-    src="/docs/img/ai/going-prod/dbpedia-ivfflat-vs-hnsw-4xl--light.png"
-  />
-  <img
-    alt="dbpedia embeddings comparing ivfflat and hnsw queries-per-second using the 4XL compute addon (dark)"
-    className="hidden dark:block"
-    src="/docs/img/ai/going-prod/dbpedia-ivfflat-vs-hnsw-4xl--dark.png"
+  <Image
+    alt="dbpedia embeddings comparing ivfflat and hnsw queries-per-second using the 4XL compute addon"
+    src={{
+      light: '/docs/img/ai/going-prod/dbpedia-ivfflat-vs-hnsw-4xl--light.png',
+      dark: '/docs/img/ai/going-prod/dbpedia-ivfflat-vs-hnsw-4xl--dark.png',
+    }}
   />
 </div>
 
@@ -56,15 +53,12 @@ Search parameters:
 - `ef_search` is the size of the dynamic list for the nearest neighbors (used during the search). Increasing `ef_search` will result in better accuracy, but it will also increase the time required to execute a query (40 is the default value).
 
 <div>
-  <img
-    alt="dbpedia embeddings comparing hnsw queries-per-second using different build parameters (light)"
-    className="dark:hidden"
-    src="/docs/img/ai/going-prod/dbpedia-hnsw-build-parameters--light.png"
-  />
-  <img
-    alt="dbpedia embeddings comparing hnsw queries-per-second using different build parameters (dark)"
-    className="hidden dark:block"
-    src="/docs/img/ai/going-prod/dbpedia-hnsw-build-parameters--dark.png"
+  <Image
+    alt="dbpedia embeddings comparing hnsw queries-per-second using different build parameters"
+    src={{
+      light: '/docs/img/ai/going-prod/dbpedia-hnsw-build-parameters--light.png',
+      dark: '/docs/img/ai/going-prod/dbpedia-hnsw-build-parameters--dark.png',
+    }}
   />
 </div>
 
@@ -81,15 +75,12 @@ The values of lists and probes directly affect accuracy and queries per second (
 You can find more examples of how `lists` and `probes` constants affect accuracy and QPS in [pgvector 0.4.0 performance](https://supabase.com/blog/pgvector-performance) blogpost.
 
 <div>
-  <img
+  <Image
     alt="multi database"
-    className="dark:hidden"
-    src="/docs/img/ai/going-prod/lists-count--light.png"
-  />
-  <img
-    alt="multi database"
-    className="hidden dark:block"
-    src="/docs/img/ai/going-prod/lists-count--dark.png"
+    src={{
+      light: '/docs/img/ai/going-prod/lists-count--light.png',
+      dark: '/docs/img/ai/going-prod/lists-count--dark.png',
+    }}
   />
 </div>
 
@@ -126,15 +117,12 @@ You can look at our [Choosing Compute Add-on](/docs/guides/ai/choosing-compute-a
 Or take a look at our [pgvector 0.5.0 performance](https://supabase.com/blog/increase-performance-pgvector-hnsw) and [pgvector 0.4.0 performance](https://supabase.com/blog/pgvector-performance) blog posts to see what pgvector is capable of and how the above technique can be used to achieve the best results.
 
 <div>
-  <img
+  <Image
     alt="multi database"
-    className="dark:hidden"
-    src="/docs/img/ai/going-prod/size-to-rps--light.png"
-  />
-  <img
-    alt="multi database"
-    className="hidden dark:block"
-    src="/docs/img/ai/going-prod/size-to-rps--dark.png"
+    src={{
+      light: '/docs/img/ai/going-prod/size-to-rps--light.png',
+      dark: '/docs/img/ai/going-prod/size-to-rps--dark.png',
+    }}
   />
 </div>
 
