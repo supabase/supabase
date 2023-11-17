@@ -323,7 +323,6 @@ services:
       LOGFLARE_API_KEY: ${LOGFLARE_API_KEY}
       LOGFLARE_SINGLE_TENANT: true
       LOGFLARE_SUPABASE_MODE: true
-      LOGFLARE_MIN_CLUSTER_SIZE: 1
 
       # Comment variables to use Big Query backend for analytics
       POSTGRES_BACKEND_URL: postgresql://supabase_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
