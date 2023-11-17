@@ -275,7 +275,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                                   <div className="w-10">
                                     <Image
                                       src={author.author_image_url}
-                                      className="dark:border-dark rounded-full border"
+                                      className="border-default rounded-full border"
                                       alt={`${author.author} avatar`}
                                       width={40}
                                       height={40}

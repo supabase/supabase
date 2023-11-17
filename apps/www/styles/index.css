@@ -201,22 +201,22 @@ h6:not(.overwrite) {
 /* Database page */
 
 .dashboard-tabs div[role='separator'] {
-  @apply border border-gray-50 dark:border-gray-700;
+  @apply border border-strong;
 }
 
 .sbui-tabs--alt div[role='tablist'] .sbui-btn-primary {
-  @apply dark:bg-surface-100 bg-gray-800 text-white dark:text-white;
+  @apply bg-border-stronger text-white;
   text-shadow: none;
   font-weight: 400;
 }
 .sbui-tabs--alt div[role='tablist'] .sbui-btn-text {
-  @apply dark:text-gray-400;
+  @apply text-border-muted;
   font-weight: 400;
   shadow: none;
 }
 
 .sbui-tabs--underline-alt div[role='tablist'] .sbui-tab-button-underline--active {
-  @apply border-gray-900 dark:border-white;
+  @apply border-foreground-muted;
 }
 /* override position of tabs  */
 .dashboard-tabs > div > div {
@@ -243,7 +243,7 @@ table {
 }
 
 .sbui-typography-container thead {
-  @apply text-gray-500 dark:text-gray-200;
+  @apply text-border;
 }
 
 .sbui-typography a {

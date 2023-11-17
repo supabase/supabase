@@ -6,7 +6,7 @@ interface Props {
 
 export default function BlogHeader({ title }: Props) {
   return (
-    <div className="dark:bg-dark-800 overflow-hidden border-b bg-white pt-4 pb-4 dark:border-gray-600">
+    <div className="overflow-hidden border-b bg-surface-100 pt-4 pb-4 border-control">
       <div className="container mx-auto px-8 sm:px-16 xl:px-20">
         <div className="mx-auto">
           <h1>

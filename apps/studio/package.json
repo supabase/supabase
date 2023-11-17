@@ -49,7 +49,6 @@
     "config": "*",
     "configcat-js": "^7.0.0",
     "dayjs": "^1.11.10",
-    "eslint-config-next": "^13.3.0",
     "file-saver": "^2.0.5",
     "framer-motion": "^6.5.1",
     "generate-password": "^1.7.0",
@@ -160,7 +159,7 @@
     "prettier": "^2.8.8",
     "storybook-dark-mode": "^3.0.1",
     "superjson": "^1.12.3",
-    "tailwindcss": "^3.1.8",
+    "tailwindcss": "^3.3.5",
     "typescript": "^5.2.2"
   }
 }

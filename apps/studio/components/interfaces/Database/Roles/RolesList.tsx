@@ -120,7 +120,7 @@ const RolesList = ({}) => {
                     value={totalActiveConnections}
                     barClass={
                       maxConnectionLimit === 0
-                        ? 'bg-gray-100 dark:bg-gray-600'
+                        ? 'bg-control'
                         : totalActiveConnections > 0.9 * maxConnectionLimit
                         ? 'bg-red-800'
                         : totalActiveConnections > 0.75 * maxConnectionLimit

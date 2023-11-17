@@ -114,7 +114,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
     <div
       className={clsx(
         'group flex items-center justify-between rounded-md',
-        isActive && 'text-foreground bg-surface-100'
+        isActive && 'text-foreground bg-surface-200'
       )}
     >
       <Link

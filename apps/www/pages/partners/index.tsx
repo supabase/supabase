@@ -39,7 +39,7 @@ const Partners = () => {
           <SectionContainer className="overflow-hidden pt-8 pb-12 md:pt-12">
             <ProductHeaderCentered {...pageData.heroSection} />
           </SectionContainer>
-          <div className="relative z-20 w-full flex py-16 mb-16 -mt-10 md:mb-24 md:-mt-20 justify-center gap-2 overflow-hidden mx-auto max-w-4xl before:content[''] before:absolute before:inset-0 before:w-full before:bg-[linear-gradient(to_right,hsl(var(--background-alternative))_0%,transparent_10%,transparent_90%,hsl(var(--background-alternative))_100%)] before:z-10">
+          <div className="relative z-20 w-full flex py-16 mb-16 -mt-10 md:mb-24 md:-mt-20 justify-center gap-2 overflow-hidden mx-auto max-w-4xl before:content[''] before:absolute before:inset-0 before:w-full before:bg-[linear-gradient(to_right,hsl(var(--background-alternative-default))_0%,transparent_10%,transparent_90%,hsl(var(--background-alternative-default))_100%)] before:z-10">
             <div className="absolute w-32 h-32 md:w-40 md:h-40 rounded-full bg-alternative/90 backdrop-blur-2xl backdrop-filter from-background to-background-alternative border-4 border-background-alternative shadow-xl top-1/2 -translate-x-1/2 left-1/2 -translate-y-1/2 flex items-center justify-center z-30">
               <div className="absolute inset-0 w-full h-full transform">
                 <svg
@@ -94,7 +94,7 @@ const Partners = () => {
               </div>
             ))}
           </div>
-          <div className="absolute inset-0 z-[1] bg-[linear-gradient(to_top,hsl(var(--background-alternative))_40%,hsl(var(--background-default))_90%)]" />
+          <div className="absolute inset-0 z-[1] bg-[linear-gradient(to_top,hsl(var(--background-alternative-default))_40%,hsl(var(--background-default))_90%)]" />
         </div>
         <SectionContainer>
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-4">
@@ -185,7 +185,7 @@ const Partners = () => {
                   className="group flex flex-col items-center text-center gap-4 px-8 py-6"
                   key={i}
                 >
-                  <div className="bg-brand-300 dark:bg-brand-500 text-brand-1200 group-hover:text-brand-800 dark:group-hover:text-brand-1000 flex h-12 w-12 items-center justify-center rounded-md border border-brand-800 dark:border-brand-800 transition-all group-hover:scale-105">
+                  <div className="bg-brand-300 [[data-theme*=dark]_&]:bg-brand-500 text-brand-1200 group-hover:text-brand-800 [[data-theme*=dark]_&]:group-hover:text-brand-1000 flex h-12 w-12 items-center justify-center rounded-md border border-brand transition-all group-hover:scale-105">
                     {item.icon ? item.icon : <IconCode strokeWidth={2} />}
                   </div>
 

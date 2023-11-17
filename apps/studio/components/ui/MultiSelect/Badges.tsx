@@ -3,7 +3,7 @@ import { IconX } from 'ui'
 export const BadgeDisabled = ({ name }: { name: string }) => (
   <div
     className={[
-      'text-typography-body-light dark:text-typography-body-dark',
+      'text-typography-body-light [[data-theme*=dark]_&]:text-typography-body-dark',
       'flex cursor-not-allowed items-center space-x-2 rounded bg-gray-600',
       'py-0.5 px-2 text-sm',
     ].join(' ')}
@@ -21,7 +21,7 @@ export const BadgeSelected = ({
 }) => (
   <div
     className={[
-      'text-typography-body-light dark:text-typography-body-dark',
+      'text-typography-body-light [[data-theme*=dark]_&]:text-typography-body-dark',
       'flex items-center space-x-2 rounded bg-surface-300',
       'py-0.5 px-2 text-sm',
     ].join(' ')}
