@@ -25,14 +25,14 @@ Let's start building the SwiftUI app from scratch.
 
 Open Xcode and create a new SwiftUI project.
 
-Then let's add the [supabase-swift](https://github.com/supabase-community/supabase-swift) dependency.
+Add the [supabase-swift](https://github.com/supabase-community/supabase-swift) dependency.
 
-Using the following [Apple tutorial](https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app) on how to add a package dependency, add the `https://github.com/supabase-community/supabase-swift` package.
+Add the `https://github.com/supabase-community/supabase-swift` package to your app. For instructions, see the [Apple tutorial on adding package dependencies](https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app).
 
-Now let's create a helper file to initialize the Supabase client.
-We need the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
-These variables will be exposed on the application, and that's completely fine since we have
-[Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
+Create a helper file to initialize the Supabase client.
+You need the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
+These variables will be exposed on the application, and that's completely fine since you have
+[Row Level Security](/docs/guides/auth#row-level-security) enabled on your database.
 
 ```swift Supabase.swift
 import Supabase
@@ -45,8 +45,8 @@ let supabase = SupabaseClient(
 
 ### Set up a Login view
 
-Let's set up a SwiftUI view to manage logins and sign ups.
-Users would be able to sign in using a magic link.
+Set up a SwiftUI view to manage logins and sign ups.
+Users should be able to sign in using a magic link.
 
 ```swift AuthView.swift
 import SwiftUI
@@ -80,7 +80,7 @@ struct AuthView: View {
         Section {
           switch result {
           case .success: 
-            Text("Check you inbox.")
+            Text("Check your inbox.")
           case .failure(let error): 
             Text(error.localizedDescription).foregroundStyle(.red)
           }
@@ -119,15 +119,15 @@ struct AuthView: View {
 
 <Admonition type="note">
 
-You noticed we used a custom `redirectTo` URL, for that to work we need to add a custom redirect url to Supabase and a custom URL scheme to SwiftUI application. Follow the guide on [implementing deep link handling](/docs/guides/auth/native-mobile-deep-linking?platform=swift).
+The example uses a custom `redirectTo` URL. For this to work, add a custom redirect URL to Supabase and a custom URL scheme to your SwiftUI application. Follow the guide on [implementing deep link handling](/docs/guides/auth/native-mobile-deep-linking?platform=swift).
 
 </Admonition>
 
 ### Account view
 
-After a user is signed in we can allow them to edit their profile details and manage their account.
+After a user is signed in, you can allow them to edit their profile details and manage their account.
 
-Let's create a new view for that called `ProfileView.swift`.
+Create a new view for that called `ProfileView.swift`.
 
 ```swift ProfileView.swift
 struct ProfileView: View {
@@ -227,7 +227,7 @@ struct ProfileView: View {
 
 ### Models
 
-On `ProfileView.swift` file we used 2 model types for deserializing the response and serializing the request to Supabase, let's add those in a new `Models.swift` file.
+In `ProfileView.swift`, you used 2 model types for deserializing the response and serializing the request to Supabase. Add those in a new `Models.swift` file.
 
 ```swift Models.swift
 struct Profile: Decodable {
@@ -257,7 +257,7 @@ struct UpdateProfileParams: Encodable {
 
 ### Launch!
 
-Now that we have all the views in place, let's add the entry point for the application, that will verify for a valid session and route the user to the authenticated/non-authenticated state.
+Now that you've created all the views, add an entry point for the application. This will verify if the user has a valid session and route them to the authenticated or non-authenticated state.
 
 Add a new `AppView.swift` file.
 
@@ -284,7 +284,7 @@ struct AppView: View {
 }
 ```
 
-Once that's done, don't forget to update the entry point to the newly created `AppView`, and that is it, hit run in Xcode to launch the application in the simulator.
+Update the entry point to the newly created `AppView`. Run in Xcode to launch your application in the simulator.
 
 ## Bonus: Profile photos
 
@@ -294,7 +294,7 @@ photos and videos.
 ### Add PhotosPicker
 
 Let's add support for the user to pick an image from the library and upload it.
-We can start by creating a new type to hold the picked avatar image:
+Start by creating a new type to hold the picked avatar image:
 
 ```swift AvatarImage.swift
 import SwiftUI
@@ -330,7 +330,7 @@ enum TransferError: Error {
 }
 ```
 
-#### Add PhotosPicket to Profile page
+#### Add PhotosPicker to Profile page
 
 ```swift ProfileView.swift
 struct ProfileView: View {
@@ -496,7 +496,7 @@ struct ProfileView: View {
 }
 ```
 
-And finally let's update our Models.
+Finally, update your Models.
 
 ```swift Models.swift
 struct Profile: Codable {  
@@ -514,7 +514,7 @@ struct Profile: Codable {
 }
 ```
 
-We no longer need the `UpdateProfileParams` struct, as we can now reuse the `Profile` struct for both request and response calls.
+You no longer need the `UpdateProfileParams` struct, as you can now reuse the `Profile` struct for both request and response calls.
 
 ### Storage management
 

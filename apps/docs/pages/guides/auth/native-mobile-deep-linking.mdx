@@ -310,14 +310,14 @@ In certain auth scenarios you will need to handle linking back into your applica
   <TabPanel id="swift" label="Swift">
   ### Deep link config
 
-    - Go to your [auth settings](https://supabase.com/dashboard/project/_/auth/url-configuration) page.
-    - You need to enter your app redirect callback on `Additional Redirect URLs` field.
+    1. Go to your [auth settings](https://supabase.com/dashboard/project/_/auth/url-configuration) page.
+    2. Enter your app redirect URL in the `Additional Redirect URLs` field. This is the URL that the user gets redirected to after clicking a magic link.
 
-    The redirect callback url should have this format `[YOUR_SCHEME]://[YOUR_HOSTNAME]`. Here, `io.supabase.user-management://login-callback` is just an example, you can choose whatever you would like for `YOUR_SCHEME` and `YOUR_HOSTNAME` as long as the scheme is unique across the user's device. For this reason, typically a reverse domain of your website is used.
+    The redirect callback url should have the format `[YOUR_SCHEME]://[YOUR_HOSTNAME]`. Here, `io.supabase.user-management://login-callback` is just an example. You can choose whatever you would like for `YOUR_SCHEME` and `YOUR_HOSTNAME` as long as the scheme is unique across the user's device. For this reason, typically a reverse domain of your website is used.
 
     ![Supabase console deep link setting](/docs/img/deeplink-setting.png)
 
-    Now add a cutom URL to your application, so the OS knows how to redirect back your application once user clicks the magic link.
+    Now add a cutom URL to your application, so the OS knows how to redirect back your application once the user clicks the magic link.
 
     You have the option to use Xcode's Target Info Editor following [official Apple documentation](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app#Register-your-URL-scheme).
 
