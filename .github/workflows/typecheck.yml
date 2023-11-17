@@ -12,7 +12,8 @@ concurrency:
 
 jobs:
   typecheck:
-    runs-on: ubuntu-latest
+    # Uses larger hosted runner as it significantly decreases build times
+    runs-on: [larger-runner-4cpu]
 
     strategy:
       matrix:

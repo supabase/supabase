@@ -8,7 +8,7 @@ const GitHubButton = () => {
 
   const kFormatter = (num: number) => {
     const kFormat = num / 1000
-    const decimals = kFormat.toString().split('.')[1]
+    const decimals = kFormat.toFixed(2).split('.')[1]
     const firstDecimal = decimals.split('')[0]
     const showDecimals = firstDecimal !== '0'
 
@@ -30,7 +30,7 @@ const GitHubButton = () => {
 
   return (
     <Button
-      className="hidden group lg:flex text-foreground-light hover:text-foreground-strong"
+      className="hidden group lg:flex text-foreground-light hover:text-foreground"
       type="text"
       asChild
     >
