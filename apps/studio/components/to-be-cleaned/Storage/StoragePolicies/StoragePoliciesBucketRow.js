@@ -105,7 +105,7 @@ const StoragePoliciesBucketRow = ({
           <p className="text-sm text-foreground-lighter">No policies created yet</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 divide-y dark:divide-dark">
+        <div className="grid grid-cols-1 divide-y [[data-theme*=dark]_&]:divide-dark">
           {policies.map((policy) => (
             <PolicyRow
               key={policy.name}
