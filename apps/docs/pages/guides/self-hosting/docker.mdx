@@ -39,7 +39,10 @@ After all the services have started you can see them running in the background:
 ```sh
 docker compose ps
 ```
+
 Please [secure your services](#securing-your-services) as soon as possible using the instructions below.
+
+For security reasons, we "pin" the versions of each service in the docker-compose file (these versions are updated ~monthly). If you want to update any services immediately, you can do so by updating the version number in the docker compose file and then running `docker compose pull`. You can find all the latest docker images in the [Supabase Docker Hub](https://hub.docker.com/u/supabase).
 
 ### Accessing Supabase Studio
 
@@ -291,7 +294,7 @@ Due to the changes in the Analytics server, you will need to run the following c
 
 <Admonition type="warning">
 
-- All data in analytics will be deleted when you run the commands below.
+All data in analytics will be deleted when you run the commands below.
 
 </Admonition>
 
