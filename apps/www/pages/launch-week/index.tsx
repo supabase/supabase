@@ -3,8 +3,9 @@ import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
-import { createClient, Session, SupabaseClient } from '@supabase/supabase-js'
+import { Session, SupabaseClient, createClient } from '@supabase/supabase-js'
 import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
+// import supabase from '~/lib/supabaseMisc'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import { PageState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
@@ -17,14 +18,16 @@ const LWXTicketContainer = dynamic(() => import('~/components/LaunchWeek/X/Ticke
 export default function TicketHome() {
   const { query } = useRouter()
 
+  console.log('query', query)
+
   const TITLE = 'Supabase Launch Week X'
   const DESCRIPTION = 'Supabase Launch Week X | 11-15 December 2023'
   const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/8/lw8-og.jpg`
 
   const ticketNumber = query.ticketNumber?.toString()
   const bgImageId = query.bgImageId?.toString()
-  const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
   const [session, setSession] = useState<Session | null>(null)
+  const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
 
   const [initialDarkMode] = useState('dark')
 
@@ -50,6 +53,10 @@ export default function TicketHome() {
       )
     }
   }, [])
+
+  useEffect(() => {
+    console.log('userData', userData)
+  }, [userData])
 
   useEffect(() => {
     if (supabase) {

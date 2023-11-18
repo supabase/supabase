@@ -25,24 +25,27 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
   const router = useRouter()
 
   // Triggered on session
-  useEffect(() => {
+  async function fetchUser() {
     if (supabase && session?.user && !userData.id) {
-      document.body.classList.add('ticket-generated')
       const username = session.user.user_metadata.user_name
       setUsername(username)
       const name = session.user.user_metadata.full_name
       const email = session.user.email
-      supabase
-        .from('lw8_tickets')
+      await supabase
+        .from('lwx_tickets')
         .insert({ email, name, username, referred_by: router.query?.referral ?? null })
         .eq('email', email)
         .select()
         .single()
         .then(async ({ error }: any) => {
           // If error because of duplicate email, ignore and proceed, otherwise sign out.
-          if (error && error?.code !== '23505') return supabase.auth.signOut()
+          if (error && error?.code !== '23505') {
+            setFormState('error')
+            return supabase.auth.signOut()
+          }
           const { data } = await supabase
-            .from('lw8_tickets_golden')
+            // .from('lwx_tickets_golden')
+            .from('lwx_tickets')
             .select('*')
             .eq('username', username)
             .single()
@@ -68,7 +71,7 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
                 {
                   event: 'UPDATE',
                   schema: 'public',
-                  table: 'lw8_tickets',
+                  table: 'lwx_tickets',
                   filter: `username=eq.${username}`,
                 },
                 (payload: any) => {
@@ -87,6 +90,11 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
           }
         })
     }
+  }
+
+  useEffect(() => {
+    fetchUser()
+
     return () => {
       // Cleanup realtime subscription on unmount
       realtimeChannel?.unsubscribe()

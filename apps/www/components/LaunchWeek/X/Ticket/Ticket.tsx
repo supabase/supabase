@@ -7,6 +7,8 @@ import TicketForm from './TicketForm'
 import TicketFooter from './TicketFooter'
 import { cn } from 'ui'
 import X from '../X'
+import Panel from '../../../Panel'
+import { useState } from 'react'
 
 type TicketGenerationState = 'default' | 'loading'
 type Props = {
@@ -20,11 +22,15 @@ export default function Ticket({
   ticketGenerationState = 'default',
   setTicketGenerationState,
 }: Props) {
-  const { username, golden = false, bg_image_id: bgImageId, ticketNumber } = user
+  const storageBaseFilepath = `https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lwx/assets/ai/`
+  const fallbackImg = `/images/launchweek/lwx/ticktts/1.png`
+  const overlay = `/images/launchweek/lwx/tickets/ticket_overlay.png`
+  const { username, golden = false, bg_image_id: bgImageId = '1', ticketNumber } = user
+  const [imageHasLoaded, setImageHasLoaded] = useState(false)
 
   const ticketBg = {
     regular: {
-      background: `/images/launchweek/8/ticket-bg/regular.png`,
+      background: `${storageBaseFilepath}/regular/${bgImageId}.jpg`,
     },
     golden: {
       background: `/images/launchweek/8/ticket-bg/golden.png`,
@@ -35,30 +41,50 @@ export default function Ticket({
   const CURRENT_TICKET_BG = ticketBg[CURRENT_TICKET].background
 
   return (
-    <div className="flex relative flex-col w-[300px] h-auto md:w-full md:max-w-none backdrop-blur-md">
-      <div
-        className={cn(
-          'flex relative flex-col justify-between w-full aspect-[1/1.6] md:aspect-[1.935/1] rounded-xl border'
-        )}
-      >
-        {username ? (
-          <div className="absolute inset-0 h-full p-6 z-10 flex flex-col items-center justify-between w-full md:h-full flex-1 overflow-hidden">
+    <Panel
+      hasShimmer
+      outerClassName="flex relative flex-col w-[300px] h-auto md:w-full md:max-w-none !bg-black"
+      innerClassName="flex relative flex-col justify-between w-full transition-colors aspect-[1/1.6] md:aspect-[1.935/1] rounded-xl bg-[#020405]"
+    >
+      {username ? (
+        <>
+          <div className="absolute inset-0 h-full p-6 z-30 flex flex-col items-center justify-between bg- w-full md:h-full flex-1 overflow-hidden">
             <TicketProfile
               user={user}
               ticketGenerationState={ticketGenerationState}
               setTicketGenerationState={setTicketGenerationState}
               golden={golden}
             />
-            <X className="w-20 h-20 mb-4 opacity-10" />
             <TicketFooter />
+            <Image
+              src={overlay}
+              alt={`Launch Week X ticket background overlay`}
+              layout="fill"
+              className="absolute z-2 inset-0 object-cover object-center"
+            />
           </div>
-        ) : (
-          <TicketForm
-            defaultUsername={username ?? undefined}
-            setTicketGenerationState={setTicketGenerationState}
+          <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#020405] via-transparent to-[#020405]" />
+          <Image
+            src={CURRENT_TICKET_BG}
+            alt={`Launch Week X ticket background #${bgImageId}`}
+            placeholder="blur"
+            blurDataURL={fallbackImg}
+            onLoad={() => setImageHasLoaded(true)}
+            loading="eager"
+            layout="fill"
+            className={cn(
+              'absolute inset-0 object-cover object-center opacity-0 transition-opacity duration-1000',
+              imageHasLoaded && 'opacity-100'
+            )}
+            quality={100}
           />
-        )}
-      </div>
-    </div>
+        </>
+      ) : (
+        <TicketForm
+          defaultUsername={username ?? undefined}
+          setTicketGenerationState={setTicketGenerationState}
+        />
+      )}
+    </Panel>
   )
 }
