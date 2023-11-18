@@ -3,66 +3,75 @@
 <img src="https://user-images.githubusercontent.com/8291514/213727225-56186826-bee8-43b5-9b15-86e839d89393.png#gh-dark-mode-only">
 </p>
 
-# Supabase
+# سوپابیس
 
-[Supabase](https://supabase.com) is an open source Firebase alternative. We're building the features of Firebase using enterprise-grade open source tools.
+[سوپابیس](https://supabase.com) د فايربيس غه یو اوپن سورس بدل دی. 
+موږ د فايربيس د اینٹرپرائز گریڈ غه اوپن سورس ټولزونو جوړو 
 
-- [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database)
-- [x] Authentication and Authorization. [Docs](https://supabase.com/docs/guides/auth)
-- [x] Auto-generated APIs.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/api)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/graphql)
-  - [x] Realtime subscriptions. [Docs](https://supabase.com/docs/guides/realtime)
-- [x] Functions.
-  - [x] Database Functions. [Docs](https://supabase.com/docs/guides/database/functions)
-  - [x] Edge Functions [Docs](https://supabase.com/docs/guides/functions)
-- [x] File Storage. [Docs](https://supabase.com/docs/guides/storage)
-- [x] AI + Vector/Embeddings Toolkit. [Docs](https://supabase.com/docs/guides/ai)
-- [x] Dashboard
+- [x] .هوسټيډ پوسټګريس ډاتابيس [اسناد](https://supabase.com/docs/guides/database)
+- [x] .تصدیق او واک ورکول [اسناد](https://supabase.com/docs/guides/auth)
+- [x] .په اتومات ډول تولید شويای-پي-آئيز
+  - [x] .ریسټ [اسناد](https://supabase.com/docs/guides/api)
+  - [x] .ګراف کیو ایل [اسناد](https://supabase.com/docs/guides/graphql)
+  - [x] .ريل ټايم سبسکرپشنز [اسناد](https://supabase.com/docs/guides/realtime)
+- [x] .فانکشنز
+  - [x] .ډاتابیس فانکشنز [اسناد](https://supabase.com/docs/guides/database/functions)
+  - [x] .ایج فانکشنز [اسناد](https://supabase.com/docs/guides/functions)
+- [x] .فایل سټوریج [اسناد](https://supabase.com/docs/guides/storage)
+- [x] اې آئی + وېکټر/امبیډنګ ټولکټ [اسناد](https://supabase.com/docs/guides/ai)
+- [x] ډشبورډ
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
-Watch "releases" of this repo to get notified of major updates.
+د دې ریپو "ریلیز" وګورئ ترڅو د لوی تازه معلوماتو خبرتیا ترلاسه کړئ.
 
 <kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
-## Documentation
+## اسناد
 
-For full documentation, visit [supabase.com/docs](https://supabase.com/docs)
+د بشپړ اسنادو لپاره، لیدنه وکړئ [supabase.com/docs](https://supabase.com/docs)
 
-To see how to Contribute, visit [Getting Started](./DEVELOPERS.md)
+د دې لپاره چې وګورو څنګه مرسته وکړو، لیدنه وکړئ [Getting Started](./DEVELOPERS.md)
 
-## Community & Support
+## ټولنه او ملاتړ
 
-- [Community Forum](https://github.com/supabase/supabase/discussions). Best for: help with building, discussion about database best practices.
-- [GitHub Issues](https://github.com/supabase/supabase/issues). Best for: bugs and errors you encounter using Supabase.
-- [Email Support](https://supabase.com/docs/support#business-support). Best for: problems with your database or infrastructure.
-- [Discord](https://discord.supabase.com). Best for: sharing your applications and hanging out with the community.
+- [Community Forum](https://github.com/supabase/supabase/discussions). د دې لپاره غوره: د جوړولو سره مرسته، د ډیټابیس غوره کړنو په اړه بحث.
+- [GitHub Issues](https://github.com/supabase/supabase/issues). د دې لپاره غوره: بګونه او غلطۍ چې تاسو د سوپابیس په کارولو سره ورسره مخ یاست.
+- [Email Support](https://supabase.com/docs/support#business-support). د دې لپاره غوره: ستاسو د ډیټابیس یا د اینفراسترکټیورا ستونزې.
+- [Discord](https://discord.supabase.com). د دې لپاره غوره: خپل غوښتنلیکونه شریک کړئ او د ټولنې سره ځړول.
 
+## څنګه کار کوي
 
-## How it works
+سوپابیس د اوپن سورس وسیلو ترکیب دی. موږ د تصدۍ درجې ، اوپن سورس محصولاتو په کارولو سره د فايربيس ځانګړتیاوې رامینځته کوو. که وسیلې او ټولنې شتون ولري، د MIT، Apache 2، یا مساوي اوپن لائسنس سره، موږ به دا وسیله وکاروو او ملاتړ یې وکړو. که دا وسیله شتون ونلري، موږ یې پخپله جوړوو او اوپن سورس جوړوو. سوپابیس د فايربيس له 1 څخه تر 1 پورې نقشه نه ده. زموږ هدف د اوپن سورس وسیلو په کارولو سره پراختیا کونکو ته د فايربيس په څیر پراختیا کونکي تجربه ورکول دي.
 
-Supabase is a combination of open source tools. We’re building the features of Firebase using enterprise-grade, open source products. If the tools and communities exist, with an MIT, Apache 2, or equivalent open license, we will use and support that tool. If the tool doesn't exist, we build and open source it ourselves. Supabase is not a 1-to-1 mapping of Firebase. Our aim is to give developers a Firebase-like developer experience using open source tools.
+**معمارۍ**
 
-**Architecture**
+سوپابیس یو [هوسټ شوی پلټفارم](https://supabase.com/dashboard) دی. تاسو سائن اپ کولی شئ او پرته له  نصبولو د سوپابیس کارول پیل کړئ.
 
-Supabase is a [hosted platform](https://supabase.com/dashboard). You can sign up and start using Supabase without installing anything.
-You can also [self-host](https://supabase.com/docs/guides/hosting/overview) and [develop locally](https://supabase.com/docs/guides/local-development).
+تاسو هم [خودهوسټ](https://supabase.com/docs/guides/hosting/overview) کولی شئ او [لوکلي جوړ کړئ](https://supabase.com/docs/guides/local-development).
 
-![Architecture](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+![معمارۍ](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 
-- [Postgres](https://www.postgresql.org/) is an object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.
-- [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. Realtime polls Postgres' built-in replication functionality for database changes, converts changes to JSON, then broadcasts the JSON over websockets to authorized clients.
-- [PostgREST](http://postgrest.org/) is a web server that turns your PostgreSQL database directly into a RESTful API
-- [GoTrue](https://github.com/supabase/gotrue) is a JWT based API for managing users and issuing JWT tokens.
-- [Storage](https://github.com/supabase/storage-api) provides a RESTful interface for managing Files stored in S3, using Postgres to manage permissions.
-- [pg_graphql](http://github.com/supabase/pg_graphql/) a PostgreSQL extension that exposes a GraphQL API
-- [postgres-meta](https://github.com/supabase/postgres-meta) is a RESTful API for managing your Postgres, allowing you to fetch tables, add roles, and run queries, etc.
-- [Kong](https://github.com/Kong/kong) is a cloud-native API gateway.
+- [Postgres](https://www.postgresql.org/) د اوبجیکټ روابطي ډیټابیس سیسټم دی. د 30 کلونو فعال پرمختګ سره چې دا یې د اعتبار، ځانګړتیا پیاوړتیا، او فعالیت لپاره قوي شهرت ترلاسه کړی
 
-#### Client libraries
+- [Realtime](https://github.com/supabase/realtime) دا یو ایلیکسیر سرور دی چې تاسو ته اجازه درکوي د ویب ساکټونو په کارولو سره د پوستګریس کو ایل داخلولو ، تازه کولو او حذف کولو ته غوږ شئ. ریل ټایم د ډیټابیس بدلونونو لپاره د پوسټګریس جوړ شوي نقل فعالیت نظر ورکوي ، JSON ته بدلونونه بدلوي ، بیا د مجاز پیرودونکو ته د ویب ساکټونو له لارې JSON خپروي.
 
-Our approach for client libraries is modular. Each sub-library is a standalone implementation for a single external system. This is one of the ways we support existing tools.
+- [PostgREST](http://postgrest.org/) یو ویب سرور دی چې ستاسو د پوستګریس کو ایل ډیټابیس مستقیم په ریسټفل اې‌پی‌آئی بدلوي.
+
+- [GoTrue](https://github.com/supabase/gotrue) د JWT پر بنسټ API دی چې د کاروونکو اداره کولو او د JWT ټوکنونو صادرولو لپاره دی.
+
+- [Storage](https://github.com/supabase/storage-api)
+ریسټفل اېس‌پی‌آئی پ ایس ۳ کې ذخیره شوي فایلونو اداره کولو لپاره د پوسټگریس په کارولو سره د اجازې اداره کول.
+
+- [pg_graphql](http://github.com/supabase/pg_graphql/) دا د پوستګریس کو ایل توسیع دی چې ګراف کو ایل اې‌پی‌آئی افشا کوي
+
+- [postgres-meta](https://github.com/supabase/postgres-meta) ستاسو د پوسټګریس اداره کولو لپاره یو Restful API دی، تاسو ته اجازه درکوي  ترلاسه کړئ، رولونه اضافه کړئ، او پوښتنې پرمخ وړئ، او داسې نور.
+
+- [Kong](https://github.com/Kong/kong) د کلاډ نیټوئئو اې‌پی‌آئی گیټوۍ ده
+
+#### د مراجعینو کتابتونونه
+
+د مراجعینو کتابتونونو لپاره زموږ چلند ماډلر دی. هر فرعي کتابتون د یو واحد بهرني سیسټم لپاره یو واحد تطبیق دی. دا یو له هغو لارو څخه دی چې موږ د موجوده وسیلو ملاتړ کوو.
 
 <table style="table-layout:fixed; white-space: nowrap;">
   <tr>
@@ -202,12 +211,12 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
 <!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->
 <!--- Keep only the link to the list of translation files-->
 
-## Badges
+## بیجونه
 
-![Made with Supabase](./apps/www/public/badge-made-with-supabase.svg)
+![د سوپابیس سره جوړ شوی](./apps/www/public/badge-made-with-supabase.svg)
 
 ```md
-[![Made with Supabase](https://supabase.com/badge-made-with-supabase.svg)](https://supabase.com)
+[![د سوپابیس سره جوړ شوی](https://supabase.com/badge-made-with-supabase.svg)](https://supabase.com)
 ```
 
 ```html
@@ -221,10 +230,10 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
 </a>
 ```
 
-![Made with Supabase (dark)](./apps/www/public/badge-made-with-supabase-dark.svg)
+![د سوپابیس سره جوړ شوی (تور)](./apps/www/public/badge-made-with-supabase-dark.svg)
 
 ```md
-[![Made with Supabase](https://supabase.com/badge-made-with-supabase-dark.svg)](https://supabase.com)
+[![د سوپابیس سره جوړ شوی](https://supabase.com/badge-made-with-supabase-dark.svg)](https://supabase.com)
 ```
 
 ```html
@@ -238,7 +247,7 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
 </a>
 ```
 
-## Translations
+## ژباړې
 
 - [Arabic | العربية](/i18n/README.ar.md)
 - [Albanian / Shqip](/i18n/README.sq.md)
