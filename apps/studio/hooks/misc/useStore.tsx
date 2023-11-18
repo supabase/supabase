@@ -26,7 +26,6 @@ export const StoreProvider = ({ children, rootStore }: PropsWithChildren<StorePr
   const selectedProject = useSelectedProject()
   useEffect(() => {
     if (selectedProject) {
-      console.log({ selectedProject })
       rootStore.setProject(selectedProject)
     }
   }, [selectedProject])
