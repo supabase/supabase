@@ -233,7 +233,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                       name="allowed_mime_types"
                       layout="vertical"
                       label="Allowed MIME types"
-                      placeholder="e.g image/jpeg, image/png, audio/mpeg, video/mp4, etc"
+                      placeholder="Each mime type specified can be a wildcard, e.g. image/*, or a specific mime type, e.g. image/png"
                       descriptionText="Comma separated values"
                     />
                   </div>
