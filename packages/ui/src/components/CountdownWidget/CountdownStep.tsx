@@ -1,3 +1,5 @@
+import { cn } from '../../lib/utils'
+
 interface CountdownStepProps {
   value: string | number
   unit: string
@@ -7,18 +9,19 @@ interface CountdownStepProps {
 function CountdownStep({ value, unit, showCard = true }: CountdownStepProps) {
   return (
     <div
-      className={[
+      className={cn(
+        'font-mono uppercase text-foreground-lighter tracking-[0.05rem] text-sm',
         showCard
-          ? 'rounded-md p-[1px] overflow-hidden bg-gradient-to-b from-[#514b6130] to-[#514b6100]'
-          : '',
-      ].join(' ')}
+          ? 'rounded-md p-[1px] overflow-hidden bg-gradient-to-b from-border-muted to-border-muted/20'
+          : 'tracking-[0.1rem]'
+      )}
     >
       <div
-        className={[
+        className={cn(
           showCard
-            ? 'py-1 px-2 rounded-md w-11 leading-4 flex items-center justify-center bg-gradient-to-b from-[#51269c40] to-[#DBB8BF10] backdrop-blur-md'
-            : 'flex items-center justify-center w-9 py-1 px-1',
-        ].join(' ')}
+            ? 'py-1 px-2 rounded-md w-11 leading-4 flex items-center justify-center bg-black backdrop-blur-md'
+            : 'flex items-center justify-center w-9 py-1 px-1'
+        )}
       >
         <span className="m-0">{value}</span>
         <span>{unit}</span>

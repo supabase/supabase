@@ -139,12 +139,3 @@
     color: #e4b641;
   }
 }
-
-.ticket-number {
-  text-shadow: 0 0px 2px rgba(22, 22, 22, 0.9), 0 0px 6px rgba(131, 6, 184, 0.9),
-    0 0px 12px rgba(217, 195, 226, 0.5);
-}
-.ticket-number-gold {
-  text-shadow: 0 0px 2px rgba(22, 22, 22, 0.9), 0 0px 6px rgba(255, 195, 125, 0.9),
-    0 0px 12px rgba(226, 224, 195, 0.5);
-}

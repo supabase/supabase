@@ -1,12 +1,10 @@
 import TicketProfile from './TicketProfile'
 import TicketNumber from './TicketNumber'
 import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
-import TicketHeader from './TicketHeader'
 import Image from 'next/image'
 import TicketForm from './TicketForm'
 import TicketFooter from './TicketFooter'
 import { cn } from 'ui'
-import X from '../X'
 import Panel from '../../../Panel'
 import { useState } from 'react'
 
@@ -43,7 +41,7 @@ export default function Ticket({
   return (
     <Panel
       hasShimmer
-      outerClassName="flex relative flex-col w-[300px] h-auto md:w-full md:max-w-none !bg-black"
+      outerClassName="flex relative flex-col w-[300px] h-auto max-h-[480px] md:w-full md:max-w-none !bg-black"
       innerClassName="flex relative flex-col justify-between w-full transition-colors aspect-[1/1.6] md:aspect-[1.935/1] rounded-xl bg-[#020405]"
     >
       {username ? (
@@ -55,7 +53,7 @@ export default function Ticket({
               setTicketGenerationState={setTicketGenerationState}
               golden={golden}
             />
-            <TicketFooter />
+            <TicketFooter user={user} />
             <Image
               src={overlay}
               alt={`Launch Week X ticket background overlay`}
