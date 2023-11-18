@@ -307,6 +307,44 @@ In certain auth scenarios you will need to handle linking back into your applica
       </TabPanel>
     </Tabs>
   </TabPanel>
+
+  <TabPanel id="swift" label="Swift">
+  ### Deep link config
+
+    1. Go to your [auth settings](https://supabase.com/dashboard/project/_/auth/url-configuration) page.
+    2. Enter your app redirect URL in the `Additional Redirect URLs` field. This is the URL that the user gets redirected to after clicking a magic link.
+
+    The redirect callback url should have the format `[YOUR_SCHEME]://[YOUR_HOSTNAME]`. Here, `io.supabase.user-management://login-callback` is just an example. You can choose whatever you would like for `YOUR_SCHEME` and `YOUR_HOSTNAME` as long as the scheme is unique across the user's device. For this reason, typically a reverse domain of your website is used.
+
+    ![Supabase console deep link setting](/docs/img/deeplink-setting.png)
+
+    Now add a cutom URL to your application, so the OS knows how to redirect back your application once the user clicks the magic link.
+
+    You have the option to use Xcode's Target Info Editor following [official Apple documentation](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app#Register-your-URL-scheme).
+
+    Or, declare the URL scheme manually in your `Info.plist` file.
+
+    ```xml Info.plist
+      <?xml version="1.0" encoding="UTF-8"?>
+      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+      <plist version="1.0">
+      <dict>
+        <!-- other tags -->
+        <key>CFBundleURLTypes</key>
+        <array>
+          <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+              <string>io.supabase.user-management</string>
+            </array>
+          </dict>
+        </array>
+      </dict>
+      </plist>
+    ```
+  </TabPanel>
 </Tabs>
 
 
