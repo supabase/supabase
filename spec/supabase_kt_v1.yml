@@ -2299,7 +2299,9 @@ functions:
             // You can extract the user's email domain and use it to trigger the
             // authentication flow with the correct identity provider.
 
-            supabase.auth.signInWith(SSO.withDomain("company.com"))
+            supabase.auth.signInWith(SSO) {
+                domain = "company.com"
+            }
 
             //the url was opened automatically, if you don't want that, provide a custom redirect url
           ```
@@ -2311,7 +2313,9 @@ functions:
             // Useful when you need to map a user's sign in request according
             // to different rules that can't use email domains.
 
-            supabase.auth.signInWith(SSO.withProvider("21648a9d-8d5a-4555-a9d1-d6375dc14e92"))
+            supabase.auth.signInWith(SSO){
+                providerId = "21648a9d-8d5a-4555-a9d1-d6375dc14e92"
+            }
 
             //the url was opened automatically, if you don't want that, provide a custom redirect url
           ```
