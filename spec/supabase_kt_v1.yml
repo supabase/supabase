@@ -2152,7 +2152,7 @@ functions:
           }
           ```
   - id: sign-in-with-password
-    title: 'loginWith()'
+    title: 'signInWith()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithPassword'
     notes: |
       Logs in an existing user.
@@ -2230,7 +2230,7 @@ functions:
           }
           ```
   - id: sign-in-with-oauth
-    title: 'loginWith(OAuthProvider)'
+    title: 'signInWith(OAuthProvider)'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOAuth'
     notes: |
       - This method is used for signing in using a third-party provider.
@@ -2284,8 +2284,8 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithSSO'
     notes: |
       - Before you can call this method you need to [establish a connection](/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to an identity provider. Use the [CLI commands](/docs/reference/cli/supabase-sso) to do this.
-      - If you've associated an email domain to the identity provider, you can use the `SSO.withDomain()` function in the `loginWith` method to start a sign-in flow.
-      - In case you need to use a different way to start the authentication flow with an identity provider, you can use the `SSO.withProviderId` function. For example:
+      - If you've associated an email domain to the identity provider, you can change the `domain` property in the `signInWith(SSO)` method to start a sign-in flow.
+      - In case you need to use a different way to start the authentication flow with an identity provider, you can change the `providerId` property. For example:
           - Mapping specific user email addresses with an identity provider.
           - Using different hints to identity the identity provider to be used by the user, like a company-specific page, IP address or other tracking information.
       - To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
