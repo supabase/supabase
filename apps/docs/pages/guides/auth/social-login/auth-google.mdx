@@ -4,6 +4,7 @@ export const meta = {
   id: 'auth-google',
   title: 'Login with Google',
   description: 'Use Sign in with Google on the web, in native apps or with Chrome extensions',
+  tocVideo: 'vojHmGUGUGc',
 }
 
 Supabase Auth supports Sign in with Google on the web, native Android applications and Chrome extensions.
@@ -110,6 +111,7 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
     ```ts
     async function handleSignInWithGoogle(response) {
       const { data, error } = await supabase.auth.signInWithIdToken({
+        provider: 'google',
         token: response.credential,
         nonce: 'NONCE', // must be the same one as provided in data-nonce (if any)
       })

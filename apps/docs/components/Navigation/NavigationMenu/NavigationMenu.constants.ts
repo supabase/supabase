@@ -318,6 +318,10 @@ export const gettingstarted: NavMenuConstant = {
           name: 'Ionic Angular',
           url: '/guides/getting-started/tutorials/with-ionic-angular',
         },
+        {
+          name: 'Swift',
+          url: '/guides/getting-started/tutorials/with-swift',
+        },
       ],
     },
   ],
@@ -513,9 +517,15 @@ export const auth = {
           items: [...PhoneLoginsItems],
         },
         {
-          name: 'Social Login',
+          name: 'Social Login (OAuth)',
           url: '/guides/auth/social-login',
-          items: [...SocialLoginItems],
+          items: [
+            {
+              name: 'Native Mobile OAuth',
+              url: '/guides/auth/native-mobile-deep-linking',
+            },
+            ...SocialLoginItems,
+          ],
         },
         {
           name: 'Native Mobile Login',
@@ -523,7 +533,7 @@ export const auth = {
           items: [
             ...NativeMobileLoginItems,
             {
-              name: 'Deep Linking',
+              name: 'OAuth Deep Linking',
               url: '/guides/auth/native-mobile-deep-linking',
             },
           ],
