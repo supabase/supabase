@@ -2122,7 +2122,7 @@ functions:
         code: |
           ```kotlin
           val user = supabase.auth.signUpWith(Phone) {
-              phoneNumber = "+4912345679"
+              phone = "+4912345679"
               password = "example-password"
           }
           ```
@@ -2174,7 +2174,7 @@ functions:
         code: |
           ```kotlin
           supabase.auth.signInWith(Phone) {
-              phoneNumber = "+4912345679"
+              phone = "+4912345679"
               password = "example-password"
           }
           ```
@@ -2226,7 +2226,7 @@ functions:
         code: |
           ```kotlin
           supabase.auth.signInWith(OTP) {
-              phoneNumber = "+4912345679"
+              phone = "+4912345679"
           }
           ```
   - id: sign-in-with-oauth
@@ -2372,7 +2372,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          supabase.auth.verifyPhoneOtp(type = OtpType.Phone.SMS, phoneNumber = "+491234567", token = "token")
+          supabase.auth.verifyPhoneOtp(type = OtpType.Phone.SMS, phone = "+491234567", token = "token")
           ```
         description: |
           Available types are:
@@ -2843,7 +2843,7 @@ functions:
         code: |
           ```kotlin
           val userWithPhone = supabase.auth.admin.createUserWithPhone {
-              phoneNumber = "+49123456789"
+              phone = "+49123456789"
               password = "secretpassword"
               userMetadata {
                   put("name", "John")
@@ -2865,7 +2865,7 @@ functions:
         code: |
           ```kotlin
           val userWithPhone = supabase.auth.admin.createUserWithPhone {
-              phoneNumber = "+49123456789"
+              phone = "+49123456789"
               password = "secretpassword"
               autoConfirm = true
           }
