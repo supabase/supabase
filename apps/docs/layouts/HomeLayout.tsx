@@ -64,14 +64,14 @@ const HomeLayout: FC<Props> = (props: Props) => {
       <HomePageCover meta={props.meta} />
       <LayoutMainContent>
         <div className={['relative transition-all ease-out', 'duration-150 '].join(' ')}>
-          <article className="prose dark:prose-dar max-w-none">
+          <article className="prose max-w-none">
             <MDXProvider components={components}>{props.children}</MDXProvider>
           </article>
         </div>
         {hasTableOfContents && !props.meta?.hide_table_of_contents && (
           <div
             className={[
-              'border-scale-400 dark:bg-scale-200 table-of-contents-height border-l',
+              'border-default bg-background table-of-contents-height border-l',
               'thin-scrollbar overflow-y-auto sticky hidden md:block md:col-span-3 px-2',
             ].join(' ')}
           >

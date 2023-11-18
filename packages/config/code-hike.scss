@@ -1,3 +1,4 @@
+[data-theme*='dark'],
 .dark {
   --ch-0: dark;
   --ch-1: #8b949e;
@@ -28,6 +29,7 @@
   --ch-25: #6e76811a;
 }
 
+[data-theme='light'],
 .light {
   --ch-0: light;
   --ch-1: #6e7781;
@@ -216,6 +218,8 @@
   top: 0.8em;
 }
 .ch-editor-tab {
+  border: none;
+  border-right: 1px solid var(--ch-16);
   min-width: -webkit-fit-content;
   min-width: -moz-fit-content;
   min-width: fit-content;
@@ -228,10 +232,9 @@
   box-sizing: border-box;
   padding-left: 15px;
   padding-right: 15px;
-  background-color: var(--ch-24) !important;
-  color: hsla(0, 0%, 100%, 0.5);
+  background-color: var(--ch-21) !important;
+  color: var(--ch-15);
   min-width: 0;
-  border-bottom: 1px solid;
 }
 .ch-editor-tab-active {
   background-color: red;
@@ -261,8 +264,8 @@
   //   border: 1px solid red;
 }
 .ch-editor-frame .ch-frame-title-bar {
-  background-color: var(--ch-t-background) !important;
-  background: var(--ch-t-background) !important;
+  background-color: var(--ch-21) !important;
+  background: var(--ch-21) !important;
 }
 .ch-editor-terminal {
   position: absolute;
@@ -620,7 +623,7 @@
 .ch-codegroup {
   margin-top: 1.25em;
   margin-bottom: 1.25em;
-  border: 1px solid var(--colors-scale5); // @mildtomato
+  border: 1px solid hsl(var(--border-default)); // @mildtomato
   box-shadow: none;
 }
 .ch-inline-code > code {
@@ -642,7 +645,7 @@
   background-color: rgba(186, 230, 253, 0.4);
 }
 .ch-editor-tab[data-active='true'] {
-  background-color: var(--ch-24);
+  background-color: var(--ch-16) !important;
 }
 .ch-section-link[data-active='true'],
 .ch-section-link[data-active='true'] * {
@@ -654,7 +657,7 @@
   margin: 0 -0.15rem;
 }
 .ch-code-multiline-mark-border {
-  background: var(--colors-scale12) !important;
+  background: var(--foreground-default) !important;
   width: 3px;
   height: 100%;
   position: absolute;

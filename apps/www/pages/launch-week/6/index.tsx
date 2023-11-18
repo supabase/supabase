@@ -169,16 +169,14 @@ export default function launchweek() {
             )}
           >
             <div className="flex justify-center">
-              {/* <img
-                src="/images/launchweek/launchweek-logo--light.svg"
-                className="flex w-40 dark:hidden lg:w-80"
-              /> */}
               <img
                 src="/images/launchweek/launchweek-logo--dark.svg"
                 className="w-40 flex lg:w-80"
               />
             </div>
-            <p className="text-light text-sm text-center">Dec 12 – 16 at 6 AM PT | 9 AM ET</p>
+            <p className="text-foreground-light text-sm text-center">
+              Dec 12 – 16 at 6 AM PT | 9 AM ET
+            </p>
           </div>
         </SectionContainer>
         <div

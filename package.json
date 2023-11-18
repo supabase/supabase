@@ -6,9 +6,7 @@
   "license": "Apache-2.0",
   "private": true,
   "workspaces": [
-    "apps/www",
-    "apps/docs",
-    "studio",
+    "apps/*",
     "tests",
     "packages/*"
   ],
@@ -22,7 +20,7 @@
     "dev:www": "turbo run dev --filter=www --parallel",
     "lint": "turbo run lint",
     "typecheck": "turbo --continue typecheck",
-    "format": "prettier --write \"{apps,studio}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}\"",
+    "format": "prettier --write \"apps/**/*.{js,jsx,ts,tsx,css,md,mdx,json}\"",
     "docker:dev": "cd docker && docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml up --renew-anon-volumes",
     "docker:up": "cd docker && docker compose up",
     "docker:down": "cd docker && docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml down --remove-orphans",

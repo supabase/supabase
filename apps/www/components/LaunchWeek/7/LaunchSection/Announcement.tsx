@@ -13,9 +13,7 @@ export const Announcement = (props: AnnouncementType) => {
       break
 
     case 'producthunt':
-      containerClasses.push(
-        'text-amber-1200 border-amber-500 dark:border-amber-500 bg-amber-200 dark:bg-amber-300'
-      )
+      containerClasses.push('text-amber-1200 border-amber-500 bg-amber-300')
       imgSrc =
         'https://www.pngkey.com/png/full/1-10768_product-hunt-original-logo-product-hunt-kitty.png'
       imgAlt = 'producthunt'

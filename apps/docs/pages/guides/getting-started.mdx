@@ -61,7 +61,13 @@ export const meta = {
   {quickstarts.map((item) => {
     return (
       <Link href={`${item.href}`} key={item.title} passHref className={'col-span-4'}>
-        <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
+        <GlassPanel
+          title={item.title}
+          span="col-span-6"
+          background={false}
+          icon={item.icon}
+          hasLightIcon={item.hasLightIcon}
+        >
           {item.description}
         </GlassPanel>
       </Link>
@@ -75,10 +81,15 @@ export const meta = {
   {webapps.map((item) => {
     return (
       <Link href={`${item.href}`} key={item.title} passHref className={'col-span-4'}>
-        <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
+        <GlassPanel
+          title={item.title}
+          span="col-span-6"
+          background={false}
+          icon={item.icon}
+          hasLightIcon={item.hasLightIcon}
+        >
           {item.description}
         </GlassPanel>
-
       </Link>
     )
 
@@ -92,7 +103,13 @@ export const meta = {
   {mobile.map((item) => {
     return (
       <Link href={`${item.href}`} key={item.title} passHref className={'col-span-4'}>
-        <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
+        <GlassPanel
+          title={item.title}
+          span="col-span-6"
+          background={false}
+          icon={item.icon}
+          hasLightIcon={item.hasLightIcon}
+        >
           {item.description}
         </GlassPanel>
       </Link>
@@ -138,6 +155,7 @@ export const quickstarts = [
     description:
       'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Next.js app.',
     icon: '/docs/img/icons/nextjs-icon',
+    hasLightIcon: true,
   },
   {
     title: 'NuxtJS',
@@ -204,6 +222,7 @@ export const webapps = [
     description:
       'Learn how to build a user management app with Next.js and Supabase Database, Auth, and Storage functionality.',
     icon: '/docs/img/icons/nextjs-icon',
+    hasLightIcon: true,
   },
   {
     title: 'React',
@@ -277,6 +296,7 @@ export const mobile = [
     description:
       'Learn how to build a user management app with Expo React Native and Supabase Database, Auth, and Storage functionality.',
     icon: '/docs/img/icons/expo-icon',
+    hasLightIcon: true,
   },
   {
     title: 'Android Kotlin',

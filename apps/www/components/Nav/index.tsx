@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -51,6 +51,24 @@ const Nav = () => {
     if (width >= 1024) setOpen(false)
   }, [width])
 
+  /**
+   * Temporary fix for next-theme client side bug
+   * https://github.com/pacocoursey/next-themes/issues/169
+   * TODO: remove when bug has been fixed
+   */
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return null
+  }
+
+  const showDarkLogo =
+    isLaunchWeekPage || (mounted && resolvedTheme?.includes('dark')!) || isHomePage
+
   return (
     <>
       <div className="sticky top-0 z-40 transform" style={{ transform: 'translate3d(0,0,999px)' }}>
@@ -63,7 +81,7 @@ const Nav = () => {
         />
         <nav
           className={cn(
-            `relative z-40 border-border border-b backdrop-blur-sm transition-opacity`,
+            `relative z-40 border-default border-b backdrop-blur-sm transition-opacity`,
             showLaunchWeekNavMode ? '!opacity-100 !border-[#e0d2f430]' : '',
             isLaunchWeekPage && showLaunchWeekNavMode ? '!border-b-0' : ''
           )}
@@ -77,11 +95,7 @@ const Nav = () => {
                     className="block w-auto h-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm"
                   >
                     <Image
-                      src={
-                        isLaunchWeekPage || resolvedTheme === 'dark' || isHomePage
-                          ? supabaseLogoWordmarkDark
-                          : supabaseLogoWordmarkLight
-                      }
+                      src={showDarkLogo ? supabaseLogoWordmarkDark : supabaseLogoWordmarkLight}
                       width={124}
                       height={24}
                       alt="Supabase Logo"
@@ -107,7 +121,7 @@ const Nav = () => {
                     {menu.primaryNav.map((menuItem) =>
                       menuItem.hasDropdown ? (
                         <NavigationMenuItem className="text-sm font-medium" key={menuItem.title}>
-                          <NavigationMenuTrigger className="bg-transparent data-[state=open]:!text-brand data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground-strong p-2 h-auto">
+                          <NavigationMenuTrigger className="bg-transparent text-foreground hover:text-brand-link data-[state=open]:!text-brand-link data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground p-2 h-auto">
                             {menuItem.title}
                           </NavigationMenuTrigger>
                           <NavigationMenuContent
@@ -122,7 +136,8 @@ const Nav = () => {
                             <MenuItem
                               href={menuItem.url}
                               title={menuItem.title}
-                              className="group-hover:bg-transparent text-strong hover:text-brand focus-visible:text-brand"
+                              className="group-hover:bg-transparent text-foreground focus-visible:text-brand-link"
+                              hoverColor="brand"
                             />
                           </NavigationMenuLink>
                         </NavigationMenuItem>
@@ -158,12 +173,7 @@ const Nav = () => {
               showLaunchWeekNavMode={showLaunchWeekNavMode}
             />
           </div>
-          <MobileMenu
-            open={open}
-            setOpen={setOpen}
-            isDarkMode={isLaunchWeekPage || resolvedTheme === 'dark' || isHomePage}
-            menu={menu}
-          />
+          <MobileMenu open={open} setOpen={setOpen} isDarkMode={showDarkLogo} menu={menu} />
         </nav>
 
         <ScrollProgress />

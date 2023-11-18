@@ -33,7 +33,7 @@ const formatTOCHeader = (content: string) => {
     if (x === '`') {
       if (!begin) {
         begin = true
-        res.push(`<code class="text-xs border rounded bg-scale-400 border-scale-500">`)
+        res.push(`<code class="text-xs border rounded bg-surface-200 border-overlay">`)
       } else {
         begin = false
         res.push(`</code>`)
@@ -69,7 +69,7 @@ const TableOfContents: FC<Props> = ({ toc, video }) => {
               <li key={i} id={item.lvl} style={{ marginLeft: `${(item.lvl - 2) * 1}rem` }}>
                 <a
                   href={`#${formatSlug(item.slug)}`}
-                  className="text-scale-1000 hover:text-brand transition-colors"
+                  className="text-foreground-lighter hover:text-brand transition-colors"
                   dangerouslySetInnerHTML={{ __html: formatTOCHeader(removeAnchor(item.content)) }}
                 />
               </li>

@@ -147,7 +147,7 @@ At this point, you can make an API request to your Edge Function using your pref
 ```shell
 curl --output result.jpg --location --request POST 'http://localhost:54321/functions/v1/text-to-image' \
   --header 'Content-Type: application/json' \
-  --data '{"query":"Llama wearing sunglasses"}'
+  --data '{"prompt":"Llama wearing sunglasses"}'
 ```
 
 In this example, your generated image will save to `result.jpg`:

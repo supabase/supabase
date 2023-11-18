@@ -39,9 +39,7 @@ const Section: FC<PropsWithChildren<ISectionContainer>> = (props) => {
   return (
     <article
       key={props.id}
-      className={`${
-        props.singleColumn ? 'prose dark:prose-dark py-16 lg:py-32 ' : 'py-16 lg:py-32'
-      }`}
+      className={`${props.singleColumn ? 'prose py-16 lg:py-32 ' : 'py-16 lg:py-32'}`}
     >
       <StickyHeader {...props} />
       <div
@@ -81,7 +79,7 @@ const StickyHeader: FC<StickyHeader> = (props) => {
       id={props.slug}
       data-ref-id={props.id}
       className={[
-        'text-xl font-medium text-scale-1200 mb-8 scroll-mt-24',
+        'text-xl font-medium text-foreground mb-8 scroll-mt-24',
         props.monoFont && 'font-mono',
       ].join(' ')}
     >

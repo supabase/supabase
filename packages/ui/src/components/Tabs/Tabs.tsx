@@ -16,10 +16,10 @@ interface TabsProps {
   onChange?: any
   onClick?: any
   scrollable?: boolean
+  wrappable?: boolean
   addOnBefore?: React.ReactNode
   addOnAfter?: React.ReactNode
   listClassNames?: string
-  children: PanelPropsProps[]
 }
 
 interface TabsSubComponents {
@@ -36,6 +36,7 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
   onChange,
   onClick,
   scrollable,
+  wrappable,
   addOnBefore,
   addOnAfter,
   listClassNames,
@@ -90,6 +91,7 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
 
   const listClasses = [__styles[type].list]
   if (scrollable) listClasses.push(__styles.scrollable)
+  if (wrappable) listClasses.push(__styles.wrappable)
   if (listClassNames) listClasses.push(listClassNames)
 
   return (

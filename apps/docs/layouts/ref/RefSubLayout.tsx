@@ -65,7 +65,7 @@ const Section: FC<PropsWithChildren<ISectionContainer>> = (props) => {
     <article
       key={props.id + 'section'}
       className={[
-        props.singleColumn ? 'prose dark:prose-dark w-full' : 'w-full',
+        props.singleColumn ? 'prose w-full' : 'w-full',
         'py-16 lg:py-32 first:pt-8 last:pb-8',
       ].join(' ')}
     >
@@ -121,7 +121,7 @@ const StickyHeader: FC<StickyHeader> = ({ icon, ...props }) => {
           id={props.slug}
           data-ref-id={props.id}
           className={[
-            'text-2xl font-medium text-scale-1200 scroll-mt-24',
+            'text-2xl font-medium text-foreground scroll-mt-24',
             !icon && 'mb-8',
             props.monoFont && 'font-mono',
           ].join(' ')}
@@ -161,7 +161,7 @@ const EducationSection: FC<PropsWithChildren<IEducationSection>> = ({
   return (
     <article
       key={props.id + 'education'}
-      className={'prose dark:prose-dark max-w-none py-16 lg:py-32 first:pt-8 last:pb-8'}
+      className={'prose max-w-none py-16 lg:py-32 first:pt-8 last:pb-8'}
     >
       {!hideTitle && <StickyHeader {...props} icon={icon} />}
       {props.children}
