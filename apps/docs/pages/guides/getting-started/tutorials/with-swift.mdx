@@ -79,9 +79,9 @@ struct AuthView: View {
       if let result {
         Section {
           switch result {
-          case .success: 
+          case .success:
             Text("Check your inbox.")
-          case .failure(let error): 
+          case .failure(let error):
             Text(error.localizedDescription).foregroundStyle(.red)
           }
         }
@@ -105,7 +105,7 @@ struct AuthView: View {
 
       do {
         try await supabase.auth.signInWithOTP(
-            email: email, 
+            email: email,
             redirectTo: URL(string: "io.supabase.user-management://login-callback")
         )
         result = .success(())
@@ -499,7 +499,7 @@ struct ProfileView: View {
 Finally, update your Models.
 
 ```swift Models.swift
-struct Profile: Codable {  
+struct Profile: Codable {
   let username: String?
   let fullName: String?
   let website: String?
@@ -521,7 +521,6 @@ You no longer need the `UpdateProfileParams` struct, as you can now reuse the `P
 <StorageManagement />
 
 At this stage you have a fully functional application!
-
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
