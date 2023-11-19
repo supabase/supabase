@@ -131,7 +131,6 @@ Create a new `src/routes/+layout.ts` file to handle the session and the supabase
 
 ```ts src/routes/+layout.ts
 // src/routes/+layout.ts
-import { invalidate } from '$app/navigation'
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
 import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit'
 
