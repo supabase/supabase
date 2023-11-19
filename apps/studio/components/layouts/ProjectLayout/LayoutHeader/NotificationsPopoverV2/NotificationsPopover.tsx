@@ -3,8 +3,13 @@ import { SlidersHorizontal } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
 import {
   Button,
+  CommandGroup_Shadcn_,
+  CommandItem_Shadcn_,
+  CommandList_Shadcn_,
+  Command_Shadcn_,
   IconAlertCircle,
   IconAlertTriangle,
+  IconCheck,
   IconInbox,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -20,11 +25,18 @@ import { useNotificationsV2UpdateMutation } from 'data/notifications/notificatio
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import NotificationRow from './NotificationRow'
+import { NOTIFICATION_FILTERS, NOTIFICATION_FILTER_TYPE } from './NotificationsPopover.constants'
 
 const NotificationsPopverV2 = () => {
-  const rowHeights = useRef<{ [key: number]: number }>({})
   const [open, setOpen] = useState(false)
+  const [openFilters, setOpenFilters] = useState(false)
+  const [selectedFilter, setSelectedFilter] = useState<NOTIFICATION_FILTER_TYPE>('all')
   const [activeTab, setActiveTab] = useState<'inbox' | 'archive'>('inbox')
+
+  // [Joshen] Just FYI this variable row heights logic should ideally live in InfiniteList
+  // but I ran into some infinite loops issues when I was trying to implement it there
+  // so opting to simplify and implement it here for now
+  const rowHeights = useRef<{ [key: number]: number }>({})
 
   const { data: projects } = useProjectsQuery()
   const { data: organizations } = useOrganizationsQuery()
@@ -50,6 +62,11 @@ const NotificationsPopverV2 = () => {
 
   const onArchiveNotification = (id: string) => {
     updateNotification({ id, status: 'archived' })
+  }
+
+  const onSelectFilter = (value: 'all' | 'unread' | 'warning' | 'critical') => {
+    setSelectedFilter(value)
+    setOpenFilters(false)
   }
 
   return (
@@ -130,7 +147,30 @@ const NotificationsPopverV2 = () => {
               />
               <Tabs.Panel id="archive" label="Archived" />
             </Tabs>
-            <Button type="text" icon={<SlidersHorizontal size={14} />} className="px-1" />
+            <Popover_Shadcn_ modal={false} open={openFilters} onOpenChange={setOpenFilters}>
+              <PopoverTrigger_Shadcn_ asChild>
+                <Button type="text" icon={<SlidersHorizontal size={14} />} className="px-1" />
+              </PopoverTrigger_Shadcn_>
+              <PopoverContent_Shadcn_ className="p-0 w-52" side="bottom" align="end">
+                <Command_Shadcn_>
+                  <CommandList_Shadcn_>
+                    <CommandGroup_Shadcn_>
+                      {NOTIFICATION_FILTERS.map((filter) => (
+                        <CommandItem_Shadcn_
+                          key={filter.id}
+                          className="cursor-pointer flex items-center justify-between"
+                          onSelect={() => onSelectFilter(filter.id)}
+                          onClick={() => onSelectFilter(filter.id)}
+                        >
+                          <p>{filter.label}</p>
+                          {selectedFilter === filter.id && <IconCheck />}
+                        </CommandItem_Shadcn_>
+                      ))}
+                    </CommandGroup_Shadcn_>
+                  </CommandList_Shadcn_>
+                </Command_Shadcn_>
+              </PopoverContent_Shadcn_>
+            </Popover_Shadcn_>
           </div>
         </div>
         <div className="border-t">

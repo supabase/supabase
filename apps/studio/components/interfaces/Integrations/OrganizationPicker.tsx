@@ -6,9 +6,6 @@ import { useMemo, useRef, useState } from 'react'
 
 import { Organization } from 'types'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Badge,
   Button,
   CommandEmpty_Shadcn_,
@@ -17,9 +14,7 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Command_Shadcn_,
-  IconAlertCircle,
   IconChevronDown,
-  IconHexagon,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
