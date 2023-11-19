@@ -100,9 +100,11 @@ const NotificationRow = ({
           </div>
         )}
         <div className="flex items-center gap-x-2">
-          <p className="text-sm max-w-[80%] break-all">{data.title}</p>
-          <p className="text-xs text-foreground-light capitalize-sentence">
-            {daysFromNow > 1 ? formattedInsertedAt : formattedTimeFromNow}
+          <p className="text-sm break-word">
+            {data.title}{' '}
+            <span className="ml-1 text-xs text-foreground-light capitalize-sentence">
+              {daysFromNow > 1 ? formattedInsertedAt : formattedTimeFromNow}
+            </span>
           </p>
         </div>
         {data.message !== undefined && (
