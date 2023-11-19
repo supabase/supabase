@@ -38,7 +38,7 @@ const NotificationRow = ({
 
   const daysFromNow = dayjs().diff(dayjs(notification.inserted_at), 'day')
   const formattedTimeFromNow = dayjs(notification.inserted_at).fromNow()
-  const formattedInsertedAt = dayjs(notification.inserted_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
+  const formattedInsertedAt = dayjs(notification.inserted_at).format('MMM DD, YYYY')
 
   const onButtonAction = (type?: string) => {
     // [Joshen] Implement accordingly - BE team will need to give us a heads up on this
