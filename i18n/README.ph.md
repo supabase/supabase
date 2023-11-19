@@ -72,7 +72,7 @@ Ang aming pamamaraan para sa mga aklatang kliyente ay modular. Bawat sub-aklatan
 
 <table style="table-layout:fixed; white-space: nowrap;">
   <tr>
-    <th>Language"</th>
+    <th>Language</th>
     <th>Kliyente</th>
     <th colspan="5">Feature-Clients (bundled in Supabase client)</th>
   </tr>
