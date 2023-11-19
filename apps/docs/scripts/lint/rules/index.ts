@@ -1,37 +1,120 @@
 import { Content } from 'mdast'
 
-interface LintSuccess {
-  success: true
+export enum ErrorSeverity {
+  Error = 1,
+  Warning,
+  Suggestion,
 }
 
-export type ErrorSeverity = 'suggestion' | 'warning' | 'error'
+interface RelativePosition {
+  lineOffset: number
+  column: number
+}
 
-interface LintError {
+type RelativePositionParams = Partial<RelativePosition> & Pick<RelativePosition, 'column'>
+
+function relPosition(column: number, lineOffset?: number): RelativePosition {
+  return {
+    lineOffset: lineOffset ?? 0,
+    column,
+  }
+}
+
+abstract class LintFix {
+  constructor() {}
+
+  abstract fix(filePath: string, fileContents: string): void
+}
+
+export class FixDelete extends LintFix {
+  start: RelativePosition
+  end: RelativePosition
+
+  constructor({ start, end }: { start: RelativePositionParams; end: RelativePositionParams }) {
+    super()
+    this.start = relPosition(start.column, start.lineOffset)
+    this.end = relPosition(end.column, end.lineOffset)
+  }
+
+  fix(filePath: string, fileContents: string) {}
+}
+
+export class FixInsert extends LintFix {
+  start: RelativePosition
+  text: string
+
+  constructor({ start, text }: { start: RelativePositionParams; text: string }) {
+    super()
+    this.start = relPosition(start.column, start.lineOffset)
+    this.text = text
+  }
+
+  fix(filePath: string, fileContents: string) {}
+}
+
+export class FixReplace extends LintFix {
+  start: RelativePosition
+  end: RelativePosition
+  text: string
+
+  constructor({
+    start,
+    end,
+    text,
+  }: {
+    start: RelativePositionParams
+    end: RelativePositionParams
+    text: string
+  }) {
+    super()
+    this.start = relPosition(start.column, start.lineOffset)
+    this.end = relPosition(end.column, end.lineOffset)
+    this.text = text
+  }
+
+  fix(filePath: string, fileContents: string) {}
+}
+
+export interface LintError {
   error: true
   severity: ErrorSeverity
   message: string
-}
-
-type LintResult = LintSuccess | LintError
-
-type Check = (content: Content) => LintResult
-
-export function success(): LintSuccess {
-  return {
-    success: true,
+  location: {
+    file: string
+    line: number
+    column: number
   }
+  fix?: LintFix
 }
 
-export function error(message: string, severity?: ErrorSeverity): LintError {
+type Check = (content: Content, file: string) => LintError[]
+
+export function error({
+  message,
+  severity = ErrorSeverity.Warning,
+  file,
+  line,
+  column,
+  fix,
+}: {
+  message: string
+  severity?: ErrorSeverity
+  file: string
+  line: number
+  column: number
+  fix?: LintFix
+}): LintError {
   return {
     error: true,
-    severity: severity ?? 'warning',
+    severity: severity ?? ErrorSeverity.Warning,
     message,
+    location: {
+      file,
+      line,
+      column,
+    },
+    ...(fix ? { fix } : {}),
   }
-}
-
-export function isSuccess(result: LintResult): result is LintSuccess {
-  return 'success' in result && result.success
 }
 
 export class LintRule {
@@ -49,7 +132,7 @@ export class LintRule {
     this.nodeTypes = Array.isArray(nodeTypes) ? nodeTypes : [nodeTypes]
   }
 
-  runRule(content: Content) {
-    return this.check(content)
+  runRule(content: Content, file: string) {
+    return this.check(content, file)
   }
 }

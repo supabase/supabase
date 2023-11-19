@@ -6,46 +6,75 @@ import { walk } from '../utils/walk'
 import { extname } from 'path'
 import { Content } from 'mdast'
 import { headingsSentenceCase } from './rules/headings-sentence-case'
-import { admonitionsNoStacking } from './rules/admonitions-no-stacking'
+import { LintError, LintRule, isSuccess } from './rules'
+import { parseArgs } from 'node:util'
 
-type Rule = (content: Content) => void
+const args = parseArgs({
+  options: {
+    fix: {
+      type: 'boolean',
+      short: 'f',
+    },
+  },
+  allowPositionals: true,
+})
 
 interface Rules {
-  byType: Partial<Record<Content['type'], Rule[]>>
+  byType: Partial<Record<Content['type'], LintRule[]>>
 }
 
 const rules: Rules = {
   byType: {
-    heading: [headingsSentenceCase],
-    mdxJsxFlowElement: [admonitionsNoStacking],
+    heading: [headingsSentenceCase()],
   },
+}
+
+interface FileErrors {
+  file: string
+  errors: LintError[]
+}
+
+function main() {
+  console.log(process.argv.slice(2))
+
+  lint()
 }
 
 async function lint() {
   const pages = await walk('pages')
+  const errors: FileErrors[] = []
+
   const result = pages.map(async (page) => {
     if (extname(page.path) !== '.mdx') {
       return
     }
 
     const contents = await readFile(page.path, 'utf8')
+    const localErrors: LintError[] = []
 
     const mdxTree = fromMarkdown(contents, {
       extensions: [mdxjs()],
       mdastExtensions: [mdxFromMarkdown()],
     })
 
-    console.log('File:', page.path)
     mdxTree.children.forEach((child) => {
       if (rules.byType[child.type]) {
         rules.byType[child.type].forEach((rule) => {
-          rule(child)
+          const result = rule.runRule(child, page.path)
+          if (result.length) {
+            localErrors.push(...result)
+          }
         })
       }
     })
+
+    if (localErrors.length) {
+      errors.push({ file: page.path, errors: localErrors })
+    }
   })
 
   await Promise.all(result)
+  console.log(JSON.stringify(errors, null, 2))
 }
 
-lint()
+main()
