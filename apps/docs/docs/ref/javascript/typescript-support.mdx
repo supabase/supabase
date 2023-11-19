@@ -7,7 +7,7 @@ title: TypeScript Support
 
 With TypeScript, `supabase-js` detects things like `not null` constraints and [generated columns](https://www.postgresql.org/docs/current/ddl-generated-columns.html). Nullable columns are typed as `T | null` when you select the column. Generated columns will show a type error when you insert to it.
 
-`supabase-js` also detects relationships between tables. A foreign table with one-to-many relationship is typed as `T[]`. Likewise, a foreign table with many-to-one relationship is typed as `T | null`.
+`supabase-js` also detects relationships between tables. A referenced table with one-to-many relationship is typed as `T[]`. Likewise, a referenced table with many-to-one relationship is typed as `T | null`.
 
 ## Generating types
 
