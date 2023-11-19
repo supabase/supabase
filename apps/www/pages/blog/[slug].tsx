@@ -232,35 +232,35 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
       <DefaultLayout>
         <div
           className="
-            container mx-auto px-8 py-16 sm:px-16
+            container mx-auto px-6 py-4 md:py-8 xl:py-16 sm:px-16
             xl:px-20
           "
         >
           <div className="grid grid-cols-12 gap-4">
-            <div className="col-span-12 mb-2 lg:col-span-2">
+            <div className="hidden col-span-12 xl:block lg:col-span-2">
               {/* Back button */}
-              <p>
-                <Link
-                  href={'/blog'}
-                  className="text-foreground-lighter hover:text-foreground flex cursor-pointer items-center text-sm transition"
-                >
-                  <IconChevronLeft style={{ padding: 0 }} />
-                  Back
-                </Link>
-              </p>
+              <Link
+                href="/blog"
+                className="text-foreground-lighter hover:text-foreground flex cursor-pointer items-center text-sm transition"
+              >
+                <IconChevronLeft style={{ padding: 0 }} />
+                Back
+              </Link>
             </div>
             <div className="col-span-12 lg:col-span-12 xl:col-span-10">
               {/* Title and description */}
-              <div className="mb-16 max-w-5xl space-y-8">
+              <div className="mb-6 lg:mb-12 max-w-5xl space-y-8">
                 <div className="space-y-4">
-                  <p className="text-brand">Blog post</p>
-                  <h1 className="h1">{props.blog.title}</h1>
+                  <Link href="/blog" className="text-brand hidden lg:inline">
+                    Blog
+                  </Link>
+                  <h1 className="text-2xl sm:text-4xl">{props.blog.title}</h1>
                   <div className="text-light flex space-x-3 text-sm">
                     <p>{props.blog.date}</p>
                     <p>•</p>
                     <p>{generateReadingTime(props.blog.source)}</p>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="hidden lg:flex justify-between">
                     <div className="flex-1 flex flex-col gap-3 pt-6 md:flex-row md:gap-0 lg:gap-3">
                       {author.map((author: any, i: number) => {
                         return (
@@ -317,7 +317,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                         ></iframe>
                       ) : (
                         props.blog.thumb && (
-                          <div className="relative mb-8 h-96 w-full overflow-auto rounded-lg border">
+                          <div className="hidden md:block relative mb-8 h-96 w-full overflow-auto rounded-lg border">
                             <Image
                               src={'/images/blog/' + props.blog.thumb}
                               alt={props.blog.title}
