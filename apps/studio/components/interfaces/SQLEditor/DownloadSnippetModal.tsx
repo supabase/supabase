@@ -22,10 +22,13 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
   const [selectedView, setSelectedView] = useState<'CLI' | 'NPM'>('CLI')
 
   return (
-    <Modal size="xlarge" header="Download snippet" hideFooter closable {...props}>
-      <div className="flex flex-col items-start justify-between gap-4 px-6 py-3 mb-4">
-        <p className="text-sm mt-2">
-          You can download this snippet as a local{' '}
+    <Modal
+      hideFooter
+      showCloseButton
+      size="xlarge"
+      header={
+        <p>
+          Download snippet as local{' '}
           <a
             className="text-brand"
             href="https://supabase.com/docs/guides/cli/local-development#database-migrations"
@@ -34,7 +37,7 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
           >
             migration
           </a>{' '}
-          file via the{' '}
+          file via{' '}
           <a
             className="text-brand"
             href="https://supabase.com/docs/guides/cli/getting-started"
@@ -43,14 +46,13 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
           >
             Supabase CLI
           </a>
-          .
         </p>
-        <Separator />
-      </div>
-
+      }
+      {...props}
+    >
       <TabsProvider>
-        <div className="flex flex-col items-start justify-between gap-4 px-6 py-3 relative mb-6">
-          <div className="absolute top-1 right-6">
+        <div className="flex flex-col items-start justify-between gap-4 py-3 relative mb-2">
+          <div className="absolute top-14 right-5">
             <TwoOptionToggle
               width={75}
               options={['CLI', 'NPM']}
@@ -62,13 +64,13 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
             />
           </div>
 
-          <Tabs type="underlined">
-            <Tabs.Panel id="migration" label="Migration">
-              <div className="flex flex-col gap-2 my-2 w-full">
+          <Tabs type="underlined" listClassNames="pl-5">
+            <Tabs.Panel id="migration" label="Migration" className="px-5">
+              <div className="flex flex-col gap-y-1 mb-3 w-full">
                 <h2 className="text-lg">Download as migration</h2>
                 <p className="text-sm text-scale-1000">
                   Use the snippet in a new migration named{' '}
-                  <CodeBlock language="bash">{migrationName}</CodeBlock>:
+                  <code className="text-xs">{migrationName}</code>:
                 </p>
               </div>
 
@@ -90,12 +92,12 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
                 </pre>
               )}
             </Tabs.Panel>
-            <Tabs.Panel id="seed" label="Seed file">
-              <div className="flex flex-col gap-2 my-2 w-full">
+            <Tabs.Panel id="seed" label="Seed file" className="px-5">
+              <div className="flex flex-col gap-y-1 mb-3 w-full">
                 <h2 className="text-lg">Download as seed file</h2>
                 <p className="text-sm text-scale-1000">
                   Alternatively if your query consists of sample data, append the snippet to the end
-                  of <CodeBlock language="bash">supabase/seed.sql</CodeBlock>:
+                  of <code className="text-xs">supabase/seed.sql</code>:
                 </p>
               </div>
               {selectedView === 'CLI' ? (
@@ -114,13 +116,12 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
                 </CodeBlock>
               )}
             </Tabs.Panel>
-
-            <Tabs.Panel id="sql" label="SQL file">
-              <div className="flex flex-col gap-2 my-2 w-full">
+            <Tabs.Panel id="sql" label="SQL file" className="px-5">
+              <div className="flex flex-col gap-y-1 mb-3 w-full">
                 <h2 className="text-lg">Download as SQL file</h2>
                 <p className="text-sm text-scale-1000">
                   You can also download the snippet directly into a new SQL file named{' '}
-                  <CodeBlock language="bash">{`${migrationName}.sql`}</CodeBlock>:
+                  <code className="text-xs">{`${migrationName}.sql`}</code>:
                 </p>
               </div>
 
