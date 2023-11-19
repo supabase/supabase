@@ -666,7 +666,7 @@ let { data: ${resourceId}, error } = await supabase
         },
         {
           key: 'read-foreign-tables',
-          title: 'Read foreign tables',
+          title: 'Read referenced tables',
           bash: `
 curl '${endpoint}/rest/v1/${resourceId}?select=some_column,other_table(foreign_key)' \\
 -H "apikey: ${apikey}" \\

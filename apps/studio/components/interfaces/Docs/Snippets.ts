@@ -293,7 +293,7 @@ let { data: ${resourceId}, error } = await supabase
     },
   }),
   readForeignTables: (resourceId: string, endpoint: string, apiKey: string) => ({
-    title: 'Read foreign tables',
+    title: 'Read referenced tables',
     bash: {
       language: 'bash',
       code: `

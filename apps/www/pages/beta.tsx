@@ -587,7 +587,7 @@ const NewFeaturesAndIntegrations = () => {
                   You can use your database immediately, without an ORM or an API backend. We
                   support GraphQL-like{' '}
                   <a
-                    href="/docs/reference/javascript/select#query-foreign-tables"
+                    href="/docs/reference/javascript/select?example=query-referenced-tables"
                     target="_blank"
                     className="text-brand hover:text-brand"
                   >
