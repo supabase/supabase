@@ -66,7 +66,7 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
 
           <Tabs type="underlined" listClassNames="pl-5">
             <Tabs.Panel id="migration" label="Migration" className="px-5">
-              <div className="flex flex-col gap-y-1 mb-3 w-full">
+              <div className="flex flex-col gap-y-2 mb-3 w-full">
                 <h2 className="text-lg">Download as migration</h2>
                 <p className="text-sm text-scale-1000">
                   Use the snippet in a new migration named{' '}
@@ -93,7 +93,7 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
               )}
             </Tabs.Panel>
             <Tabs.Panel id="seed" label="Seed file" className="px-5">
-              <div className="flex flex-col gap-y-1 mb-3 w-full">
+              <div className="flex flex-col gap-y-2 mb-3 w-full">
                 <h2 className="text-lg">Download as seed file</h2>
                 <p className="text-sm text-scale-1000">
                   Alternatively if your query consists of sample data, append the snippet to the end
@@ -117,7 +117,7 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
               )}
             </Tabs.Panel>
             <Tabs.Panel id="sql" label="SQL file" className="px-5">
-              <div className="flex flex-col gap-y-1 mb-3 w-full">
+              <div className="flex flex-col gap-y-2 mb-3 w-full">
                 <h2 className="text-lg">Download as SQL file</h2>
                 <p className="text-sm text-scale-1000">
                   You can also download the snippet directly into a new SQL file named{' '}
