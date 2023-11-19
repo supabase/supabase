@@ -1,8 +1,7 @@
-import { Badge, IconCode, IconFastForward, IconGlobe, IconRefreshCcw, cn } from 'ui'
+import { Badge, IconCode, IconFastForward, IconGlobe, IconRefreshCcw, ThemeImage, cn } from 'ui'
 import UseCaseExamples from 'data/products/functions/usecase-examples'
 import Solutions from 'data/Solutions'
 import { NextSeo } from 'next-seo'
-import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import 'swiper/swiper.min.css'
@@ -114,24 +113,13 @@ function Database() {
           ]}
           subheader={[subtitle]}
           image={[
-            <div className="header--light block w-full" key="light">
-              <Image
-                src={`${basePath}/images/product/functions/functions-hero.png`}
-                alt="database header"
-                layout="responsive"
-                width="1680"
-                height="1116"
-              />
-            </div>,
-            <div className="header--dark mr-0 w-full dark:block" key="dark">
-              <Image
-                src={`${basePath}/images/product/functions/functions-hero.png`}
-                alt="database header"
-                layout="responsive"
-                width="1680"
-                height="1116"
-              />
-            </div>,
+            <ThemeImage
+              src={`${basePath}/images/product/functions/functions-hero.png`}
+              alt="edge functions header"
+              layout="responsive"
+              width="1680"
+              height="1116"
+            />,
           ]}
           documentation_url={'/docs/guides/functions'}
         />
@@ -151,7 +139,7 @@ function Database() {
 
                     <div>
                       <h3 className="text-foreground text-lg">{item.title}</h3>
-                      <p className="text-light text-sm">{item.description}</p>
+                      <p className="text-foreground-light text-sm">{item.description}</p>
                     </div>
                   </div>
                 )
@@ -186,7 +174,9 @@ function Database() {
                         <div
                           className={cn(
                             'transition-colors ',
-                            active ? ' text-foreground' : ' text-light group-hover:text-foreground'
+                            active
+                              ? ' text-foreground'
+                              : ' text-foreground-light group-hover:text-foreground'
                           )}
                         >
                           {feat.title}
@@ -194,7 +184,9 @@ function Database() {
                         <div
                           className={cn(
                             'text-sm transition-colors ',
-                            active ? ' text-light' : ' text-light group-hover:text-light '
+                            active
+                              ? ' text-foreground-light'
+                              : ' text-foreground-light group-hover:text-foreground-light '
                           )}
                         >
                           {feat.description}
@@ -269,7 +261,7 @@ serve(async (req) => {
               <div className="grid grid-cols-12" key={0}>
                 <div className="col-span-12 mt-0 flex lg:col-span-6 xl:col-span-12 xl:mb-8">
                   <p>
-                    <p className="text-light m-0">Libraries coming soon:</p>
+                    <p className="text-foreground-light m-0">Libraries coming soon:</p>
                   </p>
                   <div className="ml-1 space-x-1">
                     <Badge dot={false}>Python</Badge>

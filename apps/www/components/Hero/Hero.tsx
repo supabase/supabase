@@ -34,7 +34,7 @@ const Hero = () => {
                     <AnnouncementBadge />
                   </div> */}
                   <h1 className="text-foreground text-4xl sm:text-5xl sm:leading-none lg:text-7xl">
-                    <span className="block text-[#F4FFFA00] bg-clip-text bg-gradient-to-b from-scale-1200 to-scale-1200 dark:to-scale-1100">
+                    <span className="block text-[#F4FFFA00] bg-clip-text bg-gradient-to-b from-foreground to-foreground-light">
                       Build in a weekend
                     </span>
                     <span className="text-transparent bg-clip-text bg-gradient-to-br from-[#3ECF8E] via-[#3ECF8E] to-[#3ecfb2] block md:ml-0">
@@ -54,7 +54,6 @@ const Hero = () => {
                       href="https://supabase.com/dashboard"
                       as="https://supabase.com/dashboard"
                       onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_startProject'])}
-                      tabIndex={-1}
                     >
                       Start your project
                     </Link>
@@ -64,7 +63,6 @@ const Hero = () => {
                       href="/docs"
                       as="/docs"
                       onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_documentation'])}
-                      tabIndex={-1}
                     >
                       Documentation
                     </Link>
