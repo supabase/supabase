@@ -238,7 +238,7 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
                       name="allowed_mime_types"
                       layout="vertical"
                       label="Allowed MIME types"
-                      placeholder="e.g image/jpeg, image/png, audio/mpeg, video/mp4, etc"
+                      placeholder="e.g image/jpeg, image/png, image/*, audio/mpeg, video/mp4, video/*, etc"
                       labelOptional="Comma separated values"
                       descriptionText="Leave the field blank to allow any MIME type to be uploaded"
                     />
