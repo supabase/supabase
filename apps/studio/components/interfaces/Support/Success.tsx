@@ -30,7 +30,7 @@ const Success = ({ sentCategory = '' }: SuccessProps) => {
       <div className="flex items-center flex-col space-y-2">
         <h3 className="text-xl">Support request successfully sent!</h3>
         <p className="text-sm text-foreground-light">
-          We will reach out to at <span className="text-foreground">{respondToEmail}</span>
+          We will reach out to you at <span className="text-foreground">{respondToEmail}</span>
         </p>
       </div>
       {categoriesToShowAdditionalResources.includes(sentCategory) && (
