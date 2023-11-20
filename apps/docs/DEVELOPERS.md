@@ -51,7 +51,7 @@ The client libraries are essentially wrappers around the clients for the various
 
 #### Example
 
-Let's look at the `updateUser()` function in the `supabase-js` library.
+Let's look at the [`updateUser()`](https://supabase.com/docs/reference/javascript/auth-updateuser) function in the `supabase-js` library.
 
 #### Common file
 
@@ -60,7 +60,7 @@ Several pieces of information for this function come from a [common file](https:
 1. id — used to identify this function
 2. title - the human-readable title
 3. slug — the url slug
-4. product - the Supabase tool or product that "owns" this function. Since `updateUser()` is an auth function, its product is `auth`
+4. product - the Supabase tool or product that "owns" this function. Since `updateUser()` is an Auth function, its product is `auth`
 5. type — `updateUser()` is a function and marked as such, but we can also have sections of markdown interspersed with these function definitions.
 
 When a new function is added, this info would need to be manually added to the common file.
