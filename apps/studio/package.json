@@ -75,7 +75,7 @@
     "react-beautiful-dnd": "^13.1.0",
     "react-contexify": "^5.0.0",
     "react-csv": "^2.0.3",
-    "react-data-grid": "7.0.0-beta.40",
+    "react-data-grid": "7.0.0-beta.41",
     "react-datepicker": "^4.18.0",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
