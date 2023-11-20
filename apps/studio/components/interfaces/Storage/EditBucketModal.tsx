@@ -240,7 +240,7 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
                       label="Allowed MIME types"
                       placeholder="e.g image/jpeg, image/png, audio/mpeg, video/mp4, etc"
                       labelOptional="Comma separated values"
-                      descriptionText="Leave the field blank to allow any MIME type to be uploaded"
+                      descriptionText="Wildcards are allowed, e.g. image/*. Leave blank to allow any MIME type."
                     />
                   </div>
                 </Collapsible.Content>
