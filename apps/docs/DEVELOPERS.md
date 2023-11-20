@@ -90,7 +90,7 @@ These reference docs are rendered by Next.JS via a dynamic route using a [`[...s
 
 The reference docs for the [Supabase Management API](https://supabase.com/docs/reference/api) and the [Supabase CLI](https://supabase.com/docs/reference/cli) are a little more straightforward than the client libraries. Both files also have a [common file](https://github.com/supabase/supabase/blob/master/spec/common-cli-sections.json) which handles things like `title`, `id` and `slug`. Both also have a spec file detailing things like parameters, descriptions, and responses ([Management API](https://github.com/supabase/supabase/blob/master/spec/api_v0_openapi.json) / [CLI](https://github.com/supabase/supabase/blob/master/spec/cli_v1_commands.yaml))
 
-On the Next.JS side of things, these work almost exactly the same as the client libaries with a dynamic [`[...slug.tsx]`](https://github.com/supabase/supabase/blob/master/apps/docs/pages/reference/cli/%5B...slug%5D.tsx).
+On the Next.JS side of things, these work almost exactly the same as the client libraries with a dynamic [`[...slug.tsx]`](https://github.com/supabase/supabase/blob/master/apps/docs/pages/reference/cli/%5B...slug%5D.tsx).
 
 ### Misc
 
