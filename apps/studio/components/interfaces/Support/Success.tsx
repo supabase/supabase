@@ -4,12 +4,16 @@ import { Button, IconCheck, IconExternalLink, IconMail, IconSearch, Input } from
 
 import Divider from 'components/ui/Divider'
 import { CATEGORY_OPTIONS } from './Support.constants'
+import { useProfile } from 'lib/profile'
 
 interface SuccessProps {
   sentCategory?: string
 }
 
 const Success = ({ sentCategory = '' }: SuccessProps) => {
+  const { profile } = useProfile()
+  const respondToEmail = profile?.primary_email ?? 'your email'
+
   const categoriesToShowAdditionalResources = ['Problem', 'Unresponsive', 'Performance']
 
   const selectedCategory = CATEGORY_OPTIONS.find((option) => option.value === sentCategory)
@@ -26,7 +30,7 @@ const Success = ({ sentCategory = '' }: SuccessProps) => {
       <div className="flex items-center flex-col space-y-2">
         <h3 className="text-xl">Support request successfully sent!</h3>
         <p className="text-sm text-foreground-light">
-          We will reach out to you using your account's email address
+          We will reach out to you at <span className="text-foreground">{respondToEmail}</span>
         </p>
       </div>
       {categoriesToShowAdditionalResources.includes(sentCategory) && (
