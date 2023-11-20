@@ -29,7 +29,6 @@ You will need to install and configure the following dependencies on your machin
 - [Node.js v18.x (LTS)](http://nodejs.org)
 - [npm](https://www.npmjs.com/) version 9.x.x
 - [Docker](https://docs.docker.com/get-docker/) (to run studio locally)
--
 
 ## Local development
 
