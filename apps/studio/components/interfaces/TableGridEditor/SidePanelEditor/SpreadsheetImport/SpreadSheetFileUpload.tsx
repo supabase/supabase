@@ -49,7 +49,7 @@ const SpreadSheetFileUpload = ({
       </div>
       {!uploadedFile ? (
         <div
-          className={`flex h-48 cursor-pointer items-center justify-center rounded-md border border-dashed dark:border-gray-700 ${
+          className={`flex h-48 cursor-pointer items-center justify-center rounded-md border border-dashed border-strong ${
             isDraggedOver ? 'bg-gray-500' : ''
           }`}
           onDragOver={onDragOver}
@@ -62,7 +62,7 @@ const SpreadSheetFileUpload = ({
           </p>
         </div>
       ) : (
-        <div className="flex h-28 flex-col items-center justify-center space-y-2 rounded-md border border-dashed dark:border-gray-700">
+        <div className="flex h-28 flex-col items-center justify-center space-y-2 rounded-md border border-dashed border-strong">
           <div className="flex items-center space-x-2">
             <IconFileText size={14} strokeWidth={1.5} />
             <p className="text-sm text-foreground">{uploadedFile.name}</p>

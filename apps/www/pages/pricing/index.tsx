@@ -182,9 +182,7 @@ export default function IndexPage() {
                 <div
                   key={`row-${plan.name}`}
                   className={[
-                    plan.name === 'Pro'
-                      ? 'bg-brand-600 dark:bg-brand border px-0.5 lg:-mt-8 rounded-[6px]'
-                      : '',
+                    plan.name === 'Pro' ? 'bg-brand border px-0.5 lg:-mt-8 rounded-[6px]' : '',
                   ].join(' ')}
                 >
                   {plan.name === 'Pro' && (
@@ -207,7 +205,7 @@ export default function IndexPage() {
                       <div className="mb-2 flex items-center gap-2">
                         <div className="flex items-center gap-2">
                           <h3
-                            className="text-brand-600 dark:text-brand text-2xl font-normal
+                            className="text-brand-600 text-2xl font-normal
                            uppercase flex items-center gap-4 font-mono"
                           >
                             {plan.name}
@@ -245,7 +243,7 @@ export default function IndexPage() {
 
                               <div className="flex items-end">
                                 <p
-                                  className={`mt-2 gradient-text-500 dark:gradient-text-100 pb-1 ${
+                                  className={`mt-2 gradient-text-500 pb-1 ${
                                     plan.name !== 'Enterprise' ? 'text-5xl' : 'text-4xl'
                                   }`}
                                 >
@@ -339,13 +337,13 @@ export default function IndexPage() {
           <div className="grid lg:grid-cols-3 gap-4 mb-16">
             {addons.map((addon) => (
               <div className="bg-surface-100 border rounded-[4px]" key={addon.name}>
-                <div className="overflow-hidden rounded-lg relative h-56">
+                <div className="overflow-hidden rounded-lg relative h-60">
                   <Image
                     className="w-full"
                     layout="fill"
-                    objectFit="contain"
+                    objectFit="cover"
                     src={`${basePath}/images/pricing/${addon.heroImg}${
-                      resolvedTheme === 'dark' ? '' : '-light'
+                      resolvedTheme?.includes('dark') ? '' : '-light'
                     }.png`}
                     alt=""
                   />
@@ -355,7 +353,7 @@ export default function IndexPage() {
                   <div className="flex items-center gap-2 mt-2">
                     <Image
                       src={`${basePath}/images/pricing/${addon.icon}${
-                        resolvedTheme === 'dark' ? '' : '-light'
+                        resolvedTheme?.includes('dark') ? '' : '-light'
                       }.svg`}
                       className="file:"
                       width={14}
@@ -424,7 +422,7 @@ export default function IndexPage() {
               objectFit="contain"
               className="w-full"
               src={`${basePath}/images/pricing/spend-cap${
-                resolvedTheme === 'dark' ? '' : '-light'
+                resolvedTheme?.includes('dark') ? '' : '-light'
               }.png`}
               alt=""
             />
@@ -688,7 +686,7 @@ export default function IndexPage() {
             <div className="hidden lg:block">
               <table className="h-px w-full table-fixed">
                 <caption className="sr-only">Pricing plan comparison</caption>
-                <thead className="bg-background dark:bg-background sticky top-[62px] z-10">
+                <thead className="bg-background sticky top-[62px] z-10">
                   <tr>
                     <th
                       className="text-foreground w-1/3 px-6 pt-2 pb-2 text-left text-sm font-normal"
@@ -707,7 +705,7 @@ export default function IndexPage() {
                         scope="col"
                         key={plan.name}
                       >
-                        <h3 className="text-brand-600 dark:text-brand text-2xl font-mono font-normal uppercase flex items-center gap-4">
+                        <h3 className="text-brand-600 text-2xl font-mono font-normal uppercase flex items-center gap-4">
                           {plan.name}
                         </h3>
                         <div
@@ -718,26 +716,28 @@ export default function IndexPage() {
                     ))}
                   </tr>
                 </thead>
-                <tr className="descriptions">
-                  <th
-                    className="text-foreground w-1/3 px-6 pt-2 pb-2 text-left text-sm font-normal"
-                    scope="col"
-                  ></th>
-
-                  {plans.map((plan) => (
+                <thead>
+                  <tr className="descriptions">
                     <th
-                      className="text-foreground w-1/4 px-6 pt-2 pb-2 text-left text-sm font-normal"
+                      className="text-foreground w-1/3 px-6 pt-2 pb-2 text-left text-sm font-normal"
                       scope="col"
-                      key={`th-${plan.name}`}
-                    >
-                      <p className="p text-sm border-b border-default pb-4">{plan.description}</p>
-                      <div
-                        className="h-0.25 absolute bottom-0 left-0 w-full"
-                        style={{ height: '1px' }}
-                      ></div>
-                    </th>
-                  ))}
-                </tr>
+                    ></th>
+
+                    {plans.map((plan) => (
+                      <th
+                        className="text-foreground w-1/4 px-6 pt-2 pb-2 text-left text-sm font-normal"
+                        scope="col"
+                        key={`th-${plan.name}`}
+                      >
+                        <p className="p text-sm border-b border-default pb-4">{plan.description}</p>
+                        <div
+                          className="h-0.25 absolute bottom-0 left-0 w-full"
+                          style={{ height: '1px' }}
+                        ></div>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
                 <tbody className="border-default divide-border divide-y">
                   <tr>
                     <th
@@ -912,7 +912,7 @@ export default function IndexPage() {
                 <a
                   target="_blank"
                   href="https://supabase.com/dashboard/support/new"
-                  className="transition text-brand hover:text-brand-600"
+                  className="transition underline text-brand-link hover:text-brand-600"
                 >
                   Open a support ticket
                 </a>{' '}
@@ -923,7 +923,7 @@ export default function IndexPage() {
                 <a
                   target="_blank"
                   href="https://supabase.com/dashboard/support/new"
-                  className="transition text-brand hover:text-brand-600"
+                  className="transition underline text-brand-link hover:text-brand-600"
                 >
                   you can contact the team here
                 </a>

@@ -318,6 +318,10 @@ export const gettingstarted: NavMenuConstant = {
           name: 'Ionic Angular',
           url: '/guides/getting-started/tutorials/with-ionic-angular',
         },
+        {
+          name: 'Swift',
+          url: '/guides/getting-started/tutorials/with-swift',
+        },
       ],
     },
   ],
@@ -490,6 +494,7 @@ export const auth = {
       items: [
         { name: 'Next.js', url: '/guides/auth/quickstarts/nextjs', items: [] },
         { name: 'React', url: '/guides/auth/quickstarts/react', items: [] },
+        { name: 'React Native', url: '/guides/auth/quickstarts/react-native', items: [] },
       ],
     },
     {
@@ -512,9 +517,15 @@ export const auth = {
           items: [...PhoneLoginsItems],
         },
         {
-          name: 'Social Login',
+          name: 'Social Login (OAuth)',
           url: '/guides/auth/social-login',
-          items: [...SocialLoginItems],
+          items: [
+            {
+              name: 'Native Mobile OAuth',
+              url: '/guides/auth/native-mobile-deep-linking',
+            },
+            ...SocialLoginItems,
+          ],
         },
         {
           name: 'Native Mobile Login',
@@ -522,7 +533,7 @@ export const auth = {
           items: [
             ...NativeMobileLoginItems,
             {
-              name: 'Deep Linking',
+              name: 'OAuth Deep Linking',
               url: '/guides/auth/native-mobile-deep-linking',
             },
           ],
@@ -620,8 +631,10 @@ export const database: NavMenuConstant = {
         { name: 'Managing database functions', url: '/guides/database/functions' },
         { name: 'Managing indexes', url: '/guides/database/postgres/indexes' },
         { name: 'Managing database triggers', url: '/guides/database/postgres/triggers' },
+        { name: 'Managing enums', url: '/guides/database/postgres/enums' },
         { name: 'Managing database webhooks', url: '/guides/database/webhooks' },
         { name: 'Using Full Text Search', url: '/guides/database/full-text-search' },
+        { name: 'Importing large datasets', url: '/guides/database/large-datasets' },
       ],
     },
     {
@@ -883,6 +896,10 @@ export const functions: NavMenuConstant = {
       items: [
         { name: 'CORS support for invoking from the browser', url: '/guides/functions/cors' },
         { name: 'Scheduling Functions', url: '/guides/functions/schedule-functions' },
+        {
+          name: 'Sending Push Notifications',
+          url: '/guides/functions/examples/push-notifications',
+        },
         { name: 'Generating OG images ', url: '/guides/functions/examples/og-image' },
         {
           name: 'CAPTCHA support with Cloudflare Turnstile',

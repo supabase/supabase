@@ -29,7 +29,7 @@ const BlogListItem = ({ post }: Props) => {
         <div className="flex flex-col space-y-6">
           <div className="flex flex-col space-y-3">
             <div
-              className={`border-default relative mb-4 h-60 w-full overflow-auto rounded-lg border shadow-sm`}
+              className={`border-default relative mb-4 w-full aspect-[2/1] lg:aspect-[3/2] overflow-auto rounded-lg border shadow-sm`}
             >
               <Image
                 layout="fill"
@@ -41,7 +41,7 @@ const BlogListItem = ({ post }: Props) => {
                     : `/images/blog/${post.thumb}`
                 }
                 objectFit="cover"
-                className="scale-100 transform duration-100 ease-in group-hover:scale-105"
+                className="scale-100 object-cover overflow-hidden transform duration-100 ease-in group-hover:scale-105"
                 alt="case study thumbnail"
               />
             </div>
@@ -63,14 +63,11 @@ const BlogListItem = ({ post }: Props) => {
           <div className="flex items-center -space-x-2">
             {author.map((author: any, i: number) => {
               return (
-                <div
-                  className="relative dark:ring-scale-200 w-10 h-10 rounded-full ring-2 ring-white"
-                  key={i}
-                >
+                <div className="relative ring-background w-10 h-10 rounded-full ring-2" key={i}>
                   {author.author_image_url && (
                     <Image
                       src={author.author_image_url}
-                      className="dark:border-dark rounded-full border w-full h-full"
+                      className="rounded-full border border-default w-full h-full"
                       alt={`${author.author} avatar`}
                       layout="fill"
                     />

@@ -71,10 +71,9 @@ const WrappersDisabledState = () => {
         style={{
           backgroundSize: '45%',
           backgroundPosition: '105% 40%',
-          backgroundImage:
-            resolvedTheme === 'dark'
-              ? `url("${BASE_PATH}/img/wrappers-dark.png")`
-              : `url("${BASE_PATH}/img/wrappers-light.png")`,
+          backgroundImage: resolvedTheme?.includes('dark')
+            ? `url("${BASE_PATH}/img/wrappers-dark.png")`
+            : `url("${BASE_PATH}/img/wrappers-light.png")`,
         }}
       >
         <div className="w-3/5 space-y-8">
