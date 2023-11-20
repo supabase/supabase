@@ -126,6 +126,7 @@ export const Grid = memo(
       }
 
       function onRowDoubleClick(row: any, column: any) {
+        console.log('onRowDoubleClick', { row, column })
         const foreignKey = getColumnForeignKey(column.name)
 
         if (foreignKey) {
