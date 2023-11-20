@@ -23,7 +23,6 @@ import Telemetry from 'lib/telemetry'
 import ConfirmDisableReadOnlyModeModal from './ConfirmDisableReadOnlyModal'
 import ResetDbPassword from './ResetDbPassword'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { IS_PLATFORM } from 'lib/constants'
 
 const DatabaseSettings = () => {
   const router = useRouter()
