@@ -14,7 +14,7 @@ const ProjectUpgradeFailedBanner = () => {
   const { ref } = useParams()
   const showDbUpgrades = useFlag('databaseUpgrades')
   const { data } = useProjectUpgradingStatusQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
-  const { target_version, status, initiated_at, error } = data?.databaseUpgradeStatus ?? {}
+  const { status, initiated_at, error } = data?.databaseUpgradeStatus ?? {}
 
   const key = `supabase-upgrade-${ref}-${initiated_at}`
   const isAcknowledged =
@@ -28,7 +28,7 @@ const ProjectUpgradeFailedBanner = () => {
     .format('DD MMM YYYY HH:mm:ss')
 
   const subject = 'Upgrade%20failed%20for%20project'
-  const message = `Upgrade information:%0A• Initiated at: ${initiated_at}%0A• Target Version: ${target_version}%0A• Error: ${error}`
+  const message = `Upgrade information:%0A• Initiated at: ${initiated_at}%0A• Error: ${error}`
 
   const acknowledgeMessage = () => {
     setShowMessage(false)
@@ -42,7 +42,7 @@ const ProjectUpgradeFailedBanner = () => {
       <Alert
         withIcon
         variant={'warning'}
-        title={`Postgres version upgrade to ${target_version} was not successful (Initiated at ${initiatedAtUTC} UTC)`}
+        title={`Postgres version upgrade was not successful (Initiated at ${initiatedAtUTC} UTC)`}
         actions={
           <div className="flex items-center h-full space-x-4">
             <Button asChild type="default">
