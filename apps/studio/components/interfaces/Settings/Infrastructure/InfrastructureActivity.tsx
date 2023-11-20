@@ -40,7 +40,7 @@ const InfrastructureActivity = () => {
   })
   const isFreePlan = subscription?.plan?.id === 'free'
 
-  const { data: resourceWarnings } = useResourceWarningsQuery({ enabled: IS_PLATFORM })
+  const { data: resourceWarnings } = useResourceWarningsQuery()
   const projectResourceWarnings = resourceWarnings?.find((x) => x.project === projectRef)
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })

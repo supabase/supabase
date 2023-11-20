@@ -18,7 +18,7 @@ import { IS_PLATFORM } from 'lib/constants'
 const ResourceExhaustionWarningBanner = () => {
   const { ref } = useParams()
   const router = useRouter()
-  const { data: resourceWarnings } = useResourceWarningsQuery({ enabled: IS_PLATFORM })
+  const { data: resourceWarnings } = useResourceWarningsQuery()
   const projectResourceWarnings = (resourceWarnings ?? [])?.find(
     (warning) => warning.project === ref
   )

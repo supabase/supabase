@@ -37,7 +37,7 @@ const ProjectList = ({ rewriteHref }: ProjectListProps) => {
     isError: isErrorPermissions,
     error: permissionsError,
   } = usePermissionsQuery()
-  const { data: resourceWarnings } = useResourceWarningsQuery({ enabled: IS_PLATFORM })
+  const { data: resourceWarnings } = useResourceWarningsQuery()
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({ enabled: IS_PLATFORM })
   const projectsByOrg = groupBy(allProjects, 'organization_id')
   const isLoadingPermissions = IS_PLATFORM ? _isLoadingPermissions : false

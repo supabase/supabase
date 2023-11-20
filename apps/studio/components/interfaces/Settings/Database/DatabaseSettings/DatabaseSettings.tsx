@@ -35,7 +35,7 @@ const DatabaseSettings = () => {
 
   const { data, isLoading, isError } = useProjectSettingsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const { data: resourceWarnings } = useResourceWarningsQuery({ enabled: IS_PLATFORM })
+  const { data: resourceWarnings } = useResourceWarningsQuery()
 
   const isReadOnlyMode =
     (resourceWarnings ?? [])?.find((warning) => warning.project === projectRef)
