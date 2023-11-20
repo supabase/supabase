@@ -44,10 +44,10 @@ import {
 import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
+import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import Telemetry from 'lib/telemetry'
-import { wrapWithUserImpersonation } from 'lib/user-impersonation'
+import { getImpersonatedRole } from 'state/role-impersonation-state'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { getImpersonatedUser } from 'state/user-impersonation-state'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
 import AISettingsModal from './AISettingsModal'
@@ -314,7 +314,10 @@ const SQLEditor = () => {
         execute({
           projectRef: project.ref,
           connectionString: project.connectionString,
-          sql: wrapWithUserImpersonation(sql, getImpersonatedUser()),
+          sql: wrapWithRoleImpersonation(sql, {
+            projectRef: project.ref,
+            role: getImpersonatedRole(),
+          }),
         })
       }
     },

@@ -1,7 +1,6 @@
 import { QueryKey, UseQueryOptions } from '@tanstack/react-query'
 import { Filter, Query, Sort, SupaRow, SupaTable } from 'components/grid'
-import { User } from 'data/auth/users-query'
-import { wrapWithUserImpersonation } from 'lib/user-impersonation'
+import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { useCallback } from 'react'
 import {
   ExecuteSqlData,
@@ -18,7 +17,7 @@ type GetTableRowsArgs = {
   sorts?: Sort[]
   limit?: number
   page?: number
-  impersonatedUser?: User | null
+  impersonatedRole?: ImpersonationRole
 }
 
 // [Joshen] From components/grid/services/row/SqlRowService.ts, we should remove the logic from SqlRowService eventually
@@ -139,19 +138,22 @@ export type TableRowsData = TableRows
 export type TableRowsError = unknown
 
 export const useTableRowsQuery = <TData extends TableRowsData = TableRowsData>(
-  { projectRef, connectionString, queryKey, table, impersonatedUser, ...args }: TableRowsVariables,
+  { projectRef, connectionString, queryKey, table, impersonatedRole, ...args }: TableRowsVariables,
   options: UseQueryOptions<ExecuteSqlData, TableRowsError, TData> = {}
 ) =>
   useExecuteSqlQuery(
     {
       projectRef,
       connectionString,
-      sql: wrapWithUserImpersonation(getTableRowsSqlQuery({ table, ...args }), impersonatedUser),
+      sql: wrapWithRoleImpersonation(getTableRowsSqlQuery({ table, ...args }), {
+        projectRef: projectRef ?? 'ref',
+        role: impersonatedRole,
+      }),
       queryKey: [
         ...(queryKey ?? []),
         {
           table: { name: table?.name, schema: table?.schema },
-          impersonatedUserId: impersonatedUser?.id,
+          impersonatedRole,
           ...args,
         },
       ],

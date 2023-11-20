@@ -24,8 +24,8 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useCheckPermissions, useStore, useUrlState } from 'hooks'
+import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { useUserImpersonationStateSnapshot } from 'state/user-impersonation-state'
 import RLSBannerWarning from './RLSBannerWarning'
 import RefreshButton from './RefreshButton'
 import FilterDropdown from './filter'
@@ -127,8 +127,12 @@ const DefaultHeader = ({
           <div className="flex items-center gap-2">
             {canCreateColumns && (
               <DropdownMenu>
-                <DropdownMenuTrigger className="flex">
-                  <Button size="tiny" icon={<IconChevronDown size={14} strokeWidth={1.5} />}>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    type="primary"
+                    size="tiny"
+                    icon={<IconChevronDown size={14} strokeWidth={1.5} />}
+                  >
                     Insert
                   </Button>
                 </DropdownMenuTrigger>
@@ -235,7 +239,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
 
-  const userImpersonationState = useUserImpersonationStateSnapshot()
+  const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
   const [isExporting, setIsExporting] = useState(false)
 
@@ -248,7 +252,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
     filters,
     page: state.page,
     limit: state.rowsPerPage,
-    impersonatedUser: userImpersonationState.user,
+    impersonatedRole: roleImpersonationState.role,
   })
 
   const { data: countData } = useTableRowsCountQuery(
@@ -258,7 +262,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
       connectionString: project?.connectionString,
       table,
       filters,
-      impersonatedUser: userImpersonationState.user,
+      impersonatedRole: roleImpersonationState.role,
     },
     { keepPreviousData: true }
   )

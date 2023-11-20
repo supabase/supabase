@@ -2,17 +2,16 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'react-hot-toast'
 
 import { Query, SupaTable } from 'components/grid'
-import { User } from 'data/auth/users-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
-import { wrapWithUserImpersonation } from 'lib/user-impersonation'
+import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { ResponseError } from 'types'
 
 export type TableRowTruncateVariables = {
   projectRef: string
   connectionString?: string
   table: SupaTable
-  impersonatedUser?: User | null
+  impersonatedRole?: ImpersonationRole
 }
 
 export function getTableRowTruncateSql({ table }: Pick<TableRowTruncateVariables, 'table'>) {
@@ -25,9 +24,12 @@ export async function truncateTableRow({
   projectRef,
   connectionString,
   table,
-  impersonatedUser,
+  impersonatedRole,
 }: TableRowTruncateVariables) {
-  const sql = wrapWithUserImpersonation(getTableRowTruncateSql({ table }), impersonatedUser)
+  const sql = wrapWithRoleImpersonation(getTableRowTruncateSql({ table }), {
+    projectRef,
+    role: impersonatedRole,
+  })
 
   const { result } = await executeSql({ projectRef, connectionString, sql })
 

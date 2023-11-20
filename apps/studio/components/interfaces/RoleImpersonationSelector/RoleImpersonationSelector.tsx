@@ -2,7 +2,7 @@ import { useDebounce } from '@uidotdev/usehooks'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useUsersQuery } from 'data/auth/users-query'
 import { useState } from 'react'
-import { useUserImpersonationStateSnapshot } from 'state/user-impersonation-state'
+import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import {
   Button,
   CommandEmpty_Shadcn_,
@@ -22,8 +22,8 @@ import {
 } from 'ui'
 import { getDisplayName } from '../Auth/Users/UserListItem.utils'
 
-const UserImpersonationSelector = () => {
-  const state = useUserImpersonationStateSnapshot()
+const RoleImpersonationSelector = () => {
+  const state = useRoleImpersonationStateSnapshot()
 
   const [searchStr, setSearchStr] = useState('')
   const debouncedSearchStr = useDebounce(searchStr, 300)
@@ -41,23 +41,23 @@ const UserImpersonationSelector = () => {
 
   const [isOpen, setIsOpen] = useState(false)
 
-  const isImpersonatingUser = state.user !== null
-  const Icon = isImpersonatingUser ? IconUser : IconUserX
+  const isImpersonatingRole = state.role !== undefined
+  const Icon = isImpersonatingRole ? IconUser : IconUserX
 
   return (
     <Popover_Shadcn_ open={isOpen} onOpenChange={setIsOpen} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button size="tiny" type={isImpersonatingUser ? 'warning' : 'outline'}>
+        <Button size="tiny" type={isImpersonatingRole ? 'warning' : 'outline'}>
           <div className="flex items-center gap-2">
             <Icon
-              className={isImpersonatingUser ? 'text-amber-1100' : 'text-foreground-light'}
+              className={isImpersonatingRole ? 'text-amber-1100' : 'text-foreground-light'}
               strokeWidth={2}
               size={12}
             />
-            {state.user
+            {state.role?.type === 'postgrest' && state.role.role === 'authenticated'
               ? `Impersonating ${getDisplayName(
-                  state.user,
-                  state.user.email || state.user.phone || state.user.id || 'Unknown'
+                  state.role.user,
+                  state.role.user.email || state.role.user.phone || state.role.user.id || 'Unknown'
                 )}`
               : 'Impersonate User'}
           </div>
@@ -82,16 +82,18 @@ const UserImpersonationSelector = () => {
                   <CommandItem_Shadcn_
                     className="cursor-pointer flex items-center justify-between gap-2 w-full"
                     onSelect={() => {
-                      state.setUser(null)
+                      state.setRole(undefined)
                       setIsOpen(false)
                     }}
                     onClick={() => {
-                      state.setUser(null)
+                      state.setRole(undefined)
                       setIsOpen(false)
                     }}
                   >
                     <span>Superuser (default)</span>
-                    {state.user === null && <IconCheck className="text-brand" strokeWidth={2} />}
+                    {state.role === undefined && (
+                      <IconCheck className="text-brand" strokeWidth={2} />
+                    )}
                   </CommandItem_Shadcn_>
 
                   <CommandSeparator_Shadcn_ />
@@ -101,20 +103,31 @@ const UserImpersonationSelector = () => {
                       key={user.id}
                       className="cursor-pointer flex items-center justify-between gap-2 w-full"
                       onSelect={() => {
-                        state.setUser(user)
+                        state.setRole({
+                          type: 'postgrest',
+                          role: 'authenticated',
+                          user,
+                        })
                         setIsOpen(false)
                       }}
                       onClick={() => {
-                        state.setUser(user)
+                        state.setRole({
+                          type: 'postgrest',
+                          role: 'authenticated',
+                          user,
+                        })
                         setIsOpen(false)
                       }}
                     >
                       <span>
                         {getDisplayName(user, user.email || user.phone || user.id || 'Unknown')}
                       </span>
-                      {state.user !== null && state.user.id === user.id && (
-                        <IconCheck className="text-brand" strokeWidth={2} />
-                      )}
+                      {state.role?.role !== undefined &&
+                        state.role.type === 'postgrest' &&
+                        state.role.role === 'authenticated' &&
+                        state.role.user.id === user.id && (
+                          <IconCheck className="text-brand" strokeWidth={2} />
+                        )}
                     </CommandItem_Shadcn_>
                   ))}
                 </ScrollArea>
@@ -127,4 +140,4 @@ const UserImpersonationSelector = () => {
   )
 }
 
-export default UserImpersonationSelector
+export default RoleImpersonationSelector
