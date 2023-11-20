@@ -55,7 +55,7 @@ Let's look at the [`updateUser()`](https://supabase.com/docs/reference/javascrip
 
 #### Common file
 
-Several pieces of information for this function come from a [common file](https://github.com/supabase/supabase/blob/master/spec/common-client-libs-sections.json#L548) where we store information shared by all libraries.
+Several pieces of information for this function come from a [common file](https://github.com/supabase/supabase/blob/3d774b3b7bcdcb410e25726d832467584ebea686/spec/common-client-libs-sections.json#L548) where we store information shared by all libraries.
 
 1. id — used to identify this function
 2. title - the human-readable title
