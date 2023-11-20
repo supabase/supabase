@@ -10,6 +10,7 @@ import {
   IconCheck,
   IconLoader,
   IconUser,
+  IconX,
   Listbox,
   Loading,
   Modal,
@@ -229,8 +230,10 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                         {showMfaEnabledColumn && (
                           <Table.td>
                             <div className="flex items-center justify-center">
-                              {x.mfa_enabled && (
+                              {x.mfa_enabled ? (
                                 <IconCheck className="text-brand" strokeWidth={2} />
+                              ) : (
+                                <IconX className="text-foreground-light" strokeWidth={1.5} />
                               )}
                             </div>
                           </Table.td>
