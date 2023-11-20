@@ -142,7 +142,7 @@ export default (isMobile?: boolean) => ({
       {
         icon: 'M11 4C11 3.44772 10.5523 3 10 3V3.66667C10 4.74852 9.64911 5.80119 9 6.66667L7.6 8.53333C7.21053 9.05262 7 9.68422 7 10.3333V15.7639C7 16.1427 7.214 16.489 7.55279 16.6584L7.60263 16.6833C8.01919 16.8916 8.47854 17 8.94427 17H14.3604C14.8371 17 15.2475 16.6635 15.341 16.1961L16.541 10.1961C16.6647 9.57732 16.1914 9 15.5604 9H11V4ZM3.5 10C3.22386 10 3 10.2239 3 10.5V16.5C3 16.7761 3.22386 17 3.5 17C3.77614 17 4 16.7761 4 16.5V10.5C4 10.2239 3.77614 10 3.5 10Z',
         title: 'Next.js Vector Search',
-        description: 'Learn how to build ChatGPT-style doc seach powered by Next.js and OpenAI.',
+        description: 'Learn how to build ChatGPT-style doc search powered by Next.js and OpenAI.',
         cta: {
           label: 'View example',
           link: '/docs/guides/ai/examples/nextjs-vector-search',
