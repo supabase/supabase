@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { SITE_URL, TWEET_TEXT, TWEET_TEXT_GOLDEN } from '~/lib/constants'
-import { Button, IconCheck } from 'ui'
+import { Button, IconLinkedinSolid, IconTwitterX } from 'ui'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import { useParams } from '~/hooks/useParams'
-import TicketForm from './TicketForm'
+import TicketCopy from './TicketCopy'
 
 type Props = {
   username: string
@@ -27,6 +27,8 @@ export default function TicketActions({ username, golden = false }: Props) {
   const params = useParams()
   const sharePage = params.username
   const LW_TABLE = 'lwx_tickets'
+
+  if (sharePage) return null
 
   useEffect(() => {
     setImgReady(false)
@@ -56,46 +58,26 @@ export default function TicketActions({ username, golden = false }: Props) {
   }
 
   return (
-    <div className="grid gap-1 sm:gap-3 grid-cols-1 sm:grid-cols-2">
-      {!sharePage ? (
-        <>
-          {/* <div className="rounded bg-[#E6E8EB] text-background-surface-300 py-1 px-3 border border-[#3e3e3e] text-xs mb-1">
-            <div className="flex items-center justify-center gap-2">
-              <div className="text-background-surface-100">
-                <IconCheckCircle size={10} strokeWidth={1.5} />
-              </div>
-              Connect with GitHub
-            </div>
-          </div> */}
-          <Button
-            onClick={() => handleShare('twitter')}
-            type={userData.sharedOnTwitter ? 'secondary' : 'default'}
-            className="rounded py-1 px-3 border border-[#3e3e3e] text-xs mb-1 transition-all ease-out"
-          >
-            <div className="flex items-center justify-center gap-2">
-              {userData.sharedOnTwitter && (
-                <IconCheck size={10} strokeWidth={2.5} className="text-muted" />
-              )}
-              Share on X
-            </div>
-          </Button>
-          <Button
-            onClick={() => handleShare('linkedin')}
-            type={userData.sharedOnLinkedIn ? 'secondary' : 'default'}
-            className="flex items-center justify-center gap-2 rounded py-1 px-3 border border-[#3e3e3e] text-xs mb-1 transition-all ease-out"
-            icon
-          >
-            <div className="flex items-center justify-center gap-2">
-              {userData.sharedOnLinkedIn && (
-                <IconCheck size={10} strokeWidth={2.5} className="text-muted" />
-              )}
-              Share on Linkedin
-            </div>
-          </Button>
-        </>
-      ) : (
-        !username && <TicketForm />
-      )}
+    <div className="gap-1 flex justify-between items-center">
+      <TicketCopy />
+      <div className="flex gap-1">
+        <Button
+          onClick={() => handleShare('twitter')}
+          type={userData.sharedOnTwitter ? 'secondary' : 'default'}
+          icon={<IconTwitterX className="text-light w-3" />}
+          size="tiny"
+        >
+          Share on X
+        </Button>
+        <Button
+          onClick={() => handleShare('linkedin')}
+          type={userData.sharedOnLinkedIn ? 'secondary' : 'default'}
+          icon={<IconLinkedinSolid className="text-light w-3" />}
+          size="tiny"
+        >
+          Share on Linkedin
+        </Button>
+      </div>
     </div>
   )
 }

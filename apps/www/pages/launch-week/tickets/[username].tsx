@@ -9,14 +9,16 @@ import { useTheme } from 'next-themes'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import TicketContainer from '~/components/LaunchWeek/8/Ticket/TicketContainer'
+import TicketContainer from '~/components/LaunchWeek/X/Ticket/TicketContainer'
 import { SITE_URL } from '~/lib/constants'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
+import supabase from '../../../lib/supabaseMisc'
 
+const LWXTicketContainer = dynamic(() => import('~/components/LaunchWeek/X/Ticket/TicketContainer'))
 const LaunchWeekPrizeSection = dynamic(
-  () => import('~/components/LaunchWeek/8/LaunchWeekPrizeSection')
+  () => import('~/components/LaunchWeek/X/LaunchWeekPrizeSection')
 )
-const TicketBrickWall = dynamic(() => import('~/components/LaunchWeek/8/TicketBrickWall'))
+const TicketBrickWall = dynamic(() => import('~/components/LaunchWeek/X/TicketBrickWall'))
 const CTABanner = dynamic(() => import('~/components/CTABanner'))
 
 interface Props {
@@ -24,12 +26,6 @@ interface Props {
   users: UserData[]
   ogImageUrl: string
 }
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_MISC_USE_URL ?? 'http://localhost:54321',
-  // ANON KEY
-  process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!
-)
 
 export default function UsernamePage({ user, users, ogImageUrl }: Props) {
   const { username, ticketNumber, name } = user
@@ -39,7 +35,6 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
     'Supabase Launch Week X | 11-15 December 2023 | Generate your ticket & win awesome swag.'
   const OG_URL = `${SITE_URL}/tickets/${username}`
 
-  const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const { resolvedTheme, setTheme } = useTheme()
   const [initialDarkMode] = useState(resolvedTheme?.includes('dark'))
@@ -51,13 +46,12 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
   }
 
   useEffect(() => {
-    if (!supabase) {
-      setSupabase(
-        createClient(
-          process.env.NEXT_PUBLIC_MISC_USE_URL!,
-          process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!
-        )
-      )
+    document.body.classList.add('bg-[#020405]')
+
+    return () => {
+      if (document.body.classList.contains('bg-[#020405]')) {
+        document.body.classList.remove('bg-[#020405]')
+      }
     }
   }, [])
 
@@ -93,23 +87,13 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
             <div className="relative">
               <div className="relative z-10">
                 <SectionContainer className="relative z-10 flex flex-col justify-around items-center gap-2 lg:!pb-0 md:gap-4 !px-2 !mx-auto md:min-h-[auto]">
-                  <div className="pt-12 lg:pt-24">
-                    {supabase && (
-                      <TicketContainer
-                        user={user}
-                        referrals={user.referrals ?? 0}
-                        supabase={supabase}
-                        sharePage
-                      />
-                    )}
+                  <div className="w-full min-h-[400px] pt-24 flex items-center">
+                    <LWXTicketContainer supabase={supabase} />
                   </div>
                 </SectionContainer>
               </div>
             </div>
-            <SectionContainer className="">
-              <LaunchWeekPrizeSection />
-            </SectionContainer>
-            {users && <TicketBrickWall users={users.slice(0, 17)} />}
+            {/* {users && <TicketBrickWall users={users.slice(0, 17)} />} */}
           </div>
           <CTABanner className="!bg-[#020405] border-t-0" />
         </DefaultLayout>
@@ -123,19 +107,18 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   let user
 
   // fetch users for the TicketBrickWall
-  const { data: users } = await supabaseAdmin!.from('lw8_tickets_golden').select().limit(17)
+  const { data: users } = await supabase!.from('lwx_tickets_golden').select().limit(17)
 
   fetch(
-    `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lw8-ticket?username=${encodeURIComponent(
+    `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-ticket?username=${encodeURIComponent(
       username ?? ''
     )}`
   ).catch((_) => {})
 
   // fetch a specific user
   if (username) {
-    const { data } = await supabaseAdmin!
-      // .from('lwx_tickets_golden')
-      .from('lwx_tickets')
+    const { data } = await supabase!
+      .from('lwx_tickets_golden')
       .select('name, username, ticketNumber, metadata, golden')
       .eq('username', username)
       .single()
@@ -145,7 +128,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   const BUCKET_FOLDER_VERSION = 'v1'
 
-  const ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw8/og/${
+  const ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lwx/og/${
     user?.golden ? 'golden' : 'regular'
   }/${BUCKET_FOLDER_VERSION}/${username}.png`
 

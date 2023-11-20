@@ -1,4 +1,3 @@
-'use client'
 import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
@@ -19,7 +18,6 @@ import { DEFAULT_TRANSITION, INITIAL_BOTTOM, getAnimation } from '../../lib/anim
 import LWXBackground from '../../components/LaunchWeek/X/LWXBackground'
 
 const LWXTicketContainer = dynamic(() => import('~/components/LaunchWeek/X/Ticket/TicketContainer'))
-// const LWXCountdown = dynamic(() => import('~/components/LaunchWeek/X/Countdown'))
 
 export default function TicketHome() {
   const { query } = useRouter()
@@ -130,17 +128,15 @@ export default function TicketHome() {
                 {ticketState === 'loading' && (
                   <motion.div
                     key="loading"
-                    initial={initial}
+                    initial={exit}
                     animate={animate}
                     exit={exit}
-                    className="w-full flex flex-col items-center gap-6 text-foreground"
+                    className="relative w-full flex flex-col items-center gap-6 text-foreground"
                   >
-                    <div className="w-full min-h-[350px] flex items-center justify-center">
-                      <LWXBackground />
-                    </div>
                     <div className="hidden">
                       <TicketForm />
                     </div>
+                    <LWXBackground className="absolute top-0 left-0 right-0 w-full !min-h-[350px] flex items-center justify-center" />
                   </motion.div>
                 )}
                 {ticketState === 'registration' && (
