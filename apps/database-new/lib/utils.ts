@@ -30,6 +30,9 @@ const constraintDefinitionSchema = z.object({
       contype: z.literal('CONSTR_UNIQUE'),
     }),
     z.object({
+      contype: z.literal('CONSTR_DEFAULT'),
+    }),
+    z.object({
       contype: z.literal('CONSTR_FOREIGN'),
       pktable: z.object({
         relname: z.string(),
