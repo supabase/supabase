@@ -2,7 +2,7 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   id: 'generating-types',
-  title: 'Generating Types',
+  title: 'Generating TypeScript Types',
   description: 'How to generate types for your API and Supabase libraries.',
   subtitle: 'How to generate types for your API and Supabase libraries.',
   tocVideo: '/7CqlTU9aOR4',
@@ -32,22 +32,169 @@ Generate types for your project to produce the `types/supabase.ts` file:
 npx supabase gen types typescript --project-id "$PROJECT_REF" --schema public > types/supabase.ts
 ```
 
-After you have generated your types, you can use them in `src/index.ts`
+These types are generated from your database schema. Given a table `public.movies`, the generated types will look like:
 
-```tsx
-import { NextApiRequest, NextApiResponse } from 'next'
-import { createClient } from '@supabase/supabase-js'
-import { Database } from '../types/supabase'
+```sql
+create table public.movies (
+  id bigint generated always as identity primary key,
+  name text not null,
+  data jsonb null
+);
+```
 
-const supabase = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SECRET_KEY
-)
+```ts ./database.types.ts
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const allOnlineUsers = await supabase.from('users').select('*').eq('status', 'ONLINE')
-  res.status(200).json(allOnlineUsers)
+export interface Database {
+  public: {
+    Tables: {
+      movies: {
+        Row: {
+          // the data expected from .select()
+          id: number
+          name: string
+          data: Json | null
+        }
+        Insert: {
+          // the data to be passed to .insert()
+          id?: never // generated columns must not be supplied
+          name: string // `not null` columns with no default must be supplied
+          data?: Json | null // nullable columns can be omitted
+        }
+        Update: {
+          // the data to be passed to .update()
+          id?: never
+          name?: string // `not null` columns are optional on .update()
+          data?: Json | null
+        }
+      }
+    }
+  }
 }
+```
+
+## Using TypeScript type definitions
+
+You can supply the type definitions to `supabase-js` like so:
+
+```ts ./index.tsx
+import { createClient } from '@supabase/supabase-js'
+import { Database } from './database.types'
+
+const supabase = createClient<Database>(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY)
+```
+
+## Helper types for Tables and Joins
+
+You can use the following helper types to make the generated TypeScript types easier to use.
+
+Sometimes the generated types are not what you expect. For example, a view's column may show up as nullable when you expect it to be `not null`. Using [type-fest](https://github.com/sindresorhus/type-fest), you can override the types like so:
+
+```ts ./database-generated.types.ts
+export type Json = // ...
+
+export interface Database {
+  // ...
+}
+```
+
+```ts ./database.types.ts
+import { MergeDeep } from 'type-fest'
+import { Database as DatabaseGenerated } from './database-generated.types'
+export { Json } from './database-generated.types'
+
+// Override the type for a specific column in a view:
+export type Database = MergeDeep<
+  DatabaseGenerated,
+  {
+    public: {
+      Views: {
+        movies_view: {
+          Row: {
+            // id is a primary key in public.movies, so it must be `not null`
+            id: number
+          }
+        }
+      }
+    }
+  }
+>
+```
+
+You can also override the type of an individual successful response if needed:
+
+```ts
+const { data } = await supabase.from('countries').select().returns<MyType>()
+```
+
+### Type shorthands
+
+It's convenient to have shorthands for your most-used types.
+
+```ts ./database.types.ts
+import { Database } from './database-generated.types.ts'
+export type { Database } from './database-generated.types.ts'
+
+export type Tables<T extends keyof Database['public']['Tables']> =
+  Database['public']['Tables'][T]['Row']
+export type Enums<T extends keyof Database['public']['Enums']> = Database['public']['Enums'][T]
+// etc.
+```
+
+```ts ./index.ts
+import { Database, Tables } from "./database.types.ts";
+
+// Before 😕
+let movie: Database['public']['Tables']['movies']['Row'] = // ...
+
+// After 😍
+let movie: Tables<'movies'>
+```
+
+### Response types for complex queries
+
+`supabase-js` always returns a `data` object (for success), and an `error` object (for unsuccessful requests).
+
+These helper types provide the result types from any query, including nested types for database joins.
+
+Given the following schema with a relation between cities and countries:
+
+```sql
+create table countries (
+  "id" serial primary key,
+  "name" text
+);
+
+create table cities (
+  "id" serial primary key,
+  "name" text,
+  "country_id" int references "countries"
+);
+```
+
+We can get the nested `CountriesWithCities` type like this:
+
+```ts
+import { PostgrestError } from '@supabase/supabase-js'
+
+export type DbResult<T> = T extends PromiseLike<infer U> ? U : never
+export type DbResultOk<T> = T extends PromiseLike<{ data: infer U }> ? Exclude<U, null> : never
+export type DbResultErr = PostgrestError
+```
+
+```ts
+const countriesWithCitiesQuery = supabase.from('countries').select(
+  `
+  id,
+  name,
+  cities ( id, name )
+`
+)
+type CountriesWithCities = DbResultOk<typeof countriesWithCitiesQuery>
+
+const { data, error } = await countriesWithCitiesQuery
+if (error) throw error
+const countriesWithCities: CountriesWithCities = data
 ```
 
 ## Update types automatically with GitHub Actions

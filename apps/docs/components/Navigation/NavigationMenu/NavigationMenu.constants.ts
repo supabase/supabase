@@ -627,6 +627,10 @@ export const database: NavMenuConstant = {
       items: [
         { name: 'Connecting to your database', url: '/guides/database/connecting-to-postgres' },
         { name: 'Managing tables, views, and data', url: '/guides/database/tables' },
+        {
+          name: 'Querying joins and nested tables',
+          url: '/guides/api/joins-and-nesting',
+        },
         { name: 'JSON and unstructured data', url: '/guides/database/json' },
         { name: 'Managing database functions', url: '/guides/database/functions' },
         { name: 'Managing indexes', url: '/guides/database/postgres/indexes' },
@@ -807,7 +811,7 @@ export const api: NavMenuConstant = {
     { name: 'Quickstart', url: '/guides/api/quickstart', items: [] },
     { name: 'Client Libraries', url: '/guides/api/rest/client-libs', items: [] },
     { name: 'Auto-generated Docs', url: '/guides/api/rest/auto-generated-docs', items: [] },
-    { name: 'Generating Types', url: '/guides/api/rest/generating-types', items: [] },
+    { name: 'Generating TypeScript Types', url: '/guides/api/rest/generating-types', items: [] },
     {
       name: 'Guides',
       url: '/guides/api',

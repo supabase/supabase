@@ -9,7 +9,7 @@ With TypeScript, `supabase-js` detects things like `not null` constraints and [g
 
 `supabase-js` also detects relationships between tables. A referenced table with one-to-many relationship is typed as `T[]`. Likewise, a referenced table with many-to-one relationship is typed as `T | null`.
 
-## Generating types
+## Generating TypeScript Types
 
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
@@ -73,7 +73,7 @@ With TypeScript, `supabase-js` detects things like `not null` constraints and [g
   </RefSubLayout.Examples>
 </RefSubLayout.EducationRow>
 
-## Using type definitions
+## Using TypeScript type definitions
 
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
@@ -95,9 +95,9 @@ With TypeScript, `supabase-js` detects things like `not null` constraints and [g
   </RefSubLayout.Examples>
 </RefSubLayout.EducationRow>
 
-## Helper types
+## Helper types for Tables and Joins
 
-You can use the following helper types to make the TypeScript support easier to use.
+You can use the following helper types to make the generated TypeScript types easier to use.
 
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
@@ -119,6 +119,7 @@ You can use the following helper types to make the TypeScript support easier to 
     import { Database as DatabaseGenerated } from './database-generated.types'
     export { Json } from './database-generated.types'
 
+    // Override the type for a specific column in a view:
     export type Database = MergeDeep<
       DatabaseGenerated,
       {
@@ -140,6 +141,21 @@ You can use the following helper types to make the TypeScript support easier to 
 </RefSubLayout.EducationRow>
 
 <RefSubLayout.EducationRow>
+<RefSubLayout.Details>
+
+You can also override the type of an individual successful response if needed:
+
+</RefSubLayout.Details>
+<RefSubLayout.Examples>
+
+```ts
+const { data } = await supabase.from('countries').select().returns<MyType>()
+```
+
+</RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
   <RefSubLayout.Details>
 
     It's convenient to have shorthands for your most-used types.
@@ -147,12 +163,17 @@ You can use the following helper types to make the TypeScript support easier to 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
     ```ts ./database.types.ts
+    import { Database } from "./database-generated.types.ts";
+    export type { Database } from "./database-generated.types.ts";
+
     export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row']
     export type Enums<T extends keyof Database['public']['Enums']> = Database['public']['Enums'][T]
     // etc.
     ```
 
     ```ts ./index.ts
+    import { Database, Tables } from "./database.types.ts";
+
     // Before 😕
     let movie: Database['public']['Tables']['movies']['Row'] = // ...
 
@@ -163,12 +184,29 @@ You can use the following helper types to make the TypeScript support easier to 
   </RefSubLayout.Examples>
 </RefSubLayout.EducationRow>
 
+### Response types for complex queries
+
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
 
     `supabase-js` always returns a `data` object (for success), and an `error` object (for unsuccessful requests).
 
-    These helper types provide the result types from any query:
+    These helper types provide the result types from any query, including nested types for database joins.
+
+    Given the following schema with a relation between cities and countries, we can get the nested `CountriesWithCities` type:
+
+    ```sql
+    create table countries (
+      "id" serial primary key,
+      "name" text
+    );
+
+    create table cities (
+      "id" serial primary key,
+      "name" text,
+      "country_id" int references "countries"
+    );
+    ```
 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
@@ -181,8 +219,18 @@ You can use the following helper types to make the TypeScript support easier to 
     ```
 
     ```ts
-    const query = supabase.from('movies').select(`id, title`)
-    const movies: DbResult<typeof query> = await query
+    const countriesWithCitiesQuery = supabase.from("countries").select(
+      `
+      id,
+      name,
+      cities ( id, name )
+    `
+    );
+    type CountriesWithCities = DbResultOk<typeof countriesWithCitiesQuery>;
+
+    const { data, error } = await countriesWithCitiesQuery;
+    if (error) throw error;
+    const countriesWithCities: CountriesWithCities = data;
     ```
 
   </RefSubLayout.Examples>

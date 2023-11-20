@@ -89,6 +89,52 @@ const { data, error } = await supabase.from('countries').select(`
 `)
 ```
 
+### TypeScript Types for Joins
+
+`supabase-js` always returns a `data` object (for success), and an `error` object (for unsuccessful requests).
+
+These helper types provide the result types from any query, including nested types for database joins.
+
+Given the following schema with a relation between cities and countries:
+
+```sql
+create table countries (
+  "id" serial primary key,
+  "name" text
+);
+
+create table cities (
+  "id" serial primary key,
+  "name" text,
+  "country_id" int references "countries"
+);
+```
+
+We can get the nested `CountriesWithCities` type like this:
+
+```ts
+import { PostgrestError } from '@supabase/supabase-js'
+
+export type DbResult<T> = T extends PromiseLike<infer U> ? U : never
+export type DbResultOk<T> = T extends PromiseLike<{ data: infer U }> ? Exclude<U, null> : never
+export type DbResultErr = PostgrestError
+```
+
+```ts
+const countriesWithCitiesQuery = supabase.from('countries').select(
+  `
+  id,
+  name,
+  cities ( id, name )
+`
+)
+type CountriesWithCities = DbResultOk<typeof countriesWithCitiesQuery>
+
+const { data, error } = await countriesWithCitiesQuery
+if (error) throw error
+const countriesWithCities: CountriesWithCities = data
+```
+
 </TabPanel>
 <TabPanel id="dart" label="Dart">
 
