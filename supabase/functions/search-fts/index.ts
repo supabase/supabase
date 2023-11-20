@@ -33,7 +33,6 @@ Deno.serve(async (req) => {
     if (!supabaseServiceKey) {
       throw new ApplicationError('Missing environment variable SUPABASE_SERVICE_ROLE_KEY')
     }
-    console.log(req)
     const requestData = await req.json()
 
     if (!requestData) {
