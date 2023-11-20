@@ -1,3 +1,4 @@
+'use client'
 import React from 'react'
 import Countdown from 'react-countdown'
 import { CountdownWidget } from 'ui'

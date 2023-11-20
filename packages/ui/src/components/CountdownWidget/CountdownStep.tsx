@@ -1,3 +1,5 @@
+'use client'
+import { useEffect, useState } from 'react'
 import { cn } from '../../lib/utils'
 
 interface CountdownStepProps {
@@ -7,6 +9,14 @@ interface CountdownStepProps {
 }
 
 function CountdownStep({ value, unit, showCard = true }: CountdownStepProps) {
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  if (!isMounted) return null
+
   return (
     <div
       className={cn(

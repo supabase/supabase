@@ -6,19 +6,11 @@ import { Button, IconCheckCircle } from 'ui'
 import { SupabaseClient } from '@supabase/supabase-js'
 
 type FormState = 'default' | 'loading' | 'error'
-type TicketGenerationState = 'default' | 'loading'
 
-type Props = {
-  defaultUsername?: string
-  ticketGenerationState?: TicketGenerationState
-  setTicketGenerationState: any
-}
-
-export default function TicketForm({ defaultUsername = '', setTicketGenerationState }: Props) {
-  const [username, setUsername] = useState(defaultUsername)
+export default function TicketForm() {
   const [formState, setFormState] = useState<FormState>('default')
   const [errorMsg] = useState('')
-  const { supabase, session, setUserData, setPageState, userData } = useConfData()
+  const { supabase, session, setUserData, ticketState, setTicketState, userData } = useConfData()
   const [realtimeChannel, setRealtimeChannel] = useState<ReturnType<
     SupabaseClient['channel']
   > | null>(null)
@@ -28,7 +20,6 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
   async function fetchUser() {
     if (supabase && session?.user && !userData.id) {
       const username = session.user.user_metadata.user_name
-      setUsername(username)
       const name = session.user.user_metadata.full_name
       const email = session.user.email
       await supabase
@@ -44,14 +35,14 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
             return supabase.auth.signOut()
           }
           const { data } = await supabase
-            // .from('lwx_tickets_golden')
-            .from('lwx_tickets')
+            .from('lwx_tickets_golden')
             .select('*')
             .eq('username', username)
             .single()
           if (data) {
             setUserData(data)
           }
+
           setFormState('default')
 
           // Prefetch GitHub avatar
@@ -59,8 +50,6 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
 
           // Prefetch the twitter share URL to eagerly generate the page
           fetch(`/launch-week/x/tickets/${username}`).catch((_) => {})
-
-          setPageState('ticket')
 
           // Listen to realtime changes
           if (!realtimeChannel && !data?.golden) {
@@ -103,28 +92,24 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
 
   async function handleGithubSignIn() {
     if (formState !== 'default') {
-      setTicketGenerationState('default')
       setFormState('default')
       return
     }
 
     setFormState('loading')
-    setTicketGenerationState('loading')
+    setTicketState('loading')
 
     const redirectTo = `${SITE_ORIGIN}/launch-week/${
       userData.username ? '?referral=' + userData.username : ''
     }`
 
-    // TODO: don't refresh page?
-    const response = await supabase?.auth.signInWithOAuth({
+    supabase?.auth.signInWithOAuth({
       provider: 'github',
       options: {
         redirectTo,
         // skipBrowserRedirect: true,
       },
     })
-
-    console.log('supabase.auth.signInWithOAuth response', response)
   }
 
   return formState === 'error' ? (
@@ -134,7 +119,7 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
         type="secondary"
         onClick={() => {
           setFormState('default')
-          setTicketGenerationState('default')
+          setTicketState('registration')
         }}
       >
         Try Again
@@ -143,13 +128,13 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
   ) : (
     <div className="flex flex-col h-full items-center justify-center relative z-20">
       <Button
-        type="secondary"
+        type="alternative"
         disabled={formState === 'loading' || Boolean(session)}
         onClick={handleGithubSignIn}
         iconLeft={session && <IconCheckCircle />}
         loading={formState === 'loading'}
       >
-        Connect with GitHub
+        Claim your ticket
       </Button>
     </div>
   )

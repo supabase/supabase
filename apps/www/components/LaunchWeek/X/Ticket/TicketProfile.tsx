@@ -1,38 +1,24 @@
-import { UserData } from '../../hooks/use-conf-data'
+import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 
-type TicketGenerationState = 'default' | 'loading'
-type Props = {
-  user: UserData
-  ticketGenerationState?: TicketGenerationState
-  setTicketGenerationState?: (ticketGenerationState: TicketGenerationState) => void
-  golden?: boolean
-}
-
-export default function TicketProfile({ user, ticketGenerationState, golden = false }: Props) {
+export default function TicketProfile() {
+  const { userData: user } = useConfData()
   const { username, name, metadata } = user
 
   const HAS_ROLE = !!metadata?.role
   const HAS_COMPANY = !!metadata?.company
-  const HAS_LOCATION = !!metadata?.location
-  const HAS_NO_META = !HAS_ROLE && !HAS_COMPANY && !HAS_LOCATION
+  const HAS_NO_META = !HAS_ROLE && !HAS_COMPANY
 
   return (
-    <div className="relative z-10 flex gap-4 items-center">
-      <div className="text-foreground-light text-center items-center flex flex-col gap-1">
-        <p className="text-xl text-foreground leading-none">{name || username || 'Your Name'}</p>
-        {HAS_NO_META && username && <p>@{username}</p>}
+    <div className="relative z-10 flex gap-4">
+      <div className="text-foreground-light flex flex-col gap-1 text-left text-xl">
+        <p className="text-2xl text-foreground leading-none">{name || username || 'Your Name'}</p>
+        {HAS_NO_META && username && <p className="text-foreground-lighter">@{username}</p>}
         <div>
           {HAS_ROLE && <span>{metadata?.role}</span>}
           {HAS_COMPANY && (
             <span>
               {HAS_ROLE && ' '}
               <span>at</span> {metadata?.company}
-            </span>
-          )}
-          {HAS_LOCATION && (
-            <span>
-              {' '}
-              {(HAS_ROLE || HAS_COMPANY) && '—'} {metadata?.location}
             </span>
           )}
         </div>

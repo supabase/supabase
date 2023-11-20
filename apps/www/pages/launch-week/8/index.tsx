@@ -9,7 +9,7 @@ import { createClient, Session, SupabaseClient } from '@supabase/supabase-js'
 import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
 
 import DefaultLayout from '~/components/Layouts/Default'
-import { PageState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
+import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/8/LaunchWeekLogoHeader'
 import { Meetup } from '~/components/LaunchWeek/8/LW8Meetups'
@@ -64,7 +64,7 @@ export default function TicketHome({ users, meetups }: Props) {
   }
 
   const [userData, setUserData] = useState<UserData>(defaultUserData)
-  const [_, setPageState] = useState<PageState>('ticket')
+  const [ticketState, setTicketState] = useState<TicketState>('ticket')
 
   useEffect(() => {
     if (!supabase) {
@@ -128,7 +128,8 @@ export default function TicketHome({ users, meetups }: Props) {
           session,
           userData,
           setUserData,
-          setPageState,
+          ticketState,
+          setTicketState,
         }}
       >
         <DefaultLayout>

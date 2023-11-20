@@ -1,7 +1,7 @@
 import { Session, SupabaseClient } from '@supabase/supabase-js'
 import { createContext, useContext } from 'react'
 
-export type PageState = 'registration' | 'ticket'
+export type TicketState = 'registration' | 'ticket' | 'loading'
 
 export type UserData = {
   id?: string
@@ -26,7 +26,8 @@ type ConfDataContextType = {
   session: Session | null
   userData: UserData
   setUserData: React.Dispatch<React.SetStateAction<UserData>>
-  setPageState: React.Dispatch<React.SetStateAction<PageState>>
+  ticketState: TicketState
+  setTicketState: React.Dispatch<React.SetStateAction<TicketState>>
 }
 
 export const ConfDataContext = createContext<ConfDataContextType | null>(null)

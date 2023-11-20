@@ -1,3 +1,4 @@
+'use client'
 import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
@@ -8,17 +9,20 @@ import { LWX_DATE, LWX_LAUNCH_DATE, SITE_ORIGIN, SITE_URL } from '~/lib/constant
 import supabase from '~/lib/supabaseMisc'
 
 import DefaultLayout from '~/components/Layouts/Default'
-import { PageState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
+import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import { Button } from 'ui'
+import CountdownComponent from '../../components/LaunchWeek/X/Countdown'
+
+import TicketForm from '../../components/LaunchWeek/X/Ticket/TicketForm'
+import { AnimatePresence, motion } from 'framer-motion'
+import { DEFAULT_TRANSITION, INITIAL_BOTTOM, getAnimation } from '../../lib/animations'
+import LWXBackground from '../../components/LaunchWeek/X/LWXBackground'
 
 const LWXTicketContainer = dynamic(() => import('~/components/LaunchWeek/X/Ticket/TicketContainer'))
-const LWXCountdown = dynamic(() => import('~/components/LaunchWeek/X/Countdown'))
+// const LWXCountdown = dynamic(() => import('~/components/LaunchWeek/X/Countdown'))
 
 export default function TicketHome() {
   const { query } = useRouter()
-
-  console.log('query', query)
 
   const TITLE = 'Supabase Launch Week X'
   const DESCRIPTION = 'Supabase Launch Week X | 11-15 December 2023'
@@ -40,7 +44,7 @@ export default function TicketHome() {
   }
 
   const [userData, setUserData] = useState<UserData>(defaultUserData)
-  const [_, setPageState] = useState<PageState>('ticket')
+  const [ticketState, setTicketState] = useState<TicketState>('loading')
 
   useEffect(() => {
     if (supabase) {
@@ -67,9 +71,21 @@ export default function TicketHome() {
     }
   }, [])
 
-  function handleClaimTicket() {
-    setPageState('registration')
-  }
+  const transition = DEFAULT_TRANSITION
+  const initial = INITIAL_BOTTOM
+  const animate = getAnimation({ duration: 1 })
+  const exit = { opacity: 0, transition: { ...transition, duration: 0.2 } }
+
+  useEffect(() => {
+    console.log(userData)
+    if (session?.user) {
+      if (userData?.id) {
+        return setTicketState('ticket')
+      }
+      return setTicketState('loading')
+    }
+    if (!session) return setTicketState('registration')
+  }, [session, userData])
 
   return (
     <>
@@ -99,28 +115,77 @@ export default function TicketHome() {
           session,
           userData,
           setUserData,
-          setPageState,
+          ticketState,
+          setTicketState,
         }}
       >
         <DefaultLayout>
-          <SectionContainer className="flex flex-col justify-center items-center gap-5 md:gap-10 lg:!h-[calc(100vh-80px)] lg:min-h-[700px] !py-4 md:!py-8 lg:!py-10 text-center">
+          <SectionContainer className="flex flex-col items-center gap-5 md:gap-10 text-center">
             <h1 className="sr-only">Supabase Launch Week X | {LWX_DATE}</h1>
             <div className="flex flex-col items-center gap-6 text-light">
-              <LWXCountdown date={LWX_LAUNCH_DATE} showCard={false} />
+              <CountdownComponent date={LWX_LAUNCH_DATE} showCard={false} />
             </div>
-            <LWXTicketContainer supabase={supabase} user={userData} />
-            <div className="flex flex-col items-center gap-6 text-foreground">
-              <div className="flex flex-col items-center justify-center font-mono uppercase gap-0 leading-0">
-                <span className="text-lg">Supabase Launch Week</span>
-                <span>{LWX_DATE}</span>
-              </div>
-              <p className="text-foreground-lighter">
-                Join us in a week of announcing new features,
-                <br className="hidden md:block" /> and find new ways to level up your development.
-              </p>
-              <Button onClick={handleClaimTicket} type="alternative">
-                Claim your ticket
-              </Button>
+            <div className="relative w-full flex flex-col justify-center items-center gap-5 md:gap-10 text-center">
+              <AnimatePresence exitBeforeEnter>
+                {ticketState === 'loading' && (
+                  <motion.div
+                    key="loading"
+                    initial={initial}
+                    animate={animate}
+                    exit={exit}
+                    className="w-full flex flex-col items-center gap-6 text-foreground"
+                  >
+                    <div className="w-full min-h-[350px] flex items-center justify-center">
+                      <LWXBackground />
+                    </div>
+                    <div className="hidden">
+                      <TicketForm />
+                    </div>
+                  </motion.div>
+                )}
+                {ticketState === 'registration' && (
+                  <motion.div
+                    key="registration"
+                    initial={initial}
+                    animate={animate}
+                    exit={exit}
+                    className="relative w-full flex flex-col items-center gap-6 text-foreground"
+                  >
+                    <div className="w-full min-h-[400px] flex items-center" />
+                    <div className="flex flex-col items-center justify-center font-mono uppercase gap-0 leading-0">
+                      <span className="text-lg">Supabase Launch Week</span>
+                      <span>{LWX_DATE}</span>
+                    </div>
+                    <p className="text-foreground-lighter">
+                      Join us in a week of announcing new features,
+                      <br className="hidden md:block" /> and find new ways to level up your
+                      development.
+                    </p>
+                    {!userData.username && <TicketForm />}
+                    <LWXBackground className="absolute top-0 left-0 right-0 w-full !min-h-[350px] flex items-center justify-center" />
+                  </motion.div>
+                )}
+                {ticketState === 'ticket' && (
+                  <motion.div
+                    key="ticket"
+                    initial={initial}
+                    animate={animate}
+                    exit={exit}
+                    className="w-full flex flex-col items-center gap-6 text-foreground"
+                  >
+                    <div className="w-full min-h-[400px] flex items-center">
+                      <LWXTicketContainer supabase={supabase} />
+                    </div>
+                    <div className="flex flex-col items-center justify-center gap-2 max-w-lg">
+                      <span className="text-lg">Share your ticket & win swag</span>
+                      <span className="text-foreground-lighter">
+                        Boost your chances of winning Supabase LWX limited-edition Keyboard and many
+                        other awards.
+                      </span>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </SectionContainer>
         </DefaultLayout>

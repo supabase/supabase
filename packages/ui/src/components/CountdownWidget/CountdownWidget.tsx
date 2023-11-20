@@ -1,3 +1,4 @@
+'use client'
 import CountdownStep from './CountdownStep'
 
 interface CountdownWidgetProps {

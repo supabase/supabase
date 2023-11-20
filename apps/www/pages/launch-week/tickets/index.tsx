@@ -5,7 +5,6 @@ import Image from 'next/image'
 import { Button } from 'ui'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { createClient } from '@supabase/supabase-js'
 import { debounce } from 'lodash'
 
 import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
@@ -16,17 +15,14 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import CTABanner from '~/components/CTABanner'
 import TicketsGrid from '~/components/LaunchWeek/8/TicketsGrid'
+import supabase from '../../../lib/supabaseMisc'
 
 interface Props {
   users: UserData[]
 }
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_MISC_USE_URL ?? 'http://localhost:54321',
-  process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!
-)
-
 const generateOgs = async (users: UserData[]) => {
+  console.log('generateOgs users', users)
   users?.map(async (user) => {
     const ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lw8-ticket-og?username=${encodeURIComponent(
       user.username ?? ''
@@ -56,12 +52,14 @@ export default function TicketsPage({ users }: Props) {
 
   const loadUsers = async (offset: number) => {
     const from = offset * PAGE_COUNT
-    return await supabaseAdmin!
-      .from('lw8_tickets_golden')
+    return await supabase!
+      .from('lwx_tickets')
       .select('*')
       .range(from, from + PAGE_COUNT - 1)
       .order('createdAt', { ascending: false })
   }
+
+  console.log('users', users)
 
   const loadMoreUsers = async (offset: number) => {
     if (isLast) return
@@ -127,7 +125,7 @@ export default function TicketsPage({ users }: Props) {
                 transition={{ type: 'spring', bounce: 0, delay: 0.2 }}
               >
                 <h2 className="text-4xl">Launch Week X tickets</h2>
-                <p className="text-[#9296AA]">
+                <p className="text-foreground-light">
                   Join us on December 15th for Launch Week X's final day{' '}
                   <br className="hidden md:inline-block" /> and find out if you are one of the lucky
                   winners.
@@ -156,18 +154,19 @@ export default function TicketsPage({ users }: Props) {
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
-  const { data: users } = await supabaseAdmin!
-    .from('lwx_tickets_golden')
+  let { data: lwx_tickets, error } = await supabase
+    .from('lwx_tickets')
     .select('*')
+
     .order('createdAt', { ascending: false })
     .limit(20)
 
   // Generate og images of not present
-  generateOgs(users as any[])
+  generateOgs(lwx_tickets as any[])
 
   return {
     props: {
-      users,
+      users: lwx_tickets,
     },
   }
 }
