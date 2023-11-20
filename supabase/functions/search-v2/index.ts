@@ -1,4 +1,3 @@
-import { serve } from 'https://deno.land/std@0.170.0/http/server.ts'
 import 'https://deno.land/x/xhr@0.2.1/mod.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.8.0'
 import { Configuration, OpenAIApi } from 'https://esm.sh/openai@3.1.0'
@@ -14,7 +13,7 @@ export const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   try {
     // Handle CORS
     if (req.method === 'OPTIONS') {
