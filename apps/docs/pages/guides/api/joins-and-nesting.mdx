@@ -130,8 +130,9 @@ const countriesWithCitiesQuery = supabase.from('countries').select(
 )
 type CountriesWithCities = DbResultOk<typeof countriesWithCitiesQuery>
 
-const { data, error }: { data: CountriesWithCities | null; error: DbResultErr | null } =
-  await countriesWithCitiesQuery
+const { data, error } = await countriesWithCitiesQuery
+if (error) throw error
+const countriesWithCities: CountriesWithCities = data
 ```
 
 </TabPanel>
