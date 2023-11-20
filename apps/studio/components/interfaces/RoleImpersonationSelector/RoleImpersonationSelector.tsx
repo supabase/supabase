@@ -96,6 +96,29 @@ const RoleImpersonationSelector = () => {
                     )}
                   </CommandItem_Shadcn_>
 
+                  <CommandItem_Shadcn_
+                    className="cursor-pointer flex items-center justify-between gap-2 w-full"
+                    onSelect={() => {
+                      state.setRole({
+                        type: 'postgrest',
+                        role: 'anon',
+                      })
+                      setIsOpen(false)
+                    }}
+                    onClick={() => {
+                      state.setRole({
+                        type: 'postgrest',
+                        role: 'anon',
+                      })
+                      setIsOpen(false)
+                    }}
+                  >
+                    <span>Anon</span>
+                    {state.role?.role === 'anon' && (
+                      <IconCheck className="text-brand" strokeWidth={2} />
+                    )}
+                  </CommandItem_Shadcn_>
+
                   <CommandSeparator_Shadcn_ />
 
                   {data.users.map((user) => (
