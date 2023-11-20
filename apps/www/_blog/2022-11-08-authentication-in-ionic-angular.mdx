@@ -820,7 +820,7 @@ We already generated a service in the beginning, and here we can add the logic t
 
 Creating a group requires just a title, and we can gather the user ID from our authentication service to then call the `insert()` function from the Supabase client to create a new record that we then return to the caller.
 
-When we want to get a list of groups, we can use `select()` but since we have a [foreign key that references the users table](https://supabase.com/docs/reference/javascript/select#query-foreign-tables), we need to join that information so instead of just having the `creator` field we end up getting the actual email for that ID instead!
+When we want to get a list of groups, we can use `select()` but since we have a [foreign key that references the users table](https://supabase.com/docs/reference/javascript/select?example=query-referenced-tables), we need to join that information so instead of just having the `creator` field we end up getting the actual email for that ID instead!
 
 Go ahead now and start the **src/app/services/data.service.ts** like this:
 

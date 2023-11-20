@@ -261,7 +261,7 @@ const Wizard: NextPageWithLayout = () => {
           </p>
         </Panel.Content>
         {projectCreationDisabled ? (
-          <Panel.Content className="pb-8 border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
+          <Panel.Content className="pb-8 border-t border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark">
             <DisabledWarningDueToIncident title="Project creation is currently disabled" />
           </Panel.Content>
         ) : (
@@ -269,7 +269,7 @@ const Wizard: NextPageWithLayout = () => {
             <Panel.Content
               className={[
                 'space-y-4 border-t border-b',
-                'border-panel-border-interior-light dark:border-panel-border-interior-dark',
+                'border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark',
               ].join(' ')}
             >
               {(organizations?.length ?? 0) > 0 && (
@@ -300,7 +300,7 @@ const Wizard: NextPageWithLayout = () => {
                 <Panel.Content
                   className={[
                     'border-b',
-                    'border-panel-border-interior-light dark:border-panel-border-interior-dark',
+                    'border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark',
                   ].join(' ')}
                 >
                   <Input
@@ -319,7 +319,7 @@ const Wizard: NextPageWithLayout = () => {
                   <Panel.Content
                     className={[
                       'border-b',
-                      'border-panel-border-interior-light dark:border-panel-border-interior-dark',
+                      'border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark',
                     ].join(' ')}
                   >
                     <Input
@@ -346,7 +346,7 @@ const Wizard: NextPageWithLayout = () => {
                   <Panel.Content
                     className={[
                       'border-b',
-                      'border-panel-border-interior-light dark:border-panel-border-interior-dark',
+                      'border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark',
                     ].join(' ')}
                   >
                     <Listbox
@@ -370,7 +370,7 @@ const Wizard: NextPageWithLayout = () => {
                   </Panel.Content>
                 )}
 
-                <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
+                <Panel.Content className="border-b border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark">
                   <Input
                     id="password"
                     copy={dbPass.length > 0}
@@ -392,7 +392,7 @@ const Wizard: NextPageWithLayout = () => {
                   />
                 </Panel.Content>
 
-                <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
+                <Panel.Content className="border-b border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark">
                   <Listbox
                     layout="horizontal"
                     label="Region"

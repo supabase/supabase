@@ -15,7 +15,7 @@ const BillingLayout = ({ children }: PropsWithChildren<BillingLayoutProps>) => {
     <BaseLayout hideHeader hideIconBar>
       <div className="flex h-full w-full flex-col">
         {/* Header */}
-        <div className="flex items-center space-x-4 border-b py-4 px-5 dark:border-dark">
+        <div className="flex items-center space-x-4 border-b py-4 px-5 border-default">
           <Link
             href={`/org/${selectedOrganization?.slug}/billing`}
             className="text-foreground-lighter transition-colors hover:text-foreground"
