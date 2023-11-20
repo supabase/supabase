@@ -4,6 +4,7 @@ import { get } from 'data/fetchers'
 import { usageKeys } from './keys'
 import { ResponseError } from 'types'
 import { components } from 'data/api'
+import { IS_PLATFORM } from 'common'
 
 export async function getResourceWarnings(signal?: AbortSignal) {
   const { data, error } = await get(`/platform/projects-resource-warnings`, { signal })
@@ -24,7 +25,7 @@ export const useResourceWarningsQuery = <TData = ResourceWarningsData>({
     usageKeys.resourceWarnings(),
     ({ signal }) => getResourceWarnings(signal),
     {
-      enabled,
+      enabled: IS_PLATFORM && enabled,
       staleTime: 1000 * 60 * 30, // default 30 minutes
       ...options,
     }
