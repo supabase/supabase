@@ -338,13 +338,13 @@ const TablesGraph = ({ className, tables }: { className?: string; tables: Postgr
           proOptions={{ hideAttribution: true }}
         >
           <Background gap={16} color={backgroundPatternColor} variant={BackgroundVariant.Lines} />
-          <MiniMap
+          {/* <MiniMap
             pannable
             zoomable
             nodeColor={miniMapNodeColor}
             maskColor={miniMapMaskColor}
             className="border border-scale-600 rounded-md shadow-sm"
-          />
+          /> */}
         </ReactFlow>
       </div>
     </>

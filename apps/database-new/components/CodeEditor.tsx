@@ -1,24 +1,8 @@
-import Editor, { EditorProps, OnMount } from '@monaco-editor/react'
+import Editor, { BeforeMount, EditorProps, OnMount } from '@monaco-editor/react'
 import { merge, noop } from 'lodash'
 import { useRef } from 'react'
 import { format } from 'sql-formatter'
 import { cn } from 'ui'
-
-export const CodeEditor = ({
-  className,
-  content = '',
-}: {
-  className?: string
-  content: string
-}) => {
-  const code = format(content, { language: 'postgresql' })
-
-  return (
-    <div className={cn('flex flex-col h-full', className)}>
-      <Editor2 id="sql-editor" language="pgsql" value={code} className="h-full" />
-    </div>
-  )
-}
 
 interface CodeEditorProps {
   id: string
@@ -34,6 +18,16 @@ interface CodeEditorProps {
   options?: EditorProps['options']
   value?: string
 }
+
+export const CodeEditor = ({ content = '' }: { content: string }) => {
+  const code = format(content, { language: 'postgresql' })
+  return (
+    <div className={cn('max-w-xl w-full border-l', 'flex flex-col h-full')}>
+      <Editor2 id="sql-editor" language="pgsql" value={code} className="h-full" />
+    </div>
+  )
+}
+
 const Editor2 = ({
   id,
   language,
@@ -46,6 +40,21 @@ const Editor2 = ({
   value,
 }: CodeEditorProps) => {
   const editorRef = useRef()
+
+  const beforeMount: BeforeMount = (monaco) => {
+    monaco.editor.defineTheme('supabase', {
+      base: 'vs-dark',
+      inherit: true,
+      rules: [
+        { token: '', background: '1f1f1f' },
+        { token: '', background: '1f1f1f', foreground: 'd4d4d4' },
+        { token: 'string.sql', foreground: '24b47e' },
+        { token: 'comment', foreground: '666666' },
+        { token: 'predefined.sql', foreground: 'D4D4D4' },
+      ],
+      colors: { 'editor.background': '#1f1f1f' },
+    })
+  }
 
   const onMount: OnMount = async (editor) => {
     // Add margin above first line
@@ -90,6 +99,7 @@ const Editor2 = ({
       defaultValue={defaultValue ?? undefined}
       loading={false}
       options={optionsMerged}
+      beforeMount={beforeMount}
       onMount={onMount}
       onChange={onInputChange}
     />

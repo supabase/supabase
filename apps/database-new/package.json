@@ -15,6 +15,7 @@
     "@tanstack/react-query": "^5.7.2",
     "common": "*",
     "config": "*",
+    "dayjs": "^1.11.10",
     "lodash": "^4.17.21",
     "lucide-react": "^0.292.0",
     "next": "^13.5.3",

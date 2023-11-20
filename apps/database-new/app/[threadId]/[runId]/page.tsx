@@ -4,17 +4,19 @@ import { last, sortBy } from 'lodash'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 
-import { Chat } from '@/components/Chat'
+import { Chat } from '@/components/Chat/Chat'
 import { CodeEditor } from '@/components/CodeEditor'
 import { Main } from '@/components/Main'
 import SchemaGraph from '@/components/SchemaGraph'
 import { AssistantMessage, PostgresTable, ReadThreadAPIResult } from '@/lib/types'
 import { parseTables } from '@/lib/utils'
+import Header from '@/components/Header'
 
 export default function ThreadPage({ params }: { params: { threadId: string; runId: string } }) {
   const router = useRouter()
-  const [selectedMessageId, setSelectedMessageId] = useState<string | undefined>(undefined)
   const [tables, setTables] = useState<PostgresTable[]>([])
+  const [selectedMessageId, setSelectedMessageId] = useState<string | undefined>(undefined)
+
   const { data, isSuccess } = useQuery<ReadThreadAPIResult>({
     queryFn: async () => {
       const response = await fetch(`/api/ai/sql/threads/${params.threadId}/read/${params.runId}`, {
@@ -55,20 +57,10 @@ export default function ThreadPage({ params }: { params: { threadId: string; run
     },
   })
 
-  let messages = useMemo(() => {
-    if (isSuccess) {
-      return sortBy(data.messages, (m) => m.created_at)
-    }
+  const messages = useMemo(() => {
+    if (isSuccess) return sortBy(data.messages, (m) => m.created_at)
     return []
   }, [data?.messages, isSuccess])
-
-  // whenever the messages change (due to fetching), select the latest message
-  useEffect(() => {
-    const l = last(messages.filter((m) => m.role === 'assistant'))
-    if (l) {
-      setSelectedMessageId(l?.id)
-    }
-  }, [messages])
 
   const selectedMessage = useMemo(
     () => messages.find((m) => m.id === selectedMessageId) as AssistantMessage | undefined,
@@ -84,9 +76,17 @@ export default function ThreadPage({ params }: { params: { threadId: string; run
     parseTables(content).then((t) => setTables(t))
   }, [content])
 
+  // whenever the messages change (due to fetching), select the latest message
+  useEffect(() => {
+    const l = last(messages.filter((m) => m.role === 'assistant'))
+    if (l) {
+      setSelectedMessageId(l?.id)
+    }
+  }, [messages])
+
   return (
     <Main>
-      <div className="h-16 bg-background border">database.new</div>
+      <Header />
       <div className="flex flex-row items-center justify-between bg-alternative h-full">
         <Chat
           messages={messages}
@@ -94,10 +94,9 @@ export default function ThreadPage({ params }: { params: { threadId: string; run
           selected={selectedMessageId}
           onSubmit={(str) => mutate(str)}
           onSelect={(id) => setSelectedMessageId(id)}
-          className="min-w-[500px]"
         />
         <SchemaGraph tables={tables} className="grow" />
-        <CodeEditor content={content} className="max-w-2xl w-full" />
+        <CodeEditor content={content} />
       </div>
     </Main>
   )
