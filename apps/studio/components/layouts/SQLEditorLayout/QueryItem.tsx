@@ -158,8 +158,6 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
     setDeleteModalOpen(true)
   }
 
-  const onClickDownloadMigration = () => {}
-
   const onConfirmShare = async () => {
     if (id) {
       try {
