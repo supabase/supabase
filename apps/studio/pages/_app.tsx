@@ -55,7 +55,7 @@ import { ProfileProvider } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
 import { RootStore } from 'stores'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
-import { AppPropsWithLayout } from 'types'
+import { AppPropsWithLayout, Project } from 'types'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -92,9 +92,9 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const [supabase] = useState(() =>
     IS_PLATFORM
       ? createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL as string,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
-        )
+        process.env.NEXT_PUBLIC_SUPABASE_URL as string,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
+      )
       : undefined
   )
 
@@ -141,6 +141,12 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    if (!IS_PLATFORM) {
+      rootStore.setProject({ ref: 'default' } as Project)
+    }
+  }, [rootStore])
 
   useThemeSandbox()
 
