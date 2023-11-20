@@ -3,7 +3,7 @@ import { ComponentType, useEffect } from 'react'
 
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useAuthenticatorAssuranceLevelQuery } from 'data/profile/mfa-authenticator-assurance-level-query'
-import { useSelectedProject, useStore } from 'hooks'
+import { useStore } from 'hooks'
 import { useAuth } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
 import { NextPageWithLayout, isNextPageWithLayout } from 'types'
@@ -73,13 +73,6 @@ export function withAuth<T>(
         router.push(`/sign-in?${searchParams.toString()}`)
       }
     }, [session, isLoading, router, aalData, isFinishedLoading, isLoggedIn])
-
-    const selectedProject = useSelectedProject()
-    useEffect(() => {
-      if (selectedProject) {
-        rootStore.setProject(selectedProject)
-      }
-    }, [selectedProject])
 
     const InnerComponent = WrappedComponent as any
 

@@ -4,6 +4,7 @@ import toast from 'react-hot-toast'
 
 import SparkBar from 'components/ui/SparkBar'
 import { IRootStore } from 'stores'
+import { useSelectedProject } from './useSelectedProject'
 
 const StoreContext = createContext<IRootStore>(undefined!)
 
@@ -21,6 +22,13 @@ interface StoreProvider {
 }
 export const StoreProvider = ({ children, rootStore }: PropsWithChildren<StoreProvider>) => {
   const { ui } = rootStore
+
+  const selectedProject = useSelectedProject()
+  useEffect(() => {
+    if (selectedProject) {
+      rootStore.setProject(selectedProject)
+    }
+  }, [selectedProject])
 
   useEffect(() => {
     autorun(() => {
