@@ -2,11 +2,10 @@
 // https://deno.land/manual/getting_started/setup_your_environment
 // This enables autocomplete, go to definition, etc.
 
-import { serve } from 'std/server'
 import { Pool } from 'postgres'
 import {
-  Kysely,
   Generated,
+  Kysely,
   PostgresAdapter,
   PostgresIntrospector,
   PostgresQueryCompiler,
@@ -59,7 +58,7 @@ const db = new Kysely<Database>({
   },
 })
 
-serve(async (_req) => {
+Deno.serve(async (_req) => {
   try {
     // Run a query
     const animals = await db.selectFrom('animals').select(['id', 'animal', 'created_at']).execute()

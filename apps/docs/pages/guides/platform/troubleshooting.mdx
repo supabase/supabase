@@ -26,7 +26,7 @@ You can view the resource utilization of your Supabase Project using the [report
 
 Some common solutions for this issue are:
 
-- [Upgrading](https://supabase.com/dashboard/project/_/settings/billing/subscription) to a [larger compute add-on](../platform/compute-add-ons) in order to serve higher volumes of traffic.
+- [Upgrading](https://supabase.com/dashboard/project/_/settings/addons?panel=computeInstance) to a [larger compute add-on](../platform/compute-add-ons) in order to serve higher volumes of traffic.
 - [Optimizing the queries](../platform/performance#examining-query-performance) being executed.
 - [Using fewer Postgres connections](../platform/performance#configuring-clients-to-use-fewer-connections) can reduce the amount of resources needed on the project.
 - [Restarting](https://supabase.com/dashboard/project/_/settings/general) the database. This only temporarily solves the issue by terminating any ongoing workloads that might be tying up your compute resources.
@@ -43,7 +43,7 @@ Errors about too many open connections can be _temporarily_ resolved by [restart
 
 - If you're receiving a `No more connections allowed (max_client_conn)` error:
   - Configure your applications and services to [use fewer connections](../platform/performance#configuring-clients-to-use-fewer-connections).
-  - [Upgrade](https://supabase.com/dashboard/project/_/settings/billing/subscription) to a [larger compute add-on](../platform/compute-add-ons) to increase the number of available connections.
+  - [Upgrade](https://supabase.com/dashboard/project/_/settings/addons?panel=computeInstance) to a [larger compute add-on](../platform/compute-add-ons) to increase the number of available connections.
 - If you're receiving a `sorry, too many clients already` or `remaining connection slots are reserved for non-replication superuser connections` error message in addition to the above suggestions, switch to using the [connection pooler](/docs/guides/database/connecting-to-postgres#connection-pool) instead.
 
 ### Connection refused

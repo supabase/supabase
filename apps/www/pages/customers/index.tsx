@@ -1,12 +1,11 @@
 import fs from 'fs'
-import { useEffect, useState } from 'react'
 
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 
 import { NextSeo } from 'next-seo'
 import { generateRss } from '~/lib/rss'
-import { getSortedPosts, getAllCategories } from '~/lib/posts'
+import { getSortedPosts } from '~/lib/posts'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import PostTypes from '~/types/post'
@@ -16,8 +15,7 @@ import Link from 'next/link'
 import { GlassPanel } from 'ui'
 
 export async function getStaticProps() {
-  const allPostsData = getSortedPosts('_customers')
-  const categories = getAllCategories('_customers')
+  const allPostsData = getSortedPosts({ directory: '_customers' })
   const rss = generateRss(allPostsData)
 
   // create a rss feed in public directory
@@ -27,14 +25,11 @@ export async function getStaticProps() {
   return {
     props: {
       blogs: allPostsData,
-      categories,
     },
   }
 }
 
 function CustomerStoriesPage(props: any) {
-  const [category, setCategory] = useState('all')
-  const [blogs, setBlogs] = useState(props.blogs)
   const { basePath } = useRouter()
 
   const meta = {
@@ -44,19 +39,7 @@ function CustomerStoriesPage(props: any) {
       'See how Supabase empowers companies of all sizes to accelerate their growth and streamline their work.',
   }
 
-  useEffect(() => {
-    // Update the document title using the browser API
-    setBlogs(
-      category === 'all'
-        ? props.blogs
-        : props.blogs.filter((post: any) => {
-            const found = post.tags?.includes(category)
-            return found
-          })
-    )
-  }, [category])
-
-  const caseStudyThumbs = blogs.map((blog: PostTypes, idx: number) => {
+  const caseStudyThumbs = props.blogs?.map((blog: PostTypes, idx: number) => {
     return {
       logo: blog.logo,
       logoInverse: blog.logo_inverse,
@@ -94,7 +77,7 @@ function CustomerStoriesPage(props: any) {
         }}
       />
       <DefaultLayout>
-        <div className="relative z-0 dark:bg-scale-200 bg-scale-200 overflow-hidden">
+        <div className="relative z-0 bg-background overflow-hidden">
           <div className="container mx-auto mt-44 px-8 sm:px-4 xl:px-20">
             <div className="mx-auto relative z-10">
               <motion.div
@@ -102,15 +85,15 @@ function CustomerStoriesPage(props: any) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0, transition: { duration: 0.5, easing: 'easeOut' } }}
               >
-                <h1 className="text-scale-1200 mb-3 text-3xl">Customer stories</h1>
-                <h2 className="text-scale-1100 text-xl">
+                <h1 className="text-foreground mb-3 text-3xl">Customer stories</h1>
+                <h2 className="text-foreground-light text-xl">
                   Discover case studies on how Supabase is being used around the world to quickly
                   create outstanding products and set new industry standards.
                 </h2>
               </motion.div>
               <div className="mx-auto my-12 md:my-20 grid grid-cols-12 gap-6 not-prose">
                 {caseStudyThumbs.map((caseStudy: any, i: number) => (
-                  <Link href={`${caseStudy.link}`} key={caseStudy.title} passHref>
+                  <Link href={`${caseStudy.link}`} key={caseStudy.title} passHref legacyBehavior>
                     <motion.a
                       className="col-span-12 md:col-span-4"
                       initial={{ opacity: 0, y: 20 }}
@@ -140,7 +123,7 @@ function CustomerStoriesPage(props: any) {
             </div>
             <div
               className={[
-                'absolute inset-0 h-[300px] dark:bg-scale-200 bg-bg-scale-200 z-0 after:!bg-scale-200',
+                'absolute inset-0 h-[300px] bg-background z-0 after:!bg-background',
                 styles['bg-visual'],
               ].join(' ')}
             />

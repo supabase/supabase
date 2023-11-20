@@ -63,7 +63,9 @@ function Toggle({
   }, [])
 
   function handleBlurEvent(e: React.FocusEvent<HTMLButtonElement>) {
-    if (handleBlur) handleBlur(e)
+    setTimeout(() => {
+      if (handleBlur) handleBlur(e)
+    }, 100)
     if (onBlur) onBlur(e)
   }
 

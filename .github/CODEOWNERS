@@ -1,5 +1,7 @@
-/studio/ @supabase/frontend
-/apps/www/ @supabase/frontend
-/apps/docs/ @supabase/docs
-/spec/ @supabase/docs
+/packages/shared-data/pricing.ts @roryw10 @kevcodez
+/packages/shared-data/plans.ts @roryw10 @kevcodez
+
+/apps/docs/pages/ @supabase/developers
+/apps/studio/ @supabase/Dashboard
+/apps/www/ @supabase/Website
 /docker/ @supabase/cli

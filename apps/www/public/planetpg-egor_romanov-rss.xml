@@ -18,7 +18,7 @@
   <guid>https://supabase.com/blog/pgvector-performance</guid>
   <title>pgvector 0.4.0 performance</title>
   <link>https://supabase.com/blog/pgvector-performance</link>
-  <description>There&apos;s been lot of talk about pgvector performance lately, so we took some datasets and pushed pgvector to the limits to find out its strengths and limitations.</description>
+  <description>There&apos;s been a lot of talk about pgvector performance lately, so we took some datasets and pushed pgvector to the limits to find out its strengths and limitations.</description>
   <pubDate>Wed, 12 Jul 2023 22:00:00 GMT</pubDate>
 </item>
 

@@ -64,7 +64,7 @@ export async function fetchSources() {
     'swift-lib',
     '/reference/swift',
     { title: 'Swift Reference' },
-    '../../spec/supabase_swift_v0.yml',
+    '../../spec/supabase_swift_v1.yml',
     '../../spec/common-client-libs-sections.json'
   )
 
@@ -72,7 +72,7 @@ export async function fetchSources() {
     'kt-lib',
     '/reference/kotlin',
     { title: 'Kotlin Reference' },
-    '../../spec/supabase_kt_v0.yml',
+    '../../spec/supabase_kt_v1.yml',
     '../../spec/common-client-libs-sections.json'
   )
 

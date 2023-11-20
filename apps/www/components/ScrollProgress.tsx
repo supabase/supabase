@@ -11,6 +11,7 @@ const ScrollProgress = () => {
   const handleScroll = () => {
     if (typeof document === 'undefined') return null
     const article = document?.querySelector('article')
+    if (!article) return null
     const { top, height } = (article as any)?.getBoundingClientRect()
     let scrollDistance = -top
     let progressPercentage =

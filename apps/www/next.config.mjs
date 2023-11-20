@@ -7,8 +7,6 @@ import rehypeSlug from 'rehype-slug'
 import rewrites from './lib/rewrites.js'
 import redirects from './lib/redirects.js'
 
-import withTM from 'next-transpile-modules'
-
 import { remarkCodeHike } from '@code-hike/mdx'
 import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 
@@ -36,27 +34,32 @@ const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 })
 
+/**
+ * @type {import('next').NextConfig}
+ */
 const nextConfig = {
   basePath: '',
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
   trailingSlash: false,
+  transpilePackages: ['ui', 'common', 'shared-data'],
   images: {
     dangerouslyAllowSVG: true,
     domains: [
-      'avatars.githubusercontent.com',
-      'github.com',
-      'ca.slack-edge.com',
-      'res.cloudinary.com',
-      'images.unsplash.com',
-      'supabase.com',
-      'obuldanrptloktxcffvn.supabase.co',
-      'avatars.githubusercontent.com',
-      'colab.research.google.com',
       'api.producthunt.com',
+      'avatars.githubusercontent.com',
+      'ca.slack-edge.com',
+      'colab.research.google.com',
+      'github.com',
       'https://s3-us-west-2.amazonaws.com',
-      's3-us-west-2.amazonaws.com',
-      'user-images.githubusercontent.com',
+      'images.unsplash.com',
+      'img.youtube.com',
+      'vercel.com',
+      'obuldanrptloktxcffvn.supabase.co',
       'pbs.twimg.com',
+      'res.cloudinary.com',
+      's3-us-west-2.amazonaws.com',
+      'supabase.com',
+      'user-images.githubusercontent.com',
     ],
   },
   async headers() {
@@ -90,6 +93,6 @@ const nextConfig = {
 
 // next.config.js.
 export default () => {
-  const plugins = [withMDX, withBundleAnalyzer, withTM(['ui', 'common', 'shared-data'])]
+  const plugins = [withMDX, withBundleAnalyzer]
   return plugins.reduce((acc, next) => next(acc), nextConfig)
 }
