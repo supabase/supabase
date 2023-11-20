@@ -121,7 +121,7 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
               )}
             </Tabs.Panel>
             <p className="text-xs text-lighter mt-4 text-right mr-6 mb-4">
-              * Run from your local <code>/supabase</code> directory
+              * Run this command from your project directory
             </p>
           </Tabs>
           <Separator className="mt-4" />
