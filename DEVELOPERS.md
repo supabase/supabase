@@ -102,15 +102,15 @@ For example:
 
 - `npm install react -w common`: installs into `./packages/common`
 - `npm install react -w www`: installs into `./apps/www`
-- `npm install react -w studio`: installs into `./studio`
+- `npm install react -w studio`: installs into `./apps/studio`
 
 You do not need to install `devDependencies` in each workspace. These can all be installed in the root package.
 
 ---
 
-## Running Docker
+## Running Docker for Supabase Studio
 
-To run Studio locally, you'll need to setup Docker.
+To run Studio locally, you'll need to setup Docker in addition to your NextJS frontend.
 
 #### Prerequsites
 
@@ -136,7 +136,7 @@ First, make sure you have the Docker installed on your device. You can download 
    docker compose up
    ```
 
-This command initializes the containers specified in the docker-compose.yml file. It might take a few moments to complete, depending on your computer and internet connection.
+This command initializes the containers specified in the `docker-compose.yml` file. It might take a few moments to complete, depending on your computer and internet connection.
 
 Once the `docker compose up` process completes, you should have your local version of Supabase up and running within Docker containers. You can access it at `http://localhost:8082`.
 
