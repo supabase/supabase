@@ -1,4 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+
+import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
 import {
@@ -17,7 +19,6 @@ import {
 } from 'ui'
 import { boolean, number, object, string } from 'yup'
 
-import { useParams } from 'common'
 import {
   FormActions,
   FormHeader,
@@ -26,9 +27,11 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from 'components/ui/Forms'
+import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 
 const schema = object({
   DISABLE_SIGNUP: boolean().required(),
@@ -44,7 +47,19 @@ const schema = object({
       .oneOf(['hcaptcha', 'turnstile'])
       .required('Captcha provider must be either hcaptcha or turnstile'),
   }),
+  SESSIONS_TIMEBOX: number().min(0, 'Must be a positive number'),
+  SESSIONS_INACTIVITY_TIMEOUT: number().min(0, 'Must be a positive number'),
 })
+
+function HoursOrNeverText({ value }: { value: number }) {
+  if (value === 0) {
+    return 'never'
+  } else if (value === 1) {
+    return 'hour'
+  } else {
+    return 'hours'
+  }
+}
 
 const BasicAuthSettingsForm = observer(() => {
   const { ui } = useStore()
@@ -62,12 +77,21 @@ const BasicAuthSettingsForm = observer(() => {
   const [hidden, setHidden] = useState(true)
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
+  const organization = useSelectedOrganization()
+  const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery({
+    orgSlug: organization!.slug,
+  })
+
+  const isProPlanAndUp = isSuccessSubscription && subscription?.plan?.id !== 'free'
+
   const INITIAL_VALUES = {
     DISABLE_SIGNUP: !authConfig?.DISABLE_SIGNUP,
     SITE_URL: authConfig?.SITE_URL,
     SECURITY_CAPTCHA_ENABLED: authConfig?.SECURITY_CAPTCHA_ENABLED || false,
     SECURITY_CAPTCHA_SECRET: authConfig?.SECURITY_CAPTCHA_SECRET || '',
     SECURITY_CAPTCHA_PROVIDER: authConfig?.SECURITY_CAPTCHA_PROVIDER || 'hcaptcha',
+    SESSIONS_TIMEBOX: authConfig?.SESSIONS_TIMEBOX || 0,
+    SESSIONS_INACTIVITY_TIMEOUT: authConfig?.SESSIONS_INACTIVITY_TIMEOUT || 0,
   }
 
   const onSubmit = (values: any, { resetForm }: any) => {
@@ -152,6 +176,45 @@ const BasicAuthSettingsForm = observer(() => {
                 </FormSectionContent>
               </FormSection>
               <div className="border-t border-muted"></div>
+              <FormSection header={<FormSectionLabel>User Sessions</FormSectionLabel>}>
+                <FormSectionContent loading={isLoading}>
+                  {isProPlanAndUp ? (
+                    <></>
+                  ) : (
+                    <UpgradeToPro
+                      primaryText="Upgrade to Pro"
+                      secondaryText="Configuring user sessions requires the Pro plan."
+                      projectRef={projectRef!}
+                      organizationSlug={organization!.slug}
+                    />
+                  )}
+                  <InputNumber
+                    id="SESSIONS_TIMEBOX"
+                    size="small"
+                    label="Time-box user sessions"
+                    descriptionText="How long before a user is forced to log in again, use 0 for never"
+                    actions={
+                      <span className="mr-3 text-foreground-lighter">
+                        <HoursOrNeverText value={values.SESSIONS_TIMEBOX} />
+                      </span>
+                    }
+                    disabled={!canUpdateConfig || !isProPlanAndUp}
+                  />
+                  <InputNumber
+                    id="SESSIONS_INACTIVITY_TIMEOUT"
+                    size="small"
+                    label="Inactivity timeout"
+                    descriptionText="How long users need to be inactive to be forced to log in again, use 0 for never"
+                    actions={
+                      <span className="mr-3 text-foreground-lighter">
+                        <HoursOrNeverText value={values.SESSIONS_INACTIVITY_TIMEOUT} />
+                      </span>
+                    }
+                    disabled={!canUpdateConfig || !isProPlanAndUp}
+                  />
+                </FormSectionContent>
+              </FormSection>
+              <div className="border-t border-scale-400"></div>
               <FormSection header={<FormSectionLabel>Bot and Abuse Protection</FormSectionLabel>}>
                 <FormSectionContent loading={isLoading}>
                   <Toggle

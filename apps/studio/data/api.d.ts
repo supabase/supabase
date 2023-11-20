@@ -13,10 +13,6 @@ type OneOf<T extends any[]> = T extends [infer Only]
   : never
 
 export interface paths {
-  '/platform/login': {
-    /** Redirects to dashboard homepage */
-    get: operations['LoginController_redirectToDashboardHomepage']
-  }
   '/platform/notifications': {
     /** Get notifications */
     get: operations['NotificationsController_getNotificationsV2']
@@ -547,7 +543,15 @@ export interface paths {
   }
   '/platform/projects/{ref}/analytics/endpoints/functions.inv-stats': {
     /** Gets a project's function invocation statistics */
-    get: operations['FunctionLogsController_getStatus']
+    get: operations['FunctionInvocationLogsController_getStatus']
+  }
+  '/platform/projects/{ref}/analytics/endpoints/functions.req-stats': {
+    /** Gets a project's function request statistics */
+    get: operations['FunctionRequestLogsController_getStatus']
+  }
+  '/platform/projects/{ref}/analytics/endpoints/functions.resource-usage': {
+    /** Gets a project's function resource usage */
+    get: operations['FunctionResourceLogsController_getStatus']
   }
   '/platform/projects/{ref}/analytics/endpoints/logs.all': {
     /** Gets project's logs */
@@ -1269,7 +1273,15 @@ export interface paths {
   }
   '/v0/projects/{ref}/analytics/endpoints/functions.inv-stats': {
     /** Gets a project's function invocation statistics */
-    get: operations['FunctionLogsController_getStatus']
+    get: operations['FunctionInvocationLogsController_getStatus']
+  }
+  '/v0/projects/{ref}/analytics/endpoints/functions.req-stats': {
+    /** Gets a project's function request statistics */
+    get: operations['FunctionRequestLogsController_getStatus']
+  }
+  '/v0/projects/{ref}/analytics/endpoints/functions.resource-usage': {
+    /** Gets a project's function resource usage */
+    get: operations['FunctionResourceLogsController_getStatus']
   }
   '/v0/projects/{ref}/analytics/endpoints/logs.all': {
     /** Gets project's logs */
@@ -1691,14 +1703,27 @@ export interface components {
       ids: string[]
     }
     NotificationResponseV2: {
+      /** @enum {string} */
+      type:
+        | 'project.tier-limit-exceeded'
+        | 'postgresql.upgrade-available'
+        | 'postgresql.upgrade-completed'
+        | 'project.update-completed'
+        | 'project.informational'
+      /** @enum {string} */
+      status: 'new' | 'seen' | 'archived'
+      /** @enum {string} */
+      priority: 'Critical' | 'Warning' | 'Info'
       id: string
       inserted_at: string
-      type: Record<string, never>
-      status: Record<string, never>
-      priority: Record<string, never>
       name: string
       data: Record<string, never>
       meta: Record<string, never>
+    }
+    UpdateNotificationBodyV2: {
+      id: string
+      /** @enum {string} */
+      status: 'new' | 'seen' | 'archived'
     }
     ResetPasswordBody: {
       email: string
@@ -1739,6 +1764,8 @@ export interface components {
     }
     ProjectResourceWarningsResponse: {
       /** @enum {string|null} */
+      need_pitr: 'critical' | 'warning' | null
+      /** @enum {string|null} */
       disk_io_exhaustion: 'critical' | 'warning' | null
       /** @enum {string|null} */
       disk_space_exhaustion: 'critical' | 'warning' | null
@@ -1764,6 +1791,7 @@ export interface components {
       SMTP_MAX_FREQUENCY: number
       SMTP_SENDER_NAME?: string
       MAILER_AUTOCONFIRM: boolean
+      MAILER_ALLOW_UNVERIFIED_EMAIL_SIGN_INS: boolean
       MAILER_SUBJECTS_INVITE: string
       MAILER_SUBJECTS_CONFIRMATION: string
       MAILER_SUBJECTS_RECOVERY: string
@@ -1782,6 +1810,8 @@ export interface components {
       SECURITY_CAPTCHA_ENABLED: boolean
       SECURITY_CAPTCHA_PROVIDER: string
       SECURITY_CAPTCHA_SECRET: string
+      SESSIONS_TIMEBOX?: number
+      SESSIONS_INACTIVITY_TIMEOUT?: number
       RATE_LIMIT_EMAIL_SENT: number
       RATE_LIMIT_SMS_SENT: number
       RATE_LIMIT_VERIFY?: number
@@ -1893,6 +1923,7 @@ export interface components {
       SMTP_PASS_ENCRYPTED?: string | null
       SMTP_MAX_FREQUENCY?: number
       SMTP_SENDER_NAME?: string
+      MAILER_ALLOW_UNVERIFIED_EMAIL_SIGN_INS?: boolean
       MAILER_AUTOCONFIRM?: boolean
       MAILER_SUBJECTS_INVITE?: string
       MAILER_SUBJECTS_CONFIRMATION?: string
@@ -1912,6 +1943,8 @@ export interface components {
       SECURITY_CAPTCHA_ENABLED?: boolean
       SECURITY_CAPTCHA_PROVIDER?: string
       SECURITY_CAPTCHA_SECRET?: string
+      SESSIONS_TIMEBOX?: number | null
+      SESSIONS_INACTIVITY_TIMEOUT?: number | null
       RATE_LIMIT_EMAIL_SENT?: number
       RATE_LIMIT_SMS_SENT?: number
       RATE_LIMIT_VERIFY?: number
@@ -2025,6 +2058,7 @@ export interface components {
       SMTP_MAX_FREQUENCY: number
       SMTP_SENDER_NAME?: string
       MAILER_AUTOCONFIRM: boolean
+      MAILER_ALLOW_UNVERIFIED_EMAIL_SIGN_INS: boolean
       MAILER_SUBJECTS_INVITE: string
       MAILER_SUBJECTS_CONFIRMATION: string
       MAILER_SUBJECTS_RECOVERY: string
@@ -2043,6 +2077,8 @@ export interface components {
       SECURITY_CAPTCHA_ENABLED: boolean
       SECURITY_CAPTCHA_PROVIDER: string
       SECURITY_CAPTCHA_SECRET: string
+      SESSIONS_TIMEBOX?: number
+      SESSIONS_INACTIVITY_TIMEOUT?: number
       RATE_LIMIT_EMAIL_SENT: number
       RATE_LIMIT_SMS_SENT: number
       RATE_LIMIT_VERIFY?: number
@@ -2190,7 +2226,6 @@ export interface components {
       inserted_at: string
     }
     BackupsResponse: {
-      tierId: string
       tierKey: string
       region: string
       walg_enabled: boolean
@@ -2234,14 +2269,25 @@ export interface components {
       migrated_at: string | null
     }
     OrganizationResponse: {
-      id: string
+      id: number
+      slug: string
       name: string
+      billing_email: string
+      is_owner: boolean
+      stripe_customer_id: string
+      subscription_id?: string
+      opt_in_tags: string[]
     }
     GetOrganizationByFlyOrganizationIdResponse: {
       slug: string
     }
     CreateOrganizationBody: {
       name: string
+      kind?: string
+      size?: string
+      /** @enum {string} */
+      tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
+      payment_method?: string
     }
     UpdateOrganizationBody: {
       name: string
@@ -2463,9 +2509,10 @@ export interface components {
     }
     Member: {
       gotrue_id: string
-      primary_email: string
+      primary_email: string | null
       role_ids: number[]
       username: string
+      mfa_enabled: boolean
     }
     UpdateMemberBody: {
       role_id: number
@@ -3307,7 +3354,6 @@ export interface components {
       region: string
       status: string
       subscription_id: string
-      is_readonly_mode_enabled?: boolean
       is_branch_enabled: boolean
       preview_branch_refs: string[]
       disk_volume_size_gb?: number
@@ -3368,7 +3414,6 @@ export interface components {
       region: string
       status: string
       subscription_id: string
-      is_readonly_mode_enabled?: boolean
       is_branch_enabled: boolean
       preview_branch_refs: string[]
       disk_volume_size_gb?: number
@@ -4147,6 +4192,11 @@ export interface components {
       branch: string
       label?: string
     }
+    CreateCliLoginSessionBody: {
+      session_id: string
+      public_key: string
+      token_name?: string
+    }
     FunctionResponse: {
       id: string
       slug: string
@@ -4180,14 +4230,13 @@ export interface components {
         | 'ACTIVE_UNHEALTHY'
         | 'COMING_UP'
         | 'GOING_DOWN'
-        | 'INACTIVE'
         | 'INIT_FAILED'
         | 'REMOVED'
         | 'RESTORING'
         | 'UNKNOWN'
         | 'UPGRADING'
-        | 'PAUSING'
       reportingToken: string
+      databaseIdentifier: string
     }
     EventBody: {
       reportingToken: string
@@ -4553,11 +4602,19 @@ export interface components {
       entrypoint_path?: string
       import_map_path?: string
     }
+    OrganizationResponseV1: {
+      id: string
+      name: string
+    }
+    CreateOrganizationBodyV1: {
+      name: string
+    }
     V1OrganizationMemberResponse: {
       user_id: string
       user_name: string
       email?: string
       role_name: string
+      mfa_enabled: boolean
     }
     OAuthTokenBody: {
       /** @enum {string} */
@@ -4745,14 +4802,6 @@ export type $defs = Record<string, never>
 export type external = Record<string, never>
 
 export interface operations {
-  /** Redirects to dashboard homepage */
-  LoginController_redirectToDashboardHomepage: {
-    responses: {
-      200: {
-        content: never
-      }
-    }
-  }
   /** Get notifications */
   NotificationsController_getNotificationsV2: {
     parameters: {
@@ -4797,7 +4846,7 @@ export interface operations {
   NotificationsController_updateNotificationsV2: {
     requestBody: {
       content: {
-        'application/json': string[]
+        'application/json': components['schemas']['UpdateNotificationBodyV2'][]
       }
     }
     responses: {
@@ -5451,7 +5500,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['OrganizationResponse'][]
+          'application/json': components['schemas']['OrganizationResponseV1'][]
         }
       }
       /** @description Unexpected error listing organizations */
@@ -8666,7 +8715,7 @@ export interface operations {
     }
   }
   /** Gets a project's function invocation statistics */
-  FunctionLogsController_getStatus: {
+  FunctionInvocationLogsController_getStatus: {
     parameters: {
       query: {
         interval: '5min' | '15min' | '1hr' | '1day' | '7day'
@@ -8687,6 +8736,60 @@ export interface operations {
         content: never
       }
       /** @description Failed to get project's function invocation statistics */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets a project's function request statistics */
+  FunctionRequestLogsController_getStatus: {
+    parameters: {
+      query: {
+        interval: '5min' | '15min' | '1hr' | '1day' | '7day'
+        function_id: string
+      }
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['AnalyticsResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to get project's function request statistics */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets a project's function resource usage */
+  FunctionResourceLogsController_getStatus: {
+    parameters: {
+      query: {
+        interval: '5min' | '15min' | '1hr' | '1day' | '7day'
+        function_id: string
+      }
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['AnalyticsResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to get project's function resource usage */
       500: {
         content: never
       }
@@ -10124,6 +10227,40 @@ export interface operations {
       }
     }
   }
+  /** Create CLI login session */
+  CliLoginController_createCliLoginSession: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateCliLoginSessionBody']
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to create CLI login session */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Retrieve CLI login session */
+  CliLoginController_getCliLoginSession: {
+    parameters: {
+      path: {
+        session_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to retrieve CLI login session */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Gets GoTrue template */
   AuthTemplateController_getTemplate: {
     parameters: {
@@ -10624,6 +10761,7 @@ export interface operations {
     parameters: {
       header: {
         'x-github-delivery': string
+        'x-github-event': string
         'x-hub-signature-256': string
       }
     }
@@ -11954,13 +12092,13 @@ export interface operations {
   OrganizationsController_createOrganization: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateOrganizationBody']
+        'application/json': components['schemas']['CreateOrganizationBodyV1']
       }
     }
     responses: {
       201: {
         content: {
-          'application/json': components['schemas']['OrganizationResponse']
+          'application/json': components['schemas']['OrganizationResponseV1']
         }
       }
       /** @description Unexpected error creating an organization */

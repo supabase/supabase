@@ -109,7 +109,12 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
       await createOrganization({
         name: orgName,
         kind: orgKind,
-        tier: 'tier_' + dbTier.toLowerCase(),
+        tier: ('tier_' + dbTier.toLowerCase()) as
+          | 'tier_payg'
+          | 'tier_pro'
+          | 'tier_free'
+          | 'tier_team'
+          | 'tier_enterprise',
         ...(orgKind == 'COMPANY' ? { size: orgSize } : {}),
         payment_method: paymentMethodId,
       })

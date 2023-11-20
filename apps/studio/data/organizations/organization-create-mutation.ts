@@ -10,7 +10,7 @@ export type OrganizationCreateVariables = {
   name: string
   kind?: string
   size?: string
-  tier?: string
+  tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
   payment_method?: string
 }
 
