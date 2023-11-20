@@ -148,6 +148,14 @@ After making any changes, open a pull request. Once you submit your pull request
 
 Once your PR has been merged, you will be proudly listed as a contributor in the [contributor chart](https://github.com/supabase/supabase/graphs/contributors)!
 
+## Issue assignment
+
+We don't have a process for assigning issues to contributors. Please feel free to jump into any issues in this repo that you are able to help with. Our intention is to encourage anyone to help without feeling burdened by an assigned task. Life can sometimes get in the way, and we don't want to leave contributors feeling obligated to complete issues when they may have limited time or unexpected commitments.
+
+We also recognize that not having a process can sometimes lead to competing or duplicate PRs. There's no perfect solution here. We encourage you to communicate early and often on an Issue to indicate that you're actively working on it. If you see that an Issue already has a PR, try working with that author instead of drafting your own.
+
+We review PRs in the order of their submission. We try to accept the earliest one that is closest to being ready to merge.
+
 ---
 
 ## Common tasks
