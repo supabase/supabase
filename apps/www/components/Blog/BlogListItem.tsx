@@ -29,7 +29,7 @@ const BlogListItem = ({ post }: Props) => {
         <div className="flex flex-col space-y-6">
           <div className="flex flex-col space-y-3">
             <div
-              className={`border-default relative mb-4 w-full aspect-[2/1] lg:aspect-[3/2] overflow-auto rounded-lg border shadow-sm`}
+              className="border-default relative mb-4 w-full aspect-[2/1] lg:aspect-[3/2] overflow-hidden rounded-lg border shadow-sm"
             >
               <Image
                 layout="fill"
