@@ -1,0 +1,140 @@
+---
+title: 'Implementing GitHub OAuth2 login for Python Flask app'
+description: Learn how to implement OAuth in your Python Flask applications.
+categories:
+  - engineering
+tags:
+  - python
+  - auth
+date: '2023-11-20'
+toc_depth: 3
+author: andrew_smith
+image: 2023-11-16-react-native-authentication/react-native-authentication-supabase.jpg
+thumb: 2023-11-16-react-native-authentication/react-native-authentication-supabase.jpg
+---
+
+OAuth is an open standard protocol facilitating secure authorization and authentication for third-party applications to access user resources without obtaining their credentials directly. The OAuth 2.0 version involves users granting permission, authorization servers issuing access tokens, and resource servers verifying tokens to enable controlled access across various web services and APIs.
+
+For a while now most of the Supabase authentication flow has been predominantly client-side driven, this was due to `supabase-js` starting as a way to cover client-side frameworks like React. However, we have since evolved beyond the client-side only authentication flow with which we started and we are now able to work with different server-side frameworks of which Python Flask is one of such.
+
+## Prerequisites
+
+This article assumes you are familiar with creating an application in Flask. It also assumes that you have read the Supabase documentation and are familiar the with concept of [Authentication](https://supabase.com/docs/guides/auth).
+
+We will use the following tools
+
+- [Flask](https://flask.palletsprojects.com/en/3.0.x/) - we used version 2.3.3 for this article
+- Supabase Dashboard - [create an account](https://database.new/) if you do not have one
+
+## Getting started
+
+To begin, inside your Flask application install the `supabase` library using the following command in the terminal:
+
+```bash
+pip install supabase
+```
+
+## Session storage
+
+Open the project in your preferred code editor and create a file called `flask_storage.py` with the following content:
+
+```python
+from gotrue import SyncSupportedStorage
+from flask import session
+
+class FlaskSessionStorage(SyncSupportedStorage):
+    def __init__(self):
+        self.storage = session
+
+    def get_item(self, key: str) -> str | None:
+        if key in self.storage:
+            return self.storage[key]
+
+    def set_item(self, key: str, value: str) -> None:
+        self.storage[key] = value
+
+    def remove_item(self, key: str) -> None:
+        if key in self.storage:
+            self.storage.pop(key, None)
+```
+
+In this file, we are extending the `SyncSupportedStorage` class from the `gotrue` library which comes bundled with the `supabase` library. Here we are telling the Supabase authentication library (`gotrue`) how to retrieve, store and remove a session that will store our JSON Web Token (JWT).
+
+## Initiate the client
+
+Create another file called `supabase.py` and in this file, we will initiate our Supabase client.
+
+```python
+import os
+from flask import g
+from werkzeug.local import LocalProxy
+from supabase.client import Client, ClientOptions
+from app.flask_storage import FlaskSessionStorage
+
+url = os.environ.get("SUPABASE_URL", "")
+key = os.environ.get("SUPABASE_KEY", "")
+
+def get_supabase() -> Client:
+    if "supabase" not in g:
+        g.supabase = Client(
+            url,
+            key,
+            options=ClientOptions(
+                storage=FlaskSessionStorage(),
+                flow_type="pkce"
+            ),
+        )
+    return g.supabase
+
+supabase: Client = LocalProxy(get_supabase)
+```
+
+Let's focus on the `get_supabase` function. Here we are checking if we have an instance of the client stored in our global object `g`, if not we create the client and store it in the global object under the `supabase` name. You will notice in the `ClientOptions` that we are specifying the `FlaskSessionStorage` class we created earlier and we are also specifying a very important option that allows us to handle the OAuth flow on the server side, the `flow_type="pkce"`.
+
+## Sign in with GitHub
+
+Supabase Auth supports Sign in with GitHub on the web, native Android applications, and Chrome extensions.
+
+For detailed set up and implemenation instructions please refer to the [docs](https://supabase.com/docs/guides/auth/social-login/auth-github).
+
+## Create sign-in route
+
+Inside our application code `app.py`, we can create the sign-in route to trigger the OAuth sign-in request.
+
+```python
+@app.route("/signin/github")
+def signin_with_github():
+    resp = supabase.auth.sign_in_with_oauth(
+        {
+            "provider": "github",
+            "options": {
+	            "redirect_to": f"{request.host_url}callback"
+	        },
+        }
+    )
+    return redirect(resp.url)
+```
+
+In this function `options` object we specify a `redirect_to` parameter which will point to the callback route we will create in the next step. This function will generate a url for us to use to redirect the user to, in this case we are using `github` as our OAuth provider so we will be redirected to the GitHub OAuth consent screen.
+
+## Create callback route
+
+Let's add another route to our `app.py` file for the callback endpoint we specified in our sign in route.
+
+```python
+@app.route("/callback")
+def callback():
+    code = request.args.get("code")
+    next = request.args.get("next", "/")
+
+    if code:
+        res = supabase.auth.exchange_code_for_session({"auth_code": code})
+
+    return redirect(next)
+```
+
+Here we are getting the `code` query parameter from the request object, if this is available we then exchange the code for a session so that the user will be signed in. Under the hood the `supabase` python library will handle storing this session (JWT) into a cookie and sign the user in.
+
+## Conclusion
+
+In this post we explained how to setup a flask session storage to work with the Supabase python library, setting the `flow_type` to use Proof Key for Code Exchange (PKCE) and creating a sign in and a callback route to handle the user authentication.
