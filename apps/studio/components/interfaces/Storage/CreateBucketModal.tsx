@@ -234,7 +234,8 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                       layout="vertical"
                       label="Allowed MIME types"
                       placeholder="e.g image/jpeg, image/png, audio/mpeg, video/mp4, etc"
-                      descriptionText="Comma separated values"
+                      labelOptional="Comma separated values"
+                      descriptionText="Wildcards are allowed, e.g. image/*. Leave blank to allow any MIME type."
                     />
                   </div>
                 </Collapsible.Content>

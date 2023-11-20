@@ -63,20 +63,6 @@ export interface User {
   free_project_limit: number
 }
 
-export interface Member {
-  id: number // To be deprecated after full ABAC roll out
-
-  primary_email: string
-  username: string
-  gotrue_id?: string
-  role_ids?: number[]
-
-  invited_id?: number
-  invited_at?: string
-
-  is_owner?: boolean // To be deprecated after full ABAC roll out
-}
-
 export interface Role {
   id: number
   name: string

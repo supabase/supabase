@@ -116,8 +116,8 @@ function Blog(props: any) {
       />
       <DefaultLayout>
         <h1 className="sr-only">Supabase blog</h1>
-        <div className="overflow-hidden py-12">
-          <div className="container mx-auto mt-16 px-8 sm:px-16 xl:px-20">
+        <div className="overflow-hidden py-12 lg:py-20">
+          <div className="container mx-auto px-8 sm:px-16 xl:px-20">
             <div className="mx-auto ">
               {props.blogs.slice(0, 1).map((blog: any, i: number) => (
                 <FeaturedThumb key={i} {...blog} />
@@ -127,7 +127,7 @@ function Blog(props: any) {
         </div>
 
         <div className="border-default border-t">
-          <div className="container mx-auto mt-16 px-8 sm:px-16 xl:px-20">
+          <div className="container mx-auto mt-10 lg:mt-16 px-8 sm:px-16 xl:px-20">
             <BlogFilters
               posts={blogs}
               setPosts={setBlogs}
@@ -136,7 +136,7 @@ function Blog(props: any) {
               handlePosts={handlePosts}
             />
 
-            <ol className="grid grid-cols-12 py-16 lg:gap-16">
+            <ol className="grid grid-cols-12 py-10 lg:py-16 lg:gap-16">
               {blogs?.length ? (
                 blogs?.map((blog: PostTypes, idx: number) => (
                   <div
@@ -175,11 +175,11 @@ function FeaturedThumb(blog: PostTypes) {
   return (
     <div key={blog.slug} className="w-full cursor-pointer">
       <Link href={`${blog.path}`} className="grid gap-8 lg:grid-cols-2 lg:gap-16">
-        <div className="relative h-96 w-full overflow-auto rounded-lg border">
+        <div className="relative w-full aspect-[2/1] lg:aspect-[3/2] overflow-auto rounded-lg border">
           <Image
             src={`/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
             layout="fill"
-            objectFit="cover"
+            className="object-cover"
             alt="blog thumbnail"
           />
         </div>
@@ -195,7 +195,7 @@ function FeaturedThumb(blog: PostTypes) {
             <p className="p text-xl">{blog.description}</p>
           </div>
 
-          <div className="grid w-max grid-flow-col grid-rows-4 gap-4">
+          <div className="flex flex-col w-max gap-2">
             {author.map((author: any, i: number) => {
               return (
                 <div className="flex items-center space-x-3" key={i}>
@@ -204,9 +204,8 @@ function FeaturedThumb(blog: PostTypes) {
                       <Image
                         src={author.author_image_url}
                         alt={`${author.author} avatar`}
-                        className="rounded-full"
+                        className="rounded-full object-cover"
                         layout="fill"
-                        objectFit="cover"
                       />
                     </div>
                   )}
