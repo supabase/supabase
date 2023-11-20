@@ -31,17 +31,20 @@ import {
   useTheme,
 } from '@graphiql/react'
 import { Fetcher } from '@graphiql/toolkit'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
 import { MouseEventHandler, useCallback, useEffect, useState } from 'react'
+
+import { useCheckPermissions } from 'hooks'
+import { RoleImpersonationSelector } from '../RoleImpersonationSelector'
 import styles from './graphiql.module.css'
 
 export interface GraphiQLProps {
   fetcher: Fetcher
   theme?: 'dark' | 'light'
-  accessToken?: string
 }
 
-export default function GraphiQL({ fetcher, theme = 'dark', accessToken }: GraphiQLProps) {
+export default function GraphiQL({ fetcher, theme = 'dark' }: GraphiQLProps) {
   // Ensure props are correct
   if (typeof fetcher !== 'function') {
     throw new TypeError(
@@ -50,14 +53,7 @@ export default function GraphiQL({ fetcher, theme = 'dark', accessToken }: Graph
   }
 
   return (
-    <GraphiQLProvider
-      fetcher={fetcher}
-      defaultHeaders={
-        accessToken !== undefined
-          ? JSON.stringify({ Authorization: `Bearer ${accessToken}` })
-          : undefined
-      }
-    >
+    <GraphiQLProvider fetcher={fetcher}>
       <GraphiQLInterface theme={theme} />
     </GraphiQLProvider>
   )
@@ -76,6 +72,8 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
   const copy = useCopyQuery()
   const merge = useMergeQuery()
   const prettify = usePrettifyEditors()
+
+  const canReadJWTSecret = useCheckPermissions(PermissionAction.READ, 'field.jwt_secret')
 
   const { setTheme } = useTheme()
   useEffect(() => {
@@ -110,13 +108,11 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
     storageKey: 'secondaryEditorFlex',
   })
 
-  const [activeSecondaryEditor, setActiveSecondaryEditor] = useState<'variables' | 'headers'>(
-    () => {
-      return !editorContext.initialVariables && editorContext.initialHeaders
-        ? 'headers'
-        : 'variables'
-    }
-  )
+  const [activeSecondaryEditor, setActiveSecondaryEditor] = useState<
+    'variables' | 'headers' | 'role-impersonation'
+  >(() => {
+    return !editorContext.initialVariables && editorContext.initialHeaders ? 'headers' : 'variables'
+  })
 
   const toolbar = (
     <>
@@ -164,7 +160,9 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
       if (editorToolsResize.hiddenElement === 'second') {
         editorToolsResize.setHiddenElement(null)
       }
-      setActiveSecondaryEditor(event.currentTarget.dataset.name as 'variables' | 'headers')
+      setActiveSecondaryEditor(
+        event.currentTarget.dataset.name as 'variables' | 'headers' | 'role-impersonation'
+      )
     },
     [editorToolsResize]
   )
@@ -303,6 +301,22 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                         Headers
                       </UnStyledButton>
 
+                      {canReadJWTSecret && (
+                        <UnStyledButton
+                          type="button"
+                          className={
+                            activeSecondaryEditor === 'role-impersonation' &&
+                            editorToolsResize.hiddenElement !== 'second'
+                              ? 'active'
+                              : ''
+                          }
+                          onClick={handleToolsTabClick}
+                          data-name="role-impersonation"
+                        >
+                          Role Impersonation
+                        </UnStyledButton>
+                      )}
+
                       <Tooltip
                         label={
                           editorToolsResize.hiddenElement === 'second'
@@ -341,6 +355,17 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                       />
 
                       <HeaderEditor isHidden={activeSecondaryEditor !== 'headers'} />
+
+                      {canReadJWTSecret && (
+                        <div
+                          className={clsx(
+                            'graphiql-editor',
+                            activeSecondaryEditor !== 'role-impersonation' && 'hidden'
+                          )}
+                        >
+                          <RoleImpersonationSelector />
+                        </div>
+                      )}
                     </section>
                   </div>
                 </div>

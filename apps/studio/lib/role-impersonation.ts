@@ -1,3 +1,5 @@
+import jwt from 'jwt-simple'
+
 import { User } from 'data/auth/users-query'
 import { uuidv4 } from './helpers'
 
@@ -28,7 +30,7 @@ function getPostgrestClaims(projectRef: string, role: PostgrestImpersonationRole
   expiryDate.setTime(expiryDate.getTime() + 60 * 60 * 1000) // 1 hour
 
   const exp = Math.floor(expiryDate.getTime() / 1000)
-  const nowTimestamp = Date.now() / 1000
+  const nowTimestamp = Math.floor(Date.now() / 1000)
 
   if (role.role === 'authenticated') {
     const user = role.user
@@ -102,4 +104,14 @@ export function wrapWithRoleImpersonation(
     ${impersonationSql}
     ${sql}
   `
+}
+
+export function getRoleImpersonationJWT(
+  projectRef: string,
+  jwtSecret: string,
+  role: PostgrestImpersonationRole
+) {
+  const claims = getPostgrestClaims(projectRef, role)
+
+  return jwt.encode(claims, jwtSecret, 'HS256')
 }

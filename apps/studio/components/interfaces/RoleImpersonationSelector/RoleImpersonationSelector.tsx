@@ -1,7 +1,8 @@
 import { useDebounce } from '@uidotdev/usehooks'
+import { useState } from 'react'
+
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useUsersQuery } from 'data/auth/users-query'
-import { useState } from 'react'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import {
   Button,
