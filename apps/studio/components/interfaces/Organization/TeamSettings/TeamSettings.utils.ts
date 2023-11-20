@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { OrganizationMember } from 'data/organizations/organization-members-query'
 import { doPermissionsCheck, useGetPermissions } from 'hooks'
-import { Member, Permission, Role } from 'types'
+import { Permission, Role } from 'types'
 
 export const useGetRolesManagementPermissions = (
   orgId?: number,
@@ -44,7 +45,7 @@ export const useGetRolesManagementPermissions = (
   return { rolesAddable, rolesRemovable }
 }
 
-export const hasMultipleOwners = (members: Member[] = [], roles: Role[] = []) => {
+export const hasMultipleOwners = (members: OrganizationMember[] = [], roles: Role[] = []) => {
   const membersWhoAreOwners = members.filter((member) => {
     const [memberRoleId] = member.role_ids ?? []
     const role = roles.find((role: Role) => role.id === memberRoleId)

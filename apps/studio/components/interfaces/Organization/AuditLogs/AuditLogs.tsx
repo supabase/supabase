@@ -1,24 +1,9 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import Image from 'next/legacy/image'
-import { useEffect, useState } from 'react'
-
-import { useParams } from 'common'
-import { FilterPopover, LogDetailsPanel } from 'components/interfaces/AuditLogs'
-import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
-import Table from 'components/to-be-cleaned/Table'
-import AlertError from 'components/ui/AlertError'
-import { DatePicker } from 'components/ui/DatePicker'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import {
-  AuditLog,
-  useOrganizationAuditLogsQuery,
-} from 'data/organizations/organization-audit-logs-query'
-import { useOrganizationDetailQuery } from 'data/organizations/organization-detail-query'
-import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import {
   Alert,
   AlertDescription_Shadcn_,
@@ -31,6 +16,21 @@ import {
   IconRefreshCw,
   IconUser,
 } from 'ui'
+
+import { FilterPopover, LogDetailsPanel } from 'components/interfaces/AuditLogs'
+import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
+import Table from 'components/to-be-cleaned/Table'
+import AlertError from 'components/ui/AlertError'
+import { DatePicker } from 'components/ui/DatePicker'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import {
+  AuditLog,
+  useOrganizationAuditLogsQuery,
+} from 'data/organizations/organization-audit-logs-query'
+import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
+import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useProjectsQuery } from 'data/projects/projects-query'
 
 // [Joshen considerations]
 // - Maybe fix the height of the table to the remaining height of the viewport, so that the search input is always visible
@@ -54,7 +54,7 @@ const AuditLogs = () => {
 
   const { data: projects } = useProjectsQuery()
   const { data: organizations } = useOrganizationsQuery()
-  const { data: detailData } = useOrganizationDetailQuery({ slug })
+  const { data: members } = useOrganizationMembersQuery({ slug })
   const { data: rolesData } = useOrganizationRolesQuery({ slug })
   const { data, error, isLoading, isSuccess, isError, isRefetching, refetch } =
     useOrganizationAuditLogsQuery(
@@ -92,7 +92,6 @@ const AuditLogs = () => {
     return () => clearInterval(interval)
   }, [dateRange.from, dateRange.to])
 
-  const members = detailData?.members ?? []
   const roles = rolesData?.roles ?? []
 
   const retentionPeriod = data?.retention_period ?? 0
@@ -311,7 +310,9 @@ const AuditLogs = () => {
                   ]}
                   body={
                     sortedLogs?.map((log) => {
-                      const user = members.find((member) => member.gotrue_id === log.actor.id)
+                      const user = (members ?? []).find(
+                        (member) => member.gotrue_id === log.actor.id
+                      )
                       const role = roles.find((role) => user?.role_ids?.[0] === role.id)
                       const project = projects?.find(
                         (project) => project.ref === log.target.metadata.project_ref

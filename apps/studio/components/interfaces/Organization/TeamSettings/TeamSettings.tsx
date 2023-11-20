@@ -1,7 +1,8 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { useParams } from 'common'
 import { useState } from 'react'
+import { Button, IconSearch, Input, Modal } from 'ui'
 
-import { useParams } from 'common/hooks'
 import {
   ScaffoldActionsContainer,
   ScaffoldActionsGroup,
@@ -10,13 +11,12 @@ import {
   ScaffoldSectionContent,
 } from 'components/layouts/Scaffold'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { useOrganizationDetailQuery } from 'data/organizations/organization-detail-query'
 import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
+import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useIsFeatureEnabled, useSelectedOrganization, useStore } from 'hooks'
 import { useProfile } from 'lib/profile'
-import { Button, IconSearch, Input, Modal } from 'ui'
 import InviteMemberButton from './InviteMemberButton'
 import MembersView from './MembersView'
 import { hasMultipleOwners, useGetRolesManagementPermissions } from './TeamSettings.utils'
@@ -35,10 +35,9 @@ const TeamSettings = () => {
   const isOwner = selectedOrganization?.is_owner
 
   const { data: permissions } = usePermissionsQuery()
-  const { data: detailData } = useOrganizationDetailQuery({ slug })
   const { data: rolesData } = useOrganizationRolesQuery({ slug })
+  const { data: members } = useOrganizationMembersQuery({ slug })
 
-  const members = detailData?.members ?? []
   const roles = rolesData?.roles ?? []
 
   const { rolesAddable } = useGetRolesManagementPermissions(
@@ -97,7 +96,7 @@ const TeamSettings = () => {
                     <InviteMemberButton
                       orgId={selectedOrganization.id}
                       userId={profile.id}
-                      members={members}
+                      members={members ?? []}
                       roles={roles}
                       rolesAddable={rolesAddable}
                     />

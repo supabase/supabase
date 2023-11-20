@@ -1,16 +1,8 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-
-import { useParams } from 'common/hooks'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
-import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
-import { useOrganizationMemberInviteDeleteMutation } from 'data/organizations/organization-member-invite-delete-mutation'
-import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useCheckPermissions, useIsFeatureEnabled, useSelectedOrganization, useStore } from 'hooks'
+import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
-import { Member, Role } from 'types'
 import {
   Button,
   DropdownMenu,
@@ -22,11 +14,20 @@ import {
   IconTrash,
   Modal,
 } from 'ui'
+
+import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
+import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
+import { useOrganizationMemberInviteDeleteMutation } from 'data/organizations/organization-member-invite-delete-mutation'
+import { OrganizationMember } from 'data/organizations/organization-members-query'
+import { usePermissionsQuery } from 'data/permissions/permissions-query'
+import { useCheckPermissions, useIsFeatureEnabled, useSelectedOrganization, useStore } from 'hooks'
+import { Role } from 'types'
 import { isInviteExpired } from '../Organization.utils'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 
 interface MemberActionsProps {
-  member: Member
+  member: OrganizationMember
   roles: Role[]
 }
 
@@ -91,7 +92,7 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
     deleteOrganizationMember({ slug, gotrueId: member.gotrue_id })
   }
 
-  const handleResendInvite = async (member: Member) => {
+  const handleResendInvite = async (member: OrganizationMember) => {
     const roleId = (member?.role_ids ?? [])[0]
     const invitedId = member.invited_id
 
@@ -107,7 +108,7 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
     })
   }
 
-  const handleRevokeInvitation = async (member: Member) => {
+  const handleRevokeInvitation = async (member: OrganizationMember) => {
     const invitedId = member.invited_id
     if (!slug) return console.error('Slug is required')
     if (!invitedId) return console.error('Member invited ID is required')
