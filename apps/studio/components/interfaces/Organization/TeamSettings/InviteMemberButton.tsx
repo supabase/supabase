@@ -1,19 +1,20 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { isNil } from 'lodash'
 import { useEffect, useState } from 'react'
+import { Button, Form, IconMail, Input, Listbox, Modal } from 'ui'
 import { object, string } from 'yup'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common/hooks'
 import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
+import { OrganizationMember } from 'data/organizations/organization-members-query'
 import { doPermissionsCheck, useGetPermissions, useStore } from 'hooks'
-import { Member, Role } from 'types'
-import { Button, Form, IconMail, Input, Listbox, Modal } from 'ui'
+import { Role } from 'types'
 
 export interface InviteMemberButtonProps {
   orgId: number
   userId: number
-  members: Member[]
+  members: OrganizationMember[]
   roles: Role[]
   rolesAddable: Number[]
 }
