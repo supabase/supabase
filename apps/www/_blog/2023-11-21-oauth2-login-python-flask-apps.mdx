@@ -132,7 +132,7 @@ def callback():
     return redirect(next)
 ```
 
-Here we are getting the `code` query parameter from the request object, if this is available we then exchange the code for a session so that the user will be signed in. Under the hood the `supabase` python library will handle storing this session (JWT) into a cookie and sign the user in.
+Here we're getting the `code` query parameter from the request object, if this is available we then exchange the code for a session so that the user will be signed in. Under the hood the `supabase` python library will handle storing this session (JWT) into a cookie and sign the user in.
 
 ## Conclusion
 
