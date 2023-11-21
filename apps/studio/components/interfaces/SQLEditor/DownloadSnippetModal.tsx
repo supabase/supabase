@@ -1,15 +1,17 @@
 import { ModalProps } from '@ui/components/Modal/Modal'
 import { snakeCase } from 'lodash'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { Button, CodeBlock, IconExternalLink, Modal, Separator, Tabs, TabsProvider } from 'ui'
+import Link from 'next/link'
 import { useState } from 'react'
+import { Button, CodeBlock, IconExternalLink, Modal, Separator, Tabs, TabsProvider } from 'ui'
+
+import TwoOptionToggle from 'components/ui/TwoOptionToggle'
+import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { Markdown } from '../Markdown'
 import {
   generateFileCliCommand,
   generateMigrationCliCommand,
   generateSeedCliCommand,
 } from './SQLEditor.utils'
-import TwoOptionToggle from 'components/ui/TwoOptionToggle'
-import Link from 'next/link'
 
 export interface DownloadSnippetModalProps extends ModalProps {
   id: string
@@ -22,6 +24,34 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
 
   const [selectedView, setSelectedView] = useState<'CLI' | 'NPM'>('CLI')
 
+  const SNIPPETS = [
+    {
+      id: 'migration',
+      label: 'Migration',
+      title: 'Download as migration',
+      description: `Download the snippet in a new migration named \`${migrationName}\``,
+      cli: generateMigrationCliCommand(id, migrationName),
+      npm: generateMigrationCliCommand(id, migrationName, true),
+    },
+    {
+      id: 'seed',
+      label: 'Seed file',
+      title: 'Download as seed file',
+      description:
+        'If your query consists of sample data, append the snippet to the end of `supabase/seed.sql`',
+      cli: generateSeedCliCommand(id),
+      npm: generateSeedCliCommand(id, true),
+    },
+    {
+      id: 'sql',
+      label: 'SQL file',
+      title: 'Download as SQL file',
+      description: `Download the snippet directly into a new SQL file named \`${migrationName}.sql\``,
+      cli: generateFileCliCommand(id, migrationName),
+      npm: generateFileCliCommand(id, migrationName, true),
+    },
+  ]
+
   return (
     <Modal
       hideFooter
@@ -31,103 +61,46 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
       {...props}
     >
       <TabsProvider>
-        <div className="flex flex-col items-start justify-between gap-4 py-5 relative mb-2">
-          <div className="absolute top-14 right-0">
-            <TwoOptionToggle
-              width={75}
-              options={['CLI', 'NPM']}
-              activeOption={selectedView}
-              borderOverride="border-gray-100"
-              onClickOption={() =>
-                selectedView === 'CLI' ? setSelectedView('NPM') : setSelectedView('CLI')
-              }
-            />
-          </div>
+        <div className="flex flex-col items-start justify-between gap-4 py-5 relative">
           <Tabs type="underlined" listClassNames="pl-5">
-            <Tabs.Panel id="migration" label="Migration" className="px-5">
-              <div className="flex flex-col gap-y-2 mb-3 w-full">
-                <h2 className="text-lg">Download as migration</h2>
-                <p className="text-sm text-scale-1000">
-                  Download the snippet in a new migration named{' '}
-                  <code className="text-xs">{migrationName}</code>:
-                </p>
-              </div>
-
-              {selectedView === 'CLI' ? (
-                <CodeBlock
-                  language="bash"
-                  className="language-bash prose dark:prose-dark max-w-none"
-                >
-                  {generateMigrationCliCommand(id, migrationName)}
-                </CodeBlock>
-              ) : (
-                <pre>
-                  <CodeBlock
-                    language="bash"
-                    className="language-bash prose dark:prose-dark max-w-none"
-                  >
-                    {generateMigrationCliCommand(id, migrationName, true)}
-                  </CodeBlock>
-                </pre>
-              )}
-            </Tabs.Panel>
-            <Tabs.Panel id="seed" label="Seed file" className="px-5">
-              <div className="flex flex-col gap-y-2 mb-3 w-full">
-                <h2 className="text-lg">Download as seed file</h2>
-                <p className="text-sm text-scale-1000">
-                  If your query consists of sample data, append the snippet to the end of{' '}
-                  <code className="text-xs">supabase/seed.sql</code>:
-                </p>
-              </div>
-              {selectedView === 'CLI' ? (
-                <CodeBlock
-                  language="bash"
-                  className="language-bash prose dark:prose-dark max-w-none"
-                >
-                  {generateSeedCliCommand(id)}
-                </CodeBlock>
-              ) : (
-                <CodeBlock
-                  language="bash"
-                  className="language-bash prose dark:prose-dark max-w-none"
-                >
-                  {generateSeedCliCommand(id, true)}
-                </CodeBlock>
-              )}
-            </Tabs.Panel>
-            <Tabs.Panel id="sql" label="SQL file" className="px-5">
-              <div className="flex flex-col gap-y-2 mb-3 w-full">
-                <h2 className="text-lg">Download as SQL file</h2>
-                <p className="text-sm text-scale-1000">
-                  Download the snippet directly into a new SQL file named{' '}
-                  <code className="text-xs">{`${migrationName}.sql`}</code>:
-                </p>
-              </div>
-
-              {selectedView === 'CLI' ? (
-                <CodeBlock
-                  language="bash"
-                  className="language-bash prose dark:prose-dark max-w-none"
-                >
-                  {generateFileCliCommand(id, migrationName)}
-                </CodeBlock>
-              ) : (
-                <CodeBlock
-                  language="bash"
-                  className="language-bash prose dark:prose-dark max-w-none"
-                >
-                  {generateFileCliCommand(id, migrationName, true)}
-                </CodeBlock>
-              )}
-            </Tabs.Panel>
-            <p className="text-xs text-lighter mt-4 text-right mr-6 mb-4">
-              * Run this command from your project directory
-            </p>
+            {SNIPPETS.map((snippet) => {
+              return (
+                <Tabs.Panel key={snippet.id} id={snippet.id} label={snippet.label} className="px-5">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex flex-col gap-y-1">
+                      <h2 className="text-lg">{snippet.title}</h2>
+                      <Markdown
+                        className="text-sm text-scale-1000 [&>p>code]:!break-normal"
+                        content={snippet.description}
+                      />
+                    </div>
+                    <TwoOptionToggle
+                      width={75}
+                      options={['CLI', 'NPM']}
+                      activeOption={selectedView}
+                      borderOverride="border-gray-100"
+                      onClickOption={() =>
+                        selectedView === 'CLI' ? setSelectedView('NPM') : setSelectedView('CLI')
+                      }
+                    />
+                  </div>
+                  <pre>
+                    <CodeBlock
+                      language="bash"
+                      className="language-bash prose dark:prose-dark max-w-none"
+                    >
+                      {selectedView === 'CLI' ? snippet.cli : snippet.npm}
+                    </CodeBlock>
+                  </pre>
+                </Tabs.Panel>
+              )
+            })}
           </Tabs>
-          <Separator className="mt-4" />
-          <div className="flex mx-5 justify-between items-center ml-auto">
-            <p className="text-sm">Learn more about:</p>
-            <div className="flex items-center space-x-2 ml-4">
+          <div className="w-full flex items-center justify-between">
+            <p className="text-xs text-lighter mx-5">
+              Run this command from your project directory
+            </p>
+            <div className="flex justify-between items-center gap-x-2 mx-5">
               <Button
                 asChild
                 type="default"
@@ -138,7 +111,7 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  Migrations
+                  About migrations
                 </Link>
               </Button>
 
@@ -152,7 +125,7 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  Local Development
+                  About CLI
                 </Link>
               </Button>
             </div>
