@@ -14,6 +14,7 @@ import Header from '@/components/Header'
 
 export default function ThreadPage({ params }: { params: { threadId: string; runId: string } }) {
   const router = useRouter()
+  const [hideChat, setHideChat] = useState(false)
   const [tables, setTables] = useState<PostgresTable[]>([])
   const [selectedMessageId, setSelectedMessageId] = useState<string | undefined>(undefined)
 
@@ -86,16 +87,17 @@ export default function ThreadPage({ params }: { params: { threadId: string; run
 
   return (
     <Main>
-      <Header />
+      <Header hideChat={hideChat} setHideChat={setHideChat} />
       <div className="flex flex-row items-center justify-between bg-alternative h-full">
         <Chat
           messages={messages}
           loading={isSuccess && data.status === 'loading'}
           selected={selectedMessageId}
+          hideChat={hideChat}
           onSubmit={(str) => mutate(str)}
           onSelect={(id) => setSelectedMessageId(id)}
         />
-        <SchemaGraph tables={tables} className="grow" />
+        <SchemaGraph tables={tables} hideChat={hideChat} />
         <CodeEditor content={content} />
       </div>
     </Main>

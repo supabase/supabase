@@ -22,7 +22,7 @@ interface CodeEditorProps {
 export const CodeEditor = ({ content = '' }: { content: string }) => {
   const code = format(content, { language: 'postgresql' })
   return (
-    <div className={cn('max-w-xl w-full border-l', 'flex flex-col h-full')}>
+    <div className={cn('max-w-lg 2xl:max-w-xl w-full border-l', 'flex flex-col h-full')}>
       <Editor2 id="sql-editor" language="pgsql" value={code} className="h-full" />
     </div>
   )
