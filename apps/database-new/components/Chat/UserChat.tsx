@@ -21,7 +21,12 @@ const UserChat = ({ message, reply, isLatest, isSelected, isLoading, onSelect }:
   return (
     <div className="flex w-full gap-x-5">
       <div className="flex flex-col justify-between items-center">
-        <div className="w-3 h-3 rounded-full border border-foreground-lighter bg-surface-300" />
+        <div
+          className={cn(
+            'transition w-3 h-3 rounded-full border border-foreground-lighter',
+            isSelected ? 'bg-white' : 'bg-surface-300'
+          )}
+        />
         {!isLatest && <div className="border-l-2 border-dashed flex-grow" />}
       </div>
 
@@ -41,13 +46,13 @@ const UserChat = ({ message, reply, isLatest, isSelected, isLoading, onSelect }:
           </span>
           <div
             className={cn(
-              'text-sm cursor-pointer transition relative overflow-hidden',
-              'w-full rounded-lg rounded-tl-none group-hover:bg-surface-200',
-              isSelected ? 'bg-surface-300' : 'bg-surface-100'
+              'cursor-pointer transition relative overflow-hidden',
+              'w-full rounded-lg rounded-tl-none',
+              isSelected ? 'bg-surface-300' : 'bg-surface-100 group-hover:bg-surface-200'
             )}
             onClick={() => reply !== undefined && onSelect(reply?.id)}
           >
-            <p className="p-4">{message.text}</p>
+            <p className="p-4 text-sm">{message.text}</p>
             {isLoading && <div className="chat-shimmering-loader w-full h-0.5 absolute bottom-0" />}
           </div>
         </div>

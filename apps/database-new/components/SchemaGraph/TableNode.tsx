@@ -46,7 +46,7 @@ const TableNode = ({ data, targetPosition, sourcePosition }: NodeProps<TableNode
 
           {data.columns.map((column) => (
             <div
-              className="text-[8px] leading-5 relative flex flex-row justify-items-start odd:bg-scale-300 even:bg-scale-400"
+              className="text-[8px] leading-5 relative flex flex-row justify-items-start odd:bg-scale-300 even:bg-scale-400 hover:bg-scale-500 transition cursor-default"
               key={column.id}
             >
               <div className="gap-[0.24rem] flex mx-2 align-middle basis-1/5 items-center justify-start">
@@ -72,14 +72,6 @@ const TableNode = ({ data, targetPosition, sourcePosition }: NodeProps<TableNode
               </div>
               <div className="flex w-full justify-between">
                 <span className="text-ellipsis overflow-hidden whitespace-nowrap">
-                  {column.name}
-                </span>
-                <span
-                  className={cn(
-                    column.isPrimary && 'pl-[6px]',
-                    'absolute top-0 left-0 right-0 pl-2 bg-scale-500 text-ellipsis overflow-hidden whitespace-nowrap opacity-0 hover:opacity-100'
-                  )}
-                >
                   {column.name}
                 </span>
                 <span className="px-2 inline-flex justify-end">{column.format}</span>
