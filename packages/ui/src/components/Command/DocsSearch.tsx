@@ -200,6 +200,7 @@ const DocsSearch = () => {
   const supabaseClient = useSupabaseClient()
   const { isLoading, setIsLoading, search, setSearch } = useCommandMenu()
   const searchId = useRef(0)
+  const initialLoad = useRef(true)
 
   const handleSearch = useCallback(
     async (query: string) => {
@@ -271,15 +272,15 @@ const DocsSearch = () => {
 
   const debouncedSearch = useMemo(() => debounce(handleSearch, 1000), [handleSearch])
 
-  // Search initial query immediately (note - empty useEffect deps)
   useEffect(() => {
-    if (search) {
-      handleSearch(search)
+    if (!search) {
+      return
     }
-  }, [])
-
-  useEffect(() => {
-    if (search) {
+    if (initialLoad.current) {
+      handleSearch(search)
+      initialLoad.current = false
+      console.log(initialLoad.current)
+    } else {
       debouncedSearch(search)
     }
   }, [search])
@@ -323,7 +324,9 @@ const DocsSearch = () => {
   const hasResults =
     state.status === 'fullResults' ||
     state.status === 'partialResults' ||
-    (state.status === 'loading' && state.staleResults.length)
+    (state.status === 'loading' && state.staleResults.length > 0)
+
+  console.log('results' in state ? state.results : '')
 
   return (
     <>
@@ -333,11 +336,13 @@ const DocsSearch = () => {
             <CommandGroup
               heading=""
               key={`${page.title}-group-index-${i}`}
-              value={`${page.title}-group-index-${i}`}
+              // Adding the search term here is a hack to prevent the cmdk menu
+              // filter from filtering out search results
+              value={`${search}-${page.title}-group-index-${i}`}
             >
               <CommandItem
                 key={`${page.title}-item-index-${i}`}
-                value={`${removeDoubleQuotes(page.title)}-item-index-${i}`}
+                value={`${search}-${removeDoubleQuotes(page.title)}-item-index-${i}`}
                 type="block-link"
                 onSelect={() => {
                   openLink(page.type, formatPageUrl(page))
@@ -368,7 +373,7 @@ const DocsSearch = () => {
                         openLink(page.type, formatSectionUrl(page, section))
                       }}
                       key={`${page.title}__${section.heading}-item-index-${i}`}
-                      value={`${removeDoubleQuotes(page.title)}__${removeDoubleQuotes(
+                      value={`${search}-${removeDoubleQuotes(page.title)}__${removeDoubleQuotes(
                         section.heading ?? ''
                       )}-item-index-${i}`}
                       type="block-link"
@@ -421,7 +426,7 @@ const DocsSearch = () => {
           })}
         </CommandGroup>
       )}
-      {state.status === 'loading' && !state.staleResults.length && (
+      {state.status === 'loading' && state.staleResults.length === 0 && (
         <div className="p-6 grid gap-6 my-4">
           <p className="text-lg text-foreground-muted text-center">Searching for results</p>
         </div>
