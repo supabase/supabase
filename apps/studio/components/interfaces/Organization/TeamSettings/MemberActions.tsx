@@ -102,7 +102,7 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
     await asyncDeleteMemberInvite({ slug, invitedId, invalidateDetail: false })
     createOrganizationMemberInvite({
       slug,
-      invitedEmail: member.primary_email,
+      invitedEmail: member.primary_email!,
       ownerId: invitedId,
       roleId: roleId,
     })
