@@ -11,8 +11,8 @@ import ReactFlow, {
 import 'reactflow/dist/style.css'
 import { cn } from 'ui'
 
-import { getGraphDataFromTables } from './SchemaGraph/SchemaGraph.utils'
-import TableNode from './SchemaGraph/TableNode'
+import { getGraphDataFromTables } from './SchemaGraph.utils'
+import TableNode from './TableNode'
 
 interface SchemaGraphProps {
   tables: PostgresTable[]

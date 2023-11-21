@@ -15,6 +15,13 @@ interface ChatProps {
   onSubmit: (value: string) => void
 }
 
+/**
+ * [Joshen] Plan for supporting multiple branches
+ * The chat will always show a single thread of conversation at any point of time
+ * We'll have a button that will expand _all_ conversations into a full screen, using react node to show the tree
+ * Once clicked on a message, the default UI shows again with that thread loaded - good enough for v1
+ */
+
 export const Chat = ({ messages, loading, selected, hideChat, onSelect, onSubmit }: ChatProps) => {
   const [value, setValue] = useState('')
   const [inputEntered, setInputEntered] = useState(false)
@@ -62,7 +69,11 @@ export const Chat = ({ messages, loading, selected, hideChat, onSelect, onSubmit
             value={value}
             disabled={loading || inputEntered}
             inputClassName="rounded-full pl-8"
-            placeholder={loading ? 'Generating reply to request...' : 'Ask for some changes'}
+            placeholder={
+              loading
+                ? 'Generating reply to request...'
+                : 'Ask for some changes on the selected message'
+            }
             icon={<div className="ml-1 w-2 h-2 rounded-full bg-purple-900" />}
             onChange={(v) => setValue(v.target.value)}
             onKeyDown={(e) => {

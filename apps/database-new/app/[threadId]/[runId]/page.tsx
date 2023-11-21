@@ -7,14 +7,17 @@ import { useEffect, useMemo, useState } from 'react'
 import { Chat } from '@/components/Chat/Chat'
 import { CodeEditor } from '@/components/CodeEditor/CodeEditor'
 import { Main } from '@/components/Main'
-import SchemaGraph from '@/components/SchemaGraph'
+import SchemaGraph from '@/components/SchemaGraph/SchemaGraph'
 import { AssistantMessage, PostgresTable, ReadThreadAPIResult, UserMessage } from '@/lib/types'
 import { parseTables } from '@/lib/utils'
 import Header from '@/components/Header'
+import { Modal } from 'ui'
+import AllThreadsModal from '@/components/AllThreadsModal/AllThreadsModal'
 
 export default function ThreadPage({ params }: { params: { threadId: string; runId: string } }) {
   const router = useRouter()
   const [hideChat, setHideChat] = useState(false)
+  const [showAllThreads, setShowAllThreads] = useState(false)
   const [tables, setTables] = useState<PostgresTable[]>([])
   const [selectedMessageId, setSelectedMessageId] = useState<string | undefined>(undefined)
   const [selectedReplyId, setSelectedReplyId] = useState<string | undefined>(undefined)
@@ -94,6 +97,7 @@ export default function ThreadPage({ params }: { params: { threadId: string; run
         }
         hideChat={hideChat}
         setHideChat={setHideChat}
+        showAllThreads={() => setShowAllThreads(true)}
       />
       <div className="flex flex-row items-center justify-between bg-alternative h-full">
         <Chat
@@ -110,6 +114,15 @@ export default function ThreadPage({ params }: { params: { threadId: string; run
         <SchemaGraph tables={tables} hideChat={hideChat} />
         <CodeEditor content={content} />
       </div>
+      <AllThreadsModal
+        visible={showAllThreads}
+        onClose={() => setShowAllThreads(false)}
+        onSelectMessage={(messageId, replyId) => {
+          setShowAllThreads(false)
+          setSelectedMessageId(messageId)
+          setSelectedReplyId(replyId)
+        }}
+      />
     </Main>
   )
 }

@@ -10,9 +10,10 @@ interface HeaderProps {
   selectedMessage?: UserMessage
   hideChat: boolean
   setHideChat: (value: boolean) => void
+  showAllThreads: () => void
 }
 
-const Header = ({ selectedMessage, hideChat, setHideChat }: HeaderProps) => {
+const Header = ({ selectedMessage, hideChat, setHideChat, showAllThreads }: HeaderProps) => {
   const [mounted, setMounted] = useState(false)
   const { setTheme, resolvedTheme } = useTheme()
 
@@ -36,6 +37,12 @@ const Header = ({ selectedMessage, hideChat, setHideChat }: HeaderProps) => {
         <Button type="default" onClick={() => setHideChat(!hideChat)}>
           {hideChat ? 'Show chat' : 'Hide chat'}
         </Button>
+
+        <Button type="default" onClick={() => showAllThreads()}>
+          Show all threads
+        </Button>
+
+        <div className="border-r py-3" />
 
         <Button type="default">
           <Link href="/new">New conversation</Link>
