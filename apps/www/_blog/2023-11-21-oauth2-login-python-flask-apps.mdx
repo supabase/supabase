@@ -57,7 +57,7 @@ class FlaskSessionStorage(SyncSupportedStorage):
             self.storage.pop(key, None)
 ```
 
-In this file, we are extending the `SyncSupportedStorage` class from the `gotrue` library which comes bundled with the `supabase` library. Here we are telling the Supabase authentication library (`gotrue`) how to retrieve, store and remove a session that will store our JSON Web Token (JWT).
+In this file, we're extending the `SyncSupportedStorage` class from the `gotrue` library which comes bundled with the `supabase` library. Here we're telling the Supabase authentication library (`gotrue`) how to retrieve, store and remove a session that will store our JSON Web Token (JWT).
 
 ## Initiate the client
 
