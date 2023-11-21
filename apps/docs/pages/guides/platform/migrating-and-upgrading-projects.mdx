@@ -114,6 +114,10 @@ WHERE rolcanlogin = true
 ALTER ROLE <role_name> WITH PASSWORD '<password>';
 ```
 
+#### Database size reduction
+
+As part of the upgrade process, maintenance operations such as [vacuuming](https://www.postgresql.org/docs/current/routine-vacuuming.html#ROUTINE-VACUUMING) are also executed. This can result in a reduction in the reported database size.
+
 #### Post-upgrade validation
 
 Supabase performs extensive pre- and post-upgrade validations to ensure that the database has been correctly upgraded. However, you should plan for your own application-level validations, as there might be changes you might not have anticipated, and this should be budgeted for when planning your downtime window.
