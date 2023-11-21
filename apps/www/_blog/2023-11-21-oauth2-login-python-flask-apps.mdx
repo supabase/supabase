@@ -6,11 +6,11 @@ categories:
 tags:
   - python
   - auth
-date: '2023-11-20'
+date: '2023-11-21'
 toc_depth: 3
 author: andrew_smith
-image: 2023-11-16-react-native-authentication/react-native-authentication-supabase.jpg
-thumb: 2023-11-16-react-native-authentication/react-native-authentication-supabase.jpg
+image: oauth2-login-python-flask-apps/OG-image.jpg
+thumb: oauth2-login-python-flask-apps/thumb.jpg
 ---
 
 OAuth is an open standard protocol facilitating secure authorization and authentication for third-party applications to access user resources without obtaining their credentials directly. The OAuth 2.0 version involves users granting permission, authorization servers issuing access tokens, and resource servers verifying tokens to enable controlled access across various web services and APIs.
@@ -62,14 +62,14 @@ In this file, we are extending the `SyncSupportedStorage` class from the `gotrue
 
 ## Initiate the client
 
-Create another file called `supabase.py` and in this file, we will initiate our Supabase client.
+Create another file called `supabase_client.py` and in this file, we will initiate our Supabase client.
 
 ```python
 import os
 from flask import g
 from werkzeug.local import LocalProxy
 from supabase.client import Client, ClientOptions
-from app.flask_storage import FlaskSessionStorage
+from flask_storage import FlaskSessionStorage
 
 url = os.environ.get("SUPABASE_URL", "")
 key = os.environ.get("SUPABASE_KEY", "")
