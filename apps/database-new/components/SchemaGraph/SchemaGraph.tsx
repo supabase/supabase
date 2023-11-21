@@ -41,7 +41,7 @@ const TablesGraph = ({ tables, hideChat }: SchemaGraphProps) => {
         zoom,
       })
     }
-  }, [hideChat, reactFlowInstance])
+  }, [hideChat])
 
   const backgroundPatternColor = resolvedTheme === 'dark' ? '#2e2e2e' : '#e6e8eb'
   const edgeStrokeColor = resolvedTheme === 'dark' ? '#ededed' : '#111318'
@@ -50,7 +50,7 @@ const TablesGraph = ({ tables, hideChat }: SchemaGraphProps) => {
     getGraphDataFromTables(tables).then(({ nodes, edges }) => {
       reactFlowInstance.setNodes(nodes)
       reactFlowInstance.setEdges(edges)
-      setTimeout(() => reactFlowInstance.fitView({})) // it needs to happen during next event tick
+      setTimeout(() => reactFlowInstance.fitView({}))
     })
   }, [tables, resolvedTheme])
 

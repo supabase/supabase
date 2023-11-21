@@ -26,8 +26,6 @@ export default function NewThread() {
     },
   })
 
-  console.log({ isPending })
-
   return (
     <main className="flex min-h-screen w-full flex-col items-center justify-center gap-y-4">
       <div className="flex items-center gap-x-1.5 font-mono text-xl">
