@@ -246,7 +246,7 @@ class ProductRepositoryImpl @Inject constructor(
                     name = product.name,
                     price = product.price,
                 )
-                postgrest["products"].insert(productDto)
+                postgrest.from("products").insert(productDto)
                 true
             }
             true
@@ -257,7 +257,7 @@ class ProductRepositoryImpl @Inject constructor(
 
     override suspend fun getProducts(): List<ProductDto>? {
         return withContext(Dispatchers.IO) {
-            val result = postgrest["products"]
+            val result = postgrest.from("products")
                 .select().decodeList<ProductDto>()
             result
         }
@@ -266,7 +266,7 @@ class ProductRepositoryImpl @Inject constructor(
 
     override suspend fun getProduct(id: String): ProductDto {
         return withContext(Dispatchers.IO) {
-            postgrest["products"].select {
+            postgrest.from("products").select {
                 eq("id", id)
             }.decodeSingle<ProductDto>()
         }
@@ -274,7 +274,7 @@ class ProductRepositoryImpl @Inject constructor(
 
     override suspend fun deleteProduct(id: String) {
         return withContext(Dispatchers.IO) {
-            postgrest["products"].delete {
+            postgrest.from("products").delete {
                 eq("id", id)
             }
         }
@@ -295,7 +295,7 @@ class ProductRepositoryImpl @Inject constructor(
                         data = imageFile,
                         upsert = true
                     )
-                postgrest["products"].update({
+                postgrest.from("products").update({
                     set("name", name)
                     set("price", price)
                     set("image", buildImageUrl(imageFileName = imageUrl))
@@ -303,7 +303,7 @@ class ProductRepositoryImpl @Inject constructor(
                     eq("id", id)
                 }
             } else {
-                postgrest["products"].update({
+                postgrest.from("products").update({
                     set("name", name)
                     set("price", price)
                 }) {

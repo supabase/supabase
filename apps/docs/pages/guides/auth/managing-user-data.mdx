@@ -114,14 +114,14 @@ const { data: profile } = await supabase
 
 ```kotlin
 // This will return nothing while the user is logged out
-val data = supabase.postgrest["profiles"].select(Columns.list("id", "username", "avatar_url", "website"))
+val data = supabase.from("profiles").select(Columns.list("id", "username", "avatar_url", "website"))
 
 // After the user is logged in, this will only return
 // the logged-in user's data - in this case a single row
 supabase.auth.signInWith(OTP) {
     this.email = email
 }
-val data = supabase.postgrest["profiles"].select(Columns.list("id", "username", "avatar_url", "website"))
+val data = supabase.from("profiles").select(Columns.list("id", "username", "avatar_url", "website"))
 ```
 
 </TabPanel>

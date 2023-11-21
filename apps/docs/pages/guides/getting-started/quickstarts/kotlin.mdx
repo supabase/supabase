@@ -180,7 +180,7 @@ export const meta = {
             private val postgrest: Postgrest,
         ) : ProductRepository {
           override suspend fun getProducts(): List<ProductDto> {
-            val result = client.postgrest["products"]
+            val result = supabase.from("products")
                 .select().decodeList<ProductDto>()
             // Handle result data for next step
             return result

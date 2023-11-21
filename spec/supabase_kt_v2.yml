@@ -279,14 +279,14 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val city = supabase.postgrest["cities"].select().decodeSingle<City>()
+          val city = supabase.from("cities").select().decodeSingle<City>()
           ```
       - id: selecting-specific-columns
         name: Selecting specific columns
         description: You can select specific fields from your tables.
         code: |
           ```kotlin
-          val city = supabase.postgrest["cities"].select(columns = Columns.list("id, name")).decodeSingle<City>()
+          val city = supabase.from("cities").select(columns = Columns.list("id, name")).decodeSingle<City>()
           ```
       - id: query-foreign-tables
         name: Query foreign tables
@@ -301,7 +301,7 @@ functions:
                 name
               )
           """.trimIndent())
-          val country = supabase.postgrest["countries"]
+          val country = supabase.from("countries")
             .select(
               columns = columns
             )
@@ -328,7 +328,7 @@ functions:
               from: sender_id(name),
               to: receiver_id(name)
           """.trimIndent())
-          val message = supabase.postgrest["messages"]
+          val message = supabase.from("messages")
               .select(columns = columns)
               .decodeSingle<Message>()
           ```
@@ -339,7 +339,7 @@ functions:
           Allowed values for count option are [Count.EXACT](https://postgrest.org/en/stable/api.html#exact-count), [Count.PLANNED](https://postgrest.org/en/stable/api.html#planned-count) and [Count.ESTIMATED](https://postgrest.org/en/stable/api.html#estimated-count).
         code: |
           ```kotlin
-          val count = supabase.postgrest["countries"]
+          val count = supabase.from("countries")
                       .select(head = true, count = Count.EXACT)
                       .count()!!
           ```
@@ -357,7 +357,7 @@ functions:
               id, name
               address->city
           """.trimIndent())
-          val user = supabase.postgrest["users"]
+          val user = supabase.from("users")
               .select(columns = columns)
               .decodeSingle<User>()
           ```
@@ -377,7 +377,7 @@ functions:
         code: |
           ```kotlin
           val city = City(name = "The Shire", countryId = 554)
-          supabase.postgrest["cities"].insert(city, returning = Returning.MINIMAL) //returning defaults to Returning.REPRESENTATION
+          supabase.from("cities").insert(city, returning = Returning.MINIMAL) //returning defaults to Returning.REPRESENTATION
           ```
       - id: bulk-create
         name: Bulk create
@@ -388,7 +388,7 @@ functions:
           ```kotlin
           val theShire = City(name = "The Shire", countryId = 554)
           val rohan = City(name = "Rohan", countryId = 554)
-          supabase.postgrest["cities"].insert(listOf(theShire, rohan), returning = Returning.MINIMAL) //returning defaults to Returning.REPRESENTATION
+          supabase.from("cities").insert(listOf(theShire, rohan), returning = Returning.MINIMAL) //returning defaults to Returning.REPRESENTATION
           ```
       - id: fetch-inserted-data
         name: Fetch inserted record
@@ -396,7 +396,7 @@ functions:
           ```kotlin
           val theShire = City(name = "The Shire", countryId = 554)
           val rohan = City(name = "Rohan", countryId = 554)
-          val result = supabase.postgrest["cities"].insert(listOf(theShire, rohan)).decodeList<City>()
+          val result = supabase.from("cities").insert(listOf(theShire, rohan)).decodeList<City>()
           ```
 
   - id: update
@@ -410,7 +410,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.postgrest["countries"].update(
+          supabase.from("countries").update(
               {
                  Country::name setTo "Australia"
                  //or
@@ -426,7 +426,7 @@ functions:
         name: Update a record and return it
         code: |
           ```kotlin
-          val newCountry = supabase.postgrest["countries"].update(
+          val newCountry = supabase.from("countries").update(
               {
                  Country::name setTo "Australia"
                  //or
@@ -473,7 +473,7 @@ functions:
         code: |
           ```kotlin
           val address = Address(street = "Melrose Place", postcode = 90210)
-          supabase.postgrest["users"].update(
+          supabase.from("users").update(
               {
                  User::address setTo address
               }
@@ -499,7 +499,7 @@ functions:
         code: |
           ```kotlin
           val toUpsert = Message(id = 3, message = "foo", username = "supabot")
-          supabase.postgrest["messages"].insert(toUpsert, upsert = true)
+          supabase.from("messages").insert(toUpsert, upsert = true)
           ```
       - id: upserting-into-tables-with-constraints
         name: Upserting into tables with constraints
@@ -511,7 +511,7 @@ functions:
         code: |
           ```kotlin
           let toUpsert = User(username = "supabot")
-          supabase.postgrest["users"].insert(toUpsert, upsert = true, onConflict = "username")
+          supabase.from("users").insert(toUpsert, upsert = true, onConflict = "username")
           ```
       - id: upsert-return-row-count
         name: Return the exact number of rows
@@ -519,7 +519,7 @@ functions:
         code: |
           ```kotlin
           let toUpsert = User(username = "supabot")
-          val count = supabase.postgrest["users"].insert(toUpsert, upsert = true, onConflict = "username", count = Count.EXACT).count()
+          val count = supabase.from("users").insert(toUpsert, upsert = true, onConflict = "username", count = Count.EXACT).count()
           ```
 
   - id: delete
@@ -538,7 +538,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.postgrest["cities"].delete {
+          supabase.from("cities").delete {
              City::id eq 666
              //or
              eq("id", 666)
@@ -548,7 +548,7 @@ functions:
         name: Fetch deleted records
         code: |
           ```kotlin
-          val deletedCity = supabase.postgrest["cities"].delete {
+          val deletedCity = supabase.from("cities").delete {
              City::id eq 666
              //or
              eq("id", 666)
@@ -609,7 +609,7 @@ functions:
           `delete()`, and `rpc()`
         code: |
           ```kotlin
-          supabase.postgrest["cities"].select(columns = Columns.list("name", "country_id")) {
+          supabase.from("cities").select(columns = Columns.list("name", "country_id")) {
               City::name eq "The Shire"
               //or
               eq("name", "The Shire")
@@ -622,7 +622,7 @@ functions:
           `delete()`, and `rpc()`
         code: |
           ```kotlin
-          supabase.postgrest["cities"].select(columns = Columns.list("name, country_id")) {
+          supabase.from("cities").select(columns = Columns.list("name, country_id")) {
               and { //when both are true
                  City::population gt 40000
                  City::population lt 700000
@@ -671,7 +671,7 @@ functions:
           ```
         code: |
           ```kotlin
-          supabase.postgrest["users"].select {
+          supabase.from("users").select {
               eq("address->postcode", 90210)
           }
           ```
@@ -685,7 +685,7 @@ functions:
                   name
               )
           """.trimIndent())
-          supabase.postgrest["countries"].select(
+          supabase.from("countries").select(
                 columns = columns
           ) {
               eq("cities.name", "Bali")
@@ -742,7 +742,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.postgrest["countries"].select(columns = Columns.list("name")) {
+          supabase.from("countries").select(columns = Columns.list("name")) {
               or {
                   Country::id eq 2
                   Country::name eq "Algeria"
@@ -756,7 +756,7 @@ functions:
         name: Use `or` with `and`
         code: |
           ```kotlin
-          supabase.postgrest["countries"].select(columns = Columns.list("name")) {
+          supabase.from("countries").select(columns = Columns.list("name")) {
               or {
                   Country::id gt 3
                   and {
@@ -779,7 +779,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.postgrest["countries"].select {
+          supabase.from("countries").select {
               filterNot("name", FilterOperation.IS, "")
           }
           ```
@@ -794,7 +794,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.postgrest["cities"].select(columns = Columns.list("name", "country_id")) {
+          supabase.from("cities").select(columns = Columns.list("name", "country_id")) {
               City::name eq "The Shire"
               //or
               eq("name", "The Shire")
@@ -805,7 +805,7 @@ functions:
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
-          supabase.postgrest["cities"].update(toUpdate) {
+          supabase.from("cities").update(toUpdate) {
               City::name eq "San Francisco"
               //or
               eq("name", "San Francisco")
@@ -815,7 +815,7 @@ functions:
         name: With `delete()`
         code: |
           ```kotlin
-          supabase.postgrest["cities"].delete {
+          supabase.from("cities").delete {
               City::name eq "Mordor"
               //or
               eq("name", "Mordor")
@@ -842,7 +842,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.postgrest["cities"].select(columns = Columns.list("name", "country_id")) {
+          supabase.from("cities").select(columns = Columns.list("name", "country_id")) {
               City::name neq "The Shire"
               //or
               neq("name", "The Shire")
@@ -853,7 +853,7 @@ functions:
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
-          supabase.postgrest["cities"].update(toUpdate) {
+          supabase.from("cities").update(toUpdate) {
               City::name neq "The Shire"
               //or
               neq("name", "The Shire")
@@ -863,7 +863,7 @@ functions:
         name: With `delete()`
         code: |
           ```kotlin
-          supabase.postgrest["cities"].delete {
+          supabase.from("cities").delete {
               City::name neq "The Shire"
               //or
               neq("name", "The Shire")
@@ -888,7 +888,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.postgrest["cities"].select(columns = Columns.list("name")) {
+          supabase.from("cities").select(columns = Columns.list("name")) {
              City::countryId gt 300
              //or
              gt("country_id", 300)
@@ -899,7 +899,7 @@ functions:
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
-          supabase.postgrest["cities"].update(toUpdate) {
+          supabase.from("cities").update(toUpdate) {
              City::countryId gt 300
              //or
              gt("country_id", 300)
@@ -909,7 +909,7 @@ functions:
         name: With `delete()`
         code: |
           ```kotlin
-          supabase.postgrest["cities"].delete {
+          supabase.from("cities").delete {
              City::countryId gt 300
              //or
              gt("country_id", 300)
@@ -936,7 +936,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.postgrest["cities"].select(columns = Columns.list("name")) {
+          supabase.from("cities").select(columns = Columns.list("name")) {
              City::countryId gte 300
              //or
              gte("country_id", 300)
@@ -947,7 +947,7 @@ functions:
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
-          supabase.postgrest["cities"].update(toUpdate) {
+          supabase.from("cities").update(toUpdate) {
              City::countryId gte 300
              //or
              gte("country_id", 300)
@@ -957,7 +957,7 @@ functions:
         name: With `delete()`
         code: |
           ```kotlin
-          supabase.postgrest["cities"].delete {
+          supabase.from("cities").delete {
              City::countryId gte 300
              //or
              gte("country_id", 300)
@@ -984,7 +984,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.postgrest["cities"].select(columns = Columns.list("name")) {
+          supabase.from("cities").select(columns = Columns.list("name")) {
              City::countryId lt 300
              //or
              lt("country_id", 300)
@@ -995,7 +995,7 @@ functions:
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
-          supabase.postgrest["cities"].update(toUpdate) {
+          supabase.from("cities").update(toUpdate) {
              City::countryId lt 300
              //or
              lt("country_id", 300)
@@ -1005,7 +1005,7 @@ functions:
         name: With `delete()`
         code: |
           ```kotlin
-          supabase.postgrest["cities"].delete {
+          supabase.from("cities").delete {
              City::countryId lt 300
              //or
              lt("country_id", 300)
@@ -1032,7 +1032,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.postgrest["cities"].select(columns = Columns.list("name")) {
+          supabase.from("cities").select(columns = Columns.list("name")) {
              City::countryId lte 300
              //or
              lte("country_id", 300)
@@ -1043,7 +1043,7 @@ functions:
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
-          supabase.postgrest["cities"].update(toUpdate) {
+          supabase.from("cities").update(toUpdate) {
              City::countryId lte 300
              //or
              lte("country_id", 300)
@@ -1053,7 +1053,7 @@ functions:
         name: With `delete()`
         code: |
           ```kotlin
-          supabase.postgrest["cities"].delete {
+          supabase.from("cities").delete {
              City::countryId lte 300
              //or
              lte("country_id", 300)
@@ -1080,7 +1080,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.postgrest["cities"].select(columns = Columns.list("name")) {
+          supabase.from("cities").select(columns = Columns.list("name")) {
              City::name like "%la%"
              //or
              like("name", "%la%")
@@ -1091,7 +1091,7 @@ functions:
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
-          supabase.postgrest["cities"].update(toUpdate) {
+          supabase.from("cities").update(toUpdate) {
              City::name like "%la%"
              //or
              like("name", "%la%")
@@ -1101,7 +1101,7 @@ functions:
         name: With `delete()`
         code: |
           ```kotlin
-          supabase.postgrest["cities"].delete {
+          supabase.from("cities").delete {
              City::name like "%la%"
              //or
              like("name", "%la%")
@@ -1128,7 +1128,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.postgrest["cities"].select(columns = Columns.list("name")) {
+          supabase.from("cities").select(columns = Columns.list("name")) {
              City::name ilike "%la%"
              //or
              ilike("name", "%la%")
@@ -1139,7 +1139,7 @@ functions:
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
-          supabase.postgrest["cities"].update(toUpdate) {
+          supabase.from("cities").update(toUpdate) {
              City::name ilike "%la%"
              //or
              ilike("name", "%la%")
@@ -1149,7 +1149,7 @@ functions:
         name: With `delete()`
         code: |
           ```kotlin
-          supabase.postgrest["cities"].delete {
+          supabase.from("cities").delete {
              City::name ilike "%la%"
              //or
              ilike("name", "%la%")
@@ -1178,7 +1178,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.postgrest["cities"].select(columns = Columns.list("name")) {
+          supabase.from("cities").select(columns = Columns.list("name")) {
              City::name isExact null
              //or
              exact("name", null)
@@ -1189,7 +1189,7 @@ functions:
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
-          supabase.postgrest["cities"].update(toUpdate) {
+          supabase.from("cities").update(toUpdate) {
              City::name isExact null
              //or
              exact("name", null)
@@ -1199,7 +1199,7 @@ functions:
         name: With `delete()`
         code: |
           ```kotlin
-          supabase.postgrest["cities"].delete {
+          supabase.from("cities").delete {
               City::name isExact null
              //or
              exact("name", null)
@@ -1226,7 +1226,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.postgrest["cities"].select(columns = Columns.list("name")) {
+          supabase.from("cities").select(columns = Columns.list("name")) {
              City::name isIn listOf("Rio de Janeiro", "San Francisco")
              //or
              isIn("name", listOf("Rio de Janeiro", "San Francisco"))
@@ -1237,7 +1237,7 @@ functions:
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
-          supabase.postgrest["cities"].update(toUpdate) {
+          supabase.from("cities").update(toUpdate) {
              City::name isIn listOf("Rio de Janeiro", "San Francisco")
              //or
              isIn("name", listOf("Rio de Janeiro", "San Francisco"))
@@ -1247,7 +1247,7 @@ functions:
         name: With `delete()`
         code: |
           ```kotlin
-          supabase.postgrest["cities"].delete {
+          supabase.from("cities").delete {
              City::name isIn listOf("Rio de Janeiro", "San Francisco")
              //or
              isIn("name", listOf("Rio de Janeiro", "San Francisco"))
@@ -1272,7 +1272,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.postgrest["cities"].select(columns = Columns.list("name")) {
+          supabase.from("cities").select(columns = Columns.list("name")) {
              City::mainExports contains listOf("oil")
              //or
              contains("main_exports", listOf("oil"))
@@ -1283,7 +1283,7 @@ functions:
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
-          supabase.postgrest["cities"].update(toUpdate) {
+          supabase.from("cities").update(toUpdate) {
              City::mainExports contains listOf("oil")
              //or
              contains("main_exports", listOf("oil"))
@@ -1293,7 +1293,7 @@ functions:
         name: With `delete()`
         code: |
           ```kotlin
-          supabase.postgrest["cities"].delete {
+          supabase.from("cities").delete {
              City::mainExports contains listOf("oil")
              //or
              contains("main_exports", listOf("oil"))
@@ -1320,7 +1320,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-            supabase.postgrest["reservations"].select {
+            supabase.from("reservations").select {
                Reservation::during rangeLt ("2000-01-02 08:30" to "2000-01-02 09:30")
                //or
                rangeLt("during", "2000-01-02 08:30" to "2000-01-02 09:30")
@@ -1374,7 +1374,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-            supabase.postgrest["reservations"].select {
+            supabase.from("reservations").select {
                Reservation::during rangeGt ("2000-01-02 08:30" to "2000-01-02 09:30")
                //or
                rangeGt("during", "2000-01-02 08:30" to "2000-01-02 09:30")
@@ -1427,7 +1427,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-            supabase.postgrest["reservations"].select {
+            supabase.from("reservations").select {
                Reservation::during rangeGte ("2000-01-02 08:30" to "2000-01-02 09:30")
                //or
                rangeGte("during", "2000-01-02 08:30" to "2000-01-02 09:30")
@@ -1482,7 +1482,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-            supabase.postgrest["reservations"].select {
+            supabase.from("reservations").select {
                Reservation::during rangeLte ("2000-01-02 08:30" to "2000-01-02 09:30")
                //or
                rangeLte("during", "2000-01-02 08:30" to "2000-01-02 09:30")
@@ -1536,7 +1536,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-            supabase.postgrest["reservations"].select {
+            supabase.from("reservations").select {
                Reservation::during adjacent ("2000-01-02 08:30" to "2000-01-02 09:30")
                //or
                adjacent("during", "2000-01-02 08:30" to "2000-01-02 09:30")
@@ -1586,7 +1586,7 @@ functions:
         name: On array columns
         code: |
           ```kotlin
-          supabase.postgrest["issues"].select(columns = Columns.list("title")) {
+          supabase.from("issues").select(columns = Columns.list("title")) {
              Issue::tags overlaps listOf("is:closed", "severity:high")
              //or
              overlaps("tags", listOf("is:closed", "severity:high"))
@@ -1626,7 +1626,7 @@ functions:
         name: On range columns
         code: |
           ```kotlin
-          supabase.postgrest["issues"].select(columns = Columns.list("title")) {
+          supabase.from("issues").select(columns = Columns.list("title")) {
              Issue::tags overlaps listOf("is:closed", "severity:high")
              //or
              overlaps("tags", listOf("is:closed", "severity:high"))
@@ -1680,7 +1680,7 @@ functions:
         name: Text search
         code: |
           ```kotlin
-          supabase.postgrest["quotes"].select(columns = Columns.list("catchphrase")) {
+          supabase.from("quotes").select(columns = Columns.list("catchphrase")) {
              textSearch(column = "catchphrase", query = "'fat' & 'cat'", config = "english", type = TextSearchType.YOUR_TYPE)
           }
           ```
@@ -1689,7 +1689,7 @@ functions:
         description: Uses PostgreSQL's `plainto_tsquery` function.
         code: |
           ```kotlin
-          supabase.postgrest["quotes"].select(columns = Columns.list("catchphrase")) {
+          supabase.from("quotes").select(columns = Columns.list("catchphrase")) {
              textSearch(column = "catchphrase", query = "'fat' & 'cat'", config = "english", type = TextSearchType.PLAINTO)
           }
           ```
@@ -1698,7 +1698,7 @@ functions:
         description: Uses PostgreSQL's `phraseto_tsquery` function.
         code: |
           ```kotlin
-          supabase.postgrest["quotes"].select(columns = Columns.list("catchphrase")) {
+          supabase.from("quotes").select(columns = Columns.list("catchphrase")) {
              textSearch(column = "catchphrase", query = "'fat' & 'cat'", config = "english", type = TextSearchType.PHRASETO)
           }
           ```
@@ -1716,7 +1716,7 @@ functions:
 
         code: |
           ```kotlin
-          supabase.postgrest["quotes"].select(columns = Columns.list("catchphrase")) {
+          supabase.from("quotes").select(columns = Columns.list("catchphrase")) {
              textSearch(column = "catchphrase", query = "'fat' & 'cat'", config = "english", type = TextSearchType.WEBSEARCH)
           }
           ```
@@ -1731,7 +1731,7 @@ functions:
         name: With `select()`
         code: |
           ```kotlin
-          supabase.postgrest["countries"].select {
+          supabase.from("countries").select {
              filter(column = "name", operator = FilterOperator.IN, value = "('Algeria', 'Japan')")
           }
           ```
@@ -1773,7 +1773,7 @@ functions:
                   name
               )
           """.trimIndent())
-          supabase.postgrest["countries"].select(
+          supabase.from("countries").select(
              columns = 
           ) {
              filter(column = "cities.name", operator = FilterOperator.EQ, value = "Bali")
@@ -1830,7 +1830,7 @@ functions:
         name: With `select()`
         code: |
           ```kotlin
-          supabase.postgrest["countries"].select(columns = Columns.list("id", "name")) {
+          supabase.from("countries").select(columns = Columns.list("id", "name")) {
              order(column = "id", order = Order.ASCENDING)
           }
           ```
@@ -1880,7 +1880,7 @@ functions:
                   name
               )
           """.trimIndent())
-          supabase.postgrest["countries"].select(
+          supabase.from("countries").select(
               columns = columns
           ) {
               order(column = "id", order = Order.ASCENDING, foreignTable = "cities")
@@ -1948,7 +1948,7 @@ functions:
         name: With `select()`
         code: |
           ```kotlin
-          supabase.postgrest["countries"].select {
+          supabase.from("countries").select {
               limit(count = 20)
           }
           ```
@@ -1989,7 +1989,7 @@ functions:
                   name
               )
           """)
-          supabase.postgrest["countries"].select(
+          supabase.from("countries").select(
               columns = columns
           ) {
               limit(count = 20, foreignTable = "cities")
@@ -2044,7 +2044,7 @@ functions:
         name: With `select()`
         code: |
           ```kotlin
-          supabase.postgrest["countries"].select {
+          supabase.from("countries").select {
               range(1L..5L)
           }
           ```
