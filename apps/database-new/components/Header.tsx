@@ -1,5 +1,9 @@
+'use client'
 import Link from 'next/link'
 import { Button } from 'ui'
+import { useTheme } from 'next-themes'
+import { Moon, Sun } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 interface HeaderProps {
   hideChat: boolean
@@ -7,6 +11,13 @@ interface HeaderProps {
 }
 
 const Header = ({ hideChat, setHideChat }: HeaderProps) => {
+  const [mounted, setMounted] = useState(false)
+  const { setTheme, resolvedTheme } = useTheme()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   return (
     <div className="bg-background border flex items-center justify-between px-4 py-3">
       <div className="flex items-center gap-x-4">
@@ -23,6 +34,15 @@ const Header = ({ hideChat, setHideChat }: HeaderProps) => {
         <Button type="default">
           <Link href="/new">New conversation</Link>
         </Button>
+
+        {mounted && (
+          <Button
+            type="outline"
+            className="px-1"
+            icon={resolvedTheme === 'dark' ? <Moon size={16} /> : <Sun size={16} />}
+            onClick={() => (resolvedTheme === 'dark' ? setTheme('light') : setTheme('dark'))}
+          />
+        )}
       </div>
     </div>
   )

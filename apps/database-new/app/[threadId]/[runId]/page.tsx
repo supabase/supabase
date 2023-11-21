@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 
 import { Chat } from '@/components/Chat/Chat'
-import { CodeEditor } from '@/components/CodeEditor'
+import { CodeEditor } from '@/components/CodeEditor/CodeEditor'
 import { Main } from '@/components/Main'
 import SchemaGraph from '@/components/SchemaGraph'
 import { AssistantMessage, PostgresTable, ReadThreadAPIResult } from '@/lib/types'

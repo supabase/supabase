@@ -1,8 +1,11 @@
 import Editor, { BeforeMount, EditorProps, OnMount } from '@monaco-editor/react'
 import { merge, noop } from 'lodash'
-import { useRef } from 'react'
+import { useTheme } from 'next-themes'
+import { useEffect, useRef } from 'react'
 import { format } from 'sql-formatter'
 import { cn } from 'ui'
+
+import { getTheme } from './CodeEditor.utils'
 
 interface CodeEditorProps {
   id: string
@@ -23,25 +26,33 @@ export const CodeEditor = ({ content = '' }: { content: string }) => {
   const code = format(content, { language: 'postgresql' })
   return (
     <div className={cn('max-w-lg 2xl:max-w-xl w-full border-l', 'flex flex-col h-full')}>
-      <Editor2 id="sql-editor" language="pgsql" value={code} className="h-full" />
+      <MonacoEditor id="sql-editor" language="pgsql" value={code} className="h-full" />
     </div>
   )
 }
 
-const Editor2 = ({
+const MonacoEditor = ({
   id,
   language,
   defaultValue,
-  autofocus = true,
   hideLineNumbers = false,
   onInputChange = noop,
   className,
   options,
   value,
 }: CodeEditorProps) => {
-  const editorRef = useRef()
+  const monacoRef = useRef<any>()
+  const { resolvedTheme } = useTheme()
+
+  useEffect(() => {
+    if (resolvedTheme && monacoRef.current) {
+      const mode: any = getTheme(resolvedTheme)
+      monacoRef.current.editor.defineTheme('supabase', mode)
+    }
+  }, [resolvedTheme, monacoRef])
 
   const beforeMount: BeforeMount = (monaco) => {
+    monacoRef.current = monaco
     monaco.editor.defineTheme('supabase', {
       base: 'vs-dark',
       inherit: true,
@@ -56,7 +67,7 @@ const Editor2 = ({
     })
   }
 
-  const onMount: OnMount = async (editor) => {
+  const onMount: OnMount = async (editor, monaco) => {
     // Add margin above first line
     editor.changeViewZones((accessor) => {
       accessor.addZone({
@@ -66,8 +77,10 @@ const Editor2 = ({
       })
     })
 
-    // await timeout(500)
-    if (autofocus) editor?.focus()
+    if (resolvedTheme) {
+      const mode: any = getTheme(resolvedTheme)
+      monacoRef.current.editor.defineTheme('supabase', mode)
+    }
   }
 
   const optionsMerged = merge(

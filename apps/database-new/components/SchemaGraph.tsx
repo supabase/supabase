@@ -1,7 +1,7 @@
 'use client'
 import { PostgresTable } from '@/lib/types'
 import { useTheme } from 'next-themes'
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ReactFlow, {
   Background,
   BackgroundVariant,
@@ -11,8 +11,8 @@ import ReactFlow, {
 import 'reactflow/dist/style.css'
 import { cn } from 'ui'
 
-import TableNode from './SchemaGraph/TableNode'
 import { getGraphDataFromTables } from './SchemaGraph/SchemaGraph.utils'
+import TableNode from './SchemaGraph/TableNode'
 
 interface SchemaGraphProps {
   tables: PostgresTable[]
@@ -20,29 +20,31 @@ interface SchemaGraphProps {
 }
 
 const TablesGraph = ({ tables, hideChat }: SchemaGraphProps) => {
-  const instanceRef = useRef<any>()
   const { resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+  const reactFlowInstance = useReactFlow()
+  const nodeTypes = useMemo(() => ({ table: TableNode }), [])
 
   useEffect(() => {
-    if (instanceRef.current) {
-      const chatWidth = window.innerWidth >= 1536 ? 500 : 400
-      const instance = instanceRef.current
-      const zoom = instance.getZoom()
-      const viewport = instance.getViewport()
+    setMounted(true)
+  }, [])
 
-      instance.setViewport({
+  useEffect(() => {
+    if (reactFlowInstance) {
+      const chatWidth = window.innerWidth >= 1536 ? 500 : 400
+      const zoom = reactFlowInstance.getZoom()
+      const viewport = reactFlowInstance.getViewport()
+
+      reactFlowInstance.setViewport({
         x: hideChat ? viewport.x + chatWidth : viewport.x - chatWidth,
         y: viewport.y,
         zoom,
       })
     }
-  }, [hideChat, instanceRef])
+  }, [hideChat, reactFlowInstance])
 
   const backgroundPatternColor = resolvedTheme === 'dark' ? '#2e2e2e' : '#e6e8eb'
   const edgeStrokeColor = resolvedTheme === 'dark' ? '#ededed' : '#111318'
-
-  const reactFlowInstance = useReactFlow()
-  const nodeTypes = useMemo(() => ({ table: TableNode }), [])
 
   useEffect(() => {
     getGraphDataFromTables(tables).then(({ nodes, edges }) => {
@@ -72,10 +74,11 @@ const TablesGraph = ({ tables, hideChat }: SchemaGraphProps) => {
           proOptions={{ hideAttribution: true }}
           onInit={(instance) => {
             instance.fitView()
-            instanceRef.current = instance
           }}
         >
-          <Background gap={16} color={backgroundPatternColor} variant={BackgroundVariant.Lines} />
+          {mounted && (
+            <Background gap={16} color={backgroundPatternColor} variant={BackgroundVariant.Lines} />
+          )}
         </ReactFlow>
       </div>
     </>
