@@ -2221,6 +2221,126 @@ functions:
           ```
         hideCodeBlock: true
         isSpotlight: true
+  - id: single
+    title: single()
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.single'
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```kotlin
+          val result = supabase.from("countries").select(Columns.list("name")) {
+              limit(1)
+              single()
+          }
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": {
+              "name": "Afghanistan"
+            },
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+
+  - id: csv
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.csv'
+    title: csv()
+    examples:
+      - id: return-data-as-csv
+        name: Return data as CSV
+        code: |
+          ```kotlin
+          val (csvData, _) = supabase.from("countries").select {
+              explain()
+          }
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": "id,name\n1,Afghanistan\n2,Albania\n3,Algeria",
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          By default, the data is returned in JSON format, but can also be returned as Comma Separated Values.
+        hideCodeBlock: true
+        isSpotlight: true
+
+  - id: explain
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.explain'
+    title: Using Explain
+    description: |
+      For debugging slow queries, you can get the [Postgres `EXPLAIN` execution plan](https://www.postgresql.org/docs/current/sql-explain.html) of a query
+      using the `explain()` method. This works on any query, even for `rpc()` or writes.
+
+      Explain is not enabled by default as it can reveal sensitive information about your database.
+      It's best to only enable this for testing environments but if you wish to enable it for production you can provide additional protection by using a `pre-request` function.
+
+      Follow the [Performance Debugging Guide](/docs/guides/api/rest/debugging-performance) to enable the functionality on your project.
+    examples:
+      - id: get-execution-plan
+        name: Get the execution plan
+        code: |
+          ```kotlin
+          val result = supabase.from("countries").select {
+              explain()
+          }
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```
+          Aggregate  (cost=33.34..33.36 rows=1 width=112)
+            ->  Limit  (cost=0.00..18.33 rows=1000 width=40)
+                  ->  Seq Scan on countries  (cost=0.00..22.00 rows=1200 width=40)
+          ```
+        description: |
+          By default, the data is returned in TEXT format, but can also be returned as JSON by using the `format` parameter.
+        hideCodeBlock: true
+        isSpotlight: true
   - id: auth-api
     title: 'Overview'
     notes: |
