@@ -3747,7 +3747,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val bucket = supabase.storage["avatars"]
+          val bucket = supabase.storage.from("avatars")
           bucket.upload("myIcon.png", byteArray, upsert = false)
           //on JVM you can use java.io.File
           bucket.upload("myIcon.png", file, upsert = false)
@@ -3757,7 +3757,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val bucket = supabase.storage["avatars"]
+          val bucket = supabase.storage.from("avatars")
           bucket.uploadAsFlow("test.png", byteArrayOf()).collect {
               when(it) {
                   is UploadStatus.Progress -> println("Progress: ${it.totalBytesSend.toFloat() / it.contentLength * 100}%")
@@ -3770,7 +3770,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val bucket = supabase.storage["avatars"]
+          val bucket = supabase.storage.from("avatars")
           //JVM/Android:
           val upload = bucket.resumable.createOrContinueUpload("icon.png", File("icon.png"))
           //Other platforms:
@@ -3818,7 +3818,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val bucket = supabase.storage["avatars"]
+          val bucket = supabase.storage.from("avatars")
 
           //only on JVM/Android:
           bucket.resumable.continuePreviousFileUploads()
@@ -3851,7 +3851,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val bucket = supabase.storage["avatars"]
+          val bucket = supabase.storage.from("avatars")
           bucket.update("myIcon.png", byteArray, upsert = false)
           //on JVM you can use java.io.File
           bucket.update("myIcon.png", file, upsert = false)
@@ -3871,7 +3871,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val bucket = supabase.storage["avatars"]
+          val bucket = supabase.storage.from("avatars")
           bucket.move("icon1.png", "icon2.png")
           ```
   - id: from-copy
@@ -3888,7 +3888,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.storage["test"].copy(from = "avatar.png", to = "avatar2.png")
+          supabase.storage.from("test").copy(from = "avatar.png", to = "avatar2.png")
           ```
   - id: from-create-signed-url
     title: from.createSignedUrl()
@@ -3904,14 +3904,14 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val bucket = supabase.storage["avatars"]
+          val bucket = supabase.storage.from("avatars")
           val url = bucket.createSignedUrl(path = "icon.png", expiresIn = 3.minutes)
           ```
       - id: create-signed-url-with-transformation
         name: Create Signed URL with transformation
         code: |
           ```kotlin
-          val bucket = supabase.storage["avatars"]
+          val bucket = supabase.storage.from("avatars")
           val url = bucket.createSignedUrl(path = "icon.png", expiresIn = 3.minutes) {
               size(100, 100)
               fill()
@@ -3931,7 +3931,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val urls = supabase.storage["avatars"].createSignedUrls(20.minutes, "avata1.jpg", "avatar2.jpg")
+          val urls = supabase.storage.from("avatars").createSignedUrls(20.minutes, "avata1.jpg", "avatar2.jpg")
           ```
   - id: from-create-signed-upload-url
     title: from.createSignedUploadUrl()
@@ -3947,7 +3947,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val url = supabase.storage["avatars"].createSignedUploadUrl("avatar.png")
+          val url = supabase.storage.from("avatars").createSignedUploadUrl("avatar.png")
           ```
   - id: from-upload-to-signed-url
     title: from.uploadToSignedUrl()
@@ -3963,9 +3963,9 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.storage["avatars"].uploadToSignedUrl(path = "avatar.jpg", token = "token-from-createSignedUploadUrl", data = bytes)
+          supabase.storage.from("avatars").uploadToSignedUrl(path = "avatar.jpg", token = "token-from-createSignedUploadUrl", data = bytes)
           //or on JVM:
-          supabase.storage["avatars"].uploadToSignedUrl(path = "avatar.jpg", token = "token-from-createSignedUploadUrl", file = File("avatar.jpg"))
+          supabase.storage.from("avatars").uploadToSignedUrl(path = "avatar.jpg", token = "token-from-createSignedUploadUrl", file = File("avatar.jpg"))
           ```
   - id: from-get-public-url
     title: from.getPublicUrl()
@@ -3982,14 +3982,14 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val url = supabase.storage["public-bucket"].publicUrl("folder/avatar1.png")
+          val url = supabase.storage.from("public-bucket").publicUrl("folder/avatar1.png")
           ```
       - id: transform-asset-in-public-bucket
         name: Returns the URL for an asset in a public bucket with transformations
         isSpotlight: true
         code: |
           ```kotlin
-          val url = supabase.storage["public-bucket"].publicRenderUrl("folder/avatar1.png") {
+          val url = supabase.storage.from("public-bucket").publicRenderUrl("folder/avatar1.png") {
               size(100, 100)
           }
           ```
@@ -4008,7 +4008,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val bucket = supabase.storage["avatars"]
+          val bucket = supabase.storage.from("avatars")
           val bytes = bucket.downloadAuthenticated("test.png")
           //or on JVM:
           bucket.downloadAuthenticatedTo("test.png", File("test.png"))
@@ -4018,7 +4018,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val bucket = supabase.storage["avatars"]
+          val bucket = supabase.storage.from("avatars")
           val bytes = bucket.downloadPublic("test.png")
           //or on JVM:
           bucket.downloadPublicTo("test.png", File("test.png"))
@@ -4027,7 +4027,7 @@ functions:
         name: Download file with transformation
         code: |
           ```kotlin
-          val bucket = supabase.storage["avatars"]
+          val bucket = supabase.storage.from("avatars")
           val bytes = bucket.downloadPublic("test.png") {
               size(100, 100)
               fill()
@@ -4044,7 +4044,7 @@ functions:
         name: Download file with progress
         code: |
           ```kotlin
-          val bucket = supabase.storage["avatars"]
+          val bucket = supabase.storage.from("avatars")
           bucket.downloadAuthenticatedAsFlow("icon.png").collect {
               when(it) {
                   is DownloadStatus.ByteData -> println("Downloaded ${it.data.size} bytes")
@@ -4075,7 +4075,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val bucket = supabase.storage["avatars"]
+          val bucket = supabase.storage.from("avatars")
           bucket.delete("test.png", "test2.png")
           ```
 
@@ -4093,6 +4093,6 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val bucket = supabase.storage["avatars"]
+          val bucket = supabase.storage.from("avatars")
           val files = bucket.list()
           ```
