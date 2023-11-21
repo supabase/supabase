@@ -20,6 +20,8 @@ const ResourceContent = ({
 }: any) => {
   const { ref } = useParams()
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
+  const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
+
   const endpoint =
     customDomainData?.customDomain?.status === 'active'
       ? `https://${customDomainData.customDomain.hostname}`
@@ -38,8 +40,6 @@ const ResourceContent = ({
     id,
     required: resourceDefinition?.required?.includes(id),
   }))
-
-  const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
 
   return (
     <>
