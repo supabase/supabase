@@ -52,10 +52,9 @@ Deno.serve(async (req) => {
 
     const supabaseClient = createClient<Database>(supabaseUrl, supabaseServiceKey)
 
-    const { data: searchData, error: searchError } = await supabaseClient.rpc(
-      'docs_full_text_search',
-      { query: sanitizedQuery }
-    )
+    const { data: searchData, error: searchError } = await supabaseClient.rpc('docs_search_fts', {
+      query: sanitizedQuery,
+    })
 
     if (searchError) {
       throw new ApplicationError('Failed to find search results', searchError)

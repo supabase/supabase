@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react'
+import { compact, uniqBy } from 'lodash'
 
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import {
@@ -17,6 +18,8 @@ import { CommandGroup, CommandItem, CommandLabel, TextHighlighter } from './Comm
 
 import { debounce } from 'lodash'
 
+const NUMBER_SOURCES = 2
+
 const questions = [
   'How do I get started with Supabase?',
   'How do I run Supabase locally?',
@@ -32,20 +35,18 @@ export enum PageType {
   GithubDiscussion = 'github-discussions',
 }
 
-export interface PageSection {
-  slug?: string
-  heading?: string
+interface PageSection {
+  heading: string
+  slug: string
 }
 
-export interface PageMetadata {
-  title: string
-  description?: string
-}
-
-export interface PageResult {
-  type: PageType
+export interface Page {
+  id: number
   path: string
-  meta: PageMetadata
+  type: PageType
+  title: string
+  subtitle: string | null
+  description: string | null
   sections: PageSection[]
 }
 
@@ -64,50 +65,208 @@ const getDocsUrl = () => {
   return isLocal ? 'http://localhost:3001/docs' : 'https://supabase.com/docs'
 }
 
+type SearchState =
+  | {
+      status: 'initial'
+    }
+  | {
+      status: 'loading'
+      staleResults: Page[]
+      searchId: number
+    }
+  | {
+      status: 'partialResults'
+      results: Page[]
+      searchId: number
+    }
+  | {
+      status: 'fullResults'
+      results: Page[]
+    }
+  | {
+      status: 'noResults'
+    }
+  | {
+      status: 'error'
+      message: string
+    }
+
+type Action =
+  | {
+      type: 'resultsReturned'
+      sourcesLoaded: number
+      searchId: number
+      results: unknown[]
+    }
+  | {
+      type: 'newSearchDispatched'
+      searchId: number
+    }
+  | {
+      type: 'reset'
+    }
+  | {
+      type: 'errored'
+      message: string
+    }
+
+function reshapeResults(result: unknown): Page | null {
+  if (typeof result !== 'object' || result === null) {
+    return null
+  }
+  if (!('id' in result && 'path' in result && 'type' in result && 'title' in result)) {
+    return null
+  }
+
+  const sections: Array<{ heading: string; slug: string }> = []
+  if (
+    'headings' in result &&
+    Array.isArray(result.headings) &&
+    'slugs' in result &&
+    Array.isArray(result.slugs) &&
+    result.headings.length === result.slugs.length
+  ) {
+    result.headings.forEach((heading, idx) => {
+      sections.push({ heading, slug: (result.slugs as Array<string>)[idx] })
+    })
+  }
+
+  return {
+    id: result.id as number,
+    path: result.path as string,
+    type: result.type as PageType,
+    title: result.title as string,
+    subtitle: 'subtitle' in result ? (result.subtitle as string) : null,
+    description: 'description' in result ? (result.description as string) : null,
+    sections,
+  }
+}
+
+function reducer(state: SearchState, action: Action): SearchState {
+  switch (action.type) {
+    case 'resultsReturned':
+      if ('searchId' in state && state.searchId > action.searchId) {
+        return state
+      }
+      const allSourcesLoaded = action.sourcesLoaded === NUMBER_SOURCES
+      const newResults = uniqBy(compact(action.results.map(reshapeResults)), (res) => res.id)
+      const allResults =
+        state.status === 'partialResults' && state.searchId === action.searchId
+          ? state.results.concat(newResults)
+          : newResults
+      if (!allResults.length) {
+        return allSourcesLoaded
+          ? {
+              status: 'noResults',
+            }
+          : {
+              status: 'loading',
+              searchId: action.searchId,
+              staleResults: [],
+            }
+      }
+      return allSourcesLoaded
+        ? {
+            status: 'fullResults',
+            results: allResults,
+          }
+        : {
+            status: 'partialResults',
+            searchId: action.searchId,
+            results: allResults,
+          }
+    case 'newSearchDispatched':
+      return {
+        status: 'loading',
+        searchId: Math.max('searchId' in state ? state.searchId : 0, action.searchId),
+        staleResults: 'results' in state ? state.results : [],
+      }
+    case 'reset':
+      return {
+        status: 'initial',
+      }
+    case 'errored':
+      return {
+        status: 'error',
+        message: action.message,
+      }
+    default:
+      return state
+  }
+}
+
 const DocsSearch = () => {
-  const [results, setResults] = useState<PageResult[]>()
-  const [hasSearchError, setHasSearchError] = useState(false)
+  const [state, dispatch] = useReducer(reducer, { status: 'initial' })
   const supabaseClient = useSupabaseClient()
   const { isLoading, setIsLoading, search, setSearch } = useCommandMenu()
+  const searchId = useRef(0)
 
   const handleSearch = useCallback(
     async (query: string) => {
-      setHasSearchError(false)
       setIsLoading(true)
 
-      const { error, data: pageResults } = await supabaseClient.functions.invoke<PageResult[]>(
-        'search-v2',
-        {
+      searchId.current += 1
+      const localSearchId = searchId.current
+      dispatch({ type: 'newSearchDispatched', searchId: localSearchId })
+
+      let loadedSources = 0
+
+      supabaseClient.functions
+        .invoke('search-fts', {
           body: { query },
-        }
-      )
+        })
+        .then(({ data: results, error }) => {
+          loadedSources += 1
+          if (error) {
+            dispatch({
+              type: 'errored',
+              message: error.message ?? '',
+            })
+          } else {
+            dispatch({
+              type: 'resultsReturned',
+              sourcesLoaded: loadedSources,
+              searchId: localSearchId,
+              results,
+            })
+          }
+          if (loadedSources === NUMBER_SOURCES) {
+            setIsLoading(false)
+          }
+        })
 
-      setIsLoading(false)
-
-      if (error) {
-        setIsLoading(false)
-
-        setHasSearchError(true)
-        console.error(error)
-        return
-      }
-
-      if (!Array.isArray(pageResults)) {
-        setIsLoading(false)
-        setHasSearchError(true)
-        console.error('Malformed response')
-        return
-      }
-
-      setResults(pageResults)
+      supabaseClient.functions
+        .invoke('search-v2', {
+          body: { query },
+        })
+        .then(({ data: results, error }) => {
+          loadedSources += 1
+          if (error) {
+            dispatch({
+              type: 'errored',
+              message: error.message ?? '',
+            })
+          } else {
+            dispatch({
+              type: 'resultsReturned',
+              sourcesLoaded: loadedSources,
+              searchId: localSearchId,
+              results,
+            })
+          }
+          if (loadedSources === NUMBER_SOURCES) {
+            setIsLoading(false)
+          }
+        })
     },
     [supabaseClient]
   )
 
   function handleResetPrompt() {
     setSearch('')
-    setResults(undefined)
-    setHasSearchError(false)
+    dispatch({
+      type: 'reset',
+    })
   }
 
   const debouncedSearch = useMemo(() => debounce(handleSearch, 1000), [handleSearch])
@@ -119,7 +278,6 @@ const DocsSearch = () => {
     }
   }, [])
 
-  // TODO: can we do this w/o useEffect if query comes from context?
   useEffect(() => {
     if (search) {
       debouncedSearch(search)
@@ -162,21 +320,24 @@ const DocsSearch = () => {
     />
   )
 
+  const hasResults =
+    state.status === 'fullResults' ||
+    state.status === 'partialResults' ||
+    (state.status === 'loading' && state.staleResults.length)
+
   return (
     <>
-      {results &&
-        results.length > 0 &&
-        results.map((page, i) => {
-          const pageSections = page.sections.filter((section) => !!section.heading)
+      {hasResults &&
+        ('results' in state ? state.results : state.staleResults).map((page, i) => {
           return (
             <CommandGroup
               heading=""
-              key={`${page.meta.title}-group-index-${i}`}
-              value={`${page.meta.title}-group-index-${i}`}
+              key={`${page.title}-group-index-${i}`}
+              value={`${page.title}-group-index-${i}`}
             >
               <CommandItem
-                key={`${page.meta.title}-item-index-${i}`}
-                value={`${removeDoubleQuotes(page.meta.title)}-item-index-${i}`}
+                key={`${page.title}-item-index-${i}`}
+                value={`${removeDoubleQuotes(page.title)}-item-index-${i}`}
                 type="block-link"
                 onSelect={() => {
                   openLink(page.type, formatPageUrl(page))
@@ -186,11 +347,11 @@ const DocsSearch = () => {
                   <IconContainer>{getPageIcon(page)}</IconContainer>
                   <div className="flex flex-col gap-0">
                     <CommandLabel>
-                      <TextHighlighter text={page.meta.title} query={search} />
+                      <TextHighlighter text={page.title} query={search} />
                     </CommandLabel>
-                    {page.meta.description && (
+                    {page.description && (
                       <div className="text-xs text-foreground-muted">
-                        <TextHighlighter text={page.meta.description} query={search} />
+                        <TextHighlighter text={page.description} query={search} />
                       </div>
                     )}
                   </div>
@@ -198,16 +359,16 @@ const DocsSearch = () => {
 
                 <ChevronArrow />
               </CommandItem>
-              {pageSections.length > 0 && (
+              {page.sections.length > 0 && (
                 <div className="border-l border-default ml-3 pt-3">
-                  {pageSections.map((section, i) => (
+                  {page.sections.map((section, i) => (
                     <CommandItem
                       className="ml-3 mb-3"
                       onSelect={() => {
                         openLink(page.type, formatSectionUrl(page, section))
                       }}
-                      key={`${page.meta.title}__${section.heading}-item-index-${i}`}
-                      value={`${removeDoubleQuotes(page.meta.title)}__${removeDoubleQuotes(
+                      key={`${page.title}__${section.heading}-item-index-${i}`}
+                      value={`${removeDoubleQuotes(page.title)}__${removeDoubleQuotes(
                         section.heading ?? ''
                       )}-item-index-${i}`}
                       type="block-link"
@@ -218,7 +379,7 @@ const DocsSearch = () => {
                           <cite>
                             <TextHighlighter
                               className="not-italic text-xs rounded-full px-2 py-1 bg-overlay-hover text-foreground"
-                              text={page.meta.title}
+                              text={page.title}
                               query={search}
                             />
                           </cite>
@@ -237,7 +398,7 @@ const DocsSearch = () => {
             </CommandGroup>
           )
         })}
-      {!results && !hasSearchError && !isLoading && (
+      {state.status === 'initial' && (
         <CommandGroup>
           {questions.map((question) => {
             const key = question.replace(/\s+/g, '_')
@@ -260,12 +421,12 @@ const DocsSearch = () => {
           })}
         </CommandGroup>
       )}
-      {isLoading && !results && (
+      {state.status === 'loading' && !state.staleResults.length && (
         <div className="p-6 grid gap-6 my-4">
           <p className="text-lg text-foreground-muted text-center">Searching for results</p>
         </div>
       )}
-      {results && results.length === 0 && (
+      {state.status === 'noResults' && (
         <div className="p-6 flex flex-col items-center gap-6 mt-4 text-foreground-light">
           <IconAlertTriangle strokeWidth={1.5} size={40} />
           <p className="text-lg text-center">No results found.</p>
@@ -274,7 +435,7 @@ const DocsSearch = () => {
           </Button>
         </div>
       )}
-      {hasSearchError && (
+      {state.status === 'error' && (
         <div className="p-6 flex flex-col items-center gap-6 mt-4">
           <IconAlertTriangle strokeWidth={1.5} size={40} />
           <p className="text-lg text-center">
@@ -292,7 +453,7 @@ const DocsSearch = () => {
 
 export default DocsSearch
 
-export function formatPageUrl(page: PageResult) {
+export function formatPageUrl(page: Page) {
   const docsUrl = getDocsUrl()
   switch (page.type) {
     case PageType.Markdown:
@@ -305,7 +466,7 @@ export function formatPageUrl(page: PageResult) {
   }
 }
 
-export function formatSectionUrl(page: PageResult, section: PageSection) {
+export function formatSectionUrl(page: Page, section: PageSection) {
   switch (page.type) {
     case PageType.Markdown:
     case PageType.GithubDiscussion:
@@ -317,7 +478,7 @@ export function formatSectionUrl(page: PageResult, section: PageSection) {
   }
 }
 
-export function getPageIcon(page: PageResult) {
+export function getPageIcon(page: Page) {
   switch (page.type) {
     case PageType.Markdown:
     case PageType.Reference:
@@ -329,7 +490,7 @@ export function getPageIcon(page: PageResult) {
   }
 }
 
-export function getPageSectionIcon(page: PageResult) {
+export function getPageSectionIcon(page: Page) {
   switch (page.type) {
     case PageType.Markdown:
     case PageType.Reference:
