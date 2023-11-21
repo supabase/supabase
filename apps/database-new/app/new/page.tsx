@@ -41,9 +41,7 @@ export default function NewThread() {
         placeholder="e.g Create a Telegram-like chat application"
         disabled={isPending || isSuccess}
         onKeyDown={(e) => {
-          console.log(e.code)
           if (e.code === 'Enter') {
-            console.log('Submit')
             const value = (e.target as any).value
             if (value.length > 0) mutate(value)
           }
