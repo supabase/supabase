@@ -539,6 +539,10 @@ export const auth = {
           ],
         },
         {
+          name: 'User Sessions',
+          url: '/guides/auth/sessions',
+        },
+        {
           name: 'Enterprise SSO',
           url: '/guides/auth/enterprise-sso',
           items: [
