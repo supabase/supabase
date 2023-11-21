@@ -9,17 +9,14 @@ import { Input } from 'ui'
 export default function NewThread() {
   const router = useRouter()
 
-  const { mutate, isPending } = useMutation({
+  const { mutate, isPending, isSuccess } = useMutation({
     mutationFn: async (prompt: string) => {
       const body = { prompt }
       const response = await fetch('/api/ai/sql/threads/create', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       })
-
       const result = await response.json()
       return result
     },
@@ -28,6 +25,8 @@ export default function NewThread() {
       router.push(url)
     },
   })
+
+  console.log({ isPending })
 
   return (
     <main className="flex min-h-screen w-full flex-col items-center justify-center gap-y-4">
@@ -42,14 +41,14 @@ export default function NewThread() {
         className="w-11/12 max-w-xl shadow"
         inputClassName="rounded-full"
         placeholder="e.g Create a Telegram-like chat application"
-        disabled={isPending}
+        disabled={isPending || isSuccess}
         onKeyDown={(e) => {
           if (e.code === 'Enter') {
             mutate((e.target as any).value)
           }
         }}
         actions={
-          isPending ? (
+          isPending || isSuccess ? (
             <div className="mr-3">
               <Loader2 size={18} className="animate-spin" />
             </div>
