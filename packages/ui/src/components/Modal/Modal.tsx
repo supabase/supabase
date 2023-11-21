@@ -149,8 +149,8 @@ const Modal = ({
                   <Button
                     onClick={onCancel}
                     type="text"
-                    icon={<IconX size="medium" />}
-                    className="px-1"
+                    icon={<IconX size="small" strokeWidth={1.5} />}
+                    className="p-0.5 !mt-0"
                   />
                 )}
               </div>

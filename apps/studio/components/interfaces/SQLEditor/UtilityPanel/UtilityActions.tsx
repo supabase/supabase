@@ -29,6 +29,7 @@ const UtilityActions = ({
   return (
     <>
       <SavingIndicator id={id} />
+
       {IS_PLATFORM && <FavoriteButton id={id} />}
       <SizeToggleButton id={id} />
       <Tooltip.Root delayDuration={0}>
