@@ -25,6 +25,8 @@ const ResourceContent = ({
       ? `https://${customDomainData.customDomain.hostname}`
       : autoApiService.endpoint
 
+  if (!paths || !definitions) return null
+
   const keyToShow = !!showApiKey ? showApiKey : 'SUPABASE_KEY'
   const resourcePaths = paths[`/${resourceId}`]
   const resourceDefinition = definitions[resourceId]
@@ -38,8 +40,6 @@ const ResourceContent = ({
   }))
 
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
-
-  if (!paths || !definitions) return null
 
   return (
     <>
