@@ -340,7 +340,9 @@ functions:
         code: |
           ```kotlin
           val count = supabase.from("countries")
-                      .select(head = true, count = Count.EXACT)
+                      .select(head = true) {
+                          count(Count.EXACT)
+                      }
                       .count()!!
           ```
       - id: querying-json-data
@@ -369,7 +371,6 @@ functions:
       - When calling an `insert` method, you have to provide a [serializable value](/docs/reference/kotlin/installing#serialization).
       - By default, every time you run `insert()`, the client library will make a `select` to return the full record.
       This is convenient, but it can also cause problems if your policies are not configured to allow the `select` operation.
-      If you are using Row Level Security and you are encountering problems, try setting the `returning` param to `Returning.MINIMAL`.
     examples:
       - id: create-a-record
         name: Create a record
@@ -377,7 +378,17 @@ functions:
         code: |
           ```kotlin
           val city = City(name = "The Shire", countryId = 554)
-          supabase.from("cities").insert(city, returning = Returning.MINIMAL) //returning defaults to Returning.REPRESENTATION
+          supabase.from("cities").insert(city)
+          ```
+      - id: create-a-record-and-return
+        name: Create a record and return it
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val city = City(name = "The Shire", countryId = 554)
+          val result = supabase.from("cities").insert(city) { 
+              select() 
+          }.decodeSingle<City>()
           ```
       - id: bulk-create
         name: Bulk create
@@ -388,15 +399,7 @@ functions:
           ```kotlin
           val theShire = City(name = "The Shire", countryId = 554)
           val rohan = City(name = "Rohan", countryId = 554)
-          supabase.from("cities").insert(listOf(theShire, rohan), returning = Returning.MINIMAL) //returning defaults to Returning.REPRESENTATION
-          ```
-      - id: fetch-inserted-data
-        name: Fetch inserted record
-        code: |
-          ```kotlin
-          val theShire = City(name = "The Shire", countryId = 554)
-          val rohan = City(name = "Rohan", countryId = 554)
-          val result = supabase.from("cities").insert(listOf(theShire, rohan)).decodeList<City>()
+          supabase.from("cities").insert(listOf(theShire, rohan))
           ```
 
   - id: update
@@ -417,9 +420,11 @@ functions:
                  set("name", "Australia")
               }
           ) {
-             Country::id eq 1
-             //or
-             eq("id", 1)
+              filter {
+                  Country::id eq 1
+                  //or
+                  eq("id", 1)
+              }
           }
           ```
       - id: update-a-record-and-return-it
@@ -433,9 +438,12 @@ functions:
                  set("name", "Australia")
               }
           ) {
-             Country::id eq 1
-             //or
-             eq("id", 1)
+              select()
+              filter {
+                  Country::id eq 1
+                  //or
+                  eq("id", 1)
+              }
           }.decodeSingle<Country>()
           ```
         data:
@@ -478,10 +486,10 @@ functions:
                  User::address setTo address
               }
           ) {
-             User::id eq 1
-             //or
-             eq("address->postcode", 90210)
-          }.decodeSingle<Country>()
+              filter {
+                  eq("address->postcode", 90210)
+              }
+          }
           ```
 
   - id: upsert
@@ -499,7 +507,7 @@ functions:
         code: |
           ```kotlin
           val toUpsert = Message(id = 3, message = "foo", username = "supabot")
-          supabase.from("messages").insert(toUpsert, upsert = true)
+          supabase.from("messages").upsert(toUpsert)
           ```
       - id: upserting-into-tables-with-constraints
         name: Upserting into tables with constraints
@@ -511,7 +519,7 @@ functions:
         code: |
           ```kotlin
           let toUpsert = User(username = "supabot")
-          supabase.from("users").insert(toUpsert, upsert = true, onConflict = "username")
+          supabase.from("users").upsert(toUpsert, onConflict = "username")
           ```
       - id: upsert-return-row-count
         name: Return the exact number of rows
@@ -519,7 +527,9 @@ functions:
         code: |
           ```kotlin
           let toUpsert = User(username = "supabot")
-          val count = supabase.from("users").insert(toUpsert, upsert = true, onConflict = "username", count = Count.EXACT).count()
+          val count = supabase.from("users").upsert(toUpsert, onConflict = "username") {
+              count(Count.EXACT)
+          }.count()
           ```
 
   - id: delete
@@ -539,9 +549,11 @@ functions:
         code: |
           ```kotlin
           supabase.from("cities").delete {
-             City::id eq 666
-             //or
-             eq("id", 666)
+              filter {
+                  City::id eq 666
+                  //or
+                  eq("id", 666)
+              }
           }
           ```
       - id: fetch-delete-records
@@ -549,9 +561,12 @@ functions:
         code: |
           ```kotlin
           val deletedCity = supabase.from("cities").delete {
-             City::id eq 666
-             //or
-             eq("id", 666)
+              select()
+              filter {
+                  City::id eq 666
+                  //or
+                  eq("id", 666)
+              }
           }.decodeSingle<City>()
           ```
   - id: rpc
@@ -598,7 +613,7 @@ functions:
       As you can see on the property syntax:
       the name of the `countryId` gets converted to `country_id`.
 
-      By default, this is done by converting camel case to snake case, but you can customize this by changing the `PropertyConversionMethod` in the Postgrest Config
+      By default, this is done by converting camel case to snake case, but you can customize this by changing the `propertyConversionMethod` in the Postgrest Config
 
       If a database function returns a table response, you can also apply filters.
     examples:
@@ -610,9 +625,11 @@ functions:
         code: |
           ```kotlin
           supabase.from("cities").select(columns = Columns.list("name", "country_id")) {
-              City::name eq "The Shire"
-              //or
-              eq("name", "The Shire")
+              filter {
+                  City::name eq "The Shire"
+                  //or
+                  eq("name", "The Shire")
+              }
           }
           ```
       - id: multiple-filters
@@ -623,13 +640,15 @@ functions:
         code: |
           ```kotlin
           supabase.from("cities").select(columns = Columns.list("name, country_id")) {
-              and { //when both are true
-                 City::population gt 40000
-                 City::population lt 700000
-              }
-              or { //when either one of the filters are true
-                 City::name eq "London"
-                 City::name eq "Berlin"
+              filter {
+                  and { //when both are true
+                     City::population gt 40000
+                     City::population lt 700000
+                  }
+                  or { //when either one of the filters are true
+                     City::name eq "London"
+                     City::name eq "Berlin"
+                  }
               }
           }
           ```
@@ -672,7 +691,9 @@ functions:
         code: |
           ```kotlin
           supabase.from("users").select {
-              eq("address->postcode", 90210)
+              filter {
+                  eq("address->postcode", 90210)
+              }
           }
           ```
       - id: filter-foreign-tables
@@ -688,7 +709,9 @@ functions:
           supabase.from("countries").select(
                 columns = columns
           ) {
-              eq("cities.name", "Bali")
+              filter {
+                  eq("cities.name", "Bali")
+              }
           }
           ```
         data:
@@ -743,12 +766,14 @@ functions:
         code: |
           ```kotlin
           supabase.from("countries").select(columns = Columns.list("name")) {
-              or {
-                  Country::id eq 2
-                  Country::name eq "Algeria"
-                  //or
-                  eq("id", 2)
-                  eq("name", "Algeria")
+              filter {
+                  or {
+                      Country::id eq 2
+                      Country::name eq "Algeria"
+                      //or
+                      eq("id", 2)
+                      eq("name", "Algeria")
+                  }
               }
           }
           ```
@@ -757,11 +782,13 @@ functions:
         code: |
           ```kotlin
           supabase.from("countries").select(columns = Columns.list("name")) {
-              or {
-                  Country::id gt 3
-                  and {
-                     Country::id eq 1
-                     Country::name eq "Afghanistan"
+              filter {
+                  or {
+                      Country::id gt 3
+                      and {
+                         Country::id eq 1
+                         Country::name eq "Afghanistan"
+                      }
                   }
               }
           }
@@ -780,7 +807,9 @@ functions:
         code: |
           ```kotlin
           supabase.from("countries").select {
-              filterNot("name", FilterOperation.IS, "")
+              filter {
+                  filterNot("name", FilterOperation.IS, "")
+              }
           }
           ```
 
@@ -795,9 +824,11 @@ functions:
         code: |
           ```kotlin
           supabase.from("cities").select(columns = Columns.list("name", "country_id")) {
-              City::name eq "The Shire"
-              //or
-              eq("name", "The Shire")
+              filter {
+                  City::name eq "The Shire"
+                  //or
+                  eq("name", "The Shire")
+              }
           }
           ```
       - id: with-update
@@ -806,9 +837,11 @@ functions:
           ```kotlin
           val toUpdate = City(name = "Mordor")
           supabase.from("cities").update(toUpdate) {
-              City::name eq "San Francisco"
-              //or
-              eq("name", "San Francisco")
+              filter {
+                  City::name eq "San Francisco"
+                  //or
+                  eq("name", "San Francisco")
+              }
           }
           ```
       - id: with-delete
@@ -816,9 +849,11 @@ functions:
         code: |
           ```kotlin
           supabase.from("cities").delete {
-              City::name eq "Mordor"
-              //or
-              eq("name", "Mordor")
+              filter {
+                  City::name eq "Mordor"
+                  //or
+                  eq("name", "Mordor")
+              }
           }
           ```
       - id: with-rpc
@@ -826,9 +861,11 @@ functions:
         code: |
           ```kotlin
           supabase.postgrest.rpc("function") {
-              City::name eq "Mordor"
-              //or
-              eq("name", "Mordor")
+              filter {
+                  City::name eq "Mordor"
+                  //or
+                  eq("name", "Mordor")
+              }
           }
           ```
 
@@ -843,9 +880,11 @@ functions:
         code: |
           ```kotlin
           supabase.from("cities").select(columns = Columns.list("name", "country_id")) {
-              City::name neq "The Shire"
-              //or
-              neq("name", "The Shire")
+              filter {
+                  City::name neq "The Shire"
+                  //or
+                  neq("name", "The Shire")
+              }
           }
           ```
       - id: with-update
@@ -854,9 +893,11 @@ functions:
           ```kotlin
           val toUpdate = City(name = "Mordor")
           supabase.from("cities").update(toUpdate) {
-              City::name neq "The Shire"
-              //or
-              neq("name", "The Shire")
+              filter {
+                  City::name neq "The Shire"
+                  //or
+                  neq("name", "The Shire")
+              }
           }
           ```
       - id: with-delete
@@ -864,9 +905,11 @@ functions:
         code: |
           ```kotlin
           supabase.from("cities").delete {
-              City::name neq "The Shire"
-              //or
-              neq("name", "The Shire")
+              filter {
+                  City::name neq "The Shire"
+                  //or
+                  neq("name", "The Shire")
+              }
           }
           ```
       - id: with-rpc
@@ -874,7 +917,9 @@ functions:
         code: |
           ```kotlin
           supabase.rpc("echo_all_cities") {
-              neq("address->postcode", 90210)
+              filter {
+                  neq("address->postcode", 90210)
+              }
           }
           ```
 
@@ -889,9 +934,11 @@ functions:
         code: |
           ```kotlin
           supabase.from("cities").select(columns = Columns.list("name")) {
-             City::countryId gt 300
-             //or
-             gt("country_id", 300)
+              filter {
+                 City::countryId gt 300
+                 //or
+                 gt("country_id", 300)
+              }
           }
           ```
       - id: with-update
@@ -900,9 +947,11 @@ functions:
           ```kotlin
           val toUpdate = City(name = "Mordor")
           supabase.from("cities").update(toUpdate) {
-             City::countryId gt 300
-             //or
-             gt("country_id", 300)
+              filter {
+                 City::countryId gt 300
+                 //or
+                 gt("country_id", 300)
+              }
           }
           ```
       - id: with-delete
@@ -910,9 +959,11 @@ functions:
         code: |
           ```kotlin
           supabase.from("cities").delete {
-             City::countryId gt 300
-             //or
-             gt("country_id", 300)
+              filter {
+                 City::countryId gt 300
+                 //or
+                 gt("country_id", 300)
+              }
           }
           ```
       - id: with-rpc
@@ -920,9 +971,11 @@ functions:
         code: |
           ```kotlin
           supabase.postgrest.rpc("echo_all_cities") {
-             City::countryId gt 250
-             //or
-             gt("country_id", 300)
+              filter {
+                 City::countryId gt 300
+                 //or
+                 gt("country_id", 300)
+              }
           }
           ```
 
@@ -937,9 +990,11 @@ functions:
         code: |
           ```kotlin
           supabase.from("cities").select(columns = Columns.list("name")) {
-             City::countryId gte 300
-             //or
-             gte("country_id", 300)
+              filter {
+                 City::countryId gte 300
+                 //or
+                 gte("country_id", 300)
+              }
           }
           ```
       - id: with-update
@@ -948,9 +1003,11 @@ functions:
           ```kotlin
           val toUpdate = City(name = "Mordor")
           supabase.from("cities").update(toUpdate) {
-             City::countryId gte 300
-             //or
-             gte("country_id", 300)
+              filter {
+                 City::countryId gte 300
+                 //or
+                 gte("country_id", 300)
+              }
           }
           ```
       - id: with-delete
@@ -958,9 +1015,11 @@ functions:
         code: |
           ```kotlin
           supabase.from("cities").delete {
-             City::countryId gte 300
-             //or
-             gte("country_id", 300)
+              filter {
+                 City::countryId gte 300
+                 //or
+                 gte("country_id", 300)
+              }
           }
           ```
       - id: with-rpc
@@ -968,9 +1027,11 @@ functions:
         code: |
           ```kotlin
           supabase.postgrest.rpc("echo_all_cities") {
-             City::countryId gte 250
-             //or
-             gte("country_id", 300)
+              filter {
+                 City::countryId gte 300
+                 //or
+                 gte("country_id", 300)
+              }
           }
           ```
 
@@ -985,9 +1046,11 @@ functions:
         code: |
           ```kotlin
           supabase.from("cities").select(columns = Columns.list("name")) {
-             City::countryId lt 300
-             //or
-             lt("country_id", 300)
+              filter {
+                 City::countryId lt 300
+                 //or
+                 lt("country_id", 300)
+              }
           }
           ```
       - id: with-update
@@ -996,9 +1059,11 @@ functions:
           ```kotlin
           val toUpdate = City(name = "Mordor")
           supabase.from("cities").update(toUpdate) {
-             City::countryId lt 300
-             //or
-             lt("country_id", 300)
+              filter {
+                 City::countryId lt 300
+                 //or
+                 lt("country_id", 300)
+              }
           }
           ```
       - id: with-delete
@@ -1006,9 +1071,11 @@ functions:
         code: |
           ```kotlin
           supabase.from("cities").delete {
-             City::countryId lt 300
-             //or
-             lt("country_id", 300)
+              filter {
+                 City::countryId lt 300
+                 //or
+                 lt("country_id", 300)
+              }
           }
           ```
       - id: with-rpc
@@ -1016,9 +1083,11 @@ functions:
         code: |
           ```kotlin
           supabase.postgrest.rpc("echo_all_cities") {
-             City::countryId lt 250
-             //or
-             lt("country_id", 300)
+              filter {
+                 City::countryId lt 300
+                 //or
+                 lt("country_id", 300)
+              }
           }
           ```
 
@@ -1033,9 +1102,11 @@ functions:
         code: |
           ```kotlin
           supabase.from("cities").select(columns = Columns.list("name")) {
-             City::countryId lte 300
-             //or
-             lte("country_id", 300)
+              filter {
+                 City::countryId lte 300
+                 //or
+                 lte("country_id", 300)
+              }
           }
           ```
       - id: with-update
@@ -1044,9 +1115,11 @@ functions:
           ```kotlin
           val toUpdate = City(name = "Mordor")
           supabase.from("cities").update(toUpdate) {
-             City::countryId lte 300
-             //or
-             lte("country_id", 300)
+              filter {
+                 City::countryId lte 300
+                 //or
+                 lte("country_id", 300)
+              }
           }
           ```
       - id: with-delete
@@ -1054,9 +1127,11 @@ functions:
         code: |
           ```kotlin
           supabase.from("cities").delete {
-             City::countryId lte 300
-             //or
-             lte("country_id", 300)
+              filter {
+                 City::countryId lte 300
+                 //or
+                 lte("country_id", 300)
+              }
           }
           ```
       - id: with-rpc
@@ -1064,9 +1139,11 @@ functions:
         code: |
           ```kotlin
           supabase.postgrest.rpc("echo_all_cities") {
-             City::countryId lte 250
-             //or
-             lte("country_id", 300)
+              filter {
+                 City::countryId lte 300
+                 //or
+                 lte("country_id", 300)
+              }
           }
           ```
 
@@ -1081,9 +1158,11 @@ functions:
         code: |
           ```kotlin
           supabase.from("cities").select(columns = Columns.list("name")) {
-             City::name like "%la%"
-             //or
-             like("name", "%la%")
+              filter {
+                 City::name like "%la%"
+                 //or
+                 like("name", "%la%")
+              }
           }
           ```
       - id: with-update
@@ -1092,9 +1171,11 @@ functions:
           ```kotlin
           val toUpdate = City(name = "Mordor")
           supabase.from("cities").update(toUpdate) {
-             City::name like "%la%"
-             //or
-             like("name", "%la%")
+              filter {
+                 City::name like "%la%"
+                 //or
+                 like("name", "%la%")
+              }
           }
           ```
       - id: with-delete
@@ -1102,9 +1183,11 @@ functions:
         code: |
           ```kotlin
           supabase.from("cities").delete {
-             City::name like "%la%"
-             //or
-             like("name", "%la%")
+              filter {
+                 City::name like "%la%"
+                 //or
+                 like("name", "%la%")
+              }
           }
           ```
       - id: with-rpc
@@ -1112,9 +1195,11 @@ functions:
         code: |
           ```kotlin
           supabase.postgrest.rpc("echo_all_cities") {
-             City::name like "%la%"
-             //or
-             like("name", "%la%")
+              filter {
+                 City::name like "%la%"
+                 //or
+                 like("name", "%la%")
+              }
           }
           ```
 
@@ -1129,9 +1214,11 @@ functions:
         code: |
           ```kotlin
           supabase.from("cities").select(columns = Columns.list("name")) {
-             City::name ilike "%la%"
-             //or
-             ilike("name", "%la%")
+              filter {
+                 City::name ilike "%la%"
+                 //or
+                 ilike("name", "%la%")
+              }
           }
           ```
       - id: with-update
@@ -1140,9 +1227,11 @@ functions:
           ```kotlin
           val toUpdate = City(name = "Mordor")
           supabase.from("cities").update(toUpdate) {
-             City::name ilike "%la%"
-             //or
-             ilike("name", "%la%")
+              filter {
+                 City::name ilike "%la%"
+                 //or
+                 ilike("name", "%la%")
+              }
           }
           ```
       - id: with-delete
@@ -1150,9 +1239,11 @@ functions:
         code: |
           ```kotlin
           supabase.from("cities").delete {
-             City::name ilike "%la%"
-             //or
-             ilike("name", "%la%")
+              filter {
+                 City::name ilike "%la%"
+                 //or
+                 ilike("name", "%la%")
+              }
           }
           ```
       - id: with-rpc
@@ -1160,9 +1251,11 @@ functions:
         code: |
           ```kotlin
           supabase.postgrest.rpc("echo_all_cities") {
-             City::name ilike "%la%"
-             //or
-             ilike("name", "%la%")
+              filter {
+                 City::name ilike "%la%"
+                 //or
+                 ilike("name", "%la%")
+              }
           }
           ```
 
@@ -1179,9 +1272,11 @@ functions:
         code: |
           ```kotlin
           supabase.from("cities").select(columns = Columns.list("name")) {
-             City::name isExact null
-             //or
-             exact("name", null)
+              filter {
+                 City::name isExact null
+                 //or
+                 exact("name", null)
+              }
           }
           ```
       - id: with-update
@@ -1190,9 +1285,11 @@ functions:
           ```kotlin
           val toUpdate = City(name = "Mordor")
           supabase.from("cities").update(toUpdate) {
-             City::name isExact null
-             //or
-             exact("name", null)
+              filter {
+                 City::name isExact null
+                 //or
+                 exact("name", null)
+              }
           }
           ```
       - id: with-delete
@@ -1200,9 +1297,11 @@ functions:
         code: |
           ```kotlin
           supabase.from("cities").delete {
-              City::name isExact null
-             //or
-             exact("name", null)
+              filter {
+                 City::name isExact null
+                 //or
+                 exact("name", null)
+              }
           }
           ```
       - id: with-rpc
@@ -1210,9 +1309,11 @@ functions:
         code: |
           ```kotlin
           supabase.postgrest.rpc("echo_all_cities") {
-             City::name isExact null
-             //or
-             exact("name", null)
+              filter {
+                 City::name isExact null
+                 //or
+                 exact("name", null)
+              }
           }
           ```
 
@@ -1227,9 +1328,11 @@ functions:
         code: |
           ```kotlin
           supabase.from("cities").select(columns = Columns.list("name")) {
-             City::name isIn listOf("Rio de Janeiro", "San Francisco")
-             //or
-             isIn("name", listOf("Rio de Janeiro", "San Francisco"))
+              filter {
+                 City::name isIn listOf("Rio de Janeiro", "San Francisco")
+                 //or
+                 isIn("name", listOf("Rio de Janeiro", "San Francisco"))
+              }
           }
           ```
       - id: with-update
@@ -1238,9 +1341,11 @@ functions:
           ```kotlin
           val toUpdate = City(name = "Mordor")
           supabase.from("cities").update(toUpdate) {
-             City::name isIn listOf("Rio de Janeiro", "San Francisco")
-             //or
-             isIn("name", listOf("Rio de Janeiro", "San Francisco"))
+              filter {
+                 City::name isIn listOf("Rio de Janeiro", "San Francisco")
+                 //or
+                 isIn("name", listOf("Rio de Janeiro", "San Francisco"))
+              }
           }
           ```
       - id: with-delete
@@ -1248,9 +1353,11 @@ functions:
         code: |
           ```kotlin
           supabase.from("cities").delete {
-             City::name isIn listOf("Rio de Janeiro", "San Francisco")
-             //or
-             isIn("name", listOf("Rio de Janeiro", "San Francisco"))
+              filter {
+                 City::name isIn listOf("Rio de Janeiro", "San Francisco")
+                 //or
+                 isIn("name", listOf("Rio de Janeiro", "San Francisco"))
+              }
           }
           ```
       - id: with-rpc
@@ -1258,9 +1365,11 @@ functions:
         code: |
           ```kotlin
           supabase.postgrest.rpc("echo_all_cities") {
-             City::name isIn listOf("Rio de Janeiro", "San Francisco")
-             //or
-             isIn("name", listOf("Rio de Janeiro", "San Francisco"))
+              filter {
+                 City::name isIn listOf("Rio de Janeiro", "San Francisco")
+                 //or
+                 isIn("name", listOf("Rio de Janeiro", "San Francisco"))
+              }
           }
           ```
 
@@ -1273,9 +1382,11 @@ functions:
         code: |
           ```kotlin
           supabase.from("cities").select(columns = Columns.list("name")) {
-             City::mainExports contains listOf("oil")
-             //or
-             contains("main_exports", listOf("oil"))
+              filter {
+                 City::mainExports contains listOf("oil")
+                 //or
+                 contains("main_exports", listOf("oil"))
+              }
           }
           ```
       - id: with-update
@@ -1284,9 +1395,11 @@ functions:
           ```kotlin
           val toUpdate = City(name = "Mordor")
           supabase.from("cities").update(toUpdate) {
-             City::mainExports contains listOf("oil")
-             //or
-             contains("main_exports", listOf("oil"))
+              filter {
+                 City::mainExports contains listOf("oil")
+                 //or
+                 contains("main_exports", listOf("oil"))
+              }
           }
           ```
       - id: with-delete
@@ -1294,9 +1407,11 @@ functions:
         code: |
           ```kotlin
           supabase.from("cities").delete {
-             City::mainExports contains listOf("oil")
-             //or
-             contains("main_exports", listOf("oil"))
+              filter {
+                 City::mainExports contains listOf("oil")
+                 //or
+                 contains("main_exports", listOf("oil"))
+              }
           }
           ```
       - id: with-rpc
@@ -1304,9 +1419,11 @@ functions:
         code: |
           ```kotlin
           supabase.postgrest.rpc("echo_all_cities") {
-             City::mainExports contains listOf("oil")
-             //or
-             contains("main_exports", listOf("oil"))
+              filter {
+                 City::mainExports contains listOf("oil")
+                 //or
+                 contains("main_exports", listOf("oil"))
+              }
           }
           ```
 
@@ -1321,9 +1438,11 @@ functions:
         code: |
           ```kotlin
             supabase.from("reservations").select {
-               Reservation::during rangeLt ("2000-01-02 08:30" to "2000-01-02 09:30")
-               //or
-               rangeLt("during", "2000-01-02 08:30" to "2000-01-02 09:30")
+                filter {
+                   Reservation::during rangeLt ("2000-01-02 08:30" to "2000-01-02 09:30")
+                   //or
+                   rangeLt("during", "2000-01-02 08:30" to "2000-01-02 09:30")
+                }
             }
           ```
         data:
@@ -1375,9 +1494,11 @@ functions:
         code: |
           ```kotlin
             supabase.from("reservations").select {
-               Reservation::during rangeGt ("2000-01-02 08:30" to "2000-01-02 09:30")
-               //or
-               rangeGt("during", "2000-01-02 08:30" to "2000-01-02 09:30")
+                filter {
+                   Reservation::during rangeGt ("2000-01-02 08:30" to "2000-01-02 09:30")
+                   //or
+                   rangeGt("during", "2000-01-02 08:30" to "2000-01-02 09:30")
+                }
             }
           ```
         data:
@@ -1428,9 +1549,11 @@ functions:
         code: |
           ```kotlin
             supabase.from("reservations").select {
-               Reservation::during rangeGte ("2000-01-02 08:30" to "2000-01-02 09:30")
-               //or
-               rangeGte("during", "2000-01-02 08:30" to "2000-01-02 09:30")
+                filter {
+                   Reservation::during rangeGte ("2000-01-02 08:30" to "2000-01-02 09:30")
+                   //or
+                   rangeGte("during", "2000-01-02 08:30" to "2000-01-02 09:30")
+                }
             }
           ```
         data:
@@ -1483,9 +1606,11 @@ functions:
         code: |
           ```kotlin
             supabase.from("reservations").select {
-               Reservation::during rangeLte ("2000-01-02 08:30" to "2000-01-02 09:30")
-               //or
-               rangeLte("during", "2000-01-02 08:30" to "2000-01-02 09:30")
+                filter {
+                   Reservation::during rangeLte ("2000-01-02 08:30" to "2000-01-02 09:30")
+                   //or
+                   rangeLte("during", "2000-01-02 08:30" to "2000-01-02 09:30")
+                }
             }
           ```
         data:
@@ -1537,9 +1662,11 @@ functions:
         code: |
           ```kotlin
             supabase.from("reservations").select {
-               Reservation::during adjacent ("2000-01-02 08:30" to "2000-01-02 09:30")
-               //or
-               adjacent("during", "2000-01-02 08:30" to "2000-01-02 09:30")
+                filter {
+                   Reservation::during adjacent ("2000-01-02 08:30" to "2000-01-02 09:30")
+                   //or
+                   adjacent("during", "2000-01-02 08:30" to "2000-01-02 09:30")
+                }
             }
           ```
         data:
@@ -1587,9 +1714,11 @@ functions:
         code: |
           ```kotlin
           supabase.from("issues").select(columns = Columns.list("title")) {
-             Issue::tags overlaps listOf("is:closed", "severity:high")
-             //or
-             overlaps("tags", listOf("is:closed", "severity:high"))
+              filter {
+                 Issue::tags overlaps listOf("is:closed", "severity:high")
+                 //or
+                 overlaps("tags", listOf("is:closed", "severity:high"))
+              }
           }
           ```
         data:
@@ -1627,9 +1756,11 @@ functions:
         code: |
           ```kotlin
           supabase.from("issues").select(columns = Columns.list("title")) {
-             Issue::tags overlaps listOf("is:closed", "severity:high")
-             //or
-             overlaps("tags", listOf("is:closed", "severity:high"))
+              filter {
+                 Issue::during overlaps listOf("2000-01-01 12:45", "2000-01-01 13:15")
+                 //or
+                 overlaps("during", listOf("2000-01-01 12:45", "2000-01-01 13:15"))
+              }
           }
           ```
         data:
@@ -1681,7 +1812,9 @@ functions:
         code: |
           ```kotlin
           supabase.from("quotes").select(columns = Columns.list("catchphrase")) {
-             textSearch(column = "catchphrase", query = "'fat' & 'cat'", config = "english", type = TextSearchType.YOUR_TYPE)
+              filter {
+                 textSearch(column = "catchphrase", query = "'fat' & 'cat'", config = "english", type = TextSearchType.YOUR_TYPE)
+              }
           }
           ```
       - id: basic-normalization
@@ -1690,7 +1823,9 @@ functions:
         code: |
           ```kotlin
           supabase.from("quotes").select(columns = Columns.list("catchphrase")) {
-             textSearch(column = "catchphrase", query = "'fat' & 'cat'", config = "english", type = TextSearchType.PLAINTO)
+              filter {
+                 textSearch(column = "catchphrase", query = "'fat' & 'cat'", config = "english", type = TextSearchType.PLAINTO)
+              }
           }
           ```
       - id: full-normalization
@@ -1699,7 +1834,9 @@ functions:
         code: |
           ```kotlin
           supabase.from("quotes").select(columns = Columns.list("catchphrase")) {
-             textSearch(column = "catchphrase", query = "'fat' & 'cat'", config = "english", type = TextSearchType.PHRASETO)
+              filter {
+                 textSearch(column = "catchphrase", query = "'fat' & 'cat'", config = "english", type = TextSearchType.PHRASETO)
+              }
           }
           ```
       - id: web-search
@@ -1717,7 +1854,9 @@ functions:
         code: |
           ```kotlin
           supabase.from("quotes").select(columns = Columns.list("catchphrase")) {
-             textSearch(column = "catchphrase", query = "'fat' & 'cat'", config = "english", type = TextSearchType.WEBSEARCH)
+              filter {
+                 textSearch(column = "catchphrase", query = "'fat' & 'cat'", config = "english", type = TextSearchType.WEBSEARCH)
+              }
           }
           ```
 
@@ -1732,7 +1871,9 @@ functions:
         code: |
           ```kotlin
           supabase.from("countries").select {
-             filter(column = "name", operator = FilterOperator.IN, value = "('Algeria', 'Japan')")
+              filter {
+                 filter(column = "name", operator = FilterOperator.IN, value = "('Algeria', 'Japan')")
+              } 
           }
           ```
         data:
@@ -1774,9 +1915,11 @@ functions:
               )
           """.trimIndent())
           supabase.from("countries").select(
-             columns = 
+             columns = columns
           ) {
-             filter(column = "cities.name", operator = FilterOperator.EQ, value = "Bali")
+              filter {
+                  filter(column = "cities.name", operator = FilterOperator.EQ, value = "Bali")
+              }
           }
           ```
         data:
