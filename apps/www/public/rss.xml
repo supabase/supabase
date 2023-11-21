@@ -5,9 +5,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Sun, 05 Nov 2023 23:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Wed, 15 Nov 2023 23:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/react-native-authentication</guid>
+  <title>Getting started with React Native authentication</title>
+  <link>https://supabase.com/blog/react-native-authentication</link>
+  <description>Learn how to implement authentication in your React Native applications.</description>
+  <pubDate>Wed, 15 Nov 2023 23:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/beta-update-october-2023</guid>
   <title>Supabase Beta October 2023</title>
   <link>https://supabase.com/blog/beta-update-october-2023</link>
