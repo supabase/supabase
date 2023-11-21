@@ -24,7 +24,7 @@ const UserChat = ({ message, reply, isLatest, isSelected, isLoading, onSelect }:
         <div
           className={cn(
             'transition w-3 h-3 rounded-full border border-foreground-lighter',
-            isSelected ? 'bg-white' : 'bg-surface-300'
+            isSelected ? 'bg-brand' : 'bg-surface-300'
           )}
         />
         {!isLatest && <div className="border-l-2 border-dashed flex-grow" />}
