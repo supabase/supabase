@@ -49,6 +49,10 @@ const Header = ({ selectedMessage, hideChat, setHideChat, showAllThreads }: Head
           <Link href="/new">New conversation</Link>
         </Button>
 
+        <Button type="default">
+          <Link href="/login">Login</Link>
+        </Button>
+
         <Button
           type="outline"
           className="px-1"
