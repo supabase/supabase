@@ -77,7 +77,7 @@ export const Chat = ({ messages, loading, selected, hideChat, onSelect, onSubmit
             icon={<div className="ml-1 w-2 h-2 rounded-full bg-purple-900" />}
             onChange={(v) => setValue(v.target.value)}
             onKeyDown={(e) => {
-              if (e.code === 'Enter') {
+              if (e.code === 'Enter' && value.length > 0) {
                 onSubmit(value)
                 setInputEntered(true)
               }

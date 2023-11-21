@@ -43,7 +43,8 @@ export default function NewThread() {
         onKeyDown={(e) => {
           if (e.code === 'Enter') {
             console.log('Submit')
-            mutate((e.target as any).value)
+            const value = (e.target as any).value
+            if (value.length > 0) mutate(value)
           }
         }}
         actions={
