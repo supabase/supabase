@@ -28,9 +28,7 @@ const BlogListItem = ({ post }: Props) => {
       <Link href={post.path} className="group inline-block min-w-full">
         <div className="flex flex-col space-y-6">
           <div className="flex flex-col space-y-3">
-            <div
-              className={`border-default relative mb-4 w-full aspect-[2/1] lg:aspect-[3/2] overflow-hidden rounded-lg border shadow-sm`}
-            >
+            <div className="border-default relative mb-4 w-full aspect-[2/1] lg:aspect-[3/2] overflow-hidden rounded-lg border shadow-sm">
               <Image
                 fill
                 src={
