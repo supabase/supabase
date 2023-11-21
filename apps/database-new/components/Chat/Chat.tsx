@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { Input, ScrollArea, cn } from 'ui'
 import BottomMarker from './BottomMarker'
 import UserChat from './UserChat'
-import Loader from './Loader'
 import { Loader2 } from 'lucide-react'
 
 interface ChatProps {
@@ -12,7 +11,7 @@ interface ChatProps {
   loading: boolean
   selected: string | undefined
   hideChat: boolean
-  onSelect: (id: string) => void
+  onSelect: (messageId: string, replyId: string) => void
   onSubmit: (value: string) => void
 }
 
@@ -31,8 +30,8 @@ export const Chat = ({ messages, loading, selected, hideChat, onSelect, onSubmit
     >
       <div className="flex flex-col grow items-between">
         {messages.length === 0 ? (
-          <div className="grow">
-            <Loader />
+          <div className="grow flex items-center justify-center">
+            <Loader2 className="animate-spin" />
           </div>
         ) : (
           <ScrollArea className="grow h-[200px]">

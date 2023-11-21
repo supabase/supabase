@@ -8,7 +8,7 @@ interface UserChatProps {
   isLatest: boolean
   isSelected: boolean
   isLoading: boolean
-  onSelect: (id: string) => void
+  onSelect: (messageId: string, replyId: string) => void
 }
 
 const UserChat = ({ message, reply, isLatest, isSelected, isLoading, onSelect }: UserChatProps) => {
@@ -50,7 +50,7 @@ const UserChat = ({ message, reply, isLatest, isSelected, isLoading, onSelect }:
               'w-full rounded-lg rounded-tl-none',
               isSelected ? 'bg-surface-300' : 'bg-surface-100 group-hover:bg-surface-200'
             )}
-            onClick={() => reply !== undefined && onSelect(reply?.id)}
+            onClick={() => (reply !== undefined ? onSelect(message.id, reply?.id) : () => {})}
           >
             <p className="p-4 text-sm">{message.text}</p>
             {isLoading && <div className="chat-shimmering-loader w-full h-0.5 absolute bottom-0" />}

@@ -8,7 +8,7 @@ import { Chat } from '@/components/Chat/Chat'
 import { CodeEditor } from '@/components/CodeEditor/CodeEditor'
 import { Main } from '@/components/Main'
 import SchemaGraph from '@/components/SchemaGraph'
-import { AssistantMessage, PostgresTable, ReadThreadAPIResult } from '@/lib/types'
+import { AssistantMessage, PostgresTable, ReadThreadAPIResult, UserMessage } from '@/lib/types'
 import { parseTables } from '@/lib/utils'
 import Header from '@/components/Header'
 
@@ -17,6 +17,7 @@ export default function ThreadPage({ params }: { params: { threadId: string; run
   const [hideChat, setHideChat] = useState(false)
   const [tables, setTables] = useState<PostgresTable[]>([])
   const [selectedMessageId, setSelectedMessageId] = useState<string | undefined>(undefined)
+  const [selectedReplyId, setSelectedReplyId] = useState<string | undefined>(undefined)
 
   const { data, isSuccess } = useQuery<ReadThreadAPIResult>({
     queryFn: async () => {
@@ -64,8 +65,8 @@ export default function ThreadPage({ params }: { params: { threadId: string; run
   }, [data?.messages, isSuccess])
 
   const selectedMessage = useMemo(
-    () => messages.find((m) => m.id === selectedMessageId) as AssistantMessage | undefined,
-    [messages, selectedMessageId]
+    () => messages.find((m) => m.id === selectedReplyId) as AssistantMessage | undefined,
+    [messages, selectedReplyId]
   )
 
   const content = useMemo(
@@ -79,23 +80,32 @@ export default function ThreadPage({ params }: { params: { threadId: string; run
 
   // whenever the messages change (due to fetching), select the latest message
   useEffect(() => {
-    const l = last(messages.filter((m) => m.role === 'assistant'))
-    if (l) {
-      setSelectedMessageId(l?.id)
-    }
+    const message = last(messages.filter((m) => m.role === 'user'))
+    const reply = last(messages.filter((m) => m.role === 'assistant'))
+    if (message) setSelectedMessageId(message.id)
+    if (reply) setSelectedReplyId(reply.id)
   }, [messages])
 
   return (
     <Main>
-      <Header hideChat={hideChat} setHideChat={setHideChat} />
+      <Header
+        selectedMessage={
+          messages.find((message) => message.id === selectedMessageId) as UserMessage
+        }
+        hideChat={hideChat}
+        setHideChat={setHideChat}
+      />
       <div className="flex flex-row items-center justify-between bg-alternative h-full">
         <Chat
           messages={messages}
           loading={isSuccess && data.status === 'loading'}
-          selected={selectedMessageId}
+          selected={selectedReplyId}
           hideChat={hideChat}
           onSubmit={(str) => mutate(str)}
-          onSelect={(id) => setSelectedMessageId(id)}
+          onSelect={(messageId, replyId) => {
+            setSelectedMessageId(messageId)
+            setSelectedReplyId(replyId)
+          }}
         />
         <SchemaGraph tables={tables} hideChat={hideChat} />
         <CodeEditor content={content} />
