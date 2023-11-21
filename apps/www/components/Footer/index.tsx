@@ -20,7 +20,8 @@ const Footer = (props: Props) => {
   const { resolvedTheme } = useTheme()
   const { pathname } = useRouter()
 
-  const forceDark = pathname.includes('launch-week') || pathname === '/'
+  const isLaunchWeek = pathname.includes('launch-week')
+  const forceDark = isLaunchWeek || pathname === '/'
 
   /**
    * Temporary fix for next-theme client side bug
@@ -38,7 +39,10 @@ const Footer = (props: Props) => {
   }
 
   return (
-    <footer className={cn('bg-alternative', props.className)} aria-labelledby="footerHeading">
+    <footer
+      className={cn('bg-alternative', isLaunchWeek && 'bg-[#020405]', props.className)}
+      aria-labelledby="footerHeading"
+    >
       <h2 id="footerHeading" className="sr-only">
         Footer
       </h2>

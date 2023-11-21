@@ -84,7 +84,7 @@ const TicketingFlow = () => {
                     <span className="text-2xl">Share your ticket & win swag</span>
                     <span className="text-foreground-lighter">
                       Boost your chances of winning Launch Week X limited-edition swag and stay
-                      tuned for a week new features.
+                      tuned for a week of announcing new features.
                     </span>
                   </div>
                 </m.div>
@@ -92,7 +92,7 @@ const TicketingFlow = () => {
             </AnimatePresence>
           </LazyMotion>
         </div>
-        <LWXBackground className="absolute z-0 top-48 left-0 right-0 w-full !min-h-[350px] flex items-center justify-center" />
+        <LWXBackground className="absolute z-0 top-0 left-0 right-0 w-full h-[620px] md:h-[720px] !min-h-[350px] flex items-center justify-center" />
       </SectionContainer>
       <SectionContainer className="!pt-4 lg:pb-40">
         <LaunchWeekPrizeSection />

@@ -17,7 +17,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
       <div className="grid md:grid-cols-2 text-lg">
         <h3 className="text-4xl text-foreground">Get your winning ticket</h3>
         <p>
-          Mark your calendars for December 11th for Launch Week X final day to find out if you're
+          Mark your calendars for December 15th for Launch Week X final day to find out if you're
           one of the lucky winners.
         </p>
       </div>

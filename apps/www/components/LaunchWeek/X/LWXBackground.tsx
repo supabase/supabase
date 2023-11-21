@@ -8,11 +8,11 @@ interface Props {
 
 const LWXBackground = ({ className }: Props) => {
   return (
-    <div className={cn('w-full h-auto absolute', className)}>
+    <div className={cn('w-full h-full absolute', className)}>
       <Image
         src="/images/launchweek/lwx/lwx_bg.svg"
         alt=""
-        className="absolute w-full h-full inset-0 mt-10 object-cover overflow-visible opacity-40"
+        className="absolute w-full h-full inset-0 mt-10 object-cover object-center opacity-40"
         role="presentation"
         fill
       />

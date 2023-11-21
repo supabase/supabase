@@ -98,15 +98,14 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
                   Launch Week X Ticket
                 </h1>
                 <span className="text-foreground-lighter">
-                  Boost your chances of winning Supabase LWX limited-edition Keyboard and many other
-                  awards.
+                  Generate and share your own custom ticket for a chance to win.
                 </span>
               </div>
               <Button type="alternative" asChild>
                 <Link href="/launch-week">Join Launch Week X</Link>
               </Button>
             </SectionContainer>
-            <LWXBackground className="absolute z-0 top-64 left-0 right-0 w-full !min-h-[350px] flex items-center justify-center" />
+            <LWXBackground className="absolute z-0 top-0 left-0 right-0 w-full h-[800px] !min-h-[350px] flex items-center justify-center" />
             {/* {users && <TicketBrickWall users={users.slice(0, 17)} />} */}
           </div>
           <SectionContainer className="!pt-4 !pb-0">
