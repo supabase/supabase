@@ -290,7 +290,7 @@ class ProductRepositoryImpl @Inject constructor(
         withContext(Dispatchers.IO) {
             if (imageFile.isNotEmpty()) {
                 val imageUrl =
-                    storage["Product%20Image"].upload(
+                    storage.from("Product%20Image").upload(
                         path = "$imageName.png",
                         data = imageFile,
                         upsert = true

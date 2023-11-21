@@ -88,7 +88,7 @@ Supabase Storage implements the [TUS protocol](https://tus.io/) to enable resuma
 
     ```kotlin
     suspend fun uploadFile(file: File) {
-        val upload: ResumableUpload = supabase.storage["bucket_name"]
+        val upload: ResumableUpload = supabase.storage.from("bucket_name")
             .resumable.createOrContinueUpload("file_path", file)
         upload.stateFlow
             .onEach {
@@ -100,7 +100,7 @@ Supabase Storage implements the [TUS protocol](https://tus.io/) to enable resuma
 
     // On other platforms you might have to give the bytes directly and specify a source if you want to continue it later:
     suspend fun uploadData(bytes: ByteArray) {
-        val upload: ResumableUpload = supabase.storage["bucket_name"]
+        val upload: ResumableUpload = supabase.storage.from("bucket_name")
             .resumable.createOrContinueUpload(bytes, "source", "file_path")
 
         upload.stateFlow
