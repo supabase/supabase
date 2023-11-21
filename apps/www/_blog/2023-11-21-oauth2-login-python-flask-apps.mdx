@@ -104,7 +104,7 @@ Inside our application code `app.py`, we can create the sign-in route to trigger
 ```python
 @app.route("/signin/github")
 def signin_with_github():
-    resp = supabase.auth.sign_in_with_oauth(
+    res = supabase.auth.sign_in_with_oauth(
         {
             "provider": "github",
             "options": {
@@ -112,7 +112,7 @@ def signin_with_github():
 	        },
         }
     )
-    return redirect(resp.url)
+    return redirect(res.url)
 ```
 
 In this function `options` object we specify a `redirect_to` parameter which will point to the callback route we will create in the next step. This function will generate a url for us to use to redirect the user to, in this case we are using `github` as our OAuth provider so we will be redirected to the GitHub OAuth consent screen.
