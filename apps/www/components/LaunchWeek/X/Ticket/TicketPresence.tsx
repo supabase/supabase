@@ -44,7 +44,7 @@ const TicketPresence = () => {
   return (
     <div className="text-foreground-muted text-xs flex items-center">
       <svg
-        className="h-5 w-5 stroke-brand-500 animate-pulse mr-2"
+        className="h-5 w-5 stroke-foreground-lighter animate-pulse mr-2"
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
