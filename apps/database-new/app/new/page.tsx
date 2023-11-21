@@ -42,6 +42,7 @@ export default function NewThread() {
         disabled={isPending || isSuccess}
         onKeyDown={(e) => {
           if (e.code === 'Enter') {
+            console.log('Submit')
             mutate((e.target as any).value)
           }
         }}
