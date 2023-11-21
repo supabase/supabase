@@ -13,6 +13,9 @@ import TicketContainer from '~/components/LaunchWeek/X/Ticket/TicketContainer'
 import { SITE_URL } from '~/lib/constants'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import supabase from '../../../lib/supabaseMisc'
+import Link from 'next/link'
+import { Button } from 'ui'
+import LWXBackground from '../../../components/LaunchWeek/X/LWXBackground'
 
 const LWXTicketContainer = dynamic(() => import('~/components/LaunchWeek/X/Ticket/TicketContainer'))
 const LaunchWeekPrizeSection = dynamic(
@@ -84,17 +87,31 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
       >
         <DefaultLayout>
           <div className="-mt-[65px]">
-            <div className="relative">
-              <div className="relative z-10">
-                <SectionContainer className="relative z-10 flex flex-col justify-around items-center gap-2 lg:!pb-0 md:gap-4 !px-2 !mx-auto md:min-h-[auto]">
-                  <div className="w-full min-h-[400px] pt-24 flex items-center">
-                    <LWXTicketContainer supabase={supabase} />
-                  </div>
-                </SectionContainer>
+            <SectionContainer className="relative z-10 flex flex-col justify-around items-center gap-2 md:gap-10 !px-2 !mx-auto md:min-h-[auto]">
+              <div className="w-full min-h-[400px] pt-24 flex items-center">
+                <LWXTicketContainer supabase={supabase} />
               </div>
-            </div>
+              <div className="flex flex-col items-center justify-center text-center gap-2 max-w-lg">
+                <h1 className="text-2xl">
+                  {name}'s
+                  <br />
+                  Launch Week X Ticket
+                </h1>
+                <span className="text-foreground-lighter">
+                  Boost your chances of winning Supabase LWX limited-edition Keyboard and many other
+                  awards.
+                </span>
+              </div>
+              <Button type="alternative" asChild>
+                <Link href="/launch-week">Join Launch Week X</Link>
+              </Button>
+            </SectionContainer>
+            <LWXBackground className="absolute z-0 top-64 left-0 right-0 w-full !min-h-[350px] flex items-center justify-center" />
             {/* {users && <TicketBrickWall users={users.slice(0, 17)} />} */}
           </div>
+          <SectionContainer className="!pt-4 !pb-0">
+            <LaunchWeekPrizeSection />
+          </SectionContainer>
           <CTABanner className="!bg-[#020405] border-t-0" />
         </DefaultLayout>
       </ConfDataContext.Provider>

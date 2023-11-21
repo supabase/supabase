@@ -27,8 +27,10 @@ export default function Ticket() {
   return (
     <Panel
       hasShimmer
-      outerClassName="flex relative flex-col w-[300px] h-auto max-h-[480px] md:w-full md:max-w-none rounded-3xl"
+      outerClassName="flex relative flex-col w-[300px] h-auto max-h-[480px] md:w-full md:max-w-none rounded-3xl !shadow-xl"
       innerClassName="flex relative flex-col justify-between w-full transition-colors aspect-[1/1.6] md:aspect-[1.935/1] rounded-3xl bg-[#020405] text-left"
+      shimmerFromColor="hsl(var(--border-strong))"
+      shimmerToColor="hsl(var(--background-default))"
     >
       <div className="absolute inset-0 h-full p-6 md:p-9 z-30 flex flex-col justify-between w-full md:h-full flex-1 overflow-hidden">
         <TicketProfile />
@@ -43,7 +45,7 @@ export default function Ticket() {
         loading="eager"
         layout="fill"
         className={cn(
-          'absolute inset-0 object-cover object-center opacity-0 transition-opacity duration-1000',
+          'absolute inset-0 object-cover object-right opacity-0 transition-opacity duration-1000',
           imageHasLoaded && 'opacity-100'
         )}
         quality={100}

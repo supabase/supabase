@@ -1,89 +1,81 @@
 import React from 'react'
+import { cn } from 'ui'
 import LabelBadge from './LabelBadge'
 import LaunchWeekPrizeCard from './LaunchWeekPrizeCard'
 import Image from 'next/image'
 
-export default function LaunchWeekPrizeSection({
-  className,
-  ticket,
-}: {
-  className?: string
-  ticket?: any
-}) {
-  const Ticket = ticket
-
+export default function LaunchWeekPrizeSection({ className }: { className?: string }) {
   return (
-    <div id="lw8-prizes" className={['relative scroll-mt-[66px]', className].join(' ')}>
-      <div className="absolute z-0 w-full aspect-[1.75/1] top-0 items-center justify-center">
-        <Image
-          src="/images/launchweek/8/swag-bg.png"
-          alt="prizes background"
-          layout="fill"
-          objectFit="cover"
-          objectPosition="top"
-          quality={100}
-        />
+    <div
+      id="lwx-prizes"
+      className={cn(
+        'relative text-left flex flex-col max-w-7xl mx-auto gap-2 scroll-mt-[66px] text-foreground-lighter',
+        className
+      )}
+    >
+      <h2 className="w-full text-sm font-mono uppercase tracking-[1px]">Awards</h2>
+      <div className="grid md:grid-cols-2 text-lg">
+        <h3 className="text-4xl text-foreground">Get your winning ticket</h3>
+        <p>
+          Mark your calendars for December 11th for Launch Week X final day to find out if you're
+          one of the lucky winners.
+        </p>
       </div>
-      <div className="!max-w-[100vw]">
-        <div className="w-full container mx-auto h-px bg-gradient-to-r from-transparent via-border-control to-transparent" />
-        <div className="text-center relative z-10 text-white">
-          <div className="max-w-[38rem] mx-auto flex flex-col items-center gap-4 px-4">
-            <div className="relative z-10 w-full h-[100px] md:h-[130px] rounded-sm flex mt-16 items-center justify-center">
-              <Image
-                src="/images/launchweek/8/swag-illustration.png"
-                alt="prizes"
-                layout="fill"
-                objectFit="contain"
-                quality={100}
-              />
-            </div>
-            <h2 className="text-4xl">Swag has been delivered</h2>
-          </div>
-        </div>
-        {ticket && <Ticket />}
-        <div className="pt-8 lg:pt-16 px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-7xl mx-auto h-auto text-white">
+      <div className="w-full pt-8 md:pt-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mx-auto h-auto text-foreground">
+          <LaunchWeekPrizeCard
+            className="col-span-full md:col-span-2"
+            contentClassName="flex flex-col justify-between"
+            content={
+              <>
+                <div className="p-4 md:p-6 flex flex-col flex-shrink gap-2 text-sm items-start">
+                  <LabelBadge text="10 keyboards" />
+                  <p className="text-lg text-foreground-lighter max-w-lg">
+                    Increase your chances of winning a limited-edition{' '}
+                    <span className="text-foreground">62-Key ISO Mechanical Keyboard</span> by
+                    sharing your ticket on X and LinkedIn.
+                  </p>
+                </div>
+                <div className="px-4 w-full">
+                  <div className="relative w-full aspect-[3.634/1]">
+                    <Image
+                      src="/images/launchweek/lwx/swag/lwx_keyboard.png"
+                      fill
+                      quality={100}
+                      alt="/images/launchweek/lwx/swag/lwx_keyboard.png"
+                      className="h-full w-full block"
+                    />
+                  </div>
+                </div>
+              </>
+            }
+          />
+          <div className="w-full flex flex-col gap-4 items-stretch">
             <LaunchWeekPrizeCard
-              className="col-span-full"
-              imageUrl="/images/launchweek/8/swag/deskmat-lg.jpg"
-              imageWrapperClassName="w-full aspect-[1.9/1] md:h-[300px]"
-              imgObjectPosition="center"
+              className="flex-grow"
               content={
-                <h3 className="w-full text-sm md:text-center flex md:justify-center items-center gap-4">
-                  Supabase Desk Mat <LabelBadge text="10 mats" />
-                </h3>
-              }
-              animateFrom="down"
-            />
-            <LaunchWeekPrizeCard
-              imageUrl="/images/launchweek/8/swag/shirt.jpg"
-              imageWrapperClassName="w-full aspect-[1.9/1]"
-              imgObjectPosition="right"
-              content={
-                <h3 className="text-sm flex items-center gap-4">
-                  Supabase T-Shirt <LabelBadge text="20 t-shirts" />
-                </h3>
-              }
-              animateFrom="down"
-            />
-            <LaunchWeekPrizeCard
-              imageUrl="/images/launchweek/8/swag/cap.jpg"
-              imageWrapperClassName="w-full aspect-[1.9/1]"
-              animateFrom="down"
-              content={
-                <h3 className="text-sm flex items-center gap-4">
-                  Supabase Cap <LabelBadge text="25 caps" />
-                </h3>
+                <div className="p-4 md:p-6 flex flex-col gap-2 text-sm items-start justify-between h-full">
+                  <LabelBadge text="20 t-shirts" />
+                  LWX T-Shirt
+                </div>
               }
             />
             <LaunchWeekPrizeCard
-              imageUrl="/images/launchweek/8/swag/stickers.jpg"
-              imageWrapperClassName="w-full aspect-[1.9/1]"
-              animateFrom="down"
+              className="flex-grow"
               content={
-                <h3 className="text-sm flex items-center gap-4">
-                  Supabase Sticker Pack <LabelBadge text="50 packs" />
-                </h3>
+                <div className="p-4 md:p-6 flex flex-col gap-2 text-sm items-start justify-between h-full">
+                  <LabelBadge text="25 caps" />
+                  LWX Cap
+                </div>
+              }
+            />
+            <LaunchWeekPrizeCard
+              className="flex-grow"
+              content={
+                <div className="p-4 md:p-6 flex flex-col gap-2 text-sm items-start justify-between h-full">
+                  <LabelBadge text="50 codes" />
+                  100% Swag Store Discount
+                </div>
               }
             />
           </div>

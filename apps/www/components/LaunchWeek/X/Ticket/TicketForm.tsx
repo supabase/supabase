@@ -4,6 +4,9 @@ import { SITE_ORIGIN } from '~/lib/constants'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import { Button, IconCheckCircle } from 'ui'
 import { SupabaseClient } from '@supabase/supabase-js'
+import ProductIcon from '../../../ProductIcon'
+import solutions from '../../../../data/Solutions'
+import TicketPresence from './TicketPresence'
 
 type FormState = 'default' | 'loading' | 'error'
 
@@ -52,7 +55,7 @@ export default function TicketForm() {
           fetch(`/launch-week/x/tickets/${username}`).catch((_) => {})
 
           // Listen to realtime changes
-          if (!realtimeChannel && !data?.golden) {
+          if (!realtimeChannel) {
             const channel = supabase
               .channel('changes')
               .on(
@@ -126,7 +129,7 @@ export default function TicketForm() {
       </Button>
     </div>
   ) : (
-    <div className="flex flex-col h-full items-center justify-center relative z-20">
+    <div className="flex flex-col h-full gap-10 items-center justify-center relative z-20">
       <Button
         type="alternative"
         disabled={formState === 'loading' || Boolean(session)}
@@ -136,6 +139,8 @@ export default function TicketForm() {
       >
         Claim your ticket
       </Button>
+
+      <TicketPresence channel={realtimeChannel} />
     </div>
   )
 }

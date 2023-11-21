@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { SITE_URL, TWEET_TEXT, TWEET_TEXT_GOLDEN } from '~/lib/constants'
-import { Button, IconLinkedinSolid, IconTwitterX } from 'ui'
+import { Button, IconLinkedinSolid, IconTwitterX, cn } from 'ui'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import { useParams } from '~/hooks/useParams'
 import TicketCopy from './TicketCopy'
@@ -25,10 +25,8 @@ export default function TicketActions({ username, golden = false }: Props) {
     username
   )}`
   const params = useParams()
-  const sharePage = params.username
+  const sharePage = !!params.username
   const LW_TABLE = 'lwx_tickets'
-
-  if (sharePage) return null
 
   useEffect(() => {
     setImgReady(false)
@@ -58,26 +56,33 @@ export default function TicketActions({ username, golden = false }: Props) {
   }
 
   return (
-    <div className="gap-1 flex justify-between items-center">
-      <TicketCopy />
-      <div className="flex gap-1">
-        <Button
-          onClick={() => handleShare('twitter')}
-          type={userData.sharedOnTwitter ? 'secondary' : 'default'}
-          icon={<IconTwitterX className="text-light w-3" />}
-          size="tiny"
-        >
-          Share on X
-        </Button>
-        <Button
-          onClick={() => handleShare('linkedin')}
-          type={userData.sharedOnLinkedIn ? 'secondary' : 'default'}
-          icon={<IconLinkedinSolid className="text-light w-3" />}
-          size="tiny"
-        >
-          Share on Linkedin
-        </Button>
-      </div>
+    <div
+      className={cn(
+        'w-full gap-3 flex flex-col md:flex-row items-center',
+        sharePage ? 'justify-center' : 'justify-between'
+      )}
+    >
+      <TicketCopy sharePage={sharePage} />
+      {!sharePage && (
+        <div className="flex gap-1">
+          <Button
+            onClick={() => handleShare('twitter')}
+            type={userData.sharedOnTwitter ? 'secondary' : 'default'}
+            icon={<IconTwitterX className="text-light w-3" />}
+            size="tiny"
+          >
+            Share on X
+          </Button>
+          <Button
+            onClick={() => handleShare('linkedin')}
+            type={userData.sharedOnLinkedIn ? 'secondary' : 'default'}
+            icon={<IconLinkedinSolid className="text-light w-3" />}
+            size="tiny"
+          >
+            Share on Linkedin
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

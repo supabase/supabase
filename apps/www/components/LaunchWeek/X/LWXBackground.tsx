@@ -12,7 +12,7 @@ const LWXBackground = ({ className }: Props) => {
       <Image
         src="/images/launchweek/lwx/lwx_bg.svg"
         alt=""
-        className="absolute w-full h-full inset-0 mt-10 object-cover overflow-visible opacity-70"
+        className="absolute w-full h-full inset-0 mt-10 object-cover overflow-visible opacity-40"
         role="presentation"
         fill
       />
