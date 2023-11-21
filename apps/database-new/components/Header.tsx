@@ -38,9 +38,10 @@ const Header = ({ selectedMessage, hideChat, setHideChat, showAllThreads }: Head
           {hideChat ? 'Show chat' : 'Hide chat'}
         </Button>
 
-        <Button type="default" onClick={() => showAllThreads()}>
+        {/* [Joshen] Hidden for now */}
+        {/* <Button type="default" onClick={() => showAllThreads()}>
           Show all threads
-        </Button>
+        </Button> */}
 
         <div className="border-r py-3" />
 
