@@ -103,7 +103,7 @@ const TableNode = ({ data, targetPosition, sourcePosition }: NodeProps<TableNode
                 <span className="text-ellipsis overflow-hidden whitespace-nowrap">
                   {column.name}
                 </span>
-                <span className="px-2 inline-flex justify-end font-mono text-lighter">
+                <span className="px-2 inline-flex justify-end font-mono text-lighter text-[0.4rem]">
                   {column.format}
                 </span>
               </div>
