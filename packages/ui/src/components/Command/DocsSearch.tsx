@@ -68,45 +68,51 @@ const getDocsUrl = () => {
 type SearchState =
   | {
       status: 'initial'
+      key: number
     }
   | {
       status: 'loading'
+      key: number
       staleResults: Page[]
-      searchId: number
     }
   | {
       status: 'partialResults'
+      key: number
       results: Page[]
-      searchId: number
     }
   | {
       status: 'fullResults'
+      key: number
       results: Page[]
     }
   | {
       status: 'noResults'
+      key: number
     }
   | {
       status: 'error'
+      key: number
       message: string
     }
 
 type Action =
   | {
       type: 'resultsReturned'
+      key: number
       sourcesLoaded: number
-      searchId: number
       results: unknown[]
     }
   | {
       type: 'newSearchDispatched'
-      searchId: number
+      key: number
     }
   | {
       type: 'reset'
+      key: number
     }
   | {
       type: 'errored'
+      key: number
       message: string
     }
 
@@ -146,55 +152,63 @@ function reshapeResults(result: unknown): Page | null {
 }
 
 function reducer(state: SearchState, action: Action): SearchState {
+  // Ignore responses from outdated async functions
+  if (state.key > action.key) {
+    return
+  }
   switch (action.type) {
     case 'resultsReturned':
-      if ('searchId' in state && state.searchId > action.searchId) {
-        return state
-      }
       const allSourcesLoaded = action.sourcesLoaded === NUMBER_SOURCES
-      const newResults = uniqBy(compact(action.results.map(reshapeResults)), (res) => res.id)
+      const newResults = compact(action.results.map(reshapeResults))
+      // If the new responses are from the same request as the current responses,
+      // combine the responses.
+      // If the new responses are from a fresher request, replace the current responses.
       const allResults =
         state.status === 'partialResults' && state.searchId === action.searchId
-          ? state.results.concat(newResults)
+          ? uniqBy(state.results.concat(newResults), (res) => res.id)
           : newResults
       if (!allResults.length) {
         return allSourcesLoaded
           ? {
               status: 'noResults',
+              key: action.key,
             }
           : {
               status: 'loading',
-              searchId: action.searchId,
+              key: action.key,
               staleResults: [],
             }
       }
       return allSourcesLoaded
         ? {
             status: 'fullResults',
+            key: action.key,
             results: allResults,
           }
         : {
             status: 'partialResults',
-            searchId: action.searchId,
+            key: action.key,
             results: allResults,
           }
     case 'newSearchDispatched':
       return {
         status: 'loading',
-        searchId: Math.max('searchId' in state ? state.searchId : 0, action.searchId),
+        key: action.key,
         staleResults: 'results' in state ? state.results : [],
       }
     case 'reset':
       return {
         status: 'initial',
+        key: action.key,
       }
     case 'errored':
       return {
         status: 'error',
+        key: action.key,
         message: action.message,
       }
     default:
-      return state
+      return { ...state, key: action.key }
   }
 }
 
@@ -202,16 +216,16 @@ const DocsSearch = () => {
   const [state, dispatch] = useReducer(reducer, { status: 'initial' })
   const supabaseClient = useSupabaseClient()
   const { isLoading, setIsLoading, search, setSearch } = useCommandMenu()
-  const searchId = useRef(0)
+  const key = useRef(0)
   const initialLoad = useRef(true)
 
   const handleSearch = useCallback(
     async (query: string) => {
       setIsLoading(true)
 
-      searchId.current += 1
-      const localSearchId = searchId.current
-      dispatch({ type: 'newSearchDispatched', searchId: localSearchId })
+      key.current += 1
+      const localKey = key.current
+      dispatch({ type: 'newSearchDispatched', key: localKey })
 
       let loadedSources = 0
 
@@ -224,13 +238,14 @@ const DocsSearch = () => {
           if (error) {
             dispatch({
               type: 'errored',
+              key: localKey,
               message: error.message ?? '',
             })
           } else {
             dispatch({
               type: 'resultsReturned',
+              key: localKey,
               sourcesLoaded: loadedSources,
-              searchId: localSearchId,
               results,
             })
           }
@@ -248,13 +263,14 @@ const DocsSearch = () => {
           if (error) {
             dispatch({
               type: 'errored',
+              key: localKey,
               message: error.message ?? '',
             })
           } else {
             dispatch({
               type: 'resultsReturned',
+              key: localKey,
               sourcesLoaded: loadedSources,
-              searchId: localSearchId,
               results,
             })
           }
@@ -268,8 +284,11 @@ const DocsSearch = () => {
 
   function handleResetPrompt() {
     setSearch('')
+
+    key.current += 1
     dispatch({
       type: 'reset',
+      key: key.current,
     })
   }
 
@@ -278,7 +297,8 @@ const DocsSearch = () => {
   useEffect(() => {
     if (!search) {
       // Clear search results if user deletes query
-      dispatch({ type: 'reset' })
+      key.current += 1
+      dispatch({ type: 'reset', key: key.current })
     } else if (initialLoad.current) {
       handleSearch(search)
       initialLoad.current = false
