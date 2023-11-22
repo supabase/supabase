@@ -29,10 +29,14 @@ const Header = ({ selectedMessage, hideCode, setHideCode, showAllThreads }: Head
   }, [])
 
   // [Joshen] Fetch user profile here
-  const isLoggedIn = false
+  const isLoggedIn = true
+  const MOCK_PROFILE = {
+    username: 'joshenlim',
+    avatar: 'https://i.pinimg.com/564x/d1/0d/89/d10d890537309f146f92f9af9d70cf83.jpg',
+  }
 
   return (
-    <div className="bg-background border flex items-center justify-between px-4 py-3">
+    <div className="bg-background border flex items-center justify-between px-4 h-14">
       <div className="flex items-center gap-x-4">
         <div className="flex items-center gap-x-1.5 font-mono">
           <span>database</span>
@@ -68,7 +72,14 @@ const Header = ({ selectedMessage, hideCode, setHideCode, showAllThreads }: Head
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild className="flex">
-            <Button type="outline" className="px-1" icon={<User2 size={16} />} />
+            {isLoggedIn ? (
+              <button
+                className="border border-foreground-lighter rounded-full w-[30px] h-[30px] bg-no-repeat bg-center bg-cover"
+                style={{ backgroundImage: `url('${MOCK_PROFILE.avatar}')` }}
+              />
+            ) : (
+              <Button type="outline" className="p-1.5 rounded-full" icon={<User2 size={16} />} />
+            )}
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="end" className="w-48">
             {isLoggedIn ? (
