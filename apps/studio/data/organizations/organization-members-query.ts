@@ -1,9 +1,9 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
+import { components } from 'data/api'
 import { get } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { organizationKeys } from './keys'
-import { components } from 'data/api'
 
 export type OrganizationMembersVariables = {
   slug?: string
@@ -13,10 +13,6 @@ type Member = components['schemas']['Member']
 export interface OrganizationMember extends Member {
   invited_at?: string
   invited_id?: number
-  // [Joshen] Proactively adding this to support showing if member has MFA enabled
-  // can be removed once infra API changes from the following PR is in
-  // https://github.com/supabase/infrastructure/pull/15725
-  mfa_enabled?: boolean
 }
 
 export async function getOrganizationMembers(
