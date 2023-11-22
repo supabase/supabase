@@ -18,7 +18,7 @@
 - [x] Mga Function.
   - [x] Mga Function ng Database. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Mga Edge functions [Docs](https://supabase.com/docs/guides/functions)
-- [x] Imbakang ng File. [Docs](https://supabase.com/docs/guides/storage)
+- [x] Imbakan ng File. [Docs](https://supabase.com/docs/guides/storage)
 - [x] AI + Vector/Embeddings Toolkit. [Docs](https://supabase.com/docs/guides/ai)
 - [x] Dashboard
 
