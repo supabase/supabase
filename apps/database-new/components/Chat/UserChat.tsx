@@ -38,9 +38,6 @@ const UserChat = ({ message, reply, isLatest, isSelected, isLoading, onSelect }:
               : 'bg-transparent border-foreground-muted group-hover:border-foreground'
           )}
         />
-        {/* <Loader2 strokeWidth={1} className="absolute -top-1.5" /> */}
-        {/* <div className="absolute border border-foreground -top-1 w-5 h-5 rounded-full before:content-none before:absolute before:width-5 before:height-5 before:border-r before:border-r-red border:rounded-[50%]" /> */}
-
         {isLoading && (
           <span
             className={cn(

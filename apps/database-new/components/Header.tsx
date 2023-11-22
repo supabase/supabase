@@ -1,10 +1,17 @@
 'use client'
 import Link from 'next/link'
-import { Button } from 'ui'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from 'ui'
 import { useTheme } from 'next-themes'
-import { Moon, Sun } from 'lucide-react'
+import { LogIn, LogOut, MessagesSquare, Moon, Plus, Sun, User2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { UserMessage } from '@/lib/types'
+import { Separator } from '@ui/components/Modal/Modal'
 
 interface HeaderProps {
   selectedMessage?: UserMessage
@@ -20,6 +27,9 @@ const Header = ({ selectedMessage, hideCode, setHideCode, showAllThreads }: Head
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  // [Joshen] Fetch user profile here
+  const isLoggedIn = false
 
   return (
     <div className="bg-background border flex items-center justify-between px-4 py-3">
@@ -55,6 +65,37 @@ const Header = ({ selectedMessage, hideCode, setHideCode, showAllThreads }: Head
           icon={mounted && resolvedTheme === 'dark' ? <Moon size={16} /> : <Sun size={16} />}
           onClick={() => (resolvedTheme === 'dark' ? setTheme('light') : setTheme('dark'))}
         />
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild className="flex">
+            <Button type="outline" className="px-1" icon={<User2 size={16} />} />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="bottom" align="end" className="w-48">
+            {isLoggedIn ? (
+              <>
+                <DropdownMenuItem className="space-x-2" onClick={() => {}}>
+                  <MessagesSquare size={14} />
+                  <p>View past conversations</p>
+                </DropdownMenuItem>
+                <Separator />
+                <DropdownMenuItem className="space-x-2" onClick={() => {}}>
+                  <LogOut size={14} />
+                  <p>Sign out</p>
+                </DropdownMenuItem>
+              </>
+            ) : (
+              <div className="flex flex-col gap-y-2 p-2">
+                <div className="text-xs">
+                  Sign in to <span className="text-foreground">database.new</span> to save your
+                  conversations!
+                </div>
+                <Button type="default" icon={<LogIn size={14} />}>
+                  Sign in
+                </Button>
+              </div>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   )
