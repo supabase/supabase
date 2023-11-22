@@ -73,7 +73,7 @@ const TableNode = ({ data, targetPosition, sourcePosition }: NodeProps<TableNode
                 {column.isPrimary && (
                   <Key
                     size={8}
-                    strokeWidth={2}
+                    strokeWidth={1}
                     className={cn(
                       // 'sb-grid-column-header__inner__primary-key'
                       'flex-shrink-0',
@@ -82,21 +82,21 @@ const TableNode = ({ data, targetPosition, sourcePosition }: NodeProps<TableNode
                   />
                 )}
                 {column.isNullable && (
-                  <DiamondIcon size={8} strokeWidth={2} className="flex-shrink-0 text-light" />
+                  <DiamondIcon size={8} strokeWidth={1} className="flex-shrink-0 text-light" />
                 )}
                 {!column.isNullable && (
                   <DiamondIcon
                     size={8}
-                    strokeWidth={2}
+                    strokeWidth={1}
                     fill="currentColor"
                     className="flex-shrink-0 text-light"
                   />
                 )}
                 {column.isUnique && (
-                  <Fingerprint size={8} strokeWidth={2} className="flex-shrink-0 text-light" />
+                  <Fingerprint size={8} strokeWidth={1} className="flex-shrink-0 text-light" />
                 )}
                 {column.isIdentity && (
-                  <Hash size={8} strokeWidth={2} className="flex-shrink-0 text-light" />
+                  <Hash size={8} strokeWidth={1} className="flex-shrink-0 text-light" />
                 )}
               </div>
               <div className="flex w-full justify-between">
