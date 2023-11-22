@@ -153,7 +153,7 @@ function reshapeResults(result: unknown): Page | null {
 function reducer(state: SearchState, action: Action): SearchState {
   // Ignore responses from outdated async functions
   if (state.key > action.key) {
-    return
+    return state
   }
   switch (action.type) {
     case 'resultsReturned':
