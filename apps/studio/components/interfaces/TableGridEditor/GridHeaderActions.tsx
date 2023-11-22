@@ -12,7 +12,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import APIDocsButton from 'components/ui/APIDocsButton'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useCheckPermissions, useIsFeatureEnabled, useStore } from 'hooks'
-import { RoleImpersonationSelector } from '../RoleImpersonationSelector'
+import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
 
 export interface GridHeaderActionsProps {
   table: PostgresTable
@@ -143,7 +143,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
           </Button>
         )}
 
-        <RoleImpersonationSelector />
+        <RoleImpersonationPopover />
 
         {realtimeEnabled && (
           <Button

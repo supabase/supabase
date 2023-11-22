@@ -36,7 +36,7 @@ import clsx from 'clsx'
 import { MouseEventHandler, useCallback, useEffect, useState } from 'react'
 
 import { useCheckPermissions } from 'hooks'
-import { RoleImpersonationSelector } from '../RoleImpersonationSelector'
+import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
 import styles from './graphiql.module.css'
 
 export interface GraphiQLProps {
@@ -363,7 +363,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                             activeSecondaryEditor !== 'role-impersonation' && 'hidden'
                           )}
                         >
-                          <RoleImpersonationSelector />
+                          <RoleImpersonationPopover />
                         </div>
                       )}
                     </section>

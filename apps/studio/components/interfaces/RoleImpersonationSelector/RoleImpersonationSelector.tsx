@@ -23,7 +23,9 @@ import {
 } from 'ui'
 import { getDisplayName } from '../Auth/Users/UserListItem.utils'
 
-const RoleImpersonationSelector = () => {
+export interface RoleImpersonationSelectorProps {}
+
+const RoleImpersonationSelector = ({}: RoleImpersonationSelectorProps) => {
   const state = useRoleImpersonationStateSnapshot()
 
   const [searchStr, setSearchStr] = useState('')
@@ -40,127 +42,56 @@ const RoleImpersonationSelector = () => {
     }
   )
 
-  const [isOpen, setIsOpen] = useState(false)
-
-  const isImpersonatingRole = state.role !== undefined
-  const Icon = isImpersonatingRole ? IconUser : IconUserX
+  const [selectedOption, setSelectedOption] = useState<string | undefined>(state.role?.role)
 
   return (
-    <Popover_Shadcn_ open={isOpen} onOpenChange={setIsOpen} modal={false}>
-      <PopoverTrigger_Shadcn_ asChild>
-        <Button size="tiny" type={isImpersonatingRole ? 'warning' : 'outline'}>
-          <div className="flex items-center gap-2">
-            <Icon
-              className={isImpersonatingRole ? 'text-amber-1100' : 'text-foreground-light'}
-              strokeWidth={2}
-              size={12}
-            />
-            {state.role?.type === 'postgrest' && state.role.role === 'authenticated'
-              ? `Impersonating ${getDisplayName(
-                  state.role.user,
-                  state.role.user.email || state.role.user.phone || state.role.user.id || 'Unknown'
-                )}`
-              : 'Impersonate User'}
-          </div>
-        </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-64" side="bottom" align="start">
-        <Command_Shadcn_>
-          <CommandInput_Shadcn_
-            placeholder="Find user..."
-            value={searchStr}
-            onValueChange={setSearchStr}
+    <div>
+      <h2>Database connection settings</h2>
+
+      <form>
+        <label>
+          <input
+            type="radio"
+            name="role"
+            value="postgres"
+            checked={selectedOption === 'postgres'}
+            onChange={(e) => {
+              setSelectedOption(e.target.value)
+            }}
+            className=""
           />
-          <CommandList_Shadcn_>
-            <CommandEmpty_Shadcn_>
-              {isLoading && 'Loading...'}
-              {isError && `Error loading users: ${error.message}`}
-              {isSuccess && 'No users found'}
-            </CommandEmpty_Shadcn_>
-            <CommandGroup_Shadcn_>
-              {isSuccess && (
-                <ScrollArea className={(data?.users || []).length > 7 ? 'h-[210px]' : ''}>
-                  <CommandItem_Shadcn_
-                    className="cursor-pointer flex items-center justify-between gap-2 w-full"
-                    onSelect={() => {
-                      state.setRole(undefined)
-                      setIsOpen(false)
-                    }}
-                    onClick={() => {
-                      state.setRole(undefined)
-                      setIsOpen(false)
-                    }}
-                  >
-                    <span>Superuser (default)</span>
-                    {state.role === undefined && (
-                      <IconCheck className="text-brand" strokeWidth={2} />
-                    )}
-                  </CommandItem_Shadcn_>
+          <span>postgres role</span>
+        </label>
 
-                  <CommandItem_Shadcn_
-                    className="cursor-pointer flex items-center justify-between gap-2 w-full"
-                    onSelect={() => {
-                      state.setRole({
-                        type: 'postgrest',
-                        role: 'anon',
-                      })
-                      setIsOpen(false)
-                    }}
-                    onClick={() => {
-                      state.setRole({
-                        type: 'postgrest',
-                        role: 'anon',
-                      })
-                      setIsOpen(false)
-                    }}
-                  >
-                    <span>Anon</span>
-                    {state.role?.role === 'anon' && (
-                      <IconCheck className="text-brand" strokeWidth={2} />
-                    )}
-                  </CommandItem_Shadcn_>
+        <label>
+          <input
+            type="radio"
+            name="role"
+            value="anon"
+            checked={selectedOption === 'option2'}
+            onChange={(e) => {
+              setSelectedOption(e.target.value)
+            }}
+            className=""
+          />
+          <span>anon role</span>
+        </label>
 
-                  <CommandSeparator_Shadcn_ />
-
-                  {data.users.map((user) => (
-                    <CommandItem_Shadcn_
-                      key={user.id}
-                      className="cursor-pointer flex items-center justify-between gap-2 w-full"
-                      onSelect={() => {
-                        state.setRole({
-                          type: 'postgrest',
-                          role: 'authenticated',
-                          user,
-                        })
-                        setIsOpen(false)
-                      }}
-                      onClick={() => {
-                        state.setRole({
-                          type: 'postgrest',
-                          role: 'authenticated',
-                          user,
-                        })
-                        setIsOpen(false)
-                      }}
-                    >
-                      <span>
-                        {getDisplayName(user, user.email || user.phone || user.id || 'Unknown')}
-                      </span>
-                      {state.role?.role !== undefined &&
-                        state.role.type === 'postgrest' &&
-                        state.role.role === 'authenticated' &&
-                        state.role.user.id === user.id && (
-                          <IconCheck className="text-brand" strokeWidth={2} />
-                        )}
-                    </CommandItem_Shadcn_>
-                  ))}
-                </ScrollArea>
-              )}
-            </CommandGroup_Shadcn_>
-          </CommandList_Shadcn_>
-        </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+        <label>
+          <input
+            type="radio"
+            name="role"
+            value="authenticated"
+            checked={selectedOption === 'option3'}
+            onChange={(e) => {
+              setSelectedOption(e.target.value)
+            }}
+            className=""
+          />
+          <span>authenticated role</span>
+        </label>
+      </form>
+    </div>
   )
 }
 
