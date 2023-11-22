@@ -1,0 +1,12 @@
+import { proxy, snapshot, useSnapshot } from 'valtio'
+
+export const appState = proxy({
+  hideCode: false,
+  setHideCode: (value: boolean) => {
+    appState.hideCode = value
+  },
+})
+
+export const getAppStateSnapshot = () => snapshot(appState)
+export const useAppStateSnapshot = (options?: Parameters<typeof useSnapshot>[1]) =>
+  useSnapshot(appState, options)
