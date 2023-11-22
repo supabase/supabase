@@ -168,9 +168,7 @@ const Footer = (props: Props) => {
         </div>
         <div className="border-default mt-32 flex justify-between border-t pt-8">
           <small className="small">&copy; Supabase Inc</small>
-          <div
-            className={cn(forceDark && '[&>button]:opacity-50 [&>button]:hover:cursor-not-allowed')}
-          >
+          <div className={cn(forceDark && 'hidden')}>
             <ThemeToggle forceDark={forceDark} />
           </div>
         </div>

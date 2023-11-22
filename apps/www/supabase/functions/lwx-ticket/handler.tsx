@@ -14,6 +14,19 @@ const BUCKET_FOLDER_VERSION = 'v1'
 
 const LW_TABLE = 'lwx_tickets_golden'
 
+const STYLING_CONGIF = {
+  REG: {
+    BACKGROUND: '#303030',
+    FOREGROUND: '#F8F9FA',
+    FOREGROUND_LIGHT: '#707070',
+  },
+  GOLD: {
+    BACKGROUND: '#303030',
+    FOREGROUND: '#F8F9FA',
+    FOREGROUND_LIGHT: '#707070',
+  },
+}
+
 export async function handler(req: Request) {
   const url = new URL(req.url)
   const username = url.searchParams.get('username') ?? url.searchParams.get('amp;username')
@@ -25,9 +38,9 @@ export async function handler(req: Request) {
 
     const supabaseAdminClient = createClient(
       // Supabase API URL - env var exported by default when deployed.
-      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('MISC_USE_URL') ?? '',
       // Supabase API SERVICE ROLE KEY - env var exported by default when deployed.
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      Deno.env.get('MISC_USE_ANON_KEY') ?? ''
     )
 
     // Track social shares
@@ -52,7 +65,7 @@ export async function handler(req: Request) {
       .eq('username', username)
       .maybeSingle()
 
-    if (error) console.log(error.message)
+    if (error) console.log('fetch error', error.message)
     if (!data) throw new Error(error?.message ?? 'user not found')
     const { name, ticketNumber, metadata } = data
 
@@ -62,12 +75,12 @@ export async function handler(req: Request) {
     // Else, generate image and upload to storage.
     const BACKGROUND = {
       REG: {
-        BG: `${STORAGE_URL}/assets/backgrounds/regular.png`,
-        LOGO: `${STORAGE_URL}/assets/lwx-logo-regular.png`,
+        BG: `${STORAGE_URL}/assets/lwx_ticket_bg.png`,
+        LOGO: `${STORAGE_URL}/assets/logo/regular_logo.png`,
       },
       GOLD: {
-        BG: `${STORAGE_URL}/assets/backgrounds/golden.png`,
-        LOGO: `${STORAGE_URL}/assets/lwx-logo-gold.png`,
+        BG: `${STORAGE_URL}/assets/lwx_ticket_bg.png`,
+        LOGO: `${STORAGE_URL}/assets/logo/regular_logo.png`,
       },
     }
 
@@ -88,8 +101,8 @@ export async function handler(req: Request) {
               width: '1200px',
               height: '628px',
               position: 'relative',
-              backgroundColor: '#000',
-              color: '#F8F9FA',
+              backgroundColor: STYLING_CONGIF[golden ? 'GOLD' : 'REG'].BACKGROUND,
+              color: STYLING_CONGIF[golden ? 'GOLD' : 'REG'].FOREGROUND,
               fontFamily: '"Circular"',
               overflow: 'hidden',
               display: 'flex',
@@ -108,17 +121,17 @@ export async function handler(req: Request) {
                 left: '-1px',
                 bottom: '-1px',
                 right: '-1px',
-                zIndex: '-9000',
+                zIndex: '0',
               }}
               src={golden ? BACKGROUND['GOLD']['BG'] : BACKGROUND['REG']['BG']}
             />
-            <div style={{ display: 'flex' }}>
+            {/* <div style={{ display: 'flex' }}>
               <img
                 src={golden ? BACKGROUND['GOLD']['LOGO'] : BACKGROUND['REG']['LOGO']}
                 width={250}
                 height={55}
               />
-            </div>
+            </div> */}
 
             {/* Name & username */}
             <div
@@ -128,88 +141,91 @@ export async function handler(req: Request) {
                 justifyContent: 'center',
                 flexDirection: 'column',
                 position: 'absolute',
-                top: '114',
-                left: '60',
-                width: '727',
-                height: '400',
+                top: '53',
+                left: '73',
+                width: '530',
+                height: 'auto',
                 overflow: 'hidden',
                 textOverflow: 'clip',
                 textAlign: 'left',
+                marginBottom: '10px',
               }}
             >
-              <div
+              <p
                 style={{
+                  color: STYLING_CONGIF[golden ? 'GOLD' : 'REG'].FOREGROUND,
+                  margin: '0',
+                  padding: '0',
+                  fontSize: '52',
+                  lineHeight: '105%',
                   display: 'flex',
-                  color: 'transparent',
-                  backgroundImage:
-                    'linear-gradient(90deg, rgba(248, 249, 250, 0.66) -31.69%, #F8F9FA 22.14%, rgba(248, 249, 250, 0.5) 122.78%)',
-                  backgroundClip: 'text',
                   marginBottom: '10px',
                 }}
               >
-                <p
-                  style={{
-                    margin: '0',
-                    padding: '10px 0',
-                    fontSize: '72px',
-                    lineHeight: '105%',
-                  }}
-                >
-                  {name ?? username}
-                </p>
-              </div>
+                {name ?? username}
+              </p>
 
               {/* Username */}
               <div
                 style={{
-                  color: '#EDEDED',
+                  color: STYLING_CONGIF[golden ? 'GOLD' : 'REG'].FOREGROUND_LIGHT,
                   opacity: 0.8,
                   display: 'flex',
-                  fontSize: '30',
+                  fontSize: '38',
                   margin: '0',
                 }}
               >
                 {HAS_NO_META && username && `@${username}`}
                 {HAS_ROLE && `${metadata.role}`}
                 {HAS_COMPANY && `${HAS_ROLE ? ' at ' : ''}${metadata.company} `}
-                {HAS_LOCATION && `${(HAS_ROLE || HAS_COMPANY) && ' —'} ${metadata.location}`}
               </div>
             </div>
-            <p
+            <div
               style={{
+                position: 'absolute',
+                bottom: '60',
+                left: '73',
+                display: 'flex',
+                gap: '10',
+                alignItems: 'flex-start',
+                justifyContent: 'center',
+                flexDirection: 'column',
                 fontFamily: '"SourceCodePro"',
                 fontSize: '21',
                 textTransform: 'uppercase',
                 letterSpacing: '0.15rem',
+                lineHeight: '120%',
               }}
             >
-              <span>August 7-11</span>
-              <span style={{ marginLeft: '70px' }}>supabase.com/launch-week</span>
-            </p>
+              {/* Ticket No  */}
+              <p
+                style={{
+                  color: STYLING_CONGIF[golden ? 'GOLD' : 'REG'].FOREGROUND_LIGHT,
+                  margin: '0',
+                  marginBottom: '4',
+                  display: 'flex',
+                }}
+              >
+                {`NO ${prefix}${ticketNumber}`}
+              </p>
+              <p
+                style={{
+                  margin: '0',
+                  marginBottom: '4',
+                  display: 'flex',
+                }}
+              >
+                Launch Week X
+              </p>
+              <p
+                style={{
+                  margin: '0',
+                }}
+              >
+                11-15 Dec 2023
+              </p>
+            </div>
           </div>
-          {/* Ticket No  */}
-          <p
-            style={{
-              color: '#F8F9FA',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              position: 'absolute',
-              bottom: '310',
-              right: '-240',
-              margin: 'auto 0',
-              textAlign: 'center',
-              width: '628',
-              height: '28',
-              transform: 'rotate(-90deg)',
-              opacity: 0.8,
-              fontFamily: '"SourceCodePro"',
-              fontSize: '35',
-              letterSpacing: '1.5rem',
-            }}
-          >
-            {`NO ${prefix}${ticketNumber}`}
-          </p>
         </>
       ),
       {
@@ -252,18 +268,18 @@ export async function handler(req: Request) {
     if (storageError) throw new Error(`storageError: ${storageError.message}`)
 
     // Generate og image
-    fetch('https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-ticket-og', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization:
-          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9idWxkYW5ycHRsb2t0eGNmZnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTIyNjkzMjYsImV4cCI6MjAwNzg0NTMyNn0.1S6qpBbHtEmGuMsIx5UOhRiFd4YbVv-yLTrLk6tVGmM',
-      },
-      body: JSON.stringify({
-        username,
-        golden,
-      }),
-    })
+    // fetch('https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-ticket-og', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     Authorization:
+    //       'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9idWxkYW5ycHRsb2t0eGNmZnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTIyNjkzMjYsImV4cCI6MjAwNzg0NTMyNn0.1S6qpBbHtEmGuMsIx5UOhRiFd4YbVv-yLTrLk6tVGmM',
+    //   },
+    //   body: JSON.stringify({
+    //     username,
+    //     golden,
+    //   }),
+    // })
 
     return await fetch(
       `${STORAGE_URL}/tickets/${
