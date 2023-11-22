@@ -43,9 +43,6 @@ const TablesGraph = ({ tables, hideChat }: SchemaGraphProps) => {
     }
   }, [hideChat])
 
-  const backgroundPatternColor = resolvedTheme === 'dark' ? '#2e2e2e' : '#e6e8eb'
-  const edgeStrokeColor = resolvedTheme === 'dark' ? '#ededed' : '#111318'
-
   useEffect(() => {
     getGraphDataFromTables(tables).then(({ nodes, edges }) => {
       reactFlowInstance.setNodes(nodes)
@@ -65,7 +62,8 @@ const TablesGraph = ({ tables, hideChat }: SchemaGraphProps) => {
             animated: true,
             deletable: false,
             style: {
-              stroke: edgeStrokeColor,
+              stroke: 'hsl(var(--border-stronger))',
+              strokeWidth: 1,
             },
           }}
           nodeTypes={nodeTypes}
@@ -77,7 +75,12 @@ const TablesGraph = ({ tables, hideChat }: SchemaGraphProps) => {
           }}
         >
           {mounted && (
-            <Background gap={16} color={backgroundPatternColor} variant={BackgroundVariant.Lines} />
+            <Background
+              gap={16}
+              className="[&>*]:stroke-foreground-muted opacity-[33%]"
+              variant={BackgroundVariant.Dots}
+              color={'inherit'}
+            />
           )}
         </ReactFlow>
       </div>

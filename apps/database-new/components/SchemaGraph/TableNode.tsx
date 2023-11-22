@@ -1,4 +1,4 @@
-import { Diamond, Fingerprint } from 'lucide-react'
+import { Diamond, DiamondIcon, Fingerprint, Hash, Key, Table, Table2 } from 'lucide-react'
 import { IconHash, IconKey, cn } from 'ui'
 import { Handle, NodeProps } from 'reactflow'
 import { NODE_WIDTH } from './SchemaGraph.constants'
@@ -22,10 +22,12 @@ const TableNode = ({ data, targetPosition, sourcePosition }: NodeProps<TableNode
   // ref: https://github.com/wbkd/react-flow/discussions/2698
   const hiddenNodeConnector = '!h-px !w-px !min-w-0 !min-h-0 !cursor-grab !border-0 !opacity-0'
 
+  const itemHeight = 'h-[22px]'
+
   return (
     <>
       {data.isForeign ? (
-        <div className="rounded-lg overflow-hidden">
+        <div className="rounded-lg">
           <header className="text-[0.5rem] leading-5 font-bold px-2 text-center bg-brand text-gray-300">
             {data.name}
             {targetPosition && (
@@ -39,42 +41,71 @@ const TableNode = ({ data, targetPosition, sourcePosition }: NodeProps<TableNode
           </header>
         </div>
       ) : (
-        <div className="rounded-lg overflow-hidden" style={{ width: NODE_WIDTH / 2 }}>
-          <header className="text-[0.5rem] leading-5 font-bold px-2 text-center bg-brand text-gray-300">
+        <div
+          className="border border-[0.5px] overflow-hidden rounded-[4px]"
+          style={{ width: NODE_WIDTH / 2 }}
+        >
+          <header
+            className={cn(
+              'text-[0.55rem] px-2 bg-alternative text-default flex gap-1 items-center',
+              itemHeight
+            )}
+          >
+            <Table2 strokeWidth={1} size={12} className="text-light" />
             {data.name}
           </header>
 
           {data.columns.map((column) => (
             <div
-              className="text-[8px] leading-5 relative flex flex-row justify-items-start odd:bg-scale-300 even:bg-scale-400 hover:bg-scale-500 transition cursor-default"
+              className={cn(
+                'text-[8px] leading-5 relative flex flex-row justify-items-start',
+                'bg-surface-100',
+                'border-t',
+                'border-t-[0.5px]',
+                // 'odd:bg-scale-300',
+                // 'even:bg-scale-400',
+                'hover:bg-scale-500 transition cursor-default',
+                itemHeight
+              )}
               key={column.id}
             >
               <div className="gap-[0.24rem] flex mx-2 align-middle basis-1/5 items-center justify-start">
                 {column.isPrimary && (
-                  <IconKey
+                  <Key
                     size={8}
                     strokeWidth={2}
-                    className="sb-grid-column-header__inner__primary-key flex-shrink-0"
+                    className={cn(
+                      // 'sb-grid-column-header__inner__primary-key'
+                      'flex-shrink-0',
+                      'text-light'
+                    )}
                   />
                 )}
                 {column.isNullable && (
-                  <Diamond size={8} strokeWidth={2} className="flex-shrink-0" />
+                  <DiamondIcon size={8} strokeWidth={2} className="flex-shrink-0 text-light" />
                 )}
                 {!column.isNullable && (
-                  <Diamond size={8} strokeWidth={2} fill="currentColor" className="flex-shrink-0" />
+                  <DiamondIcon
+                    size={8}
+                    strokeWidth={2}
+                    fill="currentColor"
+                    className="flex-shrink-0 text-light"
+                  />
                 )}
                 {column.isUnique && (
-                  <Fingerprint size={8} strokeWidth={2} className="flex-shrink-0" />
+                  <Fingerprint size={8} strokeWidth={2} className="flex-shrink-0 text-light" />
                 )}
                 {column.isIdentity && (
-                  <IconHash size={8} strokeWidth={2} className="flex-shrink-0" />
+                  <Hash size={8} strokeWidth={2} className="flex-shrink-0 text-light" />
                 )}
               </div>
               <div className="flex w-full justify-between">
                 <span className="text-ellipsis overflow-hidden whitespace-nowrap">
                   {column.name}
                 </span>
-                <span className="px-2 inline-flex justify-end">{column.format}</span>
+                <span className="px-2 inline-flex justify-end font-mono text-lighter">
+                  {column.format}
+                </span>
               </div>
               {targetPosition && (
                 <Handle
