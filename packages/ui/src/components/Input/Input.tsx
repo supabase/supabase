@@ -9,6 +9,7 @@ import InputIconContainer from '../../lib/Layout/InputIconContainer'
 
 import { HIDDEN_PLACEHOLDER } from './../../lib/constants'
 
+import { cn } from '@ui/lib/utils/cn'
 import styleHandler from '../../lib/theme/styleHandler'
 import { useFormContext } from '../Form/FormContext'
 
@@ -170,7 +171,7 @@ function Input({
           ref={inputRef}
           type={type}
           value={reveal && hidden ? HIDDEN_PLACEHOLDER : value}
-          className={inputClasses.join(' ')}
+          className={cn(inputClasses)}
           {...props}
         />
         {icon && <InputIconContainer icon={icon} className={iconContainerClassName} />}

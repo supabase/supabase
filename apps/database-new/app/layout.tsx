@@ -1,21 +1,34 @@
-import { GeistSans } from 'geist/font'
+import '@ui/layout/ai-icon-animation/ai-icon-animation-style.module.css'
 import './globals.css'
+
+import Header from '@/components/Header'
+import { ReactQueryProvider, ThemeProvider } from '@/components/providers'
+import type { Metadata } from 'next'
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : 'http://localhost:3000'
 
-export const metadata = {
+export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: 'Next.js and Supabase Starter Kit',
-  description: 'The fastest way to build apps with Next.js and Supabase',
+  title: 'database.new',
+  description: 'Generate schemas from your ideas',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={GeistSans.className}>
-      <body className="bg-background text-foreground">
-        <main className="min-h-screen flex flex-col items-center">{children}</main>
+    <html lang="en" className="dark">
+      <body>
+        <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
+          <ReactQueryProvider>
+            <div className="flex flex-col h-full">
+              <Header />
+              <main role="main" className="grow">
+                {children}
+              </main>
+            </div>
+          </ReactQueryProvider>
+        </ThemeProvider>
       </body>
     </html>
   )
