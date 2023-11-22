@@ -16,7 +16,7 @@ import AllThreadsModal from '@/components/AllThreadsModal/AllThreadsModal'
 
 export default function ThreadPage({ params }: { params: { threadId: string; runId: string } }) {
   const router = useRouter()
-  const [hideChat, setHideChat] = useState(false)
+  const [hideCode, setHideCode] = useState(false)
   const [showAllThreads, setShowAllThreads] = useState(false)
   const [tables, setTables] = useState<PostgresTable[]>([])
   const [selectedMessageId, setSelectedMessageId] = useState<string | undefined>(undefined)
@@ -95,8 +95,8 @@ export default function ThreadPage({ params }: { params: { threadId: string; run
         selectedMessage={
           messages.find((message) => message.id === selectedMessageId) as UserMessage
         }
-        hideChat={hideChat}
-        setHideChat={setHideChat}
+        hideCode={hideCode}
+        setHideCode={setHideCode}
         showAllThreads={() => setShowAllThreads(true)}
       />
       <div className="flex flex-row items-center justify-between bg-alternative h-full">
@@ -104,15 +104,14 @@ export default function ThreadPage({ params }: { params: { threadId: string; run
           messages={messages}
           loading={isSuccess && data.status === 'loading'}
           selected={selectedReplyId}
-          hideChat={hideChat}
           onSubmit={(str) => mutate(str)}
           onSelect={(messageId, replyId) => {
             setSelectedMessageId(messageId)
             setSelectedReplyId(replyId)
           }}
         />
-        <SchemaGraph tables={tables} hideChat={hideChat} />
-        <CodeEditor content={content} />
+        <SchemaGraph tables={tables} />
+        <CodeEditor content={content} hideCode={hideCode} />
       </div>
       <AllThreadsModal
         visible={showAllThreads}

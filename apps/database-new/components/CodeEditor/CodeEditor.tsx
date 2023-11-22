@@ -7,7 +7,7 @@ import { cn } from 'ui'
 
 import { getTheme } from './CodeEditor.utils'
 
-interface CodeEditorProps {
+interface MonacoEditorProps {
   id: string
   language: 'pgsql' | 'json' | 'html'
   autofocus?: boolean
@@ -22,16 +22,17 @@ interface CodeEditorProps {
   value?: string
 }
 
-export const CodeEditor = ({ content = '' }: { content: string }) => {
+export const CodeEditor = ({ content = '', hideCode }: { content: string; hideCode: boolean }) => {
   const code = format(content, { language: 'postgresql' })
   return (
-    <div className={cn('max-w-lg 2xl:max-w-xl w-full border-l', 'flex flex-col h-full')}>
-      <MonacoEditor
-        id="sql-editor"
-        language="pgsql"
-        value={code}
-        className="h-full bg-alternative"
-      />
+    <div
+      className={cn(
+        hideCode ? 'max-w-0' : 'max-w-lg 2xl:max-w-xl',
+        'w-full border-l',
+        'flex flex-col h-full'
+      )}
+    >
+      <MonacoEditor id="sql-editor" language="pgsql" value={code} className="h-full" />
     </div>
   )
 }
@@ -45,7 +46,7 @@ const MonacoEditor = ({
   className,
   options,
   value,
-}: CodeEditorProps) => {
+}: MonacoEditorProps) => {
   const monacoRef = useRef<any>()
   const { resolvedTheme } = useTheme()
 
