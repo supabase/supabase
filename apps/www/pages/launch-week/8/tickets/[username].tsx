@@ -11,7 +11,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import TicketContainer from '~/components/LaunchWeek/8/Ticket/TicketContainer'
 import { SITE_URL } from '~/lib/constants'
-import { PageState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
+import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 
 const LaunchWeekPrizeSection = dynamic(
   () => import('~/components/LaunchWeek/8/LaunchWeekPrizeSection')
@@ -44,7 +44,7 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
   const { resolvedTheme, setTheme } = useTheme()
   const [initialDarkMode] = useState(resolvedTheme?.includes('dark'))
 
-  const [pageState, setPageState] = useState<PageState>('ticket')
+  const [ticketState, setTicketState] = useState<TicketState>('ticket')
 
   if (!ticketNumber) {
     return <Error statusCode={404} />
@@ -84,7 +84,8 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
           session,
           userData: user,
           setUserData: () => null,
-          setPageState,
+          ticketState,
+          setTicketState,
         }}
       >
         <DefaultLayout>
@@ -106,9 +107,8 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
                 <div className="absolute w-full aspect-[1/1] md:aspect-[1.5/1] lg:aspect-[2.5/1] inset-0 z-0 pointer-events-none">
                   <Image
                     src="/images/launchweek/8/LW8-gradient.png"
-                    layout="fill"
-                    objectFit="cover"
-                    objectPosition="top"
+                    fill
+                    className="object-cover object-top"
                     priority
                     draggable={false}
                     alt="Launch Week 8 gradient background"
