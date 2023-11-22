@@ -42,7 +42,7 @@ const TableNode = ({ data, targetPosition, sourcePosition }: NodeProps<TableNode
         </div>
       ) : (
         <div
-          className="border border-[0.5px] overflow-hidden rounded-[4px]"
+          className="border border-[0.5px] overflow-hidden rounded-[4px] shadow-sm"
           style={{ width: NODE_WIDTH / 2 }}
         >
           <header
