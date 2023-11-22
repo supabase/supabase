@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react'
-import { compact, uniqBy } from 'lodash'
+import { compact, debounce, uniqBy } from 'lodash'
 
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import {
@@ -12,7 +12,6 @@ import {
   IconHash,
   IconMessageSquare,
   IconSearch,
-  cancellableDebounce,
   useCommandMenu,
 } from 'ui'
 import { CommandGroup, CommandItem, CommandLabel, TextHighlighter } from './Command.utils'
@@ -216,7 +215,6 @@ const DocsSearch = () => {
   const supabaseClient = useSupabaseClient()
   const { isLoading, setIsLoading, search, setSearch, inputRef } = useCommandMenu()
   const key = useRef(0)
-  const debouncedHandle = useRef<ReturnType<typeof setTimeout> | null>(null)
   const initialLoad = useRef(true)
 
   const handleSearch = useCallback(
@@ -292,7 +290,7 @@ const DocsSearch = () => {
     })
   }
 
-  const debouncedSearch = useMemo(() => cancellableDebounce(handleSearch, 1000), [handleSearch])
+  const debouncedSearch = useMemo(() => debounce(handleSearch, 1000), [handleSearch])
 
   useEffect(() => {
     if (!search) {
@@ -303,7 +301,7 @@ const DocsSearch = () => {
       handleSearch(search)
       initialLoad.current = false
     } else {
-      debouncedHandle.current = debouncedSearch(search)
+      debouncedSearch(search)
     }
   }, [search])
 
@@ -312,7 +310,7 @@ const DocsSearch = () => {
   useEffect(() => {
     const handleEnter = (event: KeyboardEvent) => {
       if (event.key === 'Enter' && search) {
-        clearTimeout(debouncedHandle.current ?? undefined)
+        debouncedSearch.cancel()
         handleSearch(search)
       }
     }
