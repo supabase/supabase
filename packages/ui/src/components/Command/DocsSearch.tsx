@@ -151,7 +151,6 @@ function reshapeResults(result: unknown): Page | null {
 }
 
 function reducer(state: SearchState, action: Action): SearchState {
-  console.log(state, action)
   // Ignore responses from outdated async functions
   if (state.key > action.key) {
     return
@@ -230,7 +229,6 @@ const DocsSearch = () => {
 
       let loadedSources = 0
 
-      console.log('query', query)
       supabaseClient.functions
         .invoke('search-fts', {
           body: { query },
