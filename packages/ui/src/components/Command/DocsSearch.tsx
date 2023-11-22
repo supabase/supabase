@@ -12,11 +12,10 @@ import {
   IconHash,
   IconMessageSquare,
   IconSearch,
+  cancellableDebounce,
   useCommandMenu,
 } from 'ui'
 import { CommandGroup, CommandItem, CommandLabel, TextHighlighter } from './Command.utils'
-
-import { debounce } from 'lodash'
 
 const NUMBER_SOURCES = 2
 
@@ -152,6 +151,7 @@ function reshapeResults(result: unknown): Page | null {
 }
 
 function reducer(state: SearchState, action: Action): SearchState {
+  console.log(state, action)
   // Ignore responses from outdated async functions
   if (state.key > action.key) {
     return
@@ -164,7 +164,7 @@ function reducer(state: SearchState, action: Action): SearchState {
       // combine the responses.
       // If the new responses are from a fresher request, replace the current responses.
       const allResults =
-        state.status === 'partialResults' && state.searchId === action.searchId
+        state.status === 'partialResults' && state.key === action.key
           ? uniqBy(state.results.concat(newResults), (res) => res.id)
           : newResults
       if (!allResults.length) {
@@ -215,8 +215,9 @@ function reducer(state: SearchState, action: Action): SearchState {
 const DocsSearch = () => {
   const [state, dispatch] = useReducer(reducer, { status: 'initial' })
   const supabaseClient = useSupabaseClient()
-  const { isLoading, setIsLoading, search, setSearch } = useCommandMenu()
+  const { isLoading, setIsLoading, search, setSearch, inputRef } = useCommandMenu()
   const key = useRef(0)
+  const debouncedHandle = useRef<ReturnType<typeof setTimeout>>(null)
   const initialLoad = useRef(true)
 
   const handleSearch = useCallback(
@@ -229,6 +230,7 @@ const DocsSearch = () => {
 
       let loadedSources = 0
 
+      console.log('query', query)
       supabaseClient.functions
         .invoke('search-fts', {
           body: { query },
@@ -292,7 +294,7 @@ const DocsSearch = () => {
     })
   }
 
-  const debouncedSearch = useMemo(() => debounce(handleSearch, 1000), [handleSearch])
+  const debouncedSearch = useMemo(() => cancellableDebounce(handleSearch, 1000), [handleSearch])
 
   useEffect(() => {
     if (!search) {
@@ -303,8 +305,23 @@ const DocsSearch = () => {
       handleSearch(search)
       initialLoad.current = false
     } else {
-      debouncedSearch(search)
+      debouncedHandle.current = debouncedSearch(search)
     }
+  }, [search])
+
+  // Immediately run search if user presses enter
+  // and abort any debounced searches that are waiting
+  useEffect(() => {
+    const handleEnter = (event: KeyboardEvent) => {
+      if (event.key === 'Enter' && search) {
+        clearTimeout(debouncedHandle.current)
+        handleSearch(search)
+      }
+    }
+
+    inputRef.current?.addEventListener('keydown', handleEnter)
+
+    return () => inputRef.current?.removeEventListener('keydown', handleEnter)
   }, [search])
 
   const ChevronArrow = () => (
