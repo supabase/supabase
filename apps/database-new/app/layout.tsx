@@ -1,9 +1,8 @@
 import '@ui/layout/ai-icon-animation/ai-icon-animation-style.module.css'
 import './globals.css'
 
-import { ReactQueryProvider, ThemeProvider } from '@/components/providers'
-
 import Header from '@/components/Header'
+import { ReactQueryProvider, ThemeProvider } from '@/components/providers'
 import type { Metadata } from 'next'
 
 const defaultUrl = process.env.VERCEL_URL

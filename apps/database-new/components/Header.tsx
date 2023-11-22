@@ -1,9 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
-import { useAppStateSnapshot } from '@/lib/state'
-import { UserMessage } from '@/lib/types'
-import { Separator } from '@ui/components/Modal/Modal'
-import { LogIn, LogOut, MessagesSquare, Moon, Sun, User2 } from 'lucide-react'
+
+import { LogIn, LogOut, Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
@@ -14,15 +12,19 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  IconMessageCircle,
+  IconUser,
 } from 'ui'
 
-interface HeaderProps {
-  selectedMessage?: UserMessage
-}
+import { useMessagesQuery } from '@/data/messages-query'
+import { useAppStateSnapshot } from '@/lib/state'
+import { UserMessage } from '@/lib/types'
+import { Separator } from '@ui/components/Modal/Modal'
 
-const Header = ({ selectedMessage }: HeaderProps) => {
+const Header = () => {
   const snap = useAppStateSnapshot()
-  const { threadId, runId } = useParams()
+  const { threadId, runId, messageId }: { threadId: string; runId: string; messageId: string } =
+    useParams()
   const [mounted, setMounted] = useState(false)
   const { setTheme, resolvedTheme } = useTheme()
 
@@ -31,6 +33,9 @@ const Header = ({ selectedMessage }: HeaderProps) => {
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  const { data } = useMessagesQuery({ threadId, runId, enabled: !isHome })
+  const selectedMessage = data?.messages.find((m) => m.id === messageId) as UserMessage
 
   // [Joshen] Fetch user profile here
   const isLoggedIn = true
@@ -83,7 +88,7 @@ const Header = ({ selectedMessage }: HeaderProps) => {
                 style={{ backgroundImage: `url('${MOCK_PROFILE.avatar}')` }}
               />
             ) : (
-              <Button type="outline" className="p-1.5 rounded-full" icon={<User2 size={16} />} />
+              <Button type="outline" className="p-1.5 rounded-full" icon={<IconUser size={16} />} />
             )}
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="end" className="w-48">
@@ -94,11 +99,11 @@ const Header = ({ selectedMessage }: HeaderProps) => {
                   <p className="text-xs text-foreground-light">{MOCK_PROFILE.email}</p>
                 </div>
                 <DropdownMenuItem className="space-x-2" onClick={() => {}}>
-                  <User2 size={14} />
+                  <IconUser size={14} />
                   <p>Profile</p>
                 </DropdownMenuItem>
                 <DropdownMenuItem className="space-x-2" onClick={() => {}}>
-                  <MessagesSquare size={14} />
+                  <IconMessageCircle size={14} />
                   <p>View past conversations</p>
                 </DropdownMenuItem>
                 <Separator />

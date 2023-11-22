@@ -32,7 +32,7 @@ const TablesGraph = ({ tables }: SchemaGraphProps) => {
     getGraphDataFromTables(tables).then(({ nodes, edges }) => {
       reactFlowInstance.setNodes(nodes)
       reactFlowInstance.setEdges(edges)
-      setTimeout(() => reactFlowInstance.fitView({}))
+      setTimeout(() => reactFlowInstance.fitView({}), 10)
     })
   }, [tables, resolvedTheme])
 

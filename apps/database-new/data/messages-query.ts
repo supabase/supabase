@@ -5,12 +5,13 @@ import { ReadThreadAPIResult } from '@/lib/types'
 export type MessagesVariables = {
   threadId: string
   runId: string
+  enabled?: boolean
 }
 
-export const useMessagesQuery = ({ threadId, runId }: MessagesVariables) =>
+export const useMessagesQuery = ({ threadId, runId, enabled }: MessagesVariables) =>
   useQuery<ReadThreadAPIResult>({
     queryKey: [threadId, runId],
-    enabled: !!(threadId && runId),
+    enabled: enabled && !!(threadId && runId),
     queryFn: async () => {
       const response = await fetch(`/api/ai/sql/threads/${threadId}/read/${runId}`, {
         method: 'GET',
