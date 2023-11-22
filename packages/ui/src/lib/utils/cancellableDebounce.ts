@@ -1,7 +1,7 @@
-export function cancellableDebounce(fn: (...args: unknown[]) => void, delay?: number) {
+export function cancellableDebounce<T>(fn: (...args: T[]) => void | Promise<void>, delay?: number) {
   let timeout: ReturnType<typeof setTimeout> | undefined
 
-  return (...args: unknown[]) => {
+  return (...args: T[]) => {
     if (timeout) {
       clearTimeout(timeout)
     }

@@ -207,16 +207,16 @@ function reducer(state: SearchState, action: Action): SearchState {
         message: action.message,
       }
     default:
-      return { ...state, key: action.key }
+      return state
   }
 }
 
 const DocsSearch = () => {
-  const [state, dispatch] = useReducer(reducer, { status: 'initial' })
+  const [state, dispatch] = useReducer(reducer, { status: 'initial', key: 0 })
   const supabaseClient = useSupabaseClient()
   const { isLoading, setIsLoading, search, setSearch, inputRef } = useCommandMenu()
   const key = useRef(0)
-  const debouncedHandle = useRef<ReturnType<typeof setTimeout>>(null)
+  const debouncedHandle = useRef<ReturnType<typeof setTimeout> | null>(null)
   const initialLoad = useRef(true)
 
   const handleSearch = useCallback(
@@ -312,7 +312,7 @@ const DocsSearch = () => {
   useEffect(() => {
     const handleEnter = (event: KeyboardEvent) => {
       if (event.key === 'Enter' && search) {
-        clearTimeout(debouncedHandle.current)
+        clearTimeout(debouncedHandle.current ?? undefined)
         handleSearch(search)
       }
     }
