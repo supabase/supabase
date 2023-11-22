@@ -1,6 +1,10 @@
 import { AssistantMessage, UserMessage } from '@/lib/types'
 import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import { useParams, useRouter } from 'next/navigation'
 import { cn } from 'ui'
+
+dayjs.extend(relativeTime)
 
 interface UserChatProps {
   message: UserMessage
@@ -8,14 +12,15 @@ interface UserChatProps {
   isLatest: boolean
   isSelected: boolean
   isLoading: boolean
-  onSelect: (messageId: string, replyId: string) => void
 }
 
-const UserChat = ({ message, reply, isLatest, isSelected, isLoading, onSelect }: UserChatProps) => {
+const UserChat = ({ message, reply, isLatest, isSelected, isLoading }: UserChatProps) => {
+  const router = useRouter()
+  const { threadId, runId } = useParams()
+
   const hoursFromNow = dayjs().diff(dayjs(message.created_at * 1000), 'hours')
   const formattedTimeFromNow = dayjs(message.created_at * 1000).fromNow()
   const formattedCreatedAt = dayjs(message.created_at * 1000).format('DD MMM YYYY, HH:mm')
-
   const replyDuration = reply !== undefined ? reply.created_at - message.created_at : undefined
 
   return (
@@ -26,7 +31,9 @@ const UserChat = ({ message, reply, isLatest, isSelected, isLoading, onSelect }:
         isSelected && 'bg-surface-200',
         isSelected ? 'border-r-foreground' : 'border-r border-r-transparent'
       )}
-      onClick={() => (reply !== undefined ? onSelect(message.id, reply?.id) : () => {})}
+      onClick={() => {
+        router.push(`/${threadId}/${runId}/${message.id}`)
+      }}
     >
       <div className="flex flex-col justify-between items-center relative top-3">
         {/* Node */}

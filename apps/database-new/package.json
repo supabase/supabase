@@ -24,7 +24,8 @@
     "react-dom": "^18.2.0",
     "react-flow": "^1.0.3",
     "sql-formatter": "^13.1.0",
-    "ui": "*"
+    "ui": "*",
+    "valtio": "^1.12.0"
   },
   "devDependencies": {
     "@types/node": "^18.11.9",

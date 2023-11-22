@@ -3,8 +3,8 @@ import './globals.css'
 
 import { ReactQueryProvider, ThemeProvider } from '@/components/providers'
 
+import Header from '@/components/Header'
 import type { Metadata } from 'next'
-import Head from 'next/head'
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -21,7 +21,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className="dark">
       <body>
         <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
-          <ReactQueryProvider>{children}</ReactQueryProvider>
+          <ReactQueryProvider>
+            <div className="flex flex-col h-full">
+              <Header />
+              <main role="main" className="grow">
+                {children}
+              </main>
+            </div>
+          </ReactQueryProvider>
         </ThemeProvider>
       </body>
     </html>

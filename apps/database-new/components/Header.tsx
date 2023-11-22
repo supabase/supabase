@@ -1,9 +1,12 @@
+/* eslint-disable @next/next/no-img-element */
 'use client'
+import { useAppStateSnapshot } from '@/lib/state'
 import { UserMessage } from '@/lib/types'
 import { Separator } from '@ui/components/Modal/Modal'
-import { CloudLightning, LogIn, LogOut, MessagesSquare, Moon, Sun, User2 } from 'lucide-react'
+import { LogIn, LogOut, MessagesSquare, Moon, Sun, User2 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
+import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import {
   Button,
@@ -15,14 +18,15 @@ import {
 
 interface HeaderProps {
   selectedMessage?: UserMessage
-  hideCode: boolean
-  setHideCode: (value: boolean) => void
-  showAllThreads: () => void
 }
 
-const Header = ({ selectedMessage, hideCode, setHideCode, showAllThreads }: HeaderProps) => {
+const Header = ({ selectedMessage }: HeaderProps) => {
+  const snap = useAppStateSnapshot()
+  const { threadId, runId } = useParams()
   const [mounted, setMounted] = useState(false)
   const { setTheme, resolvedTheme } = useTheme()
+
+  const isHome = threadId === undefined || runId === undefined
 
   useEffect(() => {
     setMounted(true)
@@ -37,7 +41,10 @@ const Header = ({ selectedMessage, hideCode, setHideCode, showAllThreads }: Head
   }
 
   return (
-    <div className="bg-background border flex items-center justify-between px-4 h-14">
+    <nav
+      role="navigation"
+      className="bg-background border flex items-center justify-between px-4 min-h-[50px]"
+    >
       <div className="flex items-center gap-x-4">
         <div className="flex items-center gap-x-1.5 font-mono">
           <span>database</span>
@@ -49,20 +56,17 @@ const Header = ({ selectedMessage, hideCode, setHideCode, showAllThreads }: Head
         )}
       </div>
       <div className="flex items-center gap-x-2">
-        <Button type="default" onClick={() => setHideCode(!hideCode)}>
-          {hideCode ? 'Show code' : 'Hide code'}
-        </Button>
-
-        {/* [Joshen] Hidden for now */}
-        {/* <Button type="default" onClick={() => showAllThreads()}>
-          Show all threads
-        </Button> */}
-
-        <div className="border-r py-3" />
-
-        <Button type="default">
-          <Link href="/new">New conversation</Link>
-        </Button>
+        {!isHome && (
+          <>
+            <Button type="default" onClick={() => snap.setHideCode(!snap.hideCode)}>
+              {snap.hideCode ? 'Show code' : 'Hide code'}
+            </Button>
+            <div className="border-r py-3" />
+            <Button type="default">
+              <Link href="/new">New conversation</Link>
+            </Button>
+          </>
+        )}
 
         <Button
           type="outline"
@@ -90,13 +94,17 @@ const Header = ({ selectedMessage, hideCode, setHideCode, showAllThreads }: Head
                   <p className="text-xs text-foreground-light">{MOCK_PROFILE.email}</p>
                 </div>
                 <DropdownMenuItem className="space-x-2" onClick={() => {}}>
+                  <User2 size={14} />
+                  <p>Profile</p>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="space-x-2" onClick={() => {}}>
                   <MessagesSquare size={14} />
                   <p>View past conversations</p>
                 </DropdownMenuItem>
                 <Separator />
                 <a href="https://supabase.com" target="_blank" rel="noreferrer">
                   <DropdownMenuItem className="space-x-2">
-                    <img src="/supabase.png" className="w-[14px]" />
+                    <img alt="supabase" src="/supabase.png" className="w-[14px]" />
                     <p>Supabase</p>
                   </DropdownMenuItem>
                 </a>
@@ -119,7 +127,7 @@ const Header = ({ selectedMessage, hideCode, setHideCode, showAllThreads }: Head
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </div>
+    </nav>
   )
 }
 
