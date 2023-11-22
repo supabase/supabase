@@ -8,12 +8,12 @@ import { UserMessage } from '@/lib/types'
 
 interface HeaderProps {
   selectedMessage?: UserMessage
-  hideChat: boolean
-  setHideChat: (value: boolean) => void
+  hideCode: boolean
+  setHideCode: (value: boolean) => void
   showAllThreads: () => void
 }
 
-const Header = ({ selectedMessage, hideChat, setHideChat, showAllThreads }: HeaderProps) => {
+const Header = ({ selectedMessage, hideCode, setHideCode, showAllThreads }: HeaderProps) => {
   const [mounted, setMounted] = useState(false)
   const { setTheme, resolvedTheme } = useTheme()
 
@@ -34,8 +34,8 @@ const Header = ({ selectedMessage, hideChat, setHideChat, showAllThreads }: Head
         )}
       </div>
       <div className="flex items-center gap-x-2">
-        <Button type="default" onClick={() => setHideChat(!hideChat)}>
-          {hideChat ? 'Show chat' : 'Hide chat'}
+        <Button type="default" onClick={() => setHideCode(!hideCode)}>
+          {hideCode ? 'Show code' : 'Hide code'}
         </Button>
 
         {/* [Joshen] Hidden for now */}

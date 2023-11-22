@@ -16,10 +16,9 @@ import TableNode from './TableNode'
 
 interface SchemaGraphProps {
   tables: PostgresTable[]
-  hideChat: boolean
 }
 
-const TablesGraph = ({ tables, hideChat }: SchemaGraphProps) => {
+const TablesGraph = ({ tables }: SchemaGraphProps) => {
   const { resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const reactFlowInstance = useReactFlow()
@@ -28,20 +27,6 @@ const TablesGraph = ({ tables, hideChat }: SchemaGraphProps) => {
   useEffect(() => {
     setMounted(true)
   }, [])
-
-  useEffect(() => {
-    if (reactFlowInstance) {
-      const chatWidth = window.innerWidth >= 1536 ? 500 : 400
-      const zoom = reactFlowInstance.getZoom()
-      const viewport = reactFlowInstance.getViewport()
-
-      reactFlowInstance.setViewport({
-        x: hideChat ? viewport.x + chatWidth : viewport.x - chatWidth,
-        y: viewport.y,
-        zoom,
-      })
-    }
-  }, [hideChat])
 
   useEffect(() => {
     getGraphDataFromTables(tables).then(({ nodes, edges }) => {
@@ -88,10 +73,10 @@ const TablesGraph = ({ tables, hideChat }: SchemaGraphProps) => {
   )
 }
 
-const SchemaGraph = ({ tables, hideChat }: SchemaGraphProps) => {
+const SchemaGraph = ({ tables }: SchemaGraphProps) => {
   return (
     <ReactFlowProvider>
-      <TablesGraph tables={tables} hideChat={hideChat} />
+      <TablesGraph tables={tables} />
     </ReactFlowProvider>
   )
 }

@@ -10,7 +10,6 @@ interface ChatProps {
   messages: Message[]
   loading: boolean
   selected: string | undefined
-  hideChat: boolean
   onSelect: (messageId: string, replyId: string) => void
   onSubmit: (value: string) => void
 }
@@ -22,7 +21,7 @@ interface ChatProps {
  * Once clicked on a message, the default UI shows again with that thread loaded - good enough for v1
  */
 
-export const Chat = ({ messages, loading, selected, hideChat, onSelect, onSubmit }: ChatProps) => {
+export const Chat = ({ messages, loading, selected, onSelect, onSubmit }: ChatProps) => {
   const [value, setValue] = useState('')
   const [inputEntered, setInputEntered] = useState(false)
   const userMessages = messages.filter((message) => message.role === 'user')
@@ -32,7 +31,7 @@ export const Chat = ({ messages, loading, selected, hideChat, onSelect, onSubmit
       className={cn(
         'border-r relative',
         'flex flex-col h-full border-r',
-        hideChat ? 'w-[0px] overflow-hidden' : 'w-[400px] 2xl:w-[500px]'
+        'w-[400px] 2xl:w-[500px]'
       )}
     >
       <div className="flex flex-col grow items-between">
