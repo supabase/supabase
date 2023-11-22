@@ -49,7 +49,7 @@ Supabase projects can consist of multiple Preview Branches. All Preview Branches
 
 Supabase branching works like Git branching, with one main Production branch and others for proposing and merging changes into it.
 
-When you create a Preview Branch (branched off your Production branch), the SQL migration files from your Production branch are run on the new Preview Branch. The Preview Branch then reflects your current Production branch schema.
+When you create a Preview Branch, the SQL migration files from your Production branch are run on the new Preview Branch. The Preview Branch then reflects your current Production branch schema.
 
 The Preview Branch will also be [seeded with sample data](#seeding-behaviour) if a seed file exists.
 
