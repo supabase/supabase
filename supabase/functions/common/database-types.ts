@@ -117,21 +117,6 @@ export interface Database {
           }
         ]
       }
-      test_tenant: {
-        Row: {
-          details: string | null
-          id: number
-        }
-        Insert: {
-          details?: string | null
-          id?: number
-        }
-        Update: {
-          details?: string | null
-          id?: number
-        }
-        Relationships: []
-      }
     }
     Views: {
       [_ in never]: never
