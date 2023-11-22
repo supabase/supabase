@@ -1,5 +1,6 @@
 import { AssistantMessage, UserMessage } from '@/lib/types'
 import dayjs from 'dayjs'
+import { useParams, useRouter } from 'next/navigation'
 import { cn } from 'ui'
 
 interface UserChatProps {
@@ -18,6 +19,9 @@ const UserChat = ({ message, reply, isLatest, isSelected, isLoading, onSelect }:
 
   const replyDuration = reply !== undefined ? reply.created_at - message.created_at : undefined
 
+  const router = useRouter()
+  const { threadId, runId } = useParams()
+
   return (
     <div
       className={cn(
@@ -26,7 +30,9 @@ const UserChat = ({ message, reply, isLatest, isSelected, isLoading, onSelect }:
         isSelected && 'bg-surface-200',
         isSelected ? 'border-r-foreground' : 'border-r border-r-transparent'
       )}
-      onClick={() => (reply !== undefined ? onSelect(message.id, reply?.id) : () => {})}
+      onClick={() => {
+        router.push(`/${threadId}/${runId}/${message.id}`)
+      }}
     >
       <div className="flex flex-col justify-between items-center relative top-3">
         {/* Node */}

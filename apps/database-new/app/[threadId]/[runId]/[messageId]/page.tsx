@@ -22,7 +22,7 @@ export default function ThreadPage({ params }: { params: { threadId: string; run
   const [selectedMessageId, setSelectedMessageId] = useState<string | undefined>(undefined)
   const [selectedReplyId, setSelectedReplyId] = useState<string | undefined>(undefined)
 
-  const { runId, threadId } = useParams()
+  const { runId, threadId, messageId } = useParams()
 
   const { data, isSuccess } = useQuery<ReadThreadAPIResult>({
     queryFn: async () => {
@@ -44,32 +44,16 @@ export default function ThreadPage({ params }: { params: { threadId: string; run
     enabled: !!(params.threadId && params.runId),
   })
 
-  console.log('data')
-
-  // const { mutate } = useMutation({
-  //   mutationFn: async (prompt: string) => {
-  //     const body = { prompt }
-  //     const response = await fetch(`/api/ai/sql/threads/${params.threadId}/update`, {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify(body),
-  //     })
-
-  //     const result = await response.json()
-  //     return result
-  //   },
-  //   onSuccess(data) {
-  //     const url = `/${data.threadId}/${data.runId}`
-  //     router.push(url)
-  //   },
-  // })
-
   const messages = useMemo(() => {
     if (isSuccess) return sortBy(data.messages, (m) => m.created_at)
     return []
   }, [data?.messages, isSuccess])
+
+  console.log('messages', messages)
+
+  const message = messages.findIndex((m) => m.id === messageId)
+
+  console.log('user message', message)
 
   const selectedMessage = useMemo(
     () => messages.find((m) => m.id === selectedReplyId) as AssistantMessage | undefined,
@@ -80,10 +64,6 @@ export default function ThreadPage({ params }: { params: { threadId: string; run
     () => selectedMessage?.sql.replaceAll('```sql', '').replaceAll('```', '') || '',
     [selectedMessage?.sql]
   )
-
-  useEffect(() => {
-    if (isSuccess) router.push(`/${params.threadId}/${params.runId}/${messages[0].id}`)
-  }, [isSuccess])
 
   useEffect(() => {
     parseTables(content).then((t) => setTables(t))
@@ -101,29 +81,11 @@ export default function ThreadPage({ params }: { params: { threadId: string; run
 
   return (
     <Main>
-      {/* <Header
-        selectedMessage={
-          messages.find((message) => message.id === selectedMessageId) as UserMessage
-        }
-        hideCode={hideCode}
-        setHideCode={setHideCode}
-        showAllThreads={() => setShowAllThreads(true)}
-      /> */}
       <div className="flex flex-row items-center justify-between bg-alternative h-full">
-        {/* <Chat
-          messages={messages}
-          loading={isSuccess && data.status === 'loading'}
-          selected={selectedReplyId}
-          onSubmit={(str) => mutate(str)}
-          onSelect={(messageId, replyId) => {
-            setSelectedMessageId(messageId)
-            setSelectedReplyId(replyId)
-          }}
-        /> */}
         <SchemaGraph tables={tables} />
         <CodeEditor content={content} hideCode={hideCode} />
       </div>
-      <AllThreadsModal
+      {/* <AllThreadsModal
         visible={showAllThreads}
         onClose={() => setShowAllThreads(false)}
         onSelectMessage={(messageId, replyId) => {
@@ -131,7 +93,7 @@ export default function ThreadPage({ params }: { params: { threadId: string; run
           setSelectedMessageId(messageId)
           setSelectedReplyId(replyId)
         }}
-      />
+      /> */}
     </Main>
   )
 }

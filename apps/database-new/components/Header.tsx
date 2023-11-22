@@ -36,8 +36,13 @@ const Header = ({ selectedMessage, hideCode, setHideCode, showAllThreads }: Head
     avatar: 'https://i.pinimg.com/564x/d1/0d/89/d10d890537309f146f92f9af9d70cf83.jpg',
   }
 
+  // return <span>no</span>
+
   return (
-    <div className="bg-background border flex items-center justify-between px-4 h-14">
+    <nav
+      role="navigation"
+      className="bg-background border flex items-center justify-between px-4 h-14"
+    >
       <div className="flex items-center gap-x-4">
         <div className="flex items-center gap-x-1.5 font-mono">
           <span>database</span>
@@ -119,7 +124,7 @@ const Header = ({ selectedMessage, hideCode, setHideCode, showAllThreads }: Head
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </div>
+    </nav>
   )
 }
 

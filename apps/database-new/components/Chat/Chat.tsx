@@ -53,7 +53,7 @@ export const Chat = ({ messages, loading, selected, onSelect, onSubmit }: ChatPr
                     message={message as UserMessage}
                     reply={reply}
                     isLatest={isLatest}
-                    isSelected={selected === reply?.id}
+                    isSelected={selected === message?.id}
                     isLoading={loading && isLatest}
                     onSelect={onSelect}
                   />
