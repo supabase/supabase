@@ -28,7 +28,7 @@ const Announcement = ({
   const [hidden, setHidden] = useState(true)
 
   const router = useRouter()
-  const isHomePage = router.pathname === '/'
+  const isHomePage = router.basePath === '/'
   const isLaunchWeekSection = router.pathname.includes('launch-week')
 
   // override to hide announcement
@@ -59,7 +59,7 @@ const Announcement = ({
     return (
       <div
         onClick={() => window.location.assign(announcement.link)}
-        className={['relative z-40 w-full cursor-pointer', className].join(' ')}
+        className={['relative z-40 h-[55px] w-full cursor-pointer', className].join(' ')}
       >
         {!isLaunchWeekSection && (
           <div
