@@ -293,7 +293,7 @@ const nextConfig = {
               source: '/',
               destination: process.env.NEXT_PUBLIC_BASE_PATH,
               basePath: false,
-              permanent: true,
+              permanent: false,
             },
           ]
         : []),
