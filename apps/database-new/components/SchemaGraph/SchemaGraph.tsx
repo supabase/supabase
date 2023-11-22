@@ -63,7 +63,7 @@ const TablesGraph = ({ tables, hideChat }: SchemaGraphProps) => {
             deletable: false,
             style: {
               stroke: 'hsl(var(--border-stronger))',
-              strokeWidth: 1,
+              strokeWidth: 0.5,
             },
           }}
           nodeTypes={nodeTypes}
