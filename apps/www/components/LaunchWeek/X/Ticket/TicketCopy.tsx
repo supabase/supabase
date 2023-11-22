@@ -33,14 +33,16 @@ export default function TicketCopy({ sharePage }: { sharePage: boolean }) {
             }, 2000)
           })
         }}
-        className="w-full h-full flex justify-center md:justify-start items-center gap-2 relative text-foreground-light hover:text-foreground text-xs truncate"
+        className="w-full h-full flex justify-center md:justify-start items-center gap-2 relative text-foreground-light hover:text-foreground text-xs"
       >
-        {copied ? (
-          <IconCheck size={14} strokeWidth={1.5} />
-        ) : (
-          <IconCopy size={14} strokeWidth={1.5} />
-        )}
-        {url}
+        <div className="w-4 min-w-4 flex-shrink-0">
+          {copied ? (
+            <IconCheck size={14} strokeWidth={1.5} />
+          ) : (
+            <IconCopy size={14} strokeWidth={1.5} />
+          )}
+        </div>
+        <span className="truncate">{url}</span>
       </button>
     </div>
   )
