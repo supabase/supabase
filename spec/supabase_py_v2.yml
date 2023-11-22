@@ -1952,8 +1952,8 @@ functions:
         name: Update file
         code: |
           ```python
-          supabase.storage.from_("bucket_name")
-            .update(file=f, path=path_on_supastorage, file_options={"cache-control": "3600", "upsert": "true"})
+          with open(filepath, 'rb') as f:
+            supabase.storage.from_("bucket_name").update(file=f, path=path_on_supastorage, file_options={"cache-control": "3600", "upsert": "true"})
           ```
   - id: from-move
     title: 'from_.move()'
