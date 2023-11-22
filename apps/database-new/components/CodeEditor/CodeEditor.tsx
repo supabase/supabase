@@ -26,7 +26,12 @@ export const CodeEditor = ({ content = '' }: { content: string }) => {
   const code = format(content, { language: 'postgresql' })
   return (
     <div className={cn('max-w-lg 2xl:max-w-xl w-full border-l', 'flex flex-col h-full')}>
-      <MonacoEditor id="sql-editor" language="pgsql" value={code} className="h-full" />
+      <MonacoEditor
+        id="sql-editor"
+        language="pgsql"
+        value={code}
+        className="h-full bg-alternative"
+      />
     </div>
   )
 }
@@ -106,7 +111,7 @@ const MonacoEditor = ({
     <Editor
       path={id}
       theme="supabase"
-      className={cn(className, 'monaco-editor')}
+      className={cn(className, 'monaco-editor', 'bg-alternative')}
       value={value ?? undefined}
       defaultLanguage={language}
       defaultValue={defaultValue ?? undefined}

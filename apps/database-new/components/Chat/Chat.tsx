@@ -30,6 +30,7 @@ export const Chat = ({ messages, loading, selected, hideChat, onSelect, onSubmit
   return (
     <div
       className={cn(
+        'bg',
         'border-r relative',
         'flex flex-col h-full border-r',
         hideChat ? 'w-[0px] overflow-hidden' : 'w-[400px] 2xl:w-[500px]'
@@ -41,8 +42,8 @@ export const Chat = ({ messages, loading, selected, hideChat, onSelect, onSubmit
             <Loader2 className="animate-spin" />
           </div>
         ) : (
-          <ScrollArea className="grow h-[200px]">
-            <div className="px-4 mt-4 flex flex-col">
+          <ScrollArea className="grow">
+            <div className="flex flex-col py-6">
               {userMessages.map((message, idx) => {
                 const index = messages.indexOf(message)
                 const reply = messages[index + 1] as AssistantMessage

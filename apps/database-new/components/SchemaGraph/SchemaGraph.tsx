@@ -77,7 +77,7 @@ const TablesGraph = ({ tables, hideChat }: SchemaGraphProps) => {
           {mounted && (
             <Background
               gap={16}
-              className="[&>*]:stroke-foreground-muted opacity-[33%]"
+              className="[&>*]:stroke-foreground-muted opacity-[25%]"
               variant={BackgroundVariant.Dots}
               color={'inherit'}
             />

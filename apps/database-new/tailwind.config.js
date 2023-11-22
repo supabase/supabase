@@ -8,4 +8,11 @@ export default config({
     './src/**/*.{ts,tsx}',
     '../../packages/ui/src/**/*.{tsx,ts,js}',
   ],
+  theme: {
+    extend: {
+      colors: {
+        dbnew: '#6046FA',
+      },
+    },
+  },
 })
