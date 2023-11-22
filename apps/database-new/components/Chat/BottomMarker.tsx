@@ -7,7 +7,7 @@ const BottomMarker = () => {
     if (ref.current) {
       setTimeout(() => {
         if (ref.current) ref.current.scrollIntoView({ behavior: 'smooth' })
-      }, 500)
+      }, 700)
     }
   }, [ref])
 

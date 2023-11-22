@@ -12,7 +12,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconMessageCircle,
   IconUser,
 } from 'ui'
 
@@ -28,18 +27,19 @@ const Header = () => {
   const [mounted, setMounted] = useState(false)
   const { setTheme, resolvedTheme } = useTheme()
 
-  const isHome = threadId === undefined || runId === undefined
+  const isConversation = threadId !== undefined && runId !== undefined
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  const { data } = useMessagesQuery({ threadId, runId, enabled: !isHome })
+  const { data } = useMessagesQuery({ threadId, runId, enabled: isConversation })
   const selectedMessage = data?.messages.find((m) => m.id === messageId) as UserMessage
 
   // [Joshen] Fetch user profile here
   const isLoggedIn = true
   const MOCK_PROFILE = {
+    name: 'J-Dog',
     username: 'joshenlim',
     email: 'joshen@supabase.io',
     avatar: 'https://i.pinimg.com/564x/d1/0d/89/d10d890537309f146f92f9af9d70cf83.jpg',
@@ -57,21 +57,25 @@ const Header = () => {
           <span>new</span>
         </div>
         {selectedMessage !== undefined && (
-          <div className="border-l text-sm px-4">{selectedMessage.text}</div>
+          <p title={selectedMessage.text} className="truncate border-l text-sm px-4">
+            {selectedMessage.text}
+          </p>
         )}
       </div>
       <div className="flex items-center gap-x-2">
-        {!isHome && (
+        {isConversation && (
           <>
+            (
             <Button type="default" onClick={() => snap.setHideCode(!snap.hideCode)}>
               {snap.hideCode ? 'Show code' : 'Hide code'}
             </Button>
-            <div className="border-r py-3" />
-            <Button type="default">
-              <Link href="/new">New conversation</Link>
-            </Button>
+            <div className="border-r py-3" />)
           </>
         )}
+
+        <Button type="default">
+          <Link href="/new">New conversation</Link>
+        </Button>
 
         <Button
           type="outline"
@@ -95,17 +99,15 @@ const Header = () => {
             {isLoggedIn ? (
               <>
                 <div className="px-2 py-2">
-                  <p className="text-xs text-foreground">{MOCK_PROFILE.username}</p>
+                  <p className="text-xs text-foreground">{MOCK_PROFILE.name}</p>
                   <p className="text-xs text-foreground-light">{MOCK_PROFILE.email}</p>
                 </div>
-                <DropdownMenuItem className="space-x-2" onClick={() => {}}>
-                  <IconUser size={14} />
-                  <p>Profile</p>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="space-x-2" onClick={() => {}}>
-                  <IconMessageCircle size={14} />
-                  <p>View past conversations</p>
-                </DropdownMenuItem>
+                <Link href="/profile">
+                  <DropdownMenuItem className="space-x-2" onClick={() => {}}>
+                    <IconUser size={14} />
+                    <p>Profile</p>
+                  </DropdownMenuItem>
+                </Link>
                 <Separator />
                 <a href="https://supabase.com" target="_blank" rel="noreferrer">
                   <DropdownMenuItem className="space-x-2">

@@ -76,6 +76,7 @@ const UserChat = ({ message, reply, isLatest, isSelected, isLoading }: UserChatP
             </svg>
           </span>
           <div
+            title={message.text}
             className={cn(
               'cursor-pointer transition relative overflow-hidden',
               'w-full rounded-lg rounded-tl-none',

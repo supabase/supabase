@@ -22,6 +22,8 @@ interface AllThreadsProps {
   onSelectMessage: (messageId: string, replyId: string) => void
 }
 
+// [Joshen] POC idea for forking/branching - not for phase 1
+
 const AllThreads = ({ visible, onClose, onSelectMessage }: AllThreadsProps) => {
   const params = useParams()
   const reactFlowInstance = useReactFlow()

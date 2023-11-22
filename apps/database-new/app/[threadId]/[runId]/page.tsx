@@ -1,5 +1,5 @@
 'use client'
-import { sortBy } from 'lodash'
+import { last, sortBy } from 'lodash'
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useMemo } from 'react'
 
@@ -19,7 +19,10 @@ export default function ThreadPage() {
   }, [data?.messages, isSuccess])
 
   useEffect(() => {
-    if (isSuccess && messages.length > 0) router.push(`/${threadId}/${runId}/${messages[0].id}`)
+    if (isSuccess && messages.length > 0) {
+      const latestMessage = last(messages.filter((message) => message.role === 'user'))
+      if (latestMessage) router.push(`/${threadId}/${runId}/${latestMessage.id}`)
+    }
   }, [isSuccess])
 
   return (
