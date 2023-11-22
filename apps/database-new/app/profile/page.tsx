@@ -3,7 +3,7 @@
 import { useConversationsQuery } from '@/data/conversations-query'
 import dayjs from 'dayjs'
 import Link from 'next/link'
-import { Button, Input } from 'ui'
+import { Button, IconChevronRight, Input } from 'ui'
 
 export default function Profile() {
   const MOCK_PROFILE = {
@@ -76,12 +76,19 @@ export default function Profile() {
                   key={conversation.id}
                   href={`/${conversation.threadId}/${conversation.runId}`}
                 >
-                  <div className="flex flex-col gap-y-1 border rounded w-full px-4 py-2 transition bg-surface-100 hover:bg-surface-200">
-                    <p className="text-sm">{conversation.name}</p>
-                    <p className="text-xs text-foreground-light">
-                      Last updated at{' '}
-                      {hoursFromNow > 6 ? `on ${formattedUpdatedAt}` : formattedTimeFromNow}
-                    </p>
+                  <div className="group flex items-center justify-between border rounded w-full px-4 py-2 transition bg-surface-100 hover:bg-surface-200">
+                    <div className="flex flex-col gap-y-1">
+                      <p className="text-sm">{conversation.name}</p>
+                      <p className="text-xs text-foreground-light">
+                        Last updated at{' '}
+                        {hoursFromNow > 6 ? `on ${formattedUpdatedAt}` : formattedTimeFromNow}
+                      </p>
+                    </div>
+                    <Button
+                      type="text"
+                      icon={<IconChevronRight size={16} strokeWidth={2} />}
+                      className="transition opacity-0 group-hover:opacity-100 px-1"
+                    />
                   </div>
                 </Link>
               )
