@@ -16,11 +16,11 @@ There are a few methods available to upgrade your project.
 
 ### pg_upgrade
 
-<Admonition type="note">
+    <Admonition type="note">
 
-This upgrade method is currently in Beta, and is being slowly made available to projects.
 
-</Admonition>
+
+        </Admonition>
 
 pg_upgrade performs an in-place upgrade on your database. For projects larger than 1GB, pg_upgrade is generally faster than a pause+restore cycle, and the speed advantage grows with the size of the database.
 
@@ -33,11 +33,11 @@ As a rough rule of thumb, pg_upgrade operates at ~100mbps (when executing an upg
 
 ### Pause + Restore
 
-<Admonition type="note">
+    <Admonition type="note">
 
-This method is only available for projects on the Free plan. For projects on the Pro plan, please contact support for assistance with upgrading.
 
-</Admonition>
+
+        </Admonition>
 
 When you pause and restore a project, the restored database includes the latest features. This method _does_ include downtime, so be aware that your project will be inaccessible for a short period of time.
 
@@ -64,6 +64,10 @@ Breaking changes are generally only present in major version upgrades of Postgre
 - [PostgREST](https://github.com/PostgREST/postgrest/releases)
 
 If you are upgrading from a significantly older version, you will need to consider the release notes for any intermediary releases as well.
+
+#### Disk Sizing
+
+When upgrading, the Supabase platform will "right-size" your disk based on the current size of the database. For example, if your database is 100GB in size, and you have a 200GB disk, the upgrade will reduce the disk size to 120GB (1.2x the size of your database).
 
 #### Objects dependent on Postgres extensions
 
