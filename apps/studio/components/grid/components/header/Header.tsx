@@ -81,6 +81,7 @@ const Header = ({
             )}
           </>
         )}
+        <span className="text-xs truncate px-4">{table.name}</span>
         <div className="sb-grid-header__inner">{headerActions}</div>
       </div>
       <RLSBannerWarning />
