@@ -18,6 +18,7 @@
     "dev:studio": "turbo run dev --filter=studio --parallel",
     "dev:docs": "turbo run dev --filter=docs --parallel",
     "dev:www": "turbo run dev --filter=www --parallel",
+    "dev:database-new": "turbo run dev --filter=database-new --parallel",
     "lint": "turbo run lint",
     "typecheck": "turbo --continue typecheck",
     "format": "prettier --write \"apps/**/*.{js,jsx,ts,tsx,css,md,mdx,json}\"",
