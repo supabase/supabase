@@ -41,7 +41,7 @@ export const Chat = ({ messages, loading, selected, onSelect, onSubmit }: ChatPr
             <Loader2 className="animate-spin" />
           </div>
         ) : (
-          <ScrollArea className="grow">
+          <ScrollArea className="grow h-[200px]">
             <div className="flex flex-col py-6">
               {userMessages.map((message, idx) => {
                 const index = messages.indexOf(message)
