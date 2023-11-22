@@ -1,5 +1,10 @@
 'use client'
+import { UserMessage } from '@/lib/types'
+import { Separator } from '@ui/components/Modal/Modal'
+import { CloudLightning, LogIn, LogOut, MessagesSquare, Moon, Sun, User2 } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import {
   Button,
   DropdownMenu,
@@ -7,11 +12,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { useTheme } from 'next-themes'
-import { LogIn, LogOut, MessagesSquare, Moon, Plus, Sun, User2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { UserMessage } from '@/lib/types'
-import { Separator } from '@ui/components/Modal/Modal'
 
 interface HeaderProps {
   selectedMessage?: UserMessage
@@ -32,6 +32,7 @@ const Header = ({ selectedMessage, hideCode, setHideCode, showAllThreads }: Head
   const isLoggedIn = true
   const MOCK_PROFILE = {
     username: 'joshenlim',
+    email: 'joshen@supabase.io',
     avatar: 'https://i.pinimg.com/564x/d1/0d/89/d10d890537309f146f92f9af9d70cf83.jpg',
   }
 
@@ -84,11 +85,21 @@ const Header = ({ selectedMessage, hideCode, setHideCode, showAllThreads }: Head
           <DropdownMenuContent side="bottom" align="end" className="w-48">
             {isLoggedIn ? (
               <>
+                <div className="px-2 py-2">
+                  <p className="text-xs text-foreground">{MOCK_PROFILE.username}</p>
+                  <p className="text-xs text-foreground-light">{MOCK_PROFILE.email}</p>
+                </div>
                 <DropdownMenuItem className="space-x-2" onClick={() => {}}>
                   <MessagesSquare size={14} />
                   <p>View past conversations</p>
                 </DropdownMenuItem>
                 <Separator />
+                <a href="https://supabase.com" target="_blank" rel="noreferrer">
+                  <DropdownMenuItem className="space-x-2">
+                    <img src="/supabase.png" className="w-[14px]" />
+                    <p>Supabase</p>
+                  </DropdownMenuItem>
+                </a>
                 <DropdownMenuItem className="space-x-2" onClick={() => {}}>
                   <LogOut size={14} />
                   <p>Sign out</p>
