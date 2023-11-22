@@ -137,15 +137,34 @@ export interface Database {
       [_ in never]: never
     }
     Functions: {
-      docs_full_text_search: {
+      docs_search_embeddings: {
+        Args: {
+          embedding: string
+          match_threshold: number
+        }
+        Returns: {
+          id: number
+          path: string
+          type: string
+          title: string
+          subtitle: string
+          description: string
+          headings: string[]
+          slugs: string[]
+        }[]
+      }
+      docs_search_fts: {
         Args: {
           query: string
         }
         Returns: {
+          id: number
           path: string
+          type: string
           title: string
           subtitle: string
           description: string
+          headings: string[]
           slugs: string[]
         }[]
       }
