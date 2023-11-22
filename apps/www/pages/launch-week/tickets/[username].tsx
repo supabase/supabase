@@ -1,27 +1,24 @@
 import { useEffect, useState } from 'react'
 import { NextSeo } from 'next-seo'
 import { GetStaticProps, GetStaticPaths } from 'next'
-import Image from 'next/image'
+import Link from 'next/link'
 import Error from 'next/error'
 import dynamic from 'next/dynamic'
-import { Session, SupabaseClient, createClient } from '@supabase/supabase-js'
 import { useTheme } from 'next-themes'
+import { Session } from '@supabase/supabase-js'
+import { Button } from 'ui'
+import { SITE_URL } from '~/lib/constants'
+import supabase from '~/lib/supabaseMisc'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import TicketContainer from '~/components/LaunchWeek/X/Ticket/TicketContainer'
-import { SITE_URL } from '~/lib/constants'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
-import supabase from '../../../lib/supabaseMisc'
-import Link from 'next/link'
-import { Button } from 'ui'
-import LWXBackground from '../../../components/LaunchWeek/X/LWXBackground'
+import LWXBackground from '~/components/LaunchWeek/X/LWXBackground'
 
 const LWXTicketContainer = dynamic(() => import('~/components/LaunchWeek/X/Ticket/TicketContainer'))
 const LaunchWeekPrizeSection = dynamic(
   () => import('~/components/LaunchWeek/X/LaunchWeekPrizeSection')
 )
-const TicketBrickWall = dynamic(() => import('~/components/LaunchWeek/X/TicketBrickWall'))
 const CTABanner = dynamic(() => import('~/components/CTABanner'))
 
 interface Props {
@@ -106,7 +103,6 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
               </Button>
             </SectionContainer>
             <LWXBackground className="absolute z-0 top-0 left-0 right-0 w-full h-[800px] !min-h-[350px] flex items-center justify-center" />
-            {/* {users && <TicketBrickWall users={users.slice(0, 17)} />} */}
           </div>
           <SectionContainer className="!pt-4 !pb-0">
             <LaunchWeekPrizeSection />

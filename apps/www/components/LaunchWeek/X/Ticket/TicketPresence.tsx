@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { SupabaseClient } from '@supabase/supabase-js'
+import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import solutions from '~/data/Solutions'
-import useConfData from '../../hooks/use-conf-data'
 
 const TicketPresence = () => {
   const { supabase } = useConfData()

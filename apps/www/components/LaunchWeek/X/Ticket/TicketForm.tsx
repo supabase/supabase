@@ -4,8 +4,6 @@ import { SITE_ORIGIN } from '~/lib/constants'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import { Button, IconCheckCircle } from 'ui'
 import { SupabaseClient } from '@supabase/supabase-js'
-import ProductIcon from '../../../ProductIcon'
-import solutions from '../../../../data/Solutions'
 import TicketPresence from './TicketPresence'
 
 type FormState = 'default' | 'loading' | 'error'
@@ -110,7 +108,6 @@ export default function TicketForm() {
       provider: 'github',
       options: {
         redirectTo,
-        // skipBrowserRedirect: true,
       },
     })
   }
@@ -140,7 +137,7 @@ export default function TicketForm() {
         Claim your ticket
       </Button>
 
-      <TicketPresence channel={realtimeChannel} />
+      <TicketPresence />
     </div>
   )
 }
