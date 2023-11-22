@@ -118,7 +118,7 @@ function reshapeResults(result: unknown): Page | null {
     return null
   }
 
-  const sections: Array<{ heading: string; slug: string }> = []
+  const sections: PageSection[] = []
   if (
     'headings' in result &&
     Array.isArray(result.headings) &&
@@ -277,12 +277,11 @@ const DocsSearch = () => {
 
   useEffect(() => {
     if (!search) {
-      return
-    }
-    if (initialLoad.current) {
+      // Clear search results if user deletes query
+      dispatch({ type: 'reset' })
+    } else if (initialLoad.current) {
       handleSearch(search)
       initialLoad.current = false
-      console.log(initialLoad.current)
     } else {
       debouncedSearch(search)
     }
@@ -328,8 +327,6 @@ const DocsSearch = () => {
     state.status === 'fullResults' ||
     state.status === 'partialResults' ||
     (state.status === 'loading' && state.staleResults.length > 0)
-
-  console.log('results' in state ? state.results : '')
 
   return (
     <>
