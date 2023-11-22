@@ -131,3 +131,12 @@ main {
     background-position: 1000px 0;
   }
 }
+
+.monaco-editor,
+.monaco-diff-editor {
+  --vscode-editor-background: hsl(var(--background-alternative)) !important;
+  --vscode-editorGutter-background: hsl(var(--background-alternative)) !important;
+  padding-top: 12px;
+}
+
+/* .monaco-editor .overflow-guard  */
