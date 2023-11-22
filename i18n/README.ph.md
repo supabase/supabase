@@ -17,8 +17,8 @@
   - [x] Realtime na mga subscription. [Docs](https://supabase.com/docs/guides/realtime)
 - [x] Mga Function.
   - [x] Mga Function ng Database. [Docs](https://supabase.com/docs/guides/database/functions)
-  - [x] Mga Function sa Gintong Gubat [Docs](https://supabase.com/docs/guides/functions)
-- [x] Imbakang Pook ng File. [Docs](https://supabase.com/docs/guides/storage)
+  - [x] Mga Edge functions [Docs](https://supabase.com/docs/guides/functions)
+- [x] Imbakang ng File. [Docs](https://supabase.com/docs/guides/storage)
 - [x] AI + Vector/Embeddings Toolkit. [Docs](https://supabase.com/docs/guides/ai)
 - [x] Dashboard
 
@@ -33,7 +33,7 @@ Magmasid sa 'releases' ng repositoriyo na ito upang maabisuhan ng mga malalaking
 
 Para sa buong dokumentasyon, bisitahin ang [supabase.com/docs](https://supabase.com/docs).
 
-Upang malaman kung paano makatulong, bisitahin ang [Getting Started](./DEVELOPERS.md).
+Upang malaman kung paano makatulong, bisitahin ang [Paano mag simula](./DEVELOPERS.md).
 
 
 ## Komunidad at Suporta
@@ -98,7 +98,7 @@ Ang aming pamamaraan para sa mga aklatang kliyente ay modular. Bawat sub-aklatan
   </tr>
   END ROW -->
   <!-- /notranslate -->
-  <th colspan="7">⚡️ Official ⚡️</th>
+  <th colspan="7">⚡️ Opisyal ⚡️</th>
   <!-- notranslate -->
   <tr>
     <td>JavaScript (TypeScript)</td>
@@ -119,7 +119,7 @@ Ang aming pamamaraan para sa mga aklatang kliyente ay modular. Bawat sub-aklatan
     <td><a href="https://github.com/supabase/functions-dart" target="_blank" rel="noopener noreferrer">functions-dart</a></td>
   </tr>
   <!-- /notranslate -->
-  <th colspan="7">💚 Community 💚</th>
+  <th colspan="7">💚 Komunidad  💚</th>
   <!-- notranslate -->
   <tr>
     <td>C#</td>
