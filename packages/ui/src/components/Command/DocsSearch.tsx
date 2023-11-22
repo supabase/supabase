@@ -127,7 +127,10 @@ function reshapeResults(result: unknown): Page | null {
     result.headings.length === result.slugs.length
   ) {
     result.headings.forEach((heading, idx) => {
-      sections.push({ heading, slug: (result.slugs as Array<string>)[idx] })
+      const slug = (result.slugs as Array<string>)[idx]
+      if (heading && slug) {
+        sections.push({ heading, slug })
+      }
     })
   }
 
