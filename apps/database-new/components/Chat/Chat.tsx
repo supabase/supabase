@@ -1,30 +1,60 @@
 'use client'
-import { AssistantMessage, Message, UserMessage } from '@/lib/types'
-import { useState } from 'react'
+import { useMutation } from '@tanstack/react-query'
+import { sortBy } from 'lodash'
+import { Loader2 } from 'lucide-react'
+import { useParams, useRouter } from 'next/navigation'
+import { useEffect, useMemo, useState } from 'react'
 import { Input, ScrollArea, cn } from 'ui'
+
+import { useMessagesQuery } from '@/data/messages-query'
+import { AssistantMessage, UserMessage } from '@/lib/types'
 import BottomMarker from './BottomMarker'
 import UserChat from './UserChat'
-import { Loader2 } from 'lucide-react'
 
-interface ChatProps {
-  messages: Message[]
-  loading: boolean
-  selected: string | undefined
-  onSelect: (messageId: string, replyId: string) => void
-  onSubmit: (value: string) => void
-}
-
-/**
- * [Joshen] Plan for supporting multiple branches
- * The chat will always show a single thread of conversation at any point of time
- * We'll have a button that will expand _all_ conversations into a full screen, using react node to show the tree
- * Once clicked on a message, the default UI shows again with that thread loaded - good enough for v1
- */
-
-export const Chat = ({ messages, loading, selected, onSelect, onSubmit }: ChatProps) => {
+export const Chat = () => {
+  const router = useRouter()
   const [value, setValue] = useState('')
   const [inputEntered, setInputEntered] = useState(false)
+  const { threadId, runId, messageId }: { threadId: string; runId: string; messageId: string } =
+    useParams()
+
+  const { data, isSuccess } = useMessagesQuery({ threadId, runId })
+
+  const messages = useMemo(() => {
+    if (isSuccess) return sortBy(data.messages, (m) => m.created_at)
+    return []
+  }, [data?.messages, isSuccess])
+
+  const selectedMessage = messageId
+  const loading = isSuccess && data.status === 'loading'
   const userMessages = messages.filter((message) => message.role === 'user')
+
+  const { mutate } = useMutation({
+    mutationFn: async (prompt: string) => {
+      const body = { prompt }
+      const response = await fetch(`/api/ai/sql/threads/${threadId}/update`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      })
+
+      const result = await response.json()
+      return result
+    },
+    onSuccess(data) {
+      const url = messageId
+        ? `/${data.threadId}/${data.runId}/${messageId}`
+        : `/${data.threadId}/${data.runId}`
+      router.push(url)
+    },
+  })
+
+  useEffect(() => {
+    setInputEntered(false)
+    setValue('')
+  }, [loading])
 
   return (
     <div
@@ -53,9 +83,8 @@ export const Chat = ({ messages, loading, selected, onSelect, onSubmit }: ChatPr
                     message={message as UserMessage}
                     reply={reply}
                     isLatest={isLatest}
-                    isSelected={selected === message?.id}
+                    isSelected={selectedMessage === message?.id}
                     isLoading={loading && isLatest}
-                    onSelect={onSelect}
                   />
                 )
               })}
@@ -78,7 +107,7 @@ export const Chat = ({ messages, loading, selected, onSelect, onSubmit }: ChatPr
             onChange={(v) => setValue(v.target.value)}
             onKeyDown={(e) => {
               if (e.code === 'Enter' && value.length > 0) {
-                onSubmit(value)
+                mutate(value)
                 setInputEntered(true)
               }
             }}

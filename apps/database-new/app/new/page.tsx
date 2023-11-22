@@ -2,7 +2,6 @@
 import { useMutation } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
 
 import { Input } from 'ui'
 
@@ -27,7 +26,7 @@ export default function NewThread() {
   })
 
   return (
-    <main className="flex min-h-screen w-full flex-col items-center justify-center gap-y-4">
+    <div className="h-full flex items-center justify-center w-full flex-col gap-y-4">
       <div className="flex items-center gap-x-1.5 font-mono text-xl">
         <span>database</span>
         <div className="w-1.5 h-1.5 rounded-full bg-purple-900"></div>
@@ -54,6 +53,6 @@ export default function NewThread() {
           ) : null
         }
       />
-    </main>
+    </div>
   )
 }

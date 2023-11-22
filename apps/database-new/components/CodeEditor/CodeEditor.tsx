@@ -6,6 +6,7 @@ import { format } from 'sql-formatter'
 import { cn } from 'ui'
 
 import { getTheme } from './CodeEditor.utils'
+import { useAppStateSnapshot } from '@/lib/state'
 
 interface MonacoEditorProps {
   id: string
@@ -16,23 +17,24 @@ interface MonacoEditorProps {
   onInputChange?: (value?: string) => void
   onInputRun?: (value: string) => void
   hideLineNumbers?: boolean
-  className?: string
   loading?: boolean
   options?: EditorProps['options']
   value?: string
 }
 
-export const CodeEditor = ({ content = '', hideCode }: { content: string; hideCode: boolean }) => {
+export const CodeEditor = ({ content = '' }: { content: string }) => {
+  const snap = useAppStateSnapshot()
   const code = format(content, { language: 'postgresql' })
+
   return (
     <div
       className={cn(
-        hideCode ? 'max-w-0' : 'max-w-lg 2xl:max-w-xl',
+        snap.hideCode ? 'max-w-0' : 'max-w-lg 2xl:max-w-xl',
         'w-full border-l',
-        'flex flex-col h-full'
+        'grow flex flex-col h-full'
       )}
     >
-      <MonacoEditor id="sql-editor" language="pgsql" value={code} className="h-full" />
+      <MonacoEditor id="sql-editor" language="pgsql" value={code} />
     </div>
   )
 }
@@ -43,7 +45,6 @@ const MonacoEditor = ({
   defaultValue,
   hideLineNumbers = false,
   onInputChange = noop,
-  className,
   options,
   value,
 }: MonacoEditorProps) => {
@@ -112,7 +113,7 @@ const MonacoEditor = ({
     <Editor
       path={id}
       theme="supabase"
-      className={cn(className, 'monaco-editor', 'bg-alternative')}
+      className={cn('bg-alternative [&>div]:p-0')}
       value={value ?? undefined}
       defaultLanguage={language}
       defaultValue={defaultValue ?? undefined}
