@@ -1,5 +1,6 @@
 import { Modal } from 'ui'
 import { ThreadType } from './Threads'
+import { deleteThread } from '@/lib/actions'
 
 const ConfirmDeleteThreadModal = ({
   thread,
@@ -8,9 +9,10 @@ const ConfirmDeleteThreadModal = ({
   thread?: ThreadType
   onClose: () => void
 }) => {
-  const deleteThread = () => {
-    // Logic here
+  const deleteCurrentThread = () => {
+    const threadID = thread?.thread_id
     onClose()
+    deleteThread(threadID!)
   }
 
   return (
@@ -20,7 +22,9 @@ const ConfirmDeleteThreadModal = ({
       size="small"
       visible={thread !== undefined}
       onCancel={onClose}
-      onConfirm={deleteThread}
+      onConfirm={async () => {
+        await deleteCurrentThread()
+      }}
       header="Confirm to delete thread?"
     >
       <Modal.Content className="py-4">
