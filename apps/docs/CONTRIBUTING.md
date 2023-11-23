@@ -13,7 +13,7 @@ Docs should be helpful, quick to read, and easy to understand. We have an audien
 To make docs as clear as possible:
 
 - Write for the user. Think about what task they want to complete by reading your doc. Tell them what, and only what, they need to know.
-- Write like you talk. Use words and sentences that sound natural when speaking. Cut out unnecessary words. Read your writing out loud to help you choose the clearest and simplest phrases.
+- Write like you talk. Use words and sentences that sound natural when speaking. Cut unnecessary words. Read your writing out loud to help you choose the clearest and simplest phrases.
 - Each paragraph should have one topic only. Start a new paragraph whenever you change the topic. Don't worry about paragraphs being too short.
 - Avoid using idioms and colloquialisms, such as `piece of cake`. These phrases are often specific to a region or culture.
 - Refer to the reader as `you`. Don't use `we` to refer to the reader. Use `we` only to refer to the Supabase team.
@@ -159,11 +159,11 @@ Use admonitions sparingly. Don't stack them on top of each other.
 
 Choose the appropriate `type` for your admonition:
 
-- **Danger** to warn the user about any missteps that could cause data loss or data leaks
-- **Deprecation** to notify the user about features that are (or will soon be) deprecated
-- **Caution** to warn about anything that could cause a bug or serious user inconvenience
-- **Tip** to point out helpful but optional actions
-- **Note** for anything else
+- `danger` to warn the user about any missteps that could cause data loss or data leaks
+- `deprecation` to notify the user about features that are (or will soon be) deprecated
+- `caution` to warn about anything that could cause a bug or serious user inconvenience
+- `tip` to point out helpful but optional actions
+- `note` for anything else
 
 ```
 <Admonition type="note" label="Optional label displays as title">
@@ -319,5 +319,5 @@ Here are some exceptions and Supabase-specific guidelines.
 - `Login` is a noun. `Log in` is a verb.
 - `Postgres` is capitalized, except in code, and used instead of `PostgreSQL`.
 - `Setup` is a noun. `Set up` is a verb.
-- `Supabase` is always (not `supabase`), except in code.
+- `Supabase` is capitalized (not `supabase`), except in code.
 - `Supabase Platform` is in title case (not `Supabase platform`).
