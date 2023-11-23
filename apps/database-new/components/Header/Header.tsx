@@ -25,6 +25,7 @@ const Header = async () => {
             <span>design</span>
           </div>
         </Link>
+        <Link href="/profile">profile</Link>
         <CurrentThreadName />
       </div>
 

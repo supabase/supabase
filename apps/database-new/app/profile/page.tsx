@@ -4,9 +4,10 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
-import { ChevronRight } from 'lucide-react'
+import { Edit, Trash2 } from 'lucide-react'
 import { timeAgo } from '@/lib/utils'
 import EmptyState from './EmptyState'
+import { deleteThread } from '@/lib/actions'
 
 dayjs.extend(relativeTime)
 
@@ -22,6 +23,19 @@ const Profile = async () => {
 
   const { data } = await supabase.from('threads').select().eq('user_id', user.id)
   const threads = data ?? []
+
+  async function handleThreadActions(formData: FormData) {
+    'use server'
+
+    const action = formData.get('action') as string
+    const threadID = formData.get('threadID') as string
+
+    if (!threadID) return
+
+    if (action === 'delete') {
+      deleteThread(threadID)
+    }
+  }
 
   return (
     <div className="grid grid-cols-4 gap-x-8 py-6 xl:py-12 gap-y-6 xl:gap-y-0">
@@ -49,17 +63,27 @@ const Profile = async () => {
               const formattedTimeAgo = timeAgo(thread.created_at)
 
               return (
-                <Link key={thread.id} href={`/${thread.thread_id}/${thread.run_id}`}>
-                  <div className="group flex items-center justify-between border rounded w-full px-4 py-2 transition bg-surface-100 hover:bg-surface-200">
-                    <div className="flex flex-col gap-y-1">
-                      <p className="text-sm">{thread.thread_title}</p>
-                      <p className="text-xs text-foreground-light">
-                        Last updated {formattedTimeAgo}
-                      </p>
-                    </div>
-                    <ChevronRight size={16} strokeWidth={2} />
+                <div
+                  key={thread.id}
+                  className="group flex items-center justify-between border rounded w-full px-4 py-2 transition bg-surface-100 hover:bg-surface-200"
+                >
+                  <div className="flex flex-col gap-y-1">
+                    <Link
+                      className="text-sm hover:underline"
+                      href={`/${thread.thread_id}/${thread.run_id}`}
+                    >
+                      {thread.thread_title}
+                    </Link>
+                    <p className="text-xs text-foreground-light">Last updated {formattedTimeAgo}</p>
                   </div>
-                </Link>
+
+                  <form action={handleThreadActions} className="flex gap-2 items-center">
+                    <input type="hidden" name="threadID" value={thread.thread_id} />
+                    <button type="submit" name="action" value="delete">
+                      <Trash2 size={16} strokeWidth={2} />
+                    </button>
+                  </form>
+                </div>
               )
             })
           ) : (
