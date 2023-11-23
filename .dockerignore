@@ -3,7 +3,6 @@
 .git
 .github
 about
-apps
 docker
 examples
 i18n
@@ -17,4 +16,4 @@ tests
 .env.*
 
 .dockerignore
-studio/Dockerfile
+apps/studio/Dockerfile
