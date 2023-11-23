@@ -71,7 +71,11 @@ const Message = ({
                   <Button type="text" size="tiny" onClick={() => onDiff(formatted)}>
                     <FileDiff className="h-4 w-4" />
                   </Button>
-                  <Button type="text" size="tiny">
+                  <Button
+                    type="text"
+                    size="tiny"
+                    onClick={() => navigator.clipboard.writeText(formatted).then()}
+                  >
                     <Copy className="h-4 w-4" />
                   </Button>
                 </div>
