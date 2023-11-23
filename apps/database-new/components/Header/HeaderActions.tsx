@@ -12,6 +12,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  IconChevronDown,
   IconClipboard,
   IconDownload,
 } from 'ui'
@@ -80,7 +81,11 @@ const HeaderActions = ({ user }: HeaderActionsProps) => {
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button type="default" onClick={() => snap.setHideCode(!snap.hideCode)}>
+              <Button
+                type="default"
+                onClick={() => snap.setHideCode(!snap.hideCode)}
+                iconRight={<IconChevronDown />}
+              >
                 Save schema
               </Button>
             </DropdownMenuTrigger>
