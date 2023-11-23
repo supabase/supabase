@@ -30,7 +30,7 @@ export async function handler(req: Request) {
         BG: '#040404',
       },
       GOLD: {
-        BG: '#040404',
+        BG: '#ffffff',
       },
     }
 
