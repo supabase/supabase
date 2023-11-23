@@ -31,8 +31,7 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
   const { username, ticketNumber, name } = user
 
   const TITLE = `${name ? name + '’s' : 'Get your'} #SupaLaunchWeek Ticket`
-  const DESCRIPTION =
-    'Supabase Launch Week X | 11-15 December 2023 | Generate your ticket & win awesome swag.'
+  const DESCRIPTION = `Supabase Launch Week X | 11-15 December 2023 | Claim your ticket and join ${name} for a chance to win Supabase swag.`
   const OG_URL = `${SITE_URL}/tickets/${username}`
 
   const [session, setSession] = useState<Session | null>(null)

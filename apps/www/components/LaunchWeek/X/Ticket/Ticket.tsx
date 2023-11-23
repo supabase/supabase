@@ -44,7 +44,7 @@ export default function Ticket() {
         blurDataURL={fallbackImg}
         onLoad={() => setImageHasLoaded(true)}
         loading="eager"
-        layout="fill"
+        fill
         className={cn(
           'absolute inset-0 object-cover object-right opacity-0 transition-opacity duration-1000',
           imageHasLoaded && 'opacity-100'

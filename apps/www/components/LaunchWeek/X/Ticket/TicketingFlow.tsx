@@ -12,6 +12,7 @@ import CountdownComponent from '../Countdown'
 import LaunchWeekPrizeSection from '../LaunchWeekPrizeSection'
 import { Button } from 'ui'
 import AddToCalendar from '../AddToCalendar'
+import Image from 'next/image'
 
 const TicketingFlow = () => {
   const { supabase, ticketState, userData } = useConfData()
@@ -39,12 +40,18 @@ const TicketingFlow = () => {
                   initial={exit}
                   animate={animate}
                   exit={exit}
-                  className="relative w-full flex flex-col items-center gap-6 text-foreground"
+                  className="relative w-full -mt-5 md:mt-3 xl:mt-0 lg:h-20 pb-64 flex flex-col items-center gap-6 text-foreground"
                 >
                   <div className="hidden">
                     <TicketForm />
                   </div>
-                  {/* <LWXBackground className="absolute top-0 left-0 right-0 w-full !min-h-[350px] flex items-center justify-center" /> */}
+                  <Image
+                    src="/images/launchweek/lwx/loading-circle.svg"
+                    alt="Supabase Launch Week X icon"
+                    width="30"
+                    height="30"
+                    className="animate-spinner opacity-50"
+                  />
                 </m.div>
               )}
               {ticketState === 'registration' && (
@@ -57,7 +64,6 @@ const TicketingFlow = () => {
                 >
                   <div className="w-full min-h-[400px] flex items-center" />
                   <div className="flex flex-col items-center justify-center font-mono uppercase gap-0 leading-0">
-                    {/* <span className="text-lg">Supabase Launch Week</span> */}
                     <span>{LWX_DATE}</span>
                   </div>
                   <p className="text-foreground-lighter">
@@ -66,7 +72,6 @@ const TicketingFlow = () => {
                     development.
                   </p>
                   {!userData.username && <TicketForm />}
-                  {/* <LWXBackground className="absolute top-0 left-0 right-0 w-full !min-h-[350px] flex items-center justify-center" /> */}
                 </m.div>
               )}
               {ticketState === 'ticket' && (

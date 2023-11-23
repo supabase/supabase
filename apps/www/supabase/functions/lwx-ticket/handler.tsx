@@ -80,7 +80,7 @@ export async function handler(req: Request) {
       },
       GOLD: {
         BG: `${STORAGE_URL}/assets/lwx_ticket_bg_golden.png?t=2023-11-23T10%3A34%3A26.211Z`,
-        LOGO: `${STORAGE_URL}/assets/logos/supabase_lwx_logo_light.png?t=2023-11-23T10%3A37%3A36.974Z`,
+        LOGO: `${STORAGE_URL}/assets/logos/supabase_lwx_logo_light.png?t=2023-11-24T10%3A37%3A36.974Z`,
       },
     }
 
