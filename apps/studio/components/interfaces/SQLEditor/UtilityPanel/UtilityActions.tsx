@@ -7,6 +7,8 @@ import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { useState } from 'react'
 import FavoriteButton from './FavoriteButton'
 import SavingIndicator from './SavingIndicator'
+import { useFlag } from 'hooks'
+import SizeToggleButton from './SizeToggleButton'
 
 export type UtilityActionsProps = {
   id: string
@@ -26,6 +28,8 @@ const UtilityActions = ({
   executeQuery,
 }: UtilityActionsProps) => {
   const os = detectOS()
+  // const readReplicasEnabled = useFlag('readReplicas')
+  const readReplicasEnabled = false
   const [selectedDatabaseId, setSelectedDatabaseId] = useState<string>('1')
 
   return (
@@ -63,10 +67,12 @@ const UtilityActions = ({
       </Tooltip.Root>
 
       <div className="flex items-center justify-between gap-x-2 mx-2">
-        <DatabaseSelector
-          selectedDatabaseId={selectedDatabaseId}
-          onChangeDatabaseId={setSelectedDatabaseId}
-        />
+        {readReplicasEnabled && (
+          <DatabaseSelector
+            selectedDatabaseId={selectedDatabaseId}
+            onChangeDatabaseId={setSelectedDatabaseId}
+          />
+        )}
 
         <Button
           onClick={() => executeQuery()}

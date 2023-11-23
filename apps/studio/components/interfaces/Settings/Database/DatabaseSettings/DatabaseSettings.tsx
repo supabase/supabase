@@ -7,35 +7,25 @@ import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Command_Shadcn_,
   IconAlertTriangle,
-  IconCheck,
-  IconChevronDown,
   IconExternalLink,
   Input,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-  ScrollArea,
   Tabs,
 } from 'ui'
 
 import AlertError from 'components/ui/AlertError'
+import DatabaseSelector from 'components/ui/DatabaseSelector'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
-import { useSelectedOrganization } from 'hooks'
+import { useFlag, useSelectedOrganization } from 'hooks'
 import { pluckObjectFields } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
 import { MOCK_DATABASES } from '../../Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import ConfirmDisableReadOnlyModeModal from './ConfirmDisableReadOnlyModal'
 import ResetDbPassword from './ResetDbPassword'
-import DatabaseSelector from 'components/ui/DatabaseSelector'
 
 const DatabaseSettings = () => {
   const router = useRouter()
@@ -44,11 +34,17 @@ const DatabaseSettings = () => {
   const organization = useSelectedOrganization()
   const selectedOrganization = useSelectedOrganization()
 
+  // const readReplicasEnabled = useFlag('readReplicas')
+  const readReplicasEnabled = false
   const connectionStringsRef = useRef<HTMLDivElement>(null)
 
-  const [open, setOpen] = useState(false)
   const [selectedDatabaseId, setSelectedDatabaseId] = useState<string>('1')
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
+
+  // [Joshen] Read replicas mock UI stuff
+  const [open, setOpen] = useState(false)
+  const databases = MOCK_DATABASES
+  const selectedDatabase = databases.find((db) => db.id.toString() === selectedDatabaseId)
 
   const { data, error, isLoading, isError, isSuccess } = useProjectSettingsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
@@ -64,9 +60,6 @@ const DatabaseSettings = () => {
     project !== undefined
       ? pluckObjectFields(project, DB_FIELDS)
       : { db_user: '', db_host: '', db_port: '', db_name: '' }
-
-  const databases = MOCK_DATABASES
-  const selectedDatabase = databases.find((db) => db.id.toString() === selectedDatabaseId)
 
   const handleCopy = (labelValue?: string) =>
     Telemetry.sendEvent(
@@ -248,10 +241,12 @@ const DatabaseSettings = () => {
                 <h5 key="panel-title" className="mb-0">
                   Connection string
                 </h5>
-                <DatabaseSelector
-                  selectedDatabaseId={selectedDatabaseId}
-                  onChangeDatabaseId={setSelectedDatabaseId}
-                />
+                {readReplicasEnabled && (
+                  <DatabaseSelector
+                    selectedDatabaseId={selectedDatabaseId}
+                    onChangeDatabaseId={setSelectedDatabaseId}
+                  />
+                )}
               </div>
             }
             className="!m-0"

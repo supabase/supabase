@@ -46,6 +46,8 @@ const InfrastructureInfo = () => {
   const latestPgVersion = (latest_app_version ?? '').split('supabase-postgres-')[1]
 
   const showDbUpgrades = useFlag('databaseUpgrades')
+  // const readReplicasEnabled = useFlag('readReplicas')
+  const readReplicasEnabled = false
   const subject = 'Request%20for%20Postgres%20upgrade%20for%20project'
   const message = `Upgrade information:%0A• Manual intervention reason: ${requires_manual_intervention}`
 
@@ -63,20 +65,27 @@ const InfrastructureInfo = () => {
       </ScaffoldContainer>
 
       <ScaffoldDivider />
-      <InstanceConfiguration />
-      <ScaffoldDivider />
+
+      {readReplicasEnabled && (
+        <>
+          <InstanceConfiguration />
+          <ScaffoldDivider />
+        </>
+      )}
 
       <ScaffoldContainer>
-        {/* <ScaffoldSection>
-          <ScaffoldSectionDetail>
-            <p>Configuration</p>
-            <p className="text-foreground-light text-sm">Information on your server provider</p>
-          </ScaffoldSectionDetail>
-          <ScaffoldSectionContent>
-            <Input readOnly disabled value={project?.cloud_provider} label="Cloud provider" />
-            <Input readOnly disabled value={project?.region} label="Region" />
-          </ScaffoldSectionContent>
-        </ScaffoldSection> */}
+        {!readReplicasEnabled && (
+          <ScaffoldSection>
+            <ScaffoldSectionDetail>
+              <p>Configuration</p>
+              <p className="text-foreground-light text-sm">Information on your server provider</p>
+            </ScaffoldSectionDetail>
+            <ScaffoldSectionContent>
+              <Input readOnly disabled value={project?.cloud_provider} label="Cloud provider" />
+              <Input readOnly disabled value={project?.region} label="Region" />
+            </ScaffoldSectionContent>
+          </ScaffoldSection>
+        )}
         <ScaffoldSection>
           <ScaffoldSectionDetail>
             <p>Service Versions</p>
