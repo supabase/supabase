@@ -72,7 +72,7 @@ export const Chat = () => {
           </div>
         ) : (
           <ScrollArea className="grow h-px">
-            <div className="flex flex-col py-6">
+            <div className="flex flex-col py-2 xl:py-6">
               {userMessages.map((message, idx) => {
                 const index = messages.indexOf(message)
                 const reply = messages[index + 1] as AssistantMessage
