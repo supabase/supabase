@@ -81,10 +81,13 @@ const TicketingFlow = () => {
                     <TicketContainer supabase={supabase} />
                   </div>
                   <div className="flex flex-col items-center justify-center gap-2 max-w-lg">
-                    <span className="text-2xl">Share your ticket & win swag</span>
+                    <span className="text-2xl">
+                      {userData.golden ? "You're a supa-champ 💪" : 'Share your ticket & win swag'}
+                    </span>
                     <span className="text-foreground-lighter">
-                      Boost your chances of winning Launch Week X limited-edition swag and stay
-                      tuned for a week of announcing new features.
+                      {userData.golden
+                        ? 'Stay tuned on Launch Week X final day to find out if you won.'
+                        : 'Boost your chances of winning Launch Week X limited-edition swag and stay tuned for a week of announcing new features.'}
                     </span>
                   </div>
                 </m.div>

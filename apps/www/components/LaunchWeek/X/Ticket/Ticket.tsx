@@ -12,6 +12,7 @@ export default function Ticket() {
   const { golden = false, bg_image_id: bgImageId = '1' } = user
   const [imageHasLoaded, setImageHasLoaded] = useState(false)
 
+  console.log('golden', golden)
   const storageBaseFilepath = `https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lwx/assets/ai/`
   const fallbackImg = `/images/launchweek/lwx/tickets/lwx_ticket_bg.svg`
 
@@ -20,7 +21,7 @@ export default function Ticket() {
       background: `/images/launchweek/lwx/tickets/lwx_ticket_bg.png`,
     },
     golden: {
-      background: `/images/launchweek/lwx/tickets/lwx_ticket_bg.png`,
+      background: `/images/launchweek/lwx/tickets/lwx_ticket_bg_golden.png`,
     },
   }
 
@@ -37,7 +38,7 @@ export default function Ticket() {
         <TicketFooter />
       </div>
       <Image
-        src={ticketBg.regular.background}
+        src={ticketBg[golden ? 'golden' : 'regular'].background}
         alt={`Launch Week X ticket background #${bgImageId}`}
         placeholder="blur"
         blurDataURL={fallbackImg}

@@ -41,6 +41,6 @@ export const LW8_LAUNCH_DATE = '2023-08-07T09:00:00.000-07:00'
 export const LWX_DATE = 'Dec 11-15 / 10am PT'
 export const LWX_LAUNCH_DATE = '2023-12-11T09:00:00.000-07:00'
 export const TWEET_TEXT =
-  '#SupaLaunchWeek 8 is coming August 7-11! Join the party and generate your custom ticket for a chance to win swag ✨'
-export const TWEET_TEXT_GOLDEN = `I turned my #SupaLaunchWeek 8 ticket GOLD! 🌟😎🌟\n\n`
+  '#SupaLaunchWeek 𝗫 is coming December 11-15 🚀\nClaim your ticket and share it with the community for a chance to win @supabase swag.\n\n'
+export const TWEET_TEXT_GOLDEN = `I turned my #SupaLaunchWeek X ticket GOLD! 🌟😎🌟\n\n`
 export const SITE_NAME = 'Supabase'

@@ -2,14 +2,32 @@ import React from 'react'
 import { LWX_DATE } from '~/lib/constants'
 import TicketNumber from './TicketNumber'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
+import Image from 'next/image'
+import { cn } from 'ui'
 
 export default function TicketFooter() {
   const { userData: user } = useConfData()
+  const { ticketNumber, golden } = user
+  const SupabaseLogo = golden
+    ? '/images/launchweek/lwx/logos/supabase_lwx_logo_light.png'
+    : '/images/launchweek/lwx/logos/supabase_lwx_logo_dark.png'
 
   return (
-    <div className="relative z-10 w-full flex flex-col gap-3 font-mono text-foreground leading-none uppercase tracking-[3px]">
-      <TicketNumber number={user.ticketNumber} />
-      <span className="text-foreground">Launch Week X</span>
+    <div
+      className={cn(
+        'relative z-10 w-full flex flex-col gap-2 font-mono text-foreground leading-none uppercase tracking-[3px]',
+        golden ? 'text-[#11181C]' : 'text-white'
+      )}
+    >
+      <Image
+        src={SupabaseLogo}
+        alt="Supabase Logo for Launch Week X"
+        width="30"
+        height="30"
+        className="mb-1"
+      />
+      <TicketNumber number={ticketNumber} />
+      <span>Launch Week X</span>
       <span>{LWX_DATE}</span>
     </div>
   )

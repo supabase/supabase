@@ -32,9 +32,9 @@ const Hero = () => {
                 <div className="flex flex-col items-center">
                   <div className="z-40 w-full flex justify-center mb-8 lg:mb-8">
                     <AnnouncementBadge
-                      announcement="Get your ticket"
+                      announcement="Claim your ticket"
                       url="/launch-week"
-                      badge="Launch Week X"
+                      badge="Launch Week X, 11-15 Dec"
                     />
                   </div>
                   <h1 className="text-foreground text-4xl sm:text-5xl sm:leading-none lg:text-7xl">

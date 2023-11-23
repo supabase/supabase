@@ -21,9 +21,9 @@ const STYLING_CONGIF = {
     FOREGROUND_LIGHT: '#707070',
   },
   GOLD: {
-    BACKGROUND: '#303030',
-    FOREGROUND: '#F8F9FA',
-    FOREGROUND_LIGHT: '#707070',
+    BACKGROUND: '#f1f1f1',
+    FOREGROUND: '#11181C',
+    FOREGROUND_LIGHT: '#7E868C',
   },
 }
 
@@ -76,11 +76,11 @@ export async function handler(req: Request) {
     const BACKGROUND = {
       REG: {
         BG: `${STORAGE_URL}/assets/lwx_ticket_bg.png`,
-        LOGO: `${STORAGE_URL}/assets/logo/regular_logo.png`,
+        LOGO: `${STORAGE_URL}/assets/logos/supabase_lwx_logo_dark.png?t=2023-11-23T09%3A37%3A36.974Z`,
       },
       GOLD: {
-        BG: `${STORAGE_URL}/assets/lwx_ticket_bg.png`,
-        LOGO: `${STORAGE_URL}/assets/logo/regular_logo.png`,
+        BG: `${STORAGE_URL}/assets/lwx_ticket_bg_golden.png?t=2023-11-23T10%3A34%3A26.211Z`,
+        LOGO: `${STORAGE_URL}/assets/logos/supabase_lwx_logo_light.png?t=2023-11-23T10%3A37%3A36.974Z`,
       },
     }
 
@@ -125,13 +125,6 @@ export async function handler(req: Request) {
               }}
               src={golden ? BACKGROUND['GOLD']['BG'] : BACKGROUND['REG']['BG']}
             />
-            {/* <div style={{ display: 'flex' }}>
-              <img
-                src={golden ? BACKGROUND['GOLD']['LOGO'] : BACKGROUND['REG']['LOGO']}
-                width={250}
-                height={55}
-              />
-            </div> */}
 
             {/* Name & username */}
             <div
@@ -191,18 +184,25 @@ export async function handler(req: Request) {
                 justifyContent: 'center',
                 flexDirection: 'column',
                 fontFamily: '"SourceCodePro"',
-                fontSize: '21',
+                fontSize: '30',
                 textTransform: 'uppercase',
-                letterSpacing: '0.15rem',
+                letterSpacing: '0.35rem',
                 lineHeight: '120%',
               }}
             >
+              <div style={{ display: 'flex', marginBottom: '20' }}>
+                <img
+                  src={golden ? BACKGROUND['GOLD']['LOGO'] : BACKGROUND['REG']['LOGO']}
+                  width={60}
+                  height={60}
+                />
+              </div>
               {/* Ticket No  */}
               <p
                 style={{
                   color: STYLING_CONGIF[golden ? 'GOLD' : 'REG'].FOREGROUND_LIGHT,
                   margin: '0',
-                  marginBottom: '4',
+                  marginBottom: '5',
                   display: 'flex',
                 }}
               >
@@ -211,7 +211,7 @@ export async function handler(req: Request) {
               <p
                 style={{
                   margin: '0',
-                  marginBottom: '4',
+                  marginBottom: '5',
                   display: 'flex',
                 }}
               >
@@ -222,7 +222,7 @@ export async function handler(req: Request) {
                   margin: '0',
                 }}
               >
-                11-15 Dec 2023
+                DEC 11-15 / 10AM PT
               </p>
             </div>
           </div>
