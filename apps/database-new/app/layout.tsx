@@ -11,7 +11,7 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: 'database.new',
+  title: 'database.design',
   description: 'Generate schemas from your ideas',
 }
 
