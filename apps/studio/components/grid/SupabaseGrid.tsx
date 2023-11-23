@@ -69,7 +69,14 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
   const { project } = useProjectContext()
-  const { data, error, isSuccess, isError, isLoading, isRefetching } = useTableRowsQuery(
+  const {
+    data,
+    error: rqError,
+    isSuccess,
+    isError,
+    isLoading,
+    isRefetching,
+  } = useTableRowsQuery(
     {
       queryKey: [props.table.schema, props.table.name],
       projectRef: project?.ref,
@@ -155,6 +162,20 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
       initializeData()
     }
   }, [state.table, props.table, props.schema])
+
+  const error: null | { message: string } = rqError ? (rqError as any).error : null
+  if (error) {
+    if (error?.message.includes('does not exist')) {
+      setParams((prevParams) => {
+        return {
+          ...prevParams,
+          filter: [],
+          sort: [],
+        }
+      })
+      return null
+    }
+  }
 
   return (
     <div className="sb-grid">
