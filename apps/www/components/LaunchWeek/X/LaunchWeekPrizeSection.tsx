@@ -36,7 +36,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
                     sharing your ticket on X and LinkedIn.
                   </p>
                 </div>
-                <div className="px-4 w-full">
+                <div className="px-4 mt-10 w-full">
                   <div className="relative w-full aspect-[3.634/1]">
                     <Image
                       src="/images/launchweek/lwx/swag/lwx_keyboard.png"
