@@ -222,6 +222,11 @@ const DocsSearch = () => {
   const key = useRef(0)
   const initialLoad = useRef(true)
 
+  const hasResults =
+    state.status === 'fullResults' ||
+    state.status === 'partialResults' ||
+    (state.status === 'loading' && state.staleResults.length > 0)
+
   const handleSearch = useCallback(
     async (query: string) => {
       setIsLoading(true)
@@ -315,7 +320,7 @@ const DocsSearch = () => {
     inputRef.current?.addEventListener('keydown', handleEnter)
 
     return () => inputRef.current?.removeEventListener('keydown', handleEnter)
-  }, [search])
+  }, [search, hasResults])
 
   const ChevronArrow = () => (
     <IconChevronRight
@@ -352,11 +357,6 @@ const DocsSearch = () => {
       {...props}
     />
   )
-
-  const hasResults =
-    state.status === 'fullResults' ||
-    state.status === 'partialResults' ||
-    (state.status === 'loading' && state.staleResults.length > 0)
 
   return (
     <>
