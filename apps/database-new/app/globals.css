@@ -2,41 +2,141 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --background: 200 20% 98%;
-    --btn-background: 200 10% 91%;
-    --btn-background-hover: 200 10% 89%;
-    --foreground: 200 50% 3%;
-  }
+@import '~ui/build/css/source/global.css';
+@import '~ui/build/css/themes/dark.css';
+@import '~ui/build/css/themes/light.css';
 
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --background: 200 50% 3%;
-      --btn-background: 200 10% 9%;
-      --btn-background-hover: 200 10% 12%;
-      --foreground: 200 20% 96%;
-    }
+@font-face {
+  font-family: 'circular';
+  src: url(/fonts/custom/CustomFont-Book.woff2) format('woff2'),
+    url(/fonts/custom/CustomFont-Book.woff) format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'circular';
+  src: url(/fonts/custom/CustomFont-BookItalic.woff2) format('woff2'),
+    url(/fonts/custom/CustomFont-BookItalic.woff) format('woff');
+  font-weight: 400;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'circular';
+  src: url(/fonts/custom/CustomFont-Medium.woff2) format('woff2'),
+    url(/fonts/custom/CustomFont-Medium.woff) format('woff');
+  font-weight: 500;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'circular';
+  src: url(/fonts/custom/CustomFont-MediumItalic.woff2) format('woff2'),
+    url(/fonts/custom/CustomFont-MediumItalic.woff) format('woff');
+  font-weight: 500;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'circular';
+  src: url(/fonts/custom/CustomFont-Bold.woff2) format('woff2'),
+    url(/fonts/custom/CustomFont-Bold.woff) format('woff');
+  font-weight: 700;
+  font-style: 600;
+}
+@font-face {
+  font-family: 'circular';
+  src: url(/fonts/custom/CustomFont-BoldItalic.woff2) format('woff2'),
+    url(/fonts/custom/CustomFont-BoldItalic.woff) format('woff');
+  font-style: 600;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'circular';
+  src: url(/fonts/custom/CustomFont-Black.woff2) format('woff2'),
+    url(/fonts/custom/CustomFont-Black.woff) format('woff');
+  font-weight: 800;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'circular';
+  src: url(/fonts/custom/CustomFont-BlackItalic.woff2) format('woff2'),
+    url(/fonts/custom/CustomFont-BlackItalic.woff) format('woff');
+  font-weight: 800;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'source code pro';
+  src: url('/fonts/source-code-pro/SourceCodePro-Regular.eot');
+  src: url('/fonts/source-code-pro/SourceCodePro-Regular.woff2') format('woff2'),
+    url('/fonts/source-code-pro/SourceCodePro-Regular.woff') format('woff'),
+    url('/fonts/source-code-pro/SourceCodePro-Regular.ttf') format('truetype'),
+    url('/fonts/source-code-pro/SourceCodePro-Regular.svg#SourceCodePro-Regular') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+html,
+body,
+main {
+  @apply bg-background;
+  @apply text-foreground;
+  height: 100%;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+}
+
+.chat-shimmering-loader {
+  animation: shimmer 1.5s infinite linear;
+  background: linear-gradient(
+    to right,
+    hsl(var(--background-default)) 0%,
+    hsl(var(--brand-default)) 25%,
+    hsl(var(--brand-300)) 35%,
+    hsl(var(--background-default)) 45%,
+    hsl(var(--background-surface-100)) 75%
+  );
+  background-size: 3000px 100%;
+}
+
+.shimmering-loader {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(
+    to right,
+    hsl(var(--border-default)) 4%,
+    hsl(var(--background-surface-200)) 25%,
+    hsl(var(--border-default)) 36%
+  );
+  background-size: 1000px 100%;
+}
+
+.dark .shimmering-loader {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(
+    to right,
+    hsl(var(--border-default)) 4%,
+    hsl(var(--border-control)) 25%,
+    hsl(var(--border-default)) 36%
+  );
+  background-size: 1000px 100%;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
   }
 }
 
-@layer base {
-  * {
-    @apply border-foreground/20;
-  }
+.monaco-editor,
+.monaco-diff-editor {
+  --vscode-editor-background: hsl(var(--background-alternative)) !important;
+  --vscode-editorGutter-background: hsl(var(--background-alternative)) !important;
+  padding-top: 12px;
 }
 
-.animate-in {
-  animation: animateIn 0.3s ease 0.15s both;
-}
-
-@keyframes animateIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+/* .monaco-editor .overflow-guard  */
