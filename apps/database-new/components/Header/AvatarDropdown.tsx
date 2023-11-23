@@ -40,7 +40,7 @@ export default function AvatarDropdown({ currentUser, signout }: AvatarDropdownP
             </div>
             <Link href="/profile">
               <DropdownMenuItem className="space-x-2" onClick={() => {}}>
-                <IconUser size={14} />
+                <IconUser size={14} strokeWidth={2} />
                 <p>Profile</p>
               </DropdownMenuItem>
             </Link>
