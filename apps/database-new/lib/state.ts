@@ -5,6 +5,11 @@ export const appState = proxy({
   setHideCode: (value: boolean) => {
     appState.hideCode = value
   },
+
+  selectedCode: '',
+  setSelectedCode: (value: string) => {
+    appState.selectedCode = value
+  },
 })
 
 export const getAppStateSnapshot = () => snapshot(appState)
