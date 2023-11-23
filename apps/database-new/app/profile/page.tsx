@@ -6,6 +6,7 @@ import { cookies } from 'next/headers'
 import Link from 'next/link'
 import { ChevronRight } from 'lucide-react'
 import { timeAgo } from '@/lib/utils'
+import EmptyState from './EmptyState'
 
 dayjs.extend(relativeTime)
 
@@ -19,7 +20,8 @@ const Profile = async () => {
 
   if (!user) redirect('/')
 
-  const { data: threads } = await supabase.from('threads').select().eq('user_id', user.id)
+  const { data } = await supabase.from('threads').select().eq('user_id', user.id)
+  const threads = data ?? []
 
   return (
     <div className="grid grid-cols-4 gap-x-8 py-12">
@@ -42,25 +44,27 @@ const Profile = async () => {
         <div className="w-full h-px border-t" />
 
         <div className="flex flex-col gap-y-3">
-          {threads
-            ? threads.map((thread) => {
-                const formattedTimeAgo = timeAgo(thread.created_at)
+          {threads.length > 0 ? (
+            threads.map((thread) => {
+              const formattedTimeAgo = timeAgo(thread.created_at)
 
-                return (
-                  <Link key={thread.id} href={`/${thread.thread_id}/${thread.run_id}`}>
-                    <div className="group flex items-center justify-between border rounded w-full px-4 py-2 transition bg-surface-100 hover:bg-surface-200">
-                      <div className="flex flex-col gap-y-1">
-                        <p className="text-sm">{thread.thread_title}</p>
-                        <p className="text-xs text-foreground-light">
-                          Last updated {formattedTimeAgo}
-                        </p>
-                      </div>
-                      <ChevronRight size={16} strokeWidth={2} />
+              return (
+                <Link key={thread.id} href={`/${thread.thread_id}/${thread.run_id}`}>
+                  <div className="group flex items-center justify-between border rounded w-full px-4 py-2 transition bg-surface-100 hover:bg-surface-200">
+                    <div className="flex flex-col gap-y-1">
+                      <p className="text-sm">{thread.thread_title}</p>
+                      <p className="text-xs text-foreground-light">
+                        Last updated {formattedTimeAgo}
+                      </p>
                     </div>
-                  </Link>
-                )
-              })
-            : 'no threads yet'}
+                    <ChevronRight size={16} strokeWidth={2} />
+                  </div>
+                </Link>
+              )
+            })
+          ) : (
+            <EmptyState />
+          )}
         </div>
       </div>
     </div>
