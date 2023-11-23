@@ -10,8 +10,6 @@ import LWXBackground from '../LWXBackground'
 import TicketForm from './TicketForm'
 import CountdownComponent from '../Countdown'
 import LaunchWeekPrizeSection from '../LaunchWeekPrizeSection'
-import { Button } from 'ui'
-import AddToCalendar from '../AddToCalendar'
 import Image from 'next/image'
 
 const TicketingFlow = () => {
@@ -27,7 +25,7 @@ const TicketingFlow = () => {
       <SectionContainer className="relative flex flex-col lg:pt-20 items-center gap-5 text-center h-[886px] min-h-[886px]">
         <h1 className="sr-only">Supabase Launch Week X | {LWX_DATE}</h1>
         <div className="flex flex-col items-center gap-1 text-light font-mono uppercase ">
-          <span className="text-lg text-foreground tracking-[3px]">Launch Week X</span>
+          <span className="text-lg text-foreground tracking-[2px]">Launch Week X</span>
           <CountdownComponent date={LWX_LAUNCH_DATE} showCard={false} />
           {/* <AddToCalendar /> */}
         </div>
@@ -87,7 +85,9 @@ const TicketingFlow = () => {
                   </div>
                   <div className="flex flex-col items-center justify-center gap-2 max-w-lg">
                     <span className="text-2xl">
-                      {userData.golden ? "You're a supa-champ 💪" : 'Share your ticket & win swag'}
+                      {userData.golden
+                        ? 'You have a platinum ticket now'
+                        : 'Share your ticket & win swag'}
                     </span>
                     <span className="text-foreground-lighter">
                       {userData.golden
