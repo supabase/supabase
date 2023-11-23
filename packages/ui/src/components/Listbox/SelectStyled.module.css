@@ -29,7 +29,7 @@
 }
 
 .sbui-listbox--error {
-  @apply border-red-500 dark:border-red-500;
+  @apply border-red-500;
 }
 
 .sbui-listbox--borderless {
@@ -97,7 +97,7 @@
 */
 
 /* .sbui-listbox-option-container {
-  @apply list-none p-0 absolute mt-1 w-full bg-white dark:bg-gray-800 shadow-lg border border-solid border-gray-100 dark:border-gray-600 max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm z-10;
+  @apply list-none p-0 absolute mt-1 w-full bg-white dark:bg-gray-800 shadow-lg border border-solid border-control max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm z-10;
 } */
 
 /* .sbui-listbox-option {

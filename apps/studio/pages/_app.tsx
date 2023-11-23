@@ -1,6 +1,5 @@
 import 'ui/build/css/themes/dark.css'
 import 'ui/build/css/themes/light.css'
-
 import 'styles/code.scss'
 import 'styles/contextMenu.scss'
 import 'styles/date-picker.scss'
@@ -162,12 +161,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                 <PageTelemetry>
                   <TooltipProvider>
                     <RouteValidationWrapper>
-                      <ThemeProvider
-                        attribute="class"
-                        defaultTheme="system"
-                        enableSystem
-                        disableTransitionOnChange
-                      >
+                      <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
                         <CommandMenuWrapper>
                           <AppBannerWrapper>
                             <FeaturePreviewContextProvider>

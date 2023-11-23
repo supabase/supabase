@@ -10,17 +10,17 @@
 .sbui-breadcrumb--item {
   @apply text-gray-500 hover:text-gray-600;
   @apply cursor-pointer;
-  @apply dark:text-dark-200 dark:hover:text-brand-400;
+  @apply [[data-theme*=dark]_&]:text-dark-200 [[data-theme*=dark]_&]:hover:text-brand-400;
 }
 
 .sbui-breadcrumb--item__active {
-  @apply text-brand-400 dark:text-brand-400;
+  @apply text-brand-400 [[data-theme*=dark]_&]:text-brand-400;
 }
 
 .sbui-breadcrumb--separator {
   @apply mx-2;
   @apply text-gray-500 hover:text-gray-600;
-  @apply dark:text-dark-200 dark:hover:text-white;
+  @apply [[data-theme*=dark]_&]:text-dark-200 [[data-theme*=dark]_&]:hover:text-white;
 }
 
 .sbui-breadcrumb--separator-small {

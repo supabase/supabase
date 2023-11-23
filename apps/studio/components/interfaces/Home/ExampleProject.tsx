@@ -28,7 +28,7 @@ const ExampleProject = ({ framework, title, description, url }: ExampleProjectPr
             className="transition-all group-hover:scale-110"
             src={`${BASE_PATH}/img/libraries/${framework.toLowerCase()}${
               ['expo', 'nextjs'].includes(framework.toLowerCase())
-                ? resolvedTheme === 'dark'
+                ? resolvedTheme?.includes('dark')
                   ? '-dark'
                   : ''
                 : ''

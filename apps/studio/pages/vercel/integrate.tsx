@@ -277,7 +277,7 @@ const IntegrationProject = observer(() => {
       </div>
       <div
         className="w-full rounded-sm border border-strong
-      bg-panel-header-light dark:bg-panel-header-dark"
+      bg-panel-header-light [[data-theme*=dark]_&]:bg-panel-header-dark"
       >
         <div className="flex items-center justify-between p-6">
           <h4 className="my-auto mr-8 text-lg capitalize">{name}</h4>

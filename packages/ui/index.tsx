@@ -17,6 +17,7 @@ export * from './src/components/Icon/IconContext'
 export * from './src/components/GlassPanel'
 export * from './src/components/IconPanel'
 export * from './src/components/Icon/IconBackground'
+export * from './src/components/ThemeImage'
 
 // DISPLAYS
 
@@ -83,6 +84,7 @@ export * from './src/lib/utils'
 
 // theme switcher
 export * from './src/components/ThemeProvider/ThemeToggle'
+export * from './src/components/ThemeProvider/themes'
 
 // animated ui
 
@@ -153,6 +155,8 @@ export {
 } from './src/components/shadcn/ui/collapsible'
 
 export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
+
+export { Separator } from './src/components/shadcn/ui/separator'
 
 // links
 
