@@ -1,7 +1,14 @@
+import type { Metadata } from 'next'
+
 type faq = {
   question: string
   answer: string
 }
+
+export const metadata: Metadata = {
+  title: 'database.design | Faq',
+}
+
 const FAQS = [
   {
     question: 'What is database.design?',

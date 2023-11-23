@@ -1,6 +1,11 @@
+import type { Metadata } from 'next'
 import ChatInput from '@/components/Chat/ChatInput'
 import { createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
+
+export const metadata: Metadata = {
+  title: 'database.design | Create',
+}
 
 const NewThread = async () => {
   const cookieStore = cookies()
