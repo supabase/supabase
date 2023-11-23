@@ -30,7 +30,7 @@ export const CodeEditor = ({ content = '' }: { content: string }) => {
     <div
       className={cn(
         snap.hideCode ? 'max-w-0' : 'max-w-lg 2xl:max-w-xl',
-        'w-full border-l',
+        'w-full xl:border-l',
         'grow flex flex-col h-full'
       )}
     >

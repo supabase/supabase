@@ -24,8 +24,8 @@ const Profile = async () => {
   const threads = data ?? []
 
   return (
-    <div className="grid grid-cols-4 gap-x-8 py-12">
-      <div className="col-span-1 flex flex-col gap-y-6">
+    <div className="grid grid-cols-4 gap-x-8 py-6 xl:py-12 gap-y-6 xl:gap-y-0">
+      <div className="col-span-4 xl:col-span-1 flex flex-col gap-y-6">
         <div className="flex items-center gap-x-4">
           <div
             className="border border-foreground-lighter rounded-full w-[30px] h-[30px] bg-no-repeat bg-center bg-cover"
@@ -38,7 +38,7 @@ const Profile = async () => {
         </div>
       </div>
 
-      <div className="col-span-3 flex flex-col gap-y-4">
+      <div className="col-span-4 xl:col-span-3 flex flex-col gap-y-4">
         <p>Past conversations</p>
 
         <div className="w-full h-px border-t" />

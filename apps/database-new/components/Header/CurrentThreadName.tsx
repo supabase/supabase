@@ -14,7 +14,7 @@ const CurrentThreadName = () => {
   const selectedMessage = data?.messages.find((m) => m.id === messageId) as UserMessage
 
   return (
-    <div className="flex items-center gap-x-4">
+    <div className="hidden xl:block flex items-center gap-x-4">
       {selectedMessage !== undefined && (
         <p title={selectedMessage.text} className="truncate border-l text-sm px-4">
           {selectedMessage.text}

@@ -38,8 +38,8 @@ const ChatInput = ({ userID }: ChatInputParams) => {
       </div>
       <Input
         autoFocus
-        size="xlarge"
-        className="w-11/12 max-w-xl shadow"
+        size="large"
+        className="w-10/12 xl:w-11/12 max-w-xl shadow"
         inputClassName="rounded-full"
         placeholder="e.g Create a Telegram-like chat application"
         disabled={isPending || isSuccess}

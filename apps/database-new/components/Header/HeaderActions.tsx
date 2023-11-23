@@ -35,7 +35,7 @@ const HeaderActions = ({ user }: HeaderActionsProps) => {
 
   return (
     <div className="flex items-center gap-x-2">
-      <Button type="default">
+      <Button type="default" className="hidden xl:block">
         <Link href="/new">New conversation</Link>
       </Button>
       {segment && segment.includes('thread') && (

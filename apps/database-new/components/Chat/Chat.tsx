@@ -62,7 +62,7 @@ export const Chat = () => {
         'bg',
         'border-r relative',
         'flex flex-col h-full border-r',
-        'w-[400px] 2xl:w-[500px]'
+        'w-full xl:w-[400px] 2xl:w-[500px]'
       )}
     >
       <div className="flex flex-col grow items-between">
