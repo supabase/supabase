@@ -5,6 +5,7 @@ import { cn } from '@ui/lib/utils'
 const Popover = PopoverPrimitive.Root
 
 const PopoverTrigger = PopoverPrimitive.Trigger
+const PopoverAnchor = PopoverPrimitive.Anchor
 
 type PopoverContentProps = {
   portal?: boolean
@@ -34,4 +35,4 @@ const PopoverContent = React.forwardRef<
 })
 PopoverContent.displayName = 'PopoverContent'
 
-export { Popover, PopoverTrigger, PopoverContent }
+export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor }

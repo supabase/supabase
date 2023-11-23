@@ -134,6 +134,7 @@ export {
   Popover as Popover_Shadcn_,
   PopoverTrigger as PopoverTrigger_Shadcn_,
   PopoverContent as PopoverContent_Shadcn_,
+  PopoverAnchor as PopoverAnchor_Shadcn_,
 } from './src/components/shadcn/ui/popover'
 
 export {
@@ -153,6 +154,17 @@ export {
   CollapsibleTrigger as CollapsibleTrigger_Shadcn_,
   CollapsibleContent as CollapsibleContent_Shadcn_,
 } from './src/components/shadcn/ui/collapsible'
+
+export {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from './src/components/shadcn/ui/sheet'
 
 export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
 
