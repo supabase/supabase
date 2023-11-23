@@ -4,6 +4,7 @@ create table if not exists public.threads (
 	modified_at timestamp with time zone not null default now(),
 	thread_id text not null,
 	run_id text not null,
+	thread_title text not null,
 	user_id uuid null,
 	constraint threads_pkey primary key (id),
 	constraint threads_user_id_fkey foreign key (user_id) references auth.users (id) on update cascade on delete cascade

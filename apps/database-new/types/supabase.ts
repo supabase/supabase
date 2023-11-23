@@ -41,6 +41,7 @@ export interface Database {
           modified_at: string
           run_id: string
           thread_id: string
+          thread_title: string
           user_id: string | null
         }
         Insert: {
@@ -49,6 +50,7 @@ export interface Database {
           modified_at?: string
           run_id: string
           thread_id: string
+          thread_title: string
           user_id?: string | null
         }
         Update: {
@@ -57,6 +59,7 @@ export interface Database {
           modified_at?: string
           run_id?: string
           thread_id?: string
+          thread_title?: string
           user_id?: string | null
         }
         Relationships: [

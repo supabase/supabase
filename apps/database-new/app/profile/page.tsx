@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
 import { ChevronRight } from 'lucide-react'
+import { timeAgo } from '@/lib/utils'
 
 dayjs.extend(relativeTime)
 
@@ -43,19 +44,13 @@ const Profile = async () => {
         <div className="flex flex-col gap-y-3">
           {threads
             ? threads.map((thread) => {
-                const createdAt = dayjs(thread.created_at)
-                const currentTime = dayjs()
-                const timeDifference = currentTime.diff(createdAt, 'seconds') // Time difference in seconds
-                const formattedTimeAgo =
-                  timeDifference < 3600
-                    ? `${Math.floor(timeDifference / 60)} minutes ago`
-                    : createdAt.fromNow()
+                const formattedTimeAgo = timeAgo(thread.created_at)
 
                 return (
                   <Link key={thread.id} href={`/${thread.thread_id}/${thread.run_id}`}>
                     <div className="group flex items-center justify-between border rounded w-full px-4 py-2 transition bg-surface-100 hover:bg-surface-200">
                       <div className="flex flex-col gap-y-1">
-                        <p className="text-sm">{thread.thread_id}</p>
+                        <p className="text-sm">{thread.thread_title}</p>
                         <p className="text-xs text-foreground-light">
                           Last updated {formattedTimeAgo}
                         </p>
