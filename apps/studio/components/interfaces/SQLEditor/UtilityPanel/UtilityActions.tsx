@@ -28,8 +28,7 @@ const UtilityActions = ({
   executeQuery,
 }: UtilityActionsProps) => {
   const os = detectOS()
-  // const readReplicasEnabled = useFlag('readReplicas')
-  const readReplicasEnabled = false
+  const readReplicasEnabled = useFlag('readReplicas')
   const [selectedDatabaseId, setSelectedDatabaseId] = useState<string>('1')
 
   return (

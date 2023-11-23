@@ -34,8 +34,7 @@ const DatabaseSettings = () => {
   const organization = useSelectedOrganization()
   const selectedOrganization = useSelectedOrganization()
 
-  // const readReplicasEnabled = useFlag('readReplicas')
-  const readReplicasEnabled = false
+  const readReplicasEnabled = useFlag('readReplicas')
   const connectionStringsRef = useRef<HTMLDivElement>(null)
 
   const [selectedDatabaseId, setSelectedDatabaseId] = useState<string>('1')

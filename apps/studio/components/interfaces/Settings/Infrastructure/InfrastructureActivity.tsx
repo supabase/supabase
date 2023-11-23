@@ -37,8 +37,7 @@ const InfrastructureActivity = () => {
   const [dateRange, setDateRange] = useState<any>()
   const [selectedDatabaseId, setSelectedDatabaseId] = useState<string>('1')
 
-  // const readReplicasEnabled = useFlag('readReplicas')
-  const readReplicasEnabled = false
+  const readReplicasEnabled = useFlag('readReplicas')
 
   const { data: subscription, isLoading: isLoadingSubscription } = useOrgSubscriptionQuery({
     orgSlug: organization?.slug,

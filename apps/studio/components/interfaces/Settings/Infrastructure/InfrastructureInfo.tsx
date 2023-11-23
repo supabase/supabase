@@ -46,8 +46,7 @@ const InfrastructureInfo = () => {
   const latestPgVersion = (latest_app_version ?? '').split('supabase-postgres-')[1]
 
   const showDbUpgrades = useFlag('databaseUpgrades')
-  // const readReplicasEnabled = useFlag('readReplicas')
-  const readReplicasEnabled = false
+  const readReplicasEnabled = useFlag('readReplicas')
   const subject = 'Request%20for%20Postgres%20upgrade%20for%20project'
   const message = `Upgrade information:%0A• Manual intervention reason: ${requires_manual_intervention}`
 
