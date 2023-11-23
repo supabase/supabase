@@ -275,15 +275,21 @@ const DocsSearch = () => {
   const debouncedSearch = useMemo(() => debounce(handleSearch, 1000), [handleSearch])
 
   useEffect(() => {
+    initialLoad.current = false
+    // search immediately if there is a search term on initial load
+    if (search) {
+      handleSearch(search)
+    }
+  }, [])
+
+  useEffect(() => {
     if (!search) {
-      // Clear search results if user deletes query and cancel any pending debounced searches
+      // Clear search results if user deletes query
+      // and cancel any pending debounced searches
       debouncedSearch.cancel()
       key.current += 1
       dispatch({ type: 'reset', key: key.current })
-    } else if (initialLoad.current) {
-      handleSearch(search)
-      initialLoad.current = false
-    } else {
+    } else if (!initialLoad.current) {
       debouncedSearch(search)
     }
   }, [search])
