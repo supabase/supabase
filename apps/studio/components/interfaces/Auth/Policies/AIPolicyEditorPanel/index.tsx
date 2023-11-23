@@ -1,12 +1,13 @@
 import { FileDiff } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
-import { Button, SidePanel } from 'ui'
+import { Button, Modal, SidePanel } from 'ui'
 
 import {
   IStandaloneCodeEditor,
   IStandaloneDiffEditor,
 } from 'components/interfaces/SQLEditor/SQLEditor.types'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useRlsSuggestMutation } from 'data/ai/rls-suggest-mutation'
 import { useRlsSuggestQuery } from 'data/ai/rls-suggest-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
@@ -38,6 +39,8 @@ export const AIPolicyEditorPanel = memo(function ({
   const { meta } = useStore()
   const selectedProject = useSelectedProject()
   const [incomingChange, setIncomingChange] = useState<string | undefined>(undefined)
+  // used for confirmation when closing the panel with unsaved changes
+  const [isClosingPolicyEditorPanel, setIsClosingPolicyEditorPanel] = useState(false)
 
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
@@ -144,6 +147,15 @@ export const AIPolicyEditorPanel = memo(function ({
     setIncomingChange(undefined)
   }, [incomingChange])
 
+  const onClosingPanel = useCallback(() => {
+    const policy = editorRef.current?.getValue()
+    if (policy) {
+      setIsClosingPolicyEditorPanel(true)
+    } else {
+      onSelectCancel()
+    }
+  }, [onSelectCancel])
+
   // when the panel is closed, reset all values
   useEffect(() => {
     if (!visible) {
@@ -160,15 +172,13 @@ export const AIPolicyEditorPanel = memo(function ({
     }
   }, [visible])
 
-  const policy = editorRef.current?.getValue()
-
   return (
     <SidePanel
       size={assistantVisible ? 'xxxxlarge' : 'large'}
       visible={visible}
       disabled
       hideFooter
-      onCancel={() => onSelectCancel()}
+      onCancel={onClosingPanel}
     >
       <div className="flex flex-row h-full">
         <div className="flex flex-col w-screen max-w-2xl h-full border">
@@ -198,7 +208,7 @@ export const AIPolicyEditorPanel = memo(function ({
               <DiffEditor
                 theme="supabase"
                 language="pgsql"
-                original={policy}
+                original={editorRef.current?.getValue()}
                 modified={incomingChange}
                 onMount={(editor) => (diffEditorRef.current = editor)}
                 options={{
@@ -223,8 +233,8 @@ export const AIPolicyEditorPanel = memo(function ({
             <Button
               loading={isExecuting}
               htmlType="submit"
-              // disable the submit button when in diff mode or the written policy is empty
-              disabled={incomingChange !== undefined || !policy}
+              // disable the submit button when in diff mode
+              disabled={incomingChange !== undefined}
               onClick={() => createNewPolicy()}
             >
               Insert policy
@@ -242,6 +252,23 @@ export const AIPolicyEditorPanel = memo(function ({
           </div>
         )}
       </div>
+      <ConfirmationModal
+        visible={isClosingPolicyEditorPanel}
+        header="Discard changes"
+        buttonLabel="Discard"
+        onSelectCancel={() => setIsClosingPolicyEditorPanel(false)}
+        onSelectConfirm={() => {
+          onSelectCancel()
+          setIsClosingPolicyEditorPanel(false)
+        }}
+      >
+        <Modal.Content>
+          <p className="py-4 text-sm text-foreground-light">
+            There are unsaved changes. Are you sure you want to close the editor? Your changes will
+            be lost.
+          </p>
+        </Modal.Content>
+      </ConfirmationModal>
     </SidePanel>
   )
 })
