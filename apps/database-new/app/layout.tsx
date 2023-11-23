@@ -4,6 +4,7 @@ import './globals.css'
 import Header from '@/components/Header/Header'
 import { ReactQueryProvider, ThemeProvider } from '@/components/providers'
 import type { Metadata } from 'next'
+import Footer from '@/components/Footer'
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <main role="main" className="grow">
                 {children}
               </main>
+              <Footer />
             </div>
           </ReactQueryProvider>
         </ThemeProvider>

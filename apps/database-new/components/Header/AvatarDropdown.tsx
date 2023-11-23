@@ -1,5 +1,5 @@
 'use client'
-import { LogIn, LogOut } from 'lucide-react'
+import { HelpCircle, LogIn, LogOut } from 'lucide-react'
 import { User } from '@supabase/supabase-js'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -42,6 +42,12 @@ export default function AvatarDropdown({ currentUser, signout }: AvatarDropdownP
               <DropdownMenuItem className="space-x-2" onClick={() => {}}>
                 <IconUser size={14} />
                 <p>Profile</p>
+              </DropdownMenuItem>
+            </Link>
+            <Link href="/faq">
+              <DropdownMenuItem className="space-x-2" onClick={() => {}}>
+                <HelpCircle size={14} />
+                <p>FAQs</p>
               </DropdownMenuItem>
             </Link>
             <SidePanel.Separator />
