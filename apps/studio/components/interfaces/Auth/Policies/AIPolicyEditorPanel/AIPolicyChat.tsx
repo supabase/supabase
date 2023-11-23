@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { compact, sortBy } from 'lodash'
+import { compact, kebabCase, sortBy, take } from 'lodash'
 import { Copy, FileDiff } from 'lucide-react'
 import Image from 'next/image'
 import OpenAI from 'openai'
@@ -45,6 +45,8 @@ const Message = ({
       <ReactMarkdown
         components={{
           p: ({ children }) => <div className="text-foreground-light text-sm">{children}</div>,
+          // intentionally rendering as pre. The other approach would be to render as code element,
+          // but that will render <code> elements which appear in the explanations as Monaco editors.
           pre: ({ children }) => {
             const code = (children[0] as any).props.children[0] as string
             let formatted = code
@@ -52,23 +54,21 @@ const Message = ({
               formatted = format(code)
             } catch {}
 
+            // create a key from the name of the generated policy so that we're sure it's unique
+            const key = kebabCase(take(code.split(' '), 3).join(' '))
+
             return (
-              <div className="relative">
+              <div className="relative group" key={key}>
                 <CodeEditor
-                  id={`rls-sql_${postedAt}`}
+                  id={`rls-sql_${key}`}
                   language="pgsql"
                   className="h-96"
                   value={formatted}
                   isReadOnly
                   options={{ scrollBeyondLastLine: false }}
                 />
-                <div className="absolute top-3 right-3 bg-surface-100 border-muted border rounded-lg h-[28px]">
-                  <Button
-                    type="text"
-                    size="tiny"
-                    onClick={() => onDiff(formatted)}
-                    // className="border-r-0 rounded-r-none"
-                  >
+                <div className="absolute top-3 right-3 bg-surface-100 border-muted border rounded-lg h-[28px] hidden group-hover:block">
+                  <Button type="text" size="tiny" onClick={() => onDiff(formatted)}>
                     <FileDiff className="h-4 w-4" />
                   </Button>
                   <Button type="text" size="tiny">
@@ -88,7 +88,7 @@ const Message = ({
   )
 }
 
-export const Chat = ({
+export const AIPolicyChat = ({
   messages,
   loading,
   onSubmit,

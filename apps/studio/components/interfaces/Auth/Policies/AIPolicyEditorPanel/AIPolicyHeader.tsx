@@ -1,6 +1,6 @@
 import { AiIcon, Button } from 'ui'
 
-export const Header = ({
+export const AIPolicyHeader = ({
   assistantVisible,
   setAssistantVisible,
 }: {

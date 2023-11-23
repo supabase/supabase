@@ -1,5 +1,4 @@
 import Editor, { OnMount } from '@monaco-editor/react'
-import { noop } from 'lodash'
 import { editor } from 'monaco-editor'
 import { MutableRefObject } from 'react'
 import { cn } from 'ui'
@@ -10,6 +9,7 @@ interface RLSCodeEditorProps {
   id: string
   defaultValue?: string
   onInputChange?: (value?: string) => void
+  wrapperClassName?: string
   className?: string
   value?: string
   editorRef: MutableRefObject<editor.IStandaloneCodeEditor | null>
@@ -18,7 +18,7 @@ interface RLSCodeEditorProps {
 const RLSCodeEditor = ({
   id,
   defaultValue,
-  onInputChange = noop,
+  wrapperClassName,
   className,
   value,
   editorRef,
@@ -48,13 +48,13 @@ const RLSCodeEditor = ({
     <Editor
       path={id}
       theme="supabase"
+      wrapperProps={{ className: cn(wrapperClassName) }}
       className={cn(className, 'monaco-editor')}
       value={value ?? undefined}
       defaultLanguage="pgsql"
       defaultValue={defaultValue ?? undefined}
       options={options}
       onMount={onMount}
-      onChange={onInputChange}
     />
   )
 }
