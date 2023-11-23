@@ -169,6 +169,8 @@ export const AIPolicyEditorPanel = memo(function ({
       if (assistantVisible) {
         setAssistantPanel(false)
       }
+      setIsClosingPolicyEditorPanel(false)
+      setIds(undefined)
     }
   }, [visible])
 
