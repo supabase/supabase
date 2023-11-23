@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Badge, Button, IconLock } from 'ui'
 
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions, useFlag } from 'hooks'
 
 interface PolicyTableRowHeaderProps {
   table: PostgresTable
@@ -27,6 +27,7 @@ const PolicyTableRowHeader = ({
   const { ref } = router.query
   const canToggleRLS = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
   const canCreatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
+  const canCreatePolicyWithAi = useFlag('policyEditorWithAi')
 
   return (
     <div id={table.id.toString()} className="flex w-full items-center justify-between">
@@ -49,35 +50,37 @@ const PolicyTableRowHeader = ({
       {!isLocked && (
         <div className="flex-1">
           <div className="flex flex-row-reverse">
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
-                <Button
-                  type="outline"
-                  disabled={!canCreatePolicies}
-                  className="ml-2"
-                  onClick={() => onSelectCreatePolicyWithAI(true)}
-                >
-                  New Policy with AI
-                </Button>
-              </Tooltip.Trigger>
-              {!canCreatePolicies && (
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow',
-                        'border border-background',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">
-                        You need additional permissions to create RLS policies
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              )}
-            </Tooltip.Root>
+            {canCreatePolicyWithAi && (
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger>
+                  <Button
+                    type="outline"
+                    disabled={!canCreatePolicies}
+                    className="ml-2"
+                    onClick={() => onSelectCreatePolicyWithAI(true)}
+                  >
+                    New Policy with AI
+                  </Button>
+                </Tooltip.Trigger>
+                {!canCreatePolicies && (
+                  <Tooltip.Portal>
+                    <Tooltip.Content side="bottom">
+                      <Tooltip.Arrow className="radix-tooltip-arrow" />
+                      <div
+                        className={[
+                          'rounded bg-alternative py-1 px-2 leading-none shadow',
+                          'border border-background',
+                        ].join(' ')}
+                      >
+                        <span className="text-xs text-foreground">
+                          You need additional permissions to create RLS policies
+                        </span>
+                      </div>
+                    </Tooltip.Content>
+                  </Tooltip.Portal>
+                )}
+              </Tooltip.Root>
+            )}
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger>
                 <Button
