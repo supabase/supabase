@@ -9,6 +9,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { useSelectedLayoutSegment } from 'next/navigation'
 import { useAppStateSnapshot } from '@/lib/state'
+import NoUserDropdown from './NoUserDropdown'
 
 interface HeaderActionsProps {
   user: User | null
@@ -51,9 +52,7 @@ const HeaderActions = ({ user }: HeaderActionsProps) => {
       {currentUser ? (
         <AvatarDropdown currentUser={currentUser} signout={signout} />
       ) : (
-        <Button type="default">
-          <Link href="/login">Login</Link>
-        </Button>
+        <NoUserDropdown />
       )}
     </div>
   )

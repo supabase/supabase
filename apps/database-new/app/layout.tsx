@@ -1,7 +1,7 @@
 import '@ui/layout/ai-icon-animation/ai-icon-animation-style.module.css'
 import './globals.css'
 
-import Header from '@/components/Header'
+import Header from '@/components/Header/Header'
 import { ReactQueryProvider, ThemeProvider } from '@/components/providers'
 import type { Metadata } from 'next'
 

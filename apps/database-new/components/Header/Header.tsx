@@ -1,7 +1,7 @@
-import HeaderActions from './Header/HeaderActions'
+import HeaderActions from './HeaderActions'
 import { createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
-import CurrentThreadName from './Header/CurrentThreadName'
+import CurrentThreadName from './CurrentThreadName'
 import Link from 'next/link'
 
 const Header = async () => {

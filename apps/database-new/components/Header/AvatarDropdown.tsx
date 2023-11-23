@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   IconUser,
-  Separator,
+  SidePanel,
 } from 'ui'
 
 interface AvatarDropdownProps {
@@ -44,7 +44,7 @@ export default function AvatarDropdown({ currentUser, signout }: AvatarDropdownP
                 <p>Profile</p>
               </DropdownMenuItem>
             </Link>
-            <Separator />
+            <SidePanel.Separator />
             <a href="https://supabase.com" target="_blank" rel="noreferrer">
               <DropdownMenuItem className="space-x-2">
                 <Image alt="supabase" src="/supabase.png" width={14} height={14} />
