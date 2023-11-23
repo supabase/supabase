@@ -16,11 +16,11 @@ There are a few methods available to upgrade your project.
 
 ### pg_upgrade
 
-    <Admonition type="note">
+<Admonition type="note">
 
+This upgrade method is currently in Beta.
 
-
-        </Admonition>
+</Admonition>
 
 pg_upgrade performs an in-place upgrade on your database. For projects larger than 1GB, pg_upgrade is generally faster than a pause+restore cycle, and the speed advantage grows with the size of the database.
 
@@ -33,11 +33,11 @@ As a rough rule of thumb, pg_upgrade operates at ~100mbps (when executing an upg
 
 ### Pause + Restore
 
-    <Admonition type="note">
+<Admonition type="note">
 
+We recommend using the pg_upgrade method, as it is faster, and more reliable. Additionally, only Free-tier projects are eligible to use the Pause + Restore method.
 
-
-        </Admonition>
+</Admonition>
 
 When you pause and restore a project, the restored database includes the latest features. This method _does_ include downtime, so be aware that your project will be inaccessible for a short period of time.
 
