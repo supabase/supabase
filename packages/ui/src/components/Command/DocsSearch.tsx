@@ -111,6 +111,7 @@ type Action =
   | {
       type: 'errored'
       key: number
+      sourcesLoaded: number
       message: string
     }
 
@@ -200,11 +201,15 @@ function reducer(state: SearchState, action: Action): SearchState {
         key: action.key,
       }
     case 'errored':
-      return {
-        status: 'error',
-        key: action.key,
-        message: action.message,
+      // At least one search has failed and all non-failing searches have come back empty
+      if (action.sourcesLoaded === NUMBER_SOURCES && !('results' in state)) {
+        return {
+          status: 'error',
+          key: action.key,
+          message: action.message,
+        }
       }
+      return state
     default:
       return state
   }
@@ -225,57 +230,34 @@ const DocsSearch = () => {
       const localKey = key.current
       dispatch({ type: 'newSearchDispatched', key: localKey })
 
-      let loadedSources = 0
+      let sourcesLoaded = 0
 
-      supabaseClient.functions
-        .invoke('search-fts', {
-          body: { query },
-        })
-        .then(({ data: results, error }) => {
-          loadedSources += 1
-          if (error) {
-            dispatch({
-              type: 'errored',
-              key: localKey,
-              message: error.message ?? '',
-            })
-          } else {
-            dispatch({
-              type: 'resultsReturned',
-              key: localKey,
-              sourcesLoaded: loadedSources,
-              results,
-            })
-          }
-          if (loadedSources === NUMBER_SOURCES) {
-            setIsLoading(false)
-          }
-        })
-
-      supabaseClient.functions
-        .invoke('search-v2', {
-          body: { query },
-        })
-        .then(({ data: results, error }) => {
-          loadedSources += 1
-          if (error) {
-            dispatch({
-              type: 'errored',
-              key: localKey,
-              message: error.message ?? '',
-            })
-          } else {
-            dispatch({
-              type: 'resultsReturned',
-              key: localKey,
-              sourcesLoaded: loadedSources,
-              results,
-            })
-          }
-          if (loadedSources === NUMBER_SOURCES) {
-            setIsLoading(false)
-          }
-        })
+      const sources = ['search-fts', 'search-v2']
+      sources.forEach((source) => {
+        supabaseClient.functions
+          .invoke(source, { body: { query } })
+          .then(({ data: results, error }) => {
+            sourcesLoaded += 1
+            if (error) {
+              dispatch({
+                type: 'errored',
+                key: localKey,
+                sourcesLoaded,
+                message: error.message ?? '',
+              })
+            } else {
+              dispatch({
+                type: 'resultsReturned',
+                key: localKey,
+                sourcesLoaded,
+                results,
+              })
+            }
+            if (sourcesLoaded === NUMBER_SOURCES) {
+              setIsLoading(false)
+            }
+          })
+      })
     },
     [supabaseClient]
   )
