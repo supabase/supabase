@@ -28,11 +28,11 @@ const Profile = async () => {
       <div className="col-span-4 xl:col-span-1 flex flex-col gap-y-6">
         <div className="flex items-center gap-x-4">
           <div
-            className="border border-foreground-lighter rounded-full w-[30px] h-[30px] bg-no-repeat bg-center bg-cover"
+            className="border border-foreground-lighter rounded-full w-12 h-12 bg-no-repeat bg-center bg-cover"
             style={{ backgroundImage: `url('${user.user_metadata.avatar_url}')` }}
           />
           <div className="flex flex-col">
-            <p className="text-xl">{user.user_metadata.full_name}</p>
+            <p className="text-lg">{user.user_metadata.full_name}</p>
             <p className="text-foreground-light">@{user.user_metadata.user_name}</p>
           </div>
         </div>

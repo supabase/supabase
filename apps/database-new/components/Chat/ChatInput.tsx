@@ -31,7 +31,7 @@ const ChatInput = ({ userID }: ChatInputParams) => {
 
   return (
     <>
-      <div className="flex items-center gap-x-1.5 font-mono text-xl">
+      <div className="flex items-center gap-x-1.5 font-mono font-bold text-xl">
         <span>database</span>
         <div className="w-1.5 h-1.5 rounded-full bg-purple-900"></div>
         <span>design</span>

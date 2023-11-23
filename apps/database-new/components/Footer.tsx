@@ -8,7 +8,7 @@ export const links = [
 ]
 
 const Footer = () => (
-  <div className="mt-16 border-t py-4 container mx-auto">
+  <div className="border-t py-4 w-full px-4 xl:px-16">
     <ul className="flex items-center gap-4 text-xs">
       {links.map((link, index) => (
         <li key={index}>

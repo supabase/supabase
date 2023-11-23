@@ -15,7 +15,7 @@ const Header = async () => {
   return (
     <nav
       role="navigation"
-      className="bg-background border flex items-center justify-between px-4 min-h-[50px]"
+      className="bg-background border flex items-center justify-between px-4 xl:px-16 min-h-[50px]"
     >
       <div className="flex items-center gap-x-4">
         <Link href="/">
