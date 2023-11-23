@@ -291,7 +291,15 @@ const DocsSearch = () => {
   // and abort any debounced searches that are waiting
   useEffect(() => {
     const handleEnter = (event: KeyboardEvent) => {
-      if (event.key === 'Enter' && search) {
+      if (
+        event.key === 'Enter' &&
+        document.activeElement === inputRef.current &&
+        search &&
+        // If there are results, cmdk menu will trigger navigation to the highlighted
+        // result on Enter, even though the active element is the input
+        !hasResults
+      ) {
+        event.preventDefault()
         debouncedSearch.cancel()
         handleSearch(search)
       }
