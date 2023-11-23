@@ -35,7 +35,7 @@ export default function Login({ searchParams }: { searchParams: { message: strin
           <div className="flex items-center gap-x-1.5 font-mono font-bold">
             <span>database</span>
             <div className="w-1.5 h-1.5 rounded-full bg-purple-900"></div>
-            <span>new</span>
+            <span>design</span>
           </div>
         </div>
         <button className="border text-sm bg-surface-100 rounded-md px-4 py-2 text-foreground mb-2 flex items-center justify-center gap-x-2">

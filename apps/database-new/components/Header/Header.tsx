@@ -22,7 +22,7 @@ const Header = async () => {
           <div className="flex items-center gap-x-1.5 font-mono">
             <span>database</span>
             <div className="w-1.5 h-1.5 rounded-full bg-purple-900"></div>
-            <span>new</span>
+            <span>design</span>
           </div>
         </Link>
         <CurrentThreadName />

@@ -59,7 +59,7 @@ export default function AvatarDropdown({ currentUser, signout }: AvatarDropdownP
         ) : (
           <div className="flex flex-col gap-y-2 p-2">
             <div className="text-xs">
-              Sign in to <span className="text-foreground">database.new</span> to save your
+              Sign in to <span className="text-foreground">database.design</span> to save your
               conversations!
             </div>
             <Button type="default" icon={<LogIn size={14} />}>

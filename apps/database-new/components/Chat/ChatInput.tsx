@@ -34,7 +34,7 @@ const ChatInput = ({ userID }: ChatInputParams) => {
       <div className="flex items-center gap-x-1.5 font-mono text-xl">
         <span>database</span>
         <div className="w-1.5 h-1.5 rounded-full bg-purple-900"></div>
-        <span>new</span>
+        <span>design</span>
       </div>
       <Input
         autoFocus
