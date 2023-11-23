@@ -3,6 +3,7 @@ import { compact } from 'lodash'
 import { z } from 'zod'
 
 import { PostgresColumn, PostgresTable } from './types'
+import dayjs from 'dayjs'
 
 const constraintDefinitionSchema = z.object({
   Constraint: z.discriminatedUnion('contype', [
@@ -223,4 +224,24 @@ export async function parseTables(sql: string) {
     })
 
   return pgTables
+}
+
+export function timeAgo(date: string) {
+  const createdAt = dayjs(date)
+  const currentTime = dayjs()
+  const timeDifference = currentTime.diff(createdAt, 'seconds') // Time difference in seconds
+
+  if (timeDifference < 60) {
+    // Less than 1 minute
+    return 'just now'
+  } else if (timeDifference < 3600) {
+    // Less than 1 hour
+    return `${Math.floor(timeDifference / 60)} minutes ago`
+  } else if (timeDifference < 86400) {
+    // Less than 1 day (24 hours)
+    return `${Math.floor(timeDifference / 3600)} hours ago`
+  } else {
+    // More than 1 day
+    return createdAt.format('MMM DD, YYYY')
+  }
 }
