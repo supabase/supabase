@@ -1,13 +1,9 @@
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs'
-import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
-import { cookies } from 'next/headers'
-import Link from 'next/link'
-import { Edit, Trash2 } from 'lucide-react'
-import { timeAgo } from '@/lib/utils'
-import EmptyState from './EmptyState'
 import { deleteThread } from '@/lib/actions'
+import { createClient } from '@/lib/supabase/server'
+import { default as dayjs, default as relativeTime } from 'dayjs'
+import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
+import Threads from './Threads'
 
 dayjs.extend(relativeTime)
 
@@ -57,39 +53,7 @@ const Profile = async () => {
 
         <div className="w-full h-px border-t" />
 
-        <div className="flex flex-col gap-y-3">
-          {threads.length > 0 ? (
-            threads.map((thread) => {
-              const formattedTimeAgo = timeAgo(thread.created_at)
-
-              return (
-                <div
-                  key={thread.id}
-                  className="group flex items-center justify-between border rounded w-full px-4 py-2 transition bg-surface-100 hover:bg-surface-200"
-                >
-                  <div className="flex flex-col gap-y-1">
-                    <Link
-                      className="text-sm hover:underline"
-                      href={`/${thread.thread_id}/${thread.run_id}`}
-                    >
-                      {thread.thread_title}
-                    </Link>
-                    <p className="text-xs text-foreground-light">Last updated {formattedTimeAgo}</p>
-                  </div>
-
-                  <form action={handleThreadActions} className="flex gap-2 items-center">
-                    <input type="hidden" name="threadID" value={thread.thread_id} />
-                    <button type="submit" name="action" value="delete">
-                      <Trash2 size={16} strokeWidth={2} />
-                    </button>
-                  </form>
-                </div>
-              )
-            })
-          ) : (
-            <EmptyState />
-          )}
-        </div>
+        <Threads threads={threads} handleThreadActions={handleThreadActions} />
       </div>
     </div>
   )
