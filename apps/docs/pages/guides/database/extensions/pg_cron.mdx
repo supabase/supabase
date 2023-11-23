@@ -109,6 +109,30 @@ select
   );
 ```
 
+### Edit a job
+
+Changes the frequency of a job called `'vacuum'` to once every 5 minutes.
+
+```sql
+select cron.alter_job(
+  job_id := (select jobid from cron.job where jobname = 'vacuum'),
+  schedule := '*/5 * * * *'
+);
+```
+
+Full options for the `cron.alter_job()` function are:
+
+```sql
+cron.alter_job(
+  job_id bigint,
+  schedule text default null,
+  command text default null,
+  database text default null,
+  username text default null,
+  active boolean default null
+)
+```
+
 ### Unschedule a job
 
 Unschedules a job called `'nightly-vacuum'`
