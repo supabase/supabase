@@ -2,7 +2,7 @@ import { NextPage } from 'next'
 import toast from 'react-hot-toast'
 import APIAuthorizationLayout from 'components/layouts/APIAuthorizationLayout'
 import { createCliLoginSession } from 'data/cli/login'
-import { useParams } from 'common'
+import { useIsLoggedIn, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { withAuth } from 'hooks'
 import Connecting from 'components/ui/Loading/Loading'
@@ -13,9 +13,10 @@ const CliLoginPage: NextPage = () => {
   const router = useRouter()
   const { session_id, public_key, token_name, success } = useParams()
   const [isSuccessfulLogin, setSuccessfulLogin] = useState(false)
+  const isLoggedIn = useIsLoggedIn()
 
   useEffect(() => {
-    if (!router.isReady) {
+    if (!isLoggedIn || !router.isReady) {
       return
     }
 
@@ -45,7 +46,7 @@ const CliLoginPage: NextPage = () => {
     }
 
     createSession()
-  }, [router, router.isReady, session_id, public_key, token_name, success])
+  }, [isLoggedIn, router, router.isReady, session_id, public_key, token_name, success])
 
   return (
     <APIAuthorizationLayout>
