@@ -259,7 +259,7 @@ const Container = memo(function Container(props: PropsWithChildren) {
       id="docs-content-container"
       className={[
         // 'overflow-x-auto',
-        'w-full h-screen transition-all ease-out',
+        'w-full transition-all ease-out',
         // 'absolute lg:relative',
         mobileMenuOpen ? 'ml-[75%] sm:ml-[50%] md:ml-[33%] overflow-hidden' : 'overflow-auto',
         // desktop override any margin styles
