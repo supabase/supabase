@@ -16,7 +16,7 @@ const CurrentThreadName = () => {
   return (
     <div className="hidden xl:block flex items-center gap-x-4">
       {selectedMessage !== undefined && (
-        <p title={selectedMessage.text} className="truncate border-l text-sm px-4">
+        <p title={selectedMessage.text} className="truncate max-w-[700px] border-l text-sm px-4">
           {selectedMessage.text}
         </p>
       )}
