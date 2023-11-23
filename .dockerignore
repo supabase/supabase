@@ -13,7 +13,7 @@ tests
 
 **/.next
 .vercel
-.env.*
+**/.env.*
 
 .dockerignore
 apps/studio/Dockerfile
