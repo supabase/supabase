@@ -43,7 +43,7 @@ const FAQ = async () => {
             Frequently Asked Questions
           </h1>
           <p className="mt-5 text-lg text-center text-foreground-light">
-            Everything you've ever wondered about database.design
+            Everything you have ever wondered about database.design
           </p>
         </div>
       </div>
