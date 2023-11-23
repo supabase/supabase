@@ -276,7 +276,8 @@ const DocsSearch = () => {
 
   useEffect(() => {
     if (!search) {
-      // Clear search results if user deletes query
+      // Clear search results if user deletes query and cancel any pending debounced searches
+      debouncedSearch.cancel()
       key.current += 1
       dispatch({ type: 'reset', key: key.current })
     } else if (initialLoad.current) {
