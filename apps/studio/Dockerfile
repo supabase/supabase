@@ -52,10 +52,10 @@ RUN npx turbo run build --scope=studio --include-dependencies --no-deps
 
 # Copy only compiled code and dependencies
 FROM base as production
-COPY --from=builder /app/studio/public ./studio/public
-COPY --from=builder /app/studio/.next/standalone ./
-COPY --from=builder /app/studio/.next/static ./studio/.next/static
+COPY --from=builder /app/apps/studio/public ./apps/studio/public
+COPY --from=builder /app/apps/studio/.next/standalone ./
+COPY --from=builder /app/apps/studio/.next/static ./apps/studio/.next/static
 EXPOSE 3000
 ENTRYPOINT ["docker-entrypoint.sh"]
 HEALTHCHECK --interval=5s --timeout=5s --retries=3 CMD node -e "require('http').get('http://localhost:3000/api/profile', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
-CMD ["node", "studio/server.js"]
+CMD ["node", "apps/studio/server.js"]
