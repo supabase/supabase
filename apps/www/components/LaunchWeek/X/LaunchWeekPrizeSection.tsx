@@ -56,7 +56,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
               content={
                 <div className="p-4 md:p-6 flex flex-col gap-2 text-sm items-start justify-between h-full">
                   <LabelBadge text="20 t-shirts" />
-                  LWX T-Shirt
+                  Launch Week X T-Shirt
                 </div>
               }
             />
@@ -65,7 +65,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
               content={
                 <div className="p-4 md:p-6 flex flex-col gap-2 text-sm items-start justify-between h-full">
                   <LabelBadge text="25 caps" />
-                  LWX Cap
+                  Launch Week X Cap
                 </div>
               }
             />
@@ -74,7 +74,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
               content={
                 <div className="p-4 md:p-6 flex flex-col gap-2 text-sm items-start justify-between h-full">
                   <LabelBadge text="50 codes" />
-                  100% Swag Store Discount
+                  100% Supabase Store Discount
                 </div>
               }
             />

@@ -16,7 +16,7 @@ export default function LaunchWeekPrizeCard({
       hasShimmer
       outerClassName={cn('relative rounded-lg overflow-hidden shadow-lg', className)}
       innerClassName={cn(
-        'relative h-full flex flex-col bg-[#030A0C] rounded-lg overflow-hidden text-foreground',
+        'relative h-full flex flex-col bg-[#121516] rounded-lg overflow-hidden text-foreground',
         contentClassName
       )}
       shimmerToColor="hsl(var(--background-alternative-default))"
