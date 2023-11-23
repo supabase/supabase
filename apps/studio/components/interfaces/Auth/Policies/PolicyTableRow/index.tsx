@@ -13,6 +13,7 @@ interface PolicyTableRowProps {
   isLocked: boolean
   onSelectToggleRLS: (table: PostgresTable) => void
   onSelectCreatePolicy: (table: PostgresTable) => void
+  onSelectCreatePolicyWithAI: (shown: boolean) => void
   onSelectEditPolicy: (policy: PostgresPolicy) => void
   onSelectDeletePolicy: (policy: PostgresPolicy) => void
 }
@@ -22,6 +23,7 @@ const PolicyTableRow = ({
   isLocked,
   onSelectToggleRLS = noop,
   onSelectCreatePolicy = noop,
+  onSelectCreatePolicyWithAI = noop,
   onSelectEditPolicy = noop,
   onSelectDeletePolicy = noop,
 }: PolicyTableRowProps) => {
@@ -37,6 +39,7 @@ const PolicyTableRow = ({
           table={table}
           isLocked={isLocked}
           onSelectToggleRLS={onSelectToggleRLS}
+          onSelectCreatePolicyWithAI={onSelectCreatePolicyWithAI}
           onSelectCreatePolicy={onSelectCreatePolicy}
         />
       }
