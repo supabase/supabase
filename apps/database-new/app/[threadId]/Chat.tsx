@@ -61,6 +61,7 @@ export const Chat = () => {
     <div
       className={cn(
         'bg',
+        'h-full',
         'border-t xl:border-t-0 xl:border-r relative',
         'flex flex-col h-full border-r',
         'w-full xl:w-[400px] 2xl:w-[500px]'
