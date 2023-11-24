@@ -142,6 +142,8 @@ function Input({
   if (disabled) inputClasses.push(__styles.disabled)
   if (inputClassName) inputClasses.push(inputClassName)
 
+  console.log(cn(inputClasses))
+
   return (
     <FormLayout
       label={label}
@@ -171,7 +173,7 @@ function Input({
           ref={inputRef}
           type={type}
           value={reveal && hidden ? HIDDEN_PLACEHOLDER : value}
-          className={cn(inputClasses)}
+          className={inputClasses.join(' ')}
           {...props}
         />
         {icon && <InputIconContainer icon={icon} className={iconContainerClassName} />}
