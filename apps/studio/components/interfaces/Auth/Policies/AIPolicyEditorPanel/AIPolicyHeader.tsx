@@ -14,7 +14,8 @@ export const AIPolicyHeader = ({
         <Button
           size="tiny"
           type="default"
-          icon={<AiIcon className="[&>div>div]:border-white" />}
+          className="pl-1.5 py-0.5"
+          icon={<AiIcon className="scale-75 [&>div>div]:border-white -mr-0.5" />}
           onClick={() => setAssistantVisible(!assistantVisible)}
         >
           {assistantVisible ? <>Close Assistant</> : <>Open Assistant</>}
