@@ -1812,6 +1812,7 @@ export interface components {
       SECURITY_CAPTCHA_SECRET: string
       SESSIONS_TIMEBOX?: number
       SESSIONS_INACTIVITY_TIMEOUT?: number
+      SESSIONS_SINGLE_PER_USER?: boolean
       RATE_LIMIT_EMAIL_SENT: number
       RATE_LIMIT_SMS_SENT: number
       RATE_LIMIT_VERIFY?: number
@@ -1945,6 +1946,7 @@ export interface components {
       SECURITY_CAPTCHA_SECRET?: string
       SESSIONS_TIMEBOX?: number | null
       SESSIONS_INACTIVITY_TIMEOUT?: number | null
+      SESSIONS_SINGLE_PER_USER?: boolean
       RATE_LIMIT_EMAIL_SENT?: number
       RATE_LIMIT_SMS_SENT?: number
       RATE_LIMIT_VERIFY?: number
@@ -2079,6 +2081,7 @@ export interface components {
       SECURITY_CAPTCHA_SECRET: string
       SESSIONS_TIMEBOX?: number
       SESSIONS_INACTIVITY_TIMEOUT?: number
+      SESSIONS_SINGLE_PER_USER?: boolean
       RATE_LIMIT_EMAIL_SENT: number
       RATE_LIMIT_SMS_SENT: number
       RATE_LIMIT_VERIFY?: number
