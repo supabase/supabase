@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@dagrejs/dagre": "^1.0.4",
-    "@graphiql/react": "^0.19.4",
+    "@graphiql/react": "^0.20.2",
     "@graphiql/toolkit": "^0.9.1",
     "@hcaptcha/react-hcaptcha": "^1.8.1",
     "@headlessui/react": "^1.7.17",
