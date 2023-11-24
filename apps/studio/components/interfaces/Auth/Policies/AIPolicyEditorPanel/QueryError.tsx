@@ -30,7 +30,7 @@ const QueryError = ({
           </Button>
         </div>
       </Alert_Shadcn_>
-      <div>
+      <div className="overflow-x-auto">
         {formattedError.length > 0 ? (
           formattedError.map((x: string, i: number) => (
             <pre key={`error-${i}`} className="font-mono text-sm">
