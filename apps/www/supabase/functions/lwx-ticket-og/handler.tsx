@@ -4,14 +4,13 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
 import { corsHeaders } from '../_shared/cors.ts'
 
 const STORAGE_URL = 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lwx'
-
 const BUCKET_FOLDER_VERSION = 'v1'
 
 export async function handler(req: Request) {
   try {
     if (req.method !== 'POST') throw new Error('method not supported')
     const {
-      username = 'fsansalvadore',
+      username,
       golden = false,
     }: {
       username?: string
@@ -57,8 +56,7 @@ export async function handler(req: Request) {
             src={ticketImg}
             style={{
               borderRadius: '26px',
-              boxShadow:
-                '0px 1px 27px rgba(158, 68, 239, 0.06), 0 80px 40#222022cc 21, 0.8), inset 0 0.2px 1px 0.2px rgba(214, 210, 210, 0.4), inset 0.4px 0.4px 1px 0.3px rgba(210, 231, 229, 0.2)',
+              boxShadow: '0px 1px 27px rgba(214, 214, 214, 0.06), 0 80px 40#222022cc 21, 0.2)',
             }}
           />
         </div>
@@ -100,7 +98,6 @@ export async function handler(req: Request) {
       status: 200,
     })
   } catch (error) {
-    console.log('error', error)
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 400,
