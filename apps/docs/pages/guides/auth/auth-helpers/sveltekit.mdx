@@ -755,7 +755,7 @@ For [row level security](https://supabase.com/docs/guides/auth/row-level-securit
 <script lang="ts">
   export let data
 
-  const { user, tableData } = data
+  let { user, tableData } = data
   $: ({ user, tableData } = data)
 </script>
 
