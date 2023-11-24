@@ -1,8 +1,7 @@
-import Link from 'next/link'
-import { headers, cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { ArrowLeft } from 'lucide-react'
+import { Github } from 'lucide-react'
+import { cookies, headers } from 'next/headers'
+import { redirect } from 'next/navigation'
 
 export default function Login({ searchParams }: { searchParams: { message: string } }) {
   const signUp = async (formData: FormData) => {
@@ -14,9 +13,7 @@ export default function Login({ searchParams }: { searchParams: { message: strin
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'github',
-      options: {
-        redirectTo: `${origin}/auth/callback`,
-      },
+      options: { redirectTo: `${origin}/auth/callback` },
     })
 
     if (error) {
@@ -28,23 +25,23 @@ export default function Login({ searchParams }: { searchParams: { message: strin
   }
 
   return (
-    <div className="flex-1 flex flex-col w-full px-8 sm:max-w-md justify-center gap-2 mx-auto mt-24">
-      <Link
-        href="/"
-        className="absolute left-8 top-8 py-2 px-4 rounded-md no-underline text-foreground bg-btn-background hover:bg-btn-background-hover flex items-center gap-2 text-sm"
-      >
-        <ArrowLeft size={14} />
-        Back
-      </Link>
-
+    <div className="flex flex-col justify-center h-full w-full px-8 sm:max-w-sm gap-2 mx-auto">
       <form
         className="animate-in flex-1 flex flex-col w-full justify-center gap-2 text-foreground"
         action={signUp}
       >
-        <button className="border border-foreground/20 rounded-md px-4 py-2 text-foreground mb-2">
-          Sign up with Github
+        <div className="flex items-center gap-x-2 justify-center mb-4">
+          <span className="text-foreground-light">Sign in to</span>{' '}
+          <div className="flex items-center gap-x-1.5 font-mono font-bold">
+            <span>database</span>
+            <div className="w-1.5 h-1.5 rounded-full bg-purple-900"></div>
+            <span>design</span>
+          </div>
+        </div>
+        <button className="border text-sm bg-surface-100 rounded-md px-4 py-2 text-foreground mb-2 flex items-center justify-center gap-x-2">
+          <Github size={18} />
+          Sign in with Github
         </button>
-
         {searchParams?.message && (
           <p className="mt-4 p-4 bg-foreground/10 text-foreground text-center">
             {searchParams.message}
