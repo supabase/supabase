@@ -19,16 +19,14 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark">
-      <body>
+      <body className="flex flex-col">
         <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
           <ReactQueryProvider>
-            <div className="flex flex-col h-full">
-              <Header />
-              <main role="main" className="grow">
-                {children}
-              </main>
-              <Footer />
-            </div>
+            <Header />
+            <main role="main" className="h-full w-full flex flex-col grow">
+              {children}
+            </main>
+            <Footer />
           </ReactQueryProvider>
         </ThemeProvider>
       </body>

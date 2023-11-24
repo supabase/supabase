@@ -45,23 +45,19 @@ const SaveSchemaDropdown = () => {
   }
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
-        <Button
-          type="default"
-          onClick={() => snap.setHideCode(!snap.hideCode)}
-          iconRight={<IconChevronDown />}
-        >
+        <Button type="default" iconRight={<IconChevronDown />}>
           Save schema
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-44" align="center">
+      <DropdownMenuContent className="w-44" align="end">
         <DropdownMenuItem className="space-x-2" onClick={() => copyToClipboard()}>
-          <IconClipboard size={14} strokeWidth={2} />
+          <IconClipboard size={14} strokeWidth={1.5} className="text-lighter" />
           <p>Copy SQL</p>
         </DropdownMenuItem>
         <DropdownMenuItem className="space-x-2" onClick={() => downloadSQL()}>
-          <IconDownload size={14} strokeWidth={2} />
+          <IconDownload size={14} strokeWidth={1.5} className="text-lighter" />
           <p>Download SQL</p>
         </DropdownMenuItem>
         <DropdownMenuItem className="space-x-2" onClick={() => loadSQLInSupabase()}>

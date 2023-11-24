@@ -47,11 +47,11 @@ const HeaderActions = ({ user }: HeaderActionsProps) => {
         <Link href="/">New conversation</Link>
       </Button>
 
-      {currentUser ? (
+      {/* {currentUser ? (
         <AvatarDropdown currentUser={currentUser} signout={signout} />
       ) : (
         <NoUserDropdown />
-      )}
+      )} */}
     </div>
   )
 }
