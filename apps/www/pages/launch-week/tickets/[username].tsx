@@ -97,7 +97,7 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
                   Generate and share your own custom ticket for a chance to win.
                 </span>
               </div>
-              <Button type="alternative" asChild>
+              <Button type="secondary" asChild>
                 <Link href={`${SITE_URL}/${username ? '?referral=' + username : ''}`}>
                   Join Launch Week X
                 </Link>
