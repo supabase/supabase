@@ -137,8 +137,8 @@ function Input({
 
   if (error) inputClasses.push(__styles.variants.error)
   if (!error) inputClasses.push(__styles.variants.standard)
-  if (icon) inputClasses.push(__styles.with_icon)
   if (size) inputClasses.push(__styles.size[size])
+  if (icon) inputClasses.push(__styles.with_icon)
   if (disabled) inputClasses.push(__styles.disabled)
   if (inputClassName) inputClasses.push(inputClassName)
 
@@ -171,7 +171,7 @@ function Input({
           ref={inputRef}
           type={type}
           value={reveal && hidden ? HIDDEN_PLACEHOLDER : value}
-          className={inputClasses.join(' ')}
+          className={cn(inputClasses)}
           {...props}
         />
         {icon && <InputIconContainer icon={icon} className={iconContainerClassName} />}
