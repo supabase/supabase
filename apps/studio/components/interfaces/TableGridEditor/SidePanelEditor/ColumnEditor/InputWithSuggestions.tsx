@@ -88,6 +88,7 @@ const InputWithSuggestions = ({
         layout={layout}
         disabled={disabled}
         className={className}
+        inputClassName="pr-10"
         type="text"
         value={value}
         onChange={onInputChange}
