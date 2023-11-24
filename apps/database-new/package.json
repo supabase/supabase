@@ -20,7 +20,7 @@
     "eslint-config-next": "^14.0.3",
     "lodash": "^4.17.21",
     "lucide-react": "^0.292.0",
-    "next": "^14.0.3",
+    "next": "14.0.4-canary.14",
     "openai": "^4.17.0",
     "react": "18.3.0-canary-fbc9b68d6-20231123",
     "react-dom": "18.3.0-canary-fbc9b68d6-20231123",

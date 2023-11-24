@@ -39,14 +39,29 @@ export async function deleteThread(threadID: string) {
   revalidatePath('/profile')
 }
 
-export async function updateThreadName(threadId: number, threadName: string) {
+export async function updateThreadName(prevState: any, formData: FormData) {
   const cookieStore = cookies()
   const supabase = createClient(cookieStore)
 
   try {
-    await supabase.from('threads').update({ thread_title: threadName }).eq('id', threadId)
-    return revalidatePath('/profile')
-  } catch (error) {
-    return error
+    const thread_title: string = formData.get('thread_title')
+    const row_id: string = formData.get('row_id')
+
+    if (!thread_title) throw new Error('Thread title is required')
+
+    const { data } = await supabase.from('threads').update({ thread_title }).eq('id', row_id)
+
+    revalidatePath('/profile')
+
+    return {
+      success: true,
+      data,
+    }
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message,
+      error,
+    }
   }
 }

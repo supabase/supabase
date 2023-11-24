@@ -26,7 +26,7 @@ const Thread = ({
   thread: ThreadType
   // handleThreadActions: (formData: FormData) => void
 }) => {
-  const formattedTimeAgo = timeAgo(thread.created_at)
+  const formattedTimeAgo = timeAgo(thread.modified_at)
 
   const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)

@@ -1,9 +1,11 @@
 'use client'
 
+// @ts-expect-error
 import { useFormState, useFormStatus } from 'react-dom'
 import { Button, Input_Shadcn_, Label_Shadcn_, Modal } from 'ui'
 import { updateThreadName } from './../../app/actions'
 import { ThreadType } from './Threads'
+import { useEffect, useState } from 'react'
 
 const EditThreadModal = ({
   thread,
@@ -15,12 +17,12 @@ const EditThreadModal = ({
   visible: boolean
 }) => {
   const initialState = {
-    threadName: thread.thread_title,
+    thread_title: thread.thread_title,
+    row_id: thread.id,
   }
 
-  const [state, formAction] = useFormState(updateThreadName, {
-    threadName: thread.thread_title,
-  })
+  const [threadTitle, setThreadTitle] = useState(thread.thread_title)
+  const [state, formAction] = useFormState(updateThreadName, initialState)
 
   function SubmitButton() {
     const { pending } = useFormStatus()
@@ -32,6 +34,12 @@ const EditThreadModal = ({
     )
   }
 
+  useEffect(() => {
+    if (state?.success) {
+      onClose()
+    }
+  }, [state?.success, onClose])
+
   return (
     <Modal
       alignFooter="right"
@@ -42,10 +50,26 @@ const EditThreadModal = ({
       header="Edit thread name"
       className="pb-2"
     >
-      <form action={formAction}>
+      <form action={formAction} key={`${thread.id}-update-thread-title-form`}>
         <Modal.Content className="py-4">
-          <Label_Shadcn_ htmlFor="threadName">Provide a name for your thread</Label_Shadcn_>
-          <Input_Shadcn_ type="text" name="threadName" id="threadName" required />
+          <Label_Shadcn_ htmlFor="thread_title">Provide a name for your thread</Label_Shadcn_>
+          <Input_Shadcn_
+            placeholder="Type in a name for the thread..."
+            type="text"
+            name="thread_title"
+            id="thread_title"
+            required
+            value={threadTitle}
+            onChange={(e) => setThreadTitle(e.target.value)}
+          />
+          <Input_Shadcn_
+            name="row_id"
+            id="row_id"
+            required
+            type="hidden"
+            className=""
+            value={thread.id}
+          />
         </Modal.Content>
         <Modal.Separator />
         <Modal.Content className="flex flex-row gap-3 justify-end">
