@@ -29,6 +29,7 @@ export async function deleteThread(prevState: any, formData: FormData) {
   const supabase = createClient(cookieStore)
 
   try {
+    // @ts-expect-error
     const thread_id: string = formData.get('thread_id')
 
     if (!thread_id) throw new Error('thread_id is required')
@@ -56,7 +57,9 @@ export async function updateThreadName(prevState: any, formData: FormData) {
   const supabase = createClient(cookieStore)
 
   try {
+    // @ts-expect-error
     const thread_title: string = formData.get('thread_title')
+    // @ts-expect-error
     const thread_id: string = formData.get('row_id')
 
     if (!thread_title) throw new Error('Thread title is required')
