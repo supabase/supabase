@@ -78,10 +78,7 @@ async function lint(target: string) {
     let newContents = contents.split('\n')
 
     localErrors.forEach((err) => {
-      newContents[err.location.line - 1] =
-        newContents[err.location.line - 1].substring(0, err.fix.start.column - 1) +
-        err.fix.text +
-        newContents[err.location.line - 1].substring(err.fix.start.column)
+      err.fix.fix(page.path, newContents)
     })
 
     await writeFile(page.path, newContents.join('\n'), 'utf8')

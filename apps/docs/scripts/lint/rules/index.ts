@@ -60,10 +60,12 @@ export class FixReplace extends LintFix {
   }
 
   fix(filePath: string, fileContents: string[]) {
+    // Line and column numbers are 1-indexed, so everything must be shifted by 1
+    // when accessing `fileContents`
     fileContents[this.start.line - 1] =
-      fileContents[this.start.line - 1].substring(0, this.start.column) +
+      fileContents[this.start.line - 1].substring(0, this.start.column - 1) +
       this.text +
-      fileContents[this.end.line - 1].substring(this.end.column)
+      fileContents[this.end.line - 1].substring(this.end.column - 1)
   }
 }
 
