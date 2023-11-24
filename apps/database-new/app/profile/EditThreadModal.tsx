@@ -3,7 +3,15 @@ import { Input, Modal } from 'ui'
 import { ThreadType } from './Threads'
 import { useEffect, useState } from 'react'
 
-const EditThreadModal = ({ thread, onClose }: { thread?: ThreadType; onClose: () => void }) => {
+const EditThreadModal = ({
+  thread,
+  onClose,
+  visible,
+}: {
+  thread: ThreadType
+  onClose: () => void
+  visible: boolean
+}) => {
   const [value, setValue] = useState('')
 
   useEffect(() => {
@@ -19,7 +27,7 @@ const EditThreadModal = ({ thread, onClose }: { thread?: ThreadType; onClose: ()
     <Modal
       alignFooter="right"
       size="medium"
-      visible={thread !== undefined}
+      visible={visible}
       onCancel={onClose}
       onConfirm={updateThread}
       header="Edit thread name"

@@ -2,8 +2,12 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
+
+import OpenAI from 'openai'
+
+const openai = new OpenAI()
 
 export async function logout() {
   const cookieStore = cookies()
@@ -18,4 +22,19 @@ export async function logout() {
 
   revalidatePath('/', 'layout')
   redirect('/')
+}
+
+export async function deleteThread(threadID: string) {
+  const cookieStore = cookies()
+  const supabase = createClient(cookieStore)
+
+  try {
+    await supabase.from('threads').delete().eq('thread_id', threadID)
+  } catch (error) {
+    if (error) console.error('Error deleting thread: ', error)
+  }
+
+  await openai.beta.threads.del(threadID)
+
+  revalidatePath('/profile')
 }
