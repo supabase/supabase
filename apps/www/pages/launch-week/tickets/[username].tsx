@@ -94,7 +94,7 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
                   Launch Week X Ticket
                 </h1>
                 <span className="text-foreground-lighter">
-                  Generate and share your own custom ticket for a chance to win.
+                  Claim your own ticket and share it for a chance to win.
                 </span>
               </div>
               <Button type="secondary" asChild>
@@ -142,7 +142,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const BUCKET_FOLDER_VERSION = 'v1'
 
   const ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lwx/og/${
-    user?.golden ? 'golden' : 'regular'
+    user?.golden ? 'platinum' : 'regular'
   }/${BUCKET_FOLDER_VERSION}/${username}.png`
 
   return {

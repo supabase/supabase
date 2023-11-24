@@ -1,4 +1,6 @@
 import React from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
 import { AnimatePresence, m, LazyMotion, domAnimation } from 'framer-motion'
 import { DEFAULT_TRANSITION, INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
 import { LWX_DATE, LWX_LAUNCH_DATE } from '~/lib/constants'
@@ -10,7 +12,6 @@ import LWXBackground from '../LWXBackground'
 import TicketForm from './TicketForm'
 import CountdownComponent from '../Countdown'
 import LaunchWeekPrizeSection from '../LaunchWeekPrizeSection'
-import Image from 'next/image'
 
 const TicketingFlow = () => {
   const { supabase, ticketState, userData } = useConfData()
@@ -94,11 +95,31 @@ const TicketingFlow = () => {
                     <span className="text-2xl">
                       {userData.golden ? 'You have a platinum ticket now' : 'Share your ticket'}
                     </span>
-                    <span className="text-foreground-lighter">
-                      {userData.golden
-                        ? 'Winners will be announced on Dec 15th on X.'
-                        : 'Boost your chances of winning limited-edition swag by sharing your ticket. Winners will be announced on Dec 15th on X.'}
-                    </span>
+                    {userData.golden ? (
+                      <span className="text-foreground-lighter">
+                        Winners will be announced on Dec 15th on{' '}
+                        <Link
+                          href="https://twitter.com/supabase"
+                          target="_blank"
+                          className="underline hover:text-foreground"
+                        >
+                          twitter.com/supabase
+                        </Link>
+                      </span>
+                    ) : (
+                      <span className="text-foreground-lighter">
+                        Boost your chances of winning limited-edition swag by sharing your ticket.
+                        Winners will be announced on Dec 15th on{' '}
+                        <Link
+                          href="https://twitter.com/supabase"
+                          target="_blank"
+                          className="underline hover:text-foreground"
+                        >
+                          twitter.com/supabase
+                        </Link>
+                        .
+                      </span>
+                    )}
                   </div>
                 </m.div>
               )}

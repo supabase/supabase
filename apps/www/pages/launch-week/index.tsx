@@ -15,7 +15,7 @@ export default function TicketHome() {
 
   const TITLE = 'Supabase Launch Week X'
   const DESCRIPTION = 'Supabase Launch Week X | 11-15 December 2023'
-  const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/8/lw8-og.jpg`
+  const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/lwx/lwx-og.jpg`
 
   const ticketNumber = query.ticketNumber?.toString()
   const bgImageId = query.bgImageId?.toString()

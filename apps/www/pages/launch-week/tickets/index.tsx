@@ -22,9 +22,8 @@ interface Props {
 }
 
 const generateOgs = async (users: UserData[]) => {
-  console.log('generateOgs users', users)
   users?.map(async (user) => {
-    const ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lw8-ticket-og?username=${encodeURIComponent(
+    const ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-ticket-og?username=${encodeURIComponent(
       user.username ?? ''
     )}${!!user.golden ? '&platinum=true' : ''}`
     return await fetch(ogImageUrl)
@@ -58,8 +57,6 @@ export default function TicketsPage({ users }: Props) {
       .range(from, from + PAGE_COUNT - 1)
       .order('createdAt', { ascending: false })
   }
-
-  console.log('users', users)
 
   const loadMoreUsers = async (offset: number) => {
     if (isLast) return

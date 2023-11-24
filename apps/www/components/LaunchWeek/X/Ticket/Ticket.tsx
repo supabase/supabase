@@ -1,8 +1,7 @@
 import { useState } from 'react'
+import Image from 'next/image'
 import TicketProfile from './TicketProfile'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
-import Image from 'next/image'
-import TicketForm from './TicketForm'
 import TicketFooter from './TicketFooter'
 import { cn } from 'ui'
 import Panel from '~/components/Panel'
@@ -12,15 +11,13 @@ export default function Ticket() {
   const { golden = false, bg_image_id: bgImageId = '1' } = user
   const [imageHasLoaded, setImageHasLoaded] = useState(false)
 
-  console.log('golden', golden)
-  const storageBaseFilepath = `https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lwx`
   const fallbackImg = `/images/launchweek/lwx/tickets/lwx_ticket_bg.svg`
 
   const ticketBg = {
     regular: {
       background: `/images/launchweek/lwx/tickets/lwx_ticket_bg_regular.png`,
     },
-    golden: {
+    platinum: {
       background: `/images/launchweek/lwx/tickets/lwx_ticket_bg_platinum.png`,
     },
   }
@@ -38,7 +35,7 @@ export default function Ticket() {
         <TicketFooter />
       </div>
       <Image
-        src={ticketBg[golden ? 'golden' : 'regular'].background}
+        src={ticketBg[golden ? 'platinum' : 'regular'].background}
         alt={`Launch Week X ticket background #${bgImageId}`}
         placeholder="blur"
         blurDataURL={fallbackImg}
