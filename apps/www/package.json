@@ -37,7 +37,6 @@
     "next-mdx-remote": "^4.4.1",
     "next-seo": "^5.14.1",
     "next-themes": "^0.2.1",
-    "next-transpile-modules": "^9.0.0",
     "octokit": "^2.0.14",
     "parse-numeric-range": "^1.3.0",
     "react": "^18.2.0",
