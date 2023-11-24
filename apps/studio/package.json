@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@dagrejs/dagre": "^1.0.4",
-    "@graphiql/react": "^0.20.2",
+    "@graphiql/react": "^0.19.4",
     "@graphiql/toolkit": "^0.9.1",
     "@hcaptcha/react-hcaptcha": "^1.8.1",
     "@headlessui/react": "^1.7.17",
@@ -49,7 +49,6 @@
     "file-saver": "^2.0.5",
     "framer-motion": "^6.5.1",
     "generate-password": "^1.7.0",
-    "graphql": "^16.8.1",
     "html-to-image": "^1.10.8",
     "immutability-helper": "^3.1.1",
     "ip-address": "^8.1.0",
