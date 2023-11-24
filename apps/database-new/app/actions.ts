@@ -38,3 +38,16 @@ export async function deleteThread(threadID: string) {
 
   revalidatePath('/profile')
 }
+
+export async function updateThreadName(threadId: number, threadName: string) {
+  const cookieStore = cookies()
+  const supabase = createClient(cookieStore)
+
+  try {
+    await supabase.from('threads').update({ thread_title: threadName }).eq('id', threadId)
+  } catch (error) {
+    if (error) console.error('Error updating thread: ', error)
+  }
+
+  revalidatePath('/profile')
+}

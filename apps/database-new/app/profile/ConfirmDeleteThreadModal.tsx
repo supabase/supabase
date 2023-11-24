@@ -1,9 +1,8 @@
 'use client'
 
 import { Button, Modal } from 'ui'
-import { ThreadType } from './Threads'
 import { deleteThread } from './../../app/actions'
-// import { threadId } from 'worker_threads'
+import { ThreadType } from './Threads'
 
 const ConfirmDeleteThreadModal = ({
   thread,
@@ -14,35 +13,11 @@ const ConfirmDeleteThreadModal = ({
   onClose: () => void
   visible: boolean
 }) => {
-  // const deleteCurrentThread = () => {
-  //   const threadID = thread?.thread_id
-  //   onClose()
-  //   deleteThread(threadID!)
-  // }
-
-  // async function deleteCurrentThread(formData: FormData) {
-  //   // 'use server'
-
-  //   const action = formData.get('action') as string
-  //   const threadID = formData.get('threadID') as string
-
-  //   if (!threadID) return
-
-  //   if (action === 'delete') {
-  //     deleteThread(threadID)
-  //   }
-  // }
-
   return (
     <Modal
-      variant="danger"
-      alignFooter="right"
       size="small"
       visible={visible}
       onCancel={onClose}
-      // onConfirm={async () => {
-      //   await deleteCurrentThread()
-      // }}
       hideFooter
       header="Confirm to delete thread?"
       className="pb-2"
