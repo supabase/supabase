@@ -31,12 +31,6 @@ const Thread = ({
   const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
 
-  //[Joshen] Just FYI Terry sorry i had to peel out your form component here which handled the delete
-  // Ideal UX for delete is to have a confirmation modal, and edit to be in a modal too so need client
-  // <form action={handleThreadActions} className="flex gap-2 items-center">
-  //   <input type="hidden" name="threadID" value={thread.thread_id} />
-  // </form>
-
   return (
     <>
       <div
