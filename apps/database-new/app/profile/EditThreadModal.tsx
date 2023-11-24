@@ -1,9 +1,9 @@
 'use client'
 
-import { Button, Input, Modal } from 'ui'
+import { useFormState, useFormStatus } from 'react-dom'
+import { Button, Input_Shadcn_, Label_Shadcn_, Modal } from 'ui'
 import { updateThreadName } from './../../app/actions'
 import { ThreadType } from './Threads'
-import { useState } from 'react'
 
 const EditThreadModal = ({
   thread,
@@ -14,7 +14,23 @@ const EditThreadModal = ({
   onClose: () => void
   visible: boolean
 }) => {
-  const [value, setValue] = useState(thread.thread_title)
+  const initialState = {
+    threadName: thread.thread_title,
+  }
+
+  const [state, formAction] = useFormState(updateThreadName, {
+    threadName: thread.thread_title,
+  })
+
+  function SubmitButton() {
+    const { pending } = useFormStatus()
+
+    return (
+      <Button type="secondary" htmlType="submit" aria-disabled={pending} loading={pending}>
+        Update thread name
+      </Button>
+    )
+  }
 
   return (
     <Modal
@@ -26,31 +42,18 @@ const EditThreadModal = ({
       header="Edit thread name"
       className="pb-2"
     >
-      <form
-        action={(formData: FormData) => {
-          const threadNameEntry: FormDataEntryValue | null = formData.get('threadName')
-
-          // Check if threadNameEntry is not null and is of type string
-          if (threadNameEntry !== null && typeof threadNameEntry === 'string') {
-            const threadName: string = threadNameEntry
-            updateThreadName(thread.id, threadName)
-          }
-        }}
-      >
+      <form action={formAction}>
         <Modal.Content className="py-4">
-          <Input
-            label="Provide a name for your thread"
-            value={value}
-            name="threadName"
-            onChange={(e) => setValue(e.target.value)}
-          />
+          <Label_Shadcn_ htmlFor="threadName">Provide a name for your thread</Label_Shadcn_>
+          <Input_Shadcn_ type="text" name="threadName" id="threadName" required />
         </Modal.Content>
         <Modal.Separator />
         <Modal.Content className="flex flex-row gap-3 justify-end">
           <Button type="default">Cancel</Button>
-          <Button type="secondary" htmlType="submit">
-            Update thread name
-          </Button>
+          <SubmitButton />
+          <p aria-live="polite" className="sr-only">
+            {state?.message}
+          </p>
         </Modal.Content>
       </form>
     </Modal>

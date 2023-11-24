@@ -45,9 +45,8 @@ export async function updateThreadName(threadId: number, threadName: string) {
 
   try {
     await supabase.from('threads').update({ thread_title: threadName }).eq('id', threadId)
+    return revalidatePath('/profile')
   } catch (error) {
-    if (error) console.error('Error updating thread: ', error)
+    return error
   }
-
-  revalidatePath('/profile')
 }
