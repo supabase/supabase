@@ -7,6 +7,11 @@ import Threads from './Threads'
 
 dayjs.extend(relativeTime)
 
+// revalidatePath not working in the create route handler
+// force-dynamic to refetch every time if needed
+// just a hack for now
+// export const dynamic = 'force-dynamic'
+
 const Profile = async () => {
   const cookieStore = cookies()
   const supabase = createClient(cookieStore)
