@@ -53,7 +53,7 @@ const Profile = async () => {
 
         <div className="w-full h-px border-t" />
 
-        {/* <Threads threads={threads} handleThreadActions={handleThreadActions} /> */}
+        <Threads threads={threads} handleThreadActions={handleThreadActions} />
       </div>
     </div>
   )
