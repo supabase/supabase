@@ -17,15 +17,7 @@ import EditThreadModal from './EditThreadModal'
 import { ThreadType } from './Threads'
 import { useState } from 'react'
 
-const Thread = ({
-  thread,
-}: // handleThreadActions,
-// onSelectEdit,
-// onSelectDelete,
-{
-  thread: ThreadType
-  // handleThreadActions: (formData: FormData) => void
-}) => {
+const Thread = ({ thread }: { thread: ThreadType }) => {
   const formattedTimeAgo = timeAgo(thread.created_at)
 
   const [editOpen, setEditOpen] = useState(false)
