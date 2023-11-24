@@ -60,9 +60,9 @@ export const Chat = () => {
     <div
       className={cn(
         'bg',
-        'border-r relative',
+        'border-t xl:border-t-0 xl:border-r relative',
         'flex flex-col h-full border-r',
-        'w-[400px] 2xl:w-[500px]'
+        'w-full xl:w-[400px] 2xl:w-[500px]'
       )}
     >
       <div className="flex flex-col grow items-between">
@@ -72,7 +72,7 @@ export const Chat = () => {
           </div>
         ) : (
           <ScrollArea className="grow h-px">
-            <div className="flex flex-col py-6">
+            <div className="flex flex-col py-2 xl:py-6">
               {userMessages.map((message, idx) => {
                 const index = messages.indexOf(message)
                 const reply = messages[index + 1] as AssistantMessage

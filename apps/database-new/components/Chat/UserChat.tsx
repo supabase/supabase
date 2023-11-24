@@ -27,7 +27,7 @@ const UserChat = ({ message, reply, isLatest, isSelected, isLoading }: UserChatP
     <div
       className={cn(
         'group',
-        'transition flex w-full gap-x-5 px-8 hover:bg-surface-200/50 cursor-pointer border-r',
+        'transition flex w-full gap-x-5 px-4 xl:px-8 hover:bg-surface-200/50 cursor-pointer border-r',
         isSelected && 'bg-surface-200',
         isSelected ? 'border-r-foreground' : 'border-r border-r-transparent'
       )}

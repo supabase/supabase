@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import OpenAI from 'openai'
+import { revalidatePath } from 'next/cache'
 
 const openai = new OpenAI()
 
@@ -51,6 +52,8 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error(error)
   }
+
+  revalidatePath('/profile')
 
   return Response.json({ threadId: thread.id, runId: run.id })
 }

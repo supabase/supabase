@@ -1,9 +1,10 @@
 import '@ui/layout/ai-icon-animation/ai-icon-animation-style.module.css'
 import './globals.css'
 
-import Header from '@/components/Header'
+import Header from '@/components/Header/Header'
 import { ReactQueryProvider, ThemeProvider } from '@/components/providers'
 import type { Metadata } from 'next'
+import Footer from '@/components/Footer'
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -11,7 +12,7 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: 'database.new',
+  title: 'database.design',
   description: 'Generate schemas from your ideas',
 }
 
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <main role="main" className="grow">
                 {children}
               </main>
+              <Footer />
             </div>
           </ReactQueryProvider>
         </ThemeProvider>
