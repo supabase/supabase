@@ -23,7 +23,7 @@
     "next": "^14.0.3",
     "openai": "^4.17.0",
     "react": "^18.2.0",
-    "react-dom": "0.0.0-experimental-fbc9b68d6-20231123",
+    "react-dom": "^18.2.0",
     "react-flow": "^1.0.3",
     "sql-formatter": "^13.1.0",
     "ui": "*",
