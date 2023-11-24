@@ -29,7 +29,7 @@ export async function handler(req: Request) {
         BG: '#040404',
       },
       PLATINUM: {
-        BG: '#ffffff',
+        BG: 'radial-gradient(100% 150% at 80% 0%, #757575, #ffffff)',
       },
     }
 
@@ -40,7 +40,7 @@ export async function handler(req: Request) {
             width: '1200px',
             height: '628px',
             position: 'relative',
-            backgroundColor: STYLE_CONFIG[platinum ? 'PLATINUM' : 'REG'].BG,
+            background: STYLE_CONFIG[platinum ? 'PLATINUM' : 'REG'].BG,
             overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
@@ -56,7 +56,7 @@ export async function handler(req: Request) {
             src={ticketImg}
             style={{
               borderRadius: '26px',
-              boxShadow: '0px 1px 27px rgba(214, 214, 214, 0.06), 0 80px 40#222022cc 21, 0.2)',
+              boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.15)',
             }}
           />
         </div>
