@@ -39,38 +39,41 @@ const Thread = ({
 
   return (
     <>
-      <Link
-        className="flex text-sm group-hover:underline truncate"
-        href={`/${thread.thread_id}/${thread.run_id}`}
+      <div
+        key={thread.id}
+        className="group w-full flex flex-row items-center gap-6  border rounded pl-5 pr-2 transition bg-surface-100 hover:bg-surface-200 h-14"
       >
-        <div
-          key={thread.id}
-          className="group w-full flex flex-row items-center gap-6  border rounded px-5 transition bg-surface-100 hover:bg-surface-200 h-14"
-        >
-          <div className="flex flex-col grow overflow-hidden">
+        <div className="flex flex-col grow overflow-hidden">
+          <Link
+            className="flex text-sm group-hover:underline truncate"
+            href={`/${thread.thread_id}/${thread.run_id}`}
+          >
             <span className="truncate">{thread.thread_title}</span>
-
-            <span className="text-xs text-foreground-light">Last updated {formattedTimeAgo}</span>
-          </div>
-          <div className="flex shrink">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button type="text" icon={<IconMoreVertical />} className="px-1" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-32" align="end">
-                <DropdownMenuItem className="space-x-2" onClick={() => setEditOpen(true)}>
-                  <IconEdit2 size={14} />
-                  <p>Edit name</p>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="space-x-2" onClick={() => setDeleteOpen(true)}>
-                  <IconTrash2 size={14} />
-                  <p>Delete thread</p>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+          </Link>
+          <span className="text-xs text-foreground-lighter font-mono">
+            Last updated {formattedTimeAgo}
+          </span>
         </div>
-      </Link>
+        <div className="flex shrink">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="px-1 group">
+                <IconMoreVertical size={14} className="text-light group-hover:text" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-32" align="end">
+              <DropdownMenuItem className="space-x-2" onClick={() => setEditOpen(true)}>
+                <IconEdit2 size={14} />
+                <p>Edit name</p>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="space-x-2" onClick={() => setDeleteOpen(true)}>
+                <IconTrash2 size={14} />
+                <p>Delete thread</p>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
 
       <ConfirmDeleteThreadModal
         key={`${thread.id}-delete-dialog`}
