@@ -1,96 +1,22 @@
-import dayjs from 'dayjs'
-import { compact, kebabCase, sortBy, take } from 'lodash'
-import { Copy, FileDiff } from 'lucide-react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { compact, sortBy } from 'lodash'
 import Image from 'next/image'
 import OpenAI from 'openai'
-import { useEffect, useMemo, useRef } from 'react'
-import ReactMarkdown from 'react-markdown'
-import { format } from 'sql-formatter'
-import { AiIcon, Button, Input } from 'ui'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import {
+  AiIcon,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  Form_Shadcn_,
+  Input_Shadcn_,
+} from 'ui'
+import * as z from 'zod'
 
-import CodeEditor from 'components/ui/CodeEditor'
 import { useProfile } from 'lib/profile'
-
-const Avatar = ({ src }: { src: string | undefined }) => {
-  return (
-    <div className="relative border shadow-lg w-8 h-8 rounded-full overflow-hidden">
-      <Image src={src || ''} width={30} height={30} alt="avatar" className="relative" />
-    </div>
-  )
-}
-
-const Message = ({
-  icon,
-  postedBy,
-  postedAt,
-  message,
-  onDiff,
-}: {
-  icon: React.ReactNode
-  postedBy: string
-  postedAt?: number
-  message: string
-  onDiff: (s: string) => void
-}) => {
-  return (
-    <div className="flex flex-col py-4 gap-4 border-y border px-5">
-      <div className="flex flex-row gap-3 items-center">
-        {icon}
-
-        <span className="text-sm">{postedBy}</span>
-        {postedAt && (
-          <span className="text-xs text-foreground-muted">{dayjs(postedAt * 1000).fromNow()}</span>
-        )}
-      </div>
-      <ReactMarkdown
-        components={{
-          p: ({ children }) => <div className="text-foreground-light text-sm">{children}</div>,
-          // intentionally rendering as pre. The other approach would be to render as code element,
-          // but that will render <code> elements which appear in the explanations as Monaco editors.
-          pre: ({ children }) => {
-            const code = (children[0] as any).props.children[0] as string
-            let formatted = code
-            try {
-              formatted = format(code)
-            } catch {}
-
-            // create a key from the name of the generated policy so that we're sure it's unique
-            const key = kebabCase(take(code.split(' '), 3).join(' '))
-
-            return (
-              <div className="relative group" key={key}>
-                <CodeEditor
-                  id={`rls-sql_${key}`}
-                  language="pgsql"
-                  className="h-96"
-                  value={formatted}
-                  isReadOnly
-                  options={{ scrollBeyondLastLine: false }}
-                />
-                <div className="absolute top-3 right-3 bg-surface-100 border-muted border rounded-lg h-[28px] hidden group-hover:block">
-                  <Button type="text" size="tiny" onClick={() => onDiff(formatted)}>
-                    <FileDiff className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    type="text"
-                    size="tiny"
-                    onClick={() => navigator.clipboard.writeText(formatted).then()}
-                  >
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            )
-          },
-        }}
-        // {...props}
-        className="gap-2.5 flex flex-col"
-      >
-        {message}
-      </ReactMarkdown>
-    </div>
-  )
-}
+import { Loader2 } from 'lucide-react'
+import Message from './Message'
 
 export const AIPolicyChat = ({
   messages,
@@ -104,6 +30,9 @@ export const AIPolicyChat = ({
   onDiff: (s: string) => void
 }) => {
   const { profile } = useProfile()
+  // [Joshen] Separate state here as there's a delay between submitting and the API updating the loading status
+  const [isLoading, setIsLoading] = useState(false)
+
   const bottomRef = useRef<HTMLDivElement>(null)
   const name = compact([profile?.first_name, profile?.last_name]).join(' ')
   const sorted = useMemo(() => {
@@ -115,10 +44,25 @@ export const AIPolicyChat = ({
     })
   }, [messages])
 
+  const FormSchema = z.object({ chat: z.string() })
+  const form = useForm<z.infer<typeof FormSchema>>({
+    mode: 'onBlur',
+    reValidateMode: 'onBlur',
+    resolver: zodResolver(FormSchema),
+    defaultValues: { chat: '' },
+  })
+
   useEffect(() => {
     // 👇️ scroll to bottom every time messages change
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages.length])
+
+  useEffect(() => {
+    if (!loading) {
+      form.setValue('chat', '')
+      setIsLoading(false)
+    }
+  }, [loading])
 
   return (
     <div className="flex flex-col h-full">
@@ -137,7 +81,7 @@ export const AIPolicyChat = ({
         {sorted.map((m) => {
           const content = m.content[0]
           if (content && content.type !== 'text') {
-            return <></>
+            return null
           }
 
           return (
@@ -147,7 +91,15 @@ export const AIPolicyChat = ({
                 m.role === 'assistant' ? (
                   <AiIcon className="[&>div>div]:border-white" />
                 ) : (
-                  <Avatar src={`https://github.com/${profile?.username}.png`} />
+                  <div className="relative border shadow-lg w-8 h-8 rounded-full overflow-hidden">
+                    <Image
+                      src={`https://github.com/${profile?.username}.png` || ''}
+                      width={30}
+                      height={30}
+                      alt="avatar"
+                      className="relative"
+                    />
+                  </div>
                 )
               }
               postedBy={m.role === 'assistant' ? 'Assistant' : name ? name : 'You'}
@@ -160,25 +112,37 @@ export const AIPolicyChat = ({
 
         <div ref={bottomRef} className="h-1" />
       </div>
-      <form
-        id="rls-chat"
-        onSubmit={(e) => {
-          e.preventDefault()
-          const value = (e.target as any)['chat-message'].value
-          onSubmit(value)
-        }}
-        className="sticky p-5 flex-0"
-      >
-        <Input
-          id="chat-message"
-          icon={<AiIcon className="[&>div>div]:border-white" />}
-          placeholder="Ask for some changes to your policy"
-          autoFocus
-          disabled={loading}
-          className="bg-black rounded-full"
-          inputClassName="!rounded-full"
-        />
-      </form>
+      <Form_Shadcn_ {...form}>
+        <form
+          id="rls-chat"
+          className="sticky p-5 flex-0"
+          onSubmit={form.handleSubmit((data: z.infer<typeof FormSchema>) => {
+            setIsLoading(true)
+            onSubmit(data.chat)
+          })}
+        >
+          <FormField_Shadcn_
+            control={form.control}
+            name="chat"
+            render={({ field }) => (
+              <FormItem_Shadcn_>
+                <FormControl_Shadcn_>
+                  <div className="relative">
+                    <AiIcon className="absolute top-2 left-3 [&>div>div]:border-white" />
+                    <Input_Shadcn_
+                      {...field}
+                      disabled={isLoading}
+                      className={`bg-black rounded-full pl-10 ${isLoading ? 'pr-10' : ''}`}
+                      placeholder="Ask for some changes to your policy"
+                    />
+                    {isLoading && <Loader2 className="absolute top-2 right-3 animate-spin" />}
+                  </div>
+                </FormControl_Shadcn_>
+              </FormItem_Shadcn_>
+            )}
+          />
+        </form>
+      </Form_Shadcn_>
     </div>
   )
 }
