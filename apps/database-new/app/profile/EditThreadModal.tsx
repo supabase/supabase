@@ -1,3 +1,4 @@
+'use client'
 import { Input, Modal } from 'ui'
 import { ThreadType } from './Threads'
 import { useEffect, useState } from 'react'

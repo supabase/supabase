@@ -1,3 +1,4 @@
+'use client'
 import { Modal } from 'ui'
 import { ThreadType } from './Threads'
 import { deleteThread } from '@/lib/actions'

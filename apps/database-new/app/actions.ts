@@ -6,8 +6,6 @@ import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 
 export async function logout() {
-  //   await submitForm()
-  console.log('hello')
   const cookieStore = cookies()
   const supabase = createClient(cookieStore)
 

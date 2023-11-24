@@ -4,6 +4,7 @@ import { default as dayjs, default as relativeTime } from 'dayjs'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import Threads from './Threads'
+import { Suspense } from 'react'
 
 dayjs.extend(relativeTime)
 
@@ -21,9 +22,6 @@ const Profile = async () => {
   } = await supabase.auth.getUser()
 
   if (!user) redirect('/')
-
-  const { data } = await supabase.from('threads').select().eq('user_id', user.id)
-  const threads = data ?? []
 
   async function handleThreadActions(formData: FormData) {
     'use server'
@@ -58,9 +56,12 @@ const Profile = async () => {
 
         <div className="w-full h-px border-t" />
 
-        <Threads threads={threads} handleThreadActions={handleThreadActions} />
+        <Suspense fallback={<div>Loading...</div>}>
+          <Threads handleThreadActions={handleThreadActions} />
+        </Suspense>
       </div>
     </div>
   )
 }
+
 export default Profile
