@@ -1,71 +1,65 @@
-'use client'
-import { CHAT_EXAMPLES } from '@/data/chat-examples'
-import { useMutation } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
-import { Input, Input_Shadcn_, cn } from 'ui'
+import { createRef, forwardRef, useEffect } from 'react'
+import { TextArea_Shadcn_, cn } from 'ui'
 
-interface ChatInputParams {
-  userID: string | undefined
+export interface TextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+  loading: boolean
+  handleSubmit: () => void
 }
 
-const suggestions = CHAT_EXAMPLES
+const ChatInputAtom = forwardRef<HTMLTextAreaElement, TextAreaProps>(
+  ({ className, loading, handleSubmit, ...props }) => {
+    const ref = createRef<HTMLTextAreaElement>()
 
-const ChatInput = ({ userID }: ChatInputParams) => {
-  const router = useRouter()
-  const [value, setValue] = useState('')
+    useEffect(() => {
+      if (!props.value && ref && ref.current) {
+        ref.current.style.height = '40px'
+      } else if (ref && ref.current) {
+        console.log('ref.current.scrollHeight', ref.current.scrollHeight)
+        const newHeight = ref.current.scrollHeight + 'px'
+        console.log('new height', newHeight)
+        ref.current.style.height = newHeight
+      }
+    }, [props.value])
 
-  const { mutate, isPending, isSuccess } = useMutation({
-    mutationFn: async (prompt: string) => {
-      const body = { prompt, userID } // Include userID in the body object
+    useEffect(() => {
+      ref?.current?.focus()
+    }, [props.value])
 
-      const response = await fetch('/api/ai/sql/threads/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      })
-      const result = await response.json()
-      return result
-    },
-    onSuccess(data) {
-      const url = `/${data.threadId}/${data.runId}`
-      router.push(url)
-    },
-  })
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      // Check if the pressed key is "Enter" (key code 13)
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault()
+        // Manually submit the form
+        // value is handled by parent component
+        handleSubmit()
+      }
+    }
 
-  return (
-    <>
-      <div className="flex items-center gap-x-1.5 font-mono font-bold text-xl">
-        <span>database</span>
-        <div className="w-1.5 h-1.5 rounded-full bg-purple-900"></div>
-        <span>design</span>
-      </div>
-      <div className="relative w-10/12 xl:w-11/12 max-w-xl">
-        <div
-          className={cn('absolute', 'top-4 left-4', 'ml-1 w-2 h-2 rounded-full bg-purple-900')}
-        />
-        <Input_Shadcn_
+    return (
+      <form className="relative">
+        <div className={cn('absolute', 'top-2 left-2', 'ml-1 w-6 h-6 rounded-full bg-dbnew')}></div>
+        <TextArea_Shadcn_
           autoFocus
-          type=""
-          value={value}
-          className={'rounded-full text-sm pl-10'}
-          placeholder="e.g Create a Telegram-like chat application"
-          disabled={isPending || isSuccess}
-          onKeyDown={(e) => {
-            if (e.code === 'Enter') {
-              if (value.length > 0) mutate(value)
-            }
-          }}
-          onChange={(e) => setValue(e.target.value)}
+          className={
+            'transition-all text-sm pl-12 pr-10 rounded-[18px] resize-none box-border leading-6'
+          }
+          ref={ref}
+          spellCheck={false}
+          onKeyDown={handleKeyDown}
+          {...props}
         />
-        <div className="absolute right-2 top-1">
-          {isPending || isSuccess ? (
-            <div className="mr-1">
-              <Loader2 size={22} className="animate-spin" />
-            </div>
+        <div className="absolute right-1.5 top-1.5 flex gap-3 items-center">
+          {loading ? (
+            <Loader2 size={22} className="animate-spin w-7 h-7 text-muted" strokeWidth={1} />
           ) : (
-            <div className="flex items-center justify-center w-7 h-7 bg-surface-300 border border-control rounded-full mr-0.5 p-1.5">
+            <div
+              className={cn(
+                'transition-all',
+                'flex items-center justify-center w-7 h-7 border border-control rounded-full mr-0.5 p-1.5 background-alternative',
+                !props.value ? 'text-muted opacity-50' : 'text-default opacity-100'
+              )}
+            >
               <svg
                 width="16"
                 height="16"
@@ -83,25 +77,11 @@ const ChatInput = ({ userID }: ChatInputParams) => {
             </div>
           )}
         </div>
-      </div>
+      </form>
+    )
+  }
+)
 
-      <div className="flex items-center space-x-2">
-        {suggestions.map((suggestion, idx) => (
-          <button
-            key={idx}
-            className={cn(
-              'transition border rounded-full px-4 py-2',
-              'text-light',
-              'hover:border-stronger hover:text'
-            )}
-            onClick={() => setValue(suggestion.prompt)}
-          >
-            <p className="text-xs">{suggestion.label}</p>
-          </button>
-        ))}
-      </div>
-    </>
-  )
-}
+ChatInputAtom.displayName = 'ChatInputAtom'
 
-export default ChatInput
+export { ChatInputAtom }

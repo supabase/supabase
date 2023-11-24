@@ -1,5 +1,5 @@
 'use client'
-import { ChatInputAtom } from '@/components/Chat/ChatInputAtom'
+import { ChatInputAtom } from '@/components/Chat/ChatInput'
 import { CHAT_EXAMPLES } from '@/data/chat-examples'
 import { useMutation } from '@tanstack/react-query'
 import { ExternalLink } from 'lucide-react'
