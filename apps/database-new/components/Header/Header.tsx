@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 import CurrentThreadName from './CurrentThreadName'
 import Link from 'next/link'
+import UserDropdown from './UserDropdown'
 
 const Header = async () => {
   const cookieStore = cookies()
@@ -28,8 +29,10 @@ const Header = async () => {
 
         <CurrentThreadName />
       </div>
-
-      <HeaderActions user={user} />
+      <div className="flex gap-3">
+        <HeaderActions user={user} />
+        <UserDropdown />
+      </div>
     </nav>
   )
 }
