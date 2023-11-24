@@ -24,19 +24,31 @@ export async function logout() {
   redirect('/')
 }
 
-export async function deleteThread(threadID: string) {
+export async function deleteThread(prevState: any, formData: FormData) {
   const cookieStore = cookies()
   const supabase = createClient(cookieStore)
 
   try {
-    await supabase.from('threads').delete().eq('thread_id', threadID)
-  } catch (error) {
-    if (error) console.error('Error deleting thread: ', error)
+    const thread_id: string = formData.get('thread_id')
+
+    if (!thread_id) throw new Error('thread_id is required')
+
+    const { data } = await supabase.from('threads').delete().eq('thread_id', thread_id)
+    await openai.beta.threads.del(thread_id)
+
+    revalidatePath('/profile')
+
+    return {
+      success: true,
+      data,
+    }
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message,
+      error,
+    }
   }
-
-  await openai.beta.threads.del(threadID)
-
-  revalidatePath('/profile')
 }
 
 export async function updateThreadName(prevState: any, formData: FormData) {
@@ -45,7 +57,7 @@ export async function updateThreadName(prevState: any, formData: FormData) {
 
   try {
     const thread_title: string = formData.get('thread_title')
-    const row_id: string = formData.get('row_id')
+    const thread_id: string = formData.get('row_id')
 
     if (!thread_title) throw new Error('Thread title is required')
 

@@ -1,11 +1,11 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 // @ts-expect-error
 import { useFormState, useFormStatus } from 'react-dom'
 import { Button, Input_Shadcn_, Label_Shadcn_, Modal } from 'ui'
 import { updateThreadName } from './../../app/actions'
 import { ThreadType } from './Threads'
-import { useEffect, useState } from 'react'
 
 const EditThreadModal = ({
   thread,
@@ -62,14 +62,7 @@ const EditThreadModal = ({
             value={threadTitle}
             onChange={(e) => setThreadTitle(e.target.value)}
           />
-          <Input_Shadcn_
-            name="row_id"
-            id="row_id"
-            required
-            type="hidden"
-            className=""
-            value={thread.id}
-          />
+          <Input_Shadcn_ name="row_id" id="row_id" required type="hidden" value={thread.id} />
         </Modal.Content>
         <Modal.Separator />
         <Modal.Content className="flex flex-row gap-3 justify-end">
