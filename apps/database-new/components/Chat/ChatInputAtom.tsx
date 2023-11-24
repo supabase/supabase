@@ -1,24 +1,57 @@
 import { Loader2 } from 'lucide-react'
-import { forwardRef } from 'react'
-import { Input_Shadcn_, cn } from 'ui'
+import { createRef, forwardRef, useEffect } from 'react'
+import { TextArea_Shadcn_, cn } from 'ui'
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface TextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   loading: boolean
+  handleSubmit: () => void
 }
 
-const ChatInputAtom = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, loading, ...props }, ref) => {
+const ChatInputAtom = forwardRef<HTMLTextAreaElement, TextAreaProps>(
+  ({ className, loading, handleSubmit, ...props }) => {
+    const ref = createRef<HTMLTextAreaElement>()
+
+    useEffect(() => {
+      if (!props.value && ref && ref.current) {
+        ref.current.style.height = '40px'
+      } else if (ref && ref.current) {
+        console.log('ref.current.scrollHeight', ref.current.scrollHeight)
+        const newHeight = ref.current.scrollHeight + 'px'
+        console.log('new height', newHeight)
+        ref.current.style.height = newHeight
+      }
+    }, [props.value])
+
+    useEffect(() => {
+      ref?.current?.focus()
+    }, [props.value])
+
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      // Check if the pressed key is "Enter" (key code 13)
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault()
+        // Manually submit the form
+        // value is handled by parent component
+        handleSubmit()
+      }
+    }
+
     return (
-      <div className="relative w-10/12 xl:w-11/12 max-w-xl">
-        <div
-          className={cn('absolute', 'top-4 left-4', 'ml-1 w-2 h-2 rounded-full bg-purple-900')}
+      <form className="relative">
+        <div className={cn('absolute', 'top-2 left-2', 'ml-1 w-6 h-6 rounded-full bg-dbnew')}></div>
+        <TextArea_Shadcn_
+          autoFocus
+          className={
+            'transition-all text-sm pl-12 pr-10 rounded-[18px] resize-none box-border leading-6'
+          }
+          ref={ref}
+          spellCheck={false}
+          onKeyDown={handleKeyDown}
+          {...props}
         />
-        <Input_Shadcn_ autoFocus className={'rounded-full text-sm pl-10'} {...props} />
-        <div className="absolute right-2 top-1">
+        <div className="absolute right-1.5 top-1.5 flex gap-3 items-center">
           {loading ? (
-            <div className="mr-1">
-              <Loader2 size={22} className="animate-spin" />
-            </div>
+            <Loader2 size={22} className="animate-spin w-7 h-7 text-muted" strokeWidth={1} />
           ) : (
             <div className="flex items-center justify-center w-7 h-7 bg-surface-300 border border-control rounded-full mr-0.5 p-1.5">
               <svg
@@ -38,7 +71,7 @@ const ChatInputAtom = forwardRef<HTMLInputElement, InputProps>(
             </div>
           )}
         </div>
-      </div>
+      </form>
     )
   }
 )

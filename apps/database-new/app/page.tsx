@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
-import NewThreadInput from './new-thread-input'
+import NewThreadInput from './NewThreadInput'
 
 export const metadata: Metadata = {
   title: 'database.design | Create',
@@ -23,7 +23,7 @@ const NewThread = async () => {
         <div className="w-1.5 h-1.5 rounded-full bg-purple-900"></div>
         <span>design</span>
       </div>
-      <NewThreadInput />
+      <NewThreadInput userID={user?.id} />
     </div>
   )
 }

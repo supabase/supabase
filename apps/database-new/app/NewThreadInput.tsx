@@ -2,6 +2,7 @@
 import { ChatInputAtom } from '@/components/Chat/ChatInputAtom'
 import { CHAT_EXAMPLES } from '@/data/chat-examples'
 import { useMutation } from '@tanstack/react-query'
+import { ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { cn } from 'ui'
@@ -36,34 +37,40 @@ const NewThreadInput = ({ userID }: ChatInputParams) => {
 
   return (
     <>
-      <ChatInputAtom
-        autoFocus
-        type=""
-        value={value}
-        className={'rounded-full text-sm pl-10'}
-        placeholder="e.g Create a Telegram-like chat application"
-        disabled={isPending || isSuccess}
-        loading={isPending || isSuccess}
-        onKeyDown={(e) => {
-          if (e.code === 'Enter') {
+      <div className="relative w-10/12 xl:w-11/12 max-w-xl">
+        <ChatInputAtom
+          handleSubmit={() => {
             if (value.length > 0) mutate(value)
-          }
-        }}
-        onChange={(e) => setValue(e.target.value)}
-      />
-
-      <div className="flex items-center space-x-2">
+          }}
+          autoFocus
+          value={value}
+          rows={1}
+          contentEditable
+          aria-expanded={false}
+          placeholder="e.g Create a Telegram-like chat application"
+          disabled={isPending || isSuccess}
+          loading={isPending || isSuccess}
+          onChange={(e) => setValue(e.target.value)}
+        />
+      </div>
+      <div className="flex gap-3">
         {suggestions.map((suggestion, idx) => (
           <button
             key={idx}
             className={cn(
-              'transition border rounded-full px-4 py-2',
+              'text-xs',
+              'flex items-center gap-3 !pr-3',
+              'transition border rounded-full px-3 py-1.5',
               'text-light',
               'hover:border-stronger hover:text'
             )}
-            onClick={() => setValue(suggestion.prompt)}
+            onClick={(event) => {
+              setValue(suggestion.prompt)
+              event.preventDefault()
+            }}
           >
-            <p className="text-xs">{suggestion.label}</p>
+            {suggestion.label}
+            <ExternalLink size={12} />
           </button>
         ))}
       </div>
