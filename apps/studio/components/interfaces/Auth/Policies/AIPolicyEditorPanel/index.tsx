@@ -174,6 +174,23 @@ export const AIPolicyEditorPanel = memo(function ({
     if (error === undefined || policy === undefined) return
 
     setAssistantPanel(true)
+    const messageId = uuidv4()
+
+    const assistantMessageBefore: ThreadMessage = {
+      id: messageId,
+      object: 'thread.message',
+      role: 'assistant',
+      file_ids: [],
+      metadata: { type: 'debug' },
+      content: [{ type: 'text', text: { value: 'Thinking...', annotations: [] } }],
+      created_at: Math.floor(Number(new Date()) / 1000),
+      assistant_id: null,
+      thread_id: ids?.threadId ?? '',
+      run_id: ids?.runId ?? '',
+    }
+
+    setDebugThread([...debugThread, assistantMessageBefore])
+
     const { solution, sql } = await debugSql({
       sql: policy.trim(),
       errorMessage: error.message,
@@ -181,21 +198,23 @@ export const AIPolicyEditorPanel = memo(function ({
     })
 
     // Temporarily to make sure that debugSQL output matches messages from RLS suggest query
-    const message = {
-      id: uuidv4(),
+    const assistantMessageAfter: ThreadMessage = {
+      id: messageId,
       object: 'thread.message',
       role: 'assistant',
       file_ids: [],
       metadata: { type: 'debug' },
       content: [
-        { type: 'text', value: solution },
-        { type: 'sql', value: sql },
+        { type: 'text', text: { value: solution, annotations: [] } },
+        { type: 'text', text: { value: sql, annotations: [] } },
       ],
       created_at: Math.floor(Number(new Date()) / 1000),
-      assistant_id: undefined,
-      thread_id: undefined,
-      run_id: undefined,
+      assistant_id: null,
+      thread_id: ids?.threadId ?? '',
+      run_id: ids?.runId ?? '',
     }
+
+    setDebugThread([...debugThread, assistantMessageAfter])
   }
 
   // when the panel is closed, reset all values
@@ -211,7 +230,7 @@ export const AIPolicyEditorPanel = memo(function ({
     }
   }, [visible])
 
-  const messages = isSuccess ? [...data.messages, ...debugThread] : []
+  const messages = [...(isSuccess ? data.messages : []), ...debugThread]
 
   return (
     <SidePanel
