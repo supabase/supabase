@@ -142,8 +142,6 @@ function Input({
   if (disabled) inputClasses.push(__styles.disabled)
   if (inputClassName) inputClasses.push(inputClassName)
 
-  console.log(cn(inputClasses))
-
   return (
     <FormLayout
       label={label}
