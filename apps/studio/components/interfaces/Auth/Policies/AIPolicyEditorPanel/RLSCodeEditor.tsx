@@ -5,6 +5,9 @@ import { cn } from 'ui'
 
 import { alignEditor } from 'components/ui/CodeEditor'
 
+// [Joshen] Is there a way we can just have one single MonacoEditor component that's shared across the dashboard?
+// Feels like we're creating multiple copies of Editor
+
 interface RLSCodeEditorProps {
   id: string
   defaultValue?: string

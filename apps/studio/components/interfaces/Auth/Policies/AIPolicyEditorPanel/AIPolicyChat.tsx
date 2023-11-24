@@ -37,9 +37,9 @@ const Message = ({
       <div className="flex flex-row gap-3 items-center">
         {icon}
 
-        <span>{postedBy}</span>
+        <span className="text-sm">{postedBy}</span>
         {postedAt && (
-          <span className="text-foreground-muted">{dayjs(postedAt * 1000).fromNow()}</span>
+          <span className="text-xs text-foreground-muted">{dayjs(postedAt * 1000).fromNow()}</span>
         )}
       </div>
       <ReactMarkdown
@@ -133,6 +133,7 @@ export const AIPolicyChat = ({
         learn and improve.`}
           onDiff={() => {}}
         />
+
         {sorted.map((m) => {
           const content = m.content[0]
           if (content && content.type !== 'text') {
@@ -156,6 +157,7 @@ export const AIPolicyChat = ({
             />
           )
         })}
+
         <div ref={bottomRef} className="h-1" />
       </div>
       <form
@@ -170,7 +172,7 @@ export const AIPolicyChat = ({
         <Input
           id="chat-message"
           icon={<AiIcon className="[&>div>div]:border-white" />}
-          placeholder="Ask AI to edit"
+          placeholder="Ask for some changes to your policy"
           autoFocus
           disabled={loading}
           className="bg-black rounded-full"

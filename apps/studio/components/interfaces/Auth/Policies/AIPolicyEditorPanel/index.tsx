@@ -10,11 +10,15 @@ import {
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useRlsSuggestMutation } from 'data/ai/rls-suggest-mutation'
 import { useRlsSuggestQuery } from 'data/ai/rls-suggest-query'
+import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
-import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useSelectedProject, useStore } from 'hooks'
+import { uuidv4 } from 'lib/helpers'
+import { ThreadMessage } from 'openai/resources/beta/threads/messages/messages'
 import { AIPolicyChat } from './AIPolicyChat'
 import { AIPolicyHeader } from './AIPolicyHeader'
+import QueryError from './QueryError'
 import RLSCodeEditor from './RLSCodeEditor'
 
 const DiffEditor = dynamic(
@@ -38,25 +42,17 @@ export const AIPolicyEditorPanel = memo(function ({
 }: AIPolicyEditorPanelProps) {
   const { meta } = useStore()
   const selectedProject = useSelectedProject()
-  const [incomingChange, setIncomingChange] = useState<string | undefined>(undefined)
-  // used for confirmation when closing the panel with unsaved changes
-  const [isClosingPolicyEditorPanel, setIsClosingPolicyEditorPanel] = useState(false)
 
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
 
+  const [error, setError] = useState<QueryResponseError>()
+  const [debugThread, setDebugThread] = useState<ThreadMessage[]>([])
   const [assistantVisible, setAssistantPanel] = useState(false)
   const [ids, setIds] = useState<{ threadId: string; runId: string } | undefined>(undefined)
-
-  const { data: entities } = useEntityDefinitionsQuery(
-    {
-      projectRef: selectedProject?.ref,
-      connectionString: selectedProject?.connectionString,
-    },
-    { enabled: true, refetchOnWindowFocus: false }
-  )
-
-  const entityDefinitions = entities?.map((def) => def.sql.trim())
+  const [incomingChange, setIncomingChange] = useState<string | undefined>(undefined)
+  // used for confirmation when closing the panel with unsaved changes
+  const [isClosingPolicyEditorPanel, setIsClosingPolicyEditorPanel] = useState(false)
 
   const { data, isSuccess } = useRlsSuggestQuery(
     { thread_id: ids?.threadId!, run_id: ids?.runId! },
@@ -72,11 +68,35 @@ export const AIPolicyEditorPanel = memo(function ({
       },
     }
   )
+
+  const { data: entities } = useEntityDefinitionsQuery(
+    {
+      projectRef: selectedProject?.ref,
+      connectionString: selectedProject?.connectionString,
+    },
+    { enabled: true, refetchOnWindowFocus: false }
+  )
+
+  const entityDefinitions = entities?.map((def) => def.sql.trim())
+
   const { mutate: addPromptMutation } = useRlsSuggestMutation({
     onSuccess: (data) => {
       setIds({ threadId: data.threadId, runId: data.runId })
     },
   })
+
+  const { mutate: executeMutation, isLoading: isExecuting } = useExecuteSqlMutation({
+    onSuccess: () => {
+      // refresh all policies
+      meta.policies.load()
+      onSaveSuccess()
+    },
+    onError: (error) => {
+      setError(error)
+    },
+  })
+
+  const { mutateAsync: debugSql, isLoading: isDebugSqlLoading } = useSqlDebugMutation()
 
   const addPrompt = useCallback(
     (message: string) => {
@@ -96,19 +116,12 @@ export const AIPolicyEditorPanel = memo(function ({
     [addPromptMutation, entityDefinitions, ids?.threadId]
   )
 
-  const { mutate: executeMutation, isLoading: isExecuting } = useExecuteSqlMutation({
-    onSuccess() {
-      // refresh all policies
-      meta.policies.load()
-      onSaveSuccess()
-    },
-  })
-
   const createNewPolicy = useCallback(() => {
     // clean up the sql before sending
     const policy = editorRef.current?.getValue().replaceAll('\n', ' ').replaceAll('  ', ' ')
 
     if (policy) {
+      setError(undefined)
       executeMutation({
         sql: policy,
         projectRef: selectedProject?.ref,
@@ -156,23 +169,49 @@ export const AIPolicyEditorPanel = memo(function ({
     }
   }, [onSelectCancel])
 
+  const onSelectDebug = async () => {
+    const policy = editorRef.current?.getValue().replaceAll('\n', ' ').replaceAll('  ', ' ')
+    if (error === undefined || policy === undefined) return
+
+    setAssistantPanel(true)
+    const { solution, sql } = await debugSql({
+      sql: policy.trim(),
+      errorMessage: error.message,
+      entityDefinitions,
+    })
+
+    // Temporarily to make sure that debugSQL output matches messages from RLS suggest query
+    const message = {
+      id: uuidv4(),
+      object: 'thread.message',
+      role: 'assistant',
+      file_ids: [],
+      metadata: { type: 'debug' },
+      content: [
+        { type: 'text', value: solution },
+        { type: 'sql', value: sql },
+      ],
+      created_at: Math.floor(Number(new Date()) / 1000),
+      assistant_id: undefined,
+      thread_id: undefined,
+      run_id: undefined,
+    }
+  }
+
   // when the panel is closed, reset all values
   useEffect(() => {
     if (!visible) {
       const policy = editorRef.current?.getValue()
-      if (policy) {
-        editorRef.current?.setValue('')
-      }
-      if (incomingChange) {
-        setIncomingChange(undefined)
-      }
-      if (assistantVisible) {
-        setAssistantPanel(false)
-      }
+      if (policy) editorRef.current?.setValue('')
+      if (incomingChange) setIncomingChange(undefined)
+      if (assistantVisible) setAssistantPanel(false)
       setIsClosingPolicyEditorPanel(false)
       setIds(undefined)
+      setError(undefined)
     }
   }, [visible])
+
+  const messages = isSuccess ? [...data.messages, ...debugThread] : []
 
   return (
     <SidePanel
@@ -183,7 +222,7 @@ export const AIPolicyEditorPanel = memo(function ({
       onCancel={onClosingPanel}
     >
       <div className="flex flex-row h-full">
-        <div className="flex flex-col w-screen max-w-2xl h-full border">
+        <div className="flex flex-col w-screen max-w-2xl h-full border max-h-screen">
           <AIPolicyHeader
             assistantVisible={assistantVisible}
             setAssistantVisible={setAssistantPanel}
@@ -205,7 +244,7 @@ export const AIPolicyEditorPanel = memo(function ({
             </div>
           ) : null}
 
-          <div className="flex-1">
+          <div className="grow">
             {incomingChange ? (
               <DiffEditor
                 theme="supabase"
@@ -221,32 +260,46 @@ export const AIPolicyEditorPanel = memo(function ({
               />
             ) : null}
             {/* this editor has to rendered at all times to not lose its editing history */}
-            <RLSCodeEditor
-              id="rls-sql-policy"
-              wrapperClassName={incomingChange ? '!hidden' : ''}
-              defaultValue={''}
-              editorRef={editorRef}
-            />
-          </div>
-          <div className="flex justify-end gap-2 p-4 bg-overlay border-t border-overlay">
-            <Button type="default" onClick={() => onSelectCancel()}>
-              Cancel
-            </Button>
-            <Button
-              loading={isExecuting}
-              htmlType="submit"
-              // disable the submit button when in diff mode
-              disabled={incomingChange !== undefined}
-              onClick={() => createNewPolicy()}
+            <div
+              // [Joshen] Not the cleanest but its to force the editor to re-render its height
+              // for now, till we can find a better solution
+              style={{
+                height:
+                  error === undefined ? 'calc(100vh - 67px - 59px)' : 'calc(100vh - 67px - 216px)',
+              }}
             >
-              Insert policy
-            </Button>
+              <RLSCodeEditor
+                id="rls-sql-policy"
+                wrapperClassName={incomingChange ? '!hidden' : ''}
+                defaultValue={''}
+                editorRef={editorRef}
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-y-4 p-4 bg-overlay border-t border-overlay w-full">
+            {error !== undefined && <QueryError error={error} onSelectDebug={onSelectDebug} />}
+            <div className="flex justify-end gap-x-2">
+              <Button type="default" onClick={() => onSelectCancel()}>
+                Cancel
+              </Button>
+              <Button
+                loading={isExecuting}
+                htmlType="submit"
+                // disable the submit button when in diff mode
+                disabled={incomingChange !== undefined}
+                onClick={() => createNewPolicy()}
+              >
+                Save policy
+              </Button>
+            </div>
           </div>
         </div>
+
         {assistantVisible && (
           <div className="w-full bg-surface-200">
             <AIPolicyChat
-              messages={isSuccess ? data.messages : []}
+              messages={messages}
               onSubmit={(message: string) => addPrompt(message)}
               onDiff={(v) => setIncomingChange(v)}
               loading={data?.status === 'loading'}
@@ -254,6 +307,7 @@ export const AIPolicyEditorPanel = memo(function ({
           </div>
         )}
       </div>
+
       <ConfirmationModal
         visible={isClosingPolicyEditorPanel}
         header="Discard changes"
