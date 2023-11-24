@@ -359,7 +359,7 @@ const nextConfig = {
   onDemandEntries: {
     maxInactiveAge: 24 * 60 * 60 * 1000,
     pagesBufferLength: 100,
-  }
+  },
 }
 
 // module.exports = withBundleAnalyzer(nextConfig)
