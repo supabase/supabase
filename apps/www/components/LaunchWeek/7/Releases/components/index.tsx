@@ -119,7 +119,7 @@ export const StyledArticleBadge = ({
       ' '
     )}
   >
-    <div className="!bg-transparent rounded-full !py-1 !px-4 w-full inset-[1px] text-sm border-none dark:from-white dark:to-[#6453C5] dark:border-none">
+    <div className="!bg-transparent rounded-full !py-1 !px-4 w-full inset-[1px] text-sm border-none">
       <span className="text-sm text-[#F4FFFA80] bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#7E7AAD]">
         {children}
       </span>
@@ -135,8 +135,8 @@ export const AccordionHeader = ({ date, day, title, shipped }: any) => {
         <Badge
           className={`relative inset-0 !bg-transparent !py-1 !px-4 h-fit backdrop-blur-md ${
             shipped
-              ? 'bg-gradient-to-br from-[#2A1E6C] to-[#2A1E6C00] dark:from-[#2A1E6C] dark:to-[#2A1E6C00] !border-[#6044FF40] dark:!border-[#6044FF40]'
-              : '!border-[#FFFFFF20] dark:!border-[#FFFFFF20]'
+              ? 'bg-gradient-to-br from-[#2A1E6C] to-[#2A1E6C00] !border-[#6044FF40]'
+              : '!border-[#FFFFFF20]'
           }`}
         >
           <span className="text-[#F4FFFA40] text-sm font-normal bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#675FA7]">
@@ -198,17 +198,16 @@ export const ChipLink = ({
       {children}
     </span>
   ) : !!href ? (
-    <Link href={href}>
-      <a
-        target={target ?? '_self'}
-        rel="noopener"
-        className={[
-          'flex flex-auto justify-center sm:justify-between w-full text-center sm:text-left min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444490] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191980] backdrop-blur-xl rounded-full text-sm py-2 px-3 sm:pr-2',
-          className,
-        ].join(' ')}
-      >
-        {children}
-      </a>
+    <Link
+      href={href}
+      target={target ?? '_self'}
+      rel="noopener"
+      className={[
+        'flex flex-auto justify-center sm:justify-between w-full text-center sm:text-left min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444490] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191980] backdrop-blur-xl rounded-full text-sm py-2 px-3 sm:pr-2',
+        className,
+      ].join(' ')}
+    >
+      {children}
     </Link>
   ) : null
 

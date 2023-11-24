@@ -139,10 +139,10 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
     return (
       <Link href={`${post.path}`} as={`${post.path}`}>
         <div className={className}>
-          <div className="border-scale-500 hover:bg-scale-100 dark:hover:bg-scale-300 cursor-pointer rounded border p-6 transition">
+          <div className="hover:bg-control cursor-pointer rounded border p-6 transition">
             <div className="space-y-4">
               <div>
-                <p className="text-muted text-sm">{label}</p>
+                <p className="text-foreground-lighter text-sm">{label}</p>
               </div>
               <div>
                 <h4 className="text-foreground text-lg">{post.title}</h4>
@@ -161,9 +161,9 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
         <div className="flex flex-wrap gap-2">
           {props.blog.tags?.map((tag: string) => {
             return (
-              <a href={`/blog/tags/${tag}`} key={`category-badge-${tag}`}>
+              <Link href={`/blog/tags/${tag}`} key={`category-badge-${tag}`}>
                 <Badge>{tag}</Badge>
-              </a>
+              </Link>
             )
           })}
         </div>
@@ -232,64 +232,65 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
       <DefaultLayout>
         <div
           className="
-            container mx-auto px-8 py-16 sm:px-16
+            container mx-auto px-6 py-4 md:py-8 xl:py-16 sm:px-16
             xl:px-20
           "
         >
           <div className="grid grid-cols-12 gap-4">
-            <div className="col-span-12 mb-2 lg:col-span-2">
+            <div className="hidden col-span-12 xl:block lg:col-span-2">
               {/* Back button */}
-              <p>
-                <a
-                  href={'/blog'}
-                  className="text-muted hover:text-foreground flex cursor-pointer items-center text-sm transition"
-                >
-                  <IconChevronLeft style={{ padding: 0 }} />
-                  Back
-                </a>
-              </p>
+              <Link
+                href="/blog"
+                className="text-foreground-lighter hover:text-foreground flex cursor-pointer items-center text-sm transition"
+              >
+                <IconChevronLeft style={{ padding: 0 }} />
+                Back
+              </Link>
             </div>
             <div className="col-span-12 lg:col-span-12 xl:col-span-10">
               {/* Title and description */}
-              <div className="mb-16 max-w-5xl space-y-8">
+              <div className="mb-6 lg:mb-12 max-w-5xl space-y-8">
                 <div className="space-y-4">
-                  <p className="text-brand">Blog post</p>
-                  <h1 className="h1">{props.blog.title}</h1>
-                  <div className="text-muted flex space-x-3 text-sm">
+                  <Link href="/blog" className="text-brand hidden lg:inline">
+                    Blog
+                  </Link>
+                  <h1 className="text-2xl sm:text-4xl">{props.blog.title}</h1>
+                  <div className="text-light flex space-x-3 text-sm">
                     <p>{props.blog.date}</p>
                     <p>•</p>
                     <p>{generateReadingTime(props.blog.source)}</p>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="hidden lg:flex justify-between">
                     <div className="flex-1 flex flex-col gap-3 pt-6 md:flex-row md:gap-0 lg:gap-3">
                       {author.map((author: any, i: number) => {
                         return (
                           <div className="mr-4 w-max" key={i}>
-                            <Link href={author.author_url} target="_blank">
-                              <a className="cursor-pointer">
-                                <div className="flex items-center gap-3">
-                                  {author.author_image_url && (
-                                    <div className="w-10">
-                                      <Image
-                                        src={author.author_image_url}
-                                        className="dark:border-dark rounded-full border"
-                                        alt={`${author.author} avatar`}
-                                        width="100%"
-                                        height="100%"
-                                        layout="responsive"
-                                      />
-                                    </div>
-                                  )}
-                                  <div className="flex flex-col">
-                                    <span className="text-foreground mb-0 text-sm">
-                                      {author.author}
-                                    </span>
-                                    <span className="text-muted mb-0 text-xs">
-                                      {author.position}
-                                    </span>
+                            <Link
+                              href={author.author_url}
+                              target="_blank"
+                              className="cursor-pointer"
+                            >
+                              <div className="flex items-center gap-3">
+                                {author.author_image_url && (
+                                  <div className="w-10">
+                                    <Image
+                                      src={author.author_image_url}
+                                      className="border-default rounded-full border"
+                                      alt={`${author.author} avatar`}
+                                      width={40}
+                                      height={40}
+                                    />
                                   </div>
+                                )}
+                                <div className="flex flex-col">
+                                  <span className="text-foreground mb-0 text-sm">
+                                    {author.author}
+                                  </span>
+                                  <span className="text-foreground-lighter mb-0 text-xs">
+                                    {author.position}
+                                  </span>
                                 </div>
-                              </a>
+                              </div>
                             </Link>
                           </div>
                         )
@@ -316,12 +317,12 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                         ></iframe>
                       ) : (
                         props.blog.thumb && (
-                          <div className="relative mb-8 h-96 w-full overflow-auto rounded-lg border">
+                          <div className="hidden md:block relative mb-8 h-96 w-full overflow-auto rounded-lg border">
                             <Image
                               src={'/images/blog/' + props.blog.thumb}
                               alt={props.blog.title}
-                              layout="fill"
-                              objectFit="cover"
+                              fill
+                              className="object-cover m-0"
                             />
                           </div>
                         )
@@ -331,7 +332,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                   </article>
                   {isLaunchWeek7 && <BlogLinks />}
                   <div className="block lg:hidden py-8">
-                    <div className="text-muted dark:text-lighter text-sm">Share this article</div>
+                    <div className="text-foreground-lighter text-sm">Share this article</div>
                     <ShareArticleActions title={props.blog.title} slug={props.blog.slug} />
                   </div>
                   <div className="grid gap-8 py-8 lg:grid-cols-1">
@@ -357,25 +358,26 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                         {props.relatedPosts.map((post) => (
                           <Link href={`${post.path}`} as={`${post.path}`} key={post.slug}>
                             <div>
-                              <p className="cursor-pointer">
+                              <div className="cursor-pointer">
                                 <div className="flex gap-2">
-                                  {/* <div className="text-muted">
+                                  {/* <div className="text-foreground-lighter">
                                     <IconFile size={'small'} style={{ minWidth: '1.2rem' }} />
                                   </div> */}
                                   <span className="text-light hover:text-gray-1200 text-sm">
                                     {post.title}
                                   </span>
                                 </div>
-                              </p>
+                              </div>
                               <Divider light className="mt-2" />
                             </div>
                           </Link>
                         ))}
                         <div className="mt-2">
-                          <Link href={`/blog`} passHref>
-                            <a className="text-light hover:text-foreground cursor-pointer text-xs">
-                              View all posts
-                            </a>
+                          <Link
+                            href={`/blog`}
+                            className="text-light hover:text-foreground cursor-pointer text-xs"
+                          >
+                            View all posts
                           </Link>
                         </div>
                         <div className="py-4 hidden lg:block">

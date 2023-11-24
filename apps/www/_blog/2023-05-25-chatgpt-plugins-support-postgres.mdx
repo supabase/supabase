@@ -131,16 +131,14 @@ This will require several steps:
 2. Convert the docs into chunks of embedded text and store them in Supabase
 3. Run our plugin locally so that we can ask questions about the Postgres docs.
 
-<img
-  className="dark:hidden !m-0"
+<Img
   alt="diagram reference"
-  src="/images/blog/2023-05-25-chatgpt-plugins-support-postgres/chatgpt-plugin-scheme--light.png"
-/>
-
-<img
-  className="hidden dark:block !m-0"
-  alt="diagram reference"
-  src="/images/blog/2023-05-25-chatgpt-plugins-support-postgres/chatgpt-plugin-scheme--dark.png"
+  className="!m-0"
+  src={{
+    light:
+      '/images/blog/2023-05-25-chatgpt-plugins-support-postgres/chatgpt-plugin-scheme--light.png',
+    dark: '/images/blog/2023-05-25-chatgpt-plugins-support-postgres/chatgpt-plugin-scheme--dark.png',
+  }}
 />
 
 ### Step 1: Fork the ChatGPT Retrieval Plugin repository
