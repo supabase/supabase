@@ -2,8 +2,8 @@
 
 import { timeAgo } from '@/lib/utils'
 import Link from 'next/link'
+import { useState } from 'react'
 import {
-  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -15,17 +15,8 @@ import {
 import ConfirmDeleteThreadModal from './ConfirmDeleteThreadModal'
 import EditThreadModal from './EditThreadModal'
 import { ThreadType } from './Threads'
-import { useState } from 'react'
 
-const Thread = ({
-  thread,
-}: // handleThreadActions,
-// onSelectEdit,
-// onSelectDelete,
-{
-  thread: ThreadType
-  // handleThreadActions: (formData: FormData) => void
-}) => {
+const Thread = ({ thread }: { thread: ThreadType }) => {
   const formattedTimeAgo = timeAgo(thread.modified_at)
 
   const [editOpen, setEditOpen] = useState(false)
