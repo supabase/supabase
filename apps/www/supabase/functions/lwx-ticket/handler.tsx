@@ -75,11 +75,11 @@ export async function handler(req: Request) {
     // Else, generate image and upload to storage.
     const BACKGROUND = {
       REG: {
-        BG: `${STORAGE_URL}/assets/lwx_ticket_bg.png`,
+        BG: `${STORAGE_URL}/assets/lwx_ticket_bg_regular.png?t=2023-11-24T12%3A52%3A28.581Z`,
         LOGO: `${STORAGE_URL}/assets/logos/supabase_lwx_logo_dark.png?t=2023-11-23T09%3A37%3A36.974Z`,
       },
       GOLD: {
-        BG: `${STORAGE_URL}/assets/lwx_ticket_bg_golden.png?t=2023-11-23T10%3A34%3A26.211Z`,
+        BG: `${STORAGE_URL}/assets/lwx_ticket_bg_platinum.png?t=2023-11-24T12%3A52%3A51.031Z`,
         LOGO: `${STORAGE_URL}/assets/logos/supabase_lwx_logo_light.png?t=2023-11-24T10%3A37%3A36.974Z`,
       },
     }
@@ -134,8 +134,8 @@ export async function handler(req: Request) {
                 justifyContent: 'center',
                 flexDirection: 'column',
                 position: 'absolute',
-                top: '53',
-                left: '73',
+                top: '70',
+                left: '80',
                 width: '530',
                 height: 'auto',
                 overflow: 'hidden',
@@ -149,7 +149,7 @@ export async function handler(req: Request) {
                   color: STYLING_CONGIF[golden ? 'GOLD' : 'REG'].FOREGROUND,
                   margin: '0',
                   padding: '0',
-                  fontSize: '52',
+                  fontSize: '44',
                   lineHeight: '105%',
                   display: 'flex',
                   marginBottom: '10px',
@@ -176,15 +176,15 @@ export async function handler(req: Request) {
             <div
               style={{
                 position: 'absolute',
-                bottom: '60',
-                left: '73',
+                bottom: '75',
+                left: '80',
                 display: 'flex',
                 gap: '10',
                 alignItems: 'flex-start',
                 justifyContent: 'center',
                 flexDirection: 'column',
                 fontFamily: '"SourceCodePro"',
-                fontSize: '30',
+                fontSize: '26',
                 textTransform: 'uppercase',
                 letterSpacing: '0.35rem',
                 lineHeight: '120%',
@@ -268,23 +268,25 @@ export async function handler(req: Request) {
     if (storageError) throw new Error(`storageError: ${storageError.message}`)
 
     // Generate og image
-    // fetch('https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-ticket-og', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     Authorization:
-    //       'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9idWxkYW5ycHRsb2t0eGNmZnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTIyNjkzMjYsImV4cCI6MjAwNzg0NTMyNn0.1S6qpBbHtEmGuMsIx5UOhRiFd4YbVv-yLTrLk6tVGmM',
-    //   },
-    //   body: JSON.stringify({
-    //     username,
-    //     golden,
-    //   }),
-    // })
+    fetch('https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-ticket-og', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization:
+          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9idWxkYW5ycHRsb2t0eGNmZnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTIyNjkzMjYsImV4cCI6MjAwNzg0NTMyNn0.1S6qpBbHtEmGuMsIx5UOhRiFd4YbVv-yLTrLk6tVGmM',
+      },
+      body: JSON.stringify({
+        username,
+        golden,
+      }),
+    })
+
+    const NEW_TIMESTAMP = new Date()
 
     return await fetch(
       `${STORAGE_URL}/tickets/${
         golden ? 'golden' : 'regular'
-      }/${BUCKET_FOLDER_VERSION}/${username}.png`
+      }/${BUCKET_FOLDER_VERSION}/${username}.png?t=${NEW_TIMESTAMP}`
     )
   } catch (error) {
     return new Response(JSON.stringify({ error: error.message }), {

@@ -27,7 +27,6 @@ const TicketingFlow = () => {
         <div className="flex flex-col items-center gap-1 text-light font-mono uppercase ">
           <span className="text-lg text-foreground tracking-[2px]">Launch Week X</span>
           <CountdownComponent date={LWX_LAUNCH_DATE} showCard={false} />
-          {/* <AddToCalendar /> */}
         </div>
         <div className="relative min-h-[634px] z-10 w-full flex flex-col justify-center items-center gap-5 md:gap-10 text-center">
           <LazyMotion features={domAnimation}>

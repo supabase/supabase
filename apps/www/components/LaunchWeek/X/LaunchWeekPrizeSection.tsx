@@ -1,4 +1,5 @@
 import React from 'react'
+import Link from 'next/link'
 import { cn } from 'ui'
 import LabelBadge from './LabelBadge'
 import LaunchWeekPrizeCard from './LaunchWeekPrizeCard'
@@ -74,7 +75,16 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
               content={
                 <div className="p-4 md:p-6 flex flex-col gap-2 text-sm items-start justify-between h-full">
                   <LabelBadge text="50 codes" />
-                  100% Discount on Supabase Store
+                  <p>
+                    100% Discount on{' '}
+                    <Link
+                      href="https://supabase.store/"
+                      target="_blank"
+                      className="inline hover:underline text-brand"
+                    >
+                      Supabase Store
+                    </Link>
+                  </p>
                 </div>
               }
             />

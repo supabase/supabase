@@ -11,8 +11,6 @@ function CountdownStep({ value, unit, showCard = true }: CountdownStepProps) {
   const [isMounted, setIsMounted] = useState(false)
   const valueWithZero = (value as number) > 9 ? value : '0' + value
 
-  console.log(value, valueWithZero)
-
   useEffect(() => {
     setIsMounted(true)
   }, [])
