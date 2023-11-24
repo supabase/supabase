@@ -52,7 +52,7 @@ const TablesGraph = ({ tables }: SchemaGraphProps) => {
             },
           }}
           nodeTypes={nodeTypes}
-          minZoom={1}
+          minZoom={0.8}
           maxZoom={1.8}
           proOptions={{ hideAttribution: true }}
           onInit={(instance) => {

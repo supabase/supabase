@@ -1,5 +1,5 @@
 'use client'
-import { LogIn, LogOut } from 'lucide-react'
+import { HelpCircle, LogIn, LogOut } from 'lucide-react'
 import { User } from '@supabase/supabase-js'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   IconUser,
-  Separator,
+  SidePanel,
 } from 'ui'
 
 interface AvatarDropdownProps {
@@ -40,11 +40,17 @@ export default function AvatarDropdown({ currentUser, signout }: AvatarDropdownP
             </div>
             <Link href="/profile">
               <DropdownMenuItem className="space-x-2" onClick={() => {}}>
-                <IconUser size={14} />
+                <IconUser size={14} strokeWidth={2} />
                 <p>Profile</p>
               </DropdownMenuItem>
             </Link>
-            <Separator />
+            <Link href="/faq">
+              <DropdownMenuItem className="space-x-2" onClick={() => {}}>
+                <HelpCircle size={14} />
+                <p>FAQs</p>
+              </DropdownMenuItem>
+            </Link>
+            <SidePanel.Separator />
             <a href="https://supabase.com" target="_blank" rel="noreferrer">
               <DropdownMenuItem className="space-x-2">
                 <Image alt="supabase" src="/supabase.png" width={14} height={14} />
@@ -59,7 +65,7 @@ export default function AvatarDropdown({ currentUser, signout }: AvatarDropdownP
         ) : (
           <div className="flex flex-col gap-y-2 p-2">
             <div className="text-xs">
-              Sign in to <span className="text-foreground">database.new</span> to save your
+              Sign in to <span className="text-foreground">database.design</span> to save your
               conversations!
             </div>
             <Button type="default" icon={<LogIn size={14} />}>

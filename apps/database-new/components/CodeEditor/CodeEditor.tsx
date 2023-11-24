@@ -1,12 +1,12 @@
 import Editor, { BeforeMount, EditorProps, OnMount } from '@monaco-editor/react'
-import { merge, noop } from 'lodash'
+import { merge } from 'lodash'
 import { useTheme } from 'next-themes'
 import { useEffect, useRef } from 'react'
 import { format } from 'sql-formatter'
 import { cn } from 'ui'
 
-import { getTheme } from './CodeEditor.utils'
 import { useAppStateSnapshot } from '@/lib/state'
+import { getTheme } from './CodeEditor.utils'
 
 interface MonacoEditorProps {
   id: string
@@ -26,11 +26,15 @@ export const CodeEditor = ({ content = '' }: { content: string }) => {
   const snap = useAppStateSnapshot()
   const code = format(content, { language: 'postgresql' })
 
+  useEffect(() => {
+    snap.setSelectedCode(code)
+  }, [code])
+
   return (
     <div
       className={cn(
         snap.hideCode ? 'max-w-0' : 'max-w-lg 2xl:max-w-xl',
-        'w-full border-l',
+        'w-full xl:border-l',
         'grow flex flex-col h-full'
       )}
     >
@@ -44,19 +48,11 @@ const MonacoEditor = ({
   language,
   defaultValue,
   hideLineNumbers = false,
-  onInputChange = noop,
   options,
   value,
 }: MonacoEditorProps) => {
   const monacoRef = useRef<any>()
   const { resolvedTheme } = useTheme()
-
-  useEffect(() => {
-    if (resolvedTheme && monacoRef.current) {
-      const mode: any = getTheme(resolvedTheme)
-      monacoRef.current.editor.defineTheme('supabase', mode)
-    }
-  }, [resolvedTheme, monacoRef])
 
   const beforeMount: BeforeMount = (monaco) => {
     monacoRef.current = monaco
@@ -74,7 +70,7 @@ const MonacoEditor = ({
     })
   }
 
-  const onMount: OnMount = async (editor, monaco) => {
+  const onMount: OnMount = async (editor) => {
     // Add margin above first line
     editor.changeViewZones((accessor) => {
       accessor.addZone({
@@ -121,7 +117,6 @@ const MonacoEditor = ({
       options={optionsMerged}
       beforeMount={beforeMount}
       onMount={onMount}
-      onChange={onInputChange}
     />
   )
 }
