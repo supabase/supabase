@@ -83,16 +83,14 @@ const TicketingFlow = () => {
                   <div className="w-full min-h-[400px] flex flex-col items-center">
                     <TicketContainer supabase={supabase} />
                   </div>
-                  <div className="flex flex-col items-center justify-center gap-2 max-w-lg">
+                  <div className="flex flex-col items-center justify-center gap-2 max-w-xl">
                     <span className="text-2xl">
-                      {userData.golden
-                        ? 'You have a platinum ticket now'
-                        : 'Share your ticket & win swag'}
+                      {userData.golden ? 'You have a platinum ticket now' : 'Share your ticket'}
                     </span>
                     <span className="text-foreground-lighter">
                       {userData.golden
                         ? 'Stay tuned on Launch Week X final day to find out if you won.'
-                        : 'Boost your chances of winning Launch Week X limited-edition swag and stay tuned for a week of announcing new features.'}
+                        : 'Boost your chances of winning limited-edition swag by sharing your ticket. Winners will be announced on Dec 15th on X.'}
                     </span>
                   </div>
                 </m.div>

@@ -21,8 +21,6 @@ export default function TicketHome() {
   const bgImageId = query.bgImageId?.toString()
   const [session, setSession] = useState<Session | null>(null)
 
-  const [initialDarkMode] = useState('dark')
-
   const defaultUserData = {
     id: query.id?.toString(),
     ticketNumber: ticketNumber ? parseInt(ticketNumber, 10) : undefined,
@@ -41,8 +39,6 @@ export default function TicketHome() {
       const {
         data: { subscription },
       } = supabase.auth.onAuthStateChange((event, session) => {
-        console.log('onAuthStateChange event', event)
-        console.log('onAuthStateChange session', session)
         setSession(session)
       })
 
@@ -51,11 +47,11 @@ export default function TicketHome() {
   }, [supabase])
 
   useEffect(() => {
-    document.body.classList.add('bg-[#020405]')
+    document.body.classList.add('bg-[#060809]')
 
     return () => {
-      if (document.body.classList.contains('bg-[#020405]')) {
-        document.body.classList.remove('bg-[#020405]')
+      if (document.body.classList.contains('bg-[#060809]')) {
+        document.body.classList.remove('bg-[#060809]')
       }
     }
   }, [])

@@ -45,11 +45,11 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
   }
 
   useEffect(() => {
-    document.body.classList.add('bg-[#020405]')
+    document.body.classList.add('bg-[#060809]')
 
     return () => {
-      if (document.body.classList.contains('bg-[#020405]')) {
-        document.body.classList.remove('bg-[#020405]')
+      if (document.body.classList.contains('bg-[#060809]')) {
+        document.body.classList.remove('bg-[#060809]')
       }
     }
   }, [])
@@ -98,7 +98,9 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
                 </span>
               </div>
               <Button type="alternative" asChild>
-                <Link href="/launch-week">Join Launch Week X</Link>
+                <Link href={`${SITE_URL}/${username ? '?referral=' + username : ''}`}>
+                  Join Launch Week X
+                </Link>
               </Button>
             </SectionContainer>
             <LWXBackground className="absolute z-0 top-0 left-0 right-0 w-full h-[800px] !min-h-[350px] flex items-center justify-center" />
@@ -106,7 +108,7 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
           <SectionContainer className="!pt-4 !pb-0">
             <LaunchWeekPrizeSection />
           </SectionContainer>
-          <CTABanner className="!bg-[#020405] border-t-0" />
+          <CTABanner className="!bg-[#060809] border-t-0" />
         </DefaultLayout>
       </ConfDataContext.Provider>
     </>

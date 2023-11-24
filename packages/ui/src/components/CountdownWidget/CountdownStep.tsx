@@ -1,4 +1,3 @@
-'use client'
 import { useEffect, useState } from 'react'
 import { cn } from '../../lib/utils'
 
@@ -10,6 +9,9 @@ interface CountdownStepProps {
 
 function CountdownStep({ value, unit, showCard = true }: CountdownStepProps) {
   const [isMounted, setIsMounted] = useState(false)
+  const valueWithZero = (value as number) > 9 ? value : '0' + value
+
+  console.log(value, valueWithZero)
 
   useEffect(() => {
     setIsMounted(true)
@@ -30,10 +32,10 @@ function CountdownStep({ value, unit, showCard = true }: CountdownStepProps) {
         className={cn(
           showCard
             ? 'py-1 px-2 rounded-md w-11 leading-4 flex items-center justify-center bg-black backdrop-blur-md'
-            : 'flex items-center justify-center w-9 py-1 px-1'
+            : 'flex items-center justify-center w-7 py-1 px-1'
         )}
       >
-        <span className="m-0">{value}</span>
+        <span className="m-0">{valueWithZero}</span>
         <span>{unit}</span>
       </div>
     </div>

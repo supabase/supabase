@@ -91,7 +91,7 @@ export default function TicketsPage({ users }: Props) {
 
   useEffect(() => {
     setTheme('dark')
-    document.body.className = 'dark bg-[#020405]'
+    document.body.className = 'dark bg-[#060809]'
     return () => {
       document.body.className = ''
       setTheme('dark')
@@ -147,7 +147,7 @@ export default function TicketsPage({ users }: Props) {
             </div>
           </SectionContainer>
         </div>
-        <CTABanner className="!bg-[#020405] border-t-0" />
+        <CTABanner className="!bg-[#060809] border-t-0" />
       </DefaultLayout>
     </>
   )

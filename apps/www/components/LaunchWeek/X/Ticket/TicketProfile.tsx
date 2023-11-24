@@ -19,7 +19,7 @@ export default function TicketProfile() {
       >
         <p
           className={cn(
-            'text-2xl md:text-3xl text-foreground leading-[105%]',
+            'text-2xl text-foreground leading-[105%]',
             golden ? 'text-[#11181C]' : 'text-white'
           )}
         >
