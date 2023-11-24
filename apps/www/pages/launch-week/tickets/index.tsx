@@ -26,7 +26,7 @@ const generateOgs = async (users: UserData[]) => {
   users?.map(async (user) => {
     const ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lw8-ticket-og?username=${encodeURIComponent(
       user.username ?? ''
-    )}${!!user.golden ? '&golden=true' : ''}`
+    )}${!!user.golden ? '&platinum=true' : ''}`
     return await fetch(ogImageUrl)
   })
 }

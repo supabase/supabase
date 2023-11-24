@@ -25,7 +25,15 @@ const TicketingFlow = () => {
       <SectionContainer className="relative flex flex-col lg:pt-20 items-center gap-5 text-center h-[886px] min-h-[886px]">
         <h1 className="sr-only">Supabase Launch Week X | {LWX_DATE}</h1>
         <div className="flex flex-col items-center gap-1 text-light font-mono uppercase ">
-          <span className="text-lg text-foreground tracking-[2px]">Launch Week X</span>
+          <p className="flex items-center gap-3 leading-none">
+            <span className="text-lg text-foreground tracking-[2px]">Launch Week</span>{' '}
+            <Image
+              src="/images/launchweek/lwx/logos/lwx_logo.svg"
+              alt="Supabase Launch Week X icon"
+              width={16}
+              height={16}
+            />
+          </p>
           <CountdownComponent date={LWX_LAUNCH_DATE} showCard={false} />
         </div>
         <div className="relative min-h-[634px] z-10 w-full flex flex-col justify-center items-center gap-5 md:gap-10 text-center">
@@ -88,7 +96,7 @@ const TicketingFlow = () => {
                     </span>
                     <span className="text-foreground-lighter">
                       {userData.golden
-                        ? 'Stay tuned on Launch Week X final day to find out if you won.'
+                        ? 'Winners will be announced on Dec 15th on X.'
                         : 'Boost your chances of winning limited-edition swag by sharing your ticket. Winners will be announced on Dec 15th on X.'}
                     </span>
                   </div>

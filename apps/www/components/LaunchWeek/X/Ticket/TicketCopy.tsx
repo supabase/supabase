@@ -9,7 +9,7 @@ export default function TicketCopy({ sharePage }: { sharePage: boolean }) {
   const [copyEnabled, setCopyEnabled] = useState(false)
   const [copied, setCopied] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
-  const url = `${SITE_URL}/tickets/${username}?lw=x${golden ? `&golden=true` : ''}`
+  const url = `${SITE_URL}/tickets/${username}?lw=x${golden ? `&platinum=true` : ''}`
 
   useEffect(() => {
     if (navigator.clipboard) {

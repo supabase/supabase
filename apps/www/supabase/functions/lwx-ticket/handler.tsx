@@ -30,7 +30,7 @@ const STYLING_CONGIF = {
 export async function handler(req: Request) {
   const url = new URL(req.url)
   const username = url.searchParams.get('username') ?? url.searchParams.get('amp;username')
-  const assumeGolden = url.searchParams.get('golden') ?? url.searchParams.get('amp;golden')
+  const assumePlatinum = url.searchParams.get('platinum') ?? url.searchParams.get('amp;platinum')
   const userAgent = req.headers.get('user-agent')
 
   try {
@@ -69,8 +69,8 @@ export async function handler(req: Request) {
     if (!data) throw new Error(error?.message ?? 'user not found')
     const { name, ticketNumber, metadata } = data
 
-    const golden = (!!data?.sharedOnTwitter && !!data?.sharedOnLinkedIn) ?? false
-    if (assumeGolden && !golden) return await fetch(`${STORAGE_URL}/assets/golden_no_meme.png`)
+    const platinum = (!!data?.sharedOnTwitter && !!data?.sharedOnLinkedIn) ?? false
+    if (assumePlatinum && !platinum) return await fetch(`${STORAGE_URL}/assets/golden_no_meme.png`)
 
     // Else, generate image and upload to storage.
     const BACKGROUND = {
@@ -101,8 +101,8 @@ export async function handler(req: Request) {
               width: '1200px',
               height: '628px',
               position: 'relative',
-              backgroundColor: STYLING_CONGIF[golden ? 'GOLD' : 'REG'].BACKGROUND,
-              color: STYLING_CONGIF[golden ? 'GOLD' : 'REG'].FOREGROUND,
+              backgroundColor: STYLING_CONGIF[platinum ? 'GOLD' : 'REG'].BACKGROUND,
+              color: STYLING_CONGIF[platinum ? 'GOLD' : 'REG'].FOREGROUND,
               fontFamily: '"Circular"',
               overflow: 'hidden',
               display: 'flex',
@@ -123,7 +123,7 @@ export async function handler(req: Request) {
                 right: '-1px',
                 zIndex: '0',
               }}
-              src={golden ? BACKGROUND['GOLD']['BG'] : BACKGROUND['REG']['BG']}
+              src={platinum ? BACKGROUND['GOLD']['BG'] : BACKGROUND['REG']['BG']}
             />
 
             {/* Name & username */}
@@ -146,7 +146,7 @@ export async function handler(req: Request) {
             >
               <p
                 style={{
-                  color: STYLING_CONGIF[golden ? 'GOLD' : 'REG'].FOREGROUND,
+                  color: STYLING_CONGIF[platinum ? 'GOLD' : 'REG'].FOREGROUND,
                   margin: '0',
                   padding: '0',
                   fontSize: '44',
@@ -161,7 +161,7 @@ export async function handler(req: Request) {
               {/* Username */}
               <div
                 style={{
-                  color: STYLING_CONGIF[golden ? 'GOLD' : 'REG'].FOREGROUND_LIGHT,
+                  color: STYLING_CONGIF[platinum ? 'GOLD' : 'REG'].FOREGROUND_LIGHT,
                   opacity: 0.8,
                   display: 'flex',
                   fontSize: '38',
@@ -192,7 +192,7 @@ export async function handler(req: Request) {
             >
               <div style={{ display: 'flex', marginBottom: '20' }}>
                 <img
-                  src={golden ? BACKGROUND['GOLD']['LOGO'] : BACKGROUND['REG']['LOGO']}
+                  src={platinum ? BACKGROUND['GOLD']['LOGO'] : BACKGROUND['REG']['LOGO']}
                   width={60}
                   height={60}
                 />
@@ -200,7 +200,7 @@ export async function handler(req: Request) {
               {/* Ticket No  */}
               <p
                 style={{
-                  color: STYLING_CONGIF[golden ? 'GOLD' : 'REG'].FOREGROUND_LIGHT,
+                  color: STYLING_CONGIF[platinum ? 'GOLD' : 'REG'].FOREGROUND_LIGHT,
                   margin: '0',
                   marginBottom: '5',
                   display: 'flex',
@@ -255,7 +255,7 @@ export async function handler(req: Request) {
     const { error: storageError } = await supabaseAdminClient.storage
       .from('images')
       .upload(
-        `lwx/tickets/${golden ? 'golden' : 'regular'}/${BUCKET_FOLDER_VERSION}/${username}.png`,
+        `lwx/tickets/${platinum ? 'platinum' : 'regular'}/${BUCKET_FOLDER_VERSION}/${username}.png`,
         generatedTicketImage.body!,
         {
           contentType: 'image/png',
@@ -277,7 +277,7 @@ export async function handler(req: Request) {
       },
       body: JSON.stringify({
         username,
-        golden,
+        platinum,
       }),
     })
 
@@ -285,7 +285,7 @@ export async function handler(req: Request) {
 
     return await fetch(
       `${STORAGE_URL}/tickets/${
-        golden ? 'golden' : 'regular'
+        platinum ? 'platinum' : 'regular'
       }/${BUCKET_FOLDER_VERSION}/${username}.png?t=${NEW_TIMESTAMP}`
     )
   } catch (error) {

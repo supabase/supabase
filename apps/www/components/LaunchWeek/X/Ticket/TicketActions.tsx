@@ -14,7 +14,7 @@ export default function TicketActions({ username, golden = false }: Props) {
   const [_imgReady, setImgReady] = useState(false)
   const [_loading, setLoading] = useState(false)
   const downloadLink = useRef<HTMLAnchorElement>()
-  const link = `${SITE_URL}/tickets/${username}?lw=x${golden ? `&golden=true` : ''}`
+  const link = `${SITE_URL}/tickets/${username}?lw=x${golden ? `&platinum=true` : ''}`
   const permalink = encodeURIComponent(link)
   const text = golden ? TWEET_TEXT_GOLDEN : TWEET_TEXT
   const encodedText = encodeURIComponent(text)

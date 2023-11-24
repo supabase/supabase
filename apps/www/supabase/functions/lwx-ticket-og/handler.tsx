@@ -11,15 +11,15 @@ export async function handler(req: Request) {
     if (req.method !== 'POST') throw new Error('method not supported')
     const {
       username,
-      golden = false,
+      platinum = false,
     }: {
       username?: string
-      golden?: boolean
+      platinum?: boolean
     } = await req.json()
 
     const timestamp = encodeURI(new Date().toISOString())
     const ticketImg = `${STORAGE_URL}/tickets/${
-      golden ? 'golden' : 'regular'
+      platinum ? 'platinum' : 'regular'
     }/${BUCKET_FOLDER_VERSION}/${username}.png?t=${timestamp}`
 
     const ticketWidth = 1100
@@ -28,7 +28,7 @@ export async function handler(req: Request) {
       REG: {
         BG: '#040404',
       },
-      GOLD: {
+      PLATINUM: {
         BG: '#ffffff',
       },
     }
@@ -40,7 +40,7 @@ export async function handler(req: Request) {
             width: '1200px',
             height: '628px',
             position: 'relative',
-            backgroundColor: STYLE_CONFIG[golden ? 'GOLD' : 'REG'].BG,
+            backgroundColor: STYLE_CONFIG[platinum ? 'PLATINUM' : 'REG'].BG,
             overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
@@ -83,7 +83,7 @@ export async function handler(req: Request) {
     const { error: storageError } = await supabaseAdminClient.storage
       .from('images')
       .upload(
-        `lwx/og/${golden ? 'golden' : 'regular'}/${BUCKET_FOLDER_VERSION}/${username}.png`,
+        `lwx/og/${platinum ? 'platinum' : 'regular'}/${BUCKET_FOLDER_VERSION}/${username}.png`,
         geneartedOGImage.body!,
         {
           contentType: 'image/png',
