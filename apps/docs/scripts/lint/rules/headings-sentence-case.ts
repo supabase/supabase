@@ -1,5 +1,4 @@
 import { Content, Text } from 'mdast'
-import { stripSymbols } from '../utils/words'
 import { capitalizedWords } from '../config/words'
 import { ErrorSeverity, FixReplace, LintError, LintRule, error } from '.'
 
@@ -14,63 +13,60 @@ function headingsSentenceCaseCheck(node: Content, file: string) {
   }
   const text = textNode.value
 
-  const words = text.split(/s+/)
   const errors: LintError[] = []
 
-  for (let i = 0; i < words.length; i++) {
-    const word = stripSymbols(words[i])
-    if (!word) {
-      continue
-    }
+  const wordRegex = /\b\S+\b/g
 
-    if (i === 0) {
-      if (/[a-z]/.test(word[0])) {
-        errors.push(
-          error({
-            message: 'First word in heading should be capitalized.',
-            severity: ErrorSeverity.Error,
-            file,
-            line: node.position.start.line,
-            column: node.position.start.column,
-            fix: new FixReplace({
-              start: {
-                lineOffset: 0,
-                column: node.position.start.column,
-              },
-              end: {
-                lineOffset: 0,
-                column: node.position.start.column + 1,
-              },
-              text: word[0].toUpperCase(),
-            }),
-          })
-        )
-      }
-      continue
-    }
+  const firstWord = wordRegex.exec(text)?.[0]
+  if (firstWord?.[0] && /[a-z]/.test(firstWord[0])) {
+    errors.push(
+      error({
+        message: 'First word in heading should be capitalized.',
+        severity: ErrorSeverity.Error,
+        file,
+        line: textNode.position.start.line,
+        column: textNode.position.start.column,
+        fix: new FixReplace({
+          start: {
+            line: textNode.position.start.line,
+            column: textNode.position.start.column,
+          },
+          end: {
+            line: textNode.position.start.line,
+            column: textNode.position.start.column + 1,
+          },
+          text: firstWord[0].toUpperCase(),
+        }),
+      })
+    )
+  }
 
-    if (/[A-Z]/.test(word[0]) && !capitalizedWords.has(word)) {
+  let currMatch: RegExpExecArray
+  while ((currMatch = wordRegex.exec(text)) !== null) {
+    const currWord = currMatch[0]
+    const index = textNode.position.start.column + currMatch.index
+
+    if (/[A-Z]/.test(currWord[0]) && !capitalizedWords.has(currWord)) {
       errors.push(
         error({
           message: 'Heading should be in sentence case.',
           severity: ErrorSeverity.Error,
           file,
-          line: node.position.start.line,
-          column: node.position.start.column,
+          line: textNode.position.start.line,
+          column: textNode.position.start.column,
           fix: new FixReplace({
             start: {
-              lineOffset: 0,
-              column: node.position.start.column,
+              line: textNode.position.start.line,
+              column: index,
             },
             end: {
-              lineOffset: 0,
-              column: node.position.start.column + 1,
+              line: textNode.position.start.line,
+              column: index + 1,
             },
-            text: word[0].toUpperCase(),
+            text: currWord[0].toLowerCase(),
           }),
         })
       )
-      break
     }
   }
 

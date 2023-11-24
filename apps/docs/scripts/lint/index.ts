@@ -1,12 +1,12 @@
 import { mdxFromMarkdown } from 'mdast-util-mdx'
 import { mdxjs } from 'micromark-extension-mdxjs'
 import { fromMarkdown } from 'mdast-util-from-markdown'
-import { readFile } from 'fs/promises'
+import { readFile, writeFile } from 'fs/promises'
 import { walk } from '../utils/walk'
 import { extname } from 'path'
 import { Content } from 'mdast'
 import { headingsSentenceCase } from './rules/headings-sentence-case'
-import { LintError, LintRule, isSuccess } from './rules'
+import { LintError, LintRule } from './rules'
 import { parseArgs } from 'node:util'
 
 const args = parseArgs({
@@ -35,13 +35,13 @@ interface FileErrors {
 }
 
 function main() {
-  console.log(process.argv.slice(2))
+  const target = process.argv[2]
 
-  lint()
+  lint(target)
 }
 
-async function lint() {
-  const pages = await walk('pages')
+async function lint(target: string) {
+  const pages = await walk(target ?? 'pages')
   const errors: FileErrors[] = []
 
   const result = pages.map(async (page) => {
@@ -69,12 +69,25 @@ async function lint() {
     })
 
     if (localErrors.length) {
-      errors.push({ file: page.path, errors: localErrors })
+      errors.push({
+        file: page.path,
+        errors: localErrors,
+      })
     }
+
+    let newContents = contents.split('\n')
+
+    localErrors.forEach((err) => {
+      newContents[err.location.line - 1] =
+        newContents[err.location.line - 1].substring(0, err.fix.start.column - 1) +
+        err.fix.text +
+        newContents[err.location.line - 1].substring(err.fix.start.column)
+    })
+
+    await writeFile(page.path, newContents.join('\n'), 'utf8')
   })
 
   await Promise.all(result)
-  console.log(JSON.stringify(errors, null, 2))
 }
 
 main()

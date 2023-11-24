@@ -6,73 +6,65 @@ export enum ErrorSeverity {
   Suggestion,
 }
 
-interface RelativePosition {
-  lineOffset: number
+interface Position {
+  line: number
   column: number
-}
-
-type RelativePositionParams = Partial<RelativePosition> & Pick<RelativePosition, 'column'>
-
-function relPosition(column: number, lineOffset?: number): RelativePosition {
-  return {
-    lineOffset: lineOffset ?? 0,
-    column,
-  }
 }
 
 abstract class LintFix {
   constructor() {}
 
-  abstract fix(filePath: string, fileContents: string): void
+  abstract fix(filePath: string, fileContents: string[]): void
 }
 
 export class FixDelete extends LintFix {
-  start: RelativePosition
-  end: RelativePosition
+  start: Position
+  end: Position
 
-  constructor({ start, end }: { start: RelativePositionParams; end: RelativePositionParams }) {
+  constructor({ start, end }: { start: Position; end: Position }) {
     super()
-    this.start = relPosition(start.column, start.lineOffset)
-    this.end = relPosition(end.column, end.lineOffset)
+    this.start = start
+    this.end = end
   }
 
-  fix(filePath: string, fileContents: string) {}
+  fix(filePath: string, fileContents: string[]) {
+    throw Error('delete fix not implemented')
+  }
 }
 
 export class FixInsert extends LintFix {
-  start: RelativePosition
+  start: Position
   text: string
 
-  constructor({ start, text }: { start: RelativePositionParams; text: string }) {
+  constructor({ start, text }: { start: Position; text: string }) {
     super()
-    this.start = relPosition(start.column, start.lineOffset)
+    this.start = start
     this.text = text
   }
 
-  fix(filePath: string, fileContents: string) {}
+  fix(filePath: string, fileContents: string[]) {
+    throw Error('insert fix not implemented')
+  }
 }
 
 export class FixReplace extends LintFix {
-  start: RelativePosition
-  end: RelativePosition
+  start: Position
+  end: Position
   text: string
 
-  constructor({
-    start,
-    end,
-    text,
-  }: {
-    start: RelativePositionParams
-    end: RelativePositionParams
-    text: string
-  }) {
+  constructor({ start, end, text }: { start: Position; end: Position; text: string }) {
     super()
-    this.start = relPosition(start.column, start.lineOffset)
-    this.end = relPosition(end.column, end.lineOffset)
+    this.start = start
+    this.end = end
     this.text = text
   }
 
-  fix(filePath: string, fileContents: string) {}
+  fix(filePath: string, fileContents: string[]) {
+    fileContents[this.start.line - 1] =
+      fileContents[this.start.line - 1].substring(0, this.start.column) +
+      this.text +
+      fileContents[this.end.line - 1].substring(this.end.column)
+  }
 }
 
 export interface LintError {
