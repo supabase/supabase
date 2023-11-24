@@ -1,4 +1,4 @@
-# database.new
+# database.design
 
 ## Overview
 
