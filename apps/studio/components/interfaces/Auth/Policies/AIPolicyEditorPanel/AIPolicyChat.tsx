@@ -106,6 +106,7 @@ export const AIPolicyChat = ({
               postedAt={m.created_at}
               message={content.text.value}
               onDiff={onDiff}
+              isDebug={(m.metadata as any).type === 'debug'}
             />
           )
         })}

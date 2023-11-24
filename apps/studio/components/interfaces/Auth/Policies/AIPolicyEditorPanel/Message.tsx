@@ -3,7 +3,7 @@ import { kebabCase, take } from 'lodash'
 import { Copy, FileDiff } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import { format } from 'sql-formatter'
-import { Button } from 'ui'
+import { Badge, Button } from 'ui'
 
 import CodeEditor from 'components/ui/CodeEditor'
 
@@ -13,11 +13,13 @@ const Message = ({
   postedAt,
   message,
   onDiff,
+  isDebug = false,
 }: {
   icon: React.ReactNode
   postedBy: string
   postedAt?: number
   message: string
+  isDebug?: boolean
   onDiff: (s: string) => void
 }) => {
   return (
@@ -29,6 +31,7 @@ const Message = ({
         {postedAt && (
           <span className="text-xs text-foreground-muted">{dayjs(postedAt * 1000).fromNow()}</span>
         )}
+        {isDebug && <Badge color="amber">Debug request</Badge>}
       </div>
       <ReactMarkdown
         components={{
