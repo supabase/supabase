@@ -116,7 +116,7 @@ export const AIPolicyChat = ({
       <Form_Shadcn_ {...form}>
         <form
           id="rls-chat"
-          className="sticky p-5 flex-0"
+          className="sticky p-5 flex-0 border-t"
           onSubmit={form.handleSubmit((data: z.infer<typeof FormSchema>) => {
             setIsLoading(true)
             onSubmit(data.chat)

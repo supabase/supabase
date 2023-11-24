@@ -23,7 +23,7 @@ const Message = ({
   onDiff: (s: string) => void
 }) => {
   return (
-    <div className="flex flex-col py-4 gap-4 border-y border px-5">
+    <div className="flex flex-col py-4 gap-4 border-t px-5">
       <div className="flex flex-row gap-3 items-center">
         {icon}
 
@@ -34,6 +34,7 @@ const Message = ({
         {isDebug && <Badge color="amber">Debug request</Badge>}
       </div>
       <ReactMarkdown
+        className="gap-2.5 flex flex-col"
         components={{
           p: ({ children }) => <div className="text-foreground-light text-sm">{children}</div>,
           // intentionally rendering as pre. The other approach would be to render as code element,
@@ -49,11 +50,14 @@ const Message = ({
             const key = kebabCase(take(code.split(' '), 3).join(' '))
 
             return (
-              <div className="relative group" key={key}>
+              <div
+                className="rounded-md border border-control overflow-hidden relative group"
+                key={key}
+              >
                 <CodeEditor
                   id={`rls-sql_${key}`}
                   language="pgsql"
-                  className="h-96"
+                  className="h-80"
                   value={formatted}
                   isReadOnly
                   options={{ scrollBeyondLastLine: false }}
@@ -74,8 +78,6 @@ const Message = ({
             )
           },
         }}
-        // {...props}
-        className="gap-2.5 flex flex-col"
       >
         {message}
       </ReactMarkdown>
