@@ -37,7 +37,22 @@ const RowEditor = ({
   updateEditorDirty = noop,
 }: RowEditorProps) => {
   const [errors, setErrors] = useState<Dictionary<any>>({})
-  const [rowFields, setRowFields] = useState<any[]>([])
+
+  const [updatedRowFields, setUpdatedRowFields] = useState<RowField[]>([])
+
+  // calculate the row fields from the existing values and the changed values. This is because the
+  // row values may change in subsequent renders due to background fetches.
+  const rowFields = useMemo(() => {
+    const fields = generateRowFields(row, selectedTable)
+    updatedRowFields.forEach((updated) => {
+      const foundIndex = fields.findIndex((f) => f.id === updated.id)
+      if (foundIndex) {
+        fields[foundIndex] = updated
+      }
+    })
+    return fields
+  }, [row, selectedTable, updatedRowFields])
+
   const [selectedValueForJsonEdit, setSelectedValueForJsonEdit] = useState<JsonEditValue>()
 
   const [isSelectingForeignKey, setIsSelectingForeignKey] = useState<boolean>(false)
@@ -48,10 +63,7 @@ const RowEditor = ({
 
   const [loading, setLoading] = useState(false)
 
-  const [requiredFields, optionalFields] = partition(
-    rowFields,
-    (rowField: any) => !rowField.isNullable
-  )
+  const [requiredFields, optionalFields] = partition(rowFields, (rowField) => !rowField.isNullable)
 
   const { project } = useProjectContext()
   const { data } = useForeignKeyConstraintsQuery({
@@ -68,11 +80,11 @@ const RowEditor = ({
     [data, referenceRow?.foreignKey?.id]
   )
 
+  // reset the values on close
   useEffect(() => {
-    if (visible) {
+    if (!visible) {
       setErrors({})
-      const rowFields = generateRowFields(row, selectedTable)
-      setRowFields(rowFields)
+      setUpdatedRowFields([])
     }
   }, [visible])
 
@@ -85,7 +97,7 @@ const RowEditor = ({
         return field
       }
     })
-    setRowFields(updatedFields)
+    setUpdatedRowFields(updatedFields)
     updateEditorDirty()
   }
 
