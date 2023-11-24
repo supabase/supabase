@@ -5,11 +5,11 @@ import { createClient } from './supabase/server'
 import { cookies } from 'next/headers'
 
 const openai = new OpenAI()
-const cookieStore = cookies()
-const supabase = createClient(cookieStore)
 
 export async function deleteThread(threadID: string) {
   'use server'
+  const cookieStore = cookies()
+  const supabase = createClient(cookieStore)
 
   try {
     await supabase.from('threads').delete().eq('thread_id', threadID)
