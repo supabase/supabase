@@ -78,7 +78,6 @@
     "ejs": "^3.1.8",
     "globby": "^13.2.2",
     "jest-environment-jsdom": "^29.7.0",
-    "next-transpile-modules": "^9.0.0",
     "npm-run-all": "^4.1.5",
     "openapi-types": "^12.0.2",
     "sass": "^1.68.0",
