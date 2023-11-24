@@ -28,13 +28,13 @@ const EditThreadModal = ({
     >
       <form
         action={(formData: FormData) => {
-          const threadNameEntry: FormDataEntryValue | null = formData.get('threadName')
-
+          const threadNameEntry = formData.get('threadName')
           // Check if threadNameEntry is not null and is of type string
           if (threadNameEntry !== null && typeof threadNameEntry === 'string') {
             const threadName: string = threadNameEntry
             updateThreadName(thread.id, threadName)
           }
+          onClose()
         }}
       >
         <Modal.Content className="py-4">
@@ -47,7 +47,9 @@ const EditThreadModal = ({
         </Modal.Content>
         <Modal.Separator />
         <Modal.Content className="flex flex-row gap-3 justify-end">
-          <Button type="default">Cancel</Button>
+          <Button type="default" onClick={onClose}>
+            Cancel
+          </Button>
           <Button type="secondary" htmlType="submit">
             Update thread name
           </Button>
