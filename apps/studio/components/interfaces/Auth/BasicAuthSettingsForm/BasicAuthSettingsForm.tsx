@@ -31,7 +31,7 @@ import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedOrganization, useStore, useFlag } from 'hooks'
 
 const schema = object({
   DISABLE_SIGNUP: boolean().required(),
@@ -49,6 +49,7 @@ const schema = object({
   }),
   SESSIONS_TIMEBOX: number().min(0, 'Must be a positive number'),
   SESSIONS_INACTIVITY_TIMEOUT: number().min(0, 'Must be a positive number'),
+  SESSIONS_SINGLE_PER_USER: boolean(),
 })
 
 function HoursOrNeverText({ value }: { value: number }) {
@@ -83,6 +84,7 @@ const BasicAuthSettingsForm = observer(() => {
   })
 
   const isProPlanAndUp = isSuccessSubscription && subscription?.plan?.id !== 'free'
+  const singlePerUserReleased = useFlag('authSingleSessionPerUserReleased')
 
   const INITIAL_VALUES = {
     DISABLE_SIGNUP: !authConfig?.DISABLE_SIGNUP,
@@ -92,6 +94,12 @@ const BasicAuthSettingsForm = observer(() => {
     SECURITY_CAPTCHA_PROVIDER: authConfig?.SECURITY_CAPTCHA_PROVIDER || 'hcaptcha',
     SESSIONS_TIMEBOX: authConfig?.SESSIONS_TIMEBOX || 0,
     SESSIONS_INACTIVITY_TIMEOUT: authConfig?.SESSIONS_INACTIVITY_TIMEOUT || 0,
+
+    ...(singlePerUserReleased
+      ? {
+          SESSIONS_SINGLE_PER_USER: authConfig?.SESSIONS_SINGLE_PER_USER || false,
+        }
+      : null),
   }
 
   const onSubmit = (values: any, { resetForm }: any) => {
@@ -188,11 +196,21 @@ const BasicAuthSettingsForm = observer(() => {
                       organizationSlug={organization!.slug}
                     />
                   )}
+                  {singlePerUserReleased && (
+                    <Toggle
+                      id="SESSIONS_SINGLE_PER_USER"
+                      size="small"
+                      label="Enforce single session per user"
+                      layout="flex"
+                      descriptionText="If enabled, all but a user's most recently active session will be terminated."
+                      disabled={!canUpdateConfig || !isProPlanAndUp}
+                    />
+                  )}
                   <InputNumber
                     id="SESSIONS_TIMEBOX"
                     size="small"
                     label="Time-box user sessions"
-                    descriptionText="How long before a user is forced to log in again, use 0 for never"
+                    descriptionText="The amount of time before a user is forced to sign in again. Use 0 for never"
                     actions={
                       <span className="mr-3 text-foreground-lighter">
                         <HoursOrNeverText value={values.SESSIONS_TIMEBOX} />
@@ -204,7 +222,7 @@ const BasicAuthSettingsForm = observer(() => {
                     id="SESSIONS_INACTIVITY_TIMEOUT"
                     size="small"
                     label="Inactivity timeout"
-                    descriptionText="How long users need to be inactive to be forced to log in again, use 0 for never"
+                    descriptionText="The amount of time a user needs to be inactive to be forced to sign in again. Use 0 for never."
                     actions={
                       <span className="mr-3 text-foreground-lighter">
                         <HoursOrNeverText value={values.SESSIONS_INACTIVITY_TIMEOUT} />
