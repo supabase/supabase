@@ -205,8 +205,10 @@ export const AIPolicyEditorPanel = memo(function ({
       file_ids: [],
       metadata: { type: 'debug' },
       content: [
-        { type: 'text', text: { value: solution, annotations: [] } },
-        { type: 'text', text: { value: sql, annotations: [] } },
+        {
+          type: 'text',
+          text: { value: `${solution}\n\`\`\`sql\n${sql}\n\`\`\``, annotations: [] },
+        },
       ],
       created_at: Math.floor(Number(new Date()) / 1000),
       assistant_id: null,
@@ -227,6 +229,7 @@ export const AIPolicyEditorPanel = memo(function ({
       setIsClosingPolicyEditorPanel(false)
       setIds(undefined)
       setError(undefined)
+      setDebugThread([])
     }
   }, [visible])
 
