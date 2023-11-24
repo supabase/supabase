@@ -19,13 +19,6 @@ const nextConfig = {
     })
     return config
   },
-  redirects: () => [
-    {
-      source: '/',
-      destination: '/new',
-      permanent: true,
-    },
-  ],
 }
 
 module.exports = nextConfig
