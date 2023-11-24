@@ -1,8 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    serverActions: true,
-  },
   transpilePackages: ['ui'],
   webpack: (config, { dev, isServer, webpack, nextRuntime }) => {
     config.module.rules.push({
