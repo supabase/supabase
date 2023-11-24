@@ -7,7 +7,7 @@ const EmptyState = () => {
     <div className="border rounded py-6 flex flex-col items-center justify-center gap-y-2">
       <p className="text-sm text-foreground-light">No conversations created yet</p>
       <Button type="default">
-        <Link href="/new">Start a conversation</Link>
+        <Link href="/">Start a conversation</Link>
       </Button>
     </div>
   )
