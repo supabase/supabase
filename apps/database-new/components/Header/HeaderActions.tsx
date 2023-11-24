@@ -9,7 +9,7 @@ import { Button } from 'ui'
 import AvatarDropdown from './AvatarDropdown'
 import NoUserDropdown from './NoUserDropdown'
 import SaveSchemaDropdown from './SaveSchemaDropdown'
-import ThemeSwitcherButton from './ThemeSwitcherButton'
+import ThemeSwitcherButton from './ThemeSwitcher'
 import ToggleCodeEditorButton from './ToggleCodeEditorButton'
 
 interface HeaderActionsProps {
@@ -19,7 +19,6 @@ const HeaderActions = ({ user }: HeaderActionsProps) => {
   const supabase = createClient()
   const router = useRouter()
   const segment = useSelectedLayoutSegment()
-  const snap = useAppStateSnapshot()
 
   const [currentUser, setCurrentUser] = useState<User | null>(user)
 
@@ -47,8 +46,6 @@ const HeaderActions = ({ user }: HeaderActionsProps) => {
       <Button type="default" className="hidden xl:block">
         <Link href="/new">New conversation</Link>
       </Button>
-
-      <ThemeSwitcherButton />
 
       {currentUser ? (
         <AvatarDropdown currentUser={currentUser} signout={signout} />

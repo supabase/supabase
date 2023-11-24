@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import ThemeSwitcher from './Header/ThemeSwitcher'
 
 export const links = [
   { title: ` © Supabase`, url: 'https://supabase.com/' },
@@ -8,7 +9,7 @@ export const links = [
 ]
 
 const Footer = () => (
-  <div className="border-t py-4 w-full px-4">
+  <div className="border-t py-4 w-full px-4 flex justify-between">
     <ul className="flex items-center gap-4 text-xs">
       {links.map((link, index) => (
         <li key={index}>
@@ -16,6 +17,7 @@ const Footer = () => (
         </li>
       ))}
     </ul>
+    <ThemeSwitcher />
   </div>
 )
 
