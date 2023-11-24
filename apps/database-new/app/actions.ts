@@ -60,7 +60,7 @@ export async function updateThreadName(prevState: any, formData: FormData) {
     // @ts-expect-error
     const thread_title: string = formData.get('thread_title')
     // @ts-expect-error
-    const thread_id: string = formData.get('row_id')
+    const row_id: string = formData.get('row_id')
 
     if (!thread_title) throw new Error('Thread title is required')
 
