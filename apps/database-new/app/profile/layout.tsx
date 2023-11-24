@@ -5,5 +5,5 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 dayjs.extend(relativeTime)
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return <div className="max-w-4xl mx-auto h-full">{children}</div>
+  return <div className="px-4 xl:px-0 xl:max-w-4xl mx-auto h-full">{children}</div>
 }
