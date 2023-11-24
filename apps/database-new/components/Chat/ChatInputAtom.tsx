@@ -53,7 +53,13 @@ const ChatInputAtom = forwardRef<HTMLTextAreaElement, TextAreaProps>(
           {loading ? (
             <Loader2 size={22} className="animate-spin w-7 h-7 text-muted" strokeWidth={1} />
           ) : (
-            <div className="flex items-center justify-center w-7 h-7 bg-surface-300 border border-control rounded-full mr-0.5 p-1.5">
+            <div
+              className={cn(
+                'transition-all',
+                'flex items-center justify-center w-7 h-7 border border-control rounded-full mr-0.5 p-1.5 background-alternative',
+                !props.value ? 'text-muted opacity-50' : 'text-default opacity-100'
+              )}
+            >
               <svg
                 width="16"
                 height="16"

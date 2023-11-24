@@ -18,11 +18,11 @@ const NewThread = async () => {
   return (
     <div className="h-full flex items-center justify-center w-full flex-col gap-y-4">
       {/* <ChatInput userID={user?.id} /> */}
-      <div className="flex items-center gap-x-1.5 font-mono font-bold text-xl">
+      {/* <div className="flex items-center gap-x-1.5 font-mono font-bold text-xl">
         <span>database</span>
-        <div className="w-1.5 h-1.5 rounded-full bg-purple-900"></div>
+        <div className="w-1.5 h-1.5 rounded-full bg-dbnew"></div>
         <span>design</span>
-      </div>
+      </div> */}
       <NewThreadInput userID={user?.id} />
     </div>
   )
