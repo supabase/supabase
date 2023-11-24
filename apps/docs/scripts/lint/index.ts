@@ -35,12 +35,21 @@ interface FileErrors {
 }
 
 function main() {
-  const target = process.argv[2]
+  if (args.positionals.length > 1) {
+    console.error('This script only takes one positional argument. Ignoring extra arguments.')
+  }
+  const target = args.positionals[0]
+  console.log(`Linting directory: ${target}`)
 
-  lint(target)
+  const isAutoFixOn = Boolean(args.values.fix)
+  if (isAutoFixOn) {
+    console.log('Autofixing is on')
+  }
+
+  lint(target, { autoFix: isAutoFixOn })
 }
 
-async function lint(target: string) {
+async function lint(target: string, options: { autoFix: boolean }) {
   const pages = await walk(target ?? 'pages')
   const errors: FileErrors[] = []
 
@@ -75,13 +84,15 @@ async function lint(target: string) {
       })
     }
 
-    let newContents = contents.split('\n')
+    if (options.autoFix) {
+      let newContents = contents.split('\n')
 
-    localErrors.forEach((err) => {
-      err.fix.fix(page.path, newContents)
-    })
+      localErrors.forEach((err) => {
+        err.fix.fix(page.path, newContents)
+      })
 
-    await writeFile(page.path, newContents.join('\n'), 'utf8')
+      await writeFile(page.path, newContents.join('\n'), 'utf8')
+    }
   })
 
   await Promise.all(result)
