@@ -245,3 +245,12 @@ export function timeAgo(date: string) {
     return createdAt.format('MMM DD, YYYY')
   }
 }
+
+export function slugify(str: string) {
+  return str
+    .toLowerCase() // Convert to lowercase
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .replace(/[^\w-]+/g, '') // Remove non-word characters except hyphens
+    .replace(/--+/g, '-') // Replace multiple consecutive hyphens with a single hyphen
+    .replace(/^-+|-+$/g, '') // Remove leading and trailing hyphens
+}

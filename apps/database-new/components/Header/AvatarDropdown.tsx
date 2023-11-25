@@ -1,11 +1,11 @@
 'use client'
 
+import { logout } from '@/app/actions'
 import { User } from '@supabase/supabase-js'
-import { HelpCircle, LogIn, LogOut } from 'lucide-react'
+import { HelpCircle, LogOut } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Button, DropdownMenuGroup, DropdownMenuItem, DropdownMenuSeparator, IconUser } from 'ui'
-import { logout } from './../../app/actions'
+import { DropdownMenuGroup, DropdownMenuItem, DropdownMenuSeparator, IconUser } from 'ui'
 
 interface AvatarDropdownProps {
   user: User

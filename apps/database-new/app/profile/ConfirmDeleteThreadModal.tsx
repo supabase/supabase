@@ -1,8 +1,8 @@
 'use client'
 
 import { Button, Modal } from 'ui'
-import { deleteThread } from './../../app/actions'
 import { ThreadType } from './Threads'
+import { deleteThread } from '../actions'
 
 const ConfirmDeleteThreadModal = ({
   thread,
