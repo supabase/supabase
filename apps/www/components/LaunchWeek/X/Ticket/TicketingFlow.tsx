@@ -12,9 +12,14 @@ import LWXBackground from '../LWXBackground'
 import TicketForm from './TicketForm'
 import CountdownComponent from '../Countdown'
 import LaunchWeekPrizeSection from '../LaunchWeekPrizeSection'
+import { cn } from 'ui'
 
 const TicketingFlow = () => {
   const { ticketState, userData } = useConfData()
+
+  const isLoading = ticketState === 'loading'
+  const isRegistering = ticketState === 'registration'
+  const hasTicket = ticketState === 'ticket'
 
   const transition = DEFAULT_TRANSITION
   const initial = INITIAL_BOTTOM
@@ -40,7 +45,7 @@ const TicketingFlow = () => {
         <div className="relative min-h-[500px] md:min-h-[634px] z-10 w-full flex flex-col justify-center items-center gap-5 md:gap-10 text-center">
           <LazyMotion features={domAnimation}>
             <AnimatePresence exitBeforeEnter key={ticketState}>
-              {ticketState === 'loading' && (
+              {isLoading && (
                 <m.div
                   key="loading"
                   initial={exit}
@@ -60,7 +65,7 @@ const TicketingFlow = () => {
                   />
                 </m.div>
               )}
-              {ticketState === 'registration' && (
+              {isRegistering && (
                 <m.div
                   key="registration"
                   initial={initial}
@@ -80,7 +85,7 @@ const TicketingFlow = () => {
                   {!userData.username && <TicketForm />}
                 </m.div>
               )}
-              {ticketState === 'ticket' && (
+              {hasTicket && (
                 <m.div
                   key="ticket"
                   initial={initial}
@@ -126,7 +131,12 @@ const TicketingFlow = () => {
             </AnimatePresence>
           </LazyMotion>
         </div>
-        <LWXBackground className="absolute z-0 top-0 left-0 right-0 w-full h-[620px] md:h-[720px] !min-h-[350px] flex items-center justify-center" />
+        <LWXBackground
+          className={cn(
+            'absolute z-0 top-0 left-0 right-0 w-full h-[620px] md:h-[720px] !min-h-[350px] flex items-center justify-center opacity-100 transition-opacity',
+            hasTicket && 'opacity-40'
+          )}
+        />
       </SectionContainer>
       <SectionContainer className="!pt-4 lg:pb-40">
         <LaunchWeekPrizeSection />

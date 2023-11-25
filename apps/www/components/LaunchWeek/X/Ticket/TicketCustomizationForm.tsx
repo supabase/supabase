@@ -38,7 +38,7 @@ const TicketCustomizationForm = () => {
     }
   }
 
-  const debouncedChangeHandler = useDebounce(handleFormSubmit, 1000)
+  const debouncedChangeHandler = useDebounce(handleFormSubmit, 1200)
 
   return (
     <form
@@ -55,7 +55,7 @@ const TicketCustomizationForm = () => {
           handleInputChange('role', event.target.value)
         }}
         disabled={IS_SAVING}
-        maxLength={30}
+        maxLength={25}
         icon={
           <IconCheck
             strokeWidth={2}
@@ -73,7 +73,7 @@ const TicketCustomizationForm = () => {
         type="text"
         placeholder="company (optional)"
         value={formData.company}
-        maxLength={30}
+        maxLength={25}
         onChange={(event) => {
           handleInputChange('company', event.target.value)
         }}
@@ -96,7 +96,7 @@ const TicketCustomizationForm = () => {
             Something went wrong
           </span>
         )}
-        <Badge color="brand" className="hidden md:block">
+        <Badge color="brand" className="hidden md:block truncate lg:max-w-sm">
           @{user.username}
         </Badge>
       </div>
