@@ -350,5 +350,13 @@
     "position": "Guest Author",
     "author_url": "https://twitter.com/bndkt",
     "author_image_url": "https://github.com/bndkt.png"
+  },
+  {
+    "author_id": "long",
+    "author": "Long Hoang",
+    "username": "loong",
+    "position": "Engineering",
+    "author_url": "https://twitter.com/beertocode",
+    "author_image_url": "https://github.com/loong.png"
   }
 ]
