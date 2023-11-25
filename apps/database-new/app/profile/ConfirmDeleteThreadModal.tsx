@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect } from 'react'
-// @ts-expect-error
 import { useFormState, useFormStatus } from 'react-dom'
 import { Button, Input_Shadcn_, Modal } from 'ui'
 import { deleteThread } from './../../app/actions'

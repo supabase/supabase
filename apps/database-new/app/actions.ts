@@ -6,6 +6,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 import OpenAI from 'openai'
+import { z } from 'zod'
 
 const openai = new OpenAI()
 
@@ -56,27 +57,39 @@ export async function updateThreadName(prevState: any, formData: FormData) {
   const cookieStore = cookies()
   const supabase = createClient(cookieStore)
 
+  console.log('running')
+
   try {
-    // @ts-expect-error
-    const thread_title: string = formData.get('thread_title')
-    // @ts-expect-error
-    const row_id: string = formData.get('row_id')
+    const schema = z.object({
+      thread_title: z.string(),
+      row_id: z.string(),
+    })
 
-    if (!thread_title) throw new Error('Thread title is required')
+    const data = schema.parse({
+      thread_title: formData.get('thread_title'),
+      row_id: formData.get('row_id'),
+    })
 
-    const { data } = await supabase.from('threads').update({ thread_title }).eq('id', row_id)
+    const { data: supabaseData } = await supabase
+      .from('threads')
+      .update({ thread_title: data.thread_title })
+      .eq('id', data.row_id)
+
+    console.log('supabaseData', supabaseData)
 
     revalidatePath('/profile')
 
     return {
+      message: 'Thread name updated to ' + data.thread_title,
       success: true,
       data,
     }
   } catch (error: any) {
+    console.error(error)
     return {
       success: false,
-      message: error.message,
-      error,
+      message: 'Failed to update title to update title',
+      data: undefined,
     }
   }
 }

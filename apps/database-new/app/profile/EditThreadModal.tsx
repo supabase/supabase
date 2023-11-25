@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 // @ts-expect-error
 import { useFormState, useFormStatus } from 'react-dom'
 import { Button, Input_Shadcn_, Label_Shadcn_, Modal } from 'ui'
@@ -17,12 +17,16 @@ const EditThreadModal = ({
   visible: boolean
 }) => {
   const initialState = {
-    thread_title: thread.thread_title,
-    row_id: thread.id,
+    message: null,
   }
 
-  const [threadTitle, setThreadTitle] = useState(thread.thread_title)
   const [state, formAction] = useFormState(updateThreadName, initialState)
+
+  useEffect(() => {
+    if (state?.success) {
+      onClose()
+    }
+  }, [state?.success, onClose])
 
   function SubmitButton() {
     const { pending } = useFormStatus()
@@ -33,12 +37,6 @@ const EditThreadModal = ({
       </Button>
     )
   }
-
-  useEffect(() => {
-    if (state?.success) {
-      onClose()
-    }
-  }, [state?.success, onClose])
 
   return (
     <Modal
@@ -57,18 +55,15 @@ const EditThreadModal = ({
             placeholder="Type in a name for the thread..."
             type="text"
             name="thread_title"
-            id="thread_title"
-            required
-            value={threadTitle}
-            onChange={(e) => setThreadTitle(e.target.value)}
+            defaultValue={thread.thread_title}
           />
-          <Input_Shadcn_ name="row_id" id="row_id" required type="hidden" value={thread.id} />
+          <Input_Shadcn_ name="row_id" type="hidden" value={thread.id} />
         </Modal.Content>
         <Modal.Separator />
         <Modal.Content className="flex flex-row gap-3 justify-end">
           <Button type="default">Cancel</Button>
           <SubmitButton />
-          <p aria-live="polite" className="sr-only">
+          <p aria-live="polite" className="sr-only" role="status">
             {state?.message}
           </p>
         </Modal.Content>
