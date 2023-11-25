@@ -1,19 +1,13 @@
 import React, { useState } from 'react'
-import { Badge, IconCheck, Input } from 'ui'
-import { UserData } from '../../hooks/use-conf-data'
-import { SupabaseClient } from '@supabase/supabase-js'
+import { Badge, IconCheck, Input, cn } from 'ui'
+import useConfData from '../../hooks/use-conf-data'
 import { useDebounce } from 'common'
 
-interface Props {
-  supabase: SupabaseClient
-  user: UserData
-}
-
-const TicketCustomizationForm = ({ supabase, user }: Props) => {
+const TicketCustomizationForm = () => {
+  const { supabase, userData: user } = useConfData()
   const defaultFormValues = {
     role: user.metadata?.role,
     company: user.metadata?.company,
-    location: user.metadata?.location,
   }
   const [formData, setFormData] = useState(defaultFormValues)
   const [formState, setFormState] = useState<'idle' | 'saved' | 'saving' | 'error'>('idle')
@@ -31,7 +25,7 @@ const TicketCustomizationForm = ({ supabase, user }: Props) => {
 
     if (supabase) {
       await supabase
-        .from('lw8_tickets')
+        .from('lwx_tickets')
         .update(payload)
         .eq('username', user.username)
         .then((res) => {
@@ -39,7 +33,7 @@ const TicketCustomizationForm = ({ supabase, user }: Props) => {
           setFormState('saved')
           setTimeout(() => {
             setFormState('idle')
-          }, 1800)
+          }, 750)
         })
     }
   }
@@ -47,31 +41,10 @@ const TicketCustomizationForm = ({ supabase, user }: Props) => {
   const debouncedChangeHandler = useDebounce(handleFormSubmit, 1200)
 
   return (
-    <form className="w-full flex flex-col gap-2 mt-4" onChange={() => debouncedChangeHandler()}>
-      <div className="flex items-center justify-between">
-        {!IS_SAVED && !HAS_ERROR && (
-          <span className="opacity-0 animate-fade-in text-foreground-lighter text-xs">
-            Connected account
-          </span>
-        )}
-        {IS_SAVED && <span className="opacity-0 animate-fade-in text-xs text-brand">Saved</span>}
-        {HAS_ERROR && (
-          <span className="opacity-0 animate-fade-in text-xs text-tomato-900">
-            Something went wrong
-          </span>
-        )}
-        <Badge color="brand">@{user.username}</Badge>
-      </div>
-      <Input
-        className="[&_input]:border-background"
-        size="small"
-        type="text"
-        required
-        disabled
-        placeholder="name"
-        value={user.name}
-        icon={<IconCheck strokeWidth={2} className="w-3 text-brand" />}
-      />
+    <form
+      className="w-full grid grid-cols-1 md:grid-cols-3 gap-2 max-w-[300px] md:max-w-none mx-auto"
+      onChange={() => debouncedChangeHandler()}
+    >
       <Input
         className="[&_input]:border-background"
         size="small"
@@ -86,11 +59,11 @@ const TicketCustomizationForm = ({ supabase, user }: Props) => {
         icon={
           <IconCheck
             strokeWidth={2}
-            className={[
+            className={cn(
               'w-3',
               IS_SAVING && 'text-background-surface-300',
-              !!formData.role ? 'text-brand' : 'text-background-surface-300',
-            ].join(' ')}
+              !!formData.role ? 'text-brand' : 'text-background-surface-300'
+            )}
           />
         }
       />
@@ -108,36 +81,25 @@ const TicketCustomizationForm = ({ supabase, user }: Props) => {
         icon={
           <IconCheck
             strokeWidth={2}
-            className={[
+            className={cn(
               'w-3',
               IS_SAVING && 'text-background-surface-300',
-              !!formData.company ? 'text-brand' : 'text-background-surface-300',
-            ].join(' ')}
+              !!formData.company ? 'text-brand' : 'text-background-surface-300'
+            )}
           />
         }
       />
-      <Input
-        className="[&_input]:border-background"
-        size="small"
-        type="text"
-        placeholder="location (optional)"
-        value={formData.location}
-        onChange={(event) => {
-          handleInputChange('location', event.target.value)
-        }}
-        disabled={IS_SAVING}
-        maxLength={20}
-        icon={
-          <IconCheck
-            strokeWidth={2}
-            className={[
-              'w-3 flex spin',
-              IS_SAVING && 'text-background-surface-300',
-              !!formData.location ? 'text-brand' : 'text-background-surface-300',
-            ].join(' ')}
-          />
-        }
-      />
+      <div className="flex items-center justify-end gap-2">
+        {IS_SAVED && <span className="opacity-0 animate-fade-in text-xs text-brand">Saved</span>}
+        {HAS_ERROR && (
+          <span className="opacity-0 animate-fade-in text-xs text-tomato-900">
+            Something went wrong
+          </span>
+        )}
+        <Badge color="brand" className="hidden md:block">
+          @{user.username}
+        </Badge>
+      </div>
     </form>
   )
 }

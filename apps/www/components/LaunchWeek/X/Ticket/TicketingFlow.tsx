@@ -14,7 +14,7 @@ import CountdownComponent from '../Countdown'
 import LaunchWeekPrizeSection from '../LaunchWeekPrizeSection'
 
 const TicketingFlow = () => {
-  const { supabase, ticketState, userData } = useConfData()
+  const { ticketState, userData } = useConfData()
 
   const transition = DEFAULT_TRANSITION
   const initial = INITIAL_BOTTOM
@@ -23,7 +23,7 @@ const TicketingFlow = () => {
 
   return (
     <>
-      <SectionContainer className="relative flex flex-col lg:pt-20 items-center gap-5 text-center h-[886px] min-h-[886px]">
+      <SectionContainer className="relative flex flex-col pt-8 lg:pt-20 items-center gap-5 text-center h-auto lg:min-h-[886px]">
         <h1 className="sr-only">Supabase Launch Week X | {LWX_DATE}</h1>
         <div className="flex flex-col items-center gap-1 text-light font-mono uppercase ">
           <p className="flex items-center gap-3 leading-none">
@@ -89,7 +89,7 @@ const TicketingFlow = () => {
                   className="w-full flex flex-col items-center gap-4 md:gap-10 text-foreground"
                 >
                   <div className="w-full min-h-[400px] flex flex-col items-center">
-                    <TicketContainer supabase={supabase} />
+                    <TicketContainer />
                   </div>
                   <div className="flex flex-col items-center justify-center gap-2 max-w-xl">
                     <span className="text-2xl">

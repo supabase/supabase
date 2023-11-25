@@ -1,13 +1,17 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import TicketProfile from './TicketProfile'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import TicketFooter from './TicketFooter'
 import { cn } from 'ui'
 import Panel from '~/components/Panel'
+import { SupabaseClient } from '@supabase/supabase-js'
 
 export default function Ticket() {
-  const { userData: user } = useConfData()
+  const [realtimeChannel, setRealtimeChannel] = useState<ReturnType<
+    SupabaseClient['channel']
+  > | null>(null)
+  const { userData: user, setUserData, supabase } = useConfData()
   const { golden = false, bg_image_id: bgImageId = '1' } = user
   const [imageHasLoaded, setImageHasLoaded] = useState(false)
 
@@ -21,6 +25,40 @@ export default function Ticket() {
       background: `/images/launchweek/lwx/tickets/lwx_ticket_bg_platinum.png`,
     },
   }
+
+  useEffect(() => {
+    // Listen to realtime changes
+    if (supabase) {
+      const channel = supabase
+        .channel('changes')
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'lwx_tickets',
+            filter: `username=eq.${user.username}`,
+          },
+          (payload: any) => {
+            // const golden = !!payload.new.sharedOnTwitter && !!payload.new.sharedOnLinkedIn
+            setUserData({
+              ...payload.new,
+              golden,
+            })
+            // if (golden) {
+            //   channel.unsubscribe()
+            // }
+          }
+        )
+        .subscribe()
+      setRealtimeChannel(channel)
+    }
+
+    return () => {
+      // Cleanup realtime subscription on unmount
+      realtimeChannel?.unsubscribe()
+    }
+  }, [])
 
   return (
     <Panel
