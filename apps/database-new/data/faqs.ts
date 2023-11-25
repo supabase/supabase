@@ -22,8 +22,8 @@ export const FAQS = [
     answer: 'You sure can. All of the source code is open source and available on Github. ',
   },
   {
-    question: `What's the licence? Can we fork this project and build our own?`,
-    answer: 'Yes. We release software under the Apache Licence 2.0.',
+    question: `What's the license? Can we fork this project and build our own?`,
+    answer: 'Yes. We release software under the Apache License 2.0.',
   },
   {
     question: 'Can I use this for non-Postgres databases?',
