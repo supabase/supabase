@@ -13,8 +13,9 @@ import TicketingFlow from '~/components/LaunchWeek/X/Ticket/TicketingFlow'
 export default function TicketHome() {
   const { query } = useRouter()
 
-  const TITLE = 'Supabase Launch Week X'
-  const DESCRIPTION = 'Supabase Launch Week X | 11-15 December 2023'
+  const TITLE = 'Supabase Launch Week X | 11-15 December 2023'
+  const DESCRIPTION =
+    'Claim your ticket for a chance to win Supabase swag and join us in a week of announcing new features.'
   const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/lwx/lwx-og.jpg`
 
   const ticketNumber = query.ticketNumber?.toString()

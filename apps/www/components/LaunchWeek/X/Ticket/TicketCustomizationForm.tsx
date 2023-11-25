@@ -33,12 +33,12 @@ const TicketCustomizationForm = () => {
           setFormState('saved')
           setTimeout(() => {
             setFormState('idle')
-          }, 750)
+          }, 1200)
         })
     }
   }
 
-  const debouncedChangeHandler = useDebounce(handleFormSubmit, 1200)
+  const debouncedChangeHandler = useDebounce(handleFormSubmit, 1000)
 
   return (
     <form
@@ -92,7 +92,7 @@ const TicketCustomizationForm = () => {
       <div className="flex items-center justify-end gap-2">
         {IS_SAVED && <span className="opacity-0 animate-fade-in text-xs text-brand">Saved</span>}
         {HAS_ERROR && (
-          <span className="opacity-0 animate-fade-in text-xs text-tomato-900">
+          <span className="opacity-0 animate-fade-in text-xs text-foreground">
             Something went wrong
           </span>
         )}
