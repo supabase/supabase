@@ -1,14 +1,19 @@
 import { useState, useEffect } from 'react'
+import { SupabaseClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/router'
 import { SITE_ORIGIN } from '~/lib/constants'
-import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import { Button, IconCheckCircle } from 'ui'
+
+import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import TicketPresence from './TicketPresence'
 
 type FormState = 'default' | 'loading' | 'error'
 
 export default function TicketForm() {
   const [formState, setFormState] = useState<FormState>('default')
+  const [realtimeChannel, setRealtimeChannel] = useState<ReturnType<
+    SupabaseClient['channel']
+  > | null>(null)
   const [errorMsg] = useState('')
   const { supabase, session, setUserData, ticketState, setTicketState, userData } = useConfData()
   const router = useRouter()
@@ -47,12 +52,40 @@ export default function TicketForm() {
 
           // Prefetch the twitter share URL to eagerly generate the page
           fetch(`/launch-week/x/tickets/${username}`).catch((_) => {})
+
+          if (!realtimeChannel) {
+            const channel = supabase
+              .channel('changes')
+              .on(
+                'postgres_changes',
+                {
+                  event: 'UPDATE',
+                  schema: 'public',
+                  table: 'lwx_tickets',
+                  filter: `username=eq.${username}`,
+                },
+                (payload: any) => {
+                  const golden = !!payload.new.sharedOnTwitter && !!payload.new.sharedOnLinkedIn
+                  setUserData({
+                    ...payload.new,
+                    golden,
+                  })
+                }
+              )
+              .subscribe()
+            setRealtimeChannel(channel)
+          }
         })
     }
   }
 
   useEffect(() => {
     fetchUser()
+
+    return () => {
+      // Cleanup realtime subscription on unmount
+      realtimeChannel?.unsubscribe()
+    }
   }, [session])
 
   async function handleGithubSignIn() {

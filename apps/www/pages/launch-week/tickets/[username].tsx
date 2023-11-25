@@ -103,7 +103,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
                 </Link>
               </Button>
             </SectionContainer>
-            <LWXBackground className="absolute z-0 top-0 left-0 right-0 w-full h-[800px] !min-h-[350px] flex items-center justify-center" />
+            <LWXBackground className="absolute z-0 top-0 left-0 right-0 w-full h-[800px] !min-h-[350px] flex items-center justify-center opacity-20" />
           </div>
           <SectionContainer className="!pt-4 !pb-0">
             <LaunchWeekPrizeSection />
