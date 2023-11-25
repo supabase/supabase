@@ -1,9 +1,10 @@
 'use client'
 
 import { Button, Input, Modal } from 'ui'
-import { updateThreadName } from './../../app/actions'
+
 import { ThreadType } from './Threads'
 import { useState } from 'react'
+import { updateThreadName } from '../actions'
 
 const EditThreadModal = ({
   thread,
