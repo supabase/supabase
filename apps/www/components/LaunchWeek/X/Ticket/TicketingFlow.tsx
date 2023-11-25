@@ -131,6 +131,7 @@ const TicketingFlow = () => {
             </AnimatePresence>
           </LazyMotion>
         </div>
+
         <LWXBackground
           className={cn(
             'absolute z-0 top-0 left-0 right-0 w-full h-[620px] md:h-[720px] !min-h-[350px] flex items-center justify-center opacity-100 transition-opacity',
