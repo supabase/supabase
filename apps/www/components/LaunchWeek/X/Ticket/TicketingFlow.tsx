@@ -37,7 +37,7 @@ const TicketingFlow = () => {
           </p>
           <CountdownComponent date={LWX_LAUNCH_DATE} showCard={false} />
         </div>
-        <div className="relative min-h-[634px] z-10 w-full flex flex-col justify-center items-center gap-5 md:gap-10 text-center">
+        <div className="relative min-h-[500px] md:min-h-[634px] z-10 w-full flex flex-col justify-center items-center gap-5 md:gap-10 text-center">
           <LazyMotion features={domAnimation}>
             <AnimatePresence exitBeforeEnter key={ticketState}>
               {ticketState === 'loading' && (
@@ -68,7 +68,7 @@ const TicketingFlow = () => {
                   exit={exit}
                   className="relative w-full flex flex-col items-center gap-6 text-foreground"
                 >
-                  <div className="w-full min-h-[400px] flex items-center" />
+                  <div className="w-full min-h-[200px] md:min-h-[400px] flex items-center" />
                   <div className="flex flex-col items-center justify-center font-mono uppercase gap-0 leading-0">
                     <span>{LWX_DATE}</span>
                   </div>
