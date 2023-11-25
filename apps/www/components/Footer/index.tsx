@@ -40,7 +40,7 @@ const Footer = (props: Props) => {
 
   return (
     <footer
-      className={cn('bg-alternative', isLaunchWeek && 'bg-[#020405]', props.className)}
+      className={cn('bg-alternative', isLaunchWeek && 'bg-[#060809]', props.className)}
       aria-labelledby="footerHeading"
     >
       <h2 id="footerHeading" className="sr-only">
